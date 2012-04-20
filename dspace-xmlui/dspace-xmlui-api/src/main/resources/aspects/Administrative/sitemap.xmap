@@ -11,7 +11,7 @@
 
 <!-- 
 
-The administrative aspect is responsible for all the features nessasary 
+The administrative aspect is responsible for all the features necessary 
 to administer DSpace. 
 
 -->
@@ -285,11 +285,11 @@ to administer DSpace.
 		        	
 		        	<!-- Flow pages
 		        	
-		        		These pages may only be reached through a flow script. While typicaly all 
+		        		These pages may only be reached through a flow script. While typically all 
 		        		the user sees in their url bar is a short url like /admin/epeople or 
 		        		/admin/groups, in reality there is another url being used. The flow scripts 
-		        		always operate on these simple url, but once the particular state is determined 
-		        		an distinquising part is appended to the url for the particular state. Below are 
+		        		always operate on these simple urls, but once the particular state is determined 
+		        		an distinguishing part is appended to the url for the particular state. Below are 
 		        		all those url.
 		        		-->
 		        	<map:match type="WildcardParameterMatcher" pattern="true">
@@ -339,7 +339,7 @@ to administer DSpace.
 		        		
 		        		<!--
 		        			The add eperson page allows the user to enter metadata about 
-		        			a yet-to-be-created eperson. Once completed then an eperson is
+		        			a yet-to-be-created eperson. Once completed, an eperson is
 		        			created.
 		        			-->
 		        		<map:match pattern="admin/epeople/add">
@@ -349,7 +349,7 @@ to administer DSpace.
 		        		</map:match>
 		        		
 		        		<!--
-		        			The edit eperson page allows for an eperson's metadata be be edited.
+		        			The edit eperson page allows for an eperson's metadata to be edited.
 		        			-->
 		        		<map:match pattern="admin/epeople/edit">
 		        			<map:transform type="EditEPersonForm">
@@ -406,7 +406,7 @@ to administer DSpace.
 		        		
 		        		<!--
 		        			The delete group page lists all the yet-to-be-deleted pages, if the user 
-		        			clicks confirm deletetion then the groups are removed.
+		        			clicks confirm deletion then the groups are removed.
 		        			-->
 		        		<map:match pattern="admin/group/delete">
 		        			<map:transform type="DeleteGroupsConfirm">
@@ -428,7 +428,7 @@ to administer DSpace.
 		        		</map:match>
 		        		
 		        		<!--
-		        			Confirm the deletition of metadata schemas
+		        			Confirm the deletion of metadata schemas
 		        			-->
 		        		<map:match pattern="admin/metadata-registry/delete-schemas">
 		        			<map:transform type="DeleteMetadataSchemaConfirm">
@@ -437,7 +437,7 @@ to administer DSpace.
 		        		</map:match>
 		        		
 		        		<!--
-		        			Edit a single schema, adding, deleteing, or updating metadata fields within
+		        			Edit a single schema, adding, deleing, or updating metadata fields within
 		        			the schema. The user can also select some fields to be moved to other
 		        			schemas.
 		        			-->
@@ -451,7 +451,7 @@ to administer DSpace.
 		        		</map:match>
 		        		
 		        		<!--
-		        			Confirm the deletetion of metadata fields
+		        			Confirm the deletion of metadata fields
 		        			-->
 		        		<map:match pattern="admin/metadata-registry/delete-fields">
 		        			<map:transform type="DeleteMetadataFieldsConfirm">
@@ -491,7 +491,7 @@ to administer DSpace.
 		        		</map:match>
 		        		
 		        		<!--
-		        			Confirm the deletetion of formats
+		        			Confirm the deletion of formats
 		        			-->
 		        		<map:match pattern="admin/format-registry/delete">
 		        			<map:transform type="DeleteBitstreamFormatsConfirm">
@@ -584,7 +584,7 @@ to administer DSpace.
 		        		</map:match>
 		        		
 		        		<!--
-		        			Confirm the item's deletition
+		        			Confirm the item's deletion
 		        			-->
 		        		<map:match pattern="admin/item/delete">
 		        			<map:transform type="ConfirmItemForm">
@@ -604,7 +604,7 @@ to administer DSpace.
 		        		</map:match>
 		        		
 		        		<!--
-		        			Confirm the item's reinstation
+		        			Confirm the item's reinstatiation
 		        			-->
 		        		<map:match pattern="admin/item/reinstate">
 		        			<map:transform type="ConfirmItemForm">
@@ -710,7 +710,7 @@ to administer DSpace.
 		        		
 		        		 
 		        		
-		        		<!-- Confirmation screen for deleteing one of the standard authorization groups -->
+		        		<!-- Confirmation screen for deleting one of the standard authorization groups -->
 		        		<map:match pattern="admin/collection/deleteRole">
 		        			<map:transform type="DeleteCollectionRoleConfirm">
 		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
@@ -921,8 +921,8 @@ to administer DSpace.
             <map:match pattern="admin/panel">
                 <map:select type="AuthenticatedSelector">
                     <map:when test="administrator">
-                        <!--If the 'clearcache' request parameter is specified, first clear
-                            the Cocoon Cache before sending user back to control panel-->
+                        <!-- If the 'clearcache' request parameter is specified, first clear
+                             the Cocoon Cache before sending user back to control panel -->
                         <map:match type="request" pattern="clearcache">
                             <map:act type="ClearCacheAction"/>
                         </map:match>    

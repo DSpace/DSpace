@@ -31,7 +31,7 @@ import org.dspace.eperson.EPerson;
  * action uses the http parameters of username, ldap_password, and login_realm
  * as credentials.
  * 
- * If the authentication attempt is successfull then an HTTP redirect will be
+ * If the authentication attempt is successful then an HTTP redirect will be
  * sent to the browser redirecting them to their original location in the system
  * before authenticated or if none is supplied back to the DSpace homepage. The
  * action will also return true, thus contents of the action will be excuted.
@@ -54,7 +54,7 @@ public class LDAPAuthenticateAction extends AbstractAction {
 	public Map act(Redirector redirector, SourceResolver resolver,
 			Map objectModel, String source, Parameters parameters)
 			throws Exception {
-		// First check if we are preforming a new login
+		// First check if we are performing a new login
 		Request request = ObjectModelHelper.getRequest(objectModel);
 
 		String username = request.getParameter("username");
@@ -78,7 +78,7 @@ public class LDAPAuthenticateAction extends AbstractAction {
 
 				if (AuthenticationUtil.isInterupptedRequest(objectModel)) {
 					// Resume the request and set the redirect target URL to
-					// that of the originaly interrupted request.
+					// that of the originally interrupted request.
 					redirectURL += AuthenticationUtil
 							.resumeInterruptedRequest(objectModel);
 				}
@@ -89,7 +89,7 @@ public class LDAPAuthenticateAction extends AbstractAction {
                                         redirectURL += (loginRedirect != null) ? loginRedirect.trim() : "/";	
                                 }
 
-				// Authentication successfull send a redirect.
+				// Authentication successful send a redirect.
 				final HttpServletResponse httpResponse = (HttpServletResponse) objectModel
 						.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 
@@ -99,8 +99,8 @@ public class LDAPAuthenticateAction extends AbstractAction {
 				// however they will be reauthenticated
 				// fully when they come back from the redirect. This prevents
 				// caching problems where part of the
-				// request is preformed fore the user was authenticated and the
-				// other half after it succedded. This
+				// request is performed fore the user was authenticated and the
+				// other half after it succeeded. This
 				// way the user is fully authenticated from the start of the
 				// request.
 				context.setCurrentUser(null);
@@ -108,7 +108,7 @@ public class LDAPAuthenticateAction extends AbstractAction {
 				return new HashMap();
 			}
 		} catch (SQLException sqle) {
-			throw new PatternException("Unable to preform authentication", sqle);
+			throw new PatternException("Unable to perform authentication", sqle);
 		}
 
 		return null;

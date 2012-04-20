@@ -25,7 +25,7 @@ import org.dspace.content.MetadataSchema;
 /**
  * Prompt the user to determin if they really want to delete the displayed schemas.
  * 
- * @author Scott phillips
+ * @author Scott Phillips
  */
 public class DeleteMetadataSchemaConfirm extends AbstractDSpaceTransformer   
 {

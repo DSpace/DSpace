@@ -104,7 +104,7 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         text.setLabel("Text");
         if (help)
         {
-            text.setHelp("This is helpfull text.");
+            text.setHelp("This is helpful text.");
         }
         if (error)
         {
@@ -130,7 +130,7 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         longError.setLabel("Long Error");
         if (help)
         {
-            longError.setHelp("TThis is helpfull text.");
+            longError.setHelp("This is helpful text.");
         }
         if (error)
         {
@@ -143,7 +143,7 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         textArea.setLabel("Text Area");
         if (help)
         {
-            textArea.setHelp("This is helpfull text.");
+            textArea.setHelp("This is helpful text.");
         }
         if (error)
         {
@@ -156,7 +156,7 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         emptyTextArea.setLabel("Empty Text Area");
         if (help)
         {
-            emptyTextArea.setHelp("This is helpfull text.");
+            emptyTextArea.setHelp("This is helpful text.");
         }
         if (error)
         {
@@ -169,7 +169,7 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         password.setLabel("password");
         if (help)
         {
-            password.setHelp("This is helpfull text.");
+            password.setHelp("This is helpful text.");
         }
         if (error)
         {
@@ -197,7 +197,7 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         }
         if (error)
         {
-            checkBox.addError("You are incorrect you actualy do like Tootse Rolls.");
+            checkBox.addError("You are incorrect you actually do like Tootse Rolls.");
         }
         checkBox.setLabel("fruits");
         checkBox.addOption("apple","Apples");
@@ -448,7 +448,7 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         }
         if (error)
         {
-            name.addError("Sorry, that username is allready used by another user.");
+            name.addError("Sorry, that username is already used by another user.");
         }
         
         Composite ssn = identity.addItem().addComposite("ssn");
@@ -468,24 +468,24 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         Text ssn3 = ssn.addText("ssn3");
         ssn3.setSize(4,4);
         
-        List intrests = list.addList("intrests",List.TYPE_FORM);
-        intrests.setHead("Intrests");
+        List interests = list.addList("interests",List.TYPE_FORM);
+        interests.setHead("Interests");
         
-        CheckBox intrest = intrests.addItem().addCheckBox("intrests");
-        intrest.setLabel("Intrests");
+        CheckBox interest = interests.addItem().addCheckBox("interests");
+        interest.setLabel("Interests");
         if (help)
         {
-            intrest.setHelp("Select all topics which are of intrests to you.");
+            interest.setHelp("Select all topics which are of interest to you.");
         }
         if (error)
         {
-            intrest.addError("You're intrests are in error?");
+            interest.addError("Your interests are in error?");
         }
-        intrest.addOption("DL","Digital Libraries");
-        intrest.addOption("HT","Hypertexts");
-        intrest.addOption("IM","Information Managment");
-        intrest.addOption("ID","Information Discovery");
-        intrest.addOption("SI","Social Impact");
+        interest.addOption("DL","Digital Libraries");
+        interest.addOption("HT","Hypertexts");
+        interest.addOption("IM","Information Managment");
+        interest.addOption("ID","Information Discovery");
+        interest.addOption("SI","Social Impact");
         
         List affiliation = list.addList("affiliation",List.TYPE_FORM);
         affiliation.setHead("Affiliation");
@@ -525,7 +525,7 @@ public class BasicFormTest extends AbstractDSpaceTransformer
     }
     
     /**
-     * Helpfull method to generate the return url to this page given the 
+     * Helpful method to generate the return url to this page given the 
      * error & help parameters.
      */
     private String makeURL(boolean help, boolean error)

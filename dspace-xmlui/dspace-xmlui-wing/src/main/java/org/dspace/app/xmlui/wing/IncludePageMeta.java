@@ -33,7 +33,7 @@ import java.util.Map;
  * Parameters should consist of a dublin core name and value. The format for
  * a parameter name must follow the form: "<element>.<qualifier>.<language>#order"
  * The qualifier, language, and order are all optional components. The order
- * component is an integer and is needed to insure that parameter names are
+ * component is an integer and is needed to ensure that parameter names are
  * unique. Since Cocoon's parameters are Hashes duplicate names are not allowed
  * the order syntax allows the sitemap programer to specify an order in which
  * these metadata values should be placed inside the document.

@@ -34,7 +34,7 @@ import org.xml.sax.SAXException;
  * This is the last step of the item submission processes. During this
  * step the user must agree to the collection's standard distribution
  * license. If the user can not agree to the license they they may either
- * save the submission untill a later time or remove the submission completely.
+ * save the submission until a later time or remove the submission completely.
  * 
  * This step will include the full license text inside the page using the
  * HTML fragment method.
@@ -115,13 +115,13 @@ public class LicenseStep extends AbstractSubmissionStep
 		// If user did not check "I accept" checkbox 
 		if(this.errorFlag==org.dspace.submit.step.LicenseStep.STATUS_LICENSE_REJECTED)
 		{
-            log.info(LogManager.getHeader(context, "reject_license", submissionInfo.getSubmissionLogInfo()));
-
+			log.info(LogManager.getHeader(context, "reject_license", submissionInfo.getSubmissionLogInfo()));
+			
 			decision.addError(T_decision_error);
 		}
 		
-		//add standard control/paging buttons
-        addControlButtons(controls);
+		// add standard control/paging buttons
+		addControlButtons(controls);
 	}
     
     /** 
@@ -147,7 +147,7 @@ public class LicenseStep extends AbstractSubmissionStep
         WingException, UIException, SQLException, IOException,
         AuthorizeException
     {
-        //License step doesn't require reviewing
+        // License step doesn't require reviewing
         return null;
     }
 }

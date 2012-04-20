@@ -41,7 +41,7 @@
     <xsl:variable name="context-path" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
 
     <!--
-        Theme path represents the full path back to theme. This is usefull for
+        Theme path represents the full path back to theme. This is useful for
         accessing static resources such as images or javascript files. Simply
         prepend this variable and then add the file name, thus
         {$theme-path}/images/myimage.jpg will result in the full path from the

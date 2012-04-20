@@ -25,7 +25,7 @@ import org.dspace.content.Item;
 
 /**
  * Display basic meta-meta information about the item and allow the user to
- * change it's state such as withdraw or reinstate, possibily even completely
+ * change its state such as withdraw or reinstate, possibly even completely
  * deleting the item!
  * 
  * @author Jay Paz
@@ -59,7 +59,7 @@ public class ViewItem extends AbstractDSpaceTransformer {
 	private static final Message T_show_simple =
         message("xmlui.ArtifactBrowser.ItemViewer.show_simple");
     
-    private static final Message T_show_full =
+        private static final Message T_show_full =
         message("xmlui.ArtifactBrowser.ItemViewer.show_full");
 	public void addPageMeta(PageMeta pageMeta) throws WingException {
 		pageMeta.addMetadata("title").addContent(T_title);
@@ -72,13 +72,13 @@ public class ViewItem extends AbstractDSpaceTransformer {
 	public void addBody(Body body) throws SQLException, WingException {
 		// Get our parameters and state
 		Request request = ObjectModelHelper.getRequest(objectModel);
-        String show = request.getParameter("show");
-        boolean showFullItem = false;
-        if (show != null && show.length() > 0)
-        {
-            showFullItem = true;
-        }
-        
+		String show = request.getParameter("show");
+		boolean showFullItem = false;
+		if (show != null && show.length() > 0)
+		{
+			showFullItem = true;
+		}
+		
 		int itemID = parameters.getParameterAsInteger("itemID", -1);
 		Item item = Item.find(context, itemID);
 		String baseURL = contextPath + "/admin/item?administrative-continue="
@@ -91,7 +91,7 @@ public class ViewItem extends AbstractDSpaceTransformer {
 				contextPath + "/admin/item", Division.METHOD_POST,
 				"primary administrative edit-item-status");
 		main.setHead(T_option_head);
-
+		
 		// LIST: options
 		List options = main.addList("options", List.TYPE_SIMPLE, "horizontal");
 		options.addItem().addXref(
@@ -102,7 +102,7 @@ public class ViewItem extends AbstractDSpaceTransformer {
 				T_option_metadata);
 		options.addItem().addHighlight("bold").addXref(tabLink, T_option_view);
                 options.addItem().addXref(baseURL + "&submit_curate", T_option_curate);
-
+		
 		// item
 		
 		Para showfullPara = main.addPara(null, "item-view-toggle item-view-toggle-top");
@@ -121,7 +121,7 @@ public class ViewItem extends AbstractDSpaceTransformer {
 		ReferenceSet referenceSet;
 		referenceSet = main.addReferenceSet("collection-viewer",
 				showFullItem?ReferenceSet.TYPE_DETAIL_VIEW:ReferenceSet.TYPE_SUMMARY_VIEW);
-		// Refrence the actual Item
+		// Reference the actual Item
 		ReferenceSet appearsInclude = referenceSet.addReference(item)
 				.addReferenceSet(ReferenceSet.TYPE_DETAIL_LIST, null, "hierarchy");
 		appearsInclude.setHead(T_head_parent_collections);

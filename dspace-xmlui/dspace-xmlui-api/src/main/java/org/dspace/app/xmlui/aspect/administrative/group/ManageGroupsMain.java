@@ -31,7 +31,7 @@ import org.dspace.eperson.Group;
 /**
  * Manage groups page is the entry point for group management. From here the user
  * may browse/search a the list of groups, they may also add new groups or select
- * exiting groups to edit or delete.
+ * existing groups to edit or delete.
  * 
  * @author Alexey Maslov
  * @author Scott Phillips

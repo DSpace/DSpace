@@ -746,7 +746,7 @@ public class ItemImport
                 + File.separatorChar);
 
         // and the bitstreams from the contents file
-        // process contents file, add bistreams and bundles, return any
+        // process contents file, add bitstreams and bundles, return any
         // non-standard permissions
         List<String> options = processContentsFile(c, myitem, path
                 + File.separatorChar + itemname, "contents");

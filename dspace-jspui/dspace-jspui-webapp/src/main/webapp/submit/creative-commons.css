@@ -12,7 +12,7 @@
 		margin-bottom:5px;
 		font-family:verdana;
 		color:#333;
-		}
+	}
 	
 	#main {
 		border-left:1px solid #D0D0D0; 
@@ -22,11 +22,11 @@
 		background:#fff;
 		margin-left:50px;
 		margin-right:50px;
-		}
+	}
 
 /* Looks like you have to specify the width of #menu
 or IE5 Mac stretches it all the way across the div, and 
-Opera streches it half way. */
+Opera streches it halfway. */
 
 	#main #menu {
 		border-left:1px dotted #ccc; 
@@ -35,17 +35,17 @@ Opera streches it half way. */
 		width:230px;
 		background:white;
 		margin:0px 0px 10px 10px;
-		}
+	}
 		
 	td, h3, p,h1,pre {
 		margin:0px 20px 20px 20px;
 		font-size:11px;
 		line-height:140%;
-		}
+	}
 		
 	.header {
-	padding-left: 10px;
-	padding-top:30px;
+		padding-left: 10px;
+		padding-top:30px;
 	}
 	
 	.nav	{
@@ -60,5 +60,5 @@ Opera streches it half way. */
 	}
 	
 	.dent {
-	margin-left:64px;
-		}
+		margin-left:64px;
+	}

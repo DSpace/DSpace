@@ -59,7 +59,7 @@ import org.xml.sax.SAXException;
  *
  * I18N: Feed's are internationalized, meaning that they may contain references
  * to messages contained in the global messages.xml file using cocoon's i18n
- * schema. However the library used to build the feeds does not understand
+ * schema. However. the library used to build the feeds does not understand
  * this schema to work around this limitation I created a little hack. It
  * basically works like this, when text that needs to be localized is put into
  * the feed it is always mangled such that a prefix is added to the messages's

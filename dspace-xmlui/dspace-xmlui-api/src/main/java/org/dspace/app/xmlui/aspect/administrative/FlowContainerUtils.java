@@ -49,7 +49,7 @@ import org.xml.sax.SAXException;
 /**
  * Utility methods to processes actions on Communities and Collections.
  *
- * @author scott phillips
+ * @author Scott Phillips
  */
 public class FlowContainerUtils 
 {
@@ -628,7 +628,7 @@ public class FlowContainerUtils
 		
 		if (roleID != 0)
         {
-            throw new UIException("Unable to create a new default read group because either the group allready exists or multiple groups are assigned the default privleges.");
+            throw new UIException("Unable to create a new default read group because either the group already exists or multiple groups are assigned the default privileges.");
         }
 		
 		Collection collection = Collection.find(context,collectionID);
@@ -668,7 +668,7 @@ public class FlowContainerUtils
 		
 		if (roleID < 1)
 		{
-			throw new UIException("Unable to delete the default read role because the role is either allready assigned to the anonymous group or multiple groups are assigned the default priveleges.");
+			throw new UIException("Unable to delete the default read role because the role is either already assigned to the anonymous group or multiple groups are assigned the default privileges.");
 		}
 		
 		Collection collection = Collection.find(context,collectionID);
@@ -1255,8 +1255,8 @@ public class FlowContainerUtils
 	 * then an error message will be returned that might (sometimes not) tell the user how
 	 * to correct the problem.
 	 * 
-	 * @param value The metadat's value
-	 * @return An error string of the problem or null if there is no problem with the metadata's value.
+	 * @param value The metadata value
+	 * @return An error string of the problem or null if there is no problem with the metadata value.
 	 */
 	public static String checkXMLFragment(String value)
 	{

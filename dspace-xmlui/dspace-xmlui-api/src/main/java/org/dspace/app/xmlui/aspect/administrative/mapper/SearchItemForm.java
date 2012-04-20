@@ -34,7 +34,7 @@ import org.xml.sax.SAXException;
 /**
  * Search for items from other collections to map into this collection.
  * 
- * @author Scott phillips
+ * @author Scott Phillips
  */
 
 public class SearchItemForm extends AbstractDSpaceTransformer {
@@ -71,7 +71,7 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 		Collection collection = Collection.find(context,collectionID);	
 		
 		String query = decodeFromURL(parameters.getParameter("query",null));
-		java.util.List<Item> items = preformSearch(collection,query);
+		java.util.List<Item> items = performSearch(collection,query);
 		
 		
 		
@@ -104,7 +104,7 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
             {
                 author = dcCreators[0].value;
             } else {
-            	// Do a fall back look for contributors
+            	// Do a fallback look for contributors
 				DCValue[] dcContributors = item.getDC("contributor",Item.ANY,Item.ANY);
 				if (dcContributors != null && dcContributors.length >= 1)
 	            {
@@ -166,7 +166,7 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 	 * @param collection The collection to mapp into
 	 * @param query The search query.
 	 */
-	private java.util.List<Item> preformSearch(Collection collection, String query) throws SQLException, IOException
+	private java.util.List<Item> performSearch(Collection collection, String query) throws SQLException, IOException
 	{
 		
 		// Search the repository
@@ -196,7 +196,7 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
         }
         
         return items;
-	}
+    }
 	
 	
 	

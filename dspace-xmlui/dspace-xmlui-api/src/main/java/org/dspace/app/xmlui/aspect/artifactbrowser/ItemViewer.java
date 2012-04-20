@@ -299,7 +299,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
                     ReferenceSet.TYPE_SUMMARY_VIEW);
         }
 
-        // Refrence the actual Item
+        // Reference the actual Item
         ReferenceSet appearsInclude = referenceSet.addReference(item).addReferenceSet(ReferenceSet.TYPE_DETAIL_LIST,null,"hierarchy");
         appearsInclude.setHead(T_head_parent_collections);
 

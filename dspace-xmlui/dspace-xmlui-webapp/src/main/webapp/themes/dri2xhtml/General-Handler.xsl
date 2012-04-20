@@ -81,7 +81,7 @@
     </xsl:template>   
     
     
-    <!-- Build a single row in the bitsreams table of the item view page -->
+    <!-- Build a single row in the bitstreams table of the item view page -->
     <xsl:template match="mets:file">
         <xsl:param name="context" select="."/>
         <tr>

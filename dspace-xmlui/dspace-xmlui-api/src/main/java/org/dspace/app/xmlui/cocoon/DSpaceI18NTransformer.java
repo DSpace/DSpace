@@ -95,7 +95,7 @@ public class DSpaceI18NTransformer extends I18nTransformer {
         		if (!baseCatalogueLocationPath.endsWith("/"))
                 {
                     baseCatalogueLocationPath += "/";
-                } // Add a trailing slash if one dosn't exist
+                } // Add a trailing slash if one doesn't exist
         			
         		String catalogueId = catalogueConf.getAttribute("id","unknown");
         		
@@ -129,7 +129,7 @@ public class DSpaceI18NTransformer extends I18nTransformer {
             		String aspectLocationPath = aspect.getPath();
             		if (!aspectLocationPath.endsWith("/"))
                     {
-                        aspectLocationPath += "/"; // Add a trailing slash if one dosn't exist
+                        aspectLocationPath += "/"; // Add a trailing slash if one doesn't exist
                     }
             		aspectLocationPath += "i18n/";
             		MutableConfiguration aspectLocation = new DefaultConfiguration("location");

@@ -60,7 +60,7 @@ public class HandleUtil
 
             if (!uri.startsWith(HANDLE_PREFIX))
             {
-                // Dosn't start with the prefix then no match
+                // Doesn't start with the prefix then no match
                 return null;
             }
 
@@ -140,7 +140,7 @@ public class HandleUtil
      * Build a list of trail metadata starting with the owning collection and
      * ending with the root level parent. If the Object is an item, a bundle,
      * or a bitstream, then the object is not included, but its collection and
-     * community parents are. However if the item is a community or collection
+     * community parents are. However, if the item is a community or collection
      * then it is included along with all parents.
      * 
      * <p>

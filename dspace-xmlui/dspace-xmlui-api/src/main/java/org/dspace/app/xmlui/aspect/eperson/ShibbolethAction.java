@@ -31,7 +31,7 @@ import org.dspace.eperson.EPerson;
  * This action uses the http parameters as supplied by Shibboleth SP.
  * Read dspace.cfg for configuration detail.
  * 
- * If the authentication attempt is successfull then an HTTP redirect will be
+ * If the authentication attempt is successful then an HTTP redirect will be
  * sent to the browser redirecting them to their original location in the 
  * system before authenticated or if none is supplied back to the DSpace 
  * homepage. The action will also return true, thus contents of the action will
@@ -60,7 +60,7 @@ public class ShibbolethAction extends AbstractAction
     {
         try
         {
-            //rely on implicit authN of Shib
+            // rely on implicit authN of Shib
             Context context = AuthenticationUtil.authenticate(objectModel, null, null, null);
 
             EPerson eperson = null;
@@ -78,7 +78,7 @@ public class ShibbolethAction extends AbstractAction
             	if (AuthenticationUtil.isInterupptedRequest(objectModel))
             	{
             		// Resume the request and set the redirect target URL to
-            		// that of the originaly interrupted request.
+            		// that of the originally interrupted request.
             		redirectURL += AuthenticationUtil.resumeInterruptedRequest(objectModel);
             	}
             	else
@@ -88,14 +88,14 @@ public class ShibbolethAction extends AbstractAction
             		redirectURL += (loginRedirect != null) ? loginRedirect.trim() : "/";	
             	}
             	
-                // Authentication successfull send a redirect.
+                // Authentication successful - send a redirect.
                 final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
                 
                 httpResponse.sendRedirect(redirectURL);
                 
                 // log the user out for the rest of this current request, however they will be reauthenticated
                 // fully when they come back from the redirect. This prevents caching problems where part of the
-                // request is preformed for the user was authenticated and the other half after it succedded. This
+                // request is performed for the user was authenticated and the other half after it succeeded. This
                 // way the user is fully authenticated from the start of the request.
                 //
                 // TODO: have no idea what this is, but leave it as it is, could be broken
@@ -106,7 +106,7 @@ public class ShibbolethAction extends AbstractAction
         }
         catch (SQLException sqle)
         {
-            throw new PatternException("Unable to preform Shibboleth authentication",
+            throw new PatternException("Unable to perform Shibboleth authentication",
                     sqle);
         }
         

@@ -23,17 +23,17 @@ public class RequestUtils {
 	
 	/**
 	 * Get values for a field from a DRI multi value field, since a field may
-	 * have multiple values this method will check for fieldName + "_n" untill
+	 * have multiple values this method will check for fieldName + "_n" until
 	 * it does not find any more values. The result is a list of all values 
 	 * for a field.
 	 * 
-	 * If the value has been seleted to be removed then it is removed from 
+	 * If the value has been selected to be removed then it is removed from 
 	 * the list.
 	 * 
 	 * @param request
-	 *            the request containing the form information
+	 * 			The request containing the form information
 	 * @param compositeFieldName
-	 * 			The fieldName of the composite field. 
+	 * 			The fieldName of the composite field 
 	 * @param componentFieldName
 	 * 			The fieldName of the component field
 	 * @return a List of Strings
@@ -82,13 +82,13 @@ public class RequestUtils {
 				}
 			}
 
-			// Only add non blank items to the list
+			// Only add non-blank items to the list
 			if (value.length() == 0)
             {
                 continue valueLoop;
             }
 			
-			// Finaly add it to the list
+			// Finally, add it to the list
 			values.add(value.trim());
 		}
 
@@ -98,16 +98,16 @@ public class RequestUtils {
 
 	/**
 	 * Get values from a DRI multi value field, since a field may have multiple 
-	 * values this method will check for fieldName + "_n" untill it does not 
+	 * values this method will check for fieldName + "_n" until it does not 
 	 * find any more values. The result is a list of all values for a field.
 	 * 
-	 * If the value has been seleted to be removed then it is removed from 
+	 * If the value has been selected to be removed then it is removed from 
 	 * the list.
 	 * 
 	 * @param request
-	 *            the request containing the form information
+	 * 			The request containing the form information
 	 * @param fieldName
-	 * 			The fieldName of the composite field. 
+	 * 			The fieldName of the composite field
 	 * @return a List of Strings
 	 */
 	public static List<String> getFieldValues(Request request, String fieldName)
@@ -154,13 +154,13 @@ public class RequestUtils {
 				}
 			}
 
-			// Only add non blank items to the list
+			// Only add non-blank items to the list
 			if (value.length() == 0)
             {
                 continue valueLoop;
             }
 			
-			// Finaly add it to the list
+			// Finally, add it to the list
 			values.add(value.trim());
 		}
 

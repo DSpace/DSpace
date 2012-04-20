@@ -39,16 +39,16 @@ import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
 /**
- * Preform an advanced search of the repository. The user is presented with
+ * Perform an advanced search of the repository. The user is presented with
  * three search parameters, that may be ORed, ANDed, NOTed together.
  * 
  * At the present time only three fields are displayed however if the theme
- * whishes to expand this they can by setting the num_search_fields to the
- * desired number of search fields. Also the theme can change the number of
+ * whishes to expand this they can do so by setting the num_search_fields to the
+ * desired number of search fields. Also, the theme can change the number of
  * results per the page by setting results_per_page
  * 
  * FIXME: The list of what fields are search should come from a configurable
- * place. Possibily the sitemap configuration.
+ * place. Possibly the sitemap configuration.
  * 
  * @author Scott Phillips
  */
@@ -191,7 +191,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
 
     /**
      * Build a conjunction field in the given for the given cell. A 
-     * conjunction consists of logical the operators AND, OR, NOT.
+     * conjunction consists of logical operators AND, OR, NOT.
      *
      * @param row The current row
      * @param cell The current cell
@@ -406,13 +406,13 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
             {   
             	// Specific search field specified, add the field specific field.
             	
-            	// Replace singe quote's with double quotes (only if they match)
+            	// Replace single quotes with double quotes (only if they match)
             	String subQuery = util.substitute("s/\'(.*)\'/\"$1\"/g", field.getQuery());
             	
             	// If the field is not quoted ...
             	if (!util.match("/\".*\"/", subQuery))
                 {
-            		// ... then seperate each word and re-specify the search field.
+            		// ... then separate each word and re-specify the search field.
                     subQuery = util.substitute("s/[ ]+/ " + field.getField() + ":/g", subQuery);
                 }
             	
@@ -521,7 +521,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
      */
     private static class SearchField {
     	
-    	/** What index the search field is, typicaly there are just three - but the theme may exand this number */
+    	/** What index the search field is, typically there are just three - but the theme may expand this number */
     	private int index;
     	
     	/** The field to search, ANY if none specified */

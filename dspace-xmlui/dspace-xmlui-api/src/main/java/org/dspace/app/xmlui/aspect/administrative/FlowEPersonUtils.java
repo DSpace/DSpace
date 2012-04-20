@@ -31,7 +31,7 @@ import org.dspace.eperson.EPersonDeletionException;
  * Utility methods to processes actions on EPeople. These methods are used
  * exclusively from the administrative flow scripts.
  * 
- * @author scott phillips
+ * @author Scott Phillips
  */
 public class FlowEPersonUtils {
 
@@ -90,7 +90,7 @@ public class FlowEPersonUtils {
         }
 	    
 	    
-		// Check if the email address is all ready being used.	        		
+		// Check if the email address is already being used.	        		
     	EPerson potentialDupicate = EPerson.findByEmail(context,email);
     	if (potentialDupicate != null)
     	{

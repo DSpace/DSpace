@@ -38,7 +38,7 @@ import org.dspace.handle.HandleManager;
 
 /**
  * Utility methods to processes actions on Groups. These methods are used
- * exclusivly from the administrative flow scripts.
+ * exclusively from the administrative flow scripts.
  * 
  * @author Jay Paz
  * @author Scott Phillips
@@ -51,8 +51,8 @@ public class FlowItemUtils
 	private static final Message T_metadata_added = new Message("default","New metadata was added.");
 	private static final Message T_item_withdrawn = new Message("default","The item has been withdrawn.");
 	private static final Message T_item_reinstated = new Message("default","The item has been reinstated.");
-    private static final Message T_item_moved = new Message("default","The item has been moved.");
-    private static final Message T_item_move_destination_not_found = new Message("default","The selected destination collection could not be found.");
+	private static final Message T_item_moved = new Message("default","The item has been moved.");
+	private static final Message T_item_move_destination_not_found = new Message("default","The selected destination collection could not be found.");
 	private static final Message T_bitstream_added = new Message("default","The new bitstream was successfully uploaded.");
 	private static final Message T_bitstream_failed = new Message("default","Error while uploading file.");
 	private static final Message T_bitstream_updated = new Message("default","The bitstream has been updated.");

@@ -37,43 +37,43 @@ import org.xml.sax.SAXException;
  * id must be the handle prefix.
  * 
  * In addition to rendering a METS document there are several options which can be specified for how the mets
- * document should be rendered. All parameters are a comma separated list of values, here is a list:
+ * document should be rendered. All parameters are a comma-separated list of values, here is a list:
  * 
  * 
  * sections:
  * 
- * A comma separated list of METS sections to included. The possible values are: "metsHdr", "dmdSec", 
+ * A comma-separated list of METS sections to included. The possible values are: "metsHdr", "dmdSec", 
  * "amdSec", "fileSec", "structMap", "structLink", "behaviorSec", and "extraSec". If no list is provided then *ALL*
  * sections are rendered.
  * 
  * 
  * dmdTypes:
  * 
- * A comma separated list of metadata formats to provide as descriptive metadata. The list of available metadata
+ * A comma-separated list of metadata formats to provide as descriptive metadata. The list of available metadata
  * types is defined in the dspace.cfg, dissemination crosswalks. If no formats are provided them DIM - DSpace 
  * Intermediate Format - is used.
  * 
  * 
  * amdTypes:
  * 
- * A comma separated list of metadata formats to provide administrative metadata. DSpace does not currently
+ * A comma-separated list of metadata formats to provide administrative metadata. DSpace does not currently
  * support this type of metadata.
  * 
  * 
  * fileGrpTypes:
  * 
- * A comma separated list of file groups to render. For DSpace a bundle is translated into a METS fileGrp, so
+ * A comma-separated list of file groups to render. For DSpace a bundle is translated into a METS fileGrp, so
  * possible values are "THUMBNAIL","CONTENT", "METADATA", etc... If no list is provided then all groups are
  * rendered.
  * 
  * 
  * structTypes:
  * 
- * A comma separated list of structure types to render. For DSpace there is only one structType: LOGICAL. If this
+ * A comma-separated list of structure types to render. For DSpace there is only one structType: LOGICAL. If this
  * is provided then the logical structType will be rendered, otherwise none will. The default operation is to
  * render all structure types.
  * 
- * @author scott phillips
+ * @author Scott Phillips
  */
 public class DSpaceMETSGenerator extends AbstractGenerator
 {
@@ -206,8 +206,8 @@ public class DSpaceMETSGenerator extends AbstractGenerator
 	 */
 	public void configureAdapter(AbstractAdapter adapter)
 	{
-		 // Configure the adapter based upon the passed parameters
-		Request request = ObjectModelHelper.getRequest(objectModel);
+        // Configure the adapter based upon the passed parameters
+        Request request = ObjectModelHelper.getRequest(objectModel);
         String sections = request.getParameter("sections");
         String dmdTypes = request.getParameter("dmdTypes");
         String techMDTypes = request.getParameter("techMDTypes");

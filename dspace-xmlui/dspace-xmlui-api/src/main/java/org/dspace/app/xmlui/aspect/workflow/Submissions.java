@@ -134,7 +134,7 @@ public class Submissions extends AbstractDSpaceTransformer
      * If the user has any workflow tasks, either assigned to them or in an
      * available pool of tasks, then build two tables listing each of these queues.
      *
-     * If the user dosn't have any workflows then don't do anything.
+     * If the user doesn't have any workflows then don't do anything.
      *
      * @param division The division to add the two queues too.
      */
