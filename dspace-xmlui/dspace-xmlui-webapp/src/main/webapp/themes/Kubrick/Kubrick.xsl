@@ -86,7 +86,7 @@
   
     
     <!-- Overrides the default footer to put in a div with id "footer" -->
-    <!-- Like the header, the footer contains various miscellanious text, links, and image placeholders -->
+    <!-- Like the header, the footer contains various miscellaneous text, links, and image placeholders -->
     <xsl:template name="buildFooter">
         <div id="footer">                         
             <a href="http://di.tamu.edu">                            

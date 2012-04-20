@@ -14,13 +14,13 @@ import java.util.Set;
 
 /**
  * A Spare v4 IPTable implementation that uses nested HashMaps
- * to optimize IP Address matching over ranges of IP Addresses.
+ * to optimize IP address matching over ranges of IP addresses.
  *
  * @author mdiggory at atmire.com
  */
 public class IPTable {
 
-    /* A lookup tree for IP Addresses and SubnetRanges */
+    /* A lookup tree for IP addresses and SubnetRanges */
     private Map<String, Map<String, Map<String, Set<String>>>> map =
             new HashMap<String, Map<String, Map<String, Set<String>>>>();
 
@@ -123,7 +123,7 @@ public class IPTable {
 
         if (subnets.length != 4)
         {
-            throw new IPFormatException("needs to be single IP Address");
+            throw new IPFormatException("needs to be a single IP address");
         }
 
         Map<String, Map<String, Set<String>>> first = map.get(subnets[0]);

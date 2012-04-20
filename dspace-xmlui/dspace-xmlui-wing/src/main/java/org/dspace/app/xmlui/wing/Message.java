@@ -13,14 +13,14 @@ import java.io.Serializable;
  * 
  * This class represents an i18n message, which is composed of three parts: a 
  * catalogue, a key, and a set of dictionary parameters. The catalogue tells 
- * the translater where to find the key, the key tells the transformer which 
- * specific text should be used, and the parameters provide for non translated 
+ * the translator where to find the key, the key tells the transformer which 
+ * specific text should be used, and the parameters are provided for non-translated 
  * data to be inserted into the resulting string.
  * 
- * This class design such that the Message object can be made static my any 
+ * This class is designed in such a way that the Message object can be made static by any 
  * class that needs to use it. If dicionary parameters are used then a new 
- * instance is created specificaly for those parameters, this prevents 
- * concurent threads from over writting parameters of each other.
+ * instance is created specifically for those parameters, this prevents 
+ * concurrent threads from overwriting each other's parameters.
  * 
  * @author Scott Phillips
  */
@@ -37,7 +37,7 @@ public class Message implements Serializable
      * Create a new translatable element.
      * 
      * @param catalogue
-     *            The catalogue were this key is to be found.
+     *            The catalogue where this key can be found.
      * @param key
      *            The key to look up in the catalogue.
      */
@@ -49,7 +49,7 @@ public class Message implements Serializable
     
     /**
      * 
-     * @return The catalogue this key is to be found in.
+     * @return The catalogue where this key can be found.
      */
     public String getCatalogue()
     {
@@ -103,12 +103,12 @@ public class Message implements Serializable
      * message. These parameters are inserted into the final translated
      * string based upon the key's definition. 
      *
-     * No one out side of this class should even know this class exists,
-     * hence the privacy, but haveing two implementations allows us to
-     * sepearete all the functionality for paramaterization into this
+     * No one outside of this class should even know this class exists,
+     * hence the privacy, but having two implementations allows us to
+     * separate all the functionality for paramaterization into this
      * one place. Since most of the messages used are unparameterized
      * this is not wasted on them and is only invoked when needed. There 
-     * may be some performance increase by doing this but i doubt it is 
+     * may be some performance increase by doing this but I doubt it is 
      * of much consequence, instead the main reason is to be able to create
      * a new instance when messages are parameterized so that concurrent
      * threads do not step on each other.

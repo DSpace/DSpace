@@ -19,9 +19,9 @@ import org.dspace.app.xmlui.wing.element.Para;
 
 /**
  * Display a generic error message saying the user can
- * not preform the requested action.
+ * not perform the requested action.
  * 
- * @author Scott phillips
+ * @author Scott Phillips
  */
 public class NotAuthorized extends AbstractDSpaceTransformer   
 {	

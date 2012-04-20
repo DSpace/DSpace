@@ -414,7 +414,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 			personData.addCell().addXref(url, fullName);
 			personData.addCell().addXref(url, email);
 			
-			// check if they are allready a member of the group
+			// check if they are already a member of the group
 			if (memberEPeopleIDs.contains(person.getID()))
 			{
 				// Check if they really members or just pending members
@@ -531,7 +531,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
         	}
         	
         	
-        	// Check if the group is allready a member or would create a cycle.
+        	// Check if the group is already a member or would create a cycle.
         	if (memberGroupIDs.contains(group.getID()))
         	{
         		// Check if they really members or just pending members
@@ -691,12 +691,12 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	
 	
 	/**
-	 * Add a singe member row for groups.
+	 * Add a single member row for groups.
 	 * 
 	 * @param table The table to add the row too.
 	 * @param group The group being displayed in this row.
 	 * @param highlight Should the row be highlighted.
-	 * @param pendingAddition Is this group pending additition
+	 * @param pendingAddition Is this group pending addition
 	 * @param pendingRemoval Is this group pending removal
 	 */
 	private void addMemberRow(Table table,Group group, boolean highlight, boolean pendingAddition, boolean pendingRemoval) throws WingException, SQLException

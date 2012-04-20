@@ -31,7 +31,7 @@ import org.dspace.authorize.AuthorizeException;
  * can describe the new eperson before being created. If the user's 
  * input is incorrect in someway then they may be returning here with 
  * some fields in error. In particular there is a special case for the 
- * condition when the email-adress entered is allready in use by 
+ * condition when the email-address entered is already in use by 
  * another user.
  * 
  * @author Alexey Maslov

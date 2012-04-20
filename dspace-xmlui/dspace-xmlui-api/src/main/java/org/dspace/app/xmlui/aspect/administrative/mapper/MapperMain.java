@@ -31,7 +31,7 @@ import org.xml.sax.SAXException;
  * search for new items to import or browse a list of currently mapped 
  * items.
  * 
- * @author Scott phillips
+ * @author Scott Phillips
  */
 
 public class MapperMain extends AbstractDSpaceTransformer {

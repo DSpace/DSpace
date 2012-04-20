@@ -9,7 +9,7 @@ package org.dspace.app.xmlui.wing;
 
 /**
  * A class representing the framework's context, what component is generationg
- * content, where should we log. It's basicaly a grab bag for framework wide
+ * content, where should we log. It's basically a grab bag for framework-wide
  * communication, if all elements need to know about something then it should go
  * here.
  * 

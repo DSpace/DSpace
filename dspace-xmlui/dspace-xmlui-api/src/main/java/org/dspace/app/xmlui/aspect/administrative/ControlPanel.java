@@ -407,9 +407,9 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         cocoon.addLabel(T_COCOON_VERSION);
         cocoon.addItem(org.apache.cocoon.Constants.VERSION);
 
-        //attempt to Display some basic info about Cocoon's Settings & Caches
+        // attempt to Display some basic info about Cocoon's Settings & Caches
 
-        //Get access to basic Cocoon Settings
+        // Get access to basic Cocoon Settings
         if(this.settings!=null)
         {
             //Output Cocoon's Work Directory & Cache Directory
@@ -420,38 +420,38 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         }    
 
         // Check if we have access to Cocoon's Default Cache
-        //Cocoon's Main (Default) Store is used to store objects that are serializable
+        // Cocoon's Main (Default) Store is used to store objects that are serializable
         if(this.storeDefault!=null)
         {
-            //Store name is just the className (remove the package info though, just to save space)
+            // Store name is just the className (remove the package info though, just to save space)
             String storeName = this.storeDefault.getClass().getName();
             storeName = storeName.substring(storeName.lastIndexOf(".")+1); 
 
-            //display main store's cache info
+            // display main store's cache info
             cocoon.addLabel(T_COCOON_MAIN_CACHE_SIZE.parameterize(storeName + ", 0x" + Integer.toHexString(this.storeDefault.hashCode())));
 
-            //display cache size & link to clear Cocoon's main cache
+            // display cache size & link to clear Cocoon's main cache
             Item defaultSize = cocoon.addItem();
             defaultSize.addContent(String.valueOf(this.storeDefault.size()) + "  ");
             defaultSize.addXref(contextPath + "/admin/panel?java=true&clearcache=true", T_COCOON_CACHE_CLEAR);
         }
 
         // Check if we have access to Cocoon's Persistent Cache
-        //Cocoon's Persistent Store may be used by the Default Cache/Store to delegate persistent storage
-        //(it's an optional store which may not exist)
+        // Cocoon's Persistent Store may be used by the Default Cache/Store to delegate persistent storage
+        // (it's an optional store which may not exist)
         if(this.storePersistent!=null)
         {
-            //Store name is just the className (remove the package info though, just to save space)
+            // Store name is just the className (remove the package info though, just to save space)
             String storeName = this.storeDefault.getClass().getName();
             storeName = storeName.substring(storeName.lastIndexOf(".")+1);
 
-            //display persistent store's cache size info
+            // display persistent store's cache size info
             cocoon.addLabel(T_COCOON_PERSISTENT_CACHE_SIZE.parameterize(storeName + ", 0x" + Integer.toHexString(this.storePersistent.hashCode())));
             cocoon.addItem(String.valueOf(this.storePersistent.size()));
         }
 
-        //Check if we have access to Cocoon's StoreJanitor
-        //The Store Janitor manages all of Cocoon's "transient caches/stores"
+        // Check if we have access to Cocoon's StoreJanitor
+        // The Store Janitor manages all of Cocoon's "transient caches/stores"
         // These "transient" stores are used for non-serializable objects or objects whose
         // storage doesn't make sense across a server restart. 
         if(this.storeJanitor!=null)
@@ -460,14 +460,14 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
             Iterator i = this.storeJanitor.iterator();
             while(i.hasNext())
             {
-                //get the Cache Store
+                // get the Cache Store
                 Store store = (Store) i.next();
 
-                //Store name is just the className (remove the package info though, just to save space)
+                // Store name is just the className (remove the package info though, just to save space)
                 String storeName = store.getClass().getName();
                 storeName = storeName.substring(storeName.lastIndexOf(".")+1); 
 
-                //display its size information
+                // display its size information
                 cocoon.addLabel(T_COCOON_TRANS_CACHE_SIZE.parameterize(storeName + ", 0x" + Integer.toHexString(store.hashCode())));
                 cocoon.addItem(String.valueOf(store.size()));
             }
@@ -565,7 +565,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         countdown.addOption(30,T_alerts_countdown_30);
         countdown.addOption(60,T_alerts_countdown_60);
 
-        // Is there a current count down active?
+        // Is there a current countdown active?
         if (SystemwideAlerts.isAlertActive() && SystemwideAlerts.getCountDownToo() - System.currentTimeMillis() > 0)
         {
             countdown.addOption(true, -1, T_alerts_countdown_keep);
@@ -808,7 +808,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		
         /**
          * Compare these two activity events based upon the given sort parameter. In the case of a tie,
-         * allways fallback to sorting based upon the timestamp.
+         * always fallback to sorting based upon the timestamp.
          */
         @Override
         public int compare(E a, E b) 
@@ -863,7 +863,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
             {
                 // Ensure that all sessions with an EPersonID associated are
                 // ordered to the top. Otherwise fall back to comparing session
-                // IDs. Unfortunitaly we can not compare eperson names because 
+                // IDs. Unfortunately, we cannot compare eperson names because 
                 // we do not have access to a context object.
                 if (a.getEPersonID() > 0  && b.getEPersonID() < 0)
                 {
@@ -883,7 +883,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
                 }
             }
 			
-            // All ways fall back to sorting by time, when events are equal.
+            // Always fall back to sorting by time, when events are equal.
             if (a.getTimeStamp() > b.getTimeStamp())
             {
                 return 1;  // A > B

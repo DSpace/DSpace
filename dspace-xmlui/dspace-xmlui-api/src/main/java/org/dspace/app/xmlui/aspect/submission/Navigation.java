@@ -64,7 +64,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         options.addList("context");
         options.addList("administrative");
     	
-//      This dosn't flow very well, lets remove it and see if anyone misses it.  
+//      This doesn't flow very well, lets remove it and see if anyone misses it.  
 //    	DSpaceObject dso = HandleUtil.obtainHandle(objectModel);	
 //    	if (dso != null && dso instanceof Collection)
 //    	{

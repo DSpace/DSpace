@@ -128,7 +128,7 @@ public class InstallItem
         // are not set then set them to today.
         DCDate now = DCDate.getCurrent();
         
-        // If the item dosn't have a date.accessioned create one.
+        // If the item doesn't have a date.accessioned create one.
         DCValue[] dateAccessioned = item.getDC("date", "accessioned", Item.ANY);
         if (dateAccessioned.length == 0)
         {
@@ -156,7 +156,7 @@ public class InstallItem
         String handleref = HandleManager.getCanonicalForm(handle);
 
         // Add handle as identifier.uri DC value.
-        // First check that identifier dosn't already exist.
+        // First check that identifier doesn't already exist.
         boolean identifierExists = false;
         DCValue[] identifiers = item.getDC("identifier", "uri", Item.ANY);
         for (DCValue identifier : identifiers)

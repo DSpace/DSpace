@@ -19,9 +19,9 @@ import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.NamespaceSupport;
 
 /**
- * Refrence a repository object that is referenced in the ObjectMeta portion of
- * the DRI document. These are internal refrences distinct from the xref element
- * which is used for extrenal refrences.
+ * Reference a repository object that is referenced in the ObjectMeta portion of
+ * the DRI document. These are internal references distinct from the xref element
+ * which is used for extrenal references.
  * 
  * @author Scott Phillips
  */
@@ -35,7 +35,7 @@ public class Reference extends AbstractWingElement implements
     /** The name of the repositoryIdentifier attribute */
     public static final String A_REPOSITORY_ID = "repositoryID";
 
-    /** An optional type of the refrenced object. */
+    /** An optional type of the referenced object. */
     public static final String A_TYPE = "type";
     
     /** The name of the objectIdentifier attribute */

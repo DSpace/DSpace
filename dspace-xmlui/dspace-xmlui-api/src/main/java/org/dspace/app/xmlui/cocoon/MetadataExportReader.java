@@ -50,7 +50,7 @@ import org.dspace.app.bulkedit.MetadataExport;
 public class MetadataExportReader extends AbstractReader implements Recyclable
 {
 
-	/**
+     /**
      * Messages to be sent when the user is not authorized to view 
      * a particular bitstream. They will be redirected to the login
      * where this message will be displayed.
@@ -59,15 +59,15 @@ public class MetadataExportReader extends AbstractReader implements Recyclable
 	private static final String AUTH_REQUIRED_MESSAGE = "xmlui.ItemExportDownloadReader.auth_message";
 	
     /**
-     * How big of a buffer should we use when reading from the bitstream before
-     * writting to the HTTP response?
+     * How big a buffer should we use when reading from the bitstream before
+     * writing to the HTTP response?
      */
     protected static final int BUFFER_SIZE = 8192;
 
     /**
      * When should a download expire in milliseconds. This should be set to
-     * some low value just to prevent someone hitting DSpace repeatily from
-     * killing the server. Note: 60000 milliseconds are in a second.
+     * some low value just to prevent someone hitting DSpace repeatedly from
+     * killing the server. Note: there are 60000 milliseconds in a minute.
      * 
      * Format: minutes * seconds * milliseconds
      */
@@ -85,7 +85,7 @@ public class MetadataExportReader extends AbstractReader implements Recyclable
     DSpaceCSV csv = null;
     MetadataExport exporter = null;
     String filename = null;
-   /**
+    /**
      * Set up the export reader.
      * 
      * See the class description for information on configuration options.
@@ -137,7 +137,7 @@ public class MetadataExportReader extends AbstractReader implements Recyclable
             }
             else {
                     /*
-                     * Auth should ge done by MetadataExport -- pass context through
+                     * Auth should be done by MetadataExport -- pass context through
                      * we should just be catching exceptions and displaying errors here
                      *
                      */

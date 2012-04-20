@@ -37,7 +37,7 @@ public class PageMeta extends AbstractWingElement implements
 
     /** 
      * A page meta may hold two types of elements, trails or 
-     * metadata. Each of these types are seperated so that 
+     * metadata. Each of these types are separated so that 
      * we can search through each time as we merge documents.
      */
     private List<Metadata> metadatum = new ArrayList<Metadata>();
@@ -63,9 +63,9 @@ public class PageMeta extends AbstractWingElement implements
 	 * @param qualifier
 	 *            (May be null) The metadata qualifier.
 	 * @param language
-	 *            (May be null) The metadata's language
+	 *            (May be null) The metadata language
 	 * @param allowMultiple
-	 *            (Required) determine if multipe metadata element with the same
+	 *            (Required) determine if multiple metadata elements with the same
 	 *            element, qualifier and language are allowed.
 	 * @return A new metadata
 	 */
@@ -85,7 +85,7 @@ public class PageMeta extends AbstractWingElement implements
 	 * @param qualifier
 	 *            (May be null) The metadata qualifier.
 	 * @param language
-	 *            (May be null) The metadata's language
+	 *            (May be null) The metadata language
 	 * @return A new metadata
 	 */
     public Metadata addMetadata(String element, String qualifier, String language)
@@ -127,7 +127,7 @@ public class PageMeta extends AbstractWingElement implements
      * @param target
      *            (May be null) Target URL for this trail item.
      * @param rend
-     *            (May be null) special rendering instructions
+     *            (May be null) Special rendering instructions
      * @return a new trail
      */
     public Trail addTrail(String target, String rend)
@@ -228,7 +228,7 @@ public class PageMeta extends AbstractWingElement implements
             WingException
     {
     	// We don't merge our children but we do have one special optimization, 
-    	// if a metadata or trail is allready in the document then we do not add 
+    	// if some metadata or trail is already in the document then we do not add 
     	// our own trail or metadata for that particular item.
     	if (WingConstants.DRI.URI.equals(namespace) && Trail.E_TRAIL.equals(localName))
     	{

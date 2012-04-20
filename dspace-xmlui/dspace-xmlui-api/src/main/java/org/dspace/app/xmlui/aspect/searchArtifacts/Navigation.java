@@ -75,7 +75,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     }
 
     /**
-     * Insure that the context path is added to the page meta.
+     * Ensure that the context path is added to the page meta.
      */
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
         WingException, UIException, SQLException, IOException,

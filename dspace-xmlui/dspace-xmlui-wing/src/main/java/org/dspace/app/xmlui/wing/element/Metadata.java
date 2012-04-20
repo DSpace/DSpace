@@ -16,7 +16,7 @@ import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.NamespaceSupport;
 
 /**
- * This is a class representing an individual metadata field in sudo-dublin core
+ * This is a class representing an individual metadata field in pseudo-dublin core
  * format. The metadata elements carries generic metadata information in the
  * form of an attribute-value pair.
  * 
@@ -47,9 +47,9 @@ public class Metadata extends TextContainer implements MetadataElement
     private String language;
     
     /** 
-     * Determine the addititive model for the metadata, should 
-     * the metadata allways be added to the document or only if 
-     * it does not allready exist?
+     * Determine the additive model for the metadata, should 
+     * the metadata always be added to the document or only if 
+     * it does not already exist?
      */
     private boolean allowMultiple;
 
@@ -61,9 +61,9 @@ public class Metadata extends TextContainer implements MetadataElement
 	 * @param qualifier
 	 *            (May be null) The qualifier of this metadata
 	 * @param language
-	 *            (May be null) the language of this metadata
+	 *            (May be null) The language of this metadata
 	 * @param allowMultiple
-	 *            (Required) Are multipe metadata elements with the same element,
+	 *            (Required) Are multiple metadata elements with the same element,
 	 *            qualifier, and language allowed?
 	 */
     protected Metadata(WingContext context, String element, String qualifier,
@@ -95,7 +95,7 @@ public class Metadata extends TextContainer implements MetadataElement
      * @param qualifier
      *            (May be null) The qualifier of this metadata
      * @param language
-     *            (May be null) the language of this metadata
+     *            (May be null) The language of this metadata
      * @return True if the given parameters are equal to this metadata.
      */
     protected boolean equals(String element, String qualifier, String language)

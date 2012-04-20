@@ -214,16 +214,16 @@
 	                <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-abstract</i18n:text>:</span></td>
 	                <td>
 	                <xsl:if test="count(dim:field[@mdschema='dc' and @element='description' and @qualifier='abstract']) &gt; 1">
-	                	<hr class="metadata-seperator"/>
+	                	<hr class="metadata-separator"/>
 	                </xsl:if>
 	                <xsl:for-each select="dim:field[@mdschema='dc' and @element='description' and @qualifier='abstract']">
 		                <xsl:copy-of select="./node()"/>
 		                <xsl:if test="count(following-sibling::dim:field[@mdschema='dc' and @element='description' and @qualifier='abstract']) != 0">
-	                    	<hr class="metadata-seperator"/>
+	                    	<hr class="metadata-separator"/>
 	                    </xsl:if>
 	              	</xsl:for-each>
 	              	<xsl:if test="count(dim:field[@mdschema='dc' and @element='description' and @qualifier='abstract']) &gt; 1">
-	                	<hr class="metadata-seperator"/>
+	                	<hr class="metadata-separator"/>
 	                </xsl:if>
 	                </td>
 	            </tr>
@@ -239,16 +239,16 @@
 	                <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-description</i18n:text>:</span></td>
 	                <td>
 	                <xsl:if test="count(dim:field[@mdschema='dc' and @element='description' and not(@qualifier)]) &gt; 1 and not(count(dim:field[@mdschema='dc' and @element='description' and @qualifier='abstract']) &gt; 1)">
-	                	<hr class="metadata-seperator"/>
+	                	<hr class="metadata-separator"/>
 	                </xsl:if>
 	                <xsl:for-each select="dim:field[@mdschema='dc' and @element='description' and not(@qualifier)]">
 		                <xsl:copy-of select="./node()"/>
 		                <xsl:if test="count(following-sibling::dim:field[@mdschema='dc' and @element='description' and not(@qualifier)]) != 0">
-	                    	<hr class="metadata-seperator"/>
+	                    	<hr class="metadata-separator"/>
 	                    </xsl:if>
 	               	</xsl:for-each>
 	               	<xsl:if test="count(dim:field[@mdschema='dc' and @element='description' and not(@qualifier)]) &gt; 1">
-	                	<hr class="metadata-seperator"/>
+	                	<hr class="metadata-separator"/>
 	                </xsl:if>
 	                </td>
 	            </tr>
@@ -436,7 +436,7 @@
     </xsl:template>
 
 
-    <!-- Build a single row in the bitsreams table of the item view page -->
+    <!-- Build a single row in the bitstreams table of the item view page -->
     <xsl:template match="mets:file">
         <xsl:param name="context" select="."/>
         <tr>

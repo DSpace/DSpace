@@ -62,12 +62,12 @@
           <!--
               There are two major flows that are present in the submissions & workflow
               aspects, one for new submissions to the repository, and another for reviewing
-              those submissions in a 3 stage workflow processes. Below are the starting
+              those submissions in a 3-stage workflow processes. Below are the starting
               points and re-entry points for those workflows.
               
               /submit               -> New submissions that have not selected a collection yet.
-              /handle/*/*/submit    -> Submitting a new item to the repository..
-              /handle/*/*/workflow  -> Preforming workflow tasks to review submissions
+              /handle/*/*/submit    -> Submitting a new item to the repository.
+              /handle/*/*/workflow  -> Performing workflow tasks to review submissions.
               -->
           
           <!-- Start a new submission, unscoped -->
@@ -162,7 +162,7 @@
                 This step will ask the user to select a collection they want
                 to submit an item to. It is not part of the 'proper' submission
                 steps in that it is not displayed in the progress list and is
-                often skipped because the user has allready selected a collection.
+                often skipped because the user has already selected a collection.
                 -->
             <map:match pattern="submit/selectCollectionStep">
               <map:transform type="SelectCollectionStep">
@@ -219,7 +219,7 @@
             </map:match>
             
             <!--
-                This step is meurly a confirmation page letting the user
+                This step is merely a confirmation page letting the user
                 know that they have completed submitting a new item to dspace.
                 -->
             <map:match pattern="handle/*/*/submit/completedStep">

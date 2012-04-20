@@ -36,11 +36,11 @@ import org.xml.sax.helpers.NamespaceSupport;
 /**
  * This class represents data that is translated from simple HTML or plain text.
  * 
- * This class represents a simple HTML fragment. It allows for user supplied
+ * This class represents a simple HTML fragment. It allows for user-supplied
  * HTML to be translated on the fly into DRI.
  * 
  * At the present time it only supports the following tags: h1, h2, h3, h4, h5,
- * p, a, b, i, u, ol, li and img. Each are translated into their DRI equivelents, note
+ * p, a, b, i, u, ol, li and img. Each are translated into their DRI equivalents, note
  * the "h" tags are translated into a paragraph of rend=heading.
  * 
  * If the linkbreaks flag is set then line breaks are treated as paragraphs. This 
@@ -129,7 +129,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 			}
 
 		} catch (JDOMException e) {
-                        //If we are here, then a parsing error occurred within the XHTML fragment.  We'll just assume
+                        // If we are here, then a parsing error occurred within the XHTML fragment.  We'll just assume
                         // that this is not supposed to be XHTML and display the fragment as plain text within <dri:p> tags.
 			startElement(contentHandler, namespaces, Para.E_PARA, null);
 			sendCharacters(contentHandler, fragment);
@@ -172,7 +172,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 			} else {
 				// The element contains data
 				StringBuilder prepend = new StringBuilder();
-                prepend.append("<").append(element.getName());
+				prepend.append("<").append(element.getName());
 
 				@SuppressWarnings("unchecked")
 				// This cast is correct
@@ -207,13 +207,13 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 	 * contain nothing but white space. If they are found then they are removed.
 	 * 
 	 * @param parent
-	 *            The parent element to attach the wrapped paragraph too.
+	 *            The parent element to attach the wrapped paragraph, too.
 	 * @param index
 	 *            The index within the parent for where the content should be
 	 *            attached.
 	 * @param contents
 	 *            The contents that should be wrapped in a paragraph.
-	 * @return wheather a paragraph was actualy added.
+	 * @return whether a paragraph was actually added.
 	 */
 	private boolean paragraphWrap(Element parent, int index,
 			List<Content> contents) {
@@ -245,7 +245,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
             return false;
         }
 
-		// May be usefull for debugging:
+		// May be useful for debugging:
 		// contents.add(0, new Text("("+index+") "));
 
 		Element para = new Element(Para.E_PARA);
@@ -311,7 +311,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 	 * Translate the given HTML fragment into a DRI document.
 	 * 
 	 * The translation is broken up into two steps, 1) recurse through all
-	 * elements and either translate them into their DRI equivelents or remove
+	 * elements and either translate them into their DRI equivalents or remove
 	 * them from the document.
 	 * 
 	 * The second step, 2) is to iterate over all top level elements and ensure
@@ -448,7 +448,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 		}
 
 		// Step 2:
-		// Ensure that all top level elements are encapusalted inside
+		// Ensure that all top level elements are encapsulated inside
 		// a block level element (i.e. a paragraph)
 		if (parent.isRootElement()) {
 			List<Content> removed = new ArrayList<Content>();
@@ -478,7 +478,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 						parent.removeContent(current);
 						i--;// account text field removed.
 
-						// Regular expressiot to split based upon blank lines.
+						// Regular expression to split based upon blank lines.
 						// FIXME: This may not work for windows people who
 						// insist on using \r\n for line breaks.
 						@SuppressWarnings("unchecked")
@@ -518,7 +518,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 	 * can not output SAX events for just a document fragment. Since it only
 	 * works with documents this class was created to filter out the events.
 	 * 
-	 * As far as I can tell the first time the bug was identified is in the
+	 * As far as I can tell, the first time the bug was identified is in the
 	 * following email, point #1:
 	 * 
 	 * http://www.servlets.com/archive/servlet/ReadMsg?msgId=491592&listName=jdom-interest

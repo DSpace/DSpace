@@ -61,7 +61,7 @@ public class AuthenticationUtil
     private static final String CURRENT_IP_ADDRESS = "dspace.user.ip";
     
     /**
-     * The effective user id, typically this will never change. However if an administrator 
+     * The effective user id, typically this will never change. However, if an administrator 
      * has assumed login as this user then they will differ.
      */
     private static final String EFFECTIVE_USER_ID = "dspace.user.effective";

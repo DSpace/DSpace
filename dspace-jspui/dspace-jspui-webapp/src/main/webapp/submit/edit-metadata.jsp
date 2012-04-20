@@ -911,7 +911,7 @@
       throws java.io.IOException
     {
                 DCValue[] unfiltered = item.getMetadata(schema, element, Item.ANY, Item.ANY);
-                // filter out both unqualified and qualified values occuring elsewhere in inputs
+                // filter out both unqualified and qualified values occurring elsewhere in inputs
                 List<DCValue> filtered = new ArrayList<DCValue>();
                 for (int i = 0; i < unfiltered.length; i++)
                 {

@@ -26,7 +26,7 @@ function getObjectModel()
 
 /**
  * Return the DSpace context for this request since each HTTP request generates
- * a new context this object should never be stored and instead allways accessed
+ * a new context this object should never be stored and instead always accessed
  * through this method so you are ensured that it is the correct one.
  */
 function getDSContext()
@@ -35,7 +35,7 @@ function getDSContext()
 }
 
  /**
- * The result object could potentialy contain a notice message and a list of
+ * The result object could potentially contain a notice message and a list of
  * errors. If either of these are present then they are added to the sitemap's
  * parameters.
  */
@@ -212,7 +212,7 @@ function getCollection(handle, serviceDoc, DSClient)
 
         if (cocoon.request.get("deposit"))
         {
-            // A collection, or rather the location of one, has been selected, so lets
+            // A collection, or rather the location of one, has been selected, so let's
             // see what file type and package format combos are available.
 
             // We have a new request so need to attach the service doc again.

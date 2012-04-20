@@ -37,7 +37,7 @@ import org.dspace.core.Constants;
  * edit them, or upload new bitstreams.
  * 
  * @author Jay Paz
- * @author Scott phillips
+ * @author Scott Phillips
  */
 
 public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {

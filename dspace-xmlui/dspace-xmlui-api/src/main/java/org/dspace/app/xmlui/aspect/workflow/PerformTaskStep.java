@@ -30,10 +30,10 @@ import org.xml.sax.SAXException;
 
 /**
  * 
- * This step displays a workfrow item to the user and and presents several
- * possible actions that they may preform on the task.
+ * This step displays a workflow item to the user and and presents several
+ * possible actions that they may perform on the task.
  * 
- * General the user may, accept the item, reject the item, or edit the item's
+ * In general, the user may accept the item, reject the item, or edit the item's
  * metadata before accepting or rejecting. The user is also given the option
  * of taking the task or returning it to the pool.
  * 
@@ -42,7 +42,7 @@ import org.xml.sax.SAXException;
 public class PerformTaskStep extends AbstractStep
 {
 	
-	/** Language Strings **/
+    /** Language Strings **/
     protected static final Message T_info1= 
         message("xmlui.Submission.workflow.PerformTaskStep.info1");
     protected static final Message T_take_help = 
@@ -77,7 +77,7 @@ public class PerformTaskStep extends AbstractStep
         message("xmlui.general.cancel");
 	
 	
-	/** Copy the workflow manager's state values so that we can refrence them easier. */
+	/** Copy the workflow manager's state values so that we can reference them easier. */
 	private static final int WFSTATE_STEP1POOL = WorkflowManager.WFSTATE_STEP1POOL;
 	private static final int WFSTATE_STEP1     = WorkflowManager.WFSTATE_STEP1;
 	private static final int WFSTATE_STEP2POOL = WorkflowManager.WFSTATE_STEP2POOL;
@@ -136,7 +136,7 @@ public class PerformTaskStep extends AbstractStep
         }
       
 		   
-        //FIXME: set the correct table size.
+        // FIXME: set the correct table size.
         Table table = div.addTable("workflow-actions", 1, 1);
         table.setHead(T_info1);
         

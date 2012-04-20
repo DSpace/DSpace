@@ -51,10 +51,10 @@ import org.xml.sax.SAXException;
 
 /**
  * This is an abstract search page. It is a collection of search methods that
- * are common between different search implementation. An implementer must
- * implement at least three methods: addBody(), getQuery(), and generateURL().
+ * are common between different search implementations. An implementation must
+ * provide at least three methods: addBody(), getQuery(), and generateURL().
  * 
- * See the two implementors: SimpleSearch and AdvancedSearch.
+ * See the two implementations: SimpleSearch and AdvancedSearch.
  * 
  * @author Scott Phillips
  */
@@ -538,8 +538,8 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
      * Determine if the scope of the search should fixed or is changeable by the
      * user. 
      * 
-     * The search scope when preformed by url, i.e. they are at the url handle/xxxx/xx/search 
-     * then it is fixed. However at the global level the search is variable.
+     * The search scope when performed by url, i.e. they are at the url handle/xxxx/xx/search 
+     * then it is fixed. However, at the global level the search is variable.
      * 
      * @return true if the scope is variable, false otherwise.
      */

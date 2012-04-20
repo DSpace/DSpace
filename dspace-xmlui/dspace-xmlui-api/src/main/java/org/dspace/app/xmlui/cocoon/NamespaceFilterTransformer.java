@@ -146,26 +146,26 @@ public class NamespaceFilterTransformer extends AbstractTransformer implements C
 	    // Reset the namespace context flag.
     	if (!filter(uri))
     	{
-    		List<Integer> filterAttributeIndexs = new ArrayList<Integer>();
+    		List<Integer> filterAttributeIndexes = new ArrayList<Integer>();
     		
     		for (int i = 0; i < a.getLength(); i++)
     		{
     			if (filter(a.getURI(i)))
                 {
                     // Add it to the list of filtered indexes.
-                    filterAttributeIndexs.add(i);
+                    filterAttributeIndexes.add(i);
                 }
     		}
     		
     		// Check if any of the attributes are to be filtered if so, filter them out.
-    		if (!filterAttributeIndexs.isEmpty())
+    		if (!filterAttributeIndexes.isEmpty())
     		{
     			// New set of attributes.
     			Attributes2Impl a2 = new Attributes2Impl();
     			
     			for (int i = 0; i < a.getLength(); i++)
     			{
-    				if (filterAttributeIndexs.contains(i))
+    				if (filterAttributeIndexes.contains(i))
                     {
                         // This index is to be filtered.
                         continue;

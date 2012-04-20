@@ -41,7 +41,7 @@ import org.xml.sax.SAXException;
  * 
  * retry - A boolean value indicating that the previously entered email was invalid.
  * 
- * accountExists - A boolean value indicating the email previously entered allready
+ * accountExists - A boolean value indicating the email previously entered already
  *   belongs to a user.
  *   
  * @author Scott Phillips
@@ -97,7 +97,7 @@ public class StartRegistration extends AbstractDSpaceTransformer implements Cach
     private java.util.List<String> errors;
     
     /** 
-     * Determine if the last failed attempt was because an account allready 
+     * Determine if the last failed attempt was because an account already 
      * existed for the given email address 
      */
     private boolean accountExists;
