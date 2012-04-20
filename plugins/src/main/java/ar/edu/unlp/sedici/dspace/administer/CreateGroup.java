@@ -173,7 +173,7 @@ public final class CreateGroup {
         
 			// Find user group
 			Group parentGroup;
-			if (parentGroupName != null || "".equals(parentGroupName)) {
+			if (parentGroupName == null || "".equals(parentGroupName)) {
 				// parentGroupName = "0 {anonymous}";
 				parentGroup = null;
 			} else {
