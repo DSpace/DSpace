@@ -51,9 +51,6 @@ public class EPerson extends DSpaceObject
     /** log4j logger */
     private static Logger log = Logger.getLogger(EPerson.class);
 
-    /** Our context */
-    private Context myContext;
-
     /** The row in the table representing this eperson */
     private TableRow myRow;
 
@@ -73,11 +70,11 @@ public class EPerson extends DSpaceObject
      */
     EPerson(Context context, TableRow row)
     {
-        myContext = context;
+        super(context);
         myRow = row;
 
         // Cache ourselves
-        context.cache(this, row.getIntColumn("eperson_id"));
+        getContext().cache(this, row.getIntColumn("eperson_id"));
         modified = false;
         modifiedMetadata = false;
         clearDetails();
@@ -548,7 +545,7 @@ public class EPerson extends DSpaceObject
             EPersonDeletionException
     {
         // authorized?
-        if (!AuthorizeManager.isAdmin(myContext))
+        if (!AuthorizeManager.isAdmin(getContext()))
         {
             throw new AuthorizeException(
                     "You must be an admin to delete an EPerson");
@@ -565,28 +562,28 @@ public class EPerson extends DSpaceObject
             throw new EPersonDeletionException(constraintList);
         }
 
-        myContext.addEvent(new Event(Event.DELETE, Constants.EPERSON, getID(), getEmail()));
+        getContext().addEvent(new Event(Event.DELETE, Constants.EPERSON, getID(), getEmail()));
 
         // Remove from cache
-        myContext.removeCached(this, getID());
+        getContext().removeCached(this, getID());
 
         // XXX FIXME: This sidesteps the object model code so it won't
         // generate  REMOVE events on the affected Groups.
 
         // Remove any group memberships first
-        DatabaseManager.updateQuery(myContext,
+        DatabaseManager.updateQuery(getContext(),
                 "DELETE FROM EPersonGroup2EPerson WHERE eperson_id= ? ",
                 getID());
 
         // Remove any subscriptions
-        DatabaseManager.updateQuery(myContext,
+        DatabaseManager.updateQuery(getContext(),
                 "DELETE FROM subscription WHERE eperson_id= ? ",
                 getID());
 
         // Remove ourself
-        DatabaseManager.delete(myContext, myRow);
+        DatabaseManager.delete(getContext(), myRow);
 
-        log.info(LogManager.getHeader(myContext, "delete_eperson",
+        log.info(LogManager.getHeader(getContext(), "delete_eperson",
                 "eperson_id=" + getID()));
     }
 
@@ -907,26 +904,26 @@ public class EPerson extends DSpaceObject
     {
         // Check authorisation - if you're not the eperson
         // see if the authorization system says you can
-        if (!myContext.ignoreAuthorization()
-                && ((myContext.getCurrentUser() == null) || (getID() != myContext
+        if (!getContext().ignoreAuthorization()
+                && ((getContext().getCurrentUser() == null) || (getID() != getContext()
                         .getCurrentUser().getID())))
         {
-            AuthorizeManager.authorizeAction(myContext, this, Constants.WRITE);
+            AuthorizeManager.authorizeAction(getContext(), this, Constants.WRITE);
         }
 
-        DatabaseManager.update(myContext, myRow);
+        DatabaseManager.update(getContext(), myRow);
 
-        log.info(LogManager.getHeader(myContext, "update_eperson",
+        log.info(LogManager.getHeader(getContext(), "update_eperson",
                 "eperson_id=" + getID()));
 
         if (modified)
         {
-            myContext.addEvent(new Event(Event.MODIFY, Constants.EPERSON, getID(), null));
+            getContext().addEvent(new Event(Event.MODIFY, Constants.EPERSON, getID(), null));
             modified = false;
         }
         if (modifiedMetadata)
         {
-            myContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.EPERSON, getID(), getDetails()));
+            getContext().addEvent(new Event(Event.MODIFY_METADATA, Constants.EPERSON, getID(), getDetails()));
             modifiedMetadata = false;
             clearDetails();
         }
@@ -955,7 +952,7 @@ public class EPerson extends DSpaceObject
         List<String> tableList = new ArrayList<String>();
 
         // check for eperson in item table
-        TableRowIterator tri = DatabaseManager.query(myContext, 
+        TableRowIterator tri = DatabaseManager.query(getContext(),
                 "SELECT * from item where submitter_id= ? ",
                 getID());
 
@@ -989,7 +986,7 @@ public class EPerson extends DSpaceObject
     private void getXMLWorkflowConstraints(List<String> tableList) throws SQLException {
          TableRowIterator tri;
         // check for eperson in claimtask table
-        tri = DatabaseManager.queryTable(myContext, "cwf_claimtask",
+        tri = DatabaseManager.queryTable(getContext(), "cwf_claimtask",
                 "SELECT * from cwf_claimtask where owner_id= ? ",
                 getID());
 
@@ -1010,7 +1007,7 @@ public class EPerson extends DSpaceObject
         }
 
         // check for eperson in pooltask table
-        tri = DatabaseManager.queryTable(myContext, "cwf_pooltask",
+        tri = DatabaseManager.queryTable(getContext(), "cwf_pooltask",
                 "SELECT * from cwf_pooltask where eperson_id= ? ",
                 getID());
 
@@ -1031,7 +1028,7 @@ public class EPerson extends DSpaceObject
         }
 
         // check for eperson in workflowitemrole table
-        tri = DatabaseManager.queryTable(myContext, "cwf_workflowitemrole",
+        tri = DatabaseManager.queryTable(getContext(), "cwf_workflowitemrole",
                 "SELECT * from cwf_workflowitemrole where eperson_id= ? ",
                 getID());
 
@@ -1056,7 +1053,7 @@ public class EPerson extends DSpaceObject
     private void getOriginalWorkflowConstraints(List<String> tableList) throws SQLException {
         TableRowIterator tri;
         // check for eperson in workflowitem table
-        tri = DatabaseManager.query(myContext, 
+        tri = DatabaseManager.query(getContext(),
                 "SELECT * from workflowitem where owner= ? ",
                 getID());
 
@@ -1077,7 +1074,7 @@ public class EPerson extends DSpaceObject
         }
 
         // check for eperson in tasklistitem table
-        tri = DatabaseManager.query(myContext, 
+        tri = DatabaseManager.query(getContext(),
                 "SELECT * from tasklistitem where eperson_id= ? ",
                 getID());
 

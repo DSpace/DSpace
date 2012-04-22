@@ -41,9 +41,6 @@ public class Bitstream extends DSpaceObject
     /** log4j logger */
     private static Logger log = Logger.getLogger(Bitstream.class);
 
-    /** Our context */
-    private Context bContext;
-
     /** The row in the table representing this bitstream */
     private TableRow bRow;
 
@@ -68,7 +65,7 @@ public class Bitstream extends DSpaceObject
      */
     Bitstream(Context context, TableRow row) throws SQLException
     {
-        bContext = context;
+        super(context);
         bRow = row;
 
         // Get the bitstream format
@@ -474,7 +471,7 @@ public class Bitstream extends DSpaceObject
         if (f == null)
         {
             // Use "Unknown" format
-            bitstreamFormat = BitstreamFormat.findUnknown(bContext);
+            bitstreamFormat = BitstreamFormat.findUnknown(getContext());
         }
         else
         {
@@ -499,24 +496,22 @@ public class Bitstream extends DSpaceObject
     public void update() throws SQLException, AuthorizeException
     {
         // Check authorisation
-        AuthorizeManager.authorizeAction(bContext, this, Constants.WRITE);
+        AuthorizeManager.authorizeAction(getContext(), this, Constants.WRITE);
 
-        log.info(LogManager.getHeader(bContext, "update_bitstream",
+        log.info(LogManager.getHeader(getContext(), "update_bitstream",
                 "bitstream_id=" + getID()));
 
-        if (modified)
-        {
-            bContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null));
+        if (modified) {
+            getContext().addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null));
             modified = false;
         }
-        if (modifiedMetadata)
-        {
-            bContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.BITSTREAM, getID(), getDetails()));
+        if (modifiedMetadata) {
+            getContext().addEvent(new Event(Event.MODIFY_METADATA, Constants.BITSTREAM, getID(), getDetails()));
             modifiedMetadata = false;
             clearDetails();
         }
 
-        DatabaseManager.update(bContext, bRow);
+        DatabaseManager.update(getContext(), bRow);
     }
 
     /**
@@ -535,25 +530,25 @@ public class Bitstream extends DSpaceObject
         // changed to a check on remove
         // Check authorisation
         //AuthorizeManager.authorizeAction(bContext, this, Constants.DELETE);
-        log.info(LogManager.getHeader(bContext, "delete_bitstream",
+        log.info(LogManager.getHeader(getContext(), "delete_bitstream",
                 "bitstream_id=" + getID()));
 
-        bContext.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, getID(), String.valueOf(getSequenceID())));
+        getContext().addEvent(new Event(Event.DELETE, Constants.BITSTREAM, getID(), String.valueOf(getSequenceID())));
 
         // Remove from cache
-        bContext.removeCached(this, getID());
+        getContext().removeCached(this, getID());
 
         // Remove policies
-        AuthorizeManager.removeAllPolicies(bContext, this);
+        AuthorizeManager.removeAllPolicies(getContext(), this);
 
         // Remove references to primary bitstreams in bundle
         String query = "update bundle set primary_bitstream_id = ";
         query += (oracle ? "''" : "Null") + " where primary_bitstream_id = ? ";
-        DatabaseManager.updateQuery(bContext,
+        DatabaseManager.updateQuery(getContext(),
                 query, bRow.getIntColumn("bitstream_id"));
 
         // Remove bitstream itself
-        BitstreamStorageManager.delete(bContext, bRow
+        BitstreamStorageManager.delete(getContext(), bRow
                 .getIntColumn("bitstream_id"));
     }
 
@@ -566,7 +561,7 @@ public class Bitstream extends DSpaceObject
     boolean isDeleted() throws SQLException
     {
         String query = "select count(*) as mycount from Bitstream where deleted = '1' and bitstream_id = ? ";
-        TableRowIterator tri = DatabaseManager.query(bContext, query, bRow.getIntColumn("bitstream_id"));
+        TableRowIterator tri = DatabaseManager.query(getContext(), query, bRow.getIntColumn("bitstream_id"));
         long count = 0;
 
         try
@@ -598,9 +593,9 @@ public class Bitstream extends DSpaceObject
             AuthorizeException
     {
         // Maybe should return AuthorizeException??
-        AuthorizeManager.authorizeAction(bContext, this, Constants.READ);
+        AuthorizeManager.authorizeAction(getContext(), this, Constants.READ);
 
-        return BitstreamStorageManager.retrieve(bContext, bRow
+        return BitstreamStorageManager.retrieve(getContext(), bRow
                 .getIntColumn("bitstream_id"));
     }
 
@@ -613,7 +608,7 @@ public class Bitstream extends DSpaceObject
     public Bundle[] getBundles() throws SQLException
     {
         // Get the bundle table rows
-        TableRowIterator tri = DatabaseManager.queryTable(bContext, "bundle",
+        TableRowIterator tri = DatabaseManager.queryTable(getContext(), "bundle",
                 "SELECT bundle.* FROM bundle, bundle2bitstream WHERE " + 
                 "bundle.bundle_id=bundle2bitstream.bundle_id AND " +
                 "bundle2bitstream.bitstream_id= ? ",
@@ -628,7 +623,7 @@ public class Bitstream extends DSpaceObject
                 TableRow r = tri.next();
 
                 // First check the cache
-                Bundle fromCache = (Bundle) bContext.fromCache(Bundle.class, r
+                Bundle fromCache = (Bundle) getContext().fromCache(Bundle.class, r
                         .getIntColumn("bundle_id"));
 
                 if (fromCache != null)
@@ -637,7 +632,7 @@ public class Bitstream extends DSpaceObject
                 }
                 else
                 {
-                    bundles.add(new Bundle(bContext, r));
+                    bundles.add(new Bundle(getContext(), r));
                 }
             }
         }
@@ -710,23 +705,23 @@ public class Bitstream extends DSpaceObject
         else
         {
             // is the bitstream a logo for a community or a collection?
-            TableRow qResult = DatabaseManager.querySingle(bContext,
+            TableRow qResult = DatabaseManager.querySingle(getContext(),
                        "SELECT collection_id FROM collection " +
                        "WHERE logo_bitstream_id = ?",getID());
             if (qResult != null) 
             {
-                return Collection.find(bContext,qResult.getIntColumn("collection_id"));
+                return Collection.find(getContext(),qResult.getIntColumn("collection_id"));
             }
             else
             {   
                 // is the bitstream related to a community?
-                qResult = DatabaseManager.querySingle(bContext,
+                qResult = DatabaseManager.querySingle(getContext(),
                         "SELECT community_id FROM community " +
                         "WHERE logo_bitstream_id = ?",getID());
     
                 if (qResult != null)
                 {
-                    return Community.find(bContext,qResult.getIntColumn("community_id"));
+                    return Community.find(getContext(),qResult.getIntColumn("community_id"));
                 }
                 else
                 {
