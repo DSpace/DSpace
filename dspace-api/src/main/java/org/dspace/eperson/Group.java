@@ -48,9 +48,6 @@ public class Group extends DSpaceObject
     /** log4j logger */
     private static Logger log = Logger.getLogger(Group.class);
 
-    /** Our context */
-    private Context myContext;
-
     /** The row in the table representing this object */
     private TableRow myRow;
 
@@ -78,11 +75,11 @@ public class Group extends DSpaceObject
      */
     Group(Context context, TableRow row) throws SQLException
     {
-        myContext = context;
+        super(context);
         myRow = row;
 
         // Cache ourselves
-        context.cache(this, row.getIntColumn("eperson_group_id"));
+        getContext().cache(this, row.getIntColumn("eperson_group_id"));
 
         modifiedMetadata = false;
         clearDetails();
@@ -104,7 +101,7 @@ public class Group extends DSpaceObject
             try
             {
                 // get epeople objects
-                TableRowIterator tri = DatabaseManager.queryTable(myContext,"eperson",
+                TableRowIterator tri = DatabaseManager.queryTable(getContext(),"eperson",
                                 "SELECT eperson.* FROM eperson, epersongroup2eperson WHERE " +
                                 "epersongroup2eperson.eperson_id=eperson.eperson_id AND " +
                                 "epersongroup2eperson.eperson_group_id= ?",
@@ -117,7 +114,7 @@ public class Group extends DSpaceObject
                         TableRow r = (TableRow) tri.next();
 
                         // First check the cache
-                        EPerson fromCache = (EPerson) myContext.fromCache(
+                        EPerson fromCache = (EPerson) getContext().fromCache(
                                 EPerson.class, r.getIntColumn("eperson_id"));
 
                         if (fromCache != null)
@@ -126,7 +123,7 @@ public class Group extends DSpaceObject
                         }
                         else
                         {
-                            epeople.add(new EPerson(myContext, r));
+                            epeople.add(new EPerson(getContext(), r));
                         }
                     }
                 }
@@ -140,7 +137,7 @@ public class Group extends DSpaceObject
                 }
 
                 // now get Group objects
-                tri = DatabaseManager.queryTable(myContext,"epersongroup",
+                tri = DatabaseManager.queryTable(getContext(),"epersongroup",
                                 "SELECT epersongroup.* FROM epersongroup, group2group WHERE " +
                                 "group2group.child_id=epersongroup.eperson_group_id AND "+
                                 "group2group.parent_id= ? ",
@@ -153,7 +150,7 @@ public class Group extends DSpaceObject
                         TableRow r = (TableRow) tri.next();
 
                         // First check the cache
-                        Group fromCache = (Group) myContext.fromCache(Group.class,
+                        Group fromCache = (Group) getContext().fromCache(Group.class,
                                 r.getIntColumn("eperson_group_id"));
 
                         if (fromCache != null)
@@ -162,7 +159,7 @@ public class Group extends DSpaceObject
                         }
                         else
                         {
-                            groups.add(new Group(myContext, r));
+                            groups.add(new Group(getContext(), r));
                         }
                     }
                 }
@@ -264,7 +261,7 @@ public class Group extends DSpaceObject
         epeople.add(e);
         epeopleChanged = true;
 
-        myContext.addEvent(new Event(Event.ADD, Constants.GROUP, getID(), Constants.EPERSON, e.getID(), e.getEmail()));
+        getContext().addEvent(new Event(Event.ADD, Constants.GROUP, getID(), Constants.EPERSON, e.getID(), e.getEmail()));
     }
 
     /**
@@ -286,7 +283,7 @@ public class Group extends DSpaceObject
         groups.add(g);
         groupsChanged = true;
 
-        myContext.addEvent(new Event(Event.ADD, Constants.GROUP, getID(), Constants.GROUP, g.getID(), g.getName()));
+        getContext().addEvent(new Event(Event.ADD, Constants.GROUP, getID(), Constants.GROUP, g.getID(), g.getName()));
     }
 
     /**
@@ -299,10 +296,9 @@ public class Group extends DSpaceObject
     {
         loadData(); // make sure Group has data loaded
 
-        if (epeople.remove(e))
-        {
+        if (epeople.remove(e)) {
             epeopleChanged = true;
-            myContext.addEvent(new Event(Event.REMOVE, Constants.GROUP, getID(), Constants.EPERSON, e.getID(), e.getEmail()));
+            getContext().addEvent(new Event(Event.REMOVE, Constants.GROUP, getID(), Constants.EPERSON, e.getID(), e.getEmail()));
         }
     }
 
@@ -315,10 +311,9 @@ public class Group extends DSpaceObject
     {
         loadData(); // make sure Group has data loaded
 
-        if (groups.remove(g))
-        {
+        if (groups.remove(g)) {
             groupsChanged = true;
-            myContext.addEvent(new Event(Event.REMOVE, Constants.GROUP, getID(), Constants.GROUP, g.getID(), g.getName()));
+            getContext().addEvent(new Event(Event.REMOVE, Constants.GROUP, getID(), Constants.GROUP, g.getID(), g.getName()));
         }
     }
 
@@ -989,30 +984,29 @@ public class Group extends DSpaceObject
      * Delete a group
      * 
      */
-    public void delete() throws SQLException
-    {
+    public void delete() throws SQLException {
         // FIXME: authorizations
 
-        myContext.addEvent(new Event(Event.DELETE, Constants.GROUP, getID(), getName()));
+        getContext().addEvent(new Event(Event.DELETE, Constants.GROUP, getID(), getName()));
 
         // Remove from cache
-        myContext.removeCached(this, getID());
+        getContext().removeCached(this, getID());
 
         // Remove any ResourcePolicies that reference this group
-        AuthorizeManager.removeGroupPolicies(myContext, getID());
+        AuthorizeManager.removeGroupPolicies(getContext(), getID());
 
         // Remove any group memberships first
-        DatabaseManager.updateQuery(myContext,
+        DatabaseManager.updateQuery(getContext(),
                 "DELETE FROM EPersonGroup2EPerson WHERE eperson_group_id= ? ",
                 getID());
 
         // remove any group2groupcache entries
-        DatabaseManager.updateQuery(myContext,
+        DatabaseManager.updateQuery(getContext(),
                 "DELETE FROM group2groupcache WHERE parent_id= ? OR child_id= ? ",
                 getID(),getID());
 
         // Now remove any group2group assignments
-        DatabaseManager.updateQuery(myContext,
+        DatabaseManager.updateQuery(getContext(),
                 "DELETE FROM group2group WHERE parent_id= ? OR child_id= ? ",
                 getID(),getID());
 
@@ -1020,11 +1014,11 @@ public class Group extends DSpaceObject
         deleteEpersonGroup2WorkspaceItem();
 
         // Remove ourself
-        DatabaseManager.delete(myContext, myRow);
+        DatabaseManager.delete(getContext(), myRow);
 
         epeople.clear();
 
-        log.info(LogManager.getHeader(myContext, "delete_group", "group_id="
+        log.info(LogManager.getHeader(getContext(), "delete_group", "group_id="
                 + getID()));
     }
 
@@ -1033,7 +1027,7 @@ public class Group extends DSpaceObject
      */
     private void deleteEpersonGroup2WorkspaceItem() throws SQLException
     {
-        DatabaseManager.updateQuery(myContext,
+        DatabaseManager.updateQuery(getContext(),
                 "DELETE FROM EPersonGroup2WorkspaceItem WHERE eperson_group_id= ? ",
                 getID());
     }
@@ -1096,14 +1090,13 @@ public class Group extends DSpaceObject
     /**
      * Update the group - writing out group object and EPerson list if necessary
      */
-    public void update() throws SQLException, AuthorizeException
-    {
+    public void update() throws SQLException, AuthorizeException {
         // FIXME: Check authorisation
-        DatabaseManager.update(myContext, myRow);
+        DatabaseManager.update(getContext(), myRow);
 
         if (modifiedMetadata)
         {
-            myContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.GROUP, getID(), getDetails()));
+            getContext().addEvent(new Event(Event.MODIFY_METADATA, Constants.GROUP, getID(), getDetails()));
             modifiedMetadata = false;
             clearDetails();
         }
@@ -1112,7 +1105,7 @@ public class Group extends DSpaceObject
         if (epeopleChanged)
         {
             // Remove any existing mappings
-            DatabaseManager.updateQuery(myContext,
+            DatabaseManager.updateQuery(getContext(),
                     "delete from epersongroup2eperson where eperson_group_id= ? ",
                     getID());
 
@@ -1126,7 +1119,7 @@ public class Group extends DSpaceObject
                 TableRow mappingRow = DatabaseManager.row("epersongroup2eperson");
                 mappingRow.setColumn("eperson_id", e.getID());
                 mappingRow.setColumn("eperson_group_id", getID());
-                DatabaseManager.insert(myContext, mappingRow);
+                DatabaseManager.insert(getContext(), mappingRow);
             }
 
             epeopleChanged = false;
@@ -1136,7 +1129,7 @@ public class Group extends DSpaceObject
         if (groupsChanged)
         {
             // Remove any existing mappings
-            DatabaseManager.updateQuery(myContext,
+            DatabaseManager.updateQuery(getContext(),
                     "delete from group2group where parent_id= ? ",
                     getID());
 
@@ -1150,7 +1143,7 @@ public class Group extends DSpaceObject
                 TableRow mappingRow = DatabaseManager.row("group2group");
                 mappingRow.setColumn("parent_id", getID());
                 mappingRow.setColumn("child_id", g.getID());
-                DatabaseManager.insert(myContext, mappingRow);
+                DatabaseManager.insert(getContext(), mappingRow);
             }
 
             // groups changed, now change group cache
@@ -1159,7 +1152,7 @@ public class Group extends DSpaceObject
             groupsChanged = false;
         }
 
-        log.info(LogManager.getHeader(myContext, "update_group", "group_id="
+        log.info(LogManager.getHeader(getContext(), "update_group", "group_id="
                 + getID()));
     }
 
@@ -1220,7 +1213,7 @@ public class Group extends DSpaceObject
     private void rethinkGroupCache() throws SQLException
     {
         // read in the group2group table
-        TableRowIterator tri = DatabaseManager.queryTable(myContext, "group2group",
+        TableRowIterator tri = DatabaseManager.queryTable(getContext(), "group2group",
                 "SELECT * FROM group2group");
 
         Map<Integer,Set<Integer>> parents = new HashMap<Integer,Set<Integer>>();
@@ -1273,7 +1266,7 @@ public class Group extends DSpaceObject
         }
 
         // empty out group2groupcache table
-        DatabaseManager.updateQuery(myContext,
+        DatabaseManager.updateQuery(getContext(),
                 "DELETE FROM group2groupcache WHERE id >= 0");
 
         // write out new one
@@ -1288,7 +1281,7 @@ public class Group extends DSpaceObject
                 row.setColumn("parent_id", parentID);
                 row.setColumn("child_id", child);
 
-                DatabaseManager.insert(myContext, row);
+                DatabaseManager.insert(getContext(), row);
             }
         }
     }
@@ -1352,7 +1345,7 @@ public class Group extends DSpaceObject
             // is this a collection related group?
             TableRow qResult = DatabaseManager
                     .querySingle(
-                            myContext,
+                            getContext(),
                             "SELECT collection_id, workflow_step_1, workflow_step_2, " +
                             " workflow_step_3, submitter, admin FROM collection "
                                     + " WHERE workflow_step_1 = ? OR "
@@ -1362,7 +1355,7 @@ public class Group extends DSpaceObject
                             getID(), getID(), getID(), getID(), getID());
             if (qResult != null)
             {
-                Collection collection = Collection.find(myContext, qResult
+                Collection collection = Collection.find(getContext(), qResult
                         .getIntColumn("collection_id"));
                 
                 if ((qResult.getIntColumn("workflow_step_1") == getID() ||
@@ -1405,13 +1398,13 @@ public class Group extends DSpaceObject
             // to manage it?
             else if (AuthorizeConfiguration.canCommunityAdminManageAdminGroup())
             {
-                qResult = DatabaseManager.querySingle(myContext,
+                qResult = DatabaseManager.querySingle(getContext(),
                         "SELECT community_id FROM community "
                                 + "WHERE admin = ?", getID());
 
                 if (qResult != null)
                 {
-                    Community community = Community.find(myContext, qResult
+                    Community community = Community.find(getContext(), qResult
                             .getIntColumn("community_id"));
                     return community;
                 }

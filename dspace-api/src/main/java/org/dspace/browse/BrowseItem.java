@@ -38,10 +38,7 @@ public class BrowseItem extends DSpaceObject
 {
 	/** Logger */
     private static Logger log = Logger.getLogger(BrowseItem.class);
-    
-    /** DSpace context */
-	private Context context;
-	
+
 	/** a List of all the metadata */
 	private List<DCValue> metadata = new ArrayList<DCValue>();
 	
@@ -67,7 +64,7 @@ public class BrowseItem extends DSpaceObject
      */
 	public BrowseItem(Context context, int id, boolean in_archive, boolean withdrawn)
 	{
-		this.context = context;
+        super(context);
 		this.id = id;
         this.in_archive = in_archive;
         this.withdrawn = withdrawn;
@@ -88,7 +85,7 @@ public class BrowseItem extends DSpaceObject
 	{
         try
         {
-            BrowseItemDAO dao = BrowseDAOFactory.getItemInstance(context);
+            BrowseItemDAO dao = BrowseDAOFactory.getItemInstance(getContext());
 
             // if the qualifier is a wildcard, we have to get it out of the
             // database
@@ -282,7 +279,7 @@ public class BrowseItem extends DSpaceObject
 		{
 			try
 			{
-				this.handle = HandleManager.findHandle(context, this);
+				this.handle = HandleManager.findHandle(getContext(), this);
 			}
 			catch (SQLException e)
 			{
@@ -307,7 +304,7 @@ public class BrowseItem extends DSpaceObject
     	throws SQLException
     {
     	// instantiate an item for this one.  Not nice.
-        Item item = Item.find(context, id);
+        Item item = Item.find(getContext(), id);
     	
     	if (item == null)
     	{
@@ -350,7 +347,7 @@ public class BrowseItem extends DSpaceObject
         	
         	if ((original[0].getBitstreams().length > 1) && (original[0].getPrimaryBitstreamID() > -1))
         	{
-        		originalBitstream = Bitstream.find(context, original[0].getPrimaryBitstreamID());
+        		originalBitstream = Bitstream.find(getContext(), original[0].getPrimaryBitstreamID());
         		thumbnailBitstream = thumbs[0].getBitstreamByName(originalBitstream.getName() + ".jpg");
         	}
         	else
@@ -360,7 +357,7 @@ public class BrowseItem extends DSpaceObject
         	}
         	
         	if ((thumbnailBitstream != null)
-        			&& (AuthorizeManager.authorizeActionBoolean(context, thumbnailBitstream, Constants.READ)))
+        			&& (AuthorizeManager.authorizeActionBoolean(getContext(), thumbnailBitstream, Constants.READ)))
         	{
                 return new Thumbnail(thumbnailBitstream, originalBitstream);
         	}
