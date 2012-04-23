@@ -60,7 +60,7 @@ public class Personas {
 	       String where=Personas.generateCondition(apellido, nombre); 
 
 	        EntityManager em = Personas.entityManager();
-	        TypedQuery<Personas> q = em.createQuery("SELECT o FROM Personas AS o " + where + " ORDER BY o.apellido, o.nombre", Personas.class);
+	        TypedQuery<Personas> q = em.createQuery("SELECT o FROM Personas AS o " + where + " ORDER BY o.apellido, o.nombre ASC", Personas.class);
 	        if (apellido.length() != 0)
 	        	q.setParameter("apellido", apellido);
 	        if (nombre.length() != 0)

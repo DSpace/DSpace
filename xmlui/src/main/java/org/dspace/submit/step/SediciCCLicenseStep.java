@@ -21,6 +21,7 @@ import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -149,63 +150,122 @@ public class SediciCCLicenseStep extends AbstractProcessingStep
             HttpServletResponse response, SubmissionInfo subInfo)
             throws ServletException, IOException, SQLException,
             AuthorizeException {
-       
-        HttpSession session = request.getSession();
-        	
+    	
+    	String[] uriField=(ConfigurationManager.getProperty("cc.license.uri")).split("\\.");
+        String uriFieldSchema=(uriField.length>0)?uriField[0]:null;
+    	String uriFieldElement=(uriField.length>1)?uriField[1]:null;
+    	String uriFieldQualifier=(uriField.length>2)?uriField[2]:null;
+    	
+    	String[] uriName=(ConfigurationManager.getProperty("cc.license.name")).split("\\.");
+    	String uriNameSchema=(uriName.length>0)?uriName[0]:null;
+    	String uriNameElement=(uriName.length>1)?uriName[1]:null;
+    	String uriNameQualifier=(uriName.length>2)?uriName[2]:null;
+    	
     	String jurisdictionId = (ConfigurationManager.getProperty("cc.license.jurisdiction") != null) ? ConfigurationManager.getProperty("cc.license.jurisdiction") : "";
     	String jurisdictionDescription = (ConfigurationManager.getProperty("cc.license.jurisdiction.description") != null) ? ConfigurationManager.getProperty("cc.license.jurisdiction.description") : "";
-        String commercial = request.getParameter("commercial_chooser");
-        String derivatives = request.getParameter("derivatives_chooser");
         
-        if (commercial!=null && derivatives!=null){
-        
-	    	String[] uriField=(ConfigurationManager.getProperty("cc.license.uri")).split("\\.");
-	        String uriFieldSchema=(uriField.length>0)?uriField[0]:null;
-	    	String uriFieldElement=(uriField.length>1)?uriField[1]:null;
-	    	String uriFieldQualifier=(uriField.length>2)?uriField[2]:null;
-	    	
-	    	String[] uriName=(ConfigurationManager.getProperty("cc.license.name")).split("\\.");
-	    	String uriNameSchema=(uriName.length>0)?uriName[0]:null;
-	    	String uriNameElement=(uriName.length>1)?uriName[1]:null;
-	    	String uriNameQualifier=(uriName.length>2)?uriName[2]:null;
-	
-	    	Item item = subInfo.getSubmissionItem().getItem();
-	    	item.clearMetadata(uriNameSchema, uriNameElement, uriNameQualifier, null);
-	    	item.clearMetadata(uriFieldSchema, uriFieldElement, uriFieldQualifier, null);
-	    	
-	    	//cargo los nuevos valores para el metadata 
-	    	String licenseUri="http://creativecommons.org/licenses/by";
-	    	String licenseDescription="Atribución";
-	    	
-	    	if (!commercial.equals("y")){
-	    		licenseUri=licenseUri+"-"+commercial; 
-	    		licenseDescription=licenseDescription+"-NoComercial";
-	    	}
-	    	if (!derivatives.equals("y")){
-	    		licenseUri=licenseUri + "-" + derivatives; 
-	    		if (derivatives=="nd"){
-	    			licenseDescription=licenseDescription+"-SinDerivadas";
-	    		} else {
-	    			licenseDescription=licenseDescription+"-CompartirIgual";
-	    		}
-	    	};
-	    	licenseUri=licenseUri+"/2.5/";
-	    	licenseDescription=licenseDescription+" 2.5";
-	    	if (!jurisdictionId.equals("")){
-	    		licenseUri=licenseUri+jurisdictionId+"/";
-	    		licenseDescription=licenseDescription+" "+ jurisdictionDescription;
-	    	};
-	    	item.addMetadata(uriFieldSchema, uriFieldElement, uriFieldQualifier, null, licenseUri);
-	    	item.addMetadata(uriNameSchema, uriNameElement, uriNameQualifier, null, licenseDescription);
-	    	
+    	Item item = subInfo.getSubmissionItem().getItem();
+    	HttpSession session = request.getSession();
+    	String licenseUri;
+    	String licenseDescription;
+    	
+       if (AuthorizeManager.isAdmin(context, item.getOwningCollection())){
+    	   //es administrador de la coleccion a la que se está agregando el item, hay un select
+    	   String cc_license = request.getParameter("cc_license_chooser");
+    	   //limpio los metadatos
+    	   item.clearMetadata(uriNameSchema, uriNameElement, uriNameQualifier, null);
+	       item.clearMetadata(uriFieldSchema, uriFieldElement, uriFieldQualifier, null);
+	       if (cc_license!=""){
+		    	//cargo los nuevos valores para el metadata 
+		    	licenseUri="http://creativecommons.org/licenses/"+cc_license;
+		    	HashMap<String, Integer> arreglo=new HashMap<String, Integer>();
+		    	arreglo.put("by-nc-nd", 1);
+		    	arreglo.put("by-nc-sa", 2);
+		    	arreglo.put("by-nc", 3);
+		    	arreglo.put("by-nd", 4);
+		    	arreglo.put("by-sa", 5);
+		    	arreglo.put("by", 6);
+		    	switch (arreglo.get(cc_license)) {
+				case 1:
+					licenseDescription="Atribución-NoComercial-SinDerivadas";
+					break;
+				case 2:
+					licenseDescription="Atribución-NoComercial-CompartirIgual";
+					break;
+				case 3:
+					licenseDescription="Atribución-NoComercial";
+					break;
+				case 4:
+					licenseDescription="Atribución-SinDerivadas";
+					break;
+				case 5:
+					licenseDescription="Atribución-CompartirIgual";
+					break;
+				default:
+					licenseDescription="Atribución";
+					break;
+				}
+		    	//agrego la version y la jurisdiccion
+		    	licenseUri=licenseUri+"/2.5/";
+		    	licenseDescription=licenseDescription+" 2.5";
+		    	if (!jurisdictionId.equals("")){
+		    		licenseUri=licenseUri+jurisdictionId+"/";
+		    		licenseDescription=licenseDescription+" "+ jurisdictionDescription;
+		    	};
+		    	//agrego los metadatos
+		    	item.addMetadata(uriFieldSchema, uriFieldElement, uriFieldQualifier, null, licenseUri);
+		    	item.addMetadata(uriNameSchema, uriNameElement, uriNameQualifier, null, licenseDescription);
+		    }
+	        //actualizo y comiteo
 			item.update();
 			context.commit();
 			removeRequiredAttributes(session);
-			return STATUS_COMPLETE;
-       } else {
-    	   request.getSession().setAttribute("ccError", "xmlui.Submission.submit.SediciCCLicenseStep.campos_obligatorios");
-    	   session.setAttribute("isFieldRequired", "TRUE");
-    	   return STATUS_LICENSE_REJECTED;
+			return STATUS_COMPLETE;			
+       } else {    	   
+            //si no es administrador trato los campos por separado
+	    	String commercial = request.getParameter("commercial_chooser");
+	        String derivatives = request.getParameter("derivatives_chooser");
+	       
+	        if (commercial!=null && derivatives!=null){
+	        
+
+		    	item.clearMetadata(uriNameSchema, uriNameElement, uriNameQualifier, null);
+		    	item.clearMetadata(uriFieldSchema, uriFieldElement, uriFieldQualifier, null);
+		    	
+		    	//cargo los nuevos valores para el metadata 
+		    	licenseUri="http://creativecommons.org/licenses/by";
+		    	licenseDescription="Atribución";
+		    	
+		    	if (!commercial.equals("y")){
+		    		licenseUri=licenseUri+"-"+commercial; 
+		    		licenseDescription=licenseDescription+"-NoComercial";
+		    	}
+		    	if (!derivatives.equals("y")){
+		    		licenseUri=licenseUri + "-" + derivatives; 
+		    		if (derivatives=="nd"){
+		    			licenseDescription=licenseDescription+"-SinDerivadas";
+		    		} else {
+		    			licenseDescription=licenseDescription+"-CompartirIgual";
+		    		}
+		    	};
+		    	licenseUri=licenseUri+"/2.5/";
+		    	licenseDescription=licenseDescription+" 2.5";
+		    	if (!jurisdictionId.equals("")){
+		    		licenseUri=licenseUri+jurisdictionId+"/";
+		    		licenseDescription=licenseDescription+" "+ jurisdictionDescription;
+		    	};
+		    	item.addMetadata(uriFieldSchema, uriFieldElement, uriFieldQualifier, null, licenseUri);
+		    	item.addMetadata(uriNameSchema, uriNameElement, uriNameQualifier, null, licenseDescription);
+		    	
+				item.update();
+				context.commit();
+				removeRequiredAttributes(session);
+				return STATUS_COMPLETE;
+	       } else {
+	    	   request.getSession().setAttribute("ccError", "xmlui.Submission.submit.SediciCCLicenseStep.campos_obligatorios");
+	    	   session.setAttribute("isFieldRequired", "TRUE");
+	    	   return STATUS_LICENSE_REJECTED;
+	       }
        }
 
     	

@@ -21,6 +21,7 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Radio;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
@@ -153,33 +154,62 @@ public class SediciCCLicenseStep extends AbstractSubmissionStep
 	    list.addItem(T_info1);
 	    list.setHead(T_head);
 	    
-	    //cargo las opciones de CC
-	    //Opcion 1
-	    List edit = div.addList("selectlist1", List.TYPE_SIMPLE, "horizontalVanilla");
-	    edit.addItem(Commercial_question);
-	    edit.addItem().addFigure(contextPath + "/themes/Reference/images/information.png", "javascript:void(0)", "El licenciador permite copiar, distribuir y comunicar públicamente la obra. A cambio, esta obra no puede ser utilizada con finalidades comerciales -- a menos que se obtenga el permiso del licenciador.", "information");
-	    List subList = div.addList("sublist2", List.TYPE_SIMPLE, "horizontalVanilla");
-	    Radio radio  = subList.addItem().addRadio("commercial_chooser");
-	    radio.setRequired();
-	    radio.addOption("nc", Commercial_question_answer_no);
-		radio.addOption("y", Commercial_question_answer_yes);
-		if (!(commercial.equals(""))){			
-			radio.setOptionSelected(commercial);
-		}
-		div.addSimpleHTMLFragment(true, "&#160;");
-		
-		edit = div.addList("selectlist2", List.TYPE_SIMPLE, "horizontalVanilla");
-		edit.addItem(Derivatives_question);
-	    edit.addItem().addFigure(contextPath + "/themes/Reference/images/information.png", "javascript:void(0)", "El licenciador permite copiar, distribuir y comunicar públicamente solamente copias inalteradas de la obra -- no obras derivadas basadas en ella.", "information");
-	    subList = div.addList("sublist2", List.TYPE_SIMPLE, "horizontalVanilla");
-	    radio  = subList.addItem().addRadio("derivatives_chooser");
-	    radio.setRequired();
-		radio.addOption("sa", Derivatives_question_answer_sa);
-		radio.addOption("nd", Derivatives_question_answer_no);
-		radio.addOption("y", Derivatives_question_answer_yes);
-		if (!(derivatives.equals(""))){			
-			radio.setOptionSelected(derivatives);
-		}
+	    if (AuthorizeManager.isAdmin(context, item.getOwningCollection())){
+	    	//si es administrador de la colección se debe mostrar un select en vez de los radios
+        	List edit = div.addList("selectlist1", List.TYPE_SIMPLE, "horizontalVanilla");
+		    edit.addItem(message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.pregunta"));
+		    edit.addItem().addFigure(contextPath + "/themes/Reference/images/information.png", "javascript:void(0)", "El licenciador permite copiar, distribuir y comunicar públicamente la obra. A cambio, esta obra no puede ser utilizada con finalidades comerciales -- a menos que se obtenga el permiso del licenciador.", "information");
+		    List subList = div.addList("sublist2", List.TYPE_SIMPLE, "horizontalVanilla");
+		    Select select  = subList.addItem().addSelect("cc_license_chooser");
+		    select.addOption("", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.sinLicencia"));
+		    select.addOption("by", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by"));
+		    select.addOption("by-nc", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc"));
+		    select.addOption("by-nc-nd", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-nd"));
+		    select.addOption("by-nc-sa", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-sa"));
+		    select.addOption("by-nd", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nd"));
+		    select.addOption("by-sa", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-sa"));
+		   
+	        if (carga.length>0){
+		    	dato=carga[0].value;
+		    	int inicio=dato.indexOf("/by")+1;
+		        if (inicio!=0){
+			    	String substring=dato.substring(inicio);
+			    	int fin= substring.indexOf("/");	    	
+			    	substring=substring.substring(0,fin);
+			    	select.setOptionSelected(substring);
+		        }
+	        } else {
+	        	select.setOptionSelected("");
+	        }
+	    } else {		    
+		    //cargo las opciones de CC
+		    //Opcion 1
+		    List edit = div.addList("selectlist1", List.TYPE_SIMPLE, "horizontalVanilla");
+		    edit.addItem(Commercial_question);
+		    edit.addItem().addFigure(contextPath + "/themes/Reference/images/information.png", "javascript:void(0)", "El licenciador permite copiar, distribuir y comunicar públicamente la obra. A cambio, esta obra no puede ser utilizada con finalidades comerciales -- a menos que se obtenga el permiso del licenciador.", "information");
+		    List subList = div.addList("sublist2", List.TYPE_SIMPLE, "horizontalVanilla");
+		    Radio radio  = subList.addItem().addRadio("commercial_chooser");
+		    radio.setRequired();
+		    radio.addOption("nc", Commercial_question_answer_no);
+			radio.addOption("y", Commercial_question_answer_yes);
+			if (!(commercial.equals(""))){			
+				radio.setOptionSelected(commercial);
+			}
+			div.addSimpleHTMLFragment(true, "&#160;");
+			
+			edit = div.addList("selectlist2", List.TYPE_SIMPLE, "horizontalVanilla");
+			edit.addItem(Derivatives_question);
+		    edit.addItem().addFigure(contextPath + "/themes/Reference/images/information.png", "javascript:void(0)", "El licenciador permite copiar, distribuir y comunicar públicamente solamente copias inalteradas de la obra -- no obras derivadas basadas en ella.", "information");
+		    subList = div.addList("sublist2", List.TYPE_SIMPLE, "horizontalVanilla");
+		    radio  = subList.addItem().addRadio("derivatives_chooser");
+		    radio.setRequired();
+			radio.addOption("sa", Derivatives_question_answer_sa);
+			radio.addOption("nd", Derivatives_question_answer_no);
+			radio.addOption("y", Derivatives_question_answer_yes);
+			if (!(derivatives.equals(""))){			
+				radio.setOptionSelected(derivatives);
+			}
+	    };
 		div.addSimpleHTMLFragment(true, "&#160;");
 
 		Division statusDivision = div.addDivision("statusDivision");

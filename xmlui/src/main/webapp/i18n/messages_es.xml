@@ -2257,6 +2257,15 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.campos_obligatorios">Ha ocurrido un error: todos los campos son obligatorios</message>
 
 
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.pregunta">Seleccione una licencia:</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.sinLicencia">Sin licencia</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by">Atribución</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc">Atribución-NoComercial</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-nd">Atribución-NoComercial-SinDerivadas</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-sa">Atribución-NoComercial-CompartirIgual</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nd">Atribución-SinDerivadas</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-sa">Atribución-CompartirIgual</message>
+
 <!-- Otras traducciones -->
 <message key="sedici.aspect.collectionViewer.addItem">Agregar Item</message>
 <message key="xmlui.administrative.Navigation.context_edit_item_workflow">Editar Item</message>

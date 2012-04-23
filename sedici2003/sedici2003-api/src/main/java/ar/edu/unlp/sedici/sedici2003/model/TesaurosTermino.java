@@ -72,6 +72,9 @@ public class TesaurosTermino {
 			"FROM TesaurosTermino AS terminos, TesaurosRelaciones AS relaciones " +
 			"WHERE terminos.id = relaciones.id.idTermino2 AND relaciones.id.tipoRelacion = 1 " +
 			"AND LOWER(terminos.nombreEs) LIKE LOWER(:filtro) AND " + parentFilter;
+		
+		//Agrego el orden
+		sql=sql + " ORDER BY terminos.nombreEs ASC";
 
 		EntityManager em = TesaurosTermino.entityManager();
 		TypedQuery<TesaurosTermino> q = em.createQuery(sql, TesaurosTermino.class);

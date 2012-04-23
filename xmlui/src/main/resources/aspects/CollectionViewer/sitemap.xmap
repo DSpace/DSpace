@@ -25,11 +25,14 @@
                         
                         <map:generate/>   
                         
-                        <map:transform type="Navigation"/>                     
+                       <map:match type="regexp" pattern="handle/.*/\d*$">
+                        	<map:transform type="Navigation"/>
+                        </map:match>                 
 
                         <!-- Handle specific features -->
                         <map:match pattern="handle/*/**">
-     
+
+                                     
                                 <!-- Community, Collection, and Item Viewers -->
                               
                                         <map:match type="HandleAuthorizedMatcher" pattern="READ">

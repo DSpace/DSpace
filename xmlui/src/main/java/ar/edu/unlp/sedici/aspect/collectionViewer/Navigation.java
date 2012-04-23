@@ -121,15 +121,14 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         options.addList("browse");
         options.addList("account");
         List context = options.addList("context");
-        options.addList("administrative");    
+        options.addList("administrative");
         
-
         // Context Administrative options
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         
     	if (dso instanceof Collection){
     		Collection collection = (Collection) dso;
-    		
+
     		//collections = Collection.findAuthorized(context, null, Constants.ADD);
     		
             if (AuthorizeManager.authorizeActionBoolean(this.context, dso, Constants.ADD)){

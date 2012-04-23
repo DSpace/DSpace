@@ -70,7 +70,11 @@ public class JerarquiasTermino {
 		String sql = "SELECT terminos " +
 			"FROM JerarquiasTermino AS terminos, JerarquiasRelaciones AS relaciones " +
 			"WHERE terminos.id = relaciones.id.idTermino2 AND relaciones.tipoRelacion = 1 " +
-			"AND LOWER(terminos.nombreEs) LIKE LOWER(:filtro) AND " + parentFilter;
+			"AND LOWER(terminos.nombreEs) LIKE LOWER(:filtro) AND " + parentFilter ;
+		
+		//Agrego el orden
+		sql=sql + " ORDER BY terminos.nombreEs ASC";
+
 
 		EntityManager em = JerarquiasTermino.entityManager();
 		TypedQuery<JerarquiasTermino> q = em.createQuery(sql, JerarquiasTermino.class);
