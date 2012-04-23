@@ -120,7 +120,7 @@
 		</includes>
 	
 		<binaries>
-		<includeDependencies>false</includeDependencies>
+		<includeDependencies>true</includeDependencies>
 		<outputDirectory>lib/</outputDirectory>
 		<unpack>false</unpack>
 		</binaries>
