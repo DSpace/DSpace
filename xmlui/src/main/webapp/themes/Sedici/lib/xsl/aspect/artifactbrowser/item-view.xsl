@@ -700,7 +700,7 @@
         <xsl:param name="context" select="."/>
         <div class="file-wrapper clearfix">
             <div class="thumbnail-wrapper">
-                <a class="image-link" target="blank">
+                <a class="image-link" target="_blank">
                     <xsl:attribute name="href">
                         <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
                     </xsl:attribute>
