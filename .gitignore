@@ -1,17 +1,31 @@
-## Ignore the MVN compiled output directories from version tracking
+dspace-api/target/
+dspace-discovery/dspace-discovery-provider/target/
+dspace-discovery/dspace-discovery-solr/target/
+dspace-discovery/dspace-discovery-xmlui-api/target/
+dspace-discovery/dspace-discovery-xmlui-webapp/target/
+dspace-jspui/dspace-jspui-api/target/
+dspace-jspui/dspace-jspui-webapp/target/
+dspace-lni/dspace-lni-client/target/
+dspace-lni/dspace-lni-core/target/
+dspace-lni/dspace-lni-webapp/target/
+dspace-oai/dspace-oai-api/target/
+dspace-oai/dspace-oai-webapp/target/
+dspace-stats/target/
+dspace-sword-client/dspace-sword-client-api/target/
+dspace-sword-client/dspace-sword-client-xmlui-api/target/
+dspace-sword-client/dspace-sword-client-xmlui-webapp/target/
+dspace-sword/dspace-sword-api/target/
+dspace-sword/dspace-sword-webapp/target/
+dspace-swordv2/target/
+dspace-xmlui/dspace-xmlui-api/target/
+dspace-xmlui/dspace-xmlui-webapp/target/
+dspace-xmlui/dspace-xmlui-wing/target/
+dspace/modules/jspui/target/
+dspace/modules/lni/target/
+dspace/modules/oai/target/
+dspace/modules/solr/target/
+dspace/modules/sword/target/
+dspace/modules/swordv2/target/
+dspace/modules/xmlui/target/
+dspace/target/
 target/
-
-## Ignore project files created by IntelliJ IDEA
-*.iml
-*.ipr
-*.iws
-.idea/
-
-## Ignore project files created by NetBeans
-nbproject/private/
-build/
-nbbuild/
-dist/
-nbdist/
-nbactions.xml
-nb-configuration.xml
