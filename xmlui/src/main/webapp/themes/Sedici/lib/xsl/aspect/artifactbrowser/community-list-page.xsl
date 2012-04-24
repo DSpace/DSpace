@@ -116,6 +116,8 @@
     		<xsl:variable name="community-selector">/metadata/handle/<xsl:value-of select="."/>/mets.xml</xsl:variable>
 
 	        <div id="content-{$id}">
+	        	<xsl:attribute name="class"><xsl:value-of select="@qualifier"></xsl:value-of></xsl:attribute>
+	        
 	        	<div class="tab-info">
 	        		<i18n:text>sedici.comunidades.<xsl:value-of select="@qualifier"/>.info</i18n:text>
 	        	</div>
