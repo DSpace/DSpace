@@ -1087,6 +1087,7 @@ margin-bottom:5px;
 -moz-border-radius-bottomleft: 10px;
 border-bottom-right-radius: 10px;
 border-bottom-left-radius: 10px;
+min-height:60px;
 }
 
 
@@ -1213,7 +1214,7 @@ background-color:#0000CC;
 
 .artifact-title a {
 	text-decoration:none;
-		font-size:110%;
+		font-size:100%;
 }
 
 .result-query,
@@ -1288,6 +1289,16 @@ background-repeat:no-repeat;
 padding-left:15px;
 height:25px;
 text-decoration:underline;
+}
+
+.localizacion_electronica  {
+background-image:url(../../images/acceso_web.png);
+background-position:left;
+background-repeat:no-repeat;
+padding-left:15px;
+height:25px;
+color:#607890;
+
 }
 
 .ds-paragraph a {
@@ -1517,7 +1528,7 @@ clear:both;
 	padding-top: 0px;
     margin-bottom: 3px;
 	text-decoration:none;
-	font-size:15px;
+	font-size:14px;
 }
 
 .ds-artifact-item {
@@ -2111,6 +2122,12 @@ bottom:20px;
 
 }
 
+.community-actual-div .logo
+{
+position:absolute;
+left:15px;
+}
+
 div#ds-body div.community-actual-div:first-child {
 float:left;
 position:relative;
@@ -2441,7 +2458,7 @@ clear:right;
 
 .artifact-title a:hover {
 color:#4e5a66;
-text-decoration:underline;
+text-decoration:none;
 }
 
 .publisher-date {
@@ -2479,7 +2496,7 @@ bottom:10px;
 
 .intro-text {
 	float:left;
-	width:550px;
+	width:390px;
 	border-top:1px solid #dedede;
 	padding-top:10px;
 	display:inline-block;
@@ -2661,7 +2678,15 @@ list-style-type:none;
 #home_envios_recientes ul li a{
 padding:0px;
 text-decoration:none;
-font-size:11px;
+font-size:12px;
+}
+
+.news_date  {
+    color: #A4A4A4;
+    font-size: 12px;
+    font-weight: bold;
+    left: -10px;
+    position: relative;
 }
 
 
@@ -3016,10 +3041,11 @@ text-align:center;
 }
 
 .community_icon_container a:hover{
-	color:#a66a12;
+	color:#c9e5f4;
 /*	text-shadow: grey 1px 1px;*/
 	font-size:12px;
 	font-weight:regular;
+	-moz-border-radius:5px;
 }
 
 h1.communities_header {
@@ -3075,8 +3101,9 @@ h1.communities_header {
 	min-height: 150px;
 }
 .community_icon_container a:hover, .community_icon_container a:hover p {
-	background-color: #E79011;
-	color: #FFFFFF;
+	background-color: #e3f1f9;
+	color: #398db3;
+	-moz-border-radius:5px;
 }
 .community_icon_container h2 {
 	font-size: 14px;
@@ -3084,7 +3111,19 @@ h1.communities_header {
 }
 .community_icon_container p {
 	max-width: 150px;
-	color: #444444;
+	color: #a4a4a4;
+}
+
+#embargo-info {
+	background: url("../../images/alerta.png") no-repeat scroll left center transparent;
+	border: 1px solid;
+	color: #B66A3C;
+	margin: 10px 0;
+	padding: 15px 15px 15px 90px;	
+}
+
+#embargo-info .ebargo_date {
+	font-weight: bold;
 }
 
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/

@@ -64,15 +64,15 @@
 .ui-widget { font-family: Verdana,Arial,sans-serif; font-size: 1.1em; }
 .ui-widget .ui-widget { font-size: 1em; }
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Verdana,Arial,sans-serif; font-size: 1em; }
-.ui-widget-content { border: 1px solid #9cacba; background: #ffffff url(../../images/jquery_ui/ui-bg_flat_100_ffffff_40x100.png) 50% 50% repeat-x; color: #444444; }
+.ui-widget-content { border: none; background: #ffffff url(../../images/jquery_ui/ui-bg_flat_100_ffffff_40x100.png) 50% 50% repeat-x; color: #444444; }
 .ui-widget-content a { color: #444444; }
-.ui-widget-header { border: 1px solid #d8e8eb; background: #f0f2f5 url(../../images/jquery_ui/ui-bg_flat_75_f0f2f5_40x100.png) 50% 50% repeat-x; color: #444444; font-weight: bold; }
+.ui-widget-header { /*border: 1px solid #d8e8eb; background: #f0f2f5 url(../../images/jquery_ui/ui-bg_flat_75_f0f2f5_40x100.png) 50% 50% repeat-x;*/ color: #444444; font-weight: bold; }
 .ui-widget-header a { color: #444444; }
 
 /* Interaction states
 ----------------------------------*/
 .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { border: 1px solid #9cacba; background: #b6c8d9 url(../../images/jquery_ui/ui-bg_flat_100_b6c8d9_40x100.png) 50% 50% repeat-x; font-weight: normal; color: #444444; }
-.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited { color: #444444; text-decoration: none; }
+.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited { color: black; text-decoration: none; }
 .ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus { border: 1px solid #1f3f5e; background: #1f3f5e url(../../images/jquery_ui/ui-bg_flat_75_1f3f5e_40x100.png) 50% 50% repeat-x; font-weight: normal; color: #ffffff; }
 .ui-state-hover a, .ui-state-hover a:hover { color: #ffffff; text-decoration: none; }
 .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active { border: 1px solid #9cacba; background: #ffffff url(../../images/jquery_ui/ui-bg_glass_65_ffffff_1x400.png) 50% 50% repeat-x; font-weight: normal; color: #444444; }
