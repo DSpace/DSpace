@@ -155,6 +155,11 @@ public abstract class DSpaceObject
         return context;
     }
 
+    /**
+     *
+     * @param context
+     * @throws SQLException
+     */
     protected void readExtraMetadata(Context context) throws SQLException {
         // Get Dublin Core metadata
         TableRowIterator tri = DatabaseManager.queryTable(context, (oracle ? "RMetadataValue" : "ResourceMetadataValue"),
@@ -198,11 +203,25 @@ public abstract class DSpaceObject
         tri.close();
     }
 
+    /**
+     *
+     * @param element
+     * @param qualifier
+     * @param lang
+     * @return
+     */
     public DCValue[] getExtraMetadata(String element, String qualifier,
                                       String lang) {
         return getExtraMetadata(getType(), element, qualifier, lang);
     }
 
+    /**
+     *
+     * @param element
+     * @param qualifier
+     * @param lang
+     * @return
+     */
     public String getExtraMetadataFirstValue(String element, String qualifier, String lang) {
         try {
             return getExtraMetadata(element, qualifier, lang)[0].value;
@@ -286,6 +305,13 @@ public abstract class DSpaceObject
         return valueArray;
     }
 
+    /**
+     *
+     * @param element
+     * @param qualifier
+     * @param lang
+     * @param value
+     */
     public void addExtraMetadata(String element, String qualifier,
                                  String lang, String value) {
         addExtraMetadata(getType(), element, qualifier, lang, value);
@@ -320,6 +346,12 @@ public abstract class DSpaceObject
         extraMetadataChanged = true;
     }
 
+    /**
+     *
+     * @param element
+     * @param qualifier
+     * @param lang
+     */
     public void clearExtraMetadata(String element, String qualifier,
                                    String lang) {
         clearExtraMetadata(getType(), element, qualifier, lang);
@@ -461,6 +493,11 @@ public abstract class DSpaceObject
         return true;
     }
 
+    /**
+     *
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
     protected void updateExtraMetadata() throws SQLException, AuthorizeException {
         // Redo Dublin Core if it's changed
         if (extraMetadataChanged)
