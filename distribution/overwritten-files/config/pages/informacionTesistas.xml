@@ -25,7 +25,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 			Realizar <strong>autoarchivo</strong>. La ventaja de esta opción es que puede realizar el trámite 
 			completo desde la comodidad de su casa y en cualquier momento. Para ello, el tesista debe 
 			<a href="login">iniciar sesión</a> en el sitio (si aún no es usuario, puede registrarse <a href="register">aquí</a>) 
-			y luego acceder a la sección de autoarchivo. Allí, el sistema lo guiará por una serie de sencillos 
+			y luego acceder a la sección de <strong>"Carga de documentos"</strong>. Allí, el sistema lo guiará por una serie de sencillos 
 			pasos que incluyen completar un formulario con los datos de la obra a agregar, la aceptación de la 
 			<a href="static/resources/licencia_de_deposito.pdf" target="_blank">Licencia de Distribución No Exclusiva</a> 
 			y la elección de la licencia de uso pertinente. A los archivos de la tesis, deberá adjuntar copia del acta 

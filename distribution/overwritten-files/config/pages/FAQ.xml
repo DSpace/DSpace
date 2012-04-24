@@ -25,7 +25,6 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 	<h1>Servicios de búsqueda y recuperación</h1>
 	<ul>
 		<li><a href="pages/FAQ#busqueda">¿Cómo realizar una búsqueda en SeDiCI?</a></li>
-		<li><a href="pages/FAQ#exploracion">¿Qué tipos de exploración pueden realizarse sobre SeDiCI?</a></li>
 		<li><a href="pages/FAQ#externos">¿Qué son los repositorios externos y qué se puede encontrar allí?</a></li>
 	</ul>
 	
@@ -59,7 +58,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 			investigadores). Su principal diferencia con una biblioteca digital es que, además de contener las referencias de 
 			catalogación de cada uno de los recursos, también ofrece, en una buena parte de su acervo y en número creciente en los 
 			últimos años, el texto completo de los mismos. El acceso a estos textos es completamente abierto y gratuito, ya que 
-			SeDiCI se rige bajo el protocolo Open Archives Initiative (OAI).</p>
+			SeDiCI se rige bajo el protocolo <a href="http://www.openarchives.org" target="_blank">Open Archives Initiative (OAI)</a>.</p>
 		<a class="volver" href="pages/FAQ#preguntas">Volver</a>
 	</div>
 	
@@ -83,11 +82,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 		metadatos (aquellos datos que sirven para catalogar correctamente un recurso). Sin embargo, este tipo de búsqueda puede traer 
 		resultados no deseados o no del todo atinados. Para refinar entonces la búsqueda puede realizarse una búsqueda avanzada, 
 		en la que se especifiquen otros criterios además de la palabra deseada. Estos criterios pueden incluir: si la palabra deseada 
-		se encuentra en el título del documento, en sus materias, descriptores o palabras claves, o bien en cualquier otro de sus 
-		metadatos. También es posible buscar por autor, por director de tesis o por título de la serie documental (publicación 
-		periódica). A su vez, también es posible refinar la búsqueda por tipo de documento: por ejemplo, se le puede indicar al 
-		sistema que recupere solamente todas las tesis de grado (o el documento que se desee) que contengan la palabra "física" en 
-		uno o cualquiera de sus metadatos.</p>
+		se encuentra en el título del documento, en sus materias,autores o su fecha publicación</p>
 		<a class="volver" href="pages/FAQ#preguntas" >Volver</a>			
 	</div>
 	

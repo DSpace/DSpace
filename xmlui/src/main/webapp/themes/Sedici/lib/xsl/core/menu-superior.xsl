@@ -37,7 +37,7 @@
 	        	<a href="#"><i18n:text>sedici.menuSuperior.institucional</i18n:text></a>
 				<ul>
 					<li><a href="{$context-path}/pages/queEsSedici"><i18n:text>sedici.menuSuperior.institucional.queEsSedici</i18n:text></a></li>
-					<li><a href="{$context-path}/pages/politica"><i18n:text>sedici.menuSuperior.institucional.politica</i18n:text></a></li>
+					<li><a href="{$context-path}/pages/politicas"><i18n:text>sedici.menuSuperior.institucional.politica</i18n:text></a></li>
 					<li><a href="{$context-path}/pages/links"><i18n:text>sedici.menuSuperior.institucional.links</i18n:text></a></li>
 	        		<li><a href="{$context-path}/pages/staff"><i18n:text>sedici.menuSuperior.institucional.staff</i18n:text></a></li>
 	        		<li><a href="{$context-path}/pages/comoLlegar"><i18n:text>sedici.menuSuperior.institucional.comoLlegar</i18n:text></a></li>
@@ -49,6 +49,7 @@
 				  <li><a href="{$context-path}/pages/comoAgregarTrabajos"><i18n:text>sedici.menuSuperior.informacion.agregacion</i18n:text></a></li>
 				  <li><a href="{$context-path}/pages/informacionTesistas"><i18n:text>sedici.menuSuperior.informacion.infoTesistas</i18n:text></a></li>
 				  <li><a href="{$context-path}/pages/FAQ"> <i18n:text>sedici.menuSuperior.informacion.faq</i18n:text></a></li>
+				  <li><a href="{$context-path}/pages/revistasAccesoAbierto"> <i18n:text>sedici.menuSuperior.informacion.revistasAccesoAbierto</i18n:text></a></li>
 				</ul>
 			
 			</li>
