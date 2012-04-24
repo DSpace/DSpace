@@ -217,6 +217,7 @@ public abstract class DSpaceObject
 
     /**
      *
+     * Get the very first value of extra metadata (convenience method)
      * @param element
      * @param qualifier
      * @param lang
