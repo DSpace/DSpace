@@ -2147,6 +2147,14 @@
 <message key="sedici.menuLateral.cuenta.export">My exportations</message>
 <message key="sedici.menuLateral.otros.head">Other</message>
 
+<message key="sedici.errorTitle.resourceNotFound">Resource not found</message>
+<message key="sedici.errorDescription.resourceNotFound">The resource doesn't exist or it's not available right now</message>
+<message key="sedici.errorTitle.invalidContinuation">Your session has expired</message>
+<message key="sedici.errorDescription.invalidContinuation">Often this happens when the system doesn't receive any activity from your computer. Please, login again.</message>
+<message key="sedici.errorTitle.internalError">An error has occurred</message> 
+<message key="sedici.errorDescription.internalError">We are sorry, but an error has ocurred. This incident will be reported to be fixed as soon as possible</message>
+<message key="sedici.errorDescription.generalNote">If you consider that there is a problem or you want to make a suggestion, please contact us to the following e-mail: info@sedici.unlp.edu.ar</message>
+
 <!-- Creative Commons mensajes -->
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.CommercialQuestion">¿Quiere permitir usos comerciales de su obra?</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.CommercialAnswerNo">No</message>
