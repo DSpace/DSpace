@@ -698,11 +698,31 @@
 
     <xsl:template match="mets:file">
         <xsl:param name="context" select="."/>
+        <xsl:variable name="documentTitle">
+	        <xsl:choose>
+		        <xsl:when test="mets:FLocat[@LOCTYPE='URL']/@xlink:label">
+		            <xsl:value-of select="encoder:encode(string(mets:FLocat[@LOCTYPE='URL']/@xlink:label))"/>
+		        </xsl:when>
+		        <xsl:when test="$context/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title'][@mdschema='dc']">
+		            <xsl:value-of select="encoder:encode(string($context/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title'][@mdschema='dc']))"/>
+		        </xsl:when>
+		        <xsl:otherwise>
+		       		<i18n:text>xmlui.bitstream.downloadName</i18n:text>
+		        </xsl:otherwise>
+	        </xsl:choose>       
+        </xsl:variable>
+        <xsl:variable name="extension" select="substring-after(mets:FLocat[@LOCTYPE='URL']/@xlink:title, '.')"/>
+        <xsl:variable name="sequence" select="substring-after(mets:FLocat[@LOCTYPE='URL']/@xlink:href, '?')"/>
+        
+        <xsl:variable name="link">
+            <xsl:value-of select="substring-before(mets:FLocat[@LOCTYPE='URL']/@xlink:href, mets:FLocat[@LOCTYPE='URL']/@xlink:title)"/><xsl:value-of select="$documentTitle"/>.<xsl:value-of select="$extension"/>?<xsl:value-of select="$sequence"/>
+        </xsl:variable>
+
         <div class="file-wrapper clearfix">
             <div class="thumbnail-wrapper">
                 <a class="image-link" target="_blank">
                     <xsl:attribute name="href">
-                        <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+                        <xsl:value-of select="$link"/>                        
                     </xsl:attribute>
                     <xsl:choose>
                         <xsl:when test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]">
@@ -736,7 +756,7 @@
                     <div>
 		                <a class="image-link">
 		                    <xsl:attribute name="href">
-		                        <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+		                        <xsl:value-of select="$link"/>
 		                    </xsl:attribute>
 	                        <span>
 	                            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>

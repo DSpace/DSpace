@@ -2285,6 +2285,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 
 <message key="xmlui.administrative.Navigation.context_in_edit_item_workflow">En edición por {0}</message>
 
+<message key="xmlui.bitstream.downloadName">documento</message>
 
 <!-- De aca en mas estan en las dependencias de dspace -->
 

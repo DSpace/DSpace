@@ -2197,6 +2197,8 @@
 
 <message key="xmlui.administrative.Navigation.context_in_edit_item_workflow">En edición por {0}</message>
 
+<message key="xmlui.bitstream.downloadName">document</message>
+
 <!-- De aca en mas estan en las dependencias de dspace -->
 
 <!-- extension al messages.xml de XmlWorkflow -->
