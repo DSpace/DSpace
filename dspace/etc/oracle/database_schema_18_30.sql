@@ -1,29 +1,30 @@
-CREATE SEQUENCE resourcemetadatafieldregistry_seq;
-CREATE SEQUENCE resourcemetadatavalue_seq;
+CREATE SEQUENCE rmetadatafieldregistry_seq;
+CREATE SEQUENCE rmetadatavalue_seq;
 
 
-CREATE TABLE ResourceMetadataFieldRegistry
+CREATE TABLE RMetadataFieldRegistry
 (
-  metadata_field_id   INTEGER PRIMARY KEY DEFAULT NEXTVAL('resourcemetadatafieldregistry_seq'),
-  resource_type_id    INTEGER,
-  element             VARCHAR(64),
-  qualifier           VARCHAR(64),
-  scope_note          TEXT
+  metadata_field_id   INTEGER PRIMARY KEY,
+  resource_type_id  INTEGER,
+  element    VARCHAR(64),
+  qualifier  VARCHAR(64),
+  scope_note VARCHAR2(2000)
 );
 
-CREATE TABLE ResourceMetadataValue
+CREATE TABLE RMetadataValue
 (
-  metadata_value_id  INTEGER PRIMARY KEY DEFAULT NEXTVAL('resourcemetadatavalue_seq'),
+  metadata_value_id  INTEGER PRIMARY KEY,
   resource_id        INTEGER,
   resource_type_id   INTEGER,
-  metadata_field_id  INTEGER REFERENCES ResourceMetadataFieldRegistry(metadata_field_id),
-  text_value         TEXT,
-  text_lang          VARCHAR(24),
+  metadata_field_id  INTEGER REFERENCES RMetadataFieldRegistry(metadata_field_id),
+  text_value         CLOB,
+  text_lang          VARCHAR(64),
   place              INTEGER
 );
 
 
-CREATE INDEX resourcemetadatavalue_resource_idx ON ResourceMetadataValue(resource_id,resource_type_id);
-CREATE INDEX resourcemetadatavalue_resource_idx2 ON ResourceMetadataValue(resource_id,resource_type_id,metadata_field_id);
-CREATE INDEX resourcemetadatavalue_field_fk_idx ON ResourceMetadataValue(metadata_field_id);
-CREATE INDEX resourcemetadatafield_schema_idx ON ResourceMetadataFieldRegistry(resource_type_id);
+CREATE INDEX rmetadatavalue_resource_idx ON RMetadataValue(resource_id,resource_type_id);
+CREATE INDEX rmetadatavalue_resource_idx2 ON RMetadataValue(resource_id,resource_type_id,metadata_field_id);
+CREATE INDEX rmetadatavalue_field_fk_idx ON RMetadataValue(metadata_field_id);
+CREATE INDEX rmetadatafield_schema_idx ON RMetadataFieldRegistry(resource_type_id);
+
