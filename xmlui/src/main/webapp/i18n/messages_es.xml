@@ -2273,7 +2273,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.discovery.ver_filtros">Ver filtros</message>
 <message key="xmlui.discovery.ocultar_filtros">Ocultar filtros</message>
 
-<message key="xmlui.forms.add">Agregar</message>
+<message key="xmlui.forms.add">Agregar Otro</message>
 <message key="xmlui.forms.remove_selected">Quitar seleccionados</message>
 
 <message key="xmlui.profile.subscriptions.add">Suscribir</message>
