@@ -138,7 +138,7 @@ do_install()
 	mkdir $INSTALL_DIR
 
 	print_sec "EMPAQUETADO DEL PROYECTO"
-	MVN_ARGS=" -Ddefault.dspace.dir=$INSTALL_DIR -Ddefault.db.username=$dspace_dbuser -Ddefault.db.password=$dspace_dbpassword -Ddefault.db.url=jdbc:postgresql://localhost:5432/$dspace_dbname"
+	MVN_ARGS=" -Ddefault.dspace.dir=$INSTALL_DIR -Ddefault.db.username=$dspace_dbuser -Ddefault.db.password=$dspace_dbpassword -Ddefault.db.url=jdbc:postgresql://$pg_connection_host:5432/$dspace_dbname"
 	mvn clean license:format install $MVN_ARGS $EXTRA_ARGS
 
 	print_sec "CREACION DE LA BBDD"
@@ -149,7 +149,7 @@ do_install()
 		echo -e "A continuacion ingrese la password para el usuario $dspace_dbuser ('$dspace_dbpassword') 2 veces"
 		sudo su -c "createuser -d -P -R -S $dspace_dbuser" postgres
 	else
-		echo -e "Ingrese primero la password del superusuario '$pg_connection_user' y luego la password para el usuario a crear $dspace_dbuser ('$dspace_dbpassword') 2 veces"
+		echo -e "Ingrese primero la password para el nuevo usuario $dspace_dbuser ('$dspace_dbpassword') 2 veces y luego la password del superusuario '$pg_connection_user' para conectar con el servidor"
 		createuser -U $pg_connection_user -h $pg_connection_host -d -P -R -S $dspace_dbuser
 	fi
 	
