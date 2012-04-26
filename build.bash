@@ -142,12 +142,21 @@ do_install()
 	mvn clean license:format install $MVN_ARGS $EXTRA_ARGS
 
 	print_sec "CREACION DE LA BBDD"
-	echo -e "A continuacion ingrese '$dspace_dbpassword' 2 veces"
-	sudo su -c "createuser -d -P -R -S $dspace_dbuser" postgres
-
-	echo -e "\nA continuacion ingrese '$dspace_dbpassword' "
-	sudo su -c "createdb -U $dspace_dbuser -E UNICODE $dspace_dbname -h localhost" postgres
+	# si la BD esta en localhost usamos el usuario "postgres" usando sudo (para evitar tener que crear un superusuario en una BD local).
+	# de lo contrario, usamos el createuser de forma remota (para lo cual se necesita un superusuario con password)
+	echo -e "Creando el usuario $dspace_dbuser en el PostgreSQL"
+	if [ $pg_connection_host = "localhost" ]; then
+		echo -e "A continuacion ingrese la password para el usuario $dspace_dbuser ('$dspace_dbpassword') 2 veces"
+		sudo su -c "createuser -d -P -R -S $dspace_dbuser" postgres
+	else
+		echo -e "Ingrese primero la password del superusuario '$pg_connection_user' y luego la password para el usuario a crear $dspace_dbuser ('$dspace_dbpassword') 2 veces"
+		createuser -U $pg_connection_user -h $pg_connection_host -d -P -R -S $dspace_dbuser
+	fi
 	
+	echo -e "\nA continuacion ingrese '$dspace_dbpassword' para conectar como $dspace_dbuser"
+	#sudo su -c "createdb -U $dspace_dbuser -E UNICODE $dspace_dbname -h localhost" postgres
+	createdb -h $pg_connection_host -U $dspace_dbuser -E UNICODE $dspace_dbname
+
 	print_sec "INSTALANDO DSPACE@SEDICI"
 	cd $BASE_DIR/distribution/target/dspace-sedici-distribution-bin
 	ant -Ddspace.dir=$INSTALL_DIR fresh_install -Dgeolite=$BASE_DIR/config/GeoLiteCity.dat.gz

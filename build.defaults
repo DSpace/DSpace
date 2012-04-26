@@ -3,19 +3,26 @@
 
 DSPACE_VERSION="1.8.2"
 
+# Usuario y grupo al que se asignaran los archivos instalados
 dspace_user=dspace
 dspace_group=dspace
 
+# usuario y grupo del web container
 web_user=tomcat7
 web_group=tomcat7
 web_home=/var/lib/tomcat7/webapps/
 
 TOMCAT_TGZ_URL="http://apache.xfree.com.ar/tomcat/tomcat-7/v7.0.27/bin/apache-tomcat-7.0.27.tar.gz"
 
+# informacion para la creacion de la base de datos
 seed="$RANDOM"
 dspace_dbuser="dspace$seed"
 dspace_dbname="dspace$seed"
 dspace_dbpassword="dspace"
+
+# si pg_connection_host es distinto de 'localhost', debe proporcionarse un pg_connection_user (ya que la conexion será remota)
+pg_connection_host="localhost"
+pg_connection_user=""
 
 #INSTALL_DIR=
 
