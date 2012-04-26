@@ -256,7 +256,7 @@ public final class CreateUser
     	if (groupName == null || "".equals(groupName)){
     		groupName = "0 {anonymous}";
     		group = Group.find(context, 0);
-    	}if ("1".equals(groupName) || "administrator".equals(groupName)){
+    	}else if ("1".equals(groupName) || "administrator".equals(groupName)){
     		groupName = "1 {administrator}";
     		group = Group.find(context, 1);
     	}else{
