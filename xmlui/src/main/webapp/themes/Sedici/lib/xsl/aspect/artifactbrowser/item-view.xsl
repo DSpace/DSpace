@@ -601,24 +601,12 @@
 
 	<xsl:template name="render-date">
 		<xsl:param name="dateString"/>
+		<xsl:variable name="locale" select="java:java.util.Locale.new('es')"/>
 
 		<!-- Se espera el formato YYYY-MM-DD[THH:mm:ssZ] -->
 		
-		
-		<xsl:choose>
-			<xsl:when test="string-length($dateString) &lt; 10">
-				<xsl:value-of select="$dateString" disable-output-escaping="yes"/>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:variable name="dateParser" select="java:java.text.SimpleDateFormat.new('yyyy-MM-dd')"/>
-				<xsl:variable name="date" select="java:parse($dateParser, $dateString)"/>
-<!-- 				TODO Hay que detectar el locale del usuario -->
-				<xsl:variable name="locale" select="java:java.util.Locale.new('es')"/>
-				<xsl:variable name="formatter" select="java:java.text.DateFormat.getDateInstance(1, $locale)"/>
+		<xsl:value-of select="java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.formatearFecha($dateString, $locale)"/>
 
-				<xsl:value-of select="java:format($formatter, $date)"/>
-			</xsl:otherwise>
-		</xsl:choose>
 	</xsl:template>
 
     <xsl:template match="dim:dim" mode="itemDetailView-DIM">

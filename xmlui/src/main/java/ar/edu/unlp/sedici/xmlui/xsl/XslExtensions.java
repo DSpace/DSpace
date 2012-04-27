@@ -1,6 +1,11 @@
 package ar.edu.unlp.sedici.xmlui.xsl;
 
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import javax.validation.Path.Node;
 import javax.xml.parsers.DocumentBuilder;
@@ -8,6 +13,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.xpath.NodeSet;
+import org.dspace.core.ConfigurationManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Text;
 
@@ -51,7 +57,7 @@ public class XslExtensions {
 		}
 		
 	}
-	
+
 	public static NodeSet tokenize(String str, String regExp) throws ParserConfigurationException {
 	      String[] tokens = str.split(regExp);
 	      NodeSet nodeSet = new NodeSet();
@@ -66,4 +72,26 @@ public class XslExtensions {
 	       
 	      return nodeSet;
 	    }
+	
+	public static String formatearFecha(String fecha, Locale locale) throws ParseException{
+
+		if (fecha.length()==7){
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM");
+			Date fechaDate=sdf.parse(fecha);
+			SimpleDateFormat sdf2=new SimpleDateFormat("MMMM yyyy", locale);			
+			return sdf2.format(fechaDate);
+			
+		} else if (fecha.length()>=10) {
+			//parseo el string que viene
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+			Date fechaDate=sdf.parse(fecha);
+			
+			DateFormat formatter=DateFormat.getDateInstance(1, locale);
+			
+			return formatter.format(fechaDate);
+		}  else {
+			return fecha;
+		}
+
+	}
 }
