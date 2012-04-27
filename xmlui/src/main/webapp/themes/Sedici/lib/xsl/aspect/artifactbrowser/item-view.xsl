@@ -601,10 +601,11 @@
 
 	<xsl:template name="render-date">
 		<xsl:param name="dateString"/>
+		<!-- TODO: se debería obtener el locale del usuario -->
 		<xsl:variable name="locale" select="java:java.util.Locale.new('es')"/>
 
 		<!-- Se espera el formato YYYY-MM-DD[THH:mm:ssZ] -->
-		
+
 		<xsl:value-of select="java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.formatearFecha($dateString, $locale)"/>
 
 	</xsl:template>
