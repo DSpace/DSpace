@@ -73,23 +73,26 @@ public class XslExtensions {
 	      return nodeSet;
 	    }
 	
-	public static String formatearFecha(String fecha, Locale locale) throws ParseException{
-
-		if (fecha.length()==7){
-			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM");
-			Date fechaDate=sdf.parse(fecha);
-			SimpleDateFormat sdf2=new SimpleDateFormat("MMMM yyyy", locale);			
-			return sdf2.format(fechaDate);
-			
-		} else if (fecha.length()>=10) {
-			//parseo el string que viene
-			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
-			Date fechaDate=sdf.parse(fecha);
-			
-			DateFormat formatter=DateFormat.getDateInstance(1, locale);
-			
-			return formatter.format(fechaDate);
-		}  else {
+	public static String formatearFecha(String fecha, Locale locale){
+		try{
+			if (fecha.length()==7){
+				SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM");
+				Date fechaDate=sdf.parse(fecha);
+				SimpleDateFormat sdf2=new SimpleDateFormat("MMMM yyyy", locale);			
+				return sdf2.format(fechaDate);
+				
+			} else if (fecha.length()>=10) {
+				//parseo el string que viene
+				SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+				Date fechaDate=sdf.parse(fecha);
+				
+				DateFormat formatter=DateFormat.getDateInstance(1, locale);
+				
+				return formatter.format(fechaDate);
+			}  else {
+				return fecha;
+			}
+		} catch (ParseException e) {
 			return fecha;
 		}
 
