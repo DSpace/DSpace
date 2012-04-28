@@ -14,13 +14,13 @@ Subject: SeDiCI - Error interno del servidor
 Un error interno del servidor ha ocurrido en {0}:
 
 Fecha:       {1}
-Sesión de ID: {2}
+SesiÃ³n de ID: {2}
 Usuario:       {5}
-Dirección de IP: {6}
+DirecciÃ³n de IP: {6}
 
 {3}
 
-Excepción:
+ExcepciÃ³n:
 {4}
 
 SeDiCI - UNLP

@@ -5,14 +5,14 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: SeDiCI - Item de exportación solicitado listo para descarga
-El item de exportación del repositorio que usted ha solicitado se encuentra listo para su descarga.
+Subject: SeDiCI - Item de exportaciï¿½n solicitado listo para descarga
+El item de exportaciÃ³n del repositorio que usted ha solicitado se encuentra listo para su descarga.
 
 Usted puede descargar el archivo comprimido usando el siguiente enlace:
 
 {0}
 
-Este archivo estará disponible por las siguientes {1} horas.  
+Este archivo estarÃ¡ disponible por las siguientes {1} horas.  
 
 
 SeDiCI - UNLP

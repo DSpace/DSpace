@@ -4,18 +4,18 @@
 # {1}  Name of collection
 # {2}  handle 
 #
-Subject: SeDiCI - Envío aprobado y archivado
+Subject: SeDiCI - Envï¿½o aprobado y archivado
 
-Usted envió: {0}
+Usted enviÃ³: {0}
 
-A la colección: {1}
+A la colecciÃ³n: {1}
 
-Su envío ha sido aceptado y archivado en SeDiCI,
+Su envÃ­o ha sido aceptado y archivado en SeDiCI,
 y se le ha asignado el siguiente identificador:
 
 {2}
 
-Por favor utilícelo cuando cite su envío.
+Por favor utilÃ­celo cuando cite su envï¿½o.
 
 Muchas gracias.
 Cordialmente,
