@@ -28,7 +28,7 @@
 			</div>
 
 			<div class="slide">
-				<a href="http://sedici.unlp.edu.ar/blog/2012/03/13/migracion-a-dspace/ ‎" target="_blank">
+				<a href="http://sedici.unlp.edu.ar/blog/2012/04/25/migracion-a-dspace/‎" target="_blank">
 		    		<img>
 		    			<xsl:attribute name="src">
 		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_slideshow_2.jpg
@@ -37,13 +37,13 @@
 				</a>
 				<div class="caption">
 					<h1>Migración a DSpace</h1>
-					<p>Desde marzo de 2012, SeDiCI se encuentra funcionando sobre plataforma de software completamente nueva. Bienvenidos a SeDiCI-DSpace.</p>
+					<p>Desde abril de 2012, SeDiCI se encuentra funcionando sobre plataforma de software completamente nueva. Bienvenidos a SeDiCI-DSpace.</p>
 				</div>
 			</div>
 			
 			
 			<div class="slide">
-				<a href="http://sedici.unlp.edu.ar/blog/2012/03/13/libro-electron…2500-descargas/" target="_blank">
+				<a href="http://sedici.unlp.edu.ar/blog/2012/04/25/libro-electronico-supera-las-3000-descargas/" target="_blank">
 		    		<img>
 		    			<xsl:attribute name="src">
 		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_slideshow_3.jpg
@@ -51,8 +51,8 @@
 		    		</img>
 				</a>
 				<div class="caption">
-					<h1>Libro electrónico supera las 2500 descargas</h1>
-					<p>El libro electrónico Cirugía. Bases clínicas y terapéuticas editado el año pasado por SeDiCI ya superó las 2500 descargas.</p>
+					<h1>Libro electrónico supera las 3000 descargas</h1>
+					<p>El libro electrónico Cirugía. Bases clínicas y terapéuticas editado el año pasado por SeDiCI ya superó las 3000 descargas.</p>
 				</div>
 			</div>
 			
@@ -60,7 +60,7 @@
 			<div class="slide">
 				<a target="_blank">
 	    			<xsl:attribute name="href">
-	    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/pages/comoAgregarTrabajosTesistas
+	    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/pages/informacionTesistas
 	    			</xsl:attribute>
 		    		<img>
 		    			<xsl:attribute name="src">
@@ -94,4 +94,3 @@
 
 </xsl:template>
 
-</xsl:stylesheet>
