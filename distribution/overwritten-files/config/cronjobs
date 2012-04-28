@@ -1,0 +1,21 @@
+# ########## MAILS ######################
+# Send out subscription e-mails at 01:00 every day
+0 1 * * *  /var/dspace/bin/dspace sub-daily
+# Run the media filter at 02:00 every day
+0 2 * * *  /var/dspace/bin/dspace filter-media
+# Run the checksum checker at 03:00
+0 3 * * *  /var/dspace/bin/dspace checker -lp
+# Mail the results to the sysadmin at 04:00
+0 4 * * *  /var/dspace/bin/dspace checker-emailer -c
+
+0 6 * * *  /var/dspace/bin/generate-sitemaps 
+
+# ########## STATS ######################
+0 1 * * * /var/dspace/bin/dspace stat-general
+0 1 * * * /var/dspace/bin/dspace stat-monthly
+0 2 * * * /var/dspace/bin/dspace stat-report-general
+0 2 * * * /var/dspace/bin/dspace stat-report-monthly
+
+# ########## POSTGRES ######################
+# Clean up the database nightly at 4.20am
+# 20 4 * * * vacuumdb --analyze dspace > /dev/null 2>&1
