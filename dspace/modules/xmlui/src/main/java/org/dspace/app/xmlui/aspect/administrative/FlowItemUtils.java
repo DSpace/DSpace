@@ -786,7 +786,7 @@ public class FlowItemUtils
             return result;
         }
 
-        DCDate embargoDcDate = new DCDate(embargoDate);
+        DCDate embargoDcDate = new DCDate(date);  //want to reparse the original date; otherwise the java Date class always adds time fields
         EmbargoManager.setEmbargo(context, item, embargoDcDate);
 
         item.update();
