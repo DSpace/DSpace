@@ -219,7 +219,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             // MINT Identifier || .
             DOI doi_ = calculateDOI(context, doi, item, history);
 
-            log.warn("DOI just minted: " + doi_);
+            log.info("DOI just minted: " + doi_);
 
             doi = doi_.toString();
             mint(doi_, register, createListMetadata(item));
@@ -285,9 +285,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     }
 
     public DSpaceObject resolve(Context context, String identifier, String... attributes) throws IdentifierNotFoundException, IdentifierNotResolvableException {
-        //Check if we really have a doi identifier
-
-        log.warn("DOIIdentofierService: start resolve() identifier ==>>  " + identifier);
+        log.debug("start resolve() identifier ==>>  " + identifier);
 
         if (identifier != null && identifier.startsWith("doi:")) {
 
@@ -297,7 +295,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
             String value = dbDOI.getInternalIdentifier();
 
-            log.warn("DOIIdentofierService: resolve to (before replace) ==>>" + value);
+            log.debug("resolve to (before replace) ==>>" + value);
 
             if (value != null) {
                 // Ask Parent Service to retrieve internal reference to resource identified in the value.
@@ -387,7 +385,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
         doi = getDOI(aDoi, item);
 
-        log.warn("calculateDOI() doi already exist? : " + (doi!=null));
+        log.debug("calculateDOI() doi already exist? : " + (doi!=null));
 
         // If our DOI doesn't exist, then we need to mint one
         if (doi == null) {
