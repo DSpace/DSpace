@@ -141,8 +141,9 @@ public class DatabaseManager
                 {
                     statement.close();
                 }
-                catch (SQLException sqle)
+                catch (SQLException sqle)		    
                 {
+		    log.error("unable to close statement", sqle);
                 }
             }
         }
@@ -177,6 +178,7 @@ public class DatabaseManager
                 }
                 catch (SQLException sqle)
                 {
+		    log.error("unable to close statement", sqle);
                 }
             }
         }
@@ -298,6 +300,7 @@ public class DatabaseManager
                 }
                 catch (SQLException s)
                 {
+		    log.error("unable to close statement", s);
                 }
             }
 
@@ -432,6 +435,7 @@ public class DatabaseManager
                 }
                 catch (SQLException sqle)
                 {
+		    log.error("unable to close statement", sqle);
                 }
             }
         }
@@ -641,7 +645,7 @@ public class DatabaseManager
         }
         catch (SQLException e)
         {
-            log.warn(e.getMessage(), e);
+            log.error("unable to close connection", e);
         }
     }
 
@@ -882,6 +886,7 @@ public class DatabaseManager
         }
         catch (IOException ioe)
         {
+	    log.error("unable to load SQL statement " + sql, ioe);
         }
     }
 
@@ -984,10 +989,7 @@ public class DatabaseManager
                 }
                 catch (SQLWarning sqlw)
                 {
-                    if (log.isDebugEnabled())
-                    {
-                        log.debug("Got SQL Warning: " + sqlw, sqlw);
-                    }
+		    log.warn("Got SQL Warning: " + sqlw, sqlw);
                 }
                 catch (SQLException sqle)
                 {
@@ -1011,18 +1013,12 @@ public class DatabaseManager
                     // If the messages are bogus, give them a low priority
                     if (isDrop || isNoResults)
                     {
-                        if (log.isDebugEnabled())
-                        {
-                            log.debug(msg, sqle);
-                        }
+			log.debug(msg, sqle);
                     }
                     // Otherwise, we need to know!
                     else
                     {
-                        if (log.isEnabledFor(Level.WARN))
-                        {
-                            log.warn(msg, sqle);
-                        }
+			log.error(msg, sqle);
                     }
                 }
 
@@ -1296,6 +1292,7 @@ public class DatabaseManager
                 }
                 catch (SQLException sqle)
                 {
+		    log.error("unable to close statement", sqle);
                 }
             }
         }
@@ -1326,6 +1323,7 @@ public class DatabaseManager
                 }
                 catch (SQLException sqle)
                 {
+		    log.error("unable to close statement");
                 }
             }
         }
@@ -1428,17 +1426,26 @@ public class DatabaseManager
         {
             if (pkcolumns != null)
             {
-                try { pkcolumns.close(); } catch (SQLException sqle) { }
+                try { pkcolumns.close(); }
+		catch (SQLException sqle) {
+		    log.error("unable to close pkcolumns", sqle);
+		}
             }
 
             if (columns != null)
             {
-                try { columns.close(); } catch (SQLException sqle) { }
+                try { columns.close(); }
+		catch (SQLException sqle) {
+		    log.error("unable to close columns", sqle);
+		}
             }
 
             if (connection != null)
             {
-                try { connection.close(); } catch (SQLException sqle) { }
+                try { connection.close(); }
+		catch (SQLException sqle) {
+		    log.error("unable to close connection", sqle);
+		}
             }
         }
     }
@@ -1520,13 +1527,14 @@ public class DatabaseManager
         catch (SQLException se)
         {
             // Simply throw up SQLExceptions
+            log.error("Exception initializing DB pool", se);
             throw se;
         }
         catch (Exception e)
         {
             // Need to be able to catch other exceptions. Pretend they are
             // SQLExceptions, but do log
-            log.warn("Exception initializing DB pool", e);
+            log.error("Exception initializing DB pool", e);
             throw new SQLException(e.toString(), e);
         }
     }
@@ -1768,6 +1776,7 @@ public class DatabaseManager
                 }
                 catch (SQLException sqle)
                 {
+		    log.error("unable to close result set", sqle);
                 }
             }
 
@@ -1779,6 +1788,7 @@ public class DatabaseManager
                 }
                 catch (SQLException sqle)
                 {
+		    log.error("unable to close statement", sqle);
                 }
             }
         }
@@ -1819,12 +1829,18 @@ public class DatabaseManager
         {
             if (rs != null)
             {
-                try { rs.close(); } catch (SQLException sqle) { }
+                try { rs.close(); }
+		catch (SQLException sqle) {
+		    log.error("unable to close result set", sqle);
+		}
             }
 
             if (statement != null)
             {
-                try { statement.close(); } catch (SQLException sqle) { }
+                try { statement.close(); }
+		catch (SQLException sqle) {
+		    log.error("unable to close statement", sqle);
+		}
             }
         }
 
