@@ -51,7 +51,8 @@ public class DryadBlogFeed extends AbstractDSpaceTransformer implements
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			GetMethod get = new GetMethod("http://blog.datadryad.org/feed/");
 
-			switch (new HttpClient().executeMethod(get)) {
+			int responseCode = new HttpClient().executeMethod(get);
+			switch (responseCode) {
 			case 200:
 			case 201:
 			case 202:
@@ -98,8 +99,9 @@ public class DryadBlogFeed extends AbstractDSpaceTransformer implements
 //						list.addList("entry-description").addItem(text);
 //					}
 				}
+				break;
 			default:
-				LOGGER.warn("Failed to connect with blog.datadryad.org/feed");
+				LOGGER.error("Unable to connect with blog.datadryad.org/feed. Http response code: " + responseCode);
 			}
 
 			// We don't want to display unless we have some entries

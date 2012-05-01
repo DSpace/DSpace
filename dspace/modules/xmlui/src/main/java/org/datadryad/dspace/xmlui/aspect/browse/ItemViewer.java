@@ -498,7 +498,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
     private void addWarningMessage(Item item, Division division) throws WingException, SQLException, AuthorizeException, IOException {
         Message message = null;
 
-        log.warn("ItemView - addWarningMessage");
+        log.debug("addWarningMessage");
 
         // Add Withdrawn Message
         if (item.isWithdrawn()) {
