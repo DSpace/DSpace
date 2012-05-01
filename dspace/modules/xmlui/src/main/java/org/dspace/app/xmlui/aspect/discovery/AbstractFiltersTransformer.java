@@ -147,9 +147,11 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                 for (FacetField field : queryResults.getFacetFields()) {
                     val.add(field.getName());
 
-                    for (FacetField.Count count : field.getValues()) {
-                        val.add(count.getName() + count.getCount());
-                    }
+		    if(field.getValues() != null) {
+			for (FacetField.Count count : field.getValues()) {
+			    val.add(count.getName() + count.getCount());
+			}
+		    }
                 }
 
 
