@@ -134,22 +134,24 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                     val.add(dso);
                 }
 
-                val.add("numFound:" + queryResults.getResults().getNumFound());
-
-                for (SolrDocument doc : queryResults.getResults()) {
-                    val.add(doc.toString());
-                }
-
-                for (SolrDocument doc : queryResults.getResults()) {
-                    val.add(doc.toString());
-                }
-
-                for (FacetField field : queryResults.getFacetFields()) {
-                    val.add(field.getName());
-
-		    if(field.getValues() != null) {
-			for (FacetField.Count count : field.getValues()) {
-			    val.add(count.getName() + count.getCount());
+		if(queryResults.getResults() != null) {
+		    val.add("numFound:" + queryResults.getResults().getNumFound());
+		    
+		    for (SolrDocument doc : queryResults.getResults()) {
+			val.add(doc.toString());
+		    }
+		    
+		    for (SolrDocument doc : queryResults.getResults()) {
+			val.add(doc.toString());
+		    }
+		    
+		    for (FacetField field : queryResults.getFacetFields()) {
+			val.add(field.getName());
+			
+			if(field.getValues() != null) {
+			    for (FacetField.Count count : field.getValues()) {
+				val.add(count.getName() + count.getCount());
+			    }
 			}
 		    }
                 }
@@ -158,7 +160,7 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                 this.validity = val.complete();
             }
             catch (Exception e) {
-                log.error(e.getMessage(),e);
+                log.error("unable to generate new DSpaceValidity object",e);
             }
 
             //TODO: dependent on tags as well :)
