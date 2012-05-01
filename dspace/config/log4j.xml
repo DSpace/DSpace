@@ -145,6 +145,15 @@
 	</logger>
 
 
+	<!-- More detailed log settings for specific debugging purposes -->
+        <logger name="org.dspace.storage.rdbms">
+          <level value="DEBUG"/>
+        </logger>
+
+	<logger name="org.dspace.statistics">
+	  <level value="DEBUG"/>
+	</logger>     
+
 	<!-- Add appenders you want live here -->
 	<root>
 		<level value="WARN"/>
