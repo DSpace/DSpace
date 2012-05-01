@@ -171,10 +171,11 @@ public class SolrLogger
             // Save our basic info that we already have
 
             String ip = request.getRemoteAddr();
+	    log.debug("IP is " + ip);
 	    String xff = request.getHeader("X-Forwarded-For");
 	    if(isUseProxies() &&  xff != null)
 		{
-		    log.debug("IP is " + ip + ", but getting proxy IP from X-Forwarded-For:" + xff); 
+		    log.debug("getting proxy IP from X-Forwarded-For:" + xff); 
 		    
 		    /* This header is a comma delimited list */
 		    for(String xfip : xff.split(","))
@@ -221,7 +222,7 @@ public class SolrLogger
             }
             catch (Exception e)
             {
-		log.warn("Failed DNS Lookup for IP:" + ip, e);
+		log.warn("Failed DNS Lookup for IP " + ip, e);
 	    }
             
             // Save the location information if valid, save the event without
