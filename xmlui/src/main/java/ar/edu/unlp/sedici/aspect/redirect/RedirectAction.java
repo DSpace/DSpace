@@ -131,8 +131,10 @@ public class RedirectAction extends AbstractAction
 	public static List<String> getPrefixes(String old_url) {
     	if (urls==null)
     		initUrls();
-    	
-    	return urls.get(old_url);
+    	List<String> prefixes = urls.get(old_url); 
+    	if (prefixes == null)
+    		prefixes = new LinkedList<String>();
+    	return prefixes; 
     	
 	}
 	
