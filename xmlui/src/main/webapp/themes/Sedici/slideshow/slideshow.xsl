@@ -28,7 +28,7 @@
 			</div>
 
 			<div class="slide">
-				<a href="http://sedici.unlp.edu.ar/blog/2012/04/25/migracion-a-dspace/‎" target="_blank">
+				<a href="http://sedici.unlp.edu.ar/blog/2012/05/02/migracion-a-dspace/" target="_blank">
 		    		<img>
 		    			<xsl:attribute name="src">
 		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_slideshow_2.jpg
