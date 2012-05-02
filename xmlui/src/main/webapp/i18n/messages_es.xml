@@ -34,7 +34,7 @@
 <message key="xmlui.ArtifactBrowser.Navigation.links_browse">Paginas estáticas</message>
 
 	<!-- General keys -->
-	<message key="xmlui.general.dspace_home">Sedici</message>
+	<message key="xmlui.general.dspace_home">SeDiCI - Repositorio de la Universidad Nacional de La Plata </message>
 <message key="xmlui.general.search">Búsquedas</message>
 <message key="xmlui.general.go">Ir</message>
 <message key="xmlui.general.go_home">Ir a la página de inicio</message>
@@ -222,7 +222,7 @@
 
 <!-- org.dspace.app.xmlui.artifactbrowser.CommunityBrowser.java -->
 
-<message key="xmlui.ArtifactBrowser.CommunityBrowser.title">Lista de comunidades</message>
+<message key="xmlui.ArtifactBrowser.CommunityBrowser.title">SeDiCI - Lista de comunidades</message>
 <message key="xmlui.ArtifactBrowser.CommunityBrowser.trail">Lista de comunidades</message>
 <message key="xmlui.ArtifactBrowser.CommunityBrowser.head">Comunidades en SeDiCI</message>
 <message key="xmlui.ArtifactBrowser.CommunityBrowser.select">Elija una comunidad para listar sus colecciones</message>
