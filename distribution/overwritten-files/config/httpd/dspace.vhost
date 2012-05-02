@@ -3,35 +3,39 @@ NameVirtualHost *:80
   ServerAdmin admin@sedici.unlp.edu.ar
   ServerName dspace.localhost
   ServerAlias sedici.unlp.edu.ar
+  ServerAlias www.sedici.unlp.edu.ar
   ServerAlias dspace.sedici.unlp.edu.ar
 
+  RewriteEngine On
+  RewriteLog rewrite_sedici.log
+RewriteLogLevel 3
+
   #directorio con reglas de escritura y otras yerbas
-  DocumentRoot ${dspace.dir}/config/httpd
-  <Directory ${dspace.dir}/config/httpd>
+  DocumentRoot /var/dspace/config/httpd
+  <Directory /var/dspace/config/httpd>
     AllowOverride all
     Order allow,deny
     Allow from all
   </Directory>
 
-#  ProxyPass /blog !
-#  Alias /blog "/var/www/sedici_blog"
-#  <Directory /var/www/sedici_blog>
-#    AllowOverride all
-#    Order allow,deny
-#    Allow from all
-#  </Directory>
+  ProxyPass /blog !
+  Alias /blog "/var/www/sedici_blog"
+  <Directory /var/www/sedici_blog>
+    AllowOverride all
+    Order allow,deny
+    Allow from all
+  </Directory>
   
   ####################################################
   ########## PROXY A DSPACE ##########################
   ####################################################
 
-  #RewriteEngine On
+  RewriteEngine On
   #RewriteRule ^/dspace(.*) $1 [PT,L]
   ProxyRequests Off
 
-  #Reglas de proxy para el WS de fisica hacia old.sedici.unlp.edu.ar
-  ProxyPass /soap_ws.php http://old.sedici.unlp.edu.ar/soap_ws.php
-  ProxyPass /sediciwebservice.wsdl http://old.sedici.unlp.edu.ar/sediciwebservice.wsdl
+#  ProxyPass /soap_ws.php http://old.sedici.unlp.edu.ar/soap_ws.php
+#  ProxyPass /sediciwebservice.wsdl http://old.sedici.unlp.edu.ar/sediciwebservice.wsdl
 
 #  <Location /search>
 #    ProxyPass http://old.sedici.unlp.edu.ar/search
@@ -44,12 +48,13 @@ NameVirtualHost *:80
     Order allow,deny
     Allow from all
 
-    ProxyPass ajp://localhost:8009/ retry=10
-    ProxyPassReverse ajp://localhost:8009/
+  #  ProxyPass ajp://localhost:8009/ retry=10
+   # ProxyPassReverse ajp://localhost:8009/
   </Location>
 
   ErrorLog /var/log/apache2/error-dspace.log
   CustomLog /var/log/apache2/access-dspace.log common
 
 </VirtualHost>
+
 

@@ -61,7 +61,9 @@
 		xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
 		<div id="ds-header-wrapper">
 			<div id="ds-header" class="clearfix">
-				<a href="/xmlui/" id="ds-header-logo-link"> 
+				 <a id="ds-header-logo-link"><xsl:attribute name="href">
+                                     <xsl:value-of select="concat($contextPath,'/')"/>
+                                     </xsl:attribute>
 					<span id="ds-header-logo">&#160;</span>
 				</a>
 			</div>
