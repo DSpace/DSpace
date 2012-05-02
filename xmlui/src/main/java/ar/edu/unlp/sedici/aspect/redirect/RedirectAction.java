@@ -20,7 +20,8 @@ import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
@@ -28,23 +29,18 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.acting.AbstractAction;
-import org.apache.cocoon.environment.ForwardRedirector;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.environment.http.HttpResponse;
-import org.apache.cocoon.sitemap.PatternException;
-import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 
 /**
  * Attempt to authenticate the user based upon their presented credentials. 
@@ -72,30 +68,22 @@ import org.dspace.eperson.EPerson;
 public class RedirectAction extends AbstractAction
 {
 
-	private static String PREFIX="sedici.redirect";
+	private static String PropertiesFilename="sedici.redirect";
 	private static String MAP_PREFIX="map.url";
-	private static String MAP_PREFIX_PARAMS="params";
+	
 	private static String OLD_URL="old_url";
 	private static String NEW_URL="new_url";
 	private static String URL_PART="url_part";
 	private static String TYPE="type";
-	private static String OLD_PARAM_NAME="old_name";
-	private static String NEW_PARAM_NAME="new_name";
 	
 	
-	private static Map<String, Map<String, Object>> properties=new HashMap<String, Map<String,Object>>();
-	private static Map<String, String> urls=null;
+	
+	
+	private static Map<String, Map<String, Object>> mapeosPorPrefijo=new HashMap<String, Map<String,Object>>();
+	private static Map<String, List<String>> urls=null;
 
-    public static Map<String, Map<String, Object>> getProperties() {    	
-		   return properties;
-	}
 
-	public static void setProperties(
-			Map<String, Map<String, Object>> properties2) {
-		properties = properties2;
-	}
-	
-	private static void generarProperties(String prefijo) {
+	private static void generarMapeo(String prefijo) {
 		// Genera el hashMap para las properties
 		HashMap<String, Object> retorno=new HashMap<String, Object>();
 		String clave;
@@ -104,85 +92,77 @@ public class RedirectAction extends AbstractAction
 		String type;
 		//cargo la key de la nueva url y el valor
 		clave=prefijo+"."+RedirectAction.NEW_URL;
-		valor=ConfigurationManager.getProperty(RedirectAction.PREFIX, clave);
+		valor=ConfigurationManager.getProperty(RedirectAction.PropertiesFilename, clave);
 		retorno.put(clave,  valor);
 		//cargo los parametros
 		int inicial=1;
-		clave=prefijo+"."+RedirectAction.MAP_PREFIX_PARAMS+"."+inicial+"."+RedirectAction.OLD_PARAM_NAME;
-		valor=ConfigurationManager.getProperty(RedirectAction.PREFIX, clave);
+		clave=prefijo+".params."+inicial+".old_name";
+		valor=ConfigurationManager.getProperty(RedirectAction.PropertiesFilename, clave);
 		while (valor!=null){
 			//agrego el nombre del parametro viejo al map
 			retorno.put(clave,  valor);
 			
 			//agrego si el aprametro va a formar parte de la nueva url
-			clave=prefijo+"."+RedirectAction.MAP_PREFIX_PARAMS+"."+inicial+"."+RedirectAction.URL_PART;			
-			valorBooleano=ConfigurationManager.getBooleanProperty(RedirectAction.PREFIX, clave);
+			clave=prefijo+".params."+inicial+"."+RedirectAction.URL_PART;			
+			valorBooleano=ConfigurationManager.getBooleanProperty(RedirectAction.PropertiesFilename, clave);
 			retorno.put(clave, valorBooleano);
 			
 			//agrego si el dato requiere la transformacion de algun tipo
-			clave=prefijo+"."+RedirectAction.MAP_PREFIX_PARAMS+"."+inicial+"."+RedirectAction.TYPE;
-			type=ConfigurationManager.getProperty(RedirectAction.PREFIX, clave);
+			clave=prefijo+".params."+inicial+"."+RedirectAction.TYPE;
+			type=ConfigurationManager.getProperty(RedirectAction.PropertiesFilename, clave);
 			retorno.put(clave, type);
 			
 			if (!valorBooleano){
 				//si no es parte de la url el parametro, tengo que guardar el new name
-				clave=prefijo+"."+RedirectAction.MAP_PREFIX_PARAMS+"."+inicial+"."+RedirectAction.NEW_PARAM_NAME;
-				valor=ConfigurationManager.getProperty(RedirectAction.PREFIX, clave);
+				clave=prefijo+".params."+inicial+".new_name";
+				valor=ConfigurationManager.getProperty(RedirectAction.PropertiesFilename, clave);
 				retorno.put(clave,  valor);
 			}
 			
 			//recupero el proximo parametro
 			inicial+=1;
-			clave=prefijo+"."+RedirectAction.MAP_PREFIX_PARAMS+"."+inicial+"."+RedirectAction.OLD_PARAM_NAME;
-			valor=ConfigurationManager.getProperty(RedirectAction.PREFIX, clave);
+			clave=prefijo+".params."+inicial+".old_name";
+			valor=ConfigurationManager.getProperty(RedirectAction.PropertiesFilename, clave);
 		}
-       properties.put(prefijo,  retorno);
+       mapeosPorPrefijo.put(prefijo,  retorno);
 		
 	}
 
-	public static Map<String, String> getUrls() {
-    	if (urls==null){
-    		return RedirectAction.generarUrls();
-    	} else {
-		   return urls;
-    	}
+	public static List<String> getPrefixes(String old_url) {
+    	if (urls==null)
+    		initUrls();
+    	
+    	return urls.get(old_url);
+    	
 	}
 	
-	public static void setUrls(Map<String, String> urls2) {
-		urls = urls2;
-	}
 
-	private static Map<String, String> generarUrls() {
-		int inicial=1;
-		Map<String, String> retorno=new HashMap<String, String>();
-		String valor=ConfigurationManager.getProperty(RedirectAction.PREFIX, RedirectAction.MAP_PREFIX + "." + inicial);
-		while (valor!=null){
-			retorno.put(valor, RedirectAction.MAP_PREFIX + "." + inicial);
-			inicial+=1;
-			valor=ConfigurationManager.getProperty(RedirectAction.PREFIX, RedirectAction.MAP_PREFIX + "." + inicial);
+	private static void initUrls() {
+		urls =new HashMap<String, List<String>>();
+		int i=1;
+		String old_url_i=ConfigurationManager.getProperty(RedirectAction.PropertiesFilename, "map.url." + i);
+
+		while (old_url_i!=null){
+			if (!urls.containsKey(old_url_i))
+				urls.put(old_url_i, new LinkedList<String>());
+			urls.get(old_url_i).add("map.url." + i);
+			i++;
+			old_url_i=ConfigurationManager.getProperty(RedirectAction.PropertiesFilename, "map.url." + i);
 		}
-		RedirectAction.setUrls(retorno);
-		return retorno;
-		
 	}
-
-
 
 	public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
     {
 		
         Request request = ObjectModelHelper.getRequest(objectModel);
-
         String old_url = request.getParameter(RedirectAction.OLD_URL);
         
         //recupero la clave para la vieja url
-        String prefijo=this.recuperarClave(old_url);
+        List<String> prefijos=this.getPrefixes(old_url);
         
-        if (prefijo == null){
-        	throw new ResourceNotFoundException("Page cannot be found", new ResourceNotFoundException("Page cannot be found"));
-        } else {
-	        Map<String, Object> propertiesPrefijo=this.recuperarProperties(prefijo);
+        for (String prefijo : prefijos) {
+		    Map<String, Object> propertiesPrefijo=this.getMapeos(prefijo);
 	        
 	        //recupero los valores
 	        String new_url=(String)propertiesPrefijo.get(prefijo+"."+RedirectAction.NEW_URL);
@@ -196,10 +176,10 @@ public class RedirectAction extends AbstractAction
 	    	Boolean url_part=false;
 	    	String type;
 	    	String param_value="";
-	    	String prefijo_parametro=prefijo+"."+RedirectAction.MAP_PREFIX_PARAMS+"."+inicial;
+	    	String prefijo_parametro=prefijo+".params."+inicial;
 	
-	        while (propertiesPrefijo.containsKey(prefijo_parametro+"."+RedirectAction.OLD_PARAM_NAME)){
-	            param_old_name=(String)propertiesPrefijo.get(prefijo_parametro+"."+RedirectAction.OLD_PARAM_NAME);
+	        while (propertiesPrefijo.containsKey(prefijo_parametro+".old_name")){
+	            param_old_name=(String)propertiesPrefijo.get(prefijo_parametro+".old_name");
 	        	
 	    		//debo verificar si el parametro es parte de la url o se pasa como parámetro.
 	    		//IMPORTANTE: aca podriamos extender el config en el caso de que varios parametros puedan formar parte de la url, para
@@ -209,9 +189,11 @@ public class RedirectAction extends AbstractAction
 	    		
 	    		//recupero del request el valor del parametro con nomre old_param
 	    		param_value=request.getParameter(param_old_name);
-	    		//Si no existe el parametro con ese nombre tiro una excepcion
+	
+	    		//Si no existe el parametro con ese nombre salteo la regla
 	    		if (param_value==null){
-	    			throw new ResourceNotFoundException("Page cannot be found", new ResourceNotFoundException("Page cannot be found"));
+	    			continue;
+//	            	throw new ResourceNotFoundException("No se puede encontrar la pagina "+old_url);
 	    		}
 	    		
 	    		//Transformo en caso de ser necesario el valor del parametro
@@ -225,12 +207,12 @@ public class RedirectAction extends AbstractAction
 					new_url=new_url+"/"+param_value;
 				}else{
 					//si no es parte de la url se agrega como parametro a la url
-	        		param_new_name=(String)propertiesPrefijo.get(prefijo_parametro+"."+RedirectAction.NEW_PARAM_NAME);
+	        		param_new_name=(String)propertiesPrefijo.get(prefijo_parametro+".new_name");
 	        		new_url_params.put(param_new_name, param_value);				
 				}
 				
 				inicial+=1;
-		    	prefijo_parametro=prefijo+"."+RedirectAction.MAP_PREFIX_PARAMS+"."+inicial;
+		    	prefijo_parametro=prefijo+".params."+inicial;
 	
 			};
 			//recorro el hashtable creado con los parametros y lo agrego a la url
@@ -250,9 +232,10 @@ public class RedirectAction extends AbstractAction
 			};
 	
 	        
+    
 	        String redirectURL = request.getContextPath()+ new_url;
 	        
-	        System.out.println(redirectURL);
+	        //System.out.println(redirectURL);
 	        
 	        final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 	        httpResponse.setStatus(HttpResponse.SC_MOVED_PERMANENTLY);
@@ -264,7 +247,11 @@ public class RedirectAction extends AbstractAction
 	        //((ForwardRedirector)redirector).permanentRedirect(true, redirectURL);
 	        
 	        return null;
+	        
         }
+        
+    	throw new ResourceNotFoundException("No se puede encontrar la pagina "+old_url);
+
     }
     
 	/*
@@ -293,18 +280,12 @@ public class RedirectAction extends AbstractAction
 		return param_value;
 	}
 
-	private Map<String, Object> recuperarProperties(String prefijo) {
-		if (!RedirectAction.getProperties().containsKey(prefijo)){
-			RedirectAction.generarProperties(prefijo);
+	private Map<String, Object> getMapeos(String prefijo) {
+		if (!mapeosPorPrefijo.containsKey(prefijo)){
+			generarMapeo(prefijo);
 		};
-		return RedirectAction.getProperties().get(prefijo);
+		return mapeosPorPrefijo.get(prefijo);
 	}
 
-	/*
-     * Recorro las properties en búsqueda de la clave que tiene como valor una url dada.
-     * Retorno la key en caso de existir, y null en caso contrario
-     */
-    public String recuperarClave(String old_url){
-    	return this.getUrls().get(old_url);
-    }
 }
+
