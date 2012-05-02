@@ -397,7 +397,7 @@
 		 <script type="text/javascript">
 			$(function() {
 				$( "#community-tabs" ).tabs({
-					collapsible: true,
+					collapsible: false,
 					fx: {opacity: 'toggle', duration: 'fast'}
 				});
 			});
