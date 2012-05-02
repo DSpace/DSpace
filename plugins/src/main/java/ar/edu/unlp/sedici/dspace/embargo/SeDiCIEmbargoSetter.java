@@ -33,12 +33,12 @@ public class SeDiCIEmbargoSetter extends DaysEmbargoSetter {
 		
 		if (item.getMetadata("sedici2003.identifier").length != 0){
 			//Es un doc importado
-			DCValue embargosViejos[] = item.getMetadata("sedici2003.fecha-creacion");
+			DCValue embargosViejos[] = item.getMetadata("sedici2003.fecha-hora-creacion");
 			if (embargosViejos.length > 0){
 				try{
         			return new DCDate(sediciDatetimeFormat.parse(embargosViejos[0].value)).toDate();
         		}catch(ParseException e){
-        			log.warn("Error de parseo de fecha al procesar (sedici2003.fecha-creacion)==("+embargosViejos[0].value+") del documento importado con id "+item.getMetadata("sedici2003.identifier")[0]);
+        			log.warn("Error de parseo de fecha al procesar (sedici2003.fecha-hora-creacion)==("+embargosViejos[0].value+") del documento importado con id "+item.getMetadata("sedici2003.identifier")[0]);
                 } 
 			}
 			
