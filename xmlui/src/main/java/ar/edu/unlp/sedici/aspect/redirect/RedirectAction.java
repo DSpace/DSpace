@@ -169,7 +169,7 @@ public class RedirectAction extends AbstractAction
 	        
 	        //recupero la cantidad de parámetros que van a ser pasados al redirect   
 	    	Hashtable<String, String> new_url_params=new Hashtable<String, String>();
-	    	
+	    	boolean missingParams = false;
 	        int inicial=1;
 	        String param_old_name="";
 	        String param_new_name="";
@@ -192,7 +192,8 @@ public class RedirectAction extends AbstractAction
 	
 	    		//Si no existe el parametro con ese nombre salteo la regla
 	    		if (param_value==null){
-	    			continue;
+	    			missingParams = true;
+	    			break;
 //	            	throw new ResourceNotFoundException("No se puede encontrar la pagina "+old_url);
 	    		}
 	    		
@@ -215,6 +216,9 @@ public class RedirectAction extends AbstractAction
 		    	prefijo_parametro=prefijo+".params."+inicial;
 	
 			};
+
+			if (missingParams)
+				continue;
 			//recorro el hashtable creado con los parametros y lo agrego a la url
 			Enumeration<String> claves_params=new_url_params.keys();
 			Boolean first_element=true;
