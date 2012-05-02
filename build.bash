@@ -169,7 +169,6 @@ do_install()
 	WORKFLOW_SCRIPTS="$INSTALL_DIR/etc/postgres/xmlworkflow"
 	$INSTALL_DIR/bin/dspace dsrun org.dspace.storage.rdbms.InitializeDatabase $WORKFLOW_SCRIPTS/xml_workflow.sql
 	$INSTALL_DIR/bin/dspace dsrun org.dspace.storage.rdbms.InitializeDatabase $WORKFLOW_SCRIPTS/workflow_migration.sql
-	$INSTALL_DIR/bin/dspace dsrun org.dspace.storage.rdbms.InitializeDatabase $WORKFLOW_SCRIPTS/initialize.sql
 
 	echo -e "Creamos un administrador (mas adelante podra crear mas desde $INSTALL_DIR/bin/dspace create-administrator)"
 	$INSTALL_DIR/bin/dspace create-administrator
