@@ -413,6 +413,18 @@
 					<visibility>workflow</visibility>
 				</field>
 
+				<!-- Descriptores SeDiCI y Unesco (solo edicion) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>descriptores</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Descriptores SeDiCI (sólo para edición)</label>
+					<input-type>onebox</input-type>
+					<hint>Términos de los tesauros SeDiCI y Unesco que ya no se usan. Este campo existe solo a los efectos de editar los valores cargados en el pasado</hint>
+					<visibility>workflow</visibility>
+				</field>
+
 				<!-- ISSN -->
 				<field>
 					<dc-schema>sedici</dc-schema>
