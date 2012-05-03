@@ -219,10 +219,6 @@
              <groupId>org.dspace</groupId>
              <artifactId>dspace-stats</artifactId>
          </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-discovery-provider</artifactId>
-         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-discovery-solr</artifactId>

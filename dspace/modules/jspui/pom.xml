@@ -105,19 +105,16 @@
 
 		<dependency>
 			<groupId>org.dspace</groupId>
-			<artifactId>dspace-jspui-webapp</artifactId>
+			<artifactId>dspace-jspui</artifactId>
 			<type>war</type>
 		</dependency>
 
 		<dependency>
 			<groupId>org.dspace</groupId>
-			<artifactId>dspace-jspui-api</artifactId>
+			<artifactId>dspace-jspui</artifactId>
+         <type>jar</type>
+         <classifier>classes</classifier>
 		</dependency>
-
-		<dependency>
-           <groupId>org.dspace</groupId>
-           <artifactId>dspace-discovery-provider</artifactId>
-        </dependency>
 
 		<dependency>
 		   <groupId>javax.servlet</groupId>

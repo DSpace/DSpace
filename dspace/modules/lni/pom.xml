@@ -100,18 +100,15 @@
 
       <dependency>
          <groupId>org.dspace</groupId>
-         <artifactId>dspace-lni-webapp</artifactId>
+         <artifactId>dspace-lni</artifactId>
          <type>war</type>
       </dependency>
 
       <dependency>
          <groupId>org.dspace</groupId>
-         <artifactId>dspace-lni-core</artifactId>
-      </dependency>
-
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-discovery-provider</artifactId>
+         <artifactId>dspace-lni</artifactId>
+         <type>jar</type>
+         <classifier>classes</classifier>
       </dependency>
 
       <dependency>

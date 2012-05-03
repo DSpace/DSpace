@@ -93,6 +93,7 @@
                     </archive>
                 </configuration>
             </plugin>
+         </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.2.1</version>
@@ -224,7 +225,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
-                <module>dspace-discovery</module>
+                <module>dspace-discovery-solr</module>
             </modules>
         </profile>
 
@@ -283,19 +284,6 @@
         </profile>
 
         <!--
-           Builds DSpace Sword Client from local source if present
-        -->
-        <profile>
-            <id>dspace-sword-client</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <module>dspace-sword-client</module>
-            </modules>
-        </profile>
-
-        <!--
            Builds XMLUI WAR for DSpace
         -->
         <profile>
@@ -321,6 +309,18 @@
             </modules>
         </profile>
 
+      <!--
+         Builds LNI WAR for DSpace
+      -->
+      <profile>
+         <id>dspace-lni-client</id>
+         <activation>
+            <activeByDefault>false</activeByDefault>
+         </activation>
+         <modules>
+            <module>dspace-lni-client</module>
+         </modules>
+      </profile>
 
       <!--
          Use 'mvn deploy -Paddons' while doing Continuous Integration
@@ -334,14 +334,13 @@
          <modules>
             <module>dspace-api</module>
             <module>dspace-stats</module>
-            <module>dspace-discovery</module>
+            <module>dspace-discovery-solr</module>
             <module>dspace-jspui</module>
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
             <module>dspace-oai</module>
             <module>dspace-sword</module>
             <module>dspace-swordv2</module>
-            <module>dspace-sword-client</module>
          </modules>
       </profile>
 
@@ -412,12 +411,14 @@
          </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
-              <artifactId>dspace-sword-api</artifactId>
+              <artifactId>dspace-sword</artifactId>
               <version>${project.version}</version>
+              <type>jar</type>
+              <classifier>classes</classifier>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
-              <artifactId>dspace-sword-webapp</artifactId>
+              <artifactId>dspace-sword</artifactId>
               <version>${project.version}</version>
               <type>war</type>
           </dependency>
@@ -434,49 +435,38 @@
               <version>${project.version}</version>
               <type>war</type>
           </dependency>
-           <dependency>
-              <groupId>org.dspace</groupId>
-              <artifactId>dspace-sword-client-api</artifactId>
-              <version>${project.version}</version>
-          </dependency>
-          <dependency>
-              <groupId>org.dspace</groupId>
-              <artifactId>dspace-sword-client-xmlui-api</artifactId>
-              <version>${project.version}</version>
-          </dependency>
-          <dependency>
-              <groupId>org.dspace</groupId>
-              <artifactId>dspace-sword-client-xmlui-webapp</artifactId>
-              <version>${project.version}</version>
-              <type>war</type>
-          </dependency>
-
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-jspui-api</artifactId>
+            <artifactId>dspace-jspui</artifactId>
             <version>${project.version}</version>
+            <type>jar</type>
+            <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-jspui-webapp</artifactId>
+            <artifactId>dspace-jspui</artifactId>
             <version>${project.version}</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-oai-api</artifactId>
+            <artifactId>dspace-oai</artifactId>
             <version>${project.version}</version>
+            <type>jar</type>
+            <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-oai-webapp</artifactId>
+            <artifactId>dspace-oai</artifactId>
             <version>${project.version}</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-lni-core</artifactId>
+            <artifactId>dspace-lni</artifactId>
             <version>${project.version}</version>
+            <type>jar</type>
+            <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
@@ -485,25 +475,22 @@
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-lni-webapp</artifactId>
+            <artifactId>dspace-lni</artifactId>
             <version>${project.version}</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-api</artifactId>
+            <artifactId>dspace-xmlui</artifactId>
             <version>${project.version}</version>
+            <type>jar</type>
+            <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-webapp</artifactId>
+            <artifactId>dspace-xmlui</artifactId>
             <version>${project.version}</version>
             <type>war</type>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-wing</artifactId>
-            <version>${project.version}</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
@@ -537,11 +524,6 @@
             <version>[1.8.0.0,1.9.0.0)</version>
             <type>war</type>
          </dependency>
-          <dependency>
-              <groupId>org.dspace</groupId>
-              <artifactId>dspace-discovery-provider</artifactId>
-              <version>${project.version}</version>
-          </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-discovery-solr</artifactId>
