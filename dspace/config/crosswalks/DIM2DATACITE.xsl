@@ -94,17 +94,26 @@
 	      <relatedIdentifiers>
                 <xsl:for-each select="dspace:field[@element='relation' and @qualifier='haspart']">
                     <relatedIdentifier relatedIdentifierType="DOI" relationType="HasPart">
-                          <xsl:value-of select="."/>
+                      <xsl:variable name="id" select="."/>
+                      <xsl:if test="starts-with($id,'doi')">
+                        <xsl:value-of select="translate(substring-after($id,'doi:'), $smallcase, $uppercase)"/>
+                      </xsl:if>
                     </relatedIdentifier>
                 </xsl:for-each>
                 <xsl:for-each select="dspace:field[@element='relation' and @qualifier='ispartof']">
                     <relatedIdentifier relatedIdentifierType="DOI" relationType="IsPartOf">
-                          <xsl:value-of select="."/>
+                      <xsl:variable name="id" select="."/>
+                      <xsl:if test="starts-with($id,'doi')">
+                        <xsl:value-of select="translate(substring-after($id,'doi:'), $smallcase, $uppercase)"/>
+	              </xsl:if>
                     </relatedIdentifier>
                 </xsl:for-each>
                 <xsl:for-each select="dspace:field[@element='relation' and @qualifier='isreferencedby']">
                     <relatedIdentifier relatedIdentifierType="DOI" relationType="IsReferencedBy">
-                          <xsl:value-of select="."/>
+                      <xsl:variable name="id" select="."/>
+                      <xsl:if test="starts-with($id,'doi')">
+                        <xsl:value-of select="translate(substring-after($id,'doi:'), $smallcase, $uppercase)"/>
+                      </xsl:if>
                     </relatedIdentifier>
                 </xsl:for-each>
 	      </relatedIdentifiers>
