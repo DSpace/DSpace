@@ -42,4 +42,4 @@ Disallow: /*type=subject
 #Disallow: /*fq=subject_filter
 #Disallow: /*fq=dateIssued.year
 #Disallow: /*fq=type_filter
-Sitemap: http://sedici.unlp.edu.ar/htmlmap
+Sitemap:  http://sedici.unlp.edu.ar/sitemap
