@@ -690,10 +690,10 @@
         <xsl:variable name="documentTitle">
 	        <xsl:choose>
 		        <xsl:when test="mets:FLocat[@LOCTYPE='URL']/@xlink:label">
-		            <xsl:value-of select="encoder:encode(string(mets:FLocat[@LOCTYPE='URL']/@xlink:label))"/>
+		            <xsl:value-of select="java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.codificarURL(string(mets:FLocat[@LOCTYPE='URL']/@xlink:label))"/>
 		        </xsl:when>
 		        <xsl:when test="$context/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title'][@mdschema='dc']">
-		            <xsl:value-of select="encoder:encode(string($context/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title'][@mdschema='dc']))"/>
+		            <xsl:value-of select="java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.codificarURL(string($context/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title'][@mdschema='dc']))"/>
 		        </xsl:when>
 		        <xsl:otherwise>
 		       		<i18n:text>xmlui.bitstream.downloadName</i18n:text>
