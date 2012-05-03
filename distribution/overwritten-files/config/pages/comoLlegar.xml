@@ -16,7 +16,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
 <div id="como_llegar">
 
-<p><a href="static/resources/mapa_grande.jpg" target="_blank" title="Mapa de SeDiCI"><img src="static/resources/mapa.jpg" title="Mapa de SeDiCI" alt="Mapa"/></a></p>
+<p><a href="static/resources/mapa_grande.png" target="_blank" title="Mapa de SeDiCI"><img src="static/resources/mapa.jpg" title="Mapa de SeDiCI" alt="Mapa"/></a></p>
 
 <h1>SeDiCI - UNLP</h1>
 <p>
