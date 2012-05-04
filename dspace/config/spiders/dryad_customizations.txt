@@ -1,5 +1,9 @@
 # Dryad added IPs of spiders/bots
 
+# localhost
+::1
+127.0.0.1
+
 # NESCent's Nagios server (checks to ensure Dryad is running)
 152.3.104.75
 

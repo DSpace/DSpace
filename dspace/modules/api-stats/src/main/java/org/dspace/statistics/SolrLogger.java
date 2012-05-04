@@ -217,8 +217,12 @@ public class SolrLogger
 
             try
             {
-            	String dns = DnsLookup.reverseDns(ip);
-                doc1.addField("dns", dns.toLowerCase());
+		if(ip.equals("::1")) {
+		    doc1.addField("dns", "localhost");
+		} else {
+		    String dns = DnsLookup.reverseDns(ip);
+		    doc1.addField("dns", dns.toLowerCase());
+		}
             }
             catch (Exception e)
             {
@@ -239,8 +243,7 @@ public class SolrLogger
                 }
                 catch (Exception e)
                 {
-                    System.out
-                            .println("COUNTRY ERROR: " + location.countryCode);
+                    log.error("COUNTRY ERROR: " + location.countryCode, e);
                 }
                 doc1.addField("countryCode", location.countryCode);
                 doc1.addField("city", location.city);
