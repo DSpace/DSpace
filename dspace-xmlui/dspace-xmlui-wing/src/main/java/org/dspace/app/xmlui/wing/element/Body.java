@@ -74,7 +74,7 @@ public class Body extends AbstractWingElement implements WingMergeableElement
 
     /**
      * Append a new division (div element) to the document's body. This is a
-     * short cut method for divisions with out special rendering instructions.
+     * short cut method for divisions without special rendering instructions.
      * The division created is not interactive meaning that it may not contain
      * any form elements, to create an interactive division use
      * addInteractiveDivision().

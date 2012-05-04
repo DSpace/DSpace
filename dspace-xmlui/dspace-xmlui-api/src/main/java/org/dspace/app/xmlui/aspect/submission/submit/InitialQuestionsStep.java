@@ -29,7 +29,7 @@ import org.xml.sax.SAXException;
  * step will ask the user two questions which will direct whether future
  * questions will be asked of the user. Since they user may move next or
  * previous or even jump around between the stages some metadata values
- * may all ready be filled for selected values. i.e. if the user selected
+ * may already be filled for selected values. i.e. if the user selected
  * that there may be multiple titles and then later comes back and unchecks
  * then multiple titles box. In this case these metadata entries are removed
  * from the item, a note is displayed informing the user of this discrepency.

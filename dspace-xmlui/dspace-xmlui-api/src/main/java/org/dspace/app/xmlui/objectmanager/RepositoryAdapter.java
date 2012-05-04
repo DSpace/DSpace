@@ -23,7 +23,7 @@ import org.xml.sax.SAXException;
 
 /**
  * This is an an adapter which translates a DSpace repository into a METS 
- * document. Unfortunately there is no real definition of what this is. So
+ * document. Unfortunately, there is no real definition of what this is. So
  * we just kind of made it up based upon what we saw for the item profile.
  * 
  * The basic structure is simply two parts, the descriptive metadata and a 
@@ -51,7 +51,7 @@ public class RepositoryAdapter extends AbstractAdapter
      * Construct a new RepositoryAdapter
      * 
      * @param context
-     * 			  The DSpace context to look up communities / collections.
+     *            The DSpace context to look up communities / collections.
      * 
      * @param contextPath
      *            The contextPath of this webapplication.
@@ -105,9 +105,9 @@ public class RepositoryAdapter extends AbstractAdapter
     }
 
     /**
-     * Return the profile this METS document conforms too...
+     * Return the profile this METS document conforms to...
      * 
-     * FIXME: It dosn't conform to a profile. This needs to be fixed.
+     * FIXME: It doesn't conform to a profile. This needs to be fixed.
      */
     protected String getMETSProfile()
     {
@@ -137,7 +137,7 @@ public class RepositoryAdapter extends AbstractAdapter
     /**
      * Render the repository's descriptive metadata section.
      *
-     * For a the DSPace repository we just grab a few items 
+     * For a the DSpace repository we just grab a few items 
      * from the config file and put them into the descriptive 
      * section, such as the name, hostname, handle prefix, and 
      * default language.
@@ -209,8 +209,8 @@ public class RepositoryAdapter extends AbstractAdapter
 		endElement(DIM,"field");
 		
         // ///////////////////////////////
-		// End the DIM element
-		endElement(DIM,"dim");
+        // End the DIM element
+        endElement(DIM,"dim");
         
         // End all the open elements.
         endElement(METS,"xmlData");
@@ -273,7 +273,7 @@ public class RepositoryAdapter extends AbstractAdapter
      */
 
     /**
-     * Recursively the DSpace hierarchy rendering each container and subcontainers.
+     * Recursively walk the DSpace hierarchy, rendering each container and subcontainer.
      *
      * @param dso
      *            The DSpace Object to be rendered.
@@ -306,7 +306,7 @@ public class RepositoryAdapter extends AbstractAdapter
         startElement(METS,"mptr",attributes,attributesXLINK);
         endElement(METS,"mptr");
         
-        // Recurse to insure that our children are also included even if this
+        // Recurse to ensure that our children are also included even if this
         // node already existed in the div structure.
         if (dso instanceof Community)
         {

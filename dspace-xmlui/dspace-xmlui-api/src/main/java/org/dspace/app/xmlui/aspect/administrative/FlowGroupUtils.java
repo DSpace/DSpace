@@ -26,9 +26,9 @@ import org.dspace.eperson.Group;
 
 /**
  * Utility methods to processes actions on Groups. These methods are used
- * exclusivly from the administrative flow scripts.
+ * exclusively from the administrative flow scripts.
  *
- * @author scott phillips
+ * @author Scott Phillips
  */
 public class FlowGroupUtils {
 
@@ -138,7 +138,7 @@ public class FlowGroupUtils {
 	 */
 	public static String[] addMember(String[] list, String id)
 	{
-		// FIXME: this is terribly ineffecient.
+		// FIXME: this is terribly inefficient.
 		List<String> newList = new ArrayList<String>(Arrays.asList(list));
 		newList.add(id);
 		return newList.toArray(new String[newList.size()]);
@@ -153,7 +153,7 @@ public class FlowGroupUtils {
 	 */
 	public static String[] removeMember(String[] list, String id)
 	{
-		// FIXME: this is terribly ineffecient.
+		// FIXME: this is terribly inefficient.
 		List<String> newList = new ArrayList<String>(Arrays.asList(list));
 		newList.remove(id);
 		return newList.toArray(new String[newList.size()]);
@@ -176,7 +176,7 @@ public class FlowGroupUtils {
 	{
 		FlowResult result = new FlowResult();
 		
-		// Decode the name incase it uses non-ascii characters.
+		// Decode the name in case it uses non-ascii characters.
 		try
         {
             newName = URLDecoder.decode(newName, Constants.DEFAULT_ENCODING);
@@ -189,7 +189,7 @@ public class FlowGroupUtils {
 		Group group = null;
 		if (groupID == -1)
 		{
-			// First check if the name is blank.
+			// First, check if the name is blank.
 			if (newName == null || newName.length() == 0)
 			{
 				// Group's can not have blank names.
@@ -201,7 +201,7 @@ public class FlowGroupUtils {
 				return result;
 			}
 			
-			// Create a new group, check if the newName is allready in use.
+			// Create a new group, check if the newName is already in use.
 			Group potentialDuplicate = Group.findByName(context,newName);
 			
 			if (potentialDuplicate == null)
@@ -212,12 +212,12 @@ public class FlowGroupUtils {
 	    	}
 			else
 			{
-				// The name is allready in use, return in error.
+				// The name is already in use, return an error.
     			result.setContinue(false);
     			result.addError("group_name");
     			result.addError("group_name_duplicate");
     			result.setOutcome(false);
-    			result.setMessage(new Message("default","The group name is allready in use"));
+    			result.setMessage(new Message("default","The group name is already in use"));
     			
     			return result;
 			}
@@ -230,7 +230,7 @@ public class FlowGroupUtils {
 			// Only update the name if there has been a change.
 			if (newName != null && newName.length() > 0 && !name.equals(newName))
 			{
-				// The group name is to be updated, check if the newName is allready in use.
+				// The group name is to be updated, check if the newName is already in use.
 				Group potentialDuplicate = Group.findByName(context,newName);
 				
 				if (potentialDuplicate == null)
@@ -240,19 +240,19 @@ public class FlowGroupUtils {
 		    	}
 				else
 				{
-					// The name is allready in use, return in error.
+					// The name is already in use, return an error.
 	    			result.setContinue(false);
 	    			result.addError("group_name");
 	    			result.addError("group_name_duplicate");
 	    			result.setOutcome(false);
-	    			result.setMessage(new Message("default","The group name is allready in use"));
+	    			result.setMessage(new Message("default","The group name is already in use"));
 	    			
 	    			return result;
 				}
 			}
 		}
 		
-		// Second, Prepare to check members by turning arrays into lists
+		// Second, prepare to check members by turning arrays into lists
 		List<Integer> newEPeopleIDs = new ArrayList<Integer>();
 		for (String epeopleID : newEPeopleIDsArray)
         {
@@ -316,7 +316,7 @@ public class FlowGroupUtils {
 		group.update();
 		context.commit();
 		
-		// Let's record our group id incase we created a new one.
+		// Let's record our group id in case we created a new one.
 		result.setParameter("groupID", group.getID());
 		result.setContinue(true);
 		result.setOutcome(true);
@@ -326,7 +326,7 @@ public class FlowGroupUtils {
 	}
 	
 	/**
-	 * Remove the specified groups. It is assumed that the user has allready confirm this selection.
+	 * Remove the specified groups. It is assumed that the user has already confirmed this selection.
 	 * 
 	 * @param context The current DSpace context
 	 * @param groupIDs A list of groups to be removed.
@@ -400,7 +400,7 @@ public class FlowGroupUtils {
 	/**
 	 * These are the possible collection suffixes, all groups which are
 	 * specific to a collection will end with one of these. The collection
-	 * id should be inbetween the prefix and the suffix.
+	 * id should be in between the prefix and the suffix.
 	 * 
 	 * Note: the order of these suffixes are important, see getCollectionRole()
 	 */
@@ -433,7 +433,7 @@ public class FlowGroupUtils {
 					}
 					catch (NumberFormatException nfe)
 					{
-						// Somethnig went wrong, just ignore the exception and
+						// Something went wrong, just ignore the exception and
 						// continue searching for a collection id
 					} // try & catch
 				} // if it ends with a proper suffix.

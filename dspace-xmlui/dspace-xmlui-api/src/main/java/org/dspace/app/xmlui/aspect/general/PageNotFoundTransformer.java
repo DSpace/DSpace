@@ -32,7 +32,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
- * This special comonent checks to see if the body element is empty (has no sub elements) and if
+ * This special component checks to see if the body element is empty (has no sub elements) and if
  * it is then displays some page not found text.
  * 
  * @author Scott Phillips
@@ -107,7 +107,7 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
         if (this.bodyEvent != null)
         {
             // If we have recorded the startElement for body and we are
-            // recieving another start event, then there must be something 
+            // receiving another start event, then there must be something 
             // inside the body element, so we send the held body and carry
             // on as normal.
             sendEvent(this.bodyEvent);
@@ -134,7 +134,7 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
     {
         if (this.bodyEvent != null && WingConstants.DRI.URI.equals(namespaceURI) && Body.E_BODY.equals(localName))
         {
-            // If we are recieving an endElement event for body while we
+            // If we are receiving an endElement event for body while we
             // still have a startElement body event recorded then
             // the body element must have been empty. In this case, record
             // that the body is empty, and send both the start and end body events.

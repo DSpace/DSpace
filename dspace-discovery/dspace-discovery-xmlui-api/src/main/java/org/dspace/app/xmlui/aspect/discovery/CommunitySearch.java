@@ -149,7 +149,7 @@ public class CommunitySearch extends AbstractDSpaceTransformer implements Cachea
     }
 
     /**
-     * Display a single community (and refrence any sub communites or
+     * Display a single community (and reference any subcommunites or
      * collections)
      */
     public void addBody(Body body) throws SAXException, WingException,

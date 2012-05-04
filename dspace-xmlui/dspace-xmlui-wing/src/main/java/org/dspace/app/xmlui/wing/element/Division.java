@@ -79,7 +79,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
     /** The name of the page url mask attribute */
     public static final String A_PAGE_URL_MASK = "pageURLMask";
 
-    /** Determines weather this division is being merged */
+    /** Determines whether this division is being merged */
     private boolean merged = false;
     
     /** The name assigned to this div */
@@ -154,7 +154,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
     /** The pagination URL mask. (used by masked pagination type) */
     private String pageURLMask;
 
-    /** The possible interactive division methods: get,post, or multipart. */
+    /** The possible interactive division methods: get, post, or multipart. */
     public static final String METHOD_GET = "get";
 
     public static final String METHOD_POST = "post";
@@ -178,7 +178,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
     private java.util.List<AbstractWingElement> contents = new ArrayList<AbstractWingElement>();
 
     /**
-     * Construct a non interactive division.
+     * Construct a non-interactive division.
      * 
      * @param context
      *            (Required) The context this element is contained in, such as
@@ -239,7 +239,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
         restrict(
                 method,
                 METHODS,
-                "The 'method' parameter must be one of these values: 'get', 'post', or 'multipart'.");
+                "The 'method' parameter must be one of these values: 'get', 'post' or 'multipart'.");
 
         this.name = name;
         this.interactive = true;
@@ -322,7 +322,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      *            (Required) How many pages the paginated div spans.
      * @param pageURLMask
      *            (Required) The mask of a URL to a particular within the
-     *            paginated set. The destination page's number should replace
+     *            paginated set. Number of the destination page should replace
      *            the {pageNum} string in the URL mask to generate a full URL to
      *            that page.
      */
@@ -581,7 +581,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
 
     /**
      * Append a table to the division. When creating a table the number of rows
-     * and columns contained in the table must be pre computed and provided
+     * and columns contained in the table must be precomputed and provided
      * here.
      * 
      * @param name
@@ -687,7 +687,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
     
     /**
      * Add a section of translated HTML to the DRI document. This will only handle 
-     * simple transformations such as <p>,<b>,<i>,and <a> tags.
+     * simple transformations such as <p>, <b>, <i> and <a> tags.
      * 
      * Depending on the given HTML this may result in multiple paragraphs being 
      * opened and several bold tags being included.
@@ -730,7 +730,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
             return false;
         }
 
-        context.getLogger().debug("Merding a division");
+        context.getLogger().debug("Merging a division");
         
         String name = attributes.getValue(A_NAME);
         String interactive = attributes.getValue(A_INTERACTIVE);
@@ -740,7 +740,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
         String pagination = attributes.getValue(A_PAGINATION);
         String behavior = attributes.getValue(A_BEHAVIOR);
 
-        context.getLogger().debug("Merging got the parameters name="+name+", interactive="+interactive+", action="+action+", method="+method+", render="+render+", pagination="+pagination);
+        context.getLogger().debug("Merging got parameters name="+name+", interactive="+interactive+", action="+action+", method="+method+", render="+render+", pagination="+pagination);
         
         // The name must be identical (but id's can differ)
         if (!this.name.equals(name))
@@ -748,7 +748,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
             return false;
         }
 
-        // Insure the render attributes are identical.
+        // Ensure the render attributes are identical.
         if (this.rend == null)
         {
             if (render != null)
@@ -763,7 +763,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
 
         if (this.interactive)
         {
-            // Insure all the interactive fields are identical.
+            // Ensure all the interactive fields are identical.
             if (!"yes".equals(interactive))
             {
                 return false;
@@ -777,14 +777,14 @@ public class Division extends AbstractWingElement implements StructuralElement, 
                 return false;
             }
             
-            // For now lets just not merge divs that have behavior.
+            // For now let's just not merge divs that have behavior.
             if (!(behavior == null || behavior.equals("")))
             {
                 return false;
             }
             
         } else {
-            // Else, insure that it is also not interactive.
+            // Else, ensure that it is also not interactive.
             if (!(interactive == null || "no".equals(interactive)))
             {
                 return false;
@@ -845,7 +845,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      * 
      * @param contentHandler
      *            (Required) The registered contentHandler where SAX events
-     *            should be routed too.
+     *            should be routed, too.
      * @param lexicalHandler
      *            (Required) The registered lexicalHandler where lexical 
      *            events (such as CDATA, DTD, etc) should be routed too.

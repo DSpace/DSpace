@@ -517,7 +517,7 @@ public class SyndicationFeed
      *
      * If the dspaceobject is null then a local url to the repository is generated.
      *
-     * @param dso The object to refrence, null if to the repository.
+     * @param dso The object to reference, null if to the repository.
      * @return
      */
     private String baseURL = null;  // cache the result for null

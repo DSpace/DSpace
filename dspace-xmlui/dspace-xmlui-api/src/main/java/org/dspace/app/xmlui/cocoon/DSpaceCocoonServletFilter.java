@@ -29,11 +29,11 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.harvest.OAIHarvester;
 
 /**
- * This is a wrapper servlet around the cocoon servlet that prefroms two functions, 1) it 
- * initializes DSpace / XML UI configuration parameters, and 2) it will preform inturrupted 
+ * This is a wrapper servlet around the cocoon servlet that performs two functions, 1) it 
+ * initializes DSpace / XML UI configuration parameters, and 2) it will perform interrupted 
  * request resumption.
  * 
- * @author scott philips
+ * @author Scott Phillips
  */
 public class DSpaceCocoonServletFilter implements Filter 
 {
@@ -51,7 +51,7 @@ public class DSpaceCocoonServletFilter implements Filter
     /**
      * This method holds code to be removed in the next version 
      * of the DSpace XMLUI, it is now managed by a Shared Context 
-     * Listener inthe dspace-api project. 
+     * Listener in the dspace-api project. 
      * 
      * It is deprecated, rather than removed to maintain backward 
      * compatibility for local DSpace 1.5.x customized overlays.
@@ -103,14 +103,14 @@ public class DSpaceCocoonServletFilter implements Filter
          * Locate the dspace config
          */
         
-        // first check the local per webapp parameter, then check the global parameter.
+        // first check the local per-webapp parameter, then check the global parameter.
         dspaceConfig = arg0.getInitParameter(DSPACE_CONFIG_PARAMETER);
         if (dspaceConfig == null)
         {
             dspaceConfig = arg0.getServletContext().getInitParameter(DSPACE_CONFIG_PARAMETER);
         }
         
-        // Finaly, if no config parameter found throw an error
+        // Finally, if no config parameter found throw an error
         if (dspaceConfig == null || "".equals(dspaceConfig))
         {
             throw new ServletException(
@@ -146,7 +146,7 @@ public class DSpaceCocoonServletFilter implements Filter
             throw new ServletException(
                     "\n\nDSpace has failed to initialize, during stage 2. Error while attempting to read the \n" +
                     "DSpace configuration file (Path: '"+dspaceConfig+"'). \n" +
-                    "This has likely occurred because either the file does not exist, or it's permissions \n" +
+                    "This has likely occurred because either the file does not exist, or its permissions \n" +
                     "are set incorrectly, or the path to the configuration file is incorrect. The path to \n" +
                     "the DSpace configuration file is stored in a context variable, 'dspace-config', in \n" +
                     "either the local servlet or global context.\n\n",e);
@@ -192,7 +192,7 @@ public class DSpaceCocoonServletFilter implements Filter
     		throw new ServletException(
     				"\n\nDSpace has failed to initialize, during stage 3. Error while attempting to read \n" +
     				"the XML UI configuration file (Path: "+webappConfigPath+" or '"+installedConfigPath+"').\n" + 
-    				"This has likely occurred because either the file does not exist, or it's permissions \n" +
+    				"This has likely occurred because either the file does not exist, or its permissions \n" +
     				"are set incorrectly, or the path to the configuration file is incorrect. The XML UI \n" +
     				"configuration file should be named \"xmlui.xconf\" and located inside the standard \n" +
     				"DSpace configuration directory. \n\n",e);
@@ -234,26 +234,26 @@ public class DSpaceCocoonServletFilter implements Filter
 	        // Send the real request or the resumed request off to
 	        // cocoon....right after we check our URL...
 	
-                //Get the Request URI, this will include the Context Path
+                // Get the Request URI, this will include the Context Path
                 String requestUri = realRequest.getRequestURI();
-                //Get the Context Path of the XMLUI web application
+                // Get the Context Path of the XMLUI web application
                 String contextPath = realRequest.getContextPath();
-                //Remove the Context Path from the Request URI -- this is the URI within our webapp
+                // Remove the Context Path from the Request URI -- this is the URI within our webapp
                 String uri = requestUri.replace(contextPath, "");
                 
-                //If the URI within XMLUI is an empty string, this means user 
-                //accessed XMLUI homepage *without* a trailing slash
+                // If the URI within XMLUI is an empty string, this means user 
+                // accessed XMLUI homepage *without* a trailing slash
                 if(uri==null || uri.length()==0)
                 {
-                    //Redirect the user to XMLUI homepage with a trailing slash
-                    //(This is necessary to ensure our Session Cookie, which ends 
+                    // Redirect the user to XMLUI homepage with a trailing slash
+                    // (This is necessary to ensure our Session Cookie, which ends 
                     // in a trailing slash, isn't lost by some browsers, e.g. IE)
                     String locationWithTrailingSlash = realRequest.getRequestURI() + "/";
                     
-                    //Reset any existing response headers -- instead we are going to redirect user to correct path
+                    // Reset any existing response headers -- instead we are going to redirect user to correct path
                     realResponse.reset();
                     
-                    //Redirect user to homepage with trailing slash
+                    // Redirect user to homepage with trailing slash
                     realResponse.sendRedirect(locationWithTrailingSlash);
                 }    
 	        // if force ssl is on and the user has authenticated and the request is not secure redirect to https

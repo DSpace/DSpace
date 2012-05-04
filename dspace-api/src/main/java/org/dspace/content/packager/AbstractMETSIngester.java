@@ -776,7 +776,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             // retrieve bundle name from manifest
             String bundleName = METSManifest.getBundleName(mfile);
 
-            // Find or create the bundle where bitstrem should be attached
+            // Find or create the bundle where bitstream should be attached
             Bundle bundle;
             Bundle bns[] = item.getBundles(bundleName);
             if (bns != null && bns.length > 0)

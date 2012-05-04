@@ -86,7 +86,7 @@ public abstract class AbstractAdapter
     
     /**
      * Construct a new adapter, implementers must use call this method so
-     * the appropriate internal values are insured to be set correctly.
+     * the appropriate internal values are ensured to be set correctly.
      * 
      * @param contextPath
      *            The contextPath of this web application.
@@ -104,7 +104,7 @@ public abstract class AbstractAdapter
     List<String> structTypes = new ArrayList<String>();
     
     /**
-     * A comma separated list of METS sections to render. If no value 
+     * A comma-separated list of METS sections to render. If no value 
      * is provided then all METS sections are rendered.
      * 
      * @param sections Comma separated list of METS sections.
@@ -123,7 +123,7 @@ public abstract class AbstractAdapter
     }
     
     /**
-     * A comma separated list of METS descriptive metadata formats to 
+     * A comma-separated list of METS descriptive metadata formats to 
      * render. If no value is provided then only the DIM format is used.
      * 
      * @param dmdTypes Comma separated list of METS metadata types.
@@ -166,7 +166,7 @@ public abstract class AbstractAdapter
     }
 
     /**
-     * A comma separated list of METS technical metadata formats to
+     * A comma-separated list of METS technical metadata formats to
      * render.
      *
      * @param techMDTypes Comma separated list of METS metadata types.
@@ -177,7 +177,7 @@ public abstract class AbstractAdapter
     }
 
     /**
-     * A comma separated list of METS intellectual property rights metadata
+     * A comma-separated list of METS intellectual property rights metadata
      * formats to render.
      *
      * @param rightsMDTypes Comma separated list of METS metadata types.
@@ -188,7 +188,7 @@ public abstract class AbstractAdapter
     }
 
     /**
-     * A comma separated list of METS source metadata
+     * A comma-separated list of METS source metadata
      * formats to render.
      *
      * @param sourceMDTypes Comma separated list of METS metadata types.
@@ -199,7 +199,7 @@ public abstract class AbstractAdapter
     }
 
     /**
-     * A comma separated list of METS digital provenance metadata
+     * A comma-separated list of METS digital provenance metadata
      * formats to render.
      *
      * @param digiprovMDTypes Comma separated list of METS metadata types.
@@ -210,7 +210,7 @@ public abstract class AbstractAdapter
     }
     
     /**
-     * A comma separated list of METS fileGrps to render. If no value
+     * A comma-separated list of METS fileGrps to render. If no value
      * is provided then all groups are rendered.
      * 
      * @param fileGrpTypes Comma separated list of METS file groups.
@@ -229,7 +229,7 @@ public abstract class AbstractAdapter
     }
     
     /**
-     * A comma separated list of METS structural types to render. If no 
+     * A comma-separated list of METS structural types to render. If no 
      * value is provided then only the DIM format is used.
      * 
      * @param structTypes Comma separated list of METS structure types.

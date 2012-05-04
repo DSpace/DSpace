@@ -12,7 +12,7 @@ package org.dspace.app.xmlui.wing.element;
  * enables multiple input conrols to be combined together into a single control.
  * Some example uses would be names, that are broken up into both a first and
  * last name. Together they represent a single value but the user can interacts
- * two seperate text boxes for each part of the name.
+ * two separate text boxes for each part of the name.
  * 
  * @author Scott Phillips
  */

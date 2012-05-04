@@ -26,7 +26,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * The Swiss army part comes in because it's configurable. Instead of 
  * defining a static set of events that are filled out by default all
  * events are filled out and must be turned on to allow each type
- * Individually.
+ * individually.
  * 
  * Primarily you can filter events based upon their type, i.e. start/end 
  * elements or start/end documents. However there is one special control,
@@ -182,7 +182,7 @@ public class SAXFilter implements ContentHandler, LexicalHandler
 	
 	/**
 	 * Add a default namespace is none is provided. The namespace 
-	 * should have allready been declared (add added to the 
+	 * should have already been declared (add added to the 
 	 * namespace support object
 	 * 
 	 * @param uri the default namespace uri.

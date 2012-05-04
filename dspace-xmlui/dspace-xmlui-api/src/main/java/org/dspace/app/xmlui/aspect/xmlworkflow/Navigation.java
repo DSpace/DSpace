@@ -59,7 +59,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         // Special case, don't cache anything if the user is logging
         // in. The problem occures because of timming, this cache key
         // is generated before we know whether the operation has
-        // succeded or failed. So we don't know whether to cache this
+        // succeeded or failed. So we don't know whether to cache this
         // under the user's specific cache or under the anonymous user.
         if (request.getParameter("login_email")    != null ||
             request.getParameter("login_password") != null ||

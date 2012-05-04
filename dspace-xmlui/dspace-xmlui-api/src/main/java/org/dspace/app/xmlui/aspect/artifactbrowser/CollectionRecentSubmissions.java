@@ -115,8 +115,8 @@ public class CollectionRecentSubmissions extends AbstractDSpaceTransformer imple
 	            // Add the actual collection;
 	            validity.add(collection);
 
-	            // add reciently submitted items
-	            for(BrowseItem item : getRecientlySubmittedItems(collection))
+	            // add recently submitted items
+	            for(BrowseItem item : getRecentlySubmittedItems(collection))
 	            {
 	                validity.add(item);
 	            }
@@ -143,7 +143,7 @@ public class CollectionRecentSubmissions extends AbstractDSpaceTransformer imple
         Collection collection = (Collection) dso;
 
 
-        java.util.List<BrowseItem> items = getRecientlySubmittedItems(collection);
+        java.util.List<BrowseItem> items = getRecentlySubmittedItems(collection);
         if(items.size() == 0)
         {
             return;
@@ -169,7 +169,7 @@ public class CollectionRecentSubmissions extends AbstractDSpaceTransformer imple
      * @param collection The collection.
      */
     @SuppressWarnings("unchecked") // The cast from getLastSubmitted is correct, it dose infact return a list of Items.
-    private java.util.List<BrowseItem> getRecientlySubmittedItems(Collection collection)
+    private java.util.List<BrowseItem> getRecentlySubmittedItems(Collection collection)
         throws SQLException
     {
         if (recentSubmissionItems != null)

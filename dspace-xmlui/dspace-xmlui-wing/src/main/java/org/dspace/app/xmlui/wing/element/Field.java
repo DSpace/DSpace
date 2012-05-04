@@ -126,10 +126,10 @@ public abstract class Field extends AbstractWingElement implements
     /** The type of field, see TYPES above */
     protected String type;
 
-    /** Weather this field is disabled */
+    /** Whether this field is disabled */
     protected boolean disabled;
 
-    /** Weather this field is required */
+    /** Whether this field is required */
     protected boolean required;
 
     /** Any special rendering instructions */
