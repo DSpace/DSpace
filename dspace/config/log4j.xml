@@ -147,7 +147,7 @@
 
 	<!-- More detailed log settings for specific debugging purposes -->
         <logger name="org.dspace.storage.rdbms">
-          <level value="DEBUG"/>
+          <level value="INFO"/>
         </logger>
 
 	<logger name="org.dspace.statistics">
