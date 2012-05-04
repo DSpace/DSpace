@@ -687,6 +687,8 @@
 
     <xsl:template match="mets:file">
         <xsl:param name="context" select="."/>
+        
+        <!-- nuevo nombre para el documento a descargar -->
         <xsl:variable name="documentTitle">
 	        <xsl:choose>
 		        <xsl:when test="mets:FLocat[@LOCTYPE='URL']/@xlink:label">
@@ -700,11 +702,12 @@
 		        </xsl:otherwise>
 	        </xsl:choose>       
         </xsl:variable>
+        
         <xsl:variable name="extension" select="substring-after(mets:FLocat[@LOCTYPE='URL']/@xlink:title, '.')"/>
         <xsl:variable name="sequence" select="substring-after(mets:FLocat[@LOCTYPE='URL']/@xlink:href, '?')"/>
         
         <xsl:variable name="link">
-            <xsl:value-of select="substring-before(mets:FLocat[@LOCTYPE='URL']/@xlink:href, mets:FLocat[@LOCTYPE='URL']/@xlink:title)"/><xsl:value-of select="$documentTitle"/>.<xsl:value-of select="$extension"/>?<xsl:value-of select="$sequence"/>
+            <xsl:value-of select="substring-before(mets:FLocat[@LOCTYPE='URL']/@xlink:href, $context/@OBJID)"/><xsl:value-of select="$context/@OBJID"/>/<xsl:value-of select="$documentTitle"/>.<xsl:value-of select="$extension"/>?<xsl:value-of select="$sequence"/>
         </xsl:variable>
 
         <div class="file-wrapper clearfix">
