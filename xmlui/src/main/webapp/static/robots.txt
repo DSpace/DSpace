@@ -31,11 +31,11 @@ Disallow: /password-login
 Disallow: /forgot
 
 
-Disallow: /browse
-Disallow: /*type=dateissued
-Disallow: /*type=author
-Disallow: /*type=title
-Disallow: /*type=subject
+#Disallow: /browse
+#Disallow: /*type=dateissued
+#Disallow: /*type=author
+#Disallow: /*type=title
+#Disallow: /*type=subject
 
 #Disallow: /discover
 #Disallow: /*fq=author_filter
