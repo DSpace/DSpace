@@ -22,6 +22,7 @@ import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -165,11 +166,12 @@ public class SediciCCLicenseStep extends AbstractProcessingStep
     	String jurisdictionDescription = (ConfigurationManager.getProperty("cc.license.jurisdiction.description") != null) ? ConfigurationManager.getProperty("cc.license.jurisdiction.description") : "";
         
     	Item item = subInfo.getSubmissionItem().getItem();
+	    Collection coleccion=subInfo.getSubmissionItem().getCollection();
     	HttpSession session = request.getSession();
     	String licenseUri;
     	String licenseDescription;
     	
-       if (AuthorizeManager.isAdmin(context, item.getOwningCollection())){
+       if (AuthorizeManager.isAdmin(context, item) || AuthorizeManager.isAdmin(context, coleccion)){
     	   //es administrador de la coleccion a la que se está agregando el item, hay un select
     	   String cc_license = request.getParameter("cc_license_chooser");
     	   //limpio los metadatos

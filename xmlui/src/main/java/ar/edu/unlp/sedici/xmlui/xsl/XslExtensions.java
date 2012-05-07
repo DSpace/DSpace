@@ -99,7 +99,7 @@ public class XslExtensions {
 	}
 	
 	public static String codificarURL(String url){
-		char[] reservados={'!','#','$','%','&','(',')','*','+',',','/',':',';','=','?','@','[',']',']'};
+		char[] reservados={'!','#','$','%','&','(',')','*','+',',','/',':',';','=','?','@','[',']',']', ' '};
 		for (char caracter: reservados) {
 			url=url.replace(caracter, '_');
 		}

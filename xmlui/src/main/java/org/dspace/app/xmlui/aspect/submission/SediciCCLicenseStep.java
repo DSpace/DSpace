@@ -93,6 +93,7 @@ public class SediciCCLicenseStep extends AbstractSubmissionStep
 	{
 	    // Build the url to and from creative commons
 	    Item item = submission.getItem();
+	    Collection collection=submission.getCollection();
 	    String ccUri=ConfigurationManager.getProperty("cc.license.uri");
 	    DCValue[] carga=item.getMetadata(ccUri);
 	    String dato;
@@ -140,7 +141,6 @@ public class SediciCCLicenseStep extends AbstractSubmissionStep
 				}
 	        };
 	    }
-	    Collection collection = submission.getCollection();
 	    String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 	    Request request = ObjectModelHelper.getRequest(objectModel);
 	    
@@ -153,8 +153,8 @@ public class SediciCCLicenseStep extends AbstractSubmissionStep
 	    List list = div.addList("licenseclasslist", List.TYPE_FORM);	    
 	    list.addItem(T_info1);
 	    list.setHead(T_head);
-	    
-	    if (AuthorizeManager.isAdmin(context, item.getOwningCollection())){
+
+	    if (AuthorizeManager.isAdmin(context, item) || AuthorizeManager.isAdmin(context, collection)){
 	    	//si es administrador de la colección se debe mostrar un select en vez de los radios
         	List edit = div.addList("selectlist1", List.TYPE_SIMPLE, "horizontalVanilla");
 		    edit.addItem(message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.pregunta"));

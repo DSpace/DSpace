@@ -751,7 +751,7 @@
 		                        <xsl:value-of select="$link"/>
 		                    </xsl:attribute>
 	                        <span>
-	                            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
+	                            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label" disable-output-escaping="yes"/>
 	                        </span>
 		                 </a>
                     </div>
