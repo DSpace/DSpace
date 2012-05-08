@@ -12,35 +12,6 @@
        <version>1.7.2</version>
     </parent>
 
-    <repositories>
-       <repository>
-          <id>maven.dspace.org-snapshot</id>
-          <name>DSpace Maven Snapshot Repository</name>
-          <url>http://maven.dspace.org/snapshot</url>
-          <releases>
-             <enabled>false</enabled>
-             <checksumPolicy>fail</checksumPolicy>
-          </releases>
-          <snapshots>
-             <enabled>true</enabled>
-             <checksumPolicy>fail</checksumPolicy>
-          </snapshots>
-       </repository>
-       <repository>
-         <id>atmire.com-releases</id>
-         <name>atmire.com-releases</name>
-         <url>https://atmire.com/artifactory/atmire.com-releases</url>
-         <releases>
-            <enabled>true</enabled>
-            <checksumPolicy>fail</checksumPolicy>
-         </releases>
-         <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-            <checksumPolicy>fail</checksumPolicy>
-         </snapshots>
-      </repository>
-    </repositories>
 
 
     <!--TODO: add db profiles ?-->
