@@ -15,115 +15,78 @@
  */
 package ar.edu.unlp.sedici.aspect.extraSubmission;
 
-
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URL;
 import java.sql.SQLException;
-import java.util.Iterator;
+import java.util.Set;
 
-import org.apache.avalon.framework.parameters.ParameterException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
-import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.Item;
-import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Metadata;
 import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.handle.HandleManager;
+import org.dspace.eperson.Group;
 import org.xml.sax.SAXException;
-
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.io.SyndFeedInput;
-import com.sun.syndication.io.XmlReader;
-
 
 /**
  * Aspect para la generacion de metas de autoarchivo
- *
+ * 
  * @author Nicolás Romagnoli
  */
-public class GenerateAutoArchivePageMeta  extends AbstractDSpaceTransformer implements CacheableProcessingComponent
-{
-    /** Language Strings */
-    
-    public static final Message T_dspace_home =
-        message("xmlui.general.dspace_home");
-	
-    private static final Message T_head = 
-        message("xmlui.ArtifactBrowser.FrontPageSearch.head");
-    
-    private static final Message T_para1 =
-        message("xmlui.ArtifactBrowser.FrontPageSearch.para1");
-    
-    private static final Message T_go =
-        message("xmlui.general.go");
-    
+public class GenerateAutoArchivePageMeta extends AbstractDSpaceTransformer
+		implements CacheableProcessingComponent {
+	/** Language Strings */
+	public static final Message T_dspace_home = message("xmlui.general.dspace_home");
 
+	private static final Message T_head = message("xmlui.ArtifactBrowser.FrontPageSearch.head");
 
-    /**
-     * Generate the cache validity object.
-     */
-    public SourceValidity getValidity() 
-    {
-        return NOPValidity.SHARED_INSTANCE;
-    }
-    
-    /** What page metadata to add to the document */
-    public void addPageMeta(PageMeta pageMeta) throws SAXException,
-            WingException, UIException, SQLException, IOException,
-            AuthorizeException
-    {
-    	//Guardo las communities que serán desplegables
-    	String dropdownCommunities = ConfigurationManager.getProperty("sedici-dspace", "xmlui.community-list.expandable-communities");
-    	Metadata meta=pageMeta.addMetadata("dropdown-communities");
-    	meta.addContent(dropdownCommunities);
-    	
-    	//Recupero el id de la coleccion de autoarchivo y lo agrego al pageMeta
-    	String handleConfig = ConfigurationManager.getProperty("sedici-dspace", "autoArchiveCollectionHandle");
-    	meta=pageMeta.addMetadata("autoArchive", "handle");
-    	meta.addContent(handleConfig);
-    	
-    	//Verifico que el usuario solo tenga permiso de escritura solamente en autoarchivo
-    	Boolean onlyAutoArchiveSubmit=false;
-    	Collection[] collections; // List of possible collections.
-		DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-		collections = Collection.findAuthorized(context, null, Constants.ADD);
-		if (collections.length==1){
-			for (Collection collection : collections) 
-	        {
-				String handle=collection.getHandle();
-				if (handle.equals(handleConfig)){
-					onlyAutoArchiveSubmit=true;
-				}	        	
-	        }
+	private static final Message T_para1 = message("xmlui.ArtifactBrowser.FrontPageSearch.para1");
+
+	private static final Message T_go = message("xmlui.general.go");
+
+	/**
+	 * Generate the cache validity object.
+	 */
+	public SourceValidity getValidity() {
+		return NOPValidity.SHARED_INSTANCE;
+	}
+
+	/** What page metadata to add to the document */
+	public void addPageMeta(PageMeta pageMeta) throws SAXException,
+			WingException, UIException, SQLException, IOException,
+			AuthorizeException {
+		// Guardo las communities que serán desplegables
+		String dropdownCommunities = ConfigurationManager.getProperty(
+				"sedici-dspace", "xmlui.community-list.expandable-communities");
+		Metadata meta = pageMeta.addMetadata("dropdown-communities");
+		meta.addContent(dropdownCommunities);
+
+		// Recupero el id de la coleccion de autoarchivo y lo agrego al pageMeta
+		String handleConfig = ConfigurationManager.getProperty("sedici-dspace",
+				"autoArchiveCollectionHandle");
+		meta = pageMeta.addMetadata("autoArchive", "handle");
+		meta.addContent(handleConfig);
+
+		// Verificamos que el usuario logueado sea solamente un Anonymous (tenga un solo grupo y este sea el cero)
+		Boolean onlyAutoArchiveSubmit = false;
+		Set<Integer> groupIDs = Group.allMemberGroupIDs(context, context.getCurrentUser());
+		if (groupIDs.size() == 1 && groupIDs.contains(Integer.valueOf(0))) {
+			onlyAutoArchiveSubmit = true;
 		}
-		meta=pageMeta.addMetadata("autoArchive", "submit");
-    	meta.addContent(onlyAutoArchiveSubmit.toString());
-		
-		
-    }
+
+		meta = pageMeta.addMetadata("autoArchive", "submit");
+		meta.addContent(onlyAutoArchiveSubmit.toString());
+	}
 
 	@Override
 	public Serializable getKey() {
-	    return "1";
+		return "1";
 	}
-    
 
 }
-

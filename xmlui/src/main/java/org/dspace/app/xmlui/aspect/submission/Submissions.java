@@ -12,6 +12,8 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 
@@ -37,6 +39,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.xml.sax.SAXException;
 
 /**
@@ -173,10 +176,9 @@ public class Submissions extends AbstractDSpaceTransformer
 
     	if (unfinishedItems.length <= 0 && supervisedItems.length <= 0)
     	{
-            Collection[] collections = Collection.findAuthorized(context, null, Constants.ADD);
-
-            if (collections.length > 0)
-            {
+    		// Verificamos que el usuario logueado sea solamente un Anonymous (tenga un solo grupo y este sea el cero)
+    		Set<Integer> groupIDs = Group.allMemberGroupIDs(context, context.getCurrentUser());
+    		if (groupIDs.size() == 1 && groupIDs.contains(Integer.valueOf(0))) {
                 Division start = division.addDivision("start-submision");
                 start.setHead(T_s_head1);
                 Para p = start.addPara();
@@ -184,7 +186,7 @@ public class Submissions extends AbstractDSpaceTransformer
                 p.addXref(contextPath+"/submit",T_s_info1b);
                 p.addContent(T_s_info1c);
                 return;
-            }
+    		}
     	}
 
     	Division unfinished = division.addDivision("unfinished-submisions");
