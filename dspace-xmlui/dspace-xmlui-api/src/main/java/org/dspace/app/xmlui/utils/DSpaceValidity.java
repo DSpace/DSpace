@@ -26,47 +26,47 @@ import org.dspace.eperson.Group;
 /**
  * This is a validity object specifically implemented for the caching 
  * needs of DSpace, Manakin, and Cocoon.
- * 
+ *
  * The basic idea is that each time a DSpace object rendered by a cocoon 
  * component the object and everything about it that makes it unique should 
  * be reflected in the validity object for the component. By following this 
  * principle if the object has been updated externally then the cache will be
  * invalidated.
- * 
+ *
  * This DSpaceValidity object makes this processes easier by abstracting out
  * the processes of determining what is unique about a DSpace object. A class
  * is expected to create a new DSpaceValidity object and add() to it all 
  * DSpaceObjects that are rendered by the component. This validity object will 
  * serialize all those objects to a string, take a hash of the string and compare
  * the hash of the string for any updates.
- * 
- * 
+ *
+ *
  * @author Scott Phillips
  */
 
 public class DSpaceValidity implements SourceValidity
 {
-	
+
     private static final long serialVersionUID = 1L;
-    
+
     /** The validityKey while it is being build, once it is completed. */
     protected StringBuffer validityKey;
-    
+
     /** Simple flag to note if the object has been completed. */
     protected boolean completed = false;
-    
+
     /** A hash of the validityKey taken after completetion */
     protected long hash;
-    
+
     /** The time when the validity is no longer assumed to be valid */
     protected long assumedValidityTime = 0;
-    
+
     /** The length of time that a cache is assumed to be valid */
     protected long assumedValidityDelay = 0;
 
     /**
      * Create a new DSpace validity object. 
-     * 
+     *
      * @param initialValidityKey
      *      The initial string 
      */
@@ -84,59 +84,59 @@ public class DSpaceValidity implements SourceValidity
     {
         this(null);
     }
-    
+
     /**
      * Complete this validity object. After the completion no more
      * objects may be added to the validity object and the object
      * will return as valid.
      */
-    public DSpaceValidity complete() 
-    {    
+    public DSpaceValidity complete()
+    {
         this.completed = true;
         this.hash = HashUtil.hash(validityKey);
         this.validityKey = null;
-        
+
         // Set the forced validity time.
         if (assumedValidityDelay > 0)
         {
             resetAssumedValidityTime();
         }
-        
+
         return this;
     }
-    
+
     /**
      * Set the time delay for how long this cache will be assumed 
      * to be valid. When it is assumed valid no other checks will be
      * made to consider it's validity, and once the time has expired 
-     * a full validation will occur on the next cache hit. If the 
+     * a full validation will occur on the next cache hit. If the
      * cache proves to be validated on this hit then the assumed 
      * validity timer is reset.
-     * 
+     *
      * @param milliseconds The delay time in millieseconds.
      */
     public void setAssumedValidityDelay(long milliseconds )
     {
     	// record the delay time.
     	this.assumedValidityDelay = milliseconds;
-    	
+
     	// Also add the delay time to the validity hash so if the
     	// admin changes the delay time then all the previous caches
     	// are invalidated.
     	this.validityKey.append("AssumedValidityDelay:"+milliseconds);
     }
-    
+
     /**
      * Set the time delay for how long this cache will be assumed to be valid.
-     * 
+     *
      * This method takes a string which is parsed for the delay time, the string 
      * must be of the following form: "<integer> <scale>" where scale is days,
      * hours, minutes, or seconds.
-     * 
+     *
      * Examples: "1 day" or "12 hours" or "1 hour" or "30 minutes"
-     * 
+     *
      * See the setAssumedValidityDelay(long) for more information.
-     * 
+     *
      * @param delay The delay time in a variable scale.
      */
     public void setAssumedValidityDelay(String delay)
@@ -145,24 +145,24 @@ public class DSpaceValidity implements SourceValidity
         {
             return;
         }
-    	
+
     	String[] parts = delay.split(" ");
-    	
+
     	if (parts == null || parts.length != 2)
         {
             throw new IllegalArgumentException("Error unable to parse the assumed validity delay time: \"" + delay + "\". All delays must be of the form \"<integer> <scale>\" where scale is either seconds, minutes, hours, or days.");
         }
 
     	long milliseconds = 0;
-    	
+
     	long value = 0;
-    	try { value = Long.valueOf(parts[0]); } 
+    	try { value = Long.valueOf(parts[0]); }
     	catch (NumberFormatException nfe) {
     		throw new IllegalArgumentException("Error unable to parse the assumed validity delay time: \""+delay+"\". All delays must be of the form \"<integer> <scale>\" where scale is either seconds, minutes, hours, or days.",nfe);
     	}
-    	
+
     	String scale = parts[1].toLowerCase();
-    
+
     	if (scale.equals("weeks") || scale.equals("week"))
     	{
     		// milliseconds * seconds * minutes * hours * days * weeks
@@ -189,7 +189,7 @@ public class DSpaceValidity implements SourceValidity
     	}
     	else if (scale.equals("seconds") || scale.equals("second"))
     	{
-    		// milliseconds * second 
+    		// milliseconds * second
     		// 1000 * 1 = 1000
     		milliseconds = value * 1000;
     	}
@@ -197,28 +197,28 @@ public class DSpaceValidity implements SourceValidity
     	{
     		throw new IllegalArgumentException("Error unable to parse the assumed validity delay time: \""+delay+"\". All delays must be of the form \"<integer> <scale>\" where scale is either seconds, minutes, hours, or days.");
         }
-    	
+
     	// Now set the actual delay.
     	setAssumedValidityDelay(milliseconds);
     }
-    
-    
+
+
     /**
-     * Add a DSpace object to the validity. The order in which objects 
-     * are added to the validity object is important, ensure that 
+     * Add a DSpace object to the validity. The order in which objects
+     * are added to the validity object is important, ensure that
      * objects are added in the *exact* same order each time a 
      * validity object is created.
-     * 
-     * Below are the following transitive rules for adding 
+     *
+     * Below are the following transitive rules for adding
      * objects, i.e. if an item is added then all the items 
      * bundles & bitstreams will also be added.
-     * 
+     *
      * Communities -> logo bitstream
      * Collection -> logo bitstream
      * Item -> bundles -> bitstream
      * Bundles -> bitstreams
      * EPeople -> groups
-     * 
+     *
      * @param dso
      *          The object to add to the validity.
      */
@@ -228,10 +228,10 @@ public class DSpaceValidity implements SourceValidity
         {
             throw new IllegalStateException("Cannot add DSpaceObject to a completed validity object");
         }
-        
-        if (dso == null) 
+
+        if (dso == null)
         {
-          this.validityKey.append("null");  
+          this.validityKey.append("null");
         }
         else if (dso instanceof Community)
         {
@@ -244,15 +244,16 @@ public class DSpaceValidity implements SourceValidity
             validityKey.append(community.getMetadata("side_bar_text"));
             validityKey.append(community.getMetadata("copyright_text"));
             validityKey.append(community.getMetadata("name"));
-            
+
             // Add the communities logo
             this.add(community.getLogo());
 
-        } 
+            addExtraMetadataToValidity(dso);
+        }
         else if (dso instanceof Collection)
         {
             Collection collection = (Collection) dso;
-            
+
             validityKey.append("Collection:");
             validityKey.append(collection.getHandle());
             validityKey.append(collection.getMetadata("introductory_text"));
@@ -261,18 +262,19 @@ public class DSpaceValidity implements SourceValidity
             validityKey.append(collection.getMetadata("provenance_description"));
             validityKey.append(collection.getMetadata("copyright_text"));
             validityKey.append(collection.getMetadata("license"));
-            validityKey.append(collection.getMetadata("name")); 
-            
+            validityKey.append(collection.getMetadata("name"));
+
             // Add the logo also;
             this.add(collection.getLogo());
-            
+
+            addExtraMetadataToValidity(dso);
         }
         else if (dso instanceof Item)
         {
             Item item = (Item) dso;
-            
+
             validityKey.append("Item:");
-            validityKey.append(item.getHandle());            
+            validityKey.append(item.getHandle());
             validityKey.append(item.getOwningCollection());
             validityKey.append(item.getLastModified());
             // Include all metadata values in the validity key.
@@ -285,7 +287,15 @@ public class DSpaceValidity implements SourceValidity
                 validityKey.append(dcv.language).append("=");
                 validityKey.append(dcv.value);
             }
-            
+
+            //This is needed so that if an item changed from collections it gets invalidated
+            Collection[] collections = item.getCollections();
+            for (Collection collection : collections) {
+                validityKey.append(collection.getID());
+            }
+
+            addExtraMetadataToValidity(dso);
+
             for(Bundle bundle : item.getBundles())
             {
                 // Add each of the items bundles & bitstreams.
@@ -295,7 +305,7 @@ public class DSpaceValidity implements SourceValidity
         else if (dso instanceof BrowseItem)
         {
         	BrowseItem browseItem = (BrowseItem) dso;
-        	
+
         	validityKey.append("BrowseItem:");
         	validityKey.append(browseItem.getHandle());
         	DCValue[] dcvs = browseItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
@@ -311,12 +321,12 @@ public class DSpaceValidity implements SourceValidity
         else if (dso instanceof Bundle)
         {
             Bundle bundle = (Bundle) dso;
-            
+
             validityKey.append("Bundle:");
             validityKey.append(bundle.getID());
             validityKey.append(bundle.getName());
             validityKey.append(bundle.getPrimaryBitstreamID());
-            
+
             for(Bitstream bitstream : bundle.getBitstreams())
             {
                 this.add(bitstream);
@@ -325,7 +335,7 @@ public class DSpaceValidity implements SourceValidity
         else if (dso instanceof Bitstream)
         {
             Bitstream bitstream = (Bitstream) dso;
-            
+
             validityKey.append("Bundle:");
             validityKey.append(bitstream.getID());
             validityKey.append(bitstream.getSequenceID());
@@ -337,11 +347,13 @@ public class DSpaceValidity implements SourceValidity
             validityKey.append(bitstream.getSize());
             validityKey.append(bitstream.getUserFormatDescription());
             validityKey.append(bitstream.getFormat().getDescription());
+
+            addExtraMetadataToValidity(dso);
         }
         else if (dso instanceof EPerson)
         {
             EPerson eperson = (EPerson) dso;
-            
+
             validityKey.append("Bundle:");
             validityKey.append(eperson.getID());
             validityKey.append(eperson.getEmail());
@@ -350,26 +362,41 @@ public class DSpaceValidity implements SourceValidity
             validityKey.append(eperson.getLastName());
             validityKey.append(eperson.canLogIn());
             validityKey.append(eperson.getRequireCertificate());
+
+            addExtraMetadataToValidity(dso);
         }
         else if (dso instanceof Group)
         {
             Group group = (Group) dso;
-            
+
             validityKey.append("Group:");
-            
+
             validityKey.append(group.getID());
             validityKey.append(group.getName());
+
+            addExtraMetadataToValidity(dso);
         }
         else
         {
             throw new IllegalArgumentException("DSpaceObject of type '"+dso.getClass().getName()+"' is not supported by the DSpaceValidity object.");
-        }    
+        }
     }
-    
+
+    private void addExtraMetadataToValidity(DSpaceObject dso) {
+        DCValue[] values = dso.getExtraMetadata(Item.ANY, Item.ANY, Item.ANY);
+        for (DCValue value : values) {
+            validityKey.append(value.schema).append(".");
+            validityKey.append(value.element).append(".");
+            validityKey.append(value.qualifier).append(".");
+            validityKey.append(value.language).append("=");
+            validityKey.append(value.value);
+        }
+    }
+
     /**
-     * Add a non-DSpaceObject to the validity, the object should be 
-     * serialized into a string form. The order in which objects 
-     * are added to the validity object is important, ensure that 
+     * Add a non-DSpaceObject to the validity, the object should be
+     * serialized into a string form. The order in which objects
+     * are added to the validity object is important, ensure that
      * objects are added in the *exact* same order each time a 
      * validity object is created.
      *
@@ -381,14 +408,14 @@ public class DSpaceValidity implements SourceValidity
         validityKey.append("String:");
         validityKey.append(nonDSpaceObject);
     }
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     /**
      * This method is used during serializion. When tomcat is shutdown cocoon's in-memory 
      * cache is serialized and written to disk to later be read back into memory on start 
@@ -399,7 +426,7 @@ public class DSpaceValidity implements SourceValidity
      * the assume validity time to zero. This means the next cache hit after a server startup
      * will never be assumed valid. Only after it has been checked once will the regular assume
      * validity mechanism be used.
-     * 
+     *
      * @param in
      * @throws IOException
      * @throws ClassNotFoundException
@@ -408,13 +435,13 @@ public class DSpaceValidity implements SourceValidity
     {
     	// Read in this object as normal.
     	in.defaultReadObject();
-    	
+
     	// After reading from serialization do not assume validity anymore until it
     	// has been checked at least once.
     	this.assumedValidityTime = 0;
     }
-    
-    
+
+
     /**
      * Reset the assume validity time. This should be called only when the validity of this cache
      * has been confirmed to be accurate. This will reset the assume valid timer based upon the
@@ -424,7 +451,7 @@ public class DSpaceValidity implements SourceValidity
     {
     	this.assumedValidityTime = System.currentTimeMillis() + this.assumedValidityDelay;
     }
-    
+
     /**
      * Determine if the cache is still valid
      */
@@ -443,7 +470,7 @@ public class DSpaceValidity implements SourceValidity
         			return SourceValidity.VALID;
         		}
         	}
-        	
+
         	return SourceValidity.UNKNOWN;
         }
         else
@@ -457,8 +484,8 @@ public class DSpaceValidity implements SourceValidity
     /**
      * Determine if the cache is still valid based 
      * upon the other validity object.
-     * 
-     * @param otherObject 
+     *
+     * @param otherObject
      *          The other validity object.
      */
     public int isValid(SourceValidity otherObject)

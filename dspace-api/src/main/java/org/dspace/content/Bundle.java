@@ -42,9 +42,6 @@ public class Bundle extends DSpaceObject
     /** log4j logger */
     private static Logger log = Logger.getLogger(Bundle.class);
 
-    /** Our context */
-    private Context ourContext;
-
     /** The table row corresponding to this bundle */
     private TableRow bundleRow;
 
@@ -67,7 +64,7 @@ public class Bundle extends DSpaceObject
      */
     Bundle(Context context, TableRow row) throws SQLException
     {
-        ourContext = context;
+        super(context);
         bundleRow = row;
         bitstreams = new ArrayList<Bitstream>();
         String bitstreamOrderingField  = ConfigurationManager.getProperty("webui.bitstream.order.field");
@@ -94,7 +91,7 @@ public class Bundle extends DSpaceObject
 
         // Get bitstreams
         TableRowIterator tri = DatabaseManager.query(
-                ourContext,
+                getContext(),
                 query.toString(),
                 bundleRow.getIntColumn("bundle_id"));
 
@@ -117,7 +114,7 @@ public class Bundle extends DSpaceObject
                     //Since bitstreams can be ordered by a column in bundle2bitstream
                     //We cannot use queryTable & so we need to add our table later on
                     r.setTable("bitstream");
-                    bitstreams.add(new Bitstream(ourContext, r));
+                    bitstreams.add(new Bitstream(getContext(), r));
                 }
             }
         }
@@ -326,7 +323,7 @@ public class Bundle extends DSpaceObject
 
         // Get items
         TableRowIterator tri = DatabaseManager.queryTable(
-        		ourContext, "item",
+                getContext(), "item",
                 "SELECT item.* FROM item, item2bundle WHERE " +
                 "item2bundle.item_id=item.item_id AND " +
                 "item2bundle.bundle_id= ? ",
@@ -339,7 +336,7 @@ public class Bundle extends DSpaceObject
                 TableRow r = (TableRow) tri.next();
 
                 // Used cached copy if there is one
-                Item fromCache = (Item) ourContext.fromCache(Item.class, r
+                Item fromCache = (Item) getContext().fromCache(Item.class, r
                         .getIntColumn("item_id"));
 
                 if (fromCache != null)
@@ -348,7 +345,7 @@ public class Bundle extends DSpaceObject
                 }
                 else
                 {
-                    items.add(new Item(ourContext, r));
+                    items.add(new Item(getContext(), r));
                 }
             }
         }
@@ -379,9 +376,9 @@ public class Bundle extends DSpaceObject
             IOException, SQLException
     {
         // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
+        AuthorizeManager.authorizeAction(getContext(), this, Constants.ADD);
 
-        Bitstream b = Bitstream.create(ourContext, is);
+        Bitstream b = Bitstream.create(getContext(), is);
 
         // FIXME: Set permissions for bitstream
         addBitstream(b);
@@ -403,9 +400,9 @@ public class Bundle extends DSpaceObject
         throws AuthorizeException, IOException, SQLException
     {
         // check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
+        AuthorizeManager.authorizeAction(getContext(), this, Constants.ADD);
 
-        Bitstream b = Bitstream.register(ourContext, assetstore, bitstreamPath);
+        Bitstream b = Bitstream.register(getContext(), assetstore, bitstreamPath);
 
         // FIXME: Set permissions for bitstream
 
@@ -423,9 +420,9 @@ public class Bundle extends DSpaceObject
             AuthorizeException
     {
         // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
+        AuthorizeManager.authorizeAction(getContext(), this, Constants.ADD);
 
-        log.info(LogManager.getHeader(ourContext, "add_bitstream", "bundle_id="
+        log.info(LogManager.getHeader(getContext(), "add_bitstream", "bundle_id="
                 + getID() + ",bitstream_id=" + b.getID()));
 
         // First check that the bitstream isn't already in the list
@@ -443,16 +440,16 @@ public class Bundle extends DSpaceObject
         // Add the bitstream object
         bitstreams.add(b);
 
-        ourContext.addEvent(new Event(Event.ADD, Constants.BUNDLE, getID(), Constants.BITSTREAM, b.getID(), String.valueOf(b.getSequenceID())));
+        getContext().addEvent(new Event(Event.ADD, Constants.BUNDLE, getID(), Constants.BITSTREAM, b.getID(), String.valueOf(b.getSequenceID())));
 
         // copy authorization policies from bundle to bitstream
         // FIXME: multiple inclusion is affected by this...
-        AuthorizeManager.inheritPolicies(ourContext, this, b);
+        AuthorizeManager.inheritPolicies(getContext(), this, b);
 
         //Determine the current highest bitstream order in our bundle2bitstream table 
         //This will always append a newly added bitstream as the last one 
         int bitstreamOrder = 0;  //bitstream order starts at '0' index
-        TableRow tableRow = DatabaseManager.querySingle(ourContext, "SELECT MAX(bitstream_order) as max_value FROM bundle2bitstream WHERE bundle_id=?", getID());
+        TableRow tableRow = DatabaseManager.querySingle(getContext(), "SELECT MAX(bitstream_order) as max_value FROM bundle2bitstream WHERE bundle_id=?", getID());
         if(tableRow != null){
             bitstreamOrder = tableRow.getIntColumn("max_value") + 1;
         }
@@ -462,7 +459,7 @@ public class Bundle extends DSpaceObject
         mappingRow.setColumn("bundle_id", getID());
         mappingRow.setColumn("bitstream_id", b.getID());
         mappingRow.setColumn("bitstream_order", bitstreamOrder);
-        DatabaseManager.insert(ourContext, mappingRow);
+        DatabaseManager.insert(getContext(), mappingRow);
     }
 
     /**
@@ -472,7 +469,7 @@ public class Bundle extends DSpaceObject
      * @throws AuthorizeException If the user can't make the changes
      */
     public void setOrder(int bitstreamIds[]) throws AuthorizeException, SQLException {
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+        AuthorizeManager.authorizeAction(getContext(), this, Constants.WRITE);
 
         //Map the bitstreams of the bundle by identifier
         Map<Integer, Bitstream> bitstreamMap = new HashMap<Integer, Bitstream>();
@@ -486,15 +483,15 @@ public class Bundle extends DSpaceObject
             int bitstreamId = bitstreamIds[i];
 
             //TODO: take into account the asc & desc ! from the dspace.cfg
-            TableRow row = DatabaseManager.querySingleTable(ourContext, "bundle2bitstream",
+            TableRow row = DatabaseManager.querySingleTable(getContext(), "bundle2bitstream",
                     "SELECT * FROM bundle2bitstream WHERE bitstream_id= ? ", bitstreamId);
 
             if(row == null){
                 //This should never occur but just in case
-                log.warn(LogManager.getHeader(ourContext, "Invalid bitstream id while changing bitstream order", "Bundle: " + getID() + ", bitstream id: " + bitstreamId));
+                log.warn(LogManager.getHeader(getContext(), "Invalid bitstream id while changing bitstream order", "Bundle: " + getID() + ", bitstream id: " + bitstreamId));
             }else{
                 row.setColumn("bitstream_order", i);
-                DatabaseManager.update(ourContext, row);
+                DatabaseManager.update(getContext(), row);
             }
 
             // Place the bitstream in the list of bitstreams in this bundle
@@ -527,9 +524,9 @@ public class Bundle extends DSpaceObject
             SQLException, IOException
     {
         // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
+        AuthorizeManager.authorizeAction(getContext(), this, Constants.REMOVE);
 
-        log.info(LogManager.getHeader(ourContext, "remove_bitstream",
+        log.info(LogManager.getHeader(getContext(), "remove_bitstream",
                 "bundle_id=" + getID() + ",bitstream_id=" + b.getID()));
 
         // Remove from internal list of bitstreams
@@ -546,7 +543,7 @@ public class Bundle extends DSpaceObject
             }
         }
 
-        ourContext.addEvent(new Event(Event.REMOVE, Constants.BUNDLE, getID(), Constants.BITSTREAM, b.getID(), String.valueOf(b.getSequenceID())));
+        getContext().addEvent(new Event(Event.REMOVE, Constants.BUNDLE, getID(), Constants.BITSTREAM, b.getID(), String.valueOf(b.getSequenceID())));
 
         //Ensure that the last modified from the item is triggered !
         Item owningItem = (Item) getParentObject();
@@ -566,13 +563,13 @@ public class Bundle extends DSpaceObject
         }
         
         // Delete the mapping row
-        DatabaseManager.updateQuery(ourContext,
+        DatabaseManager.updateQuery(getContext(),
                 "DELETE FROM bundle2bitstream WHERE bundle_id= ? "+
                 "AND bitstream_id= ? ", 
                 getID(), b.getID());
 
         // If the bitstream is orphaned, it's removed
-        TableRowIterator tri = DatabaseManager.query(ourContext,
+        TableRowIterator tri = DatabaseManager.query(getContext(),
                 "SELECT * FROM bundle2bitstream WHERE bitstream_id= ? ",
                 b.getID());
 
@@ -601,21 +598,21 @@ public class Bundle extends DSpaceObject
     {
         // Check authorisation
         //AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
-        log.info(LogManager.getHeader(ourContext, "update_bundle", "bundle_id="
+        log.info(LogManager.getHeader(getContext(), "update_bundle", "bundle_id="
                 + getID()));
 
         if (modified)
         {
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.BUNDLE, getID(), null));
+            getContext().addEvent(new Event(Event.MODIFY, Constants.BUNDLE, getID(), null));
             modified = false;
         }
         if (modifiedMetadata)
         {
-            ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.BUNDLE, getID(), null));
+            getContext().addEvent(new Event(Event.MODIFY_METADATA, Constants.BUNDLE, getID(), null));
             modifiedMetadata = false;
         }
 
-        DatabaseManager.update(ourContext, bundleRow);
+        DatabaseManager.update(getContext(), bundleRow);
     }
 
     /**
@@ -625,13 +622,13 @@ public class Bundle extends DSpaceObject
      */
     void delete() throws SQLException, AuthorizeException, IOException
     {
-        log.info(LogManager.getHeader(ourContext, "delete_bundle", "bundle_id="
+        log.info(LogManager.getHeader(getContext(), "delete_bundle", "bundle_id="
                 + getID()));
 
-        ourContext.addEvent(new Event(Event.DELETE, Constants.BUNDLE, getID(), getName()));
+        getContext().addEvent(new Event(Event.DELETE, Constants.BUNDLE, getID(), getName()));
 
         // Remove from cache
-        ourContext.removeCached(this, getID());
+        getContext().removeCached(this, getID());
 
         // Remove bitstreams
         Bitstream[] bs = getBitstreams();
@@ -642,10 +639,10 @@ public class Bundle extends DSpaceObject
         }
 
         // remove our authorization policies
-        AuthorizeManager.removeAllPolicies(ourContext, this);
+        AuthorizeManager.removeAllPolicies(getContext(), this);
 
         // Remove ourself
-        DatabaseManager.delete(ourContext, bundleRow);
+        DatabaseManager.delete(getContext(), bundleRow);
     }
 
     /**
@@ -670,7 +667,7 @@ public class Bundle extends DSpaceObject
     public void inheritCollectionDefaultPolicies(Collection c)
             throws java.sql.SQLException, AuthorizeException
     {
-        List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c,
+        List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(getContext(), c,
                 Constants.DEFAULT_BITSTREAM_READ);
 
         // change the action to just READ
@@ -710,18 +707,18 @@ public class Bundle extends DSpaceObject
             for (Bitstream bs : bitstreams)
             {
                 // change bitstream policies
-                AuthorizeManager.removeAllPolicies(ourContext, bs);
-                AuthorizeManager.addPolicies(ourContext, newpolicies, bs);
+                AuthorizeManager.removeAllPolicies(getContext(), bs);
+                AuthorizeManager.addPolicies(getContext(), newpolicies, bs);
             }
         }
         // change bundle policies
-        AuthorizeManager.removeAllPolicies(ourContext, this);
-        AuthorizeManager.addPolicies(ourContext, newpolicies, this);
+        AuthorizeManager.removeAllPolicies(getContext(), this);
+        AuthorizeManager.addPolicies(getContext(), newpolicies, this);
     }
 
     public List<ResourcePolicy> getBundlePolicies() throws SQLException
     {
-        return AuthorizeManager.getPolicies(ourContext, this);
+        return AuthorizeManager.getPolicies(getContext(), this);
     }
 
     public List<ResourcePolicy> getBitstreamPolicies() throws SQLException
@@ -731,7 +728,7 @@ public class Bundle extends DSpaceObject
         {
             for (Bitstream bs : bitstreams)
             {
-                list.addAll(AuthorizeManager.getPolicies(ourContext, bs));
+                list.addAll(AuthorizeManager.getPolicies(getContext(), bs));
             }
         }
         return list;

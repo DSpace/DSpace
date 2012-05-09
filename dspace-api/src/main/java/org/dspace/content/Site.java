@@ -28,8 +28,13 @@ public class Site extends DSpaceObject
     // cache for Handle that is persistent ID for entire site.
     private static String handle = null;
 
-    private static Site theSite = null;
+    Site(Context context) throws SQLException
+    {
+        super(context);
+        // Cache ourselves
+        context.cache(this, Constants.SITE);
 
+    }
     /**
      * Get the type of this object, found in Constants
      *
@@ -83,11 +88,15 @@ public class Site extends DSpaceObject
     public static DSpaceObject find(Context context, int id)
         throws SQLException
     {
-        if (theSite == null)
+        // First check the cache
+        Site fromCache = (Site) context.fromCache(Site.class, Constants.SITE);
+
+        if (fromCache != null)
         {
-            theSite = new Site();
+            return fromCache;
         }
-        return theSite;
+        
+        return new Site(context);
     }
 
     void delete()

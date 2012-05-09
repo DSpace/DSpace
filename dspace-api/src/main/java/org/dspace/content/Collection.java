@@ -61,9 +61,6 @@ public class Collection extends DSpaceObject
     /** log4j category */
     private static Logger log = Logger.getLogger(Collection.class);
 
-    /** Our context */
-    private Context ourContext;
-
     /** The table row corresponding to this item */
     private TableRow collectionRow;
 
@@ -105,7 +102,7 @@ public class Collection extends DSpaceObject
      */
     Collection(Context context, TableRow row) throws SQLException
     {
-        ourContext = context;
+        super(context);
         collectionRow = row;
 
         // Get the logo bitstream
@@ -115,7 +112,7 @@ public class Collection extends DSpaceObject
         }
         else
         {
-            logo = Bitstream.find(ourContext, collectionRow
+            logo = Bitstream.find(getContext(), collectionRow
                     .getIntColumn("logo_bitstream_id"));
         }
 
@@ -126,7 +123,7 @@ public class Collection extends DSpaceObject
         }
         else
         {
-            template = Item.find(ourContext, collectionRow
+            template = Item.find(getContext(), collectionRow
                     .getIntColumn("template_item_id"));
         }
 
@@ -350,10 +347,10 @@ public class Collection extends DSpaceObject
                 + "collection2item.collection_id= ? "
                 + "AND item.in_archive='1'";
 
-        TableRowIterator rows = DatabaseManager.queryTable(ourContext, "item",
+        TableRowIterator rows = DatabaseManager.queryTable(getContext(), "item",
                 myQuery,getID());
 
-        return new ItemIterator(ourContext, rows);
+        return new ItemIterator(getContext(), rows);
     }
 
     /**
@@ -368,10 +365,10 @@ public class Collection extends DSpaceObject
                 + "item.item_id=collection2item.item_id AND "
                 + "collection2item.collection_id= ? ";
 
-        TableRowIterator rows = DatabaseManager.queryTable(ourContext, "item",
+        TableRowIterator rows = DatabaseManager.queryTable(getContext(), "item",
                 myQuery,getID());
 
-        return new ItemIterator(ourContext, rows);
+        return new ItemIterator(getContext(), rows);
     }
 
      /**
@@ -391,7 +388,7 @@ public class Collection extends DSpaceObject
     {
         if(handle == null) {
         	try {
-				handle = HandleManager.findHandle(this.ourContext, this);
+				handle = HandleManager.findHandle(this.getContext(), this);
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				//e.printStackTrace();
@@ -501,7 +498,7 @@ public class Collection extends DSpaceObject
         // authorized to remove the logo when DELETE rights
         // authorized when canEdit
         if (!((is == null) && AuthorizeManager.authorizeActionBoolean(
-                ourContext, this, Constants.DELETE)))
+                getContext(), this, Constants.DELETE)))
         {
             canEdit(true);
         }
@@ -517,21 +514,21 @@ public class Collection extends DSpaceObject
             collectionRow.setColumnNull("logo_bitstream_id");
             logo = null;
 
-            log.info(LogManager.getHeader(ourContext, "remove_logo",
+            log.info(LogManager.getHeader(getContext(), "remove_logo",
                     "collection_id=" + getID()));
         }
         else
         {
-            Bitstream newLogo = Bitstream.create(ourContext, is);
+            Bitstream newLogo = Bitstream.create(getContext(), is);
             collectionRow.setColumn("logo_bitstream_id", newLogo.getID());
             logo = newLogo;
 
             // now create policy for logo bitstream
             // to match our READ policy
-            List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(ourContext, this, Constants.READ);
-            AuthorizeManager.addPolicies(ourContext, policies, newLogo);
+            List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(getContext(), this, Constants.READ);
+            AuthorizeManager.addPolicies(getContext(), policies, newLogo);
 
-            log.info(LogManager.getHeader(ourContext, "set_logo",
+            log.info(LogManager.getHeader(getContext(), "set_logo",
                     "collection_id=" + getID() + "logo_bitstream_id="
                             + newLogo.getID()));
         }
@@ -558,20 +555,20 @@ public class Collection extends DSpaceObject
             AuthorizeException
     {
         // Check authorisation - Must be an Admin to create Workflow Group
-        AuthorizeUtil.authorizeManageWorkflowsGroup(ourContext, this);
+        AuthorizeUtil.authorizeManageWorkflowsGroup(getContext(), this);
 
         if (workflowGroup[step - 1] == null)
         {
             //turn off authorization so that Collection Admins can create Collection Workflow Groups
-            ourContext.turnOffAuthorisationSystem();
-            Group g = Group.create(ourContext);
-            ourContext.restoreAuthSystemState();
+            getContext().turnOffAuthorisationSystem();
+            Group g = Group.create(getContext());
+            getContext().restoreAuthSystemState();
 
             g.setName("COLLECTION_" + getID() + "_WORKFLOW_STEP_" + step);
             g.update();
             setWorkflowGroup(step, g);
 
-            AuthorizeManager.addPolicy(ourContext, this, Constants.ADD, g);
+            AuthorizeManager.addPolicy(getContext(), this, Constants.ADD, g);
         }
 
         return workflowGroup[step - 1];
@@ -630,14 +627,14 @@ public class Collection extends DSpaceObject
     public Group createSubmitters() throws SQLException, AuthorizeException
     {
         // Check authorisation - Must be an Admin to create Submitters Group
-        AuthorizeUtil.authorizeManageSubmittersGroup(ourContext, this);
+        AuthorizeUtil.authorizeManageSubmittersGroup(getContext(), this);
 
         if (submitters == null)
         {
             //turn off authorization so that Collection Admins can create Collection Submitters
-            ourContext.turnOffAuthorisationSystem();
-            submitters = Group.create(ourContext);
-            ourContext.restoreAuthSystemState();
+            getContext().turnOffAuthorisationSystem();
+            submitters = Group.create(getContext());
+            getContext().restoreAuthSystemState();
 
             submitters.setName("COLLECTION_" + getID() + "_SUBMIT");
             submitters.update();
@@ -646,7 +643,7 @@ public class Collection extends DSpaceObject
         // register this as the submitter group
         collectionRow.setColumn("submitter", submitters.getID());
         
-        AuthorizeManager.addPolicy(ourContext, this, Constants.ADD, submitters);
+        AuthorizeManager.addPolicy(getContext(), this, Constants.ADD, submitters);
 
         modified = true;
         return submitters;
@@ -661,7 +658,7 @@ public class Collection extends DSpaceObject
     public void removeSubmitters() throws SQLException, AuthorizeException
     {
     	// Check authorisation - Must be an Admin to delete Submitters Group
-        AuthorizeUtil.authorizeManageSubmittersGroup(ourContext, this);
+        AuthorizeUtil.authorizeManageSubmittersGroup(getContext(), this);
 
         // just return if there is no administrative group.
         if (submitters == null)
@@ -705,20 +702,20 @@ public class Collection extends DSpaceObject
     public Group createAdministrators() throws SQLException, AuthorizeException
     {
         // Check authorisation - Must be an Admin to create more Admins
-        AuthorizeUtil.authorizeManageAdminGroup(ourContext, this);
+        AuthorizeUtil.authorizeManageAdminGroup(getContext(), this);
 
         if (admins == null)
         {
             //turn off authorization so that Community Admins can create Collection Admins
-            ourContext.turnOffAuthorisationSystem();
-            admins = Group.create(ourContext);
-            ourContext.restoreAuthSystemState();
+            getContext().turnOffAuthorisationSystem();
+            admins = Group.create(getContext());
+            getContext().restoreAuthSystemState();
             
             admins.setName("COLLECTION_" + getID() + "_ADMIN");
             admins.update();
         }
 
-        AuthorizeManager.addPolicy(ourContext, this,
+        AuthorizeManager.addPolicy(getContext(), this,
                 Constants.ADMIN, admins);
 
         // register this as the admin group
@@ -737,7 +734,7 @@ public class Collection extends DSpaceObject
     public void removeAdministrators() throws SQLException, AuthorizeException
     {
         // Check authorisation - Must be an Admin of the parent community to delete Admin Group
-        AuthorizeUtil.authorizeRemoveAdminGroup(ourContext, this);
+        AuthorizeUtil.authorizeRemoveAdminGroup(getContext(), this);
 
         // just return if there is no administrative group.
         if (admins == null)
@@ -848,14 +845,14 @@ public class Collection extends DSpaceObject
     public void createTemplateItem() throws SQLException, AuthorizeException
     {
         // Check authorisation
-        AuthorizeUtil.authorizeManageTemplateItem(ourContext, this);
+        AuthorizeUtil.authorizeManageTemplateItem(getContext(), this);
 
         if (template == null)
         {
-            template = Item.create(ourContext);
+            template = Item.create(getContext());
             collectionRow.setColumn("template_item_id", template.getID());
 
-            log.info(LogManager.getHeader(ourContext, "create_template_item",
+            log.info(LogManager.getHeader(getContext(), "create_template_item",
                     "collection_id=" + getID() + ",template_item_id="
                             + template.getID()));
         }
@@ -877,25 +874,25 @@ public class Collection extends DSpaceObject
             IOException
     {
         // Check authorisation
-        AuthorizeUtil.authorizeManageTemplateItem(ourContext, this);
+        AuthorizeUtil.authorizeManageTemplateItem(getContext(), this);
 
         collectionRow.setColumnNull("template_item_id");
-        DatabaseManager.update(ourContext, collectionRow);
+        DatabaseManager.update(getContext(), collectionRow);
         
         if (template != null)
         {
-            log.info(LogManager.getHeader(ourContext, "remove_template_item",
+            log.info(LogManager.getHeader(getContext(), "remove_template_item",
                     "collection_id=" + getID() + ",template_item_id="
                             + template.getID()));
             // temporary turn off auth system, we have already checked the permission on the top of the method
             // check it again will fail because we have already broken the relation between the collection and the item
-            ourContext.turnOffAuthorisationSystem();
+            getContext().turnOffAuthorisationSystem();
             template.delete();
-            ourContext.restoreAuthSystemState();
+            getContext().restoreAuthSystemState();
             template = null;
         }
         
-        ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), "remove_template_item"));
+        getContext().addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), "remove_template_item"));
     }
 
     /**
@@ -912,9 +909,9 @@ public class Collection extends DSpaceObject
     public void addItem(Item item) throws SQLException, AuthorizeException
     {
         // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
+        AuthorizeManager.authorizeAction(getContext(), this, Constants.ADD);
 
-        log.info(LogManager.getHeader(ourContext, "add_item", "collection_id="
+        log.info(LogManager.getHeader(getContext(), "add_item", "collection_id="
                 + getID() + ",item_id=" + item.getID()));
 
         // Create mapping
@@ -923,9 +920,9 @@ public class Collection extends DSpaceObject
         row.setColumn("collection_id", getID());
         row.setColumn("item_id", item.getID());
 
-        DatabaseManager.insert(ourContext, row);
+        DatabaseManager.insert(getContext(), row);
 
-        ourContext.addEvent(new Event(Event.ADD, Constants.COLLECTION, getID(), Constants.ITEM, item.getID(), item.getHandle()));
+        getContext().addEvent(new Event(Event.ADD, Constants.COLLECTION, getID(), Constants.ITEM, item.getID(), item.getHandle()));
     }
 
     /**
@@ -941,29 +938,29 @@ public class Collection extends DSpaceObject
             IOException
     {
         // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
+        AuthorizeManager.authorizeAction(getContext(), this, Constants.REMOVE);
 
         // will be the item an orphan?
-        TableRow row = DatabaseManager.querySingle(ourContext,
+        TableRow row = DatabaseManager.querySingle(getContext(),
                 "SELECT COUNT(DISTINCT collection_id) AS num FROM collection2item WHERE item_id= ? ",
                 item.getID());
 
-        DatabaseManager.setConstraintDeferred(ourContext, "coll2item_item_fk");
+        DatabaseManager.setConstraintDeferred(getContext(), "coll2item_item_fk");
         if (row.getLongColumn("num") == 1)
         {
             // Orphan; delete it
             item.delete();
         }
-        log.info(LogManager.getHeader(ourContext, "remove_item",
+        log.info(LogManager.getHeader(getContext(), "remove_item",
                 "collection_id=" + getID() + ",item_id=" + item.getID()));
     
-        DatabaseManager.updateQuery(ourContext,
+        DatabaseManager.updateQuery(getContext(),
                 "DELETE FROM collection2item WHERE collection_id= ? "+
                 "AND item_id= ? ",
                 getID(), item.getID());
-        DatabaseManager.setConstraintImmediate(ourContext, "coll2item_item_fk");
+        DatabaseManager.setConstraintImmediate(getContext(), "coll2item_item_fk");
         
-        ourContext.addEvent(new Event(Event.REMOVE, Constants.COLLECTION, getID(), Constants.ITEM, item.getID(), item.getHandle()));
+        getContext().addEvent(new Event(Event.REMOVE, Constants.COLLECTION, getID(), Constants.ITEM, item.getID(), item.getHandle()));
     }
 
     /**
@@ -979,19 +976,19 @@ public class Collection extends DSpaceObject
         // Check authorisation
         canEdit(true);
 
-        log.info(LogManager.getHeader(ourContext, "update_collection",
+        log.info(LogManager.getHeader(getContext(), "update_collection",
                 "collection_id=" + getID()));
 
-        DatabaseManager.update(ourContext, collectionRow);
+        DatabaseManager.update(getContext(), collectionRow);
 
         if (modified)
         {
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), null));
+            getContext().addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), null));
             modified = false;
         }
         if (modifiedMetadata)
         {
-            ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.COLLECTION, getID(), getDetails()));
+            getContext().addEvent(new Event(Event.MODIFY_METADATA, Constants.COLLECTION, getID(), getDetails()));
             modifiedMetadata = false;
             clearDetails();
         }
@@ -1027,20 +1024,20 @@ public class Collection extends DSpaceObject
 
         for (int i = 0; i < parents.length; i++)
         {
-            if (AuthorizeManager.authorizeActionBoolean(ourContext, parents[i],
+            if (AuthorizeManager.authorizeActionBoolean(getContext(), parents[i],
                     Constants.WRITE, useInheritance))
             {
                 return;
             }
 
-            if (AuthorizeManager.authorizeActionBoolean(ourContext, parents[i],
+            if (AuthorizeManager.authorizeActionBoolean(getContext(), parents[i],
                     Constants.ADD, useInheritance))
             {
                 return;
             }
         }
 
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE, useInheritance);
+        AuthorizeManager.authorizeAction(getContext(), this, Constants.WRITE, useInheritance);
     }
 
     /**
@@ -1054,16 +1051,16 @@ public class Collection extends DSpaceObject
      */
     void delete() throws SQLException, AuthorizeException, IOException
     {
-        log.info(LogManager.getHeader(ourContext, "delete_collection",
+        log.info(LogManager.getHeader(getContext(), "delete_collection",
                 "collection_id=" + getID()));
 
-        ourContext.addEvent(new Event(Event.DELETE, Constants.COLLECTION, getID(), getHandle()));
+        getContext().addEvent(new Event(Event.DELETE, Constants.COLLECTION, getID(), getHandle()));
 
         // Remove from cache
-        ourContext.removeCached(this, getID());
+        getContext().removeCached(this, getID());
 
         // remove subscriptions - hmm, should this be in Subscription.java?
-        DatabaseManager.updateQuery(ourContext,
+        DatabaseManager.updateQuery(getContext(),
                 "DELETE FROM subscription WHERE collection_id= ? ", 
                 getID());
 
@@ -1078,7 +1075,7 @@ public class Collection extends DSpaceObject
         	while (items.hasNext())
         	{
         		Item item = items.next();
-        		IndexBrowse ib = new IndexBrowse(ourContext);
+        		IndexBrowse ib = new IndexBrowse(getContext());
         		
         		if (item.isOwningCollection(this))
         		{
@@ -1121,12 +1118,12 @@ public class Collection extends DSpaceObject
         setLogo(null);
 
         // Remove all authorization policies
-        AuthorizeManager.removeAllPolicies(ourContext, this);
+        AuthorizeManager.removeAllPolicies(getContext(), this);
 
         if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
             // Remove any xml_WorkflowItems
             XmlWorkflowItem[] xmlWfarray = XmlWorkflowItem
-                    .findByCollection(ourContext, this);
+                    .findByCollection(getContext(), this);
 
             for (XmlWorkflowItem aXmlWfarray : xmlWfarray) {
                 // remove the workflowitem first, then the item
@@ -1137,7 +1134,7 @@ public class Collection extends DSpaceObject
         }else{
             // Remove any WorkflowItems
             WorkflowItem[] wfarray = WorkflowItem
-                    .findByCollection(ourContext, this);
+                    .findByCollection(getContext(), this);
 
             for (WorkflowItem aWfarray : wfarray) {
                 // remove the workflowitem first, then the item
@@ -1150,7 +1147,7 @@ public class Collection extends DSpaceObject
 
 
         // Remove any WorkspaceItems
-        WorkspaceItem[] wsarray = WorkspaceItem.findByCollection(ourContext,
+        WorkspaceItem[] wsarray = WorkspaceItem.findByCollection(getContext(),
                 this);
 
         for (WorkspaceItem aWsarray : wsarray) {
@@ -1160,7 +1157,7 @@ public class Collection extends DSpaceObject
         //  get rid of the content count cache if it exists
         try
         {
-        	ItemCounter ic = new ItemCounter(ourContext);
+        	ItemCounter ic = new ItemCounter(getContext());
         	ic.remove(this);
         }
         catch (ItemCountException e)
@@ -1171,17 +1168,17 @@ public class Collection extends DSpaceObject
         }
 
         // Remove any Handle
-        HandleManager.unbindHandle(ourContext, this);
+        HandleManager.unbindHandle(getContext(), this);
 
         if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
             // delete all CollectionRoles for this Collection
-            for (CollectionRole collectionRole : CollectionRole.findByCollection(ourContext, this.getID())) {
+            for (CollectionRole collectionRole : CollectionRole.findByCollection(getContext(), this.getID())) {
                 collectionRole.delete();
             }
         }
 
         // Delete collection row
-        DatabaseManager.delete(ourContext, collectionRow);
+        DatabaseManager.delete(getContext(), collectionRow);
 
         // Remove any workflow groups - must happen after deleting collection
         Group g = null;
@@ -1233,7 +1230,7 @@ public class Collection extends DSpaceObject
     public Community[] getCommunities() throws SQLException
     {
         // Get the bundle table rows
-        TableRowIterator tri = DatabaseManager.queryTable(ourContext,"community",
+        TableRowIterator tri = DatabaseManager.queryTable(getContext(),"community",
                         "SELECT community.* FROM community, community2collection WHERE " +
                         "community.community_id=community2collection.community_id " +
                         "AND community2collection.collection_id= ? ",
@@ -1249,12 +1246,12 @@ public class Collection extends DSpaceObject
                 TableRow row = tri.next();
 
                 // First check the cache
-                Community owner = (Community) ourContext.fromCache(Community.class,
+                Community owner = (Community) getContext().fromCache(Community.class,
                         row.getIntColumn("community_id"));
 
                 if (owner == null)
                 {
-                    owner = new Community(ourContext, row);
+                    owner = new Community(getContext(), row);
                 }
 
                 communities.add(owner);
@@ -1334,7 +1331,7 @@ public class Collection extends DSpaceObject
             return null;
         }
 
-        return Group.find(ourContext, collectionRow.getIntColumn(col));
+        return Group.find(getContext(), collectionRow.getIntColumn(col));
     }
 
     /**
@@ -1412,7 +1409,7 @@ public class Collection extends DSpaceObject
                     + "AND collection2item.item_id = item.item_id "
                     + "AND in_archive ='1' AND item.withdrawn='0' ";
 
-            statement = ourContext.getDBConnection().prepareStatement(query);
+            statement = getContext().getDBConnection().prepareStatement(query);
             statement.setInt(1,getID());
 
             rs = statement.executeQuery();
