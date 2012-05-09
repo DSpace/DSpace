@@ -240,6 +240,11 @@ public class XPDF2Thumbnail extends MediaFilter
             {
                 Process pdfProc = Runtime.getRuntime().exec(pdfCmd);
                 status = pdfProc.waitFor();
+                if (!outf.exists()) outf = new File(outPrefix+"-00001.ppm");
+                if (!outf.exists()) outf = new File(outPrefix+"-0001.ppm");
+                if (!outf.exists()) outf = new File(outPrefix+"-001.ppm");
+                if (!outf.exists()) outf = new File(outPrefix+"-01.ppm");
+                if (!outf.exists()) outf = new File(outPrefix+"-1.ppm");
                 log.debug("PDFTOPPM output is: "+outf+", exists="+outf.exists());
                 source = ImageIO.read(outf);
             }
