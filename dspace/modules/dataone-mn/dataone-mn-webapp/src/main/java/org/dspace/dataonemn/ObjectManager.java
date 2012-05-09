@@ -138,10 +138,8 @@ public class ObjectManager extends AbstractObjectManager {
 				String format = (String) doc.getFieldValue("format");
 				String ext = (String) doc.getFieldValue("ext");
 
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Retrieving '" + doi + "' for mn list");
-				}
-
+				LOGGER.debug("Retrieving '" + doi + "' for mn list");
+		
 				ObjectInfo objInfo = new ObjectInfo(doi);
 				Item item = Item.find(myContext, id.intValue());
 				String lastMod = DateFormat.getDateTimeInstance().format(date);
@@ -159,46 +157,37 @@ public class ObjectManager extends AbstractObjectManager {
 					}
 				}
 				catch (NotFoundException details) {
-					if (LOGGER.isErrorEnabled()) {
-						LOGGER.error("Should not happen: "
-								+ details.getMessage());
-					}
+				    LOGGER.error("Should not happen: "
+						 + details.getMessage());
+				    
 				}
 
 				Bundle[] bundles = item.getBundles("ORIGINAL");
 
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Getting bitstreams for " + item.getHandle());
-				}
-
+				LOGGER.debug("Getting bitstreams for " + item.getHandle());
+				
 				if (bundles.length > 0) {
 					for (Bitstream bitstream : bundles[0].getBitstreams()) {
 						String name = bitstream.getName();
 
-						if (LOGGER.isDebugEnabled()) {
-							LOGGER.debug("Checking '" + name + "' bitstream");
-						}
-
+						LOGGER.debug("Checking '" + name + "' bitstream");
+						
 						if (!name.equalsIgnoreCase("readme.txt")
 								&& !name.equalsIgnoreCase("readme")
 								&& !name.equalsIgnoreCase("readme.txt.txt")) {
-							if (LOGGER.isDebugEnabled()) {
-								LOGGER.debug("Getting bitstream information from: "
+						    LOGGER.debug("Getting bitstream information from: "
 										+ name);
-							}
-
-							String algorithm = bitstream.getChecksumAlgorithm();
-							String checksum = bitstream.getChecksum();
-
-							objInfo.setChecksum(algorithm, checksum);
-							objInfo.setSize(bitstream.getSize());
+						    
+						    String algorithm = bitstream.getChecksumAlgorithm();
+						    String checksum = bitstream.getChecksum();
+						    
+						    objInfo.setChecksum(algorithm, checksum);
+						    objInfo.setSize(bitstream.getSize());
 						}
 					}
 				}
 
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Writing " + doi + " to XML");
-				}
+				LOGGER.debug("Writing " + doi + " to XML");
 
 				nu.xom.Element[] parts = objInfo.split();
 

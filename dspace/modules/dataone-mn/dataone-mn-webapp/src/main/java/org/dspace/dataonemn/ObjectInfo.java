@@ -1,5 +1,6 @@
 package org.dspace.dataonemn;
 
+import nu.xom.Elements;
 import nu.xom.Element;
 
 public class ObjectInfo extends AbstractObject implements Constants {
@@ -54,7 +55,11 @@ public class ObjectInfo extends AbstractObject implements Constants {
 		newFormat.appendChild(format);
 		copy.insertChild(newFormat, 0);
 
-		removeChild(getChildElements("checksum", LIST_OBJECTS_NAMESPACE).get(0));
+
+		Elements checksumChildren = getChildElements("checksum", LIST_OBJECTS_NAMESPACE);
+		if(checksumChildren != null && checksumChildren.size() > 0) {
+		    removeChild(checksumChildren.get(0));
+		}
 
 		if (myXMLChecksum != null && myChecksumAlgo != null) {
 			setChecksum(myChecksumAlgo, myXMLChecksum);
