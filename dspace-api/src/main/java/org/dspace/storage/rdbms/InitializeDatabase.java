@@ -13,8 +13,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 
 /**
