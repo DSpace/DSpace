@@ -61,7 +61,7 @@ public class RegistrationFinished extends AbstractDSpaceTransformer
 
     finished.addPara(T_para1);
 
-    finished.addPara().addXref(contextPath, T_go_home);
+    finished.addPara().addXref(contextPath + "/", T_go_home);
   }
 
 }

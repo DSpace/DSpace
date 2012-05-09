@@ -59,7 +59,7 @@ public class ForgotPasswordFinished extends AbstractDSpaceTransformer
         
         reset.addPara(T_para1);
         
-        reset.addPara().addXref(contextPath, T_go_home);
+        reset.addPara().addXref(contextPath + "/", T_go_home);
     }
 
 }
