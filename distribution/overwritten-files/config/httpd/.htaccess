@@ -20,13 +20,13 @@ RewriteRule ^phpoai/oai2.php(.*)$ /oai/request$1 [R=permanent,L]
 
 #/ARG-UNLP-EBook-0000000001/1789.pdf
 #/search/downloadp.php?id_document=ARG-UNLP-EBook-0000000001&id_parte=1789
-RewriteRule ^([^/\?]+)/([0-9]+)\.[a-z]{3}$ /search/downloadp.php?id_document=$1&id_parte=$2 [NC]
+RewriteRule ^([^/]+)/([0-9]+)\.[a-z]{3}$ /search/downloadp.php?id_document=$1&id_parte=$2 [L,NC]
 
 #/?id=ARG-UNLP-EBook-0000000001
 #/index.php?id=ARG-UNLP-ART-0000008109
 #/search/request.php?id_document=ARG-UNLP-EBook-0000000001
 RewriteCond %{QUERY_STRING} id=([^&]*)
-RewriteRule ^([^/]+)$ search/request.php?id_document=%1 [NC]
+RewriteRule ^([^/]*)$ search/request.php?id_document=%1 [L,NC]
 
 #/static/redirector.php?adress=oai/oai
 #RewriteCond %{REQUEST_URI} ^/static/redirector.php$

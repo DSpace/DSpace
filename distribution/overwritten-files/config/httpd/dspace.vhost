@@ -7,8 +7,8 @@ NameVirtualHost *:80
   ServerAlias dspace.sedici.unlp.edu.ar
 
   RewriteEngine On
-  RewriteLog rewrite_sedici.log
-RewriteLogLevel 3
+#  RewriteLog rewrite_sedici.log
+#  RewriteLogLevel 3
 
   #directorio con reglas de escritura y otras yerbas
   DocumentRoot /var/dspace/config/httpd
@@ -33,9 +33,6 @@ RewriteLogLevel 3
   RewriteEngine On
   #RewriteRule ^/dspace(.*) $1 [PT,L]
   ProxyRequests Off
-
-#  ProxyPass /soap_ws.php http://old.sedici.unlp.edu.ar/soap_ws.php
-#  ProxyPass /sediciwebservice.wsdl http://old.sedici.unlp.edu.ar/sediciwebservice.wsdl
 
 #  <Location /search>
 #    ProxyPass http://old.sedici.unlp.edu.ar/search
