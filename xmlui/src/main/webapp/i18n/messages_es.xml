@@ -296,7 +296,7 @@
 <message key="xmlui.ArtifactBrowser.Navigation.head_this_community">Esta comunidad</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.SimpleSearch.java -->
-<message key="xmlui.ArtifactBrowser.SimpleSearch.title">Buscar</message>
+<message key="xmlui.ArtifactBrowser.SimpleSearch.title">SeDiCI - Buscar</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.trail">Buscar</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.head">Buscar</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.search_scope">Ámbito de búsqueda</message>
