@@ -165,10 +165,23 @@ public class DescribeStep extends AbstractProcessingStep
             if (qualifier == null
                     && inputs[i].getInputType().equals("qualdrop_value"))
             {
-                qualifier = Item.ANY;
+            	List qualifiers=inputs[i].getPairs();
+            	int j=1;
+            	while (j<qualifiers.size()) {
+            		item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(),
+                            (String)(qualifiers.get(j)), Item.ANY);
+            		j=j+2;
+				}
+
+            } else {
+            	if (qualifier != null){
+	                item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(),
+	                    qualifier, Item.ANY);
+            	} else {
+            		item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(),
+            				null, Item.ANY);
+            	}
             }
-            item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(),
-                    qualifier, Item.ANY);
         }
 
         // Clear required-field errors first since missing authority
