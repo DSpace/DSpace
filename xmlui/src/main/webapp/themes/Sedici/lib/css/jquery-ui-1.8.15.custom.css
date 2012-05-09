@@ -71,8 +71,8 @@
 
 /* Interaction states
 ----------------------------------*/
-.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { border: 1px solid #9cacba; background: #b6c8d9 url(../../images/jquery_ui/ui-bg_flat_100_b6c8d9_40x100.png) 50% 50% repeat-x; font-weight: normal; color: #444444; }
-.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited { color: black; text-decoration: none; }
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { border: 1px solid #9cacba; background: red url(../../images/jquery_ui/ui-bg_flat_100_b6c8d9_40x100.png) 50% 50% repeat-x; font-weight: normal; color: #444444; }
+.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited {text-decoration: none; }
 .ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus { border: 1px solid #1f3f5e; background: #1f3f5e url(../../images/jquery_ui/ui-bg_flat_75_1f3f5e_40x100.png) 50% 50% repeat-x; font-weight: normal; color: #ffffff; }
 .ui-state-hover a, .ui-state-hover a:hover { color: #ffffff; text-decoration: none; }
 .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active { border: 1px solid #9cacba; background: #ffffff url(../../images/jquery_ui/ui-bg_glass_65_ffffff_1x400.png) 50% 50% repeat-x; font-weight: normal; color: #444444; }
@@ -485,14 +485,44 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
  * http://docs.jquery.com/UI/Tabs#theming
  */
 .ui-tabs { position: relative; padding: .2em; zoom: 1; } /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
-.ui-tabs .ui-tabs-nav { margin: 0; padding: .2em .2em 0; }
-.ui-tabs .ui-tabs-nav li { list-style: none; float: left; position: relative; top: 1px; margin: 0 .2em 1px 0; border-bottom: 0 !important; padding: 0; white-space: nowrap; }
+.ui-tabs .ui-tabs-nav { margin: 0; padding: .2em .2em 0; border-bottom:1px solid #9cacba;}
+.ui-tabs .ui-tabs-nav li { list-style: none; float: left; position: relative; top: 1px; margin: 0 .2em 1px 0; border-bottom: 0 !important; padding: 0; white-space: nowrap; 
+-moz-border-radius: 8px 8px 0px 0px;
+
+
+}
 .ui-tabs .ui-tabs-nav li a { float: left; padding: .5em 1em; text-decoration: none; }
 .ui-tabs .ui-tabs-nav li.ui-tabs-selected { margin-bottom: 0; padding-bottom: 1px; }
 .ui-tabs .ui-tabs-nav li.ui-tabs-selected a, .ui-tabs .ui-tabs-nav li.ui-state-disabled a, .ui-tabs .ui-tabs-nav li.ui-state-processing a { cursor: text; }
 .ui-tabs .ui-tabs-nav li a, .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a { cursor: pointer; } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
 .ui-tabs .ui-tabs-panel { display: block; border-width: 0; padding: 1em 1.4em; background: none; }
 .ui-tabs .ui-tabs-hide { display: none !important; }
+
+#community-tabs .revistas.ui-tabs-panel{
+background-image:url(../../images/fondo_revistas.png);
+background-repeat:no-repeat;
+background-position:top right;
+}
+
+#community-tabs .libros.ui-tabs-panel{
+background-image:url(../../images/fondo_libros.png);
+background-repeat:no-repeat;
+background-position:top right;
+min-height:300px;
+}
+
+#community-tabs .eventos.ui-tabs-panel{
+background-image:url(../../images/fondo_eventos.png);
+background-repeat:no-repeat;
+background-position:top right;
+}
+
+#community-tabs .tesis.ui-tabs-panel{
+background-image:url(../../images/fondo_tesis.png);
+background-repeat:no-repeat;
+background-position:top right;
+}
+
 /*
  * jQuery UI Datepicker 1.8.15
  *

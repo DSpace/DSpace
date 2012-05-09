@@ -73,6 +73,13 @@ select {
 	margin-right:20px;
 }
 
+.tab-info {
+font-weight:lighter;
+font-size:16px;
+color:#a4a4a4;
+font-style:italic;
+}
+
 select.multiple {
     height: auto;
 }
@@ -826,8 +833,24 @@ li.ds-form-item label.ds-composite-component.last{
 }
 
 #aspect_submission_StepTransformer_field_dc_date_issued_year,
-#aspect_submission_StepTransformer_field_dc_date_issued_day {
-    width: 50px;
+#aspect_submission_StepTransformer_field_dc_date_issued_day,
+#aspect_submission_StepTransformer_field_dc_date_issued_year {
+    width: 90px;
+	background-image:url(../../images/busqueda.png);
+/*border-bottom:1 px solid #dedede;*/
+/*border-top:1px solid white;*/
+background-color:#e8e7e7;
+border-top:1px solid #bababa;
+border-left:1px solid #bababa;
+border-bottom:1px solid #dedede;
+border-right: 1px solid #dedede;
+background-repeat:repeat-x;
+font-size:13px;
+padding-left:10px;
+-moz-border-radius: 11px;
+border-radius: 11px;
+	
+	
 }
 
 #aspect_submission_StepTransformer_field_dc_identifier_value {
@@ -894,7 +917,7 @@ font-size:14px;
 
 #aspect_submission_Submissions_div_submissions table tr.ds-table-header-row, 
 #aspect_submission_Submissions_div_submissions table tr.ds-table-header-row th {
-    background-color: #B6C8D9;
+/*    background-color: #B6C8D9;*/
     border: 1px solid #9CACBA;
     
 }
@@ -1048,7 +1071,7 @@ text-align:center;
 .pagination-info {
     float: left;
     margin:0;
-	color#949494;
+	color:#c8986c;
 }
 
 .pagination-masked.top {
@@ -1103,6 +1126,7 @@ border-bottom:1px solid #e0e0e0;
 border-top:1px solid #E0E0E0;
 background-image:url(../../images/fondo_li1.gif);
 background-repeat:repeat-x;
+min-height:80px;
 
 }
 
@@ -1589,6 +1613,9 @@ form.discover-sort-box select{
     line-height: 0;
 }
 
+.value {
+text-align:left;
+}
 .icon-button.arrowUp{
     background-image: url(../../images/arrow_up_ffffff_16x16.png);
     background-repeat: no-repeat;
@@ -1873,7 +1900,10 @@ background-color:#00FF33;
 #aspect_eperson_EditProfile_field_first_name,
 #aspect_eperson_EditProfile_field_last_name,
 aspect_eperson_EditProfile_field_phone,
-#aspect_discovery_CollectionSearch_field_query
+#aspect_discovery_CollectionSearch_field_query,
+#aspect_submission_StepTransformer_field_dc_title,
+#aspect_submission_StepTransformer_field_sedici_title_subtitle,
+#aspect_submission_StepTransformer_field_sedici_creator_person
 
 {
 background-image:url(../../images/busqueda.png);
@@ -1913,9 +1943,9 @@ margin-left:5px;
 #aspect_eperson_PasswordLogin_list_password-login span.error {
 color:red;
 position:absolute;
-width:400px;
-left:0px;
-top:45px;
+width:560px;
+left:165px;
+top:25px;
 font-size:11px;
 }
 
@@ -1948,6 +1978,8 @@ padding-left:20px;
 background-color:white;
 color:#6c6c6c;
 height:20px;
+position:relative;
+left:-45px;
 }
 
 #aspect_submission_Submissions_field_submit_submissions_remove:hover, #aspect_administrative_eperson_ManageEPeopleMain_field_submit_delete:hover,
@@ -2172,7 +2204,7 @@ display:block;
 color:#9c4f0a;
 background-image:none;
 width:550px;	
-display:inline-block;
+display:block;
 padding:0;
 
 padding-bottom:5px;
@@ -2191,7 +2223,7 @@ background-repeat:no-repeat;
 background-position:left;
 padding:18px 0px 20px 45px;
 height:35px;
-display:inline;
+display:block;
 color:#E27B2A;
 font-size:20px;
 
@@ -2830,6 +2862,7 @@ div.item-summary-view-metadata h1 {
 	color: #505050;
 	text-align: justify;
 	font-size: 160%;
+	font-family:Trebuchet MS;
 }
 div.item-summary-view-metadata h2 {
     line-height: normal;
@@ -2888,7 +2921,9 @@ span.ds-dc_contributor_author-authority {
 	display: none;
 }
 .item-summary-view-metadata .metadata.title-subtitle span.metadata-value {
-	font-size: 130%;
+	font-size: 120%;
+	font-style:italic;
+	
 }
 .item-summary-view-metadata #view-item-metadata {
 	float: right;
@@ -3125,6 +3160,8 @@ h1.communities_header {
 #embargo-info .ebargo_date {
 	font-weight: bold;
 }
+
+
 
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
 body{ background-color:white;}
