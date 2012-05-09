@@ -194,10 +194,10 @@
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.head_recent_submissions">Recent Submissions</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.CommunityBrowser.java -->
-	<message key="xmlui.ArtifactBrowser.CommunityBrowser.title">Community List</message>
-	<message key="xmlui.ArtifactBrowser.CommunityBrowser.trail">Community List</message>
-	<message key="xmlui.ArtifactBrowser.CommunityBrowser.head">Communities in DSpace</message>
-	<message key="xmlui.ArtifactBrowser.CommunityBrowser.select">Select a community to browse its collections.</message>
+	<message key="xmlui.ArtifactBrowser.CommunityBrowser.title">Available collections</message>
+	<message key="xmlui.ArtifactBrowser.CommunityBrowser.trail">Collections</message>
+	<message key="xmlui.ArtifactBrowser.CommunityBrowser.head">SeDiCI's collections</message>
+	<message key="xmlui.ArtifactBrowser.CommunityBrowser.select">Here you can browse the repository's collections</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.CommunityViewer.java -->
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.search_scope">Search Scope</message>

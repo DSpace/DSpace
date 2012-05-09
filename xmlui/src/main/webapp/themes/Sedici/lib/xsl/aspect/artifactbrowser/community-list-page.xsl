@@ -135,35 +135,35 @@
         <!-- $communityId es el id de la comunidad actual, encerrado entre '|' -->
         <xsl:variable name="communityId" select="concat('|',substring-after(substring-before(substring-after(@url,'/metadata/handle/'),'/mets.xml'),'/'), '|')"/>
      
-        <li id="li-{$id}">
-            <xsl:attribute name="class">
-                <xsl:text>ds-artifact-item </xsl:text>
-                <xsl:choose>
-                    <xsl:when test="position() mod 2 = 0">even</xsl:when>
-                    <xsl:otherwise>odd</xsl:otherwise>
-                </xsl:choose>
-            </xsl:attribute>
-            
-            <!-- Si es una comunidad que se debe desplegar, muestro el boton para desplegar -->
-            <xsl:if test="@type='DSpace Community'">               
-               <xsl:if test="contains($communities-desplegables, $communityId)">
-		           <div id='div-{$id}' class='div-boton-menu-desplegable'>
-	        	   		<a href="javascript:llamar_alerta('div-{$id}','boton-{$id}','ocultar', 'ver');" type="button" class='ocultador' id='boton-{$id}' value="ver">+</a>
-	        	   </div>
-        	   </xsl:if>
-            </xsl:if>
-            
-            <!-- Si la referencia es de la coleccion de autoarchivo no se debe mostrar -->
-           <xsl:if test="not($communityId = $autoarchiveId)">   
-           		<xsl:call-template name="render-item-name">
-           			<xsl:with-param name="url" select="@url"/>
-           		</xsl:call-template>
-           </xsl:if>
-            
-           <xsl:if test="contains($communities-desplegables, $communityId)">
-           		<xsl:apply-templates mode='community-list-page'/>
-           </xsl:if>
-        </li>
+        <!-- Si la referencia es de la coleccion de autoarchivo no se debe mostrar -->
+        <xsl:if test="not($communityId = $autoarchiveId)">   
+	        <li id="li-{$id}">
+	            <xsl:attribute name="class">
+	                <xsl:text>ds-artifact-item </xsl:text>
+	                <xsl:choose>
+	                    <xsl:when test="position() mod 2 = 0">even</xsl:when>
+	                    <xsl:otherwise>odd</xsl:otherwise>
+	                </xsl:choose>
+	            </xsl:attribute>
+	            
+	            <!-- Si es una comunidad que se debe desplegar, muestro el boton para desplegar -->
+	            <xsl:if test="@type='DSpace Community'">               
+	               <xsl:if test="contains($communities-desplegables, $communityId)">
+			           <div id='div-{$id}' class='div-boton-menu-desplegable'>
+		        	   		<a href="javascript:llamar_alerta('div-{$id}','boton-{$id}','ocultar', 'ver');" type="button" class='ocultador' id='boton-{$id}' value="ver">+</a>
+		        	   </div>
+	        	   </xsl:if>
+	            </xsl:if>
+	            
+	           		<xsl:call-template name="render-item-name">
+	           			<xsl:with-param name="url" select="@url"/>
+	           		</xsl:call-template>
+	            
+	           <xsl:if test="contains($communities-desplegables, $communityId)">
+	           		<xsl:apply-templates mode='community-list-page'/>
+	           </xsl:if>
+	        </li>
+        </xsl:if>
     </xsl:template>
     
     

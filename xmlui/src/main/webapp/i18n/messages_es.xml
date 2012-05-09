@@ -222,10 +222,10 @@
 
 <!-- org.dspace.app.xmlui.artifactbrowser.CommunityBrowser.java -->
 
-<message key="xmlui.ArtifactBrowser.CommunityBrowser.title">SeDiCI - Lista de comunidades</message>
-<message key="xmlui.ArtifactBrowser.CommunityBrowser.trail">Lista de comunidades</message>
-<message key="xmlui.ArtifactBrowser.CommunityBrowser.head">Comunidades en SeDiCI</message>
-<message key="xmlui.ArtifactBrowser.CommunityBrowser.select">Elija una comunidad para listar sus colecciones</message>
+<message key="xmlui.ArtifactBrowser.CommunityBrowser.title">SeDiCI - Colecciones disponibles</message>
+<message key="xmlui.ArtifactBrowser.CommunityBrowser.trail">Colecciones</message>
+<message key="xmlui.ArtifactBrowser.CommunityBrowser.head">Colecciones en SeDiCI</message>
+<message key="xmlui.ArtifactBrowser.CommunityBrowser.select">Desde aquí usted puede navegar todas las colecciones de documentos disponibles en el repositorio</message>
 
 
 <!-- org.dspace.app.xmlui.artifactbrowser.CommunityViewer.java -->

@@ -73,13 +73,6 @@ select {
 	margin-right:20px;
 }
 
-.tab-info {
-font-weight:lighter;
-font-size:16px;
-color:#a4a4a4;
-font-style:italic;
-}
-
 select.multiple {
     height: auto;
 }
@@ -2308,15 +2301,9 @@ display:inline;
 
 }
 
-.artifact-description-community a {
+.artifact-description-community a, .artifact-description-collection a {
 color:#e27b2a;
 }
-
-.artifact-description-collection a{
-color:black;
-}
-
-
 
 .ocultador {
 color:white;
@@ -3161,7 +3148,49 @@ h1.communities_header {
 	font-weight: bold;
 }
 
+#community-tabs div ul {
+	margin: 0px;
+}
+#community-tabs .tab-info {
+	font-weight:lighter;
+	font-size:16px;
+	color:#848484;
+	font-style:italic;
+	text-align: right;
+}
 
+.ui-tabs-nav li.tab {
+	background: #FFFFFF;
+	color: #444444;
+	border: none !important;
+	border-bottom: solid 3px #444444 !important;
+	padding-bottom: 0px !important;
+	width: 164px;
+}
+.ui-tabs-nav li.tab a {
+	width: 136px;
+}
+.ui-tabs-nav li.tab a:hover {
+	color: #444444;
+}
+.ui-tabs-nav li.tab.ui-tabs-selected a:hover {
+	color: #E27B2A;
+}
+.ui-tabs-nav li.ui-tabs-selected, .ui-tabs-nav li.ui-tabs-selected a {
+	color: #E27B2A;
+	border-color: #E27B2A !important;
+	font-weight: bold;
+}
+.ui-tabs .ui-tabs-nav {
+	border-bottom: none;
+	width: 100%;
+}
+.tab.ui-state-hover a, .tab.ui-state-hover a:hover {
+	color: #444444;
+}
+.ui-tabs-nav .tab.ui-state-hover {
+	border-color: #E27B2A !important;
+}
 
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
 body{ background-color:white;}
