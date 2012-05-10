@@ -39,7 +39,7 @@ import java.sql.SQLException;
  */
 
 @Controller
-@RequestMapping(value="/resource/**", method=RequestMethod.GET)
+@RequestMapping("/resource/**")
 public class ResourceIdentifierController {
 
     public static final String DSPACE_OBJECT = "dspace.object";
@@ -50,7 +50,7 @@ public class ResourceIdentifierController {
     private static final int STATUS_OK=200;
     private static final int STATUS_FORBIDDEN=400;
 
-
+    @RequestMapping(method = RequestMethod.GET)
     public String processHandle(HttpServletRequest request) {
         String resourceIdentifier=null;
         try {
