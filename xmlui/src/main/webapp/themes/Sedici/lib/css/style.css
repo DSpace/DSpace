@@ -908,9 +908,10 @@ font-size:14px;
 	margin-bottom:20px;
 }
 
+
 #aspect_submission_Submissions_div_submissions table tr.ds-table-header-row, 
 #aspect_submission_Submissions_div_submissions table tr.ds-table-header-row th {
-/*    background-color: #B6C8D9;*/
+    background-color: #B6C8D9;
     border: 1px solid #9CACBA;
     
 }
