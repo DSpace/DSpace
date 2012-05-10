@@ -98,7 +98,7 @@
                 <version>2.2.1</version>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <phase>generate-test-resources</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
