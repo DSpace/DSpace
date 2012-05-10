@@ -3,16 +3,17 @@
 
 DSPACE_VERSION="1.8.2"
 
-# Usuario y grupo al que se asignaran los archivos instalados
-dspace_user=dspace
-dspace_group=dspace
+### Directorio de instalacion
+#INSTALL_DIR=
 
-# usuario y grupo del web container
-web_user=tomcat7
-web_group=tomcat7
-web_home=/var/lib/tomcat7/webapps/
+### Usuario y grupo al que se asignaran los archivos instalados
+#dspace_user=dspace
+#dspace_group=dspace
 
-TOMCAT_TGZ_URL="http://apache.xfree.com.ar/tomcat/tomcat-7/v7.0.27/bin/apache-tomcat-7.0.27.tar.gz"
+### usuario y grupo del web container
+#web_user=tomcat7
+#web_group=tomcat7
+#web_home=/var/lib/tomcat7/webapps/
 
 # informacion para la creacion de la base de datos
 seed="$RANDOM"
@@ -24,15 +25,8 @@ dspace_dbpassword="dspace"
 pg_connection_host="localhost"
 pg_connection_user=""
 
-#INSTALL_DIR=
 
 #/////////////////////////////////////////////////////////////
-
-        if [ -z "`sudo groupmod $dspace_group | grep $dspace_group`" ]; then
-            echo "Se creo el dspace_group $dspace_group"
-        else
-                echo "Ya existe el dspace_group $dspace_group"
-        fi
 
 #Setea los parametros por default
 
@@ -53,5 +47,8 @@ pg_connection_user=""
 		web_user=$dspace_user
 	fi
 	
+        if [ ! "$web_group" ]; then
+                web_group=$dspace_group
+        fi
 	
 	
