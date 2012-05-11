@@ -13,7 +13,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.utils.DSpace;
 
 /**
  * Command-line executed class for initializing the DSpace database. This should
@@ -37,7 +37,6 @@ public class InitializeDatabase
             System.exit(1);
         }
 
-        ConfigurationManager.loadConfig(null);
         log.info("Initializing Database");
 
         try
@@ -68,7 +67,8 @@ public class InitializeDatabase
      */
     private static FileReader getScript(String name) throws FileNotFoundException, IOException
     {
-        String dbName = ConfigurationManager.getProperty("db.name");
+        String dbName = new DSpace().getConfigurationService().getProperty("db.name") ;
+
         File myFile = null;
         
         if (dbName != null)

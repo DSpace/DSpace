@@ -779,10 +779,11 @@ Common usage:
     <target name="setup_database" description="Create database tables">
 
         <!-- Load the Schema -->
-        <java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
+        <java classname="org.dspace.app.launcher.ScriptLauncher" classpathref="class.path" fork="yes" failonerror="yes">
             <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
             <sysproperty key="dspace.log.init.disable" value="true" />
             <sysproperty key="dspace.configuration" value="${config}" />
+            <arg value="setup-database" />
             <arg value="database_schema.sql" />
         </java>
 
@@ -813,10 +814,11 @@ Common usage:
             <arg value="clean-database.sql" />
         </java>
 
-        <java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
+        <java classname="org.dspace.app.launcher.ScriptLauncher" classpathref="class.path" fork="yes" failonerror="yes">
             <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
             <sysproperty key="dspace.log.init.disable" value="true" />
             <sysproperty key="dspace.configuration" value="${config}" />
+            <arg value="clean-database" />
             <arg value="clean-database.sql" />
         </java>
 
