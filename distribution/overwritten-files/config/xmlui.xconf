@@ -79,6 +79,7 @@
 		<aspect name="CollectionViewer" path="resource://aspects/CollectionViewer/"/>
 	    <aspect name="Discovery" path="resource://aspects/Discovery/" />
 	    <aspect name="XMLWorkflow" path="resource://aspects/XMLWorkflow/" />
+	    <aspect name="Feeds" path="resource://aspects/Feeds/" />
         <!--
             To enable Discovery, uncomment this Aspect that will enable it
             within your existing XMLUI
