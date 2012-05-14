@@ -784,6 +784,11 @@
 	notificación por correo electrónico informándole la incorporación del recurso al repositorio de la UNLP o, 
 	si hubiera algún inconveniente, los motivos que impiden la realización del depósito. También podrá verificar 
 	el estado de su envío accediendo a su <a href="../../../../submissions">sitio de usuario</a>
+	<br/><br/>
+	En caso de haber depositado una Tesis de Posgrado, dentro de un plazo de 48 hs. , se le enviará a su correo electrónico 
+	 el comprobante de depósito de su tesis, necesario para la tramitación de su tesis. 
+	<br/><br/>
+	 Cualquier duda o inconveniente, sírvase escribirnos a info@sedici.unlp.edu.ar
 </message>
 <message key="xmlui.Submission.submit.CompletedStep.go_submission">Ver todos mis documentos</message>
 <message key="xmlui.Submission.submit.CompletedStep.submit_again">Enviar otro ítem</message>
