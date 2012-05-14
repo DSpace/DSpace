@@ -13,7 +13,6 @@ User-agent: *
 
 # You also may wish to disallow access to the following paths, in order
 # to stop web spiders from accessing user-based content:
-Disallow: /
 # Disallow: /advanced-search
 # Disallow: /contact
 # Disallow: /feedback
@@ -23,13 +22,13 @@ Disallow: /
 # Disallow: /search
 
 
-#Crawl-delay: 1
-#User-agent: * 
-#Disallow: /logins
-#Disallow: /feedback
-#Disallow: /register
-#Disallow: /password-login 
-#Disallow: /forgot
+Crawl-delay: 1
+User-agent: * 
+Disallow: /logins
+Disallow: /feedback
+Disallow: /register
+Disallow: /password-login 
+Disallow: /forgot
 
 
 #Disallow: /browse
@@ -43,4 +42,4 @@ Disallow: /
 #Disallow: /*fq=subject_filter
 #Disallow: /*fq=dateIssued.year
 #Disallow: /*fq=type_filter
-#Sitemap:  http://sedici.unlp.edu.ar/sitemap
+Sitemap:  http://sedici.unlp.edu.ar/sitemap
