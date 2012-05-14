@@ -51,6 +51,10 @@
                     <artifactId>ehcache</artifactId>
                     <groupId>net.sf.ehcache</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>dspace-cocoon-servlet-service-impl</artifactId>
+                    <groupId>org.dspace.dependencies.cocoon</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
 

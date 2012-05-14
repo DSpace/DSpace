@@ -246,6 +246,10 @@
                     <artifactId>ehcache</artifactId>
                     <groupId>net.sf.ehcache</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>dspace-cocoon-servlet-service-impl</artifactId>
+                    <groupId>org.dspace.dependencies.cocoon</groupId>
+                </exclusion>
             </exclusions>
        </dependency>
 
@@ -259,6 +263,12 @@
        <dependency>
            <groupId>com.atmire</groupId>
            <artifactId>atmire-authority</artifactId>
+       </dependency>
+
+       <dependency>
+           <artifactId>dspace-cocoon-servlet-service-impl</artifactId>
+           <groupId>org.dspace.dependencies.cocoon</groupId>
+           <version>1.0.3</version>
        </dependency>
 
    </dependencies>
