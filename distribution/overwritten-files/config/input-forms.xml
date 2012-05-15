@@ -197,6 +197,7 @@
 					<label>Subtítulo</label>
 					<input-type>onebox</input-type>
 					<hint>Si el título de la obra se compone de título y subtítulo, éste último debe ingresarse en este campo</hint>
+					<visibility>workflow</visibility>
 				</field>
 
 				<!-- Título alternativo -->
@@ -219,6 +220,7 @@
 					<input-type value-pairs-name="common_iso_languages">dropdown</input-type>
 					<hint>Idioma principal de la obra</hint>
 					<required>Debe indicar el idioma principal de la obra</required>
+					<visibility>workflow</visibility>
 				</field>
 				
 				<!-- Fecha de publicación -->
@@ -479,6 +481,7 @@
 					<label>Otros identificadores</label>
 					<input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
 					<hint>Otros códigos de identificación de la obra</hint>
+					<visibility>workflow</visibility>
 				</field>
 
 				<!-- Revista y volúmen de publicación -->
