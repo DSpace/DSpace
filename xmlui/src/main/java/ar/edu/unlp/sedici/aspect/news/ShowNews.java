@@ -68,6 +68,12 @@ public class ShowNews  extends AbstractDSpaceTransformer implements CacheablePro
     private static final Message T_go =
         message("xmlui.general.go");
     
+    private static final Message T_noticias_head =
+            message("sedici.noticias.head");
+    
+    private static final Message T_noticias_titulo =
+            message("sedici.noticias.titulo");
+    
     
     /**
      * Generate the unique caching key.
@@ -109,10 +115,10 @@ public class ShowNews  extends AbstractDSpaceTransformer implements CacheablePro
             //Trabajo para feed de noticias
 
             Division newsDiv = 	body.addDivision("feed"); 
-            newsDiv.setHead("Noticias");
+            newsDiv.setHead(T_noticias_head);
             List browseNewsList = newsDiv.addList("news", List.TYPE_SIMPLE,
                     "news");
-            browseNewsList.setHead("Lista de noticias");
+            browseNewsList.setHead(T_noticias_titulo);
             int cont=0;
             for (Iterator iterator = feed.getEntries().iterator(); iterator.hasNext();) {
             	SyndEntry entrada = (SyndEntry) iterator.next();
