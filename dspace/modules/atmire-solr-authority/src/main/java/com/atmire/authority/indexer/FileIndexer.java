@@ -1,20 +1,10 @@
 package com.atmire.authority.indexer;
 
 import com.atmire.authority.SolrDocumentFields;
-import com.sun.tools.example.debug.bdi.MethodNotFoundException;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
-import org.dspace.services.ConfigurationService;
 import org.dspace.submit.utils.DryadJournalSubmissionUtils;
-import org.dspace.utils.DSpace;
-
-import javax.mail.MethodNotSupportedException;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 
