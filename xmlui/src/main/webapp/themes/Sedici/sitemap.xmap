@@ -254,7 +254,19 @@
 					</map:when>
 					
 					<map:when test="authorize-exception">
-						<map:act type="LoginRedirect" />  
+						<map:transform src="exception2html.xslt">
+							<map:parameter name="contextPath" value="{request:contextPath}" />
+							<map:parameter name="printDebug" value="{xmlui_debug}" />
+							<map:parameter name="errorKind" value="notAuthorize" />
+							<map:parameter name="requestQueryString" value="{request:queryString}"/>
+							
+						</map:transform>
+						<map:act type="locale">
+							<map:transform type="i18n">
+								<map:parameter name="locale" value="{locale}" />
+							</map:transform>
+						</map:act>
+						<map:serialize type="xhtml" status-code="404" />
 					</map:when>
 					
 					<map:when test="file-not-found-exception">

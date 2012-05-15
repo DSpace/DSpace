@@ -2252,6 +2252,8 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="sedici.errorDescription.invalidContinuation">Normalmente esto sucede cuando pasan varios minutos sin registrarse actividad desde su computadora . Por favor ingrese nuevamente con su cuenta de usuario.</message>
 <message key="sedici.errorTitle.internalError">Se produjo un Error.</message> 
 <message key="sedici.errorDescription.internalError">Lo sentimos, se produjo un error de origen desconocido en la aplicación. Este incidente será reportado a los administradores para que revisen si existe algún problema. </message>
+<message key="sedici.errorTitle.notAuthorize">Sitio restringido. </message>
+<message key="sedici.errorDescription.notAuthorize">Usted no tiene los permisos requeridos para acceder a esta sección. En caso de no ser así ingrese con el usuario que posea dichos permisos.</message>
 <message key="sedici.errorDescription.generalNote">Si considera que existe un problema que debe ser resuelto o quiere realizarnos una consulta, no dude en contactarse por correo electrónico a info@sedici.unlp.edu.ar</message>
 
 <!-- Creative Commons mensajes -->
