@@ -2164,7 +2164,7 @@
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesQuestion">¿Quiere permitir modificaciones de su obra?</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerNo">No</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerYes">Yes</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerShareALike">Share a Like</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerShareALike">Share alike</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.campos_obligatorios">Ha ocurrido un error: todos los campos son obligatorios</message>
 
 

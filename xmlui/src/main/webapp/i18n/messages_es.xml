@@ -2260,7 +2260,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.CommercialAnswerYes">Sí</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesQuestion">¿Quiere permitir modificaciones de su obra?</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerNo">No</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerYes">Sin derivativas</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerYes">Si</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerShareALike">Compartir Igual</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.campos_obligatorios">Ha ocurrido un error: todos los campos son obligatorios</message>
 
