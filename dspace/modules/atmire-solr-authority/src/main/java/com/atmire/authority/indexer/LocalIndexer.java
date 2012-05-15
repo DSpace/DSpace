@@ -117,7 +117,7 @@ public class LocalIndexer implements com.atmire.authority.indexer.IndexerInterfa
     }
 
 
-    private Map<String, String> createHashMap(String fieldName, String value){
+    public Map<String, String> createHashMap(String fieldName, String value){
         Map<String, String> values = new HashMap <String, String>();
 
 

@@ -1,6 +1,7 @@
 package com.atmire.authority.indexer;
 
 import com.atmire.authority.SolrDocumentFields;
+import com.sun.tools.example.debug.bdi.MethodNotFoundException;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
@@ -11,6 +12,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 import org.dspace.utils.DSpace;
 
+import javax.mail.MethodNotSupportedException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -110,6 +112,10 @@ public class FileIndexer implements IndexerInterface, SolrDocumentFields {
     @Override
     public String getSource() {
         return SOURCE;
+    }
+
+    public Map<String, String> createHashMap(String fieldName, String value){
+        return null;
     }
 
 }

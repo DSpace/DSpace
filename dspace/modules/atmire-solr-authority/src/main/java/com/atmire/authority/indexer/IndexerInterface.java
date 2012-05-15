@@ -15,5 +15,6 @@ public interface IndexerInterface {
     public boolean hasMore();
     public void close();
     public String indexerName();
-    public String getSource();  
+    public String getSource();
+    public Map<String, String> createHashMap(String fieldName, String value);
 }
