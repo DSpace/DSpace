@@ -71,6 +71,7 @@
                         <!--
                             The footer div, dropping whatever extra information is needed on the page. It will
                             most likely be something similar in structure to the currently given example. -->
+                         <xsl:call-template name="buildRedesSociales"/>
                         <xsl:call-template name="buildFooter"/>
 
                     </div>
@@ -159,10 +160,30 @@
             </div>
         </div>
     </xsl:template>
-    
+          <xsl:template name="buildRedesSociales">
+    		<div id="redesSociales">
+			<img width="274" height="72" border="0" usemap="#Map">
+						    			<xsl:attribute name="src">
+						    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/redes3.png
+						    			</xsl:attribute>
+							  		</img>
+						
+			<map name="Map">
+			<area title="RSS" alt="RSS - Sedici" coords="4,22,69,74" shape="rect" >
+			<xsl:attribute name="href">
+				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='feed_site' and @qualifier='atom+xml']" />
+			</xsl:attribute>
+			</area>
+			<area target="_blank" title="Twitter" alt="Twitter - Sedici" href="http://twitter.com/sedici_unlp" coords="72,22,136,74" shape="rect" />
+			<area title="Blog" alt="Blog- Sedici" href="http://sedici.unlp.edu.ar/blog/" target="_blank" coords="139,22,195,74" shape="rect" />
+			<area target="_blank" title="Facebook" alt="Facebook - Sedici" href="http://www.facebook.com/home.php#!/pages/SeDiCI/106194779404955?ref=ts" coords="198,22,266,74" shape="rect" />
+			</map>
+						</div>
+    </xsl:template>
     <!-- Creo el footer especifico para SeDiCI -->
     <xsl:template name="buildFooter">
 		<div id="footer">
+	
 			<div id="footercol1">
 				<div class="datos_unlp">
 					<strong>2003-2012 &#xA9; <a href="http://prebi.unlp.edu.ar/" target="_blank">PrEBi</a></strong>
