@@ -711,7 +711,7 @@ span.error {
 	top:50px;
 	width:500px;
 	left:120px;*/
-	float:left;
+	float:right;
 	color: #c22121;
 	display:inline;
 	position:relative;
@@ -1934,15 +1934,16 @@ margin-left:5px;
 -moz-border-radius:9px;
 }
 
+
+
 #aspect_eperson_PasswordLogin_list_password-login span.error {
 color:red;
 position:absolute;
 width:560px;
-left:165px;
+left:200px;
 top:25px;
 font-size:11px;
 }
-
 #aspect_eperson_PasswordLogin_list_password-login {
 background-color:white;
 padding:25px 10px 10px 10px;
