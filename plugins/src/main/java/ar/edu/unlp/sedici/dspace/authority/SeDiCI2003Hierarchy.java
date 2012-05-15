@@ -10,8 +10,8 @@ import org.dspace.core.ConfigurationManager;
 
 public abstract class SeDiCI2003Hierarchy extends SeDiCI2003AuthorityProvider {
 	// Los tipos posibles son jearquia y tesauro
-	public static String JERARQUIAS_CONFIG_PROPERTY_FILTER = "choices.jerarquias.filter";
-	public static String JERARQUIAS_CONFIG_PROPERTY_INCLUDE_CHILDS = "choices.jerarquias.include_childs";
+	public static String JERARQUIAS_CONFIG_PROPERTY_FILTER = "sedici.choices.jerarquias.filter";
+	public static String JERARQUIAS_CONFIG_PROPERTY_INCLUDE_CHILDS = "sedici.choices.jerarquias.include_childs";
 	
 	@Override
 	protected List<Choice> findSeDiCI2003Entities(String field, String text, int start, int limit, ChoiceFactory choiceFactory) {
