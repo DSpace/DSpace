@@ -711,11 +711,19 @@
         </xsl:variable>
 
         <div class="file-wrapper clearfix">
-            <div class="thumbnail-wrapper">
-                <a class="image-link" target="_blank">
+              <div class="thumbnail-wrapper">
+             <xsl:choose>
+                        <xsl:when test="$context/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='embargo' and @qualifier='liftDate']">
+                
+                 
+               <i18n:text>sedici.comunidades.tesis.embargo</i18n:text>
+                  </xsl:when>
+                <xsl:otherwise>
+                    <a class="image-link" target="_blank">
                     <xsl:attribute name="href">
                         <xsl:value-of select="$link"/>                        
                     </xsl:attribute>
+                    
                     <xsl:choose>
                         <xsl:when test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]">
                             <img alt="Thumbnail">
@@ -740,11 +748,23 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </a>
+                   
+                </xsl:otherwise>
+                    </xsl:choose>
+
+
             </div>
 <!--             style="height: {$thumbnail.maxheight}px;" -->
             <div class="file-metadata">
-                <!-- Display the contents of 'Description' only if bitstream contains a description -->
-                <xsl:if test="mets:FLocat[@LOCTYPE='URL']/@xlink:label != ''">
+                <xsl:choose>
+                        <xsl:when test="$context/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='embargo' and @qualifier='liftDate']">
+                 
+               
+                 <h1>  <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label" disable-output-escaping="yes"/></h1>
+               
+                  </xsl:when>
+                <xsl:otherwise>
+               <xsl:if test="mets:FLocat[@LOCTYPE='URL']/@xlink:label != ''">
                     <div>
 		                <a class="image-link">
 		                    <xsl:attribute name="href">
@@ -756,6 +776,8 @@
 		                 </a>
                     </div>
                 </xsl:if>
+                 </xsl:otherwise>
+                    </xsl:choose>
                 <div>
                     <span>
                         <xsl:choose>
