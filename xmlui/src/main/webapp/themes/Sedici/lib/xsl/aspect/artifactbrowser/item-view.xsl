@@ -249,7 +249,15 @@
 				</div>
 			</div>
 		</xsl:if>
-
+	<!-- note row -->
+		<xsl:if test="(dim:field[@element='note'])">
+			<div class="simple-item-view-description">
+				<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-note</i18n:text></h2>
+				<p>
+					<xsl:value-of select="dim:field[@element='note']" disable-output-escaping="yes"/>
+				</p>
+			</div>
+		</xsl:if>
 		<!-- Si tiene director asumimos que es una tesis -->
 		<xsl:if test="dim:field[@element='contributor' and @qualifier='director']">
 			<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.tesis-info</i18n:text></h2>
