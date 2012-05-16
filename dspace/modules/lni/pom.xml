@@ -100,8 +100,7 @@
 
       <dependency>
          <groupId>org.dspace.modules</groupId>
-         <artifactId>api</artifactId>
-
+         <artifactId>additions</artifactId>
       </dependency>
 
       <dependency>

@@ -104,8 +104,7 @@
 
       <dependency>
          <groupId>org.dspace.modules</groupId>
-         <artifactId>api</artifactId>
-
+         <artifactId>additions</artifactId>
       </dependency>
 
       <!-- DSpace Custom SWORDv2 Web application -->

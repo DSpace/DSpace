@@ -31,7 +31,7 @@
              <activeByDefault>true</activeByDefault>
           </activation>
           <modules>
-             <module>api</module>
+             <module>additions</module>
           </modules>
        </profile>
         <profile>
