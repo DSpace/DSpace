@@ -79,7 +79,7 @@ public class ExceptionAction extends AbstractAction {
 
 	/*
 	 * Parameters: {0} DSpace server URL {1} Date & time {2} Session ID + IP {3}
-	 * URL + HTTP parameters, if any {4} Exception stack trace {5} User details
+	 * URL + HTTP parameters, if any {4} Exception stack trace {5} User details {6} Subject
 	 */
 	private void sendMail(Map objectModel, String recipient) throws SQLException, MessagingException, IOException {
 		Context context = ContextUtil.obtainContext(objectModel);
@@ -88,7 +88,7 @@ public class ExceptionAction extends AbstractAction {
 
 		Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "exception_error"));
 		email.addRecipient(recipient);
-
+		email.addArgument(thr.getCause().toString());
 		email.addArgument(ConfigurationManager.getProperty("dspace.url"));
 		email.addArgument(new Date());
 		email.addArgument(context.getExtraLogInfo());
