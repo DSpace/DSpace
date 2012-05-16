@@ -1,21 +1,22 @@
 # E-mail sent to designated address when an internal server error occurs
 #
-# Parameters: {0} DSpace server URL
-#             {1} Date & time
-#             {2} Session ID + IP address
-#             {3} URL + HTTP parameters, if any
-#             {4} Exception stack trace
-#             {5} User details
+# Parameters: {0} Cause
+#             {1} DSpace server URL
+#             {2} Date & time
+#             {3} Session ID + IP address
+#             {4} URL + HTTP parameters, if any
+#             {5} Exception stack trace
+#             {6} User details
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace: Exception
-Exception occurred on {0}:
+Subject: DSpace: Exception {0}
+Exception occurred on {1}:
 
-Date: {1}
-Session ID + IP address: {2}
-User details: {5}
-URL: {3}
+Date: {2}
+Session ID + IP address: {3}
+User details: {6}
+URL: {4}
 
 Exception:
-{4}
+{5}
