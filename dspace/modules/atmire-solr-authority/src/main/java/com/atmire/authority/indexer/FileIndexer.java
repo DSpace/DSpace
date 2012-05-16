@@ -17,7 +17,7 @@ import java.util.*;
  */
 public class FileIndexer implements IndexerInterface, SolrDocumentFields {
 
-    private String SOURCE="LOCAL";
+    private String SOURCE="LOCAL-DryadJournal";
 
     ItemIterator itemIterator = null;
 
