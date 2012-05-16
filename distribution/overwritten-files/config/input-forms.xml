@@ -161,7 +161,7 @@
 					<dc-element>creator</dc-element>
 					<dc-qualifier>person</dc-qualifier>
 					<repeatable>true</repeatable>
-					<label>Autor</label>
+					<label>Autor (*)</label>
 					<input-type>onebox</input-type>
 					<hint>Autores de la obra</hint>
 					<required>Debe indicar al menos un autor</required>
@@ -183,9 +183,9 @@
 				<field>
 					<dc-schema>dc</dc-schema>
 					<dc-element>title</dc-element>
-					<label>Título</label>
+					<label>Título (*)</label>
 					<input-type>onebox</input-type>
-					<hint>El título principal de la obra</hint>
+					<hint>El título principal de la obra </hint>
 					<required>El ingreso de un título es obligatorio</required>
 				</field>
 
