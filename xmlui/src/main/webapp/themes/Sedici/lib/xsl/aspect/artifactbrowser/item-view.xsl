@@ -482,18 +482,18 @@
 		</xsl:call-template>
 
 		<!-- status row -->
-		<xsl:if test="(dim:field[@element='status']='si' or dim:field[@element='fulltext']='si')">
+		<xsl:if test="(dim:field[@element='status']='si' or dim:field[@element='status']='peer-review' or dim:field[@element='fulltext']='si' or  dim:field[@element='true'])">
 			<div id="other_attributes">
 				<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.other-attributes</i18n:text></h2>
 				<ul>
-				<xsl:if test="(dim:field[@element='status']='si')">
+				<xsl:if test="(dim:field[@element='status']='si' or dim:field[@element='status']='peer-review')">
 					<li class="metadata peer-review">
 						<i18n:text>xmlui.dri2xhtml.METS-1.0.item-is-peer-review</i18n:text>
 					</li>
 				</xsl:if>
 		
 				<!-- fulltext row -->
-				<xsl:if test="(dim:field[@element='fulltext']='si')">
+				<xsl:if test="(dim:field[@element='fulltext']='si' or dim:field[@element='fulltext']='true')">
 					<li class="metadata fulltext">
 						<i18n:text>xmlui.dri2xhtml.METS-1.0.item-is-fulltext</i18n:text>
 					</li>

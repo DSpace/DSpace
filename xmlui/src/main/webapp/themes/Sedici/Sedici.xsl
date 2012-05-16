@@ -52,6 +52,7 @@
     <xsl:import href="lib/xsl/core/menu-superior.xsl"/>
     <xsl:import href="lib/xsl/core/menu-lateral.xsl"/>
     <xsl:import href="lib/xsl/core/paginas_estaticas.xsl"/>
+    <xsl:import href="lib/xsl/core/templatesEspecificos/profile.xsl"/>
     <xsl:import href="lib/xsl/core/templatesEspecificos/form_fecha_publicacion.xsl"/>
     <xsl:output indent="yes"/>
     
