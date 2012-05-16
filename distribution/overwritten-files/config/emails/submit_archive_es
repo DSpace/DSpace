@@ -4,7 +4,7 @@
 # {1}  Name of collection
 # {2}  handle 
 #
-Subject: SeDiCI - Env�o aprobado y archivado
+Subject: SeDiCI - Envío aprobado y archivado
 
 Usted envió: {0}
 
@@ -15,7 +15,7 @@ y se le ha asignado el siguiente identificador:
 
 {2}
 
-Por favor utilícelo cuando cite su env�o.
+Por favor utilícelo cuando cite su envío.
 
 Muchas gracias.
 Cordialmente,

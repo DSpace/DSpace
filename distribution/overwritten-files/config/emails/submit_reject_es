@@ -6,17 +6,17 @@
 # {3}  Reason for the rejection
 # {4}  Link to 'My DSpace' page
 #
-Subject: SeDiCI - Env�o rechazado
+Subject: SeDiCI - Envío rechazado
 
 Usted envió: {0}
 
 A la colección: {1}
 
-Su env�o ha sido rechazado por {2}
+Su envío ha sido rechazado por {2}
 con la siguiente explicación:
 
 {3}
 
-Su envío no ha sido borrado. Puede acceder a él a trav�s de su página en "Carga de documentos": {4}
+Su envío no ha sido borrado. Puede acceder a él a través de su página en "Carga de documentos": {4}
 
 SeDiCI - UNLP

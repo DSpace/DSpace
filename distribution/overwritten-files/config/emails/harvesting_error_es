@@ -9,7 +9,7 @@
 # See org.dspace.core.Email for information on the format of this file.
 #
 Subject: SeDiCI - Error de cosecha
-La colección {0} fall� en la cosecha:
+La colección {0} falló en la cosecha:
 
 Fecha:       	{1}
 Status: 	{2}
