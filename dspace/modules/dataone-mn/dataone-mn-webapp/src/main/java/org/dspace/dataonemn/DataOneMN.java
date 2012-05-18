@@ -36,7 +36,7 @@ public class DataOneMN extends HttpServlet implements Constants {
     
     private static final Logger log = Logger.getLogger(DataOneMN.class);
     
-    private static final String CONTENT_TYPE = "application/xml; charset=UTF-8";
+    private static final String XML_CONTENT_TYPE = "application/xml; charset=UTF-8";
     
     private static final String TEXT_XML_CONTENT_TYPE = "text/xml; charset=UTF-8";
     
@@ -44,6 +44,9 @@ public class DataOneMN extends HttpServlet implements Constants {
     
     private String mySolr;
     
+    /**
+     * Receives the HEAD HTTP call and passes off to the appropriate method.
+     **/
     protected void doHead(HttpServletRequest aReq, HttpServletResponse aResp)
 	throws ServletException, IOException {
 	String reqPath = aReq.getPathInfo();
@@ -85,7 +88,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 		aResp.setContentLength((int) length);
 		
 		if (format.equals("xml") || format.equals("dap")) {
-		    aResp.setContentType(CONTENT_TYPE);
+		    aResp.setContentType(XML_CONTENT_TYPE);
 		}
 		else {
 		    ServletContext context = getServletContext();
@@ -194,7 +197,10 @@ public class DataOneMN extends HttpServlet implements Constants {
 	    ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);
 	    
 	    try {
-		if (reqPath.equals("/object")) {
+		if (reqPath.equals("/") || reqPath.equals("/node")) {
+		    getCapabilities(aResp);
+		}
+		else if (reqPath.equals("/object")) {
 		    // listObjects()
 		    String format = aReq.getParameter("objectFormat");
 		    Date from = parseDate(aReq, "startTime");
@@ -205,7 +211,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 		    int count = parseInt(aReq, "count",
 					 ObjectManager.DEFAULT_COUNT);
 		    
-		    aResp.setContentType(CONTENT_TYPE);
+		    aResp.setContentType(XML_CONTENT_TYPE);
 		    
 		    if (count <= 0) {
 			OutputStream out = aResp.getOutputStream();
@@ -226,7 +232,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 			.substring(4) : name;
 		    
 		    if (format.equals("dap")) {
-			aResp.setContentType(CONTENT_TYPE);
+			aResp.setContentType(XML_CONTENT_TYPE);
 		    }
 		    else {
 			ServletContext context = getServletContext();
@@ -491,5 +497,51 @@ public class DataOneMN extends HttpServlet implements Constants {
 	catch (IllegalArgumentException details) {}
 	
 	return null;
+    }
+
+    /**
+       Responds with the capabilities of this Member Node.
+    **/
+    private void getCapabilities(HttpServletResponse response) throws IOException {
+	log.info("getting capabilities");
+	response.setContentType(XML_CONTENT_TYPE);
+	OutputStream out = response.getOutputStream();
+	PrintWriter pw = new PrintWriter(out);
+
+	// basic node description
+	pw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n" +
+		 "<d1:node xmlns:d1=\"http://ns.dataone.org/service/types/v1\" replicate=\"true\" synchronize=\"true\" type=\"mn\" state=\"up\"> \n" +
+		 "<identifier>urn:node:DRYAD</identifier>\n" +
+		 "<name>Dryad Digital Repository</name>\n" +
+		 "<description>Dryad is an international repository of data underlying peer-reviewed articles in the basic and applied biosciences.</description>\n" +
+		 "<baseURL>https://datadryad.org/mn</baseURL>\n");
+
+	// supported services 
+	pw.write("<services>\n" +
+		 "<service name=\"MNRead\" version=\"v1\" available=\"true\"/>\n" +
+		 "<service name=\"MNCore\" version=\"v1\" available=\"true\"/>\n" +
+		 "<service name=\"MNAuthorization\" version=\"v1\" available=\"false\"/>\n" +
+		 "<service name=\"MNStorage\" version=\"v1\" available=\"false\"/>\n" +
+		 "<service name=\"MNReplication\" version=\"v1\" available=\"false\"/>\n" +
+		 "</services>\n");
+
+	// synchronization
+	String lastHarvestDate = "2012-03-06T14:57:39.851+00:00";
+	pw.write("<synchronization>\n" +
+		 "<schedule hour=\"*\" mday=\"*\" min=\"0/3\" mon=\"*\" sec=\"10\" wday=\"?\" year=\"*\"/>\n" +
+		 "<lastHarvested>" + lastHarvestDate + "</lastHarvested>\n" +
+		 "<lastCompleteHarvest>" + lastHarvestDate + "</lastCompleteHarvest>\n" +
+		 "</synchronization>\n");
+
+	// other random info
+	pw.write("<ping success=\"true\"/>\n" +
+		 "<subject>CN=urn:node:DRYAD, DC=dataone, DC=org</subject>\n" +
+		 "<contactSubject>CN=METACAT1, DC=dataone, DC=org</contactSubject>\n");
+
+	// close xml
+	pw.write("</d1:node>\n");
+    
+	pw.close();
+		   
     }
 }

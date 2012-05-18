@@ -28,13 +28,11 @@ import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 public abstract class AbstractObjectManager implements Constants {
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(AbstractObjectManager.class);
+    private static final Logger log = Logger.getLogger(AbstractObjectManager.class);
 
 	protected Context myContext;
 	protected String myData;
@@ -54,27 +52,28 @@ public abstract class AbstractObjectManager implements Constants {
 
 	protected Item getDSpaceItem(String aID, String aFormat)
 			throws NotFoundException {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(aID + " requested in " + aFormat + " format");
-		}
-
-		DOIIdentifierProvider doiService = new DSpace().getSingletonService(DOIIdentifierProvider.class);
-        Item item = null;
-        try {
-            item = (Item) doiService.resolve(myContext, aID, new String[] {});
-        } catch (IdentifierNotFoundException e) {
-            throw new NotFoundException(aID);
-        } catch (IdentifierNotResolvableException e) {
-           throw new NotFoundException(aID);
-        }
-
-        if (item == null) {
-			throw new NotFoundException(aID);
-		}
-
-		return item;
+	    log.debug(aID + " requested in " + aFormat + " format");
+		
+	    DOIIdentifierProvider doiService = new DSpace().getSingletonService(DOIIdentifierProvider.class);
+	    Item item = null;
+	    try {
+		item = (Item) doiService.resolve(myContext, aID, new String[] {});
+	    } catch (IdentifierNotFoundException e) {
+		log.error("Unable to locate item " + aID, e);
+		throw new NotFoundException(aID, e);
+	    } catch (IdentifierNotResolvableException e) {
+		log.error("Unable to locate item " + aID, e);
+		throw new NotFoundException(aID, e);
+	    }
+	    
+	    if (item == null) {
+		log.error("Unable to locate item " + aID);
+		throw new NotFoundException(aID);
+	    }
+	    
+	    return item;
 	}
-
+    
 	protected String getNameExt(String aName) {
 		int suffixIndex = aName.lastIndexOf(".") + 1;
 
@@ -89,26 +88,18 @@ public abstract class AbstractObjectManager implements Constants {
 			throws SQLException, NotFoundException {
 		Bundle[] bundles = aItem.getBundles("ORIGINAL");
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Getting bitstreams for " + aItem.getHandle());
-		}
-
+		log.debug("Getting bitstreams for " + aItem.getHandle());
+		
 		if (bundles.length > 0) {
 			for (Bitstream bitstream : bundles[0].getBitstreams()) {
 				String name = bitstream.getName();
-
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Checking '" + name + "' bitstream");
-				}
-
+				log.debug("Checking '" + name + "' bitstream");
+			
 				if (!name.equalsIgnoreCase("readme.txt")
 						&& !name.equalsIgnoreCase("readme.txt.txt")
 						&& (name.endsWith(aFormat) || aFormat.equals("*"))) {
-					if (LOGGER.isDebugEnabled()) {
-						LOGGER.debug("Getting bitstream info from: " + name);
-					}
-
-					return bitstream;
+				    log.debug("Getting bitstream info from: " + name);
+				    return bitstream;
 				}
 			}
 		}
@@ -164,13 +155,12 @@ public abstract class AbstractObjectManager implements Constants {
 
 				checksum = hexString.toString();
 
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Calculated XML checksum (" + checksum
-							+ ") for " + aID);
-				}
+				log.debug("Calculated XML checksum (" + checksum
+					  + ") for " + aID);
 			}
 			catch (NoSuchAlgorithmException details) {
-				throw new RuntimeException(details);
+			    log.error("unexpected checksum algorithm", details);
+			    throw new RuntimeException(details);
 			}
 		}
 
@@ -199,21 +189,19 @@ public abstract class AbstractObjectManager implements Constants {
             Format ppFormat = Format.getPrettyFormat();
 
 			if (aFormat.equals("dap")) {
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Retrieving metadata for " + aID
-							+ " (DSO_ID: " + item.getID() + ") -- "
-							+ item.getHandle());
-				}
+			    log.debug("Retrieving metadata for " + aID
+				      + " (DSO_ID: " + item.getID() + ") -- "
+				      + item.getHandle());
+			    
 
 				DisseminationCrosswalk xWalk = (DisseminationCrosswalk) PluginManager
 						.getNamedPlugin(DisseminationCrosswalk.class,
 								DRYAD_CROSSWALK);
 				try {
 					if (!xWalk.canDisseminate(item)) {
-						if (LOGGER.isWarnEnabled()) {
-							LOGGER.warn("xWalk says item cannot be disseminated: "
-									+ item.getHandle());
-						}
+					    log.warn("xWalk says item cannot be disseminated: "
+						     + item.getHandle());
+					       
 					}
 
 					Element result = xWalk.disseminateElement(item);
@@ -237,13 +225,11 @@ public abstract class AbstractObjectManager implements Constants {
 					aOutputStream.close();
 				}
 				catch (AuthorizeException details) {
-					// We've disabled authorization for this context
-					if (LOGGER.isWarnEnabled()) {
-						LOGGER.warn("Shouldn't see this exception!");
-					}
+				    // We've disabled authorization for this context, so this should never happen
+				    log.warn("Shouldn't see this exception!", details);
 				}
 				catch (CrosswalkException details) {
-					LOGGER.error(details.getMessage(), details);
+					log.error(details.getMessage(), details);
 
 					// programming error
 					throw new RuntimeException(details);
@@ -254,19 +240,16 @@ public abstract class AbstractObjectManager implements Constants {
 				boolean found = false;
 
 				if (bundles.length == 0) {
-					if (LOGGER.isDebugEnabled()) {
-						LOGGER.debug("Didn't find any original bundles for "
-								+ item.getHandle());
-					}
+				    log.debug("Didn't find any original bundles for "
+					      + item.getHandle());
+				
 
 					throw new NotFoundException(aFormat + "data bundle for "
 							+ item.getHandle() + " not found");
 				}
 
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Retrieving scientific data for " + aID);
-				}
-
+				log.debug("Retrieving scientific data for " + aID);
+				
 				for (Bitstream bitstream : bundles[0].getBitstreams()) {
 					String name = bitstream.getName();
 
@@ -274,10 +257,8 @@ public abstract class AbstractObjectManager implements Constants {
 							&& !name.equalsIgnoreCase("readme.txt.txt")
 							&& name.endsWith(aFormat)) {
 						try {
-							if (LOGGER.isDebugEnabled()) {
-								LOGGER.debug("Retrieving bitstream " + name);
-							}
-
+						    log.debug("Retrieving bitstream " + name);
+						    
 							writeBitstream(bitstream.retrieve(), aOutputStream);
 							found = true;
 						}

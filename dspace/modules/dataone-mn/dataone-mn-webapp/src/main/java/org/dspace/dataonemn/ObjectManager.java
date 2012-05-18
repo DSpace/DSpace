@@ -30,15 +30,13 @@ import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.ibm.icu.text.DateFormat;
 
 public class ObjectManager extends AbstractObjectManager {
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ObjectManager.class);
+    private static final Logger log = Logger.getLogger(ObjectManager.class);
 
 	public static final int DEFAULT_START = 0;
 	public static final int DEFAULT_COUNT = 20;
@@ -87,10 +85,8 @@ public class ObjectManager extends AbstractObjectManager {
 
 		myContext.turnOffAuthorisationSystem();
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Setting start parameter to: " + aStart);
-			LOGGER.debug("Setting count parameter to: " + aCount);
-		}
+		log.debug("Setting start parameter to: " + aStart);
+		log.debug("Setting count parameter to: " + aCount);
 
 		list.setStart(aStart);
 		list.setCount(aCount);
@@ -121,8 +117,8 @@ public class ObjectManager extends AbstractObjectManager {
 			int total = (int) (aObjFormat == null ? docs.getNumFound() * 2
 					: docs.getNumFound()) - 1;
 
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Setting total parameter to: "
+			if (log.isDebugEnabled()) {
+				log.debug("Setting total parameter to: "
 						+ Integer.toString(total));
 			}
 
@@ -138,7 +134,7 @@ public class ObjectManager extends AbstractObjectManager {
 				String format = (String) doc.getFieldValue("format");
 				String ext = (String) doc.getFieldValue("ext");
 
-				LOGGER.debug("Retrieving '" + doi + "' for mn list");
+				log.debug("Retrieving '" + doi + "' for mn list");
 		
 				ObjectInfo objInfo = new ObjectInfo(doi);
 				Item item = Item.find(myContext, id.intValue());
@@ -156,26 +152,25 @@ public class ObjectManager extends AbstractObjectManager {
 								checksumDetails[1]);
 					}
 				}
-				catch (NotFoundException details) {
-				    LOGGER.error("Should not happen: "
-						 + details.getMessage());
+				catch (NotFoundException e) {
+				    log.error("Unable to calculate checksum for " + doi, e);
 				    
 				}
 
 				Bundle[] bundles = item.getBundles("ORIGINAL");
 
-				LOGGER.debug("Getting bitstreams for " + item.getHandle());
+				log.debug("Getting bitstreams for " + item.getHandle());
 				
 				if (bundles.length > 0) {
 					for (Bitstream bitstream : bundles[0].getBitstreams()) {
 						String name = bitstream.getName();
 
-						LOGGER.debug("Checking '" + name + "' bitstream");
+						log.debug("Checking '" + name + "' bitstream");
 						
 						if (!name.equalsIgnoreCase("readme.txt")
 								&& !name.equalsIgnoreCase("readme")
 								&& !name.equalsIgnoreCase("readme.txt.txt")) {
-						    LOGGER.debug("Getting bitstream information from: "
+						    log.debug("Getting bitstream information from: "
 										+ name);
 						    
 						    String algorithm = bitstream.getChecksumAlgorithm();
@@ -187,10 +182,10 @@ public class ObjectManager extends AbstractObjectManager {
 					}
 				}
 
-				LOGGER.debug("Writing " + doi + " to XML");
+				log.debug("Writing " + doi + " to XML");
 
 				nu.xom.Element[] parts = objInfo.split();
-
+				
 				if (counter != 0 || startIsEven) {
 					if (aObjFormat == null
 							|| aObjFormat.equals(DRYAD_NAMESPACE)) {
@@ -218,18 +213,12 @@ public class ObjectManager extends AbstractObjectManager {
 			aOutStream.close();
 		}
 		catch (SolrServerException details) {
-			if (LOGGER.isWarnEnabled()) {
-				LOGGER.warn(details.getMessage(), details);
-			}
-
-			throw new RuntimeException(details);
+		    log.warn(details.getMessage(), details);
+		    throw new RuntimeException(details);
 		}
 		catch (MalformedURLException details) {
-			if (LOGGER.isWarnEnabled()) {
-				LOGGER.warn(details.getMessage(), details);
-			}
-
-			throw new RuntimeException(details);
+		    log.warn(details.getMessage(), details);
+		    throw new RuntimeException(details);
 		}
 
 		myContext.restoreAuthSystemState();
@@ -262,15 +251,11 @@ public class ObjectManager extends AbstractObjectManager {
 				return (long) writer.toString().length();
 			}
 			catch (AuthorizeException details) {
-				if (LOGGER.isWarnEnabled()) {
-					LOGGER.warn("Shouldn't see this exception!");
-				}
-
-				throw new RuntimeException(details);
+			    log.error("Authorization problem", details);
+			    throw new RuntimeException(details);
 			}
 			catch (CrosswalkException details) {
-				LOGGER.error(details.getMessage(), details);
-
+				log.error("Unable to crosswalk metadata", details);
 				throw new RuntimeException(details);
 			}
 		}
@@ -311,10 +296,8 @@ public class ObjectManager extends AbstractObjectManager {
 
 		qString = query.toString().trim();
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Solr query: " + qString);
-		}
-
+		log.debug("Solr query: " + qString);
+	
 		return qString;
 	}
 }
