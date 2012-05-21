@@ -97,7 +97,7 @@
                         <xsl:text>/</xsl:text>
                     </xsl:attribute>
                     <span id="ds-header-logo">&#160;</span>
-                    <span id="ds-header-logo-text">mirage</span>
+                    <span id="ds-header-logo-text"><i18n:text>xmlui.general.dspace_home</i18n:text></span>
                 </a>
                 <h1 class="pagetitle visuallyhidden">
                     <xsl:choose>
