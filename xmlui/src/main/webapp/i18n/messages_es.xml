@@ -696,7 +696,7 @@
 
 	<!-- org.dspace.app.xmlui.Submission.submit.UploadStep -->
 	<message key="xmlui.Submission.submit.UploadStep.head">Adjuntar archivo(s)</message>
-<message key="xmlui.Submission.submit.UploadStep.file">Fichero</message>
+<message key="xmlui.Submission.submit.UploadStep.file">Fichero (*)</message>
 <message key="xmlui.Submission.submit.UploadStep.file_help">Por favor, presione el botón "Examinar...", se abrirá una ventana que le permitirá seleccionar un archivo de su computadora que corresponda con el ítem. </message>
 <message key="xmlui.Submission.submit.UploadStep.file_error">El ítem debe contener al menos un archivo.</message>
 <message key="xmlui.Submission.submit.UploadStep.upload_error">Hubo un problema adjuntando su archivo.  Bien el nombre del archivo era incorrecto, o hubo un problema de red  que impidió que el archivo nos llegase correctamente, o ha adjuntado un archivo cuyo formato solo se permite para usos internos del sistema. Por favor, inténtelo de nuevo.</message>
