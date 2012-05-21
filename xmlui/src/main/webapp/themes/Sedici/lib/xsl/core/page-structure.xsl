@@ -164,7 +164,8 @@
     		<div id="redesSociales">
 			<img width="274" height="72" border="0" usemap="#Map">
 						    			<xsl:attribute name="src">
-						    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/redes3.png
+						    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+						    			   	<xsl:text>/themes/Sedici/images/redes3.png</xsl:text>
 						    			</xsl:attribute>
 							  		</img>
 						
@@ -203,11 +204,14 @@
 			  		<div id="comollegar">
 			  			<a title="Como llegar a SeDiCI">
 			    			<xsl:attribute name="href">
-			    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/pages/comoLlegar
+			    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+			    				<xsl:text>/pages/comoLlegar</xsl:text>
 			    			</xsl:attribute>
 				  			<img class="vermapa">
 				    			<xsl:attribute name="src">
-				    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img1.png
+				    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+				    				<xsl:text>/themes/Sedici/images/img1.png</xsl:text>
+				    				
 				    			</xsl:attribute>
 				  			</img>
 			  			</a>
@@ -217,18 +221,22 @@
 		  			<a href="http://mail.prebi.unlp.edu.ar:8080/lists" target="_blank" title="Suscríbase al newsletter">
 				  		<img class="newsletter">
 			    			<xsl:attribute name="src">
-			    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img2.png
+			    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+			    				<xsl:text>/themes/Sedici/images/img2.png</xsl:text>
+			    				
 			    			</xsl:attribute>
 				  		</img>
 		  			</a>
 
 		  			<a title="Contáctese">
 		    			<xsl:attribute name="href">
-		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/feedback
+		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+		    				<xsl:text>/feedback</xsl:text>
 		    			</xsl:attribute>
 				  		<img class="contacto">
 			    			<xsl:attribute name="src">
-			    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img3.png
+			    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+			    				<xsl:text>/themes/Sedici/images/img3.png</xsl:text>
 			    			</xsl:attribute>
 				  		</img>
 				  	</a>
