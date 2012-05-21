@@ -669,7 +669,7 @@
 					<dc-element>note</dc-element>
 					<label>Notas</label>
 					<input-type>textarea</input-type>
-					<hint>Cualquier nota o comentario que quiera dejar registrado</hint>
+					<hint>Si usted desea aplicar embargo a su texto (no recomendado), por favor índiquelo en el campo "Notas". Tenga en cuenta que para aplicar el embargo debe presentar una nota escrita en la que se justifique debidamente la necesidad de aplicarlo. Para más información, visite el siguiente link</hint>
 				</field>
 
 			</page>
