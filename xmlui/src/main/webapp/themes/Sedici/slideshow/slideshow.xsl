@@ -13,11 +13,13 @@
 			<div class="slide">
 				<a target="_blank">
 	    			<xsl:attribute name="href">
-	    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/pages/queEsSedici
+	    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+	    				 <xsl:text>/pages/queEsSedici</xsl:text>
 	    			</xsl:attribute>
 		    		<img>
 		    			<xsl:attribute name="src">
-		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_slideshow_1.jpg
+		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+		    				 <xsl:text>/themes/Sedici/images/img_slideshow_1.jpg</xsl:text>
 		    			</xsl:attribute>
 		    		</img>
 				</a>
@@ -31,7 +33,8 @@
 				<a href="http://sedici.unlp.edu.ar/blog/2012/05/02/migracion-a-dspace/" target="_blank">
 		    		<img>
 		    			<xsl:attribute name="src">
-		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_slideshow_2.jpg
+		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+		    					 <xsl:text>/themes/Sedici/images/img_slideshow_2.jpg</xsl:text>
 		    			</xsl:attribute>
 		    		</img>
 				</a>
@@ -46,7 +49,8 @@
 				<a href="http://sedici.unlp.edu.ar/blog/2012/04/25/libro-electronico-supera-las-3000-descargas/" target="_blank">
 		    		<img>
 		    			<xsl:attribute name="src">
-		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_slideshow_3.jpg
+		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+		    				<xsl:text>/themes/Sedici/images/img_slideshow_3.jpg</xsl:text>
 		    			</xsl:attribute>
 		    		</img>
 				</a>
@@ -60,11 +64,14 @@
 			<div class="slide">
 				<a target="_blank">
 	    			<xsl:attribute name="href">
-	    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/pages/informacionTesistas
+	    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+	    				/pages/informacionTesistas
 	    			</xsl:attribute>
 		    		<img>
 		    			<xsl:attribute name="src">
-		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_slideshow_4.jpg
+		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+		    				<xsl:text>/themes/Sedici/images/img_slideshow_4.jpg</xsl:text>
+		    				
 		    			</xsl:attribute>
 		    		</img>
 				</a>
@@ -79,14 +86,16 @@
 		<a href="#" class="prev">
 			<img>
     			<xsl:attribute name="src">
-    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/arrow-prev.png
+    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+    					<xsl:text>/themes/Sedici/images/arrow-prev.png</xsl:text>
     			</xsl:attribute>
 			</img>
 		</a>
 		<a href="#" class="next">
 			<img>
     			<xsl:attribute name="src">
-    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/arrow-next.png
+    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+    				<xsl:text>/themes/Sedici/images/arrow-next.png</xsl:text>
     			</xsl:attribute>
 			</img>
 		</a>		
