@@ -81,7 +81,13 @@ public class ReviewRequiredAction extends ProcessingAction{
             email.addArgument(dataFileNames);
             email.addArgument(dataFileDois);
 
-            email.send();
+	    // Send the email -- Unless the journal is Evolution
+	    // TODO: make this configurable for each journal
+	    DCValue journals[] = wfi.getItem.getMetadata("prism", "publicationName", null, Item.ANY);
+	    String journalName =  (journals.length >= 1) ? journals[0].value : null;
+	    if(journalName !=null && !journalName.equals("Evolution")) {
+		email.send();
+	    }
         } catch (MessagingException e) {
             log.error(LogManager.getHeader(c, "Error while email submitter about approved submission", "WorkflowItemId: " + wfi.getID()), e);
         }
