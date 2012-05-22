@@ -32,6 +32,8 @@ import org.dspace.license.CCLicense;
 import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
+import ar.edu.unlp.sedici.aspect.redirect.RedirectAction;
+
 /**
  * This is an optional page of the item submission processes. The Creative 
  * Commons license may be added to an item in addition to the standard distribution 
@@ -50,7 +52,7 @@ import org.xml.sax.SAXException;
  * @author Tim Donohue (updated for Configurable Submission)
  * @author Wendy Bossons (updated for DSpace 1.8)
  */
-public class SediciCCLicenseStep extends AbstractSubmissionStep
+public class SediciAdministratorCCLicenseStep extends AbstractSubmissionStep
 {
 	/** Language Strings **/
     protected static final Message T_head = 
@@ -78,13 +80,31 @@ public class SediciCCLicenseStep extends AbstractSubmissionStep
         protected static final Message Derivatives_question_answer_no  = message("xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerNo");
         protected static final Message Derivatives_question_answer_yes  = message("xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerYes");
         protected static final Message Derivatives_question_answer_sa  = message("xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerShareALike");
+		private static final String PropertiesFilename = "sedici-dspace";
+		private static HashMap<String, String> Licencias=null;
 	/**
 	 * Establish our required parameters, abstractStep will enforce these.
 	 */
-	public SediciCCLicenseStep()
+	public SediciAdministratorCCLicenseStep()
 	{
 	    this.requireSubmission = true;
 	    this.requireStep = true;
+	}
+	
+	public static HashMap<String, String> GetLicenses(){
+		if (Licencias==null || Licencias.size()<=1){
+				//cargo el map con las licencias
+				Licencias=new HashMap<String, String>();
+			    String values=ConfigurationManager.getProperty(PropertiesFilename, "map.licenses");
+		        String[] valores=values.split(",");
+		        String[] valor;
+		        for (String entrada : valores) {
+					valor=entrada.split(" = ");
+					Licencias.put(valor[0], valor[1]);
+			}
+
+		};
+		return Licencias;
 	}
 	
 	
@@ -94,53 +114,7 @@ public class SediciCCLicenseStep extends AbstractSubmissionStep
 	    // Build the url to and from creative commons
 	    Item item = submission.getItem();
 	    Collection collection=submission.getCollection();
-	    String ccUri=ConfigurationManager.getProperty("cc.license.uri");
-	    DCValue[] carga=item.getMetadata(ccUri);
-	    String dato;
-	    String commercial="y";
-	    String derivatives="y";
-	    if (carga.length>0){
-	    	dato=carga[0].value;
-	    	int inicio=dato.indexOf("/by")+1;
-	        if (inicio!=0){
-		    	String substring=dato.substring(inicio);
-		    	int fin= substring.indexOf("/");	    	
-		    	substring=substring.substring(0,fin);
-		    	HashMap<String, Integer> arreglo=new HashMap<String, Integer>();
-		    	arreglo.put("by-nc-nd", 1);
-		    	arreglo.put("by-nc-sa", 2);
-		    	arreglo.put("by-nc", 3);
-		    	arreglo.put("by-nd", 4);
-		    	arreglo.put("by-sa", 5);
-		    	arreglo.put("by", 6);
-		    	switch (arreglo.get(substring)) {
-				case 1:
-					commercial="nc";
-					derivatives="nd";
-					break;
-				case 2:
-					commercial="nc";
-					derivatives="sa";
-					break;
-				case 3:
-					commercial="nc";
-					derivatives="y";
-					break;
-				case 4:
-					commercial="y";
-					derivatives="nd";
-					break;
-				case 5:
-					commercial="y";
-					derivatives="sa";
-					break;
-				default:
-					commercial="y";
-					derivatives="y";
-					break;
-				}
-	        };
-	    }
+
 	    String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 	    Request request = ObjectModelHelper.getRequest(objectModel);
 	    
@@ -152,61 +126,27 @@ public class SediciCCLicenseStep extends AbstractSubmissionStep
 	    // output the license selection options
 	    List list = div.addList("licenseclasslist", List.TYPE_FORM);	    
 	    list.addItem(T_info1);
-	    list.setHead(T_head);
+	    list.setHead(T_head);	    
+        //si es administrador de la colección se debe mostrar un select en vez de los radios
+    	List edit = div.addList("selectlist1", List.TYPE_SIMPLE, "horizontalVanilla");
+	    edit.addItem(message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.pregunta"));
+	    edit.addItem().addFigure(contextPath + "/themes/Reference/images/information.png", "javascript:void(0)", "El licenciador permite copiar, distribuir y comunicar públicamente la obra. A cambio, esta obra no puede ser utilizada con finalidades comerciales -- a menos que se obtenga el permiso del licenciador.", "information");
+	    List subList = div.addList("sublist2", List.TYPE_SIMPLE, "horizontalVanilla");
+	    Select select  = subList.addItem().addSelect("cc_license_chooser");
+	    select.addOption("", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.sinLicencia"));
+	    //Cargo la lista de licencias permitidas
+        for (String key : GetLicenses().keySet()) {
+        	select.addOption(key, message(GetLicenses().get(key)));
+		}
+        //En caso de que tenga una licencia la selecciono
+	    String ccUri=ConfigurationManager.getProperty("cc.license.uri");
+	    DCValue[] carga=item.getMetadata(ccUri);
+        if (carga.length>0){
+	    	select.setOptionSelected(carga[0].value);
+        } else {
+        	select.setOptionSelected("");
+        }
 
-	    if (AuthorizeManager.isAdmin(context, item) || AuthorizeManager.isAdmin(context, collection)){
-	    	//si es administrador de la colección se debe mostrar un select en vez de los radios
-        	List edit = div.addList("selectlist1", List.TYPE_SIMPLE, "horizontalVanilla");
-		    edit.addItem(message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.pregunta"));
-		    edit.addItem().addFigure(contextPath + "/themes/Reference/images/information.png", "javascript:void(0)", "El licenciador permite copiar, distribuir y comunicar públicamente la obra. A cambio, esta obra no puede ser utilizada con finalidades comerciales -- a menos que se obtenga el permiso del licenciador.", "information");
-		    List subList = div.addList("sublist2", List.TYPE_SIMPLE, "horizontalVanilla");
-		    Select select  = subList.addItem().addSelect("cc_license_chooser");
-		    select.addOption("", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.sinLicencia"));
-		    select.addOption("by", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by"));
-		    select.addOption("by-nc", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc"));
-		    select.addOption("by-nc-nd", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-nd"));
-		    select.addOption("by-nc-sa", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-sa"));
-		    select.addOption("by-nd", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nd"));
-		    select.addOption("by-sa", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-sa"));
-		   
-	        if (carga.length>0){
-		    	dato=carga[0].value;
-		    	int inicio=dato.indexOf("/by")+1;
-		        if (inicio!=0){
-			    	String substring=dato.substring(inicio);
-			    	int fin= substring.indexOf("/");	    	
-			    	substring=substring.substring(0,fin);
-			    	select.setOptionSelected(substring);
-		        }
-	        } else {
-	        	select.setOptionSelected("");
-	        }
-	    } else {		    
-		    //cargo las opciones de CC
-		    //Opcion 1
-		    List edit = div.addList("selectlist1", List.TYPE_SIMPLE, "horizontalVanilla");
-		    edit.addItem(Commercial_question);
-		    edit.addItem().addFigure(contextPath + "/themes/Reference/images/information.png", "javascript:void(0)", "El licenciador permite copiar, distribuir y comunicar públicamente la obra. A cambio, esta obra no puede ser utilizada con finalidades comerciales -- a menos que se obtenga el permiso del licenciador.", "information");
-		    List subList = div.addList("sublist2", List.TYPE_SIMPLE, "horizontalVanilla");
-		    Radio radio  = subList.addItem().addRadio("commercial_chooser");
-		    radio.setRequired();
-		    radio.addOption("nc", Commercial_question_answer_no);
-			radio.addOption("y", Commercial_question_answer_yes);		
-			radio.setOptionSelected(commercial);
-			
-			div.addSimpleHTMLFragment(true, "&#160;");
-			
-			edit = div.addList("selectlist2", List.TYPE_SIMPLE, "horizontalVanilla");
-			edit.addItem(Derivatives_question);
-		    edit.addItem().addFigure(contextPath + "/themes/Reference/images/information.png", "javascript:void(0)", "El licenciador permite copiar, distribuir y comunicar públicamente solamente copias inalteradas de la obra -- no obras derivadas basadas en ella.", "information");
-		    subList = div.addList("sublist2", List.TYPE_SIMPLE, "horizontalVanilla");
-		    radio  = subList.addItem().addRadio("derivatives_chooser");
-		    radio.setRequired();
-			radio.addOption("sa", Derivatives_question_answer_sa);
-			radio.addOption("nd", Derivatives_question_answer_no);
-			radio.addOption("y", Derivatives_question_answer_yes);
-			radio.setOptionSelected(derivatives);
-	    };
 		div.addSimpleHTMLFragment(true, "&#160;");
 
 		Division statusDivision = div.addDivision("statusDivision");

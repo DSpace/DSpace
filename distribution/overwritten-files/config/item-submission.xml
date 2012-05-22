@@ -148,6 +148,15 @@
 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.SediciCCLicenseStep</xmlui-binding>
 		<workflow-editable>true</workflow-editable>
       </step>
+      
+      <!--Step sediciAdministratorCCLicense will be to select a Creative Commons License-->
+      <step id="sediciAdministratorCCLicense">
+        <heading>submit.progressbar.CClicense</heading>
+        <processing-class>org.dspace.submit.step.SediciAdministratorCCLicenseStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPCCLicenseStep</jspui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.SediciAdministratorCCLicenseStep</xmlui-binding>
+		<workflow-editable>true</workflow-editable>
+      </step>
 
       <!--Step sediciSignOffLicense will be to Sign off on the License-->
       <step id="sediciSignOffLicense">
@@ -250,8 +259,8 @@
       <!--Step 4 will be to Verify/Review everything -->
  	  <step id="sediciVerifyItem"/>
 
-      <!--Step 5 will be to select a Creative Commons License-->
-      <step id="sediciCCLicense"/>
+      <!--Step 5 will be to select a License-->
+      <step id="sediciAdministratorCCLicense"/>
       
       <!--Step 6 cagará datos fijos en el item. No tendrá interface-->
       <step id="sediciAutomaticData"/>
