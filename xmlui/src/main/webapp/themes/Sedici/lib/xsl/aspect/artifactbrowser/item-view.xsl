@@ -369,6 +369,7 @@
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'relation-isPartOf'" />
 			<xsl:with-param name="elements" select="dim:field[@element='relation' and @qualifier='isPartOf']" />
+			<xsl:with-param name="mode" select="'DCSeriesNumber'"/>
 		</xsl:call-template>
 
 		<!-- relation.dossier row -->
@@ -508,6 +509,8 @@
 
 			
     </xsl:template>
+    
+
 
 	<!-- Renderiza un campo con su correspondiente label (solo si hay elementos para mostrar) -->
 	<xsl:template name="render-normal-field">
@@ -516,6 +519,7 @@
 		<xsl:param name="separator" select="'; '"/>
 		<xsl:param name="type" select="'text'"/>
 		<xsl:param name="acotar"/>
+		<xsl:param name="mode" select="normal"/>
 		
 		<!-- Generamos salida solo si hay algun elemento para mostrar -->
 		<xsl:if test="count($elements) &gt; 0">
@@ -533,6 +537,7 @@
 					<xsl:with-param name="separator" select="$separator"/>
 					<xsl:with-param name="type" select="$type"/>
 					<xsl:with-param name="acotar" select="$acotar"/>
+					<xsl:with-param name="mode" select="$mode"/>
 				</xsl:call-template>
 	
 			</div>
@@ -546,6 +551,7 @@
 		<xsl:param name="separator"/>
 		<xsl:param name="type"/>
 		<xsl:param name="acotar"/>
+		<xsl:param name="mode"/>
 
 		<span class="metadata-value">
 		    
@@ -587,8 +593,11 @@
 				<xsl:when test="$type='i18n-code'">
 					<i18n:text>xmlui.dri2xhtml.METS-1.0.code-value-<xsl:value-of select="$elements[$index]"/></i18n:text>
 				</xsl:when>
+				<xsl:when test="$mode='DCSeriesNumber'">
+			         	<xsl:value-of select="substring-before($elements[$index], ';')" disable-output-escaping="yes"/>; <xsl:value-of select="substring-after($elements[$index], ';')" disable-output-escaping="yes"/>
+			    </xsl:when>
 				<xsl:otherwise>
-					<xsl:value-of select="$elements[$index]" disable-output-escaping="yes"/>
+					<xsl:value-of select="$mode"/><xsl:value-of select="$elements[$index]" disable-output-escaping="yes"/>
 				</xsl:otherwise>
 			</xsl:choose>
 			
@@ -602,6 +611,7 @@
 				<xsl:with-param name="separator" select="$separator"/>
 				<xsl:with-param name="type" select="$type"/>
 				<xsl:with-param name="acotar" select="$acotar"/>
+				<xsl:with-param name="mode" select="$mode"/>
 			</xsl:call-template>
 		</xsl:if>
 	</xsl:template>
