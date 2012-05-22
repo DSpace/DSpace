@@ -85,7 +85,7 @@ public class ReviewRequiredAction extends ProcessingAction{
 	    // TODO: make this configurable for each journal
 	    DCValue journals[] = wfi.getItem().getMetadata("prism", "publicationName", null, Item.ANY);
 	    String journalName =  (journals.length >= 1) ? journals[0].value : null;
-	    if(journalName !=null && !journalName.equals("Evolution")) {
+	    if(journalName !=null && !journalName.equals("Evolution") && !journalName.equals("Evolution*")) {
 		email.send();
 	    }
         } catch (MessagingException e) {
