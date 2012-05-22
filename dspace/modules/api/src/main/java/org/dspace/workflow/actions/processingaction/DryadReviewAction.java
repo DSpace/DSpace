@@ -128,7 +128,7 @@ public class DryadReviewAction extends ProcessingAction {
         try {
 	    // Send the email -- Unless the journal is Evolution
 	    // TODO: make this configurable for each journal
-	    DCValue journals[] = wfi.getItem.getMetadata("prism", "publicationName", null, Item.ANY);
+	    DCValue journals[] = wfi.getItem().getMetadata("prism", "publicationName", null, Item.ANY);
 	    String journalName =  (journals.length >= 1) ? journals[0].value : null;
 
 	    if(journalName !=null && !journalName.equals("Evolution")) {
