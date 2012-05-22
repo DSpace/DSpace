@@ -2078,7 +2078,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
     
     <message key="xmlui.administrative.CurateForm.title">Tareas de preservación del sistema</message>
     <message key="xmlui.administrative.CurateForm.trail">Tareas de preservación</message>
-    <message key="xmlui.administrative.CurateForm.object_label_name">Handle de objeto de DSpace</message>
+    <message key="xmlui.administrative.CurateForm.object_label_name">Handle de objeto de SeDiCI</message>
     <message key="xmlui.administrative.CurateForm.object_hint">Nota: Ingrese [prefijo del handle]/0 para aplicar la tarea a través de todo el sitio (tenga en cuenta que no todas las tareas pueden aceptar esto). Pude aplicarse a todo el sitio, a una comunidad o una colección</message>
     <message key="xmlui.administrative.CurateForm.task_label_name">Tarea</message>
     <message key="xmlui.administrative.CurateForm.taskgroup_label_name">Elija de entre los siguientes grupos</message>
