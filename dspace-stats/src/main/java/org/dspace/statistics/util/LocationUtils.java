@@ -123,7 +123,7 @@ public class LocationUtils
         }
         catch (MissingResourceException e)
         {
-            logger.error("No continent code " + continentCode + "in bundle "
+            logger.error("No continent code " + continentCode + " in bundle "
                     + names.getLocale().getDisplayName());
             return I18nUtil
                     .getMessage("org.dspace.statistics.util.LocationUtils.unknown-continent");
