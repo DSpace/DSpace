@@ -729,7 +729,7 @@
         <xsl:variable name="sequence" select="substring-after(mets:FLocat[@LOCTYPE='URL']/@xlink:href, '?')"/>
         
         <xsl:variable name="link">
-            <xsl:value-of select="substring-before(mets:FLocat[@LOCTYPE='URL']/@xlink:href, $context/@OBJID)"/><xsl:value-of select="$context/@OBJID"/>/<xsl:value-of select="$documentTitle"/>.<xsl:value-of select="$extension"/>?<xsl:value-of select="$sequence"/>
+           <xsl:value-of select="substring-before(mets:FLocat[@LOCTYPE='URL']/@xlink:href, substring-after($context/@ID, ':'))"/><xsl:value-of select="substring-after($context/@ID, ':')"/>/<xsl:value-of select="$documentTitle"/>.<xsl:value-of select="$extension"/>?<xsl:value-of select="$sequence"/>
         </xsl:variable>
 
         <div class="file-wrapper clearfix">

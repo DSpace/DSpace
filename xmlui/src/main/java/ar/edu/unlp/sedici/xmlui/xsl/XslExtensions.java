@@ -6,6 +6,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.validation.Path.Node;
 import javax.xml.parsers.DocumentBuilder;
@@ -107,5 +110,20 @@ public class XslExtensions {
 		url=url.replace("'", "_"); 	
  
 		return url;
+	}
+	
+	public static boolean matches(String cadena, String regex) throws PatternSyntaxException{
+		//handle/\d+/\d+/submit(.*)
+		if (regex!=null && !regex.equals("")){
+			if (cadena!=null && !cadena.equals("")){
+				Pattern patron=Pattern.compile(regex);
+				Matcher match=patron.matcher(cadena);		
+				return match.matches();
+			} else {
+				return false;
+			}
+		} else {
+			throw new PatternSyntaxException("El patrón de matcheo no está correctamente estructurado", regex, -1);
+		}
 	}
 }
