@@ -2106,7 +2106,8 @@ display:none;
 }
 
 #submit_subscriptions_add,
-.ds-add-button {
+.ds-add-button,
+#aspect_submission_StepTransformer_field_submit_upload.ds-button-field {
 font-size:16px;
 background-image:url(../../images/add.png);
 height:20px;
@@ -2119,7 +2120,10 @@ margin-left:8px;
 
 }
 
-.ds-add-button:hover {
+
+
+.ds-add-button:hover,
+#aspect_submission_StepTransformer_field_submit_upload.ds-button-field:hover  {
 color:#87a06e;
 background-color:none;
 background-image:url(../../images/add_verde.png);
@@ -3210,6 +3214,11 @@ h1.communities_header {
 }
 .ui-tabs-nav .tab.ui-state-hover {
 	border-color: black !important;
+}
+
+#redesSociales {
+text-align:center;
+margin-bottom:10px;
 }
 
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
