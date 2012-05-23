@@ -171,14 +171,14 @@
 			</img>
 						
 			<map name="Map">
-			<area title="RSS" alt="RSS - Sedici" coords="4,22,69,74" shape="rect" >
+			<area title="RSS" alt="RSS - Sedici" coords="4,0,69,74" shape="rect" >
 			<xsl:attribute name="href">
 				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='feed_site' and @qualifier='atom+xml']" />
 			</xsl:attribute>
 			</area>
-			<area target="_blank" title="Twitter" alt="Twitter - Sedici" href="http://twitter.com/sedici_unlp" coords="72,22,136,74" shape="rect" />
-			<area title="Blog" alt="Blog- Sedici" href="http://sedici.unlp.edu.ar/blog/" target="_blank" coords="139,22,195,74" shape="rect" />
-			<area target="_blank" title="Facebook" alt="Facebook - Sedici" href="http://www.facebook.com/home.php#!/pages/SeDiCI/106194779404955?ref=ts" coords="198,22,266,74" shape="rect" />
+			<area target="_blank" title="Twitter" alt="Twitter - Sedici" href="http://twitter.com/sedici_unlp" coords="72,0,136,74" shape="rect" />
+			<area title="Blog" alt="Blog- Sedici" href="http://sedici.unlp.edu.ar/blog/" target="_blank" coords="139,0,195,74" shape="rect" />
+			<area target="_blank" title="Facebook" alt="Facebook - Sedici" href="http://www.facebook.com/home.php#!/pages/SeDiCI/106194779404955?ref=ts" coords="198,0,266,74" shape="rect" />
 			</map>
 						</div>
     </xsl:template>
