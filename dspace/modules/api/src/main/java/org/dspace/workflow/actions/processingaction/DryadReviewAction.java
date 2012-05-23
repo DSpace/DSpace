@@ -131,9 +131,12 @@ public class DryadReviewAction extends ProcessingAction {
 	    DCValue journals[] = wfi.getItem().getMetadata("prism", "publicationName", null, Item.ANY);
 	    String journalName =  (journals.length >= 1) ? journals[0].value : null;
 	    if(journalName !=null && !journalName.equals("Evolution") && !journalName.equals("Evolution*")) {
+		log.debug("sending submit_datapackage_confirm");
 		email.send();
+	    } else {
+		log.debug("skipping submit_datapackage_confirm; journal is " + journalName);
 	    }
-        } catch (MessagingException e) {
+	} catch (MessagingException e) {
             log.error(LogManager.getHeader(c, "Error while email submitter about approved submission", "WorkflowItemId: " + wfi.getID()), e);
         }
     }

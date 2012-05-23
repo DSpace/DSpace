@@ -154,6 +154,10 @@
 	  <level value="DEBUG"/>
 	</logger>     
 
+	<logger name="org.dspace.workflow.actions.processingaction">
+	  <level value="DEBUG"/>
+	</logger>     
+
 	<!-- Add appenders you want live here -->
 	<root>
 		<level value="WARN"/>
