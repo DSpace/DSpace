@@ -547,4 +547,34 @@
     <xsl:template match="dri:objectMeta" />
     <xsl:template match="dri:repositoryMeta" />
     -->
+
+    <!--
+        This variable contains a link to SFX or a SFX button (link with an image).
+        Relies on sfx.server.url and sfx.server.image_url in the config file, which are transferred in dri:pageMeta.
+    -->
+    <xsl:variable name="SFXLink">
+        <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='sfx'][@qualifier='server']">
+            <a>
+                <xsl:attribute name="href">
+                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='sfx'][@qualifier='server']"/>
+                </xsl:attribute>
+                <xsl:choose>
+                    <xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='sfx'][@qualifier='image_url']">
+                        <img>
+                            <xsl:attribute name="src">
+                                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='sfx'][@qualifier='image_url']"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="alt">
+                                <xsl:text>Find Full text</xsl:text>
+                            </xsl:attribute>
+                        </img>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text>Find Full text</xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </a>
+        </xsl:if>
+    </xsl:variable>
+    
 </xsl:stylesheet>

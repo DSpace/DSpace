@@ -40,6 +40,7 @@
         <xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim"
         mode="itemSummaryView-DIM"/>
 
+        <xsl:copy-of select="$SFXLink" />
         <!-- Generate the bitstream information from the file section -->
         <xsl:choose>
             <xsl:when test="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']">
@@ -316,6 +317,7 @@
             </xsl:attribute>
             &#xFEFF; <!-- non-breaking space to force separating the end tag -->
         </span>
+        <xsl:copy-of select="$SFXLink" />
     </xsl:template>
 
     <xsl:template match="dim:field" mode="itemDetailView-DIM">
