@@ -73,6 +73,10 @@ select {
 	margin-right:20px;
 }
 
+.image-link a{
+color:red;
+}
+
 select.multiple {
     height: auto;
 }
@@ -84,7 +88,7 @@ select.multiple {
 	background-image:url(../../images/marca_head4.png);
 	height:110px;
 	background-repeat:no-repeat;
-	background-position: -750px -42px;
+	background-position: -750px -41px;
 /*	border-bottom: 10px solid #144961;*/
 }
 
@@ -143,7 +147,7 @@ background-image:url(../../images/marca_head3.png);
 /*	background-image:url(../../images/trail.png);*/
 /*	background-position:100px -10px;*/
 	border-bottom:1px dashed #dedede;
-	background-position:-750px -182px;
+	background-position:-750px -181px;
 
 }
 
@@ -548,6 +552,8 @@ ul.ds-progress-list li.current input.ds-button-field,
     border: none;
 	padding:5px;
 	color:white;
+	-moz-border-radius:5px;
+	padding:5px 8px;
 }
 
 ul.ds-progress-list li.disabled input.ds-button-field
@@ -1679,7 +1685,7 @@ div
 	font: 13px Tahoma, Sans-serif; 
 	left: -30px;
 	background-image:url(../../images/marca_head4.png);
-	background-position:-750px -152px;
+	background-position:-750px -150px;
 /*	background-repeat:repeat-x;*/
 }
 #topNav ul { 
@@ -1896,8 +1902,8 @@ aspect_eperson_EditProfile_field_phone,
 #aspect_discovery_CollectionSearch_field_query,
 #aspect_submission_StepTransformer_field_dc_title,
 #aspect_submission_StepTransformer_field_sedici_title_subtitle,
-#aspect_submission_StepTransformer_field_sedici_creator_person
-
+#aspect_submission_StepTransformer_field_sedici_creator_person,
+#aspect_eperson_StartRegistration_field_email
 {
 background-image:url(../../images/busqueda.png);
 /*border-bottom:1 px solid #dedede;*/
@@ -2016,7 +2022,8 @@ border-right:1px solid #dedede;
 #aspect_administrative_community_CreateCommunityForm_field_submit_save,
 #aspect_administrative_WithdrawnItems_field_update,
 #aspect_administrative_group_DeleteGroupsConfirm_field_submit_confirm,
-#aspect_xmlworkflow_admin_WorkflowOverviewTransformer_field_submit_submitter
+#aspect_xmlworkflow_admin_WorkflowOverviewTransformer_field_submit_submitter,
+#aspect_eperson_StartRegistration_field_submit
  {
 margin-top:10px;
 background-image:url(../../images/ok_gris.png);
@@ -2032,7 +2039,8 @@ background-color:white;
 #aspect_administrative_community_CreateCommunityForm_field_submit_save:hover,
 #aspect_administrative_WithdrawnItems_field_update:hover,
 #aspect_administrative_group_DeleteGroupsConfirm_field_submit_confirm:hover,
-#aspect_xmlworkflow_admin_WorkflowOverviewTransformer_field_submit_submitter:hover
+#aspect_xmlworkflow_admin_WorkflowOverviewTransformer_field_submit_submitter:hover,
+#aspect_eperson_StartRegistration_field_submit:hover
 {
 margin-top:10px;
 background-image:url(../../images/ok.png);
@@ -2303,7 +2311,7 @@ display:inline;
 }
 
 .artifact-description-community a, .artifact-description-collection a {
-color:#e27b2a;
+color:#607890;
 }
 
 .ocultador {
@@ -2339,6 +2347,15 @@ height:50px;
 
 h2.ds-head {
 display:none;
+}
+
+h2.ds-head-visible{
+display:block;
+}
+
+#aspect_eperson_EditProfile_div_information h2.ds-head {
+color:green;
+display:block;
 }
 
 #aspect_discovery_SimpleSearch_div_general-query {
@@ -3157,22 +3174,24 @@ h1.communities_header {
 	font-size:16px;
 	color:#848484;
 	font-style:italic;
-	text-align: right;
+	text-align: center;
 }
 
 .ui-tabs-nav li.tab {
 	background: #FFFFFF;
 	color: #444444;
 	border: none !important;
-	border-bottom: solid 3px #444444 !important;
+	border-bottom: solid 3px #a4a4a4 !important;
 	padding-bottom: 0px !important;
 	width: 164px;
 }
 .ui-tabs-nav li.tab a {
 	width: 136px;
+	color:#a4a4a4;
+
 }
 .ui-tabs-nav li.tab a:hover {
-	color: #444444;
+	color: black;
 }
 .ui-tabs-nav li.tab.ui-tabs-selected a:hover {
 	color: #E27B2A;
@@ -3190,7 +3209,7 @@ h1.communities_header {
 	color: #444444;
 }
 .ui-tabs-nav .tab.ui-state-hover {
-	border-color: #E27B2A !important;
+	border-color: black !important;
 }
 
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
