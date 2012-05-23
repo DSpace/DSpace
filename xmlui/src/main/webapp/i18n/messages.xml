@@ -2232,9 +2232,9 @@
 <message key="sedici.comunidades.libros.info">Digitized books and e-books</message>
 <message key="sedici.comunidades.eventos.nombre">Events</message>
 <message key="sedici.comunidades.eventos.info">Congress y conference publications</message>
-<message key="sedici.comunidades.tesis.embargo">Documento Embargado</message>
-<message key="sedici.noticias.head">Noticias</message>
-<message key="sedici.noticias.titulo">Lista de noticias</message>
+<message key="sedici.comunidades.tesis.embargo">Embargoed document</message>
+<message key="sedici.noticias.head">News</message>
+<message key="sedici.noticias.titulo">News list</message>
 
 
 

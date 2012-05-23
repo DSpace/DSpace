@@ -52,7 +52,7 @@
     <!--handles the rendering of a single item in a list in file mode-->
     <xsl:template match="dri:div[@id='ar.edu.unlp.sedici.aspect.news.ShowNews.div.feed']">
 
-         	<h1><xsl:value-of select='dri:head'/></h1>
+         	<h1><xsl:copy-of select='dri:head'/></h1>
          	 <xsl:for-each select="dri:list[@id='ar.edu.unlp.sedici.aspect.news.ShowNews.list.news']">
                 <xsl:call-template name="noticias"/>
             </xsl:for-each>
