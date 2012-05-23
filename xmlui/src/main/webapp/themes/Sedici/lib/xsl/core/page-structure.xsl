@@ -147,8 +147,7 @@
                             <p>
                                 <a>
                                     <xsl:attribute name="href">
-                                        <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
-                                        dri:metadata[@element='identifier' and @qualifier='loginURL']"/>
+                                        <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='loginURL']"/>
                                     </xsl:attribute>
                                     <i18n:text>xmlui.dri2xhtml.structural.login</i18n:text>
                                 </a>
@@ -163,11 +162,11 @@
           <xsl:template name="buildRedesSociales">
     		<div id="redesSociales">
 			<img width="274" height="72" border="0" usemap="#Map">
-						    			<xsl:attribute name="src">
-						    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-						    			   	<xsl:text>/themes/Sedici/images/redes3.png</xsl:text>
-						    			</xsl:attribute>
-							  		</img>
+				<xsl:attribute name="src">
+					<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+					<xsl:text>/themes/Sedici/images/redes3.png</xsl:text>
+				</xsl:attribute>
+			</img>
 						
 			<map name="Map">
 			<area title="RSS" alt="RSS - Sedici" coords="4,22,69,74" shape="rect" >
@@ -211,7 +210,6 @@
 				    			<xsl:attribute name="src">
 				    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
 				    				<xsl:text>/themes/Sedici/images/img1.png</xsl:text>
-				    				
 				    			</xsl:attribute>
 				  			</img>
 			  			</a>
@@ -223,7 +221,6 @@
 			    			<xsl:attribute name="src">
 			    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
 			    				<xsl:text>/themes/Sedici/images/img2.png</xsl:text>
-			    				
 			    			</xsl:attribute>
 				  		</img>
 		  			</a>
@@ -290,8 +287,6 @@
 	                    <xsl:text>/</xsl:text>
 	                    <xsl:value-of select="."/>
 	                </xsl:attribute>&#160;</script>
-
-
         </xsl:for-each>
 
         <!-- add "shared" javascript from static, path is relative to webapp root-->
@@ -317,8 +312,7 @@
                 <xsl:when test="not(starts-with(text(), 'static/js/scriptaculous'))">
                     <script type="text/javascript">
                         <xsl:attribute name="src">
-                            <xsl:value-of
-                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                            <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                             <xsl:text>/</xsl:text>
                             <xsl:value-of select="."/>
                         </xsl:attribute>&#160;</script>

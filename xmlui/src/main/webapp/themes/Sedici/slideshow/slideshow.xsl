@@ -65,13 +65,12 @@
 				<a target="_blank">
 	    			<xsl:attribute name="href">
 	    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-	    				/pages/informacionTesistas
+	    				<xsl:text>/pages/informacionTesistas</xsl:text>
 	    			</xsl:attribute>
 		    		<img>
 		    			<xsl:attribute name="src">
 		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
 		    				<xsl:text>/themes/Sedici/images/img_slideshow_4.jpg</xsl:text>
-		    				
 		    			</xsl:attribute>
 		    		</img>
 				</a>
