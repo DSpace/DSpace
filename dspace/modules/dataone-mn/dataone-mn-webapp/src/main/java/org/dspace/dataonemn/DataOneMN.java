@@ -44,6 +44,7 @@ public class DataOneMN extends HttpServlet implements Constants {
     
     private String mySolr;
     
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Receives the HEAD HTTP call and passes off to the appropriate method.
      **/
@@ -141,6 +142,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	}
     }
     
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * We don't implement this yet.
      */
@@ -150,6 +152,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	aResp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
     }
     
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * We don't implement this yet.
      */
@@ -161,12 +164,14 @@ public class DataOneMN extends HttpServlet implements Constants {
     
     
     
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Receives the GET HTTP call and passes off to the appropriate method.
      **/
     @Override
     protected void doGet(HttpServletRequest aReq, HttpServletResponse aResp)
 	throws ServletException, IOException {
+
 	String reqPath = aReq.getPathInfo();
 	Context ctxt = null;
 	
@@ -195,83 +200,26 @@ public class DataOneMN extends HttpServlet implements Constants {
 
 
 	// handle (and remove) the version indicator
+	// TODO: throw an error for requests that do not have a version indicator -- need to notify potential users first
 	if(reqPath.startsWith("/v1")) {
 	    log.debug("version 1 detected, removing");
 	    reqPath = reqPath.substring("/v1".length());
 	}
-	// TODO: throw an error for requests that do not have a version indicator -- need to notify potential users first
 	
-	if(reqPath.equals("/") || reqPath.equals("/node")) {
-	    log.debug("getCapabilities");
+	if (reqPath.startsWith("/monitor/ping")) {
+	    ping(aResp);
+	}
+	else if(reqPath.equals("/") || reqPath.equals("/node")) {
 	    getCapabilities(aResp);
 	} else if(reqPath.startsWith("/object")) {			
 	    ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);
 	    
 	    try {
 		if (reqPath.equals("/object")) {
-		    // listObjects()
-		    String format = aReq.getParameter("objectFormat");
-		    Date from = parseDate(aReq, "startTime");
-		    Date to = parseDate(aReq, "endTime");
-		    
-		    int start = parseInt(aReq, "start",
-					 ObjectManager.DEFAULT_START);
-		    int count = parseInt(aReq, "count",
-					 ObjectManager.DEFAULT_COUNT);
-		    
-		    aResp.setContentType(XML_CONTENT_TYPE);
-		    
-		    if (count <= 0) {
-			OutputStream out = aResp.getOutputStream();
-			objManager.printList(from, to, format, out);
-		    }
-		    else {
-			OutputStream out = aResp.getOutputStream();
-			objManager.printList(start, count, from, to, format,
-					     out);
-		    }
+		    listObjects(aReq, aResp, objManager);
 		}
 		else if (reqPath.startsWith("/object/")) {
-		    String id = reqPath.substring("/object/".length());
-		    int lastSlashIndex = id.lastIndexOf("/");
-		    String format = id.substring(lastSlashIndex + 1);
-		    String name = id.substring(0, lastSlashIndex);
-		    String fileName = name.startsWith("doi:") ? name
-			.substring(4) : name;
-		    
-		    if (format.equals("dap")) {
-			aResp.setContentType(XML_CONTENT_TYPE);
-		    }
-		    else {
-			ServletContext context = getServletContext();
-			String mimeType = context.getMimeType("f." + format);
-			
-			if (mimeType == null || mimeType.equals("")) {
-			    mimeType = "application/octet-stream";
-			}
-			
-			log.debug("Setting data file MIME type to: "
-				  + mimeType + " (this is configurable)");
-			
-			// We need to check types supported here and add to it
-			aResp.setContentType(mimeType);
-			
-			// We want to download it if viewing in the browser
-			aResp.setHeader(
-					"Content-Disposition",
-					"attachment; filename=\""
-					+ fileName.replaceAll("[\\/|\\.]", "_")
-					+ "." + format + "\"");
-		    }
-		    
-		    try {
-			objManager.getObject(name, format,
-					     aResp.getOutputStream());
-		    }
-		    catch (NotFoundException details) {
-			aResp.sendError(HttpServletResponse.SC_NOT_FOUND, name
-					+ "." + format + " couldn't be found");
-		    }
+		    getObject(reqPath, aResp, objManager);
 		}
 		else {
 		    aResp.sendError(HttpServletResponse.SC_NOT_FOUND,
@@ -375,13 +323,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	else if (reqPath.startsWith("/log")) {
 	    aResp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
 	}
-	else if (reqPath.startsWith("/node")) {
-	    aResp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-	}
 	else if (reqPath.startsWith("/error")) {
-	    aResp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-	}
-	else if (reqPath.startsWith("/monitor/ping")) {
 	    aResp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
 	}
 	else if (reqPath.startsWith("/monitor/object")) {
@@ -410,6 +352,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	}
     }
     
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Initializes the DSpace context, so we have access to the DSpace objects.
      * Requires the location of the dspace.cfg file to be set in the web.xml.
@@ -426,13 +369,15 @@ public class DataOneMN extends HttpServlet implements Constants {
 		log.debug("DSpace config loaded from " + aConfig);
 	    }
 	    else if (!aConfig.exists()) {
-		throw new RuntimeException(aConfig.getAbsolutePath()
-					   + " doesn't exist");
+		log.fatal("dspace.cfg file at " + aConfig.getAbsolutePath() + " doesn't exist");
+		throw new RuntimeException(aConfig.getAbsolutePath() + " doesn't exist");
 	    }
 	    else if (!aConfig.canRead()) {
+		log.fatal("dspace.cfg file at " + aConfig.getAbsolutePath() + " cannot be read");
 		throw new RuntimeException("Can't read the dspace.cfg file");
 	    }
 	    else if (!aConfig.isFile()) {
+		log.fatal("dspace.cfg file at " + aConfig.getAbsolutePath() + " is not a file!");
 		throw new RuntimeException("Err, dspace.cfg isn't a file?");
 	    }
 	}
@@ -441,6 +386,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	mySolr = ConfigurationManager.getProperty("solr.dryad.server");
     }
     
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
     private int parseInt(HttpServletRequest aReq, String aParam, int aDefault) {
 	String intString = aReq.getParameter(aParam);
 	int intValue = aDefault;
@@ -457,6 +403,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	return intValue;
     }
     
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
        Parses a user-entered date. The date may appear in one of many common formats. If the date
        format is not recognized, null is returned.
@@ -507,11 +454,49 @@ public class DataOneMN extends HttpServlet implements Constants {
 	return null;
     }
 
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+       Performs a basic test that this Member Node is alive
+    **/
+    private void ping(HttpServletResponse response) throws IOException {
+	log.info("ping");
+
+	try {
+	    
+	} catch (Exception e) {
+	    // if there is any problem, respond with an error
+	    aResp.sendError(HttpServletResponse.SC_INTERNAL_SERVICE_ERROR);
+	    return;
+	}
+	
+	response.setContentType(XML_CONTENT_TYPE);
+	OutputStream out = response.getOutputStream();
+	PrintWriter pw = new PrintWriter(out);
+	
+	// basic node description
+	pw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n" +
+		 "<d1:node xmlns:d1=\"http://ns.dataone.org/service/types/v1\" replicate=\"true\" synchronize=\"true\" type=\"mn\" state=\"up\"> \n" +
+		 "<identifier>urn:node:DRYAD</identifier>\n" +
+		 "<name>Dryad Digital Repository</name>\n" +
+		 "<description>Dryad is an international repository of data underlying peer-reviewed articles in the basic and applied biosciences.</description>\n" +
+		 "<baseURL>https://datadryad.org/mn</baseURL>\n");
+
+    	// other random info
+	pw.write("<ping success=\"true\"/>\n" +
+		 "<subject>CN=urn:node:DRYAD, DC=dataone, DC=org</subject>\n" +
+		 "<contactSubject>CN=METACAT1, DC=dataone, DC=org</contactSubject>\n");
+
+	// close xml
+	pw.write("</d1:node>\n");
+    }
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
        Responds with the capabilities of this Member Node.
     **/
     private void getCapabilities(HttpServletResponse response) throws IOException {
-	log.info("getting capabilities");
+	log.info("getCapabilities()");
 	response.setContentType(XML_CONTENT_TYPE);
 	OutputStream out = response.getOutputStream();
 	PrintWriter pw = new PrintWriter(out);
@@ -551,5 +536,82 @@ public class DataOneMN extends HttpServlet implements Constants {
     
 	pw.close();
 		   
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+       List all objects available on this Member Node.
+    **/
+    private void listObjects(HttpServletRequest aReq, HttpServletResponse response, ObjectManager objManager) throws IOException {
+	log.info("listObjects()");
+	String format = aReq.getParameter("objectFormat");
+	Date from = parseDate(aReq, "startTime");
+	Date to = parseDate(aReq, "endTime");
+	
+	int start = parseInt(aReq, "start",
+			     ObjectManager.DEFAULT_START);
+	int count = parseInt(aReq, "count",
+			     ObjectManager.DEFAULT_COUNT);
+	
+	aResp.setContentType(XML_CONTENT_TYPE);
+	
+	if (count <= 0) {
+	    OutputStream out = aResp.getOutputStream();
+	    objManager.printList(from, to, format, out);
+	}
+	else {
+	    OutputStream out = aResp.getOutputStream();
+	    objManager.printList(start, count, from, to, format,
+				 out);
+	}
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+       Retrieve a particular object from this Member Node.
+    **/
+    private void getObject(String reqPath, HttpServletResponse response, ObjectManager objManager) throws IOException {
+	log.info("getObject()");
+	
+	String id = reqPath.substring("/object/".length());
+	int lastSlashIndex = id.lastIndexOf("/");
+	String format = id.substring(lastSlashIndex + 1);
+	String name = id.substring(0, lastSlashIndex);
+	String fileName = name.startsWith("doi:") ? name.substring(4) : name;
+	
+	if (format.equals("dap")) {
+	    aResp.setContentType(XML_CONTENT_TYPE);
+	}
+	else {
+	    ServletContext context = getServletContext();
+	    String mimeType = context.getMimeType("f." + format);
+	    
+	    if (mimeType == null || mimeType.equals("")) {
+		mimeType = "application/octet-stream";
+	    }
+	    
+	    log.debug("Setting data file MIME type to: "
+		      + mimeType + " (this is configurable)");
+			
+	    // We need to check types supported here and add to it
+	    aResp.setContentType(mimeType);
+	    
+	    // We want to download it if viewing in the browser
+	    aResp.setHeader(
+			    "Content-Disposition",
+			    "attachment; filename=\""
+			    + fileName.replaceAll("[\\/|\\.]", "_")
+			    + "." + format + "\"");
+	}
+	
+	try {
+	    objManager.getObject(name, format,
+				 aResp.getOutputStream());
+	}
+	catch (NotFoundException details) {
+	    aResp.sendError(HttpServletResponse.SC_NOT_FOUND, name
+			    + "." + format + " couldn't be found");
+	}
+	
     }
 }
