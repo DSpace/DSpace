@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
 public class ItemExportDownloadReader extends AbstractReader implements Recyclable
 {
 
-	/**
+     /**
      * Messages to be sent when the user is not authorized to view 
      * a particular bitstream. They will be redirected to the login
      * where this message will be displayed.
@@ -46,15 +46,15 @@ public class ItemExportDownloadReader extends AbstractReader implements Recyclab
 	private static final String AUTH_REQUIRED_MESSAGE = "xmlui.ItemExportDownloadReader.auth_message";
 	
     /**
-     * How big of a buffer should we use when reading from the bitstream before
-     * writting to the HTTP response?
+     * How big a buffer should we use when reading from the bitstream before
+     * writing to the HTTP response?
      */
     protected static final int BUFFER_SIZE = 8192;
 
     /**
      * When should a download expire in milliseconds. This should be set to
-     * some low value just to prevent someone hiting DSpace repeatily from
-     * killing the server. Note: 60000 milliseconds are in a second.
+     * some low value just to prevent someone hiting DSpace repeatedly from
+     * killing the server. Note: there are 60000 milliseconds in a minute.
      * 
      * Format: minutes * seconds * milliseconds
      */
@@ -110,9 +110,9 @@ public class ItemExportDownloadReader extends AbstractReader implements Recyclab
             	}
             	else{
 
-            		// The user does not have read access to this bitstream. Inturrupt this current request
+            		// The user does not have read access to this bitstream. Interrupt this current request
             		// and then forward them to the login page so that they can be authenticated. Once that is
-            		// successfull they will request will be resumed.
+            		// successful they will request will be resumed.
             		AuthenticationUtil.interruptRequest(objectModel, AUTH_REQUIRED_HEADER, AUTH_REQUIRED_MESSAGE, null);
 
             		// Redirect
@@ -127,7 +127,7 @@ public class ItemExportDownloadReader extends AbstractReader implements Recyclab
                 
                 
             // Success, bitstream found and the user has access to read it.
-            // Store these for later retreval:
+            // Store these for later retrieval:
             this.compressedExportInputStream = ItemExport.getExportDownloadInputStream(fileName, context.getCurrentUser());
             this.compressedExportSize = ItemExport.getExportFileSize(fileName);
             this.compressedExportName = fileName;
@@ -142,11 +142,11 @@ public class ItemExportDownloadReader extends AbstractReader implements Recyclab
     /**
 	 * Write the actual data out to the response.
 	 * 
-	 * Some implementation notes,
+	 * Some implementation notes:
 	 * 
-	 * 1) We set a short expires time just in the hopes of preventing someone
+	 * 1) We set a short expiration time just in the hopes of preventing someone
 	 * from overloading the server by clicking reload a bunch of times. I
-	 * realize that this is nowhere near 100% effective but it may help in some
+	 * Realize that this is nowhere near 100% effective but it may help in some
 	 * cases and shouldn't hurt anything.
 	 * 
 	 */

@@ -38,7 +38,7 @@
     <xsl:variable name="context-path" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
     
     <!--
-        Theme path represents the full path back to theme. This is usefull for
+        Theme path represents the full path back to theme. This is useful for
         accessing static resources such as images or javascript files. Simply
         prepend this variable and then add the file name, thus
         {$theme-path}/images/myimage.jpg will result in the full path from the
@@ -54,7 +54,7 @@
     <xsl:variable name="request-uri" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']"/>
     
     <!--
-    This style sheet will be written in several stages:
+    This stylesheet will be written in several stages:
         1. Establish all the templates that catch all the elements
         2. Finish implementing the XHTML output within the templates
         3. Figure out the special case stuff as well as the small details
@@ -447,7 +447,7 @@
     </xsl:template>
 
 
-    <!-- Like the header, the footer contains various miscellanious text, links, and image placeholders -->
+    <!-- Like the header, the footer contains various miscellaneous text, links, and image placeholders -->
     <xsl:template name="buildFooter">
         <div id="ds-footer">
             <i18n:text>xmlui.dri2xhtml.structural.footer-promotional</i18n:text>
@@ -468,7 +468,7 @@
                     <i18n:text>xmlui.dri2xhtml.structural.feedback-link</i18n:text>
                 </a>
             </div>
-            <!--Invisible link to HTML sitemap (for search engines) -->
+            <!-- Invisible link to HTML sitemap (for search engines) -->
             <a>
                 <xsl:attribute name="href">
                     <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
@@ -650,7 +650,7 @@
                         </xsl:if>
                     </fieldset>
                 </form>
-                <!--Only add if the advanced search url is different from the simple search-->
+                <!-- Only add if the advanced search url is different from the simple search -->
                 <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='search'][@qualifier='advancedURL'] != /dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='search'][@qualifier='simpleURL']">
                     <!-- The "Advanced search" link, to be perched underneath the search box -->
                     <a>
@@ -731,8 +731,8 @@
             </xsl:call-template>
             <xsl:choose>
                     <!--  does this element have any children -->
-                        <xsl:when test="child::node()">
-                                <xsl:apply-templates select="*[not(name()='head')]"/>
+                    <xsl:when test="child::node()">
+                        <xsl:apply-templates select="*[not(name()='head')]"/>
                     </xsl:when>
                         <!-- if no children are found we add a space to eliminate self closing tags -->
                         <xsl:otherwise>
@@ -781,11 +781,11 @@
                 <xsl:attribute name="enctype">multipart/form-data</xsl:attribute>
             </xsl:if>
             <xsl:attribute name="onsubmit">javascript:tSubmit(this);</xsl:attribute>
-                        <!--For Item Submission process, disable ability to submit a form by pressing 'Enter'-->
-                        <xsl:if test="starts-with(@n,'submit')">
-                                <xsl:attribute name="onkeydown">javascript:return disableEnterKey(event);</xsl:attribute>
+            <!--For Item Submission process, disable ability to submit a form by pressing 'Enter'-->
+            <xsl:if test="starts-with(@n,'submit')">
+                <xsl:attribute name="onkeydown">javascript:return disableEnterKey(event);</xsl:attribute>
             </xsl:if>
-                        <xsl:apply-templates select="*[not(name()='head')]"/>
+            <xsl:apply-templates select="*[not(name()='head')]"/>
           
         </form>
         <!-- JS to scroll form to DIV parent of "Add" button if jump-to -->
@@ -821,7 +821,7 @@
             <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-notice-div</xsl:with-param>
             </xsl:call-template>
-                <xsl:apply-templates />
+            <xsl:apply-templates />
         </div>
     </xsl:template>
     
@@ -1287,7 +1287,7 @@
                     <xsl:text>ds-form-item </xsl:text>
 
                 <!-- Row counting voodoo, meant to impart consistent row alternation colors to the form lists.
-                    Should probably be chnaged to a system that is more straitforward. -->
+                    Should probably be chnaged to a system that is more straightforward. -->
                 <xsl:choose>
                     <xsl:when test="(count(../../..//dri:item) - count(../../..//dri:list[@type='form'])) mod 2 = 0">
                         <!--<xsl:if test="count(../dri:item) > 3">-->
@@ -1393,10 +1393,10 @@
     <xsl:template match="dri:list[@type='form']/dri:label" priority="3">
                 <xsl:attribute name="class">
                 <xsl:text>ds-form-label</xsl:text>
-               <xsl:if test="@rend">
-                     <xsl:text> </xsl:text>
-                     <xsl:value-of select="@rend"/>
-                 </xsl:if>
+                <xsl:if test="@rend">
+                    <xsl:text> </xsl:text>
+                    <xsl:value-of select="@rend"/>
+                </xsl:if>
         </xsl:attribute>
         <xsl:choose>
                 <xsl:when test="following-sibling::dri:item[1]/dri:field/@id">
@@ -1722,7 +1722,7 @@
     
     
     
-    <!-- The hadling of the special case of instanced composite fields under "form" lists -->
+    <!-- The handling of the special case of instanced composite fields under "form" lists -->
     <xsl:template match="dri:field[@type='composite'][dri:field/dri:instance | dri:params/@operations]" mode="formComposite" priority="2">
         <xsl:variable name="confidenceIndicatorID" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
         <div class="ds-form-content">
@@ -2084,7 +2084,7 @@
         </xsl:choose>
     </xsl:template>
     
-    <!-- TODO: make this work? Maybe checkboxes and radio buttons should not be instanced... -->
+    <!-- TODO: make this work? Maybe checkboxes and radio buttons should not be instantiated... -->
     <xsl:template match="dri:field[@type='checkbox' or @type='radio']" mode="compositeField">
         <xsl:param name="position">1</xsl:param>
         <xsl:if test="not(position()=1)">
@@ -2163,11 +2163,11 @@
             file: An input control that allows the user to select files to be submitted with the form. Note that a form which uses a file field must use the multipart method.
             hidden: An input control that is not rendered on the screen and hidden from the user.
             password: A single-line text input control where the input text is rendered in such a way as to hide the characters from the user.
-            radio:  A boolean input control which may be toggled by the user. Multiple radio button fields may share the same name. When this occurs only one field may be selected to be true. This is distinct from a checkbox where multiple fields may be toggled.
+            radio:  A boolean input control which may be toggled by the user. Multiple radio button fields may share the same name. When this occurts, only one field may be selected to be true. This is distinct from a checkbox where multiple fields may be toggled.
             select: A menu input control which allows the user to select from a list of available options.
             text: A single-line text input control.
             textarea: A multi-line text input control.
-            composite: A composite input control combines several input controls into a single field. The only fields that may be combined together are: checkbox, password, select, text, and textarea. When fields are combined together they can posses multiple combined values.
+            composite: A composite input control combines several input controls into a single field. The only fields that may be combined together are: checkbox, password, select, text, and textarea. When fields are combined together they can possess multiple combined values.
     </xsl:template>
         -->
     
@@ -2229,7 +2229,7 @@
     <xsl:template match="dri:field" mode="normalField">
         <xsl:variable name="confidenceIndicatorID" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
         <xsl:choose>
-            <!-- TODO: this has changed drammatically (see form3.xml) -->
+            <!-- TODO: this has changed dramatically (see form3.xml) -->
                         <xsl:when test="@type= 'select'">
                                 <select>
                                     <xsl:call-template name="fieldAttributes"/>
@@ -2242,7 +2242,7 @@
                                     
                                     <!--
                                         if the cols and rows attributes are not defined we need to call
-                                        the tempaltes for them since they are required attributes in strict xhtml
+                                        the templates for them since they are required attributes in strict xhtml
                                      -->
                                     <xsl:choose>
                                         <xsl:when test="not(./dri:params[@cols])">
@@ -2311,7 +2311,7 @@
               </xsl:choose>
             </xsl:when>
 
-            <!-- This is changing drammatically -->
+            <!-- This is changing dramatically -->
             <xsl:when test="@type= 'checkbox' or @type= 'radio'">
                 <fieldset>
                     <xsl:call-template name="standardAttributes">
@@ -2513,7 +2513,7 @@
     
     
     
-    <!-- Help elementns are turning into tooltips. There might be a better way tot do this -->
+    <!-- Help elementns are turning into tooltips. There might be a better way to do this -->
     <xsl:template match="dri:help">
         <xsl:attribute name="title"><xsl:value-of select="."/></xsl:attribute>
         <xsl:if test="i18n:text">
@@ -2522,7 +2522,7 @@
     </xsl:template>
     
     <xsl:template match="dri:help" mode="help">
-        <!--Only create the <span> if there is content in the <dri:help> node-->
+        <!-- Only create the <span> if there is content in the <dri:help> node -->
         <xsl:if test="./text() or ./node()">
             <span class="field-help">
                 <xsl:apply-templates />
@@ -2832,34 +2832,34 @@
         
         sections:
         
-        A comma seperated list of METS sections to included. The possible values are: "metsHdr", "dmdSec",
+        A comma-separated list of METS sections to included. The possible values are: "metsHdr", "dmdSec",
         "amdSec", "fileSec", "structMap", "structLink", "behaviorSec", and "extraSec". If no list is provided then *ALL*
         sections are rendered.
         
         
         dmdTypes:
         
-        A comma seperated list of metadata formats to provide as descriptive metadata. The list of avaialable metadata
+        A comma-separated list of metadata formats to provide as descriptive metadata. The list of avaialable metadata
         types is defined in the dspace.cfg, disseminationcrosswalks. If no formats are provided them DIM - DSpace
         Intermediate Format - is used.
         
         
         amdTypes:
         
-        A comma seperated list of metadata formats to provide administative metadata. DSpace does not currently
+        A comma-separated list of metadata formats to provide administative metadata. DSpace does not currently
         support this type of metadata.
         
         
         fileGrpTypes:
         
-        A comma seperated list of file groups to render. For DSpace a bundle is translated into a METS fileGrp, so
+        A comma-separated list of file groups to render. For DSpace a bundle is translated into a METS fileGrp, so
         possible values are "THUMBNAIL","CONTENT", "METADATA", etc... If no list is provided then all groups are
         rendered.
         
         
         structTypes:
         
-        A comma seperated list of structure types to render. For DSpace there is only one structType: LOGICAL. If this
+        A comma-separated list of structure types to render. For DSpace there is only one structType: LOGICAL. If this
         is provided then the logical structType will be rendered, otherwise none will. The default operation is to
         render all structure types.
     -->
@@ -2869,7 +2869,7 @@
         <xsl:variable name="externalMetadataURL">
             <xsl:text>cocoon:/</xsl:text>
             <xsl:value-of select="@url"/>
-            <!-- Since this is a summary only grab the descriptive metadata, and the thumbnails -->
+            <!-- Since this is a summary only, grab the descriptive metadata, and the thumbnails -->
             <xsl:text>?sections=dmdSec,fileSec&amp;fileGrpTypes=THUMBNAIL</xsl:text>
             <!-- An example of requesting a specific metadata standard (MODS and QDC crosswalks only work for items)->
             <xsl:if test="@type='DSpace Item'">
@@ -3441,15 +3441,15 @@
         </xsl:for-each>
     </xsl:template>
 
-    <!--Template for the bitstream reordering-->
+    <!-- Template for the bitstream reordering -->
     <xsl:template match="dri:cell[starts-with(@id, 'aspect.administrative.item.EditItemBitstreamsForm.cell.bitstream_order_')]" priority="2">
         <td>
             <xsl:call-template name="standardAttributes"/>
             <xsl:apply-templates select="*[not(@type='button')]" />
-            <!--A div that will indicate the old & the new order-->
+            <!-- A div that will indicate the old & the new order -->
             <div>
                 <span>
-                    <!--Give this one an ID so that the javascript can change his value-->
+                    <!-- Give this one an ID so that the javascript can change his value -->
                     <xsl:attribute name="id">
                         <xsl:value-of select="dri:field/@id"/>
                         <xsl:text>_new</xsl:text>

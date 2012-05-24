@@ -4,7 +4,6 @@
    <artifactId>dspace-jspui-api</artifactId>
    <name>DSpace JSP-UI :: API and Implementation</name>
    <packaging>jar</packaging>
-   <url>http://projects.dspace.org/dspace-jspui/dspace-jspui-api</url>
    <description>Libraries for DSpace JSP Based Webapplication</description>
 
    <!-- 
@@ -17,17 +16,6 @@
       <version>3.0-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
-
-   <!-- 
-      The Subversion repository location is used by Continuum to update against
-      when changes have occured, this spawns a new build cycle and releases snapshots
-      into the snapshot repository below.
-   -->
-   <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-jspui/dspace-jspui-api</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-jspui/dspace-jspui-api</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-jspui/dspace-jspui-api</url>
-   </scm>
 
    <dependencies>
       <dependency>

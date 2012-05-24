@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace</groupId>
@@ -5,39 +6,49 @@
    <packaging>pom</packaging>
    <version>3.0-SNAPSHOT</version>
    <name>DSpace Parent Project</name>
-   <url>http://projects.dspace.org</url>
+   <url>https://github.com/dspace/DSpace</url>
 
    <organization>
       <name>DuraSpace</name>
       <url>http://www.dspace.org</url>
    </organization>
 
+    <!-- brings the sonatype snapshot repository and signing requirement on board -->
     <parent>
-        <artifactId>dspace-pom</artifactId>
-        <groupId>org.dspace</groupId>
-        <version>12</version>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
     </parent>
 
-    <!--
-    <repositories>
-        <repository>
-            <id>sonatype-nexus-releases</id>
-            <name>Sonatype Nexus Releases</name>
-            <url>
-                https://oss.sonatype.org/content/repositories/releases
-            </url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-    -->
+    <!--Force UTF-8 encoding during build on all platforms-->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <build>
       <plugins>
+           <plugin>
+                <!-- DSpace requires Java 1.6 or higher -->
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+         </plugin>
          <plugin>
             <artifactId>maven-release-plugin</artifactId>
             <!-- Because of below bug, we are forced to use version 2.0-beta-9
@@ -72,13 +83,22 @@
                      http://jira.codehaus.org/browse/MNG-2742
                      Once the bug is fixed, we should put open-ended range in dspace-pom -->
                 <version>2.1.1</version>
-         </plugin>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.2.1</version>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <phase>generate-test-resources</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
@@ -94,9 +114,59 @@
                 </executions>
                 <inherited>false</inherited>
             </plugin>
+            <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <version>1.9.0</version>
+                <configuration>
+                    <!-- external and absolute URL for use in external addon builds -->
+                    <header>https://raw.github.com/DSpace/DSpace/master/LICENSE_HEADER</header>
+                    <!--Just check headers of everything in the /src directory -->
+                    <includes>
+                        <include>src/**</include>
+                    </includes>
+                    <!--Use all default exclusions for IDE files & Maven files, see: 
+                        http://code.google.com/p/maven-license-plugin/wiki/Configuration#Default_excludes -->
+                    <useDefaultExcludes>true</useDefaultExcludes>
+                    <!-- Add some default DSpace exclusions not covered by <useDefaultExcludes> 
+                         Individual Maven projects may choose to override these defaults. -->
+                    <excludes>
+                        <exclude>**/src/test/resources/**</exclude>
+                        <exclude>**/src/test/data/**</exclude>
+                        <exclude>**/META-INF/**</exclude>
+                        <exclude>**/robots.txt</exclude>
+                        <exclude>**/*.LICENSE</exclude>
+                        <exclude>**/LICENSE*</exclude>
+                        <exclude>**/README*</exclude>
+                        <exclude>**/readme*</exclude>
+                        <exclude>**/.gitignore</exclude>
+                    </excludes>
+                    <mapping> 
+                        <!-- Custom DSpace file extensions which are not recognized by maven-release-plugin: 
+                             *.xmap, *.xslt, *.wsdd, *.wsdl, *.LICENSE -->
+                        <xmap>XML_STYLE</xmap>
+                        <xslt>XML_STYLE</xslt>
+                        <wsdd>XML_STYLE</wsdd>
+                        <wsdl>XML_STYLE</wsdl>
+                        <LICENSE>TEXT</LICENSE>
+                    </mapping>  
+                    <encoding>UTF-8</encoding>
+                    <!-- maven-license-plugin recommends a strict check (e.g. check spaces/tabs too) -->
+                    <strictCheck>true</strictCheck>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>check-headers</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
       </plugins>
    </build>
-
+   
    <profiles>
 
       <!--
@@ -293,12 +363,12 @@
                      <execution>
                         <inherited>false</inherited>
                         <configuration>
-                           <descriptorRefs>
-                              <descriptorRef>release</descriptorRef>
-                              <descriptorRef>src-release</descriptorRef>
-                           </descriptorRefs>
+                           <descriptors>
+                              <descriptor>src/main/assembly/release.xml</descriptor>
+                              <descriptor>src/main/assembly/src-release.xml</descriptor>
+                           </descriptors>
                            <tarLongFileMode>gnu</tarLongFileMode>
-                           <finalName>dspace-${pom.version}</finalName>
+                           <finalName>dspace-${project.version}</finalName>
                         </configuration>
                         <phase>package</phase>
                         <goals>
@@ -306,13 +376,6 @@
                         </goals>
                      </execution>
                   </executions>
-                  <dependencies>
-                     <dependency>
-                        <groupId>org.dspace.maven.plugins</groupId>
-                        <artifactId>dspace-assembly-plugin</artifactId>
-                        <version>1.2</version>
-                     </dependency>
-                  </dependencies>
                </plugin>
             </plugins>
          </build>
@@ -825,7 +888,7 @@
             <url>http://scm.dspace.org/svn/repo/licenses/LICENSE.txt</url>
             <distribution>repo</distribution>
         <comments>
-            A BSD compatable OSS license for the DSpace codebase.
+            A BSD-compatible OSS license for the DSpace codebase.
          </comments>
       </license>
     </licenses>
@@ -1087,9 +1150,19 @@
       snapshots into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/trunk</url>
+      <connection>scm:git:git@github.com:dspace/DSpace.git</connection>
+      <developerConnection>scm:git:git@github.com:dspace/DSpace</developerConnection>
+      <url>git@github.com:dspace/DSpace</url>
    </scm>
 
+    <!--
+        Distribution Management is currently used by the Continuum
+        server to update snapshots it generates. This will also be used
+        on release to deploy release versions to the repository by the
+        release manager.
+    -->
+    <distributionManagement>
+        <!-- further distribution management is found upstream in the sonatype parent -->
+    </distributionManagement>
+    
 </project>

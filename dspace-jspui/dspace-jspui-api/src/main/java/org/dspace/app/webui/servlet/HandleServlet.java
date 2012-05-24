@@ -177,7 +177,7 @@ public class HandleServlet extends DSpaceServlet
                     if (modSince != -1 && item.getLastModified().getTime() < modSince)
                     {
                         // Item has not been modified since requested date,
-                        // hence bitstream has not; return 304
+                        // hence bitstream has not been, either; return 304
                         response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
                     }
                     else
@@ -380,7 +380,7 @@ public class HandleServlet extends DSpaceServlet
         boolean suggestEnable = false;
         if (!ConfigurationManager.getBooleanProperty("webui.suggest.enable"))
         {
-            // do nothing, the suggestLink is allready set to false 
+            // do nothing, the suggestLink is already set to false 
         }
         else
         {

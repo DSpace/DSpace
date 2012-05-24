@@ -430,11 +430,11 @@ public final class BitstreamInfoDAO extends DAOSupport
     }
 
     /**
-     * Returns the oldest bistream that in the set of bitstreams that are less
+     * Returns the oldest bitstream that in the set of bitstreams that are less
      * than the specified date. If no bitstreams are found -1 is returned.
      * 
      * @param lessThanDate
-     * @return id of olded bitstream or -1 if not bistreams are found
+     * @return id of olded bitstream or -1 if not bitstreams are found
      */
     public int getOldestBitstream(Timestamp lessThanDate)
     {

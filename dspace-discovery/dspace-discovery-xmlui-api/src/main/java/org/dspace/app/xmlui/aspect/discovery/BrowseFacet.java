@@ -126,7 +126,7 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
                     validity.add(dso);
                 }
 
-                // add reciently submitted items, serialize solr query contents.
+                // add recently submitted items, serialize solr query contents.
                 DiscoverResult response = getQueryResponse(dso);
 
                 validity.add("numFound:" + response.getDspaceObjects().size());

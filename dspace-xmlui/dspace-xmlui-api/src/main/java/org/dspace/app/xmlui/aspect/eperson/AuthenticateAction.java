@@ -31,7 +31,7 @@ import org.dspace.eperson.EPerson;
  * This action uses the http parameters of login_email, login_password, and 
  * login_realm as credentials.
  * 
- * If the authentication attempt is successfull then an HTTP redirect will be
+ * If the authentication attempt is successful then an HTTP redirect will be
  * sent to the browser redirecting them to their original location in the 
  * system before authenticated or if none is supplied back to the DSpace 
  * homepage. The action will also return true, thus contents of the action will
@@ -58,7 +58,7 @@ public class AuthenticateAction extends AbstractAction
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
     {
-        // First check if we are preforming a new login
+        // First check if we are performing a new login
         Request request = ObjectModelHelper.getRequest(objectModel);
 
         String email = request.getParameter("login_email");
@@ -86,7 +86,7 @@ public class AuthenticateAction extends AbstractAction
             	if (AuthenticationUtil.isInterupptedRequest(objectModel))
             	{
             		// Resume the request and set the redirect target URL to
-            		// that of the originaly interrupted request.
+            		// that of the originally interrupted request.
             		redirectURL += AuthenticationUtil.resumeInterruptedRequest(objectModel);
             	}
             	else
@@ -96,14 +96,14 @@ public class AuthenticateAction extends AbstractAction
             		redirectURL += (loginRedirect != null) ? loginRedirect.trim() : "/";	
             	}
             	
-                // Authentication successfull send a redirect.
+                // Authentication successful send a redirect.
                 final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
                 
                 httpResponse.sendRedirect(redirectURL);
                 
                 // log the user out for the rest of this current request, however they will be reauthenticated
                 // fully when they come back from the redirect. This prevents caching problems where part of the
-                // request is preformed fore the user was authenticated and the other half after it succedded. This
+                // request is performed before the user was authenticated and the other half after it succeeded. This
                 // way the user is fully authenticated from the start of the request.
                 context.setCurrentUser(null);
                 
@@ -112,7 +112,7 @@ public class AuthenticateAction extends AbstractAction
         }
         catch (SQLException sqle)
         {
-            throw new PatternException("Unable to preform authentication",
+            throw new PatternException("Unable to perform authentication",
                     sqle);
         }
         

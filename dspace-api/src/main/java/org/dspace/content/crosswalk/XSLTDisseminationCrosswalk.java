@@ -260,7 +260,7 @@ public class XSLTDisseminationCrosswalk
     }
 
     /**
-     * return true if this crosswalk prefers the list form over an singe
+     * return true if this crosswalk prefers the list form over an single
      * element, otherwise false.
      *
      * @see DisseminationCrosswalk

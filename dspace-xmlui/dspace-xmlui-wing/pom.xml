@@ -4,7 +4,6 @@
     <artifactId>dspace-xmlui-wing</artifactId>
     <packaging>jar</packaging>
     <name>DSpace XML-UI (Manakin) :: Wing-Framework</name>
-    <url>http://projects.dspace.org/dspace-xmlui/dspace-xmlui-wing</url>
     <description>The Cocoon-based Wing framework</description>
 
     <parent>
@@ -13,13 +12,6 @@
         <version>3.0-SNAPSHOT</version>
       <relativePath>..</relativePath>
     </parent>
-
-    <scm>
-        <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui/dspace-xmlui-wing</connection>
-        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui/dspace-xmlui-wing
-        </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui/dspace-xmlui-wing</url>
-    </scm>
 
     <dependencies>
 

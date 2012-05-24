@@ -75,19 +75,4 @@
         </plugins>
     </build>
 
-    <!--
-       The Subversion repository location is used by Continuum to update
-       against when changes have occured, this spawns a new build cycle
-       and releases snapshots into the snapshot repository below.
-    -->
-    <scm>
-        <connection>
-            scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-xmlui-webapp
-        </connection>
-        <developerConnection>
-            scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-xmlui-webapp
-        </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-xmlui-webapp</url>
-    </scm>
-
 </project>

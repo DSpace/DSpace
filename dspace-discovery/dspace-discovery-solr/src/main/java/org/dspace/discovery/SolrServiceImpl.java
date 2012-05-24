@@ -73,7 +73,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     private CommonsHttpSolrServer solr = null;
 
     /**
-     * Non-Static Singelton instance of Configuration Service
+     * Non-Static Singleton instance of Configuration Service
      */
 //    private ConfigurationService configurationService;
 

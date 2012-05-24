@@ -1537,7 +1537,7 @@ public abstract class AbstractMETSDisseminator
                 }
                 else
                 {   //no Handle assigned, so persistent(-ish) URI for bitstream is
-                    // Format: {site-base-url}/retrieve/{bistream-internal-id}
+                    // Format: {site-base-url}/retrieve/{bitstream-internal-id}
                     return ConfigurationManager
                                     .getProperty("dspace.url")
                             + "/retrieve/"

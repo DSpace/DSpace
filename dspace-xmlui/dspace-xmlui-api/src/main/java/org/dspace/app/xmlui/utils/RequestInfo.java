@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
  * can be replicated during a later request, once authentication has
  * successfully occurred. 
  * 
- * This class is the same as found in the JSPUI however a few extra methods were added to
+ * This class is the same as found in the JSPUI, however a few extra methods were added to
  * remember the original path information (info,translated, uri, url, etc..) that coocoon
  * needs inorder to be able to resume a request.
  * 

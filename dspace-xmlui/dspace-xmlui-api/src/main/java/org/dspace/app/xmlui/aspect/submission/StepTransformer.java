@@ -78,7 +78,7 @@ public class StepTransformer extends AbstractDSpaceTransformer
 	 * Grab all the step's parameters from the sitemap. This includes 
 	 * workspaceID, step, and a list of errored fields.
 	 * 
-	 * If the implementer set any required parameters then insure that 
+	 * If the implementer set any required parameters then ensure that 
 	 * they are all present.
 	 */
 	public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) 
@@ -86,23 +86,23 @@ public class StepTransformer extends AbstractDSpaceTransformer
 	{ 
 		super.setup(resolver,objectModel,src,parameters);
 
-		//retrieve id and transformer information
-		//(This ID should always exist by this point, since the
+		// retrieve id and transformer information
+		// (This ID should always exist by this point, since the
 		// selection of the collection should have already happened!)
 		this.id = parameters.getParameter("id",null);
 		this.transformerClassName = parameters.getParameter("transformer",null);
 		
-		//even though its not used in this class, this "step" parameter
-		//is heavily used by the Transformers which extend the 
-		//org.dspace.app.xmlui.submission.AbstractStep
+		// even though its not used in this class, this "step" parameter
+		// is heavily used by the Transformers which extend the 
+		// org.dspace.app.xmlui.submission.AbstractStep
 		this.stepAndPage = Double.valueOf(parameters.getParameter("step","-1"));
 		
-		//retrieve collection handle if it's there
+		// retrieve collection handle if it's there
 		this.collectionHandle = parameters.getParameter("handle",null);
 		
 		try
 		{
-			//retrieve an instance of the transformer class
+	        // retrieve an instance of the transformer class
 	        ClassLoader loader = this.getClass().getClassLoader();
 	        Class stepClass = loader
 	                .loadClass(this.transformerClassName);
@@ -114,18 +114,18 @@ public class StepTransformer extends AbstractDSpaceTransformer
 		}
 		catch(ClassNotFoundException cnfe)
 		{
-			//means that we couldn't find a class by the given name
+			// means that we couldn't find a class by the given name
 			throw new ProcessingException("Class Not Found: " + this.transformerClassName, cnfe);
 		}
 	    catch(Exception e)
 	    {
-	    	//means we couldn't instantiate the class as an AbstractStep
+	    	// means we couldn't instantiate the class as an AbstractStep
 	    	throw new ProcessingException("Unable to instantiate class " + this.transformerClassName + ". " +
 	    								  "Please make sure it extends org.dspace.app.xmlui.submission.AbstractSubmissionStep!", e);
 	    }
 	
 	    
-	    //call the setup for this step
+	    // call the setup for this step
 	    if(step!=null)
         {
             step.setup(resolver, objectModel, src, parameters);

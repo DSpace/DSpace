@@ -23,10 +23,10 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.BitstreamFormat;
 
 /**
- * Confirm the deletition of bitstream formats by listing to-be-deleted
+ * Confirm the deletion of bitstream formats by listing to-be-deleted
  * formats and asking the user for confirmation.
  * 
- * @author Scott phillips
+ * @author Scott Phillips
  */
 public class DeleteBitstreamFormatsConfirm extends AbstractDSpaceTransformer   
 {

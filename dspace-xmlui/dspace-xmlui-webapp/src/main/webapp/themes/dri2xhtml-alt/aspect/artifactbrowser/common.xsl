@@ -115,34 +115,34 @@
 
         sections:
 
-        A comma seperated list of METS sections to included. The possible values are: "metsHdr", "dmdSec",
+        A comma-separated list of METS sections to included. The possible values are: "metsHdr", "dmdSec",
         "amdSec", "fileSec", "structMap", "structLink", "behaviorSec", and "extraSec". If no list is provided then *ALL*
         sections are rendered.
 
 
         dmdTypes:
 
-        A comma seperated list of metadata formats to provide as descriptive metadata. The list of avaialable metadata
+        A comma-separated list of metadata formats to provide as descriptive metadata. The list of avaialable metadata
         types is defined in the dspace.cfg, disseminationcrosswalks. If no formats are provided them DIM - DSpace
         Intermediate Format - is used.
 
 
         amdTypes:
 
-        A comma seperated list of metadata formats to provide administative metadata. DSpace does not currently
+        A comma-separated list of metadata formats to provide administative metadata. DSpace does not currently
         support this type of metadata.
 
 
         fileGrpTypes:
 
-        A comma seperated list of file groups to render. For DSpace a bundle is translated into a METS fileGrp, so
+        A comma-separated list of file groups to render. For DSpace a bundle is translated into a METS fileGrp, so
         possible values are "THUMBNAIL","CONTENT", "METADATA", etc... If no list is provided then all groups are
         rendered.
 
 
         structTypes:
 
-        A comma seperated list of structure types to render. For DSpace there is only one structType: LOGICAL. If this
+        A comma-separated list of structure types to render. For DSpace there is only one structType: LOGICAL. If this
         is provided then the logical structType will be rendered, otherwise none will. The default operation is to
         render all structure types.
     -->

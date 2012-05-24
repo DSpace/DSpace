@@ -4,7 +4,6 @@
     <artifactId>dspace-xmlui-webapp</artifactId>
     <packaging>war</packaging>
     <name>DSpace XML-UI (Manakin) :: Web Application Resources</name>
-    <url>http://projects.dspace.org/dspace-xmlui/dspace-xmlui-webapp</url>
     <description>
         DSpace/Manakin XML-UI Based Web Application using the Cocoon and
         Wing frameworks
@@ -16,13 +15,6 @@
         <version>3.0-SNAPSHOT</version>
       <relativePath>..</relativePath>
     </parent>
-
-    <scm>
-        <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui/dspace-xmlui-webapp</connection>
-        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui/dspace-xmlui-webapp
-        </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui/dspace-xmlui-webapp</url>
-    </scm>
 
     <build>
         <plugins>

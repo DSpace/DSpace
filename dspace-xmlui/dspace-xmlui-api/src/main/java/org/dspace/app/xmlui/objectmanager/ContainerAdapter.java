@@ -36,17 +36,17 @@ import org.xml.sax.SAXException;
 /**
  * This is an adapter which translates DSpace containers 
  * (communities & collections) into METS documents. This adapter follows
- * the DSpace METS profile however that profile does not define how a
+ * the DSpace METS profile, however that profile does not define how a
  * community or collection should be described, but we make the obvious 
- * decisions to deviate when nessasary from the profile.
+ * decisions to deviate when necessary from the profile.
  * 
  * The METS document consists of three parts: descriptive metadata section,
  * file section, and a structural map. The descriptive metadata sections holds
  * metadata about the item being adapted using DSpace crosswalks. This is the 
  * same way the item adapter works.
  * 
- * However the file section and structural map are a bit different. In these
- * casses the the only files listed is the one logo that may be attached to 
+ * However, the file section and structural map are a bit different. In these
+ * cases the the only files listed is the one logo that may be attached to 
  * a community or collection.
  * 
  * @author Scott Phillips
@@ -58,7 +58,7 @@ public class ContainerAdapter extends AbstractAdapter
     /** The community or collection this adapter represents. */
     private DSpaceObject dso;
 
-    /** A space seperated list of descriptive metadata sections */
+    /** A space-separated list of descriptive metadata sections */
     private StringBuffer dmdSecIDS;
     
     /** Current DSpace context **/
@@ -208,23 +208,23 @@ public class ContainerAdapter extends AbstractAdapter
      */
     protected void renderDescriptiveSection() throws WingException, SAXException, CrosswalkException, IOException, SQLException 
     {
-    	AttributeMap attributes;
-    	
+        AttributeMap attributes;
+        
         String groupID = getGenericID("group_dmd_");
         dmdSecIDS = new StringBuffer();
 
         // Add DIM descriptive metadata if it was requested or if no metadata types 
-    	// were specified. Further more since this is the default type we also use a 
-    	// faster rendering method that the crosswalk API.
-    	if(dmdTypes.size() == 0 || dmdTypes.contains("DIM"))
-    	{
-        	// Metadata element's ID
-        	String dmdID = getGenericID("dmd_");
-        	
-        	// Keep track of all descriptive sections
+        // were specified. Furthermore, since this is the default type we also use a 
+        // faster rendering method that the crosswalk API.
+        if(dmdTypes.size() == 0 || dmdTypes.contains("DIM"))
+        {
+            // Metadata element's ID
+            String dmdID = getGenericID("dmd_");
+            
+            // Keep track of all descriptive sections
             dmdSecIDS.append(dmdID);
             
-        	
+            
             // ////////////////////////////////
             // Start a new dmdSec for each crosswalk.
             attributes = new AttributeMap();
@@ -235,8 +235,8 @@ public class ContainerAdapter extends AbstractAdapter
             // ////////////////////////////////
             // Start metadata wrapper
             attributes = new AttributeMap();
-        	attributes.put("MDTYPE", "OTHER");
-        	attributes.put("OTHERMDTYPE", "DIM");
+            attributes.put("MDTYPE", "OTHER");
+            attributes.put("OTHERMDTYPE", "DIM");
             startElement(METS,"mdWrap",attributes);
 
             // ////////////////////////////////
@@ -245,10 +245,10 @@ public class ContainerAdapter extends AbstractAdapter
             
             
             // ///////////////////////////////
-			// Start the DIM element
-			attributes = new AttributeMap();
-			attributes.put("dspaceType", Constants.typeText[dso.getType()]);
-			startElement(DIM,"dim",attributes);
+            // Start the DIM element
+            attributes = new AttributeMap();
+            attributes.put("dspaceType", Constants.typeText[dso.getType()]);
+            startElement(DIM,"dim",attributes);
 
             // Add each field for this collection
             if (dso.getType() == Constants.COLLECTION) 
@@ -274,7 +274,7 @@ public class ContainerAdapter extends AbstractAdapter
                 createField("dc","title",null,null,title);
                 
                 boolean useCache = ConfigurationManager.getBooleanProperty("webui.strengths.cache");
-        		
+                 
                 //To improve scalability, XMLUI only adds item counts if they are cached
                 if (useCache)
         		{
@@ -382,7 +382,7 @@ public class ContainerAdapter extends AbstractAdapter
             startElement(METS,"xmlData");
             
             // ///////////////////////////////
-    		// Send the actual XML content
+            // Send the actual XML content
             try {
 	    		Element dissemination = crosswalk.disseminateElement(dso);
 	
@@ -401,8 +401,8 @@ public class ContainerAdapter extends AbstractAdapter
 			}
 			catch (AuthorizeException ae)
 			{
-				// just ignore the authorize exception and continue on with
-				//out parsing the xml document.
+				// just ignore the authorize exception and continue on
+				// without parsing the xml document.
 			}
     		
             
@@ -473,13 +473,13 @@ public class ContainerAdapter extends AbstractAdapter
     }
 
     /**
-     * Render the container's structural map. This includes a refrence
+     * Render the container's structural map. This includes a reference
      * to the container's logo, if available, otherwise it is an empty 
      * division that just states it is a DSpace community or Collection.
      * 
-     * Examlpe:
+     * Example:
      * <structMap TYPE="LOGICAL" LABEL="DSpace">
-     *   <div TYPE="DSpace Collection" DMDID="space seperated list of ids">
+     *   <div TYPE="DSpace Collection" DMDID="space-separated list of ids">
      *     <fptr FILEID="logo id"/>
      *   </div>
      * </structMap>
@@ -512,30 +512,30 @@ public class ContainerAdapter extends AbstractAdapter
         if (logo != null)
         {
             // ////////////////////////////////
-            // Add a refrence to the logo as the primary bitstream.
-        	attributes = new AttributeMap();
-        	attributes.put("FILEID",getFileID(logo));
-        	startElement(METS,"fptr",attributes);
-        	endElement(METS,"fptr");
+            // Add a reference to the logo as the primary bitstream.
+            attributes = new AttributeMap();
+            attributes.put("FILEID",getFileID(logo));
+            startElement(METS,"fptr",attributes);
+            endElement(METS,"fptr");
         
             
             // ///////////////////////////////////////////////
-            // Add a div for the publicaly viewable bitstreams (i.e. the logo)
-        	attributes = new AttributeMap();
+            // Add a div for the publicly viewable bitstreams (i.e. the logo)
+            attributes = new AttributeMap();
             attributes.put("ID", getGenericID("div_"));
             attributes.put("TYPE", "DSpace Content Bitstream");
-        	startElement(METS,"div",attributes);
+            startElement(METS,"div",attributes);
         	
             // ////////////////////////////////
-            // Add a refrence to the logo as the primary bitstream.
-        	attributes = new AttributeMap();
-        	attributes.put("FILEID",getFileID(logo));
-        	startElement(METS,"fptr",attributes);
-        	endElement(METS,"fptr");
+            // Add a reference to the logo as the primary bitstream.
+            attributes = new AttributeMap();
+            attributes.put("FILEID",getFileID(logo));
+            startElement(METS,"fptr",attributes);
+            endElement(METS,"fptr");
         	
-        	// //////////////////////////
-        	// End the logo division
-        	endElement(METS,"div");
+            // //////////////////////////
+            // End the logo division
+            endElement(METS,"div");
         }
 
     	// ////////////////////////////////
@@ -552,7 +552,7 @@ public class ContainerAdapter extends AbstractAdapter
      * 
      * 
      * 
-     * Private helpfull methods
+     * Private helpful methods
      * 
      * 
      * 
@@ -579,13 +579,13 @@ public class ContainerAdapter extends AbstractAdapter
     }
     
     /**
-     * Count how many occurance there is of the given
+     * Count how many occurrence there is of the given
      * character in the given string.
      * 
      * @param string The string value to be counted.
      * @param character the character to count in the string.
      */
-    private int countOccurances(String string, char character)
+    private int countOccurences(String string, char character)
     {
     	if (string == null || string.length() == 0)
         {
@@ -668,18 +668,18 @@ public class ContainerAdapter extends AbstractAdapter
         }
 		startElement(DIM,"field",attributes);
 		
-		// Only try and add the metadata's value, but only if it is non null.
+		// Only try and add the metadata value, but only if it is non-null.
     	if (value != null)
     	{
-    		// First, preform a queck check to see if the value may be XML.
-	        int countOpen = countOccurances(value,'<');
-	        int countClose = countOccurances(value, '>');
+    		// First, perform a quick check to see if the value may be XML.
+	        int countOpen = countOccurences(value,'<');
+	        int countClose = countOccurences(value, '>');
 	        
 	        // If it passed the quick test, then try and parse the value.
 	        Element xmlDocument = null;
 	        if (countOpen > 0 && countOpen == countClose)
 	        {
-	        	// This may be XML, First try and remove any bad entity refrences.
+	        	// This may be XML, First try and remove any bad entity references.
 	        	int amp = -1;
 	        	while ((amp = value.indexOf('&', amp+1)) > -1)
 	        	{

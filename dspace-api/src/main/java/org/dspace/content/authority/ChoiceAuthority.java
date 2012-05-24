@@ -18,7 +18,7 @@ package org.dspace.content.authority;
 public interface ChoiceAuthority
 {
     /**
-     * Get all values from the authority that match the profferred value.
+     * Get all values from the authority that match the preferred value.
      * Note that the offering was entered by the user and may contain
      * mixed/incorrect case, whitespace, etc so the plugin should be careful
      * to clean up user data before making comparisons.

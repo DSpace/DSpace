@@ -342,7 +342,7 @@
 
 
                         <!--
-                                For URL compatability with the JSPUI, redirect these old url to their new locations.
+                                For URL compatibility with the JSPUI, redirect these old url to their new locations.
 
                                 /bitstream/[handlePrefix]/[handlePostfix]/[sequence]/[name]
                                 /html/[handlePrefix]/[handePostfix]/[name]

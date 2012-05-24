@@ -60,7 +60,7 @@ public class Deposit
    /** Deposit ID */
    private String depositID;
    
-   /** The IP Address */
+   /** The IP address */
    private String IPAddress;
    
    /** The location */

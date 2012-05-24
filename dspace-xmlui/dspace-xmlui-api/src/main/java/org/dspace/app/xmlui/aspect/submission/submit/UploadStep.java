@@ -42,11 +42,11 @@ import org.xml.sax.SAXException;
 
 /**
  * This is a step of the item submission processes. The upload
- * stages allows the user to upload files into the submission. The
+ * stages allow the user to upload files into the submission. The
  * form is optimized for one file, but allows the user to upload
  * more if needed.
  * <P>
- * The form is brokenup into three sections:
+ * The form is broken up into three sections:
  * <P>
  * Part A: Ask the user to upload a file
  * Part B: List previously uploaded files
@@ -138,8 +138,8 @@ public class UploadStep extends AbstractSubmissionStep
     { 
         super.setup(resolver,objectModel,src,parameters);
                
-        //If this page for editing an uploaded file's information
-        //was requested, then we need to load EditFileStep instead!
+        // If this page for editing an uploaded file's information
+        // was requested, then we need to load EditFileStep instead!
         if(this.errorFlag==org.dspace.submit.step.UploadStep.STATUS_EDIT_BITSTREAM)
         {
             this.editFile = new EditFileStep();
@@ -154,8 +154,8 @@ public class UploadStep extends AbstractSubmissionStep
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
-        //If we are actually editing an uploaded file's information,
-        //then display that body instead!
+        // If we are actually editing information of an uploaded file,
+        // then display that body instead!
     	if(this.editFile!=null)
         {
             editFile.addBody(body);
@@ -193,7 +193,7 @@ public class UploadStep extends AbstractSubmissionStep
 	        file.setHelp(T_file_help);
 	        file.setRequired();
 	        
-	        //if no files found error was thrown by processing class, display it!
+	        // if no files found error was thrown by processing class, display it!
 	        if (this.errorFlag==org.dspace.submit.step.UploadStep.STATUS_NO_FILES_ERROR)
 	        {
                 file.addError(T_file_error);
@@ -226,7 +226,7 @@ public class UploadStep extends AbstractSubmissionStep
     	}
         
         // Part B:
-        //  If the user has allready uploaded files provide a list for the user.
+        //  If the user has already uploaded files provide a list for the user.
         if (bitstreams.length > 0 || workflow)
 		{
 	        Table summary = div.addTable("submit-upload-summary",(bitstreams.length * 2) + 2,7);
@@ -325,7 +325,7 @@ public class UploadStep extends AbstractSubmissionStep
 	        
 	        if (!workflow)
 	        {
-	        	// Workflow user's can not remove files.
+	        	// Workflow users can not remove files.
 		        Row actionRow = summary.addRow();
 		        actionRow.addCell();
 		        Button removeSeleceted = actionRow.addCell(null, null, 0, 6, null).addButton("submit_remove_selected");
@@ -349,7 +349,7 @@ public class UploadStep extends AbstractSubmissionStep
      * <P>
      * NOTE: To remain consistent across all Steps, you should first
      * add a sub-List object (with this step's name as the heading),
-     * by using a call to reviewList.addList().   This sublist is
+     * by using a call to reviewList.addList().  This sublist is
      * the list you return from this method!
      * 
      * @param reviewList
@@ -367,7 +367,7 @@ public class UploadStep extends AbstractSubmissionStep
         List uploadSection = reviewList.addList("submit-review-" + this.stepAndPage, List.TYPE_FORM);
         uploadSection.setHead(T_head);
         
-        //Review all uploaded files
+        // Review all uploaded files
         Item item = submission.getItem();
         Bundle[] bundles = item.getBundles("ORIGINAL");
         Bitstream[] bitstreams = new Bitstream[0];
@@ -400,7 +400,7 @@ public class UploadStep extends AbstractSubmissionStep
             
         }
         
-        //return this new "upload" section
+        // return this new "upload" section
         return uploadSection;
     }
 
@@ -409,7 +409,7 @@ public class UploadStep extends AbstractSubmissionStep
      *
      * @param item The DSpace Item that the bitstream is part of
      * @param bitstream The bitstream to link to
-     * @returns a String link to the bistream
+     * @returns a String link to the bitstream
      */
     private String makeBitstreamLink(Item item, Bitstream bitstream)
     {

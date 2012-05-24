@@ -754,7 +754,7 @@ div.license-text {
 		font-size: 125%;
 }
 
-/** System generated notices, typicaly these follow any action in the administrative section. */
+/** System-generated notices, typically these follow any action in the administrative section. */
 div.notice {
 		background-color: rgb(238, 238, 238);
 		border: 2px solid gray;

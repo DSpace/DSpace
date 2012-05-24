@@ -47,9 +47,9 @@ import org.dspace.eperson.Group;
 public class DSpaceValidity implements SourceValidity
 {
 	
-	private static final long serialVersionUID = 1L;
-
-	/** The validityKey while it is being build, once it is completed. */
+    private static final long serialVersionUID = 1L;
+    
+    /** The validityKey while it is being build, once it is completed. */
     protected StringBuffer validityKey;
     
     /** Simple flag to note if the object has been completed. */
@@ -109,7 +109,7 @@ public class DSpaceValidity implements SourceValidity
      * Set the time delay for how long this cache will be assumed 
      * to be valid. When it is assumed valid no other checks will be
      * made to consider it's validity, and once the time has expired 
-     * a full validation will occure on the next cache hit. If the 
+     * a full validation will occur on the next cache hit. If the 
      * cache proves to be validated on this hit then the assumed 
      * validity timer is reset.
      * 
@@ -198,18 +198,18 @@ public class DSpaceValidity implements SourceValidity
     		throw new IllegalArgumentException("Error unable to parse the assumed validity delay time: \""+delay+"\". All delays must be of the form \"<integer> <scale>\" where scale is either seconds, minutes, hours, or days.");
         }
     	
-    	// Now set the actualy delay.
+    	// Now set the actual delay.
     	setAssumedValidityDelay(milliseconds);
     }
     
     
     /**
-     * Add a DSpace object to the validity. The order inwhich objects 
-     * are added to the validity object is important, insure that 
+     * Add a DSpace object to the validity. The order in which objects 
+     * are added to the validity object is important, ensure that 
      * objects are added in the *exact* same order each time a 
      * validity object is created.
      * 
-     * Below are the following transative rules for adding 
+     * Below are the following transitive rules for adding 
      * objects, i.e. if an item is added then all the items 
      * bundles & bitstreams will also be added.
      * 
@@ -226,7 +226,7 @@ public class DSpaceValidity implements SourceValidity
     {
         if (this.completed)
         {
-            throw new IllegalStateException("Can not add DSpaceObject to a completed validity object");
+            throw new IllegalStateException("Cannot add DSpaceObject to a completed validity object");
         }
         
         if (dso == null) 
@@ -367,14 +367,14 @@ public class DSpaceValidity implements SourceValidity
     }
     
     /**
-     * Add a non DSpaceObject to the validity, the object should be 
-     * seralized into a string form. The order inwhich objects 
-     * are added to the validity object is important, insure that 
+     * Add a non-DSpaceObject to the validity, the object should be 
+     * serialized into a string form. The order in which objects 
+     * are added to the validity object is important, ensure that 
      * objects are added in the *exact* same order each time a 
      * validity object is created.
      *
      * @param nonDSpaceObject
-     *          The non DSpace object to add to the validity.
+     *          The non-DSpace object to add to the validity.
      */
     public void add(String nonDSpaceObject) throws SQLException
     {
@@ -439,7 +439,7 @@ public class DSpaceValidity implements SourceValidity
         		// Check if we should assume validitity.
         		if (System.currentTimeMillis() < this.assumedValidityTime)
         		{
-        			// Assume the cache is valid with out rechecking another validity object.
+        			// Assume the cache is valid without rechecking another validity object.
         			return SourceValidity.VALID;
         		}
         	}
