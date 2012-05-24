@@ -192,15 +192,23 @@ public class DataOneMN extends HttpServlet implements Constants {
 	    
 	    throw new ServletException(details);
 	}
+
+
+	// handle (and remove) the version indicator
+	if(reqPath.startsWith("/v1")) {
+	    log.debug("version 1 detected, removing");
+	    reqPath = reqPath.substring("/v1".length());
+	}
+	// TODO: throw an error for requests that do not have a version indicator -- need to notify potential users first
 	
-	if (reqPath.startsWith("/object")) {			
+	if(reqPath.equals("/") || reqPath.equals("/node")) {
+	    log.debug("getCapabilities");
+	    getCapabilities(aResp);
+	} else if(reqPath.startsWith("/object")) {			
 	    ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);
 	    
 	    try {
-		if (reqPath.equals("/") || reqPath.equals("/node")) {
-		    getCapabilities(aResp);
-		}
-		else if (reqPath.equals("/object")) {
+		if (reqPath.equals("/object")) {
 		    // listObjects()
 		    String format = aReq.getParameter("objectFormat");
 		    Date from = parseDate(aReq, "startTime");
