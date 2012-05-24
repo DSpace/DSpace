@@ -20,6 +20,7 @@ import org.apache.avalon.framework.service.ServiceException;
 import org.apache.avalon.framework.service.ServiceManager;
 
 import org.apache.cocoon.sitemap.PatternException;
+import org.apache.log4j.Logger;
 
 import java.util.List;
 
@@ -29,7 +30,8 @@ import java.util.List;
 public class VariableResolverFactory {
 
     //private static ThreadLocal disposableCollector = new ThreadLocal();
-
+	private static Logger log = Logger.getLogger(VariableResolverFactory.class);
+	
     /**
      * Set the thread-local list where all created resolvers that need to be
      * disposed will be collected.
@@ -40,6 +42,7 @@ public class VariableResolverFactory {
     public static void setDisposableCollector(List collector) {
     	//This variable is not used anywhere and might generate memory leaks
         //disposableCollector.set(collector);
+    	log.trace("Omitiendo setear <ThreadLocal> disposableCollector con: "+collector);
     }
 
     /**
