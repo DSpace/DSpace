@@ -258,8 +258,9 @@
 				</p>
 			</div>
 		</xsl:if>
-		<!-- Si tiene director asumimos que es una tesis -->
-		<xsl:if test="dim:field[@element='contributor' and @qualifier='director']">
+		
+		<!-- Solo para el tipo tesis -->
+		<xsl:if test="dim:field[@element='type'] = 'Tesis'">
 			<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.tesis-info</i18n:text></h2>
 			<!-- contributor.director row -->
 			<xsl:call-template name="render-normal-field">
