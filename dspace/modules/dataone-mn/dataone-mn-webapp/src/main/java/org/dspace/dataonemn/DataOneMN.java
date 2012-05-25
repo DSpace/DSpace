@@ -44,55 +44,66 @@ public class DataOneMN extends HttpServlet implements Constants {
     
     private String mySolr;
     
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+       Opens a DSpace context, and cleanly recovers if there is a problem opening it.
+    **/
+    private Context getContext() throws ServletException {
+	Context ctxt = null;
+	
+	try {
+	    ctxt = new Context();
+	    
+	    log.debug("DSpace context initialized");
+	    return ctxt;
+	}
+	catch (SQLException e) {
+	    log.error("Unable to initialize DSpace context", e);
+	    
+	    try {
+		if (ctxt != null) {
+		    ctxt.complete();
+		}
+	    }
+	    catch (SQLException e2) {
+		log.warn("unable to close context cleanly;" + e2.getMessage(), e2);
+	    }
+	    
+	    throw new ServletException("Unable to initialize DSpace context", e);
+	}
+    }
+
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    private void closeContext(Context ctxt) throws ServletException {
+	try {
+	    if (ctxt != null) {
+		ctxt.complete();
+	    }
+	} catch (SQLException e) {
+	    log.warn("unable to close context cleanly;" + e.getMessage(), e);
+	}
+    }
+    
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Receives the HEAD HTTP call and passes off to the appropriate method.
      **/
-    protected void doHead(HttpServletRequest request, HttpServletResponse response)
-	throws ServletException, IOException {
+    protected void doHead(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	String reqPath = buildReqPath(request.getPathInfo());
-	Context ctxt = null;
-	
 	log.debug("pathinfo=" + reqPath);
-	
-	try {
-	    ctxt = new Context();
-	    ctxt.ignoreAuthorization();
-	    
-	    log.debug("DSpace context initialized");
-	    
-	}
-	catch (SQLException details) {
-	    log.error("Unable to initialize DSpace", details);
-	    
-	    try {
-		if (ctxt != null) {
-		    ctxt.complete();
-		}
-	    }
-	    catch (SQLException deets) {
-		log.warn(deets.getMessage(), deets);
-	    }
-	    
-	    throw new ServletException(details);
-	}
+
+	Context ctxt = getContext();
 	
 	if (reqPath.startsWith("/object/")) {
-	    	ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);
-		describe(reqPath, response, objManager);
-	}
-	else {
+	    ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);
+	    describe(reqPath, response, objManager);
+	} else {
 	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-	    
-	    try {
-		if (ctxt != null) {
-		    ctxt.complete();
-		}
-	    }
-	    catch (SQLException details) {
-		log.warn(details.getMessage(), details);
-	    }
 	}
+	
+	closeContext(ctxt);
     }
     
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,12 +146,12 @@ public class DataOneMN extends HttpServlet implements Constants {
 	    log.debug("version 1 detected, removing");
 	    reqPath = reqPath.substring("/v1".length());
 	}
-
+	
 	// remove any trailing slash, but not if the entire path is a slash
 	if(reqPath.endsWith("/") && reqPath.length() > 1) {
 	    reqPath = reqPath.substring(0, reqPath.length() - 1);
 	}
-
+	
 	return reqPath;
     }
     
@@ -149,48 +160,25 @@ public class DataOneMN extends HttpServlet implements Constants {
      * Receives the GET HTTP call and passes off to the appropriate method.
      **/
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-	throws ServletException, IOException {
-
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	
 	String reqPath = buildReqPath(request.getPathInfo());
 	Context ctxt = null;
 	
 	log.debug("reqPath=" + reqPath);
-	
+
 	try {
-	    ctxt = new Context();
-	    ctxt.ignoreAuthorization();
+	    ctxt = getContext();
 	    
-	    log.debug("DSpace context initialized");
-	}
-	catch (SQLException details) {
-	    log.error("Unable to initialize DSpace", details);
-	    
-	    try {
-		if (ctxt != null) {
-		    ctxt.complete();
-		}
-	    }
-	    catch (SQLException deets) {
-		log.error(deets.getMessage(), deets);
-	    }
-	    
-	    throw new ServletException(details);
-	}
-	
-	if (reqPath.startsWith("/monitor/ping")) {
-	    ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);
-	    ping(response, objManager);
-	}
-	else if (reqPath.startsWith("/log")) {
-	    getLogRecords(reqPath, response);
-	}
-	else if(reqPath.equals("") || reqPath.equals("/") || reqPath.equals("/node")) {
-	    getCapabilities(response);
-	} else if(reqPath.startsWith("/object")) {			
-	    ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);
-	    
-	    try {
+	    if (reqPath.startsWith("/monitor/ping")) {
+		ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);
+		ping(response, objManager);
+	    } else if (reqPath.startsWith("/log")) {
+		getLogRecords(reqPath, response);
+	    } else if(reqPath.equals("") || reqPath.equals("/") || reqPath.equals("/node")) {
+		getCapabilities(response);
+	    } else if(reqPath.startsWith("/object")) {			
+		ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);	    
 		if (reqPath.equals("/object")) {
 		    listObjects(request, response, objManager);
 		}
@@ -199,66 +187,36 @@ public class DataOneMN extends HttpServlet implements Constants {
 		}
 		else {
 		    response.sendError(HttpServletResponse.SC_NOT_FOUND,
-				    "Did you mean '/object' or '/object/doi:...'");
+				       "Did you mean '/object' or '/object/doi:...'");
 		}		
+	    } else if (reqPath.startsWith("/meta/")) {
+		SysMetaManager sysMetaMgr = new SysMetaManager(ctxt, myData, mySolr);
+		
+		getSystemMetadata(reqPath, response, sysMetaMgr);
+	    } else if (reqPath.startsWith("/checksum/")) {
+		ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);
+		getChecksum(reqPath, response, objManager);
+	    } else if (reqPath.startsWith("/isAuthorized/")) {
+		response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	    } else if (reqPath.startsWith("/accessRules/")) {
+		response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	    } else if (reqPath.startsWith("/error")) {
+		response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	    } else if (reqPath.startsWith("/monitor/object")) {
+		response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	    } else if (reqPath.startsWith("/monitor/event")) {
+		response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	    } else if (reqPath.startsWith("/monitor/status")) {
+		response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	    } else if (reqPath.startsWith("/replicate")) {
+		response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	    } else {
+		response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 	    }
-	    catch (StringIndexOutOfBoundsException details) {
-		log.error("Passed request did not find a match", details);
-		response.sendError(HttpServletResponse.SC_NOT_FOUND);
-	    }
-	    catch (Exception details) {
-		log.error("UNEXPECTED EXCEPTION", details);
-	    }
-	    finally {
-		try {
-		    ctxt.complete();
-		}
-		catch (SQLException sqlDetails) {
-		    log.error("Couldn't complete DSpace context");
-		}
-	    }
-	}
-	else if (reqPath.startsWith("/meta/")) {
-	    SysMetaManager sysMetaMgr = new SysMetaManager(ctxt, myData, mySolr);
-	    
-	    getSystemMetadata(reqPath, response, sysMetaMgr);
-	}
-	else if (reqPath.startsWith("/checksum/")) {
-	    ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);
-	    getChecksum(reqPath, response, objManager);
-	}
-	else if (reqPath.startsWith("/isAuthorized/")) {
-	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-	}
-	else if (reqPath.startsWith("/accessRules/")) {
-	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-	}
-	else if (reqPath.startsWith("/error")) {
-	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-	}
-	else if (reqPath.startsWith("/monitor/object")) {
-	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-	}
-	else if (reqPath.startsWith("/monitor/event")) {
-	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-	}
-	else if (reqPath.startsWith("/monitor/status")) {
-	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-	}
-	else if (reqPath.startsWith("/replicate")) {
-	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-	}
-	else {
-	    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-	}
-	
-	try {
-	    if (ctxt != null && ctxt.isValid()) {
-		ctxt.complete();
-	    }
-	}
-	catch (SQLException details) {
-	    log.error(details.getMessage(), details);
+	} catch (Exception e) {
+		log.error("UNEXPECTED EXCEPTION", e);
+	} finally {
+	    closeContext(ctxt);
 	}
     }
     
@@ -466,7 +424,7 @@ public class DataOneMN extends HttpServlet implements Constants {
     /**
        Retrieve a particular object from this Member Node.
     **/
-    private void getObject(String reqPath, HttpServletResponse response, ObjectManager objManager) throws IOException {
+    private void getObject(String reqPath, HttpServletResponse response, ObjectManager objManager) throws ServletException, IOException {
 	log.info("getObject()");
 	
 	String id = reqPath.substring("/object/".length());
@@ -507,10 +465,13 @@ public class DataOneMN extends HttpServlet implements Constants {
 	catch (NotFoundException details) {
 	    response.sendError(HttpServletResponse.SC_NOT_FOUND, name
 			    + "." + format + " couldn't be found");
+	} catch (StringIndexOutOfBoundsException e) {
+	    log.error("Passed request did not find a match", e);
+	    response.sendError(HttpServletResponse.SC_NOT_FOUND);
 	} catch(Exception e) {
 	    log.error("unable to getObject " + reqPath, e);
-
-	    throw new IOException("unable to getObject" + reqPath, e);
+	    
+	    throw new ServletException("unable to getObject" + reqPath, e);
 	}
 	
     }
@@ -674,11 +635,13 @@ public class DataOneMN extends HttpServlet implements Constants {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST,
 			       e.getMessage());
 	    
-	}  catch (SQLException e) {
+	} catch (SQLException e) {
 	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 			       "unable to list objects; " + e.getMessage());
+	} catch (StringIndexOutOfBoundsException e) {
+	    log.error("Passed request did not find a match", e);
+	    response.sendError(HttpServletResponse.SC_NOT_FOUND);
 	}
-
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
