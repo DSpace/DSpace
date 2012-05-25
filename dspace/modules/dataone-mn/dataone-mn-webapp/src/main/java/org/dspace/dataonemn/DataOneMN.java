@@ -185,7 +185,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	else if (reqPath.startsWith("/log")) {
 	    getLogRecords(reqPath, response);
 	}
-	else if(reqPath.equals("/") || reqPath.equals("/node")) {
+	else if(reqPath.equals("") || reqPath.equals("/") || reqPath.equals("/node")) {
 	    getCapabilities(response);
 	} else if(reqPath.startsWith("/object")) {			
 	    ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);
