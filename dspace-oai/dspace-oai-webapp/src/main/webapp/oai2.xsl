@@ -39,7 +39,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
   Not Done
     The 'about' section of 'record'
-    The 'compession' part of 'identify'
+    The 'compression' part of 'identify'
     The optional attributes of 'resumptionToken'
     The optional 'setDescription' container of 'set'
 
@@ -50,6 +50,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
     xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+    xmlns:tk="http://oai.dlib.vt.edu/OAI/metadata/toolkit"
 >
 
 <xsl:output method="html"/>
@@ -257,11 +258,31 @@ p.intro {
 -->
 
 <xsl:template match="oai:description/*" priority="-100">
-  <h2>Unsupported Description Type</h2>
-  <p>The XSL currently does not support this type of description.</p>
-  <div class="xmlSource">
-    <xsl:apply-templates select="." mode='xmlMarkup' />
-  </div>
+<!--p><xsl:value-of select="name(.)" /></p-->
+  <xsl:choose>
+    <xsl:when test="local-name(.) = 'toolkit'">
+      <h2>Description: Toolkit</h2>
+      <table class="values">
+        <tr><td class="key">Title</td>
+        <td class="value"><xsl:value-of select="tk:title"/></td></tr>
+        <tr><td class="key">Author</td>
+        <td class="value"><xsl:value-of select="concat(tk:author/tk:name, ' &lt;', tk:author/tk:email, '&gt;, ', tk:author/tk:institution)"/></td></tr>
+        <tr><td class="key">Version</td>
+        <td class="value"><xsl:value-of select="tk:version"/></td></tr>
+        <tr><td class="key">URL</td>
+        <td class="value"><xsl:value-of select="tk:URL"/></td></tr>
+        <tr><td class="key">Icon</td>
+        <td class="value"><img><xsl:attribute name="src"><xsl:value-of select="tk:toolkitIcon"/></xsl:attribute></img></td></tr>
+      </table>
+    </xsl:when>
+    <xsl:otherwise>
+      <h2>Unsupported Description Type</h2>
+      <p>The XSL currently does not support this type of description.</p>
+      <div class="xmlSource">
+        <xsl:apply-templates select="." mode='xmlMarkup' />
+      </div>
+    </xsl:otherwise>
+  </xsl:choose>
 </xsl:template>
 
 
