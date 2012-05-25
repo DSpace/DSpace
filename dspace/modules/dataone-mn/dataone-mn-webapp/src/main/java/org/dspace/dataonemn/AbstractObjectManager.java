@@ -298,4 +298,19 @@ public abstract class AbstractObjectManager implements Constants {
 		oStream.close();
 		iStream.close();
 	}
+
+    public void completeContext() {
+	try {
+	    if (myContext != null) {
+		myContext.complete();
+	    }
+	}
+	catch (SQLException e) {
+	    log.error("unable to complete DSpace context", e);
+
+	    // don't pass on the exception because this isn't an error in responding to a DataONE request,
+	    // it's an internal error in shutting down resources.
+	}
+    }
+    
 }

@@ -48,9 +48,9 @@ public class DataOneMN extends HttpServlet implements Constants {
     /**
      * Receives the HEAD HTTP call and passes off to the appropriate method.
      **/
-    protected void doHead(HttpServletRequest aReq, HttpServletResponse aResp)
+    protected void doHead(HttpServletRequest request, HttpServletResponse response)
 	throws ServletException, IOException {
-	String reqPath = aReq.getPathInfo();
+	String reqPath = buildReqPath(request.getPathInfo());
 	Context ctxt = null;
 	
 	log.debug("pathinfo=" + reqPath);
@@ -78,58 +78,11 @@ public class DataOneMN extends HttpServlet implements Constants {
 	}
 	
 	if (reqPath.startsWith("/object/")) {
-	    ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);
-	    String id = reqPath.substring("/object/".length());
-	    String[] parts = objManager.parseIDFormat(id);
-	    String name = parts[0];
-	    String format = parts[1];
-	    
-	    try {
-		long length = objManager.getObjectSize(name, format);
-		aResp.setContentLength((int) length);
-		
-		if (format.equals("xml") || format.equals("dap")) {
-		    aResp.setContentType(XML_CONTENT_TYPE);
-		}
-		else {
-		    ServletContext context = getServletContext();
-		    String mimeType = context.getMimeType("f." + format);
-		    
-		    if (mimeType == null || mimeType.equals("")) {
-			mimeType = "application/octet-stream";
-		    }
-		    
-		    log.debug("Checking mimeType of " + format);
-		    
-		    log.debug("Setting data file MIME type to: "
-			      + mimeType + " (this is configurable)");
-		    
-		    aResp.setContentType(mimeType);
-		}
-	    }
-	    catch (SQLException details) {
-		log.error(details.getMessage(), details);
-		throw new ServletException(details);
-	    }
-	    catch (StringIndexOutOfBoundsException details) {
-		log.error("Passed request did not find a match", details);
-		aResp.sendError(HttpServletResponse.SC_NOT_FOUND);
-	    }
-	    catch (Exception details) {
-		log.error("UNEXPECTED EXCEPTION", details);
-		aResp.sendError(HttpServletResponse.SC_NOT_FOUND);
-	    }
-	    finally {
-		try {
-		    ctxt.complete();
-		}
-		catch (SQLException sqlDetails) {
-		    log.warn("Couldn't complete DSpace context");
-		}
-	    }
+	    	ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);
+		describe(reqPath, response, objManager);
 	}
 	else {
-	    aResp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
 	    
 	    try {
 		if (ctxt != null) {
@@ -144,12 +97,19 @@ public class DataOneMN extends HttpServlet implements Constants {
     
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
-     * We don't implement this yet.
+     * Receives the HEAD POST call and passes off to the appropriate method.
      */
     @Override
-    protected void doPost(HttpServletRequest aReq, HttpServletResponse aResp)
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
 	throws ServletException, IOException {
-	aResp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	
+	String reqPath = buildReqPath(request.getPathInfo());
+
+	if (reqPath.startsWith("/")) {
+	    synchronizationFailed(request, response);
+	} else {   
+	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	}
     }
     
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -157,25 +117,45 @@ public class DataOneMN extends HttpServlet implements Constants {
      * We don't implement this yet.
      */
     @Override
-    protected void doPut(HttpServletRequest aReq, HttpServletResponse aResp)
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
 	throws ServletException, IOException {
-	aResp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
     }
     
-    
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * Cleans up the URL request path.
+     **/
+    private String buildReqPath(String aPath) {
+	String reqPath = aPath;
+	
+	// handle (and remove) the version indicator
+	// TODO: throw an error for requests that do not have a version indicator -- need to notify potential users first
+	if(reqPath.startsWith("/v1")) {
+	    log.debug("version 1 detected, removing");
+	    reqPath = reqPath.substring("/v1".length());
+	}
+
+	// remove any trailing slash, but not if the entire path is a slash
+	if(reqPath.endsWith("/") && reqPath.length() > 1) {
+	    reqPath = reqPath.substring(0, reqPath.length() - 1);
+	}
+
+	return reqPath;
+    }
     
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Receives the GET HTTP call and passes off to the appropriate method.
      **/
     @Override
-    protected void doGet(HttpServletRequest aReq, HttpServletResponse aResp)
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
 	throws ServletException, IOException {
 
-	String reqPath = aReq.getPathInfo();
+	String reqPath = buildReqPath(request.getPathInfo());
 	Context ctxt = null;
 	
-	log.debug("pathinfo=" + reqPath);
+	log.debug("reqPath=" + reqPath);
 	
 	try {
 	    ctxt = new Context();
@@ -192,49 +172,39 @@ public class DataOneMN extends HttpServlet implements Constants {
 		}
 	    }
 	    catch (SQLException deets) {
-		log.warn(deets.getMessage(), deets);
+		log.error(deets.getMessage(), deets);
 	    }
 	    
 	    throw new ServletException(details);
 	}
-
-
-	// handle (and remove) the version indicator
-	// TODO: throw an error for requests that do not have a version indicator -- need to notify potential users first
-	if(reqPath.startsWith("/v1")) {
-	    log.debug("version 1 detected, removing");
-	    reqPath = reqPath.substring("/v1".length());
-	}
 	
 	if (reqPath.startsWith("/monitor/ping")) {
-	    ping(aResp);
+	    ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);
+	    ping(response, objManager);
+	}
+	else if (reqPath.startsWith("/log")) {
+	    getLogRecords(reqPath, response);
 	}
 	else if(reqPath.equals("/") || reqPath.equals("/node")) {
-	    getCapabilities(aResp);
+	    getCapabilities(response);
 	} else if(reqPath.startsWith("/object")) {			
 	    ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);
 	    
 	    try {
 		if (reqPath.equals("/object")) {
-		    listObjects(aReq, aResp, objManager);
+		    listObjects(request, response, objManager);
 		}
 		else if (reqPath.startsWith("/object/")) {
-		    getObject(reqPath, aResp, objManager);
+		    getObject(reqPath, response, objManager);
 		}
 		else {
-		    aResp.sendError(HttpServletResponse.SC_NOT_FOUND,
+		    response.sendError(HttpServletResponse.SC_NOT_FOUND,
 				    "Did you mean '/object' or '/object/doi:...'");
-		}
-		
-		log.debug("DSpace context completed");
-	    }
-	    catch (SQLException details) {
-		log.error(details.getMessage(), details);
-		throw new ServletException(details);
+		}		
 	    }
 	    catch (StringIndexOutOfBoundsException details) {
 		log.error("Passed request did not find a match", details);
-		aResp.sendError(HttpServletResponse.SC_NOT_FOUND);
+		response.sendError(HttpServletResponse.SC_NOT_FOUND);
 	    }
 	    catch (Exception details) {
 		log.error("UNEXPECTED EXCEPTION", details);
@@ -244,102 +214,42 @@ public class DataOneMN extends HttpServlet implements Constants {
 		    ctxt.complete();
 		}
 		catch (SQLException sqlDetails) {
-		    log.warn("Couldn't complete DSpace context");
+		    log.error("Couldn't complete DSpace context");
 		}
 	    }
 	}
 	else if (reqPath.startsWith("/meta/")) {
-	    SysMetaManager sysMeta = new SysMetaManager(ctxt, myData, mySolr);
-	    String id = reqPath.substring("/meta/".length());
+	    SysMetaManager sysMetaMgr = new SysMetaManager(ctxt, myData, mySolr);
 	    
-	    aResp.setContentType(TEXT_XML_CONTENT_TYPE); // default for /meta
-	    
-	    try {
-		sysMeta.getObjectMetadata(id, aResp.getOutputStream());
-	    }
-	    catch (NotFoundException details) {
-		aResp.sendError(HttpServletResponse.SC_NOT_FOUND, id
-				+ " couldn't be found");
-	    }
-	    catch (SQLException details) {
-		log.error(details.getMessage(), details);
-		throw new ServletException(details);
-	    }
-	    catch (SolrServerException details) {
-		log.error(details.getMessage(), details);
-		throw new ServletException(details);
-	    }
-	    catch (StringIndexOutOfBoundsException details) {
-		log.error("Passed request did not find a match", details);
-		aResp.sendError(HttpServletResponse.SC_NOT_FOUND);
-	    }
-	    finally {
-		try {
-		    ctxt.complete();
-		}
-		catch (SQLException sqlDetails) {
-		    log.warn("Couldn't complete DSpace context");
-		}
-	    }
+	    getSystemMetadata(reqPath, response, sysMetaMgr);
 	}
 	else if (reqPath.startsWith("/checksum/")) {
 	    ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);
-	    String id = reqPath.substring("/checksum/".length());
-	    int lastSlashIndex = id.lastIndexOf("/");
-	    String format = id.substring(lastSlashIndex + 1);
-	    String name = id.substring(0, lastSlashIndex);
-	    
-	    aResp.setContentType(TEXT_XML_CONTENT_TYPE);
-	    
-	    try {
-		String[] checksum = objManager.getObjectChecksum(name, format);
-		PrintWriter writer = aResp.getWriter();
-		
-		writer.print("<checksum xmlns=\"" + MN_SERVICE_TYPES_NAMESPACE
-			     + "\" algorithm=\"" + checksum[1] + "\">" + checksum[0]
-			     + "</checksum>");
-		
-		writer.close();
-	    }
-	    catch (NotFoundException details) {
-		aResp.sendError(HttpServletResponse.SC_NOT_FOUND, name + "/"
-				+ format + " not found");
-	    }
-	    catch (SQLException details) {
-		aResp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-				details.getMessage());
-	    }
-	    catch (IOException details) {
-		aResp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-				details.getMessage());
-	    }
+	    getChecksum(reqPath, response, objManager);
 	}
 	else if (reqPath.startsWith("/isAuthorized/")) {
-	    aResp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
 	}
 	else if (reqPath.startsWith("/accessRules/")) {
-	    aResp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-	}
-	else if (reqPath.startsWith("/log")) {
-	    aResp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
 	}
 	else if (reqPath.startsWith("/error")) {
-	    aResp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
 	}
 	else if (reqPath.startsWith("/monitor/object")) {
-	    aResp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
 	}
 	else if (reqPath.startsWith("/monitor/event")) {
-	    aResp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
 	}
 	else if (reqPath.startsWith("/monitor/status")) {
-	    aResp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
 	}
 	else if (reqPath.startsWith("/replicate")) {
-	    aResp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
 	}
 	else {
-	    aResp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+	    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 	}
 	
 	try {
@@ -348,7 +258,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	    }
 	}
 	catch (SQLException details) {
-	    log.warn(details.getMessage(), details);
+	    log.error(details.getMessage(), details);
 	}
     }
     
@@ -387,8 +297,8 @@ public class DataOneMN extends HttpServlet implements Constants {
     }
     
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    private int parseInt(HttpServletRequest aReq, String aParam, int aDefault) {
-	String intString = aReq.getParameter(aParam);
+    private int parseInt(HttpServletRequest request, String aParam, int aDefault) {
+	String intString = request.getParameter(aParam);
 	int intValue = aDefault;
 	
 	try {
@@ -408,9 +318,9 @@ public class DataOneMN extends HttpServlet implements Constants {
        Parses a user-entered date. The date may appear in one of many common formats. If the date
        format is not recognized, null is returned.
     **/
-    private Date parseDate(HttpServletRequest aReq, String aParam)
+    private Date parseDate(HttpServletRequest request, String aParam)
 	throws ParseException {
-	String date = aReq.getParameter(aParam);
+	String date = request.getParameter(aParam);
 	
 	if (date == null) {
 	    return null;
@@ -459,17 +369,20 @@ public class DataOneMN extends HttpServlet implements Constants {
     /**
        Performs a basic test that this Member Node is alive
     **/
-    private void ping(HttpServletResponse response) throws IOException {
+    private void ping(HttpServletResponse response,  ObjectManager objManager) throws IOException {
 	log.info("ping");
 
+	// try to get a single object. If it fails, return an error.
 	try {
-	    
+	    OutputStream dummyOutput = new OutputStream() { public void write(int b) throws IOException {}};
+	    objManager.getObject("doi:10.5061/dryad.20/1", "dap", dummyOutput);	    
 	} catch (Exception e) {
 	    // if there is any problem, respond with an error
-	    aResp.sendError(HttpServletResponse.SC_INTERNAL_SERVICE_ERROR);
+	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	    return;
 	}
 	
+	// the basic test passed; return some simple information about this node
 	response.setContentType(XML_CONTENT_TYPE);
 	OutputStream out = response.getOutputStream();
 	PrintWriter pw = new PrintWriter(out);
@@ -490,7 +403,18 @@ public class DataOneMN extends HttpServlet implements Constants {
 	// close xml
 	pw.write("</d1:node>\n");
     }
+
     
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+       Returns logs of this Member Node's activities.
+    **/
+    private void getLogRecords(String reqPath, HttpServletResponse response) throws IOException {
+	log.info("getLogRecords()");
+	response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+    }
+
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
        Responds with the capabilities of this Member Node.
@@ -540,34 +464,6 @@ public class DataOneMN extends HttpServlet implements Constants {
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
-       List all objects available on this Member Node.
-    **/
-    private void listObjects(HttpServletRequest aReq, HttpServletResponse response, ObjectManager objManager) throws IOException {
-	log.info("listObjects()");
-	String format = aReq.getParameter("objectFormat");
-	Date from = parseDate(aReq, "startTime");
-	Date to = parseDate(aReq, "endTime");
-	
-	int start = parseInt(aReq, "start",
-			     ObjectManager.DEFAULT_START);
-	int count = parseInt(aReq, "count",
-			     ObjectManager.DEFAULT_COUNT);
-	
-	aResp.setContentType(XML_CONTENT_TYPE);
-	
-	if (count <= 0) {
-	    OutputStream out = aResp.getOutputStream();
-	    objManager.printList(from, to, format, out);
-	}
-	else {
-	    OutputStream out = aResp.getOutputStream();
-	    objManager.printList(start, count, from, to, format,
-				 out);
-	}
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /**
        Retrieve a particular object from this Member Node.
     **/
     private void getObject(String reqPath, HttpServletResponse response, ObjectManager objManager) throws IOException {
@@ -580,7 +476,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	String fileName = name.startsWith("doi:") ? name.substring(4) : name;
 	
 	if (format.equals("dap")) {
-	    aResp.setContentType(XML_CONTENT_TYPE);
+	    response.setContentType(XML_CONTENT_TYPE);
 	}
 	else {
 	    ServletContext context = getServletContext();
@@ -594,10 +490,10 @@ public class DataOneMN extends HttpServlet implements Constants {
 		      + mimeType + " (this is configurable)");
 			
 	    // We need to check types supported here and add to it
-	    aResp.setContentType(mimeType);
+	    response.setContentType(mimeType);
 	    
 	    // We want to download it if viewing in the browser
-	    aResp.setHeader(
+	    response.setHeader(
 			    "Content-Disposition",
 			    "attachment; filename=\""
 			    + fileName.replaceAll("[\\/|\\.]", "_")
@@ -606,12 +502,202 @@ public class DataOneMN extends HttpServlet implements Constants {
 	
 	try {
 	    objManager.getObject(name, format,
-				 aResp.getOutputStream());
+				 response.getOutputStream());
 	}
 	catch (NotFoundException details) {
-	    aResp.sendError(HttpServletResponse.SC_NOT_FOUND, name
+	    response.sendError(HttpServletResponse.SC_NOT_FOUND, name
 			    + "." + format + " couldn't be found");
+	} catch(Exception e) {
+	    log.error("unable to getObject " + reqPath, e);
+
+	    throw new IOException("unable to getObject" + reqPath, e);
 	}
 	
     }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+       Returns the system metadata associated with an object.       
+    **/
+    private void getSystemMetadata(String reqPath, HttpServletResponse response, SysMetaManager sysMetaMgr) throws ServletException, IOException {
+	log.info("getSystemMetadata()");
+	String id = reqPath.substring("/meta/".length());
+	
+	response.setContentType(TEXT_XML_CONTENT_TYPE); // default for /meta
+	
+	try {
+	    sysMetaMgr.getObjectMetadata(id, response.getOutputStream());
+	}
+	catch (NotFoundException details) {
+	    response.sendError(HttpServletResponse.SC_NOT_FOUND, id
+			    + " couldn't be found");
+	}
+	catch (SQLException details) {
+	    throw new ServletException("unable to retrieve System Metadata for " + reqPath, details);
+	}
+	catch (SolrServerException details) {
+	    throw new ServletException("unable to retrieve System Metadata for " + reqPath, details);
+	}
+	catch (IOException details) {
+	    throw new ServletException("unable to retrieve System Metadata for " + reqPath, details);
+	}
+	catch (StringIndexOutOfBoundsException details) {
+	    log.error("Passed request did not find a match", details);
+	    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+	}
+	finally {
+	    sysMetaMgr.completeContext();
+	}
+	
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+       Returns the basic properties of an object.
+    **/
+    private void describe(String reqPath, HttpServletResponse response, ObjectManager objManager) throws ServletException, IOException {
+	log.info("describe()");
+
+	String id = reqPath.substring("/object/".length());
+	String[] parts = objManager.parseIDFormat(id);
+	String name = parts[0];
+	String format = parts[1];
+	
+	try {
+	    long length = objManager.getObjectSize(name, format);
+	    response.setContentLength((int) length);
+	    
+	    if (format.equals("xml") || format.equals("dap")) {
+		response.setContentType(XML_CONTENT_TYPE);
+	    }
+	    else {
+		ServletContext context = getServletContext();
+		String mimeType = context.getMimeType("f." + format);
+		
+		if (mimeType == null || mimeType.equals("")) {
+		    mimeType = "application/octet-stream";
+		}
+		
+		log.debug("Checking mimeType of " + format);
+		
+		log.debug("Setting data file MIME type to: "
+			  + mimeType + " (this is configurable)");
+		
+		response.setContentType(mimeType);
+	    }
+	}
+	catch (SQLException details) {
+	    log.error(details.getMessage(), details);
+	    throw new ServletException(details);
+	}
+	catch (StringIndexOutOfBoundsException details) {
+	    log.error("Passed request did not find a match", details);
+	    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+	}
+	catch (Exception details) {
+	    log.error("UNEXPECTED EXCEPTION", details);
+	    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+	}
+	finally {
+	    objManager.completeContext();
+	}
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+       Returns the checksum associated with an object.
+    **/
+    private void getChecksum(String reqPath, HttpServletResponse response, ObjectManager objManager) throws IOException {
+	log.info("getChecksum()");
+
+	String id = reqPath.substring("/checksum/".length());
+	int lastSlashIndex = id.lastIndexOf("/");
+	String format = id.substring(lastSlashIndex + 1);
+	String name = id.substring(0, lastSlashIndex);
+	
+	response.setContentType(TEXT_XML_CONTENT_TYPE);
+	
+	try {
+	    String[] checksum = objManager.getObjectChecksum(name, format);
+	    PrintWriter writer = response.getWriter();
+	    
+	    writer.print("<checksum xmlns=\"" + MN_SERVICE_TYPES_NAMESPACE
+			 + "\" algorithm=\"" + checksum[1] + "\">" + checksum[0]
+			 + "</checksum>");
+	    
+	    writer.close();
+	}
+	catch (NotFoundException details) {
+	    response.sendError(HttpServletResponse.SC_NOT_FOUND, name + "/"
+			    + format + " not found");
+	}
+	catch (SQLException details) {
+	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+			       "unable to get checksum for " + reqPath + "; " + details.getMessage());
+	}
+	catch (IOException details) {
+	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+			    details.getMessage());
+	}
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+       List all objects available on this Member Node.
+    **/
+    private void listObjects(HttpServletRequest request, HttpServletResponse response, ObjectManager objManager) throws IOException {
+	log.info("listObjects()");
+	String format = request.getParameter("objectFormat");
+
+	try {
+	    Date from = parseDate(request, "startTime");
+	    Date to = parseDate(request, "endTime");
+	    
+	    int start = parseInt(request, "start",
+				 ObjectManager.DEFAULT_START);
+	    int count = parseInt(request, "count",
+				 ObjectManager.DEFAULT_COUNT);
+	    
+	    response.setContentType(XML_CONTENT_TYPE);
+	    
+	    if (count <= 0) {
+		OutputStream out = response.getOutputStream();
+		objManager.printList(from, to, format, out);
+	    }
+	    else {
+		OutputStream out = response.getOutputStream();
+		objManager.printList(start, count, from, to, format,
+				     out);
+	    }
+	} catch (ParseException e) {
+	    log.error("unable to parse request info", e);
+	    response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+			       e.getMessage());
+	    
+	}  catch (SQLException e) {
+	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+			       "unable to list objects; " + e.getMessage());
+	}
+
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+       Record the fact that a synchronization has failed.
+    **/
+    private void synchronizationFailed(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	log.info("synchronizationFailed()");
+	response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+       Retrieve a replica of an item.
+    **/
+    private void getReplica(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	log.info("getReplica()");
+	response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+    }
+
+
 }
