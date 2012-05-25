@@ -63,6 +63,11 @@
   </servlet>
 
   <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>*.xsl</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
     <servlet-name>oai-handler</servlet-name>
     <url-pattern>/request</url-pattern>
   </servlet-mapping>
