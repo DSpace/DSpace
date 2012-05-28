@@ -150,6 +150,21 @@ ul.quicklinks li {
 p.intro {
 	font-size: 80%;
 }
+#form1, #form2 {
+	position: relative;
+}
+#form1div {
+	position: relative;
+	top: 7.5em;
+}
+#form2div {
+	position: relative;
+	top: 1.5em;
+}
+#form1table, #form2table {
+	position: relative;
+	top: -2em;
+}
 <xsl:call-template name='xmlstyle' />
 </xsl:template>
 
@@ -170,6 +185,19 @@ p.intro {
     <h2><a name="moreinfo">About the XSLT</a></h2>
     <p>An XSLT file has converted the <a href="http://www.openarchives.org">OAI-PMH 2.0</a> responses into XHTML which looks nice in a browser which supports XSLT such as Mozilla, Firebird and Internet Explorer. The XSLT file was created by <a href="http://www.ecs.soton.ac.uk/people/cjg">Christopher Gutteridge</a> at the University of Southampton as part of the <a href="http://www.eprints.org/software/">GNU EPrints system</a>, and is freely redistributable under the <a href="http://www.gnu.org">GPL</a>.</p><p>If you want to use the XSL file on your own OAI interface you may but due to the way XSLT works you must install the XSL file on the same server as the OAI script, you can't just link to this copy.</p><p>For more information or to download the XSL file please see the <a href="http://software.eprints.org/xslt.php">OAI to XHTML XSLT homepage</a>.</p>
 
+    <script type="text/javascript"><![CDATA[
+    <!--
+// don't submit blank form fields
+document.getElementById('form1').onsubmit = function(){
+    var el = this.getElementsByTagName('input');
+    for (var i=0; i<el.length; i++) {
+        if (el[i].type == 'text' && el[i].value == '') {
+            el[i].disabled = true;
+        }
+    }
+};
+    -->
+    ]]></script>
   </body>
 </html>
 </xsl:template>
@@ -200,6 +228,31 @@ p.intro {
       <div class="results">
         <xsl:apply-templates select="oai:error"/>
       </div>
+      <xsl:if test="oai:error/@code = 'badArgument'">
+        <p>For your convenience, here's a form with possible combinations of arguments (required arguments are in bold text):</p>
+        <form id="form1" method="GET">
+          <div id='form1div'>
+            <input type="submit" name="verb" value="ListRecords" />
+            <input type="submit" name="verb" value="ListIdentifiers" />
+          </div>
+          <table id="form1table">
+            <tr><td><b>metadataPrefix:</b></td><td><input type="text" name="metadataPrefix" value="" /></td></tr>
+            <tr><td>set:</td><td><input type="text" name="set" /></td></tr>
+            <tr><td>from:</td><td><input type="text" name="from" /></td><td>(YYYY-MM-DD)</td></tr>
+            <tr><td>until:</td><td><input type="text" name="until" /></td><td>(YYYY-MM-DD)</td></tr>
+          </table>
+        </form>
+        <p>Alternatively, you can provide only the resumptionToken:</p>
+        <form name='form2' method="GET">
+          <div id='form2div'>
+            <input type="submit" name="verb" value="ListRecords" />
+            <input type="submit" name="verb" value="ListIdentifiers" />
+          </div>
+          <table id="form2table">
+            <tr><td><b>resumptionToken:</b></td><td><input type="text" name="resumptionToken" /></td></tr>
+          </table>
+        </form>
+      </xsl:if>
     </xsl:when>
     <xsl:otherwise>
       <p>Request was of type <xsl:value-of select="oai:request/@verb"/>.</p>
