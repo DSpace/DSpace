@@ -281,8 +281,7 @@
 			       </input>
              </xsl:when>
              <xsl:otherwise>
-                    <xsl:value-of select="dri:value[@type='raw']"/>
-                    <xsl:apply-templates select="." mode="hiddenInterpreter"/>
+                    <xsl:value-of select="dri:value[@type='raw']"/>                    
              </xsl:otherwise>
         </xsl:choose>
         
