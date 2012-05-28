@@ -73,7 +73,6 @@ public class SelectCollectionStep extends AbstractSubmissionStep
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {  
-    	long inicio=System.currentTimeMillis();
 		CollectionsWithCommunities collections; // List of possible collections.
 		String actionURL = contextPath + "/submit/" + knot.getId() + ".continue";
 		DSpaceObject dso = HandleManager.resolveToObject(context, handle);
@@ -118,8 +117,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         
         Button submit = list.addItem().addButton("submit");
         submit.setValue(T_submit_next);
-        System.out.println("Tardo: "+(System.currentTimeMillis()-inicio) + " segundos");
-    }
+     }
     
     /** 
      * Each submission step must define its own information to be reviewed
