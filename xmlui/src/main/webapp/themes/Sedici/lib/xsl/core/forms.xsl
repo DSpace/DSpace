@@ -56,7 +56,7 @@
                     the form still submits the information in those instances, even though they are no
                     longer encoded as HTML fields. The DRI Reference should contain the exact attributes
                     the hidden fields should have in order for this to work properly. -->
-				<xsl:apply-templates select="dri:instance" mode="hiddenInterpreter"/>                    
+				<!-- <xsl:apply-templates select="dri:instance" mode="hiddenInterpreter"/>                  -->    
               </div>
         </xsl:if>
     </xsl:template>
@@ -70,7 +70,9 @@
             <xsl:variable name="authValue" select="substring-before(dri:instance[position()=$position]/dri:value[@type='authority'], '#')"/>
             <xsl:variable name="authLabel" select="substring-after(dri:instance[position()=$position]/dri:value[@type='authority'], '#')"/>
             <input type="checkbox" value="{concat(@n,'_',$position)}" name="{concat(@n,'_selected')}"/>
-            <xsl:value-of select="dri:instance[position()=$position]/dri:value"></xsl:value-of>
+            <xsl:apply-templates select="dri:instance[position()=$position]" mode='inputChange'>
+               <xsl:with-param name="position" select="$position"/>
+            </xsl:apply-templates>
 
              <!-- look for authority value in instance. -->
             <xsl:if test="dri:instance[position()=$position]/dri:value[@type='authority']">             	
@@ -90,9 +92,7 @@
         </xsl:if>
     </xsl:template>
     
-    
-    
-    
+   
 <!--   <input type="hidden" value="Aacn Clinical Issues" name="dc_title_alternative_1">
 <input class="ds-authority-value " type="text" onchange="javascript: return DSpaceAuthorityOnChange(this, '_confidence','');" value="1079-0713" name="dc_title_alternative_authority_1" readonly="readonly">
 <input class="ds-authority-confidence-input" type="hidden" value="failed" name="dc_title_alternative_confidence_1">
@@ -245,6 +245,48 @@
                 <xsl:with-param name="position"><xsl:value-of select="$position + 1"/></xsl:with-param>
             </xsl:call-template>
         </xsl:if>
+    </xsl:template>
+    
+    <!-- TEMPLATE PARA GENERAR LOS INPUt PARA MODIFICACIONES -->
+    
+    <xsl:template match="dri:instance" mode="inputChange">
+        <xsl:param name="position" select="1"/>
+        <xsl:choose>
+             <xsl:when test="../@type= 'textarea'">
+             <textarea>
+                    <xsl:call-template name="fieldAttributes"/>
+                    <xsl:attribute name="class">ds-textarea-field submit-textarea</xsl:attribute>
+                    <xsl:attribute name="name"><xsl:value-of select="concat(../@n,'_',$position)"/></xsl:attribute>
+                    <xsl:choose>
+                       <xsl:when test="not(../dri:params[@cols])">
+                           <xsl:call-template name="textAreaCols"/>
+                        </xsl:when>
+                    </xsl:choose>
+                    <xsl:choose>
+                       <xsl:when test="not(../dri:params[@rows])">
+                           <xsl:call-template name="textAreaRows"/>
+                       </xsl:when>
+                    </xsl:choose>
+			        <xsl:value-of select="dri:value" disable-output-escaping="yes"/>
+
+                </textarea> 
+             </xsl:when>
+             <xsl:when test="../@type= 'text' and not(../dri:params/@authorityControlled='yes')">
+			       <input type="text">
+			           <xsl:attribute name="class">ds-text-field submit-text</xsl:attribute>
+			           <xsl:attribute name="name"><xsl:value-of select="concat(../@n,'_',$position)"/></xsl:attribute>
+			           <xsl:attribute name="value">
+			               <xsl:value-of select="dri:value[@type='raw']"/>
+			           </xsl:attribute>
+			       </input>
+             </xsl:when>
+             <xsl:otherwise>
+                    <xsl:value-of select="dri:value[@type='raw']"/>
+                    <xsl:apply-templates select="." mode="hiddenInterpreter"/>
+             </xsl:otherwise>
+        </xsl:choose>
+        
+
     </xsl:template>
     
 
