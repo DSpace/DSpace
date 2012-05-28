@@ -72,6 +72,15 @@ td.key {
 	font-weight: bold;
 	vertical-align: top;
 }
+.result-count {
+	margin-top:10px;
+	background-color: #e0e0ff;
+	padding: 3px;
+	border: 1px solid #c0c0c0;
+	white-space: nowrap;
+	font-weight: bold;
+	vertical-align: top;
+}
 .dcdata td.key {
 	background-color: #ffffe0;
 }
@@ -486,6 +495,7 @@ document.getElementById('form1').onsubmit = function(){
 <!-- ListRecords -->
 
 <xsl:template match="oai:ListRecords">
+  <div class="result-count">Results fetched: <xsl:value-of select="count(oai:record)"/></div>
   <xsl:apply-templates select="oai:record" />
   <xsl:apply-templates select="oai:resumptionToken" />
 </xsl:template>
@@ -493,6 +503,7 @@ document.getElementById('form1').onsubmit = function(){
 <!-- ListIdentifiers -->
 
 <xsl:template match="oai:ListIdentifiers">
+  <div class="result-count">Results fetched: <xsl:value-of select="count(oai:header)"/></div>
   <xsl:apply-templates select="oai:header" />
   <xsl:apply-templates select="oai:resumptionToken" />
 </xsl:template>
@@ -500,6 +511,7 @@ document.getElementById('form1').onsubmit = function(){
 <!-- ListSets -->
 
 <xsl:template match="oai:ListSets">
+  <div class="result-count">Results fetched: <xsl:value-of select="count(oai:set)"/></div>
   <xsl:apply-templates select="oai:set" />
   <xsl:apply-templates select="oai:resumptionToken" />
 </xsl:template>
