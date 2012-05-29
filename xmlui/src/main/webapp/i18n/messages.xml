@@ -2095,7 +2095,7 @@
 <message key="xmlui.dri2xhtml.METS-1.0.item-date-exposure">Exposure date</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-relation-dossier">Dossier</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-originInfo">Origin</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-identifier-uri">URI</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-identifier-uri">External link</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-identifier-doi">DOI</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-identifier-handle">Handle</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-identifier-other">Other</message>
