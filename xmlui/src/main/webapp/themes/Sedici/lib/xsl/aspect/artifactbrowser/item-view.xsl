@@ -373,6 +373,12 @@
 			<xsl:with-param name="type" select="'DCSeriesNumber'"/>
 		</xsl:call-template>
 
+		<!-- sedici.relation.event row -->
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'relation-event'" />
+			<xsl:with-param name="elements" select="dim:field[@element='relation' and @qualifier='event']" />
+		</xsl:call-template>
+
 		<!-- relation.dossier row -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'relation-dossier'" />
