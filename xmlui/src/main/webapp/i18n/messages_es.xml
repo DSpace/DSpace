@@ -2094,7 +2094,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.dri2xhtml.mimetype.application/marc">MARC record</message>
 <message key="xmlui.dri2xhtml.mimetype.application/mathematica">Mathematica</message>
 <message key="xmlui.dri2xhtml.mimetype.application/msword">Microsoft Word</message>
-<message key="xmlui.dri2xhtml.mimetype.application/octet-stream">Desconicido</message>
+<message key="xmlui.dri2xhtml.mimetype.application/octet-stream">Desconocido</message>
 <message key="xmlui.dri2xhtml.mimetype.application/pdf">PDF</message>
 <message key="xmlui.dri2xhtml.mimetype.application/postscript">Postscript</message>
 <message key="xmlui.dri2xhtml.mimetype.application/sgml">SGML</message>
