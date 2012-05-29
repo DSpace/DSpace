@@ -16,22 +16,9 @@ import org.dspace.storage.rdbms.TableRowIterator;
 
 public class CollectionSearchSedici {
 
-	/*
-	 * 
-	 */
     public static CollectionsWithCommunities findAuthorizedWithCommunitiesName(Context context, Community comm,
             int actionID) throws java.sql.SQLException
     {
-
-    	CollectionsWithCommunities collectionsWithCommunities = CollectionSearchSedici.findCollectionsWithCommunitiesAuthorized(context, comm, actionID);
-
-        return collectionsWithCommunities;
-    }
-
-
-	private static CollectionsWithCommunities findCollectionsWithCommunitiesAuthorized(Context context, Community comm, int actionID) {
-        // Get the bundle table rows
-
         List<Collection> collections = new ArrayList<Collection>();
         List<String> communitiesName = new ArrayList<String>();
         	//Son las colecciones de todas las comunidades las que tengo que filtrar
@@ -72,11 +59,67 @@ public class CollectionSearchSedici {
                 if (fromCache == null)
                 {
                 	fromCache=new Collection(context, row);
-                	if (AuthorizeManager.authorizeActionBoolean(context, fromCache, actionID)){	    					
-	                	collections.add(fromCache);
-	                    communitiesName.add(communityName);
-                	}
                 }
+            	if (AuthorizeManager.authorizeActionBoolean(context, fromCache, actionID)){	    					
+                	collections.add(fromCache);
+                    communitiesName.add(communityName);
+            	}
+                
+                
+            }
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+            {
+                tri.close();
+            }
+        }
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+        return new CollectionsWithCommunities(collections, communitiesName);
+	}
+	
+	public static CollectionsWithCommunities findAllWithCommunitiesName(Context context) {
+        // Get the bundle table rows
+
+        List<Collection> collections = new ArrayList<Collection>();
+        List<String> communitiesName = new ArrayList<String>();
+
+        TableRowIterator tri;
+		try {
+
+				tri = DatabaseManager.queryTable(context,null,
+				                "SELECT collection.*, community.name as community_name FROM collection, community, community2collection WHERE " +
+				                "community.community_id=community2collection.community_id "+
+				                " AND collection.collection_id=community2collection.collection_id" +
+				                " ORDER BY community_name, collection.name"
+				                );
+
+        // Build a list of Community objects
+        Collection fromCache;
+        String communityName;
+        try
+        {
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+
+                // First check the cache
+                fromCache = (Collection) context.fromCache(
+                        Collection.class, row.getIntColumn("collection_id"));
+                communityName=row.getStringColumn("community_name");
+
+                if (fromCache == null)
+                {
+                	fromCache=new Collection(context, row);
+                }
+            	collections.add(fromCache);
+                communitiesName.add(communityName);
                 
                 
             }
