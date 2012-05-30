@@ -33,44 +33,45 @@ import org.dspace.content.Collection;
  */
 public class EditCollectionMetadataForm extends AbstractDSpaceTransformer   
 {
-	/** Language Strings */
-	private static final Message T_dspace_home =
-        message("xmlui.general.dspace_home");
-	
-	private static final Message T_collection_trail = message("xmlui.administrative.collection.general.collection_trail");
-	private static final Message T_options_metadata = message("xmlui.administrative.collection.general.options_metadata");	
-	private static final Message T_options_roles = message("xmlui.administrative.collection.general.options_roles");
-	private static final Message T_options_harvest = message("xmlui.administrative.collection.GeneralCollectionHarvestingForm.options_harvest");
-        private static final Message T_options_curate = message("xmlui.administrative.collection.general.options_curate");	
-	private static final Message T_submit_return = message("xmlui.general.return");
-	
-	private static final Message T_title = message("xmlui.administrative.collection.EditCollectionMetadataForm.title");
-	private static final Message T_trail = message("xmlui.administrative.collection.EditCollectionMetadataForm.trail");
+    /** Language Strings */
+    private static final Message T_dspace_home = message("xmlui.general.dspace_home");
 
-	private static final Message T_main_head = message("xmlui.administrative.collection.EditCollectionMetadataForm.main_head");
-	
-	private static final Message T_label_name = message("xmlui.administrative.collection.EditCollectionMetadataForm.label_name");
-	private static final Message T_label_short_description = message("xmlui.administrative.collection.EditCollectionMetadataForm.label_short_description");
-	private static final Message T_label_introductory_text = message("xmlui.administrative.collection.EditCollectionMetadataForm.label_introductory_text");
-	private static final Message T_label_copyright_text = message("xmlui.administrative.collection.EditCollectionMetadataForm.label_copyright_text");
-	private static final Message T_label_side_bar_text = message("xmlui.administrative.collection.EditCollectionMetadataForm.label_side_bar_text");
-	private static final Message T_label_license = message("xmlui.administrative.collection.EditCollectionMetadataForm.label_license");
-	private static final Message T_label_provenance_description = message("xmlui.administrative.collection.EditCollectionMetadataForm.label_provenance_description");
+    private static final Message T_collection_trail = message("xmlui.administrative.collection.general.collection_trail");
+    private static final Message T_options_metadata = message("xmlui.administrative.collection.general.options_metadata");	
+    private static final Message T_options_roles = message("xmlui.administrative.collection.general.options_roles");
+    private static final Message T_options_harvest = message("xmlui.administrative.collection.GeneralCollectionHarvestingForm.options_harvest");
+    private static final Message T_options_curate = message("xmlui.administrative.collection.general.options_curate");	
+    private static final Message T_submit_return = message("xmlui.general.return");
 
-	private static final Message T_label_logo = message("xmlui.administrative.collection.EditCollectionMetadataForm.label_logo");
-	private static final Message T_label_existing_logo = message("xmlui.administrative.collection.EditCollectionMetadataForm.label_existing_logo");
+    private static final Message T_title = message("xmlui.administrative.collection.EditCollectionMetadataForm.title");
+    private static final Message T_trail = message("xmlui.administrative.collection.EditCollectionMetadataForm.trail");
 
-	private static final Message T_label_item_template = message("xmlui.administrative.collection.EditCollectionMetadataForm.label_item_template");
+    private static final Message T_main_head = message("xmlui.administrative.collection.EditCollectionMetadataForm.main_head");
 
-	private static final Message T_submit_create_template = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_create_template");
-	private static final Message T_submit_edit_template = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_edit_template");
-	private static final Message T_submit_delete_template = message("xmlui.general.delete");
+    private static final Message T_label_name = message("xmlui.administrative.collection.EditCollectionMetadataForm.label_name");
+    private static final Message T_label_short_description = message("xmlui.administrative.collection.EditCollectionMetadataForm.label_short_description");
+    private static final Message T_label_introductory_text = message("xmlui.administrative.collection.EditCollectionMetadataForm.label_introductory_text");
+    private static final Message T_label_copyright_text = message("xmlui.administrative.collection.EditCollectionMetadataForm.label_copyright_text");
+    private static final Message T_label_side_bar_text = message("xmlui.administrative.collection.EditCollectionMetadataForm.label_side_bar_text");
+    private static final Message T_label_license = message("xmlui.administrative.collection.EditCollectionMetadataForm.label_license");
+    private static final Message T_label_provenance_description = message("xmlui.administrative.collection.EditCollectionMetadataForm.label_provenance_description");
 
-	private static final Message T_submit_delete_logo = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_delete_logo");
-	private static final Message T_submit_delete = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_delete");
-	private static final Message T_submit_save = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_save");
-	
-	public void addPageMeta(PageMeta pageMeta) throws WingException
+    private static final Message T_label_logo = message("xmlui.administrative.collection.EditCollectionMetadataForm.label_logo");
+    private static final Message T_label_existing_logo = message("xmlui.administrative.collection.EditCollectionMetadataForm.label_existing_logo");
+
+    private static final Message T_label_item_template = message("xmlui.administrative.collection.EditCollectionMetadataForm.label_item_template");
+
+    private static final Message T_submit_create_template = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_create_template");
+    private static final Message T_submit_edit_template = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_edit_template");
+    private static final Message T_submit_delete_template = message("xmlui.general.delete");
+
+    private static final Message T_submit_delete_logo = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_delete_logo");
+    private static final Message T_submit_delete = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_delete");
+    private static final Message T_submit_save = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_save");
+
+    @Override
+    public void addPageMeta(PageMeta pageMeta)
+            throws WingException
     {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
@@ -79,8 +80,10 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
     }
 	
 	
-	public void addBody(Body body) throws WingException, SQLException, AuthorizeException
-	{
+    @Override
+    public void addBody(Body body)
+            throws WingException, SQLException, AuthorizeException
+    {
 		int collectionID = parameters.getParameterAsInteger("collectionID", -1);
 		Collection thisCollection = Collection.find(context, collectionID);
 		
@@ -173,7 +176,12 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    if (thisCollection.getLogo() != null) {
 	    	metadataList.addLabel(T_label_existing_logo);
 	    	item = metadataList.addItem();
-	    	item.addFigure(contextPath + "/bitstream/id/" + thisCollection.getLogo().getID() + "/bob.jpg", null, null);
+                // Filename in URL is  ignored by the sitemap.  It's needed to
+                // provide a format hint to the browser, since logo bitstreams
+                // don't have names(!).
+                item.addFigure(contextPath + "/bitstream/id/"
+                        + thisCollection.getLogo().getID() + "/bob.jpg", null,
+                        null);
 	    	item.addButton("submit_delete_logo").setValue(T_submit_delete_logo);
 	    }
 	    
