@@ -50,12 +50,14 @@
 		            </xsl:otherwise>
 	            </xsl:choose>
             </a>
-			<!--Display community strengths (item counts) if they exist-->
-			<xsl:if test="string-length($data/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">
-                <xsl:text> [</xsl:text>
-                <xsl:value-of select="$data/dim:field[@element='format'][@qualifier='extent'][1]"/>
-                <xsl:text>]</xsl:text>
-            </xsl:if>
+            <!--Display community strengths (item counts) if they exist-->
+            <span class="ds-strength">
+                <xsl:if test="string-length($data/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">
+                    <xsl:text> [</xsl:text>
+                    <xsl:value-of select="$data/dim:field[@element='format'][@qualifier='extent'][1]"/>
+                    <xsl:text>]</xsl:text>
+                </xsl:if>
+            </span>
         </span>
     </xsl:template>
 
@@ -73,12 +75,14 @@
 		            </xsl:otherwise>
            		</xsl:choose>
             </a>
-			<!--Display community strengths (item counts) if they exist-->
-			<xsl:if test="string-length($data/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">
-                <xsl:text> [</xsl:text>
-                <xsl:value-of select="$data/dim:field[@element='format'][@qualifier='extent'][1]"/>
-                <xsl:text>]</xsl:text>
-            </xsl:if>
+            <!--Display community strengths (item counts) if they exist-->
+            <span class="ds-strength">
+                <xsl:if test="string-length($data/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">
+                    <xsl:text> [</xsl:text>
+                    <xsl:value-of select="$data/dim:field[@element='format'][@qualifier='extent'][1]"/>
+                    <xsl:text>]</xsl:text>
+                </xsl:if>
+            </span>
             <br/>
             <xsl:choose>
                 <xsl:when test="$data/dim:field[@element='description' and @qualifier='abstract']">
