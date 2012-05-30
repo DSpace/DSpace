@@ -539,7 +539,7 @@
 					<label>Nombre del evento</label>
 					<input-type>onebox</input-type>
 					<hint>Nombre del congreso o conferencia en el que este objeto fue presentado</hint>
-					<type-bind>Objeto de conferencia</type-bind>
+					<type-bind>Articulo,Objeto de conferencia</type-bind>
 					<required>Debe ingresar el nombre del evento al que este objeto pertenece</required>
 				</field>
 
