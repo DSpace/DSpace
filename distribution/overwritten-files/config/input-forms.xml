@@ -531,7 +531,7 @@
 					<type-bind>Tesis,Objeto de conferencia</type-bind>
 				</field>
 
-				<!-- Nombre del evento -->
+				<!-- Nombre del evento (Obligatorio para Objetos de Conferencia) -->
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>relation</dc-element>
@@ -539,8 +539,19 @@
 					<label>Nombre del evento</label>
 					<input-type>onebox</input-type>
 					<hint>Nombre del congreso o conferencia en el que este objeto fue presentado</hint>
-					<type-bind>Articulo,Objeto de conferencia</type-bind>
+					<type-bind>Objeto de conferencia</type-bind>
 					<required>Debe ingresar el nombre del evento al que este objeto pertenece</required>
+				</field>
+
+				<!-- Nombre del evento (Opcional para articulos) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>event</dc-qualifier>
+					<label>Nombre del evento</label>
+					<input-type>onebox</input-type>
+					<hint>Nombre del congreso o conferencia en el que este documento fue presentado</hint>
+					<type-bind>Articulo</type-bind>
 				</field>
 
 				<!-- Director de tesis -->
