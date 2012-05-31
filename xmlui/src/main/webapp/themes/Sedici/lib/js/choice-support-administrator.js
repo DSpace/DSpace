@@ -120,8 +120,10 @@ function DSpaceSetupAutocomplete(formID, args) {
     			return verificarConfidenceIndividual(args.inputID, args.confidenceName, confianza_100);
     		})
     	}
-    	//si es authority controlled y el value del label es distinto al del value,  debo cambar la confianza ya que vendra como 200 y en realidad es 600
-    	verificarConfianzaInicial(inputID, authorityLabelID, args.confidenceIndicatorID, args.confidenceName);
+    	if (args.verificaConfianzaInicial == 'yes'){
+	    	//si es authority controlled y el value del label es distinto al del value,  debo cambar la confianza ya que vendra como 200 y en realidad es 600
+	    	verificarConfianzaInicial(inputID, authorityLabelID, args.confidenceIndicatorID, args.confidenceName);
+        }	
     	
     } else {
     	isAuthorityControlled=false;     

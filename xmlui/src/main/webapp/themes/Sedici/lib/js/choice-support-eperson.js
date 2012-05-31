@@ -103,7 +103,9 @@ function DSpaceSetupAutocomplete(formID, args) {
 
     if (args.authorityControlled=='yes'){
     	isAuthorityControlled=true; 
-    	verificarConfianzaInicial(args.confidenceIndicatorID, args.confidenceName);
+    	if (args.verificaConfianzaInicial == 'yes'){
+    		verificarConfianzaInicial(args.confidenceIndicatorID, args.confidenceName);
+    	}
     } else {
     	isAuthorityControlled=false;    
     };
