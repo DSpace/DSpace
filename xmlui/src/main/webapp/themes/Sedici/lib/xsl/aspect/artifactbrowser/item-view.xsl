@@ -667,24 +667,22 @@
 			<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2>
 			<xsl:choose>
 				<xsl:when test="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='ORE'] or ./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and @qualifier='uri' and @mdschema='sedici']">
-			        <xsl:choose>
-			            <xsl:when test="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']">
-			                <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']">
-			                    <xsl:with-param name="context" select="."/>
-			                    <xsl:with-param name="primaryBitstream" select="./mets:structMap[@TYPE='LOGICAL']/mets:div[@TYPE='DSpace Item']/mets:fptr/@FILEID"/>
-			                </xsl:apply-templates>
-			            </xsl:when>
-			            
-			            <!-- Special case for handling ORE resource maps stored as DSpace bitstreams -->
-			            <xsl:when test="./mets:fileSec/mets:fileGrp[@USE='ORE']">
-			                <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='ORE']"/>
-			            </xsl:when>
-			            
-			            <!-- Localizacion Electronica -->
-			            <xsl:when test="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and @qualifier='uri' and @mdschema='sedici']">
-							<xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and @qualifier='uri' and @mdschema='sedici']"/>
-			            </xsl:when>
-			        </xsl:choose>
+		            <xsl:if test="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']">
+		                <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']">
+		                    <xsl:with-param name="context" select="."/>
+		                    <xsl:with-param name="primaryBitstream" select="./mets:structMap[@TYPE='LOGICAL']/mets:div[@TYPE='DSpace Item']/mets:fptr/@FILEID"/>
+		                </xsl:apply-templates>
+		            </xsl:if>
+		            
+		            <!-- Special case for handling ORE resource maps stored as DSpace bitstreams -->
+		            <xsl:if test="./mets:fileSec/mets:fileGrp[@USE='ORE']">
+		                <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='ORE']"/>
+		            </xsl:if>
+		            
+		            <!-- Localizacion Electronica -->
+		            <xsl:if test="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and @qualifier='uri' and @mdschema='sedici']">
+						<xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and @qualifier='uri' and @mdschema='sedici']"/>
+		            </xsl:if>
 				</xsl:when>
 				<xsl:otherwise>
 					<p><i18n:text>xmlui.dri2xhtml.METS-1.0.item-no-files</i18n:text></p>
