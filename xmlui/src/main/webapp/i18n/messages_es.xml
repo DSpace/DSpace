@@ -2297,6 +2297,8 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 
 <message key="xmlui.bitstream.downloadName">documento</message>
 
+<message key="xmlui.forms.remove">Eliminar</message>
+
 <!-- De aca en mas estan en las dependencias de dspace -->
 
 <!-- extension al messages.xml de XmlWorkflow -->

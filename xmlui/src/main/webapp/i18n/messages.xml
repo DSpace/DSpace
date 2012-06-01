@@ -2206,6 +2206,8 @@
 
 <message key="xmlui.bitstream.downloadName">document</message>
 
+<message key="xmlui.forms.remove">Remove</message>
+
 <!-- De aca en mas estan en las dependencias de dspace -->
 
 <!-- extension al messages.xml de XmlWorkflow -->

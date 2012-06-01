@@ -107,6 +107,13 @@ $(document).ready(function (){
 
 });
 
+//-------------------- Funcion que elimina un previous value
+
+function eliminarMetadato(metadatoCheckboxId){
+     var checkbox = $('#'+metadatoCheckboxId);
+     checkbox.attr('checked', true);
+}
+
 //-------------------- support for Lookup Popup
 
 //Create popup window with authority choices for value of an input field.

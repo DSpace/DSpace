@@ -1299,7 +1299,7 @@ form.search p.ds-paragraph.button-list {
 }
 
 p.ds-paragraph {
-/*margin-left:50px;*/
+margin-left:50px;
 
 }
 
@@ -1391,16 +1391,12 @@ clear:both;
 #aspect_submission_Submissions_table_unfinished-submissions,
 #aspect_submission_Submissions_table_submissions-inprogress,
 #aspect_submission_Submissions_table_completed-submissions,
-#aspect_administrative_eperson_ManageEPeopleMain_table_eperson-search-table,
-#aspect_administrative_group_ManageGroupsMain_table_groups-search-table,
-#aspect_xmlworkflow_Submissions_table_submissions-inprogress,
 table.detailtable {
     margin-top: 10px;
     margin-bottom: 10px;
     border-collapse: collapse;
-	/*margin-left:50px;*/
-	width: 100%;
-	
+	margin-left:50px;
+
 }
 
 #aspect_administrative_registries_EditMetadataSchema_table_metadata-schema-edit-existing-fields tr,
@@ -1983,7 +1979,7 @@ background-color:white;
 color:#6c6c6c;
 height:20px;
 position:relative;
-/*left:-45px;*/
+left:-45px;
 }
 
 #aspect_submission_Submissions_field_submit_submissions_remove:hover, #aspect_administrative_eperson_ManageEPeopleMain_field_submit_delete:hover,
@@ -2005,6 +2001,19 @@ background-color:white;
 color:#6c6c6c;
 height:20px;
 float:right;
+}
+
+
+input.ds-delete-button-previous-values {
+font-size:16px;
+background-image:url(../../images/tachito.png);
+height:20px;
+background-color:white;
+background-repeat:no-repeat;
+padding:0px 0px 5px 17px;
+color:#939598;
+font-weight:bold;
+margin-left:8px;
 }
 
 /*LOGIN*/
@@ -2648,8 +2657,6 @@ background-position:right top;
 background-repeat:no-repeat;
 background-color:white;
 border:none;
-padding-top: 45px;
-margin-top: -60px;
 }
 
 #aspect_submission_Submissions_div_submissions p.ds-paragraph {
@@ -2954,18 +2961,20 @@ margin-right:9px;
 }
 
 #other_attributes {
-	background-color: #E3EEF0;
+	margin-top: 75px;
+}
+#other_attributes {
+background-color: #E3EEF0;
     border: 1px dashed #8ECED6;
     margin-bottom: 15px;
     padding: 10px 15px;
-}
+	}
 
 
 #item-file-section {
 	border: dashed 1px #CFCFCF;
 	padding: 10px 15px 10px 15px;
 	margin-bottom:15px;
-	margin-top: 75px;
 }
 
 #other_attributes h2{
@@ -3224,12 +3233,6 @@ h1.communities_header {
 text-align:center;
 margin-bottom:10px;
 }
-
-#aspect_submission_StepTransformer_field_dc_title,
-#aspect_submission_StepTransformer_field_sedici_title_subtitle {
-	width: 100%;
-}
-
 
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
 body{ background-color:white;}
