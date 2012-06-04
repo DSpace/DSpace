@@ -15,7 +15,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 <div id='pagina_estatica' class="pagina_informacionTesistas">
 
 <p>
-	Con el fin de socializar el conocimiento, la UNLP ha dictaminado, mediante la <a href="pages/resolucionSedici">resolución 78/11</a>, que 
+	Con el fin de socializar el conocimiento, la UNLP ha dictaminado, mediante la <a href="http://hdl.handle.net/10915/18184">Resolución 78/11</a>, que 
 	todos los alumnos de posgrado deben depositar una copia digital de sus tesis en SeDiCI antes de 
 	iniciar los trámites para la obtención de su título.<br/>
 	De este modo, una vez que la tesis ha sido presentada y aprobada, el alumno puede elegir cualquiera 
