@@ -520,6 +520,11 @@
 		</xsl:if>
 	</xsl:template>
 	
+		<xsl:template match="dri:list[@id='aspect.submission.StepTransformer.list.submit-describe']">
+		<i18n:text>sedici.common.camposObligatorios</i18n:text><br/><br/>
+		<xsl:apply-templates />
+		</xsl:template>
+	
     <!-- Solo las urls se acotan en caso de que este explicitado -->
 	<xsl:template name="render-field-value">
 		<xsl:param name="elements"/>
