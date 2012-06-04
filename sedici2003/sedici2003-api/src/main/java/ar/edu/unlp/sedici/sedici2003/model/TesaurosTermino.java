@@ -78,7 +78,7 @@ public class TesaurosTermino {
 
 		EntityManager em = TesaurosTermino.entityManager();
 		TypedQuery<TesaurosTermino> q = em.createQuery(sql, TesaurosTermino.class);
-		q.setParameter("filtro", "%"+text+"%");
+		q.setParameter("filtro", "%"+text.trim()+"%");
 		q.setFirstResult(start);
 		q.setMaxResults(count);
 		
