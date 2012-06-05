@@ -220,6 +220,32 @@
 
     </xsl:template>
     
+    <xsl:template match="/dri:document/dri:body/dri:div[@id='aspect.xmlworkflow.WorkflowTransformer.div.perform-task']/dri:head">
+        <xsl:variable name="handle"><xsl:value-of select="substring-after(substring-before(../dri:referenceSet/dri:reference/@url,'/mets.xml'), 'metadata/')"/></xsl:variable>
+        <xsl:variable name="head_count" select="count(ancestor::dri:*[dri:head])"/>
+        <xsl:variable name="class">ds-div-head</xsl:variable>
+        <xsl:element name="h{$head_count}">
+            <xsl:call-template name="standardAttributes">
+                <xsl:with-param name="class" select="$class"/>
+            </xsl:call-template>
+            <xsl:apply-templates/>
+            <xsl:choose>
+            	<xsl:when test="contains($handle,'internal')">
+            		(<i18n:text>xmlui.forms.claimedAction.non_installed</i18n:text>)
+            	</xsl:when>
+            	<xsl:otherwise>
+	            	(<a>
+		        	  <xsl:attribute name="href">
+		        	  <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']"/>/<xsl:value-of select="$handle"/>
+                      </xsl:attribute>		        	  
+		        	  <xsl:value-of select="substring-after($handle, 'handle/')"/>
+		            </a>)
+            	</xsl:otherwise>
+            </xsl:choose>
+        </xsl:element>
+
+    </xsl:template>
+    
 
 
 </xsl:stylesheet>

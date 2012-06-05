@@ -2299,6 +2299,8 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 
 <message key="xmlui.forms.remove">Eliminar</message>
 
+<message key="xmlui.forms.claimedAction.non_installed">Aún no publicado</message>
+
 <!-- De aca en mas estan en las dependencias de dspace -->
 
 <!-- extension al messages.xml de XmlWorkflow -->

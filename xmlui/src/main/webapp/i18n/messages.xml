@@ -2208,6 +2208,8 @@
 
 <message key="xmlui.forms.remove">Remove</message>
 
+<message key="xmlui.forms.claimedAction.non_installed">Non installed</message>
+
 <!-- De aca en mas estan en las dependencias de dspace -->
 
 <!-- extension al messages.xml de XmlWorkflow -->
