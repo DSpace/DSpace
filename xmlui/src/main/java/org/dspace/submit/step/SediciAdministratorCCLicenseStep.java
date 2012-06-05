@@ -172,8 +172,8 @@ public class SediciAdministratorCCLicenseStep extends AbstractProcessingStep
         //es administrador de la coleccion a la que se está agregando el item, hay un select
     	String licenseUri = request.getParameter("cc_license_chooser");
 	   //limpio los metadatos
-	   item.clearMetadata(uriNameSchema, uriNameElement, uriNameQualifier, null);
-       item.clearMetadata(uriFieldSchema, uriFieldElement, uriFieldQualifier, null);
+	   item.clearMetadata(uriNameSchema, uriNameElement, uriNameQualifier, Item.ANY);
+       item.clearMetadata(uriFieldSchema, uriFieldElement, uriFieldQualifier, Item.ANY);
        if (licenseUri!=""){
             String licenseDescription=org.dspace.app.xmlui.aspect.submission.SediciAdministratorCCLicenseStep.GetLicenses().get(licenseUri);
 	    	//agrego los metadatos
