@@ -392,7 +392,7 @@ No redefino todos los templates, solo los que necesito redefinir.
         </xsl:variable>
 
 	  <!-- imprimo el value -->
-      <input type="text">
+      <input type="text" class="ds-text-field">
         <xsl:attribute name="value">
           <xsl:value-of select="$value"/>
         </xsl:attribute>
@@ -448,19 +448,15 @@ No redefino todos los templates, solo los que necesito redefinir.
 	             		</xsl:choose>
 		      </xsl:attribute>-->
 	        <xsl:attribute name="value">
-	          <xsl:value-of select="$authLabel"/>
+	        	<xsl:value-of select="$authLabel"/>
 	        </xsl:attribute>
-	        <xsl:attribute name="class">
-	          ds-authority-label
-	        </xsl:attribute>
-	        <xsl:attribute name="readonly">
-	          readonly
-	        </xsl:attribute>
+	        <xsl:attribute name="class">ds-authority-label</xsl:attribute>
+	        <xsl:attribute name="readonly">readonly</xsl:attribute>
 	        <xsl:attribute name="name">
-	        <xsl:value-of select="$labelName"/>
+	        	<xsl:value-of select="$labelName"/>
 	        </xsl:attribute>
 	        <xsl:attribute name="id">
-	          <xsl:value-of select="$labelName"/>
+	        	<xsl:value-of select="$labelName"/>
 	        </xsl:attribute>
 	      </input>
       </xsl:if>

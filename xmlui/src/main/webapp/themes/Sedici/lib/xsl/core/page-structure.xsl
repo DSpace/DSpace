@@ -406,6 +406,14 @@
 					}
 				});
 			});
+
+			$(document).ready(function() {
+				//click event on confident indicators
+				$("img.ds-authority-confidence").click(function() {
+					var self = $(this).siblings('.ds-authority-label').toggle();
+				});
+			});
+
 			</xsl:text>
 		</script>
         

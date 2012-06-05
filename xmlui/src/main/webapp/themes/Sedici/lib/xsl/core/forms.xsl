@@ -41,6 +41,7 @@
         
         <!-- Create the first field normally -->
         <xsl:apply-templates select="." mode="normalField"/>
+        
         <!-- Follow it up with an ADD button if the add operation is specified. This allows
             entering more than one value for this field. -->
         <xsl:if test="contains(dri:params/@operations,'add')">
@@ -142,34 +143,39 @@
         <xsl:param name="position"/>
         
         <xsl:if test="dri:instance[position()=$position]">
-            <xsl:variable name="authValue" select="substring-before(dri:instance[position()=$position]/dri:value[@type='authority'], '#')"/>
-            <xsl:variable name="authLabel" select="substring-after(dri:instance[position()=$position]/dri:value[@type='authority'], '#')"/>
-            <xsl:variable name="checkboxId" select="concat(@n,'_checkbox_',$position)"/>
-            <input type="checkbox" id="{$checkboxId}"  value="{concat(@n,'_',$position)}" name="{concat(@n,'_selected')}" style="display:none;"/> 
-
-            <xsl:apply-templates select="dri:instance[position()=$position]" mode='inputChange'>
-               <xsl:with-param name="position" select="$position"/>
-            </xsl:apply-templates>
-
-             <!-- look for authority value in instance. -->
-            <xsl:if test="dri:instance[position()=$position]/dri:value[@type='authority']">             	
-              <xsl:call-template name="multipleAuthorityInputFields">
-                <xsl:with-param name="name" select="@n"/>
-      			<xsl:with-param name="position" select="$position"/>
-     			<xsl:with-param name="value" select="dri:instance[position()=$position]/dri:value"/>
-      			<xsl:with-param name="authValue" select="$authValue"/>
-      			<xsl:with-param name="authLabel" select="$authLabel"/>
-      			<xsl:with-param name="confValue" select="dri:instance[position()=$position]/dri:value[@type='authority']/@confidence"/>
-              </xsl:call-template>
-            </xsl:if>
+        
+        	<div class="previous-value-item">
+        
+	            <xsl:variable name="authValue" select="substring-before(dri:instance[position()=$position]/dri:value[@type='authority'], '#')"/>
+	            <xsl:variable name="authLabel" select="substring-after(dri:instance[position()=$position]/dri:value[@type='authority'], '#')"/>
+	            <xsl:variable name="checkboxId" select="concat(@n,'_checkbox_',$position)"/>
+	            <input type="checkbox" id="{$checkboxId}"  value="{concat(@n,'_',$position)}" name="{concat(@n,'_selected')}" style="display:none;"/> 
+	
+	            <xsl:apply-templates select="dri:instance[position()=$position]" mode='inputChange'>
+	               <xsl:with-param name="position" select="$position"/>
+	            </xsl:apply-templates>
+	
+	             <!-- look for authority value in instance. -->
+	            <xsl:if test="dri:instance[position()=$position]/dri:value[@type='authority']">             	
+	              <xsl:call-template name="multipleAuthorityInputFields">
+	                <xsl:with-param name="name" select="@n"/>
+	      			<xsl:with-param name="position" select="$position"/>
+	     			<xsl:with-param name="value" select="dri:instance[position()=$position]/dri:value"/>
+	      			<xsl:with-param name="authValue" select="$authValue"/>
+	      			<xsl:with-param name="authLabel" select="$authLabel"/>
+	      			<xsl:with-param name="confValue" select="dri:instance[position()=$position]/dri:value[@type='authority']/@confidence"/>
+	              </xsl:call-template>
+	            </xsl:if>
+	            
+	             <!-- Conclude with a DELETE button if the delete operation is specified. This allows
+	                removing one value stored for this field. -->
+	            <xsl:if test="contains(dri:params/@operations,'delete') and dri:instance">
+	                <!-- Delete buttons should be named "submit_[field]_delete" so that we can ignore errors from required fields when simply removing values-->
+	                <input type="submit" value="xmlui.forms.remove" i18n:attr="value" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" onClick="eliminarMetadato('{$checkboxId}');"/>
+	            </xsl:if>
+	            
+            </div>
             
-             <!-- Conclude with a DELETE button if the delete operation is specified. This allows
-                removing one value stored for this field. -->
-            <xsl:if test="contains(dri:params/@operations,'delete') and dri:instance">
-                <!-- Delete buttons should be named "submit_[field]_delete" so that we can ignore errors from required fields when simply removing values-->
-                <input type="submit" value="xmlui.forms.remove" i18n:attr="value" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" onClick="eliminarMetadato('{$checkboxId}');"/>
-            </xsl:if>
-            <br/>
             <xsl:call-template name="especialSimpleFieldIterator">
                 <xsl:with-param name="position"><xsl:value-of select="$position + 1"/></xsl:with-param>
             </xsl:call-template>
@@ -182,7 +188,7 @@
         <xsl:param name="position" select="1"/>
         <xsl:choose>
              <xsl:when test="../@type= 'textarea'">
-             <textarea>
+             	<textarea>
                     <xsl:call-template name="fieldAttributes"/>
                     <xsl:attribute name="class">ds-textarea-field submit-textarea</xsl:attribute>
                     <xsl:attribute name="name"><xsl:value-of select="concat(../@n,'_',$position)"/></xsl:attribute>
@@ -197,7 +203,6 @@
                        </xsl:when>
                     </xsl:choose>
 			        <xsl:value-of select="dri:value" disable-output-escaping="yes"/>
-
                 </textarea> 
              </xsl:when>
              <xsl:when test="../@type= 'text' and not(../dri:params/@authorityControlled='yes')">
@@ -217,6 +222,9 @@
              </xsl:when>
         </xsl:choose>
         
+        <xsl:apply-templates select="." mode="i18n-field">
+        	<xsl:with-param name="position" select="$position"/>
+        </xsl:apply-templates>
 
     </xsl:template>
     
@@ -247,5 +255,279 @@
     </xsl:template>
     
 
+	<!-- Normal field rendering -->
+    <xsl:template match="dri:field" mode="normalField">
+        <xsl:variable name="confidenceIndicatorID" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
+        <xsl:choose>
+			<!-- TODO: this has changed drammatically (see form3.xml) -->
+			<xsl:when test="@type= 'select'">
+				<select>
+					<xsl:call-template name="fieldAttributes" />
+					<xsl:apply-templates />
+				</select>
+			</xsl:when>
+               
+           	<xsl:when test="@type= 'textarea'">
+                <textarea>
+                    <xsl:call-template name="fieldAttributes"/>
+
+                    <!--
+                        if the cols and rows attributes are not defined we need to call
+                        the tempaltes for them since they are required attributes in strict xhtml
+                     -->
+                    <xsl:choose>
+                        <xsl:when test="not(./dri:params[@cols])">
+                               <xsl:call-template name="textAreaCols"/>
+                        </xsl:when>
+                    </xsl:choose>
+                    <xsl:choose>
+                        <xsl:when test="not(./dri:params[@rows])">
+                               <xsl:call-template name="textAreaRows"/>
+                        </xsl:when>
+                    </xsl:choose>
+
+                    <xsl:apply-templates />
+                    
+                    <xsl:choose>
+                        <xsl:when test="./dri:value[@type='raw']">
+                            <xsl:copy-of select="./dri:value[@type='raw']/node()"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:copy-of select="./dri:value[@type='default']/node()"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:if  test="string-length(./dri:value) &lt; 1">
+                       <i18n:text>xmlui.dri2xhtml.default.textarea.value</i18n:text>
+                    </xsl:if>
+                </textarea>
+
+				<xsl:apply-templates select="." mode="i18n-field"/>
+
+				<!-- add place to store authority value -->
+				<xsl:if test="dri:params/@authorityControlled">
+					<xsl:variable name="confidence">
+						<xsl:if test="./dri:value[@type='authority']">
+							<xsl:value-of select="./dri:value[@type='authority']/@confidence" />
+						</xsl:if>
+					</xsl:variable>
+					<!-- add authority confidence widget -->
+					<xsl:call-template name="authorityConfidenceIcon">
+						<xsl:with-param name="confidence" select="$confidence" />
+						<xsl:with-param name="id" select="$confidenceIndicatorID" />
+					</xsl:call-template>
+					<xsl:call-template name="authorityInputFields">
+						<xsl:with-param name="name" select="@n" />
+						<xsl:with-param name="id" select="@id" />
+						<xsl:with-param name="authValue" select="dri:value[@type='authority']/text()" />
+						<xsl:with-param name="confValue" select="dri:value[@type='authority']/@confidence" />
+						<xsl:with-param name="confIndicatorID" select="$confidenceIndicatorID" />
+						<xsl:with-param name="unlockButton" select="dri:value[@type='authority']/dri:field[@rend='ds-authority-lock']/@n" />
+						<xsl:with-param name="unlockHelp" select="dri:value[@type='authority']/dri:field[@rend='ds-authority-lock']/dri:help" />
+					</xsl:call-template>
+				</xsl:if>
+				
+				<!-- add choice mechanisms -->
+				<xsl:choose>
+					<xsl:when test="dri:params/@choicesPresentation = 'suggest'">
+						<xsl:call-template name="addAuthorityAutocomplete">
+							<xsl:with-param name="confidenceIndicatorID" select="$confidenceIndicatorID" />
+							<xsl:with-param name="confidenceName">
+								<xsl:value-of select="concat(@n,'_confidence')" />
+							</xsl:with-param>
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:when test="dri:params/@choicesPresentation = 'lookup'">
+						<xsl:call-template name="addLookupButton">
+							<xsl:with-param name="isName" select="'false'" />
+							<xsl:with-param name="confIndicator" select="$confidenceIndicatorID" />
+						</xsl:call-template>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:when>
+
+			<!-- This is changing drammatically -->
+			<xsl:when test="@type= 'checkbox' or @type= 'radio'">
+				<fieldset>
+					<xsl:call-template name="standardAttributes">
+						<xsl:with-param name="class">
+							<xsl:text>ds-</xsl:text>
+							<xsl:value-of select="@type" />
+							<xsl:text>-field </xsl:text>
+							<xsl:if test="dri:error">
+								<xsl:text>error </xsl:text>
+							</xsl:if>
+						</xsl:with-param>
+					</xsl:call-template>
+					<xsl:attribute name="id"><xsl:value-of select="generate-id()" /></xsl:attribute>
+					<xsl:if test="dri:label">
+						<legend>
+							<xsl:apply-templates select="dri:label" mode="compositeComponent" />
+						</legend>
+					</xsl:if>
+					<xsl:apply-templates />
+				</fieldset>
+			</xsl:when>
+			
+           <!--
+               <input>
+                           <xsl:call-template name="fieldAttributes"/>
+                   <xsl:if test="dri:value[@checked='yes']">
+                               <xsl:attribute name="checked">checked</xsl:attribute>
+                   </xsl:if>
+                   <xsl:apply-templates/>
+               </input>
+               -->
+            <xsl:when test="@type= 'composite'">
+                <!-- TODO: add error and help stuff on top of the composite -->
+                <span class="ds-composite-field">
+                    <xsl:apply-templates select="dri:field" mode="compositeComponent"/>
+                </span>
+                <xsl:apply-templates select="dri:field/dri:error" mode="compositeComponent"/>
+                <xsl:apply-templates select="dri:error" mode="compositeComponent"/>
+                <xsl:apply-templates select="dri:field/dri:help" mode="compositeComponent"/>
+                <!--<xsl:apply-templates select="dri:help" mode="compositeComponent"/>-->
+            </xsl:when>
+
+                   <!-- text, password, file, and hidden types are handled the same.
+                       Buttons: added the xsl:if check which will override the type attribute button
+                           with the value 'submit'. No reset buttons for now...
+	                    -->
+			<xsl:otherwise>
+				<input>
+					<xsl:call-template name="fieldAttributes" />
+					<xsl:if test="@type='button'">
+						<xsl:attribute name="type">submit</xsl:attribute>
+					</xsl:if>
+					<xsl:attribute name="value">
+                        <xsl:choose>
+                            <xsl:when test="./dri:value[@type='raw']">
+                                <xsl:value-of select="./dri:value[@type='raw']" />
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="./dri:value[@type='default']" />
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+					<xsl:if test="dri:value/i18n:text">
+						<xsl:attribute name="i18n:attr">value</xsl:attribute>
+					</xsl:if>
+					<xsl:apply-templates />
+				</input>
+		
+				<xsl:apply-templates select="." mode="i18n-field"/>
+		
+				<xsl:variable name="confIndicatorID" select="concat(@id,'_confidence_indicator')" />
+				<xsl:if test="dri:params/@authorityControlled">
+					<xsl:variable name="confidence">
+						<xsl:if test="./dri:value[@type='authority']">
+							<xsl:value-of select="./dri:value[@type='authority']/@confidence" />
+						</xsl:if>
+					</xsl:variable>
+					<!-- add authority confidence widget -->
+					<xsl:call-template name="authorityConfidenceIcon">
+						<xsl:with-param name="confidence" select="$confidence" />
+						<xsl:with-param name="id" select="$confidenceIndicatorID" />
+					</xsl:call-template>
+					<xsl:call-template name="authorityInputFields">
+						<xsl:with-param name="name" select="@n" />
+						<xsl:with-param name="id" select="@id" />
+						<xsl:with-param name="authValue"
+							select="dri:value[@type='authority']/text()" />
+						<xsl:with-param name="confValue"
+							select="dri:value[@type='authority']/@confidence" />
+					</xsl:call-template>
+				</xsl:if>
+				<xsl:choose>
+					<xsl:when test="dri:params/@choicesPresentation = 'suggest'">
+						<xsl:call-template name="addAuthorityAutocomplete">
+							<xsl:with-param name="confidenceIndicatorID" select="$confidenceIndicatorID" />
+							<xsl:with-param name="confidenceName">
+								<xsl:value-of select="concat(@n,'_confidence')" />
+							</xsl:with-param>
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:when test="dri:params/@choicesPresentation = 'lookup'">
+						<xsl:call-template name="addLookupButton">
+							<xsl:with-param name="isName" select="'false'" />
+							<xsl:with-param name="confIndicator" select="$confidenceIndicatorID" />
+						</xsl:call-template>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+	<xsl:template match="dri:field|dri:instance" mode="i18n-field">
+		<xsl:param name="position" select="''"/>
+		
+		<xsl:if test="dri:params[@i18nable = 'yes']|../dri:params[@i18nable = 'yes']">
+			<!-- this element's name -->
+			<xsl:variable name="name">
+				<xsl:choose>
+				 	<!-- assumes it's a dri:instance -->
+					<xsl:when test="../dri:params[@i18nable = 'yes']">
+						<xsl:value-of select="concat(../@n,'_lang')"/>					
+					</xsl:when>
+					<!-- assumes it's a dri:field -->
+					<xsl:otherwise>
+						<xsl:value-of select="concat(@n,'_lang')"/>
+					</xsl:otherwise>
+				</xsl:choose>
+				<xsl:if test="$position != ''">
+					<xsl:value-of select="concat('_',$position)"/>
+				</xsl:if>
+			</xsl:variable>
+
+			<!-- we show the combo only to administrators. Normal user get a hidden input with default language -->
+			<xsl:choose>
+				<xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element = 'administrator'] = 'true'">
+					<xsl:variable name="lang" select="dri:value[@type='lang']"/>
+					
+					<select class="ds-select-field select-lang">
+						<xsl:attribute name="name"><xsl:value-of select="$name"/></xsl:attribute>
+						<!-- option list -->
+						<xsl:apply-templates select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='supported_locale']">
+							<xsl:with-param name="lang" select="$lang"/>
+						</xsl:apply-templates>
+					</select>
+				</xsl:when>
+
+				<xsl:otherwise>
+					<!-- we take the default language from de repository information -->
+					<xsl:variable name="siteMETSUrl">
+			            <xsl:text>cocoon:/</xsl:text>
+			            <xsl:value-of select="/dri:document/dri:meta/dri:repositoryMeta/dri:repository/@url"/>
+			            <xsl:text>?sections=dmdSec</xsl:text>
+			        </xsl:variable>
+				
+					<xsl:variable name="default_lang" select="document($siteMETSUrl)/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='default' and @qualifier='language']"/>
+					
+					<input type="hidden">
+						<xsl:attribute name="name">
+							<xsl:value-of select="$name"/>
+						</xsl:attribute>
+						<xsl:attribute name="value">
+							<xsl:value-of select="$default_lang"/>
+						</xsl:attribute>
+					</input>
+				</xsl:otherwise>
+			</xsl:choose>
+			
+		</xsl:if>
+	</xsl:template>
+	
+	<!-- generates the language options for metadata lanugage selection -->
+	<xsl:template match="dri:metadata[@element='supported_locale']">
+		<xsl:param name="lang"/>
+		<option>
+			<xsl:attribute name="value">
+				<xsl:value-of select="."/>
+			</xsl:attribute>
+			<xsl:if test="string(.) = $lang">
+				<xsl:attribute name="selected">true</xsl:attribute>
+			</xsl:if>
+			<i18n:text>xmlui.dri2xhtml.METS-1.0.code-value-<xsl:value-of select="."></xsl:value-of></i18n:text>
+		</option>
+	</xsl:template>
 
 </xsl:stylesheet>

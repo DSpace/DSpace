@@ -15,6 +15,7 @@
 		<map:transformer name="Navigation" src="ar.edu.unlp.sedici.aspect.extraSubmission.Navigation"/>
 		<map:transformer name="AutoArchive" src="ar.edu.unlp.sedici.aspect.extraSubmission.GenerateAutoArchivePageMeta"/>
 		<map:transformer name="HomeLinks" src="ar.edu.unlp.sedici.aspect.extraSubmission.GenerateHomeLinksPageMeta"/>
+		<map:transformer name="InternationalizableSubmission" src="ar.edu.unlp.sedici.aspect.extraSubmission.InternationalizableSubmission"/>
 	</map:transformers>
 
     <map:matchers default="wildcard">
@@ -51,6 +52,11 @@
       <!-- Make sure the user is atleast logged in -->
       <map:select type="AuthenticatedSelector">
         <map:when test="administrator">
+
+		  <map:match type="regexp" pattern="submit|workflow_edit_metadata|edit_item_metadata">
+		  	<map:transform type="InternationalizableSubmission"/>
+		  </map:match>
+        
           <map:match pattern="handle/*/*/submit/*.continue">
             <map:transform type="IncludePageMeta">
                 <map:parameter name="administrator" value="true"/>

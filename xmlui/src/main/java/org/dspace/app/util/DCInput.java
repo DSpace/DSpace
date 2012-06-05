@@ -69,6 +69,9 @@ public class DCInput
     /** allowed document types */
     private List<String> typeBind = null;
 
+    /** if the field is internationalizable */
+    private boolean i18nable = false;
+        
     /**  
      * Group-based mandatory attribute
      * if hasToBeMember is true, the this field is madantory if the user is member of <code>requiredOnGroup</code>
@@ -139,6 +142,11 @@ public class DCInput
         		typeBind.add( type.trim() );
         	}
         }
+        
+        // is i18nable ?
+        String i18nableStr = fieldMap.get("i18n");
+        i18nable = "true".equalsIgnoreCase(i18nableStr)
+                || "yes".equalsIgnoreCase(i18nableStr);
         
         // Is it a group-based field?
         String requiredOnGroupDef = fieldMap.get("required-on-group");
@@ -441,5 +449,9 @@ public class DCInput
 	 */
 	public boolean hasToBeMemeber() {
 		return hasToBeMember;
+	}
+	
+	public boolean isI18nable() {
+		return i18nable;
 	}
 }

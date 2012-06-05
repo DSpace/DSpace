@@ -187,6 +187,7 @@
 					<input-type>onebox</input-type>
 					<hint>El título principal de la obra </hint>
 					<required>El ingreso de un título es obligatorio</required>
+					<i18n>true</i18n>
 				</field>
 
 				<!-- Subtítulo (principal) -->
@@ -198,6 +199,7 @@
 					<input-type>onebox</input-type>
 					<hint>Si el título de la obra se compone de título y subtítulo, éste último debe ingresarse en este campo</hint>
 					<visibility>workflow</visibility>
+					<i18n>true</i18n>
 				</field>
 
 				<!-- Título alternativo -->
@@ -210,6 +212,7 @@
 					<input-type>onebox</input-type>
 					<hint>Otros títulos con los que se conoce la obra, traducciones del título, etc. Si el título alternativo incluye un subtítulo, éste debe indicarse usando "::" (ej: titulo alternativo :: subtitulo)</hint>
 					<visibility>workflow</visibility>
+					<i18n>true</i18n>
 				</field>
 
 				<!-- Idioma del recurso -->
@@ -312,6 +315,7 @@
 					<label>Resumen</label>
 					<input-type>textarea</input-type>
 					<hint>Resumen de la obra</hint>
+					<i18n>true</i18n>
 				</field>
 
 				<!-- Keywords -->
@@ -323,6 +327,7 @@
 					<label>Palabras clave</label>
 					<input-type>onebox</input-type>
 					<hint>Palabras o terminos extraídos del documento</hint>
+					<i18n>true</i18n>
 				</field>
 				<!-- Período de embargo -->
 				<field>
@@ -414,6 +419,7 @@
 					<input-type>onebox</input-type>
 					<hint>Descriptores del recurso. Texto libre</hint>
 					<visibility>workflow</visibility>
+					<i18n>true</i18n>
 				</field>
 
 				<!-- Descriptores SeDiCI y Unesco (solo edicion) -->
@@ -507,6 +513,7 @@
 					<hint>Nombre de la sección Dossier en la que el artículo se encuentra</hint>
 					<type-bind>Articulo</type-bind>
 					<visibility>workflow</visibility>
+					<i18n>true</i18n>
 				</field>
 
 				<!-- Evaluación -->
