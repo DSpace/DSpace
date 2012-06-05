@@ -21,6 +21,9 @@ importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
 importClass(Packages.org.dspace.app.xmlui.cocoon.HttpServletRequestCocoonWrapper);
 
 importClass(Packages.org.dspace.xmlworkflow.storedcomponents.PoolTask);
+importClass(Packages.org.dspace.xmlworkflow.storedcomponents.ClaimedTask);
+
+importClass(Packages.org.dspace.eperson.EPerson);
 
 /* Global variable which stores a comma-separated list of all fields
  * which errored out during processing of the last step.
@@ -113,14 +116,30 @@ function doEditItemMetadata()
 		throw "Error generando XmlWorkflowItem para el item "+handle;
 
 	var poolTaskList = PoolTask.find(getDSContext(), xmlWorkflowItem);
+	var usuario=getDSContext().getCurrentUser();
+	var redireccionamiento;
+	var contextPath = cocoon.request.getContextPath();
 	if(poolTaskList.length > 1)
 		throw "Existen multiples PoolTasks para el item "+handle;
 	
-	var poolTask = poolTaskList.get(0);
+	//esto es para el caso de la edicion de una solapa abierta previamente a la aceptacion de la tarea desde otra solapa
+	if(poolTaskList.isEmpty()){
+		var claimedTask=ClaimedTask.findByWorkflowIdAndEPerson(getDSContext(), xmlWorkflowItem.getID(), getDSContext().getCurrentUser().getID());
+		if (claimedTask==null){
+			redireccionamiento=contextPath+"/handle/"+handle;
+		} else {
+			redireccionamiento=contextPath+"/handle/"+handle+"/workflow_edit_metadata?"+"workflowID=X"+xmlWorkflowItem.getID()+"&stepID="+claimedTask.getStepID()+"&actionID="+claimedTask.getActionID();
+		}
+	} else {
+		var poolTask = poolTaskList.get(0);
+		redireccionamiento=contextPath+"/handle/"+handle+"/xmlworkflow?"+"workflowID="+xmlWorkflowItem.getID()+"&stepID="+poolTask.getStepID()+"&actionID="+poolTask.getActionID();
+		
+	}	
+	
 	
 	// Enviamos al usuario a la pantalla de aceptación del trabajo
-	var contextPath = cocoon.request.getContextPath();
-	cocoon.redirectTo(contextPath+"/handle/"+handle+"/xmlworkflow?"+"workflowID="+xmlWorkflowItem.getID()+"&stepID="+poolTask.getStepID()+"&actionID="+poolTask.getActionID(), true);
+
+	cocoon.redirectTo(redireccionamiento, true);
     getDSContext().complete();
     cocoon.exit();
 }
