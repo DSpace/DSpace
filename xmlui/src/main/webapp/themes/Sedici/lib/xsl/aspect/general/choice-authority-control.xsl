@@ -25,6 +25,10 @@ No redefino todos los templates, solo los que necesito redefinir.
     <!-- choose 'hidden' for invisible auth, 'text' lets CSS control it. -->
     <xsl:variable name="authorityInputType" select="'text'"/>
     
+        
+    <!-- Variable que determina si el icono de confidence se va a mostrar -->
+    <xsl:variable name="showConfidence" select="/dri:document/dri:meta/dri:userMeta[@authenticated='yes']"/>
+    
     <!-- Variable para el manejo de la propiedad -->
     <xsl:variable name="isAdministrator" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='administrator']"/>
 
@@ -39,31 +43,33 @@ No redefino todos los templates, solo los que necesito redefinir.
       <xsl:param name="confidence" select="'blank'"/>
       <xsl:param name="id" select="''"/>
       <xsl:variable name="lcConfidence" select="translate($confidence,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')"/>
-      <img i18n:attr="title">
-        <xsl:if test="string-length($id) > 0">
-          <xsl:attribute name="id">
-             <xsl:value-of select="$id"/>
-          </xsl:attribute>
-        </xsl:if>
-        <xsl:attribute name="src">
-           <xsl:value-of select="concat($theme-path,'/images/authority_control/invisible.gif')"/>
-        </xsl:attribute>
-        <xsl:attribute name="class">
-          <xsl:text>ds-authority-confidence </xsl:text>
-          <xsl:choose>
-            <xsl:when test="string-length($lcConfidence) > 0">
-              <xsl:value-of select="concat('cf-',$lcConfidence,' ')"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>cf-blank </xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-        <xsl:attribute name="title">
-          <xsl:text>xmlui.authority.confidence.description.cf_</xsl:text>
-          <xsl:value-of select="$lcConfidence"/>
-        </xsl:attribute>
-      </img>
+      <xsl:if test="$showConfidence">
+	      <img i18n:attr="title">
+	        <xsl:if test="string-length($id) > 0">
+	          <xsl:attribute name="id">
+	             <xsl:value-of select="$id"/>
+	          </xsl:attribute>
+	        </xsl:if>
+	        <xsl:attribute name="src">
+	           <xsl:value-of select="concat($theme-path,'/images/authority_control/invisible.gif')"/>
+	        </xsl:attribute>
+	        <xsl:attribute name="class">
+	          <xsl:text>ds-authority-confidence </xsl:text>
+	          <xsl:choose>
+	            <xsl:when test="string-length($lcConfidence) > 0">
+	              <xsl:value-of select="concat('cf-',$lcConfidence,' ')"/>
+	            </xsl:when>
+	            <xsl:otherwise>
+	              <xsl:text>cf-blank </xsl:text>
+	            </xsl:otherwise>
+	          </xsl:choose>
+	        </xsl:attribute>
+	        <xsl:attribute name="title">
+	          <xsl:text>xmlui.authority.confidence.description.cf_</xsl:text>
+	          <xsl:value-of select="$lcConfidence"/>
+	        </xsl:attribute>
+	      </img>
+      </xsl:if>
     </xsl:template>
 
     <!-- Fragment to include an authority confidence hidden input
