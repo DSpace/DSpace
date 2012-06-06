@@ -62,7 +62,7 @@ $remove_multiple_enters = empty($_POST['remove_multiple_enters']);
 if (isset($_POST['text'])){
 	$text = $_POST['text'];
 //	$text2 = htmlspecialchars(special_htmlentities($text),ENT_NOQUOTES);
-	$text2 = htmlspecialchars(htmlspecialchars($text,ENT_NOQUOTES|ENT_DISALLOWED));
+	$text2 = htmlspecialchars(htmlspecialchars($text,ENT_NOQUOTES));
 
 	if ($remove_multiple_enters)
 		$text2 = preg_replace("/[\r\n]+/", "\n", $text2);
@@ -97,7 +97,6 @@ if (isset($_POST['text'])){
 	<input type="checkbox" <?php if (!$remove_multiple_enters) echo 'checked="checked"';?> value="1" name="remove_multiple_enters"/> No quitar saltos de linea multiples
 	<input type="submit" />
 </form>
-<pre><?php echo $text2?></pre>
 <textarea cols="100" rows="15"><?php echo $text2?></textarea>
 </body>
 </html>
