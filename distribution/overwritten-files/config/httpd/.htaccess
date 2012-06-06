@@ -34,6 +34,7 @@ RewriteCond %{QUERY_STRING} ^.*adress=([^&]*).*$
 RewriteRule ^static/redirector.php.*$ static2/%1
 
 #redirecciono todo lo que es .php, static o autoarchivo
+RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_URI} !redirect.php$
 RewriteCond %{REQUEST_URI} \.php$ [OR]
 #RewriteCond %{REQUEST_URI} ^static/.* [OR]
@@ -46,6 +47,7 @@ RewriteRule ^(.*)$ /redirect.php?old_url=\/$1\&%{QUERY_STRING}  [L]
 ###################################################
 
 #Canalizo todo hacia dspace por mod_proxy
+RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*)$ ajp://localhost:8009/$1 [P]
 #retry=10
 #ajp://localhost:8009/
