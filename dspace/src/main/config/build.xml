@@ -862,10 +862,13 @@ Common usage:
 
 
     <!-- ============================================================= -->
-    <!-- Do a fresh system install                                     -->
+    <!-- Install fresh code but do not touch the database              -->
     <!-- ============================================================= -->
-
-    <target name="fresh_install" depends="init_installation,init_configs,test_database,setup_database,load_registries" description="Do a fresh install of the system, overwriting any data">
+    
+    <target name="install_code"
+            depends="init_installation,init_configs"
+            description="Do a fresh install of the code, preserving any data."
+            >
 
         <delete failonerror="no">
             <fileset dir="${dspace.dir}/bin" includes="**/*" />
@@ -899,6 +902,23 @@ Common usage:
     	<copy todir="${dspace.dir}/solr" preservelastmodified="true">
     	    <fileset dir="solr" />
     	</copy>
+
+        <echo>
+====================================================================
+ The DSpace code has been installed.
+====================================================================
+        </echo>
+
+    </target>
+
+
+    <!-- ============================================================= -->
+    <!-- Do a fresh system install                                     -->
+    <!-- ============================================================= -->
+
+    <target name="fresh_install"
+            depends="init_installation,init_configs,test_database,setup_database,load_registries,install_code"
+            description="Do a fresh install of the system, overwriting any data">
 
         <delete failonerror="no">
             <fileset dir="${dspace.dir}/webapps" includes="**/*" />
