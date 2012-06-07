@@ -290,7 +290,7 @@ document.getElementById('form1').onsubmit = function(){
       </xsl:if>
     </xsl:when>
     <xsl:otherwise>
-      <p>Request was of type <xsl:value-of select="oai:request/@verb"/>.</p>
+      <p></p>
       <div class="results">
         <xsl:apply-templates select="oai:Identify" />
         <xsl:apply-templates select="oai:GetRecord"/>
