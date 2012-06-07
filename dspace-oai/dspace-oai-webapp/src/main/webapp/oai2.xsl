@@ -8,6 +8,11 @@
 
   v1.1
 
+  modified version for DSpace by Ivan Masár <helix84@centrum.sk>, 2012.
+   * response pages display number of results on top
+   * badArgument error page displays forms to help build correct queries
+   * Identify response page renders OAICat-specific "toolkit" description element
+
 -->
 
 <!-- 
@@ -42,6 +47,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     The 'compression' part of 'identify'
     The optional attributes of 'resumptionToken'
     The optional 'setDescription' container of 'set'
+    Encoding of special characters in forms <http://www.openarchives.org/OAI/openarchivesprotocol.html#SpecialCharacters>
 
   All the links just link to oai_dc versions of records.
 
@@ -159,7 +165,8 @@ ul.quicklinks li {
 p.intro {
 	font-size: 80%;
 }
-#form1, #form2 {
+/* Order in HTML must be: verb, arguments. The displayed order is reversed here to conventional: arguments, verb. */
+#form1, #form2, #form3 {
 	position: relative;
 }
 #form1div {
@@ -170,9 +177,17 @@ p.intro {
 	position: relative;
 	top: 1.5em;
 }
-#form1table, #form2table {
+#form3div {
+	position: relative;
+	top: 3.5em;
+}
+#form1table, #form2table, #form3table {
 	position: relative;
 	top: -2em;
+}
+.value-error {
+	background: #FF9999;
+	text-align: left;
 }
 <xsl:call-template name='xmlstyle' />
 </xsl:template>
@@ -226,10 +241,11 @@ document.getElementById('form1').onsubmit = function(){
   <table class="values">
     <tr><td class="key">Datestamp of response</td>
     <td class="value"><xsl:value-of select="oai:responseDate"/></td></tr>
-    <tr><td class="key">Request URL</td>
+    <tr><td class="key">Request base URL</td>
     <td class="value"><xsl:value-of select="oai:request"/></td></tr>
+    <tr><td class="key">Request verb</td>
+    <td class="value"><xsl:value-of select="oai:request/@verb"/></td></tr>
   </table>
-<!--  verb: [<xsl:value-of select="oai:request/@verb" />]<br /> -->
   <xsl:choose>
     <xsl:when test="oai:error">
       <h2>OAI Error(s)</h2>
@@ -259,6 +275,16 @@ document.getElementById('form1').onsubmit = function(){
           </div>
           <table id="form2table">
             <tr><td><b>resumptionToken:</b></td><td><input type="text" name="resumptionToken" /></td></tr>
+          </table>
+        </form>
+        <p>Or you can get a single record:</p>
+        <form name='form3' method="GET">
+          <div id='form3div'>
+            <input type="submit" name="verb" value="GetRecord" />
+          </div>
+          <table id="form3table">
+            <tr><td><b>metadataPrefix:</b></td><td><input type="text" name="metadataPrefix" value="" /></td></tr>
+            <tr><td><b>identifier:</b></td><td><input type="text" name="identifier" /></td></tr>
           </table>
         </form>
       </xsl:if>
@@ -320,7 +346,6 @@ document.getElementById('form1').onsubmit = function(){
 -->
 
 <xsl:template match="oai:description/*" priority="-100">
-<!--p><xsl:value-of select="name(.)" /></p-->
   <xsl:choose>
     <xsl:when test="local-name(.) = 'toolkit'">
       <h2>Description: Toolkit</h2>
