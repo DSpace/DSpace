@@ -14,6 +14,76 @@
 	<version>3.0-SNAPSHOT</version>
 	<description>Library of Shared UsageEvent and EventConsumer Tools for Logging to Solr.</description>
 
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <id>setupTestEnvironment</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/testing</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.dspace</groupId>
+                                    <artifactId>dspace-parent</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <classifier>testEnvironment</classifier>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>edu.iu.ul.maven.plugins</groupId>
+                <artifactId>fileweaver</artifactId>
+                <version>1.0</version>
+                <configuration>
+                    <outputs>
+                        <output>
+                            <outputPath>${project.build.directory}/testing</outputPath>
+                            <name>dspace.cfg.woven</name>
+                            <parts>
+                                <part><path>${project.build.directory}/testing/dspace/config/dspace.cfg</path></part>
+                                <part><path>${project.build.directory}/testing/dspace.cfg.more</path></part>
+                            </parts>
+                            <properties>
+                              <default.dspace.dir>${project.build.directory}/testing/dspace</default.dspace.dir>
+                            </properties>
+                        </output>
+                    </outputs>
+                </configuration>
+                <executions>
+                   <execution>
+                      <id>edit-dspace-cfg</id>
+                      <phase>process-test-resources</phase>
+                      <goals>
+                        <goal>weave</goal>
+                      </goals>
+                   </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <dspace.dir>${project.build.directory}/testing/dspace</dspace.dir>
+                        <dspace.configuration>${project.build.directory}/testing/dspace.cfg.woven</dspace.configuration>
+                        <dspace.log.init.disable>true</dspace.log.init.disable>
+                        <db.schema.path>${project.build.directory}/testing/dspace/etc/h2/database_schema.sql</db.schema.path>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 	<developers>
 		<developer>
 			<name>Ben Bosman</name>
@@ -71,7 +141,7 @@
 		<dependency>
 			<groupId>org.apache.solr</groupId>
 			<artifactId>solr-solrj</artifactId>
-                        <version>3.3.0</version>
+			<version>3.3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.dspace.dependencies</groupId>
@@ -97,7 +167,43 @@
             <artifactId>utils</artifactId>
             <version>1.07.00</version>
         </dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.databene</groupId>
+            <artifactId>contiperf</artifactId>
+            <version>1.07</version>
+            <type>jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace.dependencies.jmockit</groupId>
+            <artifactId>dspace-jmockit</artifactId>
+            <version>0.999.4</version>
+            <type>jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.3.158</version>
+            <type>jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <type>jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
    
    <reporting>
       <excludeDefaults>false</excludeDefaults>

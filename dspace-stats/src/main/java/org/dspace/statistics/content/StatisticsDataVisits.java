@@ -456,10 +456,12 @@ public class StatisticsDataVisits extends StatisticsData
             Context context) throws SQLException
     {
         if("continent".equals(datasetQuery.getName())){
-            value = LocationUtils.getContinentName(value);
+            value = LocationUtils.getContinentName(value, context
+                    .getCurrentLocale());
         }else
         if("countryCode".equals(datasetQuery.getName())){
-            value = LocationUtils.getCountryName(value);
+            value = LocationUtils.getCountryName(value, context
+                    .getCurrentLocale());
         }else{
             Query query = datasetQuery.getQueries().get(0);
             //TODO: CHANGE & THROW AWAY THIS ENTIRE METHOD
