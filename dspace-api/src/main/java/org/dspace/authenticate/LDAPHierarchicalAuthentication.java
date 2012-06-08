@@ -182,7 +182,19 @@ public class LDAPHierarchicalAuthentication
 		// Get the DN of the user
 		String adminUser = ConfigurationManager.getProperty("authentication-ldap", "search.user");
 		String adminPassword = ConfigurationManager.getProperty("authentication-ldap", "search.password");
-		String dn = ldap.getDNOfUser(adminUser, adminPassword, context, netid);
+		String objectContext = ConfigurationManager.getProperty("authentication-ldap", "object_context");
+		String idField = ConfigurationManager.getProperty("authentication-ldap", "id_field");
+		String dn = "";
+
+		// If adminUser is blank, then we can't search so assume the DN
+		if (StringUtils.isBlank(adminUser) || StringUtils.isBlank(adminPassword))
+		{
+			dn = idField + "=" + netid + "," + objectContext;
+		}
+		else
+		{
+			dn = ldap.getDNOfUser(adminUser, adminPassword, context, netid);
+		}
 
 		// Check a DN was found
 		if ((dn == null) || (dn.trim().equals("")))
