@@ -52,9 +52,9 @@
       snapshots into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:git:git@github.com/DSpace/dspace-solr.git</connection>
-      <developerConnection>scm:git:git@github.com/DSpace/dspace-solr.git</developerConnection>
-      <url>git@github.com/DSpace/dspace-solr.git</url>
+      <connection>scm:git:git@github.com:DSpace/dspace-solr.git</connection>
+      <developerConnection>scm:git:git@github.com:DSpace/dspace-solr.git</developerConnection>
+      <url>git@github.com:DSpace/dspace-solr.git</url>
    </scm>
 
    <modules>
