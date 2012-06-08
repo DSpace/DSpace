@@ -513,7 +513,6 @@
 					<hint>Nombre de la sección Dossier en la que el artículo se encuentra</hint>
 					<type-bind>Articulo</type-bind>
 					<visibility>workflow</visibility>
-					<i18n>true</i18n>
 				</field>
 
 				<!-- Evaluación -->

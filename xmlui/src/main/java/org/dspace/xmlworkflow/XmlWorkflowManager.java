@@ -913,4 +913,29 @@ public class XmlWorkflowManager {
     public static String getMyDSpaceLink() {
         return ConfigurationManager.getProperty("dspace.url") + "/mydspace";
     }
+    
+    
+    
+    private static final String wf_edited_schema = "sedici";
+    private static final String wf_edited_element = "workflowEdited";
+    
+    public static void cleanWorkflowEdited(Context c, Item item) throws SQLException, AuthorizeException {
+    	item.clearMetadata(wf_edited_schema, wf_edited_element, null, "es");
+        item.update();
+        c.commit();
+    }
+    	
+    public static void setWorkflowEdited(Context c, Item item) throws SQLException, AuthorizeException {
+    	item.clearMetadata(wf_edited_schema, wf_edited_element, null, "es");
+    	item.addMetadata(wf_edited_schema, wf_edited_element, null, "es", "true");
+        item.update();
+        c.commit();
+    }
+
+    public static boolean isWorkflowEdited(Item item) {
+    	DCValue[] values = item.getMetadata(wf_edited_schema, wf_edited_element, null, "es");
+    	if(values.length > 0)
+    		return "true".equals( values[0].value );
+    	return false;
+    }
 }

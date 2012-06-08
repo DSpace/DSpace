@@ -172,6 +172,13 @@
         <processing-class>ar.edu.unlp.sedici.aspect.extraSubmission.submit.AutomaticIssuedMetadataStep</processing-class>
 		<workflow-editable>false</workflow-editable>
       </step> 
+      
+      <!--Step para controlar si el item fue revisado. No tendrá interface-->
+      <step id="sediciWorkflowEditedControl">
+        <processing-class>ar.edu.unlp.sedici.aspect.extraSubmission.submit.WorkflowEditedControlStep</processing-class>
+		<workflow-editable>true</workflow-editable>
+      </step> 
+      
  </step-definitions>
 
  <!-- The submission-definitions map lays out the detailed definition of   -->
@@ -264,6 +271,9 @@
       
       <!--Step 6 cagará datos fijos en el item. No tendrá interface-->
       <step id="sediciAutomaticData"/>
+
+      <!--Step 7 Setea el flag indicando que se completo el proceso de edición desde el workflow. No tiene interface-->
+      <step id="sediciWorkflowEditedControl"/>
     
    </submission-process>
    
@@ -289,6 +299,9 @@
       
       <!--Step 7 cagará datos fijos en el item. No tendrá interface-->
       <step id="sediciAutomaticData"/>
+    
+      <!--Step 8 Setea el flag indicando que se completo el proceso de edición desde el workflow. No tiene interface-->
+      <step id="sediciWorkflowEditedControl"/>
     
    </submission-process>
 

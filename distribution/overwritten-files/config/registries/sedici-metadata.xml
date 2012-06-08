@@ -355,4 +355,10 @@
 		<!-- sin calificar -->
 		<scope_note>Numero de acta de una tesis</scope_note>
 	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>workflowEdited</element>
+		<!-- sin calificar -->
+		<scope_note>Flag para validar si un item nuevo pasó por el proceso de revisión</scope_note>
+	</dc-type>
 </dspace-dc-types>
