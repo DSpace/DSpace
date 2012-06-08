@@ -20,13 +20,13 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-solr-parent</artifactId>
-      <version>3.5.0.0</version>
+      <version>3.5.0.1-SNAPSHOT</version>
    </parent>
 
    <groupId>org.dspace</groupId>
    <artifactId>dspace-solr</artifactId>
    <name>Apache Solr Webapp</name>
-   <version>3.5.0.0</version>
+   <version>3.5.0.1-SNAPSHOT</version>
    <description>Apache Solr Server</description>
    <packaging>war</packaging>
 
