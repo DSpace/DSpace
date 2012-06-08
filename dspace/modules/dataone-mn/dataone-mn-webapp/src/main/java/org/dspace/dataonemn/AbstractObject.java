@@ -12,7 +12,7 @@ public abstract class AbstractObject extends Element {
 	}
 	
 	public void setObjectFormat(String aFormat) {
-		addElement("objectFormat", aFormat);
+		addElement("formatId", aFormat);
 	}
 	
 	public void setSize(int aSize) {

@@ -370,7 +370,15 @@ public class DataOneMN extends HttpServlet implements Constants {
     **/
     private void getLogRecords(String reqPath, HttpServletResponse response) throws IOException {
 	log.info("getLogRecords()");
-	response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+
+	response.setContentType(XML_CONTENT_TYPE);
+	OutputStream out = response.getOutputStream();
+	PrintWriter pw = new PrintWriter(out);
+
+	// send xml stub
+	pw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n" +
+		 "<d1:log xmlns:d1=\"http://ns.dataone.org/service/types/v1\" count=\"0\" start=\"0\" total=\"1273\"> \n" +
+		 "</d1:log>");
     }
 
 
@@ -609,7 +617,7 @@ public class DataOneMN extends HttpServlet implements Constants {
     **/
     private void listObjects(HttpServletRequest request, HttpServletResponse response, ObjectManager objManager) throws IOException {
 	log.info("listObjects()");
-	String format = request.getParameter("objectFormat");
+	String format = request.getParameter("formatId");
 
 	try {
 	    Date from = parseDate(request, "startTime");

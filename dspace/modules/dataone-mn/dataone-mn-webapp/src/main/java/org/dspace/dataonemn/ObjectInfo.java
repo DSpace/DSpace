@@ -40,7 +40,7 @@ public class ObjectInfo extends AbstractObject implements Constants {
 		Element[] elements = new Element[2];
 		Element thisID = getChildElements("identifier", LIST_OBJECTS_NAMESPACE)
 				.get(0);
-		Element thisFormat = getChildElements("objectFormat",
+		Element thisFormat = getChildElements("formatId",
 				LIST_OBJECTS_NAMESPACE).get(0);
 		String baseID = thisID.getValue();
 		String format = thisFormat.getValue();
@@ -50,8 +50,8 @@ public class ObjectInfo extends AbstractObject implements Constants {
 		removeChild(thisID);
 		copy = (Element) copy();
 
-		insertElement("objectFormat", DRYAD_NAMESPACE);
-		Element newFormat = new Element("objectFormat", LIST_OBJECTS_NAMESPACE);
+		insertElement("formatId", DRYAD_NAMESPACE);
+		Element newFormat = new Element("formatId", LIST_OBJECTS_NAMESPACE);
 		newFormat.appendChild(format);
 		copy.insertChild(newFormat, 0);
 
