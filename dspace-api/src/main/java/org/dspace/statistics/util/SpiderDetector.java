@@ -7,20 +7,25 @@
  */
 package org.dspace.statistics.util;
 
-import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.log4j.Logger;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.statistics.SolrLogger;
 
 /**
  * SpiderDetector is used to find IP's that are spiders...
- * In future someone may add UserAgents and Host Domains
+ * In future someone may add Host Domains
  * to the detection criteria here.
  *
  * @author kevinvandevelde at atmire.com
@@ -38,11 +43,14 @@ public class SpiderDetector {
      */
     private static IPTable table = null;
 
+    /** Collection of regular expressions to match known spiders' agents */
+    private static List<Pattern> agents = null;
+
     /**
-     * Utility method which Reads the ip addresses out a file & returns them in a Set
+     * Utility method which reads IP addresses from a file & returns them in a Set.
      *
      * @param spiderIpFile the location of our spider file
-     * @return a vector full of ip's
+     * @return a vector full of IPs
      * @throws IOException could not happen since we check the file be4 we use it
      */
     public static Set<String> readIpAddresses(File spiderIpFile) throws IOException {
@@ -77,7 +85,43 @@ public class SpiderDetector {
     }
 
     /**
-     * Get an immutable Set representing all the Spider Addresses here.
+     * Let e.g. Spring add agent patterns to our collection.
+     * This can be called more than once, and will simply augment the collection
+     * with new patterns.
+     * 
+     * @param agentPatterns
+     * @throws PatternSyntaxExpression
+     */
+    static public void setAgentPatterns(List<String> agentPatterns)
+    {
+        if (null == agents)
+            agents = new ArrayList<Pattern>(agentPatterns.size());
+
+        int nPatterns = 0;
+        for (String agentPattern : agentPatterns)
+        {
+            Pattern newPattern = Pattern.compile(agentPattern);
+            agents.add(newPattern);
+            nPatterns++;
+        }
+        log.info("Received " + String.valueOf(nPatterns) + " agent patterns.");
+    }
+
+    /**
+     * Empty the agent pattern list.
+     */
+    static void clearAgentPatterns()
+    {
+        if (null == agents)
+            agents = new ArrayList<Pattern>();
+        else
+            agents.clear();
+    }
+
+    /**
+     * Get an immutable Set representing all the Spider Addresses here
+     *
+     * @return
      */
     public static Set<String> getSpiderIpAddresses() {
 
@@ -125,10 +169,9 @@ public class SpiderDetector {
 
     /**
      * Static Service Method for testing spiders against existing spider files.
-     * <p/>
-     * In the future this will be extended to support User Agent and
-     * domain Name detection.
-     * <p/>
+     * <p>
+     * In the future this will be extended to support Domain Name detection.
+     * <p>
      * In future spiders HashSet may be optimized as byte offset array to
      * improve performance and memory footprint further.
      *
@@ -137,6 +180,16 @@ public class SpiderDetector {
      */
     public static boolean isSpider(HttpServletRequest request) {
 
+        // See if any agent patterns match
+        String agent = request.getHeader("User-Agent");
+        if ((null != agent) && (null != agents))
+            for (Pattern candidate : agents)
+            {
+                if (candidate.matcher(agent).find())
+                    return true;
+            }
+
+        // No.  See if any IP addresses match
         if (isUseProxies() && request.getHeader("X-Forwarded-For") != null) {
             /* This header is a comma delimited list */
             for (String xfip : request.getHeader("X-Forwarded-For").split(",")) {
