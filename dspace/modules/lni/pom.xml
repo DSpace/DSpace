@@ -12,7 +12,7 @@
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
       <version>3.0-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+      <relativePath>..</relativePath>
    </parent>
 
    <build>
@@ -97,6 +97,11 @@
    </profiles>
 
    <dependencies>
+
+      <dependency>
+         <groupId>org.dspace.modules</groupId>
+         <artifactId>additions</artifactId>
+      </dependency>
 
       <dependency>
          <groupId>org.dspace</groupId>

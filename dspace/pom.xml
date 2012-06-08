@@ -84,22 +84,6 @@
             </properties>
         </profile>
 
-        <profile>
-            <id>postgres-support</id>
-            <activation>
-                <property>
-                    <name>!db.name</name>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>postgresql</groupId>
-                    <artifactId>postgresql</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-
-
         <!--
            Default profile for Oracle database configuration
            Use -Poracle or -Ddb.name=oracle to activate.
@@ -123,47 +107,6 @@
                 <default.db.username>dspace</default.db.username>
                 <default.db.password>dspace</default.db.password>
             </properties>
-        </profile>
-
-        <profile>
-            <id>oracle-support</id>
-            <activation>
-                <property>
-                    <name>db.name</name>
-                    <value>oracle</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.oracle</groupId>
-                    <artifactId>ojdbc6</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <!--
-           Using xpdf filters requires the inclusion
-           Of Sun dependencies these are not redistributable
-           and you will need to install them locally in your
-           maven repository prior to building your dspace instance
-        -->
-        <profile>
-            <id>xpdf-mediafilter-support</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun.media</groupId>
-                    <artifactId>jai_imageio</artifactId>
-                    <version>1.0_01</version>
-                </dependency>
-                <dependency>
-                    <groupId>javax.media</groupId>
-                    <artifactId>jai_core</artifactId>
-                    <version>1.1.2_01</version>
-                </dependency>
-            </dependencies>
         </profile>
 
     </profiles>
@@ -198,50 +141,5 @@
         </plugins>
     </build>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-api-lang</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-services-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-services-utils</artifactId>
-        </dependency>
-        <dependency>
-             <groupId>org.dspace</groupId>
-             <artifactId>dspace-stats</artifactId>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-discovery-provider</artifactId>
-         </dependency>
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-discovery-solr</artifactId>
-        </dependency>
-         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ant-contrib</groupId>
-            <artifactId>ant-contrib</artifactId>
-            <version>1.0b3</version>
-            <exclusions>
-              <exclusion>
-                <groupId>ant</groupId>
-                <artifactId>ant</artifactId>
-              </exclusion>
-            </exclusions> 
-        </dependency>
-    </dependencies>
 
 </project>
