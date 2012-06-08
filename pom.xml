@@ -46,15 +46,16 @@
       </license>
    </licenses>
 
+   <!--
+      The Subversion repository location is used by Continuum to update against
+      when changes have occurred.  This spawns a new build cycle and releases
+      snapshots into the snapshot repository below.
+   -->
    <scm>
-      <connection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk
-      </connection>
-      <developerConnection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk
-      </developerConnection>
-      <url>http://svn.apache.org/viewvc/maven/pom/tags/dspace-solr-parent-3.3.0.0</url>
-  </scm>
+      <connection>scm:git:git@github.com:dspace/dspace-solr.git</connection>
+      <developerConnection>scm:git:git@github.com:dspace/dspace-solr</developerConnection>
+      <url>git@github.com:dspace/dspace-solr</url>
+   </scm>
 
    <modules>
       <module>webapp</module>
