@@ -98,7 +98,7 @@ public class MoveItemForm extends AbstractDSpaceTransformer {
    		    // Only add the item if it isn't already the owner
             if (!item.isOwningCollection(collection))
             {
-            	select.addOption(collection.getHandle(),communityName+" > "+collectionName);
+            	select.addOption(collection.equals(owningCollection), collection.getID(), communityName+" > "+collectionName);  
             }
         	
         }
