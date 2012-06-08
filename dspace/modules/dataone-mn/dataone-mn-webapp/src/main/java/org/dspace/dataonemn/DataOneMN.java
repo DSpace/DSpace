@@ -81,6 +81,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	    if (ctxt != null) {
 		ctxt.complete();
 	    }
+	    log.debug("DSpace context closed.");
 	} catch (SQLException e) {
 	    log.warn("unable to close context cleanly;" + e.getMessage(), e);
 	}
