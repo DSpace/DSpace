@@ -185,6 +185,12 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             sfxserverUrl = sfxserverUrl.trim() +"&" + sfxQuery.trim();
             pageMeta.addMetadata("sfx","server").addContent(sfxserverUrl);
         }
+        
+        String sfxserverImg = ConfigurationManager.getProperty("sfx.server.image_url");
+        if (sfxserverImg != null && sfxserverImg.length() > 0)
+        {
+            pageMeta.addMetadata("sfx","image_url").addContent(sfxserverImg);
+        }
 
         boolean googleEnabled = ConfigurationManager.getBooleanProperty(
             "google-metadata.enable", false);
