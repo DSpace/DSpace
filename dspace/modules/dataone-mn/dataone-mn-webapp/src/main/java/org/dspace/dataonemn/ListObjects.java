@@ -6,7 +6,7 @@ import nu.xom.Element;
 public class ListObjects extends Element implements Constants {
 	
 	public ListObjects() {
-		super("objectList", LIST_OBJECTS_NAMESPACE);
+	    super("d1:objectList", LIST_OBJECTS_NAMESPACE);
 	}
 	
 	public void setCount(int aCount) {
