@@ -53,8 +53,8 @@
    -->
    <scm>
       <connection>scm:git:git@github.com:dspace/dspace-solr.git</connection>
-      <developerConnection>scm:git:git@github.com:dspace/dspace-solr.git</developerConnection>
-      <url>git@github.com:dspace/dspace-solr.git</url>
+      <developerConnection>scm:git:git@github.com:dspace/dspace-solr</developerConnection>
+      <url>git@github.com:dspace/dspace-solr</url>
    </scm>
 
    <modules>
