@@ -1423,6 +1423,7 @@ color:black;
 div.item-summary-view-metadata p.item-view-toggle-bottom,
 div.simple-item-view-description {
     margin-top: 20px;
+    white-space: pre-line;
 }
 
 #aspect_artifactbrowser_ItemViewer_div_item-view h2,
