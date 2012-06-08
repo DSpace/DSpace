@@ -279,7 +279,9 @@ public class AuthenticationUtil
                 }
                 else
                 {
-                    // Possible hack attempt.
+                    // Possible hack attempt or maybe your setup is not providing a consistent end-user IP address.
+                    log.info(LogManager.getHeader(context, "ip_mismatch", "id=" + id + ", request ip=" +
+                        request.getRemoteAddr() + ", session ip=" + address));
                 }
             } // if id
         } // if session
