@@ -408,102 +408,108 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
          </dependency>
+         <dependency>
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>additions</artifactId>
+            <version>3.0-SNAPSHOT</version>
+         </dependency>
+
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-api</artifactId>
-              <version>${project.version}</version>
+              <version>3.0-SNAPSHOT</version>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-webapp</artifactId>
-              <version>${project.version}</version>
+              <version>3.0-SNAPSHOT</version>
               <type>war</type>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-swordv2</artifactId>
-              <version>${project.version}</version>
+              <version>3.0-SNAPSHOT</version>
               <type>jar</type>
               <classifier>classes</classifier>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-swordv2</artifactId>
-              <version>${project.version}</version>
+              <version>3.0-SNAPSHOT</version>
               <type>war</type>
           </dependency>
            <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-client-api</artifactId>
-              <version>${project.version}</version>
+              <version>3.0-SNAPSHOT</version>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-client-xmlui-api</artifactId>
-              <version>${project.version}</version>
+              <version>3.0-SNAPSHOT</version>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-client-xmlui-webapp</artifactId>
-              <version>${project.version}</version>
+              <version>3.0-SNAPSHOT</version>
               <type>war</type>
           </dependency>
 
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui-api</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui-webapp</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai-api</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai-webapp</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-core</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-client</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-webapp</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-api</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-webapp</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-wing</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
@@ -523,7 +529,7 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-stats</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
          </dependency>
          <!-- DSpace Localization Packages -->
          <dependency>
@@ -540,12 +546,12 @@
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-discovery-provider</artifactId>
-              <version>${project.version}</version>
+              <version>3.0-SNAPSHOT</version>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-discovery-solr</artifactId>
-              <version>${project.version}</version>
+              <version>3.0-SNAPSHOT</version>
           </dependency>
          <!-- DSpace third Party Dependencies -->
 
@@ -844,6 +850,16 @@
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
             <version>11.2.0.2.0</version>
+         </dependency>
+         <dependency>
+            <groupId>com.sun.media</groupId>
+            <artifactId>jai_imageio</artifactId>
+            <version>1.0_01</version>
+         </dependency>
+         <dependency>
+            <groupId>javax.media</groupId>
+            <artifactId>jai_core</artifactId>
+            <version>1.1.2_01</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
