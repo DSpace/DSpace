@@ -3196,11 +3196,13 @@
 
         <!-- Choice Lookup - for Dryad dwc.ScientificName -->
     <message key="xmlui.ChoiceLookupTransformer.field.dwc_ScientificName.title">Lookup Scientific Name</message>
+    <message key="xmlui.ChoiceLookupTransformer.field.dwc_ScientificName.help">Scientific Name</message>
     <message key="xmlui.ChoiceLookupTransformer.field.dwc_ScientificName.instructions">Below is a list of possible matches from the configured <a href="http://en.wikipedia.org/wiki/Controlled_vocabulary">controlled vocabulary</a>. Select the desired scientific name and then select "Accept." The existing name will be replaced with the selected controlled name and will be linked to the associated controlled vocabulary. Select "Cancel" to keep the current entry.</message>
         <message key="xmlui.ChoiceLookupTransformer.field.dwc_ScientificName.nonauthority">Use local value "@1@" (not in authority)</message>
  
         <!-- Choice Lookup - for Dryad dc.subject -->
     <message key="xmlui.ChoiceLookupTransformer.field.dc_subject.title">Lookup Subject</message>
+    <message key="xmlui.ChoiceLookupTransformer.field.dc_subject.help">Subject</message>
      <message key="xmlui.ChoiceLookupTransformer.field.dc_subject.instructions">Below is a list of possible matches from the configured <a href="http://en.wikipedia.org/wiki/Controlled_vocabulary">controlled vocabulary</a>. Select the desired term or phrase and then select "Accept." The existing phrase will be replaced with the selected controlled phrase and will be linked to the associated controlled vocabulary. Select "Cancel" to keep the current entry.</message>
      <message key="xmlui.ChoiceLookupTransformer.field.dc_subject.nonauthority">Use local value "@1@" (not in authority)</message>
 
