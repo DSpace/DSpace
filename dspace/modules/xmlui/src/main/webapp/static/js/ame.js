@@ -6,8 +6,8 @@ function AMESuggestSetup(itemID, treeContainerElem, treeElem, field, buttonID)
 	var container = document.getElementById(treeContainerElem);
 	var tree = document.getElementById(treeElem);
 	container.style.display = 'block';
-	$(tree).dynatree("destroy");
-	$(tree).dynatree({
+	jQuery(tree).dynatree("destroy");
+	jQuery(tree).dynatree({
 	      checkbox: true,
 	      selectMode: 2,
 	      minExpandLevel: 10,
@@ -42,7 +42,7 @@ function AMESuggestSetup(itemID, treeContainerElem, treeElem, field, buttonID)
 	        // Display list of selected nodes
 	        var selNodes = node.tree.getSelectedNodes();
 	        // convert to title/key array
-	        var selKeys = $.map(selNodes, function(node){
+	        var selKeys = jQuery.map(selNodes, function(node){
 	             return "[" + node.data.key + "]: '" + node.data.title + "'";
 	        });
 	      },
@@ -70,10 +70,10 @@ function AMESuggestSetup(itemID, treeContainerElem, treeElem, field, buttonID)
 	    });
 
         var addButton = document.getElementById(buttonID);
-        $(addButton).button();
-        $(addButton).click(
+        jQuery(addButton).button();
+        jQuery(addButton).click(
             function() { 
-	        var selected = $(tree).dynatree("getSelectedNodes");
+	        var selected = jQuery(tree).dynatree("getSelectedNodes");
                 for (i=0; i<selected.length; i++) {
                    var el = document.createElement("input");
                    el.type = "hidden";
@@ -101,15 +101,5 @@ function AMESuggestSetup(itemID, treeContainerElem, treeElem, field, buttonID)
                 form.submit();
             } 
         );
+        jQuery('.ame-item-remove').attr("title", "Removes the selected entry.");
   }
-  
-  $(function(){
-        $('.ame-item-remove').attr("title", "Removes the selected entry.");
-        $('[title]').tooltip({
-		tipClass: 'ame-tooltip'
-        });
-        $('.ame-item-remove').tooltip({
-		tipClass: 'ame-tooltip'
-        });
-
-  });
