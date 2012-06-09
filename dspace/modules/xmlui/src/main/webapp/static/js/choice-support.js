@@ -379,6 +379,7 @@ function DSpaceChoicesAcceptOnClick() {
             var authValue = null;
             var selectedOption = select.find(':selected');
             if (selectedOption.length >= 0 && selectedOption.data('authority') != null) {
+                authValue = selectedOption.data('authority');
                 of.find('*[name = ' + authorityInput + ']').val(selectedOption.data('authority'));
             }
             of.find('*[name = ' + confInput + ']').val('accepted');
