@@ -138,13 +138,11 @@ public class AMEForm extends AbstractDSpaceTransformer
             text.setAuthorityRequired(MetadataAuthorityManager.getManager().isAuthorityRequired(fieldKey));
             Value authValue =  text.setAuthorityValue((dcValue.authority == null)?"":dcValue.authority, Choices.getConfidenceText(dcValue.confidence));
             // add the "unlock" button to auth field
-            Button unlock = authValue.addButton("authority_unlock" + nameField,"ds-authority-lock");
+            Button unlock = authValue.addButton("authority_unlock_" + nameField,"ds-authority-lock");
             unlock.setHelp(T_unlock);
-	        if (ChoiceAuthorityManager.getManager().isChoicesConfigured(fieldKey)) {
-	            text.setChoices(fieldKey);
-	            text.setChoicesPresentation(ChoiceAuthorityManager.getManager().getPresentation(fieldKey));
-	            text.setChoicesClosed(ChoiceAuthorityManager.getManager().isClosed(fieldKey));
-	        }
+            text.setChoices(fieldKey);
+            text.setChoicesPresentation("lookup");
+            text.setChoicesClosed(false);
 	        fieldIndex++;
 		}
 
@@ -191,12 +189,9 @@ public class AMEForm extends AbstractDSpaceTransformer
             // add the "unlock" button to auth field
             Button unlock = authValue.addButton("authority_unlock_" + nameField,"ds-authority-lock");
             unlock.setHelp(T_unlock);
-                
-	        if (ChoiceAuthorityManager.getManager().isChoicesConfigured(fieldKey)) {
-	            text.setChoices(fieldKey);
-	            text.setChoicesPresentation(ChoiceAuthorityManager.getManager().getPresentation(fieldKey));
-	            text.setChoicesClosed(ChoiceAuthorityManager.getManager().isClosed(fieldKey));
-	        }
+            text.setChoices(fieldKey);
+            text.setChoicesPresentation("lookup");
+            text.setChoicesClosed(false);
 	        fieldIndex++;
 		}
 		
