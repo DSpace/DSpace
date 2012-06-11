@@ -7,10 +7,15 @@ import nu.xom.Elements;
 public abstract class AbstractObject extends Element {
 
 	protected AbstractObject(String aName, String aNamespace, String aIdentifier) {
-		super(aName, aNamespace);
-		addElement("identifier", aIdentifier);
+	    super(aName, aNamespace); 
+	    addElement("identifier", aIdentifier);
 	}
-	
+
+	protected AbstractObject(String aName, String aIdentifier) {
+	    super(aName); 
+	    addElement("identifier", aIdentifier);
+	}
+    
 	public void setObjectFormat(String aFormat) {
 		addElement("formatId", aFormat);
 	}

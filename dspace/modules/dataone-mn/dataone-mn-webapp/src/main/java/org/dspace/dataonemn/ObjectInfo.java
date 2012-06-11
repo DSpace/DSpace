@@ -13,15 +13,15 @@ public class ObjectInfo extends AbstractObject implements Constants {
 	private String myFormatExtension;
 
 	public ObjectInfo(String aIdentifier) {
-		super("objectInfo", LIST_OBJECTS_NAMESPACE, aIdentifier);
+	    super("objectInfo", aIdentifier);
 	}
 
 	public String getNamespace() {
-		return LIST_OBJECTS_NAMESPACE;
+		return null;
 	}
 
 	private Element insertElement(String aName, String aValue) {
-		Element element = new Element(aName, LIST_OBJECTS_NAMESPACE);
+		Element element = new Element(aName);
 		element.appendChild(aValue);
 		insertChild(element, 0);
 		return element;
@@ -35,13 +35,17 @@ public class ObjectInfo extends AbstractObject implements Constants {
 	public void setFormatExtension(String aExtension) {
 		myFormatExtension = aExtension;
 	}
-	
-	public Element[] split() {
+    
+    /*
+      Create the elements needed for the XML version of this object's info. Two separate elements are created --
+      one for the metadata and one for the primary bitstream.
+    */
+	public Element[] createInfoElements() {
 		Element[] elements = new Element[2];
-		Element thisID = getChildElements("identifier", LIST_OBJECTS_NAMESPACE)
-				.get(0);
-		Element thisFormat = getChildElements("formatId",
-				LIST_OBJECTS_NAMESPACE).get(0);
+		//Element thisID = getChildElements("identifier",LIST_OBJECTS_NAMESPACE).get(0);
+		//Element thisFormat = getChildElements("formatId",LIST_OBJECTS_NAMESPACE).get(0);
+		Element thisID = getChildElements("identifier").get(0);
+		Element thisFormat = getChildElements("formatId").get(0);
 		String baseID = thisID.getValue();
 		String format = thisFormat.getValue();
 		Element copy;
@@ -51,12 +55,12 @@ public class ObjectInfo extends AbstractObject implements Constants {
 		copy = (Element) copy();
 
 		insertElement("formatId", DRYAD_NAMESPACE);
-		Element newFormat = new Element("formatId", LIST_OBJECTS_NAMESPACE);
+		Element newFormat = new Element("formatId");
 		newFormat.appendChild(format);
 		copy.insertChild(newFormat, 0);
 
 
-		Elements checksumChildren = getChildElements("checksum", LIST_OBJECTS_NAMESPACE);
+		Elements checksumChildren = getChildElements("checksum");
 		if(checksumChildren != null && checksumChildren.size() > 0) {
 		    removeChild(checksumChildren.get(0));
 		}
@@ -66,10 +70,10 @@ public class ObjectInfo extends AbstractObject implements Constants {
 		}
 
 		// this don't apply to the dap metadata, so remove (it's on copy)
-		removeChild(getChildElements("size", LIST_OBJECTS_NAMESPACE).get(0));
+		removeChild(getChildElements("size").get(0));
 
 		insertElement("identifier", baseID + "/dap");
-		Element newID = new Element("identifier", LIST_OBJECTS_NAMESPACE);
+		Element newID = new Element("identifier");
 		newID.appendChild(baseID + "/" + myFormatExtension);
 		copy.insertChild(newID, 0);
 

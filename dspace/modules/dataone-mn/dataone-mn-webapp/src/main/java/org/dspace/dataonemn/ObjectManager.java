@@ -140,10 +140,10 @@ public class ObjectManager extends AbstractObjectManager {
 				Item item = Item.find(myContext, id.intValue());
 				String lastMod = DateFormat.getDateTimeInstance().format(date);
 
-				objInfo.setLastModified(lastMod);
 				objInfo.setObjectFormat(format);
 				objInfo.setFormatExtension(ext);
-
+				objInfo.setLastModified(lastMod);
+				
 				try {
 					String[] checksumDetails = getObjectChecksum(doi, "dap");
 
@@ -184,7 +184,7 @@ public class ObjectManager extends AbstractObjectManager {
 
 				log.debug("Writing " + doi + " to XML");
 
-				nu.xom.Element[] parts = objInfo.split();
+				nu.xom.Element[] parts = objInfo.createInfoElements();
 				
 				if (counter != 0 || startIsEven) {
 					if (aObjFormat == null
