@@ -57,8 +57,12 @@ public abstract class AbstractObject extends Element {
 	}
 	
 	protected abstract String getNamespace();
-	
-	protected Element addElement(String aName, String aValue) {
+    
+    /**
+       Adds a new element as a child of this element. The added element will be appended
+       to the list of children, so it will always occur at the end.
+    **/
+    protected Element addElement(String aName, String aValue) {
 		Element element = new Element(aName, getNamespace());
 		element.appendChild(aValue);
 		appendChild(element);

@@ -7,8 +7,6 @@ public interface Constants {
 	public static final String DEFAULT_CHECKSUM_ALGO = "MD5";
 	
 	// Namespaces...
-	public static final String LIST_OBJECTS_NAMESPACE = "http://ns.dataone.org/service/types/v1";
-
 	public static final String SYS_META_NAMESPACE = "http://ns.dataone.org/service/types/v1";
 
 	public static final String XSI_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance";

@@ -3,10 +3,10 @@ package org.dspace.dataonemn;
 import nu.xom.Attribute;
 import nu.xom.Element;
 
-public class ListObjects extends Element implements Constants {
+public class ListObjects extends Element {
 	
 	public ListObjects() {
-	    super("d1:objectList", LIST_OBJECTS_NAMESPACE);
+	    super("d1:objectList", "http://ns.dataone.org/service/types/v1");
 	}
 	
 	public void setCount(int aCount) {

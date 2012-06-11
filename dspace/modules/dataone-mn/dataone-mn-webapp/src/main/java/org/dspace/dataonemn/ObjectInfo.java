@@ -20,13 +20,6 @@ public class ObjectInfo extends AbstractObject implements Constants {
 		return null;
 	}
 
-	private Element insertElement(String aName, String aValue) {
-		Element element = new Element(aName);
-		element.appendChild(aValue);
-		insertChild(element, 0);
-		return element;
-	}
-
 	public void setXMLChecksum(String aChecksum, String aAlgorithm) {
 		myXMLChecksum = aChecksum;
 		myChecksumAlgo = aAlgorithm;
@@ -36,51 +29,44 @@ public class ObjectInfo extends AbstractObject implements Constants {
 		myFormatExtension = aExtension;
 	}
     
-    /*
-      Create the elements needed for the XML version of this object's info. Two separate elements are created --
-      one for the metadata and one for the primary bitstream.
-    */
-	public Element[] createInfoElements() {
-		Element[] elements = new Element[2];
-		//Element thisID = getChildElements("identifier",LIST_OBJECTS_NAMESPACE).get(0);
-		//Element thisFormat = getChildElements("formatId",LIST_OBJECTS_NAMESPACE).get(0);
-		Element thisID = getChildElements("identifier").get(0);
-		Element thisFormat = getChildElements("formatId").get(0);
-		String baseID = thisID.getValue();
-		String format = thisFormat.getValue();
-		Element copy;
+    /**
+       Split this object into two separate elements -- one for the metadata and one for the primary bitstream.
+    **/
+	public Element[] createInfoElements() {    
+	    Element[] elements = new Element[2];
 
-		removeChild(thisFormat);
-		removeChild(thisID);
-		copy = (Element) copy();
+	    // create objects and set identifiers
+	    Element thisID = getChildElements("identifier").get(0);
+	    String baseID = thisID.getValue();
+	    ObjectInfo metadataElem = new ObjectInfo(baseID + "/dap");
+	    ObjectInfo bitstreamElem = new ObjectInfo(baseID + "/" + myFormatExtension);
 
-		insertElement("formatId", DRYAD_NAMESPACE);
-		Element newFormat = new Element("formatId");
-		newFormat.appendChild(format);
-		copy.insertChild(newFormat, 0);
+	    // formats
+	    Element thisFormat = getChildElements("formatId").get(0);
+	    String format = thisFormat.getValue();
+	    metadataElem.setObjectFormat(DRYAD_NAMESPACE);
+	    bitstreamElem.setObjectFormat(format);
 
-
-		Elements checksumChildren = getChildElements("checksum");
-		if(checksumChildren != null && checksumChildren.size() > 0) {
-		    removeChild(checksumChildren.get(0));
-		}
-
-		if (myXMLChecksum != null && myChecksumAlgo != null) {
-			setChecksum(myChecksumAlgo, myXMLChecksum);
-		}
-
-		// this don't apply to the dap metadata, so remove (it's on copy)
-		removeChild(getChildElements("size").get(0));
-
-		insertElement("identifier", baseID + "/dap");
-		Element newID = new Element("identifier");
-		newID.appendChild(baseID + "/" + myFormatExtension);
-		copy.insertChild(newID, 0);
-
-		// fill out our results array
-		elements[0] = this;
-		elements[1] = copy;
-
-		return elements;
+	    // checksum
+	    if (myXMLChecksum != null && myChecksumAlgo != null) {
+		metadataElem.setChecksum(myChecksumAlgo, myXMLChecksum);
+	    }
+	    bitstreamElem.appendChild((Element)this.getChildElements("checksum").get(0).copy());
+	    
+	    // modification date
+	    Element thisModDate = this.getChildElements("dateSysMetadataModified").get(0);
+	    metadataElem.appendChild((Element)thisModDate.copy());
+	    bitstreamElem.appendChild((Element)thisModDate.copy());
+	    
+	    // size
+	    // the size doesn't apply to the dap metadata, so it is only added to the bitstreamElem
+	    bitstreamElem.appendChild((Element)this.getChildElements("size").get(0).copy());
+	    
+	    
+	    // fill out our results array
+	    elements[0] = metadataElem;
+	    elements[1] = bitstreamElem;
+	    
+	    return elements;
 	}
 }

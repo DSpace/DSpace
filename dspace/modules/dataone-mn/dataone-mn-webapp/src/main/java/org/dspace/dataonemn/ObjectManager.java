@@ -32,11 +32,10 @@ import org.jdom.output.XMLOutputter;
 
 import org.apache.log4j.Logger;
 
-import com.ibm.icu.text.DateFormat;
-
 public class ObjectManager extends AbstractObjectManager {
 
     private static final Logger log = Logger.getLogger(ObjectManager.class);
+    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
 	public static final int DEFAULT_START = 0;
 	public static final int DEFAULT_COUNT = 20;
@@ -138,11 +137,10 @@ public class ObjectManager extends AbstractObjectManager {
 		
 				ObjectInfo objInfo = new ObjectInfo(doi);
 				Item item = Item.find(myContext, id.intValue());
-				String lastMod = DateFormat.getDateTimeInstance().format(date);
+				String lastMod = dateFormatter.format(date);
 
 				objInfo.setObjectFormat(format);
 				objInfo.setFormatExtension(ext);
-				objInfo.setLastModified(lastMod);
 				
 				try {
 					String[] checksumDetails = getObjectChecksum(doi, "dap");
@@ -156,7 +154,9 @@ public class ObjectManager extends AbstractObjectManager {
 				    log.error("Unable to calculate checksum for " + doi, e);
 				    
 				}
+				objInfo.setLastModified(lastMod);
 
+				
 				Bundle[] bundles = item.getBundles("ORIGINAL");
 
 				log.debug("Getting bitstreams for " + item.getHandle());
