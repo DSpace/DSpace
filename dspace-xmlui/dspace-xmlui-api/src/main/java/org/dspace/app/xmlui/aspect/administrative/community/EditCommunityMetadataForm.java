@@ -33,35 +33,37 @@ import org.dspace.core.Constants;
  */
 public class EditCommunityMetadataForm extends AbstractDSpaceTransformer   
 {
-	/** Language Strings */
-	private static final Message T_dspace_home = message("xmlui.general.dspace_home");
-	
+    /** Language Strings */
+    private static final Message T_dspace_home = message("xmlui.general.dspace_home");
+
     private static final Message T_community_trail = message("xmlui.administrative.community.general.community_trail");
     private static final Message T_options_metadata = message("xmlui.administrative.community.general.options_metadata");  
     private static final Message T_options_roles = message("xmlui.administrative.community.general.options_roles");
     private static final Message T_options_curate = message("xmlui.administrative.community.general.options_curate");
 
-	private static final Message T_title = message("xmlui.administrative.community.EditCommunityMetadataForm.title");
-	private static final Message T_trail = message("xmlui.administrative.community.EditCommunityMetadataForm.trail");
+    private static final Message T_title = message("xmlui.administrative.community.EditCommunityMetadataForm.title");
+    private static final Message T_trail = message("xmlui.administrative.community.EditCommunityMetadataForm.trail");
 
-	private static final Message T_main_head = message("xmlui.administrative.community.EditCommunityMetadataForm.main_head");
+    private static final Message T_main_head = message("xmlui.administrative.community.EditCommunityMetadataForm.main_head");
 
-	private static final Message T_label_name = message("xmlui.administrative.community.EditCommunityMetadataForm.label_name");
-	private static final Message T_label_short_description = message("xmlui.administrative.community.EditCommunityMetadataForm.label_short_description");
-	private static final Message T_label_introductory_text = message("xmlui.administrative.community.EditCommunityMetadataForm.label_introductory_text");
-	private static final Message T_label_copyright_text = message("xmlui.administrative.community.EditCommunityMetadataForm.label_copyright_text");
-	private static final Message T_label_side_bar_text = message("xmlui.administrative.community.EditCommunityMetadataForm.label_side_bar_text");
+    private static final Message T_label_name = message("xmlui.administrative.community.EditCommunityMetadataForm.label_name");
+    private static final Message T_label_short_description = message("xmlui.administrative.community.EditCommunityMetadataForm.label_short_description");
+    private static final Message T_label_introductory_text = message("xmlui.administrative.community.EditCommunityMetadataForm.label_introductory_text");
+    private static final Message T_label_copyright_text = message("xmlui.administrative.community.EditCommunityMetadataForm.label_copyright_text");
+    private static final Message T_label_side_bar_text = message("xmlui.administrative.community.EditCommunityMetadataForm.label_side_bar_text");
 
-	private static final Message T_label_logo = message("xmlui.administrative.community.EditCommunityMetadataForm.label_logo");
-	private static final Message T_label_existing_logo = message("xmlui.administrative.community.EditCommunityMetadataForm.label_existing_logo");
+    private static final Message T_label_logo = message("xmlui.administrative.community.EditCommunityMetadataForm.label_logo");
+    private static final Message T_label_existing_logo = message("xmlui.administrative.community.EditCommunityMetadataForm.label_existing_logo");
 
-	private static final Message T_submit_delete_logo = message("xmlui.administrative.community.EditCommunityMetadataForm.submit_delete_logo");
-	private static final Message T_submit_delete = message("xmlui.administrative.community.EditCommunityMetadataForm.submit_delete");
-	private static final Message T_submit_update = message("xmlui.general.update");
-	private static final Message T_submit_return = message("xmlui.general.return");
-	
-	
-	public void addPageMeta(PageMeta pageMeta) throws WingException
+    private static final Message T_submit_delete_logo = message("xmlui.administrative.community.EditCommunityMetadataForm.submit_delete_logo");
+    private static final Message T_submit_delete = message("xmlui.administrative.community.EditCommunityMetadataForm.submit_delete");
+    private static final Message T_submit_update = message("xmlui.general.update");
+    private static final Message T_submit_return = message("xmlui.general.return");
+
+
+    @Override
+    public void addPageMeta(PageMeta pageMeta)
+            throws WingException
     {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
@@ -69,7 +71,9 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
         pageMeta.addTrail().addContent(T_trail);
     }
 	
-	public void addBody(Body body) throws WingException, SQLException, AuthorizeException
+    @Override
+    public void addBody(Body body)
+            throws WingException, SQLException, AuthorizeException
 	{
 		int communityID = parameters.getParameterAsInteger("communityID", -1);
 		Community thisCommunity = Community.find(context, communityID);
@@ -148,7 +152,12 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
 	    if (thisCommunity.getLogo() != null) {
 	    	metadataList.addLabel(T_label_existing_logo);
 	    	item = metadataList.addItem();
-	    	item.addFigure(contextPath + "/bitstream/id/" + thisCommunity.getLogo().getID() + "/bob.jpg", null, null);
+                // Filename in URL is  ignored by the sitemap.  It's needed to
+                // provide a format hint to the browser, since logo bitstreams
+                // don't have names(!).
+                item.addFigure(contextPath + "/bitstream/id/"
+                        + thisCommunity.getLogo().getID() + "/bob.jpg", null,
+                        null);
 	    	item.addButton("submit_delete_logo").setValue(T_submit_delete_logo);
 	    }
 	    

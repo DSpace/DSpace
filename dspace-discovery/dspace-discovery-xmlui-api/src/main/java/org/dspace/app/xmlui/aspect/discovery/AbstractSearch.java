@@ -617,7 +617,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      * Determine if the scope of the search should fixed or is changeable by the
      * user.
      * <p/>
-     * The search scope when preformed by url, i.e. they are at the url handle/xxxx/xx/search
+     * The search scope when performed by url, i.e. they are at the url handle/xxxx/xx/search
      * then it is fixed. However at the global level the search is variable.
      *
      * @return true if the scope is variable, false otherwise.

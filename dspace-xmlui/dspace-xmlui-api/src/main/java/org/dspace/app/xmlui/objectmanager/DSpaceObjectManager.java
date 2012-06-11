@@ -24,7 +24,7 @@ import org.dspace.handle.HandleManager;
 
 
 /**
- * The Wing ObjectManager implemented specificaly for DSpace. This manager 
+ * The Wing ObjectManager implemented specifically for DSpace. This manager 
  * is able identify all DSpace items, communities, and collections.
  * 
  * @author Scott Phillips
@@ -60,14 +60,14 @@ public class DSpaceObjectManager implements ObjectManager
 			DSpaceObject dso = (DSpaceObject) object;
 			String handle = dso.getHandle();
 			
-			// If the object has a handle then refrence it by it's handle.
+			// If the object has a handle then reference it by its handle.
 			if (handle != null)
 			{
 				return "/metadata/handle/" + handle + "/mets.xml";
 			}
 			else
 			{
-				// No handle then refrence it by an internal ID.
+				// No handle then reference it by an internal ID.
 				if (dso instanceof Item || dso instanceof BrowseItem)
 		    	{
 		    		return "/metadata/internal/item/" + dso.getID() + "/mets.xml";
@@ -88,7 +88,7 @@ public class DSpaceObjectManager implements ObjectManager
 	
 	/**
 	 * Return a pretty specific string giving a hint to the theme as to what
-	 * type of DSpace object is being refrenced.
+	 * type of DSpace object is being referenced.
 	 */
 	public String getObjectType(Object object)
 	{

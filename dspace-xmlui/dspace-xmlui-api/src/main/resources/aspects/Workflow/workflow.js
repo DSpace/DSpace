@@ -136,7 +136,7 @@ function doWorkflow()
 
         if (cocoon.request.get("submit_leave"))
         {
-            // Just exit workflow with out doing anything
+            // Just exit workflow without doing anything
             var contextPath = cocoon.request.getContextPath();
             cocoon.redirectTo(contextPath+"/submissions",true);
             getDSContext().complete();

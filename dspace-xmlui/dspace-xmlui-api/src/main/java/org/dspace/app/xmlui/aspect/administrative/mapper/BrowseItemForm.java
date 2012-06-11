@@ -33,7 +33,7 @@ import org.xml.sax.SAXException;
 /**
  * List all items in this collection that are mapped from other collections.
  * 
- * @author Scott phillips
+ * @author Scott Phillips
  */
 
 public class BrowseItemForm extends AbstractDSpaceTransformer {

@@ -61,14 +61,14 @@ public class InvalidToken extends AbstractDSpaceTransformer
        
        invalid.addPara(T_para1);
 
-       Para example1 = invalid.addPara("invalid-token-examlpe","code");
+       Para example1 = invalid.addPara("invalid-token-example","code");
        example1.addContent(ConfigurationManager.getProperty("dspace.url") + "/register?token=ABCDEFGHIJK");
-       Para example2 = invalid.addPara("invalid-token-examlpe","code");
+       Para example2 = invalid.addPara("invalid-token-example","code");
        example2.addContent("LMNOP");
        
        invalid.addPara(T_para2);
 
-       Para example3 = invalid.addPara("valid-token-examlpe","code");
+       Para example3 = invalid.addPara("valid-token-example","code");
        example3.addContent(ConfigurationManager.getProperty("dspace.url") + "/register?token=ABCDEFGHIJKLMNOP");
 
    }

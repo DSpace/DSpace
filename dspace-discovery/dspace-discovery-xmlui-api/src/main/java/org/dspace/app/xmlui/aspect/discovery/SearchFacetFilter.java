@@ -132,7 +132,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
                     validity.add(dso);
                 }
 
-                // add reciently submitted items, serialize solr query contents.
+                // add recently submitted items, serialize solr query contents.
                 DiscoverResult response = getQueryResponse(dso);
 
                 validity.add("numFound:" + response.getDspaceObjects().size());

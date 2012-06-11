@@ -126,7 +126,7 @@
         }
         else
         {
-         // do nothing the date is allready set to "without date"
+         // do nothing the date is already set to "without date"
         }
         String contributor = LocaleSupport.getLocalizedMessage(pageContext, "jsp.general.without-contributor");
         DCValue[] contributors = item.getMetadata("dc", "contributor", Item.ANY, Item.ANY);
@@ -137,7 +137,7 @@
         }
         else
         {
-         // do nothing the contributor is allready set to anonymous
+         // do nothing the contributor is already set to anonymous
         }
         String title = LocaleSupport.getLocalizedMessage(pageContext, "jsp.general.untitled");
         DCValue[] titles = item.getMetadata("dc", "title", null, Item.ANY);
@@ -148,7 +148,7 @@
         }
         else
         {
-         // do nothing the title is allready set to untitled
+         // do nothing the title is already set to untitled
             
         }
  

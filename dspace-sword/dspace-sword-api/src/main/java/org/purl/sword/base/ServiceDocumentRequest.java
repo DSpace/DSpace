@@ -24,7 +24,7 @@ public class ServiceDocumentRequest
    /** The onBehalf of name */
    private String onBehalfOf;
    
-   /** The IP Address */
+   /** The IP address */
    private String  IPAddress;
    
    /** The location */

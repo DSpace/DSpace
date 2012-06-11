@@ -216,7 +216,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 		}
 		else
 		{
-			// Only show the actions if there are fields available to preform them on.
+			// Only show the actions if there are fields available to perform them on.
 			Para actions = main.addPara();
 			actions.addButton("submit_delete").setValue(T_submit_delete);
 			if (MetadataSchema.findAll(context).length > 1)
@@ -347,7 +347,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 	 * Determine if there were any special errors and display approparte 
 	 * text. Because of the inline nature of the element and qualifier 
 	 * fields these errors can not be placed on the field. Instead they 
-	 * have to be added as seperate items above the field.
+	 * have to be added as separate items above the field.
 	 * 
 	 * @param form The form to add errors to.
 	 * @param errors A list of errors.

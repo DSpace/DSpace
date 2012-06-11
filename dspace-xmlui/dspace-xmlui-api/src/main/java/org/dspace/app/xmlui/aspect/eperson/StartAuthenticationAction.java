@@ -22,13 +22,13 @@ import org.dspace.app.xmlui.utils.AuthenticationUtil;
 
 /**
  * 
- * This action will start the nessary steps to authenticate a user. After the user 
- * successfully authenticates the user will resume this request with all parameters
+ * This action will start the necessary steps to authenticate a user. After the user 
+ * successfuly authenticates, the user will resume this request with all parameters
  * and attributes intact. An optional message can be added that will be displayed
  * on the login form. This could be used to provide a reason why the user is being
  * queried for a user name and password.
  * 
- * Possible parameter are:
+ * Possible parameters are:
  * 
  * header: An i18n message that will be used as the header for the message.
  * 
@@ -43,7 +43,7 @@ import org.dspace.app.xmlui.utils.AuthenticationUtil;
  * <map:act type="StartAuthenticationAction"/>
  * 
  * 
- * Typicaly this is used in conjunction with the AuthenticatedSelector as:
+ * Typically, this is used in conjunction with the AuthenticatedSelector as:
  * 
  * <map:select type="AuthenticatedSelector">
  *   <map:when test="eperson">
@@ -73,7 +73,7 @@ public class StartAuthenticationAction extends AbstractAction
     	String message = parameters.getParameter("message",null);
     	String characters = parameters.getParameter("characters",null);
     	
-    	// Interupt this request
+    	// Interrupt this request
     	AuthenticationUtil.interruptRequest(objectModel,header,message,characters);
 
     	final HttpServletRequest  httpRequest  = (HttpServletRequest)  objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT); 

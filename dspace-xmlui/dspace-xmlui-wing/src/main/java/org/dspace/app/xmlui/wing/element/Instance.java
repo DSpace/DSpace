@@ -194,7 +194,7 @@ public class Instance extends Container
     
     /**
      * Add an option value, there may be many of these. These values reference
-     * an option all ready added to the field.
+     * an option already added to the field.
      *
      * @param option
      *            (Required) The return value of the selected option.

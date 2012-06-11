@@ -36,7 +36,7 @@ public abstract class AbstractWingTransformer extends AbstractTransformer
         implements WingTransformer
 {
     /**
-     * Simple variable to indicate weather a new namespace context is needed. If
+     * Simple variable to indicate whether a new namespace context is needed. If
      * several namespaces are declared on the same attribute then they are
      * considered in the same 'context'. Each time an element is opened this
      * flag is reset to true, and each time a new namespace is declared it is
@@ -47,7 +47,7 @@ public abstract class AbstractWingTransformer extends AbstractTransformer
 
     /**
      * The namespace support object keeps track of registered URI prefixes. This
-     * is used by the WingElements so that they may attach the correctp prefix
+     * is used by the WingElements so that they may attach the correct prefix
      * when assigning elements to namespaces.
      */
     private NamespaceSupport namespaces;
@@ -192,7 +192,7 @@ public abstract class AbstractWingTransformer extends AbstractTransformer
                 else
                 {
                     throw new WingException(
-                            "Attempting to merge DRI documents but the source document is not compatable with the feeder document.");
+                            "Attempting to merge DRI documents but the source document is not compatible with the feeder document.");
                 }
 
             }
@@ -353,7 +353,7 @@ public abstract class AbstractWingTransformer extends AbstractTransformer
     }
 
     /**
-     * Return the name of this component. Typicaly the name is just 
+     * Return the name of this component. Typically the name is just 
      * the class name of the component.
      */
     public String getComponentName()
@@ -386,7 +386,7 @@ public abstract class AbstractWingTransformer extends AbstractTransformer
 
     /**
      * This is a short cut method for creating a new message object. This
-     * version allows the callie to specify a particular catalogue overriding
+     * version allows the callee to specify a particular catalogue overriding
      * the default catalogue supplied.
      * 
      * @param catalogue
@@ -421,7 +421,7 @@ public abstract class AbstractWingTransformer extends AbstractTransformer
         this.feederDocument = null;
         this.wingContext=null;
         this.stack =null;
-    	//super.dispose(); super dosn't dispose.
+    	//super.dispose(); super doesn't dispose.
     }
     
 }

@@ -28,8 +28,8 @@ import org.xml.sax.SAXException;
 
 /**
  * This is a class to test the capabilities of including HTML inside
- * a DRI document. This can be usefull for resources out side of a
- * developers control such as text files on disk or user supplied data.
+ * a DRI document. This can be useful for resources outside of
+ * developer's control such as text files on disk or user-supplied data.
  * 
  * This class is not internationalized because it is never intended
  * to be used in production. It is merely a tool to aid developers of

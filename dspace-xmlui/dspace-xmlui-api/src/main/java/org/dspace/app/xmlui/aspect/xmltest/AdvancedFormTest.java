@@ -96,7 +96,7 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
 		text.enableDeleteOperation();
 		if (help)
         {
-            text.setHelp("This is helpfull text.");
+            text.setHelp("This is helpful text.");
         }
 		if (error)
         {
@@ -119,7 +119,7 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
 		select.setSize(4);
 		if (help)
         {
-            select.setHelp("This is helpfull text.");
+            select.setHelp("This is helpful text.");
         }
 		if (error)
         {
@@ -173,7 +173,7 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
         text = composite.addText("firstA");
         if (help)
         {
-            text.setHelp("This is helpfull text.");
+            text.setHelp("This is helpful text.");
         }
         text.addInstance().setValue("1, Raw A");
         text.addInstance().setValue("2, Raw A");
@@ -182,7 +182,7 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
         text = composite.addText("secondA");
         if (help)
         {
-            text.setHelp("This is helpfull text.");
+            text.setHelp("This is helpful text.");
         }
         text.addInstance().setValue("1, Raw B");
         text.addInstance().setValue("2, Raw B");
@@ -315,7 +315,7 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
 	}
 	
     /**
-     * Helpfull method to generate the return url to this page given the 
+     * Helpful method to generate the return url to this page given the 
      * error & help parameters.
      */
 	private String makeURL(boolean help, boolean error)

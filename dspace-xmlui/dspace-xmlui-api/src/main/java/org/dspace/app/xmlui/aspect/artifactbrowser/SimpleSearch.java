@@ -31,7 +31,7 @@ import org.dspace.content.DSpaceObject;
 import org.xml.sax.SAXException;
 
 /**
- * Preform a simple search of the repository. The user provides a simple one
+ * Perform a simple search of the repository. The user provides a simple one
  * field query (the url parameter is named query) and the results are processed.
  * 
  * @author Scott Phillips

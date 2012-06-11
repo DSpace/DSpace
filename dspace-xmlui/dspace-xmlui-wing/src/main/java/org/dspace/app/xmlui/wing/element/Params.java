@@ -105,7 +105,7 @@ public class Params extends AbstractWingElement implements StructuralElement
     /** The maximum length of the field */
     protected int maxlength = -1;
 
-    /** Weather multiple values for this field are allowed */
+    /** Whether multiple values for this field are allowed */
     protected boolean multiple = false;
 
     /** The number of rows the field should span */

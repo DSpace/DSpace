@@ -99,7 +99,7 @@
                 <version>2.2.1</version>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <phase>generate-test-resources</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
@@ -409,102 +409,108 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
          </dependency>
+         <dependency>
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>additions</artifactId>
+            <version>3.0-SNAPSHOT</version>
+         </dependency>
+
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-api</artifactId>
-              <version>${project.version}</version>
+              <version>3.0-SNAPSHOT</version>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-webapp</artifactId>
-              <version>${project.version}</version>
+              <version>3.0-SNAPSHOT</version>
               <type>war</type>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-swordv2</artifactId>
-              <version>${project.version}</version>
+              <version>3.0-SNAPSHOT</version>
               <type>jar</type>
               <classifier>classes</classifier>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-swordv2</artifactId>
-              <version>${project.version}</version>
+              <version>3.0-SNAPSHOT</version>
               <type>war</type>
           </dependency>
            <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-client-api</artifactId>
-              <version>${project.version}</version>
+              <version>3.0-SNAPSHOT</version>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-client-xmlui-api</artifactId>
-              <version>${project.version}</version>
+              <version>3.0-SNAPSHOT</version>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-client-xmlui-webapp</artifactId>
-              <version>${project.version}</version>
+              <version>3.0-SNAPSHOT</version>
               <type>war</type>
           </dependency>
 
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui-api</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui-webapp</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai-api</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai-webapp</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-core</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-client</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-webapp</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-api</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-webapp</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-wing</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
@@ -524,7 +530,7 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-stats</artifactId>
-            <version>${project.version}</version>
+            <version>3.0-SNAPSHOT</version>
          </dependency>
          <!-- DSpace Localization Packages -->
          <dependency>
@@ -541,12 +547,12 @@
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-discovery-provider</artifactId>
-              <version>${project.version}</version>
+              <version>3.0-SNAPSHOT</version>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-discovery-solr</artifactId>
-              <version>${project.version}</version>
+              <version>3.0-SNAPSHOT</version>
           </dependency>
          <!-- DSpace third Party Dependencies -->
 
@@ -847,6 +853,16 @@
             <version>11.2.0.2.0</version>
          </dependency>
          <dependency>
+            <groupId>com.sun.media</groupId>
+            <artifactId>jai_imageio</artifactId>
+            <version>1.0_01</version>
+         </dependency>
+         <dependency>
+            <groupId>javax.media</groupId>
+            <artifactId>jai_core</artifactId>
+            <version>1.1.2_01</version>
+         </dependency>
+         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>oclc-harvester2</artifactId>
             <version>0.1.12</version>
@@ -889,7 +905,7 @@
             <url>http://scm.dspace.org/svn/repo/licenses/LICENSE.txt</url>
             <distribution>repo</distribution>
         <comments>
-            A BSD compatable OSS license for the DSpace codebase.
+            A BSD-compatible OSS license for the DSpace codebase.
          </comments>
       </license>
     </licenses>
@@ -1151,9 +1167,9 @@
       snapshots into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:git:git@github.com:dspace/DSpace.git</connection>
-      <developerConnection>scm:git:git@github.com:dspace/DSpace</developerConnection>
-      <url>git@github.com:dspace/DSpace</url>
+      <connection>scm:git:git@github.com:DSpace/DSpace.git</connection>
+      <developerConnection>scm:git:git@github.com:DSpace/DSpace.git</developerConnection>
+      <url>git@github.com:DSpace/DSpace.git</url>
    </scm>
 
     <!--

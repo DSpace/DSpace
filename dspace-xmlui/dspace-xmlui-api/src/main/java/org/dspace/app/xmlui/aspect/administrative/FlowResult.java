@@ -16,14 +16,14 @@ import org.dspace.app.xmlui.wing.Message;
 
 /**
  * This class represents the results that may be generated during a flow script
- * in this administrative section. Typicaly, some method preforms an operation
+ * in this administrative section. Typically, some method performs an operation
  * and returns an object of type FlowResult, then the flow script can inspect
  * the results object to determine what the next course of action is.
  * 
- * Basicaly, this results object stores all the errors and contiunation states
+ * Basically, this results object stores all the errors and continuation states
  * that need to be represented. There are four types of information stored:
  * 
- * 1) Continuation, this is a simple boolean variable that indicates wheather
+ * 1) Continuation, this is a simple boolean variable that indicates whether
  * the required operation is complete and the user may continue on to the next step.
  * 
  * 2) Notice information, this is a simple encoding of a notice message to be displayed
@@ -32,10 +32,10 @@ import org.dspace.app.xmlui.wing.Message;
  * or characters are required.
  * 
  * 3) Errors, this is a list of errors that were encountered during processing. 
- * Typical, it just consists of a list of errored fields. However occasionaly there 
+ * Typically, it just consists of a list of errored fields. However occasionally there 
  * may be other specialized errors listed.
  * 
- * 4) Parameters, this is a map of attached parameters that may be relevnt to the 
+ * 4) Parameters, this is a map of attached parameters that may be relevant to the 
  * result. This should be used for things such as generated id's when objects are newly
  * created.
  * 
@@ -44,7 +44,7 @@ import org.dspace.app.xmlui.wing.Message;
 public class FlowResult {
 
 	/**
-	 * Determine wheather the operation has been completed enough that the user
+	 * Determine whether the operation has been completed enough that the user
 	 * may successufully continue on to the next step.
 	 */
 	private boolean continuep;
@@ -52,18 +52,18 @@ public class FlowResult {
 	/**
 	 * Notice parameters:
 	 * 
-	 * Outcome: The outcome of the notice, may be either success, failure, or netural.
+	 * Outcome: The outcome of the notice, may be either success, failure, or neutral.
 	 * 
 	 * Header: The notice's label, an i18n dictionary key.
 	 * 
 	 * message: The main body of the notice, an i18n dictionary key.
 	 * 
-	 * characters: Supplementaiol information for the notice, plain text. This is 
-	 * typicaly used for exepctions.
+	 * characters: Supplemental information for the notice, plain text. This is 
+	 * typically used for exceptions.
 	 *
 	 */
-	private enum Outcome{ SUCCESS, FAILURE, NETURAL};
-	private Outcome outcome = Outcome.NETURAL;
+	private enum Outcome{ SUCCESS, FAILURE, NEUTRAL};
+	private Outcome outcome = Outcome.NEUTRAL;
 	private Message header;
 	private Message message;
 	private String characters;
@@ -103,8 +103,8 @@ public class FlowResult {
 	
 	/**
 	 * Set the notice outcome to either success or failure. Note, 
-	 * the default outcome is netural, once an outcome is set the
-	 * netural outcome can never be atained again.
+	 * the default outcome is neutral, once an outcome is set the
+	 * neutral outcome can never be attained again.
 	 * 
 	 * @param success True for success, false for failure.
 	 */
@@ -122,7 +122,7 @@ public class FlowResult {
 	
 	/**
 	 * Get the notice outcome in string form, either success 
-	 * or failure. If the outcome is netural then null is returned.
+	 * or failure. If the outcome is neutral then null is returned.
 	 */
 	public String getOutcome()
 	{
@@ -231,7 +231,7 @@ public class FlowResult {
 	}
 	
 	/**
-	 * Return the list of errors in string form, i.e. a comma seperated list
+	 * Return the list of errors in string form, i.e. a comma-separated list
 	 * of errors. If there are no errors then null is returned.
 	 */
 	public String getErrorString()
@@ -258,7 +258,7 @@ public class FlowResult {
 	
 	
 	/**
-	 * Attatch a new parameter to this result object with the specified
+	 * Attach a new parameter to this result object with the specified
 	 * name & value.
 	 * 
 	 * @param name The parameter's name

@@ -32,7 +32,7 @@ import org.xml.sax.SAXException;
 
 /**
  * This is a class to test the use of form fields inline with normal 
- * paragraaphs, lists, or tables. Any other location besides forms.
+ * paragraphs, lists, or tables. Any other location besides forms.
  * 
  * This class is not internationalized because it is never intended
  * to be used in production. It is merely a tool to aid developers of
@@ -103,7 +103,7 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         text.setLabel("Text");
         if (help)
         {
-            text.setHelp("This is helpfull text.");
+            text.setHelp("This is helpful text.");
         }
         if (error)
         {
@@ -114,7 +114,7 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         
         // Single Checkbox field
         p = suited.addPara();
-		p.addContent("This is a singe 'CheckBox' field, ");
+		p.addContent("This is a single 'CheckBox' field, ");
         CheckBox checkBox = p.addCheckBox("yes-or-no");
         if (help)
         {
@@ -183,7 +183,7 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         
         
         Division unsuited = body.addDivision("unsuited");
-        unsuited.setHead("Fields typicaly unsuited towards being used inline");
+        unsuited.setHead("Fields typically unsuited towards being used inline");
 		
         unsuited.addPara("Below are a list of embedded fields that are normally considered useless in an inline context. This is because there widgets normally cross multiple lines making them hard to render inline. However these are all legal, but perhaps not advisable, and in some circumstances may be needed.");
 		
@@ -195,7 +195,7 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         textArea.setLabel("Text Area");
         if (help)
         {
-            textArea.setHelp("This is helpfull text.");
+            textArea.setHelp("This is helpful text.");
         }
         if (error)
         {
@@ -214,7 +214,7 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         }
         if (error)
         {
-            checkBox.addError("You are incorrect you actualy do like Tootse Rolls.");
+            checkBox.addError("You are incorrect you actually do like Tootse Rolls.");
         }
         checkBox.setLabel("fruits");
         checkBox.addOption("apple","Apples");
@@ -304,7 +304,7 @@ public class InlineFormTest extends AbstractDSpaceTransformer
     }
     
     /**
-     * Helpfull method to generate the return url to this page given the 
+     * Helpful method to generate the return url to this page given the 
      * error & help parameters.
      */
     private String makeURL(boolean help, boolean error)

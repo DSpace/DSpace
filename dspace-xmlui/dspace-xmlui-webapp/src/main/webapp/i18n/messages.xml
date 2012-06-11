@@ -1759,7 +1759,7 @@
 	<message key="xmlui.administrative.ControlPanel.start_bot">START recording bot activity.</message>
 	<message key="xmlui.administrative.ControlPanel.activity_sort_time">Time Stamp</message>
 	<message key="xmlui.administrative.ControlPanel.activity_sort_user">User</message>
-	<message key="xmlui.administrative.ControlPanel.activity_sort_ip">IP Address</message>
+	<message key="xmlui.administrative.ControlPanel.activity_sort_ip">IP address</message>
 	<message key="xmlui.administrative.ControlPanel.activity_sort_url">URL Page</message>
 	<message key="xmlui.administrative.ControlPanel.activity_sort_Agent">User-Agent</message>
 	<message key="xmlui.administrative.ControlPanel.activity_anonymous">Anonymous {0}</message>

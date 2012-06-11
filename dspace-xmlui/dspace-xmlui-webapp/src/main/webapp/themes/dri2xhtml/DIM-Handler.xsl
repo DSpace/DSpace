@@ -196,12 +196,14 @@
 	            </xsl:otherwise>
             </xsl:choose>
         </a>
-		<!--Display collection strengths (item counts) if they exist-->
-		<xsl:if test="string-length($data/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">
-            <xsl:text> [</xsl:text>
-            <xsl:value-of select="$data/dim:field[@element='format'][@qualifier='extent'][1]"/>
-            <xsl:text>]</xsl:text>
-        </xsl:if>
+        <!--Display collection strengths (item counts) if they exist-->
+        <span class="ds-strength">
+            <xsl:if test="string-length($data/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">
+                <xsl:text> [</xsl:text>
+                <xsl:value-of select="$data/dim:field[@element='format'][@qualifier='extent'][1]"/>
+                <xsl:text>]</xsl:text>
+            </xsl:if>
+        </span>
     </xsl:template>
 
     <!-- A community rendered in the summaryList pattern. Encountered on the community-list and on 
@@ -219,12 +221,14 @@
 		            </xsl:otherwise>
 	            </xsl:choose>
             </a>
-			<!--Display community strengths (item counts) if they exist-->
-			<xsl:if test="string-length($data/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">
-                <xsl:text> [</xsl:text>
-                <xsl:value-of select="$data/dim:field[@element='format'][@qualifier='extent'][1]"/>
-                <xsl:text>]</xsl:text>
-            </xsl:if>
+            <!--Display community strengths (item counts) if they exist-->
+            <span class="ds-strength">
+                <xsl:if test="string-length($data/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">
+                    <xsl:text> [</xsl:text>
+                    <xsl:value-of select="$data/dim:field[@element='format'][@qualifier='extent'][1]"/>
+                    <xsl:text>]</xsl:text>
+                </xsl:if>
+            </span>
         </span>
     </xsl:template>
     
@@ -545,16 +549,16 @@
 	                <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-abstract</i18n:text>:</span></td>
 	                <td>
 	                <xsl:if test="count(dim:field[@element='description' and @qualifier='abstract']) &gt; 1">
-	                	<hr class="metadata-seperator"/>
+	                	<hr class="metadata-separator"/>
 	                </xsl:if>
 	                <xsl:for-each select="dim:field[@element='description' and @qualifier='abstract']">
 		                <xsl:copy-of select="./node()"/>
 		                <xsl:if test="count(following-sibling::dim:field[@element='description' and @qualifier='abstract']) != 0">
-	                    	<hr class="metadata-seperator"/>
+	                    	<hr class="metadata-separator"/>
 	                    </xsl:if>
 	              	</xsl:for-each>
 	              	<xsl:if test="count(dim:field[@element='description' and @qualifier='abstract']) &gt; 1">
-	                	<hr class="metadata-seperator"/>
+	                	<hr class="metadata-separator"/>
 	                </xsl:if>
 	                </td>
 	            </tr>
@@ -570,16 +574,16 @@
 	                <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-description</i18n:text>:</span></td>
 	                <td>
 	                <xsl:if test="count(dim:field[@element='description' and not(@qualifier)]) &gt; 1 and not(count(dim:field[@element='description' and @qualifier='abstract']) &gt; 1)">
-	                	<hr class="metadata-seperator"/>
+	                	<hr class="metadata-separator"/>
 	                </xsl:if>
 	                <xsl:for-each select="dim:field[@element='description' and not(@qualifier)]">
 		                <xsl:copy-of select="./node()"/>
 		                <xsl:if test="count(following-sibling::dim:field[@element='description' and not(@qualifier)]) != 0">
-	                    	<hr class="metadata-seperator"/>
+	                    	<hr class="metadata-separator"/>
 	                    </xsl:if>
 	               	</xsl:for-each>
 	               	<xsl:if test="count(dim:field[@element='description' and not(@qualifier)]) &gt; 1">
-	                	<hr class="metadata-seperator"/>
+	                	<hr class="metadata-separator"/>
 	                </xsl:if>
 	                </td>
 	            </tr>

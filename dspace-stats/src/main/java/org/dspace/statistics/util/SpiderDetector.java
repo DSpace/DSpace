@@ -33,7 +33,7 @@ public class SpiderDetector {
     private static Logger log = Logger.getLogger(SpiderDetector.class);
 
     /**
-     * Sparse HAshTable structure to hold IP Address Ranges.
+     * Sparse HashTable structure to hold IP address ranges.
      */
     private static IPTable table = null;
 

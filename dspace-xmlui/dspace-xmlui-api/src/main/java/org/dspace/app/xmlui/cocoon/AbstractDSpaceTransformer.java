@@ -64,7 +64,7 @@ public abstract class AbstractDSpaceTransformer extends AbstractWingTransformer
     
     protected WebContinuation knot;
     
-    // Only access this through getObjectManager, so that we don't have to create one if we don't want too.
+    // Only access this through getObjectManager, so that we don't have to create one if we don't want to.
     private ObjectManager objectManager;
 
     public void setup(SourceResolver resolver, Map objectModel, String src,
@@ -219,7 +219,7 @@ public abstract class AbstractDSpaceTransformer extends AbstractWingTransformer
 
     /**
      * Generate a URL for the given base URL with the given parameters. This is
-     * a convenance method to make it easier to generate URL refrences with
+     * a convenance method to make it easier to generate URL references with
      * parameters.
      * 
      * Example

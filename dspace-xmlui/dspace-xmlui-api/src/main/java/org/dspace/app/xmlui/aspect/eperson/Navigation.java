@@ -39,11 +39,11 @@ import org.xml.sax.SAXException;
  * 1) Login and Logout links
  * 
  * 2) Navigational links to register or edit their profile based 
- *    upon wheather the user is authenticatied or not.
+ *    upon whether the user is authenticatied or not.
  * 
  * 3) User metadata 
  * 
- * 4) The user's language prefrences (wheather someone is logged 
+ * 4) The user's language preferences (whether someone is logged 
  *    in or not)
  * 
  * @author Scott Phillips
@@ -83,7 +83,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         // Special case, don't cache anything if the user is logging 
         // in. The problem occures because of timming, this cache key
         // is generated before we know whether the operation has 
-        // succeded or failed. So we don't know whether to cache this 
+        // succeeded or failed. So we don't know whether to cache this 
         // under the user's specific cache or under the anonymous user.
         if (request.getParameter("login_email")    != null ||
             request.getParameter("login_password") != null ||
@@ -95,7 +95,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         // FIXME:
         // Do not cache the home page. There is a bug that is causing the
         // homepage to be cached with user's data after a logout. This
-        // polutes the cache. As a work-around this problem we just won't
+        // pollutes the cache. As a work-around this problem we just won't
         // cache this page.
         if (request.getSitemapURI().length() == 0)
         {
@@ -217,10 +217,10 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             userMeta.setAuthenticated(false);
         }
 
-        // Allways have a login URL.
+        // Always have a login URL.
         userMeta.addMetadata("identifier","loginURL").addContent(contextPath+"/login");
         
-        // Allways add language information
+        // Always add language information
         Request request = ObjectModelHelper.getRequest(objectModel);
         Enumeration locales = request.getLocales();
         while (locales.hasMoreElements())

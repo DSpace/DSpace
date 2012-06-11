@@ -221,9 +221,14 @@
 <%
     if (ConfigurationManager.getProperty("sfx.server.url") != null)
     {
+        String sfximage = ConfigurationManager.getProperty("sfx.server.image_url");
+        if (sfximage == null)
+        {
+            sfximage = request.getContextPath() + "/image/sfx-link.gif";
+        }
 %>
     <p align="center">
-        <a href="<dspace:sfxlink item="<%= item %>"/>" /><img src="<%= request.getContextPath() %>/image/sfx-link.gif" border="0" alt="SFX Query" /></a>
+        <a href="<dspace:sfxlink item="<%= item %>"/>" /><img src="<%= sfximage %>" border="0" alt="SFX Query" /></a>
     </p>
 <%
     }

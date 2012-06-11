@@ -153,7 +153,7 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
 	 * Grab all the page's parameters from the sitemap. This includes 
 	 * workspaceID, step, and a list of errored fields.
 	 * 
-	 * If the implementer set any required parameters then insure that 
+	 * If the implementer set any required parameters then ensure that 
 	 * they are all present.
 	 */
 	public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) 
@@ -169,7 +169,7 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
 			this.errorFlag = Integer.valueOf(parameters.getParameter("error", String.valueOf(AbstractProcessingStep.STATUS_COMPLETE)));
 			this.errorFields = getErrorFields(parameters);
 			
-			//load in-progress submission
+			// load in-progress submission
 			if (this.id != null)
             {
                 try {
@@ -261,25 +261,25 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
 	 */
 	public void addSubmissionProgressList(Division div) throws WingException
 	{
-		//each entry in progress bar is placed under this "submit-progress" div
+		// each entry in progress bar is placed under this "submit-progress" div
 		List progress = div.addList("submit-progress",List.TYPE_PROGRESS);
 		
-		//get Map of progress bar information
-		//key: entry # (i.e. step & page), 
-		//value: entry name key (i.e. display name)
+		// get Map of progress bar information
+		// key: entry # (i.e. step & page), 
+		// value: entry name key (i.e. display name)
 		Map<String, String> progBarInfo = this.submissionInfo.getProgressBarInfo();
 
-		//add each entry to progress bar
+		// add each entry to progress bar
 		for (Map.Entry<String, String> progBarEntry : progBarInfo.entrySet())
 		{
-			//Since we are using XML-UI, we need to prepend the heading key with "xmlui.Submission."
+			// Since we are using XML-UI, we need to prepend the heading key with "xmlui.Submission."
 			String entryNameKey = "xmlui.Submission." + progBarEntry.getValue();
 			
-			//the value of entryNum is current step & page 
-			//(e.g. 1.2 is page 2 of step 1) 
+			// the value of entryNum is current step & page 
+			// (e.g. 1.2 is page 2 of step 1) 
 			StepAndPage currentStepAndPage = new StepAndPage(progBarEntry.getKey());
 			
-            //add a button to progress bar for this step & page
+            // add a button to progress bar for this step & page
             addJumpButton(progress, message(entryNameKey), currentStepAndPage);
 		}
 		
@@ -307,10 +307,10 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
     public void addJumpButton(List list, Message buttonText, StepAndPage stepAndPage)
         throws WingException
     {
-        //Only add the button if we have button text and a valid step & page!
+        // Only add the button if we have button text and a valid step & page!
         if(buttonText!=null && stepAndPage.isSet())
         {    
-            //add a Jump To button for this section
+            // add a Jump To button for this section
             Button jumpButton = list.addItem("step_" + stepAndPage, renderJumpButton(stepAndPage))
                                     .addButton(AbstractProcessingStep.PROGRESS_BAR_PREFIX + stepAndPage);
             jumpButton.setValue(buttonText);
@@ -334,21 +334,21 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
     {
         Item actions = controls.addItem();
         
-        //only have "<-Previous" button if not first step
+        // only have "<-Previous" button if not first step
         if(!isFirstStep())
         {
             actions.addButton(AbstractProcessingStep.PREVIOUS_BUTTON).setValue(T_previous);
         }
         
-        //always show "Save/Cancel"
+        // always show "Save/Cancel"
         actions.addButton(AbstractProcessingStep.CANCEL_BUTTON).setValue(T_save);
         
-        //If last step, show "Complete Submission"
+        // If last step, show "Complete Submission"
         if(isLastStep())
         {
             actions.addButton(AbstractProcessingStep.NEXT_BUTTON).setValue(T_complete);
         }
-        else //otherwise, show "Next->"
+        else // otherwise, show "Next->"
         {
             actions.addButton(AbstractProcessingStep.NEXT_BUTTON).setValue(T_next);
         }
@@ -492,12 +492,12 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
      * <P>
      * If the given step and page is greater than the max,
      * render it with "disabled" style.
-	 * 
-	 * @param givenStepAndPage 
+     * 
+     * @param givenStepAndPage 
      *        This given step & page (e.g. (1,2))
-	 * @return
+     * @return
      *        render style for this button
-	 */
+     */
 	private String renderJumpButton(StepAndPage givenStepAndPage)
 	{
         try
