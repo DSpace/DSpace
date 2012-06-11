@@ -1,9 +1,7 @@
 /*
- * EthOntos - a tool for comparative methods using ontologies
- * Copyright 2004-2005 Peter E. Midford
  * 
  * Created on Jun 3, 2012
- * Last updated on Jun 3, 2012
+ * Last updated on Jun 11, 2012
  * 
  */
 package org.dspace.dataonemn;
