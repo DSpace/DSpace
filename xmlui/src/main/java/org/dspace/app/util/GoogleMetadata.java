@@ -65,9 +65,11 @@ public class GoogleMetadata
 
     public static final String PUBLISHER = "citation_publisher";
 
-    public static final String AUTHORS = "citation_authors";
+    public static final String AUTHORS = "citation_author";
 
-    public static final String DATE = "citation_date";
+    public static final String DATE = "citation_publication_date";
+    
+    public static final String ONLINE_DATE ="citation_online_date";
 
     public static final String VOLUME = "citation_volume";
 
@@ -95,7 +97,7 @@ public class GoogleMetadata
 
     public static final String KEYWORDS = "citation_keywords";
 
-    public static final String CONFERENCE = "citation_conference";
+    public static final String CONFERENCE = "citation_conference_title";
 
     public static final String DISSERTATION_ID = "identifiers.dissertation";
 
@@ -663,7 +665,10 @@ public class GoogleMetadata
 
         // DATE
         addSingleField(DATE);
-
+        
+        // ONLINE_DATE
+        addSingleField(ONLINE_DATE);
+        
         // ISSN
         addSingleField(ISSN);
 
@@ -999,14 +1004,38 @@ public class GoogleMetadata
     private String getPDFSimpleUrl(Item item)
     {
         try {
-            Bundle[] contentBundles = item.getBundles("ORIGINAL");
-            if (contentBundles.length > 0) {
-                Bitstream[] bitstreams = contentBundles[0].getBitstreams();
-                if (bitstreams.length == 1) {
-                    if (bitstreams[0].getFormat().getMIMEType().equals("application/pdf")) {
-                        StringBuilder path = new StringBuilder();
-                        path.append(ConfigurationManager.getProperty("dspace.url"));
+        	Bundle[] contentBundles = item.getBundles("ORIGINAL");
+            if (contentBundles.length > 0) { 
+            	Bitstream[] bitstreams = contentBundles[0].getBitstreams();
+            	if (bitstreams.length > 1){
+                    for (Bitstream bitstream : bitstreams){
+                        
+                        	if (bitstream.getFormat().getMIMEType().equals("application/pdf") && bitstream.getID() == contentBundles[0].getPrimaryBitstreamID()) {
+                        		StringBuilder path = new StringBuilder();
+                                path.append(ConfigurationManager.getProperty("dspace.url"));
 
+                                if (item.getHandle() != null) {
+                                    path.append("/bitstream/");
+                                    path.append(item.getHandle());
+                                    path.append("/");
+                                    path.append(bitstream.getSequenceID());
+                                } else {
+                                    path.append("/retrieve/");
+                                    path.append(bitstream.getID());
+                                }
+
+                                path.append("/");
+                                path.append(Util.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING));
+                                return path.toString();
+                                
+            		        } 
+                        	
+                        }
+            	}
+            	else{ 
+            		if (bitstreams[0].getFormat().getMIMEType().equals("application/pdf")){
+            			StringBuilder path = new StringBuilder();
+                        path.append(ConfigurationManager.getProperty("dspace.url"));                        
                         if (item.getHandle() != null) {
                             path.append("/bitstream/");
                             path.append(item.getHandle());
@@ -1020,8 +1049,11 @@ public class GoogleMetadata
                         path.append("/");
                         path.append(Util.encodeBitstreamName(bitstreams[0].getName(), Constants.DEFAULT_ENCODING));
                         return path.toString();
-                    }
-                }
+                        
+            		}
+            		
+            	}
+            		
             }
         } catch (UnsupportedEncodingException ex) {
             log.debug(ex.getMessage());
