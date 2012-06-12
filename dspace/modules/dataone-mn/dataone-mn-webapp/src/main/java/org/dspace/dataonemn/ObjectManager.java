@@ -149,6 +149,8 @@ public class ObjectManager extends AbstractObjectManager {
 						objInfo.setXMLChecksum(checksumDetails[0],
 								checksumDetails[1]);
 					}
+
+					objInfo.setXMLSize(getObjectSize(doi,"dap"));
 				}
 				catch (NotFoundException e) {
 				    log.error("Unable to calculate checksum for " + doi, e);
