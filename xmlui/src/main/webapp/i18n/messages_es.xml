@@ -2472,6 +2472,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="sedici.comunidades.libros.info">Libros digitalizados y e-books</message>
 <message key="sedici.comunidades.eventos.nombre">Eventos</message>
 <message key="sedici.comunidades.eventos.info">Ponencias realizadas en congresos y conferencias</message>
+<message key="sedici.comunidades.tesis.embargo">Documento Embargado</message>
 <message key="sedici.noticias.head">Noticias</message>
 <message key="sedici.noticias.titulo">Lista de noticias</message>
 <message key="sedici.common.camposObligatorios">(*) Campos Obligatorios</message>
