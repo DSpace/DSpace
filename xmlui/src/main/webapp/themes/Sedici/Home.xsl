@@ -76,6 +76,25 @@
 			 		</a>
 			 	 </div>
 	     	 </xsl:for-each>
+	     	 
+	     	 <!-- Agrego el link de libros -->
+    	 	 <div class="community_icon_container">
+	         	 <xsl:attribute name="id">icono_libros</xsl:attribute>
+		 		 <a>
+		 		    <xsl:attribute name="href"><xsl:text>discover?fq=type_filter%3Alibro\|\|\|Libro</xsl:text></xsl:attribute>
+			 		<h2><i18n:text>sedici.comunidades.libros.nombre</i18n:text></h2>
+			 		<img class="community_icon">
+			 			<xsl:attribute name="id">community_icon_libros</xsl:attribute>
+			            <xsl:attribute name="src">
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+			                <xsl:text>/themes/</xsl:text>
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+			                <xsl:text>/images/icono_libros.png</xsl:text>
+			            </xsl:attribute>&#160;
+			 		</img>
+			 		<p><i18n:text>sedici.comunidades.libros.info</i18n:text></p>
+		 		 </a>
+	 	     </div>
 	     </div>
 	     
 	     <div id='home_feed'>
