@@ -9,7 +9,6 @@ package org.dspace.statistics.configuration;
 
 import java.io.File;
 import java.net.MalformedURLException;
-
 import org.dspace.kernel.config.SpringLoader;
 import org.dspace.services.ConfigurationService;
 
@@ -17,11 +16,12 @@ import org.dspace.services.ConfigurationService;
  * @author mwood
  *
  */
-public class StatisticsSpringLoader implements SpringLoader
+public class StatisticsSpringLoader
+        implements SpringLoader
 {
-
-    /* (non-Javadoc)
-     * @see org.dspace.kernel.config.SpringLoader#getResourcePaths(org.dspace.services.ConfigurationService)
+    /*
+     * (non-Javadoc) @see
+     * org.dspace.kernel.config.SpringLoader#getResourcePaths(org.dspace.services.ConfigurationService)
      */
     @Override
     public String[] getResourcePaths(ConfigurationService configurationService)
@@ -33,15 +33,18 @@ public class StatisticsSpringLoader implements SpringLoader
         filePath.append(File.separator);
         filePath.append("spring");
         filePath.append(File.separator);
-        filePath.append("stats");
+        filePath.append("statistics");
         filePath.append(File.separator);
 
-
-        try {
-            return new String[] { new File(filePath.toString()).toURI().toURL()
-                    .toString()
-                    + XML_SUFFIX };
-        } catch (MalformedURLException e) {
+        try
+        {
+            return new String[]
+                    {
+                        new File(filePath.toString()).toURI().toURL().toString()
+                        + File.separator + XML_SUFFIX
+                    };
+        } catch (MalformedURLException e)
+        {
             return new String[0];
         }
     }

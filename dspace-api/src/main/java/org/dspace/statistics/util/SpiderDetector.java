@@ -44,7 +44,7 @@ public class SpiderDetector {
     private static IPTable table = null;
 
     /** Collection of regular expressions to match known spiders' agents */
-    private static List<Pattern> agents = null;
+    private static List<Pattern> agents = new ArrayList<Pattern>();
 
     /**
      * Utility method which reads IP addresses from a file & returns them in a Set.
@@ -85,26 +85,24 @@ public class SpiderDetector {
     }
 
     /**
-     * Let e.g. Spring add agent patterns to our collection.
-     * This can be called more than once, and will simply augment the collection
-     * with new patterns.
+     * Unpack a list of lists of patterns and compile them to Patterns.
+     * We have to do the list-of-lists to get Spring to accumulate them across
+     * configuration files.
      * 
      * @param agentPatterns
      * @throws PatternSyntaxExpression
      */
-    static public void setAgentPatterns(List<String> agentPatterns)
+    static public void setAgentPatterns(List<AgentPatternList> agentPatternLists)
     {
-        if (null == agents)
-            agents = new ArrayList<Pattern>(agentPatterns.size());
+        clearAgentPatterns();
 
-        int nPatterns = 0;
-        for (String agentPattern : agentPatterns)
-        {
-            Pattern newPattern = Pattern.compile(agentPattern);
-            agents.add(newPattern);
-            nPatterns++;
-        }
-        log.info("Received " + String.valueOf(nPatterns) + " agent patterns.");
+        for (AgentPatternList agentPatterns : agentPatternLists)
+            for (String agentPattern : agentPatterns.getPatterns())
+            {
+                Pattern newPattern = Pattern.compile(agentPattern);
+                agents.add(newPattern);
+            }
+        log.info("Received " + String.valueOf(agents.size()) + " agent patterns.");
     }
 
     /**
@@ -112,10 +110,7 @@ public class SpiderDetector {
      */
     static void clearAgentPatterns()
     {
-        if (null == agents)
-            agents = new ArrayList<Pattern>();
-        else
-            agents.clear();
+        agents.clear();
     }
 
     /**

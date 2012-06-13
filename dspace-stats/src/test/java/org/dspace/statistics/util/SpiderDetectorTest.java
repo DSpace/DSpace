@@ -63,10 +63,16 @@ public class SpiderDetectorTest
         DummyHttpServletRequest req = new DummyHttpServletRequest();
         req.setAddress("192.168.0.1"); // avoid surprises
 
+        // Some pattern strings
         List<String> testPatterns = new ArrayList<String>();
         testPatterns.add("^msnbot");
+        // Wrap it in an AgentPatternList
+        AgentPatternList patternList = new AgentPatternList(testPatterns);
+        List<AgentPatternList> patternLists = new ArrayList<AgentPatternList>();
+        patternLists.add(patternList);
+        // Test!
         SpiderDetector.clearAgentPatterns(); // start fresh, in case Spring is active
-        SpiderDetector.setAgentPatterns(testPatterns);
+        SpiderDetector.setAgentPatterns(patternLists);
 
         req.setAgent("msnbot is watching you");
         assertTrue("'msnbot' did not match any pattern", SpiderDetector.isSpider(req));

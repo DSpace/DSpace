@@ -9,16 +9,20 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-	<description>
-	   User-Agents to be marked as "spiders" in statistics.
-	</description>
+    <description>
+        User-Agents to be marked as "spiders" in statistics.
+    </description>
 
-	<bean class="org.dspace.statistics.util.SpiderDetector">
-		<property name="AgentPatterns">
-			<list>
-			 <value>^msnbot</value>
-			</list>
-		</property>
-	</bean>
+    <bean class="org.dspace.statistics.util.SpiderDetector">
+        <property name="AgentPatterns">
+            <description>
+                java.util.regex regular expression patterns to match User-Agent
+                headers of known spiders.
+            </description>
+            <list>
+                <value>^msnbot</value>
+            </list>
+        </property>
+    </bean>
 
 </beans>
