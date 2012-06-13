@@ -39,7 +39,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * into the DRI document.
  * 
  * This class provides the chassis for those unique parts of the document to be
- * build upon, there are seven rendering methods that may be overridden for each
+ * built upon. There are seven rendering methods that may be overridden for each
  * section of the METS document.
  * 
  * Header
@@ -85,7 +85,7 @@ public abstract class AbstractAdapter
     protected NamespaceSupport namespaces;
     
     /**
-     * Construct a new adapter, implementers must use call this method so
+     * Construct a new adapter, implementers must call this method so
      * the appropriate internal values are ensured to be set correctly.
      * 
      * @param contextPath
@@ -147,7 +147,7 @@ public abstract class AbstractAdapter
      *
      * @param amdSec Section of <amdSec> where this administrative metadata
      *                will be rendered
-     * @param mdTypes Comma separated list of METS metadata types.
+     * @param mdTypes Comma-separated list of METS metadata types.
      */
     public final void setAmdTypes(String amdSec, String mdTypes)
     {
@@ -169,7 +169,7 @@ public abstract class AbstractAdapter
      * A comma-separated list of METS technical metadata formats to
      * render.
      *
-     * @param techMDTypes Comma separated list of METS metadata types.
+     * @param techMDTypes Comma-separated list of METS metadata types.
      */
     public final void setTechMDTypes(String techMDTypes)
     {
@@ -180,7 +180,7 @@ public abstract class AbstractAdapter
      * A comma-separated list of METS intellectual property rights metadata
      * formats to render.
      *
-     * @param rightsMDTypes Comma separated list of METS metadata types.
+     * @param rightsMDTypes Comma-separated list of METS metadata types.
      */
     public final void setRightsMDTypes(String rightsMDTypes)
     {
@@ -191,7 +191,7 @@ public abstract class AbstractAdapter
      * A comma-separated list of METS source metadata
      * formats to render.
      *
-     * @param sourceMDTypes Comma separated list of METS metadata types.
+     * @param sourceMDTypes Comma-separated list of METS metadata types.
      */
     public final void setSourceMDTypes(String sourceMDTypes)
     {
@@ -202,7 +202,7 @@ public abstract class AbstractAdapter
      * A comma-separated list of METS digital provenance metadata
      * formats to render.
      *
-     * @param digiprovMDTypes Comma separated list of METS metadata types.
+     * @param digiprovMDTypes Comma-separated list of METS metadata types.
      */
     public final void setDigiProvMDTypes(String digiprovMDTypes)
     {
@@ -213,7 +213,7 @@ public abstract class AbstractAdapter
      * A comma-separated list of METS fileGrps to render. If no value
      * is provided then all groups are rendered.
      * 
-     * @param fileGrpTypes Comma separated list of METS file groups.
+     * @param fileGrpTypes Comma-separated list of METS file groups.
      */
     public final void setFileGrpTypes(String fileGrpTypes)
     {
@@ -232,7 +232,7 @@ public abstract class AbstractAdapter
      * A comma-separated list of METS structural types to render. If no 
      * value is provided then only the DIM format is used.
      * 
-     * @param structTypes Comma separated list of METS structure types.
+     * @param structTypes Comma-separated list of METS structure types.
      */
     public final void setStructTypes(String structTypes)
     {
@@ -270,7 +270,7 @@ public abstract class AbstractAdapter
     protected abstract String getMETSOBJID() throws WingException;
 
     /**
-     * @return Return the URL for editing this item
+     * @return the URL for editing this item
      */
     protected abstract String getMETSOBJEDIT();
 
@@ -280,7 +280,7 @@ public abstract class AbstractAdapter
     protected abstract String getMETSID() throws WingException;
 
     /**
-     * @return The Profile this METS document conforms too.
+     * @return The Profile this METS document conforms to.
      */
     protected abstract String getMETSProfile() throws WingException;
 
@@ -414,7 +414,7 @@ public abstract class AbstractAdapter
      * Generate a METS file element for a given bitstream.
      * 
      * @param item
-     *            If the bitstream is associated with an item provide the item
+     *            If the bitstream is associated with an item, provide the item,
      *            otherwise leave null.
      * @param bitstream
      *            The bitstream to build a file element for.
@@ -471,7 +471,7 @@ public abstract class AbstractAdapter
         String description = bitstream.getDescription();
 
         
-        // If possible reference this bitstream via a handle, however this may
+        // If possible, reference this bitstream via a handle, however this may
         // be null if a handle has not yet been assigned. In this case reference the
         // item its internal id. In the last case where the bitstream is not associated
         // with an item (such as a community logo) then reference the bitstreamID directly.
@@ -492,7 +492,7 @@ public abstract class AbstractAdapter
         
         String url = contextPath + "/bitstream/"+identifier+"/";
         
-        // If we can put the pretty name of the bitstream on the end of the URL
+        // If we can, append the pretty name of the bitstream to the URL
         try
         {
         	if (bitstream.getName() != null)
@@ -503,7 +503,7 @@ public abstract class AbstractAdapter
         catch (UnsupportedEncodingException uee)
         {
             // just ignore it, we don't have to have a pretty
-            // name on the end of the URL because the sequence id will 
+            // name at the end of the URL because the sequence id will 
         	// locate it. However it means that links in this file might
         	// not work....
         }
@@ -667,7 +667,7 @@ public abstract class AbstractAdapter
      *            SAX Helper class to keep track of namespaces able to determine
      *            the correct prefix for a given namespace URI.
      * @param attributes
-     *            An existing SAX AttributesImpl object to add attributes too.
+     *            An existing SAX AttributesImpl object to add attributes to.
      *            If the value is null then a new attributes object will be
      *            created to house the attributes.
      * @param attributeMap

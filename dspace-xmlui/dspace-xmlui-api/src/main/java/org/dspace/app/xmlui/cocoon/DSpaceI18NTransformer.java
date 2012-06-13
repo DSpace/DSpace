@@ -34,7 +34,7 @@ import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
  * 
  * EXAMPLE:
  * 
- * For instance let's say there the i18n transformer's configuration 
+ * For instance let's say that the i18n transformer's configuration 
  * were as follows:
  * <catalogues default="default">
  *   <catalogue id="default" name="messages" aspects="true">

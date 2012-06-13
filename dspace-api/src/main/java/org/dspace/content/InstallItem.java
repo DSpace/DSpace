@@ -123,12 +123,12 @@ public class InstallItem
             handle = HandleManager.createHandle(c, item, suppliedHandle);
         }
 
-        // Even though we are restoring an item it may not have a have the proper dates. So lets
+        // Even though we are restoring an item it may not have the proper dates. So let's
         // double check that it has a date accessioned and date issued, and if either of those dates
         // are not set then set them to today.
         DCDate now = DCDate.getCurrent();
         
-        // If the item doesn't have a date.accessioned create one.
+        // If the item doesn't have a date.accessioned, create one.
         DCValue[] dateAccessioned = item.getDC("date", "accessioned", Item.ANY);
         if (dateAccessioned.length == 0)
         {
@@ -251,7 +251,7 @@ public class InstallItem
      * Generate provenance-worthy description of the bitstreams contained in an
      * item.
      * 
-     * @param myitem  the item generate description for
+     * @param myitem  the item to generate description for
      * 
      * @return provenance description
      */
