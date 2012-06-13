@@ -410,17 +410,14 @@ public class DataOneMN extends HttpServlet implements Constants {
 		 "</services>\n");
 
 	// synchronization
-	String lastHarvestDate = "2012-03-06T14:57:39.851+00:00";
 	pw.write("<synchronization>\n" +
 		 "<schedule hour=\"*\" mday=\"*\" min=\"0/3\" mon=\"*\" sec=\"10\" wday=\"?\" year=\"*\"/>\n" +
-		 "<lastHarvested>" + lastHarvestDate + "</lastHarvested>\n" +
-		 "<lastCompleteHarvest>" + lastHarvestDate + "</lastCompleteHarvest>\n" +
 		 "</synchronization>\n");
 
 	// other random info
 	pw.write("<ping success=\"true\"/>\n" +
 		 "<subject>CN=urn:node:DRYAD, DC=dataone, DC=org</subject>\n" +
-		 "<contactSubject>CN=METACAT1, DC=dataone, DC=org</contactSubject>\n");
+		 "<contactSubject>CN=Ryan Scherle, DC=datadryad, DC=org</contactSubject>\n");
 
 	// close xml
 	pw.write("</d1:node>\n");
