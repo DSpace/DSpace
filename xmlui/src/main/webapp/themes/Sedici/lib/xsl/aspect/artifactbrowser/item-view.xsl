@@ -750,7 +750,33 @@
              <div class="thumbnail-wrapper">
              <xsl:choose>
              	<xsl:when test="$context/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='embargo' and @qualifier='liftDate']">
-	               <i18n:text>sedici.comunidades.tesis.embargo</i18n:text>
+	              <i18n:text>sedici.comunidades.tesis.embargo</i18n:text> 
+	               <br/>
+                    <span> 
+                    <xsl:choose>
+	                        <xsl:when test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]">
+	                            <img alt="Thumbnail">
+	                                <xsl:attribute name="src">
+	                                    <xsl:value-of select="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+	                                </xsl:attribute>
+	                            </img>
+	                        </xsl:when>
+	                        <xsl:otherwise>
+	                        	<xsl:variable name="file_type" select="substring-before(@MIMETYPE, '/')"/>
+	                        	<xsl:variable name="file_subtype" select="substring-after(@MIMETYPE, '/')"/>
+	                        	<xsl:variable name="img_path">
+		                        	<xsl:choose>
+		                        		<xsl:when test="$file_type = 'image'">mime_img.png</xsl:when>
+		                        		<xsl:when test="$file_subtype = 'pdf'">mime_pdf.png</xsl:when>
+		                        		<xsl:when test="$file_subtype = 'msword'">mime_msword.png</xsl:when>
+		                        		<xsl:otherwise>mime.png</xsl:otherwise>
+		                        	</xsl:choose>
+	                        	</xsl:variable>
+	                            <img alt="Icon" src="{concat($theme-path, '/images/',$img_path)}"/>
+	                        </xsl:otherwise>
+	                    </xsl:choose>
+                      </span>
+	               
                 </xsl:when>
                 <xsl:otherwise>
                     <a class="image-link" target="_blank">
@@ -788,7 +814,7 @@
             <div class="file-metadata">
                <xsl:choose>
                		<xsl:when test="$context/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='embargo' and @qualifier='liftDate']">
-	                	<h1><xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label" disable-output-escaping="yes"/></h1>
+	                	<xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label" disable-output-escaping="yes"/>
                		</xsl:when>
 	                <xsl:otherwise>
 		               <xsl:if test="mets:FLocat[@LOCTYPE='URL']/@xlink:label != ''">
