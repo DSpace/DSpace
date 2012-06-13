@@ -966,7 +966,33 @@
     
     <xsl:template match="/dri:document/dri:body/dri:div/dri:p[@rend='item-view-toggle item-view-toggle-bottom']">
     </xsl:template>
+    
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:referenceSet[@id='aspect.artifactbrowser.ItemViewer.referenceSet.collection-viewer']/dri:reference/dri:referenceSet[@rend='hierarchy']">
+        <xsl:apply-templates select="dri:head"/>
+        <ul id="ds-trail">
+        	<xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.artifactbrowser.AddItemCollections.div.item-view-sedici']/dri:list[@id='aspect.artifactbrowser.AddItemCollections.list.item-view-sedici-colecciones']/dri:list" mode='collectionsWithCommunities'/>
+        </ul>
+    </xsl:template>
 
+    <xsl:template match="dri:list[@id='aspect.artifactbrowser.AddItemCollections.list.item-view-sedici-colecciones']/dri:list" mode="collectionsWithCommunities">
+    	<li class="ds-trail-link first-link ">
+	    	<a>
+	    	<xsl:attribute name="href">
+		    	<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']"/>/handle/<xsl:value-of select="dri:item[1]/dri:xref/@target"/>
+	    	</xsl:attribute>
+	    	<xsl:value-of select="dri:item[1]/dri:xref"/> 
+	    	</a>  
+    	</li> 	
+    	<li class="ds-trail-arrow">→</li>
+    	<li class="ds-trail-link last-link ">
+    	<a>
+    	<xsl:attribute name="href">
+    	    	<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']"/>/handle/<xsl:value-of select="dri:item[2]/dri:xref/@target"/>
+    	</xsl:attribute>
+    	<xsl:value-of select="dri:item[2]/dri:xref"/> 
+    	</a>
+    	</li>
+    </xsl:template>
 
 </xsl:stylesheet>
 
