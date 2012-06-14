@@ -645,7 +645,7 @@
                     </xsl:if>
                 </td>
             <td>
-              <xsl:copy-of select="./node()"/>
+             <xsl:value-of select="./node()" disable-output-escaping="yes" />
               <xsl:if test="./@authority and ./@confidence">
                 <xsl:call-template name="authorityConfidenceIcon">
                   <xsl:with-param name="confidence" select="./@confidence"/>
