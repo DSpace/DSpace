@@ -171,7 +171,7 @@
           <xsl:attribute name="href">
           	<xsl:value-of select="@OBJID"/>
           </xsl:attribute>
-               <xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title']"/>
+               <xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title']" disable-output-escaping="yes"/>
        </a> 
     </xsl:template>
 
