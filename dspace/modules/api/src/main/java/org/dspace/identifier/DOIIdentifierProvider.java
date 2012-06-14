@@ -392,6 +392,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             try {
                 context.turnOffAuthorisationSystem();
                 String collection = getCollection(context, item);
+		log.debug("collection is " + collection);
 
                 // DATAPACKAGE
                 if (collection.equals(myDataPkgColl)) {
