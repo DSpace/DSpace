@@ -202,7 +202,7 @@ public class RedirectAction extends AbstractAction
 	    		//Transformo en caso de ser necesario el valor del parametro
 	    		type=(String)propertiesPrefijo.get(prefijo_parametro+"."+RedirectAction.TYPE); 
 	    		if (type!=null){
-	    			param_value=this.transformParamValue(request, type, param_value);
+	    			param_value=this.transformParamValue(request, type, param_value.toUpperCase());
 	    		}
 	    		
 	    		//Si el parametro es parte de la url lo agrego separado por /, sino lo agrego como parametro del request
