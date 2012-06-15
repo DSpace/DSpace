@@ -23,15 +23,11 @@
 
 
     <xsl:template match="dri:referenceSet[@type = 'embeddedView']" priority="2">
-
-        <!-- <xsl:apply-templates select="dri:head"/>  -->
-
-        <!-- <table style="border:1px solid black; background-color: #fafad2;"><tr><td> -->
         <xsl:apply-templates select="*[not(name()='head')]" mode="embeddedView"/>
-        <!-- </td></tr></table>  -->
-
     </xsl:template>
 
+
+  <!-- ################################ Pull out METS metadata reference and render it ################################ -->
     <xsl:template match="dri:reference" mode="embeddedView">
         <xsl:variable name="externalMetadataURL">
             <xsl:text>cocoon:/</xsl:text>
@@ -45,6 +41,7 @@
         <xsl:apply-templates/>
     </xsl:template>
 
+  <!-- ################################ Data File blurb for use on a Data Package page ################################ -->
     <xsl:template match="mets:METS[mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']]" mode="embeddedView">
 
         <xsl:variable name="my_doi"
@@ -56,21 +53,6 @@
                 <xsl:copy-of select=".//dim:field[@element='title']"/>
             </span>
 
-           <!-- <xsl:variable name="pageviews" select=".//dim:field[@element='dryad'][@qualifier='pageviews']"/>
-            <xsl:if test="$pageviews">
-                <xsl:text>   </xsl:text>
-                <xsl:value-of select="$pageviews"/>
-                <xsl:choose>
-                    <xsl:when test="string($pageviews) = '1'">
-                        <xsl:text>&#160;</xsl:text>
-                        <i18n:text>xmlui.DryadItemSummary.view</i18n:text>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:text>&#160;</xsl:text>
-                        <i18n:text>xmlui.DryadItemSummary.views</i18n:text>
-                    </xsl:otherwise>
-                </xsl:choose> 
-            </xsl:if> -->
             <xsl:variable name="downloads" select=".//dim:field[@element='dryad'][@qualifier='downloads']"/>
                 <xsl:if test="$downloads">
                     <span style="font-size: smaller; font-weight: bold;">
