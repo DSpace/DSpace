@@ -1,0 +1,21 @@
+# E-mail sent to designated address when a a missing authority key is found
+#
+# Parameters: {0} DSpace server URL
+#             {1} Date & time
+#             {2} Session ID + IP address
+#             {3} User details
+#             {4} FieldName
+#             {5} Offending Key
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: [Dspace@SeDiCI] Authority no encontrada para {4}
+La clave {5} no se encuentra en la authority definida para el campo {4}.
+
+- Fecha: {1}
+- Usuario: {3}
+- ID de sesión y dirección de IP: {2}
+
+
+ 
+

@@ -15,15 +15,20 @@
  */
 package ar.edu.unlp.sedici.dspace.authority;
 
+import java.sql.SQLException;
 import java.util.List;
+
+import javax.mail.MessagingException;
 
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ar.edu.unlp.sedici.dspace.utils.MailReporter;
 import ar.edu.unlp.sedici.sedici2003.service.SeDiCI2003Manager;
 
 
@@ -131,7 +136,27 @@ public abstract class SeDiCI2003AuthorityProvider implements ChoiceAuthority {
 		public Choice createChoice(String id, String value, String label){
 			return new Choice(id, value, label);
 		}
-		
+    }
+    
+    protected void reportMissingAuthorityKey(String field, String key){
+    	//TODO check for some kind of flag mail.reporter.reportMissingAuthorityKey = true
+		Context context;
+		try {
+			context = new Context();
+		} catch (SQLException e) {
+			log.error("No se pudo instancia el Context ... algo raro pasa", e);
+			throw new RuntimeException(e);
+		} 
+
+		MailReporter reporter = new MailReporter();
+		try {
+			reporter.reportMissingAuthorityKey(context, field, key);
+		}  catch (MessagingException e) {
+			log.error("Se produjo un error al intentar enviar un mail de reportMissingAuthorityKey", e);
+			//Silenciosamente dejo pasar el error porque la operacion en curson no tiene nada que ver con el envio de email
+			//throw new RuntimeException(e);
+		}
+
     }
 	
 }
