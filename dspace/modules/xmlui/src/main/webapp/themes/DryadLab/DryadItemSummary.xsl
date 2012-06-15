@@ -175,7 +175,7 @@
               <td colspan="2">
 		<ul class="text-list">
                   <xsl:for-each
-                     select=".//dim:field[@element='learningoutcome']">
+                     select=".//dim:field[@element='learningOutcome']">
                     <li> 
 		      <xsl:copy-of select="node()"/>
 		    </li>
