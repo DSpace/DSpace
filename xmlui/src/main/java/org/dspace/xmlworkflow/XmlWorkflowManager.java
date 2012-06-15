@@ -14,6 +14,7 @@ import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.core.*;
+import org.dspace.embargo.EmbargoManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
@@ -443,9 +444,28 @@ public class XmlWorkflowManager {
 
         //BEGIN SeDiCI: aca preguntamos si es un Item nuevo en el repositorio o uno existente
         if(item.isArchived()) {
+        	/*
+        	 * TODO probar y habilitar parche para #1785
+        	// En lugar de hacer un Install, no hacemos mas que eliminar el XmlWorkflowItem (directamente o con un restore, segun el embargo)
+        	DCDate newLiftDate;
+        	try{
+        		newLiftDate=EmbargoManager.getEmbargoDate(c, item);
+        	}catch (IllegalArgumentException e) {
+        		//liftDate is in the past or uninterpretable 
+        		newLiftDate=null;
+			}
+        	DCDate oldLiftDate = getLiftDate(item); 
         	
-        	// En lugar de hacer un Install, no hacemos mas que eliminar el XmlWorkflowItem
-        	wfi.deleteWrapper();
+        	if (oldLiftDate != null && newLiftDate == null){
+        		//se anula el embargo
+        		EmbargoManager.liftEmbargo(c, item);
+        	}else if (newLiftDate != null && !newLiftDate.equals(oldLiftDate)){
+                EmbargoManager.setEmbargo(c, item, newLiftDate);
+        	}else{//newLiftDate.equals(oldLiftDate)
+        		//no-op
+        	}
+        	*/
+       		wfi.deleteWrapper();
         	
         } else { 
         	// Codigo original antes de agregar este IF
@@ -911,7 +931,21 @@ public class XmlWorkflowManager {
     }
 
     public static String getMyDSpaceLink() {
-        return ConfigurationManager.getProperty("dspace.url") + "/mydspace";
+        return ConfigurationManager.getProperty("dspace.url") + "/submissions";
+    }
+
+    private static DCDate getLiftDate(Item item ){
+        
+        String lift = ConfigurationManager.getProperty("embargo.field.lift");
+        String sa[] = lift.split("\\.", 3);
+        
+        String lift_schema = sa[0];
+        String lift_element = sa[1];
+        String lift_qualifier = sa.length > 2 ? sa[2] : null;
+
+        DCValue[] liftDate = item.getMetadata(lift_schema, lift_element, lift_qualifier, Item.ANY);
+        return liftDate.length==0?null:new DCDate(liftDate[0].value);
+        
     }
     
     
