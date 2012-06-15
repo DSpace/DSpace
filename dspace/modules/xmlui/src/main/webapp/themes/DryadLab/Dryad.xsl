@@ -5,7 +5,7 @@
 
     This stylesheet overrides and extends the basic dri2xhtml of Manakin.
 
-    Original authors: Amol Bapat, Ryan Scherle, Kevin Clarke
+    Authors: Amol Bapat, Ryan Scherle, Kevin Clarke
 -->
 
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
@@ -26,9 +26,7 @@
 
     <xsl:output method="xml" version="1.0" encoding="utf-8" indent="yes"/>
 
-    <!-- Check to see if XHTML pages are included via this XSLT. If a page is found,
-      it is placed in the "doc" variable. 
-      -->
+    <!-- Check to see if XHTML pages are included via this XSLT -->
     <xsl:variable name="meta" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata"/>
     <xsl:variable name="pageName" select="$meta[@element='request'][@qualifier='URI']"/>
     <xsl:variable name="doc" select="document(concat('pages/', $pageName, '.xhtml'))"/>
@@ -47,7 +45,7 @@
             <xsl:choose>
                 <xsl:when test="$doc">
                     <xsl:copy-of select="$doc//div[@id='ds-body']/*"/>
-                    <!-- hint 'error=' is used to indicate we should append a feedback form -->
+                    <!-- hint 'error=' is used to indicate we should append -->
                     <xsl:if test="$meta[@qualifier='queryString'][starts-with(., 'error=')]">
                         <div style="margin-top: 20px;">
                             <xsl:variable name="report_text">
@@ -313,23 +311,8 @@
                         <xsl:otherwise>/</xsl:otherwise>
                     </xsl:choose>
                 </xsl:attribute>
-                <xsl:choose>
-                    <xsl:when test="$meta[@element='request'][@qualifier='realServerPort'][. = '9999']">
-                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo-dev.png"/>
-                    </xsl:when>
-                    <xsl:when test="$meta[@element='request'][@qualifier='realServerPort'][. = '7777']">
-                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo-demo.png"/>
-                    </xsl:when>
-                    <xsl:when test="$meta[@element='request'][@qualifier='realServerPort'][. = '8888']">
-                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo-staging.png"/>
-                    </xsl:when>
-                    <xsl:when test="$meta[@element='request'][@qualifier='realServerPort'][. = '6666']">
-                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo-mrc.png"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo.png"/>
-                    </xsl:otherwise>
-                </xsl:choose>
+                <img id="ds-header-logo" src="{$theme-path}/images/dryadLabLogo.png"/>
+               
             </a>
 
             <span>

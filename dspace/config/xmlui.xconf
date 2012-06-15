@@ -127,7 +127,12 @@
         <!-- <theme name="Test Theme 1" handle="123456789/1" path="theme1/"/>    -->
         <!-- <theme name="Test Theme 2" regex="community-list" path="theme2/"/> -->
 
-        <!-- Default theme -->
+	<!-- Use the DryadLab theme for anything with "dryadlab" in the URL or anything in 
+	     the DryadLab activities collection. -->
+        <theme name="Dryad Lab Theme" regex="dryadlab" path="DryadLab/" />
+        <theme name="Dryad Lab Theme" handle="10255/dryad.7872" path="DryadLab/" />
+
+        <!-- Default theme for all other pages -->
         <theme name="Dryad Theme" regex=".*" path="Dryad/" />
 
         <!-- Classic theme, inspired by the JSP UI -->
