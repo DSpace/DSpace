@@ -69,9 +69,6 @@
                 </xsl:otherwise>
             </xsl:choose>
         </div>
-
-
-        <xsl:call-template name="buildFooter" />
  
     </xsl:template>
 
