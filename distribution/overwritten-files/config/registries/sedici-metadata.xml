@@ -296,12 +296,6 @@
 		<scope_note>Editorial que reliazó la publicación de un libro o tesis</scope_note>
 	</dc-type>
 	<dc-type>
-		<schema>dc</schema>
-		<element>relation</element>
-		<qualifier>isVersionOf</qualifier>
-		<scope_note>No utilizado por el momento. Handle o URL que apunta hacia otro recurso, del cual este documento es una versión</scope_note>
-	</dc-type>
-	<dc-type>
 		<schema>sedici</schema>
 		<element>institucionDesarrollo</element>
 		<!-- sin calificar -->
@@ -324,12 +318,6 @@
 		<element>date</element>
 		<qualifier>exposure</qualifier>
 		<scope_note>Fecha de presentación de una tesis u objeto de conferencia</scope_note>
-	</dc-type>
-	<dc-type>
-		<schema>dc</schema>
-		<element>relation</element>
-		<qualifier>isPartOf</qualifier>
-		<scope_note>Título y número de la revista en la que un artículo fue presentado</scope_note>
 	</dc-type>
 	<dc-type>
 		<schema>sedici</schema>
@@ -360,5 +348,17 @@
 		<element>workflowEdited</element>
 		<!-- sin calificar -->
 		<scope_note>Flag para validar si un item nuevo pasó por el proceso de revisión</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>relation</element>
+		<qualifier>journalTitle</qualifier>
+		<scope_note>Nombre de la serie en la que un documento fue publicado</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>relation</element>
+		<qualifier>journalVolumeAndIssue</qualifier>
+		<scope_note>Volumen y numero de la serie en la que un documento fue publicado</scope_note>
 	</dc-type>
 </dspace-dc-types>
