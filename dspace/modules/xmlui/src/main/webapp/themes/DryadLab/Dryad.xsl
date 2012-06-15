@@ -69,6 +69,10 @@
                 </xsl:otherwise>
             </xsl:choose>
         </div>
+
+
+        <xsl:call-template name="buildFooter" />
+ 
     </xsl:template>
 
 
@@ -246,94 +250,37 @@
                 </xsl:choose>
             </span>
 
-            <xsl:choose>
-                <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
-		  <!-- Display authenticated username and Logout link -->
-                    <div id="ds-user-box">
-                        <p>
-                            <a>
-                                <xsl:attribute name="href">
-                                    <xsl:value-of
-                                            select="/dri:document/dri:meta/dri:userMeta/
-                                        dri:metadata[@element='identifier' and @qualifier='url']"
-                                            />
-                                </xsl:attribute>
-                                <i18n:text>xmlui.dri2xhtml.structural.profile</i18n:text>
-                                <xsl:value-of
-                                        select="/dri:document/dri:meta/dri:userMeta/
-                                    dri:metadata[@element='identifier' and @qualifier='firstName']"/>
-                                <xsl:text> </xsl:text>
-                                <xsl:value-of
-                                        select="/dri:document/dri:meta/dri:userMeta/
-                                    dri:metadata[@element='identifier' and @qualifier='lastName']"
-                                        />
-                            </a>
-                            <xsl:text> | </xsl:text>
-                            <a>
-                                <xsl:attribute name="href">
-                                    <xsl:value-of
-                                            select="/dri:document/dri:meta/dri:userMeta/
-                                        dri:metadata[@element='identifier' and @qualifier='logoutURL']"
-                                            />
-                                </xsl:attribute>
-                                <i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
-                            </a>
-                        </p>
-                        <form action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
-                            <p>
-                                <input name="query" type="text" value=""/>
-                                <input name="submit" type="submit" value=" Search Data "/>
-                                <a href="/searching" alt="How searching works in Dryad">
-                                    <img src="/themes/Dryad/images/help.png" alt="How searching works in Dryad"/>
-                                </a>
-                                <input name="location" type="hidden" value="l2"/>
-                            </p>
-                        </form>
-                    </div>
-                </xsl:when>
-                <xsl:otherwise>
-		  <!-- Display Login link -->
-                    <div id="ds-user-box">
-                        <p>
-                            <a>
-                                <xsl:attribute name="href">
-                                    <xsl:value-of
-                                            select="/dri:document/dri:meta/dri:userMeta/
-                                        dri:metadata[@element='identifier' and @qualifier='loginURL']"
-                                            />
-                                </xsl:attribute>
-                                <i18n:text>xmlui.dri2xhtml.structural.login</i18n:text>
-                            </a>
-                        </p>
-                        <form action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
-                            <p>
-                                <input name="query" type="text" value=""/>
-                                <input name="submit" type="submit" value=" Search Data "/>
-                                <a href="/searching" alt="How searching works in Dryad">
-                                    <img src="/themes/Dryad/images/help.png" alt="How searching works in Dryad"/>
-                                </a>
-                                <input name="location" type="hidden" value="l2"/>
-                            </p>
-                        </form>
-                    </div>
-                </xsl:otherwise>
-            </xsl:choose>
         </div>
+
+
     </xsl:template>
 
     <!-- ###################################################
         The template to handle dri:options. Since it contains only dri:list tags (which carry the actual
         information), the only things than need to be done is creating the ds-options div and applying
         the templates inside it.
-
-        In fact, the only bit of real work this template does is add the search box, which has to be
-        handled specially in that it is not actually included in the options div, and is instead built
-        from metadata available under pageMeta.
     -->
     <xsl:template match="dri:options">
-        <div id="ds-options">
-            <xsl:apply-templates/>
-        </div>
+      <div id="ds-options">
+	<!-- This used to simply call <xsl:apply-templates/> to process the options list sent in by the Java code.
+	     For DryadLab, we build the options list manually, though we will eventually want to process the faceted 
+	     search data. -->
+	<h3 class="ds-option-set-head"></h3>
+	<div xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_administrative_Navigation_list_account" class="ds-option-set">
+	  <p />
+	</div>
+	<h3 class="ds-option-set-head">Information</h3>
+	<div xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_administrative_Navigation_list_account" class="ds-option-set">
+	  <ul class="ds-simple-list">
+	    <li>
+	      <a href="/">Dryad Home</a>
+	    </li>
+	    <li>
+	      <a href="/about">About Dryad</a>
+	    </li>
+	  </ul>
+	</div>
+      </div>
     </xsl:template>
 
 
