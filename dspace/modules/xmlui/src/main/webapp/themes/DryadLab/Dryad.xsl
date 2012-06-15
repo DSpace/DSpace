@@ -191,6 +191,8 @@
         </head>
     </xsl:template>
 
+
+    <!-- ########################################### Page Header #################################### -->
     <xsl:template name="buildHeader">
         <div id="ds-header">
             <!--add functional javasript-->
@@ -319,7 +321,7 @@
         </div>
     </xsl:template>
 
-    <!--
+    <!-- ###################################################
         The template to handle dri:options. Since it contains only dri:list tags (which carry the actual
         information), the only things than need to be done is creating the ds-options div and applying
         the templates inside it.
@@ -553,6 +555,8 @@
         </div>
     </xsl:template>
 
+
+    <!-- Rendering table for Full Metadata view -->
     <xsl:template match="dim:field" mode="itemDetailView-DIM">
         <xsl:if test="not(./@qualifier = 'manuscriptNumber')">
             <tr>
@@ -579,21 +583,9 @@
             </tr>
         </xsl:if>
     </xsl:template>
-
-    <!--Render the edit embargo page-->
-    <xsl:template match="dri:div[@id = 'aspect.administrative.item.EditItemEmbargoForm.div.edit_embargo_div']">
-        <fieldset class="ds-form-list">
-            <legend>
-                <i18n:text>xmlui.administrative.item.EditItemEmbargoForm.legend</i18n:text>
-            </legend>
-
-            <xsl:apply-templates/>
-        </fieldset>
-    </xsl:template>
     
     <!-- Don't render the "Submit Data Now" button -->
-    <xsl:template match="dri:xref[../../@id='aspect.submission.Navigation.list.submitNow']" />
-    
+    <xsl:template match="dri:xref[../../@id='aspect.submission.Navigation.list.submitNow']" /> 
 
 
     <!-- ignore the hierarchy so no collection displays on item pages: ticket 1351 -->
@@ -764,7 +756,6 @@
                 </xsl:choose>
             </xsl:when>
 
-            <!-- This is changing drammatically -->
             <xsl:when test="@type= 'checkbox' or @type= 'radio'">
                 <fieldset>
                     <xsl:call-template name="standardAttributes">
@@ -788,15 +779,7 @@
                     <xsl:apply-templates/>
                 </fieldset>
             </xsl:when>
-            <!--
-            <input>
-                        <xsl:call-template name="fieldAttributes"/>
-                <xsl:if test="dri:value[@checked='yes']">
-                            <xsl:attribute name="checked">checked</xsl:attribute>
-                </xsl:if>
-                <xsl:apply-templates/>
-            </input>
-            -->
+
             <xsl:when test="@type= 'composite'">
                 <!-- TODO: add error and help stuff on top of the composite -->
                 <span class="ds-composite-field">
@@ -912,65 +895,7 @@
     </xsl:template>
 
 
-    <xsl:template
-            match="dri:item[starts-with(@id, 'aspect.submission.StepTransformer.item.submission-file-') or (@id = 'aspect.submission.StepTransformer.item.bitstream-item') or (@id = 'aspect.submission.StepTransformer.item.external-item')]">
-        <li>
-            <xsl:call-template name="standardAttributes">
-                <xsl:with-param name="class">
-                    <xsl:text>ds-form-item </xsl:text>
-                    <xsl:choose>
-                        <!-- Makes sure that the dark always falls on the last item -->
-                        <xsl:when test="count(../dri:item) mod 2 = 0">
-                            <xsl:if test="count(../dri:item) > 3">
-                                <xsl:if test="(count(preceding-sibling::dri:item) mod 2 = 0)">even</xsl:if>
-                                <xsl:if test="(count(preceding-sibling::dri:item) mod 2 = 1)">odd</xsl:if>
-                            </xsl:if>
-                        </xsl:when>
-                        <xsl:when test="count(../dri:item) mod 2 = 1">
-                            <xsl:if test="count(../dri:item) > 3">
-                                <xsl:if test="(count(preceding-sibling::dri:item) mod 2 = 1)">even</xsl:if>
-                                <xsl:if test="(count(preceding-sibling::dri:item) mod 2 = 0)">odd</xsl:if>
-                            </xsl:if>
-                        </xsl:when>
-                    </xsl:choose>
-                    <!-- The row is also tagged specially if it contains another "form" list -->
-                    <xsl:if test="dri:list[@type='form']">sublist</xsl:if>
-                </xsl:with-param>
-            </xsl:call-template>
-
-            <xsl:call-template name="pick-label"/>
-
-            <div class="ds-form-content">
-                <xsl:if test="dri:hi[@rend='head']">
-                    <table class="submittable">
-                        <tr>
-                            <xsl:for-each select="dri:hi[@rend='head']">
-                                <th>
-                                    <xsl:apply-templates/>
-                                </th>
-                            </xsl:for-each>
-                        </tr>
-                        <tr>
-                            <xsl:for-each select="dri:hi[@rend='content']">
-                                <td>
-                                    <xsl:apply-templates/>
-                                </td>
-                            </xsl:for-each>
-                        </tr>
-                    </table>
-                </xsl:if>
-                <!--Add all optional hidden fields-->
-                <xsl:if test="@id = 'aspect.submission.StepTransformer.item.external-item'">
-                    <xsl:apply-templates select="dri:xref"/>
-                    <xsl:apply-templates select="dri:hi"/>
-                </xsl:if>
-                <xsl:apply-templates select="dri:field"/>
-            </div>
-
-        </li>
-
-    </xsl:template>
-
+    <!-- ############################################# Discovery rendering ####################################### -->
     <xsl:template match="dri:field[@id='aspect.discovery.SiteViewer.field.submit']">
         <input>
             <xsl:call-template name="fieldAttributes"/>
@@ -1021,7 +946,6 @@
                 <input name="location" type="hidden" value="l2"/>
             </xsl:otherwise>
         </xsl:choose>
-        <!-- end of what was added -->
         <input>
             <xsl:call-template name="fieldAttributes"/>
             <xsl:if test="@type='button'">
@@ -1038,6 +962,7 @@
         </a>
     </xsl:template>
 
+    <!-- ################################################### Random Utility Stuff ################################################### -->
 
     <xsl:template match="dri:help" mode="help">
         <xsl:if
@@ -1251,24 +1176,6 @@
         </tr>
     </xsl:template>
 
-
-    <!-- Adding button for GenBank. -->
-    <xsl:template match="dri:field[@id='aspect.submission.submit.OverviewStep.field.submit_genbank']">
-        <xsl:variable name="url"
-                      select="//dri:field[@id='aspect.submission.submit.OverviewStep.field.genbank_url']/dri:value"/>
-
-        <xsl:element name="input">
-            <xsl:attribute name="type">button</xsl:attribute>
-            <xsl:attribute name="id">aspect_submission_submit_OverviewStep_field_submit_genbank</xsl:attribute>
-            <xsl:attribute name="value">Send to Gen Bank</xsl:attribute>
-            <xsl:attribute name="name">submit_adddataset</xsl:attribute>
-            <xsl:attribute name="onclick">javascript:return openCenterPopup('<xsl:value-of select="$url"/>', 'GenBank',
-                '1000', '800');
-            </xsl:attribute>
-        </xsl:element>
-    </xsl:template>
-
-
     <!-- RestrictItem: template used for dispalying the right page based upon the item state stored in the metadatapage dryad.itemState -->
     <xsl:template match="dri:div[@n='workflow_pendingPublicationStep']/dri:head" priority="100">
         <xsl:variable name="head_count" select="count(ancestor::dri:div)"/>
@@ -1303,224 +1210,6 @@
         </p>
 
     </xsl:template>
-
-
-    <xsl:template
-            match="dri:body/dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-dataset']/dri:list[@id='aspect.submission.StepTransformer.list.submit-describe-dataset']/dri:item/dri:field[@n='submit_cancel']">
-
-
-        <input id="aspect_submission_StepTransformer_field_submit_cancel" class="ds-button-field" name="submit_cancel"
-               type="submit" value="Cancel &amp; Delete">
-            <xsl:attribute name="onclick">
-		    <xsl:text>var x = confirm ("Data File and all its content will be deleted. Do you want to continue?");
-			      if(x) return true;
-		              return false;
-		    </xsl:text>
-            </xsl:attribute>
-        </input>
-
-    </xsl:template>
-
-
-    <xsl:template
-            match="dri:body/dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-dataset']/dri:list[@n='submit-overview-file']/dri:item[@n='bitstream-item']/dri:hi/dri:field[@n='submit_remove_dataset']">
-
-
-        <input id="aspect_submission_StepTransformer_field_submit_remove_dataset" class="ds-button-field"
-               name="submit_remove_dataset" type="submit" value="Remove">
-            <xsl:attribute name="onclick">
-		<xsl:text>var x = confirm ("The selected file will be removed. Do you want to continue?");
-			  if(x) return true;
-			  return false;
-		</xsl:text>
-            </xsl:attribute>
-        </input>
-
-    </xsl:template>
-
-
-
-
-
-      <!-- First submission form: added and rewrote some templates to manage the form using jquery, to lead the user through the submission -->
-
-      <!-- First submission form: Article Status Radios -->
-      <xsl:template match="dri:body/dri:div/dri:list/dri:item[@n='article_status']/dri:field[@n='article_status']">
-
-          <br/>
-          <span style="margin-left:-195px;color:gray">
-              <i18n:text>
-                  <xsl:value-of select="dri:help"/>
-              </i18n:text>
-          </span>
-          <br/>
-          <br/>
-          <div class="radios" style="margin-left:-195px;">
-              <xsl:for-each select="dri:option">
-                  <input type="radio">
-                      <xsl:attribute name="id">
-                          <xsl:value-of select="."/>
-                      </xsl:attribute>
-                      <xsl:attribute name="name">
-                          <xsl:value-of select="../@n"/>
-                      </xsl:attribute>
-                      <xsl:attribute name="value">
-                          <xsl:value-of select="@returnValue"/>
-                      </xsl:attribute>
-                      <xsl:if test="../dri:value[@type='option'][@option = current()/@returnValue]">
-                          <xsl:attribute name="checked">checked</xsl:attribute>
-                      </xsl:if>
-                  </input>
-                  <i18n:text>
-                      <xsl:value-of select="."/>
-                  </i18n:text>
-                  <br/>
-              </xsl:for-each>
-          </div>
-      </xsl:template>
-
-
-
-      <!-- First submission form: STATUS: PUBLISHED - journalID Select + Manuscript Number Edit Box -->
-      <xsl:template match="dri:list[@n='doi']">
-          <li id="aspect_submission_StepTransformer_list_doi">
-          <table style="border: 2px solid gray; float:right; display:inline-block; margin-top:-65px; margin-right:200px; padding:10px; width:500px">
-              <tr>
-		<xsl:for-each select="dri:item/dri:field">
-		    <xsl:variable name="currentId"><xsl:value-of select="@id"/></xsl:variable>
-		    <xsl:variable name="currentName"><xsl:value-of select="@n"/></xsl:variable>
-		    <xsl:attribute name="id"><xsl:value-of select="$currentName"/></xsl:attribute>
-      
-		    <xsl:if test="$currentName!='unknown_doi'">
-			<td style='width:35%'>
-			  <label class="ds-form-label-select-publication">
-			      <xsl:attribute name="for">
-			      <xsl:value-of select="translate($currentId,'.','_')"/>
-			      </xsl:attribute>
-			      <i18n:text>
-			      <xsl:value-of select="dri:label"/>
-			      </i18n:text>
-			      <xsl:text>: </xsl:text>
-			  </label>
-	
-			  <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
-			  <xsl:apply-templates select="../dri:field[@id=$currentId]/dri:error"/>
-			</td>
-		    </xsl:if>
-		    
-		    <xsl:if test="$currentName='unknown_doi'">
-			<td style='font-weight:bold; border-left: 1px solid gray; padding:0px;width:5%'>&#160;&#160;&#160;&#160;&#160;&#160;OR</td>
-			
-			<td style='font-weight:bold; border-right: 1px solid gray;'>
-			  <span style=''></span>
-			  </td>
-			  <td>
-			  <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
-			  <xsl:apply-templates select="../dri:field[@id=$currentId]/dri:error"/>
-			</td>
-		    </xsl:if>
-  
-		</xsl:for-each>
-	    </tr>
-	  </table>
-          </li>
-      </xsl:template>
-
-      <!-- First submission form: STATUS: ACCEPTED/IN REVIEW/NOT_YET_SUBMITTED -->
-      <xsl:template match="dri:list/dri:item[@n='select_publication_new' or @n='select_publication_exist']">
-          <li>
-          <table id="status_other_than_published" style="border: 2px solid gray; float:right; display:inline-block; margin-top:-65px; margin-right:200px; padding:10px; width:500px;">
-          <tr><td>
-              <!--xsl:call-template name="standardAttributes">
-              <xsl:with-param name="class">
-                  <xsl:text>ds-form-item </xsl:text>
-                  <xsl:choose>
-                  <xsl:when test="position() mod 2 = 0 and not(@rend = 'odd')">even</xsl:when>
-                  <xsl:otherwise>odd</xsl:otherwise>
-                  </xsl:choose>
-              </xsl:with-param>
-              </xsl:call-template>
-
-              <div class="ds-form-content">
-
-              <xsl:if test="dri:field[@type='radio']">
-                  <xsl:apply-templates select="dri:field[@type='radio']"/>
-                  <br/>
-              </xsl:if-->
-
-              <!-- RENDER:
-                  - JournalID_status_not_yet_submitted
-                  - journalID_status_in_review
-                  - journalID
-                  - MANUSCRIPT NUMBER
-
-              -->
-              <xsl:for-each select="dri:field[@type='composite']/dri:field">
-                  <tr class="selectPubSubmitTable"><td>
-
-                  <xsl:variable name="currentId"><xsl:value-of select="@id"/></xsl:variable>
-                  <xsl:variable name="currentName"><xsl:value-of select="@n"/></xsl:variable>
-                  <xsl:attribute name="id"><xsl:value-of select="$currentName"/></xsl:attribute>
-
-
-                      <label class="ds-form-label-select-publication">
-                          <xsl:attribute name="for"><xsl:value-of select="translate($currentId,'.','_')"/></xsl:attribute>
-                          <i18n:text><xsl:value-of select="dri:label"/></i18n:text>
-                          <xsl:text>: </xsl:text>
-                      </label>
-
-
-
-                      <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
-                      <xsl:apply-templates select="../dri:field[@id=$currentId]/dri:error"/>
-
-
-                  </td></tr>
-              </xsl:for-each>
-
-              <xsl:for-each select="dri:field[@type!='composite']">
-                  <xsl:variable name="currentId"><xsl:value-of select="@id"/></xsl:variable>
-                  <xsl:variable name="currentName"><xsl:value-of select="@n"/></xsl:variable>
-
-                  <!-- MANUSCRIPT NUMBER STATUS ACCEPTED -->
-                  <xsl:if test="$currentName!='manu_accepted-cb'">
-                  <tr id="aspect_submission_StepTransformer_item_manu-number-status-accepted">
-                      <td>
-                      <label class="ds-form-label-select-publication">
-                          <xsl:attribute name="for">
-                          <xsl:value-of select="translate($currentId,'.','_')"/>
-                          </xsl:attribute>
-                          <i18n:text>
-                          <xsl:value-of select="dri:label"/>
-                          </i18n:text>
-                          <xsl:text>: </xsl:text>
-                      </label>
-                      <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
-                      <xsl:apply-templates select="../dri:field[@id=$currentId]/dri:error"/>
-                      </td>
-                  </tr>
-                  </xsl:if>
-
-                  <!-- CHECKBOX ACCEPTEANCE STATUS ACCEPTED -->
-                  <xsl:if test="$currentName='manu_accepted-cb'">
-                  <tr id="aspect_submission_StepTransformer_item_manu_accepted-cb">
-                      <td>
-                      <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
-                      <xsl:apply-templates select="../dri:field[@id=$currentId]/dri:error"/>
-                      </td>
-                  </tr>
-                  </xsl:if>
-
-
-
-              </xsl:for-each>
-
-              <!--/div-->
-          </td></tr>
-          </table>
-          </li>
-      </xsl:template>
-     <!-- END First submission form: added and rewrote some templates to manage the form using jquery, to lead the user through the submission -->
 
 
     <!-- Quick patch to remove empty lists from options -->
@@ -1576,30 +1265,5 @@
 
 
     </xsl:template>
-
-
-
-
-
-
-
-    <!-- TEST !!!!!!!! -->
-    <!-- Submission file upload step. Adding jquery progres bar-->
-    <!--<xsl:template match="dri:body/dri:div/dri:list/dri:item[@n='dataset-item']/dri:field[@n='dataset-file']">-->
-         <!--<xsl:apply-imports/>-->
-
-        <!--<div class="row">-->
-            <!--<label for="aspect_submission_StepTransformer_field_dataset-file">Select a File to Upload</label><br />-->
-                <!--<input type="file" name="dataset-file" id="aspect_submission_StepTransformer_field_dataset-file" onchange="fileSelected();"/>-->
-            <!--</div>-->
-            <!--<div id="fileName"></div>-->
-            <!--<div id="fileSize"></div>-->
-            <!--<div id="fileType"></div>-->
-            <!--<div class="row">-->
-            <!--<input type="button" onclick="uploadFile()" value="Upload" />-->
-        <!--</div>-->
-        <!--<div id="progressNumber"></div>-->
-     <!--</xsl:template>-->
-    <!-- END TEST !!!!!!!! -->
 
 </xsl:stylesheet>
