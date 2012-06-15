@@ -254,7 +254,63 @@
 
     </xsl:template>
     
+    <!-- An item in a nested "form" list -->
+    <xsl:template match="dri:list[@id='aspect.submission.StepTransformer.list.submit-review']//dri:list[@type='form']/dri:item[not(@id)]" priority="3">
+        <li>
+                <xsl:call-template name="standardAttributes">
+                <xsl:with-param name="class">
+                    <xsl:text>ds-form-item </xsl:text>
 
+                <!-- Row counting voodoo, meant to impart consistent row alternation colors to the form lists.
+                    Should probably be chnaged to a system that is more straitforward. -->
+                <xsl:choose>
+                    <xsl:when test="(count(../../..//dri:item) - count(../../..//dri:list[@type='form'])) mod 2 = 0">
+                        <!--<xsl:if test="count(../dri:item) > 3">-->
+                            <xsl:if test="(count(preceding-sibling::dri:item | ../../preceding-sibling::dri:item/dri:list[@type='form']/dri:item) mod 2 = 0)">even </xsl:if>
+                            <xsl:if test="(count(preceding-sibling::dri:item | ../../preceding-sibling::dri:item/dri:list[@type='form']/dri:item) mod 2 = 1)">odd </xsl:if>
+                        
+                    </xsl:when>
+                    <xsl:when test="(count(../../..//dri:item) - count(../../..//dri:list[@type='form'])) mod 2 = 1">
+                        <!--<xsl:if test="count(../dri:item) > 3">-->
+                            <xsl:if test="(count(preceding-sibling::dri:item | ../../preceding-sibling::dri:item/dri:list[@type='form']/dri:item) mod 2 = 1)">even </xsl:if>
+                            <xsl:if test="(count(preceding-sibling::dri:item | ../../preceding-sibling::dri:item/dri:list[@type='form']/dri:item) mod 2 = 0)">odd </xsl:if>
+                        
+                    </xsl:when>
+                </xsl:choose>
+                <!--
+                <xsl:if test="position()=last() and dri:field[@type='button'] and not(dri:field[not(@type='button')])">last</xsl:if>
+                    -->
+               </xsl:with-param>
+            </xsl:call-template>
+            
+            <xsl:call-template name="pick-label"/>
+
+            <xsl:choose>
+                <xsl:when test="dri:field[@type='composite']">
+                    <xsl:apply-templates mode="formComposite"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <div class="ds-form-content">
+                        <xsl:choose>
+                        	<xsl:when test="count(*)>0">
+                        		<xsl:apply-templates/>
+                        	</xsl:when>
+                        	<xsl:otherwise>
+                        		<xsl:value-of select="." disable-output-escaping="yes"/>
+                        	</xsl:otherwise>
+                        </xsl:choose>
+                        
+                        <!-- special name used in submission UI review page -->
+                        <xsl:if test="@n = 'submit-review-field-with-authority'">
+                          <xsl:call-template name="authorityConfidenceIcon">
+                            <xsl:with-param name="confidence" select="substring-after(./@rend, 'cf-')"/>
+                          </xsl:call-template>
+                        </xsl:if>
+                    </div>
+                </xsl:otherwise>
+            </xsl:choose>
+        </li>
+    </xsl:template>
 	<!-- Normal field rendering -->
     <xsl:template match="dri:field" mode="normalField">
         <xsl:variable name="confidenceIndicatorID" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
