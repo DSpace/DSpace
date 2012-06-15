@@ -71,94 +71,6 @@
         </div>
     </xsl:template>
 
-    <xsl:template match="*[@rend='ame-suggest-widget']">
-        <xsl:param name="containerID" select="concat(translate(@id,'.','_'),'_container')"/>
-        <xsl:param name="treeID" select="concat(translate(@id,'.','_'),'_tree')"/>
-        <xsl:param name="itemID" select="//dri:field[@n='ame-item-id']/dri:value/text()"/>
-        <xsl:param name="field" select="@n"/>
-        <xsl:param name="buttonID" select="concat(translate(@id,'.','_'),'_add')"/>
-
-        <div class="ame-suggest-container">
-            <xsl:attribute name="id">
-                <xsl:value-of select="$containerID"/>
-            </xsl:attribute>
-
-            <div class="ame-suggest-header">
-                <font>Suggested Terms
-                    <a title="These terms have been automatically selected from a controlled vocabulary based on the article title, description, and any existing keywords.">
-                        ?
-                    </a>
-                </font>
-            </div>
-            <div class="ame-suggest-control">
-                <xsl:attribute name="id">
-                    <xsl:value-of select="$treeID"/>
-                </xsl:attribute>
-                &#160;
-            </div>
-            <div class="ame-suggest-buttons">
-                <input class="ame-suggest-add" type="button" value="Add Selected">
-                    <xsl:attribute name="id">
-                        <xsl:value-of select="$buttonID"/>
-                    </xsl:attribute>
-                </input>
-            </div>
-        </div>
-
-        <xsl:call-template name="ameSetup">
-            <xsl:with-param name="itemID" select="$itemID"/>
-            <xsl:with-param name="containerID" select="$containerID"/>
-            <xsl:with-param name="treeID" select="$treeID"/>
-            <xsl:with-param name="field" select="$field"/>
-            <xsl:with-param name="buttonID" select="$buttonID"/>
-        </xsl:call-template>
-        <div class="ame-suggest-end">&#160;</div>
-    </xsl:template>
-
-    <xsl:template name="ameSetup">
-        <xsl:param name="itemID" select="'mising value'"/>
-        <xsl:param name="containerID" select="'missing value'"/>
-        <xsl:param name="treeID" select="'missing value'"/>
-        <xsl:param name="field" select="'missing value'"/>
-        <xsl:param name="buttonID" select="'missing value'"/>
-        <script type="text/javascript">
-            <xsl:text>var ame = AMESuggestSetup('</xsl:text>
-            <xsl:value-of select="$itemID"/>
-            <xsl:text>','</xsl:text>
-            <xsl:value-of select="$containerID"/>
-            <xsl:text>','</xsl:text>
-            <xsl:value-of select="$treeID"/>
-            <xsl:text>','</xsl:text>
-            <xsl:value-of select="$field"/>
-            <xsl:text>','</xsl:text>
-            <xsl:value-of select="$buttonID"/>
-            <xsl:text>');</xsl:text>
-        </script>
-    </xsl:template>
-
-
-    <xsl:template match="*[@rend='blog-box']">
-        <div id="dryad_blog">
-            <h3>
-                <i18n:text>
-                    <xsl:value-of select=".//dri:head"/>
-                </i18n:text>
-                <xsl:text>&#160;&#160;</xsl:text>
-                <a href="http://blog.datadryad.org/feed/">
-                    <img src="/themes/Dryad/images/rss.jpg" style="border: 0px;"/>
-                </a>
-            </h3>
-            <ul>
-                <xsl:for-each select=".//dri:item/dri:xref">
-                    <li>
-                        <a href="{string(./@target)}">
-                            <xsl:value-of select="."/>
-                        </a>
-                    </li>
-                </xsl:for-each>
-            </ul>
-        </div>
-    </xsl:template>
 
     <!-- Overwriting the default DSpace head element template to check for pages -->
     <xsl:template name="buildHead">
@@ -334,6 +246,7 @@
 
             <xsl:choose>
                 <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
+		  <!-- Display authenticated username and Logout link -->
                     <div id="ds-user-box">
                         <p>
                             <a>
@@ -364,11 +277,6 @@
                                 <i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
                             </a>
                         </p>
-                        <!-- temporary hack -->
-                        <!--<xsl:if
-                              test="$meta[@element='request'][@qualifier='URI'][not(contains(., 'discover')) and string-length(.) &gt; 1]">-->
-                        <!--						<xsl:if
-                                  test="$meta[@element='request'][@qualifier='URI'][string-length(.) &gt; 1]">-->
                         <form action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
                             <p>
                                 <input name="query" type="text" value=""/>
@@ -379,10 +287,10 @@
                                 <input name="location" type="hidden" value="l2"/>
                             </p>
                         </form>
-                        <!--						</xsl:if>-->
                     </div>
                 </xsl:when>
                 <xsl:otherwise>
+		  <!-- Display Login link -->
                     <div id="ds-user-box">
                         <p>
                             <a>
@@ -395,10 +303,6 @@
                                 <i18n:text>xmlui.dri2xhtml.structural.login</i18n:text>
                             </a>
                         </p>
-                        <!--						<xsl:if
-                   test="$meta[@element='request'][@qualifier='URI'][not(contains(., 'discover')) and string-length(.) &gt; 1]">-->
-                        <!--						<xsl:if
-                                  test="$meta[@element='request'][@qualifier='URI'][string-length(.) &gt; 1]">-->
                         <form action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
                             <p>
                                 <input name="query" type="text" value=""/>
@@ -409,11 +313,9 @@
                                 <input name="location" type="hidden" value="l2"/>
                             </p>
                         </form>
-                        <!--						</xsl:if>-->
                     </div>
                 </xsl:otherwise>
             </xsl:choose>
-
         </div>
     </xsl:template>
 
@@ -426,8 +328,6 @@
         handled specially in that it is not actually included in the options div, and is instead built
         from metadata available under pageMeta.
     -->
-    <!-- TODO: figure out why i18n tags break the go button -->
-
     <xsl:template match="dri:options">
         <div id="ds-options">
             <xsl:apply-templates/>
@@ -690,33 +590,14 @@
             <xsl:apply-templates/>
         </fieldset>
     </xsl:template>
+    
+    <!-- Don't render the "Submit Data Now" button -->
+    <xsl:template match="dri:xref[../../@id='aspect.submission.Navigation.list.submitNow']" />
+    
 
-    <xsl:template match="dri:xref[../../@id='aspect.submission.Navigation.list.submitNow'][@rend='submitnowbutton']">
-        <a class="button-link">
-            <xsl:attribute name="href">
-                <xsl:value-of select="@target"/>
-            </xsl:attribute>
-            <span>
-                <xsl:apply-templates/>
-            </span>
-        </a>
-    </xsl:template>
 
-    <xsl:template match="dri:xref[../../@id='aspect.submission.Navigation.list.submitNow'][not(@rend)]">
-        <a>
-            <xsl:attribute name="href">
-                <xsl:value-of select="@target"/>
-            </xsl:attribute>
-            <xsl:attribute name="target">_blank</xsl:attribute>
-            <span>
-                <xsl:apply-templates/>
-            </span>
-        </a>
-    </xsl:template>
-
-    <xsl:template match="dri:referenceSet[@rend='hierarchy'][@type='detailList']">
-        <!-- ignore so no collection display on item pages: ticket 1351 -->
-    </xsl:template>
+    <!-- ignore the hierarchy so no collection displays on item pages: ticket 1351 -->
+    <xsl:template match="dri:referenceSet[@rend='hierarchy'][@type='detailList']" />
 
 
     <!-- Overwriting the structural XSL's general paragraph processing -->
