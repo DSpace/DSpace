@@ -361,4 +361,16 @@
 		<qualifier>journalVolumeAndIssue</qualifier>
 		<scope_note>Volumen y numero de la serie en la que un documento fue publicado</scope_note>
 	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>contributor</element>
+		<qualifier>inscriber</qualifier>
+		<scope_note>Firmante en un documento institucional</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>identifier</element>
+		<qualifier>expediente</qualifier>
+		<scope_note>Numero de expediente asociado a un documento institucional</scope_note>
+	</dc-type>
 </dspace-dc-types>

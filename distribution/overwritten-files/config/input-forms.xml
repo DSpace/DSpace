@@ -679,6 +679,31 @@
 					<visibility>workflow</visibility>
 				</field>
 
+				<!-- Firmante de un documento institucional -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>contributor</dc-element>
+					<dc-qualifier>inscriber</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Firmantes</label>
+					<input-type>onebox</input-type>
+					<hint>Personas que firman la resolución</hint>
+					<type-bind>Documento institucional</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Numero de expediente del documento institucional -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>identifier</dc-element>
+					<dc-qualifier>expediente</dc-qualifier>
+					<label>Nº de expediente</label>
+					<input-type>onebox</input-type>
+					<hint>Número de expediente asociado a este documento</hint>
+					<type-bind>Documento institucional</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+
 				<!-- Editorial -->
 				<field>
 					<dc-schema>dc</dc-schema>
@@ -861,6 +886,10 @@
 		</value-pairs>
 
 		<value-pairs value-pairs-name="common_subtypes_documento_institucional" dc-term="type">
+			<pair>
+				<displayed-value>Resolución</displayed-value>
+				<stored-value>Resolucion</stored-value>
+			</pair>
 			<pair>
 				<displayed-value>Documento institucional</displayed-value>
 				<stored-value>Documento institucional</stored-value>

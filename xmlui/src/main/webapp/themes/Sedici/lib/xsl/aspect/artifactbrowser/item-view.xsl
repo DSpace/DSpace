@@ -288,6 +288,18 @@
 			</xsl:call-template>
 		</xsl:if>
 
+		<!-- identifier.expediente row -->
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'identifier-expediente'" />
+			<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='expediente']" />
+		</xsl:call-template>
+
+		<!-- contributor.inscriber row -->
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'contributor-inscriber'" />
+			<xsl:with-param name="elements" select="dim:field[@element='contributor' and @qualifier='inscriber']" />
+		</xsl:call-template>
+
 		<xsl:if test="(dim:field[@element='contributor' and (@qualifier='editor' or @qualifier='translator' or @qualifier='compiler' or @qualifier='juror' or @qualifier='colaborator')])">
 			<div id="contributors">
 				<!-- contributor.editor row -->
