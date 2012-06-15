@@ -222,7 +222,7 @@
                         <xsl:when test="$contextpath != ''">
                             <xsl:value-of select="$contextpath"/>
                         </xsl:when>
-                        <xsl:otherwise>/</xsl:otherwise>
+                        <xsl:otherwise>/dryadlab</xsl:otherwise>
                     </xsl:choose>
                 </xsl:attribute>
                 <img id="ds-header-logo" src="{$theme-path}/images/dryadLabLogo.png"/>

@@ -97,7 +97,7 @@
                 <xsl:for-each
                         select=".//dim:field[@element='contributor']">
                     <xsl:copy-of select="node()"/>
-                    <xsl:text>, </xsl:text>
+                    <br />
                 </xsl:for-each>
             </xsl:variable>
             <xsl:if test="$authors!=''">
@@ -130,61 +130,6 @@
                 </tr>
             </xsl:if>
 
-	    <!-- Duration -->
-            <xsl:variable name="duration">
-              <xsl:value-of select=".//dim:field[@element='format'][@qualifier='extent']" />
-            </xsl:variable>
-            <xsl:if test="$duration!=''">
-                <tr class="ds-table-row">
-                    <td>
-                      <span class="bold">
-                        <xsl:text>Duration:</xsl:text>
-                      </span>
-                    </td>
-                    <td width="70%" colspan="2">
-                        <xsl:copy-of select="$duration"/>
-                    </td>
-                </tr>
-            </xsl:if>
-
-	    <!-- Requirements -->
-            <xsl:variable name="requirements">
-              <xsl:value-of select=".//dim:field[@element='relation'][@qualifier='requires']" />
-            </xsl:variable>
-            <xsl:if test="$requirements!=''">
-                <tr class="ds-table-row">
-                    <td>
-                      <span class="bold">
-                        <xsl:text>Requirements:</xsl:text>
-                      </span>
-                    </td>
-                    <td width="70%" colspan="2">
-                        <xsl:copy-of select="$requirements"/>
-                    </td>
-                </tr>
-            </xsl:if>
-
-
-            <!-- Learning Outcomes -->
-            <tr class="ds-table-row">
-              <td>
-                <span class="bold">
-                  <xsl:text>Learning Outcomes:</xsl:text>
-                </span>
-              </td>
-              <td colspan="2">
-		<ul class="text-list">
-                  <xsl:for-each
-                     select=".//dim:field[@element='learningOutcome']">
-                    <li> 
-		      <xsl:copy-of select="node()"/>
-		    </li>
-                  </xsl:for-each>
-		</ul>
-              </td>
-              <td>
-              </td>
-            </tr>
 	    
             <!-- Keywords -->
             <xsl:variable name="keywords">
@@ -225,8 +170,116 @@
                     </td>
                 </tr>
             </xsl:if>
+
+	    <!-- Duration -->
+            <xsl:variable name="duration">
+              <xsl:value-of select=".//dim:field[@element='format'][@qualifier='extent']" />
+            </xsl:variable>
+            <xsl:if test="$duration!=''">
+                <tr class="ds-table-row">
+                    <td>
+                      <span class="bold">
+                        <xsl:text>Duration:</xsl:text>
+                      </span>
+                    </td>
+                    <td width="70%" colspan="2">
+                        <xsl:copy-of select="$duration"/>
+                    </td>
+                </tr>
+            </xsl:if>
+
+	    <!-- Requirements -->
+            <xsl:variable name="requirements">
+              <xsl:value-of select=".//dim:field[@element='relation'][@qualifier='requires']" />
+            </xsl:variable>
+            <xsl:if test="$requirements!=''">
+                <tr class="ds-table-row">
+                    <td>
+                      <span class="bold">
+                        <xsl:text>Requirements:</xsl:text>
+                      </span>
+                    </td>
+                    <td width="70%" colspan="2">
+                        <xsl:copy-of select="$requirements"/>
+                    </td>
+                </tr>
+            </xsl:if>
+
+            <!-- Learning Outcomes -->
+            <tr class="ds-table-row">
+              <td>
+                <span class="bold">
+                  <xsl:text>Learning Outcomes:</xsl:text>
+                </span>
+              </td>
+              <td colspan="2">
+		<ul class="text-list">
+                  <xsl:for-each
+                     select=".//dim:field[@element='learningOutcome']">
+                    <li> 
+		      <xsl:copy-of select="node()"/>
+		    </li>
+                  </xsl:for-each>
+		</ul>
+              </td>
+              <td>
+              </td>
+            </tr>
+
+	    <!-- Prerequisites -->
+            <xsl:variable name="prereq">
+              <xsl:value-of select=".//dim:field[@element='prerequisiteKnowledge']" />
+            </xsl:variable>
+            <xsl:if test="$prereq!=''">
+                <tr class="ds-table-row">
+                    <td>
+                      <span class="bold">
+                        <xsl:text>Prerequisite Knowledge:</xsl:text>
+                      </span>
+                    </td>
+                    <td width="70%" colspan="2">
+                        <xsl:copy-of select="$prereq"/>
+                    </td>
+                </tr>
+            </xsl:if>
+
+	    <!-- Instructor Background -->
+            <xsl:variable name="instbackground">
+              <xsl:value-of select=".//dim:field[@element='instructorBackground']" />
+            </xsl:variable>
+            <xsl:if test="$instbackground!=''">
+                <tr class="ds-table-row">
+                    <td>
+                      <span class="bold">
+                        <xsl:text>Instructor Background:</xsl:text>
+                      </span>
+                    </td>
+                    <td width="70%" colspan="2">
+                        <xsl:copy-of select="$instbackground"/>
+                    </td>
+                </tr>
+            </xsl:if>
 	    
+
+	    <!-- Description of Activity -->
+            <xsl:variable name="longdescription">
+              <xsl:value-of select=".//dim:field[@element='descriptionOfActivity']" />
+            </xsl:variable>
+            <xsl:if test="$longdescription!=''">
+                <tr class="ds-table-row">
+                    <td>
+                      <span class="bold">
+                        <xsl:text>Description of Activity:</xsl:text>
+                      </span>
+                    </td>
+                    <td width="70%" colspan="2">
+                        <xsl:copy-of select="$longdescription"/>
+                    </td>
+                </tr>
+            </xsl:if>
+
 	    <!-- Identifier -->
+<!-- temporarily disabled until we get the DOIs to register properly....
             <tr class="ds-table-row">
               <td width="15%">
 		<span class="bold">
@@ -256,7 +309,8 @@
 		
               </td>
             </tr>
-	    
+	    -->
+
             </table>
 	<!-- End of main metadata section -->
 
