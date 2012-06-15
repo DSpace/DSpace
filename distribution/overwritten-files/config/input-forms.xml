@@ -491,18 +491,28 @@
 					<visibility>workflow</visibility>
 				</field>
 
-				<!-- Revista y volúmen de publicación -->
+				<!-- Titulo de la revista -->
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>relation</dc-element>
-					<dc-qualifier>isPartOf</dc-qualifier>
-					<label>Título y número de la serie</label>
-					<input-type>series</input-type>
-					<hint>Título y volúmen de la serie en la que el documento fué publicado</hint>
-<!-- 					<required>Debe proveer la información de la serie en la que el documento fue publicado</required> -->
+					<dc-qualifier>journalTitle</dc-qualifier>
+					<label>Título de la serie</label>
+					<input-type>onebox</input-type>
+					<hint>Título de la serie en la que el documento fué publicado</hint>
 					<type-bind>Articulo,Libro</type-bind>
 				</field>
 				
+				<!-- Volumen y numero de la revista -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>journalVolumeAndIssue</dc-qualifier>
+					<label>Volúmen y número de la serie</label>
+					<input-type>onebox</input-type>
+					<hint>Volúmen y número de la serie en la que el documento fué publicado</hint>
+					<type-bind>Articulo,Libro</type-bind>
+				</field>
+
 				<!-- Dossier -->
 				<field>
 					<dc-schema>sedici</dc-schema>

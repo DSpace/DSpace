@@ -2111,7 +2111,7 @@
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-descriptores">Descriptors</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-other">Other descriptors</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-keyword">Keywords</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-relation-isPartOf">Journal</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-relation-journal">Journal</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-relation-event">Event</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subtype">Document type</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-authors">Authors</message>  

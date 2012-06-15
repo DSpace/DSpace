@@ -343,12 +343,19 @@
 			<xsl:with-param name="elements" select="dim:field[@element='publisher']" />
 		</xsl:call-template>
 
-		<!-- relation.isPartOf row -->
-		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'relation-isPartOf'" />
-			<xsl:with-param name="elements" select="dim:field[@element='relation' and @qualifier='isPartOf']" />
-			<xsl:with-param name="type" select="'DCSeriesNumber'"/>
-		</xsl:call-template>
+		<!-- Si hay informacion de la revista, mostramos el metadato -->
+		<xsl:if test="dim:field[@element='relation' and @qualifier='journalTitle']">
+			<div class="metadata simple-item-view-other relation-journal">
+				<span class="metadata-label"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-relation-journal</i18n:text>:</span>
+				<span class="metadata-value">
+					<xsl:value-of select="dim:field[@element='relation' and @qualifier='journalTitle']" disable-output-escaping="yes"/>
+					<xsl:if test="dim:field[@element='relation' and @qualifier='journalVolumeAndIssue']">
+						<xsl:text>; </xsl:text>
+						<xsl:value-of select="dim:field[@element='relation' and @qualifier='journalVolumeAndIssue']" disable-output-escaping="yes"/>
+					</xsl:if>
+				</span>
+			</div>
+		</xsl:if>
 
 		<!-- sedici.relation.event row -->
 		<xsl:call-template name="render-normal-field">
@@ -573,17 +580,6 @@
 				<xsl:when test="$type='i18n-code'">
 					<i18n:text>xmlui.dri2xhtml.METS-1.0.code-value-<xsl:value-of select="$elements[$index]"/></i18n:text>
 				</xsl:when>
-				<xsl:when test="$type='DCSeriesNumber'">
-				        <xsl:choose>
-				        	<xsl:when test="contains($elements[$index], ';')">
-				        		<xsl:value-of select="substring-before($elements[$index], ';')" disable-output-escaping="yes"/>; <xsl:value-of select="substring-after($elements[$index], ';')" disable-output-escaping="yes"/>
-				        	</xsl:when>
-				        	<xsl:otherwise>
-				        		<xsl:value-of select="$elements[$index]" disable-output-escaping="yes"/>
-				        	</xsl:otherwise>
-				        </xsl:choose>
-			         	
-			    </xsl:when>
 				<xsl:otherwise>
 					<xsl:value-of select="$elements[$index]" disable-output-escaping="yes"/>
 				</xsl:otherwise>
