@@ -65,12 +65,13 @@
 
         <!-- ################################# General metadata display ############################## -->
 
+	<!-- tempate to render list of files -->
         <xsl:call-template name="bitstreamList"/>
 	
         <table class="ds-includeSet-table">
 
 
-            <!-- "Overview" -->
+            <!-- Overview -->
             <xsl:variable name="description">
                 <xsl:for-each
                         select=".//dim:field[@element='description'][not(@qualifier='provenance')]">
@@ -82,7 +83,7 @@
                 <tr class="ds-table-row">
                     <td>
                       <span class="bold">
-                        <xsl:text>Overview</xsl:text>
+                        <xsl:text>Overview:</xsl:text>
                       </span>
                     </td>
                     <td width="70%" colspan="2">
@@ -91,7 +92,101 @@
                 </tr>
             </xsl:if>
 
-            <!-- Need to add spatial, temporal, taxonomic keywords from file metadata -->
+            <!-- Authors -->
+            <xsl:variable name="authors">
+                <xsl:for-each
+                        select=".//dim:field[@element='contributor']">
+                    <xsl:copy-of select="node()"/>
+                    <xsl:text>, </xsl:text>
+                </xsl:for-each>
+            </xsl:variable>
+            <xsl:if test="$authors!=''">
+                <tr class="ds-table-row">
+                    <td>
+                      <span class="bold">
+                        <xsl:text>Authors:</xsl:text>
+                      </span>
+                    </td>
+                    <td width="70%" colspan="2">
+                        <xsl:copy-of select="$authors"/>
+                    </td>
+                </tr>
+            </xsl:if>
+
+	    <!-- Instruction Level -->
+            <xsl:variable name="instructionlevel">
+              <xsl:value-of select=".//dim:field[@element='audience']" />
+            </xsl:variable>
+            <xsl:if test="$instructionlevel!=''">
+                <tr class="ds-table-row">
+                    <td>
+                      <span class="bold">
+                        <xsl:text>Instruction Level:</xsl:text>
+                      </span>
+                    </td>
+                    <td width="70%" colspan="2">
+                        <xsl:copy-of select="$instructionlevel"/>
+                    </td>
+                </tr>
+            </xsl:if>
+
+	    <!-- Duration -->
+            <xsl:variable name="duration">
+              <xsl:value-of select=".//dim:field[@element='format'][@qualifier='extent']" />
+            </xsl:variable>
+            <xsl:if test="$duration!=''">
+                <tr class="ds-table-row">
+                    <td>
+                      <span class="bold">
+                        <xsl:text>Duration:</xsl:text>
+                      </span>
+                    </td>
+                    <td width="70%" colspan="2">
+                        <xsl:copy-of select="$duration"/>
+                    </td>
+                </tr>
+            </xsl:if>
+
+	    <!-- Requirements -->
+            <xsl:variable name="requirements">
+              <xsl:value-of select=".//dim:field[@element='relation'][@qualifier='requires']" />
+            </xsl:variable>
+            <xsl:if test="$requirements!=''">
+                <tr class="ds-table-row">
+                    <td>
+                      <span class="bold">
+                        <xsl:text>Requirements:</xsl:text>
+                      </span>
+                    </td>
+                    <td width="70%" colspan="2">
+                        <xsl:copy-of select="$requirements"/>
+                    </td>
+                </tr>
+            </xsl:if>
+
+
+            <!-- Learning Outcomes -->
+            <tr class="ds-table-row">
+              <td>
+                <span class="bold">
+                  <xsl:text>Learning Outcomes:</xsl:text>
+                </span>
+              </td>
+              <td colspan="2">
+		<ul class="text-list">
+                  <xsl:for-each
+                     select=".//dim:field[@element='learningoutcome']">
+                    <li> 
+		      <xsl:copy-of select="node()"/>
+		    </li>
+                  </xsl:for-each>
+		</ul>
+              </td>
+              <td>
+              </td>
+            </tr>
+	    
+            <!-- Keywords -->
             <xsl:variable name="keywords">
                 <xsl:for-each
                         select=".//dim:field[@element='subject'][@mdschema='dc'][not(@qualifier)]">
@@ -119,7 +214,7 @@
                 <tr class="ds-table-row">
                     <td>
                         <span class="bold">
-                            <i18n:text>xmlui.DryadItemSummary.depDate</i18n:text>
+                          <xsl:text>Date Published:</xsl:text>
                         </span>
                     </td>
                     <td>
@@ -130,215 +225,39 @@
                     </td>
                 </tr>
             </xsl:if>
-
-            <xsl:variable name="sciNames">
-                <xsl:for-each select=".//dim:field[@element='ScientificName']">
-                    <xsl:copy-of select="node()"/>
-                    <xsl:text>, </xsl:text>
-                </xsl:for-each>
-            </xsl:variable>
-            <xsl:if test="$sciNames!=''">
-                <tr class="ds-table-row">
-                    <td>
-                        <span class="bold">
-                            <i18n:text>xmlui.DryadItemSummary.sciNames</i18n:text>
-                        </span>
-                    </td>
-                    <td colspan="2">
-                        <xsl:copy-of select="$sciNames"/>
-                    </td>
-                    <td>
-                    </td>
-                </tr>
-            </xsl:if>
-
-            <xsl:variable name="spatialCoverage">
-                <xsl:for-each
-                        select=".//dim:field[@element='coverage'][@qualifier='spatial']">
-                    <xsl:copy-of select="node()"/>
-                    <xsl:text>, </xsl:text>
-                </xsl:for-each>
-            </xsl:variable>
-            <xsl:if test="$spatialCoverage!=''">
-                <tr class="ds-table-row">
-                    <td>
-                        <span class="bold">
-                            <i18n:text>xmlui.DryadItemSummary.spatialCov</i18n:text>
-                        </span>
-                    </td>
-                    <td colspan="2">
-                        <xsl:copy-of select="$spatialCoverage"/>
-                    </td>
-                    <td>
-                    </td>
-                </tr>
-            </xsl:if>
-
-            <xsl:variable name="temporalCoverage">
-                <xsl:for-each
-                        select=".//dim:field[@element='coverage'][@qualifier='temporal']">
-                    <xsl:copy-of select="node()"/>
-                    <xsl:text>, </xsl:text>
-                </xsl:for-each>
-            </xsl:variable>
-            <xsl:if test="$temporalCoverage!=''">
-                <tr class="ds-table-row">
-                    <td>
-                        <span class="bold">
-                            <i18n:text>xmlui.DryadItemSummary.temporalCov</i18n:text>
-                        </span>
-                    </td>
-                    <td colspan="2">
-                        <xsl:copy-of select="$temporalCoverage"/>
-                    </td>
-                    <td>
-                    </td>
-                </tr>
-            </xsl:if>
-
-            <xsl:if
-                    test=".//dim:field[@element='identifier'][not(@qualifier)][not(contains(., 'dryad.'))]">
-
-                <xsl:variable name="dc-creators"
-                              select=".//dim:field[@element='creator'][@mdschema='dc']"/>
-
-                <xsl:if test="$dc-creators != ''">
-                    <tr class="ds-table-row">
-                        <td>
-                            <xsl:choose>
-                                <xsl:when test="count($dc-creators) &gt; 1">
-                                    <span class="bold">
-                                        <i18n:text>xmlui.DryadItemSummary.authors</i18n:text>
-                                    </span>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <span class="bold">
-                                        <i18n:text>xmlui.DryadItemSummary.author</i18n:text>
-                                    </span>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </td>
-                        <td>
-                            <xsl:for-each select="$dc-creators">
-                                <xsl:value-of select="."/>
-                                <br/>
-                            </xsl:for-each>
-                        </td>
-                    </tr>
-                </xsl:if>
-
-                <xsl:variable name="dc-publishers"
-                              select=".//dim:field[@element='publisher'][@mdschema='dc']"/>
-
-                <xsl:if test="$dc-publishers != ''">
-                    <tr class="ds-table-row">
-                        <td>
-                            <xsl:choose>
-                                <xsl:when test="count($dc-publishers) &gt; 1">
-                                    <span class="bold">
-                                        <i18n:text>xmlui.DryadItemSummary.publishers</i18n:text>
-                                    </span>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <span class="bold">
-                                        <i18n:text>xmlui.DryadItemSummary.publisher</i18n:text>
-                                    </span>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </td>
-                        <td>
-                            <xsl:for-each select="$dc-publishers">
-                                <xsl:value-of select="."/>
-                                <br/>
-                            </xsl:for-each>
-                        </td>
-                    </tr>
-                </xsl:if>
-
-                <xsl:variable name="dc-date"
-                              select=".//dim:field[@element='date'][not(@qualifier)][@mdschema='dc']"/>
-
-                <xsl:if test="$dc-date != ''">
-                    <tr class="ds-table-row">
-                        <td>
-                            <span class="bold">
-                                <i18n:text>xmlui.DryadItemSummary.published</i18n:text>
-                            </span>
-                        </td>
-                        <td>
-                            <xsl:value-of select="$dc-date[1]"/>
-                        </td>
-                    </tr>
-                </xsl:if>
-            </xsl:if>
-
-
-            <xsl:variable name="describedBy">
-                <xsl:for-each
-                        select=".//dim:field[@element='relation' and @qualifier='ispartof']">
-                    <a>
-                        <xsl:attribute name="href">
-                            <xsl:call-template name="checkURL">
-                                <xsl:with-param name="doiIdentifier" select="$my_doi"/>
-                            </xsl:call-template>
-                        </xsl:attribute>
-                        <xsl:choose>
-                            <xsl:when test="$meta[@element='title'][@qualifier='package']">
-                                <xsl:value-of select="$meta[@element='title'][@qualifier='package']"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:copy-of select="."/>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </a>
-                    <br/>
-                </xsl:for-each>
-            </xsl:variable>
-            <xsl:if test="$describedBy!=''">
-                <tr class="ds-table-row">
-                    <td>
-                        <span class="bold">
-                            <i18n:text>xmlui.DryadItemSummary.containedInPackage</i18n:text>
-                        </span>
-                    </td>
-                    <td colspan="2">
-                        <xsl:copy-of select="$describedBy"/>
-                    </td>
-                </tr>
-            </xsl:if>
-
-	  <!-- Identifier -->
+	    
+	    <!-- Identifier -->
             <tr class="ds-table-row">
-                <td width="15%">
-		  <span class="bold">
-		    <xsl:text>Activity Identifier</xsl:text>
-		  </span>
-                </td>
-                <td width="55%">
-                    <xsl:choose>
-                        <xsl:when test="$my_doi">
-                          <xsl:value-of select="$my_doi"/>
-                        </xsl:when>
-                        <xsl:when test="$my_uri">
-                          <a>
-                            <xsl:attribute name="href">
-                              <xsl:value-of select="$my_uri"/>
-                            </xsl:attribute>
-                            <xsl:value-of select="$my_uri"/>
-                          </a>
-                        </xsl:when>
-                    </xsl:choose>
-                    <span class="Z3988">
-                        <xsl:attribute name="title">
-                            <xsl:call-template name="renderCOinS"/>
-                        </xsl:attribute>
-                        <xsl:text>&#160;</xsl:text>
-                    </span>
-
-                </td>
+              <td width="15%">
+		<span class="bold">
+		  <xsl:text>Activity Identifier</xsl:text>
+		</span>
+              </td>
+              <td width="55%">
+                <xsl:choose>
+                  <xsl:when test="$my_doi">
+                    <xsl:value-of select="$my_doi"/>
+                  </xsl:when>
+                  <xsl:when test="$my_uri">
+                    <a>
+                      <xsl:attribute name="href">
+                        <xsl:value-of select="$my_uri"/>
+                      </xsl:attribute>
+                      <xsl:value-of select="$my_uri"/>
+                    </a>
+                  </xsl:when>
+                </xsl:choose>
+                <span class="Z3988">
+                  <xsl:attribute name="title">
+                    <xsl:call-template name="renderCOinS"/>
+                  </xsl:attribute>
+                  <xsl:text>&#160;</xsl:text>
+                </span>
+		
+              </td>
             </tr>
-
-        </table>
+	    
+            </table>
 	<!-- End of main metadata section -->
 
 
@@ -372,21 +291,21 @@
     </xsl:template>
 
 
-
-    <xsl:template name="bitstreamList">
-        <table class="ds-table file-list">
-            <tr class="ds-table-header-row">
-            </tr>
-            <tr>
-                <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CONTENT']">
+	    <!-- ######################### Bitstream List ############################ -->
+	    <xsl:template name="bitstreamList">
+	      <table class="ds-table file-list">
+		<tr class="ds-table-header-row">
+		</tr>
+		<tr>
+                  <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CONTENT']">
                     <xsl:with-param name="context" select="."/>
                     <xsl:with-param name="primaryBitstream"
                                     select="./mets:structMap[@TYPE='LOGICAL']/mets:div[@TYPE='DSpace Item']/mets:fptr/@FILEID"/>
-                </xsl:apply-templates>
-            </tr>
-        </table>
-    </xsl:template>
-
+                  </xsl:apply-templates>
+		</tr>
+              </table>
+	    </xsl:template>
+	    
 
     <!-- ########################### An item rendered in the detailView pattern, the "full item record" ####################
          ########################### view of a DSpace item in Manakin.                                  #################### -->
