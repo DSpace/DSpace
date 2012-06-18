@@ -192,6 +192,7 @@
                     <xsl:call-template name="fieldAttributes"/>
                     <xsl:attribute name="class">ds-textarea-field submit-textarea</xsl:attribute>
                     <xsl:attribute name="name"><xsl:value-of select="concat(../@n,'_',$position)"/></xsl:attribute>
+                    <xsl:attribute name="onkeydown">event.cancelBubble=true;</xsl:attribute>
                     <xsl:choose>
                        <xsl:when test="not(../dri:params[@cols])">
                            <xsl:call-template name="textAreaCols"/>
@@ -326,7 +327,7 @@
            	<xsl:when test="@type= 'textarea'">
                 <textarea>
                     <xsl:call-template name="fieldAttributes"/>
-
+					<xsl:attribute name="onkeydown">event.cancelBubble=true;</xsl:attribute>
                     <!--
                         if the cols and rows attributes are not defined we need to call
                         the tempaltes for them since they are required attributes in strict xhtml
