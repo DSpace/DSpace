@@ -33,6 +33,9 @@
     String feedRef = (String)request.getAttribute("dspace.layout.feedref");
     List parts = (List)request.getAttribute("dspace.layout.linkparts");
     String extraHeadData = (String)request.getAttribute("dspace.layout.head");
+
+    //check if google analytics enabled
+    boolean gaEnabled = ConfigurationManager.getBooleanProperty("google.analytics.enabled");
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -58,6 +61,10 @@
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/builder.js"> </script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/controls.js"> </script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/choice-support.js"> </script>
+    
+    <% if (gaEnabled) { %>
+        <%@ include file="<%= request.getContextPath() %>/ga.jspf" %>
+    <% } %>
     </head>
 
     <%-- HACK: leftmargin, topmargin: for non-CSS compliant Microsoft IE browser --%>
