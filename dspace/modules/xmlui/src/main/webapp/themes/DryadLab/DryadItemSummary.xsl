@@ -136,7 +136,9 @@
                 <xsl:for-each
                         select=".//dim:field[@element='subject'][@mdschema='dc'][not(@qualifier)]">
                     <xsl:copy-of select="node()"/>
-                    <xsl:text>, </xsl:text>
+                    <xsl:if test="position() != last()">
+		      <xsl:text>, </xsl:text>
+		    </xsl:if>
                 </xsl:for-each>
             </xsl:variable>
             <xsl:if test="$keywords!=''">
