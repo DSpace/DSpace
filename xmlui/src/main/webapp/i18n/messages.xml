@@ -2067,7 +2067,9 @@
 <message key="xmlui.dri2xhtml.METS-1.0.embargoed-document">Embargoed document</message>
 <message key="xmlui.dri2xhtml.METS-1.0.embargoed-document-description">This document can not be accesioned because it has embargo until:</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-is-peer-review">Peer reviewed document</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-is-fulltext">Fulltext document</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-is-non-peer-review">Non peer reviewed document</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-true-fulltext">Fulltext document</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-false-fulltext">Non fulltext document</message>
 <message key="xmlui.dri2xhtml.METS-1.0.other-attributes">Other attributes of the document</message>
 <message key="xmlui.dri2xhtml.METS-1.0.tesis-info">Thesis information</message>
 <message key="xmlui.dri2xhtml.METS-1.0.general-info">General information</message>

@@ -1928,7 +1928,9 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 <message key="xmlui.dri2xhtml.METS-1.0.embargoed-document">Documento embargado</message>
 <message key="xmlui.dri2xhtml.METS-1.0.embargoed-document-description">Este documento no puede ser accedido aún dado que su autor ha solicitado un período de embargo hasta la fecha:</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-is-peer-review">Documento revisado por pares</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-is-fulltext">Documento disponible a texto completo</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-is-non-peer-review">Documento sin revisión por pares</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-true-fulltext">Documento disponible a texto completo</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-false-fulltext">Documento no disponible a texto completo</message>
 <message key="xmlui.dri2xhtml.METS-1.0.other-attributes">Otros atributos del documento</message>
 <message key="xmlui.dri2xhtml.METS-1.0.tesis-info">Información de la Tesis</message>
 <message key="xmlui.dri2xhtml.METS-1.0.general-info">Información general</message>
