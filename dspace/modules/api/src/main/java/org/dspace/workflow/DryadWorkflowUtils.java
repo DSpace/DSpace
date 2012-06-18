@@ -56,7 +56,7 @@ public class DryadWorkflowUtils {
 
                 return dataPackage;
             } catch (Exception e){
-                log.error(LogManager.getHeader(context, "Error while retrieving data package", "datafile: " + dataFile.getID()));
+                log.error(LogManager.getHeader(context, "Error while retrieving data package", "datafile: " + dataFile.getID()), e);
             }
         }
         return null;
@@ -78,7 +78,7 @@ public class DryadWorkflowUtils {
                 }
                 result.add(datasetItem);
             } catch (Exception e){
-                log.error(LogManager.getHeader(context, "Error while retrieving data files", "datapackage: " + dataPackage.getID()));
+                log.error(LogManager.getHeader(context, "Error while retrieving data files", "datapackage: " + dataPackage.getID()), e);
             }
         }
         return result.toArray(new Item[result.size()]);
