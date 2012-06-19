@@ -28,7 +28,7 @@ public class MailReporter {
 	private static final String PROPERTY_DEBUG_MODE = "xmlui.debug";
 
 	private static final String EXCEPTION_MAIL_TEMPLATE = "exception_error";
-	private static final String MISSING_AUTHORITY_MAIL_TEMPLATE = "missing_authority_key_error";
+	private static final String MISSING_AUTHORITY_MAIL_TEMPLATE = "missing_authority_key";
 	
 	protected static Logger logger = LoggerFactory.getLogger(MailReporter.class);
 	
