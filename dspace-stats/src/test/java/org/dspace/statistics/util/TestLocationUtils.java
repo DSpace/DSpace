@@ -10,7 +10,6 @@ package org.dspace.statistics.util;
 import java.util.Locale;
 import static org.junit.Assert.*;
 
-import org.dspace.AbstractUnitTest;
 import org.dspace.core.I18nUtil;
 import org.junit.Test;
 
@@ -18,7 +17,6 @@ import org.junit.Test;
  * @author mwood
  */
 public class TestLocationUtils
-extends AbstractUnitTest
 {
     private static final String UNKNOWN_CONTINENT = I18nUtil
             .getMessage("org.dspace.statistics.util.LocationUtils.unknown-continent");
