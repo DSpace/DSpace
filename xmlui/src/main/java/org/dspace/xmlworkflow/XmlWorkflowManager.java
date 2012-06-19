@@ -339,6 +339,9 @@ public class XmlWorkflowManager {
             if (nextActionConfig != null) {
                 nextActionConfig.getProcessingAction().activate(c, wfi);
                 if (nextActionConfig.requiresUI() && !enteredNewStep) {
+                	//Antes de crear la nueva OwnedTask, eliminamos la anterior
+                    ClaimedTask task = ClaimedTask.findByWorkflowIdAndEPerson(c, wfi.getID(), user.getID());
+                    deleteClaimedTask(c, wfi, task);
                     createOwnedTask(c, wfi, currentStep, nextActionConfig, user);
                     return nextActionConfig;
                 } else if( nextActionConfig.requiresUI() && enteredNewStep){

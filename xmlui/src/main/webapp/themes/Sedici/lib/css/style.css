@@ -3246,5 +3246,12 @@ input.ds-authority-label {
 	text-align: center;
 }
 
+#aspect_xmlworkflow_WorkflowTransformer_div_select-collection input {
+	color: #CD642F;
+}
+#aspect_xmlworkflow_WorkflowTransformer_div_select-collection li {
+	margin: 0px;
+}
+
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
 body{ background-color:white;}

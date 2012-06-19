@@ -2482,4 +2482,14 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="sedici.noticias.titulo">Lista de noticias</message>
 <message key="sedici.common.camposObligatorios">(*) Campos Obligatorios</message>
 
+<message key="sedici.XMLWorkflow.workflow.selectCollectionAction.head">Ejecutar tarea: seleccionar colección de destino</message>
+<message key="sedici.XMLWorkflow.workflow.selectCollectionAction.complete">Instalar documento</message>
+<message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.selectcollectionaction">Asignación de colección</message>
+
+<message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview">Revisión </message>
+<message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.claimaction">Revisión SeDiCI</message>
+<message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.editaction">Revisión SeDiCI</message>
+<message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.selectcollectionaction">Asignación de colección</message>
+<message key="sedici.Submission.submit.SelectCollection.collection_help">Seleccione la colección en la que se instalará el documento</message>
+
 </catalogue>

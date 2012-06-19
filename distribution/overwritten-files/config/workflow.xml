@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <wf-config>
+
     <workflow-map>
         <name-map collection="default" workflow="default"/>
-        <!--<name-map collection="123456789/4" workflow="selectSingleReviewer"/>-->
-        <!--<name-map collection="123456789/5" workflow="scoreReview"/>-->
+        <name-map collection="10915/50" workflow="autoarchive"/>
     </workflow-map>
 
     <!--Workflow modificado para SeDiCI-->
@@ -27,7 +27,15 @@
     	Si bien los pasos son ejecutados por roles distintos, la acción de cada uno es la misma: Editar/Aceptar/Rechazar.
     	Esto es para que tanto a nivel local (colección) como a nivel global (administradores de SeDiCI) exista la posibilidad de 
     	editar los metadatos de un envío, rechazarlo o bien aceptarlo (para pasar al paso 2 o archivarlo en DSpace según corresponda).
+    	
+    	
+    	Coleccion de Autoarchivo:
+    	
+    	Para la coleccion de autoarchivo se utiliza un workflow especial que incluye una Action adicional para la seleccion de la
+    	colección en la que se instalará el ítem.
      -->
+     
+    <!-- Workflow general -->
     <workflow start="CollectionLevelReview" id="default">
 
         <roles>
@@ -54,85 +62,33 @@
         
     </workflow>
 
-
-    <!--Standard workflow step-->
-    <workflow start="reviewstep" id="original">
+	<!-- Workflow para la coleccion de autoarchivo -->
+    <workflow start="CollectionLevelReview" id="autoarchive">
 
         <roles>
-            <role id="reviewer" name="Reviewer" description="The people responsible for this step are able to edit the metadata of incoming submissions, and then accept or reject them." />
-            <role id="editor" name="Editor" description="The people responsible for this step are able to edit the metadata of incoming submissions, and then accept or reject them."/>
-            <role id="finaleditor" name="Final Editor" description="The people responsible for this step are able to edit the metadata of incoming submissions, but will not be able to reject them."/>
+            <role id="CollectionAdmin" name="CollectionAdmin" scope="collection" description="Este paso le permite a un revisor de la Colección, editar los metadatos y aceptar o rechazar el envío"/>
+            <role id="SeDiCIAdmin" name="SeDiCIAdmin" scope="repository" description="Este paso le permite a los administradores de SeDiCI editar los metadatos, aceptar o rechazar el envío"/>
         </roles>
 
-        <step id="reviewstep" role="reviewer" userSelectionMethod="claimaction">
+		<!-- PASO 1: Revisión a nivel de colección (aplicable por colección) -->
+        <step id="CollectionLevelReview" role="CollectionAdmin" userSelectionMethod="claimaction">
             <outcomes>
-                <step status="0">editstep</step>
-            </outcomes>
-            <actions>
-                <action id="reviewaction"/>
-            </actions>
-        </step>
-        <step id="editstep" role="editor" userSelectionMethod="claimaction">
-            <outcomes>
-                <step status="0">finaleditstep</step>
+                <step status="0">SeDiCILevelReview</step>
             </outcomes>
             <actions>
                 <action id="editaction"/>
             </actions>
         </step>
-        <step id="finaleditstep" role="finaleditor" userSelectionMethod="claimaction">
+        
+        <!-- PASO 2: Revisión a nivel de SeDiCI (aplicable a todos los ítems de todo el repositorio) -->
+        <step id="SeDiCILevelReview" role="SeDiCIAdmin" userSelectionMethod="claimaction">
             <actions>
-                <action id="finaleditaction"/>
+                <action id="editaction"/>
+                <action id="selectcollectionaction"/>
             </actions>
         </step>
+        
     </workflow>
 
-    <!--Workflow where a reviewManager can select a single review who will then either accept/reject the item-->
-    <workflow id="selectSingleReviewer" start="selectReviewerStep">
-        <roles>
-            <role id="reviewer" name="Reviewer" scope="item" />
-            <role id="reviewmanagers" name="ReviewManagers" scope="repository"/>
-        </roles>
 
-
-        <step id="selectReviewerStep" role="reviewmanagers" userSelectionMethod="claimaction">
-            <outcomes>
-                <step status="0">singleUserReviewStep</step>
-            </outcomes>
-            <actions>
-                <action id="selectrevieweraction"/>
-            </actions>
-        </step>
-
-        <step id="singleUserReviewStep" role="reviewer" userSelectionMethod="autoassignAction">
-            <outcomes>
-                <step status="1">selectReviewerStep</step>
-            </outcomes>
-            <actions>
-                <action id="singleuserreviewaction"/>
-            </actions>
-        </step>
-
-    </workflow>
-
-    <!--Workflow where a number of users will perform reviews on an item and depending on the scores the item will be archived/rejected-->
-    <workflow id="scoreReview" start="scoreReviewStep">
-        <roles>
-            <role id="scoreReviewers" name="ScoreReviewers" scope="collection" description="The people responsible to select a single reviewer for the submission"/>
-        </roles>
-
-        <step id="scoreReviewStep" role="scoreReviewers" userSelectionMethod="claimaction" requiredUsers="2">
-            <outcomes>
-                <step status="0">evaluationStep</step>
-            </outcomes>
-            <actions>
-                <action id="scorereviewaction"/>
-            </actions>
-        </step>
-        <step id="evaluationStep" userSelectionMethod="noUserSelectionAction">
-            <actions>
-                <action id="evaluationaction"/>
-            </actions>
-        </step>
-    </workflow>
 </wf-config>
