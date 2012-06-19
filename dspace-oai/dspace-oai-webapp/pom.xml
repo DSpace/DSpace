@@ -43,6 +43,16 @@
                </execution>
             </executions>
          </plugin>
+         <plugin>
+            <groupId>com.mycila.maven-license-plugin</groupId>
+            <artifactId>maven-license-plugin</artifactId>
+            <configuration>
+               <excludes>
+                  <exclude>**/*.LICENSE</exclude>
+                  <exclude>src/main/webapp/oai2.xsl</exclude>
+               </excludes>
+            </configuration>
+         </plugin>
       </plugins>
    </build>
 
