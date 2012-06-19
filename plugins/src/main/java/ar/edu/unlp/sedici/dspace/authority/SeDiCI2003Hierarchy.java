@@ -47,11 +47,6 @@ public abstract class SeDiCI2003Hierarchy extends SeDiCI2003AuthorityProvider {
     	return 0;
     }
 
-	@Override
-	protected String getSeDiCI2003EntityLabel(String field, String key) {
-		return getSeDiCI2003HierarchyElementLabel(key);
-	}
-
 	
 	/**
 	 * Accede a la configuración y retorna la lista de IDs padres que se usarán para filtrar de la tabla de jerarquias
@@ -69,8 +64,6 @@ public abstract class SeDiCI2003Hierarchy extends SeDiCI2003AuthorityProvider {
 	 * @return
 	 */
 	protected abstract List<Object> getSeDiCI2003HierarchyElements(String text, String[] parents, boolean includeChilds, int start, int limit);
-	
-	protected abstract String getSeDiCI2003HierarchyElementLabel(String key);
 	
 	protected abstract String getAuthority(Object entity);
 	

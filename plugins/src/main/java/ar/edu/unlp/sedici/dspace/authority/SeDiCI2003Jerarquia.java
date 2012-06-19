@@ -14,9 +14,14 @@ public class SeDiCI2003Jerarquia extends SeDiCI2003Hierarchy {
 	}
 
 	@Override
-	protected String getSeDiCI2003HierarchyElementLabel(String key) {
+	protected String getSeDiCI2003EntityLabel(String field, String key) {
 		JerarquiasTermino t = JerarquiasTermino.findJerarquiasTermino(key);
-		return t.getNombreEs();
+		if (t == null){
+			this.reportMissingAuthorityKey(field, key);
+			return key;
+		}else{
+			return t.getNombreEs();
+		}
 	}
 
 	@Override
