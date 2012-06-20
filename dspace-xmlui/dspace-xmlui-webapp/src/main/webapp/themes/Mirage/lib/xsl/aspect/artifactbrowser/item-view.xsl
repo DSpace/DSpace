@@ -348,12 +348,12 @@
             </tr>
     </xsl:template>
 
-    <!--dont render the item-view-toggle automatically in the summary view, only when it get's called-->
+    <!-- don't render the item-view-toggle automatically in the summary view, only when it gets called -->
     <xsl:template match="dri:p[contains(@rend , 'item-view-toggle') and
         (preceding-sibling::dri:referenceSet[@type = 'summaryView'] or following-sibling::dri:referenceSet[@type = 'summaryView'])]">
     </xsl:template>
 
-    <!-- dont render the head on the item view page -->
+    <!-- don't render the head on the item view page -->
     <xsl:template match="dri:div[@n='item-view']/dri:head" priority="5">
     </xsl:template>
 
