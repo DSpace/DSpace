@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 
+import ar.edu.unlp.sedici.util.AuthorizeUtil;
+
 /**
  * When an item is submitted and is somewhere in a workflow, it has a row in the
  * WorkflowItem table pointing to it.
@@ -66,6 +68,10 @@ public class XmlWorkflowManager {
         removeUserItemPolicies(context, myitem, myitem.getSubmitter());
         grantSubmitterReadPolicies(context, myitem);
 
+    	// Decides if the alert email should be sent 
+    	if(!shouldSendAlert(context, wfi, null))
+    		noEMail.put(myitem.getID(), Boolean.TRUE);
+        
         context.turnOffAuthorisationSystem();
         Step firstStep = wf.getFirstStep();
         if(firstStep.isValidStep(context, wfi)){
@@ -119,6 +125,9 @@ public class XmlWorkflowManager {
         wfi.update();
         removeUserItemPolicies(context, item, item.getSubmitter());
         grantSubmitterReadPolicies(context, item);
+
+        // Shouldn't send the email (the logged user is an admin)
+		noEMail.put(item.getID(), Boolean.TRUE);
 
         context.turnOffAuthorisationSystem();
         Step firstStep = wf.getFirstStep();
@@ -186,6 +195,24 @@ public class XmlWorkflowManager {
     	 // Look for the unique workspaceitem entry where 'item_id' references this item
         TableRow row =  DatabaseManager.findByUnique(context, "cwf_workflowitem", "item_id", item.getID());
         return (row != null);
+    }
+    
+    /**
+     * Decide si debe enviarse o no un mail de notificación de nueva tarea disponible, según si el usuario logueado es administrador o no.
+     * 
+     * @param context DSpace context
+     * @param wfi XmlWorkflowItem related to this invocation
+     * @param useNoEMail signals if the item's ID should be set in the noEMail static var
+     * @return whether the mail should be sent or not
+     * @throws SQLException
+     */
+    public static boolean shouldSendAlert(Context context, XmlWorkflowItem wfi, EPerson eperson) throws SQLException {
+    	// Checks the ADMIN privilege on target collection for the scpeficied eperson or the current users if eperson is null
+    	if(eperson == null) {
+    		return !AuthorizeManager.isAdmin(context, wfi.getCollection());
+    	} else {
+    		return !AuthorizeUtil.isAdmin(context, eperson, wfi.getCollection());
+    	}
     }
     
     /**
@@ -475,8 +502,9 @@ public class XmlWorkflowManager {
         	
 	        InstallItem.installItem(c, wfi);
 
-	        //Notify
-	        notifyOfArchive(c, item, collection);
+	        //Notify only when it is needed
+	        if(shouldSendAlert(c, wfi, wfi.getSubmitter()))
+	        	notifyOfArchive(c, item, collection);
         }
 
         //Clear any remaining workflow metadata
