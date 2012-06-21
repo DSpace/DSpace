@@ -109,7 +109,7 @@ public class ClientOptions
    private String formatNamespace = null; 
 
    /**
-    * Introduce a checksum error. This is used to simualte an error with the 
+    * Introduce a checksum error. This is used to simulate an error with the 
     * MD5 value. 
     */
    private boolean checksumError = false;
@@ -130,7 +130,7 @@ public class ClientOptions
    private static final Pattern multiPattern = Pattern.compile("(.*?)(\\[(.*?)\\]){0,1}(:(.*)){0,1}@(http://.*)");
 
    /**
-    * Flag that indicates if the gui mode has been set. This is 
+    * Flag that indicates if the GUI mode has been set. This is 
     * true by default. 
     */
    private boolean guiMode = true; 

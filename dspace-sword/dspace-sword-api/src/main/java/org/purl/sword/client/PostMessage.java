@@ -95,7 +95,7 @@ public class PostMessage
    private String packaging;
 
    /**
-    * True if the deposit should simualte a checksum error. The client should check this
+    * True if the deposit should simulate a checksum error. The client should check this
     * field to determine if a correct MD5 checksum should be sent or whether the checksum should
     * be modified so that it generates an error at the server.
     */
