@@ -235,7 +235,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
         if (dso != null)
         {
-            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath);
+            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath, true);
         }
 
         pageMeta.addTrail().addContent(getTrailMessage(info));
