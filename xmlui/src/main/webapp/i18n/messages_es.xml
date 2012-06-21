@@ -2440,6 +2440,10 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.title">Título</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Materia</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued">Fecha de publicación</message>
+<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.persona">Personas</message>
+<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.institucion">Institución</message>
+<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subtipo">Subtipo</message>
+<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.descriptor">Descriptor</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.selected">Filtros aplicados</message>
 <message key="xmlui.dri2xhtml.structural.pagination-info.nototal">Mostrando items {0}-{1}</message>
 <message key="xmlui.Discovery.AbstractSearch.type_author">Filtrado por: Autor</message>

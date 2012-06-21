@@ -36,7 +36,9 @@
     exclude-result-prefixes="xalan java encoder i18n dri mets dim xlink xsl util">
 
     <xsl:output indent="yes" method="xhtml" />
-
+    
+    <xsl:variable name="linkFilter"><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']"/>/discover</xsl:variable>
+    
     <xsl:template name="itemSummaryView-DIM">
         <!-- Generate the info about the item from the metadata section -->
         <xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim" mode="itemSummaryView-DIM"/>
@@ -115,9 +117,12 @@
 						<span class="metadata-value">
 							<xsl:if test="@authority">
 								<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
-							</xsl:if>
-	
-							<xsl:copy-of select="node()" />
+							</xsl:if>	
+								
+							<a>
+								<xsl:attribute name="href"><xsl:value-of select="$linkFilter"/>?filtertype=author&amp;filter=<xsl:copy-of select="node()"/></xsl:attribute>
+								<xsl:copy-of select="node()" />
+							</a>							
 	
 							<xsl:if test="count(following-sibling::dim:field[@element='creator']) != 0">
 								<xsl:text> | </xsl:text>
@@ -142,7 +147,10 @@
 								<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
 							</xsl:if>
 	
-							<xsl:copy-of select="node()" />
+							<a>
+								<xsl:attribute name="href"><xsl:value-of select="$linkFilter"/>?filtertype=persona&amp;filter=<xsl:copy-of select="node()"/></xsl:attribute>
+								<xsl:copy-of select="node()" />
+							</a>							
 	
 							<xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='compiler']) != 0">
 								<xsl:text> | </xsl:text>
@@ -185,12 +193,14 @@
 				<xsl:call-template name="render-normal-field">
 					<xsl:with-param name="name" select="'subtype'" />
 					<xsl:with-param name="elements" select="dim:field[@element='subtype']" />
+					<xsl:with-param name="filter">subtipo</xsl:with-param>
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test="dim:field[@element='type']">
 				<xsl:call-template name="render-normal-field">
 					<xsl:with-param name="name" select="'subtype'" />
 					<xsl:with-param name="elements" select="dim:field[@element='type']" />
+					<xsl:with-param name="filter">subtipo</xsl:with-param>
 				</xsl:call-template>
 			</xsl:when>
 			<!-- No hay otherwise -->
@@ -243,12 +253,14 @@
 			<xsl:call-template name="render-normal-field">
 				<xsl:with-param name="name" select="'contributor-director'" />
 				<xsl:with-param name="elements" select="dim:field[@element='contributor' and @qualifier='director']" />
+				<xsl:with-param name="filter">persona</xsl:with-param>
 			</xsl:call-template>
 	
 			<!-- contributor.codirector row -->
 			<xsl:call-template name="render-normal-field">
 				<xsl:with-param name="name" select="'contributor-codirector'" />
 				<xsl:with-param name="elements" select="dim:field[@element='contributor' and @qualifier='codirector']" />
+				<xsl:with-param name="filter">persona</xsl:with-param>
 			</xsl:call-template>
 	
 			<!-- date.exposure row -->
@@ -262,6 +274,7 @@
 			<xsl:call-template name="render-normal-field">
 				<xsl:with-param name="name" select="'institucion-desarrollo'" />
 				<xsl:with-param name="elements" select="dim:field[@element='institucionDesarrollo']" />
+				<xsl:with-param name="filter">institucion</xsl:with-param>
 			</xsl:call-template>
 	
 			<!-- degree.name row -->
@@ -285,6 +298,7 @@
 				<xsl:with-param name="name" select="'date-exposure'" />
 				<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='exposure']" />
 				<xsl:with-param name="type" select="'date'" />
+				<xsl:with-param name="filter">persona</xsl:with-param>
 			</xsl:call-template>
 		</xsl:if>
 
@@ -298,6 +312,7 @@
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'contributor-inscriber'" />
 			<xsl:with-param name="elements" select="dim:field[@element='contributor' and @qualifier='inscriber']" />
+			<xsl:with-param name="filter">persona</xsl:with-param>
 		</xsl:call-template>
 
 		<xsl:if test="(dim:field[@element='contributor' and (@qualifier='editor' or @qualifier='translator' or @qualifier='compiler' or @qualifier='juror' or @qualifier='colaborator')])">
@@ -307,6 +322,7 @@
 					<xsl:with-param name="name" select="'contributor-editor'" />
 					<xsl:with-param name="elements" select="dim:field[@element='contributor' and @qualifier='editor']" />
 					<xsl:with-param name="separator" select="' | '"/>
+					<xsl:with-param name="filter">persona</xsl:with-param>
 				</xsl:call-template>
 	
 				<!-- contributor.translator row -->
@@ -314,6 +330,7 @@
 					<xsl:with-param name="name" select="'contributor-translator'" />
 					<xsl:with-param name="elements" select="dim:field[@element='contributor' and @qualifier='translator']" />
 					<xsl:with-param name="separator" select="' | '"/>
+					<xsl:with-param name="filter">persona</xsl:with-param>
 				</xsl:call-template>
 	
 				<!-- contributor.compiler row -->
@@ -322,6 +339,7 @@
 						<xsl:with-param name="name" select="'contributor-compiler'" />
 						<xsl:with-param name="elements" select="dim:field[@element='contributor' and @qualifier='compiler']" />
 						<xsl:with-param name="separator" select="' | '"/>
+						<xsl:with-param name="filter">persona</xsl:with-param>
 					</xsl:call-template>
 				</xsl:if>
 	
@@ -330,6 +348,7 @@
 					<xsl:with-param name="name" select="'contributor-juror'" />
 					<xsl:with-param name="elements" select="dim:field[@element='contributor' and @qualifier='juror']" />
 					<xsl:with-param name="separator" select="' | '"/>
+					<xsl:with-param name="filter">persona</xsl:with-param>
 				</xsl:call-template>
 	
 				<!-- contributor.colaborator row -->
@@ -337,6 +356,7 @@
 					<xsl:with-param name="name" select="'contributor-colaborator'" />
 					<xsl:with-param name="elements" select="dim:field[@element='contributor' and @qualifier='colaborator']" />
 					<xsl:with-param name="separator" select="' | '"/>
+					<xsl:with-param name="filter">persona</xsl:with-param>
 				</xsl:call-template>
 				
 			</div>
@@ -385,6 +405,7 @@
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'originInfo'" />
 			<xsl:with-param name="elements" select="dim:field[@element='originInfo']" />
+			<xsl:with-param name="filter">institucion</xsl:with-param>
 		</xsl:call-template>
 
 		<xsl:call-template name="render-normal-field">
@@ -453,18 +474,21 @@
 				<xsl:call-template name="render-normal-field">
 					<xsl:with-param name="name" select="'subject-materias'" />
 					<xsl:with-param name="elements" select="dim:field[@element='subject' and @qualifier='materias']" />
+					<xsl:with-param name="filter">subject</xsl:with-param>
 				</xsl:call-template>
 	
 				<!-- todos los descriptores (terminos de tesuaro) -->
 				<xsl:call-template name="render-normal-field">
 					<xsl:with-param name="name" select="'subject-descriptores'" />
 					<xsl:with-param name="elements" select="dim:field[(@element='subject' and @qualifier='descriptores') or (@element='subject' and @qualifier='decs') or (@element='subject' and @qualifier='eurovoc') or (@element='subject' and @qualifier='other')]" />
+					<xsl:with-param name="filter">descriptor</xsl:with-param>
 				</xsl:call-template>
 	
 				<!-- subject.keyword row --> 
 				<xsl:call-template name="render-normal-field">
 					<xsl:with-param name="name" select="'subject-keyword'" />
 					<xsl:with-param name="elements" select="dim:field[@element='subject' and @qualifier='keyword']" />
+					<xsl:with-param name="filter">descriptor</xsl:with-param>
 				</xsl:call-template>
 	
 	    	</div>
@@ -512,6 +536,7 @@
 		<xsl:param name="separator" select="'; '"/>
 		<xsl:param name="type" select="'text'"/>
 		<xsl:param name="acotar"/>
+		<xsl:param name="filter" select="''"/>
 		
 		<!-- Generamos salida solo si hay algun elemento para mostrar -->
 		<xsl:if test="count($elements) &gt; 0">
@@ -529,6 +554,7 @@
 					<xsl:with-param name="separator" select="$separator"/>
 					<xsl:with-param name="type" select="$type"/>
 					<xsl:with-param name="acotar" select="$acotar"/>
+					<xsl:with-param name="filter" select="$filter"/>
 				</xsl:call-template>
 	
 			</div>
@@ -547,6 +573,7 @@
 		<xsl:param name="separator"/>
 		<xsl:param name="type"/>
 		<xsl:param name="acotar"/>
+		<xsl:param name="filter"/>
 
 		<span class="metadata-value">
 		    
@@ -588,6 +615,14 @@
 				<xsl:when test="$type='i18n-code'">
 					<i18n:text>xmlui.dri2xhtml.METS-1.0.code-value-<xsl:value-of select="$elements[$index]"/></i18n:text>
 				</xsl:when>
+				
+				<xsl:when test="$filter!=''">
+					<a>
+						<xsl:attribute name="href"><xsl:value-of select="$linkFilter"/>?filtertype=<xsl:value-of select="$filter"/>&amp;filter=<xsl:value-of select="$elements[$index]"/></xsl:attribute>
+						<xsl:value-of select="$elements[$index]" disable-output-escaping="yes"/>
+					</a>
+				</xsl:when>
+				
 				<xsl:otherwise>
 					<xsl:value-of select="$elements[$index]" disable-output-escaping="yes"/>
 				</xsl:otherwise>
@@ -603,6 +638,7 @@
 				<xsl:with-param name="separator" select="$separator"/>
 				<xsl:with-param name="type" select="$type"/>
 				<xsl:with-param name="acotar" select="$acotar"/>
+				<xsl:with-param name="filter" select="$filter"/>
 			</xsl:call-template>
 		</xsl:if>
 	</xsl:template>
@@ -1025,5 +1061,3 @@
     </xsl:template>
 
 </xsl:stylesheet>
-
-			

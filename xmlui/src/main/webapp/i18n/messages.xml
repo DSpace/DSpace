@@ -2232,6 +2232,11 @@
 <message key="xmlui.Discovery.AbstractSearch.type_type">Filtered by: Document types</message>
 <message key="xmlui.Discovery.AbstractSearch.type_keywords">Filtered by: Keywords</message>
 
+<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.persona">People</message>
+<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.institucion">Institution</message>
+<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subtipo">Subtype</message>
+<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.descriptor">Descriptor</message>
+
 <message key="sedici.comunidades.header">Navigate our collections</message>
 <message key="sedici.comunidades.tesis.nombre">Thesis</message>
 <message key="sedici.comunidades.tesis.info">Bachelor and doctoral thesis among other documents</message>

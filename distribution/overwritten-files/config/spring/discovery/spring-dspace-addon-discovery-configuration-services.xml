@@ -56,6 +56,10 @@
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
+                <ref bean="searchFilterPersona" />
+                <ref bean="searchFilterInstitucion" />
+                <ref bean="searchFilterSubtype" />
+                <ref bean="searchFilterDescriptor" />
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -131,6 +135,50 @@
         </property>
         <property name="type" value="date"/>
         <property name="fullAutoComplete" value="false"/>
+    </bean>
+    
+    <bean id="searchFilterPersona" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="persona"/>
+        <property name="metadataFields">
+            <list>
+                <value>sedici.creator.person</value>
+                <value>sedici.contributor.*</value>                
+            </list>
+        </property>
+        <property name="fullAutoComplete" value="true"/>
+    </bean>
+    
+    <bean id="searchFilterInstitucion" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="institucion"/>
+        <property name="metadataFields">
+            <list>
+                <value>sedici.institucionDesarrollo</value>   
+                <value>mods.originInfo.place</value>                 
+            </list>
+        </property>
+        <property name="fullAutoComplete" value="true"/>
+    </bean>
+    
+    <bean id="searchFilterSubtype" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="subtipo"/>
+        <property name="metadataFields">
+            <list>
+                <value>sedici.subtype</value>   
+                <value>dc.type</value>                 
+            </list>
+        </property>
+        <property name="fullAutoComplete" value="true"/>
+    </bean>
+    
+    <bean id="searchFilterDescriptor" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="descriptor"/>
+        <property name="metadataFields">
+            <list>
+                <value>sedici.subject.descriptores</value>   
+                <value>sedici.subject.keyword</value>                 
+            </list>
+        </property>
+        <property name="fullAutoComplete" value="true"/>
     </bean>
     
     <!--Sidebar facet configuration beans-->
