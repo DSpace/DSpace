@@ -149,6 +149,7 @@ public class HandleUtil
      *
      * @param dso the DSpace who's parents we wil add to the pageMeta
      * @param pageMeta the object to which we link our trial
+     * @param contextPath The context path
      */
     public static void buildHandleTrail(DSpaceObject dso, PageMeta pageMeta,
                                         String contextPath) throws SQLException, WingException
@@ -169,6 +170,8 @@ public class HandleUtil
         *
         * @param dso the DSpace who's parents we wil add to the pageMeta
         * @param pageMeta the object to which we link our trial
+        * @param contextPath The context path
+        * @param linkOriginalObject whether or not to make a link of the original object
         */
     public static void buildHandleTrail(DSpaceObject dso, PageMeta pageMeta,
             String contextPath, boolean linkOriginalObject) throws SQLException, WingException
