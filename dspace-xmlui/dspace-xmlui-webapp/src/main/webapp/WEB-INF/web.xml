@@ -71,7 +71,7 @@
     <description>Multipart MIME handling filter for Cocoon</description>
     <display-name>Cocoon multipart filter</display-name>
     <filter-name>CocoonMultipartFilter</filter-name>
-    <filter-class>org.apache.cocoon.servlet.multipart.MultipartFilter</filter-class>
+    <filter-class>org.dspace.app.xmlui.cocoon.servlet.multipart.DSpaceMultipartFilter</filter-class>
   </filter>
 
   <!--
