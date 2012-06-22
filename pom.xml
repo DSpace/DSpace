@@ -900,11 +900,11 @@
 
    <licenses>
       <license>
-            <name>DuraSpace Sourcecode License</name>
-            <url>http://scm.dspace.org/svn/repo/licenses/LICENSE.txt</url>
-            <distribution>repo</distribution>
-        <comments>
-            A BSD-compatible OSS license for the DSpace codebase.
+         <name>DuraSpace BSD License</name>
+         <url>https://raw.github.com/DSpace/DSpace/master/LICENSE</url>
+         <distribution>repo</distribution>
+         <comments>
+            A BSD 3-Clause license for the DSpace codebase.
          </comments>
       </license>
     </licenses>
