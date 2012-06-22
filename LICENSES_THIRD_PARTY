@@ -1,0 +1,108 @@
+DSpace uses third-party libraries which may be distributed under different 
+licenses. We have attempted to list all of these third party libraries and 
+their licenses below (however the most up-to-date information can be found
+via Maven, see NOTE #2 at bottom of this page). 
+
+You must agree to the terms of these licenses, in addition to the DSpace 
+source code license, in order to use this software.
+
+--------------------------------------------------
+Third party Java libraries listed by License type
+[Format: Name (Maven Project) - URL]
+--------------------------------------------------
+
+Apache Software License, Version 2.0 (http://opensource.org/licenses/apache2.0)
+  * Ant-Contrib Tasks (ant-contrib:*) - http://ant-contrib.sourceforge.net/
+  * Apache Abdera (org.apache.abdera::*) - http://projects.apache.org/projects/abdera.html
+  * Apache Ant (org.apache.ant:*) - http://ant.apache.org/
+  * Apache Axis (axis:*) - http://axis.apache.org/axis/
+  * Apache Cocoon (org.apache.cocoon:*) - http://cocoon.apache.org/2.2/license.html
+  * Apache Commons CLI (commons-cli:*) - http://commons.apache.org/cli/license.html
+  * Apache Commons Codec (commons-codec:*) - http://commons.apache.org/codec/license.html
+  * Apache Commons Collections (commons-collections:*) - http://commons.apache.org/collections/license.html
+  * Apache Commons DBCP (commons-dbcp:*) - http://commons.apache.org/dbcp/license.html
+  * Apache Commons Discovery (commons-discovery:*) - http://commons.apache.org/discovery/license.html
+  * Apache Commons FileUpload (commons-fileupload:*) - http://commons.apache.org/fileupload/license.html
+  * Apache Commons HTTP Client (commons-httpclient:*) - http://commons.apache.org/httpclient/license.html
+  * Apache Commons IO (commons-io:*) - http://commons.apache.org/io/license.html
+  * Apache Commons JXPath (commons-jxpath:*) - http://commons.apache.org/jxpath/license.html
+  * Apache Commons Lang (commons-lang:*) - http://commons.apache.org/lang/license.html
+  * Apache Commons Logging (commons-logging:*) - http://commons.apache.org/logging/license.html
+  * Apache Commons Pool (commons-pool:*) - http://commons.apache.org/pool/license.html
+  * Apache Commons Validator (commons-validator:*) - http://commons.apache.org/validator/license.html
+  * Apache Jakarta ORO (oro:*) - http://svn.apache.org/repos/asf/jakarta/oro/trunk/LICENSE
+  * Apache log4j (log4j:*) : http://logging.apache.org/log4j/
+  * Apache Lucene (org.apache.lucene:*) - http://lucene.apache.org/
+  * Apache PDFBox (org.apache.pdfbox:*) - http://pdfbox.apache.org/
+  * Apache POI (org.apache.poi:*) - http://poi.apache.org/
+  * Apache Solr (org.apache.solr:*) - http://lucene.apache.org/solr/
+  * Apache Xerces (xerces:*) - http://xerces.apache.org/
+  * Apache XML Commons (xml-apis:*) - http://xerces.apache.org/xml-commons/licenses.html
+  * Apache XML Project (xalan:*) - http://xml.apache.org/xalan-j/#license
+  * Databene ContiPerf (org.databene:contiperf) - http://databene.org/contiperf
+  * Rome (net.java.dev.rome:*, org.rometools:*, rome:*) - http://rometools.org/
+  * Spring Framework  (org.springframework:*) - http://www.springsource.org/spring-framework
+  * SWORD Libraries (org.swordapp:*) - http://mvnrepository.com/artifact/org.swordapp/server/2.0
+
+BSD License (http://www.opensource.org/licenses/BSD-3-Clause)
+  * DNSJava (org.dspace.dnsjava:dnsjava)- http://www.xbill.org/dnsjava/dnsjava-current/README
+  * Foresite Toolkit (com.googlecode.foresite-toolkit:*) - http://code.google.com/p/foresite-toolkit/
+  * Jaxen (jaxen:*) -  http://jaxen.codehaus.org/license.html 
+  * YUI (com.yahoo.platform.yui:*) - http://yuilibrary.com/license/
+  
+Common Development and Distribution License (CDDL) v1.0 (http://www.opensource.org/licenses/CDDL-1.0)
+  * JavaBeans Activation Framework (javax.activation:*) - http://www.opensource.org/licenses/CDDL-1.0  
+  * Java Mail (javax.mail:*) - http://www.opensource.org/licenses/CDDL-1.0
+  * JAX-RPC (javax.xml:jaxrpc-api) - http://java.net/projects/jax-rpc/
+  
+Common Public License v1.0 (http://www.opensource.org/licenses/cpl1.0)
+  * JUnit (junit:*) - http://junit.org/license   
+  * WSDL4J (wsdl4j:*) - http://sourceforge.net/projects/wsdl4j/
+  
+Lesser GPL (http://www.opensource.org/licenses/LGPL-2.1)
+  * Text-mining (org.dspace.dependencies:dspace-tm-extractors) - http://code.google.com/p/text-mining/  
+  * MaxMind GeoIP (org.dspace.dependencies:dspace-geoip) - http://geoip.cvs.sourceforge.net/viewvc/geoip/java/LICENSE
+  
+MIT / X11 License (or adaptations) (http://www.opensource.org/licenses/MIT)
+  * Bouncy Castle (org.bouncycastle:*) - http://www.bouncycastle.org/licence.html
+  * jmockit (org.dspace.dependencies.jmockit:dspace-jmockit) - http://code.google.com/p/jmockit/
+  * SLF4J (org.slf4j:*) - http://www.slf4j.org/license.html
+  
+Mozilla Public License (http://www.opensource.org/licenses/MPL-2.0)
+  * H2 database (com.h2database:*) - http://www.h2database.com/html/license.html
+  
+Other Open Source Licenses:
+  * ICU4J (com.ibm.icu:icu4j) - ICU License : http://source.icu-project.org/repos/icu/icu/trunk/license.html
+  * JDOM  (jdom:*) - JDOM License : https://github.com/hunterhacker/jdom/blob/master/LICENSE.txt
+  * PostgreSQL (postgresql:*) - PostgreSQL License (BSD-based): http://www.postgresql.org/about/licence/
+  
+----
+NOTE #1: Some individual web application files in DSpace (e.g. Javascript 
+libraries, CSS Frameworks) may have their own open source license. In that 
+scenario, we place a copy of the full text of the license alongside the 
+licensed files. You can locate these additional licenses in our codebase 
+by searching for files with a ".LICENSE" file extension.
+----
+
+----
+NOTE #2: Although we try to keep this libraries list current, the latest 
+information about DSpace third party libraries can be found by running the 
+following Maven command(s):
+
+mvn project-info-reports:dependencies
+
+This generates a "[project]/target/site/dependencies.html" report under every 
+DSpace project directory. This report lists all dependencies and their license
+(if it can be determined by Maven).
+
+Additionally, you may wish to run:
+
+mvn project-info-reports:dependancy-convergence
+
+This generates a summary report at 
+"[dspace]/target/site/dependancy-convergence.html" which lists all dependencies
+of all DSpace projects (though it does not list license information)
+
+For more information see the maven-project-info-reports-plugin:
+http://maven.apache.org/plugins/maven-project-info-reports-plugin/
+----
