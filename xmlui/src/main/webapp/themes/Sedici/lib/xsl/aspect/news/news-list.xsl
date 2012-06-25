@@ -56,7 +56,12 @@
          	 <xsl:for-each select="dri:list[@id='ar.edu.unlp.sedici.aspect.news.ShowNews.list.news']">
                 <xsl:call-template name="noticias"/>
             </xsl:for-each>
-
+ 			<a href="http://sedici.unlp.edu.ar/blog/">
+    	     <xsl:attribute name="target">
+                 _blank
+             </xsl:attribute>
+             <i18n:text>sedici.noticias.verTodas</i18n:text>
+          </a> 
     </xsl:template>
     
     <xsl:template name="noticias">

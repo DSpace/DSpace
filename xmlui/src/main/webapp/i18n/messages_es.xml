@@ -2485,6 +2485,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="sedici.noticias.head">Noticias</message>
 <message key="sedici.noticias.titulo">Lista de noticias</message>
 <message key="sedici.common.camposObligatorios">(*) Campos Obligatorios</message>
+<message key="sedici.noticias.verTodas">Ver todas las noticias</message>
 
 <message key="sedici.XMLWorkflow.workflow.selectCollectionAction.head">Ejecutar tarea: seleccionar colección de destino</message>
 <message key="sedici.XMLWorkflow.workflow.selectCollectionAction.complete">Instalar documento</message>
