@@ -120,7 +120,7 @@
 							</xsl:if>	
 								
 							<a>
-								<xsl:attribute name="href"><xsl:value-of select="$linkFilter"/>?filtertype=author&amp;filter=<xsl:copy-of select="node()"/></xsl:attribute>
+								<xsl:attribute name="href"><xsl:value-of select="$linkFilter"/>?filtertype=author&amp;filter="<xsl:copy-of select="translate(node(),'áéíóú','aeiou')"/>"</xsl:attribute>
 								<xsl:copy-of select="node()" />
 							</a>							
 	
@@ -148,7 +148,7 @@
 							</xsl:if>
 	
 							<a>
-								<xsl:attribute name="href"><xsl:value-of select="$linkFilter"/>?filtertype=persona&amp;filter=<xsl:copy-of select="node()"/></xsl:attribute>
+								<xsl:attribute name="href"><xsl:value-of select="$linkFilter"/>?filtertype=persona&amp;filter="<xsl:copy-of select="translate(node(),'áéíóú','aeiou')"/>"</xsl:attribute>
 								<xsl:copy-of select="node()" />
 							</a>							
 	
@@ -618,7 +618,7 @@
 				
 				<xsl:when test="$filter!=''">
 					<a>
-						<xsl:attribute name="href"><xsl:value-of select="$linkFilter"/>?filtertype=<xsl:value-of select="$filter"/>&amp;filter=<xsl:value-of select="$elements[$index]"/></xsl:attribute>
+						<xsl:attribute name="href"><xsl:value-of select="$linkFilter"/>?filtertype=<xsl:value-of select="$filter"/>&amp;filter="<xsl:value-of select="translate($elements[$index],'áéíóú','aeiou')"/>"</xsl:attribute>
 						<xsl:value-of select="$elements[$index]" disable-output-escaping="yes"/>
 					</a>
 				</xsl:when>
