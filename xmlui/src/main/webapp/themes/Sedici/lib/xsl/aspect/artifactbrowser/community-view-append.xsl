@@ -141,7 +141,7 @@
        <xsl:attribute name="href">
           <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']"/>/<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']"/>/discover
        </xsl:attribute>
-       (Ver todos)
+      <i18n:text>sedici.common.link.verTodos</i18n:text>
        </a>
        <div id="aspect_artifactbrowser_CommunityRecentSubmissions_div_community-recent-submission" class="ds-static-div secondary recent-submission">
        <xsl:apply-templates select="dri:referenceSet[@n='community-last-submitted']"/>
