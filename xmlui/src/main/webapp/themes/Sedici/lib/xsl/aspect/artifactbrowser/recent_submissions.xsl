@@ -36,6 +36,18 @@
       <h2 class="ds-div-head">
       	<i18n:text><xsl:value-of select="."/></i18n:text>&#160;<xsl:value-of select="/dri:document/dri:body/dri:div/dri:head"/>
       </h2>
+       <a class="image-link" target="_blank">
+      <xsl:attribute name="href">
+				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='feed' and @qualifier='atom+xml']" />
+			</xsl:attribute>
+      <img width="12" height="12" border="0" >
+				<xsl:attribute name="src">
+					<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+					<xsl:text>/themes/Sedici/images/rss12x12.png</xsl:text>
+				</xsl:attribute>
+			</img>
+      
+		</a>	
     </xsl:template>
     
     <!-- Generacion del titulo para los envios recientes en las colecciones -->
