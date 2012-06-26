@@ -2249,10 +2249,10 @@
 <message key="sedici.comunidades.tesis.embargo">Embargoed document</message>
 <message key="sedici.noticias.head">News</message>
 <message key="sedici.noticias.titulo">News list</message>
-<message key="sedici.common.camposObligatorios">(*) Campos Obligatorios</message>
-<message key="sedici.noticias.verTodas">Ver todas las noticias</message>
-<message key="sedici.comunidades.link.hintRSS">RSS con últimos documentos agregados a esta colección</message>
-<message key="sedici.common.link.verTodos">(Ver Todos)</message>
+<message key="sedici.common.camposObligatorios">(*) Mandatory</message>
+<message key="sedici.noticias.verTodas">Show all news</message>
+<message key="sedici.comunidades.link.hintRSS">RSS with latest added documents</message>
+<message key="sedici.common.link.verTodos">show all</message>
 
 <message key="sedici.XMLWorkflow.workflow.selectCollectionAction.head">Perform task: select collection</message>
 <message key="sedici.XMLWorkflow.workflow.selectCollectionAction.complete">Install document</message>

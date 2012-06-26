@@ -3253,5 +3253,12 @@ input.ds-authority-label {
 	margin: 0px;
 }
 
+a.link-community-view-all {
+	font-weight: normal;
+	font-size: 12px;
+	line-height: 22px;
+	float: right;
+}
+
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
 body{ background-color:white;}

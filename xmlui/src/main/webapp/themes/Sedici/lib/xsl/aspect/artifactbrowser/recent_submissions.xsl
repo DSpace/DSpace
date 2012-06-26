@@ -62,7 +62,27 @@
     <!-- Generacion del titulo para los envios recientes en las colecciones -->
     <xsl:template match="dri:div[@id='aspect.artifactbrowser.CollectionRecentSubmissions.div.collection-recent-submission']/dri:head">
       <h2 class="ds-div-head">
+		<a class="image-link" target="_blank" i18n:attr="title" >
+	      	<xsl:attribute name="href">
+					<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='feed' and @qualifier='atom+xml']" />
+			</xsl:attribute>
+			<xsl:attribute name="title">
+					<xsl:text>sedici.comunidades.link.hintRSS</xsl:text>
+			</xsl:attribute>
+			<img width="12" height="12" border="0" >
+				<xsl:attribute name="src">
+					<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+					<xsl:text>/themes/Sedici/images/rss12x12.png</xsl:text>
+				</xsl:attribute>
+			</img>
+      	</a>	
       	<i18n:text><xsl:value-of select="."/></i18n:text>&#160;<xsl:value-of select="/dri:document/dri:body/dri:div/dri:head"/>
+       	<a class="link-community-view-all">
+	       <xsl:attribute name="href">
+	          <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']"/>/<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']"/>/discover
+	       </xsl:attribute>
+	       <i18n:text>sedici.common.link.verTodos</i18n:text>
+        </a>
       </h2>
     </xsl:template>
     
