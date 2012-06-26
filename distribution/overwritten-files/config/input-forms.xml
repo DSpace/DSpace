@@ -673,7 +673,7 @@
 					<dc-element>contributor</dc-element>
 					<repeatable>true</repeatable>
 					<label>Otros colaboradores del Libro</label>
-					<input-type value-pairs-name="common_libro_contributors">dropdown</input-type>
+					<input-type value-pairs-name="common_libro_contributors">qualdrop_value</input-type>
 					<hint>Otros colaboradores del libro</hint>
 					<type-bind>Libro</type-bind>
 					<visibility>workflow</visibility>
