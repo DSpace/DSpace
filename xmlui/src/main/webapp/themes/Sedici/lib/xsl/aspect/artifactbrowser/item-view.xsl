@@ -504,21 +504,23 @@
 		<xsl:apply-templates select="/mets:METS" mode="generate-bitstream"/>
 
 		<!-- status row -->
-        <div id="other_attributes">
-			<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.other-attributes</i18n:text></h2>
-			<ul>
-				<xsl:if test="dim:field[@element='status']">
-					<li class="metadata peer-review">
-						<i18n:text>xmlui.dri2xhtml.METS-1.0.item-is-<xsl:value-of select="dim:field[@element='status']"/></i18n:text>
+		<xsl:if test="dim:field[@element='status'] or dim:field[@element='fulltext']">
+	        <div id="other_attributes">
+				<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.other-attributes</i18n:text></h2>
+				<ul>
+					<xsl:if test="dim:field[@element='status']">
+						<li class="metadata peer-review">
+							<i18n:text>xmlui.dri2xhtml.METS-1.0.item-is-<xsl:value-of select="dim:field[@element='status']"/></i18n:text>
+						</li>
+					</xsl:if>
+			
+					<!-- fulltext row -->
+					<li class="metadata fulltext">
+						<i18n:text>xmlui.dri2xhtml.METS-1.0.item-<xsl:value-of select="dim:field[@element='fulltext']"/>-fulltext</i18n:text>
 					</li>
-				</xsl:if>
-		
-				<!-- fulltext row -->
-				<li class="metadata fulltext">
-					<i18n:text>xmlui.dri2xhtml.METS-1.0.item-<xsl:value-of select="dim:field[@element='fulltext']"/>-fulltext</i18n:text>
-				</li>
-			</ul>
-		</div>
+				</ul>
+			</div>
+		</xsl:if>
 		
 		<!-- Generate the Creative Commons license information from the file section (DSpace deposit license hidden by default) -->
 		<xsl:apply-templates select="mets:fileSec/mets:fileGrp[@USE='CC-LICENSE']"/>
