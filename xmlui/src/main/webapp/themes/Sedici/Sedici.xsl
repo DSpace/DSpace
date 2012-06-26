@@ -44,6 +44,7 @@
     <xsl:import href="lib/xsl/aspect/artifactbrowser/authors_table.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/recent_submissions.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/discovery_search.xsl"/>
+   
     <xsl:import href="lib/xsl/core/forms.xsl"/>
     <xsl:import href="lib/xsl/core/page-structure.xsl"/>
     <xsl:import href="lib/xsl/core/feedback.xsl"/>
