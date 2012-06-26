@@ -44,7 +44,7 @@
         </roles>
 
 		<!-- PASO 1: Revisión a nivel de colección (aplicable por colección) -->
-        <step id="CollectionLevelReview" role="CollectionAdmin" userSelectionMethod="claimaction">
+        <step id="CollectionLevelReview" role="CollectionAdmin" userSelectionMethod="skipadminclaimaction">
             <outcomes>
                 <step status="0">SeDiCILevelReview</step>
             </outcomes>
@@ -71,7 +71,7 @@
         </roles>
 
 		<!-- PASO 1: Revisión a nivel de colección (aplicable por colección) -->
-        <step id="CollectionLevelReview" role="CollectionAdmin" userSelectionMethod="claimaction">
+        <step id="CollectionLevelReview" role="CollectionAdmin" userSelectionMethod="skipadminclaimaction">
             <outcomes>
                 <step status="0">SeDiCILevelReview</step>
             </outcomes>

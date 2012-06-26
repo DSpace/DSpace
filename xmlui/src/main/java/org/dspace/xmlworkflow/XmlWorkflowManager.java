@@ -72,7 +72,7 @@ public class XmlWorkflowManager {
     	if(!shouldSendAlert(context, wfi, null))
     		noEMail.put(myitem.getID(), Boolean.TRUE);
         
-        context.turnOffAuthorisationSystem();
+        //context.turnOffAuthorisationSystem();
         Step firstStep = wf.getFirstStep();
         if(firstStep.isValidStep(context, wfi)){
              activateFirstStep(context, wf, firstStep, wfi);
@@ -88,7 +88,7 @@ public class XmlWorkflowManager {
         }
         // remove the WorkspaceItem
         wsi.deleteWrapper();
-        context.restoreAuthSystemState();
+        //context.restoreAuthSystemState();
         return wfi;
     }
 
@@ -129,7 +129,7 @@ public class XmlWorkflowManager {
         // Shouldn't send the email (the logged user is an admin)
 		noEMail.put(item.getID(), Boolean.TRUE);
 
-        context.turnOffAuthorisationSystem();
+        //context.turnOffAuthorisationSystem();
         Step firstStep = wf.getFirstStep();
         if(firstStep.isValidStep(context, wfi)){
              activateFirstStep(context, wf, firstStep, wfi);
@@ -142,7 +142,7 @@ public class XmlWorkflowManager {
                 activateFirstStep(context, wf, firstStep, wfi);
             }
         }       
-        context.restoreAuthSystemState();
+        //context.restoreAuthSystemState();
         return wfi;
     }
     

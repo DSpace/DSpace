@@ -13,6 +13,8 @@
     <bean id="singleuserreviewactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.SingleUserReviewAction" scope="prototype"/>
 	<bean id="selectcollectionactionAPI" class="ar.edu.unlp.sedici.aspect.extraSubmission.submit.SeDiCISelectCollectionStep" scope="prototype"/>
 
+	<bean id="skipadminclaimactionAPI" class="ar.edu.unlp.sedici.aspect.extraSubmission.submit.SkipAdminClaimAction" scope="prototype"/>
+
     <bean id="selectrevieweractionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerAction" scope="prototype">
         <property name="roleId" value="reviewer"/>
     </bean>
@@ -78,6 +80,12 @@
 
 
 <!--User selection actions-->
+    <bean id="skipadminclaimaction" class="org.dspace.xmlworkflow.state.actions.UserSelectionActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="skipadminclaimaction"/>
+        <property name="processingAction" ref="skipadminclaimactionAPI"/>
+        <property name="requiresUI" value="true"/>
+    </bean>
+
     <bean id="claimaction" class="org.dspace.xmlworkflow.state.actions.UserSelectionActionConfig" scope="prototype">
         <constructor-arg type="java.lang.String" value="claimaction"/>
         <property name="processingAction" ref="claimactionAPI"/>

@@ -2498,6 +2498,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.claimaction">Revisión SeDiCI</message>
 <message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.editaction">Revisión SeDiCI</message>
 <message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.selectcollectionaction">Asignación de colección</message>
+<message key="xmlui.XMLWorkflow.default.CollectionLevelReview.skipadminclaimaction">Revisión Local</message>
 <message key="sedici.Submission.submit.SelectCollection.collection_help">Seleccione la colección en la que se instalará el documento</message>
 
 </catalogue>

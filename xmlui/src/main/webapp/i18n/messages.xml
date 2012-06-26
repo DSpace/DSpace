@@ -2249,6 +2249,10 @@
 <message key="sedici.comunidades.tesis.embargo">Embargoed document</message>
 <message key="sedici.noticias.head">News</message>
 <message key="sedici.noticias.titulo">News list</message>
+<message key="sedici.common.camposObligatorios">(*) Campos Obligatorios</message>
+<message key="sedici.noticias.verTodas">Ver todas las noticias</message>
+<message key="sedici.comunidades.link.hintRSS">RSS con últimos documentos agregados a esta colección</message>
+<message key="sedici.common.link.verTodos">(Ver Todos)</message>
 
 <message key="sedici.XMLWorkflow.workflow.selectCollectionAction.head">Perform task: select collection</message>
 <message key="sedici.XMLWorkflow.workflow.selectCollectionAction.complete">Install document</message>
@@ -2258,6 +2262,7 @@
 <message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.claimaction">SeDiCI Review</message>
 <message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.editaction">SeDiCI Review</message>
 <message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.selectcollectionaction">Select collection</message>
+<message key="xmlui.XMLWorkflow.default.CollectionLevelReview.skipadminclaimaction">Local review</message>
 <message key="sedici.Submission.submit.SelectCollection.collection_help">Select the collection for install this item</message>
 
 </catalogue>

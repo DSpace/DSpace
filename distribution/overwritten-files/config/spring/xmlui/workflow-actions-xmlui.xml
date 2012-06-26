@@ -19,4 +19,6 @@
     
     <bean id="selectcollectionaction_xmlui" class="ar.edu.unlp.sedici.aspect.extraSubmission.SeDiCISelectCollectionStep" scope="singleton"/>
     
+    <bean id="skipadminclaimaction_xmlui" class="org.dspace.app.xmlui.aspect.xmlworkflow.actions.userassignment.ClaimAction" scope="singleton"/>
+    
 </beans>
