@@ -316,7 +316,7 @@
 		</xsl:call-template>
 
 		<xsl:if test="(dim:field[@element='contributor' and (@qualifier='editor' or @qualifier='translator' or @qualifier='compiler' or @qualifier='juror' or @qualifier='colaborator')])">
-			<div id="contributors">
+
 				<!-- contributor.editor row -->
 				<xsl:call-template name="render-normal-field">
 					<xsl:with-param name="name" select="'contributor-editor'" />
@@ -359,7 +359,7 @@
 					<xsl:with-param name="filter">persona</xsl:with-param>
 				</xsl:call-template>
 				
-			</div>
+
 		</xsl:if>
 
 		<!-- language row -->
