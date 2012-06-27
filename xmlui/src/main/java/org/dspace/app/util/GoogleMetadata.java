@@ -674,6 +674,9 @@ public class GoogleMetadata
 
         // ISBN
         addSingleField(ISBN);
+        
+        //JOURNAL_TITLE 
+        addSingleField(JOURNAL_TITLE);
 
         // VOLUME
         addSingleField(VOLUME);
