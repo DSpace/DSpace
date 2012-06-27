@@ -72,7 +72,6 @@ public class XmlWorkflowManager {
     	if(!shouldSendAlert(context, wfi, null))
     		noEMail.put(myitem.getID(), Boolean.TRUE);
         
-        //context.turnOffAuthorisationSystem();
         Step firstStep = wf.getFirstStep();
         if(firstStep.isValidStep(context, wfi)){
              activateFirstStep(context, wf, firstStep, wfi);
@@ -87,8 +86,9 @@ public class XmlWorkflowManager {
 
         }
         // remove the WorkspaceItem
+        context.turnOffAuthorisationSystem();
         wsi.deleteWrapper();
-        //context.restoreAuthSystemState();
+        context.restoreAuthSystemState();
         return wfi;
     }
 
