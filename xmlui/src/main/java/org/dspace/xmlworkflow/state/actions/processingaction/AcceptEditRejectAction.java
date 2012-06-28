@@ -12,9 +12,14 @@ import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.cocoon.Constants;
 import org.dspace.app.util.Util;
+import org.dspace.app.xmlui.aspect.administrative.FlowItemUtils;
+import org.dspace.app.xmlui.aspect.administrative.FlowResult;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DCDate;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.XmlWorkflowManager;
@@ -36,6 +41,7 @@ public class AcceptEditRejectAction extends ProcessingAction {
 
     public static final int MAIN_PAGE = 0;
     public static final int REJECT_PAGE = 1;
+    public static final int DELETE_PAGE = 2;
 
     //TODO: rename to AcceptAndEditMetadataAction
 
@@ -53,6 +59,8 @@ public class AcceptEditRejectAction extends ProcessingAction {
                 return processMainPage(c, wfi, step, request);
             case REJECT_PAGE:
                 return processRejectPage(c, wfi, step, request);
+            case DELETE_PAGE:
+                return processDeletePage(c, wfi, step, request);
 
         }
 
@@ -61,7 +69,7 @@ public class AcceptEditRejectAction extends ProcessingAction {
 
     public ActionResult processMainPage(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException {
         if(request.getParameter("submit_approve") != null){
-            //Delete the tasks
+            //Delete the tTYPE_PAGEasks
             addApprovedProvenance(c, wfi);
             
             // Delete the workflow_eidted flag
@@ -73,7 +81,12 @@ public class AcceptEditRejectAction extends ProcessingAction {
             request.setAttribute("page", REJECT_PAGE);
             // We have pressed reject item, so take the user to a page where he can reject
             return new ActionResult(ActionResult.TYPE.TYPE_PAGE);
-        } else {
+        } else if(request.getParameter("submit_delete") != null){
+            // Make sure we indicate which page we want to process
+            request.setAttribute("page", DELETE_PAGE);
+            // We have pressed reject item, so take the user to a page where he can reject
+            return new ActionResult(ActionResult.TYPE.TYPE_PAGE);
+        }else {
             //We pressed the leave button so return to our submissions page
             return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
         }
@@ -117,5 +130,21 @@ public class AcceptEditRejectAction extends ProcessingAction {
         // Add to item as a DC field
         wfi.getItem().addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
         wfi.getItem().update();
+    }
+    
+    public ActionResult processDeletePage(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException {
+        if(request.getParameter("submit_delete") != null){
+            if (AuthorizeManager.authorizeActionBoolean(c,wfi.getItem(),org.dspace.core.Constants.DELETE)){
+            	FlowResult resultado = FlowItemUtils.processDeleteItem(c,wfi.getItem().getID());
+            	if (resultado.getContinue()){
+            		return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
+            	} 
+            }
+        }
+        //Cancel, go back to the main task page
+        request.setAttribute("page", MAIN_PAGE);
+
+        return new ActionResult(ActionResult.TYPE.TYPE_PAGE);
+
     }
 }
