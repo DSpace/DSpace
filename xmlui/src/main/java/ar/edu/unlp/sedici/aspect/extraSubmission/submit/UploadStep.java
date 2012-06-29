@@ -32,7 +32,7 @@ public class UploadStep extends org.dspace.submit.step.UploadStep {
     	if(fileRequired) {
     		String excludedGroupName = ConfigurationManager.getProperty("webui.submit.upload.excluded_group");
     		Group excludedGroup = Group.findByName(context, excludedGroupName);
-    		fileRequired = !Group.isMember(context, excludedGroup.getID());
+    		fileRequired = excludedGroup == null || !Group.isMember(context, excludedGroup.getID());
     	}
     	// END SeDiCI
     	
