@@ -26,26 +26,15 @@ import java.util.List;
 
 public class CollectionServiceImpl implements CollectionService {
 
-    private List<CollectionDAO> collectionDAOs;
     private CollectionDAO collectionDAO;
 
     /** log4j category */
     private static Logger log = Logger.getLogger(CollectionServiceImpl.class);
 
-    public void setCollectionDAOs(List<CollectionDAO> collectionDAOs) {
-        this.collectionDAOs = collectionDAOs;
-    }
 
-    public void setCollectionDAO()
+    public void setCollectionDAO(CollectionDAO collectionDAO)
     {
-        String dbName = new DSpace().getConfigurationService().getProperty("db.name") ;
-        for (CollectionDAO collDAO : collectionDAOs)
-        {
-            if (collDAO.getDBName().equals(dbName))
-            {
-                collectionDAO = collDAO;
-            }
-        }
+        this.collectionDAO = collectionDAO;
     }
 
     public Collection find(Context context, int id) throws SQLException {

@@ -19,8 +19,6 @@ import java.sql.SQLException;
  */
 public interface CollectionDAO {
 
-    public String getDBName();
-
     public Collection find(Context context, int id) throws SQLException;
 
 

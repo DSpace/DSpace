@@ -19,16 +19,10 @@
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
-    <bean id="org.dspace.content.service.CollectionService" class="org.dspace.content.service.CollectionServiceImpl" init-method="setCollectionDAO" lazy-init="true">
-       <property name="collectionDAOs">
-           <list>
-               <ref bean="org.dspace.content.dao.PostgresCollectionDAO" />
-               <ref bean="org.dspace.content.dao.OracleCollectionDAO" />
-          </list>
-       </property>
+    <bean id="org.dspace.content.service.CollectionService" class="org.dspace.content.service.CollectionServiceImpl" >
+       <property name="collectionDAO" ref="org.dspace.content.dao.CollectionDAO" />
     </bean>
 
-    <bean id="org.dspace.content.dao.PostgresCollectionDAO" class="org.dspace.content.dao.PostgresCollectionDAO" />
-    <bean id="org.dspace.content.dao.OracleCollectionDAO" class="org.dspace.content.dao.OracleCollectionDAO" />
+    <bean id="org.dspace.content.dao.CollectionDAO" class="org.dspace.content.dao.LegacyCollectionDAO" />
 
 </beans>

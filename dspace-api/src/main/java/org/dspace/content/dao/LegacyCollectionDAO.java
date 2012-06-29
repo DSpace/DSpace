@@ -22,13 +22,10 @@ import java.sql.SQLException;
  * Time: 13:46
  */
 
-public class PostgresCollectionDAO implements CollectionDAO {
+public class LegacyCollectionDAO implements CollectionDAO {
 
-    private static Logger log = Logger.getLogger(PostgresCollectionDAO.class);
+    private static Logger log = Logger.getLogger(LegacyCollectionDAO.class);
 
-    public String getDBName() {
-        return "postgres";
-    }
 
      /**
      * Get a collection from the database. Loads in the metadata
