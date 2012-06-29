@@ -190,7 +190,9 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
                 {
                     values[i] = node.getAttributes().getNamedItem("label").getNodeValue();
                 }
-                authorities[i] = node.getAttributes().getNamedItem("id").getNodeValue();
+                Node idAttr = node.getAttributes().getNamedItem("id");
+                if (null != idAttr) // 'id' is optional
+                    authorities[i] = idAttr.getNodeValue();
             }
             int resultCount = Math.min(labels.length - start, limit);
             choices = new Choice[resultCount];
