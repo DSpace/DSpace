@@ -730,6 +730,10 @@ Common usage:
 
     	<mkdir dir="${dspace.dir}/solr" />
 
+    	<!-- Runtime files (That could be erased - just for performing purposes) -->
+    	<mkdir dir="${dspace.dir}/var" />
+    	<!-- Runtime files for XOAI -->
+    	<mkdir dir="${dspace.dir}/var/xoai" />
     </target>
 
 

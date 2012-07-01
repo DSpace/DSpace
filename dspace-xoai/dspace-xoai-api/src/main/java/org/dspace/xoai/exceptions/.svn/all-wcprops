@@ -1,0 +1,11 @@
+K 25
+svn:wc:ra_dav:version-url
+V 130
+/svn/!svn/ver/58/dspace/1.8.2/integration/dspace+xoai/dspace-xoai/dspace-xoai-api/src/main/java/com/lyncode/xoai/dspace/exceptions
+END
+InvalidMetadataFieldException.java
+K 25
+svn:wc:ra_dav:version-url
+V 165
+/svn/!svn/ver/58/dspace/1.8.2/integration/dspace+xoai/dspace-xoai/dspace-xoai-api/src/main/java/com/lyncode/xoai/dspace/exceptions/InvalidMetadataFieldException.java
+END
