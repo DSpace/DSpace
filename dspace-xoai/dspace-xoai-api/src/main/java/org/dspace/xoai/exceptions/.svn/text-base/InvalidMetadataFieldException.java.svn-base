@@ -1,0 +1,10 @@
+package com.lyncode.xoai.dspace.exceptions;
+
+public class InvalidMetadataFieldException extends Exception {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5187555092904394914L;
+
+}

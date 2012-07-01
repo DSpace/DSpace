@@ -363,5 +363,12 @@
 		</step>
 	</command>
 
+	<command>
+		<name>xoai-import</name>
+		<description>Importing items to XOAI index</description>
+		<step>
+			<class>org.dspace.xoai.app.SolrIndexer</class>
+		</step>
+	</command>
 
 </commands>
