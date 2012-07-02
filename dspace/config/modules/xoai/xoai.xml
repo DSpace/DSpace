@@ -10,11 +10,8 @@
 	Developed by DSpace @ Lyncode <dspace@lyncode.com>
  -->
 <Configuration xmlns="http://www.lyncode.com/XOAIConfiguration"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.lyncode.com/XOAIConfiguration ../../../../xoai-common/schemas/XOAIConfiguration.xsd "
 	identation="false" maxListIdentifiersSize="100" maxListRecordsSize="100"
-	maxListSetsSize="100" stylesheet="style.xsl">
-
+	maxListSetsSize="100" stylesheet="static/style.xsl">
 
 	<Contexts>
 		<Context baseurl="request">
