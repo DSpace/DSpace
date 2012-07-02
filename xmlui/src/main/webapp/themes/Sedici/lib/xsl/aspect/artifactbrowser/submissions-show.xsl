@@ -23,6 +23,7 @@
 		    <xsl:attribute name="action">
 						<xsl:value-of select="@action"/>
 			</xsl:attribute>
+			<xsl:apply-templates select="dri:div[@id='aspect.submission.Submissions.div.start-submision']" />
 	    	<xsl:apply-templates select="dri:div[@id='aspect.submission.Submissions.div.unfinished-submisions']" />
 	        <xsl:apply-templates select="dri:div[@id='aspect.xmlworkflow.Submissions.div.workflow-tasks']" />
 	        <xsl:apply-templates select="dri:div[@id='aspect.xmlworkflow.Submissions.div.submissions-inprogress']" />
