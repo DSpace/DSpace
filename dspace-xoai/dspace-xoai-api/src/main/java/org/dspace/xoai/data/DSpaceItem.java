@@ -219,7 +219,7 @@ public class DSpaceItem extends AbstractItem {
 						String url = "";
 						String bsName = bitstream.getName();
 				        String sid = String.valueOf(bit.getSequenceID());
-				        String baseUrl = ConfigurationManager.getProperty("dspace.url");
+				        String baseUrl = ConfigurationManager.getProperty("xoai.bitstream.baseUrl");
 				        String handle = null;
 				        // get handle of parent Item of this bitstream, if there is one:
 				        Bundle[] bn = bit.getBundles();
