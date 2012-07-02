@@ -168,6 +168,7 @@ public class SolrIndexer {
             while (iterator.hasNext()) {
                 try {
                     docs.add(this.index(Item.find(_context, iterator.next().getIntColumn("item_id"))));
+                    _context.clearCache();
                 } catch (SQLException ex) {
                     log.error(ex.getMessage(), ex);
                 }
