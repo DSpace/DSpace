@@ -245,11 +245,14 @@ public class SolrIndexer {
             } else {
             	
             	if (!line.hasOption("p")) {
+            		System.out.println("XOAI import started");
+            		long start = System.currentTimeMillis();
 	                Context ctx = new Context();
 	                SolrIndexer indexer = new
 	                        SolrIndexer(ctx, line.hasOption('a'), line.hasOption('o'), line.hasOption('c'), line.hasOption('v'));
 	
 	                indexer.index();
+	                System.out.println("XOAI import ended. It took "+((System.currentTimeMillis()-start)/1000)+" seconds.");
             	} else if (line.hasOption('v')) System.out.println("Just purging cached OAI responses.");
             	
                 if (!line.hasOption('o'))
