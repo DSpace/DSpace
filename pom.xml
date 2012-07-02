@@ -229,19 +229,6 @@
         </profile>
 
         <!--
-           Builds OAI Gateway WAR for DSpace
-        -->
-        <profile>
-            <id>dspace-oai</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <module>dspace-oai</module>
-            </modules>
-        </profile>
-
-        <!--
            Builds XOAI Gateway WAR for DSpace
         -->
         <profile>
@@ -351,7 +338,6 @@
             <module>dspace-jspui</module>
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
-            <module>dspace-oai</module>
             <module>dspace-xoai</module>
             <module>dspace-sword</module>
             <module>dspace-swordv2</module>
@@ -479,17 +465,6 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui-webapp</artifactId>
-            <version>3.0-SNAPSHOT</version>
-            <type>war</type>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-oai-api</artifactId>
-            <version>3.0-SNAPSHOT</version>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-oai-webapp</artifactId>
             <version>3.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
