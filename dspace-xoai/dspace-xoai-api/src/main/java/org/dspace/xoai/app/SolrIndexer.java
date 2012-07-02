@@ -236,20 +236,25 @@ public class SolrIndexer {
             options.addOption("c", "clear", false, "Clear index before indexing");
             options.addOption("o", "optimize", false, "Optimize index at the end of the operation");
             options.addOption("v", "verbose", false, "Verbose output");
+            options.addOption("p", "purge-cache", false, "Purges cached OAI responses");
             options.addOption("h", "help", false, "Shows some help");
             CommandLine line = parser.parse(options, argv);
 
             if (line.hasOption('h')) {
                 usage();
             } else {
-                Context ctx = new Context();
-                SolrIndexer indexer = new
-                        SolrIndexer(ctx, line.hasOption('a'), line.hasOption('o'), line.hasOption('c'), line.hasOption('v'));
-
-                indexer.index();
-                
+            	
+            	if (!line.hasOption("p")) {
+	                Context ctx = new Context();
+	                SolrIndexer indexer = new
+	                        SolrIndexer(ctx, line.hasOption('a'), line.hasOption('o'), line.hasOption('c'), line.hasOption('v'));
+	
+	                indexer.index();
+            	} else if (line.hasOption('v')) System.out.println("Just purging cached OAI responses.");
+            	
                 if (!line.hasOption('o'))
                 	cleanCache(line.hasOption('v'));
+                
             }
         } catch (ParseException ex) {
             System.err.println("Error. Please see the log file for more details.");
@@ -292,6 +297,7 @@ public class SolrIndexer {
         System.out.println("    -o Optimize index after operation");
         System.out.println("    -c Clear index before indexing");
         System.out.println("    -v Verbose output");
+        System.out.println("    -p Purges cached OAI responses");
         System.out.println("    -h Shows this text");
     }
 }
