@@ -16,6 +16,7 @@
 		<map:transformer name="AutoArchive" src="ar.edu.unlp.sedici.aspect.extraSubmission.GenerateAutoArchivePageMeta"/>
 		<map:transformer name="HomeLinks" src="ar.edu.unlp.sedici.aspect.extraSubmission.GenerateHomeLinksPageMeta"/>
 		<map:transformer name="InternationalizableSubmission" src="ar.edu.unlp.sedici.aspect.extraSubmission.InternationalizableSubmission"/>
+		<map:transformer name="FlashMessagesConsumer" src="ar.edu.unlp.sedici.util.FlashMessagesTransformer"/>
 	</map:transformers>
 
     <map:matchers default="wildcard">
@@ -39,6 +40,8 @@
       <map:transform type="AutoArchive"/>
 
       <map:transform type="Navigation"/>
+      
+      <map:transform type="FlashMessagesConsumer"/>
       
       <!-- Agregar los links a las comunidades en el home -->
       <map:match pattern="">

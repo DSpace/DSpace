@@ -451,6 +451,14 @@
                     </p>
                 </div>
             </xsl:if>
+            
+            <xsl:if test="/dri:document/dri:body/dri:div[@id='ar.edu.unlp.sedici.util.FlashMessagesTransformer.div.flash-message']">
+                        <xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='ar.edu.unlp.sedici.util.FlashMessagesTransformer.div.flash-message']">
+                        	<xsl:with-param name="muestra">true</xsl:with-param>
+                        </xsl:apply-templates>
+            </xsl:if>
+            
+           
  
             <xsl:apply-templates select="dri:div[@id='aspect.discovery.SiteViewer.div.front-page-search']">
             <xsl:with-param name="muestra">true</xsl:with-param>
@@ -469,6 +477,18 @@
 
         </div>
     </xsl:template>
+    
+    <xsl:template match="dri:div[@id='ar.edu.unlp.sedici.util.FlashMessagesTransformer.div.flash-message']">
+        <xsl:param name="muestra">false</xsl:param>
+        <xsl:if test="$muestra='true'">
+        	<div>
+        		<xsl:attribute name="id">ar_edu_unlp_sedici_util_FlashMessagesTransformer_div_flash-message</xsl:attribute>
+        		<xsl:attribute name="class">ds-notice-div <xsl:value-of select="@rend"/></xsl:attribute>
+            	<xsl:apply-templates select="dri:p"/>
+			</div>
+         </xsl:if>
+     </xsl:template>
+            
 
     <xsl:template name="busqueda_inicio" match="dri:div[@id='aspect.discovery.SiteViewer.div.front-page-search']">
         <xsl:param name="muestra">false</xsl:param>    
