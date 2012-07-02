@@ -72,13 +72,13 @@ public class DSpaceItem extends AbstractItem {
 		return sets;
 	}
 
-	private static String _hostname = null;
+	private static String _prefix = null;
 
 	private static String getIdentifier(Item item) {
-		if (_hostname == null) {
-			_hostname = ConfigurationManager.getProperty("dspace.hostname");
+		if (_prefix == null) {
+			_prefix = ConfigurationManager.getProperty("xoai.identifier.prefix");
 		}
-		return "xoai:" + _hostname + ":" + item.getHandle();
+		return "xoai:" + _prefix + ":" + item.getHandle().replaceAll("^.*/", "/");
 	}
 
 	private Item item;
