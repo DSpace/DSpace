@@ -2214,6 +2214,9 @@
 
 <message key="xmlui.forms.claimedAction.non_installed">Non installed</message>
 
+<message key="xmlui.flashMessage.deleteItem.success">Item has been removed.</message>
+<message key="xmlui.flashMessage.deleteItem.failure">Item couldn't been removed.</message>
+
 <!-- De aca en mas estan en las dependencias de dspace -->
 
 <!-- extension al messages.xml de XmlWorkflow -->

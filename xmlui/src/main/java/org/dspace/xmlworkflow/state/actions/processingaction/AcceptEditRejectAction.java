@@ -9,6 +9,8 @@ package org.dspace.xmlworkflow.state.actions.processingaction;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,6 +29,8 @@ import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.state.actions.processingaction.ProcessingAction;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+
+import ar.edu.unlp.sedici.util.FlashMessagesUtil;
 
 /**
  * Processing class of an action that allows users to
@@ -133,12 +137,17 @@ public class AcceptEditRejectAction extends ProcessingAction {
     }
     
     public ActionResult processDeletePage(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException {
-        if(request.getParameter("submit_delete") != null){
+    	if(request.getParameter("submit_delete") != null){
             if (AuthorizeManager.authorizeActionBoolean(c,wfi.getItem(),org.dspace.core.Constants.DELETE)){
             	FlowResult resultado = FlowItemUtils.processDeleteItem(c,wfi.getItem().getID());
             	if (resultado.getContinue()){
+            		FlashMessagesUtil.setNoticeMessage(request.getSession(), "xmlui.flashMessage.deleteItem.success");
             		return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
-            	} 
+            	} else {
+                	FlashMessagesUtil.setErrorMessage(request.getSession(), "xmlui.flashMessage.deleteItem.failure");
+            	}
+            } else {
+            	FlashMessagesUtil.setErrorMessage(request.getSession(), "xmlui.flashMessage.deleteItem.failure");
             }
         }
         //Cancel, go back to the main task page

@@ -2306,6 +2306,9 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 
 <message key="xmlui.forms.claimedAction.non_installed">Aún no publicado</message>
 
+<message key="xmlui.flashMessage.deleteItem.success">Se ha borrado permanente el item.</message>
+<message key="xmlui.flashMessage.deleteItem.failure">El item no se ha podido borrar.</message>
+
 <!-- De aca en mas estan en las dependencias de dspace -->
 
 <!-- extension al messages.xml de XmlWorkflow -->
@@ -2505,4 +2508,5 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.delete_submit">Eliminar item</message>
 <message key="xmlui.Submission.workflow.DeleteTaskStep.info1">¿Está seguro de querer eliminar el item?</message>
 <message key="xmlui.Submission.workflow.DeleteTaskStep.submit_delete">Confirmar</message>
+
 </catalogue>
