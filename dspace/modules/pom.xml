@@ -97,5 +97,14 @@
                 <module>solr</module>
             </modules>
         </profile>
+        <profile>
+            <id>dspace-xoai</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>xoai</module>
+            </modules>
+        </profile>
     </profiles>
 </project>
