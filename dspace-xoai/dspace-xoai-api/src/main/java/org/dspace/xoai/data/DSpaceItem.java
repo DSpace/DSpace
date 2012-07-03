@@ -78,7 +78,7 @@ public class DSpaceItem extends AbstractItem {
 		if (_prefix == null) {
 			_prefix = ConfigurationManager.getProperty("xoai.identifier.prefix");
 		}
-		return "xoai:" + _prefix + ":" + item.getHandle().replaceAll("^.*/", "/");
+		return "xoai:" + _prefix + ":" + item.getHandle();
 	}
 
 	private Item item;
