@@ -14,7 +14,6 @@ package org.dspace.xoai.solr.exceptions;
  */
 @SuppressWarnings("serial")
 public class DSpaceSolrIndexerException extends Exception {
-
     /**
      * Creates a new instance of <code>DSpaceSolrException</code> without detail message.
      */

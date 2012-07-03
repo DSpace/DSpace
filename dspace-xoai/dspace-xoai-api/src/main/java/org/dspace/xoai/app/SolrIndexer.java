@@ -9,6 +9,7 @@ package org.dspace.xoai.app;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -85,8 +86,7 @@ public class SolrIndexer {
     }
 
     private void println (String line) {
-        if (_verbose)
-            System.out.println(line);
+        System.out.println(line);
     }
 
     public void index () throws DSpaceSolrIndexerException  {
@@ -110,7 +110,7 @@ public class SolrIndexer {
                 
                 SolrDocumentList results = DSpaceSolrSearch.query(solrParams);
                 if (results.getNumFound() == 0) {
-                	if (_verbose) System.out.println("There are no documents indexed. Using full import.");
+                	System.out.println("There are no indexed documents, using full import.");
                 	this.indexAll();
                 }
                 else this.index((Date) results.get(0).getFieldValue("item.lastmodified"));
@@ -135,6 +135,9 @@ public class SolrIndexer {
                     println("Index optimized");
                 }
             } catch (SolrServerException ex) {
+            	if (ex.getCause().getClass().equals(ConnectException.class)) {
+            		println("Solr server ("+ConfigurationManager.getProperty("xoai.solr.url")+") is down, turn it on.");
+            	}
                 throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
             } catch (IOException ex) {
                 throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
@@ -143,7 +146,7 @@ public class SolrIndexer {
     }
 
     private void index(Date last) throws DSpaceSolrIndexerException {
-    	if (_verbose) System.out.println("Incremental import of information. Searching for documents modified after: "+last.toString());
+    	System.out.println("Incremental import of information. Searching for documents modified after: "+last.toString());
         try {
             TableRowIterator iterator = DatabaseManager.query(_context, "SELECT item_id FROM item WHERE in_archive=TRUE AND last_modified > ?", new java.sql.Date(last.getTime()));
             this.index(iterator);
@@ -153,7 +156,7 @@ public class SolrIndexer {
     }
 
     private void indexAll() throws DSpaceSolrIndexerException {
-    	if (_verbose) System.out.println("Full import of information.");
+    	System.out.println("Full import of information.");
         try {
         	TableRowIterator iterator = DatabaseManager.query(_context, "SELECT item_id FROM item WHERE in_archive=TRUE");
             this.index(iterator);
@@ -185,12 +188,12 @@ public class SolrIndexer {
         }
     }
 
-    private SolrInputDocument index(Item item) throws SQLException {
+    private SolrInputDocument index(Item item) throws SQLException {    	
         SolrInputDocument doc = new SolrInputDocument();
         doc.addField("item.id", item.getID());
-        doc.addField("item.public", this.isPublic(item));
+        boolean pub = this.isPublic(item);
+        doc.addField("item.public", pub);
         String handle = item.getHandle();
-        println("Indexing item with Handle: "+handle);
         doc.addField("item.handle", handle);
         doc.addField("item.lastmodified", item.getLastModified());
         doc.addField("item.submitter", item.getSubmitter().getEmail());
@@ -211,6 +214,9 @@ public class SolrIndexer {
             doc.addField("metadata.dc.format.mimetype", f);
         }
 
+        if (_verbose) {
+        	println("Item with Handle "+handle);
+        }
         return doc;
     }
 
@@ -260,15 +266,36 @@ public class SolrIndexer {
                 
             }
         } catch (ParseException ex) {
-            System.err.println("Error. Please see the log file for more details.");
-            log.error(ex.getMessage(), ex);
+        	if (!searchForReason(ex)) {
+        		ex.printStackTrace();
+        	}
+        	log.error(ex.getMessage(), ex);
         } catch (SQLException ex) {
-            System.err.println("Error. Please see the log file for more details.");
-            log.error(ex.getMessage(), ex);
+        	if (!searchForReason(ex)) {
+        		ex.printStackTrace();
+        	}
+        	log.error(ex.getMessage(), ex);
         } catch (DSpaceSolrIndexerException ex) {
-            System.err.println("Error. Please see the log file for more details.");
+        	if (!searchForReason(ex)) {
+        		ex.printStackTrace();
+        	}
             log.error(ex.getMessage(), ex);
         }
+    }
+    
+    private static boolean getKnownExplanation (Throwable t) {
+    	if (t instanceof ConnectException) {
+    		System.err.println("Solr server ("+ConfigurationManager.getProperty("xoai.solr.url")+") is down, turn it on.");
+    		return true;
+    	}
+    	
+    	return false;
+    }
+    
+    private static boolean searchForReason (Throwable t) {
+    	if (getKnownExplanation(t)) return true;
+    	if (t.getCause() != null) return searchForReason(t.getCause());
+    	return false;
     }
 
     private static void cleanCache(boolean verbose) {
@@ -288,10 +315,10 @@ public class SolrIndexer {
 	    	   if (!file.delete())
 	    	   {
 	    	       // Failed to delete file
-	    	       System.out.println("Failed to delete cache "+file);
+	    	       System.out.println("Failed to delete cache file: "+file);
 	    	   }
 	    	}
-    	} else if (verbose) System.out.println("Directory "+dir+" doesn't exists");
+    	} else System.out.println("Directory "+dir+" doesn't exists, must run ant init_configs");
 	}
 
 	private static void usage () {
