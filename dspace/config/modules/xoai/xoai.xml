@@ -126,13 +126,7 @@
 		<Filter id="driverdocumenttypeFilter">
 			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
 			<Parameter key="field">
-<<<<<<< HEAD
-				<!-- To understand these parameters, you must look at the XOAI schema -->
-				<Value>dc.type.*</Value>
-=======
-				<!-- To understand this parameters must look at the XOAI schema -->
 				<Value>dc.type</Value>
->>>>>>> Configuration corrected: #25
 			</Parameter>
 			<Parameter key="operator">
 				<Value>ends_with</Value>
