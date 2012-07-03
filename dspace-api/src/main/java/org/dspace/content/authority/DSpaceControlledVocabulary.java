@@ -194,7 +194,9 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
                 if (null != idAttr) // 'id' is optional
                     authorities[i] = idAttr.getNodeValue();
             }
-            int resultCount = Math.min(labels.length - start, limit);
+            int resultCount = labels.length - start;
+            if ((limit > 0) && (resultCount > limit)) // limit = 0 means no limit
+                resultCount = limit;
             choices = new Choice[resultCount];
             if (resultCount > 0)
             {
