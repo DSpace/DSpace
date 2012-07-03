@@ -112,22 +112,27 @@
 		<Filter id="authorexistsFilter">
 			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
 			<Parameter key="field">
-				<Value>dc.contributor.author.*</Value>
+				<Value>dc.contributor.author</Value>
 			</Parameter>
 		</Filter>
 		
 		<Filter id="titleexistsFilter">
 			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
 			<Parameter key="field">
-				<Value>dc.title.*</Value>
+				<Value>dc.title</Value>
 			</Parameter>
 		</Filter>
 		
 		<Filter id="driverdocumenttypeFilter">
 			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
 			<Parameter key="field">
+<<<<<<< HEAD
 				<!-- To understand these parameters, you must look at the XOAI schema -->
 				<Value>dc.type.*</Value>
+=======
+				<!-- To understand this parameters must look at the XOAI schema -->
+				<Value>dc.type</Value>
+>>>>>>> Configuration corrected: #25
 			</Parameter>
 			<Parameter key="operator">
 				<Value>ends_with</Value>
@@ -154,7 +159,7 @@
 		<Filter id="driveraccessFilter">
 			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
 			<Parameter key="field">
-				<Value>dc.rights.*</Value>
+				<Value>dc.rights</Value>
 			</Parameter>
 			<Parameter key="operator">
 				<Value>contains</Value>
@@ -170,7 +175,7 @@
 		<Filter id="openairerelationFilter">
 			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
 			<Parameter key="field">
-				<Value>dc.relation.*</Value>
+				<Value>dc.relation</Value>
 			</Parameter>
 			<Parameter key="operator">
 				<Value>starts_with</Value>
