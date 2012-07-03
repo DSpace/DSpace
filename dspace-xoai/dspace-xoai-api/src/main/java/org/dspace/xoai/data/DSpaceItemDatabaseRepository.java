@@ -129,7 +129,6 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository {
         if (!where.equals(""))
             query += " WHERE " + where;
         query += " ORDER BY i.item_id OFFSET ? LIMIT ?";
-        log.debug("{ OAIPlus } Query: " + query);
         parameters.add(offset);
         return this.getResult(query, parameters, length);
     }

@@ -413,7 +413,7 @@
 				}
 				
 				div.getRecord div.getcontent div.in label {
-					font-size: 25px; margin: 5px;
+					font-weight: bold; margin: 5px;
 				}
 				
 				
@@ -434,7 +434,8 @@
 				}
 				
 				div.getRecordAlternate div.getcontent div.in label {
-					font-size: 25px; margin: 5px;
+					font-weight: bold;
+					margin: 5px;
 				}
 				
 				div.recSets label.lab {
@@ -497,10 +498,9 @@
 				}
 				
 				div.recSets label.getrecordsets {
-					font-size: 25px;
 					display: block;
 					float: left;
-					margin-top: 3px;
+					margin-top: 8px;
 				}
 				
 				div.metadataTitle {
@@ -553,6 +553,17 @@
 					background-color: rgba(0,0,0,0.3);
 				}
 				
+				.result-count {
+					text-align: left;
+					padding: 20px;
+					margin-left: 40px;
+					margin-bottom: 20px;
+				}
+				.result-count label {
+					font-weight: bold;
+					margin-right: 10px;
+				}
+				
 				.tag {
 					color: #FFF;
 					font-weight: bold;
@@ -568,6 +579,11 @@
 				
 				.multiple {
 					margin-bottom: 10px;
+				}
+				
+				.tiny {
+					font-size: 10px;
+					margin-left: 10px;
 				}
 				
 				.clear {
@@ -694,6 +710,7 @@
 						</div>
 						</xsl:if>
 						<xsl:if test="oai:OAI-PMH/oai:ListSets">
+							<div class="result-count"><label>Results fetched</label> <span><xsl:value-of select="count(oai:OAI-PMH/oai:ListSets/oai:set)"/></span></div>
 							<div class="sets">
 								<xsl:for-each select="oai:OAI-PMH/oai:ListSets/oai:set">
 									<div class="set">
@@ -701,7 +718,15 @@
 											<xsl:attribute  name="class">setalternate</xsl:attribute>
 										</xsl:if>
 										<div class="name">
-											<xsl:value-of select="oai:setName/text()" />
+											<xsl:choose>
+												<xsl:when test="string-length(oai:setName/text()) &gt; 83">
+													<xsl:value-of select="substring(oai:setName/text(),0, 80 )"/>...
+												</xsl:when>
+												<xsl:otherwise>
+													<xsl:value-of select="oai:setName/text()"/>
+												</xsl:otherwise>
+											</xsl:choose>
+											<span class="tiny">(<xsl:value-of select="oai:setSpec/text()" />)</span>
 										</div>
 										<div class="spec">
 											<a>
@@ -751,6 +776,7 @@
 							</div>
 						</xsl:if>
 						<xsl:if test="oai:OAI-PMH/oai:ListMetadataFormats">
+							<div class="result-count"><label>Results fetched</label> <span><xsl:value-of select="count(oai:OAI-PMH/oai:ListMetadataFormats/oai:metadataFormat)"/></span></div>
 							<div class="formats">
 								<xsl:for-each select="oai:OAI-PMH/oai:ListMetadataFormats/oai:metadataFormat">
 									<a class="format">
@@ -776,6 +802,7 @@
 						</xsl:if>
 						<xsl:if test="oai:OAI-PMH/oai:ListIdentifiers">
 						<div class="identifiers">
+							<div class="result-count"><label>Results fetched</label> <span><xsl:value-of select="count(oai:OAI-PMH/oai:ListIdentifiers/oai:header)"/></span></div>
 							<xsl:for-each select="oai:OAI-PMH/oai:ListIdentifiers/oai:header">
 							<div class="identifier">
 								<xsl:if test="position() mod 2 = 0">
@@ -924,13 +951,14 @@
 							</script>
 						</xsl:if>
 						<xsl:if test="oai:OAI-PMH/oai:ListRecords">
+							<div class="result-count"><label>Results fetched</label> <span><xsl:value-of select="count(oai:OAI-PMH/oai:ListRecords/oai:record)"/></span></div>
 							<xsl:for-each select="oai:OAI-PMH/oai:ListRecords/oai:record">
 							<div class="getRecord multiple">
-									<xsl:if test="position() mod 2 = 0">
+								<xsl:if test="position() mod 2 = 0">
 								<xsl:attribute name="class">
 									getRecordAlternate multiple
 								</xsl:attribute>
-									</xsl:if>
+								</xsl:if>
 								<div class="getcontent">
 									<div class="in">
 										<label>Identifier</label>

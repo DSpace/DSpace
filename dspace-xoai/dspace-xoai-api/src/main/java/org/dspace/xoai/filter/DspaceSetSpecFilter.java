@@ -34,7 +34,6 @@ public class DspaceSetSpecFilter extends DSpaceFilter {
     private String _setSpec;
 	
     public DspaceSetSpecFilter (String spec) {
-        log.debug("{ OAIPlus } SetSpec Filter: "+spec);
         _setSpec = spec;
     }
 	
