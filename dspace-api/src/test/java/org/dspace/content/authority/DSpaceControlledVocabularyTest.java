@@ -87,7 +87,7 @@ public class DSpaceControlledVocabularyTest
         String text = "north 40";
         int collection = 0;
         int start = 0;
-        int limit = 1; // FIXME 0 should mean "no limit" but code under test is busted
+        int limit = 0;
         String locale = null;
         DSpaceControlledVocabulary instance = (DSpaceControlledVocabulary)
                 PluginManager.getNamedPlugin(Class.forName(PLUGIN_INTERFACE), "farm");
