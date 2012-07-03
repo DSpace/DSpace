@@ -13,7 +13,6 @@ import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
@@ -22,7 +21,6 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.statistics.SolrLogger;
 
-import java.sql.SQLException;
 import java.text.*;
 import java.io.*;
 import java.util.*;
@@ -135,7 +133,7 @@ public class StatisticsImporter
     }
 
     /**
-     * Method to load the lines from the statics file and load them into solr
+     * Read lines from the statistics file and load their data into solr.
      *
      * @param filename The filename of the file to load
      * @param context The DSpace Context
@@ -143,9 +141,6 @@ public class StatisticsImporter
      */
     private void load(String filename, Context context, boolean verbose)
     {
-        // Print out the filename for confirmation
-        System.out.println("Processing file: " + filename);
-
         // Item counter
         int counter = 0;
         int errors = 0;
@@ -153,7 +148,17 @@ public class StatisticsImporter
 
         try
         {
-            BufferedReader input =  new BufferedReader(new FileReader(new File(filename)));
+            BufferedReader input;
+            if (null == filename || "-".equals(filename))
+            {
+                input = new BufferedReader(new InputStreamReader(System.in));
+                filename = "standard input";
+            }
+            else
+                input = new BufferedReader(new FileReader(new File(filename)));
+
+            // Print out the filename for confirmation
+            System.out.println("Processing file: " + filename);
 
             String line;
 //            String uuid;
@@ -426,7 +431,7 @@ public class StatisticsImporter
 
 		Options options = new Options();
 
-        options.addOption("i", "in", true, "the inpout file");
+        options.addOption("i", "in", true, "the input file ('-' or omit for standard input)");
         options.addOption("l", "local", false, "developers tool - map external log file to local handles");
         options.addOption("m", "multiple", false, "treat the input file as having a wildcard ending");
         options.addOption("s", "skipdns", false, "skip performing reverse DNS lookups on IP addresses");
@@ -439,12 +444,6 @@ public class StatisticsImporter
         if (line.hasOption('h'))
         {
             printHelp(options, 0);
-        }
-
-        if (!line.hasOption('i'))
-        {
-            System.err.println("You must specify an input file using the -i flag");
-            printHelp(options, 1);
         }
 
         if (line.hasOption('s'))
