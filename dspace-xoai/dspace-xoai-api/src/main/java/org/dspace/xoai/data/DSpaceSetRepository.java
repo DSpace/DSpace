@@ -144,34 +144,34 @@ public class DSpaceSetRepository extends AbstractSetRepository {
 		log.debug("Has More Results: "+((offset+length < communityCount + collectionCount) ? "Yes" : "No"));
 		return new ListSetsResult(offset+length < communityCount + collectionCount, array);
 	}
-
+	
 	@Override
 	public boolean supportSets() {
 		return true;
 	}
-
-    @Override
-    protected boolean exists(String setSpec) {
-        if (setSpec.startsWith("col_")) {
-            try {
-                DSpaceObject dso = HandleManager.resolveToObject(_context, setSpec.replace("col_", "").replace("_", "/"));
-                if (dso == null || !(dso instanceof Collection))
-                    return false;
-                return true;
-            } catch (Exception ex) {
-                log.error(ex.getMessage(), ex);
-            }
-        } else if (setSpec.startsWith("com_")) {
-            try {
-                DSpaceObject dso = HandleManager.resolveToObject(_context, setSpec.replace("com_", "").replace("_", "/"));
-                if (dso == null || !(dso instanceof Community))
-                    return false;
-                return true;
-            } catch (Exception ex) {
-                log.error(ex.getMessage(), ex);
-            }
-        }
-        return false;
-    }
+	
+	@Override
+	protected boolean exists(String setSpec) {
+		if (setSpec.startsWith("col_")) {
+			try {
+				DSpaceObject dso = HandleManager.resolveToObject(_context, setSpec.replace("col_", "").replace("_", "/"));
+				if (dso == null || !(dso instanceof Collection))
+					return false;
+				return true;
+			} catch (Exception ex) {
+				log.error(ex.getMessage(), ex);
+			}
+		} else if (setSpec.startsWith("com_")) {
+			try {
+				DSpaceObject dso = HandleManager.resolveToObject(_context, setSpec.replace("com_", "").replace("_", "/"));
+				if (dso == null || !(dso instanceof Community))
+					return false;
+				return true;
+			} catch (Exception ex) {
+				log.error(ex.getMessage(), ex);
+			}
+		}
+		return false;
+	}
 
 }

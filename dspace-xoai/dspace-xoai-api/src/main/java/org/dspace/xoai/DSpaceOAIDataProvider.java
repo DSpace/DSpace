@@ -74,7 +74,7 @@ public class DSpaceOAIDataProvider extends HttpServlet {
 			log.debug("XOAI request received");
 			context = new Context();
 			
-			// Filters require for database connection -> dependency injection?
+			// Filters require database connection -> dependency injection?
 			for (AbstractFilter filter : XOAIManager.getManager().getFilterManager().getFilters())
 				if (filter instanceof DSpaceFilter)
 					((DSpaceFilter) filter).initialize(context);
@@ -150,7 +150,7 @@ public class DSpaceOAIDataProvider extends HttpServlet {
 	 */
 	private void handle(String identification, OAIDataProvider dataProvider,
 			OAIRequestParameters parameters, OutputStream out) {
-    	String dir = ConfigurationManager.getProperty("dspace.dir");
+		String dir = ConfigurationManager.getProperty("dspace.dir");
 		if (!dir.endsWith("/")) dir += "/";
 		dir += "var/xoai";
 		File fdir = new File(dir);

@@ -17,7 +17,7 @@
 	version="1.0">
 	<xsl:output omit-xml-declaration="yes" method="xml" indent="yes" />
 	
-	<!-- Shows the internal XOAI generated XML -->
+	<!-- An identity transformation to show the internal XOAI generated XML -->
 	<xsl:template match="/ | @* | node()">
 		<xsl:copy-of select="@* | node()">
 		</xsl:copy-of>

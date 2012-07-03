@@ -31,7 +31,7 @@ public class DatabaseFilterResult {
 			_params.add(obj);
 	}
 
-        public DatabaseFilterResult (String where, List<Object> params) {
+	public DatabaseFilterResult (String where, List<Object> params) {
 		_nothing = false;
 		_where = where;
 		_params = params;

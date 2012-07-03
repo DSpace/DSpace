@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
  * @author Lyncode Development Team <dspace@lyncode.com>
  */
 public class MetadataFieldManager {
-    private static Logger log = LogManager.getLogger(MetadataFieldManager.class);
+	private static Logger log = LogManager.getLogger(MetadataFieldManager.class);
 	private static MetadataFieldManager _manager = null;
 	public static int getFieldID (Context context, String field) throws InvalidMetadataFieldException, SQLException {
 		if (_manager == null) _manager = new MetadataFieldManager();
@@ -46,13 +46,13 @@ public class MetadataFieldManager {
 				
 				if (qualifier == null) {
 					query += " AND mfr.qualifier is NULL";
-                                        log.debug("Query: "+query);
+					log.debug("Query: "+query);
 					iterator = DatabaseManager.query(context, query, schema, element);
 				}
 				else {
-                                        log.debug("Qualifier: "+qualifier);
+					log.debug("Qualifier: "+qualifier);
 					query += " AND mfr.qualifier = ?";
-                                        log.debug("Query: "+query);
+					log.debug("Query: "+query);
 					iterator = DatabaseManager.query(context, query, schema, element, qualifier);
 				}
 				

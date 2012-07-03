@@ -21,11 +21,11 @@
 		</Context>
 		
 		<!--
-			Driver Guide-lines:
+			Driver Guidelines:
 		 
 			- http://www.driver-support.eu/documents/DRIVER_Guidelines_v2_Final_2008-11-13.pdf
 			
-			Pag. 57 - 58
+			Page 57 - 58
 		 -->
 		<Context baseurl="driver">
 			<!-- Date format, field prefixes, etc are ensured by the transformer -->
@@ -40,7 +40,7 @@
 			<Filter refid="driveraccessFilter"/>
 			<!-- Open Access (Downloadable) -->
 			<Filter refid="bitstreamaccessFilter"/>
-			<!-- Just an alias, if fact it returns all items within driver context -->
+			<!-- Just an alias, if fact it returns all items within the driver context -->
 			<Set refid="driverSet" />
 			<!-- Metadata Formats -->
 			<Format refid="oaidc"/>
@@ -48,13 +48,13 @@
 		</Context>
 		
 		<!-- 
-			OpenAIRE Guide-lines 1.1:
+			OpenAIRE Guidelines 1.1:
 			
 			- http://www.openaire.eu/en/component/attachments/download/79%E2%8C%A9=en
 			
 			There is a limitation over the embargoedEndDate parameter:
 			
-			- Predefined DSpace fields doesn't allow to set this up with a default.
+			- Predefined DSpace fields don't allow to set this up with a default.
 		 -->
 		<Context baseurl="openaire">
 			<!-- Date format, field prefixes, etc are ensured by the transformer -->
@@ -63,11 +63,11 @@
 			<Filter refid="titleexistsFilter" />
 			<!-- Author : Mandatory -->
 			<Filter refid="authorexistsFilter"/>
-			<!-- Possible Document Type (sames has Driver)-->
+			<!-- Possible Document Type (same as Driver)-->
 			<Filter refid="driverdocumenttypeFilter"/>
 			<!-- dc.relation must has the specified prefix -->
 			<Filter refid="openairerelationFilter" />
-			<!-- Just an alias, if fact it returns all items within driver context -->
+			<!-- Just an alias, if fact it returns all items within the driver context -->
 			<Set refid="openaireSet" />
 			<!-- Metadata Formats -->
 			<Format refid="oaidc" />
@@ -126,7 +126,7 @@
 		<Filter id="driverdocumenttypeFilter">
 			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
 			<Parameter key="field">
-				<!-- To understand this parameters must look at the XOAI schema -->
+				<!-- To understand these parameters, you must look at the XOAI schema -->
 				<Value>dc.type.*</Value>
 			</Parameter>
 			<Parameter key="operator">

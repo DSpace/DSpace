@@ -13,23 +13,23 @@ package org.dspace.xoai.filter;
  */
 public class SolrFilterResult {
 
-    private String _where;
-    private boolean _nothing;
-
-    public SolrFilterResult() {
-        _nothing = true;
-    }
-
-    public SolrFilterResult(String query) {
-        _nothing = false;
-        _where = query;
-    }
-
-    public boolean hasResult() {
-        return !_nothing;
-    }
-
-    public String getQuery() {
-        return _where;
-    }
+	private String _where;
+	private boolean _nothing;
+	
+	public SolrFilterResult() {
+		_nothing = true;
+	}
+	
+	public SolrFilterResult(String query) {
+		_nothing = false;
+		_where = query;
+	}
+	
+	public boolean hasResult() {
+		return !_nothing;
+	}
+	
+	public String getQuery() {
+		return _where;
+	}
 }

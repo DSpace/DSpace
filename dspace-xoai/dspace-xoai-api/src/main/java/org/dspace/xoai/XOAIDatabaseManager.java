@@ -53,37 +53,37 @@ public class XOAIDatabaseManager {
 		
 		return result;
 	}
-
-        public static List<Community> flatParentCommunities (Community c) throws SQLException {
+	
+	public static List<Community> flatParentCommunities (Community c) throws SQLException {
 		Queue<Community> queue = new LinkedList<Community>();
 		List<Community> result = new ArrayList<Community>();
-
-                queue.add(c);
-
+		
+		queue.add(c);
+		
 		while (!queue.isEmpty()) {
 			Community p = queue.poll();
 			Community par = p.getParentCommunity();
 			if (par != null) queue.add(par);
 			if (!result.contains(p)) result.add(p);
 		}
-
+		
 		return result;
 	}
-
-        public static List<Community> flatParentCommunities (Item c) throws SQLException {
+	
+	public static List<Community> flatParentCommunities (Item c) throws SQLException {
 		Queue<Community> queue = new LinkedList<Community>();
 		List<Community> result = new ArrayList<Community>();
-
-                for (Community com : c.getCommunities())
-                    queue.add(com);
-
+		
+		for (Community com : c.getCommunities())
+			queue.add(com);
+		
 		while (!queue.isEmpty()) {
 			Community p = queue.poll();
 			Community par = p.getParentCommunity();
 			if (par != null) queue.add(par);
 			if (!result.contains(p)) result.add(p);
 		}
-
+		
 		return result;
 	}
 }

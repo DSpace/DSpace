@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-        <artifactId>dspace-parent</artifactId>
-        <groupId>org.dspace</groupId>
-        <version>3.0-SNAPSHOT</version>
-    </parent>
-  <artifactId>dspace-xoai</artifactId>
-  <packaging>pom</packaging>
-  
-  
-  <name>DSpace XOAI</name>
-  <description>Parent project for the XOAI API and Webapp</description>
-  <url>http://www.lyncode.com/dspace/addons/xoai</url>
-  <modules>
-    <module>dspace-xoai-api</module>
-    <module>dspace-xoai-webapp</module>
-  </modules>
-  
-  
-  <developers>
-  	<developer>
-  		<name>DSpace @ Lyncode</name>
-  		<email>dspace@lyncode.com</email>
-  		<organization>Lyncode</organization>
-  		<organizationUrl>http://www.lyncode.com</organizationUrl>
-  	</developer>
-  </developers>
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+	<artifactId>dspace-parent</artifactId>
+	<groupId>org.dspace</groupId>
+	<version>3.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>dspace-xoai</artifactId>
+	<packaging>pom</packaging>
+
+
+	<name>DSpace XOAI</name>
+	<description>Parent project for the XOAI API and Webapp</description>
+	<url>http://www.lyncode.com/dspace/addons/xoai</url>
+	<modules>
+		<module>dspace-xoai-api</module>
+		<module>dspace-xoai-webapp</module>
+	</modules>
+
+
+	<developers>
+		<developer>
+			<name>DSpace @ Lyncode</name>
+			<email>dspace@lyncode.com</email>
+			<organization>Lyncode</organization>
+			<organizationUrl>http://www.lyncode.com</organizationUrl>
+		</developer>
+	</developers>
 </project>

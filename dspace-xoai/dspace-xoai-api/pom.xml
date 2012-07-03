@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>dspace-xoai</artifactId>
@@ -14,53 +13,53 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <description>XOAI API</description>
+  
   <dependencies>
-  	<dependency>
-  		<groupId>com.lyncode</groupId>
-  		<artifactId>xoai-common</artifactId>
-  		<version>2.0.0</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.dspace</groupId>
-  		<artifactId>dspace-api</artifactId>
-  	</dependency>
-		<dependency>
-			<groupId>org.apache.solr</groupId>
-			<artifactId>solr-solrj</artifactId>
-			<version>3.3.0</version>
-		</dependency>
-         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.3</version>
-         </dependency>
-  	<dependency>
-  		<groupId>org.slf4j</groupId>
-  		<artifactId>slf4j-log4j12</artifactId>
-  		<version>1.5.6</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.slf4j</groupId>
-  		<artifactId>slf4j-api</artifactId>
-  		<version>1.5.6</version>
-  	</dependency>
+    <dependency>
+      <groupId>com.lyncode</groupId>
+      <artifactId>xoai-common</artifactId>
+      <version>2.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.dspace</groupId>
+      <artifactId>dspace-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-solrj</artifactId>
+      <version>3.3.0</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.5.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.5.6</version>
+    </dependency>
   </dependencies>
   
-  
   <repositories>
-  	<repository>
-  		<id>lyncode-stage</id>
-  		<name>Lyncode Stage Development</name>
-  		<url>http://lyncode-dev.dtdns.net/nexus/content/repositories/lyncode-dev</url>
-  	</repository>
+    <repository>
+      <id>lyncode-stage</id>
+      <name>Lyncode Stage Development</name>
+      <url>http://lyncode-dev.dtdns.net/nexus/content/repositories/lyncode-dev</url>
+    </repository>
   </repositories>
   
   <developers>
-  	<developer>
-  		<name>DSpace @ Lyncode</name>
-  		<email>dspace@lyncode.com</email>
-  		<organization>Lyncode</organization>
-  		<organizationUrl>http://www.lyncode.com</organizationUrl>
-  	</developer>
+    <developer>
+      <name>DSpace @ Lyncode</name>
+      <email>dspace@lyncode.com</email>
+      <organization>Lyncode</organization>
+      <organizationUrl>http://www.lyncode.com</organizationUrl>
+    </developer>
   </developers>
 </project>

@@ -9,7 +9,7 @@
     http://www.dspace.org/license/
     
 	Developed by DSpace @ Lyncode <dspace@lyncode.com> 
-	Following Driver Guide-lines 2.0:
+	Following Driver Guidelines 2.0:
 		- http://www.driver-support.eu/managers.html#guidelines
 
  -->

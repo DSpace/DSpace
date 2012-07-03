@@ -15,23 +15,22 @@ package org.dspace.xoai.solr.exceptions;
 @SuppressWarnings("serial")
 public class SolrSearchEmptyException extends Exception {
 
-    /**
-     * Creates a new instance of <code>SolrSearchEmptyException</code> without detail message.
-     */
-    public SolrSearchEmptyException() {
-    }
+	/**
+	 * Creates a new instance of <code>SolrSearchEmptyException</code> without detail message.
+	 */
+	public SolrSearchEmptyException() {
+	}
+	
+	/**
+	 * Constructs an instance of <code>SolrSearchEmptyException</code> with the specified detail message.
+	 * @param msg the detail message.
+	 */
+	public SolrSearchEmptyException(String msg) {
+		super(msg);
+	}
 
 
-    /**
-     * Constructs an instance of <code>SolrSearchEmptyException</code> with the specified detail message.
-     * @param msg the detail message.
-     */
-    public SolrSearchEmptyException(String msg) {
-        super(msg);
-    }
-
-
-    public SolrSearchEmptyException(String msg, Throwable t) {
-        super(msg, t);
-    }
+	public SolrSearchEmptyException(String msg, Throwable t) {
+		super(msg, t);
+	}
 }

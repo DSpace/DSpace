@@ -314,7 +314,7 @@ public class SolrIndexer {
 			}
 		} else
 			System.out.println("Directory " + dir
-					+ " doesn't exist, must run ant init_configs");
+					+ " doesn't exist, must run 'ant init_configs'");
 	}
 
 	private static void usage() {
