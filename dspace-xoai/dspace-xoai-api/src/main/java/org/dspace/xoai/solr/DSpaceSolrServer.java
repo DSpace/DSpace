@@ -18,24 +18,34 @@ import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.dspace.core.ConfigurationManager;
 
 /**
- *
+ * 
  * @author Lyncode Development Team <dspace@lyncode.com>
  */
-public class DSpaceSolrServer {
-	private static Logger log = LogManager.getLogger(DSpaceSolrServer.class);
-	
-	private static SolrServer _server = null;
-	public static SolrServer getServer () throws SolrServerException {
-		if (_server == null) {
-			try {
-				_server = new CommonsHttpSolrServer (ConfigurationManager.getProperty("xoai", "solr.url"));
-				log.debug("Solr Server Initialized");
-			} catch (MalformedURLException e) {
-				throw new SolrServerException(e);
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-			}
-		}
-		return _server;
-	}
+public class DSpaceSolrServer
+{
+    private static Logger log = LogManager.getLogger(DSpaceSolrServer.class);
+
+    private static SolrServer _server = null;
+
+    public static SolrServer getServer() throws SolrServerException
+    {
+        if (_server == null)
+        {
+            try
+            {
+                _server = new CommonsHttpSolrServer(
+                        ConfigurationManager.getProperty("xoai", "solr.url"));
+                log.debug("Solr Server Initialized");
+            }
+            catch (MalformedURLException e)
+            {
+                throw new SolrServerException(e);
+            }
+            catch (Exception e)
+            {
+                log.error(e.getMessage(), e);
+            }
+        }
+        return _server;
+    }
 }

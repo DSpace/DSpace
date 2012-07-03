@@ -14,40 +14,48 @@ import java.util.List;
  * 
  * @author Lyncode Development Team <dspace@lyncode.com>
  */
-public class DatabaseFilterResult {
-	private String _where;
-	private List<Object> _params;
-	private boolean _nothing;
-	
-	
-	public DatabaseFilterResult () {
-		_nothing = true;
-	}
-	public DatabaseFilterResult (String where, Object... params) {
-		_nothing = false;
-		_where = where;
-		_params = new ArrayList<Object>();
-		for (Object obj : params)
-			_params.add(obj);
-	}
+public class DatabaseFilterResult
+{
+    private String _where;
 
-	public DatabaseFilterResult (String where, List<Object> params) {
-		_nothing = false;
-		_where = where;
-		_params = params;
-	}
+    private List<Object> _params;
 
-	public boolean hasResult () {
-		return !_nothing;
-	}
-	
-	public String getWhere() {
-		return _where;
-	}
+    private boolean _nothing;
 
-	public List<Object> getParameters() {
-		return _params;
-	}
-	
-	
+    public DatabaseFilterResult()
+    {
+        _nothing = true;
+    }
+
+    public DatabaseFilterResult(String where, Object... params)
+    {
+        _nothing = false;
+        _where = where;
+        _params = new ArrayList<Object>();
+        for (Object obj : params)
+            _params.add(obj);
+    }
+
+    public DatabaseFilterResult(String where, List<Object> params)
+    {
+        _nothing = false;
+        _where = where;
+        _params = params;
+    }
+
+    public boolean hasResult()
+    {
+        return !_nothing;
+    }
+
+    public String getWhere()
+    {
+        return _where;
+    }
+
+    public List<Object> getParameters()
+    {
+        return _params;
+    }
+
 }

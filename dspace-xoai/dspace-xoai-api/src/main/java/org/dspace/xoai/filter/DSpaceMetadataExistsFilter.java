@@ -16,46 +16,59 @@ import org.dspace.xoai.MetadataFieldManager;
 import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
 
-
 /**
  * 
  * @author Lyncode Development Team <dspace@lyncode.com>
  */
-public class DSpaceMetadataExistsFilter extends DSpaceFilter {
-	private static Logger log = LogManager.getLogger(DSpaceMetadataExistsFilter.class);
-	private String _field;
+public class DSpaceMetadataExistsFilter extends DSpaceFilter
+{
+    private static Logger log = LogManager
+            .getLogger(DSpaceMetadataExistsFilter.class);
 
-	private String getField () {
-		if (this._field == null) {
-			_field = super.getParameter("field");
-		}
-		return _field;
-	}
-	
-	@Override
-	public DatabaseFilterResult getWhere(Context context) {
-		try {
-			return new DatabaseFilterResult("EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.item_id=i.item_id AND tmp.metadata_field_id=?)",
-				MetadataFieldManager.getFieldID(context, this.getField()));
-		} catch (InvalidMetadataFieldException e) {
-			log.error(e.getMessage(), e);
-		} catch (SQLException e) {
-			log.error(e.getMessage(), e);
-		}
-		return new DatabaseFilterResult();
-	}
-	
-	@Override
-	public boolean isShown(DSpaceItem item) {
-		if (item.getMetadata(this.getField()).size() > 0)
-			return true;
-		
-		return false;
-	}
-	
-	@Override
-	public SolrFilterResult getQuery() {
-		return new SolrFilterResult("metadata."+this.getField()+":[* TO *]");
-	}
+    private String _field;
+
+    private String getField()
+    {
+        if (this._field == null)
+        {
+            _field = super.getParameter("field");
+        }
+        return _field;
+    }
+
+    @Override
+    public DatabaseFilterResult getWhere(Context context)
+    {
+        try
+        {
+            return new DatabaseFilterResult(
+                    "EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.item_id=i.item_id AND tmp.metadata_field_id=?)",
+                    MetadataFieldManager.getFieldID(context, this.getField()));
+        }
+        catch (InvalidMetadataFieldException e)
+        {
+            log.error(e.getMessage(), e);
+        }
+        catch (SQLException e)
+        {
+            log.error(e.getMessage(), e);
+        }
+        return new DatabaseFilterResult();
+    }
+
+    @Override
+    public boolean isShown(DSpaceItem item)
+    {
+        if (item.getMetadata(this.getField()).size() > 0)
+            return true;
+
+        return false;
+    }
+
+    @Override
+    public SolrFilterResult getQuery()
+    {
+        return new SolrFilterResult("metadata." + this.getField() + ":[* TO *]");
+    }
 
 }

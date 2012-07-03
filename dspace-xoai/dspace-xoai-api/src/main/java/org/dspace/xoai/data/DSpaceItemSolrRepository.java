@@ -35,119 +35,161 @@ import com.lyncode.xoai.common.dataprovider.filter.Filter;
 import com.lyncode.xoai.common.dataprovider.filter.FilterScope;
 
 /**
- *
+ * 
  * @author Lyncode Development Team <dspace@lyncode.com>
  */
-public class DSpaceItemSolrRepository extends DSpaceItemRepository {
-	private static Logger log = LogManager.getLogger(DSpaceItemSolrRepository.class);
-	private Context ctx;
-	
-	public DSpaceItemSolrRepository (Context ctx) {
-		this.ctx = ctx;
-	}
-	
-	@Override
-	public AbstractItem getItem (String identifier) throws IdDoesNotExistException {
-		String parts[] = identifier.split(Pattern.quote(":"));
-		if (parts.length == 3) {
-			try {
-				SolrQuery params = new SolrQuery("item.handle:" + parts[2]);
-				Item item = Item.find(ctx, (Integer) DSpaceSolrSearch.querySingle(params).getFieldValue("item.id"));
-				return new DSpaceItem(item);
-			} catch (SolrSearchEmptyException ex) {
-				throw new IdDoesNotExistException(ex);
-			} catch (SQLException e) {
-				throw new IdDoesNotExistException(e);
-			}
-		}
-		throw new IdDoesNotExistException();
-	}
-	
-	@Override
-	protected ListItemIdentifiersResult getItemIdentifiers(
-			List<Filter> filters, int offset, int length) {
-		List<String> whereCond = new ArrayList<String>();
-		for (Filter filter : filters) {
-			if (filter.getFilter() instanceof DSpaceFilter) {
-				DSpaceFilter dspaceFilter = (DSpaceFilter) filter.getFilter();
-				SolrFilterResult result = dspaceFilter.getQuery();
-				if (result.hasResult()) {
-					if (filter.getScope() == FilterScope.MetadataFormat)
-						whereCond.add("(item.deleted:true OR (" + result.getQuery() + "))");
-					else
-						whereCond.add("(" + result.getQuery() + ")");
-				}
-			}
-		}
-		if (whereCond.isEmpty())
-		    whereCond.add("*:*");
-		String where = "("+StringUtils.join(whereCond.iterator(), ") AND (") + ")";
-		return this.getIdentifierResult(where, offset, length);
-	}
-	
-	@Override
-	protected ListItemsResults getItems(List<Filter> filters, int offset, int length) {
-			List<String> whereCond = new ArrayList<String>();
-		for (Filter filter : filters) {
-			if (filter.getFilter() instanceof DSpaceFilter) {
-				DSpaceFilter dspaceFilter = (DSpaceFilter) filter.getFilter();
-				SolrFilterResult result = dspaceFilter.getQuery();
-				if (result.hasResult()) {
-					if (filter.getScope() == FilterScope.MetadataFormat)
-						whereCond.add("(item.deleted:true OR (" + result.getQuery() + "))");
-					else
-						whereCond.add("(" + result.getQuery() + ")");
-				}
-			}
-		}
-		if (whereCond.isEmpty())
-		whereCond.add("*:*");
-		String where = "("+StringUtils.join(whereCond.iterator(), ") AND (") + ")";
-		return this.getResult(where, offset, length);
-	}
-	
-	private ListItemsResults getResult(String where, int offset, int length) {
-			List<AbstractItem> list = new ArrayList<AbstractItem>();
-		try {
-			SolrQuery params = new SolrQuery(where)
-				.setRows(length)
-				.setStart(offset);
-			SolrDocumentList docs = DSpaceSolrSearch.query(params);
-			for (SolrDocument doc : docs) {
-				Item item = Item.find(ctx, (Integer) doc.getFieldValue("item.id"));
-				list.add(new DSpaceItem(item));
-			}
-			return new ListItemsResults((docs.getNumFound() > offset + length), list);
-		} catch (DSpaceSolrException ex) {
-			log.error(ex.getMessage(), ex);
-			return new ListItemsResults(false, list);
-		} catch (SQLException e) {
-			log.error(e.getMessage(), e);
-			return new ListItemsResults(false, list);
-		}
-	}
-	
-	private ListItemIdentifiersResult getIdentifierResult(String where, int offset, int length) {
-			List<AbstractItemIdentifier> list = new ArrayList<AbstractItemIdentifier>();
-		try {
-			SolrQuery params = new SolrQuery(where)
-				.setRows(length)
-				.setStart(offset);
-			boolean hasMore = false;
-			SolrDocumentList docs = DSpaceSolrSearch.query(params);
-			hasMore = (offset + length) < docs.getNumFound();
-			for (SolrDocument doc : docs) {
-				Item item = Item.find(ctx, (Integer) doc.getFieldValue("item.id"));
-				list.add(new DSpaceItem(item));
-			}
-			return new ListItemIdentifiersResult(hasMore, list);
-		} catch (DSpaceSolrException ex) {
-			log.error(ex.getMessage(), ex);
-			return new ListItemIdentifiersResult(false, list);
-		} catch (SQLException e) {
-			log.error(e.getMessage(), e);
-			return new ListItemIdentifiersResult(false, list);
-		}
-	}
+public class DSpaceItemSolrRepository extends DSpaceItemRepository
+{
+    private static Logger log = LogManager
+            .getLogger(DSpaceItemSolrRepository.class);
+
+    private Context ctx;
+
+    public DSpaceItemSolrRepository(Context ctx)
+    {
+        this.ctx = ctx;
+    }
+
+    @Override
+    public AbstractItem getItem(String identifier)
+            throws IdDoesNotExistException
+    {
+        String parts[] = identifier.split(Pattern.quote(":"));
+        if (parts.length == 3)
+        {
+            try
+            {
+                SolrQuery params = new SolrQuery("item.handle:" + parts[2]);
+                Item item = Item.find(ctx, (Integer) DSpaceSolrSearch
+                        .querySingle(params).getFieldValue("item.id"));
+                return new DSpaceItem(item);
+            }
+            catch (SolrSearchEmptyException ex)
+            {
+                throw new IdDoesNotExistException(ex);
+            }
+            catch (SQLException e)
+            {
+                throw new IdDoesNotExistException(e);
+            }
+        }
+        throw new IdDoesNotExistException();
+    }
+
+    @Override
+    protected ListItemIdentifiersResult getItemIdentifiers(
+            List<Filter> filters, int offset, int length)
+    {
+        List<String> whereCond = new ArrayList<String>();
+        for (Filter filter : filters)
+        {
+            if (filter.getFilter() instanceof DSpaceFilter)
+            {
+                DSpaceFilter dspaceFilter = (DSpaceFilter) filter.getFilter();
+                SolrFilterResult result = dspaceFilter.getQuery();
+                if (result.hasResult())
+                {
+                    if (filter.getScope() == FilterScope.MetadataFormat)
+                        whereCond.add("(item.deleted:true OR ("
+                                + result.getQuery() + "))");
+                    else
+                        whereCond.add("(" + result.getQuery() + ")");
+                }
+            }
+        }
+        if (whereCond.isEmpty())
+            whereCond.add("*:*");
+        String where = "(" + StringUtils.join(whereCond.iterator(), ") AND (")
+                + ")";
+        return this.getIdentifierResult(where, offset, length);
+    }
+
+    @Override
+    protected ListItemsResults getItems(List<Filter> filters, int offset,
+            int length)
+    {
+        List<String> whereCond = new ArrayList<String>();
+        for (Filter filter : filters)
+        {
+            if (filter.getFilter() instanceof DSpaceFilter)
+            {
+                DSpaceFilter dspaceFilter = (DSpaceFilter) filter.getFilter();
+                SolrFilterResult result = dspaceFilter.getQuery();
+                if (result.hasResult())
+                {
+                    if (filter.getScope() == FilterScope.MetadataFormat)
+                        whereCond.add("(item.deleted:true OR ("
+                                + result.getQuery() + "))");
+                    else
+                        whereCond.add("(" + result.getQuery() + ")");
+                }
+            }
+        }
+        if (whereCond.isEmpty())
+            whereCond.add("*:*");
+        String where = "(" + StringUtils.join(whereCond.iterator(), ") AND (")
+                + ")";
+        return this.getResult(where, offset, length);
+    }
+
+    private ListItemsResults getResult(String where, int offset, int length)
+    {
+        List<AbstractItem> list = new ArrayList<AbstractItem>();
+        try
+        {
+            SolrQuery params = new SolrQuery(where).setRows(length).setStart(
+                    offset);
+            SolrDocumentList docs = DSpaceSolrSearch.query(params);
+            for (SolrDocument doc : docs)
+            {
+                Item item = Item.find(ctx,
+                        (Integer) doc.getFieldValue("item.id"));
+                list.add(new DSpaceItem(item));
+            }
+            return new ListItemsResults((docs.getNumFound() > offset + length),
+                    list);
+        }
+        catch (DSpaceSolrException ex)
+        {
+            log.error(ex.getMessage(), ex);
+            return new ListItemsResults(false, list);
+        }
+        catch (SQLException e)
+        {
+            log.error(e.getMessage(), e);
+            return new ListItemsResults(false, list);
+        }
+    }
+
+    private ListItemIdentifiersResult getIdentifierResult(String where,
+            int offset, int length)
+    {
+        List<AbstractItemIdentifier> list = new ArrayList<AbstractItemIdentifier>();
+        try
+        {
+            SolrQuery params = new SolrQuery(where).setRows(length).setStart(
+                    offset);
+            boolean hasMore = false;
+            SolrDocumentList docs = DSpaceSolrSearch.query(params);
+            hasMore = (offset + length) < docs.getNumFound();
+            for (SolrDocument doc : docs)
+            {
+                Item item = Item.find(ctx,
+                        (Integer) doc.getFieldValue("item.id"));
+                list.add(new DSpaceItem(item));
+            }
+            return new ListItemIdentifiersResult(hasMore, list);
+        }
+        catch (DSpaceSolrException ex)
+        {
+            log.error(ex.getMessage(), ex);
+            return new ListItemIdentifiersResult(false, list);
+        }
+        catch (SQLException e)
+        {
+            log.error(e.getMessage(), e);
+            return new ListItemIdentifiersResult(false, list);
+        }
+    }
 
 }

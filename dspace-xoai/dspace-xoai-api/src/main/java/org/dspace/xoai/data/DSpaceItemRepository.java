@@ -24,118 +24,141 @@ import com.lyncode.xoai.common.dataprovider.filter.FilterScope;
  * 
  * @author Lyncode Development Team <dspace@lyncode.com>
  */
-public abstract class DSpaceItemRepository extends AbstractItemRepository {
+public abstract class DSpaceItemRepository extends AbstractItemRepository
+{
 
-	// private static Logger log = LogManager.getLogger(DSpaceItemRepository.class);
-	@Override
-	protected ListItemIdentifiersResult getItemIdentifiers(
-			List<Filter> filters, int offset, int length, Date from) {
-		filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
-		return this.getItemIdentifiers(filters, offset, length);
-	}
-	
-	@Override
-	protected ListItemIdentifiersResult getItemIdentifiers(
-			List<Filter> filters, int offset, int length, String setSpec) {
-		filters.add(new Filter(new DspaceSetSpecFilter(setSpec), FilterScope.Query));
-		return this.getItemIdentifiers(filters, offset, length);
-	}
-	
-	@Override
-	protected ListItemIdentifiersResult getItemIdentifiers(
-			List<Filter> filters, int offset, int length, Date from,
-			Date until) {
-		filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
-		filters.add(new Filter(new DateUntilFilter(until), FilterScope.Query));
-		return this.getItemIdentifiers(filters, offset, length);
-	}
-	
-	@Override
-	protected ListItemIdentifiersResult getItemIdentifiers(
-			List<Filter> filters, int offset, int length,
-			String setSpec, Date from) {
-		filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
-		filters.add(new Filter(new DspaceSetSpecFilter(setSpec), FilterScope.Query));
-		return this.getItemIdentifiers(filters, offset, length);
-	}
-	
-	@Override
-	protected ListItemIdentifiersResult getItemIdentifiers(
-			List<Filter> filters, int offset, int length,
-			String setSpec, Date from, Date until) {
-		filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
-		filters.add(new Filter(new DateUntilFilter(until), FilterScope.Query));
-		filters.add(new Filter(new DspaceSetSpecFilter(setSpec), FilterScope.Query));
-		return this.getItemIdentifiers(filters, offset, length);
-	}
-	
-	@Override
-	protected ListItemIdentifiersResult getItemIdentifiersUntil(
-			List<Filter> filters, int offset, int length, Date until) {
-		filters.add(new Filter(new DateUntilFilter(until), FilterScope.Query));
-		return this.getItemIdentifiers(filters, offset, length);
-	}
-	
-	@Override
-	protected ListItemIdentifiersResult getItemIdentifiersUntil(
-			List<Filter> filters, int offset, int length,
-			String setSpec, Date until) {
-		filters.add(new Filter(new DateUntilFilter(until), FilterScope.Query));
-		filters.add(new Filter(new DspaceSetSpecFilter(setSpec), FilterScope.Query));
-		return this.getItemIdentifiers(filters, offset, length);
-	}
-	
-	@Override
-	protected ListItemsResults getItems(List<Filter> filters,
-			int offset, int length, Date from) {
-		filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
-		return this.getItems(filters, offset, length);
-	}
-	
-	@Override
-	protected ListItemsResults getItems(List<Filter> filters,
-			int offset, int length, String setSpec) {
-		filters.add(new Filter(new DspaceSetSpecFilter(setSpec), FilterScope.Query));
-		return this.getItems(filters, offset, length);
-	}
-	
-	@Override
-	protected ListItemsResults getItems(List<Filter> filters,
-			int offset, int length, Date from, Date until) {
-		filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
-		filters.add(new Filter(new DateUntilFilter(until), FilterScope.Query));
-		return this.getItems(filters, offset, length);
-	}
-	
-	@Override
-	protected ListItemsResults getItems(List<Filter> filters,
-			int offset, int length, String setSpec, Date from) {
-		filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
-		filters.add(new Filter(new DspaceSetSpecFilter(setSpec), FilterScope.Query));
-		return this.getItems(filters, offset, length);
-	}
-	
-	@Override
-	protected ListItemsResults getItems(List<Filter> filters,
-			int offset, int length, String setSpec, Date from, Date until) {
-		filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
-		filters.add(new Filter(new DateUntilFilter(until), FilterScope.Query));
-		filters.add(new Filter(new DspaceSetSpecFilter(setSpec), FilterScope.Query));
-		return this.getItems(filters, offset, length);
-	}
-	
-	@Override
-	protected ListItemsResults getItemsUntil(List<Filter> filters,
-			int offset, int length, Date until) {
-		filters.add(new Filter(new DateUntilFilter(until), FilterScope.Query));
-		return this.getItems(filters, offset, length);
-	}
-	
-	@Override
-	protected ListItemsResults getItemsUntil(List<Filter> filters,
-			int offset, int length, String setSpec, Date from) {
-		filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
-		filters.add(new Filter(new DspaceSetSpecFilter(setSpec), FilterScope.Query));
-		return this.getItems(filters, offset, length);
-	}
+    // private static Logger log =
+    // LogManager.getLogger(DSpaceItemRepository.class);
+    @Override
+    protected ListItemIdentifiersResult getItemIdentifiers(
+            List<Filter> filters, int offset, int length, Date from)
+    {
+        filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
+        return this.getItemIdentifiers(filters, offset, length);
+    }
+
+    @Override
+    protected ListItemIdentifiersResult getItemIdentifiers(
+            List<Filter> filters, int offset, int length, String setSpec)
+    {
+        filters.add(new Filter(new DspaceSetSpecFilter(setSpec),
+                FilterScope.Query));
+        return this.getItemIdentifiers(filters, offset, length);
+    }
+
+    @Override
+    protected ListItemIdentifiersResult getItemIdentifiers(
+            List<Filter> filters, int offset, int length, Date from, Date until)
+    {
+        filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
+        filters.add(new Filter(new DateUntilFilter(until), FilterScope.Query));
+        return this.getItemIdentifiers(filters, offset, length);
+    }
+
+    @Override
+    protected ListItemIdentifiersResult getItemIdentifiers(
+            List<Filter> filters, int offset, int length, String setSpec,
+            Date from)
+    {
+        filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
+        filters.add(new Filter(new DspaceSetSpecFilter(setSpec),
+                FilterScope.Query));
+        return this.getItemIdentifiers(filters, offset, length);
+    }
+
+    @Override
+    protected ListItemIdentifiersResult getItemIdentifiers(
+            List<Filter> filters, int offset, int length, String setSpec,
+            Date from, Date until)
+    {
+        filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
+        filters.add(new Filter(new DateUntilFilter(until), FilterScope.Query));
+        filters.add(new Filter(new DspaceSetSpecFilter(setSpec),
+                FilterScope.Query));
+        return this.getItemIdentifiers(filters, offset, length);
+    }
+
+    @Override
+    protected ListItemIdentifiersResult getItemIdentifiersUntil(
+            List<Filter> filters, int offset, int length, Date until)
+    {
+        filters.add(new Filter(new DateUntilFilter(until), FilterScope.Query));
+        return this.getItemIdentifiers(filters, offset, length);
+    }
+
+    @Override
+    protected ListItemIdentifiersResult getItemIdentifiersUntil(
+            List<Filter> filters, int offset, int length, String setSpec,
+            Date until)
+    {
+        filters.add(new Filter(new DateUntilFilter(until), FilterScope.Query));
+        filters.add(new Filter(new DspaceSetSpecFilter(setSpec),
+                FilterScope.Query));
+        return this.getItemIdentifiers(filters, offset, length);
+    }
+
+    @Override
+    protected ListItemsResults getItems(List<Filter> filters, int offset,
+            int length, Date from)
+    {
+        filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
+        return this.getItems(filters, offset, length);
+    }
+
+    @Override
+    protected ListItemsResults getItems(List<Filter> filters, int offset,
+            int length, String setSpec)
+    {
+        filters.add(new Filter(new DspaceSetSpecFilter(setSpec),
+                FilterScope.Query));
+        return this.getItems(filters, offset, length);
+    }
+
+    @Override
+    protected ListItemsResults getItems(List<Filter> filters, int offset,
+            int length, Date from, Date until)
+    {
+        filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
+        filters.add(new Filter(new DateUntilFilter(until), FilterScope.Query));
+        return this.getItems(filters, offset, length);
+    }
+
+    @Override
+    protected ListItemsResults getItems(List<Filter> filters, int offset,
+            int length, String setSpec, Date from)
+    {
+        filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
+        filters.add(new Filter(new DspaceSetSpecFilter(setSpec),
+                FilterScope.Query));
+        return this.getItems(filters, offset, length);
+    }
+
+    @Override
+    protected ListItemsResults getItems(List<Filter> filters, int offset,
+            int length, String setSpec, Date from, Date until)
+    {
+        filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
+        filters.add(new Filter(new DateUntilFilter(until), FilterScope.Query));
+        filters.add(new Filter(new DspaceSetSpecFilter(setSpec),
+                FilterScope.Query));
+        return this.getItems(filters, offset, length);
+    }
+
+    @Override
+    protected ListItemsResults getItemsUntil(List<Filter> filters, int offset,
+            int length, Date until)
+    {
+        filters.add(new Filter(new DateUntilFilter(until), FilterScope.Query));
+        return this.getItems(filters, offset, length);
+    }
+
+    @Override
+    protected ListItemsResults getItemsUntil(List<Filter> filters, int offset,
+            int length, String setSpec, Date from)
+    {
+        filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
+        filters.add(new Filter(new DspaceSetSpecFilter(setSpec),
+                FilterScope.Query));
+        return this.getItems(filters, offset, length);
+    }
 }

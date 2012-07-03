@@ -33,154 +33,199 @@ import org.dspace.xoai.filter.DSpaceFilter;
 import org.dspace.xoai.filter.DatabaseFilterResult;
 
 /**
- *
+ * 
  * @author Lyncode Development Team <dspace@lyncode.com>
  */
-public class DSpaceItemDatabaseRepository extends DSpaceItemRepository {
+public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
+{
 
-	private static Logger log = LogManager.getLogger(DSpaceItemDatabaseRepository.class);
-	private Context _context;
-	
-	public DSpaceItemDatabaseRepository(Context context) {
-		_context = context;
-	}
-	
-	@Override
-	public AbstractItem getItem(String id) throws IdDoesNotExistException {
-		try {
-			String parts[] = id.split(Pattern.quote(":"));
-			if (parts.length == 3) {
-				DSpaceObject obj = HandleManager.resolveToObject(_context, parts[2]);
-				if (obj == null) throw new IdDoesNotExistException();
-				if (!(obj instanceof Item)) throw new IdDoesNotExistException();
-				return new DSpaceItem((Item) obj);
-			}
-		} catch (NumberFormatException e) {
-			log.debug(e.getMessage(), e);
-			throw new IdDoesNotExistException();
-		} catch (SQLException e) {
-			log.error(e.getMessage(), e);
-			throw new IdDoesNotExistException();
-		}
-		throw new IdDoesNotExistException();
-	}
-	
-	private ListItemIdentifiersResult getIdentifierResult(String query, List<Object> parameters, int length) {
-		boolean hasMore = false;
-		List<AbstractItemIdentifier> list = new ArrayList<AbstractItemIdentifier>();
-		TableRowIterator rows;
-		try {
-			parameters.add(length + 1);
-			rows = DatabaseManager.queryTable(_context, "item", query, parameters.toArray());
-			ItemIterator iterator = new ItemIterator(_context, rows);
-			int i = 0;
-			while (iterator.hasNext() && i < length) {
-				list.add(new DSpaceItem(iterator.next()));
-				i++;
-			}
-			hasMore = iterator.hasNext();
-		} catch (SQLException e) {
-			log.error(e.getMessage(), e);
-		}
-		return new ListItemIdentifiersResult(hasMore, list);
-	}
+    private static Logger log = LogManager
+            .getLogger(DSpaceItemDatabaseRepository.class);
 
+    private Context _context;
 
-	private ListItemsResults getResult(String query, List<Object> parameters, int length) {
-		boolean hasMore = false;
-		List<AbstractItem> list = new ArrayList<AbstractItem>();
-		TableRowIterator rows;
-		try {
-			parameters.add(length + 1);
-			rows = DatabaseManager.queryTable(_context, "item", query, parameters.toArray());
-			ItemIterator iterator = new ItemIterator(_context, rows);
-			int i = 0;
-			while (iterator.hasNext() && i < length) {
-				list.add(new DSpaceItem(iterator.next()));
-				i++;
-			}
-			hasMore = iterator.hasNext();
-		} catch (SQLException e) {
-			log.error(e.getMessage(), e);
-		}
-		return new ListItemsResults(hasMore, list);
-	}
-	
-	@Override
-	protected ListItemsResults getItems(List<Filter> filters,
-			int offset, int length) {
-		List<Object> parameters = new ArrayList<Object>();
-		String query = "SELECT i.* FROM item i ";
-		List<String> whereCond = new ArrayList<String>();
-		for (Filter filter : filters) {
-			if (filter.getFilter() instanceof DSpaceFilter) {
-			DSpaceFilter dspaceFilter = (DSpaceFilter) filter.getFilter();
-			DatabaseFilterResult result = dspaceFilter.getWhere(_context);
-			if (result.hasResult()) {
-				if (filter.getScope() == FilterScope.MetadataFormat)
-					whereCond.add("(i.withdrawn=TRUE OR (" + result.getWhere() + "))");
-				else
-					whereCond.add("(" + result.getWhere() + ")");
-				parameters.addAll(result.getParameters());
-				}
-			}
-		}
-		String where = StringUtils.join(whereCond.iterator(), " AND ");
-		if (!where.equals(""))
-			query += " WHERE " + where;
-		query += " ORDER BY i.item_id";
-		String db = ConfigurationManager.getProperty("db.name");
-		boolean postgres = true;
-		// Assuming Postgres as default
-		if ("oracle".equals(db))
-			postgres = false;
-		if (postgres) {
-			query += " OFFSET ? LIMIT ?";
-		} else {
-			// Oracle
-			query = "SELECT *, ROWNUM r FROM ("+query+") WHERE r BETWEEN ? AND ?";
-			length = length + offset;
-		}
-		parameters.add(offset);
-		return this.getResult(query, parameters, length);
-	}
-	
-	@Override
-	protected ListItemIdentifiersResult getItemIdentifiers(
-			List<Filter> filters, int offset, int length) {
-		List<Object> parameters = new ArrayList<Object>();
-		String query = "SELECT i.* FROM item i";
-		List<String> whereCond = new ArrayList<String>();
-		for (Filter filter : filters) {
-			if (filter.getFilter() instanceof DSpaceFilter) {
-				DSpaceFilter dspaceFilter = (DSpaceFilter) filter.getFilter();
-				DatabaseFilterResult result = dspaceFilter.getWhere(_context);
-				if (result.hasResult()) {
-					if (filter.getScope() == FilterScope.MetadataFormat)
-						whereCond.add("(i.withdrawn=TRUE OR (" + result.getWhere() + "))");
-					else
-						whereCond.add("(" + result.getWhere() + ")");
-					parameters.addAll(result.getParameters());
-				}
-			}
-		}
-		String where = StringUtils.join(whereCond.iterator(), " AND ");
-		if (!where.equals(""))
-			query += " WHERE " + where;
-		query += " ORDER BY i.item_id";
-		String db = ConfigurationManager.getProperty("db.name");
-		boolean postgres = true;
-		// Assuming Postgres as default
-		if ("oracle".equals(db))
-			postgres = false;
-		if (postgres) {
-			query += " OFFSET ? LIMIT ?";
-		} else {
-			// Oracle
-			query = "SELECT *, ROWNUM r FROM ("+query+") WHERE r BETWEEN ? AND ?";
-			length = length + offset;
-		}
-		parameters.add(offset);
-		return this.getIdentifierResult(query, parameters, length);
-	}
+    public DSpaceItemDatabaseRepository(Context context)
+    {
+        _context = context;
+    }
+
+    @Override
+    public AbstractItem getItem(String id) throws IdDoesNotExistException
+    {
+        try
+        {
+            String parts[] = id.split(Pattern.quote(":"));
+            if (parts.length == 3)
+            {
+                DSpaceObject obj = HandleManager.resolveToObject(_context,
+                        parts[2]);
+                if (obj == null)
+                    throw new IdDoesNotExistException();
+                if (!(obj instanceof Item))
+                    throw new IdDoesNotExistException();
+                return new DSpaceItem((Item) obj);
+            }
+        }
+        catch (NumberFormatException e)
+        {
+            log.debug(e.getMessage(), e);
+            throw new IdDoesNotExistException();
+        }
+        catch (SQLException e)
+        {
+            log.error(e.getMessage(), e);
+            throw new IdDoesNotExistException();
+        }
+        throw new IdDoesNotExistException();
+    }
+
+    private ListItemIdentifiersResult getIdentifierResult(String query,
+            List<Object> parameters, int length)
+    {
+        boolean hasMore = false;
+        List<AbstractItemIdentifier> list = new ArrayList<AbstractItemIdentifier>();
+        TableRowIterator rows;
+        try
+        {
+            parameters.add(length + 1);
+            rows = DatabaseManager.queryTable(_context, "item", query,
+                    parameters.toArray());
+            ItemIterator iterator = new ItemIterator(_context, rows);
+            int i = 0;
+            while (iterator.hasNext() && i < length)
+            {
+                list.add(new DSpaceItem(iterator.next()));
+                i++;
+            }
+            hasMore = iterator.hasNext();
+        }
+        catch (SQLException e)
+        {
+            log.error(e.getMessage(), e);
+        }
+        return new ListItemIdentifiersResult(hasMore, list);
+    }
+
+    private ListItemsResults getResult(String query, List<Object> parameters,
+            int length)
+    {
+        boolean hasMore = false;
+        List<AbstractItem> list = new ArrayList<AbstractItem>();
+        TableRowIterator rows;
+        try
+        {
+            parameters.add(length + 1);
+            rows = DatabaseManager.queryTable(_context, "item", query,
+                    parameters.toArray());
+            ItemIterator iterator = new ItemIterator(_context, rows);
+            int i = 0;
+            while (iterator.hasNext() && i < length)
+            {
+                list.add(new DSpaceItem(iterator.next()));
+                i++;
+            }
+            hasMore = iterator.hasNext();
+        }
+        catch (SQLException e)
+        {
+            log.error(e.getMessage(), e);
+        }
+        return new ListItemsResults(hasMore, list);
+    }
+
+    @Override
+    protected ListItemsResults getItems(List<Filter> filters, int offset,
+            int length)
+    {
+        List<Object> parameters = new ArrayList<Object>();
+        String query = "SELECT i.* FROM item i ";
+        List<String> whereCond = new ArrayList<String>();
+        for (Filter filter : filters)
+        {
+            if (filter.getFilter() instanceof DSpaceFilter)
+            {
+                DSpaceFilter dspaceFilter = (DSpaceFilter) filter.getFilter();
+                DatabaseFilterResult result = dspaceFilter.getWhere(_context);
+                if (result.hasResult())
+                {
+                    if (filter.getScope() == FilterScope.MetadataFormat)
+                        whereCond.add("(i.withdrawn=TRUE OR ("
+                                + result.getWhere() + "))");
+                    else
+                        whereCond.add("(" + result.getWhere() + ")");
+                    parameters.addAll(result.getParameters());
+                }
+            }
+        }
+        String where = StringUtils.join(whereCond.iterator(), " AND ");
+        if (!where.equals(""))
+            query += " WHERE " + where;
+        query += " ORDER BY i.item_id";
+        String db = ConfigurationManager.getProperty("db.name");
+        boolean postgres = true;
+        // Assuming Postgres as default
+        if ("oracle".equals(db))
+            postgres = false;
+        if (postgres)
+        {
+            query += " OFFSET ? LIMIT ?";
+        }
+        else
+        {
+            // Oracle
+            query = "SELECT *, ROWNUM r FROM (" + query
+                    + ") WHERE r BETWEEN ? AND ?";
+            length = length + offset;
+        }
+        parameters.add(offset);
+        return this.getResult(query, parameters, length);
+    }
+
+    @Override
+    protected ListItemIdentifiersResult getItemIdentifiers(
+            List<Filter> filters, int offset, int length)
+    {
+        List<Object> parameters = new ArrayList<Object>();
+        String query = "SELECT i.* FROM item i";
+        List<String> whereCond = new ArrayList<String>();
+        for (Filter filter : filters)
+        {
+            if (filter.getFilter() instanceof DSpaceFilter)
+            {
+                DSpaceFilter dspaceFilter = (DSpaceFilter) filter.getFilter();
+                DatabaseFilterResult result = dspaceFilter.getWhere(_context);
+                if (result.hasResult())
+                {
+                    if (filter.getScope() == FilterScope.MetadataFormat)
+                        whereCond.add("(i.withdrawn=TRUE OR ("
+                                + result.getWhere() + "))");
+                    else
+                        whereCond.add("(" + result.getWhere() + ")");
+                    parameters.addAll(result.getParameters());
+                }
+            }
+        }
+        String where = StringUtils.join(whereCond.iterator(), " AND ");
+        if (!where.equals(""))
+            query += " WHERE " + where;
+        query += " ORDER BY i.item_id";
+        String db = ConfigurationManager.getProperty("db.name");
+        boolean postgres = true;
+        // Assuming Postgres as default
+        if ("oracle".equals(db))
+            postgres = false;
+        if (postgres)
+        {
+            query += " OFFSET ? LIMIT ?";
+        }
+        else
+        {
+            // Oracle
+            query = "SELECT *, ROWNUM r FROM (" + query
+                    + ") WHERE r BETWEEN ? AND ?";
+            length = length + offset;
+        }
+        parameters.add(offset);
+        return this.getIdentifierResult(query, parameters, length);
+    }
 }

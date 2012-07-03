@@ -16,20 +16,25 @@ import com.lyncode.xoai.common.dataprovider.core.Set;
  * 
  * @author Lyncode Development Team <dspace@lyncode.com>
  */
-public class DSpaceSet extends Set {
-	public static Set newDSpaceCommunitySet (String handle, String name) {
-		return new Set("com_"+handle.replace('/', '_'), name);
-	}
-	public static Set newDSpaceCollectionSet (String handle, String name) {
-		return new Set("col_"+handle.replace('/', '_'), name);
-	}
-	
-	
-	public DSpaceSet(Community c) {
-		super("com_"+c.getHandle().replace('/', '_'), c.getName());
-	}
-	
-	public DSpaceSet(Collection c) {
-		super("col_"+c.getHandle().replace('/', '_'), c.getName());
-	}
+public class DSpaceSet extends Set
+{
+    public static Set newDSpaceCommunitySet(String handle, String name)
+    {
+        return new Set("com_" + handle.replace('/', '_'), name);
+    }
+
+    public static Set newDSpaceCollectionSet(String handle, String name)
+    {
+        return new Set("col_" + handle.replace('/', '_'), name);
+    }
+
+    public DSpaceSet(Community c)
+    {
+        super("com_" + c.getHandle().replace('/', '_'), c.getName());
+    }
+
+    public DSpaceSet(Collection c)
+    {
+        super("col_" + c.getHandle().replace('/', '_'), c.getName());
+    }
 }
