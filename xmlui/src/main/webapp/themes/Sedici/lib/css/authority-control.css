@@ -21,7 +21,7 @@ div.autocomplete {
 
 div.autocomplete, ul.ui-menu {
   position:absolute;
-  width:250px;
+  width:auto !important;
   background-color:white;
   border:1px solid #888;
   margin:0;
