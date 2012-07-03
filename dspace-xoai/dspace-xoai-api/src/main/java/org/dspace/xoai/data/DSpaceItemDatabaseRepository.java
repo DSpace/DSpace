@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -128,7 +129,19 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository {
         String where = StringUtils.join(whereCond.iterator(), " AND ");
         if (!where.equals(""))
             query += " WHERE " + where;
-        query += " ORDER BY i.item_id OFFSET ? LIMIT ?";
+        query += " ORDER BY i.item_id";
+        String db = ConfigurationManager.getProperty("db.name");
+        boolean postgres = true;
+        // Assuming postgres as default
+        if ("oracle".equals(db))
+            postgres = false;
+        if (postgres) {
+            query += " OFFSET ? LIMIT ?";
+        } else {
+            // ORACLE
+            query = "SELECT *, ROWNUM r FROM ("+query+") WHERE r BETWEEN ? AND ?";
+            length = length + offset;
+        }
         parameters.add(offset);
         return this.getResult(query, parameters, length);
     }
@@ -156,7 +169,19 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository {
         String where = StringUtils.join(whereCond.iterator(), " AND ");
         if (!where.equals(""))
             query += " WHERE " + where;
-        query += " ORDER BY i.item_id OFFSET ? LIMIT ?";
+        query += " ORDER BY i.item_id";
+        String db = ConfigurationManager.getProperty("db.name");
+        boolean postgres = true;
+        // Assuming postgres as default
+        if ("oracle".equals(db))
+            postgres = false;
+        if (postgres) {
+            query += " OFFSET ? LIMIT ?";
+        } else {
+            // ORACLE
+            query = "SELECT *, ROWNUM r FROM ("+query+") WHERE r BETWEEN ? AND ?";
+            length = length + offset;
+        }
         parameters.add(offset);
         return this.getIdentifierResult(query, parameters, length);
     }

@@ -5,6 +5,8 @@ target/
 *.project
 *.settings
 
+bin/
+
 ## Ignore project files created by IntelliJ IDEA
 *.iml
 *.ipr

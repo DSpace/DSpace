@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -63,7 +64,19 @@ public class DSpaceSetRepository extends AbstractSetRepository {
 	
 	private List<Set> community (int offset, int length) {
 		List<Set> array = new ArrayList<Set>();
-		String query = "SELECT community_id, name, handle FROM community c, handle h WHERE h.resource_id=community_id AND h.resource_type_id=? ORDER BY community_id OFFSET ? LIMIT ?";
+		String query = "SELECT community_id, name, handle FROM community c, handle h WHERE h.resource_id=community_id AND h.resource_type_id=? ORDER BY community_id";
+		String db = ConfigurationManager.getProperty("db.name");
+        boolean postgres = true;
+        // Assuming postgres as default
+        if ("oracle".equals(db))
+            postgres = false;
+        if (postgres) {
+            query += " OFFSET ? LIMIT ?";
+        } else {
+            // ORACLE
+            query = "SELECT *, ROWNUM r FROM ("+query+") WHERE r BETWEEN ? AND ?";
+            length = length + offset;
+        }
 		try {
 			TableRowIterator iterator = DatabaseManager.query(_context, query, Constants.COMMUNITY, offset, length);
 			int i = 0;
@@ -80,7 +93,19 @@ public class DSpaceSetRepository extends AbstractSetRepository {
 	
 	private List<Set> collection (int offset, int length) {
 		List<Set> array = new ArrayList<Set>();
-		String query = "SELECT collection_id, name, handle FROM collection c, handle h WHERE h.resource_id=collection_id AND h.resource_type_id=? ORDER BY collection_id OFFSET ? LIMIT ?";
+		String query = "SELECT collection_id, name, handle FROM collection c, handle h WHERE h.resource_id=collection_id AND h.resource_type_id=? ORDER BY collection_id";
+		String db = ConfigurationManager.getProperty("db.name");
+        boolean postgres = true;
+        // Assuming postgres as default
+        if ("oracle".equals(db))
+            postgres = false;
+        if (postgres) {
+            query += " OFFSET ? LIMIT ?";
+        } else {
+            // ORACLE
+            query = "SELECT *, ROWNUM r FROM ("+query+") WHERE r BETWEEN ? AND ?";
+            length = length + offset;
+        }
 		try {
 			TableRowIterator iterator = DatabaseManager.query(_context, query, Constants.COLLECTION, offset, length);
 			int i = 0;
