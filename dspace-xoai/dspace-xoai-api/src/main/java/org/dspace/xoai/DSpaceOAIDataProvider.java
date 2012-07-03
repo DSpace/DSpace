@@ -134,8 +134,10 @@ public class DSpaceOAIDataProvider extends HttpServlet {
 
 	private String getStaticHead () {
 		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-				"<?xml-stylesheet type=\"text/xsl\" href=\""+XOAIManager.getManager().getStyleSheet()+"\"?>"+
-			    "<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\">";
+				((XOAIManager.getManager().hasStyleSheet()) ?
+				("<?xml-stylesheet type=\"text/xsl\" href=\""+XOAIManager.getManager().getStyleSheet()+"\"?>"):"")+
+			    "<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+			    "xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\">";
 	}
 	
 	/**
@@ -173,6 +175,8 @@ public class DSpaceOAIDataProvider extends HttpServlet {
 			} catch (IOException e) {
 				log.error(e.getMessage(), e);
 			} catch (OAIException e) {
+				// try to remove the file
+				if (f.exists()) f.delete();
 				log.error(e.getMessage(), e);
 			}
 		} else log.debug("[XOAI] Cached Result");
