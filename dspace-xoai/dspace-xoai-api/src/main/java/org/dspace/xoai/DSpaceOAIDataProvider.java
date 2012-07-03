@@ -80,7 +80,7 @@ public class DSpaceOAIDataProvider extends HttpServlet {
 					((DSpaceFilter) filter).initialize(context);
 
 			DSpaceItemRepository repository;
-			String storage = ConfigurationManager.getProperty("xoai.storage");
+			String storage = ConfigurationManager.getProperty("xoai", "storage");
 			if (storage == null || !storage.trim().toLowerCase().equals("database")) {
 				log.debug("Using Solr for querying");
 				repository = new DSpaceItemSolrRepository(context);
