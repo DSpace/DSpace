@@ -2110,6 +2110,7 @@
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-materias">Subjects</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-decs">DECS Thesaurus</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-eurovoc">Eurovoc Thesaurus</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-subject-acmcss98">ACM98 Classification System</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-descriptores">Descriptors</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-other">Other descriptors</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-keyword">Keywords</message>

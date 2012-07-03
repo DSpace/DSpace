@@ -737,6 +737,7 @@
        	sedici.subject.lcsh^0.05
        	sedici.subject.decs^0.05
        	sedici.subject.eurovoc^0.05
+       	sedici.subject.acmcss98^0.05
        	sedici.subject.descriptores^0.05
        	sedici.subject.other^0.05
        	sedici.contributor.colaborator^0.1
@@ -770,6 +771,7 @@
        	sedici.subject.lcsh^0.1
        	sedici.subject.decs^0.1
        	sedici.subject.eurovoc^0.1
+       	sedici.subject.acmcss98^0.1
        	sedici.subject.descriptores^0.1
        	sedici.subject.other^0.1
        	sedici.contributor.colaborator^0.1

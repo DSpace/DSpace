@@ -190,6 +190,12 @@
 	<dc-type>
 		<schema>sedici</schema>
 		<element>subject</element>
+		<qualifier>acmcss98</qualifier>
+		<scope_note>Descriptores extraídos del Sist de clasificacion ACM CSS 98</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>subject</element>
 		<qualifier>descriptores</qualifier>
 		<scope_note>Descriptores extraídos de los tesauros SeDiCI y Unesco</scope_note>
 	</dc-type>

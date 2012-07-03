@@ -155,7 +155,7 @@
 				<!-- /////////////////// FIN DE LOS TYPES Y SUBTYPES /////////////////// -->
 				
 
-				<!-- Autor (persona) -->
+				<!-- Autor (persona), Submission -->
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>creator</dc-element>
@@ -165,7 +165,19 @@
 					<input-type>onebox</input-type>
 					<hint>Autores de la obra</hint>
 					<required>Debe indicar al menos un autor</required>
-					<required-on-group>!SeDiCIAdmin</required-on-group>
+					<visibility>submit</visibility>
+				</field>
+	
+				<!-- Autor (persona), Workflow -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>creator</dc-element>
+					<dc-qualifier>person</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Autor (*)</label>
+					<input-type>onebox</input-type>
+					<hint>Autores de la obra</hint>
+					<visibility>workflow</visibility>
 				</field>
 
 				<!-- Autor Institucional (institucion) -->
@@ -406,6 +418,18 @@
 					<label>Descriptores Eurovoc</label>
 					<input-type>onebox</input-type>
 					<hint>Descriptores del recurso a partir del tesauro Eurovoc</hint>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Descriptores acmcss98 -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>acmcss98</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Descriptores ACM</label>
+					<input-type>onebox</input-type>
+					<hint>Descriptores del recurso a partir del Sist de clasificacion ACM98</hint>
 					<visibility>workflow</visibility>
 				</field>
 
