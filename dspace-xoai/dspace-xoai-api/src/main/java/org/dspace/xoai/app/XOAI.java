@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -51,9 +52,9 @@ import org.dspace.xoai.solr.exceptions.DSpaceSolrIndexerException;
  * @author Lyncode Development Team <dspace@lyncode.com>
  */
 @SuppressWarnings("deprecation")
-public class SolrIndexer
+public class XOAI
 {
-    private static Logger log = LogManager.getLogger(SolrIndexer.class);
+    private static Logger log = LogManager.getLogger(XOAI.class);
 
     private Context _context;
 
@@ -84,7 +85,7 @@ public class SolrIndexer
         return formats;
     }
 
-    public SolrIndexer(Context ctx, boolean optimize, boolean verb)
+    public XOAI(Context ctx, boolean optimize, boolean verb)
     {
         _context = ctx;
         _optimize = optimize;
@@ -275,43 +276,47 @@ public class SolrIndexer
         {
             CommandLineParser parser = new PosixParser();
             Options options = new Options();
-            options.addOption("i", "index", false, "Index database items");
-            options.addOption("c", "clear", false, "Clear index");
+            options.addOption("c", "clear", false, "Clear index before indexing");
             options.addOption("o", "optimize", false,
-                    "Optimize index at the end of the operation");
+                    "Optimize index at the end");
             options.addOption("v", "verbose", false, "Verbose output");
-            options.addOption("p", "purge-cache", false,
-                    "Purges cached OAI responses");
             options.addOption("h", "help", false, "Shows some help");
             CommandLine line = parser.parse(options, argv);
+            
+            String[] validCommands = { "import", "clean-cache", "clear-index" };
+            
+            if (!line.hasOption('h') && line.getArgs().length > 0) {
+                if (Arrays.asList(validCommands).contains(line.getArgs()[0])) {
+                    System.out.println("XOAI manager action started");
+                    long start = System.currentTimeMillis();
+                    
+                    String command = line.getArgs()[0];
+                    
+                    if ("import".equals(command)) {
+                        if (line.hasOption('c'))
+                            clearIndex();
 
-            if (line.hasOption('h'))
-            {
-                usage();
-            }
-            else
-            {
-                System.out.println("XOAI import app started");
-                long start = System.currentTimeMillis();
+                        if (line.hasOption('p'))
+                            cleanCache();
+                        Context ctx = new Context();
+                        XOAI indexer = new XOAI(ctx,
+                                line.hasOption('o'), line.hasOption('v'));
 
-                if (line.hasOption('c'))
-                    clearIndex();
+                        indexer.index();
+                    } else if ("clean-cache".equals(command)) {
+                        cleanCache();
+                    } else if ("clear-index".equals(command)) {
+                        clearIndex();
+                    }
 
-                if (line.hasOption('p'))
-                    cleanCache();
-
-                if (line.hasOption('i'))
-                {
-                    Context ctx = new Context();
-                    SolrIndexer indexer = new SolrIndexer(ctx,
-                            line.hasOption('o'), line.hasOption('v'));
-
-                    indexer.index();
+                    System.out.println("XOAI manager action ended. It took "
+                            + ((System.currentTimeMillis() - start) / 1000)
+                            + " seconds.");
+                } else {
+                    usage();
                 }
-
-                System.out.println("XOAI import ended. It took "
-                        + ((System.currentTimeMillis() - start) / 1000)
-                        + " seconds.");
+            } else {
+                usage();
             }
         }
         catch (Throwable ex)
@@ -397,12 +402,16 @@ public class SolrIndexer
 
     private static void usage()
     {
-        System.out.println("Parameters:");
-        System.out.println("    -i Index database items");
-        System.out.println("    -o Optimize index after operation");
-        System.out.println("    -c Clear index");
-        System.out.println("    -v Verbose output");
-        System.out.println("    -p Purges cached OAI responses");
-        System.out.println("    -h Shows this text");
+        System.out.println("XOAI Manager Script");
+        System.out.println("Syntax: xoai <action> [parameters]");
+        System.out.println("> Possible actions:");
+        System.out.println("     import - To import DSpace items into XOAI Solr index");
+        System.out.println("     clean-cache - Cleans the XOAI cache");
+        System.out.println("     clear-index - Clears the XOAI Solr index");
+        System.out.println("> Parameters:");
+        System.out.println("     -o Optimize index after indexing");
+        System.out.println("     -c Clear index");
+        System.out.println("     -v Verbose output");
+        System.out.println("     -h Shows this text");
     }
 }

@@ -364,10 +364,10 @@
 	</command>
 
 	<command>
-		<name>xoai-import</name>
-		<description>Importing items to XOAI index</description>
+		<name>xoai</name>
+		<description>XOAI script manager</description>
 		<step>
-			<class>org.dspace.xoai.app.SolrIndexer</class>
+			<class>org.dspace.xoai.app.XOAI</class>
 		</step>
 	</command>
 
