@@ -11,9 +11,9 @@
     <bean id="editactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.AcceptEditRejectAction" scope="prototype"/>
     <bean id="finaleditactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.FinalEditAction" scope="prototype"/>
     <bean id="singleuserreviewactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.SingleUserReviewAction" scope="prototype"/>
-	<bean id="selectcollectionactionAPI" class="ar.edu.unlp.sedici.aspect.extraSubmission.submit.SeDiCISelectCollectionStep" scope="prototype"/>
+	<bean id="selectcollectionactionAPI" class="ar.edu.unlp.sedici.dspace.xmlworkflow.state.actions.processingaction.SeDiCISelectCollectionAction" scope="prototype"/>
 
-	<bean id="skipadminclaimactionAPI" class="ar.edu.unlp.sedici.aspect.extraSubmission.submit.SkipAdminClaimAction" scope="prototype"/>
+	<bean id="skipadminclaimactionAPI" class="ar.edu.unlp.sedici.dspace.xmlworkflow.state.actions.processingaction.SkipAdminClaimAction" scope="prototype"/>
 
     <bean id="selectrevieweractionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerAction" scope="prototype">
         <property name="roleId" value="reviewer"/>

@@ -26,6 +26,14 @@
 			<artifactId>dspace-api</artifactId>
 		</dependency>
 		
+		
+        <dependency>
+        	<!-- Esta dependencia es por xmlworkflow ... -->
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        
     </dependencies>
 
     <build>

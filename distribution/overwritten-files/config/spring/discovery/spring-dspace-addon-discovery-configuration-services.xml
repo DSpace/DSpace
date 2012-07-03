@@ -220,6 +220,7 @@
             <list>
                 <value>sedici.subject.decs</value>
                 <value>sedici.subject.eurovoc</value>
+                <value>sedici.subject.acmcss98</value>
                 <value>sedici.subject.descriptores</value>
                 <value>sedici.subject.other</value>
             </list>
