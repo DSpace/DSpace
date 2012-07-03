@@ -263,7 +263,7 @@ public class SolrIndexer {
 	private static boolean getKnownExplanation(Throwable t) {
 		if (t instanceof ConnectException) {
 			System.err.println("Solr server ("
-					+ ConfigurationManager.getProperty("xoai.solr.url")
+					+ ConfigurationManager.getProperty("xoai","solr.url")
 					+ ") is down, turn it on.");
 			return true;
 		}

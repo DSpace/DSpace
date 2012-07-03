@@ -29,7 +29,7 @@ public class DSpaceSolrServer {
     public static SolrServer getServer () throws SolrServerException {
         if (_server == null) {
         	try {
-				_server = new CommonsHttpSolrServer (ConfigurationManager.getProperty("xoai.solr.url"));
+				_server = new CommonsHttpSolrServer (ConfigurationManager.getProperty("xoai", "solr.url"));
 	        	log.debug("Solr Server Initialized");
 			} catch (MalformedURLException e) {
 				throw new SolrServerException(e);
