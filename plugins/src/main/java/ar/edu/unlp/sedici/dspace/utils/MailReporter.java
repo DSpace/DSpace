@@ -3,6 +3,7 @@ package ar.edu.unlp.sedici.dspace.utils;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -30,22 +31,22 @@ public class MailReporter {
 	private static final String EXCEPTION_MAIL_TEMPLATE = "exception_error";
 	private static final String MISSING_AUTHORITY_MAIL_TEMPLATE = "missing_authority_key";
 	
-	protected static Logger logger = LoggerFactory.getLogger(MailReporter.class);
+	protected static Logger log = LoggerFactory.getLogger(MailReporter.class);
 	
 	public MailReporter() {
 	}
 	
-	private Email getEmailTemplate(Context context,String templateName) throws MessagingException{
+	private static Email getEmailTemplate(Context context,String templateName) throws MessagingException{
 		String filename = I18nUtil.getEmailFilename(context.getCurrentLocale(), templateName);
 		try {
 			return ConfigurationManager.getEmail(filename);
 		} catch (IOException e) {
 			//Si es un mail de reporte diferente al de UnknownException, mando reporte de UnknownException
 			if (!EXCEPTION_MAIL_TEMPLATE.equals(templateName)){
-				this.reportUnknownException(context, e , null);
+				reportUnknownException(context, e , null);
 				//no puedo levantar el template de error ...
 			}
-			logger.error("No se pudo levantar el template "+templateName, e);
+			log.error("No se pudo levantar el template "+templateName, e);
 			throw new MessagingException("No se pudo levantar el template "+templateName, e);
 		}
 	}
@@ -60,9 +61,9 @@ public class MailReporter {
 	 * @param mailTemplateName 
 	 * @throws MessagingException 
 	 */
-	private void sendMail(Context context, String recipient, String mailTemplateName, List<String> args) throws MessagingException{
+	private static void sendMail(Context context, String recipient, String mailTemplateName, List<String> args) throws MessagingException{
 	
-		Email email = this.getEmailTemplate(context, mailTemplateName);
+		Email email = getEmailTemplate(context, mailTemplateName);
 		
 		email.addRecipient(recipient);
 
@@ -83,30 +84,30 @@ public class MailReporter {
 		try{
 			email.send();
 		}catch (SendFailedException e) {
-			logger.error("Se produjo un error al intentar enviar un mail. No se pudo enviar a los destinatarios: "+Arrays.toString(e.getInvalidAddresses()), e);
+			log.error("Se produjo un error al intentar enviar un mail. No se pudo enviar a los destinatarios: "+Arrays.toString(e.getInvalidAddresses()), e);
 			//me como el error porque es una falla de las direcciones de destino?
 		}catch(MessagingException e){
 			//email no es descriptivo pero no hay forma de desarmarlo desde afuera. 
-			logger.error("Error al tratar de enviar el email: ", e);
+			log.error("Error al tratar de enviar el email: ", e);
 			throw e;
 		}
 	}
 
-	protected boolean isDebugMode() {
+	protected static boolean isDebugMode() {
 		return ConfigurationManager.getBooleanProperty(SEDICI_MODULE, PROPERTY_DEBUG_MODE, false);
 	}
 
-	protected String getAdminEmail(){
+	protected static String getAdminEmail(){
 		String email = ConfigurationManager.getProperty("alert.recipient");
 		if (email == null || "".equals(email))
 			email = ConfigurationManager.getProperty("mail.from.address");
 		return email;
 	}
 	
-	protected String getFeedbackEmail(){
+	protected static String getFeedbackEmail(){
 		String email = ConfigurationManager.getProperty("feedback.recipient");
 		if (email == null || "".equals(email))
-			email = this.getAdminEmail();
+			email = getAdminEmail();
 		return email;
 	}
 
@@ -118,11 +119,11 @@ public class MailReporter {
 	 * @param url La url que se trató de acceder
 	 * @throws MessagingException
 	 */
-	public void reportUnknownException(Context context, Throwable fullThr, String url) throws MessagingException {
+	public static void reportUnknownException(Context context, Throwable fullThr, String url) {
 
-		if (this.isDebugMode()) {
-			logger.error("Se produjo una exception ", fullThr);
-			logger.info("No mando el mail por la exception porque xmlui.debug es true");
+		if (isDebugMode()) {
+			log.error("Se produjo una exception ", fullThr);
+			log.info("No mando el mail por la exception porque xmlui.debug es true");
 			return;
 		}
 
@@ -148,9 +149,12 @@ public class MailReporter {
 		
 		//{6} Exception stack trace
 		args.add(sw.toString());
-		
-		this.sendMail(context,getAdminEmail(), EXCEPTION_MAIL_TEMPLATE, args);
-
+		try{
+			sendMail(context,getAdminEmail(), EXCEPTION_MAIL_TEMPLATE, args);
+		}  catch (MessagingException me) {
+			log.error("Se produjo un error al intentar enviar un mail de reportUnknownException", me);
+			//Silenciosamente dejo pasar el error porque la operacion en curson no tiene nada que ver con el envio de email
+		}
 	}
 	
 
@@ -161,15 +165,33 @@ public class MailReporter {
 	 * @param url La url que se trató de acceder
 	 * @throws MessagingException
 	 */
-	public void reportMissingAuthorityKey(Context context, String field, String key) throws MessagingException {
+	public static void reportMissingAuthorityKey(Context context, String field, String key) {
 
 		//            {4} Field
 		//            {5} Key
 		List<String> args = new ArrayList<String>();
 		args.add(field);
 		args.add(key);
-		this.sendMail(context,getFeedbackEmail(), MISSING_AUTHORITY_MAIL_TEMPLATE, args);
+		try{
+			sendMail(context,getFeedbackEmail(), MISSING_AUTHORITY_MAIL_TEMPLATE, args);
+		}  catch (MessagingException e) {
+			log.error("Se produjo un error al intentar enviar un mail de reportMissingAuthorityKey", e);
+			//Silenciosamente dejo pasar el error porque la operacion en curso no tiene nada que ver con el envio de email
+			//throw new RuntimeException(e);
+		}
+	}
 
+	public static void reportUnknownException(String message, Throwable e, String url) {
+		Context context;
+		try {
+			context = new Context();
+		} catch (SQLException e2) {
+			log.error("No se pudo instancia el Context ... algo raro pasa", e);
+			throw new RuntimeException(e2);
+		} 
+
+		MailReporter.reportUnknownException(context, e, url);
+		
 	}
 
 }

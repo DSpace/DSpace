@@ -18,8 +18,6 @@ package ar.edu.unlp.sedici.aspect.redirect;
 import java.sql.SQLException;
 import java.util.Map;
 
-import javax.mail.MessagingException;
-
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.acting.AbstractAction;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -51,13 +49,7 @@ public class ExceptionAction extends AbstractAction {
 		if (thr == null) {
 			this.getLogger().error("En teoria, se produjo una exception, pero no se puede recuperar la excepcion para imprimir su stack trace. Es raro");
 		}else{
-			MailReporter reporter = new MailReporter();
-			try {
-				reporter.reportUnknownException(context, thr, url);
-			} catch (MessagingException e) {
-				this.getLogger().error("Se produjo un error al intentar enviar un mail de exception desde ExceptionAction", e);
-				return null;
-			}
+			MailReporter.reportUnknownException(context, thr, url);
 		}
 		return null;
 		

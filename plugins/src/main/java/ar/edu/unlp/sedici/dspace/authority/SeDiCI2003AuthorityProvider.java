@@ -148,15 +148,8 @@ public abstract class SeDiCI2003AuthorityProvider implements ChoiceAuthority {
 			throw new RuntimeException(e);
 		} 
 
-		MailReporter reporter = new MailReporter();
-		try {
-			reporter.reportMissingAuthorityKey(context, field, key);
-		}  catch (MessagingException e) {
-			log.error("Se produjo un error al intentar enviar un mail de reportMissingAuthorityKey", e);
-			//Silenciosamente dejo pasar el error porque la operacion en curson no tiene nada que ver con el envio de email
-			//throw new RuntimeException(e);
-		}
-
+		MailReporter.reportMissingAuthorityKey(context, field, key);
+		
     }
 	
 }
