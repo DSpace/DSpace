@@ -150,7 +150,7 @@ public class DSpaceOAIDataProvider extends HttpServlet
             if (context != null)
                 context.abort();
             response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                    "Context does not exists");
+                    "Context does not exist");
         }
 
     }
