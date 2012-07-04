@@ -241,12 +241,13 @@
 					color: #444751;
 					background-color: #FFF;
 				}
-				a.format div {
+				a.format span {
+					display: block;
 					text-align: left;
 				}
 				
 				
-				a.format div.prefix {
+				a.format span.prefix {
 					text-align: center;
 					font-size: 30px;
 					margin-bottom: 15px;
@@ -790,18 +791,18 @@
 										<xsl:attribute name="href">
 											<xsl:value-of select="concat(/oai:OAI-PMH/oai:request/text(), '?verb=ListRecords&amp;metadataPrefix=', oai:metadataPrefix/text())" />
 										</xsl:attribute>
-										<div class="prefix">
+										<span class="prefix">
 											<xsl:value-of select="oai:metadataPrefix/text()"></xsl:value-of>
-										</div>
-										<div class="namespace">
+										</span>
+										<span class="namespace">
 											Namespace: 
 											<xsl:value-of select="oai:metadataNamespace/text()"></xsl:value-of>
-										</div>
-										<div class="schema">
+										</span>
+										<span class="schema">
 											Schema: 
 											<xsl:value-of select="oai:schema/text()"></xsl:value-of>
-										</div>
-										<div class="clear"></div>
+										</span>
+										<span class="clear"></span>
 									</a>
 									<div class="clear"></div>
 								</xsl:for-each>
