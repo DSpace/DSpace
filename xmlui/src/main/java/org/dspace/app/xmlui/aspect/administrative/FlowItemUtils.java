@@ -443,13 +443,13 @@ public class FlowItemUtils
         	} else {
         		if (tareas.get(0).getOwnerID()==context.getCurrentUser().getID()){
         			WorkflowRequirementsManager.clearInProgressUsers(context, wfItem);
-        			wfItem.deleteWrapper();   
-        			
+        			wfItem.deleteWrapper();         			
             		retorno=true;
         		}
-        	}
-        	
-        };
+        	}        	
+        } else {
+        	retorno=true;
+        }
         if (retorno){
         	// Remove item from all the collections it's in
 	        for (Collection collection : collections)
