@@ -61,7 +61,7 @@ public class DSpaceIdentify extends AbstractIdentify
             String result = ConfigurationManager.getProperty("mail.admin");
             if (result == null)
             {
-                log.warn("{ OAI Plus :: DSpace } Not able to retrieve the mail.admin property from the configuration file");
+                log.warn("{ XOAI :: DSpace } Not able to retrieve the mail.admin property from the configuration file");
             }
             else
                 _emails.add(result);
@@ -138,7 +138,7 @@ public class DSpaceIdentify extends AbstractIdentify
             _name = ConfigurationManager.getProperty("dspace.name");
             if (_name == null)
             {
-                log.warn("{ OAI Plus :: DSpace } Not able to retrieve the dspace.name property from the configuration file");
+                log.warn("{ XOAI :: DSpace } Not able to retrieve the dspace.name property from the configuration file");
                 _name = "OAI Repository";
             }
         }

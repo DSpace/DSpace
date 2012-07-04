@@ -108,13 +108,14 @@ public class XOAI
             SolrDocumentList results = DSpaceSolrSearch.query(solrParams);
             if (results.getNumFound() == 0)
             {
-                System.out
-                        .println("There are no indexed documents, using full import.");
+                System.out.println("There are no indexed documents, using full import.");
                 this.indexAll();
             }
             else
-                this.index((Date) results.get(0).getFieldValue(
-                        "item.lastmodified"));
+                this.index((Date) results.get(0).getFieldValue("item.lastmodified"));
+            
+            DSpaceSolrServer.getServer().commit();
+            
             if (_optimize)
             {
                 println("Optimizing Index");
@@ -296,17 +297,18 @@ public class XOAI
                         if (line.hasOption('c'))
                             clearIndex();
 
-                        if (line.hasOption('p'))
-                            cleanCache();
                         Context ctx = new Context();
                         XOAI indexer = new XOAI(ctx,
                                 line.hasOption('o'), line.hasOption('v'));
 
                         indexer.index();
+                        
+                        cleanCache();
                     } else if ("clean-cache".equals(command)) {
                         cleanCache();
                     } else if ("clear-index".equals(command)) {
                         clearIndex();
+                        cleanCache();
                     }
 
                     System.out.println("XOAI manager action ended. It took "
@@ -355,9 +357,9 @@ public class XOAI
     {
         try
         {
-            cleanCache();
             System.out.println("Clearing index");
-            DSpaceSolrServer.getServer().deleteByQuery("*.*");
+            DSpaceSolrServer.getServer().deleteByQuery("*:*");
+            DSpaceSolrServer.getServer().commit();
             System.out.println("Index cleared");
         }
         catch (SolrServerException ex)
