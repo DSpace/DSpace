@@ -36,16 +36,20 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.xoai.XOAIDatabaseManager;
+import org.dspace.xoai.data.DSpaceItem;
+import org.dspace.xoai.exceptions.CompilingException;
 import org.dspace.xoai.solr.DSpaceSolrSearch;
 import org.dspace.xoai.solr.DSpaceSolrServer;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrException;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrIndexerException;
+import org.dspace.xoai.util.XOAICacheManager;
+import org.dspace.xoai.util.XOAIDatabaseManager;
 
 /**
  * 
@@ -92,6 +96,12 @@ public class XOAI
         _verbose = verb;
     }
 
+    public XOAI(Context ctx, boolean hasOption)
+    {
+        _context = ctx;
+        _verbose = hasOption;
+    }
+
     private void println(String line)
     {
         System.out.println(line);
@@ -122,7 +132,9 @@ public class XOAI
                 DSpaceSolrServer.getServer().optimize();
                 println("Index optimized");
             }
-            cleanCache();
+            
+            // Set last compilation date
+            XOAICacheManager.setLastCompilationDate(new Date());
         }
         catch (DSpaceSolrException ex)
         {
@@ -184,6 +196,8 @@ public class XOAI
                 {
                     docs.add(this.index(Item.find(_context, iterator.next()
                             .getIntColumn("item_id"))));
+                    
+                    
                     _context.clearCache();
                 }
                 catch (SQLException ex)
@@ -246,8 +260,22 @@ public class XOAI
 
         if (_verbose)
         {
-            println("Item with Handle " + handle);
+            println("Item with handle "+handle+" indexed");
         }
+
+        if (_verbose) 
+        {
+            println("Compiling item...");
+        }
+        
+        XOAICacheManager.compileItem(new DSpaceItem(item));
+        
+        if (_verbose) 
+        {
+            println("Item compiled");
+        }
+        
+        
         return doc;
     }
 
@@ -271,63 +299,6 @@ public class XOAI
         return false;
     }
 
-    public static void main(String[] argv)
-    {
-        try
-        {
-            CommandLineParser parser = new PosixParser();
-            Options options = new Options();
-            options.addOption("c", "clear", false, "Clear index before indexing");
-            options.addOption("o", "optimize", false,
-                    "Optimize index at the end");
-            options.addOption("v", "verbose", false, "Verbose output");
-            options.addOption("h", "help", false, "Shows some help");
-            CommandLine line = parser.parse(options, argv);
-            
-            String[] validCommands = { "import", "clean-cache" };
-            
-            if (!line.hasOption('h') && line.getArgs().length > 0) {
-                if (Arrays.asList(validCommands).contains(line.getArgs()[0])) {
-                    System.out.println("XOAI manager action started");
-                    long start = System.currentTimeMillis();
-                    
-                    String command = line.getArgs()[0];
-                    
-                    if ("import".equals(command)) {
-                        if (line.hasOption('c'))
-                            clearIndex();
-
-                        Context ctx = new Context();
-                        XOAI indexer = new XOAI(ctx,
-                                line.hasOption('o'), line.hasOption('v'));
-
-                        indexer.index();
-                        
-                        cleanCache();
-                    } else if ("clear-index".equals(command)) {
-                        clearIndex();
-                        cleanCache();
-                    }
-
-                    System.out.println("XOAI manager action ended. It took "
-                            + ((System.currentTimeMillis() - start) / 1000)
-                            + " seconds.");
-                } else {
-                    usage();
-                }
-            } else {
-                usage();
-            }
-        }
-        catch (Throwable ex)
-        {
-            if (!searchForReason(ex))
-            {
-                ex.printStackTrace();
-            }
-            log.error(ex.getMessage(), ex);
-        }
-    }
 
     private static boolean getKnownExplanation(Throwable t)
     {
@@ -373,44 +344,167 @@ public class XOAI
     private static void cleanCache()
     {
         System.out.println("Purging cached OAI responses.");
-        String dir = ConfigurationManager.getProperty("dspace.dir");
-        if (!dir.endsWith("/"))
-            dir += "/";
-        dir += "var/xoai";
+        XOAICacheManager.deleteCachedResponses();
+    }
 
-        File directory = new File(dir);
-        if (directory.exists())
+    private static final String COMMAND_IMPORT = "import";
+    private static final String COMMAND_CLEAN_CACHE = "clean-cache";
+    private static final String COMMAND_COMPILE_ITEMS = "compile-items";
+    private static final String COMMAND_ERASE_COMPILED_ITEMS = "erase-compiled-items";
+    
+    public static void main(String[] argv)
+    {
+        try
         {
-            // log.info("Directory "+dir+" exists");
-            // Get all files in directory
-            File[] files = directory.listFiles();
-            for (File file : files)
-            {
-                // Delete each file
+            CommandLineParser parser = new PosixParser();
+            Options options = new Options();
+            options.addOption("c", "clear", false, "Clear index before indexing");
+            options.addOption("o", "optimize", false,
+                    "Optimize index at the end");
+            options.addOption("v", "verbose", false, "Verbose output");
+            options.addOption("h", "help", false, "Shows some help");
+            CommandLine line = parser.parse(options, argv);
 
-                if (!file.delete())
-                {
-                    // Failed to delete file
-                    System.out.println("Failed to delete cache file: " + file);
+            String[] validSolrCommands = { COMMAND_IMPORT, COMMAND_CLEAN_CACHE };
+            String[] validDatabaseCommands = { COMMAND_CLEAN_CACHE, COMMAND_COMPILE_ITEMS, COMMAND_ERASE_COMPILED_ITEMS };
+            
+            
+            boolean solr = true; // Assuming solr by default
+            solr = !("database").equals(ConfigurationManager.getProperty("xoai", "storage"));
+            
+            
+            boolean run = false;
+            if (line.getArgs().length > 0) {
+                if (solr) {
+                    if (Arrays.asList(validSolrCommands).contains(line.getArgs()[0])) {
+                        run = true;
+                    }
+                } else {
+                    if (Arrays.asList(validDatabaseCommands).contains(line.getArgs()[0])) {
+                        run = true;
+                    }
                 }
             }
+            
+            if (!line.hasOption('h') && run) {
+                    System.out.println("XOAI manager action started");
+                    long start = System.currentTimeMillis();
+                    
+                    String command = line.getArgs()[0];
+                    
+                    if (COMMAND_IMPORT.equals(command)) {
+                        if (line.hasOption('c'))
+                            clearIndex();
+
+                        Context ctx = new Context();
+                        XOAI indexer = new XOAI(ctx,
+                                line.hasOption('o'), line.hasOption('v'));
+
+                        indexer.index();
+                        
+                        cleanCache();
+                        
+                        ctx.abort();
+                    } else if (COMMAND_CLEAN_CACHE.equals(command)) {
+                        clearIndex();
+                        cleanCache();
+                    } else if (COMMAND_COMPILE_ITEMS.equals(command)) {
+
+                        Context ctx = new Context();
+                        XOAI indexer = new XOAI(ctx, line.hasOption('v'));
+
+                        indexer.compile();
+                        
+                        cleanCache();
+                        
+                        ctx.abort();
+                    } else if (COMMAND_ERASE_COMPILED_ITEMS.equals(command)) {
+                        cleanCompiledItems();
+                        cleanCache();
+                    }
+
+                    System.out.println("XOAI manager action ended. It took "
+                            + ((System.currentTimeMillis() - start) / 1000)
+                            + " seconds.");
+            } else {
+                usage();
+            }
         }
-        else
-            System.out.println("Directory " + dir
-                    + " doesn't exist, must run 'ant init_configs'");
+        catch (Throwable ex)
+        {
+            if (!searchForReason(ex))
+            {
+                ex.printStackTrace();
+            }
+            log.error(ex.getMessage(), ex);
+        }
+    }
+    
+    private static void cleanCompiledItems()
+    {
+        System.out.println("Purging compiled items");
+        XOAICacheManager.deleteCompiledItems();
+    }
+
+    private void compile() throws CompilingException
+    {
+        ItemIterator iterator;
+        try
+        {
+            Date last = XOAICacheManager.getLastCompilationDate();
+            
+            if (last == null) {
+                System.out.println("Retrieving all items to be compiled");
+                iterator = Item.findAll(_context);
+            } else {
+                System.out.println("Retrieving items modified after "+last+" to be compiled");
+                String query = "SELECT * FROM item WHERE last_modified>?";
+                iterator = new ItemIterator(_context, DatabaseManager.query(_context, query, new java.sql.Date(last.getTime())));
+            }
+            
+            while (iterator.hasNext()) {
+                Item item = iterator.next();
+                if (_verbose) System.out.println("Compiling item with handle: "+ item.getHandle());
+                XOAICacheManager.compileItem(new DSpaceItem(item));
+                _context.clearCache();
+            }
+            
+            XOAICacheManager.setLastCompilationDate(new Date());
+        }
+        catch (SQLException e)
+        {
+            throw new CompilingException(e);
+        }
+        System.out.println("Items compiled");
     }
 
     private static void usage()
     {
-        System.out.println("XOAI Manager Script");
-        System.out.println("Syntax: xoai <action> [parameters]");
-        System.out.println("> Possible actions:");
-        System.out.println("     import - To import DSpace items into XOAI Solr index");
-        System.out.println("     clean-cache - Cleans the XOAI cache");
-        System.out.println("> Parameters:");
-        System.out.println("     -o Optimize index after indexing");
-        System.out.println("     -c Clear index");
-        System.out.println("     -v Verbose output");
-        System.out.println("     -h Shows this text");
+        boolean solr = true; // Assuming solr by default
+        solr = !("database").equals(ConfigurationManager.getProperty("xoai", "storage"));
+        
+        if (solr) {
+            System.out.println("OAI Manager Script");
+            System.out.println("Syntax: oai <action> [parameters]");
+            System.out.println("> Possible actions:");
+            System.out.println("     "+COMMAND_IMPORT+" - To import DSpace items into OAI index and cache system");
+            System.out.println("     "+COMMAND_CLEAN_CACHE+" - Cleans the OAI cached responses");
+            System.out.println("> Parameters:");
+            System.out.println("     -o Optimize index after indexing");
+            System.out.println("     -c Clear index");
+            System.out.println("     -v Verbose output");
+            System.out.println("     -h Shows this text");
+        } else {
+            System.out.println("OAI Manager Script");
+            System.out.println("Syntax: oai <action> [parameters]");
+            System.out.println("> Possible actions:");
+            System.out.println("     "+COMMAND_CLEAN_CACHE+" - Cleans the OAI cached responses");
+            System.out.println("     "+COMMAND_COMPILE_ITEMS+" - Compiles all DSpace items");
+            System.out.println("     "+COMMAND_ERASE_COMPILED_ITEMS+" - Erase the OAI compiled items");
+            System.out.println("> Parameters:");
+            System.out.println("     -v Verbose output");
+            System.out.println("     -h Shows this text");
+        }
+        
     }
 }

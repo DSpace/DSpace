@@ -17,10 +17,10 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.core.Context;
-import org.dspace.xoai.MetadataFieldManager;
 import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
 import org.dspace.xoai.filter.data.DSpaceMetadataFilterOperator;
+import org.dspace.xoai.util.MetadataFieldManager;
 
 /**
  * 

@@ -21,8 +21,8 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.handle.HandleManager;
-import org.dspace.xoai.XOAIDatabaseManager;
 import org.dspace.xoai.data.DSpaceItem;
+import org.dspace.xoai.util.XOAIDatabaseManager;
 
 /**
  * 

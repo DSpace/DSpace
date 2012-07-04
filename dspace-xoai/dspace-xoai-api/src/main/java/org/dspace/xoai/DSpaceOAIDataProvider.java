@@ -33,6 +33,7 @@ import org.dspace.xoai.data.DSpaceItemRepository;
 import org.dspace.xoai.data.DSpaceItemSolrRepository;
 import org.dspace.xoai.data.DSpaceSetRepository;
 import org.dspace.xoai.filter.DSpaceFilter;
+import org.dspace.xoai.util.XOAICacheManager;
 
 import com.lyncode.xoai.common.dataprovider.OAIDataProvider;
 import com.lyncode.xoai.common.dataprovider.OAIRequestParameters;
@@ -134,8 +135,11 @@ public class DSpaceOAIDataProvider extends HttpServlet
                     + parameters.getFrom() + parameters.getUntil();
 
             log.debug("Handling OAI request");
-            this.handle(identification, dataProvider, parameters, out);
-
+            XOAICacheManager.handle(identification, dataProvider, parameters, out);
+            
+            out.flush();
+            out.close();
+            
             if (context != null)
                 context.abort();
         }
@@ -155,81 +159,6 @@ public class DSpaceOAIDataProvider extends HttpServlet
                     + "\" does not exist");
         }
 
-    }
-
-    private String getStaticHead()
-    {
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                + ((XOAIManager.getManager().hasStyleSheet()) ? ("<?xml-stylesheet type=\"text/xsl\" href=\""
-                        + XOAIManager.getManager().getStyleSheet() + "\"?>")
-                        : "")
-                + "<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-                + "xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\">";
-    }
-
-    /**
-     * This method caches the results.
-     * 
-     * @param identification
-     * @param dataProvider
-     * @param parameters
-     * @param out
-     * @throws IOException
-     */
-    private void handle(String identification, OAIDataProvider dataProvider,
-            OAIRequestParameters parameters, OutputStream out)
-            throws IOException
-    {
-        String dir = ConfigurationManager.getProperty("dspace.dir");
-        if (!dir.endsWith("/"))
-            dir += "/";
-        dir += "var/xoai";
-        File fdir = new File(dir);
-        if (!fdir.exists())
-            fdir.mkdir();
-        dir += "/";
-        File f = new File(dir + Base64Utils.encode(identification));
-        if (!f.exists())
-        {
-            log.debug("[XOAI] Result not cached");
-            try
-            {
-                ByteArrayOutputStream intermediate = new ByteArrayOutputStream();
-                dataProvider.handle(parameters, intermediate);
-                String outa = intermediate.toString();
-                FileOutputStream output = new FileOutputStream(f);
-                String end = "</responseDate>";
-                int pos = outa.indexOf(end);
-                if (pos > 0)
-                    outa = outa.substring(pos + (end.length()));
-                output.write(outa.getBytes());
-                output.flush();
-                output.close();
-            }
-            catch (OAIException e)
-            {
-                // try to remove the file
-                if (f.exists())
-                    f.delete();
-                log.error(e.getMessage(), e);
-            }
-        }
-        else
-            log.debug("[XOAI] Cached Result");
-        FileInputStream in = new FileInputStream(f);
-        byte[] buf = new byte[1024];
-        int len;
-        SimpleDateFormat format = new SimpleDateFormat(
-                "yyyy-MM-dd'T'HH:mm:ss'Z'");
-        out.write((this.getStaticHead() + "<responseDate>"
-                + format.format(new Date()) + "</responseDate>").getBytes());
-        while ((len = in.read(buf)) > 0)
-        {
-            out.write(buf, 0, len);
-        }
-        in.close();
-        out.flush();
-        out.close();
     }
 
     @Override

@@ -20,9 +20,9 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.xoai.MetadataFieldManager;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
 import org.dspace.xoai.util.DateUtils;
+import org.dspace.xoai.util.MetadataFieldManager;
 
 import com.lyncode.xoai.common.dataprovider.core.DeleteMethod;
 import com.lyncode.xoai.common.dataprovider.core.Granularity;

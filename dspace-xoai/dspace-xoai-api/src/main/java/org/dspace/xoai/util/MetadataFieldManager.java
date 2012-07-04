@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.xoai;
+package org.dspace.xoai.util;
 
 import java.sql.SQLException;
 import java.util.HashMap;
