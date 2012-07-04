@@ -14,17 +14,24 @@
     xmlns:lyn="http://www.lyncode.com/fakeNamespace"
     xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
     xmlns:dc="http://purl.org/dc/doc:elements/1.1/"
+    exclude-result-prefixes="oai lyn oai_dc dc"
 >
 
 	<xsl:output method="html"/>
 	
+	<xsl:template name="write-doctype">
+		<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"&gt;
+</xsl:text>
+	</xsl:template>
+	
 	<xsl:template match="/">
+		<xsl:call-template name="write-doctype"/>
 		<html>
 			<head>
 				<title>DSpace OAI-PMH Data Provider</title>
 				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-				<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-				<style >
+				<script src="http://code.jquery.com/jquery-1.7.2.min.js" type="text/javascript"></script>
+				<style type="text/css">
 				a {
 					color: #00b2d0;
 					text-decoration: none;
@@ -1040,7 +1047,7 @@
 					<div class="footer">
 						<div class="right">
 							<p class="text">Stylesheet provided by</p>
-							<p class="image"><a href="http://www.lyncode.com"><img src="static/lyncode.png" /></a></p>
+							<p class="image"><a href="http://www.lyncode.com"><img src="static/lyncode.png" alt="Lyncode logo" /></a></p>
 						</div>
 					</div>
 				</div>
