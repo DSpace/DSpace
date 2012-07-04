@@ -8,7 +8,7 @@
 		<version>3.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>dspace-xoai-api</artifactId>
-	<name>DSpace XOAI API</name>
+	<name>DSpace XOAI :: API and Implementation</name>
 	<url>http://www.lyncode.com/dspace/addons/xoai</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -13,7 +13,7 @@
 	<artifactId>dspace-xoai-webapp</artifactId>
 	<packaging>war</packaging>
 
-	<name>DSpace XOAI Webapp</name>
+	<name>DSpace XOAI :: Web Application</name>
 	<description>Webapp</description>
 	<url>http://www.lyncode.com/dspace/addons/xoai</url>
 
