@@ -118,7 +118,7 @@ public class XOAICacheManager
             }
             catch (FileNotFoundException e)
             {
-                log.warn("Could not open (for writting purposes) file: "
+                log.warn("Could not open file for writing: "
                         + metadataCache.getPath(), e);
             }
             catch (MarshallingException e)

@@ -247,7 +247,7 @@ public class DSpaceItem extends AbstractItem
 
             valueElem.getField().add(createValue(factory, val.value));
         }
-        // Done! Metadata readed!
+        // Done! Metadata has been read!
         // Now adding bitstream info
         Element bundles = create(factory, "bundles");
         metadata.getElement().add(bundles);

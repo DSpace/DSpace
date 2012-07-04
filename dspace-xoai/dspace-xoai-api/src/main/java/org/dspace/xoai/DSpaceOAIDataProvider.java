@@ -154,7 +154,7 @@ public class DSpaceOAIDataProvider extends HttpServlet
             if (context != null)
                 context.abort();
             response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                    "Context \""
+                    "Requested OAI context \""
                     + request.getPathInfo().replace("/", "")
                     + "\" does not exist");
         }
