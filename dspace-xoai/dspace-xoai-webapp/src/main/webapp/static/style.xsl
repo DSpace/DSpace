@@ -116,25 +116,26 @@
 					
 				}
 				
-				table.identify {
+				div.identify {
+					display: inline-block;
 					text-align: left;
-					margin-left: auto;
-					margin-right: auto;
 				}
 				
-				tr.identify td.separator {
+				div.identify div.separator {
 					border-bottom: solid 1px #CCC;
+					
 				}
 				
-				tr.info td.name {
-					font-size: 20px;
-					font-weight: bold;
+				div.info div.name {
+					font-size: 30px;
 					padding: 10px;
+					display: inline-block;
 				}
 				
-				tr.info td.value {
+				div.info div.value {
 					font-size: 20px;
 					padding: 10px;
+					display: inline-block;
 				}
 				
 				div.sets {
@@ -240,13 +241,12 @@
 					color: #444751;
 					background-color: #FFF;
 				}
-				a.format span {
-					display: block;
+				a.format div {
 					text-align: left;
 				}
 				
 				
-				a.format span.prefix {
+				a.format div.prefix {
 					text-align: center;
 					font-size: 30px;
 					margin-bottom: 15px;
@@ -672,51 +672,49 @@
 					</div>
 					<div class="content">
 						<xsl:if test="oai:OAI-PMH/oai:Identify">
-						<table class="identify">
-							<tr class="info">
-								<td class="name">Repository Name</td>
-								<td class="value"><xsl:value-of select="oai:OAI-PMH/oai:Identify/oai:repositoryName/text()" /></td>
-								<td class="clear"></td>
-							</tr>
-							<tr class="info">
-								<td class="name">E-Mail Contact</td>
-								<td class="value"><a>
+						<div class="identify">
+							<div class="info">
+								<div class="name">Repository Name</div>
+								<div class="value"><xsl:value-of select="oai:OAI-PMH/oai:Identify/oai:repositoryName/text()" /></div>
+								<div class="clear"></div>
+							</div>
+							<div class="info">
+								<div class="name">E-Mail Contact</div>
+								<div class="value"><a>
 									<xsl:attribute name="href">
 										<xsl:value-of select="concat('mailto:', oai:OAI-PMH/oai:Identify/oai:adminEmail/text())" />
 									</xsl:attribute>
 									<xsl:value-of select="oai:OAI-PMH/oai:Identify/oai:adminEmail/text()" /></a>
-								</td>
-								<td class="clear"></td>
-							</tr>
-							<tr class="info">
-								<td class="name">Description</td>
-								<td class="value"><xsl:value-of select="oai:OAI-PMH/oai:Identify/oai:description/node()/text()" /></td>
-								<td class="clear"></td>
-							</tr>
-							<tr>
-								<td class="separator"></td>
-							</tr>
-							<tr class="info">
-								<td class="name">Protocol Version</td>
-								<td class="value"><xsl:value-of select="oai:OAI-PMH/oai:Identify/oai:protocolVersion/text()" /></td>
-								<td class="clear"></td>
-							</tr>
-							<tr class="info">
-								<td class="name">Earliest Registered Date</td>
-								<td class="value"><xsl:value-of select="translate(oai:OAI-PMH/oai:Identify/oai:earliestDatestamp/text(), 'TZ' ,' ')" /></td>
-								<td class="clear"></td>
-							</tr>
-							<tr class="info">
-								<td class="name">Date Granularity</td>
-								<td class="value"><xsl:value-of select="translate(oai:OAI-PMH/oai:Identify/oai:granularity/text(), 'TZ', ' ')" /></td>
-								<td class="clear"></td>
-							</tr>
-							<tr class="info">
-								<td class="name">Deletion Mode</td>
-								<td class="value"><xsl:value-of select="oai:OAI-PMH/oai:Identify/oai:deletedRecord/text()" /></td>
-								<td class="clear"></td>
-							</tr>
-						</table>
+								</div>
+								<div class="clear"></div>
+							</div>
+							<div class="info">
+								<div class="name">Description</div>
+								<div class="value"><xsl:value-of select="oai:OAI-PMH/oai:Identify/oai:description/node()/text()" /></div>
+								<div class="clear"></div>
+							</div>
+							<div class="separator"></div>
+							<div class="info">
+								<div class="name">Protocol Version</div>
+								<div class="value"><xsl:value-of select="oai:OAI-PMH/oai:Identify/oai:protocolVersion/text()" /></div>
+								<div class="clear"></div>
+							</div>
+							<div class="info">
+								<div class="name">Earliest Registered Date</div>
+								<div class="value"><xsl:value-of select="translate(oai:OAI-PMH/oai:Identify/oai:earliestDatestamp/text(), 'TZ' ,' ')" /></div>
+								<div class="clear"></div>
+							</div>
+							<div class="info">
+								<div class="name">Date Granularity</div>
+								<div class="value"><xsl:value-of select="translate(oai:OAI-PMH/oai:Identify/oai:granularity/text(), 'TZ', ' ')" /></div>
+								<div class="clear"></div>
+							</div>
+							<div class="info">
+								<div class="name">Deletion Mode</div>
+								<div class="value"><xsl:value-of select="oai:OAI-PMH/oai:Identify/oai:deletedRecord/text()" /></div>
+								<div class="clear"></div>
+							</div>
+						</div>
 						</xsl:if>
 						<xsl:if test="oai:OAI-PMH/oai:ListSets">
 							<div class="result-count"><label>Results fetched</label> <span><xsl:value-of select="count(oai:OAI-PMH/oai:ListSets/oai:set)"/></span></div>
@@ -792,18 +790,18 @@
 										<xsl:attribute name="href">
 											<xsl:value-of select="concat(/oai:OAI-PMH/oai:request/text(), '?verb=ListRecords&amp;metadataPrefix=', oai:metadataPrefix/text())" />
 										</xsl:attribute>
-										<span class="prefix">
+										<div class="prefix">
 											<xsl:value-of select="oai:metadataPrefix/text()"></xsl:value-of>
-										</span>
-										<span class="namespace">
+										</div>
+										<div class="namespace">
 											Namespace: 
 											<xsl:value-of select="oai:metadataNamespace/text()"></xsl:value-of>
-										</span>
-										<span class="schema">
+										</div>
+										<div class="schema">
 											Schema: 
 											<xsl:value-of select="oai:schema/text()"></xsl:value-of>
-										</span>
-										<span class="clear"></span>
+										</div>
+										<div class="clear"></div>
 									</a>
 									<div class="clear"></div>
 								</xsl:for-each>
@@ -1066,20 +1064,20 @@
 	<xsl:template match="node()" mode='prettyXML'>
 		<div class="divXML">
 			<div class="clear"></div>
-			<div>
+			<span>
 				<xsl:attribute name="class">
 					level<xsl:value-of select="count(ancestor::*)-4" />
 				</xsl:attribute>
-			</div>
-			<span class="tag">&lt;</span><div class="tagname"><xsl:value-of select='name(.)' /></div><xsl:apply-templates select="@*" mode='prettyXML'/><span class="tag">&gt;</span>
+			</span>
+			<span class="tag">&lt;</span><span class="tagname"><xsl:value-of select='name(.)' /></span><xsl:apply-templates select="@*" mode='prettyXML'/><span class="tag">&gt;</span>
 			<xsl:apply-templates select="node()" mode='prettyXML' />
 			<div class="clear"></div>
-			<div>
+			<span>
 				<xsl:attribute name="class">
 					level<xsl:value-of select="count(ancestor::*)-4" />
 				</xsl:attribute>
-			</div>
-			<span class="tag">&lt;/</span><div class="tagname"><xsl:value-of select='name(.)' /></div><span class="tag">&gt;</span>
+			</span>
+			<span class="tag">&lt;/</span><span class="tagname"><xsl:value-of select='name(.)' /></span><span class="tag">&gt;</span>
 		</div>
 	</xsl:template>
 	
