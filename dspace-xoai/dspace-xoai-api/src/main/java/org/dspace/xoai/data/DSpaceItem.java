@@ -165,6 +165,18 @@ public class DSpaceItem extends AbstractItem
 
     private Metadata metadata = null;
 
+    private String URLEncode (String value) {
+        try
+        {
+            return URLEncoder.encode(value, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            log.error(e.getMessage(), e);
+            return value;
+        }
+    }
+    
     @Override
     public Metadata getMetadata()
     {
@@ -242,15 +254,17 @@ public class DSpaceItem extends AbstractItem
             // Now adding bitstream info
             Element bundles = create(factory, "bundles");
             metadata.getElement().add(bundles);
+
+            Bundle[] bs;
             try
             {
-                Bundle[] bs = item.getBundles();
+                bs = item.getBundles();
                 for (Bundle b : bs)
                 {
                     Element bundle = create(factory, "bundle");
                     bundles.getElement().add(bundle);
-                    bundle.getField().add(
-                            createValue(factory, "name", b.getName()));
+                    bundle.getField()
+                            .add(createValue(factory, "name", b.getName()));
 
                     Element bitstreams = create(factory, "bitstreams");
                     bundle.getElement().add(bitstreams);
@@ -262,8 +276,8 @@ public class DSpaceItem extends AbstractItem
                         String url = "";
                         String bsName = bitstream.getName();
                         String sid = String.valueOf(bit.getSequenceID());
-                        String baseUrl = ConfigurationManager.getProperty(
-                                "xoai", "bitstream.baseUrl");
+                        String baseUrl = ConfigurationManager.getProperty("xoai",
+                                "bitstream.baseUrl");
                         String handle = null;
                         // get handle of parent Item of this bitstream, if there
                         // is one:
@@ -285,13 +299,13 @@ public class DSpaceItem extends AbstractItem
                         if (handle != null && baseUrl != null)
                         {
                             url = baseUrl + "/bitstream/"
-                                    + URLEncoder.encode(handle, "UTF-8") + "/"
+                                    + this.URLEncode(handle) + "/"
                                     + sid + "/"
-                                    + URLEncoder.encode(bsName, "UTF-8");
+                                    + this.URLEncode(bsName);
                         }
                         else
                         {
-                            url = URLEncoder.encode(bsName, "UTF-8");
+                            url = URLEncode(bsName);
                         }
 
                         String cks = bit.getChecksum();
@@ -308,11 +322,9 @@ public class DSpaceItem extends AbstractItem
                         bitstream.getField().add(
                                 createValue(factory, "format", bit.getFormat()
                                         .getMIMEType()));
-                        bitstream.getField()
-                                .add(createValue(factory, "size",
-                                        "" + bit.getSize()));
                         bitstream.getField().add(
-                                createValue(factory, "url", url));
+                                createValue(factory, "size", "" + bit.getSize()));
+                        bitstream.getField().add(createValue(factory, "url", url));
                         bitstream.getField().add(
                                 createValue(factory, "checksum", cks));
                         bitstream.getField().add(
@@ -322,23 +334,39 @@ public class DSpaceItem extends AbstractItem
                                         + ""));
                     }
                 }
+            }
+            catch (SQLException e1)
+            {
+                e1.printStackTrace();
+            }
+            
 
-                // Repository Info
-                Element repository = create(factory, "repository");
-                repository
-                        .getField()
-                        .add(createValue(factory, "name",
-                                ConfigurationManager.getProperty("dspace.name")));
-                repository
-                        .getField()
-                        .add(createValue(factory, "mail",
-                                ConfigurationManager.getProperty("mail.admin")));
-                metadata.getElement().add(repository);
+            // Other info
+            Element other = create(factory, "others");
 
-                // Licensing info
-                Element license = create(factory, "license");
-                Bundle[] licBundles = item
-                        .getBundles(Constants.LICENSE_BUNDLE_NAME);
+            other.getField().add(
+                    createValue(factory, "handle", item.getHandle()));
+            other.getField().add(
+                    createValue(factory, "lastModifyDate", item
+                            .getLastModified().toString()));
+            metadata.getElement().add(other);
+
+            // Repository Info
+            Element repository = create(factory, "repository");
+            repository.getField().add(
+                    createValue(factory, "name",
+                            ConfigurationManager.getProperty("dspace.name")));
+            repository.getField().add(
+                    createValue(factory, "mail",
+                            ConfigurationManager.getProperty("mail.admin")));
+            metadata.getElement().add(repository);
+
+            // Licensing info
+            Element license = create(factory, "license");
+            Bundle[] licBundles;
+            try
+            {
+                licBundles = item.getBundles(Constants.LICENSE_BUNDLE_NAME);
                 if (licBundles.length > 0)
                 {
                     Bundle licBundle = licBundles[0];
@@ -352,8 +380,8 @@ public class DSpaceItem extends AbstractItem
                             in = licBit.retrieve();
                             ByteArrayOutputStream out = new ByteArrayOutputStream();
                             Utils.bufferedCopy(in, out);
-                            license.getField()
-                                    .add(createValue(factory, "bin",
+                            license.getField().add(
+                                    createValue(factory, "bin",
                                             Base64Utils.encode(out.toString())));
                             metadata.getElement().add(license);
                         }
@@ -361,32 +389,21 @@ public class DSpaceItem extends AbstractItem
                         {
                             log.warn(e.getMessage(), e);
                         }
+                        catch (IOException e)
+                        {
+                            log.warn(e.getMessage(), e);
+                        }
+                        catch (SQLException e)
+                        {
+                            log.warn(e.getMessage(), e);
+                        }
 
                     }
                 }
-
-                // Other info
-                Element other = create(factory, "others");
-                metadata.getElement().add(other);
-
-                other.getField().add(
-                        createValue(factory, "handle", item.getHandle()));
-                other.getField().add(
-                        createValue(factory, "lastModifyDate", item
-                                .getLastModified().toString()));
-
             }
-            catch (SQLException e)
+            catch (SQLException e1)
             {
-                log.warn(e.getMessage(), e);
-            }
-            catch (UnsupportedEncodingException e)
-            {
-                log.warn(e.getMessage(), e);
-            }
-            catch (IOException e)
-            {
-                log.warn(e.getMessage(), e);
+                log.warn(e1.getMessage(), e1);
             }
 
         }

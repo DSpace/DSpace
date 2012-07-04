@@ -18,6 +18,7 @@
 			<Format refid="oaidc" />
 			<Format refid="mets" />
 			<Format refid="xoai" />
+			<Format refid="didl" />
 		</Context>
 		
 		<!--
@@ -45,6 +46,7 @@
 			<!-- Metadata Formats -->
 			<Format refid="oaidc"/>
 			<Format refid="mets" />
+			<Format refid="didl" />
 		</Context>
 		
 		<!-- 
@@ -95,6 +97,12 @@
 			<XSLT>metadataFormats/xoai.xsl</XSLT>
 			<Namespace>http://www.lyncode.com/xoai</Namespace>
 			<SchemaLocation>http://www.lyncode.com/schemas/xoai.xsd</SchemaLocation>
+		</Format>
+		<Format id="didl">
+			<Prefix>didl</Prefix>
+			<XSLT>metadataFormats/didl.xsl</XSLT>
+			<Namespace>urn:mpeg:mpeg21:2002:02-DIDL-NS</Namespace>
+			<SchemaLocation>http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/did/didl.xsd</SchemaLocation>
 		</Format>
 	</Formats>
 	
