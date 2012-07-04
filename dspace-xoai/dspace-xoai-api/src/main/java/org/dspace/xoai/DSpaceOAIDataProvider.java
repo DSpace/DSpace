@@ -136,6 +136,8 @@ public class DSpaceOAIDataProvider extends HttpServlet
             log.debug("Handling OAI request");
             this.handle(identification, dataProvider, parameters, out);
 
+            if (context != null)
+                context.abort();
         }
         catch (SQLException e)
         {
@@ -151,8 +153,6 @@ public class DSpaceOAIDataProvider extends HttpServlet
                     "Context does not exists");
         }
 
-        if (context != null)
-            context.abort();
     }
 
     private String getStaticHead()
