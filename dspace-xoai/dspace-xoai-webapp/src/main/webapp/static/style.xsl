@@ -528,7 +528,7 @@
 				
 				div.divXML { display: inline; }
 				div.tagName { display: inline; }
-				div.divText { text-align: justify; }
+				div.divText { display: inline; text-align: justify; }
 				div.divAttribute { display: inline; color: #9C1313; }
 				div.divAttributeValue { display: inline; color: #0A0E80; }
 				
@@ -1066,17 +1066,13 @@
 		<div class="divXML">
 			<div class="clear"></div>
 			<span>
-				<xsl:attribute name="class">
-					level<xsl:value-of select="count(ancestor::*)-4" />
-				</xsl:attribute>
+				<xsl:attribute name="class">level<xsl:value-of select="count(ancestor::*)-4" /></xsl:attribute>
 			</span>
 			<span class="tag">&lt;</span><span class="tagname"><xsl:value-of select='name(.)' /></span><xsl:apply-templates select="@*" mode='prettyXML'/><span class="tag">&gt;</span>
 			<xsl:apply-templates select="node()" mode='prettyXML' />
 			<div class="clear"></div>
 			<span>
-				<xsl:attribute name="class">
-					level<xsl:value-of select="count(ancestor::*)-4" />
-				</xsl:attribute>
+				<xsl:attribute name="class">level<xsl:value-of select="count(ancestor::*)-4" /></xsl:attribute>
 			</span>
 			<span class="tag">&lt;/</span><span class="tagname"><xsl:value-of select='name(.)' /></span><span class="tag">&gt;</span>
 		</div>
@@ -1085,9 +1081,7 @@
 	<xsl:template match="text()" mode='prettyXML'>
 		<div class="clear"></div>
 		<div class="divText">
-			<xsl:attribute name="class">
-				level<xsl:value-of select="count(ancestor::*)-3" /> divText
-			</xsl:attribute>
+			<xsl:attribute name="class">level<xsl:value-of select="count(ancestor::*)-3" /> divText</xsl:attribute>
 			<xsl:value-of select='.' />
 		</div>
 	</xsl:template>
