@@ -284,7 +284,7 @@ public class XOAI
             options.addOption("h", "help", false, "Shows some help");
             CommandLine line = parser.parse(options, argv);
             
-            String[] validCommands = { "import", "clean-cache", "clear-index" };
+            String[] validCommands = { "import", "clean-cache" };
             
             if (!line.hasOption('h') && line.getArgs().length > 0) {
                 if (Arrays.asList(validCommands).contains(line.getArgs()[0])) {
@@ -303,8 +303,6 @@ public class XOAI
 
                         indexer.index();
                         
-                        cleanCache();
-                    } else if ("clean-cache".equals(command)) {
                         cleanCache();
                     } else if ("clear-index".equals(command)) {
                         clearIndex();
@@ -409,7 +407,6 @@ public class XOAI
         System.out.println("> Possible actions:");
         System.out.println("     import - To import DSpace items into XOAI Solr index");
         System.out.println("     clean-cache - Cleans the XOAI cache");
-        System.out.println("     clear-index - Clears the XOAI Solr index");
         System.out.println("> Parameters:");
         System.out.println("     -o Optimize index after indexing");
         System.out.println("     -c Clear index");
