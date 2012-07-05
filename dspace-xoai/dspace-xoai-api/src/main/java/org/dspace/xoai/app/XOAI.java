@@ -65,6 +65,10 @@ public class XOAI
     private boolean _optimize;
 
     private boolean _verbose;
+    
+    private boolean _fst;
+    
+    private int _n;
 
     private static List<String> getFileFormats(Item item)
     {
@@ -89,11 +93,13 @@ public class XOAI
         return formats;
     }
 
-    public XOAI(Context ctx, boolean optimize, boolean verb)
+    public XOAI(Context ctx, boolean optimize, boolean verb, boolean fst, int n)
     {
         _context = ctx;
         _optimize = optimize;
         _verbose = verb;
+        _fst = fst;
+        _n = n;
     }
 
     public XOAI(Context ctx, boolean hasOption)
@@ -190,8 +196,10 @@ public class XOAI
         try
         {
             List<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
+            int i = 0;
             while (iterator.hasNext())
             {
+                if (_fst) if (i >= _n) break;
                 try
                 {
                     docs.add(this.index(Item.find(_context, iterator.next()
@@ -204,6 +212,7 @@ public class XOAI
                 {
                     log.error(ex.getMessage(), ex);
                 }
+                i++;
             }
             SolrServer server = DSpaceSolrServer.getServer();
             server.add(docs);
@@ -363,6 +372,7 @@ public class XOAI
                     "Optimize index at the end");
             options.addOption("v", "verbose", false, "Verbose output");
             options.addOption("h", "help", false, "Shows some help");
+            options.addOption("n", "number", true, "FOR DEVELOPMENT MUST DELETE");
             CommandLine line = parser.parse(options, argv);
 
             String[] validSolrCommands = { COMMAND_IMPORT, COMMAND_CLEAN_CACHE };
@@ -398,7 +408,7 @@ public class XOAI
 
                         Context ctx = new Context();
                         XOAI indexer = new XOAI(ctx,
-                                line.hasOption('o'), line.hasOption('v'));
+                                line.hasOption('o'), line.hasOption('v'), line.hasOption('n'), Integer.parseInt(line.getOptionValue('n')));
 
                         indexer.index();
                         
@@ -406,7 +416,6 @@ public class XOAI
                         
                         ctx.abort();
                     } else if (COMMAND_CLEAN_CACHE.equals(command)) {
-                        clearIndex();
                         cleanCache();
                     } else if (COMMAND_COMPILE_ITEMS.equals(command)) {
 

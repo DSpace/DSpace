@@ -147,7 +147,7 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository
                 list.add(new DSpaceItem(item));
             }
             return new ListItemsResults((docs.getNumFound() > offset + length),
-                    list);
+                    list, (int) docs.getNumFound());
         }
         catch (DSpaceSolrException ex)
         {
@@ -178,7 +178,7 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository
                         (Integer) doc.getFieldValue("item.id"));
                 list.add(new DSpaceItem(item));
             }
-            return new ListItemIdentifiersResult(hasMore, list);
+            return new ListItemIdentifiersResult(hasMore, list, (int) docs.getNumFound());
         }
         catch (DSpaceSolrException ex)
         {

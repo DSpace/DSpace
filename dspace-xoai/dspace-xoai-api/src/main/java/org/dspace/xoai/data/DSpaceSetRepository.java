@@ -188,7 +188,7 @@ public class DSpaceSetRepository extends AbstractSetRepository
                 + ((offset + length < communityCount + collectionCount) ? "Yes"
                         : "No"));
         return new ListSetsResult(offset + length < communityCount
-                + collectionCount, array);
+                + collectionCount, array, communityCount + collectionCount);
     }
 
     @Override

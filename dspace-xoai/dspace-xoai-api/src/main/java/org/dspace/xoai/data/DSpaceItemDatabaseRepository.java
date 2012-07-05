@@ -79,12 +79,22 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
         throw new IdDoesNotExistException();
     }
 
-    private ListItemIdentifiersResult getIdentifierResult(String query,
+    private ListItemIdentifiersResult getIdentifierResult(String query, String countQuery, 
+            List<Object> countParameters,
             List<Object> parameters, int length)
     {
         boolean hasMore = false;
         List<AbstractItemIdentifier> list = new ArrayList<AbstractItemIdentifier>();
         TableRowIterator rows;
+        int count = -1;
+        try
+        {
+            count = DatabaseManager.querySingle(_context, countQuery, countParameters).getIntColumn("count");
+        }
+        catch (SQLException e1)
+        {
+            log.error("Unable to retrieve number of items that match");
+        }
         try
         {
             parameters.add(length + 1);
@@ -103,17 +113,26 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
         {
             log.error(e.getMessage(), e);
         }
-        return new ListItemIdentifiersResult(hasMore, list);
+        return new ListItemIdentifiersResult(hasMore, list, count);
     }
 
-    private ListItemsResults getResult(String query, List<Object> parameters,
-            int length)
+    private ListItemsResults getResult(String query, String countQuery, List<Object> countParameters, List<Object> parameters, int length)
     {
         boolean hasMore = false;
         List<AbstractItem> list = new ArrayList<AbstractItem>();
         TableRowIterator rows;
+        int count = -1;
         try
         {
+            count = DatabaseManager.querySingle(_context, countQuery, countParameters).getIntColumn("count");
+        }
+        catch (SQLException e1)
+        {
+            log.error("Unable to retrieve number of items that match");
+        }
+        try
+        {
+            
             parameters.add(length + 1);
             rows = DatabaseManager.queryTable(_context, "item", query,
                     parameters.toArray());
@@ -130,7 +149,7 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
         {
             log.error(e.getMessage(), e);
         }
-        return new ListItemsResults(hasMore, list);
+        return new ListItemsResults(hasMore, list, count);
     }
 
     @Override
@@ -138,7 +157,9 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
             int length)
     {
         List<Object> parameters = new ArrayList<Object>();
+        List<Object> countParameters = new ArrayList<Object>();
         String query = "SELECT i.* FROM item i ";
+        String countQuery = "SELECT COUNT(*) as count FROM item i";
         List<String> whereCond = new ArrayList<String>();
         for (Filter filter : filters)
         {
@@ -154,12 +175,16 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
                     else
                         whereCond.add("(" + result.getWhere() + ")");
                     parameters.addAll(result.getParameters());
+                    countParameters.addAll(result.getParameters());
                 }
             }
         }
         String where = StringUtils.join(whereCond.iterator(), " AND ");
-        if (!where.equals(""))
+        if (!where.equals("")) {
             query += " WHERE " + where;
+            countQuery += " WHERE " + where;
+        }
+        
         query += " ORDER BY i.item_id";
         String db = ConfigurationManager.getProperty("db.name");
         boolean postgres = true;
@@ -178,7 +203,7 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
             length = length + offset;
         }
         parameters.add(offset);
-        return this.getResult(query, parameters, length);
+        return this.getResult(query, countQuery, countParameters, parameters, length);
     }
 
     @Override
@@ -186,7 +211,9 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
             List<Filter> filters, int offset, int length)
     {
         List<Object> parameters = new ArrayList<Object>();
-        String query = "SELECT i.* FROM item i";
+        List<Object> countParameters = new ArrayList<Object>();
+        String query = "SELECT i.* FROM item i ";
+        String countQuery = "SELECT COUNT(*) as count FROM item i";
         List<String> whereCond = new ArrayList<String>();
         for (Filter filter : filters)
         {
@@ -202,12 +229,15 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
                     else
                         whereCond.add("(" + result.getWhere() + ")");
                     parameters.addAll(result.getParameters());
+                    countParameters.addAll(result.getParameters());
                 }
             }
         }
         String where = StringUtils.join(whereCond.iterator(), " AND ");
-        if (!where.equals(""))
+        if (!where.equals("")) {
             query += " WHERE " + where;
+            countQuery += " WHERE "+ where;
+        }
         query += " ORDER BY i.item_id";
         String db = ConfigurationManager.getProperty("db.name");
         boolean postgres = true;
@@ -226,6 +256,6 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
             length = length + offset;
         }
         parameters.add(offset);
-        return this.getIdentifierResult(query, parameters, length);
+        return this.getIdentifierResult(query, countQuery, countParameters, parameters, length);
     }
 }
