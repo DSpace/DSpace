@@ -34,6 +34,9 @@ import org.dspace.handle.HandleManager;
 
 import org.jdom.Element;
 
+import ar.edu.unlp.sedici.xmlui.xsl.XslExtensions;
+
+
 /**
  * 
  * @author Sands Fish
@@ -1011,24 +1014,21 @@ public class GoogleMetadata
             if (contentBundles.length > 0) { 
             	Bitstream[] bitstreams = contentBundles[0].getBitstreams();
             	if (bitstreams.length > 1){
-                    for (Bitstream bitstream : bitstreams){
-                        
+                    for (Bitstream bitstream : bitstreams){ 
                         	if (bitstream.getFormat().getMIMEType().equals("application/pdf") && bitstream.getID() == contentBundles[0].getPrimaryBitstreamID()) {
                         		StringBuilder path = new StringBuilder();
                                 path.append(ConfigurationManager.getProperty("dspace.url"));
-
-                                if (item.getHandle() != null) {
-                                    path.append("/bitstream/");
-                                    path.append(item.getHandle());
-                                    path.append("/");
-                                    path.append(bitstream.getSequenceID());
-                                } else {
-                                    path.append("/retrieve/");
-                                    path.append(bitstream.getID());
-                                }
-
+                                
+                                path.append("/bitstream/handle/");
+                                path.append(item.getHandle());
                                 path.append("/");
-                                path.append(Util.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING));
+                                path.append(XslExtensions.codificarURL(bitstream.getDescription()));
+                                path.append(".pdf?sequence=");
+                                path.append(bitstream.getSequenceID());
+                               
+                                
+                               /* path.append("/");
+                                path.append(Util.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING));*/
                                 return path.toString();
                                 
             		        } 
@@ -1038,19 +1038,17 @@ public class GoogleMetadata
             	else{ 
             		if (bitstreams[0].getFormat().getMIMEType().equals("application/pdf")){
             			StringBuilder path = new StringBuilder();
-                        path.append(ConfigurationManager.getProperty("dspace.url"));                        
-                        if (item.getHandle() != null) {
-                            path.append("/bitstream/");
-                            path.append(item.getHandle());
-                            path.append("/");
-                            path.append(bitstreams[0].getSequenceID());
-                        } else {
-                            path.append("/retrieve/");
-                            path.append(bitstreams[0].getID());
-                        }
-
+                        path.append(ConfigurationManager.getProperty("dspace.url")); 
+                        
+                        path.append("/bitstream/handle/");
+                        path.append(item.getHandle());
                         path.append("/");
-                        path.append(Util.encodeBitstreamName(bitstreams[0].getName(), Constants.DEFAULT_ENCODING));
+                        path.append(XslExtensions.codificarURL( bitstreams[0].getDescription()));
+                        path.append(".pdf?sequence=");
+                        path.append(bitstreams[0].getSequenceID());
+/*
+                        path.append("/");
+                        path.append(Util.encodeBitstreamName(bitstreams[0].getName(), Constants.DEFAULT_ENCODING));*/
                         return path.toString();
                         
             		}
@@ -1058,8 +1056,8 @@ public class GoogleMetadata
             	}
             		
             }
-        } catch (UnsupportedEncodingException ex) {
-            log.debug(ex.getMessage());
+      /*  } catch (UnsupportedEncodingException ex) {
+            log.debug(ex.getMessage());*/
         } catch (SQLException ex) {
             log.debug(ex.getMessage());
         }
