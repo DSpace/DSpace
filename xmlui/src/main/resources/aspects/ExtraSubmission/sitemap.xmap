@@ -34,6 +34,10 @@
   <map:pipelines>
     <map:pipeline>
     
+      <map:match pattern="submit/finalize">
+        <map:serialize type="xml"/>
+      </map:match>
+      
       <map:generate/>
 
       <!-- Genero los meta para la funcionalidad de autoarchivo -->

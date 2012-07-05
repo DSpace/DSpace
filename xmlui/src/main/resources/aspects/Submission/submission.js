@@ -226,7 +226,7 @@ function doSubmission()
                    var contextPath = cocoon.request.getContextPath();
                    cocoon.sendPage("submit/finalize");
                    cocoon.redirectTo(contextPath+"/submissions",true);
-                   getDSContext().complete();
+                   //getDSContext().complete();
                    cocoon.exit();
                }
 
@@ -751,14 +751,14 @@ function doWorkflowEditMetadata() {
         submissionControl(handle, "X"+workflowItemId, null);
         cocoon.sendPage("submit/finalize");
         cocoon.redirectTo(contextPath+"/handle/"+handle+"/xmlworkflow?"+"workflowID="+workflowItemId+"&stepID="+step.getId()+"&actionID="+action.getId(), true);
-        getDSContext().complete();
+        //getDSContext().complete();
         cocoon.exit();
     } else {
         workflowItemId = workflowItemId.replace("W", "");
         submissionControl(handle, "W"+workflowItemId, null);
         cocoon.sendPage("submit/finalize");
         cocoon.redirectTo(contextPath+"/handle/"+handle+"/workflow?workflowID="+workflowItemId, true);
-        getDSContext().complete();
+        //getDSContext().complete();
         cocoon.exit();
     }
 }

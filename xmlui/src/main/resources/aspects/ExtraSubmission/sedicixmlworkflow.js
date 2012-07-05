@@ -138,8 +138,8 @@ function doEditItemMetadata()
 	
 	
 	// Enviamos al usuario a la pantalla de aceptación del trabajo
-
+	cocoon.sendPage("submit/finalize");
 	cocoon.redirectTo(redireccionamiento, true);
-    getDSContext().complete();
+    //getDSContext().complete();
     cocoon.exit();
 }
