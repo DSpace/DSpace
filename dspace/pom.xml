@@ -145,7 +145,7 @@
     	<!-- Don't know how to add artifacts to dspace lib -->
     	<dependency>
     		<groupId>org.dspace</groupId>
-    		<artifactId>dspace-xoai-api</artifactId>
+    		<artifactId>dspace-oai-api</artifactId>
     	</dependency>
     	<dependency>
     		<groupId>javax.servlet</groupId>

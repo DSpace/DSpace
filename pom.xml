@@ -232,12 +232,12 @@
            Builds XOAI Gateway WAR for DSpace
         -->
         <profile>
-            <id>dspace-xoai</id>
+            <id>dspace-oai</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
-                <module>dspace-xoai</module>
+                <module>dspace-oai</module>
             </modules>
         </profile>
 
@@ -338,7 +338,7 @@
             <module>dspace-jspui</module>
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
-            <module>dspace-xoai</module>
+            <module>dspace-oai</module>
             <module>dspace-sword</module>
             <module>dspace-swordv2</module>
             <module>dspace-sword-client</module>
@@ -470,12 +470,12 @@
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-xoai-api</artifactId>
+            <artifactId>dspace-oai-api</artifactId>
             <version>3.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-xoai-webapp</artifactId>
+            <artifactId>dspace-oai-webapp</artifactId>
             <version>3.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
