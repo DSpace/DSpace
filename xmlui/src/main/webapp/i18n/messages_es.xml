@@ -678,7 +678,7 @@
 <message key="xmlui.Submission.submit.InitialQuestionsStep.published_before_note">Si la casilla contigua está desmarcada, entonces el elemento será eliminado del ítem:</message>
 <message key="xmlui.Submission.submit.InitialQuestionsStep.date_issued">Fecha proporcionada</message>
 <message key="xmlui.Submission.submit.InitialQuestionsStep.citation">Cita</message>
-<message key="xmlui.Submission.submit.InitialQuestionsStep.publisher">Editor</message>
+<message key="xmlui.Submission.submit.InitialQuestionsStep.publisher">Editorial</message>
 
 
 	<!-- org.dspace.app.xmlui.Submission.submit.DescribeStep -->
@@ -1951,7 +1951,7 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-juror">Jurado</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-colaborator">Colaborador</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-language">Idioma del documento</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Lugar de publicación</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Editorial</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-affiliated-institution">Lugar de desarrollo</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-degree-name">Grado alcanzado</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-degree-grantor">Institución otorgante</message>
@@ -1991,7 +1991,7 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 <message key="xmlui.dri2xhtml.METS-1.0.item-description">Descripción</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-uri">URI</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-date">Fecha</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Editor</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Editorial</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject">Tema</message>           
 <message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Archivos asociados</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-files-file">archivos</message>
@@ -2200,8 +2200,8 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.ChoiceLookupTransformer.fail">No se pudo cargar los datos de la elección: </message>
 
   <!-- Choice Lookup - sample config for dc.publisher field -->
-  <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.help">Nombre del Editor</message>
-<message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.title">Buscar Editor</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.help">Nombre de la Editorial</message>
+<message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.title">Buscar Editorial</message>
 
   <!-- Params are: search-value -->
 <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.nonauthority">No es valor de Autoridad: @1@</message>
@@ -2411,7 +2411,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <!-- Site Leve Recently Added Content -->
 <message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Últimos documentos agregados</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_type_filter">Tipo</message>
-<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_publisher_filter">Editor</message>
+<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_publisher_filter">Editorial</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.ispartof">Es parte de</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.group_by">Resultados agrupados por</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.group_by.none">Ninguno</message>
