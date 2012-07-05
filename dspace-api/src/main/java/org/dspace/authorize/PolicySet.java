@@ -8,15 +8,12 @@
 package org.dspace.authorize;
 
 import java.sql.SQLException;
+import java.util.Date;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
+import org.dspace.content.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
@@ -24,7 +21,7 @@ import org.dspace.eperson.Group;
 /**
  * Was Hack/Tool to set policies for items, bundles, and bitstreams. Now has
  * helpful method, setPolicies();
- * 
+ *
  * @author dstuve
  * @version $Revision$
  */
@@ -38,7 +35,7 @@ public class PolicySet
         if (argv.length < 6)
         {
             System.out
-                   .println("Args: containerType containerID contentType actionID groupID command [filter]");
+                    .println("Args: containerType containerID contentType actionID groupID command [filter]");
             System.out.println("container=COLLECTION command = ADD|REPLACE");
 
             return;
@@ -55,7 +52,7 @@ public class PolicySet
         String filter = null;
         if ( argv.length == 7 )
         {
-                filter = argv[6];
+            filter = argv[6];
         }
 
         if (command.equals("REPLACE"))
@@ -77,11 +74,11 @@ public class PolicySet
         c.complete();
         System.exit(0);
     }
-    
+
     /**
      * Useful policy wildcard tool. Can set entire collections' contents'
      * policies
-     * 
+     *
      * @param c
      *            current context
      * @param containerType
@@ -106,18 +103,44 @@ public class PolicySet
      *             if current user is not authorized to change these policies
      */
     public static void setPolicies(Context c, int containerType,
-            int containerID, int contentType, int actionID, int groupID,
-            boolean isReplace, boolean clearOnly) throws SQLException,
+                                   int containerID, int contentType, int actionID, int groupID,
+                                   boolean isReplace, boolean clearOnly) throws SQLException,
             AuthorizeException
     {
+        setPoliciesFilter(c, containerType,containerID, contentType, actionID, groupID, isReplace, clearOnly, null, null, null, null, null);
+    }
+
+
+    /**
+     *
+     * @param c
+     * @param containerType
+     * @param containerID
+     * @param contentType
+     * @param actionID
+     * @param groupID
+     * @param isReplace
+     * @param clearOnly
+     * @param name
+     * @param description
+     * @param startDate
+     * @param endDate
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    public static void setPolicies(Context c, int containerType,
+                                   int containerID, int contentType, int actionID, int groupID,
+                                   boolean isReplace, boolean clearOnly,
+                                   String name, String description, Date startDate, Date endDate) throws SQLException, AuthorizeException
+    {
         setPoliciesFilter(c, containerType, containerID, contentType,
-                           actionID, groupID, isReplace, clearOnly, null);                         
+                actionID, groupID, isReplace, clearOnly, null, name, description, startDate, endDate);
     }
 
     /**
      * Useful policy wildcard tool. Can set entire collections' contents'
      * policies
-     * 
+     *
      * @param c
      *            current context
      * @param containerType
@@ -144,9 +167,49 @@ public class PolicySet
      *             if current user is not authorized to change these policies
      */
     public static void setPoliciesFilter(Context c, int containerType,
-            int containerID, int contentType, int actionID, int groupID,
-            boolean isReplace, boolean clearOnly, String filter) throws SQLException,
-            AuthorizeException
+                                         int containerID, int contentType, int actionID, int groupID,
+                                         boolean isReplace, boolean clearOnly, String filter) throws SQLException,AuthorizeException
+    {
+        setPoliciesFilter(c, containerType,containerID, contentType, actionID, groupID, isReplace, clearOnly, filter, null, null, null, null);
+    }
+
+    /**
+     * Useful policy wildcard tool. Can set entire collections' contents'
+     * policies
+     *
+     * @param c
+     *            current context
+     * @param containerType
+     *            type, Constants.ITEM or Constants.COLLECTION
+     * @param containerID
+     *            ID of container (DB primary key)
+     * @param contentType
+     *            type (BUNDLE, ITEM, or BITSTREAM)
+     * @param actionID
+     *            action ID
+     * @param groupID
+     *            group ID (database key)
+     * @param isReplace
+     *            if <code>true</code>, existing policies are removed first,
+     *            otherwise add to existing policies
+     * @param clearOnly
+     *            if <code>true</code>, just delete policies for matching
+     *            objects
+     * @param filter
+     *            if non-null, only process bitstreams whose names contain filter
+     * @param name
+     * @param description
+     * @param startDate
+     * @param endDate
+     * @throws SQLException
+     *             if database problem
+     * @throws AuthorizeException
+     *             if current user is not authorized to change these policies
+     */
+    public static void setPoliciesFilter(Context c, int containerType,
+                                         int containerID, int contentType, int actionID, int groupID,
+                                         boolean isReplace, boolean clearOnly, String filter,
+                                         String name, String description, Date startDate, Date endDate) throws SQLException, AuthorizeException
     {
         if (containerType == Constants.COLLECTION)
         {
@@ -171,14 +234,23 @@ public class PolicySet
 
                         if (!clearOnly)
                         {
-                            // now add the policy
-                            ResourcePolicy rp = ResourcePolicy.create(c);
 
-                            rp.setResource(myitem);
-                            rp.setAction(actionID);
-                            rp.setGroup(group);
+                            // before create a new policy check if an identical policy is already in place
+                            if(!AuthorizeManager.isAnIdenticalPolicyAlreadyInPlace(c, myitem, groupID, actionID, -1)){
+                                // now add the policy
+                                ResourcePolicy rp = ResourcePolicy.create(c);
 
-                            rp.update();
+                                rp.setResource(myitem);
+                                rp.setAction(actionID);
+                                rp.setGroup(group);
+
+                                rp.setRpName(name);
+                                rp.setRpDescription(description);
+                                rp.setStartDate(startDate);
+                                rp.setEndDate(endDate);
+
+                                rp.update();
+                            }
                         }
                     }
                 }
@@ -194,24 +266,32 @@ public class PolicySet
 
                         for (int j = 0; j < bundles.length; j++)
                         {
-                            Bundle t = bundles[j]; // t for target
+                            Bundle bundle = bundles[j]; // t for target
 
                             // is this a replace? delete policies first
                             if (isReplace || clearOnly)
                             {
-                                AuthorizeManager.removeAllPolicies(c, t);
+                                AuthorizeManager.removeAllPolicies(c, bundle);
                             }
 
                             if (!clearOnly)
                             {
-                                // now add the policy
-                                ResourcePolicy rp = ResourcePolicy.create(c);
+                                // before create a new policy check if an identical policy is already in place
+                                if(!AuthorizeManager.isAnIdenticalPolicyAlreadyInPlace(c, bundle, groupID, actionID, -1)){
+                                    // now add the policy
+                                    ResourcePolicy rp = ResourcePolicy.create(c);
 
-                                rp.setResource(t);
-                                rp.setAction(actionID);
-                                rp.setGroup(group);
+                                    rp.setResource(bundle);
+                                    rp.setAction(actionID);
+                                    rp.setGroup(group);
 
-                                rp.update();
+                                    rp.setRpName(name);
+                                    rp.setRpDescription(description);
+                                    rp.setStartDate(startDate);
+                                    rp.setEndDate(endDate);
+
+                                    rp.update();
+                                }
                             }
                         }
                     }
@@ -235,27 +315,35 @@ public class PolicySet
 
                             for (int k = 0; k < bitstreams.length; k++)
                             {
-                                Bitstream t = bitstreams[k]; // t for target
+                                Bitstream bitstream = bitstreams[k]; // t for target
 
                                 if ( filter == null ||
-                                     t.getName().indexOf( filter ) != -1 )
+                                        bitstream.getName().indexOf( filter ) != -1 )
                                 {
                                     // is this a replace? delete policies first
                                     if (isReplace || clearOnly)
                                     {
-                                            AuthorizeManager.removeAllPolicies(c, t);
+                                        AuthorizeManager.removeAllPolicies(c, bitstream);
                                     }
 
                                     if (!clearOnly)
                                     {
+                                        // before create a new policy check if an identical policy is already in place
+                                        if(!AuthorizeManager.isAnIdenticalPolicyAlreadyInPlace(c, bitstream,  groupID, actionID, -1)){
                                             // now add the policy
                                             ResourcePolicy rp = ResourcePolicy.create(c);
 
-                                            rp.setResource(t);
+                                            rp.setResource(bitstream);
                                             rp.setAction(actionID);
                                             rp.setGroup(group);
 
+                                            rp.setRpName(name);
+                                            rp.setRpDescription(description);
+                                            rp.setStartDate(startDate);
+                                            rp.setEndDate(endDate);
+
                                             rp.update();
+                                        }
                                     }
                                 }
                             }
