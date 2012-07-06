@@ -57,7 +57,7 @@
 	     	 <h1 class="communities_header"><i18n:text>sedici.comunidades.header</i18n:text></h1>
 	     	
 	     	 <!-- mostramos los links principales basados en la propiedad de configuracion xmlui.community-list.home-links -->
-	     	 <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link']">
+	     	 <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link' and @qualifier!='redunci']">
 		         <div class="community_icon_container">
 		         	<xsl:attribute name="id">icono_<xsl:value-of select="@qualifier"/></xsl:attribute>
 			 		<a>
@@ -95,6 +95,26 @@
 			 		<p><i18n:text>sedici.comunidades.libros.info</i18n:text></p>
 		 		 </a>
 	 	     </div>
+	 	     
+	     	 <!-- Se harcodea el incono de la Red UNCI y su handle, para asegurar que aparezca ultimo en la lista -->
+    	 	 <div class="community_icon_container">
+	         	 <xsl:attribute name="id">icono_redunci</xsl:attribute>
+		 		 <a>
+		 		    <xsl:attribute name="href"><xsl:text>handle/10915/18267</xsl:text></xsl:attribute>
+			 		<h2><i18n:text>sedici.comunidades.redunci.nombre</i18n:text></h2>
+			 		<img class="community_icon">
+			 			<xsl:attribute name="id">community_icon_redunci</xsl:attribute>
+			            <xsl:attribute name="src">
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+			                <xsl:text>/themes/</xsl:text>
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+			                <xsl:text>/images/icono_redunci.png</xsl:text>
+			            </xsl:attribute>&#160;
+			 		</img>
+			 		<p><i18n:text>sedici.comunidades.redunci.info</i18n:text></p>
+		 		 </a>
+	 	     </div>
+	 	     
 	     </div>
 	     
 	     <div id='home_feed'>

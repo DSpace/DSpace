@@ -2251,6 +2251,9 @@
 <message key="sedici.comunidades.eventos.nombre">Events</message>
 <message key="sedici.comunidades.eventos.info">Congress y conference publications</message>
 <message key="sedici.comunidades.tesis.embargo">Embargoed document</message>
+<message key="sedici.comunidades.redunci.nombre">Red UNCI</message>
+<message key="sedici.comunidades.redunci.info">Journals and events from Red UNCI</message>
+
 <message key="sedici.noticias.head">News</message>
 <message key="sedici.noticias.titulo">News list</message>
 <message key="sedici.common.camposObligatorios">(*) Mandatory</message>

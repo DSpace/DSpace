@@ -3068,15 +3068,19 @@ background-position:center top;
 
 .community_icon_container {
 	float: left;
-	height:106px;
-text-align:center;
+	height: 106px;
+	text-align:center;
+	width: 133px;
 }
 
-.community_icon_container a{
+.community_icon_container a {
 	color:#e79011;
-/*	text-shadow: grey 1px 1px;*/
 	font-size:12px;
 	font-weight:regular;
+	padding: 10px 0px;
+	display: block;
+	border-radius: 10px;
+	min-height: 150px;
 }
 
 .community_icon_container a:hover{
@@ -3132,12 +3136,6 @@ h1.communities_header {
 }
 .community_icon_container img {
 	max-width: 150px;
-}
-.community_icon_container a {
-	padding: 10px 5px;
-	display: block;
-	border-radius: 10px;
-	min-height: 150px;
 }
 .community_icon_container a:hover, .community_icon_container a:hover p {
 	background-color: #e3f1f9;
