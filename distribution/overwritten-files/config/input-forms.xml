@@ -155,7 +155,7 @@
 				<!-- /////////////////// FIN DE LOS TYPES Y SUBTYPES /////////////////// -->
 				
 
-				<!-- Autor (persona), Submission -->
+				<!-- Autor (persona) -->
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>creator</dc-element>
@@ -165,19 +165,7 @@
 					<input-type>onebox</input-type>
 					<hint>Autores de la obra</hint>
 					<required>Debe indicar al menos un autor</required>
-					<visibility>submit</visibility>
-				</field>
-	
-				<!-- Autor (persona), Workflow -->
-				<field>
-					<dc-schema>sedici</dc-schema>
-					<dc-element>creator</dc-element>
-					<dc-qualifier>person</dc-qualifier>
-					<repeatable>true</repeatable>
-					<label>Autor (*)</label>
-					<input-type>onebox</input-type>
-					<hint>Autores de la obra</hint>
-					<visibility>workflow</visibility>
+					<required-on-group>!SeDiCIAdmin</required-on-group>
 				</field>
 
 				<!-- Autor Institucional (institucion) -->
