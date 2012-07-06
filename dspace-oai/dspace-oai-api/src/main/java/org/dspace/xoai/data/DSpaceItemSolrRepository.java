@@ -7,7 +7,6 @@
  */
 package org.dspace.xoai.data;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -18,8 +17,6 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.dspace.content.Item;
-import org.dspace.core.Context;
 import org.dspace.xoai.filter.DSpaceFilter;
 import org.dspace.xoai.filter.SolrFilterResult;
 import org.dspace.xoai.solr.DSpaceSolrSearch;
@@ -40,14 +37,10 @@ import com.lyncode.xoai.common.dataprovider.filter.FilterScope;
  */
 public class DSpaceItemSolrRepository extends DSpaceItemRepository
 {
-    private static Logger log = LogManager
-            .getLogger(DSpaceItemSolrRepository.class);
+    private static Logger log = LogManager.getLogger(DSpaceItemSolrRepository.class);
 
-    private Context ctx;
-
-    public DSpaceItemSolrRepository(Context ctx)
+    public DSpaceItemSolrRepository()
     {
-        this.ctx = ctx;
     }
 
     @Override
@@ -60,17 +53,11 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository
             try
             {
                 SolrQuery params = new SolrQuery("item.handle:" + parts[2]);
-                Item item = Item.find(ctx, (Integer) DSpaceSolrSearch
-                        .querySingle(params).getFieldValue("item.id"));
-                return new DSpaceItem(item);
+                return new DSpaceSolrItem(DSpaceSolrSearch.querySingle(params));
             }
             catch (SolrSearchEmptyException ex)
             {
                 throw new IdDoesNotExistException(ex);
-            }
-            catch (SQLException e)
-            {
-                throw new IdDoesNotExistException(e);
             }
         }
         throw new IdDoesNotExistException();
@@ -142,9 +129,7 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository
             SolrDocumentList docs = DSpaceSolrSearch.query(params);
             for (SolrDocument doc : docs)
             {
-                Item item = Item.find(ctx,
-                        (Integer) doc.getFieldValue("item.id"));
-                list.add(new DSpaceItem(item));
+                list.add(new DSpaceSolrItem(doc));
             }
             return new ListItemsResults((docs.getNumFound() > offset + length),
                     list, (int) docs.getNumFound());
@@ -152,11 +137,6 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository
         catch (DSpaceSolrException ex)
         {
             log.error(ex.getMessage(), ex);
-            return new ListItemsResults(false, list);
-        }
-        catch (SQLException e)
-        {
-            log.error(e.getMessage(), e);
             return new ListItemsResults(false, list);
         }
     }
@@ -174,20 +154,13 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository
             hasMore = (offset + length) < docs.getNumFound();
             for (SolrDocument doc : docs)
             {
-                Item item = Item.find(ctx,
-                        (Integer) doc.getFieldValue("item.id"));
-                list.add(new DSpaceItem(item));
+                list.add(new DSpaceSolrItem(doc));
             }
             return new ListItemIdentifiersResult(hasMore, list, (int) docs.getNumFound());
         }
         catch (DSpaceSolrException ex)
         {
             log.error(ex.getMessage(), ex);
-            return new ListItemIdentifiersResult(false, list);
-        }
-        catch (SQLException e)
-        {
-            log.error(e.getMessage(), e);
             return new ListItemIdentifiersResult(false, list);
         }
     }

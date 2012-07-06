@@ -63,7 +63,7 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
                     throw new IdDoesNotExistException();
                 if (!(obj instanceof Item))
                     throw new IdDoesNotExistException();
-                return new DSpaceItem((Item) obj);
+                return new DSpaceDatabaseItem((Item) obj);
             }
         }
         catch (NumberFormatException e)
@@ -104,7 +104,7 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
             int i = 0;
             while (iterator.hasNext() && i < length)
             {
-                list.add(new DSpaceItem(iterator.next()));
+                list.add(new DSpaceDatabaseItem(iterator.next()));
                 i++;
             }
             hasMore = iterator.hasNext();
@@ -140,7 +140,7 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
             int i = 0;
             while (iterator.hasNext() && i < length)
             {
-                list.add(new DSpaceItem(iterator.next()));
+                list.add(new DSpaceDatabaseItem(iterator.next()));
                 i++;
             }
             hasMore = iterator.hasNext();

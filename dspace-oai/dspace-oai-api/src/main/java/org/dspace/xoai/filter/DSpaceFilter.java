@@ -8,7 +8,7 @@
 package org.dspace.xoai.filter;
 
 import org.dspace.core.Context;
-import org.dspace.xoai.data.DSpaceItem;
+import org.dspace.xoai.data.DSpaceDatabaseItem;
 
 import com.lyncode.xoai.common.dataprovider.data.AbstractItemIdentifier;
 import com.lyncode.xoai.common.dataprovider.filter.AbstractFilter;
@@ -42,14 +42,14 @@ public abstract class DSpaceFilter extends AbstractFilter
 
     public abstract SolrFilterResult getQuery();
 
-    public abstract boolean isShown(DSpaceItem item);
+    public abstract boolean isShown(DSpaceDatabaseItem item);
 
     @Override
     public boolean isItemShown(AbstractItemIdentifier item)
     {
-        if (item instanceof DSpaceItem)
+        if (item instanceof DSpaceDatabaseItem)
         {
-            return this.isShown((DSpaceItem) item);
+            return this.isShown((DSpaceDatabaseItem) item);
         }
         return false;
     }

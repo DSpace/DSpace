@@ -11,7 +11,7 @@ import java.util.Date;
 
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.core.Context;
-import org.dspace.xoai.data.DSpaceItem;
+import org.dspace.xoai.data.DSpaceDatabaseItem;
 import org.dspace.xoai.util.DateUtils;
 
 /**
@@ -35,7 +35,7 @@ public class DateFromFilter extends DSpaceFilter
     }
 
     @Override
-    public boolean isShown(DSpaceItem item)
+    public boolean isShown(DSpaceDatabaseItem item)
     {
         if (item.getDatestamp().compareTo(_date) >= 0)
             return true;

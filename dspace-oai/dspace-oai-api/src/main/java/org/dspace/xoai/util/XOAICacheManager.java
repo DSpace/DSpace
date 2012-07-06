@@ -17,28 +17,21 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.xoai.data.DSpaceItem;
+import org.dspace.xoai.data.DSpaceDatabaseItem;
+import org.dspace.xoai.exceptions.MetadataBindException;
 
 import com.lyncode.xoai.common.dataprovider.OAIDataProvider;
 import com.lyncode.xoai.common.dataprovider.OAIRequestParameters;
 import com.lyncode.xoai.common.dataprovider.core.XOAIManager;
-import com.lyncode.xoai.common.dataprovider.exceptions.MarshallingException;
 import com.lyncode.xoai.common.dataprovider.exceptions.OAIException;
 import com.lyncode.xoai.common.dataprovider.util.Base64Utils;
-import com.lyncode.xoai.common.dataprovider.util.MarshallingUtils;
-import com.lyncode.xoai.common.dataprovider.xml.PrefixMapper;
 import com.lyncode.xoai.common.dataprovider.xml.xoai.Metadata;
 
 /**
@@ -90,7 +83,7 @@ public class XOAICacheManager
         return new File(getBaseDir() + ITEMDIR + name);
     }
 
-    public static void compileItem(DSpaceItem item)
+    public static void compileItem(DSpaceDatabaseItem item)
     {
         File metadataCache = getMetadataCache(item.getItem());
         if (metadataCache.exists())
@@ -98,7 +91,7 @@ public class XOAICacheManager
         getMetadata(item);
     }
 
-    public static Metadata getMetadata(DSpaceItem item)
+    public static Metadata getMetadata(DSpaceDatabaseItem item)
     {
         log.debug("Trying to find compiled item");
         File metadataCache = getMetadataCache(item.getItem());
@@ -107,21 +100,19 @@ public class XOAICacheManager
         {
             log.debug("This is not a compiled item");
             // generate cache
-            metadata = item.retrieveMetadata();
+            metadata = ItemUtils.retrieveMetadata(item.getItem());
             FileOutputStream output;
             try
             {
                 output = new FileOutputStream(metadataCache);
-                MarshallingUtils.marshalWithoutXMLHeader(Metadata.class
-                        .getPackage().getName(), metadata, new PrefixMapper(),
-                        output);
+                XMLBindUtils.writeMetadata(output, metadata);
             }
             catch (FileNotFoundException e)
             {
                 log.warn("Could not open file for writing: "
                         + metadataCache.getPath(), e);
             }
-            catch (MarshallingException e)
+            catch (MetadataBindException e)
             {
                 log.warn("Unable to export in-memory metadata into file: "
                         + metadataCache.getPath(), e);
@@ -131,19 +122,17 @@ public class XOAICacheManager
         {
             log.debug("This is a compiled item!");
             // Read compiled file
+            FileInputStream input;
             try
             {
-                JAXBContext context = JAXBContext.newInstance(Metadata.class
-                        .getPackage().getName());
-                Unmarshaller unmarshaller = context.createUnmarshaller();
-                metadata = (Metadata) unmarshaller.unmarshal(metadataCache);
+                input = new FileInputStream(metadataCache);
+                metadata = XMLBindUtils.readMetadata(input);
+                input.close();
             }
-            catch (JAXBException e)
+            catch (Exception e)
             {
-                log.warn("Unable to read metadata from compiled file: "
-                        + metadataCache.getPath()
-                        + " (low performance expected)", e);
-                metadata = item.retrieveMetadata();
+                log.warn(e.getMessage(), e);
+                metadata = ItemUtils.retrieveMetadata(item.getItem());
             }
         }
         return metadata;

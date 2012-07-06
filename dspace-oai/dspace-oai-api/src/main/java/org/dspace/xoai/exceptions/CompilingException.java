@@ -1,5 +1,6 @@
 package org.dspace.xoai.exceptions;
 
+@SuppressWarnings("serial")
 public class CompilingException extends Exception
 {
 

@@ -7,16 +7,9 @@
  */
 package org.dspace.xoai;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -39,9 +32,7 @@ import com.lyncode.xoai.common.dataprovider.OAIDataProvider;
 import com.lyncode.xoai.common.dataprovider.OAIRequestParameters;
 import com.lyncode.xoai.common.dataprovider.core.XOAIManager;
 import com.lyncode.xoai.common.dataprovider.exceptions.InvalidContextException;
-import com.lyncode.xoai.common.dataprovider.exceptions.OAIException;
 import com.lyncode.xoai.common.dataprovider.filter.AbstractFilter;
-import com.lyncode.xoai.common.dataprovider.util.Base64Utils;
 
 /**
  * 
@@ -98,7 +89,7 @@ public class DSpaceOAIDataProvider extends HttpServlet
                     || !storage.trim().toLowerCase().equals("database"))
             {
                 log.debug("Using Solr for querying");
-                repository = new DSpaceItemSolrRepository(context);
+                repository = new DSpaceItemSolrRepository();
             }
             else
             {

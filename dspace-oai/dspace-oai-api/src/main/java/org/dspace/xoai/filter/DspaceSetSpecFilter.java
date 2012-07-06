@@ -21,7 +21,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.handle.HandleManager;
-import org.dspace.xoai.data.DSpaceItem;
+import org.dspace.xoai.data.DSpaceDatabaseItem;
 import org.dspace.xoai.util.XOAIDatabaseManager;
 
 /**
@@ -79,7 +79,7 @@ public class DspaceSetSpecFilter extends DSpaceFilter
     }
 
     @Override
-    public boolean isShown(DSpaceItem item)
+    public boolean isShown(DSpaceDatabaseItem item)
     {
         try
         {

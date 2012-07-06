@@ -19,7 +19,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.xoai.data.DSpaceItem;
+import org.dspace.xoai.data.DSpaceDatabaseItem;
 
 /**
  * 
@@ -44,7 +44,7 @@ public class DSpaceAuthorizationFilter extends DSpaceFilter
     }
 
     @Override
-    public boolean isShown(DSpaceItem item)
+    public boolean isShown(DSpaceDatabaseItem item)
     {
         try
         {

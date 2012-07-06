@@ -7,7 +7,7 @@
  */
 package org.dspace.xoai.app;
 
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.sql.SQLException;
@@ -42,12 +42,15 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.xoai.data.DSpaceItem;
+import org.dspace.xoai.data.DSpaceDatabaseItem;
 import org.dspace.xoai.exceptions.CompilingException;
+import org.dspace.xoai.exceptions.MetadataBindException;
 import org.dspace.xoai.solr.DSpaceSolrSearch;
 import org.dspace.xoai.solr.DSpaceSolrServer;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrException;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrIndexerException;
+import org.dspace.xoai.util.ItemUtils;
+import org.dspace.xoai.util.XMLBindUtils;
 import org.dspace.xoai.util.XOAICacheManager;
 import org.dspace.xoai.util.XOAIDatabaseManager;
 
@@ -153,7 +156,7 @@ public class XOAI
     private void index(Date last) throws DSpaceSolrIndexerException
     {
         System.out
-                .println("Incremental import of information. Searching for documents modified after: "
+                .println("Incremental import. Searching for documents modified after: "
                         + last.toString());
         try
         {
@@ -171,7 +174,7 @@ public class XOAI
 
     private void indexAll() throws DSpaceSolrIndexerException
     {
-        System.out.println("Full import of information.");
+        System.out.println("Full import");
         try
         {
             TableRowIterator iterator = DatabaseManager.query(_context,
@@ -189,15 +192,14 @@ public class XOAI
     {
         try
         {
-            List<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
             int i = 1;
+            SolrServer server = DSpaceSolrServer.getServer();
             while (iterator.hasNext())
             {
                 try
                 {
-                    docs.add(this.index(Item.find(_context, iterator.next()
+                    server.add(this.index(Item.find(_context, iterator.next()
                             .getIntColumn("item_id"))));
-                    
                     
                     _context.clearCache();
                 }
@@ -205,12 +207,14 @@ public class XOAI
                 {
                     log.error(ex.getMessage(), ex);
                 }
+                catch (MetadataBindException e)
+                {
+                    log.error(e.getMessage(), e);
+                }
                 i++;
-                if (i % 100 == 0) System.out.println(i+" items imported.. continuing");
+                if (i % 100 == 0) System.out.println(i+" items imported so far...");
             }
             System.out.println("Total: "+i+" items");
-            SolrServer server = DSpaceSolrServer.getServer();
-            server.add(docs);
             server.commit();
         }
         catch (SQLException ex)
@@ -227,7 +231,7 @@ public class XOAI
         }
     }
 
-    private SolrInputDocument index(Item item) throws SQLException
+    private SolrInputDocument index(Item item) throws SQLException, MetadataBindException
     {
         SolrInputDocument doc = new SolrInputDocument();
         doc.addField("item.id", item.getID());
@@ -261,22 +265,14 @@ public class XOAI
         {
             doc.addField("metadata.dc.format.mimetype", f);
         }
+        
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            XMLBindUtils.writeMetadata(out, ItemUtils.retrieveMetadata(item));
+            doc.addField("item.compile", out.toString());
 
         if (_verbose)
         {
             println("Item with handle "+handle+" indexed");
-        }
-
-        if (_verbose) 
-        {
-            println("Compiling item...");
-        }
-        
-        XOAICacheManager.compileItem(new DSpaceItem(item));
-        
-        if (_verbose) 
-        {
-            println("Item compiled");
         }
         
         
@@ -469,7 +465,7 @@ public class XOAI
             while (iterator.hasNext()) {
                 Item item = iterator.next();
                 if (_verbose) System.out.println("Compiling item with handle: "+ item.getHandle());
-                XOAICacheManager.compileItem(new DSpaceItem(item));
+                XOAICacheManager.compileItem(new DSpaceDatabaseItem(item));
                 _context.clearCache();
             }
             
