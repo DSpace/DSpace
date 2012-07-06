@@ -389,7 +389,7 @@ public class XOAI
             }
             
             if (!line.hasOption('h') && run) {
-                    System.out.println("XOAI manager action started");
+                    System.out.println("OAI 2.0 manager action started");
                     long start = System.currentTimeMillis();
                     
                     String command = line.getArgs()[0];
@@ -424,7 +424,7 @@ public class XOAI
                         cleanCache();
                     }
 
-                    System.out.println("XOAI manager action ended. It took "
+                    System.out.println("OAI 2.0 manager action ended. It took "
                             + ((System.currentTimeMillis() - start) / 1000)
                             + " seconds.");
             } else {

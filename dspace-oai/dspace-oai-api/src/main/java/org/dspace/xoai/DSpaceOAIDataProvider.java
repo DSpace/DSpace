@@ -56,23 +56,23 @@ public class DSpaceOAIDataProvider extends HttpServlet
             if (!"database".equals(ConfigurationManager.getProperty("oai", "storage"))) {
                 DSpaceSolrServer.getServer();
             }
-            System.out.println("[XOAI] Initialized");
+            System.out.println("[OAI 2.0] Initialized");
         }
         catch (com.lyncode.xoai.common.dataprovider.exceptions.ConfigurationException e)
         {
-            System.out.println("Unable to configure XOAI Core");
+            System.out.println("Unable to configure XOAI (OAI 2.0 Core)");
             e.printStackTrace();
         }
         catch (SolrServerException e)
         {
-            System.out.println("Unable to configure XOAI Core");
+            System.out.println("Unable to configure XOAI (OAI 2.0 Core)");
             e.printStackTrace();
         }
     }
 
     public void destroy()
     {
-        System.out.println("[XOAI] Destroyed");
+        System.out.println("[OAI 2.0] Destroyed");
     }
 
     @Override
@@ -84,7 +84,7 @@ public class DSpaceOAIDataProvider extends HttpServlet
 
         try
         {
-            log.debug("XOAI request received");
+            log.debug("OAI 2.0 request received");
             context = new Context();
 
             // Filters require database connection -> dependency injection?

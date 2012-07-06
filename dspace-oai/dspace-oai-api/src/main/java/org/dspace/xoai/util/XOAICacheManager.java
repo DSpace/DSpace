@@ -59,7 +59,7 @@ public class XOAICacheManager
             String dir = ConfigurationManager.getProperty("dspace.dir");
             if (!dir.endsWith("/"))
                 dir += "/";
-            dir += "var/xoai";
+            dir += "var/oai";
             baseDir = dir;
         }
         return baseDir;
@@ -243,7 +243,7 @@ public class XOAICacheManager
             }
         }
         else
-            log.debug("[XOAI] Cached Result");
+            log.debug("[OAI 2.0] Cached Result");
 
         // The cached file is written, now one start by adding the header
         SimpleDateFormat format = new SimpleDateFormat(
