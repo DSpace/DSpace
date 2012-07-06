@@ -34,7 +34,7 @@ public class DSpaceSolrServer
             try
             {
                 _server = new CommonsHttpSolrServer(
-                        ConfigurationManager.getProperty("xoai", "solr.url"));
+                        ConfigurationManager.getProperty("oai", "solr.url"));
                 log.debug("Solr Server Initialized");
             }
             catch (MalformedURLException e)

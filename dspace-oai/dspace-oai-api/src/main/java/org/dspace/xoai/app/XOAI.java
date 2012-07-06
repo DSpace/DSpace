@@ -306,7 +306,7 @@ public class XOAI
         if (t instanceof ConnectException)
         {
             System.err.println("Solr server ("
-                    + ConfigurationManager.getProperty("xoai", "solr.url")
+                    + ConfigurationManager.getProperty("oai", "solr.url")
                     + ") is down, turn it on.");
             return true;
         }
@@ -372,7 +372,7 @@ public class XOAI
             
             
             boolean solr = true; // Assuming solr by default
-            solr = !("database").equals(ConfigurationManager.getProperty("xoai", "storage"));
+            solr = !("database").equals(ConfigurationManager.getProperty("oai", "storage"));
             
             
             boolean run = false;
@@ -482,7 +482,7 @@ public class XOAI
     private static void usage()
     {
         boolean solr = true; // Assuming solr by default
-        solr = !("database").equals(ConfigurationManager.getProperty("xoai", "storage"));
+        solr = !("database").equals(ConfigurationManager.getProperty("oai", "storage"));
         
         if (solr) {
             System.out.println("OAI Manager Script");

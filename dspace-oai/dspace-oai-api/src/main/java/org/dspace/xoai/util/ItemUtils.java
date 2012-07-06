@@ -153,7 +153,7 @@ public class ItemUtils
                     String url = "";
                     String bsName = bitstream.getName();
                     String sid = String.valueOf(bit.getSequenceID());
-                    String baseUrl = ConfigurationManager.getProperty("xoai",
+                    String baseUrl = ConfigurationManager.getProperty("oai",
                             "bitstream.baseUrl");
                     String handle = null;
                     // get handle of parent Item of this bitstream, if there

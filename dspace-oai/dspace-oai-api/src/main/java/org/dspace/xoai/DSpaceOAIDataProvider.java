@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.xoai.data.DSpaceIdentify;
@@ -26,6 +27,7 @@ import org.dspace.xoai.data.DSpaceItemRepository;
 import org.dspace.xoai.data.DSpaceItemSolrRepository;
 import org.dspace.xoai.data.DSpaceSetRepository;
 import org.dspace.xoai.filter.DSpaceFilter;
+import org.dspace.xoai.solr.DSpaceSolrServer;
 import org.dspace.xoai.util.XOAICacheManager;
 
 import com.lyncode.xoai.common.dataprovider.OAIDataProvider;
@@ -50,18 +52,27 @@ public class DSpaceOAIDataProvider extends HttpServlet
         try
         {
             XOAIManager.initialize(ConfigurationManager
-                    .getProperty("dspace.dir") + "/config/modules/xoai");
-            log.info("[XOAI] Initialized");
+                    .getProperty("dspace.dir") + "/config/modules/oai");
+            if (!"database".equals(ConfigurationManager.getProperty("oai", "storage"))) {
+                DSpaceSolrServer.getServer();
+            }
+            System.out.println("[XOAI] Initialized");
         }
         catch (com.lyncode.xoai.common.dataprovider.exceptions.ConfigurationException e)
         {
-            log.error(e.getMessage(), e);
+            System.out.println("Unable to configure XOAI Core");
+            e.printStackTrace();
+        }
+        catch (SolrServerException e)
+        {
+            System.out.println("Unable to configure XOAI Core");
+            e.printStackTrace();
         }
     }
 
     public void destroy()
     {
-        log.info("[XOAI] Destroyed");
+        System.out.println("[XOAI] Destroyed");
     }
 
     @Override
@@ -84,7 +95,7 @@ public class DSpaceOAIDataProvider extends HttpServlet
 
             DSpaceItemRepository repository;
             String storage = ConfigurationManager
-                    .getProperty("xoai", "storage");
+                    .getProperty("oai", "storage");
             if (storage == null
                     || !storage.trim().toLowerCase().equals("database"))
             {

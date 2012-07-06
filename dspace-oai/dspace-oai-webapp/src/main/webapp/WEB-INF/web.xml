@@ -37,7 +37,7 @@
 	</listener>
 	
 	<servlet>
-		<servlet-name>xoai</servlet-name>
+		<servlet-name>oai</servlet-name>
 		<servlet-class>org.dspace.xoai.DSpaceOAIDataProvider</servlet-class>
 	</servlet>
 	
@@ -47,7 +47,7 @@
 	</servlet-mapping>
 	
 	<servlet-mapping>
-		<servlet-name>xoai</servlet-name>
+		<servlet-name>oai</servlet-name>
 		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
 

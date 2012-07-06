@@ -26,7 +26,7 @@ public abstract class DSpaceItem extends AbstractItem
     {
         if (_prefix == null)
         {
-            _prefix = ConfigurationManager.getProperty("xoai",
+            _prefix = ConfigurationManager.getProperty("oai",
                     "identifier.prefix");
         }
         return "oai:" + _prefix + ":" + this.getHandle();
