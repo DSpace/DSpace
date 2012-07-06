@@ -1,6 +1,5 @@
 package org.dspace.xoai.data;
 
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -8,10 +7,9 @@ import java.util.List;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrDocument;
-import org.dspace.xoai.util.XMLBindUtils;
 
+import com.lyncode.xoai.common.dataprovider.core.ItemMetadata;
 import com.lyncode.xoai.common.dataprovider.core.ReferenceSet;
-import com.lyncode.xoai.common.dataprovider.xml.xoai.Metadata;
 
 public class DSpaceSolrItem extends DSpaceItem
 {
@@ -19,7 +17,7 @@ public class DSpaceSolrItem extends DSpaceItem
             .getLogger(DSpaceSolrItem.class);
     
     private String unparsedMD;
-    private Metadata metadata;
+    private ItemMetadata metadata;
     private String handle;
     private Date lastMod;
     private List<ReferenceSet> sets;
@@ -38,19 +36,10 @@ public class DSpaceSolrItem extends DSpaceItem
     }
 
     @Override
-    public Metadata getMetadata()
+    public ItemMetadata getMetadata()
     {
         if (metadata == null) {
-            ByteArrayInputStream input = new ByteArrayInputStream(unparsedMD.getBytes());
-            try
-            {
-                metadata = XMLBindUtils.readMetadata(input);
-                input.close();
-            }
-            catch (Exception e)
-            {
-                log.error(e.getMessage(), e);
-            }
+            metadata = new ItemMetadata(unparsedMD);
         }
         return metadata;
     }

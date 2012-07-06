@@ -44,15 +44,16 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.xoai.data.DSpaceDatabaseItem;
 import org.dspace.xoai.exceptions.CompilingException;
-import org.dspace.xoai.exceptions.MetadataBindException;
 import org.dspace.xoai.solr.DSpaceSolrSearch;
 import org.dspace.xoai.solr.DSpaceSolrServer;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrException;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrIndexerException;
 import org.dspace.xoai.util.ItemUtils;
-import org.dspace.xoai.util.XMLBindUtils;
 import org.dspace.xoai.util.XOAICacheManager;
 import org.dspace.xoai.util.XOAIDatabaseManager;
+
+import com.lyncode.xoai.common.dataprovider.exceptions.MetadataBindException;
+import com.lyncode.xoai.common.dataprovider.util.MarshallingUtils;
 
 /**
  * 
@@ -267,7 +268,7 @@ public class XOAI
         }
         
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            XMLBindUtils.writeMetadata(out, ItemUtils.retrieveMetadata(item));
+            MarshallingUtils.writeMetadata(out, ItemUtils.retrieveMetadata(item));
             doc.addField("item.compile", out.toString());
 
         if (_verbose)

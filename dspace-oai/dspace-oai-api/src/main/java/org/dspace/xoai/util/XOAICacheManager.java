@@ -24,14 +24,16 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Utils;
 import org.dspace.xoai.data.DSpaceDatabaseItem;
-import org.dspace.xoai.exceptions.MetadataBindException;
 
 import com.lyncode.xoai.common.dataprovider.OAIDataProvider;
 import com.lyncode.xoai.common.dataprovider.OAIRequestParameters;
 import com.lyncode.xoai.common.dataprovider.core.XOAIManager;
+import com.lyncode.xoai.common.dataprovider.exceptions.MetadataBindException;
 import com.lyncode.xoai.common.dataprovider.exceptions.OAIException;
 import com.lyncode.xoai.common.dataprovider.util.Base64Utils;
+import com.lyncode.xoai.common.dataprovider.util.MarshallingUtils;
 import com.lyncode.xoai.common.dataprovider.xml.xoai.Metadata;
 
 /**
@@ -91,6 +93,59 @@ public class XOAICacheManager
         getMetadata(item);
     }
 
+    public static String getCompiledMetadata(DSpaceDatabaseItem item)
+            throws MetadataBindException
+    {
+        log.debug("Trying to find compiled item");
+        File metadataCache = getMetadataCache(item.getItem());
+        Metadata metadata;
+        String compiled;
+        if (!metadataCache.exists())
+        {
+            log.debug("This is not a compiled item");
+            // generate cache
+            metadata = ItemUtils.retrieveMetadata(item.getItem());
+            FileOutputStream output;
+            try
+            {
+                output = new FileOutputStream(metadataCache);
+                MarshallingUtils.writeMetadata(output, metadata);
+            }
+            catch (FileNotFoundException e)
+            {
+                log.warn(
+                        "Could not open file for writing: "
+                                + metadataCache.getPath(), e);
+            }
+            catch (MetadataBindException e)
+            {
+                log.warn("Unable to export in-memory metadata into file: "
+                        + metadataCache.getPath(), e);
+            }
+        }
+        log.debug("This is a compiled item!");
+        // Read compiled file
+        FileInputStream input;
+        try
+        {
+            input = new FileInputStream(metadataCache);
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            Utils.bufferedCopy(input, output);
+            input.close();
+            output.close();
+            compiled = output.toString();
+        }
+        catch (Exception e)
+        {
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            log.warn(e.getMessage(), e);
+            MarshallingUtils.writeMetadata(output,
+                    ItemUtils.retrieveMetadata(item.getItem()));
+            compiled = output.toString();
+        }
+        return compiled;
+    }
+
     public static Metadata getMetadata(DSpaceDatabaseItem item)
     {
         log.debug("Trying to find compiled item");
@@ -105,12 +160,13 @@ public class XOAICacheManager
             try
             {
                 output = new FileOutputStream(metadataCache);
-                XMLBindUtils.writeMetadata(output, metadata);
+                MarshallingUtils.writeMetadata(output, metadata);
             }
             catch (FileNotFoundException e)
             {
-                log.warn("Could not open file for writing: "
-                        + metadataCache.getPath(), e);
+                log.warn(
+                        "Could not open file for writing: "
+                                + metadataCache.getPath(), e);
             }
             catch (MetadataBindException e)
             {
@@ -126,7 +182,7 @@ public class XOAICacheManager
             try
             {
                 input = new FileInputStream(metadataCache);
-                metadata = XMLBindUtils.readMetadata(input);
+                metadata = MarshallingUtils.readMetadata(input);
                 input.close();
             }
             catch (Exception e)

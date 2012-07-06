@@ -22,10 +22,11 @@ import org.dspace.content.Item;
 import org.dspace.xoai.util.XOAICacheManager;
 import org.dspace.xoai.util.XOAIDatabaseManager;
 
+import com.lyncode.xoai.common.dataprovider.core.ItemMetadata;
 import com.lyncode.xoai.common.dataprovider.core.ReferenceSet;
 import com.lyncode.xoai.common.dataprovider.data.AbstractAbout;
+import com.lyncode.xoai.common.dataprovider.exceptions.MetadataBindException;
 import com.lyncode.xoai.common.dataprovider.xml.xoai.Element;
-import com.lyncode.xoai.common.dataprovider.xml.xoai.Metadata;
 
 /**
  * 
@@ -106,14 +107,22 @@ public class DSpaceDatabaseItem extends DSpaceItem
         return null;
     }
 
-    private Metadata metadata = null;
+    private ItemMetadata metadata = null;
     
     @Override
-    public Metadata getMetadata()
+    public ItemMetadata getMetadata()
     {
         if (metadata == null)
         {
-            metadata = XOAICacheManager.getMetadata(this);
+            try
+            {
+                metadata = new ItemMetadata(XOAICacheManager.getCompiledMetadata(this));
+            }
+            catch (MetadataBindException e)
+            {
+                log.warn(e.getMessage(), e);
+                metadata = new ItemMetadata(XOAICacheManager.getMetadata(this));
+            }
         }
         return metadata;
     }
@@ -189,7 +198,7 @@ public class DSpaceDatabaseItem extends DSpaceItem
     public List<String> getMetadata(String field)
     {
         String[] parts = field.split(Pattern.quote("."));
-        return getMetadata(this.getMetadata().getElement(), parts);
+        return getMetadata(this.getMetadata().getMetadata().getElement(), parts);
     }
 
     public Item getItem()
