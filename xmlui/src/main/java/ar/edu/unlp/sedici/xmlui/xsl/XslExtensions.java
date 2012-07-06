@@ -17,6 +17,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.xpath.NodeSet;
 import org.dspace.core.ConfigurationManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Text;
 
@@ -31,6 +33,7 @@ import org.w3c.dom.Text;
  *
  */
 public class XslExtensions {
+	private static Logger log =  LoggerFactory.getLogger(XslExtensions.class);
 
 	private XslExtensions() {
 	}
@@ -102,6 +105,14 @@ public class XslExtensions {
 	}
 	
 	public static String codificarURL(String url){
+		if (url == null){
+			try{
+				throw new NullPointerException();
+			}catch (Exception e) {
+				log.error("Se recibe null como url en XslExtension.codificarURL", e);
+			}
+			return "";
+		}
 		char[] reservados={'!','#','$','%','&','(',')','*','+',',','/',':',';','=','?','@','[',']',']', ' '};
 		for (char caracter: reservados) {
 			url=url.replace(caracter, '_');

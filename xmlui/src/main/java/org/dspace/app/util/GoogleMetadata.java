@@ -7,31 +7,31 @@
  */
 package org.dspace.app.util;
 
-import java.sql.SQLException;
-import org.dspace.content.*;
-
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
-
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
-import org.dspace.core.Constants;
+
+import org.apache.log4j.Logger;
+import org.bouncycastle.crypto.RuntimeCryptoException;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.DCValue;
+import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
-
 import org.jdom.Element;
 
 import ar.edu.unlp.sedici.xmlui.xsl.XslExtensions;
@@ -999,71 +999,73 @@ public class GoogleMetadata
         return metadataMappings.get(TECH_REPORT_INSTITUTION);
     }
 
-    /**
-     * Gets the URL to a PDF using a very basic strategy by assuming that the PDF
-     * is in the default content bundle, and that the item only has one public bitstream
-     * and it is a PDF.
-     *
-     * @param item
-     * @return URL that the PDF can be directly downloaded from
-     */
-    private String getPDFSimpleUrl(Item item)
-    {
-        try {
-        	Bundle[] contentBundles = item.getBundles("ORIGINAL");
-            if (contentBundles.length > 0) { 
-            	Bitstream[] bitstreams = contentBundles[0].getBitstreams();
-            	if (bitstreams.length > 1){
-                    for (Bitstream bitstream : bitstreams){ 
-                        	if (bitstream.getFormat().getMIMEType().equals("application/pdf") && bitstream.getID() == contentBundles[0].getPrimaryBitstreamID()) {
-                        		StringBuilder path = new StringBuilder();
-                                path.append(ConfigurationManager.getProperty("dspace.url"));
-                                
-                                path.append("/bitstream/handle/");
-                                path.append(item.getHandle());
-                                path.append("/");
-                                path.append(XslExtensions.codificarURL(bitstream.getDescription()));
-                                path.append(".pdf?sequence=");
-                                path.append(bitstream.getSequenceID());
-                               
-                                
-                               /* path.append("/");
-                                path.append(Util.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING));*/
-                                return path.toString();
-                                
-            		        } 
-                        	
-                        }
-            	}
-            	else{ 
-            		if (bitstreams[0].getFormat().getMIMEType().equals("application/pdf")){
-            			StringBuilder path = new StringBuilder();
-                        path.append(ConfigurationManager.getProperty("dspace.url")); 
-                        
-                        path.append("/bitstream/handle/");
-                        path.append(item.getHandle());
-                        path.append("/");
-                        path.append(XslExtensions.codificarURL( bitstreams[0].getDescription()));
-                        path.append(".pdf?sequence=");
-                        path.append(bitstreams[0].getSequenceID());
-/*
-                        path.append("/");
-                        path.append(Util.encodeBitstreamName(bitstreams[0].getName(), Constants.DEFAULT_ENCODING));*/
-                        return path.toString();
-                        
-            		}
-            		
-            	}
-            		
-            }
-      /*  } catch (UnsupportedEncodingException ex) {
-            log.debug(ex.getMessage());*/
-        } catch (SQLException ex) {
-            log.debug(ex.getMessage());
-        }
+	/**
+	 * Gets the URL to a PDF using a very basic strategy by assuming that the
+	 * PDF is in the default content bundle, and that the item only has one
+	 * public bitstream and it is a PDF.
+	 * 
+	 * @param item
+	 * @return URL that the PDF can be directly downloaded from
+	 */
+	private String getPDFSimpleUrl(Item item) {
+		Bundle[] contentBundles;
+		try {
+			contentBundles = item.getBundles("ORIGINAL");
+		} catch (SQLException e) {
+			log.error("item.getBundles(ORIGINAL) threw an SQLException", e);
+			throw new RuntimeException("item.getBundles(ORIGINAL) threw an SQLException", e);
+		}
 
-        return "";
-    }
+		Bitstream the_bitstream = null;
+		if (contentBundles.length > 0) {
+			Bitstream[] bitstreams = contentBundles[0].getBitstreams();
+			if (bitstreams.length > 1) {
+				for (Bitstream bitstream : bitstreams) {
+					if ("application/pdf".equalsIgnoreCase(bitstream.getFormat().getMIMEType())
+							&& bitstream.getID() == contentBundles[0].getPrimaryBitstreamID()) {
+						the_bitstream = bitstream;
+						break;
+					}
+				}
+			} else {
+				if ("application/pdf".equalsIgnoreCase(bitstreams[0].getFormat().getMIMEType())) {
+					the_bitstream = bitstreams[0];
+				}
+			}
+		}
+		if (the_bitstream == null) {
+			return "";
+		}
+		StringBuilder path = new StringBuilder();
+		path.append(ConfigurationManager.getProperty("dspace.url"));
+		String the_handle = item.getHandle();
+		if (the_handle == null) {
+			the_handle = "no-handle";
+			log.warn("Missing handle for item " + item.getID());
+			path.append("/retrieve/");
+			path.append(the_bitstream.getID());
+		} else {
+			path.append("/bitstream/handle/");
+			path.append(the_handle);
+		}
+		path.append("/");
+		String bs_filename;
+		if (the_bitstream.getDescription() != null)
+			bs_filename = the_bitstream.getDescription();
+		else if (the_bitstream.getName() != null)
+			bs_filename = the_bitstream.getName();
+		else
+			bs_filename = the_handle + "-bitstream-" + the_bitstream.getSequenceID();
+
+		path.append(XslExtensions.codificarURL(bs_filename));
+		path.append(".pdf?sequence=");
+		path.append(the_bitstream.getSequenceID());
+
+		// path.append(Util.encodeBitstreamName(bitstream.getName(),
+		// Constants.DEFAULT_ENCODING));
+		return path.toString();
+
+	}
 
     /**
      * 
