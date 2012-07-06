@@ -556,14 +556,21 @@ function startCreateCollection()
 {
 	var communityID = cocoon.request.get("communityID");
 
+	var result;
 	assertAuthorized(Constants.COMMUNITY,communityID,Constants.ADD);
+    result=doCreateCollection(communityID);
 
-	doCreateCollection(communityID);
-
-	// Root level community, cancel out to the global community list.
-	cocoon.sendPage("admin/finalize");
-	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+collection.getHandle(),true);
-	//cocoon.redirectTo(cocoon.request.getContextPath()+"/community-list",true);
+    // Root level community, cancel out to the global community list.
+    cocoon.sendPage("admin/finalize");
+	if (result.getParameter("collectionID")){
+		var collection = Collection.find(getDSContext(),result.getParameter("collectionID"));
+		cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+collection.getHandle(),true);
+		
+	} else{
+		var community = Community.find(getDSContext(),communityID);
+		cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+community.getHandle(),true);
+	}
+	
 	//getDSContext().complete();
 	cocoon.exit();
 }
@@ -594,22 +601,13 @@ function startEditCollection()
  */
 function startCreateCommunity()
 {
+		
 	var communityID = cocoon.request.get("communityID");
-
-	var result;
-	assertAuthorized(Constants.COMMUNITY,communityID,Constants.ADD);
-    result=doCreateCollection(communityID);
+	doCreateCommunity(communityID);
 
 	// Root level community, cancel out to the global community list.
     cocoon.sendPage("admin/finalize");
-	if (result.getParameter("collectionID")){
-		var collection = Collection.find(getDSContext(),result.getParameter("collectionID"));
-		cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+collection.getHandle(),true);
-		
-	} else{
-		var community = Community.find(getDSContext(),communityID);
-		cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+community.getHandle(),true);
-	}
+	cocoon.redirectTo(cocoon.request.getContextPath()+"/community-list",true);
 	//getDSContext().complete();
 	cocoon.exit();
 }
@@ -2797,7 +2795,7 @@ function doCreateCollection(communityID)
 			// send the user to the authorization screen
 			if (result.getContinue() && result.getParameter("collectionID")) {
 				collectionID = result.getParameter("collectionID");
-				result = doEditCollection(collectionID,true);
+				doEditCollection(collectionID,true);
 				// If they return then pass them back to where they came from.
 				return result;
 			}
