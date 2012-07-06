@@ -65,10 +65,6 @@ public class XOAI
     private boolean _optimize;
 
     private boolean _verbose;
-    
-    private boolean _fst;
-    
-    private int _n;
 
     private static List<String> getFileFormats(Item item)
     {
@@ -93,13 +89,11 @@ public class XOAI
         return formats;
     }
 
-    public XOAI(Context ctx, boolean optimize, boolean verb, boolean fst, int n)
+    public XOAI(Context ctx, boolean optimize, boolean verb)
     {
         _context = ctx;
         _optimize = optimize;
         _verbose = verb;
-        _fst = fst;
-        _n = n;
     }
 
     public XOAI(Context ctx, boolean hasOption)
@@ -196,10 +190,9 @@ public class XOAI
         try
         {
             List<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
-            int i = 0;
+            int i = 1;
             while (iterator.hasNext())
             {
-                if (_fst) if (i >= _n) break;
                 try
                 {
                     docs.add(this.index(Item.find(_context, iterator.next()
@@ -213,7 +206,9 @@ public class XOAI
                     log.error(ex.getMessage(), ex);
                 }
                 i++;
+                if (i % 100 == 0) System.out.println(i+" items imported.. continuing");
             }
+            System.out.println("Total: "+i+" items");
             SolrServer server = DSpaceSolrServer.getServer();
             server.add(docs);
             server.commit();
@@ -408,7 +403,7 @@ public class XOAI
 
                         Context ctx = new Context();
                         XOAI indexer = new XOAI(ctx,
-                                line.hasOption('o'), line.hasOption('v'), line.hasOption('n'), Integer.parseInt(line.getOptionValue('n')));
+                                line.hasOption('o'), line.hasOption('v'));
 
                         indexer.index();
                         
