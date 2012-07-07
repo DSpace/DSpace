@@ -21,6 +21,7 @@
       <groupId>org.dspace</groupId>
       <artifactId>dspace-solr-parent</artifactId>
       <version>3.5.0.1-SNAPSHOT</version>
+      <relativePath>..</relativePath>
    </parent>
 
    <groupId>org.dspace</groupId>
