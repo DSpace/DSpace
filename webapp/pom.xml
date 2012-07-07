@@ -26,7 +26,6 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-solr</artifactId>
    <name>Apache Solr Webapp</name>
-   <version>3.5.0.1</version>
    <description>Apache Solr Server</description>
    <packaging>war</packaging>
 
