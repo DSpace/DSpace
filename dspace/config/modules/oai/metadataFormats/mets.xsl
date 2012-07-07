@@ -22,8 +22,14 @@
 	<xsl:template match="/">
 		<mets xmlns="http://www.loc.gov/METS/" xmlns:xlink="http://www.w3.org/1999/xlink"
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="DSpace_ITEM_10400.7-31"
-			OBJID="hdl:10400.7/31" TYPE="DSpace ITEM" PROFILE="DSpace METS SIP Profile 1.0"
+			TYPE="DSpace ITEM" PROFILE="DSpace METS SIP Profile 1.0"
 			xsi:schemaLocation="http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd">
+			<xsl:attribute name="OBJID">
+				hdl:<xsl:value-of select="doc:metadata/doc:element[@name='others']/doc:field[@name='handle']/text()"></xsl:value-of>
+			</xsl:attribute>
+			<xsl:attribute name="ID">
+				DSpace_ITEM_<xsl:value-of select="translate(doc:metadata/doc:element[@name='others']/doc:field[@name='handle']/text(),'/','-')"></xsl:value-of>
+			</xsl:attribute>
 			<metsHdr>
 				<xsl:attribute name="CREATEDATE">
 					<xsl:value-of select="concat(date:format-date(date:date(), 'yyyy-MM-dd'), 'T' , date:format-date(date:time(), 'HH:mm:ss'), 'Z')"/>
