@@ -718,7 +718,13 @@
 						</table>
 						</xsl:if>
 						<xsl:if test="oai:OAI-PMH/oai:ListSets">
-							<div class="result-count"><label>Results fetched</label> <span><xsl:value-of select="count(oai:OAI-PMH/oai:ListSets/oai:set)"/></span></div>
+							<div class="result-count"><label>Results fetched:</label>
+								<span>
+									<xsl:call-template name="result-count">
+										<xsl:with-param name="path" select="oai:OAI-PMH/oai:ListSets/oai:set"/>
+									</xsl:call-template>
+								</span>
+							</div>
 							<div class="sets">
 								<xsl:for-each select="oai:OAI-PMH/oai:ListSets/oai:set">
 									<div class="set">
@@ -810,7 +816,13 @@
 						</xsl:if>
 						<xsl:if test="oai:OAI-PMH/oai:ListIdentifiers">
 						<div class="identifiers">
-							<div class="result-count"><label>Results fetched</label> <span><xsl:value-of select="count(oai:OAI-PMH/oai:ListIdentifiers/oai:header)"/></span></div>
+							<div class="result-count"><label>Results fetched:</label>
+								<span>
+									<xsl:call-template name="result-count">
+										<xsl:with-param name="path" select="oai:OAI-PMH/oai:ListIdentifiers/oai:header"/>
+									</xsl:call-template>
+								</span>
+							</div>
 							<xsl:for-each select="oai:OAI-PMH/oai:ListIdentifiers/oai:header">
 							<div class="identifier">
 								<xsl:if test="position() mod 2 = 0">
@@ -959,7 +971,28 @@
 							</script>
 						</xsl:if>
 						<xsl:if test="oai:OAI-PMH/oai:ListRecords">
-							<div class="result-count"><label>Results fetched</label> <span><xsl:value-of select="count(oai:OAI-PMH/oai:ListRecords/oai:record)"/></span></div>
+							<div class="result-count"><label>Results fetched:</label>
+								<span>
+									<xsl:call-template name="result-count">
+										<xsl:with-param name="path" select="oai:OAI-PMH/oai:ListRecords/oai:record"/>
+									</xsl:call-template>
+<!--
+									<xsl:choose>
+										<xsl:when test="oai:OAI-PMH/oai:ListRecords/oai:resumptionToken/@cursor">
+											<xsl:variable name="cursor" select="oai:OAI-PMH/oai:ListRecords/oai:resumptionToken/@cursor"/>
+											<xsl:variable name="per-page" select="count(oai:OAI-PMH/oai:ListRecords/oai:record)"/>
+											<xsl:value-of select="$cursor * $per-page"/>-<xsl:value-of select="($cursor+1) * $per-page"/>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of select="count(oai:OAI-PMH/oai:ListRecords/oai:record)"/>
+										</xsl:otherwise>
+									</xsl:choose>
+									<xsl:if test="oai:OAI-PMH/oai:ListRecords/oai:resumptionToken/@completeListSize">
+										of <xsl:value-of select="oai:OAI-PMH/oai:ListRecords/oai:resumptionToken/@completeListSize"/>
+									</xsl:if>
+-->
+								</span>
+							</div>
 							<xsl:for-each select="oai:OAI-PMH/oai:ListRecords/oai:record">
 							<div class="getRecord multiple">
 								<xsl:if test="position() mod 2 = 0">
@@ -1088,5 +1121,30 @@
 	
 	<xsl:template match="@*" mode='prettyXML'>
 	  <xsl:text> </xsl:text><div class="divAttribute"><xsl:value-of select='name()' /></div><span class="equal">=</span><span class="quote">"</span><div class="divAttributeValue"><xsl:value-of select='.' /></div><span class="quote">"</span>
+	</xsl:template>
+	
+	
+	<xsl:template name="result-count">
+		<xsl:param name="path" />
+		<xsl:choose>
+			<xsl:when test="$path/../oai:resumptionToken/@cursor">
+				<xsl:variable name="cursor" select="$path/../oai:resumptionToken/@cursor"/>
+				<xsl:variable name="per-page" select="count($path)"/>
+				<xsl:choose>
+					<xsl:when test="$per-page &lt; 100"> <!-- on the last page of results we have to assume that there were 100 results per page and that @completeListSize is available -->
+						<xsl:value-of select="$path/../oai:resumptionToken/@completeListSize - $per-page"/>-<xsl:value-of select="$path/../oai:resumptionToken/@completeListSize"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="$cursor * $per-page"/>-<xsl:value-of select="($cursor+1) * $per-page"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="count($path)"/>
+			</xsl:otherwise>
+		</xsl:choose>
+		<xsl:if test="$path/../oai:resumptionToken/@completeListSize">
+			of <xsl:value-of select="$path/../oai:resumptionToken/@completeListSize"/>
+		</xsl:if>
 	</xsl:template>
 </xsl:stylesheet>
