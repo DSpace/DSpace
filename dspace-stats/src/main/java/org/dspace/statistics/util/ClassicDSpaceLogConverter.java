@@ -84,17 +84,38 @@ public class ClassicDSpaceLogConverter {
         // Line counter
         int counter = 0;
         int lines = 0;
+        
+        // Figure out input, output
+        BufferedReader input;
+        Writer output;
+        try {
+            if (null == in || in.isEmpty() || "-".equals(in))
+            {
+                input = new BufferedReader(new InputStreamReader(System.in));
+                in = "standard input";
+            }
+            else
+                input = new BufferedReader(new FileReader(in));
+
+            if (null == out || out.isEmpty() || "-".equals(out))
+            {
+                output = new BufferedWriter(new OutputStreamWriter(System.out));
+                out = "standard output";
+            }
+            else
+                output = new BufferedWriter(new FileWriter(out));
+        } catch (IOException ie) {
+            log.error("File access problem", ie);
+            return 0;
+        }
 
         // Say what we're going to do
-        System.out.println(" About to convert '" + in + "' to '" + out + "'");
+        System.err.println(" About to convert '" + in + "' to '" + out + "'");
 
         // Setup the regular expressions for the log file
         LogAnalyser.setRegex(in);
 
         // Open the file and read it line by line
-        BufferedReader input = null;
-        Writer output = null;
-
         try {
             String line;
             LogLine lline;
@@ -106,9 +127,6 @@ public class ClassicDSpaceLogConverter {
             DSpaceObject dso;
             String uid;
             String lastLine = "";
-
-            input =  new BufferedReader(new FileReader(new File(in)));
-            output = new BufferedWriter(new FileWriter(new File(out)));
 
             while ((line = input.readLine()) != null)
             {
@@ -236,7 +254,7 @@ public class ClassicDSpaceLogConverter {
         }
 
         // Tell the user what we have done
-        System.out.println("  Read " + lines + " lines and recorded " + counter + " events");
+        System.err.println("  Read " + lines + " lines and recorded " + counter + " events");
         return counter;
     }
 
@@ -251,7 +269,7 @@ public class ClassicDSpaceLogConverter {
         // print the help message
         HelpFormatter myhelp = new HelpFormatter();
         myhelp.printHelp("ClassicDSpaceLogConverter\n", options);
-        System.out.println("\n\tClassicDSpaceLogConverter -i infilename -o outfilename -v (for verbose output)");
+        System.err.println("\n\tClassicDSpaceLogConverter -i infilename -o outfilename -v (for verbose output)");
         System.exit(exitCode);
     }
 
@@ -266,8 +284,8 @@ public class ClassicDSpaceLogConverter {
 
         Options options = new Options();
 
-        options.addOption("i", "in", true, "source file");
-        options.addOption("o", "out", true, "destination directory");
+        options.addOption("i", "in", true, "source file ('-' or omit for standard input)");
+        options.addOption("o", "out", true, "destination file or directory ('-' or omit for standard output)");
         options.addOption("m", "multiple",false, "treat the input file as having a wildcard ending");
         options.addOption("n", "newformat",false, "process new format log lines (1.6+)");
         options.addOption("v", "verbose", false, "display verbose output (useful for debugging)");
@@ -290,24 +308,6 @@ public class ClassicDSpaceLogConverter {
         if (line.hasOption('h'))
         {
             printHelp(options, 0);
-        }
-
-        // Check we have an input and output file
-        if ((!line.hasOption('i')) && (!line.hasOption('o')))
-        {
-            System.err.println("-i and -o input and output file names are required");
-            printHelp(options, 1);
-        }
-        else if (!line.hasOption('i'))
-        {
-            System.err.println("-i input file name is required");
-            printHelp(options, 1);
-        }
-
-        if (!line.hasOption('o'))
-        {
-            System.err.println("-o output file names is required");
-            printHelp(options, 1);
         }
 
         // Whether or not to include event created by org.dspace.usage.LoggerUsageEventListener
@@ -357,7 +357,7 @@ public class ClassicDSpaceLogConverter {
             String[] children = dir.list(filter);
             for (String in : children)
             {
-                System.out.println(in);
+                System.err.println(in);
                 String out = line.getOptionValue('o') +
                              (dir.getAbsolutePath() +
                               System.getProperty("file.separator") + in).substring(line.getOptionValue('i').length());
