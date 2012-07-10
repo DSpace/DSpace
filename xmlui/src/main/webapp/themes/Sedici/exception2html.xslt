@@ -101,8 +101,11 @@
 							<ul class="ds-options-list">
 								<li>
 									<h2 class="ds-sublist-head">
-    								  <a><xsl:attribute name="href">
-    								  	<xsl:value-of select="$contextPath"/></xsl:attribute><i18n:text>xmlui.general.go_home</i18n:text>
+    								  <a>
+    								  <xsl:attribute name="href">
+    								  		<xsl:value-of select="$contextPath"/>/
+    								  </xsl:attribute>
+    								  <i18n:text>xmlui.general.go_home</i18n:text>
     								  </a>
     								</h2>
 								</li>
