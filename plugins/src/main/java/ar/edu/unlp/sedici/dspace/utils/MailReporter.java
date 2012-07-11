@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -68,7 +69,7 @@ public class MailReporter {
 		email.addRecipient(recipient);
 
 		email.addArgument(ConfigurationManager.getProperty("dspace.url"));
-		email.addArgument(new Date());
+		email.addArgument(DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(new Date()));
 		email.addArgument(context.getExtraLogInfo());
 		
 		if (context.getCurrentUser() != null) {
