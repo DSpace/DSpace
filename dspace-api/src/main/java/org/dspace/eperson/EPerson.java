@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -869,26 +868,43 @@ public class EPerson extends DSpaceObject
 
     /**
      * Set the EPerson's password hash.
-     * FIXME include the salt and algorithm
      * 
-     * @param s
-     *          hash of the password
+     * @param password
+     *          hashed password, or null to set row data to NULL.
      */
-    public void setPasswordHash(String s)
+    public void setPasswordHash(PasswordHash password)
     {
-        myRow.setColumn("password", s);
+        if (null == password)
+        {
+            myRow.setColumnNull("digest_algorithm");
+            myRow.setColumnNull("salt");
+            myRow.setColumnNull("password");
+        }
+        else
+        {
+            myRow.setColumn("digest_algorithm", password.getAlgorithm());
+            myRow.setColumn("salt", password.getSaltString());
+            myRow.setColumn("password", password.getHashString());
+        }
         modified = true;
     }
 
     /**
      * Return the EPerson's password hash.
-     * FIXME return an actual PasswordHash
      *
      * @return hash of the password
      */
-    public String getPasswordHash()
+    public PasswordHash getPasswordHash()
     {
-        return myRow.getStringColumn("password");
+        PasswordHash hash = null;
+        try {
+            hash = new PasswordHash(myRow.getStringColumn("digestAlgorithm"),
+                    myRow.getStringColumn("salt"),
+                    myRow.getStringColumn("password"));
+        } catch (DecoderException ex) {
+            log.error("Problem decoding stored salt or hash:  " + ex.getMessage());
+        }
+        return hash;
     }
 
     /**

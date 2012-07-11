@@ -85,7 +85,10 @@ public class PasswordHash
         else
             this.algorithm = algorithm;
 
-        this.salt = Hex.decodeHex(salt.toCharArray());
+        if (null == salt)
+            this.salt = null;
+        else
+            this.salt = Hex.decodeHex(salt.toCharArray());
 
         this.hash = Hex.decodeHex(hash.toCharArray());
     }
@@ -132,7 +135,7 @@ public class PasswordHash
     }
 
     /**
-     * Get the value of hash
+     * Get the hash.
      *
      * @return the value of hash
      */
@@ -142,13 +145,39 @@ public class PasswordHash
     }
 
     /**
-     * Get the value of salt
+     * Get the hash, as a String.
+     *
+     * @return hash encoded as hexadecimal digits, or null if none.
+     */
+    public String getHashString()
+    {
+        if (null != hash)
+            return new String(Hex.encodeHex(hash));
+        else
+            return null;
+    }
+
+    /**
+     * Get the salt.
      *
      * @return the value of salt
      */
     public byte[] getSalt()
     {
         return salt;
+    }
+
+    /**
+     * Get the salt, as a String.
+     *
+     * @return salt encoded as hexadecimal digits, or null if none.
+     */
+    public String getSaltString()
+    {
+        if (null != salt)
+            return new String(Hex.encodeHex(salt));
+        else
+            return null;
     }
 
     /**
