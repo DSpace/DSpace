@@ -172,7 +172,9 @@ CREATE TABLE EPerson
 (
   eperson_id          INTEGER PRIMARY KEY,
   email               VARCHAR(64),
-  password            VARCHAR(64),
+  password            VARCHAR(128),
+  salt                VARCHAR(32),
+  digest_algorithm    VARCHAR(16),
   firstname           VARCHAR(64),
   lastname            VARCHAR(64),
   can_log_in          BOOL,

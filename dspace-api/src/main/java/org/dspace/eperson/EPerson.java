@@ -10,6 +10,8 @@ package org.dspace.eperson;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -851,22 +853,23 @@ public class EPerson extends DSpaceObject
     }
 
     /**
-     * Set the EPerson's password
+     * Set the EPerson's password.
      * 
      * @param s
-     *            the new email
+     *            the new password.
      */
     public void setPassword(String s)
     {
-        // FIXME: encoding
-        String encoded = Utils.getMD5(s);
-
-        myRow.setColumn("password", encoded);
+        PasswordHash hash = new PasswordHash(s);
+        myRow.setColumn("password", Utils.toHex(hash.getHash()));
+        myRow.setColumn("salt", Utils.toHex(hash.getSalt()));
+        myRow.setColumn("digest_algorithm", hash.getAlgorithm());
         modified = true;
     }
 
     /**
-     * Set the EPerson's password hash
+     * Set the EPerson's password hash.
+     * FIXME include the salt and algorithm
      * 
      * @param s
      *          hash of the password
@@ -878,7 +881,9 @@ public class EPerson extends DSpaceObject
     }
 
     /**
-     * Return the EPerson's password hash
+     * Return the EPerson's password hash.
+     * FIXME return an actual PasswordHash
+     *
      * @return hash of the password
      */
     public String getPasswordHash()
@@ -895,9 +900,19 @@ public class EPerson extends DSpaceObject
      */
     public boolean checkPassword(String attempt)
     {
-        String encoded = Utils.getMD5(attempt);
-
-        return (encoded.equals(myRow.getStringColumn("password")));
+        PasswordHash myHash;
+        try
+        {
+            myHash = new PasswordHash(
+                    myRow.getStringColumn("digest_algorithm"),
+                    myRow.getStringColumn("salt"),
+                    myRow.getStringColumn("password"));
+        } catch (DecoderException ex)
+        {
+            log.error(ex.getMessage());
+            return false;
+        }
+        return myHash.matches(attempt);
     }
 
     /**
