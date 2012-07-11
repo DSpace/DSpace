@@ -2167,6 +2167,8 @@
 <message key="sedici.errorTitle.notAuthorize">Unathorized site.</message>
 <message key="sedici.errorDescription.notAuthorize">You do not have the requested permissions to access this site. In case you have them, please log in with the correct user.</message>
 <message key="sedici.errorDescription.generalNote">If you consider that there is a problem or you want to make a suggestion, please contact us to the following e-mail: info@sedici.unlp.edu.ar</message>
+<message key="sedici.errorTitle.badRequest">Bad Request</message>
+<message key="sedici.errorDescription.badRequest">The request seems to be incorrect. Probably this is due to a parameter error.</message>
 
 <!-- Creative Commons mensajes -->
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.CommercialQuestion">¿Quiere permitir usos comerciales de su obra?</message>
