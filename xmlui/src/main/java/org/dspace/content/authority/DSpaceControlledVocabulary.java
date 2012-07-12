@@ -56,8 +56,8 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
 {
 
 	private static Logger log = Logger.getLogger(DSpaceControlledVocabulary.class);
-    private static String xpathTemplate = "//node[contains(translate(@label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'%s')]";
-    private static String idTemplate = "//node[@id = '%s']";
+    private static String xpathTemplate = "//isComposedBy/node[contains(translate(@label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'%s')]";
+    private static String idTemplate = "//isComposedBy/node[@id = '%s']";
     private static String pluginNames[] = null;
 
     private String vocabularyName = null;
@@ -238,8 +238,15 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     	try {
     		Node node = (Node)xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODE);
     		return node.getAttributes().getNamedItem("label").getNodeValue();
-    	} catch(XPathExpressionException e) {
-    		return("");
+    	} catch(Exception e) {
+    		String url = "url://get-label-url/?field="+field+"&key="+key+"&locale="+locale;
+    		String message = "Exception on expression "+xpathExpression;
+    		log.warn(message,e);
+    		
+    		MailReporter.reportUnknownException(message, e, url);
+    		//continue
     	}
+    	return key;
+    	
     }
 }
