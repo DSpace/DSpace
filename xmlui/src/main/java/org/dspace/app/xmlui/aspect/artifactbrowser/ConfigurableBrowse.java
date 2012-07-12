@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.*;
 
+import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -226,36 +227,33 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     public void addPageMeta(PageMeta pageMeta) throws SAXException, WingException, UIException,
             SQLException, IOException, AuthorizeException
     {
-        BrowseInfo info = getBrowseInfo();
-
-        pageMeta.addMetadata("title").addContent(getTitleMessage(info));
-
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-
-        pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-        if (dso != null)
-        {
-            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath);
-        }
-
-        pageMeta.addTrail().addContent(getTrailMessage(info));
+    	try {
+	        BrowseInfo info = getBrowseInfo();
+	
+	        pageMeta.addMetadata("title").addContent(getTitleMessage(info));
+	
+	        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+	
+	        pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
+	        if (dso != null)
+	        {
+	            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath);
+	        }
+	
+	        pageMeta.addTrail().addContent(getTrailMessage(info));
+    	} catch(ResourceNotFoundException e) {
+    		// Dado que no podemos dejar que la exception continue porque este metodo no seria compatible con su padre,
+    		// la capturamos aca y no hacemos NADA. Si corresponde, volvera a saltar en el metodo addBody() y se manejará alli
+    	}
     }
 
     /**
      * Add the browse-title division.
      */
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException,
-            IOException, AuthorizeException
+            IOException, AuthorizeException, ProcessingException
     {
-        BrowseParams params = null;
-
-        try {
-            params = getUserParams();
-        } catch (ResourceNotFoundException e) {
-           HttpServletResponse response = (HttpServletResponse)objectModel
-		.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-	    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        }
+        BrowseParams params = getUserParams();
 
         BrowseInfo info = getBrowseInfo();
 
@@ -651,7 +649,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             String type   = request.getParameter(BrowseParams.TYPE);
             int    sortBy = RequestUtils.getIntParameter(request, BrowseParams.SORT_BY);
 
-            if(!request.getParameters().containsKey("type"))
+            if(!request.getParameters().containsKey("type") || "".equals(type))
             {
                 // default to first browse index.
                 String defaultBrowseIndex = ConfigurationManager.getProperty("webui.browse.index.1");
@@ -789,7 +787,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
      * @throws SQLException
      * @throws UIException
      */
-    private BrowseInfo getBrowseInfo() throws SQLException, UIException
+    private BrowseInfo getBrowseInfo() throws SQLException, UIException, ResourceNotFoundException
     {
         if (this.browseInfo != null)
         {
@@ -800,12 +798,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
         // Get the parameters we will use for the browse
         // (this includes a browse scope)
-        BrowseParams params = null;
-        try {
-            params = getUserParams();
-        } catch (ResourceNotFoundException e) {
-            return null;
-        }
+        BrowseParams params = getUserParams();
 
         try
         {
