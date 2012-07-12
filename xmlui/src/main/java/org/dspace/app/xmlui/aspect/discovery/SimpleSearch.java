@@ -284,7 +284,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
             String type = request.getParameter("filtertype");
             String value = request.getParameter("filter");
 
-            if(value != null && !value.equals("")){
+            if(type != null && !type.equals("") && value != null && !value.equals("")){
                 allFilterQueries.add(searchService.toFilterQuery(context, (type.equals("*") ? "" : type), value).getFilterQuery());
             }
 
