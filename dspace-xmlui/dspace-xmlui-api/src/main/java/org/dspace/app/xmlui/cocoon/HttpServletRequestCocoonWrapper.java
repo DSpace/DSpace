@@ -270,6 +270,22 @@ public class HttpServletRequestCocoonWrapper implements HttpServletRequest{
 			throws UnsupportedEncodingException {
 		this.cocoonRequest.setCharacterEncoding(arg0);
 	}
+
+	public int getRemotePort() {
+		return this.cocoonRequest.getRemotePort();
+	}
+
+	public String getLocalName() {
+		return this.cocoonRequest.getLocalName();
+	}
+
+	public String getLocalAddr() {
+		return this.cocoonRequest.getLocalAddr();
+	}
+
+	public int getLocalPort() {
+		return this.cocoonRequest.getLocalPort();
+	}
 	
 	
 	
