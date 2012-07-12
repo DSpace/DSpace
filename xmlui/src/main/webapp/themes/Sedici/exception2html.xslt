@@ -74,25 +74,25 @@
 		<div id="ds-content-wrapper">
 			<div id="ds-content" class="clearfix">
 
-<!--  BODYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY-->
-<div id="ds-body">
-	<h1 class="errorTitle">
-		<i18n:text>sedici.errorTitle.<xsl:value-of select="$errorKind"/></i18n:text>
-		<xsl:value-of select="$requestQueryString"/>
-	</h1>
-	<p class="errorDescription"><i18n:text>sedici.errorDescription.<xsl:value-of select="$errorKind"/></i18n:text></p>
-	<p class="generalNote"><i18n:text>sedici.errorDescription.generalNote</i18n:text></p>
-	
-	
-	<xsl:if test="$printDebug = 'true'">
-  		<xsl:apply-templates select="ex:exception-report" />
-	</xsl:if>
-</div>
-<!--  BODYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY-->
+				<!--  BODYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY-->
+				<div id="ds-body">
+					<h1 class="errorTitle">
+						<i18n:text>sedici.errorTitle.<xsl:value-of select="$errorKind"/></i18n:text>
+				<!-- 		<xsl:value-of select="$requestQueryString"/> -->
+					</h1>
+					<p class="errorDescription"><i18n:text>sedici.errorDescription.<xsl:value-of select="$errorKind"/></i18n:text></p>
+					<p class="generalNote"><i18n:text>sedici.errorDescription.generalNote</i18n:text></p>
+					
+					
+					<xsl:if test="$printDebug = 'true'">
+				  		<xsl:apply-templates select="ex:exception-report" />
+					</xsl:if>
+				</div>
+				<!--  BODYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY-->
 				
 				<div id="ds-options-wrapper">
 					<div id="ds-options">
-						<h1 class="ds-option-set-head"><i18n:text>xmlui.general.go</i18n:text></h1>
+<!-- 						<h1 class="ds-option-set-head"><i18n:text>xmlui.general.go</i18n:text></h1> -->
 						<div class="ds-option-set"
 							id="aspect_discovery_Navigation_list_discovery"
 							xmlns="http://di.tamu.edu/DRI/1.0/"
