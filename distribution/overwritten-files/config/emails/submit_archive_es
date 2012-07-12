@@ -4,24 +4,28 @@
 # {1}  Name of collection
 # {2}  handle 
 #
-Subject: SeDiCI - Envío aprobado y archivado
+Subject: Repositorio SeDiCI, UNLP - Su envío fue aprobado y publicado
 
-Usted envió: {0}
+Estimado usuario:
 
-A la colección: {1}
+Por el presente le comunicamos que la obra que ha subido al repositorio SeDiCI denominada "{0}" ha sido incorporada a la colección "{1}". 
 
-Su envío ha sido aceptado y archivado en SeDiCI,
-y se le ha asignado el siguiente identificador:
+A partir de este momento, el envío se encontrará siempre disponible en nuestra página web a través del siguiente enlace: 
+   {2}
 
-{2}
+Por favor utilícelo cuando en las referencias cuando cite su trabajo para aumentar la visibilidad de sus obras.
 
-Por favor utilícelo cuando cite su envío.
+Lo invitamos, asimismo, a recorrer el resto del repositorio, donde seguramente encontrará información de su interés, como ser artículos, tesis de grado y posgrado, ponencias y otros documentos referidos a su área de investigación, así como a otras: 
+    http://sedici.unlp.edu.ar
 
-Muchas gracias.
+Cualquier inquietud que desee comunicarnos, sírvase escribirnos a info@sedici.unlp.edu.ar
+
+
+Muchas gracias por su aporte.
 Cordialmente,
 
+Servicio de Difusión de la Creación Intelectual (http://sedici.unlp.edu.ar)
 Universidad Nacional de La Plata
-Servicio de Difusión de la Creación Intelectual
-Facultad de Ingeniería - Departamento de Ciencias Básicas
-49 y 115, sin número, primer piso
-Tel. 0221- 4236677/6696 Interno 141
+Ubicación: 49 y 115 s/n, 1er piso, Departamento de Ciencias Básicas, Facultad de Ingeniería.
+Mapa: http://sedici.unlp.edu.ar/pages/comoLlegar
+Tel 0221- 4236677/6696 Interno 141
