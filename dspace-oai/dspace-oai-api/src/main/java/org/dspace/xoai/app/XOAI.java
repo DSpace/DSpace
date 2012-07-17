@@ -52,8 +52,8 @@ import org.dspace.xoai.util.ItemUtils;
 import org.dspace.xoai.util.XOAICacheManager;
 import org.dspace.xoai.util.XOAIDatabaseManager;
 
-import com.lyncode.xoai.common.dataprovider.exceptions.MetadataBindException;
-import com.lyncode.xoai.common.dataprovider.util.MarshallingUtils;
+import com.lyncode.xoai.dataprovider.exceptions.MetadataBindException;
+import com.lyncode.xoai.dataprovider.util.MarshallingUtils;
 
 /**
  * 

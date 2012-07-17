@@ -27,14 +27,14 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Utils;
 import org.dspace.xoai.data.DSpaceDatabaseItem;
 
-import com.lyncode.xoai.common.dataprovider.OAIDataProvider;
-import com.lyncode.xoai.common.dataprovider.OAIRequestParameters;
-import com.lyncode.xoai.common.dataprovider.core.XOAIManager;
-import com.lyncode.xoai.common.dataprovider.exceptions.MetadataBindException;
-import com.lyncode.xoai.common.dataprovider.exceptions.OAIException;
-import com.lyncode.xoai.common.dataprovider.util.Base64Utils;
-import com.lyncode.xoai.common.dataprovider.util.MarshallingUtils;
-import com.lyncode.xoai.common.dataprovider.xml.xoai.Metadata;
+import com.lyncode.xoai.dataprovider.OAIDataProvider;
+import com.lyncode.xoai.dataprovider.OAIRequestParameters;
+import com.lyncode.xoai.dataprovider.core.XOAIManager;
+import com.lyncode.xoai.dataprovider.exceptions.MetadataBindException;
+import com.lyncode.xoai.dataprovider.exceptions.OAIException;
+import com.lyncode.xoai.dataprovider.util.Base64Utils;
+import com.lyncode.xoai.dataprovider.util.MarshallingUtils;
+import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 
 /**
  * 

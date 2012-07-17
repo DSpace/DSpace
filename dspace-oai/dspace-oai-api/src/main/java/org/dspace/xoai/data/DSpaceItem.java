@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.dspace.core.ConfigurationManager;
 
-import com.lyncode.xoai.common.dataprovider.data.AbstractAbout;
-import com.lyncode.xoai.common.dataprovider.data.AbstractItem;
+import com.lyncode.xoai.dataprovider.data.AbstractAbout;
+import com.lyncode.xoai.dataprovider.data.AbstractItem;
 
 public abstract class DSpaceItem extends AbstractItem
 {

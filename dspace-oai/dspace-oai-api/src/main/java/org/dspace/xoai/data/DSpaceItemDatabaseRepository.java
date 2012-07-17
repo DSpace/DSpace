@@ -7,13 +7,13 @@
  */
 package org.dspace.xoai.data;
 
-import com.lyncode.xoai.common.dataprovider.core.ListItemIdentifiersResult;
-import com.lyncode.xoai.common.dataprovider.core.ListItemsResults;
-import com.lyncode.xoai.common.dataprovider.data.AbstractItem;
-import com.lyncode.xoai.common.dataprovider.data.AbstractItemIdentifier;
-import com.lyncode.xoai.common.dataprovider.exceptions.IdDoesNotExistException;
-import com.lyncode.xoai.common.dataprovider.filter.Filter;
-import com.lyncode.xoai.common.dataprovider.filter.FilterScope;
+import com.lyncode.xoai.dataprovider.core.ListItemIdentifiersResult;
+import com.lyncode.xoai.dataprovider.core.ListItemsResults;
+import com.lyncode.xoai.dataprovider.data.AbstractItem;
+import com.lyncode.xoai.dataprovider.data.AbstractItemIdentifier;
+import com.lyncode.xoai.dataprovider.exceptions.IdDoesNotExistException;
+import com.lyncode.xoai.dataprovider.filter.Filter;
+import com.lyncode.xoai.dataprovider.filter.FilterScope;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;

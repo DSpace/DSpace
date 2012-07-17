@@ -19,9 +19,9 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
-import com.lyncode.xoai.common.dataprovider.core.ListSetsResult;
-import com.lyncode.xoai.common.dataprovider.core.Set;
-import com.lyncode.xoai.common.dataprovider.data.AbstractSetRepository;
+import com.lyncode.xoai.dataprovider.core.ListSetsResult;
+import com.lyncode.xoai.dataprovider.core.Set;
+import com.lyncode.xoai.dataprovider.data.AbstractSetRepository;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;

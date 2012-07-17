@@ -22,11 +22,11 @@ import org.dspace.content.Item;
 import org.dspace.xoai.util.XOAICacheManager;
 import org.dspace.xoai.util.XOAIDatabaseManager;
 
-import com.lyncode.xoai.common.dataprovider.core.ItemMetadata;
-import com.lyncode.xoai.common.dataprovider.core.ReferenceSet;
-import com.lyncode.xoai.common.dataprovider.data.AbstractAbout;
-import com.lyncode.xoai.common.dataprovider.exceptions.MetadataBindException;
-import com.lyncode.xoai.common.dataprovider.xml.xoai.Element;
+import com.lyncode.xoai.dataprovider.core.ItemMetadata;
+import com.lyncode.xoai.dataprovider.core.ReferenceSet;
+import com.lyncode.xoai.dataprovider.data.AbstractAbout;
+import com.lyncode.xoai.dataprovider.exceptions.MetadataBindException;
+import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 
 /**
  * 

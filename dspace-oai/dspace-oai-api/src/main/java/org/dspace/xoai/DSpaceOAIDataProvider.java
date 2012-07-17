@@ -30,11 +30,11 @@ import org.dspace.xoai.filter.DSpaceFilter;
 import org.dspace.xoai.solr.DSpaceSolrServer;
 import org.dspace.xoai.util.XOAICacheManager;
 
-import com.lyncode.xoai.common.dataprovider.OAIDataProvider;
-import com.lyncode.xoai.common.dataprovider.OAIRequestParameters;
-import com.lyncode.xoai.common.dataprovider.core.XOAIManager;
-import com.lyncode.xoai.common.dataprovider.exceptions.InvalidContextException;
-import com.lyncode.xoai.common.dataprovider.filter.AbstractFilter;
+import com.lyncode.xoai.dataprovider.OAIDataProvider;
+import com.lyncode.xoai.dataprovider.OAIRequestParameters;
+import com.lyncode.xoai.dataprovider.core.XOAIManager;
+import com.lyncode.xoai.dataprovider.exceptions.InvalidContextException;
+import com.lyncode.xoai.dataprovider.filter.AbstractFilter;
 
 /**
  * 
@@ -58,7 +58,7 @@ public class DSpaceOAIDataProvider extends HttpServlet
             }
             System.out.println("[OAI 2.0] Initialized");
         }
-        catch (com.lyncode.xoai.common.dataprovider.exceptions.ConfigurationException e)
+        catch (com.lyncode.xoai.dataprovider.exceptions.ConfigurationException e)
         {
             System.out.println("Unable to configure XOAI (OAI 2.0 Core)");
             e.printStackTrace();

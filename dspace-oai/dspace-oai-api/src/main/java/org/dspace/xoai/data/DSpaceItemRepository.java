@@ -14,11 +14,11 @@ import org.dspace.xoai.filter.DateFromFilter;
 import org.dspace.xoai.filter.DateUntilFilter;
 import org.dspace.xoai.filter.DspaceSetSpecFilter;
 
-import com.lyncode.xoai.common.dataprovider.core.ListItemIdentifiersResult;
-import com.lyncode.xoai.common.dataprovider.core.ListItemsResults;
-import com.lyncode.xoai.common.dataprovider.data.AbstractItemRepository;
-import com.lyncode.xoai.common.dataprovider.filter.Filter;
-import com.lyncode.xoai.common.dataprovider.filter.FilterScope;
+import com.lyncode.xoai.dataprovider.core.ListItemIdentifiersResult;
+import com.lyncode.xoai.dataprovider.core.ListItemsResults;
+import com.lyncode.xoai.dataprovider.data.AbstractItemRepository;
+import com.lyncode.xoai.dataprovider.filter.Filter;
+import com.lyncode.xoai.dataprovider.filter.FilterScope;
 
 /**
  * 

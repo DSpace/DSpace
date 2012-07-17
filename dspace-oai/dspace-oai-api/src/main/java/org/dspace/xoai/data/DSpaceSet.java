@@ -10,7 +10,7 @@ package org.dspace.xoai.data;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 
-import com.lyncode.xoai.common.dataprovider.core.Set;
+import com.lyncode.xoai.dataprovider.core.Set;
 
 /**
  * 

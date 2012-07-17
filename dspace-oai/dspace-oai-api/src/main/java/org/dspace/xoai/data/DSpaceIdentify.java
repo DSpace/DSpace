@@ -24,9 +24,9 @@ import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
 import org.dspace.xoai.util.DateUtils;
 import org.dspace.xoai.util.MetadataFieldManager;
 
-import com.lyncode.xoai.common.dataprovider.core.DeleteMethod;
-import com.lyncode.xoai.common.dataprovider.core.Granularity;
-import com.lyncode.xoai.common.dataprovider.data.AbstractIdentify;
+import com.lyncode.xoai.dataprovider.core.DeleteMethod;
+import com.lyncode.xoai.dataprovider.core.Granularity;
+import com.lyncode.xoai.dataprovider.data.AbstractIdentify;
 
 /**
  * 

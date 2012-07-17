@@ -17,8 +17,8 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.lyncode</groupId>
-			<artifactId>xoai-common</artifactId>
-			<version>2.1.0</version>
+			<artifactId>xoai</artifactId>
+			<version>2.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.dspace</groupId>
@@ -45,14 +45,6 @@
 			<version>1.5.6</version>
 		</dependency>
 	</dependencies>
-
-	<repositories>
-		<repository>
-			<id>lyncode-stage</id>
-			<name>Lyncode Stage Development</name>
-			<url>http://lyncode-dev.dtdns.net/nexus/content/repositories/lyncode-dev</url>
-		</repository>
-	</repositories>
 
 	<developers>
 		<developer>

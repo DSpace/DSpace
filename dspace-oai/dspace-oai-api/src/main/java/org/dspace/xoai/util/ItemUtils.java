@@ -17,10 +17,10 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Utils;
 
-import com.lyncode.xoai.common.dataprovider.util.Base64Utils;
-import com.lyncode.xoai.common.dataprovider.xml.xoai.Element;
-import com.lyncode.xoai.common.dataprovider.xml.xoai.Metadata;
-import com.lyncode.xoai.common.dataprovider.xml.xoai.ObjectFactory;
+import com.lyncode.xoai.dataprovider.util.Base64Utils;
+import com.lyncode.xoai.dataprovider.xml.xoai.Element;
+import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
+import com.lyncode.xoai.dataprovider.xml.xoai.ObjectFactory;
 
 @SuppressWarnings("deprecation")
 public class ItemUtils

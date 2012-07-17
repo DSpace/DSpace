@@ -10,8 +10,8 @@ package org.dspace.xoai.filter;
 import org.dspace.core.Context;
 import org.dspace.xoai.data.DSpaceDatabaseItem;
 
-import com.lyncode.xoai.common.dataprovider.data.AbstractItemIdentifier;
-import com.lyncode.xoai.common.dataprovider.filter.AbstractFilter;
+import com.lyncode.xoai.dataprovider.data.AbstractItemIdentifier;
+import com.lyncode.xoai.dataprovider.filter.AbstractFilter;
 
 /**
  * 
