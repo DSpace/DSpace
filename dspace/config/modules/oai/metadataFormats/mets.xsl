@@ -47,12 +47,12 @@
 						xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-1.xsd">
 						<mods:mods
 							xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-1.xsd">
-							<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='contributor']">
+							<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='contributor']/doc:element">
 							<mods:name>
 								<mods:role>
-									<mods:roleTerm type="text"><xsl:value-of select="doc:element/@name" /></mods:roleTerm>
+									<mods:roleTerm type="text"><xsl:value-of select="@name" /></mods:roleTerm>
 								</mods:role>
-								<mods:namePart><xsl:value-of select="doc:element/doc:element/doc:field/text()" /></mods:namePart>
+								<mods:namePart><xsl:value-of select="doc:element/doc:field/text()" /></mods:namePart>
 							</mods:name>
 							</xsl:for-each>
 							<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='accessioned']">
@@ -93,6 +93,11 @@
 								<mods:languageTerm authority="rfc3066"><xsl:value-of select="doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element/doc:element/doc:field"></xsl:value-of></mods:languageTerm>
 							</mods:language>
 							<mods:accessCondition type="useAndReproduction"><xsl:value-of select="doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field"></xsl:value-of></mods:accessCondition>
+							<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='subject']/doc:element/doc:field">
+							<mods:subject>
+								<mods:topic><xsl:value-of select="text()" /></mods:topic>
+							</mods:subject>
+							</xsl:for-each>
 							<mods:titleInfo>
 								<mods:title><xsl:value-of select="doc:metadata/doc:element[@name='dc']/doc:element[@name='title']/doc:element/doc:field"></xsl:value-of></mods:title>
 							</mods:titleInfo>
