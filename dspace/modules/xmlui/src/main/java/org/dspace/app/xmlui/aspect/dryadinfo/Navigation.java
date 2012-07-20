@@ -92,7 +92,7 @@ public class Navigation extends AbstractDSpaceTransformer
         info.setHead("Information");
         info.addItemXref(contextPath + "/depositing", "Depositing Data");
         info.addItemXref(contextPath + "/using", "Using Data");
-        info.addItemXref(contextPath + "/partners", "Dryad Partners");
+        info.addItemXref(contextPath + "/members", "Dryad Members");
         info.addItemXref(contextPath + "/jdap", "Journal Archiving Policy");
         info.addItemXref(contextPath + "/about", "About Dryad");
         info.addItemXref("http://blog.datadryad.org", "Dryad Blog");
