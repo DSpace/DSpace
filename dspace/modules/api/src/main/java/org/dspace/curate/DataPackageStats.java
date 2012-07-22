@@ -40,9 +40,10 @@ import org.apache.log4j.Logger;
 
 /**
  * DataPackageStats retrieves statistics based on an input data package.
- * WARNING: This file is a complete hack! Its original purpose was to generate
- * statistics for the 2011 Dryad NSF grant proposal. It is being modified
- * to generate statistics for conference presentations.
+ *
+ * WARNING: This file is deprecated! Its original purpose was to generate
+ * statistics for the 2011 Dryad NSF grant proposal. We are now breaking these stats out into their
+ * own curation tasks, which makes it easier to update when we need to make changes.
  *
  * The task succeeds if it was able to locate all required stats, otherwise it fails.
  * Originally based on the RequiredMetadata task by Richard Rodgers.
