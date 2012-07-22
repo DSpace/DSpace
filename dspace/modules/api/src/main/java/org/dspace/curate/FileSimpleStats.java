@@ -28,22 +28,21 @@ import org.dspace.core.Context;
 import org.apache.log4j.Logger;
 
 /**
- * PackageSimpleStats generates a list of data packages with useful statistical information.
+ * FileSimpleStats generates a list of journals and the first date on which Dryad archived a submission from that journal.
+ * It computes stats both for the repository as a whole, and for a specific time window.
  *
  * The task succeeds if it was able to calculate the correct result.
  *
- * Originally adapted from the ProfileFormats curation task by Richard Rodgers.
- *
- * Input: a collection of data packages
- * Output: 
+ * Input: a collection of data files
+ * Output: a CSV indicating simple statistics about data file objects
  *
  * @author Ryan Scherle
  */
 @Distributive
-public class PackageSimpleStats extends AbstractCurationTask {
+public class FileSimpleStats extends AbstractCurationTask {
 
-   private static Logger log = Logger.getLogger(PackageSimpleStats.class);
-
+    private static Logger log = Logger.getLogger(FileSimpleStats.class);
+    
     private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
 
     // dates for the specific time window to analyze
@@ -51,11 +50,11 @@ public class PackageSimpleStats extends AbstractCurationTask {
     private static final String END_DATE_STRING = "2012-07-01T00:00:00Z";
     private static Date START_DATE = null;
     private static Date END_DATE = null;
-    
-    // accumulators for counting integrated submissions
-    private int numIntegrated = 0;
-    private int windowNumIntegrated = 0;
-    
+
+    // map of embargo types to counts of items with those types
+    private Map<String, Integer> embargoTable = new HashMap<String, Integer>();
+    private Map<String, Integer> windowEmbargoTable = new HashMap<String, Integer>();
+
     /**
        Distribute the process across all items in the collection, then report the results.
      **/
@@ -69,22 +68,19 @@ public class PackageSimpleStats extends AbstractCurationTask {
 	    return Curator.CURATE_FAIL;
 	}
 
-	distribute(dso);
+	windowEmbargoTable.clear();
+        embargoTable.clear();
+        distribute(dso);
         formatResults();
         return Curator.CURATE_SUCCESS;
     }
 
     /**
-       Process a single item.
+       For a single item, if the item has an earlier deposit date than currently known for the journal, update the date.
      **/
     @Override
     protected void performItem(Item item) throws SQLException, IOException {
-	
-	DCValue[] vals = item.getMetadata("dc.identifier.manuscriptNumber");
-	if (vals.length > 0) {
-	    numIntegrated = numIntegrated + 1;
-	}
-
+	String journal = "UNKNOWN";
 
 	// determine whether this item falls in our target date range
 	// TODO: change this to an external selector based on a query
@@ -104,11 +100,43 @@ public class PackageSimpleStats extends AbstractCurationTask {
 	    log.error("Unable to parse date " + accDate + " in item " + item.getHandle());
 	    return;
 	}
-	// only increment counts in the window accumulator if the item's accession date is within the window
-	if(itemDate.after(START_DATE) && itemDate.before(END_DATE) && vals.length > 0) {
-	    windowNumIntegrated = windowNumIntegrated + 1;
+	
+	// get embargo type
+	String emType = "none";
+	DCValue[] vals = item.getMetadata("dc.type.embargo");
+	if (vals.length == 0) {
+	    // there is no type set; check if a date was set. If a date is set, the embargo was "oneyear" and was deleted.
+	    DCValue[] emDateVals = item.getMetadata("dc.date.embargoedUntil");
+	    if(emDateVals.length != 0) {
+		String emDate = emDateVals[0].value;
+		if(emDate != null && !emDate.equals("")) {
+		    emType = "oneyear";
+		}
+	    }
+	} else {
+	    // there is a type set, so use it
+	    emType = vals[0].value;
 	}
 	
+	// increment counter for this embargo type
+	Integer count = embargoTable.get(emType);
+	if (count == null || count == 0) {
+	    count = 1;
+	} else {
+	    count += 1;
+	}
+	embargoTable.put(emType, count);
+	
+	// only increment counts in the window table if the item's accession date is within the window
+	if(itemDate.after(START_DATE) && itemDate.before(END_DATE)) {
+	    Integer wcount = windowEmbargoTable.get(emType);
+	    if (wcount == null || wcount == 0) {
+		wcount = 1;
+	    } else {
+		wcount += 1;
+	    }
+	    windowEmbargoTable.put(emType, wcount);
+	}
 	
 	// clean up the DSpace cache so we don't use excessive memory
 	item.decache();
@@ -121,8 +149,17 @@ public class PackageSimpleStats extends AbstractCurationTask {
         try {
             Context c = new Context();
             StringBuilder sb = new StringBuilder();
-	    sb.append("Total integrated submissions: " + numIntegrated + "\n");
-	    sb.append("Integrated submissions within date window: " + windowNumIntegrated + "\n");
+	    sb.append("File stats for entire repository: \n");
+            for (String emType : embargoTable.keySet()) {
+                sb.append(emType).append(", ").
+		    append(embargoTable.get(emType)).append("\n");
+            }
+
+	    sb.append("File stats for time " + START_DATE_STRING + " to " + END_DATE_STRING + " \n");
+            for (String wemType : windowEmbargoTable.keySet()) {
+                sb.append(wemType).append(", ").
+		    append(windowEmbargoTable.get(wemType)).append("\n");
+            }
             report(sb.toString());
             setResult(sb.toString());
             c.complete();
