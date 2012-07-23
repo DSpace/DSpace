@@ -52,7 +52,7 @@ public class DSpaceOAIDataProvider extends HttpServlet
         try
         {
             XOAIManager.initialize(ConfigurationManager
-                    .getProperty("dspace.dir") + "/config/modules/oai");
+                    .getProperty("oai", "config.dir"));
             if (!"database".equals(ConfigurationManager.getProperty("oai", "storage"))) {
                 DSpaceSolrServer.getServer();
             }
