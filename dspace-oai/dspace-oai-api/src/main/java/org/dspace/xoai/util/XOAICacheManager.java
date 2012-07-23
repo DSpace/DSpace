@@ -44,11 +44,11 @@ public class XOAICacheManager
 {
     private static Logger log = LogManager.getLogger(XOAICacheManager.class);
 
-    private static final String ITEMDIR = "/items";
+    private static final String ITEMDIR = File.separator + "items";
 
-    private static final String REQUESTDIR = "/requests";
+    private static final String REQUESTDIR = File.separator + "requests";
 
-    private static final String DATEFILE = "/date.file";
+    private static final String DATEFILE = File.separator + "date.file";
 
     private static String baseDir = null;
 
@@ -56,10 +56,7 @@ public class XOAICacheManager
     {
         if (baseDir == null)
         {
-            String dir = ConfigurationManager.getProperty("dspace.dir");
-            if (!dir.endsWith("/"))
-                dir += "/";
-            dir += "var/oai";
+            String dir = ConfigurationManager.getProperty("oai", "cache.dir");
             baseDir = dir;
         }
         return baseDir;
@@ -71,7 +68,7 @@ public class XOAICacheManager
         if (!dir.exists())
             dir.mkdirs();
 
-        String name = "/" + Base64Utils.encode(id);
+        String name = File.separator + Base64Utils.encode(id);
         return new File(getBaseDir() + REQUESTDIR + name);
     }
 
@@ -81,7 +78,7 @@ public class XOAICacheManager
         if (!dir.exists())
             dir.mkdirs();
 
-        String name = "/" + item.getHandle().replace('/', '_');
+        String name = File.separator + item.getHandle().replace('/', '_');
         return new File(getBaseDir() + ITEMDIR + name);
     }
 
