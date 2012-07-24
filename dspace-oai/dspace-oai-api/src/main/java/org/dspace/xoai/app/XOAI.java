@@ -409,9 +409,6 @@ public class XOAI
                         ctx.abort();
                     } else if (COMMAND_CLEAN_CACHE.equals(command)) {
                         cleanCache();
-                        
-                        if (solr && line.hasOption('c'))
-                            clearIndex();
                     } else if (COMMAND_COMPILE_ITEMS.equals(command)) {
 
                         Context ctx = new Context();
@@ -495,7 +492,7 @@ public class XOAI
             System.out.println("     "+COMMAND_CLEAN_CACHE+" - Cleans the OAI cached responses");
             System.out.println("> Parameters:");
             System.out.println("     -o Optimize index after indexing ("+COMMAND_IMPORT+" only)");
-            System.out.println("     -c Clear index");
+            System.out.println("     -c Clear index ("+COMMAND_IMPORT+" only)");
             System.out.println("     -v Verbose output");
             System.out.println("     -h Shows this text");
         } else {
