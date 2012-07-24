@@ -69,6 +69,8 @@ public class XOAI
     private boolean _optimize;
 
     private boolean _verbose;
+    
+    private boolean _clean;
 
     private static List<String> getFileFormats(Item item)
     {
@@ -93,10 +95,11 @@ public class XOAI
         return formats;
     }
 
-    public XOAI(Context ctx, boolean optimize, boolean verb)
+    public XOAI(Context ctx, boolean optimize, boolean verb, boolean b)
     {
         _context = ctx;
         _optimize = optimize;
+        _clean = b;
         _verbose = verb;
     }
 
@@ -115,20 +118,28 @@ public class XOAI
     {
         try
         {
-            SolrQuery solrParams = new SolrQuery("*:*")
-                    .addField("item.lastmodified")
-                    .addSortField("item.lastmodified", ORDER.desc).setRows(1);
 
-            SolrDocumentList results = DSpaceSolrSearch.query(solrParams);
-            if (results.getNumFound() == 0)
-            {
-                System.out.println("There are no indexed documents, using full import.");
+        	if (_clean)  {
+        		clearIndex();
+                System.out.println("Using full import.");
                 this.indexAll();
-            }
-            else
-                this.index((Date) results.get(0).getFieldValue("item.lastmodified"));
-            
+        	} else {
+	            SolrQuery solrParams = new SolrQuery("*:*")
+	                    .addField("item.lastmodified")
+	                    .addSortField("item.lastmodified", ORDER.desc).setRows(1);
+	
+	            SolrDocumentList results = DSpaceSolrSearch.query(solrParams);
+	            if (results.getNumFound() == 0)
+	            {
+	                System.out.println("There are no indexed documents, using full import.");
+	                this.indexAll();
+	            }
+	            else
+	                this.index((Date) results.get(0).getFieldValue("item.lastmodified"));
+	            
+        	}
             DSpaceSolrServer.getServer().commit();
+            
             
             if (_optimize)
             {
@@ -395,12 +406,11 @@ public class XOAI
                     String command = line.getArgs()[0];
                     
                     if (COMMAND_IMPORT.equals(command)) {
-                        if (line.hasOption('c'))
-                            clearIndex();
-
                         Context ctx = new Context();
                         XOAI indexer = new XOAI(ctx,
-                                line.hasOption('o'), line.hasOption('v'));
+                                line.hasOption('o'), 
+                                line.hasOption('c'), 
+                                line.hasOption('v'));
 
                         indexer.index();
                         
