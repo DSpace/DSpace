@@ -16,3 +16,8 @@ nbdist/
 nbactions.xml
 nb-configuration.xml
 META-INF/
+
+## Ignore settings, project and classpath ECLIPSE
+.settings/
+.project
+.classpath
