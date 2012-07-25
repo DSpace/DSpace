@@ -1,0 +1,29 @@
+<%--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+--%>
+<%--
+    This GA tracking code can be obtained at your GA account settings page.
+    It should be the same (untill Google will change the script) and the only difference for 
+    accounts will be in XX-YYYYYYYY-Z code.
+    Put your real account's code here insteand of XX-YYYYYYYY-Z 
+--%>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'XX-YYYYYYYY-Z']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
