@@ -50,7 +50,8 @@
 		
 	<modules>
 		<module>dspace-tag-files/modules/solr</module>
- 		<module>dspace-tag-files/modules/oai</module> 
+<!--  		<module>dspace-tag-files/modules/oai</module>  -->
+ 		 <module>overwritten-files/modules/xoai</module> 
 	</modules>
 	
 	<dependencies>
@@ -93,6 +94,11 @@
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 		</dependency>
+		<dependency>
+             <groupId>org.dspace</groupId>
+            <artifactId>dspace-xoai-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 	</dependencies>
 
 </project>
