@@ -367,4 +367,12 @@
             <class>ar.edu.unlp.sedici.dspace.administer.ImportUsers</class>
         </step>
     </command>
+    
+    <command>
+		<name>xoai</name>
+		<description>XOAI script manager</description>
+		<step>
+			<class>org.dspace.xoai.app.XOAI</class>
+		</step>
+	</command>
 </commands>
