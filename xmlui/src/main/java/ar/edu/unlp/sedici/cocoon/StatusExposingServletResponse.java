@@ -52,6 +52,14 @@ public class StatusExposingServletResponse extends HttpServletResponseWrapper {
     public void setStatus(int status, String string) {
         super.setStatus(status, string);
         this.httpStatus = status;
+    } 
+    
+    public boolean statusHasChanged(){
+    	if (this.httpStatus==-1){
+    		return false;
+    	} else {
+    		return true;
+    	}
     }
 
 }

@@ -886,7 +886,7 @@ public abstract class AbstractCachingProcessingPipeline extends BaseCachingProce
         };
         if (environment.getObjectModel().get(HttpEnvironment.HTTP_RESPONSE_OBJECT) instanceof StatusExposingServletResponse){
         	StatusExposingServletResponse response= (StatusExposingServletResponse)(environment.getObjectModel().get(HttpEnvironment.HTTP_RESPONSE_OBJECT));
-        	if (response.getStatus()==-1){
+        	if (!response.statusHasChanged()){
         		environment.setStatus(HttpServletResponse.SC_OK);
         	};
         } else {
