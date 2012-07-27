@@ -13,6 +13,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Utils;
@@ -128,7 +129,8 @@ public class ItemUtils
             valueElem.getField().add(createValue(factory, "value", val.value));
             if (val.authority != null) {
             	valueElem.getField().add(createValue(factory, "authority", val.authority));
-            	valueElem.getField().add(createValue(factory, "confidence", val.confidence + ""));
+            	if (val.confidence != Choices.CF_NOVALUE)
+            		valueElem.getField().add(createValue(factory, "confidence", val.confidence + ""));
             }
         }
         // Done! Metadata has been read!
