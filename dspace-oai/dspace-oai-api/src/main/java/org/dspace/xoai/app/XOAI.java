@@ -271,6 +271,10 @@ public class XOAI
                 key += "." + dc.qualifier;
             }
             doc.addField(key, dc.value);
+            if (dc.authority != null) {
+            	doc.addField(key + ".authority", dc.authority);
+            	doc.addField(key + ".confidence", dc.confidence + "");
+            }
         }
 
         for (String f : getFileFormats(item))

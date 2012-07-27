@@ -125,7 +125,11 @@ public class ItemUtils
                 valueElem = language;
             }
 
-            valueElem.getField().add(createValue(factory, val.value));
+            valueElem.getField().add(createValue(factory, "value", val.value));
+            if (val.authority != null) {
+            	valueElem.getField().add(createValue(factory, "authority", val.authority));
+            	valueElem.getField().add(createValue(factory, "confidence", val.confidence + ""));
+            }
         }
         // Done! Metadata has been read!
         // Now adding bitstream info
