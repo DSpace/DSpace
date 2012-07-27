@@ -117,7 +117,8 @@ install_webapps()
 		
 		sudo mv $web_home/ROOT $web_home/ROOT_old
 		sudo ln -s $INSTALL_DIR/webapps/xmlui $web_home/ROOT 
-		sudo ln -s $INSTALL_DIR/webapps/xoai $web_home/oai
+		sudo ln -s $INSTALL_DIR/webapps/oai $web_home/oai
+		sudo ln -s $INSTALL_DIR/webapps/xoai $web_home/xoai
 		sudo ln -s $INSTALL_DIR/webapps/solr $web_home/solr
 	else
 		echo "No se crean los links simbólicos a las webapps porque no se encontro la variable de entorno CATALINA_HOME ni web_home"
