@@ -79,7 +79,9 @@
     			  -->	
     			  
     			<!-- Genero la seccion del contexto-->	
-                <xsl:apply-templates select="dri:list[@id='aspect.viewArtifacts.Navigation.list.context']"/>
+    			<xsl:if test="/dri:document/dri:meta/dri:userMeta[@authenticated='yes']">
+                	<xsl:apply-templates select="dri:list[@id='aspect.viewArtifacts.Navigation.list.context']"/>
+				</xsl:if>
 
 				<!-- Genero la seccion administrativa -->
                 <xsl:apply-templates select="dri:list[@id='aspect.viewArtifacts.Navigation.list.administrative']"/>
