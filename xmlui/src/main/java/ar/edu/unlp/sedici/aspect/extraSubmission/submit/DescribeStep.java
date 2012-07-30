@@ -561,10 +561,9 @@ public class DescribeStep extends AbstractSubmissionStep
                 // for the year, followed by a select box of the months, follewed
                 // by a text box for the day.
                 Composite fullDate = form.addItem().addComposite(fieldName, "submit-date");
-                Text year = fullDate.addText(fieldName+"_year");
+                Text day = fullDate.addText(fieldName+"_day");               
                 Select month = fullDate.addSelect(fieldName+"_month");
-                Text day = fullDate.addText(fieldName+"_day");
-
+                Text year = fullDate.addText(fieldName+"_year");
                 // Set up the full field
                 fullDate.setLabel(dcInput.getLabel());
                 fullDate.setHelp(cleanHints(dcInput.getHints()));
