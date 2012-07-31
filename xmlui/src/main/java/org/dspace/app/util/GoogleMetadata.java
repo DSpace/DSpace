@@ -1028,7 +1028,7 @@ public class GoogleMetadata
 					}
 				}
 			} else {
-				if ("application/pdf".equalsIgnoreCase(bitstreams[0].getFormat().getMIMEType())) {
+				if ((bitstreams.length == 1) &&("application/pdf".equalsIgnoreCase(bitstreams[0].getFormat().getMIMEType()))) {
 					the_bitstream = bitstreams[0];
 				}
 			}
