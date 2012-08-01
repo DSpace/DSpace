@@ -908,7 +908,8 @@ public class EPerson extends DSpaceObject
     }
 
     /**
-     * Check EPerson's password
+     * Check EPerson's password.  Side effect:  original unsalted MD5 hashes are
+     * converted using the current algorithm.
      * 
      * @param attempt
      *            the password attempt
@@ -928,7 +929,13 @@ public class EPerson extends DSpaceObject
             log.error(ex.getMessage());
             return false;
         }
-        return myHash.matches(attempt);
+        boolean answer = myHash.matches(attempt);
+
+        // If using the old unsalted hash, and this password is correct, update to a new hash
+        if (answer && (null == myRow.getStringColumn("digest_algorithm")))
+            setPassword(attempt);
+
+        return answer;
     }
 
     /**
