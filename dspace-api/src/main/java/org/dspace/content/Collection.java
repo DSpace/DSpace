@@ -27,6 +27,7 @@ import org.dspace.browse.BrowseException;
 import org.dspace.browse.IndexBrowse;
 import org.dspace.browse.ItemCounter;
 import org.dspace.browse.ItemCountException;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -38,6 +39,7 @@ import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -103,7 +105,7 @@ public class Collection extends DSpaceObject
      *            the corresponding row in the table
      * @throws SQLException
      */
-    Collection(Context context, TableRow row) throws SQLException
+    public Collection(Context context, TableRow row) throws SQLException
     {
         ourContext = context;
         collectionRow = row;
@@ -164,36 +166,8 @@ public class Collection extends DSpaceObject
      */
     public static Collection find(Context context, int id) throws SQLException
     {
-        // First check the cache
-        Collection fromCache = (Collection) context.fromCache(Collection.class,
-                id);
-
-        if (fromCache != null)
-        {
-            return fromCache;
-        }
-
-        TableRow row = DatabaseManager.find(context, "collection", id);
-
-        if (row == null)
-        {
-            if (log.isDebugEnabled())
-            {
-                log.debug(LogManager.getHeader(context, "find_collection",
-                        "not_found,collection_id=" + id));
-            }
-
-            return null;
-        }
-
-        // not null, return Collection
-        if (log.isDebugEnabled())
-        {
-            log.debug(LogManager.getHeader(context, "find_collection",
-                    "collection_id=" + id));
-        }
-
-        return new Collection(context, row);
+        CollectionService collectionService = new DSpace().getSingletonService(CollectionService.class);
+        return collectionService.find(context, id);
     }
 
     /**
