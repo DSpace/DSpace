@@ -34,6 +34,7 @@ public class PasswordHash
     private static final int SALT_BYTES = 128/8; // XXX magic we want 128 bits
     private static final int HASH_ROUNDS = 1024; // XXX magic 1024 rounds
     private static final int SEED_BYTES = 64; // XXX magic
+    private static final int RESEED_INTERVAL = 100; // XXX magic
 
     /** A secure random number generator instance. */
     private static SecureRandom rng = null;
@@ -53,7 +54,7 @@ public class PasswordHash
      *
      * @param algorithm the digest algorithm used in producing {@code hash}.
      *          If null or empty, assume MD5 (the original, only algorithm).
-     * @param salt the salt hashed with the secret.
+     * @param salt the salt hashed with the secret, or null.
      * @param hash the hashed secret.
      */
     public PasswordHash(String algorithm, byte[] salt, byte[] hash)
@@ -73,7 +74,7 @@ public class PasswordHash
      *          hexadecimal-encoded {@code String}s.
      * @param algorithm the digest algorithm used in producing {@code hash}.
      *          If null or empty, assume MD5.
-     * @param salt hexadecimal digits encoding the bytes of the salt.
+     * @param salt hexadecimal digits encoding the bytes of the salt, or null.
      * @param hash hexadecimal digits encoding the bytes of the hash.
      * @throws DecoderException if salt or hash is not proper hexadecimal.
      */
@@ -90,6 +91,8 @@ public class PasswordHash
         else
             this.salt = Hex.decodeHex(salt.toCharArray());
 
+        if (null == hash)
+            throw new DecoderException("Hash may not be null");
         this.hash = Hex.decodeHex(hash.toCharArray());
     }
 
@@ -197,13 +200,14 @@ public class PasswordHash
         if (null == rng)
         {
             rng = new SecureRandom();
-            log.info("Initialized a random number stream using "
-                    + rng.getAlgorithm() + " provided by " + rng.getProvider());
+            log.info("Initialized a random number stream using {} provided by {}",
+                    rng.getAlgorithm(), rng.getProvider());
             rngUses = 0;
         }
 
-        if (rngUses++ > 100)
+        if (rngUses++ > RESEED_INTERVAL)
         { // re-seed the generator periodically to break up possible patterns
+            log.debug("Re-seeding the RNG");
             rng.setSeed(rng.generateSeed(SEED_BYTES));
             rngUses = 0;
         }
@@ -217,7 +221,7 @@ public class PasswordHash
      * Generate a salted hash of a string using a given algorithm.
      *
      * @param salt random bytes to salt the hash.
-     * @param algorithm  name of the digest algorithm to use.
+     * @param algorithm name of the digest algorithm to use.  Assume unsalted MD5 if null.
      * @param secret the string to be hashed.  Null is treated as an empty string ("").
      * @return hash bytes.
      * @throws NoSuchAlgorithmException if algorithm is unknown.
@@ -225,11 +229,21 @@ public class PasswordHash
     private byte[] digest(byte[] salt, String algorithm, String secret)
             throws NoSuchAlgorithmException
     {
+        MessageDigest digester;
+
         if (null == secret)
             secret = "";
 
+        // Special case:  old unsalted one-trip MD5 hash.
+        if (null == algorithm)
+        {
+            digester = MessageDigest.getInstance("MD5");
+            digester.update(secret.getBytes(UTF_8));
+            return digester.digest();
+        }
+
         // Set up a digest
-        MessageDigest digester =  MessageDigest.getInstance(algorithm);
+        digester =  MessageDigest.getInstance(algorithm);
 
         // Grind up the salt with the password, yielding a hash
         if (null != salt)
