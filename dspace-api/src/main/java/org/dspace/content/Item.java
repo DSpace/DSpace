@@ -10,6 +10,7 @@ package org.dspace.content;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -308,11 +309,18 @@ public class Item extends DSpaceObject
 
     /**
      * Method that updates the last modified date of the item
-     * The modified boolean will be set to true and the actual date update will occur on item.update().
      */
-    void updateLastModified()
+    public void updateLastModified()
     {
-        modified = true;
+        try {
+            Date lastModified = new Timestamp(new Date().getTime());
+            itemRow.setColumn("last_modified", lastModified);
+            DatabaseManager.updateQuery(ourContext, "UPDATE item SET last_modified = ? WHERE item_id= ? ", lastModified, getID());
+            //Also fire a modified event since the item HAS been modified
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null));
+        } catch (SQLException e) {
+            log.error(LogManager.getHeader(ourContext, "Error while updating last modified timestamp", "Item: " + getID()));
+        }
     }
 
     /**

@@ -384,6 +384,12 @@ public class BrowseItem extends DSpaceObject
 		}
     }
 
+    @Override
+    public void updateLastModified()
+    {
+
+    }
+
     public boolean isArchived()
     {
         return in_archive;

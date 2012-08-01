@@ -224,20 +224,22 @@
             <xsl:when test="dri:field">
                 <xsl:choose>
                         <xsl:when test="preceding-sibling::*[1][local-name()='label']">
-                                <label class="ds-form-label">
+                                <xsl:if test="string-length(string(preceding-sibling::*[1][local-name()='label'])) > 0">
+                                    <label class="ds-form-label">
                                         <xsl:choose>
-                                                <xsl:when test="./dri:field/@id">
-                                                        <xsl:attribute name="for">
-                                                                <xsl:value-of select="translate(./dri:field/@id,'.','_')"/>
-                                                        </xsl:attribute>
-                                                </xsl:when>
-                                                <xsl:otherwise></xsl:otherwise>
+                                            <xsl:when test="./dri:field/@id">
+                                                    <xsl:attribute name="for">
+                                                            <xsl:value-of select="translate(./dri:field/@id,'.','_')"/>
+                                                    </xsl:attribute>
+                                            </xsl:when>
+                                            <xsl:otherwise></xsl:otherwise>
                                         </xsl:choose>
-                                    <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>&#160;
-                                </label>
+                                        <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>
+                                    </label>
+                                </xsl:if>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>&#160;
+                                <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>
                             </xsl:otherwise>
                 </xsl:choose>
             </xsl:when>

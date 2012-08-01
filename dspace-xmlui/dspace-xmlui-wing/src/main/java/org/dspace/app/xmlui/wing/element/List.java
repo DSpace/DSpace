@@ -84,9 +84,11 @@ public class List extends AbstractWingElement implements WingMergeableElement,
     
     public static final String TYPE_FORM = "form";
 
+    public static final String TYPE_DSO_LIST = "dsolist";
+
     /** All the possible list types collected into one array */
     public static final String[] TYPES = { TYPE_SIMPLE, TYPE_ORDERED,
-            TYPE_BULLETED, TYPE_GLOSS, TYPE_PROGRESS, TYPE_FORM };
+            TYPE_BULLETED, TYPE_GLOSS, TYPE_PROGRESS, TYPE_FORM, TYPE_DSO_LIST };
 
     /** The list's name */
     private String name;

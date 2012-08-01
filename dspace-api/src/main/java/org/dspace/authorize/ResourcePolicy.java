@@ -171,6 +171,16 @@ public class ResourcePolicy
      */
     public void delete() throws SQLException
     {
+        if(getResourceID() != -1 && getResourceType() != -1)
+        {
+            //A policy for a DSpace Object has been modified, fire a modify event on the DSpace object
+            DSpaceObject dso = DSpaceObject.find(myContext, getResourceType(), getResourceID());
+            if(dso != null)
+            {
+                dso.updateLastModified();
+            }
+        }
+
         // FIXME: authorizations
         // Remove ourself
         DatabaseManager.delete(myContext, myRow);
@@ -446,8 +456,15 @@ public class ResourcePolicy
     /**
      * Update the ResourcePolicy
      */
-    public void update() throws SQLException
-    {
+    public void update() throws SQLException, AuthorizeException {
+        if(getResourceID() != -1 && getResourceType() != -1){
+            //A policy for a DSpace Object has been modified, fire a modify event on the DSpace object
+            DSpaceObject dso = DSpaceObject.find(myContext, getResourceType(), getResourceID());
+            if(dso != null){
+                dso.updateLastModified();
+            }
+        }
+
         // FIXME: Check authorisation
         DatabaseManager.update(myContext, myRow);
     }

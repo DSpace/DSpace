@@ -475,7 +475,7 @@
         </xsl:variable>
 
    <xsl:if test="$ccLicenseName and $ccLicenseUri and contains($ccLicenseUri, 'creativecommons')">
-        <div about="{$handleUri}">
+        <div about="{$handleUri}" class="clearfix">
             <xsl:attribute name="style">
                 <xsl:text>margin:0em 2em 0em 2em; padding-bottom:0em;</xsl:text>
             </xsl:attribute>
