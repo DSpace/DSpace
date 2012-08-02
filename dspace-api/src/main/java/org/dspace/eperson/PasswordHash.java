@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 
 package org.dspace.eperson;
 
@@ -53,14 +60,14 @@ public class PasswordHash
      * Construct a hash structure from existing data, just for passing around.
      *
      * @param algorithm the digest algorithm used in producing {@code hash}.
-     *          If null or empty, assume MD5 (the original, only algorithm).
+     *          If empty, set to null.  Other methods will treat this as unsalted MD5.
      * @param salt the salt hashed with the secret, or null.
      * @param hash the hashed secret.
      */
     public PasswordHash(String algorithm, byte[] salt, byte[] hash)
     {
-        if ((null == algorithm) || algorithm.isEmpty())
-            this.algorithm = "MD5";
+        if ((null != algorithm) && algorithm.isEmpty())
+            this.algorithm = null;
         else
             this.algorithm = algorithm;
 
@@ -73,7 +80,7 @@ public class PasswordHash
      * Convenience:  like {@link PasswordHash(String, byte[], byte[])} but with
      *          hexadecimal-encoded {@code String}s.
      * @param algorithm the digest algorithm used in producing {@code hash}.
-     *          If null or empty, assume MD5.
+     *          If empty, set to null.  Other methods will treat this as unsalted MD5.
      * @param salt hexadecimal digits encoding the bytes of the salt, or null.
      * @param hash hexadecimal digits encoding the bytes of the hash.
      * @throws DecoderException if salt or hash is not proper hexadecimal.
@@ -81,8 +88,8 @@ public class PasswordHash
     public PasswordHash(String algorithm, String salt, String hash)
             throws DecoderException
     {
-        if ((null == algorithm) || algorithm.isEmpty())
-            this.algorithm = "MD5";
+        if ((null != algorithm) && algorithm.isEmpty())
+            this.algorithm = null;
         else
             this.algorithm = algorithm;
 
@@ -92,8 +99,9 @@ public class PasswordHash
             this.salt = Hex.decodeHex(salt.toCharArray());
 
         if (null == hash)
-            throw new DecoderException("Hash may not be null");
-        this.hash = Hex.decodeHex(hash.toCharArray());
+            this.hash = null;
+        else
+            this.hash = Hex.decodeHex(hash.toCharArray());
     }
 
     /**
