@@ -61,6 +61,7 @@ public class PasswordHash
      *
      * @param algorithm the digest algorithm used in producing {@code hash}.
      *          If empty, set to null.  Other methods will treat this as unsalted MD5.
+     *          If you want salted multi-round MD5, specify "MD5".
      * @param salt the salt hashed with the secret, or null.
      * @param hash the hashed secret.
      */
@@ -81,6 +82,7 @@ public class PasswordHash
      *          hexadecimal-encoded {@code String}s.
      * @param algorithm the digest algorithm used in producing {@code hash}.
      *          If empty, set to null.  Other methods will treat this as unsalted MD5.
+     *          If you want salted multi-round MD5, specify "MD5".
      * @param salt hexadecimal digits encoding the bytes of the salt, or null.
      * @param hash hexadecimal digits encoding the bytes of the hash.
      * @throws DecoderException if salt or hash is not proper hexadecimal.
