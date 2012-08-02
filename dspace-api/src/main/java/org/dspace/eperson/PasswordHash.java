@@ -37,7 +37,7 @@ public class PasswordHash
     private static final Charset UTF_8 = Charset.forName("UTF-8"); // Should always succeed:  UTF-8 is required
 
     private static final String DEFAULT_DIGEST_ALGORITHM = "SHA-512"; // XXX magic
-    private static final String ALGORITHM_PROPERTY = "passwordAuthentication.digestAlgorithm"; // FIXME better name?
+    private static final String ALGORITHM_PROPERTY = "authentication-password.digestAlgorithm";
     private static final int SALT_BYTES = 128/8; // XXX magic we want 128 bits
     private static final int HASH_ROUNDS = 1024; // XXX magic 1024 rounds
     private static final int SEED_BYTES = 64; // XXX magic
