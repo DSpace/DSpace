@@ -45,40 +45,57 @@ public class ApacheLogRobotsProcessor {
 
         CommandLine line = parser.parse(options, args);
 
+        // Log source
         String logFileLoc;
-        String spiderIpPath;
         if (line.hasOption("l"))
         {
             logFileLoc = line.getOptionValue("l");
         }
         else {
-            System.out.println("We need our log file");
-            return;
+            logFileLoc = "-";
         }
+
+        // Spider IP list
+        String spiderIpPath;
         if (line.hasOption("s"))
         {
             spiderIpPath = line.getOptionValue("s");
         }
         else {
-            System.out.println("We need a spider IP output file");
-            return;
+            spiderIpPath = "-";
         }
-
-        File spiderIpFile = new File(spiderIpPath);
 
         //Get the IPs already added in our file
         Set<String> logSpiders;
-        if (spiderIpFile.exists())
+        Writer output;
+
+        if ("-".equals(spiderIpPath))
         {
-            logSpiders = SpiderDetector.readIpAddresses(spiderIpFile);
+            logSpiders = new HashSet<String>();
+            output = new BufferedWriter(new OutputStreamWriter(System.out));
         }
         else
         {
-            logSpiders = new HashSet<String>();
+            File spiderIpFile = new File(spiderIpPath);
+
+            if (spiderIpFile.exists())
+            {
+                logSpiders = SpiderDetector.readIpAddresses(spiderIpFile);
+            }
+            else
+            {
+                logSpiders = new HashSet<String>();
+            }
+            output = new BufferedWriter(new FileWriter(spiderIpFile));
         }
 
         //First read in our log file line per line
-        BufferedReader in = new BufferedReader(new FileReader(logFileLoc));
+        BufferedReader in;
+        if ("-".equals(logFileLoc))
+            in = new BufferedReader(new InputStreamReader(System.in));
+        else
+            in = new BufferedReader(new FileReader(logFileLoc));
+
         String logLine;
         while ((logLine = in.readLine()) != null) {
             //Currently only check if robot.txt is present in our line
@@ -92,11 +109,8 @@ public class ApacheLogRobotsProcessor {
         in.close();
 
         //Last but not least add the IPs to our file
-        BufferedWriter output = new BufferedWriter(new FileWriter(spiderIpFile));
-
-        //Second write the new IPs
         for (String ip : logSpiders) {
-            System.out.println("Adding new ip: " + ip);
+            System.err.println("Adding new ip: " + ip);
             //Write each new IP on a separate line
             output.write(ip + "\n");
         }
