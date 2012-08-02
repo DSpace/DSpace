@@ -66,7 +66,7 @@ public class PasswordHashTest
         assertFalse("Match null string?", h3.matches(null));
         assertFalse("Match non-null string?", h3.matches("not null"));
 
-        // Test 3-argument constructor with string arguments
+        // Test 3-argument constructor with null string arguments
         h3 = new PasswordHash(null, (String)null, (String)null);
         assertNull("Null algorithm", h3.getAlgorithm());
         assertNull("Null salt", h3.getSalt());
@@ -78,12 +78,12 @@ public class PasswordHashTest
         String password = "I've got a secret.";
         h1 = new PasswordHash(password);
         assertEquals("SHA-512", h1.getAlgorithm());
-        assertFalse(h1.matches("random rubbish"));
-        assertTrue(h1.matches(password));
+        assertFalse("Match against a different string", h1.matches("random rubbish"));
+        assertTrue("Match against the correct string", h1.matches(password));
 
         // Test 3-argument constructor with non-null data.
         h3 = new PasswordHash(h1.getAlgorithm(), h1.getSalt(), h1.getHash());
-        assertTrue(h3.matches(password));
+        assertTrue("Match a duplicate original made from getter values", h3.matches(password));
     }
 
     /**
