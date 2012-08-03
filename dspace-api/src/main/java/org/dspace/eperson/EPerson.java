@@ -933,7 +933,20 @@ public class EPerson extends DSpaceObject
 
         // If using the old unsalted hash, and this password is correct, update to a new hash
         if (answer && (null == myRow.getStringColumn("digest_algorithm")))
+        {
+            log.info("Upgrading password hash for EPerson " + getID());
             setPassword(attempt);
+            try {
+                myContext.turnOffAuthorisationSystem();
+                update();
+            } catch (SQLException ex) {
+                log.error("Could not update password hash", ex);
+            } catch (AuthorizeException ex) {
+                log.error("Could not update password hash", ex);
+            } finally {
+                myContext.restoreAuthSystemState();
+            }
+        }
 
         return answer;
     }
