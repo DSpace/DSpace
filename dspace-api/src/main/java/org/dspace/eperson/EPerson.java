@@ -898,7 +898,7 @@ public class EPerson extends DSpaceObject
     {
         PasswordHash hash = null;
         try {
-            hash = new PasswordHash(myRow.getStringColumn("digestAlgorithm"),
+            hash = new PasswordHash(myRow.getStringColumn("digest_algorithm"),
                     myRow.getStringColumn("salt"),
                     myRow.getStringColumn("password"));
         } catch (DecoderException ex) {
