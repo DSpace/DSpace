@@ -15,7 +15,6 @@ import org.apache.commons.codec.DecoderException;
 import org.dspace.MockConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.kernel.DSpaceKernel;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.services.ConfigurationService;
