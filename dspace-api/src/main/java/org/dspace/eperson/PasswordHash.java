@@ -203,6 +203,16 @@ public class PasswordHash
         return algorithm;
     }
 
+    /**
+     * The digest algorithm used if none is configured.
+     * 
+     * @return name of the default digest.
+     */
+    static public String getDefaultAlgorithm()
+    {
+        return DEFAULT_DIGEST_ALGORITHM;
+    }
+
     /** Generate an array of random bytes. */
     private synchronized byte[] generateSalt()
     {
