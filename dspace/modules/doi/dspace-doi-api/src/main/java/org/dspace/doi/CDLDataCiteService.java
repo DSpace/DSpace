@@ -346,7 +346,7 @@ public class CDLDataCiteService {
             DSpaceObject dso = null;
             try {
 
-                log.debug("obtaining dspace object");
+                log.debug("obtaining dspace object " + doiID);
                 dso = identifierService.resolve(context, doiID);
 
                 log.debug("dspace object is " + dso);
