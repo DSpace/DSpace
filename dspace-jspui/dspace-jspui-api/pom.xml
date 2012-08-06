@@ -66,6 +66,34 @@
          <artifactId>spring-webmvc</artifactId>
          <type>jar</type>
       </dependency>
+	  <dependency>
+		 <groupId>org.mcavallo</groupId>
+		 <artifactId>opencloud</artifactId>
+		 <version>1.0</version>
+		 <scope>system</scope>
+		 <systemPath>${basedir}/libs/opencloud.jar</systemPath>
+	  </dependency>
+	  <dependency>
+		 <groupId>javax.servlet</groupId>
+		 <artifactId>servlet-api</artifactId>
+		 <version>3.0-alpha-1</version>
+		 <type>jar</type>
+		 <scope>compile</scope>
+	  </dependency>
+	  <dependency>
+		 <groupId>javax.servlet</groupId>
+		 <artifactId>jstl</artifactId>
+		 <version>1.2</version>
+		 <type>jar</type>
+		 <scope>compile</scope>
+	  </dependency>
+	  <dependency>
+		 <groupId>tomcat</groupId>
+		 <artifactId>jsp-api</artifactId>
+		 <version>5.5.23</version>
+		 <type>jar</type>
+		 <scope>compile</scope>
+	  </dependency>
    </dependencies>
 
 </project>
