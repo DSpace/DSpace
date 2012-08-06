@@ -29,7 +29,7 @@
 		</repository>
 	</repositories>
 	
-		<profiles>
+	<profiles>
 		<profile>
 			<id>sedici.fulldistribution</id>
 			<activation>
@@ -53,6 +53,19 @@
 			</build>
 
 		</profile>
+
+		<profile>
+			<id>xoai</id>
+			<activation>
+				<property>
+					<name>xoai</name>
+				</property>
+			</activation>
+			<modules>
+				<module>dspace-xoai</module>
+			</modules>
+		</profile>
+
 	</profiles>
 
 	<properties>
@@ -69,7 +82,6 @@
 	<modules>
 		<module>xmlui</module>
 		<module>plugins</module>
-		<module>dspace-xoai</module>
 		<module>distribution</module>
 <!-- 		<module>sedici2003</module> Esta en un profile  -->
 	</modules>
