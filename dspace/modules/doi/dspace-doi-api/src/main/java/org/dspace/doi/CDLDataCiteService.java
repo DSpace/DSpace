@@ -119,14 +119,14 @@ public class CDLDataCiteService {
 
     /**
      * @param aDOI A DOI in the form <code>10.5061/dryad.1731</code>
-     * @param aURL A redirect URL in the form
+     * @param target A redirect URL in the form
      *             <code>http://datadryad.org/handle/10255/dryad.1731</code>
      * @return A response message from the remote service
      * @throws IOException If there was trouble connection and communicating to
      *                     the remote service
      */
-    public String update(String aDOI, String aURL, Map<String, String> metadata) throws IOException {
-	log.debug("updating metadata for DOI: " + aDOI + " with redirect URL " + aURL);
+    public String update(String aDOI, String target, Map<String, String> metadata) throws IOException {
+	log.debug("updating metadata for DOI: " + aDOI + " with redirect URL " + target);
         if (!ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)) {
 	    return "datacite.notConnected";
 	}
@@ -140,13 +140,13 @@ public class CDLDataCiteService {
 	log.debug("posting to " + fullURL);
 	PostMethod post = new PostMethod(fullURL);
 	
-	return executeHttpMethod(aURL, metadata, post);
+	return executeHttpMethod(target, metadata, post);
     }
 
-    private String executeHttpMethod(String aURL, Map<String, String> metadata, EntityEnclosingMethod httpMethod) throws IOException {
-        logMetadata(metadata);
+    private String executeHttpMethod(String target, Map<String, String> metadata, EntityEnclosingMethod httpMethod) throws IOException {
+        logMetadata(target, metadata);
 
-        httpMethod.setRequestEntity(new StringRequestEntity(encodeAnvl(metadata), "text/plain", "UTF-8"));
+        httpMethod.setRequestEntity(new StringRequestEntity(encodeAnvl(target, metadata), "text/plain", "UTF-8"));
         httpMethod.setRequestHeader("Content-Type", "text/plain");
         httpMethod.setRequestHeader("Accept", "text/plain");
 
@@ -158,8 +158,9 @@ public class CDLDataCiteService {
 
 
 
-    private void logMetadata(Map<String, String> metadata) {
+    private void logMetadata(String target, Map<String, String> metadata) {
         log.debug("Adding the following Metadata:");
+	log.debug("_target: " + target);
         if (metadata != null) {
             Set<String> keys = metadata.keySet();
             for (String key : keys) {
@@ -168,7 +169,7 @@ public class CDLDataCiteService {
         }
 
 	log.debug("Anvl form of metadata:");
-	log.debug(encodeAnvl(metadata));
+	log.debug(encodeAnvl(target, metadata));
     }
 
 
@@ -466,14 +467,15 @@ public class CDLDataCiteService {
     }
 
 
-    private String encodeAnvl(Map<String, String> metadata) {
+    private String encodeAnvl(String target, Map<String, String> metadata) {
         Iterator<Map.Entry<String, String>> i = metadata.entrySet().iterator();
         StringBuffer b = new StringBuffer();
-        while (i.hasNext()) {
+	b.append("_target: " + escape(target) + "\n");
+	while (i.hasNext()) {
             Map.Entry<String, String> e = i.next();
             b.append(escape(e.getKey()) + ": " + escape(e.getValue()) + "");
         }
-        return b.toString();
+	return b.toString();
     }
 
      private String escape(String s) {
