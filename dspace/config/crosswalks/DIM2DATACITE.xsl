@@ -59,8 +59,8 @@
             <publisher>Dryad Digital Repository</publisher>
 
 	    <!-- ************ Publication Year ************** -->
-            <xsl:if test="dspace:field[@element='date' and @qualifier='available']">
-                <xsl:for-each select="dspace:field[@qualifier='available']">
+            <xsl:if test="dspace:field[@element='date' and @qualifier='accessioned']">
+                <xsl:for-each select="dspace:field[@qualifier='accessioned']">
                     <publicationYear>
                         <xsl:variable name="date" select="."/>
                         <xsl:value-of select="substring($date, 0, 5)"/>
