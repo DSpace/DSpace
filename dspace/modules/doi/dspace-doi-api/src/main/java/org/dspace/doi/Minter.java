@@ -67,7 +67,7 @@ public class Minter implements org.springframework.beans.factory.InitializingBea
 			String response = myDoiService.registerDOI(doi, target, metadata);
 			response = response.toUpperCase();
 			
-			if(!response.contains("OK")) {
+			if(!response.contains("OK") && !response.contains("CREATED")) {
 			    log.error("DOI Service reports problem: " + response);
 			    myDoiService.emailException(response, doi, "registration");
 			} else {
@@ -104,7 +104,9 @@ public class Minter implements org.springframework.beans.factory.InitializingBea
             if (!myLocalDatabase.put(aDOI)){
                 throw new RuntimeException("Should be able to put if db doesn't contain DOI");
             }
-        }
+        } else {
+	    log.debug(aDOI + " is in local database");
+	}
     }
 
 	/**

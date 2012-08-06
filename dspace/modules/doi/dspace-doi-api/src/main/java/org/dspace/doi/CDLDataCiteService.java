@@ -126,21 +126,21 @@ public class CDLDataCiteService {
      *                     the remote service
      */
     public String update(String aDOI, String aURL, Map<String, String> metadata) throws IOException {
-
-        if (ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)) {
-            if (aDOI.startsWith("doi")) {
-                aDOI = aDOI.substring(4);
-            }
-	    
-	    aDOI = aDOI.toUpperCase();
-	    String fullURL = BASEURL + "/id/doi%3A" + aDOI;
-	    log.debug("posting to " + fullURL);
-            PostMethod post = new PostMethod(fullURL);
-
-	    return executeHttpMethod(aURL, metadata, post);
+	log.debug("updating metadata for DOI: " + aDOI + " with redirect URL " + aURL);
+        if (!ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)) {
+	    return "datacite.notConnected";
 	}
-        return "datacite.notConnected";
 
+	if (aDOI.startsWith("doi")) {
+	    aDOI = aDOI.substring(4);
+	}
+	
+	aDOI = aDOI.toUpperCase();
+	String fullURL = BASEURL + "/id/doi%3A" + aDOI;
+	log.debug("posting to " + fullURL);
+	PostMethod post = new PostMethod(fullURL);
+	
+	return executeHttpMethod(aURL, metadata, post);
     }
 
     private String executeHttpMethod(String aURL, Map<String, String> metadata, EntityEnclosingMethod httpMethod) throws IOException {
@@ -153,7 +153,7 @@ public class CDLDataCiteService {
         this.getClient(false).executeMethod(httpMethod);
 	log.info("HTTP status: " + httpMethod.getStatusLine());
 	log.debug("HTTP response text: " + httpMethod.getResponseBodyAsString(1000));
-        return httpMethod.getStatusLine().toString();
+        return httpMethod.getResponseBodyAsString(1000);
     }
 
 
@@ -169,7 +169,6 @@ public class CDLDataCiteService {
 
 	log.debug("Anvl form of metadata:");
 	log.debug(encodeAnvl(metadata));
-
     }
 
 
@@ -398,50 +397,6 @@ public class CDLDataCiteService {
         else
             log.debug("generating DataCite metadata for " + item.getHandle());
 
-
-//        // dc: creator, title, publisher
-//        addMetadata(metadata, item, "dc.contributor.author", DC_CREATOR);
-//        addMetadata(metadata, item, "dc.title", DC_TITLE);
-//        addMetadata(metadata, item, "dc.publisher", DC_PUBLISHER);
-//
-//        // datacite: creator, title, publisher
-//        addMetadata(metadata, item, "dc.contributor.author", DATACITE_CREATOR);
-//        addMetadata(metadata, item, "dc.title", DATACITE_TITLE);
-//
-//
-//        //addMetadata(metadata, item, "dc.publisher", DATACITE_PUBLISHER);
-//        metadata.put(DATACITE_PUBLISHER, "Dryad Digital Repository");
-//
-//
-//        // dc.date && datacite.publicationyear
-//        // date.available =  dc.date.available || dc.date.embargoUntil
-//        String publicationDate = null;
-//        DCValue[] values = item.getMetadata("dc.date.available");
-//        if (values != null && values.length > 0) publicationDate = values[0].value;
-//        else {
-//            values = item.getMetadata("dc.date.embargoUntil");
-//            if (values != null && values.length > 0) publicationDate = values[0].value;
-//        }
-//        if (publicationDate != null){
-//            metadata.put(DC_DATE_AVAILABLE, publicationDate.substring(0, 4));
-//            metadata.put(DC_DATE, publicationDate);
-//            metadata.put(DATACITE_PUBBLICATIONYEAR, publicationDate.substring(0, 4));
-//        }
-//
-//
-//        // others only dc.
-//        // dc.subject = dc:subject + dwc.ScientificName + dc:coverage.spatial + dc:coverage.temporal
-//        String subject = createSubject(item);
-//        if (subject != null && !subject.equals("")) metadata.put(DC_SUBJECT, subject);
-//
-//
-//        addMetadata(metadata, item, "dc.relation.isreferencedby",DC_RELATION_ISREFERENCEBY);
-//        addMetadata(metadata, item, "dc.rights.uri", DC_RIGHTS);
-//        addMetadata(metadata, item, "dc.description", DC_DESCRIPTION);
-//
-//        log.debug("DataCite metadata contains " + metadata.size() + " fields");
-
-
         metadata = createMetadataListXML(item);
 
         return metadata;
@@ -455,23 +410,6 @@ public class CDLDataCiteService {
             Element element = dc.disseminateElement(item);
             XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
             String xmlout = outputter.outputString(element);
-
-//            xmlout = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + xmlout;
-//
-//            xmlout=xmlout.replace("xmlns:dim=\"http://www.dspace.org/xmlns/dspace/dim\"", "");
-//            xmlout=xmlout.replace("xmlns:dspace=\"http://www.dspace.org/xmlns/dspace/dim\"", "");
-//
-//            xmlout=xmlout.replace("\r","").replace("\n","");
-//            xmlout=xmlout.replace("\r\n","");
-//
-//
-//            xmlout=xmlout.replaceAll(">   ",">");
-//            xmlout=xmlout.replaceAll(">  ",">");
-//            xmlout=xmlout.replaceAll("> ",">");
-
-
-
-
             metadata.put(DATACITE, xmlout);
         } catch (CrosswalkException e) {
             e.printStackTrace();
