@@ -69,6 +69,7 @@
 	<modules>
 		<module>xmlui</module>
 		<module>plugins</module>
+		<module>dspace-xoai</module>
 		<module>distribution</module>
 <!-- 		<module>sedici2003</module> Esta en un profile  -->
 	</modules>
