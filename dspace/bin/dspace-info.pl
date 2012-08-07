@@ -16,6 +16,8 @@
 
 use strict;
 use File::Find;
+use Cwd 'abs_path', 'realpath';
+use File::Basename 'dirname';
 
 
 ##################################################
@@ -23,10 +25,7 @@ use File::Find;
 ##################################################
 
 # where is DSpace installed?
-my $dspace_dir = "/dspace";
-
-#where is the DATA for the database tables stored?
-my $database_dir = "/dspace/database";
+my $dspace_dir = realpath(dirname(abs_path($0)).'/..');
 
 # find DSpace directories ###################
 
@@ -43,7 +42,6 @@ my @zerolength_dirs = ( $assetstore_dir );
 
 # error out if cannot locate above directories
 die "Cannot find dspace directory tree $dspace_dir - edit dspace-info.pl 'dspace_dir' variable with correct path"     if( ! -d $dspace_dir   );
-die "Cannot find database data directory $database_dir - edit dspace-info.pl 'database_dir' variable with correct path" if( ! -d $database_dir );
 
 
 #############################################
@@ -70,7 +68,6 @@ my $workspaceitem_count = CountRows( "workspaceitem" );
 my $assetstore_size = DirectorySize( $assetstore_dir );
 my $search_size     = DirectorySize( $search_dir     );
 my $logs_size       = DirectorySize( $logs_dir       );
-my $database_size   = DirectorySize( $database_dir   );
 
 # look for missing logos ####################
 my @communities_without_logos = FindCommunitiesWithoutLogos();
@@ -78,9 +75,6 @@ my @collections_without_logos = FindCollectionsWithoutLogos();
 
 # look for deleted bitstreams
 my @deleted_bitstreams        = FindDeletedBitstreams();
-
-# look for bitstreams without policies
-my @bitstreams_without_policies = FindBitstreamsWithoutPolicies();
 
 # look for empty groups
 my @empty_groups = FindEmptyGroups();
@@ -105,9 +99,7 @@ print "Date: " . localtime() . "\n";
 print "\n"; 
 print "Size of Important Directories:\n";
 SizeReport("Asset store:",      $assetstore_size);
-SizeReport("Database:",         $database_size  );
 SizeReport("Search Directory:", $search_size    );
-SizeReport("History Directory:",$history_size   );
 SizeReport("Logs Directory:",   $logs_size      );
 print "\n";
 print "\n";
@@ -212,20 +204,6 @@ if( $#empty_groups >= 0 )
 }
 
 
-if( $#bitstreams_without_policies >= 0 )
-{
-    my $count = $#bitstreams_without_policies + 1;
-
-    print "Bitstreams without policies:  $count\n";
-    foreach( sort { $a <=> $b } @bitstreams_without_policies )
-    {
-        my ($id) = split /\|/;
-        print "\t$id\n";
-    } 
-    print "\n";
-}
-
-
 # check ownership - check the jsp and asset store directories
 #  for ownership issues - be sure to run this script as the dspace user
 
@@ -291,6 +269,8 @@ sub GetConfigParameter
     }
 
     close CONFIG;
+
+    $return_value =~ s/\$\{dspace.dir\}/$dspace_dir/g;
 
     return $return_value;
 }
