@@ -233,7 +233,7 @@
 					<dc-qualifier>issued</dc-qualifier>
 					<label>Fecha de Publicación</label>
 					<input-type>date</input-type>
-					<hint>Fecha en la que la obra fue publicada en una revista, libro, etc. La fecha de entrega o defensa de una tésis se carga en el campo Fecha de Presentación</hint>
+					<hint>Fecha en la que la obra fue publicada en una revista, libro, etc. No debe confundirse con la fecha de entrega o defensa de una tesis, que debe cargarse en el campo Fecha de Presentación. Los valores posibles para este campo son día/mes, mes/año o día/mes/año.</hint>
 				</field>
 
 				<!-- Localización fisica -->
