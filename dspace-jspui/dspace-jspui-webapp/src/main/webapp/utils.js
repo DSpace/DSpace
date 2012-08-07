@@ -265,5 +265,229 @@ function isBrowser(b,v) {
 		  return browserOk && versionOk;
 }
 
+//FUNCTIONS FOR THE ADVANCED SEARCH EFFECTS////////////////////////////////
 
+function arrayContains(a, obj) {
+    var i = a.length;
+    while (i--) {
+       if (a[i] === (obj+'')) {
+           return true;
+       }
+    }
+    return false;
+}
+
+function onFieldChange(searchLabel, dateIndices) {
+	var indices = dateIndices.split('_');
+	var selectedIndex = document.getElementById('tfield1').selectedIndex;
+	if (arrayContains(indices, selectedIndex)){
+		document.getElementById('tfield4_column').style.display = "block";
+		document.getElementById('tfield4_label').style.display = "block";
+		document.getElementById('tfield4').style.display = "block";	
+	} else {
+		document.getElementById('tfield4_column').style.display = "none";
+		document.getElementById('tfield4_label').style.display = "none";
+		document.getElementById('tfield4').style.display = "none";
+		document.getElementById('tquery1_label').innerHTML = searchLabel;
+		document.getElementById('tquery4_label').style.display = "none";
+		document.getElementById('tquery4').style.display = "none";
+		document.getElementById('date_row').setAttribute('height','25');
+		document.getElementById('tfield4').selectedIndex = 0;
+		document.getElementById('tfield4').options[0].selected = true;
+		document.getElementById('tquery4').value = "";
+	}	
+	
+	if (selectedIndex != 1) {
+		var selectedIndex2 = document.getElementById('tfield2').selectedIndex;
+		var selectedIndex3 = document.getElementById('tfield3').selectedIndex;
+		if (selectedIndex2 != 1 && selectedIndex3 != 1){
+			//document.getElementById('radio1').checked = true;
+			//document.getElementById('radio2').checked = false;
+			//document.getElementById('radio1').disabled = false;
+			//document.getElementById('radio2').disabled = false;
+		}
+	}
+}
+
+function onFieldChange2(dateIndices){
+	var indices = dateIndices.split('_');
+	var selectedIndex = document.getElementById('tfield2').selectedIndex;
+	if (arrayContains(indices, selectedIndex)){
+		document.getElementById('tfield5_column').style.display = "block";
+		document.getElementById('tfield5_label').style.display = "none";
+		document.getElementById('tfield5').style.display = "block";
+	} else {
+		document.getElementById('tfield5_column').style.display = "none";
+		document.getElementById('tfield5_label').style.display = "none";
+		document.getElementById('tfield5').style.display = "none";
+		document.getElementById('tquery2_label').style.display = "none";
+		document.getElementById('tquery5_label').style.display = "none";
+		document.getElementById('tquery5').style.display = "none";
+		document.getElementById('date_row2').setAttribute('height','25');
+		document.getElementById('tfield5').selectedIndex = 0;
+		document.getElementById('tfield5').options[0].selected = true;
+		document.getElementById('tquery5').value = "";
+	}
+
+	if (selectedIndex != 1) {
+		var selectedIndex2 = document.getElementById('tfield1').selectedIndex;
+		var selectedIndex3 = document.getElementById('tfield3').selectedIndex;
+		if (selectedIndex2 != 1 && selectedIndex3 != 1){
+			//document.getElementById('radio1').checked = true;
+			//document.getElementById('radio2').checked = false;
+			//document.getElementById('radio1').disabled = false;
+			//document.getElementById('radio2').disabled = false;
+		}
+	}
+}
+
+function onFieldChange3(dateIndices) {
+	var indices = dateIndices.split('_');
+	var selectedIndex = document.getElementById('tfield3').selectedIndex;
+	if (arrayContains(indices, selectedIndex)){
+		document.getElementById('tfield6_column').style.display = "block";
+		document.getElementById('tfield6_label').style.display = "none";
+		document.getElementById('tfield6').style.display = "block";
+	}
+	else{
+		document.getElementById('tfield6_column').style.display = "none";
+		document.getElementById('tfield6_label').style.display = "none";
+		document.getElementById('tfield6').style.display = "none";
+		document.getElementById('tquery3_label').style.display = "none";
+		document.getElementById('tquery6_label').style.display = "none";
+		document.getElementById('tquery6').style.display = "none";
+		document.getElementById('date_row3').setAttribute('height','25');
+		document.getElementById('tfield6').selectedIndex = 0;
+		document.getElementById('tfield6').options[0].selected = true;
+		document.getElementById('tquery6').value = "";
+	}
+
+	if (selectedIndex != 1)
+	{
+		var selectedIndex2 = document.getElementById('tfield1').selectedIndex;
+		var selectedIndex3 = document.getElementById('tfield2').selectedIndex;
+		if (selectedIndex2 != 1 && selectedIndex3 != 1){
+			//document.getElementById('radio1').checked = true;
+			//document.getElementById('radio2').checked = false;
+			//document.getElementById('radio1').disabled = false;
+			//document.getElementById('radio2').disabled = false;
+		}
+	}
+}
+
+function onOptionChange(fromLabel, searchLabel){
+	var selectedIndex = document.getElementById('tfield4').selectedIndex;
+	if (selectedIndex == 3){
+		document.getElementById('tquery1_label').innerHTML = fromLabel;
+		document.getElementById('tquery4_label').style.display = "block";
+		document.getElementById('tquery4').style.display = "block";
+		document.getElementById('date_row').setAttribute('height','50');
+	} else {
+		document.getElementById('tquery1_label').innerHTML = searchLabel;
+		document.getElementById('tquery4_label').style.display = "none";
+		document.getElementById('tquery4').style.display = "none";
+		document.getElementById('date_row').setAttribute('height','25');
+		document.getElementById('tquery4').value = "";
+	}	
+}
+
+function onOptionChange2(fromLabel, searchLabel){
+	var selectedIndex = document.getElementById('tfield5').selectedIndex;
+	if (selectedIndex == 3){
+		document.getElementById('tquery2_label').innerHTML = fromLabel;
+		document.getElementById('tquery2_label').style.display = "block";
+		document.getElementById('tquery5_label').style.display = "block";
+		document.getElementById('tquery5').style.display = "block";
+		document.getElementById('date_row2').setAttribute('height','50');
+	}
+	else{
+		document.getElementById('tquery2_label').style.display = "none";
+		document.getElementById('tquery5_label').style.display = "none";
+		document.getElementById('tquery5').style.display = "none";
+		document.getElementById('date_row2').setAttribute('height','25');
+		document.getElementById('tquery5').value = "";
+	}	
+}
+
+function onOptionChange3(fromLabel, searchLabel){
+	var selectedIndex = document.getElementById('tfield6').selectedIndex;
+	if (selectedIndex == 3){
+		document.getElementById('tquery3_label').innerHTML = fromLabel;
+		document.getElementById('tquery3_label').style.display = "block";
+		document.getElementById('tquery6_label').style.display = "block";
+		document.getElementById('tquery6').style.display = "block";
+		document.getElementById('date_row3').setAttribute('height','50');
+	}
+	else{
+		document.getElementById('tquery3_label').style.display = "none";
+		document.getElementById('tquery6_label').style.display = "none";
+		document.getElementById('tquery6').style.display = "none";
+		document.getElementById('date_row3').setAttribute('height','25');
+		document.getElementById('tquery6').value = "";
+	}	
+}
+
+function validateDateNumber(check, dateIndices) {
+	var indices = dateIndices.split('_');
+	if (arrayContains(indices, document.getElementById('tfield1').selectedIndex)){
+		var date1 = document.getElementById('tquery1').value;
+		var date2 = document.getElementById('tquery4').value;
+		if (!isNaN(date1) && !isNaN(date2)){
+			document.getElementById('error_log').style.display = "none";
+			document.getElementById('adv_search_submit').disabled = false;
+			if (check){
+				validateDateNumber2(false);
+				validateDateNumber3(false);	
+			}
+		}
+		else{
+			document.getElementById('error_log').innerHTML = "Please, insert a valid year!";
+			document.getElementById('error_log').style.display = "block";
+			document.getElementById('adv_search_submit').disabled = true;
+		}
+	}
+}
+
+function validateDateNumber2(check, dateIndices){
+	var indices = dateIndices.split('_');
+	if (arrayContains(indices, document.getElementById('tfield2').selectedIndex)){
+		var date1 = document.getElementById('tquery2').value;
+		var date2 = document.getElementById('tquery5').value;
+		if (!isNaN(date1) && !isNaN(date2)){
+			document.getElementById('error_log').style.display = "none";
+			document.getElementById('adv_search_submit').disabled = false;
+			if (check){
+				validateDateNumber(false);
+				validateDateNumber3(false);
+			}
+		}
+		else{
+			document.getElementById('error_log').innerHTML = "Please, insert a valid year!";
+			document.getElementById('error_log').style.display = "block";
+			document.getElementById('adv_search_submit').disabled = true;
+		}
+	}	
+}
+
+function validateDateNumber3(check, dateIndices){
+	var indices = dateIndices.split('_');
+	if (arrayContains(indices, document.getElementById('tfield3').selectedIndex)){
+		var date1 = document.getElementById('tquery3').value;
+		var date2 = document.getElementById('tquery6').value;
+		if (!isNaN(date1) && !isNaN(date2)){
+			document.getElementById('error_log').style.display = "none";
+			document.getElementById('adv_search_submit').disabled = false;
+			if (check){
+				validateDateNumber(false);
+				validateDateNumber2(false);
+			}
+		}
+		else{
+			document.getElementById('error_log').innerHTML = "Please, insert a valid year!";
+			document.getElementById('error_log').style.display = "block";
+			document.getElementById('adv_search_submit').disabled = true;
+		}
+	}	
+}
+//////////////////////////////////////////////////////////////////////////
 

@@ -22,12 +22,17 @@ import org.dspace.core.Constants;
 import org.dspace.sort.SortOption;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 /**
  * Contains the arguments for a query. Fill it out and pass to the query engine
  */
 public class QueryArgs
 {
+
+	/** log4j category */
+    private static Logger log = Logger.getLogger(QueryArgs.class);
+
     // the query string
     private String query;
 
@@ -171,9 +176,63 @@ public class QueryArgs
         List<String> field = new ArrayList<String>();
         List<String> conjunction = new ArrayList<String>();
         
+		//Additions to support date range searches
+        String tmp_query4 = request.getParameter("query4");
+        String tmp_field4 = request.getParameter("field4");
+        String tmp_query5 = request.getParameter("query5");
+        String tmp_field5 = request.getParameter("field5");
+        String tmp_query6 = request.getParameter("query6");
+        String tmp_field6 = request.getParameter("field6");
+
+
         for (int i = 1; i <= numField; i++)
         {
         	String tmp_query = request.getParameter("query"+i);
+
+			//Aaddition to support date range searches
+        	if (i==1 && !request.getParameter("query"+i).trim().equals("")){
+        		if (tmp_field4.trim().equals("between") && !tmp_query4.trim().equals("")){
+        			tmp_query = "\"[" + request.getParameter("query"+i)+ " TO " + tmp_query4 + "]\"";
+        		}
+        		else if (tmp_field4.trim().equals("after")){
+        			tmp_query = "\"[" + request.getParameter("query"+i)+ " TO 9999]\"";
+        		}
+        		else if (tmp_field4.trim().equals("before")){
+        			tmp_query = "\"[0 TO " + request.getParameter("query"+i) + "]\"";
+        		}
+        		else
+            		tmp_query = request.getParameter("query"+i);
+        	}
+        	else if (i==2 && !request.getParameter("query"+i).trim().equals("")){
+        		if (tmp_field5.trim().equals("between") && !tmp_query5.trim().equals("")){
+        			tmp_query = "\"[" + request.getParameter("query"+i)+ " TO " + tmp_query5 + "]\"";
+        		}
+        		else if (tmp_field5.trim().equals("after")){
+        			tmp_query = "\"[" + request.getParameter("query"+i)+ " TO 9999]\"";
+        		}
+        		else if (tmp_field5.trim().equals("before")){
+        			tmp_query = "\"[0 TO " + request.getParameter("query"+i) + "]\"";
+        		}
+        		else
+            		tmp_query = request.getParameter("query"+i);
+        	}
+        	else if (i==3 && !request.getParameter("query"+i).trim().equals("")){
+        		if (tmp_field6.trim().equals("between") && !tmp_query6.trim().equals("")){
+        			tmp_query = "\"[" + request.getParameter("query"+i)+ " TO " + tmp_query6 + "]\"";
+        		}
+        		else if (tmp_field6.trim().equals("after")){
+        			tmp_query = "\"[" + request.getParameter("query"+i)+ " TO 9999]\"";
+        		}
+        		else if (tmp_field6.trim().equals("before")){
+        			tmp_query = "\"[0 TO " + request.getParameter("query"+i) + "]\"";
+        		}
+        		else
+            		tmp_query = request.getParameter("query"+i);
+        	}
+        	else
+        		tmp_query = request.getParameter("query"+i);
+        	
+
         	String tmp_field = request.getParameter("field"+i);
         	// TODO: Ensure a valid field from config
             // Disarm fields with regexp control characters
@@ -220,7 +279,12 @@ public class QueryArgs
         }
         
         newquery = newquery + ")";
-        return (newquery);
+        
+		 //Additions to support date range searches
+        String newQueryString = newquery.toString();
+        newQueryString = newQueryString.replace("\"[", "[").replace("]\"", "]");
+        
+        return newQueryString;
     }
 
     /**
@@ -338,6 +402,13 @@ public class QueryArgs
         	queryMap.put(queryStr, StringUtils.defaultString(request.getParameter(queryStr), ""));
         	queryMap.put(fieldStr, StringUtils.defaultString(request.getParameter(fieldStr), "ANY"));
             queryMap.put(conjunctionStr, StringUtils.defaultString(request.getParameter(conjunctionStr), "AND"));
+
+			//Addition to support date ranges
+            queryMap.put("query"+(i+3), (request.getParameter("query"+(i+3)) == null) ? ""
+                    : request.getParameter("query"+(i+3)));
+            queryMap.put("field"+(i+3),
+                    (request.getParameter("field"+(i+3)) == null) ? "ANY" : request
+                            .getParameter("field"+(i+3)));
         }
         
         String queryStr = "query" + numField;
@@ -345,6 +416,15 @@ public class QueryArgs
         queryMap.put(queryStr, StringUtils.defaultString(request.getParameter(queryStr), ""));
         queryMap.put(fieldStr, StringUtils.defaultString(request.getParameter(fieldStr), "ANY"));
         
+		//Addition to support date ranges
+        queryMap.put("query"+(numField+3), (request.getParameter("query"+(numField+3)) == null) ? ""
+                : request.getParameter("query"+(numField+3)));
+        
+        queryMap.put("field"+(numField+3),
+                (request.getParameter("field"+(numField+3)) == null) ? "ANY" 
+                : request.getParameter("field"+(numField+3)));
+        
+
         return (queryMap);
     }
 
