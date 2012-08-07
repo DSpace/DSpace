@@ -363,5 +363,12 @@
 		</step>
 	</command>
 
+	<command>
+        <name>clsjsonexport</name>
+        <description>CLS JSONExport items or collections</description>
+        <step>
+            <class>gr.ekt.repositories.dspace.export.CslJsonExport</class>
+        </step>
+    </command>
 
 </commands>

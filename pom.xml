@@ -895,6 +895,11 @@
             <version>1.06</version>
             <scope>test</scope>
         </dependency>
+		<dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.7.0</version>
+        </dependency>
       </dependencies>
    </dependencyManagement>
 

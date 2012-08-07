@@ -30,12 +30,17 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="java.util.*"%>
+<%@page import="java.util.ArrayList"%>
+
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.handle.HandleManager" %>
 <%@ page import="org.dspace.license.CreativeCommons" %>
+
+<%@ page import="gr.ekt.utils.CitationFormat" %>
 
 <%
     // Attributes
@@ -129,7 +134,57 @@
     }
 
     String displayStyle = (displayAll ? "full" : "");
+    
+    //START - addition for exporting item in a citation format
+    if(ConfigurationManager.getProperty("citeproc.url") != null && ConfigurationManager.getProperty("export.references.item") != null){
+        if(ConfigurationManager.getProperty("export.references.item").equals("true")){
+            HttpSession sessionResults = request.getSession();
+            sessionResults.removeAttribute("items");
+            sessionResults.setAttribute("item", item);
+            
+            // read in export formats from the config
+            ArrayList<String> formatList = new ArrayList<String>();
+
+            // read in export.references.format.1, export.references.format.2....
+            for (int i = 1; ConfigurationManager.getProperty("export.references.format." + i) != null; i++)
+            {
+                formatList.add(ConfigurationManager.getProperty("export.references.format." + i));
+            }
+			
+            if (formatList.size() > 0)
+            {                                
 %>
+                <form action="<%= request.getContextPath() %>/citation"  id="select-format" method="post">
+
+                    <div class="info">
+                        <h2><fmt:message key="jsp.references.title"/></h2>
+                    </div>
+                    <select name="format" style="margin-bottom: 20px;margin-left: 20px;width: 300px;"> 
+                        <option value=""><fmt:message key="jsp.references.select"/></option>
+                        <%
+                        for (int i = 0; i < formatList.size(); i++)
+                        {                    
+                            String format = formatList.get(i);
+
+                            String[] configLine = format.split(":");
+                            if(configLine.length == 2){%>
+                                <option value="<%=configLine[0]%>"><%=configLine[1]%></option>
+                        <%     
+                            }
+                        }
+                        %>                            
+                    </select>
+                    <input type="submit" id="ekt_submit_button" name="submit_button" value="text">
+                    <input type="submit" id="ekt_submit_button" name="submit_button" value="html">                
+                    <input type="submit" id="ekt_submit_button" name="submit_button" value="word">
+                    <input type="submit" id="ekt_submit_button" name="submit_button" value="pdf">
+                </form>        
+    <%
+            }
+        }
+    }
+    %>    
+        <!-- END - addition for exporting item in a citation format -->
     <dspace:item-preview item="<%= item %>" />
     <dspace:item item="<%= item %>" collections="<%= collections %>" style="<%= displayStyle %>" />
 
@@ -221,14 +276,9 @@
 <%
     if (ConfigurationManager.getProperty("sfx.server.url") != null)
     {
-        String sfximage = ConfigurationManager.getProperty("sfx.server.image_url");
-        if (sfximage == null)
-        {
-            sfximage = request.getContextPath() + "/image/sfx-link.gif";
-        }
 %>
     <p align="center">
-        <a href="<dspace:sfxlink item="<%= item %>"/>" /><img src="<%= sfximage %>" border="0" alt="SFX Query" /></a>
+        <a href="<dspace:sfxlink item="<%= item %>"/>" /><img src="<%= request.getContextPath() %>/image/sfx-link.gif" border="0" alt="SFX Query" /></a>
     </p>
 <%
     }
