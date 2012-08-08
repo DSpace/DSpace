@@ -651,7 +651,7 @@ public class DSIndexer
     }
 
 
-    static IndexingTask prepareIndexingTask(DSpaceObject dso, boolean force) throws SQLException, IOException
+    static IndexingTask prepareIndexingTask(DSpaceObject dso, boolean force) throws SQLException, IOException, DCInputsReaderException
     {
         String handle = dso.getHandle();
         Term term = new Term("handle", handle);
@@ -1039,7 +1039,7 @@ public class DSIndexer
      * @throws SQLException
      * @throws IOException
      */
-    private static Document buildDocumentForItem(Item item) throws SQLException, IOException
+    private static Document buildDocumentForItem(Item item) throws SQLException, IOException, DCInputsReaderException
     {
     	String handle = item.getHandle();
 
