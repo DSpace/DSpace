@@ -1,24 +1,35 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-   <modelVersion>4.0.0</modelVersion>
-   <groupId>org.dspace</groupId>
-   <artifactId>dspace-oai</artifactId>
-   <packaging>pom</packaging>
-   <name>DSpace OAI</name>
-   <description>Parent for DSpace OAI Service Provider Webapplication</description>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+	<artifactId>dspace-parent</artifactId>
+	<groupId>org.dspace</groupId>
+	<version>3.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>dspace-oai</artifactId>
+	<packaging>pom</packaging>
 
-   <!-- 
-      A Parent POM that Maven inherits DSpace Default 
-      POM atrributes from. 
-   -->
-   <parent>
-      <groupId>org.dspace</groupId>
-      <artifactId>dspace-parent</artifactId>
-      <version>3.0-SNAPSHOT</version>
-      <relativePath>..</relativePath>
-   </parent>
-   
-   <modules>
-      <module>dspace-oai-api</module>
-      <module>dspace-oai-webapp</module>
-   </modules>
+
+	<name>DSpace OAI 2.0</name>
+	<description>Parent project for the OAI API and Webapp</description>
+	<url>http://www.lyncode.com/dspace/addons/xoai</url>
+	<modules>
+		<module>dspace-oai-api</module>
+		<module>dspace-oai-webapp</module>
+	</modules>
+
+
+	<developers>
+		<developer>
+			<name>DSpace @ Lyncode</name>
+			<email>dspace@lyncode.com</email>
+			<organization>Lyncode</organization>
+			<organizationUrl>http://www.lyncode.com</organizationUrl>
+		</developer>
+		<developer>
+			<id>helix84</id>
+			<name>Ivan Másar</name>
+			<email>helix84@centrum.sk</email>
+		</developer>
+	</developers>
 </project>

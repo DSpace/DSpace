@@ -1,6 +1,12 @@
 ## Ignore the MVN compiled output directories from version tracking
 target/
 
+*.classpath
+*.project
+*.settings
+
+bin/
+
 ## Ignore project files created by IntelliJ IDEA
 *.iml
 *.ipr
