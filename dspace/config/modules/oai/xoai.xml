@@ -20,6 +20,7 @@
 			<Format refid="xoai" />
 			<Format refid="didl" />
 			<Format refid="dim" />
+			<Format refid="ore" />
 		</Context> 
 		
 		<!--
@@ -110,6 +111,12 @@
 			<XSLT>metadataFormats/dim.xsl</XSLT>
 			<Namespace>http://www.dspace.org/xmlns/dspace/dim</Namespace>
 			<SchemaLocation>http://www.dspace.org/schema/dim.xsd</SchemaLocation>
+		</Format>
+		<Format id="ore">
+			<Prefix>ore</Prefix>
+			<XSLT>metadataFormats/ore.xsl</XSLT>
+			<Namespace>http://www.w3.org/2005/Atom</Namespace>
+			<SchemaLocation>http://tweety.lanl.gov/public/schemas/2008-06/atom-tron.sch</SchemaLocation>
 		</Format>
 	</Formats>
 	
