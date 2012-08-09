@@ -8,8 +8,6 @@
 
     http://www.dspace.org/license/
 	Developed by DSpace @ Lyncode <dspace@lyncode.com>
-	
-	> http://www.openarchives.org/OAI/2.0/oai_dc.xsd
 
  -->
 <xsl:stylesheet 

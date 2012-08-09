@@ -21,6 +21,7 @@
 			<Format refid="didl" />
 			<Format refid="dim" />
 			<Format refid="ore" />
+			<Format refid="rdf" />
 		</Context> 
 		
 		<!--
@@ -117,6 +118,12 @@
 			<XSLT>metadataFormats/ore.xsl</XSLT>
 			<Namespace>http://www.w3.org/2005/Atom</Namespace>
 			<SchemaLocation>http://tweety.lanl.gov/public/schemas/2008-06/atom-tron.sch</SchemaLocation>
+		</Format>
+		<Format id="rdf">
+			<Prefix>rdf</Prefix>
+			<XSLT>metadataFormats/rdf.xsl</XSLT>
+			<Namespace>http://www.openarchives.org/OAI/2.0/rdf/</Namespace>
+			<SchemaLocation>http://www.openarchives.org/OAI/2.0/rdf.xsd</SchemaLocation>
 		</Format>
 	</Formats>
 	

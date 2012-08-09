@@ -17,6 +17,7 @@ import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Utils;
+import org.dspace.xoai.data.DSpaceDatabaseItem;
 
 import com.lyncode.xoai.dataprovider.util.Base64Utils;
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
@@ -61,6 +62,9 @@ public class ItemUtils
     }
     public static Metadata retrieveMetadata (Item item) {
         Metadata metadata;
+        
+        DSpaceDatabaseItem dspaceItem = new DSpaceDatabaseItem(item);
+        
         // read all metadata into Metadata Object
         ObjectFactory factory = new ObjectFactory();
         metadata = factory.createMetadata();
@@ -229,6 +233,8 @@ public class ItemUtils
 
         other.getField().add(
                 createValue(factory, "handle", item.getHandle()));
+        other.getField().add(
+                createValue(factory, "identifier", dspaceItem.getIdentifier()));
         other.getField().add(
                 createValue(factory, "lastModifyDate", item
                         .getLastModified().toString()));
