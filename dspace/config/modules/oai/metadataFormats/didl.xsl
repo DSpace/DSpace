@@ -21,7 +21,7 @@
 	<xsl:template match="/">
 		<d:DIDL xmlns:d="urn:mpeg:mpeg21:2002:02-DIDL-NS" 
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-			xsi:schemaLocation="urn:mpeg:mpeg21:2002:02-DIDL-NS < ">
+			xsi:schemaLocation="urn:mpeg:mpeg21:2002:02-DIDL-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/did/didl.xsd">
 			<xsl:if test="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='available']/doc:element/doc:field[@name='value']">
 			<d:DIDLInfo>
 				<dcterms:created xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://purl.org/dc/terms/ ">

@@ -19,7 +19,8 @@
 			<Format refid="mets" />
 			<Format refid="xoai" />
 			<Format refid="didl" />
-		</Context>
+			<Format refid="dim" />
+		</Context> 
 		
 		<!--
 			Driver Guidelines:
@@ -103,6 +104,12 @@
 			<XSLT>metadataFormats/didl.xsl</XSLT>
 			<Namespace>urn:mpeg:mpeg21:2002:02-DIDL-NS</Namespace>
 			<SchemaLocation>http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/did/didl.xsd</SchemaLocation>
+		</Format>
+		<Format id="dim">
+			<Prefix>dim</Prefix>
+			<XSLT>metadataFormats/dim.xsl</XSLT>
+			<Namespace>http://www.dspace.org/xmlns/dspace/dim</Namespace>
+			<SchemaLocation>http://www.dspace.org/schema/dim.xsd</SchemaLocation>
 		</Format>
 	</Formats>
 	
