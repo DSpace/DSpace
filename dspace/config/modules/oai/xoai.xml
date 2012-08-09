@@ -23,6 +23,7 @@
 			<Format refid="ore" />
 			<Format refid="rdf" />
 			<Format refid="etdms" />
+			<Format refid="mods" />
 		</Context> 
 		
 		<!--
@@ -131,6 +132,12 @@
 			<XSLT>metadataFormats/etdms.xsl</XSLT>
 			<Namespace>http://www.ndltd.org/standards/metadata/etdms/1.0/</Namespace>
 			<SchemaLocation>http://www.ndltd.org/standards/metadata/etdms/1.0/etdms.xsd</SchemaLocation>
+		</Format>
+		<Format id="mods">
+			<Prefix>mods</Prefix>
+			<XSLT>metadataFormats/mods.xsl</XSLT>
+			<Namespace>>http://www.loc.gov/mods/v3</Namespace>
+			<SchemaLocation>http://www.loc.gov/standards/mods/v3/mods-3-1.xsd</SchemaLocation>
 		</Format>
 	</Formats>
 	
