@@ -22,6 +22,7 @@
 			<Format refid="dim" />
 			<Format refid="ore" />
 			<Format refid="rdf" />
+			<Format refid="etdms" />
 		</Context> 
 		
 		<!--
@@ -124,6 +125,12 @@
 			<XSLT>metadataFormats/rdf.xsl</XSLT>
 			<Namespace>http://www.openarchives.org/OAI/2.0/rdf/</Namespace>
 			<SchemaLocation>http://www.openarchives.org/OAI/2.0/rdf.xsd</SchemaLocation>
+		</Format>
+		<Format id="etdms">
+			<Prefix>etdms</Prefix>
+			<XSLT>metadataFormats/etdms.xsl</XSLT>
+			<Namespace>http://www.ndltd.org/standards/metadata/etdms/1.0/</Namespace>
+			<SchemaLocation>http://www.ndltd.org/standards/metadata/etdms/1.0/etdms.xsd</SchemaLocation>
 		</Format>
 	</Formats>
 	
