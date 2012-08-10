@@ -2048,7 +2048,8 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.not">NO</message>
    <message key="xmlui.ArtifactBrowser.RestrictedItem.login">Proceda a loguearse</message>
    <message key="xmlui.ArtifactBrowser.RestrictedItem.head_item_withdrawn">Este item ha sido retirado.</message>
-   <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_withdrawn">El item seleccionado ha sido retirado y ya no está disponible.</message>
+   <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_withdrawn">Lo sentimos, pero el item solicitado ha sido retirado del repositorio. Le sugerimos que realice una nueva búsqueda.</message>
+   <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_withdrawn_contact">Si considera que se trata de un error, sírvase escribir a </message>
    <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_restricted_auth">El item seleccionado tiene acceso restringido y requiere ser un usuario con privilegios para poder verse. Por favor, loguéese en el sistema para accederlo.</message>
    <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_restricted"> Su cuenta de usuario no tiene los privilegios necesarios para ver este item. Por favor, póngase en contacto con el administrador del sistema si tiene alguna pregunta.</message>
 

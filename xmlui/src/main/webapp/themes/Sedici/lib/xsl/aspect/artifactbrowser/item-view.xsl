@@ -1061,5 +1061,18 @@
     	</a>
     	</li>
     </xsl:template>
+    
+    <xsl:template match="dri:div[@id='aspect.artifactbrowser.RestrictedItem.div.withdrawn']">
+        <xsl:apply-templates select="dri:head"/>
+        <xsl:apply-templates select="dri:p[@id='aspect.artifactbrowser.RestrictedItem.p.item_status']"/>
+        <p class="ds-paragraph">
+           <i18n:text>xmlui.ArtifactBrowser.RestrictedItem.para_item_withdrawn_contact</i18n:text>        
+        <a>
+        <xsl:attribute name="href">mailto: info@sedici.unlp.edu.ar</xsl:attribute>
+            info@sedici.unlp.edu.ar
+        </a>
+        </p>
+    </xsl:template>
+    
 
 </xsl:stylesheet>
