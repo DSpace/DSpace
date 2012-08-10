@@ -159,5 +159,10 @@
         	</div>
         </xsl:if>
     </xsl:template>
+    
+    <!-- Template que muestra las estadisticas de una coleccion -->
+    <xsl:template match="dri:div[@id='aspect.statistics.StatisticsTransformer.div.collection-home']">
+    	<xsl:apply-templates/>    
+    </xsl:template>
 
 </xsl:stylesheet>

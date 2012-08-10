@@ -167,5 +167,10 @@
             </div>
         </xsl:if>
     </xsl:template>
+   
+    <!-- Template que muestra las estadisticas de una comunidad -->
+    <xsl:template match="dri:div[@id='aspect.statistics.StatisticsTransformer.div.community-home']">
+    	<xsl:apply-templates/>    
+    </xsl:template>
 
 </xsl:stylesheet>
