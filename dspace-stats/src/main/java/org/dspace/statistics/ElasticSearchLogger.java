@@ -17,8 +17,9 @@ import org.dspace.statistics.util.SpiderDetector;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.admin.indices.exists.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.IndicesExistsResponse;
-import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.action.admin.indices.mapping.put.PutMappingRequestBuilder;
 import org.elasticsearch.client.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
@@ -145,11 +146,8 @@ public class ElasticSearchLogger {
                     .put("number_of_shards", 5)
                     .put("cluster.name", clusterName)
                     .build();
-
-
-
             
-            String stringMappingJSON = "{\n" +
+            String stringMappingJSON = "{\""+indexType+"\" : { \"properties\" : {\n" +
                     "   \"userAgent\":{\n" +
                     "      \"type\":\"string\"\n" +
                     "   },\n" +
@@ -228,11 +226,9 @@ public class ElasticSearchLogger {
                     "      \"type\":\"string\",\n" +
                     "      \"index\":\"not_analyzed\"\n" +
                     "   }\n" +
-                    "}";
-            
-            log.info("Mapping for ["+indexName+"]/["+indexType+"]="+stringMappingJSON);
+                    "} } }";
 
-            IndexResponse response = client.prepareIndex(indexName, indexType, "1")
+            client.prepareIndex(indexName, indexType, "1")
                     .setSource(jsonBuilder()
                                 .startObject()
                                     .field("user", "kimchy")
@@ -242,24 +238,23 @@ public class ElasticSearchLogger {
                               )
                     .execute()
                     .actionGet();
-            //.setSettings(settings)
-            //client.admin().indices().prepareCreate(indexName).addMapping(indexType, stringMappingJSON).execute().actionGet();
+
             log.info("Create INDEX ["+indexName+"]/["+indexType+"]");
 
+            // Wait for create to be finished.
+            client.admin().indices().prepareRefresh(indexName).execute().actionGet();
 
-            //PutMappingRequestBuilder putMappingRequestBuilder = client.admin().indices().preparePutMapping(indexName).setType(indexType);
-            //putMappingRequestBuilder.setSource(stringMappingJSON);
-            //PutMappingResponse response = putMappingRequestBuilder.execute().actionGet();
+            //Put the schema/mapping
+            log.info("Put Mapping for ["+indexName+"]/["+indexType+"]="+stringMappingJSON);
+            PutMappingRequestBuilder putMappingRequestBuilder = client.admin().indices().preparePutMapping(indexName).setType(indexType);
+            putMappingRequestBuilder.setSource(stringMappingJSON);
+            PutMappingResponse response = putMappingRequestBuilder.execute().actionGet();
 
-            //if(!response.getAcknowledged()) {
-            //    log.info("Could not define mapping for type ["+indexName+"]/["+indexType+"]");
-            //} else {
-            //    log.info("Successfully put mapping for ["+indexName+"]/["+indexType+"]");
-            //}
-
-
-
-            //TODO, need to put the index mapping, i.e. country, city, id, type look at kb-stats-csv-import-elasticsearch/main.php
+            if(!response.getAcknowledged()) {
+                log.info("Could not define mapping for type ["+indexName+"]/["+indexType+"]");
+            } else {
+                log.info("Successfully put mapping for ["+indexName+"]/["+indexType+"]");
+            }
 
             log.info("DS ES index didn't exist, but we created it.");
         } else {
@@ -535,6 +530,11 @@ public class ElasticSearchLogger {
         //createElasticClient(true);
     }
 
+    // Get the already available client, otherwise we will create a new client.
+    // TODO Allow for config to determine which architecture / topology to use.
+    //   - Local Node, store Data
+    //   - Node Client, must discover a master within ES cluster
+    //   - Transport Client, specify IP address of server running ES.
     public Client getClient() {
         if(client == null) {
             log.error("getClient reports null client");
