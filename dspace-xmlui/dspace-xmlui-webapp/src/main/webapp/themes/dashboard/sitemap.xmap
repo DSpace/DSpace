@@ -125,30 +125,21 @@
 				<map:generate type="file" src="cocoon://DRI/{1}"/>
 				
 				<!-- Step 2 Add page metadata -->
-				<map:select type="browser">
-					<map:when test="explorer">
-						<map:transform type="IncludePageMeta">
-                                                        <!--<map:parameter name="javascript#1" value="visualizeData.js" />-->
-                                                        
-                                                        
-							<map:parameter name="theme.path" value="{global:theme-path}"/>
-							<map:parameter name="theme.name" value="{global:theme-name}"/>
-                                                        <map:parameter name="stylesheet.screen#1" value="lib/style.css"/>
-                                                        <map:parameter name="stylesheet.screen#2" value="lib/jquery.ui.smoothness/jquery-ui-1.8.18.custom.css"/>
-						</map:transform>
-					</map:when>
-					<map:otherwise>
-						<map:transform type="IncludePageMeta">
-							<!--<map:parameter name="javascript#1" value="visualizeData.js" />-->
-                                                        
-							
-							<map:parameter name="theme.path" value="{global:theme-path}"/>
-							<map:parameter name="theme.name" value="{global:theme-name}"/>
-                                                        <map:parameter name="stylesheet.screen#1" value="lib/style.css"/>
-                                                        <map:parameter name="stylesheet.screen#2" value="lib/jquery.ui.smoothness/jquery-ui-1.8.18.custom.css"/>
-						</map:transform>
-					</map:otherwise>
-				</map:select>
+				<map:transform type="IncludePageMeta">
+                    <map:parameter name="theme.path" value="{global:theme-path}"/>
+                    <map:parameter name="theme.name" value="{global:theme-name}"/>
+                    <map:parameter name="stylesheet.screen#1" value="lib/style.css"/>
+                    <map:parameter name="stylesheet.screen#2" value="lib/jquery.ui.smoothness/jquery-ui-1.8.18.custom.css"/>
+                    <map:parameter name="stylesheet.static#3" value="themes/Reference/lib/style.css"/>
+
+                    <map:parameter name="javascript.url#1" value="https://www.google.com/jsapi" />
+                    <map:parameter name="javascript.static#2" value="static/js/jquery-1.6.2.min.js" />
+                    <map:parameter name="javascript#2" value="lib/jquery.ui.datepicker-accessible.min.js" />
+                    <map:parameter name="javascript#3" value="lib/report-generator-mod.js" />
+                    <map:parameter name="javascript#4" value="visualizeData.js" />
+
+                </map:transform>
+
 				
 				<!-- Debuging output -->
 				<map:match type="request" pattern="XML">

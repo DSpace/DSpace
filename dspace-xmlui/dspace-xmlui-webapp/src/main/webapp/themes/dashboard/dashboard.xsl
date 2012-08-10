@@ -61,24 +61,6 @@
     <xsl:import href="../dri2xhtml.xsl"/>
     <xsl:output indent="yes"/>
 
-    <xsl:template name="extraHead-top">
-        <script type="text/javascript" src="https://www.google.com/jsapi">
-            <xsl:text> </xsl:text>
-        </script>
-    </xsl:template>
-
-    <xsl:template name="extraBody-end">
-        <script type="text/javascript" src="/dspace/themes/dashboard/lib/jquery.ui.datepicker-accessible.min.js">
-            <xsl:text> </xsl:text>
-        </script>
-        <script type="text/javascript" src="/dspace/themes/dashboard/lib/report-generator-mod.js">
-            <xsl:text> </xsl:text>
-        </script>
-        <script type="text/javascript" src="/dspace/themes/dashboard/visualizeData.js">
-            <xsl:text> </xsl:text>
-        </script>
-    </xsl:template>
-
     <!-- Just a plain old table cell -->
     <xsl:template match="dri:cell" priority="1">
         <td>

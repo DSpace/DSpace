@@ -52,7 +52,7 @@
                 dataSection: null,
                 keyField: 'term',
                 valueField: 'count',
-                parentElement: 'aspect_dashboard_ElasticSearchStatsViewer_div_chart_div',
+                parentElement: 'aspect_statisticsElasticSearch_ElasticSearchStatsViewer_div_chart_div',
                 chartType: 'GeoChart'
             }, userConfig);
 
@@ -171,7 +171,7 @@
         var chartMaker = new ChartMaker();
 
         // Get data from elastic that has been dumped on the page.
-        var elasticJSON = $.parseJSON($('#aspect_dashboard_ElasticSearchStatsViewer_field_response').val());
+        var elasticJSON = $.parseJSON($('#aspect_statisticsElasticSearch_ElasticSearchStatsViewer_field_response').val());
 
         // `function chartDataHelper` creates a chartData object from a few
         // parameters.
@@ -458,12 +458,12 @@
         var toDateString = $('input[name=dateEnd]').val();
 
         if ($('input[name=reportDepth]').val() == "summary") {
-            $('<p>'+timeRangeString+' <a href="'+ baseURLStats + '/itemsAdded">For more information.</a></p>').insertBefore('#aspect_dashboard_ElasticSearchStatsViewer_table_itemsAddedGrid');
-            $('<p>'+timeRangeString+' <a href="'+ baseURLStats + '/filesAdded">For more information.</a></p>').insertBefore('#aspect_dashboard_ElasticSearchStatsViewer_table_filesInContainer-grid');
+            $('<p>'+timeRangeString+' <a href="'+ baseURLStats + '/itemsAdded">For more information.</a></p>').insertBefore('#aspect_statisticsElasticSearch_ElasticSearchStatsViewer_table_itemsAddedGrid');
+            $('<p>'+timeRangeString+' <a href="'+ baseURLStats + '/filesAdded">For more information.</a></p>').insertBefore('#aspect_statisticsElasticSearch_ElasticSearchStatsViewer_table_filesInContainer-grid');
             $('<h3>Number of File Downloads for ' + name + '</h3>'+timeRangeString+' <a href="'+ baseURLStats + '/fileDownloads">For more information.</a>').insertBefore('#dspaceChart_downloadsMonthly');
             $('<h3>Countries with most Downloads ' + name + '</h3>'+timeRangeString+' <a href="'+ baseURLStats + '/topCountries">For more information.</a>').insertBefore('#dspaceChart_topCountries');
             $('<p>'+timeRangeString+' <a href="'+ baseURLStats + '/topUSCities">For more information.</a></p>').insertBefore('#dspaceChart_topUSCities');
-            $('<p>'+timeRangeString+' <a href="'+ baseURLStats + '/topDownloads">For more information.</a></p>').insertBefore('#aspect_dashboard_ElasticSearchStatsViewer_table_facet-Bitstream');
+            $('<p>'+timeRangeString+' <a href="'+ baseURLStats + '/topDownloads">For more information.</a></p>').insertBefore('#aspect_statisticsElasticSearch_ElasticSearchStatsViewer_table_facet-Bitstream');
         }
 
         var reportName = $('input[name=reportName]').val();
@@ -485,7 +485,7 @@
                 contextPanel += 'to=' + toDateString;
             }
             contextPanel += '"><img src="http://www.famfamfam.com/lab/icons/silk/icons/page_excel.png"/>Download Data as .csv</a></div>';
-            $(contextPanel).insertAfter('#aspect_dashboard_ElasticSearchStatsViewer_div_chart_div');
+            $(contextPanel).insertAfter('#aspect_statisticsElasticSearch_ElasticSearchStatsViewer_div_chart_div');
 
         }
       });
