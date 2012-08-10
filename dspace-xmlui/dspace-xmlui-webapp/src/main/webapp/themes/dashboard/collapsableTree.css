@@ -1,0 +1,33 @@
+#aspect_artifactbrowser_CommunityBrowser_list_comunity-browser ul {
+	padding: 0 0 0 0px;
+        margin: -4px 5px 3px 0;
+}
+#aspect_artifactbrowser_CommunityBrowser_list_comunity-browser li {
+	list-style:none;
+        margin: 8px 0 0 20px;
+        padding: 2px 0 0 0;
+        text-indent: -40px;
+}
+#aspect_artifactbrowser_CommunityBrowser_list_comunity-browser ul.hide {
+	display:none;
+}
+#aspect_artifactbrowser_CommunityBrowser_list_comunity-browser span {
+	color:#999;
+	font-family:"Courier New", Courier, monospace;
+        font-size: 1.2em;
+        font-weight: bold;
+        cursor:default;
+}
+#aspect_artifactbrowser_CommunityBrowser_list_comunity-browser span.expanded, #aspect_artifactbrowser_CommunityBrowser_list_comunity-browser span.collapsed {
+	cursor:pointer;
+}
+
+
+#aspect_artifactbrowser_CommunityBrowser_list_comunity-browser a.community {
+    color: #5e7c5e;
+    font-weight: bold;
+}
+#aspect_artifactbrowser_CommunityBrowser_list_comunity-browser a.collection {
+    color: #005b7f;
+    font-weight: bold;
+}

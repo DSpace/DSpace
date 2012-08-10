@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  sitemap.xmap
+
+  Version: $Revision: 5529 $
+ 
+  Date: $Date: 2010-10-21 12:28:37 -0400 (Thu, 21 Oct 2010) $
+ 
+  Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+  Institute of Technology.  All rights reserved.
+ 
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+ 
+  - Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+ 
+  - Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+ 
+  - Neither the name of the Hewlett-Packard Company nor the name of the
+  Massachusetts Institute of Technology nor the names of their
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+ 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+  OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+  DAMAGE.
+-->
+
+<!--
+
+The Dashboard Aspect is responsible providing a dashboard for statistical inquiries to the system.
+
+-->
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+    <map:components>
+
+        <map:transformers>
+            <map:transformer name="ElasticSearchStatsViewer" src="org.dspace.app.xmlui.aspect.statisticsElasticSearch.ElasticSearchStatsViewer"/>
+            <map:transformer name="RestrictedItem" src="org.dspace.app.xmlui.aspect.artifactbrowser.RestrictedItem"/>
+        </map:transformers>
+
+        <map:matchers default="wildcard">
+            <map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
+			<map:matcher name="StatisticsAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.statistics.StatisticsAuthorizedMatcher"/>
+		</map:matchers>
+
+        <map:selectors>
+            <map:selector name="AuthenticatedSelector" src="org.dspace.app.xmlui.aspect.general.AuthenticatedSelector"/>
+            <map:selector name="SpecifiedGroupAuthenticatedSelector" src="org.dspace.app.xmlui.aspect.statisticsElasticSearch.SpecifiedGroupAuthenticatedSelector"/>
+        </map:selectors>
+
+    </map:components>
+
+    <map:pipelines>
+        <map:pipeline>
+
+
+            <!--<map:match pattern="collection-info">
+                <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
+                    <map:transform type="CollectionInfo"/>
+                    <map:serialize type="xml"/>
+                </map:match>
+            </map:match>
+
+            <map:match pattern="community-info">
+                <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
+                    <map:transform type="CommunityInfo"/>
+                    <map:serialize type="xml"/>
+                </map:match>
+            </map:match>-->
+
+
+
+            <map:generate/>
+
+
+            <map:match pattern="handle/*/*/stats">
+                <map:select type="SpecifiedGroupAuthenticatedSelector">
+                    <map:when test="statistics_viewer">
+                        <map:transform type="ElasticSearchStatsViewer"/>
+                    </map:when>
+                    <map:otherwise>
+                        <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
+                            <map:transform type="ElasticSearchStatsViewer"/>
+                        </map:match>
+
+                        <map:match type="StatisticsAuthorizedMatcher" pattern="!READ">
+                            <map:select type="SpecifiedGroupAuthenticatedSelector">
+                                <map:when test="statistics_viewer">
+                                    <map:transform type="RestrictedItem"/>
+                                    <map:serialize/>
+                                </map:when>
+                                <map:otherwise>
+                                    <map:act type="StartAuthentication">
+                                        <map:parameter name="header" value="xmlui.ArtifactBrowser.RestrictedItem.auth_header"/>
+                                        <map:parameter name="message" value="xmlui.ArtifactBrowser.RestrictedItem.auth_message"/>
+                                    </map:act>
+                                    <map:serialize/>
+                                </map:otherwise>
+                            </map:select>
+                        </map:match>
+                        <map:serialize type="xml"/>
+                    </map:otherwise>
+                </map:select>
+            </map:match>
+
+            <map:match pattern="handle/*/*/stats/*">
+                <map:select type="SpecifiedGroupAuthenticatedSelector">
+                    <map:when test="statistics_viewer">
+                        <map:transform type="ElasticSearchStatsViewer"/>
+                    </map:when>
+                    <map:otherwise>
+                        <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
+                            <map:transform type="ElasticSearchStatsViewer"/>
+                        </map:match>
+
+                        <map:match type="StatisticsAuthorizedMatcher" pattern="!READ">
+                            <map:select type="AuthenticatedSelector">
+                                <map:when test="eperson">
+                                    <map:transform type="RestrictedItem"/>
+                                    <map:serialize/>
+                                </map:when>
+                                <map:otherwise>
+                                    <map:act type="StartAuthentication">
+                                        <map:parameter name="header" value="xmlui.ArtifactBrowser.RestrictedItem.auth_header"/>
+                                        <map:parameter name="message" value="xmlui.ArtifactBrowser.RestrictedItem.auth_message"/>
+                                    </map:act>
+                                    <map:serialize/>
+                                </map:otherwise>
+                            </map:select>
+                        </map:match>
+                        <map:serialize type="xml"/>
+                    </map:otherwise>
+                </map:select>
+            </map:match>
+
+            <!--
+            <map:match pattern="growth-statistics">
+                <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
+                    <map:transform type="GrowthStatistics"/>
+                    <map:serialize type="xml"/>
+                </map:match>
+            </map:match>
+
+            <map:match pattern="hierarchy-info">
+                <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
+                    <map:transform type="HierarchyInfo"/>
+                    <map:serialize type="xml"/>
+                </map:match>
+            </map:match>
+
+            <map:match pattern="usage-report">
+                <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
+                    <map:transform type="UsageReport"/>
+                    <map:serialize type="xml"/>
+                </map:match>
+            </map:match>-->
+
+            <!-- Not a URL we care about, so just pass it on. -->
+            <map:serialize type="xml"/>
+
+        </map:pipeline>
+    </map:pipelines>
+</map:sitemap>
