@@ -37,13 +37,7 @@ public class Utilities {
 		// find the EPerson, assign to context
 		EPerson myEPerson = null;
 
-		//@ sign, must be an email
-		myEPerson = EPerson.findByEmail(c, "kstamatis@ekt.gr");
-
-		//set current user
-		c.setCurrentUser(myEPerson);
-
-		c.setIgnoreAuthorization(true);
+		c.turnOffAuthorisationSystem();
 
 		//int browseIndexID = getBrowseIndicesId(element);
 		//String disTable = "bi_"+Integer.toString(browseIndexID)+"_dis";
