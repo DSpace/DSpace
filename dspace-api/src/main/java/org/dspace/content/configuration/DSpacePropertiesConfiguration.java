@@ -16,8 +16,11 @@ import java.util.Properties;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+<<<<<<< HEAD
 import org.apache.commons.configuration.event.ConfigurationListener;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
+=======
+>>>>>>> DSpace Configuration Manager changed
 
 /**
  * Class to read and write configuration files.
@@ -33,27 +36,36 @@ public class DSpacePropertiesConfiguration {
 		write.setAutoSave(true);
 		read = new PropertiesConfiguration(file);
 		read.setAutoSave(false);
+<<<<<<< HEAD
 		FileChangedReloadingStrategy stretagy = new FileChangedReloadingStrategy();
 		read.setReloadingStrategy(stretagy);
 		write.setReloadingStrategy(stretagy);
+=======
+>>>>>>> DSpace Configuration Manager changed
 	}
 	public DSpacePropertiesConfiguration(String fileName) throws ConfigurationException {
 		write = new PropertiesConfiguration(fileName);
 		write.setAutoSave(true);
 		read = new PropertiesConfiguration(fileName);
 		read.setAutoSave(false);
+<<<<<<< HEAD
 		FileChangedReloadingStrategy stretagy = new FileChangedReloadingStrategy();
 		read.setReloadingStrategy(stretagy);
 		write.setReloadingStrategy(stretagy);
+=======
+>>>>>>> DSpace Configuration Manager changed
 	}
 	public DSpacePropertiesConfiguration(URL url) throws ConfigurationException {
 		write = new PropertiesConfiguration(url);
 		write.setAutoSave(true);
 		read = new PropertiesConfiguration(url);
 		read.setAutoSave(false);
+<<<<<<< HEAD
 		FileChangedReloadingStrategy stretagy = new FileChangedReloadingStrategy();
 		read.setReloadingStrategy(stretagy);
 		write.setReloadingStrategy(stretagy);
+=======
+>>>>>>> DSpace Configuration Manager changed
 	}
 	
 	public void save() throws ConfigurationException {
@@ -63,12 +75,15 @@ public class DSpacePropertiesConfiguration {
 		write.addProperty(key, value);
 		read.addProperty(key, value);
 	}
+<<<<<<< HEAD
 	
 	public void setPropertyDescription (String key, String description) {
 		write.getLayout().setComment(key, description);
 		read.getLayout().setComment(key, description);
 	}
 	
+=======
+>>>>>>> DSpace Configuration Manager changed
 	public void setProperty(String key, Object value) {
 		write.setProperty(key, value);
 		read.setProperty(key, value);
@@ -84,10 +99,13 @@ public class DSpacePropertiesConfiguration {
 		return p;
 	}
 
+<<<<<<< HEAD
 	public Object getProperty (String key) {
 		return read.getProperty(key);
 	}
 	
+=======
+>>>>>>> DSpace Configuration Manager changed
 	public String getString (String key) {
 		return read.getString(key);
 	}
@@ -109,6 +127,7 @@ public class DSpacePropertiesConfiguration {
 	public void load (File f) throws ConfigurationException {
 		read.load(f);
 	}
+<<<<<<< HEAD
 	
 	public void addConfigurationEventListener (ConfigurationListener event) {
 		read.addConfigurationListener(event);
@@ -126,3 +145,6 @@ public class DSpacePropertiesConfiguration {
 		return read.getLayout().getComment(key);
 	}
 }
+=======
+}
+>>>>>>> DSpace Configuration Manager changed
