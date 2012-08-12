@@ -52,7 +52,7 @@ public final class ResultsPruner
     {
         try
         {
-            return getPruner(ConfigurationManager.getProperties());
+            return getPruner(ConfigurationManager.getProperties().getProperties());
         }
         catch (FileNotFoundException e)
         {
