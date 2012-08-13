@@ -16,6 +16,8 @@ import java.util.Properties;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.event.ConfigurationListener;
+import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 
 /**
  * Class to read and write configuration files.
@@ -31,18 +33,27 @@ public class DSpacePropertiesConfiguration {
 		write.setAutoSave(true);
 		read = new PropertiesConfiguration(file);
 		read.setAutoSave(false);
+		FileChangedReloadingStrategy stretagy = new FileChangedReloadingStrategy();
+		read.setReloadingStrategy(stretagy);
+		write.setReloadingStrategy(stretagy);
 	}
 	public DSpacePropertiesConfiguration(String fileName) throws ConfigurationException {
 		write = new PropertiesConfiguration(fileName);
 		write.setAutoSave(true);
 		read = new PropertiesConfiguration(fileName);
 		read.setAutoSave(false);
+		FileChangedReloadingStrategy stretagy = new FileChangedReloadingStrategy();
+		read.setReloadingStrategy(stretagy);
+		write.setReloadingStrategy(stretagy);
 	}
 	public DSpacePropertiesConfiguration(URL url) throws ConfigurationException {
 		write = new PropertiesConfiguration(url);
 		write.setAutoSave(true);
 		read = new PropertiesConfiguration(url);
 		read.setAutoSave(false);
+		FileChangedReloadingStrategy stretagy = new FileChangedReloadingStrategy();
+		read.setReloadingStrategy(stretagy);
+		write.setReloadingStrategy(stretagy);
 	}
 	
 	public void save() throws ConfigurationException {
@@ -52,6 +63,12 @@ public class DSpacePropertiesConfiguration {
 		write.addProperty(key, value);
 		read.addProperty(key, value);
 	}
+	
+	public void setPropertyDescription (String key, String description) {
+		write.getLayout().setComment(key, description);
+		read.getLayout().setComment(key, description);
+	}
+	
 	public void setProperty(String key, Object value) {
 		write.setProperty(key, value);
 		read.setProperty(key, value);
@@ -67,6 +84,10 @@ public class DSpacePropertiesConfiguration {
 		return p;
 	}
 
+	public Object getProperty (String key) {
+		return read.getProperty(key);
+	}
+	
 	public String getString (String key) {
 		return read.getString(key);
 	}
@@ -87,5 +108,18 @@ public class DSpacePropertiesConfiguration {
 	
 	public void load (File f) throws ConfigurationException {
 		read.load(f);
+	}
+	
+	public void addConfigurationEventListener (ConfigurationListener event) {
+		read.addConfigurationListener(event);
+	}
+	public int getInt(String key, int defaultValue) {
+		return read.getInt(key, defaultValue);
+	}
+	public long getLong(String key, long defaultValue) {
+		return read.getLong(key, defaultValue);
+	}
+	public boolean getBoolean(String key, boolean defaultValue) {
+		return read.getBoolean(key, defaultValue);
 	}
 }
