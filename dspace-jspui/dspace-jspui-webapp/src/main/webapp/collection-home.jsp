@@ -37,6 +37,9 @@
 <%@ page import="org.dspace.eperson.Group"     %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.List"%>
+
 
 <%
     // Retrieve attributes
@@ -168,6 +171,72 @@
 	      </td>
             </tr>
           </table>
+  <!--START - addition for exporting collection items in a citation format-->
+  <br />
+<%
+   
+    if(ConfigurationManager.getProperty("citeproc.url") != null && ConfigurationManager.getProperty("export.references.collection") != null){
+        if(ConfigurationManager.getProperty("export.references.collection").equals("true")){
+            HttpSession sessionResults = request.getSession();
+            sessionResults.removeAttribute("items");
+            ItemIterator itemIterator = collection.getAllItems();
+            ArrayList<Item> collectionItemsList = new ArrayList<Item>();
+
+            while (itemIterator.hasNext()){
+                    Item currentItem = itemIterator.next();
+
+                    if(currentItem.getName() != null && currentItem.getHandle() != null)            
+                        collectionItemsList.add(currentItem);
+            }
+
+            Item[] collectionItemsArray = (Item[]) collectionItemsList.toArray(new Item[collectionItemsList.size()]);
+
+            sessionResults.setAttribute("items", collectionItemsArray);
+            
+            // read in export formats from the config
+            ArrayList<String> formatList = new ArrayList<String>();
+
+            // read in export.references.format.1, export.references.format.2....
+            for (int i = 1; ConfigurationManager.getProperty("export.references.format." + i) != null; i++)
+            {
+                formatList.add(ConfigurationManager.getProperty("export.references.format." + i));
+            }
+			
+            if (formatList.size() > 0)
+            {
+%>
+
+                <form action="<%= request.getContextPath() %>/citation"  id="select-format" method="post">
+
+                    <div class="info">
+                        <h2><fmt:message key="jsp.references.title"/></h2>
+                    </div>
+                    <select name="format" style="margin-bottom: 20px;margin-left: 20px;width: 300px;"> 
+                            <option value=""><fmt:message key="jsp.references.select"/></option>
+                            <%
+                            for (int i = 0; i < formatList.size(); i++)
+                            {                    
+                                String format = formatList.get(i);
+
+                                String[] configLine = format.split(":");
+                                if(configLine.length == 2){%>
+                                    <option value="<%=configLine[0]%>"><%=configLine[1]%></option>
+                            <%     
+                                }
+                            }
+                            %>
+                    </select>
+                    <input type="submit" id="ekt_submit_button" name="submit_button" value="text">
+                    <input type="submit" id="ekt_submit_button" name="submit_button" value="html">
+                    <input type="submit" id="ekt_submit_button" name="submit_button" value="word">
+                    <input type="submit" id="ekt_submit_button" name="submit_button" value="pdf">
+            </form>
+    <%
+            }
+        }
+    }
+    %>                                
+            <!--END - addition for exporting collection items in a citation format-->                        
 
   <table width="100%" align="center" cellspacing="10">
     <tr>
