@@ -2,9 +2,9 @@
 target/
 
 ## Ignore project files created by Eclipse
-*.settings
-*.project
-*.classpath
+.settings/
+.project
+.classpath
 
 ## Ignore project files created by IntelliJ IDEA
 *.iml
