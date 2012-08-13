@@ -19,14 +19,16 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.log4j.Category;
 import org.apache.log4j.Logger;
 import org.apache.log4j.helpers.OptionConverter;
+import org.dspace.content.configuration.DSpacePropertiesConfiguration;
 
 /**
  * Class for reading the DSpace system configuration. The main configuration is
@@ -55,17 +57,13 @@ public class ConfigurationManager
     private static Logger log = Logger.getLogger(ConfigurationManager.class);
 
     /** The configuration properties */
-    private static Properties properties = null;
+    private static DSpacePropertiesConfiguration properties = null;
     
     /** module configuration properties */
-    private static Map<String, Properties> moduleProps = new HashMap<String, Properties>();
+    private static Map<String, DSpacePropertiesConfiguration> moduleProps = new HashMap<String, DSpacePropertiesConfiguration>();
 
     /** The default license */
     private static String license;
-
-    // limit of recursive depth of property variable interpolation in
-    // configuration; anything greater than this is very likely to be a loop.
-    private static final int RECURSION_LIMIT = 9;
 
     protected ConfigurationManager()
     {
@@ -117,13 +115,12 @@ public class ConfigurationManager
      * 
      * @return properties - all non-modular properties
      */
-    public static Properties getProperties()
+    public static DSpacePropertiesConfiguration getProperties()
     {
-        Properties props = getMutableProperties();
-        return props == null ? null : (Properties)props.clone();
+    	return getMutableProperties();
     }
 
-    private static Properties getMutableProperties()
+    private static DSpacePropertiesConfiguration getMutableProperties()
     {
         if (properties == null)
         {
@@ -140,18 +137,17 @@ public class ConfigurationManager
      *        the name of the module
      * @return properties - all module's properties
      */
-    public static Properties getProperties(String module)
+    public static DSpacePropertiesConfiguration getProperties(String module)
     {
-        Properties props = getMutableProperties(module);
-        return props == null ? null : (Properties)props.clone();
+    	return getMutableProperties(module);
     }
 
-    private static Properties getMutableProperties(String module)
+    private static DSpacePropertiesConfiguration getMutableProperties(String module)
     {
         if (module == null)
             return properties;
 
-        Properties retProps = moduleProps.get(module);
+        DSpacePropertiesConfiguration retProps = moduleProps.get(module);
         if (retProps == null)
         {
             loadModuleConfig(module);
@@ -160,7 +156,91 @@ public class ConfigurationManager
 
         return retProps;
     }
+    
 
+    /**
+     * Returns a String from DSpace configuration
+     * 
+     * @param key Property Key
+     * @param defaultValue Return value if undefined
+     * @return Returns a String from configuration
+     */
+    public static String getString (String key, String defaultValue) {
+    	DSpacePropertiesConfiguration props = getMutableProperties();
+        String value = props == null ? null : props.getString(key, defaultValue);
+        return (value != null) ? value : defaultValue;
+    }
+
+    /**
+     * Returns a List of Strings from DSpace configuration
+     * 
+     * @param key Property Key
+     * @return Returns a List of Strings from configuration
+     */
+    public static List<String> getList (String key) {
+    	DSpacePropertiesConfiguration props = getMutableProperties();
+        List<String> value = null;
+		if (props != null)
+			value = props.getList(key);
+        
+		return (value != null) ? value : new ArrayList<String>();
+    }
+    /**
+     * Returns a List of Strings from DSpace configuration
+     * 
+     * @param key Property Key
+     * @return Returns a List of Strings from configuration
+     */
+    public static List<String> getList (String module, String key) {
+    	if (module == null)
+        {
+            return getList(key);
+        }
+        
+    	List<String> value = null;
+        DSpacePropertiesConfiguration modProps = getMutableProperties(module);
+        
+        if (modProps != null && modProps.containsKey(key))
+        {
+        	value = modProps.getList(key);
+        } else {
+        	value = getList(module + "." + key);
+        }
+
+        return value;
+    }
+
+    /**
+     * Returns a String from DSpace configuration
+     * 
+     * @param module Module name
+     * @param key Property Key
+     * @param defaultValue Return value if undefined
+     * @return Returns a String from configuration
+     */
+    public static String getString (String module, String key, String defaultValue) {
+    	if (module == null)
+        {
+            return getString(key, defaultValue);
+        }
+        
+        String value = null;
+        DSpacePropertiesConfiguration modProps = getMutableProperties(module);
+        
+        if (modProps != null)
+        {
+            value = modProps.getString(key, null);
+        }
+
+        if (value == null)
+        {
+            // look in regular properties with module name prepended
+            value = getString(module + "." + key, defaultValue);
+        }
+
+        return (value != null) ? value : defaultValue;
+    }
+    
     /**
      * Get a configuration property
      * 
@@ -172,8 +252,8 @@ public class ConfigurationManager
      */
     public static String getProperty(String property)
     {
-        Properties props = getMutableProperties();
-        String value = props == null ? null : props.getProperty(property);
+    	DSpacePropertiesConfiguration props = getMutableProperties();
+        String value = props == null ? null : props.getString(property);
         return (value != null) ? value.trim() : null;
     }
     
@@ -197,11 +277,11 @@ public class ConfigurationManager
         }
         
         String value = null;
-        Properties modProps = getMutableProperties(module);
+        DSpacePropertiesConfiguration modProps = getMutableProperties(module);
 
         if (modProps != null)
         {
-            value = modProps.getProperty(property);
+            value = modProps.getString(property);
         }
 
         if (value == null)
@@ -569,8 +649,8 @@ public class ConfigurationManager
      */
     public static Enumeration<?> propertyNames(String module)
     {
-        Properties props = getProperties(module);
-        return props == null ? null : props.propertyNames();
+    	DSpacePropertiesConfiguration props = getProperties(module);
+        return (Enumeration<?>) (props == null ? null : props.getKeys());
     }
 
     /**
@@ -803,30 +883,10 @@ public class ConfigurationManager
 
             if (modFile.exists())
             {
-                Properties modProps = new Properties();
-                InputStream modIS = null;
-                try
-                {
-                    modIS = new FileInputStream(modFile);
-                    modProps.load(modIS);
-                }
-                finally
-                {
-                    if (modIS != null)
-                    {
-                        modIS.close();
-                    }
-                }
-
-                for (Enumeration pe = modProps.propertyNames(); pe.hasMoreElements(); )
-                {
-                    String key = (String)pe.nextElement();
-                    String ival = interpolate(key, modProps.getProperty(key), 1);
-                    if (ival != null)
-                    {
-                        modProps.setProperty(key, ival);
-                    }
-                }
+                DSpacePropertiesConfiguration modProps = new DSpacePropertiesConfiguration(modFile);
+                if (loadedFile != null)
+                	modProps.load(loadedFile);
+                
                 moduleProps.put(module, modProps);
             }
             else
@@ -835,10 +895,10 @@ public class ConfigurationManager
                 warn("Requested configuration module: " + module + " not found");
             }
         }
-        catch (IOException ioE)
+        catch (Exception ioE)
         {
             fatal("Can't load configuration: " + (modFile == null ? "<unknown>" : modFile.getAbsolutePath()), ioE);
-        }
+        } 
 
         return;
     }
@@ -919,11 +979,10 @@ public class ConfigurationManager
             }
             else
             {
-                properties = new Properties();
-                is = url.openStream();
-                properties.load(is);
+                properties = new DSpacePropertiesConfiguration(url);
 
                 // walk values, interpolating any embedded references.
+                /*
                 for (Enumeration<?> pe = properties.propertyNames(); pe.hasMoreElements(); )
                 {
                     String key = (String)pe.nextElement();
@@ -932,11 +991,11 @@ public class ConfigurationManager
                     {
                         properties.setProperty(key, value);
                     }
-                }
+                }*/
             }
 
         }
-        catch (IOException e)
+        catch (Exception e)
         {
             fatal("Can't load configuration: " + url, e);
 
@@ -1091,72 +1150,6 @@ public class ConfigurationManager
             throw new IllegalStateException("Cannot load dspace provided log4j configuration",e);
         }
         
-    }
-
-    /**
-     * Recursively interpolate variable references in value of
-     * property named "key".
-     * @return new value if it contains interpolations, or null
-     *   if it had no variable references.
-     */
-    private static String interpolate(String key, String value, int level)
-    {
-        if (level > RECURSION_LIMIT)
-        {
-            throw new IllegalArgumentException("ConfigurationManager: Too many levels of recursion in configuration property variable interpolation, property=" + key);
-        }
-        //String value = (String)properties.get(key);
-        int from = 0;
-        StringBuffer result = null;
-        while (from < value.length())
-        {
-            int start = value.indexOf("${", from);
-            if (start >= 0)
-            {
-                int end = value.indexOf('}', start);
-                if (end < 0)
-                {
-                    break;
-                }
-                String var = value.substring(start+2, end);
-                if (result == null)
-                {
-                    result = new StringBuffer(value.substring(from, start));
-                }
-                else
-                {
-                    result.append(value.substring(from, start));
-                }
-                if (properties.containsKey(var))
-                {
-                    String ivalue = interpolate(var, properties.getProperty(var), level+1);
-                    if (ivalue != null)
-                    {
-                        result.append(ivalue);
-                        properties.setProperty(var, ivalue);
-                    }
-                    else
-                    {
-                        result.append(((String)properties.getProperty(var)).trim());
-                    }
-                }
-                else
-                {
-                    log.warn("Interpolation failed in value of property \""+key+
-                             "\", there is no property named \""+var+"\"");
-                }
-                from = end+1;
-            }
-            else
-            {
-                break;
-            }
-        }
-        if (result != null && from < value.length())
-        {
-            result.append(value.substring(from));
-        }
-        return (result == null) ? null : result.toString();
     }
 
     /**
