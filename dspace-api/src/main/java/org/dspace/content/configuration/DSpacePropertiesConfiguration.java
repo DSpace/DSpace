@@ -122,4 +122,7 @@ public class DSpacePropertiesConfiguration {
 	public boolean getBoolean(String key, boolean defaultValue) {
 		return read.getBoolean(key, defaultValue);
 	}
+	public String getDescription(String key) {
+		return read.getLayout().getComment(key);
+	}
 }

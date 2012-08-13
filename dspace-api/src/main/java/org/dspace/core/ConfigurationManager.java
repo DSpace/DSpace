@@ -258,6 +258,33 @@ public class ConfigurationManager
     }
     
     /**
+     * Gets the property description (comment just before the property definition)
+     * 
+     * @param property Property Key
+     * @return Description
+     */
+    public static String getDescription (String property) {
+    	DSpacePropertiesConfiguration props = getMutableProperties();
+    	if (props != null) return props.getDescription(property);
+    	return null;
+    }
+
+    /**
+     * Gets the property description (comment just before the property definition)
+     * 
+     * @param module Module name
+     * @param property Property Key
+     * @return Description
+     */
+    public static String getDescription (String module, String property) {
+    	DSpacePropertiesConfiguration props = getMutableProperties(module);
+        String val = null;
+    	if (props != null) val = props.getDescription(property);
+        if (val == null) val = getDescription(module + "." + property);
+        return val;
+    }
+    
+    /**
      * Get a module configuration property value.
      * 
      * @param module 
