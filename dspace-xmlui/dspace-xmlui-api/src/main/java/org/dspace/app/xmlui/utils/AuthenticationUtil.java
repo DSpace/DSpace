@@ -247,8 +247,11 @@ public class AuthenticationUtil
             
             if (id != null)
             {
+                // Should we check for an ip match from the start of the request to now?
+                boolean ipcheck = ConfigurationManager.getBooleanProperty("xmlui.session.ipcheck", true);
+
                 String address = (String)session.getAttribute(CURRENT_IP_ADDRESS);
-                if (address != null && address.equals(request.getRemoteAddr()))
+                if (!ipcheck || (address != null && address.equals(request.getRemoteAddr())))
                 {
                     EPerson eperson = EPerson.find(context, id);
                     context.setCurrentUser(eperson);
