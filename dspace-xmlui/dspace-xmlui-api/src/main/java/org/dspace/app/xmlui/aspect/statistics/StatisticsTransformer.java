@@ -51,7 +51,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 
         if(dso != null)
         {
-            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath);
+            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath, true);
         }
         pageMeta.addTrailLink(contextPath + "/handle" + (dso != null && dso.getHandle() != null ? "/" + dso.getHandle() : "/statistics"), T_statistics_trail);
 
