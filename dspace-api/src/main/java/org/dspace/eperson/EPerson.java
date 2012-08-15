@@ -9,6 +9,7 @@ package org.dspace.eperson;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.apache.commons.codec.DecoderException;
 
@@ -811,7 +812,7 @@ public class EPerson extends DSpaceObject
     }
 
     /**
-     * Can the user log in?
+     * Is the user self-registered?
      * 
      * @return boolean, yes/no (or false if the column is an SQL NULL)
      */
@@ -952,6 +953,26 @@ public class EPerson extends DSpaceObject
         }
 
         return answer;
+    }
+
+    /**
+     * Stamp the EPerson's last-active date.
+     * 
+     * @param when latest activity timestamp, or null to clear.
+     */
+    public void setLastActive(Date when)
+    {
+        myRow.setColumn("last_active", when);
+    }
+
+    /**
+     * Get the EPerson's last-active stamp.
+     * 
+     * @return date when last logged on, or null.
+     */
+    public Date getLastActive()
+    {
+        return myRow.getDateColumn("last_active");
     }
 
     /**
