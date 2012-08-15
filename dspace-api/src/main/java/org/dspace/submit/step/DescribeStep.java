@@ -139,10 +139,20 @@ public class DescribeStep extends AbstractProcessingStep
             throw new ServletException(e);
         }
 
+        // Fetch the document type (dc.type)
+        String documentType = "";
+        if( (item.getMetadata("dc.type") != null) && (item.getMetadata("dc.type").length >0) )
+        {
+            documentType = item.getMetadata("dc.type")[0].value;
+        }
+        
         // Step 1:
         // clear out all item metadata defined on this page
         for (int i = 0; i < inputs.length; i++)
         {
+
+        	// Allow the clearing out of the metadata defined for other document types, provided it can change anytime
+        	
             if (!inputs[i]
                     .isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE
                             : DCInput.SUBMISSION_SCOPE))
@@ -169,6 +179,12 @@ public class DescribeStep extends AbstractProcessingStep
         boolean moreInput = false;
         for (int j = 0; j < inputs.length; j++)
         {
+        	// Omit fields not allowed for this document type
+            if(!inputs[j].isAllowedFor(documentType))
+            {
+            	continue;
+            }
+
             if (!inputs[j]
                         .isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE
                                 : DCInput.SUBMISSION_SCOPE))
@@ -284,6 +300,13 @@ public class DescribeStep extends AbstractProcessingStep
         {
             for (int i = 0; i < inputs.length; i++)
             {
+            	// Do not check the required attribute if it is not visible or not allowed for the document type
+            	String scope = subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE;
+                if ( !( inputs[i].isVisible(scope) && inputs[i].isAllowedFor(documentType) ) )
+                {
+                	continue;
+                }
+            	
                 DCValue[] values = item.getMetadata(inputs[i].getSchema(),
                         inputs[i].getElement(), inputs[i].getQualifier(), Item.ANY);
 

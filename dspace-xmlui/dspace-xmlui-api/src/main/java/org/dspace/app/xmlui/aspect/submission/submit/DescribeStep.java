@@ -177,11 +177,24 @@ public class DescribeStep extends AbstractSubmissionStep
                 List form = div.addList("submit-describe",List.TYPE_FORM);
                 form.setHead(T_head);
 
+                // Fetch the document type (dc.type)
+                String documentType = "";
+                if( (item.getMetadata("dc.type") != null) && (item.getMetadata("dc.type").length >0) )
+                {
+                    documentType = item.getMetadata("dc.type")[0].value;
+                }
+                
                 // Iterate over all inputs and add it to the form.
                 for(DCInput dcInput : inputs)
                 {
                     String scope = submissionInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE;
                     boolean readonly = dcInput.isReadOnly(scope);
+                    
+                	// Omit fields not allowed for this document type
+                    if(!dcInput.isAllowedFor(documentType))
+                    {
+                    	continue;
+                    }
                     
                     // If the input is invisible in this scope, then skip it.
                         if (!dcInput.isVisible(scope) && !readonly)
