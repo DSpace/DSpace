@@ -55,7 +55,7 @@
                                 <part><path>${project.build.directory}/testing/dspace.cfg.more</path></part>
                             </parts>
                             <properties>
-                              <default.dspace.dir>${project.build.directory}/testing/dspace</default.dspace.dir>
+                              <dspace.dir>${project.build.directory}/testing/dspace</dspace.dir>
                             </properties>
                         </output>
                     </outputs>
