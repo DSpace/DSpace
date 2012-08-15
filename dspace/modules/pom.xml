@@ -53,15 +53,6 @@
             </modules>
         </profile>
         <profile>
-            <id>dspace-oai</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <module>oai</module>
-            </modules>
-        </profile>
-        <profile>
             <id>dspace-jspui</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -95,6 +86,15 @@
             </activation>
             <modules>
                 <module>solr</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>dspace-xoai</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>oai</module>
             </modules>
         </profile>
     </profiles>
