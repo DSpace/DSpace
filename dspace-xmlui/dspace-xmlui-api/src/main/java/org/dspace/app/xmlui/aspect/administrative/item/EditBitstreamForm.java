@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.aspect.administrative.item;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.dspace.app.xmlui.aspect.submission.submit.AccessStepUtil;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -25,6 +26,7 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
+import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -60,7 +62,7 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
     private static final Message T_filename_label = message("xmlui.administrative.item.EditBitstreamForm.name_label");
     private static final Message T_filename_help = message("xmlui.administrative.item.EditBitstreamForm.name_help");
 
-
+    private boolean isAdvancedFormEnabled=true;
 
 	public void addPageMeta(PageMeta pageMeta) throws WingException
 	{
@@ -69,11 +71,15 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 		pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
 		pageMeta.addTrailLink(contextPath + "/admin/item",T_item_trail);
 		pageMeta.addTrail().addContent(T_trail);
+        pageMeta.addMetadata("javascript", "static").addContent("static/js/editItemUtil.js");
 	}
 
 	public void addBody(Body body) throws SAXException, WingException,
 	UIException, SQLException, IOException, AuthorizeException
-	{    	
+	{
+
+        isAdvancedFormEnabled= ConfigurationManager.getBooleanProperty("xmlui.submission.restrictstep.enableAdvancedForm", false);
+
 		// Get our parameters
 		int bitstreamID = parameters.getParameterAsInteger("bitstreamID",-1);
 
@@ -106,7 +112,6 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 		Division div = body.addInteractiveDivision("edit-bitstream", contextPath+"/admin/item", Division.METHOD_MULTIPART, "primary administrative item");    	
 		div.setHead(T_head1);
 
-
 		// LIST: edit form
 		List edit = div.addList("edit-bitstream-list", List.TYPE_FORM);
         edit.addLabel(T_file_label);
@@ -126,6 +131,15 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 		description.setLabel(T_description_label);
 		description.setHelp(T_description_help);
 		description.setValue(bitstream.getDescription());
+
+        // EMBARGO FIELD
+        // if AdvancedAccessPolicy=false: add Embargo Fields.
+        if(!isAdvancedFormEnabled){
+            AccessStepUtil asu = new AccessStepUtil(context);
+            // if the item is embargoed default value will be displayed.
+            asu.addEmbargoDateSimpleForm(bitstream, edit, -1);
+            asu.addReason(null, edit, -1);
+        }
 
 		edit.addItem(T_para1);
 

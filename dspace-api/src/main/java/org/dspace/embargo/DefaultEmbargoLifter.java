@@ -32,10 +32,10 @@ public class DefaultEmbargoLifter implements EmbargoLifter
      * this Item back on.
      *
      * @param context the DSpace context
-     * @param item the item to embargo
+     * @param item    the item to embargo
      */
     public void liftEmbargo(Context context, Item item)
-        throws SQLException, AuthorizeException, IOException
+            throws SQLException, AuthorizeException, IOException
     {
         // remove the item's policies and replace them with
         // the defaults from the collection

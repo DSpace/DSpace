@@ -74,13 +74,9 @@ public class InstallItem
 
         populateHandleMetadata(item, handle);
 
-        // this is really just to flush out fatal embargo metadata
-        // problems before we set inArchive.
-        DCDate liftDate = EmbargoManager.getEmbargoDate(c, item);
+        populateMetadata(c, item);
 
-        populateMetadata(c, item, liftDate);
-
-        return finishItem(c, item, is, liftDate);
+        return finishItem(c, item, is);
 
     }
 
@@ -147,7 +143,7 @@ public class InstallItem
 		String provDescription = "Restored into DSpace on "+ now + " (GMT).";
 		item.addDC("description", "provenance", "en", provDescription);
 
-        return finishItem(c, item, is, null);
+        return finishItem(c, item, is);
     }
 
     private static void populateHandleMetadata(Item item, String handle)
@@ -173,7 +169,7 @@ public class InstallItem
     }
 
 
-    private static void populateMetadata(Context c, Item item, DCDate embargoLiftDate)
+    private static void populateMetadata(Context c, Item item)
         throws SQLException, IOException, AuthorizeException
     {
         // create accession date
@@ -182,9 +178,11 @@ public class InstallItem
 
         // add date available if not under embargo, otherwise it will
         // be set when the embargo is lifted.
-        if (embargoLiftDate == null)
+        // this will flush out fatal embargo metadata
+        // problems before we set inArchive.
+        if (EmbargoManager.getEmbargoTermsAsDate(c, item) == null)
         {
-            item.addDC("date", "available", null, now.toString());
+             item.addDC("date", "available", null, now.toString());
         }
 
         // create issue date if not present
@@ -212,7 +210,7 @@ public class InstallItem
 
     // final housekeeping when adding new Item to archive
     // common between installing and "restoring" items.
-    private static Item finishItem(Context c, Item item, InProgressSubmission is, DCDate embargoLiftDate)
+    private static Item finishItem(Context c, Item item, InProgressSubmission is)
         throws SQLException, IOException, AuthorizeException
     {
         // create collection2item mapping
@@ -221,8 +219,13 @@ public class InstallItem
         // set owning collection
         item.setOwningCollection(is.getCollection());
 
-        // set in_archive=true
-        item.setArchived(true);
+        // set in_archive=true only if the user didn't specify that it is a private item
+        if(item.isDiscoverable()){
+            item.setArchived(true);
+        }
+        else{ // private item is withdrawn as well
+            item.withdraw();
+        }
 
         // save changes ;-)
         item.update();
@@ -239,10 +242,7 @@ public class InstallItem
         item.inheritCollectionDefaultPolicies(is.getCollection());
 
         // set embargo lift date and take away read access if indicated.
-        if (embargoLiftDate != null)
-        {
-            EmbargoManager.setEmbargo(c, item, embargoLiftDate);
-        }
+        EmbargoManager.setEmbargo(c, item);
 
         return item;
     }

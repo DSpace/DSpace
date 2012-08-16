@@ -1146,3 +1146,40 @@ background-color: rgb(255, 255, 255);
 margin: 2px 2px 0px 2px;
 /* border: 1px solid rgb(240, 240, 210); */
 }
+
+#aspect_administrative_authorization_EditPolicyForm_field_start_date{
+    width: 100px;
+}
+#aspect_administrative_authorization_EditPolicyForm_field_end_date{
+    width: 100px;
+}
+#aspect_administrative_authorization_EditItemPolicies_table_policies-confirm-delete tr,
+#aspect_administrative_authorization_EditItemPolicies_table_policies-confirm-delete td
+{
+    border: 1px solid lightgray;
+}
+
+
+#aspect_administrative_authorization_AdvacedAuthorizationsForm_field_end_date{
+    width: 100px;
+}
+#aspect_administrative_authorization_AdvacedAuthorizationsForm_field_start_date{
+    width: 100px;
+}
+#aspect_submission_StepTransformer_field_embargo_until_date{
+    width: 100px;
+}
+
+#aspect_administrative_item_AddBitstreamForm_field_embargo_until_date{
+    width: 100px;
+}
+
+#aspect_administrative_item_EditBitstreamForm_field_embargo_until_date{
+    width: 100px;
+}
+
+#aspect_submission_StepTransformer_table_policies tr,
+#aspect_submission_StepTransformer_table_policies td
+{
+    border: 1px solid lightgray;
+}
