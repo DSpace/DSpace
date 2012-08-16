@@ -1,0 +1,6 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Standard to msysgit
+*.pdf  diff=astextplain
+*.PDF  diff=astextplain
