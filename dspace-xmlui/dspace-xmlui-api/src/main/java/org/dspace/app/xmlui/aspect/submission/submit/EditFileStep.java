@@ -28,6 +28,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
 import org.dspace.content.FormatIdentifier;
+import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -133,6 +134,16 @@ public class EditFileStep extends AbstractStep
         description.setLabel(T_description);
         description.setHelp(T_description_help);
         description.setValue(bitstream.getDescription());
+
+        // if AdvancedAccessPolicy=false: add simmpleFormEmbargo in UploadStep
+        boolean isAdvancedFormEnabled= ConfigurationManager.getBooleanProperty("xmlui.submission.restrictstep.enableAdvancedForm", false);
+        if(!isAdvancedFormEnabled){
+            AccessStepUtil asu = new AccessStepUtil(context);
+            // this step is possible only in case of AdvancedForm
+            asu.addEmbargoDateSimpleForm(bitstream, edit, errorFlag);
+            // Reason
+            asu.addReason(null, edit, errorFlag);
+        }
         
         edit.addItem(T_info1);
         if (guessedFormat != null)

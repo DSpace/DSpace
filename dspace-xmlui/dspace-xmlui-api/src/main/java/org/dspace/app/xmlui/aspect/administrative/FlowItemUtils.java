@@ -11,10 +11,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.servlet.multipart.Part;
+import org.apache.commons.lang.time.DateUtils;
 import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -35,6 +37,9 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
 import org.dspace.handle.HandleManager;
+import org.dspace.submit.step.AccessStep;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Utility methods to processes actions on Groups. These methods are used
@@ -50,6 +55,8 @@ public class FlowItemUtils
 	private static final Message T_metadata_updated = new Message("default","The Item's metadata was successfully updated.");
 	private static final Message T_metadata_added = new Message("default","New metadata was added.");
 	private static final Message T_item_withdrawn = new Message("default","The item has been withdrawn.");
+    private static final Message T_item_public = new Message("default","The item is now public.");
+    private static final Message T_item_private = new Message("default","The item is now private.");
 	private static final Message T_item_reinstated = new Message("default","The item has been reinstated.");
 	private static final Message T_item_moved = new Message("default","The item has been moved.");
 	private static final Message T_item_move_destination_not_found = new Message("default","The selected destination collection could not be found.");
@@ -310,8 +317,61 @@ public class FlowItemUtils
         
 		return result;
 	}
-	
-	
+
+
+    /**
+     * Make the specified item Private, this method assumes that the action has been confirmed.
+     *
+     * @param context The DSpace context
+     * @param itemID The id of the to-be-withdrawn item.
+     * @return A result object
+     */
+    public static FlowResult processPrivateItem(Context context, int itemID) throws SQLException, AuthorizeException, IOException
+    {
+        FlowResult result = new FlowResult();
+        result.setContinue(false);
+
+        Item item = Item.find(context, itemID);
+        item.setDiscoverable(false);
+        // private item is withdrawn as well
+        item.withdraw();
+        item.update();
+        context.commit();
+
+        result.setContinue(true);
+        result.setOutcome(true);
+        result.setMessage(T_item_private);
+
+        return result;
+    }
+
+    /**
+     * Make the specified item Private, this method assumes that the action has been confirmed.
+     *
+     * @param context The DSpace context
+     * @param itemID The id of the to-be-withdrawn item.
+     * @return A result object
+     */
+    public static FlowResult processPublicItem(Context context, int itemID) throws SQLException, AuthorizeException, IOException
+    {
+        FlowResult result = new FlowResult();
+        result.setContinue(false);
+
+        Item item = Item.find(context, itemID);
+        item.setDiscoverable(true);
+        // since private Items are withdrawn they are reinstated during "make it public" process
+        item.reinstate();
+        item.update();
+        context.commit();
+
+        result.setContinue(true);
+        result.setOutcome(true);
+        result.setMessage(T_item_public);
+
+        return result;
+    }
+
+
     /**
      * Move the specified item to another collection.
      *
@@ -516,6 +576,8 @@ public class FlowItemUtils
 			// Update to DB
 			bitstream.update();
 			item.update();
+
+            processAccessFields(context, request, item.getOwningCollection(), bitstream);
 			
 			context.commit();
 			
@@ -531,6 +593,21 @@ public class FlowItemUtils
 		}
 		return result;
 	}
+
+    private static void processAccessFields(Context context, HttpServletRequest request, Collection collection, Bitstream b) throws SQLException, AuthorizeException {
+
+        // if it is a simple form we should create the policy for Anonymous
+        // if Anonymous does not have right on this collection, create policies for any other groups with
+        // DEFAULT_ITEM_READ specified.
+        Date startDate = null;
+        try {
+            startDate = DateUtils.parseDate(request.getParameter("embargo_until_date"), new String[]{"yyyy-MM-dd", "yyyy-MM", "yyyy"});
+        } catch (Exception e) {
+            //Ignore, start date is already null
+        }
+        String reason = request.getParameter("reason");
+        AuthorizeManager.generateAutomaticPolicies(context, startDate, reason, b, collection);
+    }
 	
 	
 	/**
@@ -544,7 +621,8 @@ public class FlowItemUtils
 	 * @param userFormat Any user supplied formats.
 	 * @return A flow result object.
 	 */
-	public static FlowResult processEditBitstream(Context context, int itemID, int bitstreamID, String bitstreamName, String primary, String description, int formatID, String userFormat) throws SQLException, AuthorizeException
+	public static FlowResult processEditBitstream(Context context, int itemID, int bitstreamID, String bitstreamName,
+                                                  String primary, String description, int formatID, String userFormat, Request request) throws SQLException, AuthorizeException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
@@ -617,8 +695,11 @@ public class FlowItemUtils
 		// Save our changes
 		bitstream.update();
 		context.commit();
-		
-		 result.setContinue(true);
+
+        processAccessFields(context, request, ((Item)bitstream.getParentObject()).getOwningCollection(), bitstream);
+
+
+        result.setContinue(true);
 	     result.setOutcome(true);
 	     result.setMessage(T_bitstream_updated);
 	        
