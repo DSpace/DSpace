@@ -13,9 +13,11 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Utils;
+import org.dspace.xoai.data.DSpaceDatabaseItem;
 
 import com.lyncode.xoai.dataprovider.util.Base64Utils;
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
@@ -60,6 +62,9 @@ public class ItemUtils
     }
     public static Metadata retrieveMetadata (Item item) {
         Metadata metadata;
+        
+        DSpaceDatabaseItem dspaceItem = new DSpaceDatabaseItem(item);
+        
         // read all metadata into Metadata Object
         ObjectFactory factory = new ObjectFactory();
         metadata = factory.createMetadata();
@@ -125,7 +130,12 @@ public class ItemUtils
                 valueElem = language;
             }
 
-            valueElem.getField().add(createValue(factory, val.value));
+            valueElem.getField().add(createValue(factory, "value", val.value));
+            if (val.authority != null) {
+            	valueElem.getField().add(createValue(factory, "authority", val.authority));
+            	if (val.confidence != Choices.CF_NOVALUE)
+            		valueElem.getField().add(createValue(factory, "confidence", val.confidence + ""));
+            }
         }
         // Done! Metadata has been read!
         // Now adding bitstream info
@@ -153,7 +163,7 @@ public class ItemUtils
                     String url = "";
                     String bsName = bitstream.getName();
                     String sid = String.valueOf(bit.getSequenceID());
-                    String baseUrl = ConfigurationManager.getProperty("xoai",
+                    String baseUrl = ConfigurationManager.getProperty("oai",
                             "bitstream.baseUrl");
                     String handle = null;
                     // get handle of parent Item of this bitstream, if there
@@ -223,6 +233,8 @@ public class ItemUtils
 
         other.getField().add(
                 createValue(factory, "handle", item.getHandle()));
+        other.getField().add(
+                createValue(factory, "identifier", dspaceItem.getIdentifier()));
         other.getField().add(
                 createValue(factory, "lastModifyDate", item
                         .getLastModified().toString()));
