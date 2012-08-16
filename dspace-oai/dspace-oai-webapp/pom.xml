@@ -18,6 +18,28 @@
    </parent>
    
    <build>
+		<filters>
+            <filter>${basedir}/../../${filters.file}</filter>
+        </filters>
+		<resources>
+			<!-- Enumerate filtered files explicitly to avoid issues with other config tech. -->
+			<resource>
+				<directory>${basedir}</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>src/main/webapp/WEB-INF/web.xml</include>
+				</includes>
+			</resource>
+			<!-- Declare a mutually exclusive resource set for non-filtered files. -->
+			<resource>
+				<directory>${basedir}</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>src/main/webapp/WEB-INF/web.xml</exclude>
+				</excludes>
+			</resource>
+		</resources>      
+      
       <plugins>
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -27,15 +49,6 @@
                <!-- In version 2.1-alpha-1, this was incorrectly named warSourceExcludes -->
                <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
                <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
-               <webResources>
-                  <resource>
-                     <filtering>true</filtering>
-                     <directory>${basedir}/src/main/webapp</directory>
-                     <includes>
-                        <include>WEB-INF/web.xml</include>
-                     </includes>
-                  </resource>
-               </webResources>
             </configuration>
             <executions>
                <execution>
@@ -57,26 +70,6 @@
    </build>
 
    <profiles>
-      <!-- 
-         when activated a dspace.config configuration
-         file location passed on the commandline 
-         (-Ddspace.config=...) can be passed through 
-         to be used as a filter source by projects for 
-         tasks such as updating the ${dspace.dir} in
-         web.xml etc.
-      -->
-      <profile>
-         <activation>
-            <property>
-               <name>dspace.config</name>
-            </property>
-         </activation>
-         <build>
-            <filters>
-               <filter>${dspace.config}</filter>
-            </filters>
-         </build>
-      </profile>
       <profile>
          <id>oracle-support</id>
          <activation>

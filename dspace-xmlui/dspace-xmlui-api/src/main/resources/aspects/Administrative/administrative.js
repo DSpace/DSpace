@@ -1483,6 +1483,16 @@ function doEditItemStatus(itemID)
 			// Confirm the reinstatiation of the item
 			result = doReinstateItem(itemID);
 		}
+        else if (cocoon.request.get("submit_private"))
+        {
+
+            result = doPrivateItem(itemID);
+        }
+        else if (cocoon.request.get("submit_public"))
+        {
+
+            result = doPublicItem(itemID);
+        }
 		else if (cocoon.request.get("submit_move"))
 		{
 			// Move this item somewhere else
@@ -1683,6 +1693,35 @@ function doReinstateItem(itemID)
 	return null;
 }
 
+
+function doPrivateItem(itemID)
+{
+    assertEditItem(itemID);
+    sendPageAndWait("admin/item/private",{"itemID":itemID});
+
+    if (cocoon.request.get("submit_confirm"))
+    {
+        var result = FlowItemUtils.processPrivateItem(getDSContext(),itemID);
+        return result;
+    }
+    return null;
+}
+
+function doPublicItem(itemID)
+{
+    assertEditItem(itemID);
+    sendPageAndWait("admin/item/public",{"itemID":itemID});
+
+    if (cocoon.request.get("submit_confirm"))
+    {
+        var result = FlowItemUtils.processPublicItem(getDSContext(),itemID);
+        return result;
+    }
+    return null;
+}
+
+
+
 /*
  * Move this item to another collection
  */
@@ -1776,7 +1815,7 @@ function doEditBitstream(itemID, bitstreamID)
             var userFormat = cocoon.request.get("user_format");
             var bitstreamName = cocoon.request.get("bitstreamName");
 
-            result = FlowItemUtils.processEditBitstream(getDSContext(),itemID,bitstreamID,bitstreamName,primary,description,formatID,userFormat);
+            result = FlowItemUtils.processEditBitstream(getDSContext(),itemID,bitstreamID,bitstreamName,primary,description,formatID,userFormat, cocoon.request);
         }
     } while (result == null || ! result.getContinue())
 
@@ -2159,20 +2198,39 @@ function doAdvancedAuthorization()
 {
     assertAdministrator();
     var result;
-
+    var groupIDs;
+    var actionID;
+    var resourceID;
+    var collectionIDs;
+    var name;
+    var description;
+    var startDate;
+    var endDate;
     do {
-        sendPageAndWait("admin/authorize/advanced",{},result);
+
+        if(groupIDs!=null)
+            cocoon.request.setAttribute("groupIDs", groupIDs);
+        if(collectionIDs!=null)
+            cocoon.request.setAttribute("collectionIDs", collectionIDs);
+
+        sendPageAndWait("admin/authorize/advanced",{"resource_id":resourceID,"action_id":actionID,"name":name,
+                            "description":description, "startDate":startDate, "endDate":endDate},result);
         assertAdministrator();
         result = null;
 
         // For all of the selected groups...
-        var groupIDs = cocoon.request.getParameterValues("group_id");
+        groupIDs = cocoon.request.getParameterValues("group_id");
         // ...grant the ability to perform the following action...
-        var actionID = cocoon.request.get("action_id");
+        actionID = cocoon.request.get("action_id");
         // ...for all following object types...
-        var resourceID = cocoon.request.get("resource_id");
+        resourceID = cocoon.request.get("resource_id");
         // ...across the following collections.
-        var collectionIDs = cocoon.request.getParameterValues("collection_id");
+        collectionIDs = cocoon.request.getParameterValues("collection_id");
+
+        name = cocoon.request.get("name");
+        description = cocoon.request.get("description");
+        startDate = cocoon.request.get("start_date");
+        endDate = cocoon.request.get("end_date");
 
         if (cocoon.request.get("submit_return"))
         {
@@ -2180,7 +2238,7 @@ function doAdvancedAuthorization()
         }
         else if (cocoon.request.get("submit_add"))
         {
-            result = FlowAuthorizationUtils.processAdvancedPolicyAdd(getDSContext(),groupIDs,actionID,resourceID,collectionIDs);
+            result = FlowAuthorizationUtils.processAdvancedPolicyAdd(getDSContext(),groupIDs,actionID,resourceID,collectionIDs, name, description, startDate, endDate);
         }
         else if (cocoon.request.get("submit_remove_all"))
         {
@@ -2205,12 +2263,17 @@ function doEditPolicy(objectType,objectID,policyID)
     var groupID;
     var actionID;
     var page = 0;
+    var name;
+    var description;
+    var startDate;
+    var endDate;
 
     do {
     	/* The page receives parameters for the type and ID of the DSpace object that the policy is assciated with, the
     	 * policy ID, the group search query (if a search was performed), the ID of the currently associated group, the
     	 * current action and the currently viewed page (if a search returned more than one page of results) */
-        sendPageAndWait("admin/authorize/edit",{"objectType":objectType,"objectID":objectID,"policyID":policyID,"query":query,"groupID":groupID,"actionID":actionID,"page":page},result);
+        sendPageAndWait("admin/authorize/edit",{"objectType":objectType,"objectID":objectID,"policyID":policyID,"query":query,"groupID":groupID,"actionID":actionID,"page":page,
+                                                "name":name, "description":description, "startDate":startDate, "endDate":endDate},result);
         // authorize check moved to FlowAuthorizationUtils.processEditPolicy
     	// assertAdministrator();
         result = null;
@@ -2247,10 +2310,12 @@ function doEditPolicy(objectType,objectID,policyID)
             groupID = cocoon.request.get("group_id");
             if (groupID == null) groupID = -1;
 
-            actionID = cocoon.request.get("action_id");
-            if (actionID == null) actionID = -1;
+            name = cocoon.request.get("name");
+            description = cocoon.request.get("description");
+            startDate = cocoon.request.get("start_date");
+            endDate = cocoon.request.get("end_date");
 
-            result = FlowAuthorizationUtils.processEditPolicy(getDSContext(),objectType,objectID,policyID,groupID,actionID);
+            result = FlowAuthorizationUtils.processEditPolicy(getDSContext(),objectType,objectID,policyID,groupID,actionID, name, description, startDate, endDate);
         }
         else if (cocoon.request.get("submit_cancel"))
         {

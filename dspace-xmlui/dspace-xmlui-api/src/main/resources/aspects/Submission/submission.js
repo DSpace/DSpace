@@ -497,7 +497,7 @@ function processPage(workspaceID, stepConfig, page)
     	//load info about uploaded file, so that it can be
     	//saved properly by the step's doProcessing() method below
     	loadFileUploadInfo();
-    }	
+    }
     
 	//before beginning processing, let this step know what page to process
 	//(this is important for multi-page steps!)	

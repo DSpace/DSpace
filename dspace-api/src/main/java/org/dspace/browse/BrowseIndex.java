@@ -61,6 +61,8 @@ public final class BrowseIndex
     /** additional 'internal' tables that are always defined */
     private static BrowseIndex itemIndex      = new BrowseIndex("bi_item");
     private static BrowseIndex withdrawnIndex = new BrowseIndex("bi_withdrawn");
+    private static BrowseIndex privateIndex = new BrowseIndex("bi_private");
+
 
     /**
      * Ensure no one else can create these
@@ -750,6 +752,12 @@ public final class BrowseIndex
     {
         return BrowseIndex.withdrawnIndex;
     }
+
+
+    public static BrowseIndex getPrivateBrowseIndex()
+    {
+        return BrowseIndex.privateIndex;
+    }
     
     /**
      * Take a string representation of a metadata field, and return it as an array.
@@ -790,7 +798,7 @@ public final class BrowseIndex
      */
     public boolean isInternalIndex()
     {
-        return (this == itemIndex || this == withdrawnIndex);
+        return (this == itemIndex || this == withdrawnIndex || this == privateIndex);
     }
 
     /**

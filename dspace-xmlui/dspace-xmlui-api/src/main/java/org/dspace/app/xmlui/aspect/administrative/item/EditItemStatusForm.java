@@ -69,7 +69,12 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 	
 	private static final Message T_not_allowed = message("xmlui.administrative.item.EditItemStatusForm.not_allowed");
 	private static final Message T_collectionadmins_only = message("xmlui.administrative.item.EditItemStatusForm.collection_admins_only");
-	
+
+
+    private static final Message T_label_private = message("xmlui.administrative.item.EditItemStatusForm.label_private");
+    private static final Message T_label_public = message("xmlui.administrative.item.EditItemStatusForm.label_public");
+    private static final Message T_submit_private = message("xmlui.administrative.item.EditItemStatusForm.submit_private");
+    private static final Message T_submit_public = message("xmlui.administrative.item.EditItemStatusForm.submit_public");
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
 	{
@@ -182,7 +187,12 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		
 		itemInfo.addLabel(T_label_move);
 		addCollectionAdminOnlyButton(itemInfo.addItem(), item.getOwningCollection(), "submit_move", T_submit_move);
-		 
+
+
+        privateOrPublicAccess(item, itemInfo);
+
+
+
 		itemInfo.addLabel(T_label_delete);
 		if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.DELETE))
 		{
@@ -202,7 +212,38 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		main.addHidden("administrative-continue").setValue(knot.getId());
 	}
 
-	/**
+    private void privateOrPublicAccess(Item item, List itemInfo) throws WingException, SQLException {
+        if(item.isDiscoverable())
+        {
+            itemInfo.addLabel(T_label_private);
+            try
+            {
+                // who can Withdraw can also Make It Private
+                AuthorizeUtil.authorizeWithdrawItem(context, item);
+                itemInfo.addItem().addButton("submit_private").setValue(T_submit_private);
+            }
+            catch (AuthorizeException authex)
+            {
+                addNotAllowedButton(itemInfo.addItem(), "submit_private", T_submit_private);
+            }
+        }
+        else
+        {
+            itemInfo.addLabel(T_label_public);
+            try
+            {
+                // who can Reinstate can also Make It Public
+                AuthorizeUtil.authorizeReinstateItem(context, item);
+                itemInfo.addItem().addButton("submit_public").setValue(T_submit_public);
+            }
+            catch (AuthorizeException authex)
+            {
+                addNotAllowedButton(itemInfo.addItem(), "submit_public", T_submit_public);
+            }
+        }
+    }
+
+    /**
 	 * Add a disabled button with a "not allowed" notice
 	 * @param item
 	 * @param buttonName

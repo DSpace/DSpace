@@ -142,16 +142,39 @@ public class HandleUtil
      * or a bitstream, then the object is not included, but its collection and
      * community parents are. However, if the item is a community or collection
      * then it is included along with all parents.
-     * 
+     *
      * <p>
      * If the terminal object in the trail is the passed object, do not link to
      * it, because that is (presumably) the page at which the user has arrived.
-     * 
-     * @param dso
-     * @param pageMeta
+     *
+     * @param dso the DSpace who's parents we wil add to the pageMeta
+     * @param pageMeta the object to which we link our trial
+     * @param contextPath The context path
      */
     public static void buildHandleTrail(DSpaceObject dso, PageMeta pageMeta,
-            String contextPath) throws SQLException, WingException
+                                        String contextPath) throws SQLException, WingException
+    {
+        buildHandleTrail(dso, pageMeta, contextPath, false);
+    }
+
+        /**
+        * Build a list of trail metadata starting with the owning collection and
+        * ending with the root level parent. If the Object is an item, a bundle,
+        * or a bitstream, then the object is not included, but its collection and
+        * community parents are. However, if the item is a community or collection
+        * then it is included along with all parents.
+        *
+        * <p>
+        * If the terminal object in the trail is the passed object, do not link to
+        * it, because that is (presumably) the page at which the user has arrived.
+        *
+        * @param dso the DSpace who's parents we wil add to the pageMeta
+        * @param pageMeta the object to which we link our trial
+        * @param contextPath The context path
+        * @param linkOriginalObject whether or not to make a link of the original object
+        */
+    public static void buildHandleTrail(DSpaceObject dso, PageMeta pageMeta,
+            String contextPath, boolean linkOriginalObject) throws SQLException, WingException
     {
         // Add the trail back to the repository root.
         Stack<DSpaceObject> stack = new Stack<DSpaceObject>();
@@ -206,7 +229,7 @@ public class HandleUtil
             DSpaceObject pop = stack.pop();
 
             String target;
-            if (pop == dso)
+            if (pop == dso && !linkOriginalObject)
                 target = null; // Do not link "back" to the terminal object
             else
                 target = contextPath + "/handle/" + pop.getHandle();

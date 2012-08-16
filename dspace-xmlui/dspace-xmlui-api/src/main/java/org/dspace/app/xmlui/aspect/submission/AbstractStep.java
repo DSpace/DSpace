@@ -229,7 +229,7 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
 			Collection collection = submission.getCollection();
 			
 	        pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-	        HandleUtil.buildHandleTrail(collection,pageMeta,contextPath);
+	        HandleUtil.buildHandleTrail(collection,pageMeta,contextPath, true);
 	        pageMeta.addTrail().addContent(T_submission_trail);
 		}
 		else if (submission instanceof WorkflowItem)
@@ -239,7 +239,7 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
 			Collection collection = submission.getCollection();
 			
 	        pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-	        HandleUtil.buildHandleTrail(collection,pageMeta,contextPath);
+	        HandleUtil.buildHandleTrail(collection,pageMeta,contextPath, true);
 	        pageMeta.addTrail().addContent(T_workflow_trail);
 		}
 		else

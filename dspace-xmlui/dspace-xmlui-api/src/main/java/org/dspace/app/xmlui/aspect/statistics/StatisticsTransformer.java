@@ -51,7 +51,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 
         if(dso != null)
         {
-            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath);
+            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath, true);
         }
         pageMeta.addTrailLink(contextPath + "/handle" + (dso != null && dso.getHandle() != null ? "/" + dso.getHandle() : "/statistics"), T_statistics_trail);
 
@@ -297,7 +297,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 			/** Generate Table */
 			Division wrapper = mainDiv.addDivision("tablewrapper");
 			Table table = wrapper.addTable("list-table", 1, 1,
-					title == null ? "" : "tableWithTitle");
+					title == null ? "detailtable" : "tableWithTitle detailtable");
 			if (title != null)
             {
                 table.setHead(message(title));
@@ -353,7 +353,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 			// String[] rLabels = dataset.getRowLabels().toArray(new String[0]);
 
 			Table table = mainDiv.addTable("list-table", matrix.length, 2,
-					title == null ? "" : "tableWithTitle");
+					title == null ? "detailtable" : "tableWithTitle detailtable");
 			if (title != null)
             {
                 table.setHead(message(title));
