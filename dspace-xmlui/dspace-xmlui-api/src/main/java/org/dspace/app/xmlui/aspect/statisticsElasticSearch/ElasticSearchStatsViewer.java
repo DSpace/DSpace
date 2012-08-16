@@ -12,6 +12,7 @@ import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.content.*;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
+import org.dspace.statistics.DataTermsFacet;
 import org.dspace.statistics.ElasticSearchLogger;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -261,6 +262,15 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
                 // Top Downloads to Owning Object
         TermsFacet bitstreamsFacet = resp.getFacets().facet(TermsFacet.class, "top_bitstreams_lastmonth");
         addTermFacetToTable(bitstreamsFacet, division, "Bitstream", "Top Downloads for " + getLastMonthString());
+
+        // Convert Elastic Search data to a common DataTermsFacet object, and stuff in DRI/HTML of page.
+        TermsFacet topBitstreamsFacet = resp.getFacets().facet(TermsFacet.class, "top_bitstreams_lastmonth");
+        List<? extends TermsFacet.Entry> termsFacetEntries = topBitstreamsFacet.getEntries();
+        DataTermsFacet termsFacet = new DataTermsFacet();
+        for(TermsFacet.Entry entry : termsFacetEntries) {
+            termsFacet.addTermFacet(new DataTermsFacet.TermsFacet(entry.getTerm(), entry.getCount()));
+        }
+        division.addHidden("jsonTopDownloads").setValue(termsFacet.toJson());
     }
     
     public AbstractFacetBuilder facetTopBitstreamsLastMonth() {
