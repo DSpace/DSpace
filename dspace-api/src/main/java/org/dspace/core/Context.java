@@ -51,7 +51,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class Context
 {
     private static final Logger log = Logger.getLogger(Context.class);
-    private static final String CACHING_CONFIGURATION = "org/dspace/services/caching/ehcache-config.xml";
 
     /** Database connection */
     private Connection connection;
@@ -478,14 +477,10 @@ public class Context
     
     private Cache getCache () {
     	if (this.cache == null) {
-    		CacheConfig config;
-			try {
-				config = (CacheConfig) XMLBindUtils.unmarshall(this.getClass().getClassLoader().getResourceAsStream(CACHING_CONFIGURATION), CacheConfig.class);
-			} catch (JAXBException e) {
-				// FIXME: Maybe it would be fair to not fail...
-				throw new IllegalStateException("Failed to read cache configuration.", e);
-			}
-    		this.cache = this.getCacheService().getCache(this.getClass().getName(), config);
+    		/** 
+    		 * it will use the defaults which are configured for this cacheName (part of the underlying implementation) if the cacheConfig is nul
+    	     */
+    		this.cache = this.getCacheService().getCache(this.getClass().getName(), null);
     	}
     	return this.cache;
     }
