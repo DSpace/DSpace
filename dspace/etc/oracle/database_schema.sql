@@ -404,8 +404,8 @@ CREATE TABLE ResourcePolicy
   start_date           DATE,
   end_date             DATE,
   rpname               VARCHAR2(30),
-  rpdescription        VARCHAR2(100),
-  rptype               VARCHAR2(30);
+  rptype               VARCHAR2(30),
+  rpdescription        VARCHAR2(100)
 );
 
 -- index by resource_type,resource_id - all queries by
