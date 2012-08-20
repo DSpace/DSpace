@@ -12,6 +12,9 @@ import org.dspace.eperson.EPerson;
 import org.dspace.services.model.Event;
 import org.dspace.usage.AbstractUsageEventListener;
 import org.dspace.usage.UsageEvent;
+import org.dspace.usage.UsageSearchEvent;
+import org.dspace.usage.UsageWorkflowEvent;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Simple SolrLoggerUsageEvent facade to separate Solr specific 
@@ -29,12 +32,27 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
 		if(event instanceof UsageEvent)
 		{
 			try{
-			
 			    UsageEvent ue = (UsageEvent)event;
 			
 			    EPerson currentUser = ue.getContext() == null ? null : ue.getContext().getCurrentUser();
 
-                SolrLogger.post(ue.getObject(), ue.getRequest(), currentUser);
+                if(UsageEvent.Action.VIEW == ue.getAction()){
+                    SolrLogger.postView(ue.getObject(), ue.getRequest(), currentUser);
+                }else
+                if(UsageEvent.Action.SEARCH == ue.getAction()){
+                    UsageSearchEvent usageSearchEvent = (UsageSearchEvent) ue;
+                    //Only log if the user has already filled in a query !
+                    if(!CollectionUtils.isEmpty(((UsageSearchEvent) ue).getQueries())){
+                        SolrLogger.postSearch(ue.getObject(), ue.getRequest(), currentUser,
+                                usageSearchEvent.getQueries(), usageSearchEvent.getRpp(), usageSearchEvent.getSortBy(),
+                                usageSearchEvent.getSortOrder(), usageSearchEvent.getPage(), usageSearchEvent.getScope());
+                    }
+                }else
+                if(UsageEvent.Action.WORKFLOW == ue.getAction()){
+                    UsageWorkflowEvent usageWorkflowEvent = (UsageWorkflowEvent) ue;
+
+                    SolrLogger.postWorkflow(usageWorkflowEvent);
+                }
 
 			}
 			catch(Exception e)

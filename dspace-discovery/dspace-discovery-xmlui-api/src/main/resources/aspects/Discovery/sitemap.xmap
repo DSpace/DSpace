@@ -44,6 +44,9 @@ and searching the repository.
             <map:transformer name="RestrictedItem" src="org.dspace.app.xmlui.aspect.artifactbrowser.RestrictedItem"/>
         </map:transformers>
                
+        <map:actions>
+            <map:action name="DiscoverySearchLoggerAction" src="org.dspace.app.xmlui.aspect.discovery.DiscoverySearchLoggerAction"/>
+        </map:actions>
 
         <map:matchers default="wildcard">
             <map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
@@ -97,6 +100,7 @@ and searching the repository.
 
 			<!-- Search -->
 			<map:match pattern="discover">
+                <map:act type="DiscoverySearchLoggerAction"/>
 				<map:transform type="SidebarFacetsTransformer"/>
                 <map:transform type="SimpleSearch"/>
                 <map:transform type="IncludePageMeta">
@@ -133,6 +137,7 @@ and searching the repository.
 
                         <!-- Simple search -->
 						<map:match pattern="handle/*/*/discover">
+                            <map:act type="DiscoverySearchLoggerAction"/>
                             <map:transform type="SidebarFacetsTransformer"/>
                             <map:transform type="SimpleSearch"/>
                             <map:transform type="IncludePageMeta">

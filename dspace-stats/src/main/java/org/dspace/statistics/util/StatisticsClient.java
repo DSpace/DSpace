@@ -61,6 +61,7 @@ public class StatisticsClient
         options.addOption("o", "optimize", false, "Run maintenance on the SOLR index");
         options.addOption("b", "reindex-bitstreams", false, "Reindex the bitstreams to ensure we have the bundle name");
         options.addOption("r", "remove-deleted-bitstreams", false, "While indexing the bundle names remove the statistics about deleted bitstreams");
+        options.addOption("s", "shard-solr-index", false, "Split the data from the main Solr core into separate Solr cores per year");
         options.addOption("h", "help", false, "help");
 
 		CommandLine line = parser.parse(options, args);
@@ -94,6 +95,10 @@ public class StatisticsClient
         else if(line.hasOption('b'))
         {
             SolrLogger.reindexBitstreamHits(line.hasOption('r'));
+        }
+        else if(line.hasOption('s'))
+        {
+            SolrLogger.shardSolrIndex();
         }
         else
         {

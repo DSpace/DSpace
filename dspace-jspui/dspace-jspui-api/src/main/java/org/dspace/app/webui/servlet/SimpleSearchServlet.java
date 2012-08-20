@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -26,10 +28,7 @@ import org.dspace.app.bulkedit.MetadataExport;
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
+import org.dspace.content.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -38,6 +37,9 @@ import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
 import org.dspace.sort.SortOption;
+import org.dspace.usage.UsageEvent;
+import org.dspace.usage.UsageSearchEvent;
+import org.dspace.utils.DSpace;
 
 /**
  * Servlet for handling a simple search.
@@ -337,6 +339,17 @@ public class SimpleSearchServlet extends DSpaceServlet
         // pageFirst = max(1,pageCurrent-9)
         int pageFirst = ((pageCurrent - 9) > 1) ? (pageCurrent - 9) : 1;
 
+                //Fire an event to log our search
+        DSpaceObject scope = null;
+        if(collection != null){
+            scope = collection;
+        }else
+        if(community != null){
+            scope = community;
+        }
+        logSearch(context, request, query, pageCurrent, scope);
+
+
         // Pass the results to the display JSP
         request.setAttribute("items", resultsItems);
         request.setAttribute("communities", resultsCommunities);
@@ -388,6 +401,31 @@ public class SimpleSearchServlet extends DSpaceServlet
         {
             JSPManager.showJSP(request, response, "/search/results.jsp");
         }
+    }
+
+    protected void logSearch(Context context, HttpServletRequest request, String query, int start, DSpaceObject scope) {
+        UsageSearchEvent searchEvent = new UsageSearchEvent(
+                UsageEvent.Action.SEARCH,
+                request,
+                context,
+                null, Arrays.asList(query), scope);
+
+
+        if(!StringUtils.isBlank(request.getParameter("rpp"))){
+            searchEvent.setRpp(Integer.parseInt(request.getParameter("rpp")));
+        }
+        if(!StringUtils.isBlank(request.getParameter("sort_by"))){
+            searchEvent.setSortBy(request.getParameter("sort_by"));
+        }
+        if(!StringUtils.isBlank(request.getParameter("order"))){
+            searchEvent.setSortOrder(request.getParameter("order"));
+        }
+        if(!StringUtils.isBlank(request.getParameter("start"))){
+            searchEvent.setPage(start);
+        }
+
+        //Fire our event
+        new DSpace().getEventService().fireEvent(searchEvent);
     }
 
     /**
