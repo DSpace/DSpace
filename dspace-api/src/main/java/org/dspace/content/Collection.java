@@ -1487,4 +1487,11 @@ public class Collection extends DSpaceObject
             return null;
         }
     }
+
+    @Override
+    public void updateLastModified()
+    {
+        //Also fire a modified event since the collection HAS been modified
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), null));
+    }
 }

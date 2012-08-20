@@ -16,10 +16,10 @@ import java.util.List;
  */
 public class DiscoverySearchFilter {
 
-    private String indexFieldName;
-    private List<String> metadataFields;
-    private boolean fullAutoComplete;
-    private String type = DiscoveryConfigurationParameters.TYPE_TEXT;
+    protected String indexFieldName;
+    protected List<String> metadataFields;
+    protected String type = DiscoveryConfigurationParameters.TYPE_TEXT;
+    public static final String FILTER_TYPE_DEFAULT = "default";
 
     public String getIndexFieldName() {
         return indexFieldName;
@@ -39,28 +39,29 @@ public class DiscoverySearchFilter {
         this.metadataFields = metadataFields;
     }
 
-    public boolean isFullAutoComplete() {
-        return fullAutoComplete;
-    }
-
-    public void setFullAutoComplete(boolean fullAutoComplete) {
-        this.fullAutoComplete = fullAutoComplete;
-    }
-
     public String getType() {
         return type;
     }
 
-    public void setType(String type) {
-        if(type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_TEXT)){
+    public void setType(String type) throws DiscoveryConfigurationException {
+        if(type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_TEXT))
+        {
             this.type = DiscoveryConfigurationParameters.TYPE_TEXT;
         } else
-        if(type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_DATE)){
+        if(type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_DATE))
+        {
             this.type = DiscoveryConfigurationParameters.TYPE_DATE;
+        } else
+        if(type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_HIERARCHICAL))
+        {
+            throw new DiscoveryConfigurationException("The " + type + " can't be used with a default side bar facet use the \"HierarchicalSidebarFacetConfiguration\" class instead.");
         }else{
             this.type = type;
         }
+    }
 
+    public String getFilterType(){
+        return FILTER_TYPE_DEFAULT;
     }
 
 }

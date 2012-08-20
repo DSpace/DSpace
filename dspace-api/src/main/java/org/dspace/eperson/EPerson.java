@@ -1103,4 +1103,10 @@ public class EPerson extends DSpaceObject
         return getEmail();
     }
 
+    @Override
+    public void updateLastModified()
+    {
+
+    }
+
 }

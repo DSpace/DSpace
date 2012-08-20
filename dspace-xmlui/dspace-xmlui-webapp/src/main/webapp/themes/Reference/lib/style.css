@@ -1246,22 +1246,6 @@ span.Z3988 {
 	display: none;
 }
 
-
-form.discover-search-box div.ds-form-content,
-form.discover-sort-box div.ds-form-content
-{
-    width: auto;
-}
-
-form.discover-search-box div.ds-form-content input.update-filters{
-    margin-left: 145px;
-}
-
-form.discover-sort-box select{
-    margin: 0 4px;
-}
-
-
 .hidden {
     display:none;
     visibility:hidden;
@@ -1333,3 +1317,85 @@ select#aspect_submission_submit_SelectCollectionStep_field_handle
 {
     max-width: 350px;
 }
+
+
+/* Start discovery layout DSpace 3.x*/
+div.discoverySearchBox
+{
+    background-color: #FFFFF5;
+    border: 2px solid #F0F0D2;
+}
+
+form.discover-search-box fieldset{
+    border: none;
+}
+
+div.discoverySearchBox label{
+    width: auto;
+}
+
+div.discoverySearchBox div.ds-form-content{
+    width: auto;
+}
+
+input#aspect_discovery_SimpleSearch_field_query{
+    width: 480px;
+}
+
+input.search-icon{
+    background-image: url('../images/search_icon_DF6E00_20x20.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    text-indent: -1000px;
+    /*Css props below are required for IE*/
+    font-size: 0;
+    line-height: 0;
+    border: 1px solid #000000;
+}
+
+div.controls-gear-wrapper{
+    float: none;
+    position: relative;
+}
+
+div.gear-icon{
+    background-image: url('../images/gear_DF6E00_25x25.png');
+}
+
+ul.gear-selection li.gear-option-selected{
+    background: url('../images/check_606060_15x15.png') no-repeat 3px center;
+}
+
+table.discovery-filters input.filter-control {
+    width: 30px;
+    margin-left: 5px;
+    text-indent: -1000px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    height: 22px;
+    float: left;
+    /*Css props below are required for IE*/
+    font-size: 0;
+    display:block;
+    line-height: 0;
+}
+
+table.discovery-filters input.filter-control.filter-remove{
+    margin-left: 15px;
+    background-image: url('../images/remove_icon_DF6E00_16x16.png');
+    border: 1px solid #000000;
+}
+
+table.discovery-filters input.filter-control.filter-add{
+    background-image: url('../images/plus_icon_DF6E00_16x16.png');
+    border: 1px solid #000000;
+}
+
+ul.gear-selection{
+    left: 0;
+    right: auto;
+    background-color: ivory;
+    border: 2px solid #F0F0D2;
+}
+
+/* End discovery layout DSpace 3.x*/

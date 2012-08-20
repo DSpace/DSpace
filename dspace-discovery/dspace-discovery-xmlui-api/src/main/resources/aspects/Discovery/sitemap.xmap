@@ -100,19 +100,10 @@ and searching the repository.
 				<map:transform type="SidebarFacetsTransformer"/>
                 <map:transform type="SimpleSearch"/>
                 <map:transform type="IncludePageMeta">
-                    <map:parameter name="stylesheet.screen.discovery#1" value="../../static/css/discovery/style.css"/>
+                    <map:parameter name="stylesheet.screen.discovery#1" value="../../static/css/discovery/discovery-style.css"/>
 
                     <map:parameter name="javascript.static#1" value="loadJQuery.js"/>
-                    <map:parameter name="javascript.static#2" value="static/js/discovery/core/Core.js"/>
-                    <map:parameter name="javascript.static#3" value="static/js/discovery/core/AbstractManager.js"/>
-                    <map:parameter name="javascript.static#4" value="static/js/discovery/core/Parameter.js"/>
-                    <map:parameter name="javascript.static#5" value="static/js/discovery/core/ParameterStore.js"/>
-                    <map:parameter name="javascript.static#6" value="static/js/discovery/core/AbstractWidget.js"/>
-                    <map:parameter name="javascript.static#7" value="static/js/discovery/core/AbstractFacetWidget.js"/>
-                    <map:parameter name="javascript.static#8" value="static/js/discovery/managers/Manager.jquery.js"/>
-                    <map:parameter name="javascript.static#9" value="static/js/jquery/jquery.autocomplete.js"/>
-                    <map:parameter name="javascript.static#10" value="static/js/discovery/widgets/AutocompleteWidget.js"/>
-                    <map:parameter name="javascript.static#11" value="static/js/discovery/search/search.js"/>
+                    <map:parameter name="javascript.static#2" value="static/js/discovery/search-controls.js"/>
                 </map:transform>
 				<map:serialize type="xml"/>
 			</map:match>
@@ -145,19 +136,10 @@ and searching the repository.
                             <map:transform type="SidebarFacetsTransformer"/>
                             <map:transform type="SimpleSearch"/>
                             <map:transform type="IncludePageMeta">
-                                <map:parameter name="stylesheet.screen.discovery#1" value="../../static/css/discovery/style.css"/>
+                                <map:parameter name="stylesheet.screen.discovery#1" value="../../static/css/discovery/discovery-style.css"/>
 
                                 <map:parameter name="javascript.static#1" value="loadJQuery.js"/>
-                                <map:parameter name="javascript.static#2" value="static/js/discovery/core/Core.js"/>
-                                <map:parameter name="javascript.static#3" value="static/js/discovery/core/AbstractManager.js"/>
-                                <map:parameter name="javascript.static#4" value="static/js/discovery/core/Parameter.js"/>
-                                <map:parameter name="javascript.static#5" value="static/js/discovery/core/ParameterStore.js"/>
-                                <map:parameter name="javascript.static#6" value="static/js/discovery/core/AbstractWidget.js"/>
-                                <map:parameter name="javascript.static#7" value="static/js/discovery/core/AbstractFacetWidget.js"/>
-                                <map:parameter name="javascript.static#8" value="static/js/discovery/managers/Manager.jquery.js"/>
-                                <map:parameter name="javascript.static#9" value="static/js/jquery/jquery.autocomplete.js"/>
-                                <map:parameter name="javascript.static#10" value="static/js/discovery/widgets/AutocompleteWidget.js"/>
-                                <map:parameter name="javascript.static#11" value="static/js/discovery/search/search.js"/>
+                                <map:parameter name="javascript.static#2" value="static/js/discovery/search-controls.js"/>
                             </map:transform>
                             <map:serialize type="xml"/>
 						</map:match>

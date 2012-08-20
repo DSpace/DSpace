@@ -490,6 +490,8 @@ public class AuthorizeManager
         rp.setRpType(type);
 
         rp.update();
+
+        o.updateLastModified();
     }
 
     /**
@@ -543,6 +545,8 @@ public class AuthorizeManager
         rp.setRpType(type);
 
         rp.update();
+
+        o.updateLastModified();
     }
 
     /**
@@ -805,6 +809,8 @@ public class AuthorizeManager
             // and write out new policy
             drp.update();
         }
+
+        dest.updateLastModified();
     }
 
     /**
@@ -820,6 +826,8 @@ public class AuthorizeManager
     public static void removeAllPolicies(Context c, DSpaceObject o)
             throws SQLException
     {
+        o.updateLastModified();
+
         // FIXME: authorization check?
         DatabaseManager.updateQuery(c, "DELETE FROM resourcepolicy WHERE "
                 + "resource_type_id= ? AND resource_id= ? ",
@@ -882,6 +890,7 @@ public class AuthorizeManager
     public static void removePoliciesActionFilter(Context context,
                                                   DSpaceObject dso, int actionID) throws SQLException
     {
+        dso.updateLastModified();
         if (actionID == -1)
         {
             // remove all policies from object
@@ -929,6 +938,8 @@ public class AuthorizeManager
     public static void removeGroupPolicies(Context c, DSpaceObject o, Group g)
             throws SQLException
     {
+        o.updateLastModified();
+
         DatabaseManager.updateQuery(c, "DELETE FROM resourcepolicy WHERE "
                 + "resource_type_id= ? AND resource_id= ? AND epersongroup_id= ? ",
                 o.getType(), o.getID(), g.getID());
@@ -950,6 +961,7 @@ public class AuthorizeManager
     public static void removeEPersonPolicies(Context c, DSpaceObject o, EPerson e)
             throws SQLException
     {
+        o.updateLastModified();
         DatabaseManager.updateQuery(c, "DELETE FROM resourcepolicy WHERE "
                 + "resource_type_id= ? AND resource_id= ? AND eperson_id= ? ",
                 o.getType(), o.getID(), e.getID());

@@ -40,6 +40,7 @@ public class DiscoverQuery {
     private int facetLimit = -1;
     private int facetMinCount = -1;
     private int facetOffset = 0;
+    private Map<String, DiscoverHitHighlightingField> hitHighlighting;
 
     /** Used when you want to search for a specific field value **/
     private List<String> searchFields;
@@ -55,6 +56,7 @@ public class DiscoverQuery {
         this.facetFields = new ArrayList<DiscoverFacetField>();
         this.facetQueries = new ArrayList<String>();
         this.searchFields = new ArrayList<String>();
+        this.hitHighlighting = new HashMap<String, DiscoverHitHighlightingField>();
         //Use a linked hashmap since sometimes insertion order might matter
         this.properties = new LinkedHashMap<String, List<String>>();
     }
@@ -239,10 +241,27 @@ public class DiscoverQuery {
     public void addProperty(String property, String value){
         List<String> toAddList = properties.get(property);
         if(toAddList == null)
+        {
             toAddList = new ArrayList<String>();
+        }
 
         toAddList.add(value);
 
         properties.put(property, toAddList);
+    }
+
+    public DiscoverHitHighlightingField getHitHighlightingField(String field)
+    {
+        return hitHighlighting.get(field);
+    }
+
+    public List<DiscoverHitHighlightingField> getHitHighlightingFields()
+    {
+        return new ArrayList<DiscoverHitHighlightingField>(hitHighlighting.values());
+    }
+
+    public void addHitHighlightingField(DiscoverHitHighlightingField hitHighlighting)
+    {
+        this.hitHighlighting.put(hitHighlighting.getField(), hitHighlighting);
     }
 }

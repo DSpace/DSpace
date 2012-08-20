@@ -1419,4 +1419,10 @@ public class Group extends DSpaceObject
         }
         return null;
     }
+
+    @Override
+    public void updateLastModified()
+    {
+
+    }
 }
