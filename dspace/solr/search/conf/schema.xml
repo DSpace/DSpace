@@ -437,12 +437,13 @@
         </analyzer>
     </fieldType>
 
-    <fieldType name="dspaceFilter" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+    <fieldType name="keywordFilter" class="solr.TextField" sortMissingLast="true" omitNorms="true">
         <analyzer>
             <!--Treats the entire field as a single token, regardless of its content-->
             <tokenizer class="solr.KeywordTokenizerFactory"/>
 
             <!--<filter class="solr.LowerCaseFilterFactory" />-->
+            <filter class="solr.TrimFilterFactory" />
         </analyzer>
     </fieldType>
  </types>
@@ -480,7 +481,7 @@
     <field name="text" type="text" indexed="true" stored="false" multiValued="true"/>
 
 
-   <field name="fulltext" type="text" indexed="true" stored="false" multiValued="true"/>
+   <field name="fulltext" type="text" indexed="true" stored="true" multiValued="true"/>
 
     <!-- Internal DSpace Object ID -->
    <field name="search.resourceid" type="sint" indexed="true" stored="true" required="true" omitNorms="true" />
@@ -510,10 +511,16 @@
     <dynamicField name="*_ac" type="dspaceAutoComplete" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
 
      <!--Dynamic field used for sidebar filters-->
-     <dynamicField name="*_filter" type="dspaceFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
+     <dynamicField name="*_filter" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
+     <dynamicField name="*_keyword" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
 
+     <!--Dynamic field used for hit highlighting-->
+     <dynamicField name="*_hl" type="text" indexed="true" stored="true" multiValued="true" omitNorms="true"/>
 
      <dynamicField name="*_sort" type="lowerCaseSort" indexed="true" stored="true" multiValued="false" omitNorms="true"/>
+
+     <!--Dynamic field used for related item searches-->
+     <dynamicField name="*_mlt" type="text" indexed="true" stored="true" multiValued="true" omitNorms="true" termVectors="true" termPositions="true" termOffsets="true"/>
 
      <!--Date matching-->
     <dynamicField name="*.year" type="sint" indexed="true" stored="true" multiValued="true" omitNorms="true" />

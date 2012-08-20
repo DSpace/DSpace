@@ -42,6 +42,7 @@
     <xsl:import href="community-view.xsl"/>
     <xsl:import href="ORE.xsl"/>
     <xsl:import href="COinS.xsl"/>
+    <xsl:import href="discovery.xsl"/>
 
     <xsl:output indent="yes"/>
 

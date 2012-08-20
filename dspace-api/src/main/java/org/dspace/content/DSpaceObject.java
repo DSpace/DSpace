@@ -161,4 +161,6 @@ public abstract class DSpaceObject
     {
         return null;
     }
+
+    public abstract void updateLastModified();
 }
