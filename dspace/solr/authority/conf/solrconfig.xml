@@ -638,6 +638,7 @@
       <float name="hl.regex.slop">0.5</float>
       <!-- a basic sentence pattern -->
       <str name="hl.regex.pattern">[-\w ,/\n\"']{20,200}</str>
+      <!-- Comment including an extra " to match the one in the regular expression above, so emacs text formatting goes back to normal -->
     </lst>
    </fragmenter>
 
@@ -693,5 +694,24 @@
     <healthcheck type="file">server-enabled</healthcheck>
     -->
   </admin>
+
+  <requestHandler name="/replication" class="solr.ReplicationHandler" >
+    <lst name="master">
+      <!--Replicate on 'startup' and 'commit'. 'optimize' is also a valid value for replicateAfter. -->
+      <str name="replicateAfter">startup</str>
+      <str name="replicateAfter">commit</str>
+      
+      <!--Create a backup after 'optimize'. Other values can be 'commit', 'startup'. It is possible to have multiple entries of this config string.  Note that this is just for backup, replication does not require this. -->
+      <!-- <str name="backupAfter">optimize</str> -->
+      
+      <!--If configuration files need to be replicated give the names here, separated by comma -->
+      <str name="confFiles">schema.xml,stopwords.txt,elevate.xml</str>
+      <!--The default value of reservation is 10 secs.See the documentation below . Normally , you should not need to specify this -->
+      <str name="commitReserveDuration">00:00:10</str>
+    </lst>
+    <!-- keep only 1 backup.  Using this parameter precludes using the "numberToKeep" request parameter. (Solr3.6 / Solr4.0)-->
+    <!-- (For this to work in conjunction with "backupAfter" with Solr 3.6.0, see bug fix https://issues.apache.org/jira/browse/SOLR-3361 )-->
+    <str name="maxNumberOfBackups">1</str> 
+  </requestHandler>
 
 </config>
