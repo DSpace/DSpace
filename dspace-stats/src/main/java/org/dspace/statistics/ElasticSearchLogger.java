@@ -68,7 +68,9 @@ public class ElasticSearchLogger {
 
     private static Client client;
 
-    private static boolean havingTroubles = false;
+    public static enum ClientType {
+        NODE, LOCAL, TRANSPORT
+    }
 
 
     public ElasticSearchLogger() {
@@ -269,7 +271,7 @@ public class ElasticSearchLogger {
         }
 
         log.info("DSpace ElasticSearchLogger Initialized Successfully (I suppose)");
-        havingTroubles=false;
+
         } catch (Exception e) {
             log.info("Elastic Search crashed during init. " + e.getMessage());
         }
@@ -405,11 +407,9 @@ public class ElasticSearchLogger {
 
         } catch (RuntimeException re) {
             log.error("RunTimer in ESL:\n" + ExceptionUtils.getStackTrace(re));
-            havingTroubles=true;
             throw re;
         } catch (Exception e) {
             log.error(e.getMessage());
-            havingTroubles=true;
         } finally {
             client.close();
         }
@@ -525,10 +525,17 @@ public class ElasticSearchLogger {
     }
 
     // Transport Client will talk to another server on 9300
-    public void createTransportClient(boolean skipCheck) {
-        if(havingTroubles && !skipCheck) {
-            initializeElasticSearch();
-        }
+    public void createTransportClient() {
+        // Configurable values for all elasticsearch connection constants
+        clusterName = getConfigurationStringWithFallBack("statistics.elasticsearch.clusterName", clusterName);
+        indexName   = getConfigurationStringWithFallBack("statistics.elasticsearch.indexName", indexName);
+        indexType   = getConfigurationStringWithFallBack("statistics.elasticsearch.indexType", indexType);
+        address     = getConfigurationStringWithFallBack("statistics.elasticsearch.address", address);
+        port        = ConfigurationManager.getIntProperty("statistics.elasticsearch.port", port);
+        storeData   = ConfigurationManager.getBooleanProperty("statistics.elasticsearch.storeData", storeData);
+
+        log.info("Creating TransportClient to [Address:" + address + "] [Port:" + port + "] [cluster.name:" + clusterName + "]");
+
         Settings settings = ImmutableSettings.settingsBuilder().put("cluster.name", clusterName).build();
         client = new TransportClient(settings).addTransportAddress(new InetSocketTransportAddress(address, port));
     }
@@ -536,45 +543,51 @@ public class ElasticSearchLogger {
     public void createElasticClient() {
         //createElasticClient(true);
     }
+    
+    public Client getClient() {
+        //Get an available client, otherwise new default is NODE.
+        return getClient(ClientType.NODE);
+    }
 
     // Get the already available client, otherwise we will create a new client.
     // TODO Allow for config to determine which architecture / topology to use.
     //   - Local Node, store Data
     //   - Node Client, must discover a master within ES cluster
     //   - Transport Client, specify IP address of server running ES.
-    public Client getClient() {
+    public Client getClient(ClientType clientType) {
         if(client == null) {
             log.error("getClient reports null client");
-            createNodeClient();
-            
-            
-            //createElasticClient();
+
+            if(clientType == ClientType.TRANSPORT) {
+                createTransportClient();
+            } else {
+                createNodeClient(clientType);
+            }
         }
+
         return client;
     }
 
     // Node Client will discover other ES nodes running in local JVM
-    public void createNodeClient() {
-        NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName(clusterName);
+    public Client createNodeClient(ClientType clientType) {
+        String dspaceDir = ConfigurationManager.getProperty("dspace.dir");
+        Settings settings = ImmutableSettings.settingsBuilder().put("path.data", dspaceDir + "/elasticsearch/").build();
+        
+        NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName(clusterName).data(true).settings(settings);
 
-        if(storeData) {
-            String dspaceDir = ConfigurationManager.getProperty("dspace.dir");
-            Settings settings = ImmutableSettings.settingsBuilder().put("path.data", dspaceDir + "/elasticsearch/").build();
-            log.info("Create a Local Node that will store data.");
-            nodeBuilder = nodeBuilder.data(true).local(true).settings(settings);
-        } else {
-            log.info("Create a nodeClient, that looks for a neighbor to be master.");
-            nodeBuilder = nodeBuilder.client(true);
+        if(clientType == ClientType.LOCAL) {
+            log.info("Create a Local Node.");
+            nodeBuilder = nodeBuilder.local(true);
+        } else if(clientType == ClientType.NODE) {
+            log.info("Create a nodeClient, allows transport clients to connect");
+            nodeBuilder = nodeBuilder.local(false);
         }
+
         Node node = nodeBuilder.node();
         log.info("Got node");
         client = node.client();
         log.info("Created new node client");
-    }
-
-    public void createElasticClient(boolean skipCheck) {
-        log.info("Creating a new elastic-client");
-        //createTransportClient(skipCheck);
+        return client;
     }
     
     public String getConfigurationStringWithFallBack(String configurationKey, String defaultFallbackValue) {
