@@ -292,6 +292,14 @@
     </command>
 
     <command>
+        <name>stats-log-importer-elasticsearch</name>
+        <description>Import solr-format converted log files into Elastic Search statistics</description>
+        <step>
+            <class>org.dspace.statistics.util.StatisticsImporterElasticSearch</class>
+        </step>
+    </command>
+
+    <command>
         <name>stats-util</name>
         <description>Statistics Client for Maintenance of Solr Statistics Indexes</description>
         <step>

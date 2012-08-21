@@ -47,7 +47,7 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 public class StatisticsImporterElasticSearch {
     private static final Logger log = Logger.getLogger(StatisticsImporterElasticSearch.class);
 
-    /** Date format (for solr) */
+    /** Date format */
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     //TODO ES Client
@@ -66,7 +66,7 @@ public class StatisticsImporterElasticSearch {
     private static BulkRequestBuilder bulkRequest;
 
     /**
-     * Read lines from the statistics file and load their data into solr.
+     * Read lines from the statistics file and load their data into Elastic Search.
      *
      * @param filename The filename of the file to load
      * @param context The DSpace Context
@@ -310,12 +310,11 @@ public class StatisticsImporterElasticSearch {
         if (counter > 0)
         {
             Double committedpercentage = 100d * committed / counter;
-            System.out.println(" - " + committed + " entries added to solr: " + percentage.format(committedpercentage) + "%");
+            System.out.println(" - " + committed + " entries added to ElasticSearch: " + percentage.format(committedpercentage) + "%");
             Double errorpercentage = 100d * errors / counter;
             System.out.println(" - " + errors + " errors: " + percentage.format(errorpercentage) + "%");
             Double sepercentage = 100d * searchengines / counter;
             System.out.println(" - " + searchengines + " search engine activity skipped: " + percentage.format(sepercentage) + "%");
-            System.out.print("About to commit data to solr...");
         }
         System.out.println(" done!");
     }
@@ -331,7 +330,7 @@ public class StatisticsImporterElasticSearch {
     {
         // print the help message
         HelpFormatter myhelp = new HelpFormatter();
-        myhelp.printHelp("StatisticsImporter\n", options);
+        myhelp.printHelp("StatisticsImporterElasticSearch\n", options);
         System.exit(exitCode);
     }
 
@@ -349,7 +348,6 @@ public class StatisticsImporterElasticSearch {
         Options options = new Options();
 
         options.addOption("i", "in", true, "the input file ('-' or omit for standard input)");
-        options.addOption("l", "local", false, "developers tool - map external log file to local handles");
         options.addOption("m", "multiple", false, "treat the input file as having a wildcard ending");
         options.addOption("s", "skipdns", false, "skip performing reverse DNS lookups on IP addresses");
         options.addOption("v", "verbose", false, "display verbose output (useful for debugging)");
@@ -370,12 +368,11 @@ public class StatisticsImporterElasticSearch {
 
         elasticSearchLoggerInstance = new ElasticSearchLogger();
 
-        log.info("Getting Transport Client...");
+        log.info("Getting ElasticSearch Transport Client for StatisticsImporterElasticSearch...");
 
         // This is only invoked via terminal, do not use _this_ node as that data storing node.
         // Need to get a NodeClient or TransportClient, but definitely do not want to get a local data storing client.
         client = elasticSearchLoggerInstance.getClient(ElasticSearchLogger.ClientType.TRANSPORT);
-        log.info("We have TransportClient");
 
         client.admin().indices().prepareRefresh(ElasticSearchLogger.getIndexName()).execute().actionGet();
         bulkRequest = client.prepareBulk();
@@ -393,7 +390,7 @@ public class StatisticsImporterElasticSearch {
         }
         catch (FileNotFoundException fe)
         {
-            log.error("The GeoLite Database file is missing (" + dbfile + ")! Solr Statistics cannot generate location based reports! Please see the DSpace installation instructions for instructions to install this file.", fe);
+            log.error("The GeoLite Database file is missing (" + dbfile + ")! Elastic Search  Statistics cannot generate location based reports! Please see the DSpace installation instructions for instructions to install this file.", fe);
         }
         catch (IOException e)
         {
