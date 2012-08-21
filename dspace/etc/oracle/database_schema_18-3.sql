@@ -24,8 +24,8 @@
 ALTER TABLE resourcepolicy
   ADD (
         rpname VARCHAR2(30);
-        rpdescription VARCHAR2(100);
-        rptype VARCHAR2(30)
+        rptype VARCHAR2(30);
+        rpdescription VARCHAR2(100)
       );
 
 

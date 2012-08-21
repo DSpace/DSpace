@@ -295,17 +295,6 @@ public class AuthorizeManager
             }
         }
 
-        if (o instanceof Item)
-        {
-            Item i = (Item) o;
-            if (!i.isArchived()) return false;
-
-            if (i.isWithdrawn()) return false;
-
-            if (!i.isDiscoverable()) return false;
-        }
-
-
         for (ResourcePolicy rp : getPoliciesActionFilter(c, o, action))
         {
             // check policies for date validity
