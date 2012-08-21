@@ -637,32 +637,38 @@ public class BitstreamStorageManager
 				    continue;			// do not delete registered bitstreams
 				}
 
-                boolean success = file.delete();
 
-                String message = ("Deleted bitstream " + bid + " (file "
-                            + file.getAbsolutePath() + ") with result "
-                            + success);
-                if (log.isDebugEnabled())
+                // Since versioning allows for multiple bitstreams, check if the internal identifier isn't used on another place
+                TableRow duplicateBitRow = DatabaseManager.querySingleTable(context, "Bitstream", "SELECT * FROM Bitstream WHERE internal_id = ? AND bitstream_id <> ?", row.getStringColumn("internal_id"), bid);
+                if(duplicateBitRow == null)
                 {
-                    log.debug(message);
-                }
-                if (verbose)
-                {
-                    System.out.println(message);
+                    boolean success = file.delete();
+
+                    String message = ("Deleted bitstream " + bid + " (file "
+                                + file.getAbsolutePath() + ") with result "
+                                + success);
+                    if (log.isDebugEnabled())
+                    {
+                        log.debug(message);
+                    }
+                    if (verbose)
+                    {
+                        System.out.println(message);
+                    }
+
+                    // if the file was deleted then
+                    // try deleting the parents
+                    // Otherwise the cleanup script is set to
+                    // leave the db records then the file
+                    // and directories have already been deleted
+                    // if this is turned off then it still looks like the
+                    // file exists
+                    if( success )
+                    {
+                        deleteParents(file);
+                    }
                 }
 
-                // if the file was deleted then
-                // try deleting the parents
-                // Otherwise the cleanup script is set to 
-                // leave the db records then the file
-                // and directories have already been deleted
-                // if this is turned off then it still looks like the
-                // file exists
-                if( success )
-                {
-                    deleteParents(file);
-                }
-                
                 // Make sure to commit our outstanding work every 100
                 // iterations. Otherwise you risk losing the entire transaction
                 // if we hit an exception, which isn't useful at all for large
@@ -700,6 +706,22 @@ public class BitstreamStorageManager
             throw ioe;
         }
     }
+
+    /**
+     *
+     * @param context
+     * @param id of the bitstream to clone
+     * @return
+     * @throws SQLException
+     */
+    public static int clone(Context context, int id) throws SQLException
+    {
+        TableRow row = DatabaseManager.find(context, "bitstream", id);
+        row.setColumn("bitstream_id", -1);
+        DatabaseManager.insert(context, row);
+        return row.getIntColumn("bitstream_id");
+    }
+
 
     ////////////////////////////////////////
     // Internal methods

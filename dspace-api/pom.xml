@@ -106,13 +106,35 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!--
+                The ant plugin below ensures that the dspace "woven" configuration file ends up in the dspace directory
+                The dspace service manager needs this "woven" configuration file when it starts
+            -->
+            <plugin>
+              <artifactId>maven-antrun-plugin</artifactId>
+              <executions>
+                <execution>
+                  <phase>process-test-resources</phase>
+                  <configuration>
+                    <tasks>
+                        <copy file="${project.build.directory}/testing/dspace.cfg.woven" tofile="${project.build.directory}/testing/dspace/config/dspace.cfg"/>
+                    </tasks>
+                  </configuration>
+                  <goals>
+                    <goal>run</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
                         <dspace.dir>${project.build.directory}/testing/dspace</dspace.dir>
                         <dspace.dir.static>${basedir}/src/test/data/dspaceFolder</dspace.dir.static>
-                        <dspace.configuration>${project.build.directory}/testing/dspace.cfg.woven</dspace.configuration>
+                        <dspace.configuration>${project.build.directory}/testing/dspace/config/dspace.cfg</dspace.configuration>
                         <db.schema.path>${project.build.directory}/testing/dspace/etc/h2/database_schema.sql</db.schema.path>
                         <dspace.log.init.disable>true</dspace.log.init.disable>
                     </systemPropertyVariables>

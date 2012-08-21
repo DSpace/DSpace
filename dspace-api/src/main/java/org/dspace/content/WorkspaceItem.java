@@ -506,7 +506,7 @@ public class WorkspaceItem implements InProgressSubmission
     /**
      * Update the workspace item, including the unarchived item.
      */
-    public void update() throws SQLException, AuthorizeException, IOException
+    public void update() throws SQLException, AuthorizeException
     {
         // Authorisation is checked by the item.update() method below
 

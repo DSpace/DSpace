@@ -64,6 +64,7 @@
             BrowseArtifacts, SearchArtifacts
             <aspect name="Artifact Browser" path="resource://aspects/ArtifactBrowser/" />
         -->
+        <aspect name="Versioning Aspect" path="resource://aspects/Versioning/" />
         <aspect name="Displaying Artifacts" path="resource://aspects/ViewArtifacts/" />
         <aspect name="Browsing Artifacts" path="resource://aspects/BrowseArtifacts/" />
         <aspect name="Searching Artifacts" path="resource://aspects/SearchArtifacts/" />
