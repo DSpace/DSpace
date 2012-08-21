@@ -236,6 +236,8 @@ public class StatisticsImporterElasticSearch {
                     eperson.getID();
                 }
 
+                //TODO Is there any way to reuse ElasticSearchLogger.post() ?
+
                 // Save it in our server
                 XContentBuilder postBuilder = jsonBuilder().startObject()
                         .field("id", dso.getID())
@@ -249,10 +251,10 @@ public class StatisticsImporterElasticSearch {
                         .field("city", city)
 
                         .field("ip", ip)
-                        .field("userAgent")
 
                         .field("time", DateFormatUtils.format(date, SolrLogger.DATE_FORMAT_8601));
 
+                // Unable to get UserAgent from logs. .field("userAgent")
 
                 if (dso instanceof Bitstream) {
                     Bitstream bit = (Bitstream) dso;
@@ -285,11 +287,12 @@ public class StatisticsImporterElasticSearch {
                 errors--;
             }
 
-            BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-            if(bulkResponse.hasFailures()) {
-                log.error("Bulk Request Failed due to: " + bulkResponse.buildFailureMessage());
+            if(bulkRequest.numberOfActions() > 0) {
+                BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                if(bulkResponse.hasFailures()) {
+                    log.error("Bulk Request Failed due to: " + bulkResponse.buildFailureMessage());
+                }
             }
-
         }
         catch (RuntimeException re)
         {
@@ -366,7 +369,15 @@ public class StatisticsImporterElasticSearch {
         }
 
         elasticSearchLoggerInstance = new ElasticSearchLogger();
-        client = elasticSearchLoggerInstance.getClient();
+
+        log.info("Getting Transport Client...");
+
+        // This is only invoked via terminal, do not use _this_ node as that data storing node.
+        // Need to get a NodeClient or TransportClient, but definitely do not want to get a local data storing client.
+        client = elasticSearchLoggerInstance.getClient(ElasticSearchLogger.ClientType.TRANSPORT);
+        log.info("We have TransportClient");
+
+        client.admin().indices().prepareRefresh(ElasticSearchLogger.getIndexName()).execute().actionGet();
         bulkRequest = client.prepareBulk();
 
         // We got all our parameters now get the rest
