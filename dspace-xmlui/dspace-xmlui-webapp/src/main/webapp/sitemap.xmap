@@ -188,6 +188,7 @@
                     <map:reader name="SitemapReader" src="org.dspace.app.xmlui.cocoon.SitemapReader"/>
                     <map:reader name="ConcatenationReader" src="org.dspace.app.xmlui.cocoon.ConcatenationReader"/>
                     <map:reader name="JQueryLoaderReader" src="org.dspace.app.xmlui.utils.JQueryLoaderReader"/>
+                    <map:reader name="JSONControlledVocabularyReader" src="org.dspace.app.xmlui.cocoon.JSONControlledVocabularyReader"/>
                 </map:readers>
                 <map:actions>
                         <map:action name="locale" src="org.dspace.app.xmlui.cocoon.DSpaceLocaleAction"/>
@@ -380,6 +381,9 @@
                             <map:mount check-reload="no" src="aspects/json-solr.xmap" uri-prefix="JSON/discovery/"/>
                         </map:match>
 
+                        <map:match pattern="JSON/controlled-vocabulary">
+                            <map:read type="JSONControlledVocabularyReader"/>
+                        </map:match>
                 </map:pipeline>
 
                 <!-- new AJAX menu (choices) responses for metadata authority control -->

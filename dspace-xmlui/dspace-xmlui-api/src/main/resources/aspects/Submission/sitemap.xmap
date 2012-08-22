@@ -29,6 +29,7 @@
       <map:transformer name="SaveOrRemoveStep" src="org.dspace.app.xmlui.aspect.submission.submit.SaveOrRemoveStep"/>
       <map:transformer name="RemovedStep" src="org.dspace.app.xmlui.aspect.submission.submit.RemovedStep"/>
       <map:transformer name="CompletedStep" src="org.dspace.app.xmlui.aspect.submission.submit.CompletedStep"/>
+      <map:transformer name="ControlledVocabularyTransformer" src="org.dspace.app.xmlui.aspect.submission.ControlledVocabularyTransformer"/>
     </map:transformers>
     
     <map:selectors>
@@ -233,13 +234,19 @@
           <!-- javascript libraries and utils for choice/authority-control -->
           <map:match type="regexp" pattern="(^submit)|(^handle/.*/submit)|(^handle/.*/workflow)">
             <map:transform type="IncludePageMeta">
-              <map:parameter name="javascript.static#1" value="static/js/scriptaculous/prototype.js"/>
-              <map:parameter name="javascript.static#2" value="static/js/scriptaculous/effects.js"/>
-              <map:parameter name="javascript.static#3" value="static/js/scriptaculous/builder.js"/>
-              <map:parameter name="javascript.static#4" value="static/js/scriptaculous/controls.js"/>
-              <map:parameter name="javascript.static#5" value="static/js/choice-support.js"/>
+              <map:parameter name="javascript.static#1" value="loadJQuery.js"/>
+              <map:parameter name="javascript.static#2" value="static/js/vocabulary-support.js"/>
+              <map:parameter name="javascript.static#3" value="static/js/scriptaculous/prototype.js"/>
+              <map:parameter name="javascript.static#4" value="static/js/scriptaculous/effects.js"/>
+              <map:parameter name="javascript.static#5" value="static/js/scriptaculous/builder.js"/>
+              <map:parameter name="javascript.static#6" value="static/js/scriptaculous/controls.js"/>
+              <map:parameter name="javascript.static#7" value="static/js/choice-support.js"/>
             </map:transform>
           </map:match>
+
+            <map:match pattern="controlled-vocabulary-dialog">
+                <map:transform type="ControlledVocabularyTransformer"/>
+            </map:match>
 
           <map:serialize type="xml"/>
           

@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.utils;
 
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Response;
 import org.apache.cocoon.reading.AbstractReader;
 import org.xml.sax.SAXException;
 
@@ -29,13 +30,15 @@ public class JQueryLoaderReader extends AbstractReader {
     public void generate() throws IOException, SAXException, ProcessingException {
         String contextPath = ObjectModelHelper.getRequest(objectModel).getContextPath();
 
-        String script = "!window.jQuery && document.write('<script type=\"text/javascript\" src=\"" + contextPath + "/static/js/jquery-1.4.2.min.js\">&nbsp;</script>');";
+        String script = "!window.jQuery && document.write('<script type=\"text/javascript\" src=\"" + contextPath + "/static/js/jquery-1.6.2.min.js\">&nbsp;</script>');";
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(script.getBytes("UTF-8"));
 
         byte[] buffer = new byte[8192];
 
-        ObjectModelHelper.getResponse(objectModel).setHeader("Content-Length", String.valueOf(script.length()));
+        Response response = ObjectModelHelper.getResponse(objectModel);
+        response.setHeader("Content-Length", String.valueOf(script.length()));
+        response.setHeader("Content-Type", "text/javascript");
         int length;
         while ((length = inputStream.read(buffer)) > -1)
         {
