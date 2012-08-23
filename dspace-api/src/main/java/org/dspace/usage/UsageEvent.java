@@ -86,7 +86,7 @@ public class UsageEvent extends Event {
 			return  objText + ":" + action.text();
 		}catch(Exception e)
 		{
-			
+
 		}
 		return "";
 		
