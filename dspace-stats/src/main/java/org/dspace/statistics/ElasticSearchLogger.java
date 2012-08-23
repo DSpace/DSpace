@@ -57,8 +57,6 @@ public class ElasticSearchLogger {
 
     private static LookupService locationService;
 
-    private static Map<String, String> metadataStorageInfo;
-
     public static String clusterName = "dspacestatslogging";
     public static String indexName = "dspaceindex";
     public static String indexType = "stats";
@@ -117,18 +115,6 @@ public class ElasticSearchLogger {
         }
 
         log.info("useProxies=" + useProxies);
-
-        metadataStorageInfo = new HashMap<String, String>();
-        int count = 1;
-        String metadataVal;
-        while ((metadataVal = ConfigurationManager.getProperty("solr-statistics", "metadata.item." + count)) != null) {
-            String storeVal = metadataVal.split(":")[0];
-            String metadataField = metadataVal.split(":")[1];
-
-            metadataStorageInfo.put(storeVal, metadataField);
-            log.info("solr-statistics.metadata.item." + count + "=" + metadataVal);
-            count++;
-        }
         
         // Configurable values for all elasticsearch connection constants
         clusterName = getConfigurationStringWithFallBack("statistics.elasticsearch.clusterName", clusterName);
@@ -359,25 +345,6 @@ public class ElasticSearchLogger {
 
                 if (request.getHeader("User-Agent") != null) {
                     docBuilder.field("userAgent", request.getHeader("User-Agent"));
-                }
-            }
-
-            if (dspaceObject instanceof Item) {
-                Item item = (Item) dspaceObject;
-                // Store the metadata
-                for (Object storedField : metadataStorageInfo.keySet()) {
-                    String dcField = metadataStorageInfo
-                            .get(storedField);
-
-                    DCValue[] vals = item.getMetadata(dcField.split("\\.")[0],
-                            dcField.split("\\.")[1], dcField.split("\\.")[2],
-                            Item.ANY);
-                    for (DCValue val1 : vals) {
-                        String val = val1.value;
-                        docBuilder.field(String.valueOf(storedField), val);
-                        docBuilder.field(storedField + "_search", val
-                                .toLowerCase());
-                    }
                 }
             }
 
