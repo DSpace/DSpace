@@ -470,7 +470,7 @@ public class StatisticsImporter
 		solr = new CommonsHttpSolrServer(sserver);
 
 		metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
-        String dbfile = ConfigurationManager.getProperty("solr-statistics", "dbfile");
+        String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
         try
         {
             geoipLookup = new LookupService(dbfile, LookupService.GEOIP_STANDARD);

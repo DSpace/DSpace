@@ -383,7 +383,7 @@ public class StatisticsImporterElasticSearch {
         // Verbose option
         boolean verbose = line.hasOption('v');
 
-        String dbfile = ConfigurationManager.getProperty("solr-statistics", "dbfile");
+        String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
         try
         {
             geoipLookup = new LookupService(dbfile, LookupService.GEOIP_STANDARD);

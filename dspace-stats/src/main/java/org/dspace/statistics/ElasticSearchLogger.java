@@ -92,18 +92,17 @@ public class ElasticSearchLogger {
         try {
         LookupService service = null;
         // Get the db file for the location
-        String dbfile = ConfigurationManager.getProperty("solr-statistics", "dbfile");
+        String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
         if (dbfile != null) {
             try {
-                service = new LookupService(dbfile,
-                        LookupService.GEOIP_STANDARD);
+                service = new LookupService(dbfile, LookupService.GEOIP_STANDARD);
             } catch (FileNotFoundException fe) {
-                log.error("The GeoLite Database file is missing (" + dbfile + ")! Solr Statistics cannot generate location based reports! Please see the DSpace installation instructions for instructions to install this file.", fe);
+                log.error("The GeoLite Database file is missing (" + dbfile + ")! Usage Statistics cannot generate location based reports! Please see the DSpace installation instructions for instructions to install this file.", fe);
             } catch (IOException e) {
                 log.error("Unable to load GeoLite Database file (" + dbfile + ")! You may need to reinstall it. See the DSpace installation instructions for more details.", e);
             }
         } else {
-            log.error("The required 'dbfile' configuration is missing in solr-statistics.cfg!");
+            log.error("The required 'dbfile' configuration is missing in usage-statistics.cfg!");
         }
         locationService = service;
 
@@ -270,7 +269,7 @@ public class ElasticSearchLogger {
 
         try {
             if (isSpiderBot &&
-                    !ConfigurationManager.getBooleanProperty("solr-statistics", "logBots", true)) {
+                    !ConfigurationManager.getBooleanProperty("usage-statistics", "logBots", true)) {
                 return;
             }
 
