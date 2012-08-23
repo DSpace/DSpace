@@ -62,7 +62,6 @@ public class ElasticSearchLogger {
     public static String indexType = "stats";
     public static String address = "127.0.0.1";
     public static int port = 9300;
-    public static boolean storeData = true;
 
     private static Client client;
 
@@ -117,12 +116,11 @@ public class ElasticSearchLogger {
         log.info("useProxies=" + useProxies);
         
         // Configurable values for all elasticsearch connection constants
-        clusterName = getConfigurationStringWithFallBack("statistics.elasticsearch.clusterName", clusterName);
-        indexName   = getConfigurationStringWithFallBack("statistics.elasticsearch.indexName", indexName);
-        indexType   = getConfigurationStringWithFallBack("statistics.elasticsearch.indexType", indexType);
-        address     = getConfigurationStringWithFallBack("statistics.elasticsearch.address", address);
-        port        = ConfigurationManager.getIntProperty("statistics.elasticsearch.port", port);
-        storeData   = ConfigurationManager.getBooleanProperty("statistics.elasticsearch.storeData", storeData);
+        clusterName = getConfigurationStringWithFallBack("elastic-search-statistics", "clusterName", clusterName);
+        indexName   = getConfigurationStringWithFallBack("elastic-search-statistics", "indexName", indexName);
+        indexType   = getConfigurationStringWithFallBack("elastic-search-statistics", "indexType", indexType);
+        address     = getConfigurationStringWithFallBack("elastic-search-statistics", "address", address);
+        port        = ConfigurationManager.getIntProperty("elastic-search-statistics", "port", port);
 
         //Initialize the connection to Elastic Search, and ensure our index is available.
         client = getClient();
@@ -491,24 +489,20 @@ public class ElasticSearchLogger {
         return useProxies;
     }
 
-    // Transport Client will talk to another server on 9300
+    // Transport Client will talk to server on 9300
     public void createTransportClient() {
         // Configurable values for all elasticsearch connection constants
-        clusterName = getConfigurationStringWithFallBack("statistics.elasticsearch.clusterName", clusterName);
-        indexName   = getConfigurationStringWithFallBack("statistics.elasticsearch.indexName", indexName);
-        indexType   = getConfigurationStringWithFallBack("statistics.elasticsearch.indexType", indexType);
-        address     = getConfigurationStringWithFallBack("statistics.elasticsearch.address", address);
-        port        = ConfigurationManager.getIntProperty("statistics.elasticsearch.port", port);
-        storeData   = ConfigurationManager.getBooleanProperty("statistics.elasticsearch.storeData", storeData);
+        // Can't guarantee that these values are already loaded, since this can be called by a different JVM
+        clusterName = getConfigurationStringWithFallBack("elastic-search-statistics", "clusterName", clusterName);
+        indexName   = getConfigurationStringWithFallBack("elastic-search-statistics", "indexName", indexName);
+        indexType   = getConfigurationStringWithFallBack("elastic-search-statistics", "indexType", indexType);
+        address     = getConfigurationStringWithFallBack("elastic-search-statistics", "address", address);
+        port        = ConfigurationManager.getIntProperty("elastic-search-statistics", "port", port);
 
         log.info("Creating TransportClient to [Address:" + address + "] [Port:" + port + "] [cluster.name:" + clusterName + "]");
 
         Settings settings = ImmutableSettings.settingsBuilder().put("cluster.name", clusterName).build();
         client = new TransportClient(settings).addTransportAddress(new InetSocketTransportAddress(address, port));
-    }
-
-    public void createElasticClient() {
-        //createElasticClient(true);
     }
     
     public Client getClient() {
@@ -557,8 +551,8 @@ public class ElasticSearchLogger {
         return client;
     }
     
-    public String getConfigurationStringWithFallBack(String configurationKey, String defaultFallbackValue) {
-        String configDrivenValue = ConfigurationManager.getProperty(configurationKey);
+    public String getConfigurationStringWithFallBack(String module, String configurationKey, String defaultFallbackValue) {
+        String configDrivenValue = ConfigurationManager.getProperty(module, configurationKey);
         if(configDrivenValue == null || configDrivenValue.trim().equalsIgnoreCase("")) {
             return defaultFallbackValue;
         } else {
