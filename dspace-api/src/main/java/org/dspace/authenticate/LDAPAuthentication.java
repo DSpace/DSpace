@@ -9,19 +9,16 @@ package org.dspace.authenticate;
 
 import java.sql.SQLException;
 import java.util.Hashtable;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.BasicAttribute;
-import javax.naming.directory.BasicAttributes;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.InitialDirContext;
-import javax.naming.directory.SearchResult;
+import javax.naming.directory.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
@@ -31,10 +28,16 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
 /**
- * Authentication module to authenticate against a flat LDAP tree where
- * all users are in the same unit.
+ * This combined LDAP authentication method supersedes both the 'LDAPAuthentication'
+ * and the 'LDAPHierarchicalAuthentication' methods. It's capable of both:
+ * - authenticaton  against a flat LDAP tree where all users are in the same unit
+ *   (if search.user or search.password is not set)
+ * - authentication against structured hierarchical LDAP trees of users. 
+ *   An initial bind is required using a user name and password in order to
+ *   search the tree and find the DN of the user. A second bind is then required to
+ *   check the credentials of the user by binding directly to their DN.
  *
- * @author Larry Stone, Stuart Lewis
+ * @author Stuart Lewis, Chris Yates, Alex Barbieri, Flavio Botelho, Reuben Pasquini, Samuel Ottenhoff, Ivan Masár
  * @version $Revision$
  */
 public class LDAPAuthentication
@@ -43,7 +46,7 @@ public class LDAPAuthentication
     /** log4j category */
     private static Logger log = Logger.getLogger(LDAPAuthentication.class);
 
-    /**
+	/**
      * Let a real auth method return true if it wants.
      */
     public boolean canSelfRegister(Context context,
@@ -51,8 +54,7 @@ public class LDAPAuthentication
                                    String username)
         throws SQLException
     {
-        // XXX might also want to check that username exists in LDAP.
-
+        // Looks to see if autoregister is set or not
         return ConfigurationManager.getBooleanProperty("authentication-ldap", "autoregister");
     }
 
@@ -89,7 +91,7 @@ public class LDAPAuthentication
 
     /*
      * Add authenticated users to the group defined in dspace.cfg by
-     * the ldap.login.specialgroup key.
+     * the login.specialgroup key.
      */
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
     {
@@ -102,7 +104,7 @@ public class LDAPAuthentication
 				String groupName = ConfigurationManager.getProperty("authentication-ldap", "login.specialgroup");
 				if ((groupName != null) && (!groupName.trim().equals("")))
 				{
-				Group ldapGroup = Group.findByName(context, groupName);
+					Group ldapGroup = Group.findByName(context, groupName);
 					if (ldapGroup == null)
 					{
 						// Oops - the group isn't there.
@@ -122,12 +124,39 @@ public class LDAPAuthentication
 		}
 		return new int[0];
     }
-	
-	/*
-     * MIT policy on certs and groups, so always short-circuit.
+
+    /*
+     * Authenticate the given credentials.
+     * This is the heart of the authentication method: test the
+     * credentials for authenticity, and if accepted, attempt to match
+     * (or optionally, create) an <code>EPerson</code>.  If an <code>EPerson</code> is found it is
+     * set in the <code>Context</code> that was passed.
+     *
+     * @param context
+     *  DSpace context, will be modified (ePerson set) upon success.
+     *
+     * @param username
+     *  Username (or email address) when method is explicit. Use null for
+     *  implicit method.
+     *
+     * @param password
+     *  Password for explicit auth, or null for implicit method.
+     *
+     * @param realm
+     *  Realm is an extra parameter used by some authentication methods, leave null if
+     *  not applicable.
+     *
+     * @param request
+     *  The HTTP request that started this operation, or null if not applicable.
      *
      * @return One of:
      *   SUCCESS, BAD_CREDENTIALS, CERT_REQUIRED, NO_SUCH_USER, BAD_ARGS
+     * <p>Meaning:
+     * <br>SUCCESS         - authenticated OK.
+     * <br>BAD_CREDENTIALS - user exists, but credentials (e.g. passwd) don't match
+     * <br>CERT_REQUIRED   - not allowed to login this way without X.509 cert.
+     * <br>NO_SUCH_USER    - user not found using this method.
+     * <br>BAD_ARGS        - user/pw not appropriate for this method
      */
     public int authenticate(Context context,
                             String netid,
@@ -155,7 +184,32 @@ public class LDAPAuthentication
         }
         SpeakerToLDAP ldap = new SpeakerToLDAP(log);
 
-        // if they entered a netid that matches an eperson
+		// Get the DN of the user
+		String adminUser = ConfigurationManager.getProperty("authentication-ldap", "search.user");
+		String adminPassword = ConfigurationManager.getProperty("authentication-ldap", "search.password");
+		String objectContext = ConfigurationManager.getProperty("authentication-ldap", "object_context");
+		String idField = ConfigurationManager.getProperty("authentication-ldap", "id_field");
+		String dn = "";
+
+		// If adminUser is blank, then we can't search so assume the DN
+		if (StringUtils.isBlank(adminUser) || StringUtils.isBlank(adminPassword))
+		{
+			dn = idField + "=" + netid + "," + objectContext;
+		}
+		else
+		{
+			dn = ldap.getDNOfUser(adminUser, adminPassword, context, netid);
+		}
+
+		// Check a DN was found
+		if ((dn == null) || (dn.trim().equals("")))
+		{
+			log.info(LogManager
+				.getHeader(context, "failed_login", "no DN found for user " + netid));
+			return BAD_CREDENTIALS;
+		}
+
+		// if they entered a netid that matches an eperson
         if (eperson != null)
         {
             // e-mail address corresponds to active account
@@ -168,11 +222,15 @@ public class LDAPAuthentication
                 return BAD_ARGS;
             }
 
-            if (ldap.ldapAuthenticate(netid, password, context))
+            if (ldap.ldapAuthenticate(dn, password, context))
             {
-                eperson = EPerson.findByNetid(context, netid.toLowerCase());
                 context.setCurrentUser(eperson);
-                log.info(LogManager.getHeader(context, "authenticate", "type=ldap"));
+
+                // assign user to groups based on ldap dn
+                assignGroupsBasedOnLdapDn(dn, context);
+                
+                log.info(LogManager
+                    .getHeader(context, "authenticate", "type=ldap"));
                 return SUCCESS;
             }
             else
@@ -185,7 +243,7 @@ public class LDAPAuthentication
         // with ldap and create an eperson for them
         else
         {
-            if (ldap.ldapAuthenticate(netid, password, context))
+            if (ldap.ldapAuthenticate(dn, password, context))
             {
                 // Register the new user automatically
                 log.info(LogManager.getHeader(context,
@@ -201,85 +259,92 @@ public class LDAPAuthentication
 
                 if ((email != null) && (!"".equals(email)))
 				{
-                    try
-                    {
-                        eperson = EPerson.findByEmail(context, email);
-	                    if (eperson!=null)
-	                    {
-	                        log.info(LogManager.getHeader(context,
-	                                "type=ldap-login", "type=ldap_but_already_email"));
-	                        context.setIgnoreAuthorization(true);
-	                        eperson.setNetid(netid.toLowerCase());
-	                        eperson.update();
-	                        context.commit();
-	                        context.setIgnoreAuthorization(false);
-	                        context.setCurrentUser(eperson);
-	                        return SUCCESS;
-	                    }
-	                    else
-	                    {
-	                        if (canSelfRegister(context, request, netid))
-	                        {
-	                            // TEMPORARILY turn off authorisation
-	                            try
-	                            {
-	                                context.setIgnoreAuthorization(true);
-	                                eperson = EPerson.create(context);
-	                                if ((email != null) && (!"".equals(email)))
+					try
+					{
+						eperson = EPerson.findByEmail(context, email);
+						if (eperson!=null)
+						{
+							log.info(LogManager.getHeader(context,
+									"type=ldap-login", "type=ldap_but_already_email"));
+							context.setIgnoreAuthorization(true);
+							eperson.setNetid(netid.toLowerCase());
+							eperson.update();
+							context.commit();
+							context.setIgnoreAuthorization(false);
+							context.setCurrentUser(eperson);
+
+							// assign user to groups based on ldap dn
+							assignGroupsBasedOnLdapDn(dn, context);
+
+							return SUCCESS;
+						}
+						else
+						{
+							if (canSelfRegister(context, request, netid))
+							{
+								// TEMPORARILY turn off authorisation
+								try
+								{
+									context.setIgnoreAuthorization(true);
+									eperson = EPerson.create(context);
+									if ((email != null) && (!"".equals(email)))
 									{
 										eperson.setEmail(email);
 									}
-	                                if ((ldap.ldapGivenName!=null)&&(!ldap.ldapGivenName.equals("")))
-                                    {
-                                        eperson.setFirstName(ldap.ldapGivenName);
-                                    }
-	                                if ((ldap.ldapSurname!=null)&&(!ldap.ldapSurname.equals("")))
-                                    {
-                                        eperson.setLastName(ldap.ldapSurname);
-                                    }
-	                                if ((ldap.ldapPhone!=null)&&(!ldap.ldapPhone.equals("")))
-                                    {
-                                        eperson.setMetadata("phone", ldap.ldapPhone);
-                                    }
-	                                eperson.setNetid(netid.toLowerCase());
-	                                eperson.setCanLogIn(true);
-	                                AuthenticationManager.initEPerson(context, request, eperson);
-	                                eperson.update();
-	                                context.commit();
+									if ((ldap.ldapGivenName!=null) && (!ldap.ldapGivenName.equals("")))
+									{
+										eperson.setFirstName(ldap.ldapGivenName);
+									}
+									if ((ldap.ldapSurname!=null) && (!ldap.ldapSurname.equals("")))
+									{
+										eperson.setLastName(ldap.ldapSurname);
+									}
+									if ((ldap.ldapPhone!=null)&&(!ldap.ldapPhone.equals("")))
+									{
+										eperson.setMetadata("phone", ldap.ldapPhone);
+									}
+									eperson.setNetid(netid.toLowerCase());
+									eperson.setCanLogIn(true);
+									AuthenticationManager.initEPerson(context, request, eperson);
+									eperson.update();
+									context.commit();
 									context.setCurrentUser(eperson);
-								}
-	                            catch (AuthorizeException e)
-	                            {
-	                                return NO_SUCH_USER;
-	                            }
-	                            finally
-	                            {
-	                                context.setIgnoreAuthorization(false);
-	                            }
 
-	                            log.info(LogManager.getHeader(context, "authenticate",
-	                                        "type=ldap-login, created ePerson"));
-	                            return SUCCESS;
-	                        }
-	                        else
-	                        {
-	                            // No auto-registration for valid certs
-	                            log.info(LogManager.getHeader(context,
-	                                            "failed_login", "type=ldap_but_no_record"));
-	                            return NO_SUCH_USER;
-	                        }
-	                    }
-                    }
-                    catch (AuthorizeException e)
-                    {
-                        eperson = null;
-                    }
-                    finally
-                    {
-                        context.setIgnoreAuthorization(false);
-                    }
-                }
-            }
+									// assign user to groups based on ldap dn
+									assignGroupsBasedOnLdapDn(dn, context);
+								}
+								catch (AuthorizeException e)
+								{
+									return NO_SUCH_USER;
+								}
+								finally
+								{
+									context.setIgnoreAuthorization(false);
+								}
+
+								log.info(LogManager.getHeader(context, "authenticate",
+											"type=ldap-login, created ePerson"));
+								return SUCCESS;
+							}
+							else
+							{
+								// No auto-registration for valid certs
+								log.info(LogManager.getHeader(context,
+												"failed_login", "type=ldap_but_no_record"));
+								return NO_SUCH_USER;
+							}
+						}
+					}
+					catch (AuthorizeException e)
+					{
+						eperson = null;
+					}
+					finally
+					{
+						context.setIgnoreAuthorization(false);
+					}
+				}
+			}
         }
         return BAD_ARGS;
     }
@@ -292,141 +357,219 @@ public class LDAPAuthentication
 
         private Logger log = null;
 
-        /** ldap email result */
         protected String ldapEmail = null;
-
-        /** ldap name result */
         protected String ldapGivenName = null;
         protected String ldapSurname = null;
         protected String ldapPhone = null;
 
-        SpeakerToLDAP(Logger thelog)
+		/** LDAP settings */
+		String ldap_provider_url = ConfigurationManager.getProperty("authentication-ldap", "provider_url");
+		String ldap_id_field = ConfigurationManager.getProperty("authentication-ldap", "id_field");
+		String ldap_search_context = ConfigurationManager.getProperty("authentication-ldap", "search_context");
+		String ldap_search_scope = ConfigurationManager.getProperty("authentication-ldap", "search_scope");
+
+		String ldap_email_field = ConfigurationManager.getProperty("authentication-ldap", "email_field");
+		String ldap_givenname_field = ConfigurationManager.getProperty("authentication-ldap", "givenname_field");
+		String ldap_surname_field = ConfigurationManager.getProperty("authentication-ldap", "surname_field");
+		String ldap_phone_field = ConfigurationManager.getProperty("authentication-ldap", "phone_field");
+
+		SpeakerToLDAP(Logger thelog)
         {
             log = thelog;
         }
 
-        /**
-         * contact the ldap server and attempt to authenticate
-         */
-        protected boolean ldapAuthenticate(String netid, String password, Context context)
-        {
-            if (!password.equals(""))
+		protected String getDNOfUser(String adminUser, String adminPassword, Context context, String netid)
+		{
+			// The resultant DN
+			String resultDN;
+
+			// The search scope to use (default to 0)
+			int ldap_search_scope_value = 0;
+			try
+			{
+				ldap_search_scope_value = Integer.parseInt(ldap_search_scope.trim());
+			}
+			catch (NumberFormatException e)
+			{
+				// Log the error if it has been set but is invalid
+				if (ldap_search_scope != null)
+				{
+					log.warn(LogManager.getHeader(context,
+							"ldap_authentication", "invalid search scope: " + ldap_search_scope));
+				}
+			}
+
+			// Set up environment for creating initial context
+			Hashtable env = new Hashtable(11);
+			env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+			env.put(javax.naming.Context.PROVIDER_URL, ldap_provider_url);
+
+            if ((adminUser != null) && (!adminUser.trim().equals("")) &&
+                (adminPassword != null) && (!adminPassword.trim().equals("")))
             {
-                String ldap_provider_url = ConfigurationManager.getProperty("authentication-ldap", "provider_url");
-                String ldap_id_field = ConfigurationManager.getProperty("authentication-ldap", "id_field");
-                String ldap_search_context = ConfigurationManager.getProperty("authentication-ldap", "search_context");
-                String ldap_object_context = ConfigurationManager.getProperty("authentication-ldap", "object_context");
-
-                // Set up environment for creating initial context
-                Hashtable env = new Hashtable(11);
-                env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-                env.put(javax.naming.Context.PROVIDER_URL, ldap_provider_url);
-
-                // Authenticate
+                // Use admin credencials for search// Authenticate
                 env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "simple");
-                env.put(javax.naming.Context.SECURITY_PRINCIPAL, ldap_id_field+"="+netid+","+ldap_object_context);
-                env.put(javax.naming.Context.SECURITY_CREDENTIALS, password);
-
-                DirContext ctx = null;
-                try
-                {
-                    // Create initial context
-                    ctx = new InitialDirContext(env);
-
-                    String ldap_email_field = ConfigurationManager.getProperty("authentication-ldap", "email_field");
-                    String ldap_givenname_field = ConfigurationManager.getProperty("authentication-ldap", "givenname_field");
-                    String ldap_surname_field = ConfigurationManager.getProperty("authentication-ldap", "surname_field");
-                    String ldap_phone_field = ConfigurationManager.getProperty("authentication-ldap", "phone_field");
-
-                    Attributes matchAttrs = new BasicAttributes(true);
-                    matchAttrs.put(new BasicAttribute(ldap_id_field, netid));
-
-                    String attlist[] = {ldap_email_field, ldap_givenname_field, ldap_surname_field, ldap_phone_field};
-
-                    // look up attributes
-                    try
-                    {
-                        NamingEnumeration answer = ctx.search(ldap_search_context, matchAttrs, attlist);
-                        while(answer.hasMore()) {
-                            SearchResult sr = (SearchResult)answer.next();
-                            Attributes atts = sr.getAttributes();
-                            Attribute att;
-
-                            if (attlist[0]!=null)
-                            {
-                                    att = atts.get(attlist[0]);
-                                    if (att != null)
-                                    {
-                                        ldapEmail = (String) att.get();
-                                    }
-                            }
-
-                            if (attlist[1]!=null)
-                            {
-                                    att = atts.get(attlist[1]);
-                                    if (att != null)
-                                    {
-                                        ldapGivenName = (String) att.get();
-                                    }
-                            }
-
-                            if (attlist[2]!=null)
-                            {
-                                    att = atts.get(attlist[2]);
-                                    if (att != null)
-                                    {
-                                        ldapSurname = (String) att.get();
-                                    }
-                            }
-
-                            if (attlist[3]!=null)
-                            {
-                                    att = atts.get(attlist[3]);
-                                    if (att != null)
-                                    {
-                                        ldapPhone = (String) att.get();
-                                    }
-                            }
-                        }
-                    }
-                    catch (NamingException e)
-                    {
-                        // if the lookup fails go ahead and create a new record for them because the authentication
-                        // succeeded
-                        log.warn(LogManager.getHeader(context,
-                                        "ldap_attribute_lookup", "type=failed_search "+e));
-                        return true;
-                    }
-                }
-                catch (NamingException e)
-                {
-                    log.warn(LogManager.getHeader(context,
-                                        "ldap_authentication", "type=failed_auth "+e));
-                    return false;
-                }
-                finally
-                {
-                    // Close the context when we're done
-                    try
-                    {
-                        if (ctx != null)
-                        {
-                            ctx.close();
-                        }
-                    }
-                    catch (NamingException e)
-                    {
-                    }
-                }
+                env.put(javax.naming.Context.SECURITY_PRINCIPAL, adminUser);
+                env.put(javax.naming.Context.SECURITY_CREDENTIALS, adminPassword);
             }
             else
             {
-                return false;
+                // Use anonymous authentication
+                env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "none");
             }
 
-            return true;
-        }
-    }
+			DirContext ctx = null;
+			try
+			{
+				// Create initial context
+				ctx = new InitialDirContext(env);
+
+				Attributes matchAttrs = new BasicAttributes(true);
+				matchAttrs.put(new BasicAttribute(ldap_id_field, netid));
+
+				// look up attributes
+				try
+				{
+					SearchControls ctrls = new SearchControls();
+					ctrls.setSearchScope(ldap_search_scope_value);
+
+					NamingEnumeration<SearchResult> answer = ctx.search(
+							ldap_provider_url + ldap_search_context,
+							"(&({0}={1}))", new Object[] { ldap_id_field,
+									netid }, ctrls);
+
+					while (answer.hasMoreElements()) {
+						SearchResult sr = answer.next();
+                        if (StringUtils.isEmpty(ldap_search_context)) {
+                            resultDN = sr.getName();
+                        } else {
+                            resultDN = (sr.getName() + "," + ldap_search_context);
+                        }
+
+						String attlist[] = {ldap_email_field, ldap_givenname_field,
+								            ldap_surname_field, ldap_phone_field};
+						Attributes atts = sr.getAttributes();
+						Attribute att;
+
+						if (attlist[0] != null) {
+							att = atts.get(attlist[0]);
+							if (att != null)
+                            {
+                                ldapEmail = (String) att.get();
+                            }
+						}
+
+						if (attlist[1] != null) {
+							att = atts.get(attlist[1]);
+							if (att != null)
+                            {
+                                ldapGivenName = (String) att.get();
+                            }
+						}
+
+						if (attlist[2] != null) {
+							att = atts.get(attlist[2]);
+							if (att != null)
+                            {
+                                ldapSurname = (String) att.get();
+                            }
+						}
+
+						if (attlist[3] != null) {
+							att = atts.get(attlist[3]);
+							if (att != null)
+                            {
+                                ldapPhone = (String) att.get();
+                            }
+						}
+
+						if (answer.hasMoreElements()) {
+							// Oh dear - more than one match
+							// Ambiguous user, can't continue
+
+						} else {
+							log.debug(LogManager.getHeader(context, "got DN", resultDN));
+							return resultDN;
+						}
+					}
+				}
+				catch (NamingException e)
+				{
+					// if the lookup fails go ahead and create a new record for them because the authentication
+					// succeeded
+					log.warn(LogManager.getHeader(context,
+								"ldap_attribute_lookup", "type=failed_search "
+										+ e));
+				}
+			}
+			catch (NamingException e)
+			{
+				log.warn(LogManager.getHeader(context,
+							"ldap_authentication", "type=failed_auth " + e));
+			}
+			finally
+			{
+				// Close the context when we're done
+				try
+				{
+					if (ctx != null)
+                    {
+                        ctx.close();
+                    }
+				}
+				catch (NamingException e)
+				{
+				}
+			}
+
+			// No DN match found
+			return null;
+		}
+
+		/**
+         * contact the ldap server and attempt to authenticate
+         */
+		protected boolean ldapAuthenticate(String netid, String password,
+						Context context) {
+			if (!password.equals("")) {
+				// Set up environment for creating initial context
+				Hashtable<String, String> env = new Hashtable<String, String>();
+				env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY,
+						"com.sun.jndi.ldap.LdapCtxFactory");
+				env.put(javax.naming.Context.PROVIDER_URL, ldap_provider_url);
+
+				// Authenticate
+				env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "Simple");
+				env.put(javax.naming.Context.SECURITY_PRINCIPAL, netid);
+				env.put(javax.naming.Context.SECURITY_CREDENTIALS, password);
+				env.put(javax.naming.Context.AUTHORITATIVE, "true");
+				env.put(javax.naming.Context.REFERRAL, "follow");
+
+				DirContext ctx = null;
+				try {
+					// Try to bind
+					ctx = new InitialDirContext(env);
+				} catch (NamingException e) {
+					log.warn(LogManager.getHeader(context,
+							"ldap_authentication", "type=failed_auth " + e));
+					return false;
+				} finally {
+					// Close the context when we're done
+					try {
+						if (ctx != null)
+                        {
+                            ctx.close();
+                        }
+					} catch (NamingException e) {
+					}
+				}
+			} else {
+				return false;
+			}
+
+			return true;
+		}		
+	}
 
     /*
      * Returns URL to which to redirect to obtain credentials (either password
@@ -463,5 +606,58 @@ public class LDAPAuthentication
     public String loginPageTitle(Context context)
     {
         return "org.dspace.eperson.LDAPAuthentication.title";
+    }
+
+
+    /*
+     * Add authenticated users to the group defined in dspace.cfg by
+     * the ldap.login.groupmap.* key.
+     */
+    private void assignGroupsBasedOnLdapDn(String dn, Context context)
+    {
+        if (StringUtils.isNotBlank(dn)) 
+        {
+            System.out.println("dn:" + dn);
+            int i = 1;
+            String groupMap = ConfigurationManager.getProperty("authentication-ldap", "login.groupmap." + i);
+            while (groupMap != null)
+            {
+                String t[] = groupMap.split(":");
+                String ldapSearchString = t[0];
+                String dspaceGroupName = t[1];
+
+                if (StringUtils.containsIgnoreCase(dn, ldapSearchString)) 
+                {
+                    // assign user to this group   
+                    try
+                    {
+                        Group ldapGroup = Group.findByName(context, dspaceGroupName);
+                        if (ldapGroup != null)
+                        {
+                            ldapGroup.addMember(context.getCurrentUser());
+                            ldapGroup.update();
+                            context.commit();
+                        }
+                        else
+                        {
+                            // The group does not exist
+                            log.warn(LogManager.getHeader(context,
+                                    "ldap_assignGroupsBasedOnLdapDn",
+                                    "Group defined in ldap.login.groupmap." + i + " does not exist :: " + dspaceGroupName));
+                        }
+                    }
+                    catch (AuthorizeException ae)
+                    {
+						log.debug(LogManager.getHeader(context, "assignGroupsBasedOnLdapDn could not authorize addition to group", dspaceGroupName));
+                    }
+                    catch (SQLException e)
+                    {
+						log.debug(LogManager.getHeader(context, "assignGroupsBasedOnLdapDn could not find group", dspaceGroupName));
+                    }
+                }
+
+                groupMap = ConfigurationManager.getProperty("ldap.login.groupmap." + ++i);
+            }
+        }
     }
 }
