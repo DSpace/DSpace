@@ -597,9 +597,9 @@
 <message key="xmlui.Submission.Submissions.submit_info1a">Si desea incorporar nuevos documentos al repositorio haga click en </message>
 <message key="xmlui.Submission.Submissions.submit_info1b">agregar un documento</message>
 <message key="xmlui.Submission.Submissions.submit_info1c">. Podrá cargar todos los recursos académicos que desee para que sean incluidos como parte de la producción intelectual de la UNLP, y consecuentemente preservados y difundidos de forma tal que los documentos sean libremente accesibles a perpetuidad. El proceso de carga consiste en una serie de pasos simples que no debería demandar más de unos pocos minutos.</message>
-<message key="xmlui.Submission.Submissions.submit_head2">Cargas no teminadas</message>
-<message key="xmlui.Submission.Submissions.submit_info2a">Estos son los envíos parciales de ítems que no han sido completados. Podría</message>
-<message key="xmlui.Submission.Submissions.submit_info2b">comenzar otro envío</message>
+<message key="xmlui.Submission.Submissions.submit_head2">Cargas Pendientes</message>
+<message key="xmlui.Submission.Submissions.submit_info2a">Envíos pendientes. Podría</message>
+<message key="xmlui.Submission.Submissions.submit_info2b">Nuevo envío</message>
 <message key="xmlui.Submission.Submissions.submit_info2c">.</message>
 <message key="xmlui.Submission.Submissions.submit_column1"></message>
 <message key="xmlui.Submission.Submissions.submit_column2">Título</message>
