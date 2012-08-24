@@ -468,7 +468,7 @@
                                                         select="concat('http://www.mendeley.com/import/?url=http://datadryad.org/resource/',
                                                                        $pkgDOI)" />
                                                 </xsl:attribute>
-                                                <img border="0px;" src="http://www.mendeley.com/graphics/mendeley.png"/>
+                                                <img border="0px;" src="http://www.mendeley.com/graphics/mendeley.png" alt="Mendeley"/>
                                             </xsl:element>
                                         </td>
                                     </tr>
@@ -874,7 +874,7 @@
                                                             select="concat('http://www.mendeley.com/import/?url=http://datadryad.org/resource/',
                                                             $my_doi)" />
                                                </xsl:attribute>
-                                                <img border="0px;" src="http://www.mendeley.com/graphics/mendeley.png"/>
+                                                <img border="0px;" src="http://www.mendeley.com/graphics/mendeley.png" alt="Mendeley"/>
                                             </xsl:element>
                                         </td>
                                     </tr>
@@ -1067,7 +1067,9 @@
                 <xsl:for-each
                         select=".//dim:field[@element='subject'][@mdschema='dc'][not(@qualifier)]">
                     <xsl:copy-of select="node()"/>
-                    <xsl:text>, </xsl:text>
+                    <xsl:if test="position() != last()">
+		      <xsl:text>, </xsl:text>
+		    </xsl:if>
                 </xsl:for-each>
             </xsl:variable>
             <xsl:if test="$keywords!=''">
@@ -1105,7 +1107,9 @@
             <xsl:variable name="sciNames">
                 <xsl:for-each select=".//dim:field[@element='ScientificName']">
                     <xsl:copy-of select="node()"/>
-                    <xsl:text>, </xsl:text>
+                    <xsl:if test="position() != last()">
+		      <xsl:text>, </xsl:text>
+		    </xsl:if>
                 </xsl:for-each>
             </xsl:variable>
             <xsl:if test="$sciNames!=''">
@@ -1127,7 +1131,9 @@
                 <xsl:for-each
                         select=".//dim:field[@element='coverage'][@qualifier='spatial']">
                     <xsl:copy-of select="node()"/>
-                    <xsl:text>, </xsl:text>
+                    <xsl:if test="position() != last()">
+		      <xsl:text>, </xsl:text>
+		    </xsl:if>
                 </xsl:for-each>
             </xsl:variable>
             <xsl:if test="$spatialCoverage!=''">
@@ -1149,7 +1155,9 @@
                 <xsl:for-each
                         select=".//dim:field[@element='coverage'][@qualifier='temporal']">
                     <xsl:copy-of select="node()"/>
-                    <xsl:text>, </xsl:text>
+                    <xsl:if test="position() != last()">
+		      <xsl:text>, </xsl:text>
+		    </xsl:if>
                 </xsl:for-each>
             </xsl:variable>
             <xsl:if test="$temporalCoverage!=''">
@@ -1421,10 +1429,10 @@
                             <xsl:text> &#160; </xsl:text>
                             <a href="http://creativecommons.org/publicdomain/zero/1.0/"
                                target="_blank">
-                                <img src="/themes/Dryad/images/cc-zero.png"/>
+                                <img src="/themes/Dryad/images/cc-zero.png" alt="CC0"/>
                             </a>
                             <a href="http://opendefinition.org/">
-                                <img src="/themes/Dryad/images/opendata.png"/>
+                                <img src="/themes/Dryad/images/opendata.png" alt="open data"/>
                             </a>
                         </div>
                     </xsl:if>
@@ -1435,10 +1443,10 @@
                         <xsl:text> &#160; </xsl:text>
                         <a href="http://creativecommons.org/publicdomain/zero/1.0/"
                            target="_blank">
-                            <img src="/themes/Dryad/images/cc-zero.png"/>
+                            <img src="/themes/Dryad/images/cc-zero.png" alt="CC0"/>
                         </a>
                         <a href="http://opendefinition.org/">
-                            <img src="/themes/Dryad/images/opendata.png"/>
+                            <img src="/themes/Dryad/images/opendata.png" alt="open data"/>
                         </a>
                     </div>
                 </xsl:otherwise>
@@ -1648,7 +1656,7 @@
                          alt="Ecological Monographs cover"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "Evolution - suppress cover"'>
+            <xsl:when test='$journal-name = "Evolution"'>
                 <a>
                     <xsl:attribute name="href">
                         <xsl:choose>
@@ -1714,7 +1722,7 @@
                     <img id="journal-logo" src="/themes/Dryad/images/coverimages/ijm.png" alt="International Journal of Myriapodology cover"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "Journal of Evolutionary Biology - suppress cover"'>
+            <xsl:when test='$journal-name = "Journal of Evolutionary Biology"'>
                 <a>
                     <xsl:attribute name="href">
                         <xsl:choose>
@@ -1943,7 +1951,7 @@
                         alt="PhytoKeys cover"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "PLoS Biology"'>
+            <xsl:when test='$journal-name = "PLoS Biology" or $journal-name = "PLOS Biology"'>
                 <a>
                     <xsl:attribute name="href">
                         <xsl:choose>
@@ -1957,11 +1965,11 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/pbiology.png"
-                        alt="PLoS Biology logo"/>
+                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/PLOS-Biology.png"
+                        alt="PLOS Biology logo"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "PLoS Computational Biology"'>
+            <xsl:when test='$journal-name = "PLoS Computational Biology" or $journal-name = "PLOS Computational Biology"'>
                 <a>
                     <xsl:attribute name="href">
                         <xsl:choose>
@@ -1975,11 +1983,11 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/pcompbiol.png"
-                        alt="PLoS Computational Biology logo"/>
+                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/PLOS-CompBiology.png"
+                        alt="PLOS Computational Biology logo"/>
                 </a>
             </xsl:when>
-            <xsl:when test='starts-with($journal-name,"PLoS Currents")'>
+            <xsl:when test='starts-with($journal-name,"PLoS Currents") or starts-with($journal-name,"PLOS Currents")'>
                 <a>
                     <xsl:attribute name="href">
                         <xsl:choose>
@@ -1993,11 +2001,11 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/pcurrents.png"
-                        alt="PLoS Currents logo"/>
+                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/PLOS-Currents_TreeOfLife.png"
+                        alt="PLOS Currents logo"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "PLoS Genetics"'>
+            <xsl:when test='$journal-name = "PLoS Genetics" or $journal-name = "PLOS Genetics"'>
                 <a>
                     <xsl:attribute name="href">
                         <xsl:choose>
@@ -2011,11 +2019,11 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/pgenetics.png"
-                        alt="PLoS Genetics logo"/>
+                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/PLOS-Genetics.png"
+                        alt="PLOS Genetics logo"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "PLoS Medicine"'>
+            <xsl:when test='$journal-name = "PLoS Medicine" or $journal-name = "PLOS Medicine"'>
                 <a>
                     <xsl:attribute name="href">
                         <xsl:choose>
@@ -2030,10 +2038,10 @@
                         </xsl:choose>
                     </xsl:attribute>
                     <img id="journal-logo" src="/themes/Dryad/images/coverimages/pmedicine.png"
-                        alt="PLoS Medicine logo"/>
+                        alt="PLOS Medicine logo"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "PLoS Neglected Tropical Diseases"'>
+            <xsl:when test='$journal-name = "PLoS Neglected Tropical Diseases" or $journal-name = "PLOS Neglected Tropical Diseases"'>
                 <a>
                     <xsl:attribute name="href">
                         <xsl:choose>
@@ -2048,10 +2056,10 @@
                         </xsl:choose>
                     </xsl:attribute>
                     <img id="journal-logo" src="/themes/Dryad/images/coverimages/pntd.png"
-                        alt="PLoS Neglected Tropical Diseases logo"/>
+                        alt="PLOS Neglected Tropical Diseases logo"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "PLoS ONE"'>
+            <xsl:when test='$journal-name = "PLoS ONE" or $journal-name = "PLOS ONE"'>
                 <a>
                     <xsl:attribute name="href">
                         <xsl:choose>
@@ -2065,11 +2073,11 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/pone.png"
-                        alt="PLoS ONE logo"/>
+                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/PLOS-ONE.png"
+                        alt="PLOS ONE logo"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "PLoS Pathogens"'>
+            <xsl:when test='$journal-name = "PLoS Pathogens" or $journal-name = "PLOS Pathogens"'>
                 <a>
                     <xsl:attribute name="href">
                         <xsl:choose>
@@ -2083,8 +2091,8 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/ppathogens.png"
-                        alt="PLoS Pathogens logo"/>
+                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/PLOS-Pathogens.png"
+                        alt="PLOS Pathogens logo"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Systematic Biology"'>
