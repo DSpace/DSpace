@@ -126,7 +126,9 @@ CREATE TABLE EPerson
 (
   eperson_id          INTEGER PRIMARY KEY,
   email               VARCHAR2(64) UNIQUE,
-  password            VARCHAR2(64),
+  password            VARCHAR2(128),
+  salt                VARCHAR2(32),
+  digest_algorithm    VARCHAR2(16),
   firstname           VARCHAR2(64),
   lastname            VARCHAR2(64),
   can_log_in          NUMBER(1),

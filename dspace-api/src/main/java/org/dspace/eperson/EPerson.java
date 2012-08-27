@@ -10,6 +10,7 @@ package org.dspace.eperson;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.codec.DecoderException;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -851,43 +852,64 @@ public class EPerson extends DSpaceObject
     }
 
     /**
-     * Set the EPerson's password
+     * Set the EPerson's password.
      * 
      * @param s
-     *            the new email
+     *            the new password.
      */
     public void setPassword(String s)
     {
-        // FIXME: encoding
-        String encoded = Utils.getMD5(s);
-
-        myRow.setColumn("password", encoded);
+        PasswordHash hash = new PasswordHash(s);
+        myRow.setColumn("password", Utils.toHex(hash.getHash()));
+        myRow.setColumn("salt", Utils.toHex(hash.getSalt()));
+        myRow.setColumn("digest_algorithm", hash.getAlgorithm());
         modified = true;
     }
 
     /**
-     * Set the EPerson's password hash
+     * Set the EPerson's password hash.
      * 
-     * @param s
-     *          hash of the password
+     * @param password
+     *          hashed password, or null to set row data to NULL.
      */
-    public void setPasswordHash(String s)
+    public void setPasswordHash(PasswordHash password)
     {
-        myRow.setColumn("password", s);
+        if (null == password)
+        {
+            myRow.setColumnNull("digest_algorithm");
+            myRow.setColumnNull("salt");
+            myRow.setColumnNull("password");
+        }
+        else
+        {
+            myRow.setColumn("digest_algorithm", password.getAlgorithm());
+            myRow.setColumn("salt", password.getSaltString());
+            myRow.setColumn("password", password.getHashString());
+        }
         modified = true;
     }
 
     /**
-     * Return the EPerson's password hash
+     * Return the EPerson's password hash.
+     *
      * @return hash of the password
      */
-    public String getPasswordHash()
+    public PasswordHash getPasswordHash()
     {
-        return myRow.getStringColumn("password");
+        PasswordHash hash = null;
+        try {
+            hash = new PasswordHash(myRow.getStringColumn("digest_algorithm"),
+                    myRow.getStringColumn("salt"),
+                    myRow.getStringColumn("password"));
+        } catch (DecoderException ex) {
+            log.error("Problem decoding stored salt or hash:  " + ex.getMessage());
+        }
+        return hash;
     }
 
     /**
-     * Check EPerson's password
+     * Check EPerson's password.  Side effect:  original unsalted MD5 hashes are
+     * converted using the current algorithm.
      * 
      * @param attempt
      *            the password attempt
@@ -895,9 +917,38 @@ public class EPerson extends DSpaceObject
      */
     public boolean checkPassword(String attempt)
     {
-        String encoded = Utils.getMD5(attempt);
+        PasswordHash myHash;
+        try
+        {
+            myHash = new PasswordHash(
+                    myRow.getStringColumn("digest_algorithm"),
+                    myRow.getStringColumn("salt"),
+                    myRow.getStringColumn("password"));
+        } catch (DecoderException ex)
+        {
+            log.error(ex.getMessage());
+            return false;
+        }
+        boolean answer = myHash.matches(attempt);
 
-        return (encoded.equals(myRow.getStringColumn("password")));
+        // If using the old unsalted hash, and this password is correct, update to a new hash
+        if (answer && (null == myRow.getStringColumn("digest_algorithm")))
+        {
+            log.info("Upgrading password hash for EPerson " + getID());
+            setPassword(attempt);
+            try {
+                myContext.turnOffAuthorisationSystem();
+                update();
+            } catch (SQLException ex) {
+                log.error("Could not update password hash", ex);
+            } catch (AuthorizeException ex) {
+                log.error("Could not update password hash", ex);
+            } finally {
+                myContext.restoreAuthSystemState();
+            }
+        }
+
+        return answer;
     }
 
     /**
