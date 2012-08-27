@@ -38,7 +38,7 @@ public class DiscoveryConfigurationService {
             System.out.println("Facets:");
             DiscoveryConfiguration discoveryConfiguration = mainService.getMap().get(key);
             for (int i = 0; i < discoveryConfiguration.getSidebarFacets().size(); i++) {
-                SidebarFacetConfiguration sidebarFacet = discoveryConfiguration.getSidebarFacets().get(i);
+                DiscoverySearchFilterFacet sidebarFacet = discoveryConfiguration.getSidebarFacets().get(i);
                 System.out.println("\t" + sidebarFacet.getIndexFieldName());
                 for (int j = 0; j < sidebarFacet.getMetadataFields().size(); j++) {
                     String metadataField = sidebarFacet.getMetadataFields().get(j);
@@ -49,7 +49,6 @@ public class DiscoveryConfigurationService {
             System.out.println("Search filters");
             List<DiscoverySearchFilter> searchFilters = discoveryConfiguration.getSearchFilters();
             for (DiscoverySearchFilter searchFilter : searchFilters) {
-                System.out.println("\t" + searchFilter.getIndexFieldName()  + " full: " + searchFilter.isFullAutoComplete());
                 for (int i = 0; i < searchFilter.getMetadataFields().size(); i++) {
                     String metadataField = searchFilter.getMetadataFields().get(i);
                     System.out.println("\t\t" + metadataField);

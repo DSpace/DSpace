@@ -415,7 +415,7 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
                     rows++;
                 }
 
-                Table block = currDiv.addTable("reportBlock", rows, 2);
+                Table block = currDiv.addTable("reportBlock", rows, 2, "detailtable");
 
                 // prepare the table headers
                 if (content.getStatName() != null || content.getResultName() != null)

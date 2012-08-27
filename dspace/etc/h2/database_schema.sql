@@ -172,7 +172,9 @@ CREATE TABLE EPerson
 (
   eperson_id          INTEGER PRIMARY KEY,
   email               VARCHAR(64),
-  password            VARCHAR(64),
+  password            VARCHAR(128),
+  salt                VARCHAR(32),
+  digest_algorithm    VARCHAR(16),
   firstname           VARCHAR(64),
   lastname            VARCHAR(64),
   can_log_in          BOOL,
@@ -241,6 +243,7 @@ CREATE TABLE Item
   submitter_id    INTEGER REFERENCES EPerson(eperson_id),
   in_archive      BOOL,
   withdrawn       BOOL,
+  discoverable    BOOL,
   last_modified   TIMESTAMP,
   owning_collection INTEGER
 );
@@ -444,7 +447,10 @@ CREATE TABLE ResourcePolicy
   eperson_id           INTEGER REFERENCES EPerson(eperson_id),
   epersongroup_id      INTEGER REFERENCES EPersonGroup(eperson_group_id),
   start_date           DATE,
-  end_date             DATE
+  end_date             DATE,
+  rpname               VARCHAR(30),
+  rptype               VARCHAR(30),
+  rpdescription        VARCHAR(100)
 );
 
 -- index by resource_type,resource_id - all queries by

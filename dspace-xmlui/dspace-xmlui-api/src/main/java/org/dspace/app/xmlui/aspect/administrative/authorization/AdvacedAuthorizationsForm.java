@@ -8,16 +8,15 @@
 package org.dspace.app.xmlui.aspect.administrative.authorization;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 
+import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Para;
-import org.dspace.app.xmlui.wing.element.Select;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.content.Collection;
 import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
@@ -25,7 +24,7 @@ import org.dspace.eperson.Group;
 /**
  * @author Alexey Maslov
  */
-public class AdvacedAuthorizationsForm extends AbstractDSpaceTransformer   
+public class AdvacedAuthorizationsForm extends AbstractDSpaceTransformer
 {	
 	private static final Message T_title = 
 		message("xmlui.administrative.authorization.AdvacedAuthorizationsForm.title");
@@ -56,6 +55,14 @@ public class AdvacedAuthorizationsForm extends AbstractDSpaceTransformer
 		message("xmlui.administrative.authorization.AdvacedAuthorizationsForm.actions_policyResource");
     private static final Message T_actions_policyCollections =
 		message("xmlui.administrative.authorization.AdvacedAuthorizationsForm.actions_policyCollections");
+
+
+    private static final Message T_actions_description =
+            message("xmlui.administrative.authorization.AdvancedAuthorizationsForm.actions_description");
+    private static final Message T_actions_start_date =
+            message("xmlui.administrative.authorization.AdvancedAuthorizationsForm.actions_start_date");
+    private static final Message T_actions_end_date =
+            message("xmlui.administrative.authorization.AdvancedAuthorizationsForm.actions_end_date");
     
     private static final Message T_submit_add =
 		message("xmlui.administrative.authorization.AdvacedAuthorizationsForm.submit_add");
@@ -66,6 +73,15 @@ public class AdvacedAuthorizationsForm extends AbstractDSpaceTransformer
 	
 	private static final Message T_dspace_home =
 		message("xmlui.general.dspace_home");
+
+    private static final Message T_label_date_help =
+            message("xmlui.administrative.authorization.AdvacedAuthorizationsForm.label_date_help");
+
+
+    private static final Message T_error_groupIds = message("xmlui.administrative.authorization.AdvancedAuthorizationsForm.error_groupIds");
+    private static final Message T_error_collectionIds = message("xmlui.administrative.authorization.AdvancedAuthorizationsForm.error_collectionIds");
+    private static final Message T_error_date_format = message("xmlui.administrative.authorization.AdvancedAuthorizationsForm.error_date_format");
+    private static final Message T_error_start_date_greater_than_end_date = message("xmlui.administrative.authorization.AdvancedAuthorizationsForm.error_start_date_greater_than_end_date");
 	
 	
 	
@@ -75,26 +91,61 @@ public class AdvacedAuthorizationsForm extends AbstractDSpaceTransformer
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
         pageMeta.addTrailLink(contextPath + "/admin/authorize", T_authorize_trail);
         pageMeta.addTrail().addContent(T_trail);
+
+        pageMeta.addMetadata("javascript", "static").addContent("static/js/advancedAuthorizationsForm.js");
     }
 		
 	public void addBody(Body body) throws WingException, SQLException 
 	{
+        int resourceID = parameters.getParameterAsInteger("resource_id", -1);
+        int actionID = parameters.getParameterAsInteger("action_id",-1);
+        String rpDescription = parameters.getParameter("description", null);
+        String rpStartDate = parameters.getParameter("startDate", null);
+        String rpEndDate = parameters.getParameter("endDate", null);
+
+        Request request = ObjectModelHelper.getRequest(objectModel);
+
+        String[] groupIDs = null;
+        if(request.getAttribute("groupIDs")!=null){
+            groupIDs = (String[])request.getAttribute("groupIDs");
+        }
+
+        String[] collectionIDs = null;
+        if(request.getAttribute("collectionIDs")!=null){
+            collectionIDs = (String[])request.getAttribute("collectionIDs");
+        }
+
+        ArrayList<String> errors = getListOfValues(parameters.getParameter("errors",null));
+
 		Division main = body.addInteractiveDivision("advanced-authorization",contextPath+"/admin/authorize",Division.METHOD_POST,"primary administrative authorization");
 		main.setHead(T_main_head);
 		main.addPara(T_main_para);		
 		
 		
 		List actionsList = main.addList("actions","form");
-        
+
+
+        // description
+        Text description = actionsList.addItem().addText("description");
+        description.setLabel(T_actions_description);
+        description.setValue(rpDescription);
+
 		// For all of the selected groups...
 		actionsList.addItem().addContent(T_actions_groupSentence);
         actionsList.addLabel(T_actions_policyGroup);
         Select groupSelect = actionsList.addItem().addSelect("group_id");
         groupSelect.setMultiple(true);
         groupSelect.setSize(15);
+        if (errors.contains("groupIDs")){
+            groupSelect.addError(T_error_groupIds);
+        }
         for (Group group : Group.findAll(context, Group.NAME))
         {
-            groupSelect.addOption(false, group.getID(), group.getName());
+            if(wasElementSelected(group.getID(), groupIDs)){
+                groupSelect.addOption(true, group.getID(), group.getName());
+            }else{
+                groupSelect.addOption(false, group.getID(), group.getName());
+            }
         }
         
         // Grant the ability to perform the following action...
@@ -103,15 +154,24 @@ public class AdvacedAuthorizationsForm extends AbstractDSpaceTransformer
         Select actionSelect = actionsList.addItem().addSelect("action_id");
         for( int i = 0; i < Constants.actionText.length; i++ )
         {
-            actionSelect.addOption(i, Constants.actionText[i]);
+            if (actionID == i){
+                actionSelect.addOption(true, i, Constants.actionText[i]);
+            }else{
+                actionSelect.addOption(i, Constants.actionText[i]);
+            }
         }
         
         // For all following object types...
         actionsList.addItem().addContent(T_actions_resourceSentence);
         actionsList.addLabel(T_actions_policyResource);
         Select resourceSelect = actionsList.addItem().addSelect("resource_id");
-        resourceSelect.addOption(true, Constants.ITEM, "item");
-        resourceSelect.addOption(false, Constants.BITSTREAM, "bitstream");
+        if(resourceID==Constants.BITSTREAM ){
+            resourceSelect.addOption(false, Constants.ITEM, "item");
+            resourceSelect.addOption(true, Constants.BITSTREAM, "bitstream");
+        }else{ // default
+            resourceSelect.addOption(true, Constants.ITEM, "item");
+            resourceSelect.addOption(false, Constants.BITSTREAM, "bitstream");
+        }
         
         // Across the following collections...
         actionsList.addItem().addContent(T_actions_collectionSentence);
@@ -119,10 +179,35 @@ public class AdvacedAuthorizationsForm extends AbstractDSpaceTransformer
         Select collectionsSelect = actionsList.addItem().addSelect("collection_id");
         collectionsSelect.setMultiple(true);
         collectionsSelect.setSize(15);
+        if (errors.contains("collectionIDs")){
+            collectionsSelect.addError(T_error_collectionIds);
+        }
         for (Collection collection : Collection.findAll(context))
         {
-            collectionsSelect.addOption(false, collection.getID(), collection.getMetadata("name"));
+            if(wasElementSelected(collection.getID(), collectionIDs)){
+                collectionsSelect.addOption(true, collection.getID(), collection.getMetadata("name"));
+            }else{
+                collectionsSelect.addOption(false, collection.getID(), collection.getMetadata("name"));
+            }
         }
+
+        // start date
+        Text startDate = actionsList.addItem().addText("start_date");
+        startDate.setLabel(T_actions_start_date);
+        startDate.setHelp(T_label_date_help);
+        startDate.setValue(rpStartDate);
+        if (errors.contains("startDate"))
+            startDate.addError(T_error_date_format);
+        else if (errors.contains("startDateGreaterThenEndDate"))
+            startDate.addError(T_error_start_date_greater_than_end_date);
+
+        // end date
+        Text endDate = actionsList.addItem().addText("end_date");
+        endDate.setLabel(T_actions_end_date);
+        endDate.setHelp(T_label_date_help);
+        endDate.setValue(rpEndDate);
+        if (errors.contains("endDate"))
+            endDate.addError(T_error_date_format);
         
         
     	Para buttons = main.addPara();
@@ -132,4 +217,24 @@ public class AdvacedAuthorizationsForm extends AbstractDSpaceTransformer
     	
 		main.addHidden("administrative-continue").setValue(knot.getId());
    }
+
+    private ArrayList<String> getListOfValues(String input) {
+        ArrayList<String> values = new ArrayList<String>();
+        if (input != null){
+            Collections.addAll(values, input.split(","));
+        }
+        return values;
+    }
+
+
+    private boolean wasElementSelected(int element, String[] elements){
+
+        if(elements!=null){
+            for(String s : elements){
+                if(Integer.parseInt(s) == element)
+                    return true;
+            }
+        }
+        return false;
+    }
 }

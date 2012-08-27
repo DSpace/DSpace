@@ -34,7 +34,7 @@ DAMAGE.
 
 
 DSpace uses third-party libraries which may be distributed under
-different licenses to the above.  These licenses are located in
-the lib/licenses directory.  You must agree to the terms of these
-licenses, in addition to the above DSpace source code license, in
-order to use this software.
+different licenses to the above. Information about these licenses 
+is detailed in the LICENSES_THIRD_PARTY file at the root of the source 
+tree.  You must agree to the terms of these licenses, in addition to 
+the above DSpace source code license, in order to use this software.

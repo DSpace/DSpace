@@ -25,12 +25,15 @@ public class DiscoverResult {
     /** A map that contains all the documents sougth after, the key is a string representation of the DSpace object */
     private Map<String, List<SearchDocument>> searchDocuments;
     private int maxResults = -1;
+    private int searchTime;
+    private Map<String, DSpaceObjectHighlightResult> highlightedResults;
 
 
     public DiscoverResult() {
         dspaceObjects = new ArrayList<DSpaceObject>();
         facetResults = new LinkedHashMap<String, List<FacetResult>>();
         searchDocuments = new LinkedHashMap<String, List<SearchDocument>>();
+        highlightedResults = new HashMap<String, DSpaceObjectHighlightResult>();
     }
 
 
@@ -66,6 +69,16 @@ public class DiscoverResult {
         this.maxResults = maxResults;
     }
 
+    public int getSearchTime()
+    {
+        return searchTime;
+    }
+
+    public void setSearchTime(int searchTime)
+    {
+        this.searchTime = searchTime;
+    }
+
     public void addFacetResult(String facetField, FacetResult ...facetResults){
         List<FacetResult> facetValues = this.facetResults.get(facetField);
         if(facetValues == null)
@@ -82,6 +95,16 @@ public class DiscoverResult {
 
     public List<FacetResult> getFacetResult(String facet){
         return facetResults.get(facet) == null ? new ArrayList<FacetResult>() : facetResults.get(facet);
+    }
+
+    public DSpaceObjectHighlightResult getHighlightedResults(DSpaceObject dso)
+    {
+        return highlightedResults.get(dso.getHandle());
+    }
+
+    public void addHighlightedResult(DSpaceObject dso, DSpaceObjectHighlightResult highlightedResult)
+    {
+        this.highlightedResults.put(dso.getHandle(), highlightedResult);
     }
 
     public static final class FacetResult{
@@ -105,6 +128,28 @@ public class DiscoverResult {
 
         public long getCount() {
             return count;
+        }
+    }
+
+    public static final class DSpaceObjectHighlightResult
+    {
+        private DSpaceObject dso;
+        private Map<String, List<String>> highlightResults;
+
+        public DSpaceObjectHighlightResult(DSpaceObject dso, Map<String, List<String>> highlightResults)
+        {
+            this.dso = dso;
+            this.highlightResults = highlightResults;
+        }
+
+        public DSpaceObject getDso()
+        {
+            return dso;
+        }
+
+        public List<String> getHighlightResults(String metadataKey)
+        {
+            return highlightResults.get(metadataKey);
         }
     }
 

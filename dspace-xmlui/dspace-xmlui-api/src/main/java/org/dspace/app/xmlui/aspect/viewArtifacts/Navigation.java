@@ -95,7 +95,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             WingException, UIException, SQLException, IOException,
             AuthorizeException
     {
-        // FIXME: I don't think these should be set here, but there needed and I'm
+        // FIXME: I don't think these should be set here, but they're needed and I'm
         // not sure where else it could go. Perhaps the linkResolver?
         Request request = ObjectModelHelper.getRequest(objectModel);
         pageMeta.addMetadata("contextPath").addContent(contextPath);

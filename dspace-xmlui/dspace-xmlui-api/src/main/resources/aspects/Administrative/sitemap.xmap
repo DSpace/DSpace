@@ -91,6 +91,7 @@ to administer DSpace.
                         <map:transformer name="ItemExport" src="org.dspace.app.xmlui.aspect.administrative.ItemExport"/>
                         <map:transformer name="CurateForm" src="org.dspace.app.xmlui.aspect.administrative.CurateForm"/>
                         <map:transformer name="ChoiceLookup" src="org.dspace.app.xmlui.aspect.general.ChoiceLookupTransformer"/>
+            <map:transformer name="PrivateItems" src="org.dspace.app.xmlui.aspect.administrative.PrivateItems" />
 		</map:transformers>
 		
 		<map:matchers default="wildcard">
@@ -612,6 +613,21 @@ to administer DSpace.
 		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
 		        			</map:transform>
 		        		</map:match>
+
+		        		<map:match pattern="admin/item/private">
+                            <map:transform type="ConfirmItemForm">
+                                <map:parameter name="confirm" value="private"/>
+                                <map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+                            </map:transform>
+                        </map:match>
+
+                        <map:match pattern="admin/item/public">
+                            <map:transform type="ConfirmItemForm">
+                                <map:parameter name="confirm" value="public"/>
+                                <map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+                            </map:transform>
+                        </map:match>
+
 		        		
 		        		<!--
 		        			Move the item to another collection
@@ -835,7 +851,15 @@ to administer DSpace.
 		        			to items or bitstreams or one of more communities.   
 		        			-->
 		        		<map:match pattern="admin/authorize/advanced">
-		        			<map:transform type="AdvacedAuthorizationsForm"/>
+		        			<map:transform type="AdvacedAuthorizationsForm">
+                                <map:parameter name="resource_id" value="{flow-attribute:resource_id}"/>
+                                <map:parameter name="action_id" value="{flow-attribute:action_id}"/>
+                                <map:parameter name="name" value="{flow-attribute:name}"/>
+                                <map:parameter name="description" value="{flow-attribute:description}"/>
+                                <map:parameter name="startDate" value="{flow-attribute:startDate}"/>
+                                <map:parameter name="endDate" value="{flow-attribute:endDate}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                            </map:transform>
 		        		</map:match>
 		        		
 		        		<!-- 
@@ -852,6 +876,12 @@ to administer DSpace.
 		        				<map:parameter name="query" value="{flow-attribute:query}"/>
 		        				<map:parameter name="page" value="{flow-attribute:page}"/>
 		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+
+                                <map:parameter name="name" value="{flow-attribute:name}"/>
+                                <map:parameter name="description" value="{flow-attribute:description}"/>
+                                <map:parameter name="startDate" value="{flow-attribute:startDate}"/>
+                                <map:parameter name="endDate" value="{flow-attribute:endDate}"/>
+
 		        			</map:transform>
 		        		</map:match>
 		        		
@@ -951,6 +981,22 @@ to administer DSpace.
                             <map:transform type="SystemwideAlerts"/>
                         </map:act>
                         <map:transform type="WithdrawnItems" />
+                        <map:serialize type="xml"/>
+                    </map:when>
+
+                    <map:otherwise>
+                        <map:act type="StartAuthentication"/>
+                    </map:otherwise>
+                </map:select>
+            </map:match>
+
+            <map:match pattern="admin/private">
+                <map:select type="AuthenticatedSelector">
+                    <map:when test="administrator">
+                        <map:act type="ControlPanelAction">
+                            <map:transform type="SystemwideAlerts"/>
+                        </map:act>
+                        <map:transform type="PrivateItems" />
                         <map:serialize type="xml"/>
                     </map:when>
 

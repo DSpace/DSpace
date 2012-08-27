@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.aspect.administrative.item;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.dspace.app.xmlui.aspect.submission.submit.AccessStepUtil;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -60,18 +61,23 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
 
 	
 	private static final String DEFAULT_BUNDLE_LIST = "ORIGINAL, METADATA, THUMBNAIL, LICENSE, CC-LICENSE";
+
+    private boolean isAdvancedFormEnabled=true;
 		
 	public void addPageMeta(PageMeta pageMeta) throws WingException
 	{
-            pageMeta.addMetadata("title").addContent(T_title);
+        pageMeta.addMetadata("title").addContent(T_title);
 
-            pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-            pageMeta.addTrailLink(contextPath + "/admin/item", T_item_trail);
-            pageMeta.addTrail().addContent(T_trail);
-        }
+        pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
+        pageMeta.addTrailLink(contextPath + "/admin/item", T_item_trail);
+        pageMeta.addTrail().addContent(T_trail);
+        pageMeta.addMetadata("javascript", "static").addContent("static/js/editItemUtil.js");
+    }
 
 	public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException
 	{
+            isAdvancedFormEnabled=ConfigurationManager.getBooleanProperty("xmlui.submission.restrictstep.enableAdvancedForm", false);
+
             int itemID = parameters.getParameterAsInteger("itemID", -1);
             org.dspace.content.Item item = org.dspace.content.Item.find(context, itemID);
 
@@ -128,6 +134,17 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
             if (bundleCount == 0) {
                 upload.addItem().addContent(T_no_bundles);
             }
+
+            // EMBARGO FIELD
+            // if AdvancedAccessPolicy=false: add Embargo Fields.
+            if(!isAdvancedFormEnabled){
+                AccessStepUtil asu = new AccessStepUtil(context);
+                // if the item is embargoed default value will be displayed.
+                asu.addEmbargoDateSimpleForm(item, upload, -1);
+                asu.addReason(null, upload, -1);
+            }
+
+
 
             // ITEM: actions
             Item actions = upload.addItem();

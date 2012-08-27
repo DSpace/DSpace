@@ -8,6 +8,7 @@
 package org.dspace.authorize;
 
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Date;
 import org.apache.log4j.Logger;
 
@@ -27,6 +28,14 @@ import org.dspace.storage.rdbms.TableRow;
  */
 public class ResourcePolicy
 {
+
+    public static String TYPE_SUBMISSION = "TYPE_SUBMISSION";
+    public static String TYPE_WORKFLOW = "TYPE_WORKFLOW";
+    public static String TYPE_CUSTOM= "TYPE_CUSTOM";
+    public static String TYPE_INHERITED= "TYPE_INHERITED";
+
+
+
     /** log4j logger */
     private static Logger log = Logger.getLogger(ResourcePolicy.class);
 
@@ -171,6 +180,16 @@ public class ResourcePolicy
      */
     public void delete() throws SQLException
     {
+        if(getResourceID() != -1 && getResourceType() != -1)
+        {
+            //A policy for a DSpace Object has been modified, fire a modify event on the DSpace object
+            DSpaceObject dso = DSpaceObject.find(myContext, getResourceType(), getResourceID());
+            if(dso != null)
+            {
+                dso.updateLastModified();
+            }
+        }
+
         // FIXME: authorizations
         // Remove ourself
         DatabaseManager.delete(myContext, myRow);
@@ -446,9 +465,38 @@ public class ResourcePolicy
     /**
      * Update the ResourcePolicy
      */
-    public void update() throws SQLException
-    {
+    public void update() throws SQLException, AuthorizeException {
+        if(getResourceID() != -1 && getResourceType() != -1){
+            //A policy for a DSpace Object has been modified, fire a modify event on the DSpace object
+            DSpaceObject dso = DSpaceObject.find(myContext, getResourceType(), getResourceID());
+            if(dso != null){
+                dso.updateLastModified();
+            }
+        }
+
         // FIXME: Check authorisation
         DatabaseManager.update(myContext, myRow);
+    }
+
+
+    public String getRpName(){
+        return myRow.getStringColumn("rpname");
+    }
+    public void setRpName(String name){
+        myRow.setColumn("rpname", name);
+    }
+
+    public String getRpType(){
+        return myRow.getStringColumn("rptype");
+    }
+    public void setRpType(String type){
+        myRow.setColumn("rptype", type);
+    }
+
+    public String getRpDescription(){
+        return myRow.getStringColumn("rpdescription");
+    }
+    public void setRpDescription(String description){
+        myRow.setColumn("rpdescription", description);
     }
 }

@@ -118,7 +118,7 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
                     if (!change.isNewItem())
                     {
                         Item i = change.getItem();
-                        Cell cell = headerrow.addCell();
+                        Cell cell = headerrow.addCell(1, 2); // colspan="2"
                         cell.addContent(T_changes_pending);
                         cell.addContent(" " + i.getID() + " (" + i.getHandle() + ")");
 
@@ -127,7 +127,6 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
                     {
                       headerrow.addCellContent(T_new_item);
                     }
-                    headerrow.addCell();
                 }
 
                 // Show actions

@@ -45,11 +45,11 @@ import ORG.oclc.oai.server.verb.NoSetHierarchyException;
 import ORG.oclc.oai.server.verb.OAIInternalServerError;
 
 /**
- * This is class extends OAICat's AbstractCatalog base class to allow metadata
+ * This class extends OAICat's AbstractCatalog base class to allow
  * harvesting of the metadata in DSpace via OAI-PMH 2.0.
  * 
  * FIXME: Some CNRI Handle-specific stuff in here. Anyone wanting to use
- * something else will need to update this code too. Sorry about that.
+ * something else will need to update this code, too. Sorry about that.
  * 
  * @author Robert Tansley
  * @version $Revision$
@@ -102,7 +102,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
         {
             context = new Context();
 
-            // Valid identifiers all have prefix "oai:hostname:"
+            // All valid identifiers have the "oai:hostname:" prefix 
             if (identifier != null && identifier.startsWith(OAI_ID_PREFIX))
             {
                 itemInfo = Harvest.getSingle(context, identifier
@@ -444,7 +444,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
 
         Map m = doRecordHarvest(from, until, set, metadataPrefix, 0);
 
-        // Null means bad metadata prefix was bad
+        // Null means bad metadata prefix
         if (m == null)
         {
             log.info(LogManager.getHeader(null, "oai_error",
@@ -894,8 +894,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
                 String s = st.nextToken();
 
                 // If this value is a delimiter /, we have no value for this
-                // part
-                // of the resumption token.
+                // part of the resumption token.
                 if (s.equals("/"))
                 {
                     obj[i] = null;

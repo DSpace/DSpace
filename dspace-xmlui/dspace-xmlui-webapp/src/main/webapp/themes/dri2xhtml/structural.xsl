@@ -994,7 +994,7 @@
             <xsl:apply-templates select="*[not(name()='head')]" mode="nested"/>
         </ul>
     </xsl:template>
-    
+
     <!-- The item template creates an HTML list item element and places the contents of the DRI item inside it.
         Additionally, it checks to see if the currently viewed item has a label element directly preceeding it,
         and if it does, applies the label's template before performing its own actions. This mechanism applies
@@ -1007,7 +1007,7 @@
             <xsl:apply-templates />
         </li>
     </xsl:template>
-    
+
     <!-- The case of nested lists is handled in a similar way across all lists. You match the sub-list based on
         its parent, create a list item approtiate to the list type, fill its content from the sub-list's head
         element and apply the other templates normally. -->
@@ -1016,8 +1016,8 @@
             <xsl:apply-templates select="."/>
         </li>
     </xsl:template>
-    
-       
+
+
     <!-- Second type is the ordered list, which is a list with either labels or names to designate an ordering
         of some kind. -->
     <xsl:template match="dri:list[@type='ordered']" priority="2">
@@ -1031,7 +1031,7 @@
             </xsl:apply-templates>
         </ol>
     </xsl:template>
-    
+
     <xsl:template match="dri:list[@type='ordered']/dri:item" priority="2" mode="nested">
         <li>
             <xsl:if test="name(preceding-sibling::*[position()=1]) = 'label'">
@@ -1040,14 +1040,14 @@
             <xsl:apply-templates />
         </li>
     </xsl:template>
-    
+
     <xsl:template match="dri:list[@type='ordered']/dri:list" priority="3" mode="nested">
         <li>
             <xsl:apply-templates select="."/>
         </li>
     </xsl:template>
-    
-    
+
+
     <!-- Progress list used primarily in forms that span several pages. There isn't a template for the nested
         version of this list, mostly because there isn't a use case for it. -->
     <xsl:template match="dri:list[@type='progress']" priority="2">
@@ -1059,7 +1059,7 @@
             <xsl:apply-templates select="dri:item"/>
         </ul>
     </xsl:template>
-    
+
     <xsl:template match="dri:list[@type='progress']/dri:item" priority="2">
         <li>
             <xsl:attribute name="class">
@@ -1082,8 +1082,8 @@
             </li>
         </xsl:if>
     </xsl:template>
-        
-    
+
+
     <!-- The third type of list is the glossary (gloss) list. It is essentially a list of pairs, consisting of
         a set of labels, each followed by an item. Unlike the ordered and bulleted lists, gloss is implemented
         via HTML definition list (dd) element. It can also be changed to work as a two-column table. -->
@@ -1096,13 +1096,13 @@
             <xsl:apply-templates select="*[not(name()='head')]" mode="nested"/>
         </dl>
     </xsl:template>
-    
+
     <xsl:template match="dri:list[@type='gloss']/dri:item" priority="2" mode="nested">
         <dd>
             <xsl:apply-templates />
         </dd>
     </xsl:template>
-    
+
     <xsl:template match="dri:list[@type='gloss']/dri:label" priority="2" mode="nested">
         <dt>
             <span>
@@ -1115,14 +1115,14 @@
             </span>
         </dt>
     </xsl:template>
-    
+
     <xsl:template match="dri:list[@type='gloss']/dri:list" priority="3" mode="nested">
         <dd>
             <xsl:apply-templates select="."/>
         </dd>
     </xsl:template>
-    
-    
+
+
     <!-- The next list type is one without a type attribute. In this case XSL makes a decision: if the items
         of the list have labels the the list will be made into a table-like structure, otherwise it is considered
         to be a plain unordered list and handled generically. -->
@@ -1147,7 +1147,7 @@
             </ul>
         </xsl:if>
     </xsl:template>
-    
+
     <xsl:template match="dri:list[not(@type)]/dri:item" priority="2" mode="labeled">
         <tr>
             <xsl:attribute name="class">
@@ -1164,7 +1164,7 @@
             </td>
         </tr>
     </xsl:template>
-    
+
     <xsl:template match="dri:list[not(@type)]/dri:label" priority="2" mode="labeled">
         <td>
             <xsl:if test="count(./node())>0">
@@ -1179,9 +1179,12 @@
             </xsl:if>
         </td>
     </xsl:template>
-    
+
     <xsl:template match="dri:list[not(@type)]/dri:item" priority="2" mode="nested">
         <li>
+            <xsl:call-template name="standardAttributes">
+                <xsl:with-param name="class">ds-simple-list-item</xsl:with-param>
+            </xsl:call-template>
             <xsl:apply-templates />
             <!-- Wrap orphaned sub-lists into the preceding item -->
             <xsl:variable name="node-set1" select="./following-sibling::dri:list"/>
@@ -1189,18 +1192,18 @@
             <xsl:apply-templates select="$node-set1[count(.|$node-set2) != count($node-set2)]"/>
         </li>
     </xsl:template>
-            
-   
-    
-    
-    
+
+
+
+
+
     <!-- Special treatment of a list type "form", which is used to encode simple forms and give them structure.
         This is done partly to ensure that the resulting HTML form follows accessibility guidelines. -->
-    
+
     <xsl:template match="dri:list[@type='form']" priority="3">
     <xsl:choose>
        <xsl:when test="ancestor::dri:list[@type='form']">
-                        
+
             <li>
             <fieldset>
             <xsl:call-template name="standardAttributes">
@@ -1217,7 +1220,7 @@
                 </xsl:with-param>
             </xsl:call-template>
             <xsl:apply-templates select="dri:head"/>
-            
+
             <ol>
                 <xsl:apply-templates select="*[not(name()='label' or name()='head')]" />
             </ol>
@@ -1240,7 +1243,7 @@
                 </xsl:with-param>
             </xsl:call-template>
             <xsl:apply-templates select="dri:head"/>
-            
+
             <ol>
                 <xsl:apply-templates select="*[not(name()='label' or name()='head')]" />
             </ol>
@@ -1248,7 +1251,7 @@
             </xsl:otherwise>
             </xsl:choose>
     </xsl:template>
-    
+
     <!-- TODO: Account for the dri:hi/dri:field kind of nesting here and everywhere else... -->
     <xsl:template match="dri:list[@type='form']/dri:item" priority="3">
         <li>
@@ -1276,7 +1279,7 @@
                 <xsl:if test="dri:list[@type='form']">sublist </xsl:if>
                 </xsl:with-param>
             </xsl:call-template>
-            
+
             <xsl:choose>
                 <xsl:when test="dri:field[@type='composite']">
                     <xsl:call-template name="pick-label"/>
@@ -1300,7 +1303,7 @@
             </xsl:choose>
         </li>
     </xsl:template>
-    
+
     <!-- An item in a nested "form" list -->
     <xsl:template match="dri:list[@type='form']//dri:list[@type='form']/dri:item" priority="3">
         <li>
@@ -1315,13 +1318,13 @@
                         <!--<xsl:if test="count(../dri:item) > 3">-->
                             <xsl:if test="(count(preceding-sibling::dri:item | ../../preceding-sibling::dri:item/dri:list[@type='form']/dri:item) mod 2 = 0)">even </xsl:if>
                             <xsl:if test="(count(preceding-sibling::dri:item | ../../preceding-sibling::dri:item/dri:list[@type='form']/dri:item) mod 2 = 1)">odd </xsl:if>
-                        
+
                     </xsl:when>
                     <xsl:when test="(count(../../..//dri:item) - count(../../..//dri:list[@type='form'])) mod 2 = 1">
                         <!--<xsl:if test="count(../dri:item) > 3">-->
                             <xsl:if test="(count(preceding-sibling::dri:item | ../../preceding-sibling::dri:item/dri:list[@type='form']/dri:item) mod 2 = 1)">even </xsl:if>
                             <xsl:if test="(count(preceding-sibling::dri:item | ../../preceding-sibling::dri:item/dri:list[@type='form']/dri:item) mod 2 = 0)">odd </xsl:if>
-                        
+
                     </xsl:when>
                 </xsl:choose>
                 <!--
@@ -1329,7 +1332,7 @@
                     -->
                </xsl:with-param>
             </xsl:call-template>
-            
+
             <xsl:call-template name="pick-label"/>
 
             <xsl:choose>
@@ -1350,7 +1353,7 @@
             </xsl:choose>
         </li>
     </xsl:template>
-    
+
     <xsl:template name="pick-label">
         <xsl:choose>
             <xsl:when test="dri:field/dri:label">
@@ -1382,7 +1385,7 @@
                                 </span>
                         </xsl:otherwise>
                 </xsl:choose>
-                
+
             </xsl:when>
             <xsl:when test="dri:field">
                 <xsl:choose>
@@ -1411,7 +1414,7 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-    
+
     <xsl:template match="dri:list[@type='form']/dri:label" priority="3">
                 <xsl:attribute name="class">
                 <xsl:text>ds-form-label</xsl:text>
@@ -1431,12 +1434,12 @@
         </xsl:choose>
         <xsl:apply-templates />
     </xsl:template>
-    
-    
+
+
     <xsl:template match="dri:field/dri:label" mode="formComposite">
         <xsl:apply-templates />
     </xsl:template>
-         
+
     <xsl:template match="dri:list[@type='form']/dri:head" priority="5">
         <legend>
                 <xsl:apply-templates />
@@ -1561,27 +1564,30 @@
             <xsl:apply-templates select="*[not(name()='head')]" mode="nested"/>
         </ul>
     </xsl:template>
-    
-    
+
+
     <!-- Generic label handling: simply place the text of the element followed by a period and space. -->
     <xsl:template match="dri:label" priority="1" mode="nested">
         <xsl:copy-of select="./node()"/>
     </xsl:template>
-    
+
     <!-- Generic item handling for cases where nothing special needs to be done -->
     <xsl:template match="dri:item" mode="nested">
         <li>
+            <xsl:call-template name="standardAttributes">
+                <xsl:with-param name="class">ds-simple-list-item</xsl:with-param>
+            </xsl:call-template>
             <xsl:apply-templates />
         </li>
     </xsl:template>
-    
+
     <xsl:template match="dri:list/dri:list" priority="1" mode="nested">
         <li>
             <xsl:apply-templates select="."/>
         </li>
     </xsl:template>
-    
-    
+
+
     
     <!-- From here on out come the templates for supporting elements that are contained within structural
         ones. These include head (in all its myriad forms), rich text container elements (like hi and figure),
@@ -2692,11 +2698,33 @@
                             <i18n:text>xmlui.dri2xhtml.structural.pagination-next</i18n:text>
                         </a>
                     </xsl:if>
+                    <xsl:if test="parent::node()/dri:div[@n = 'masked-page-control']">
+                        <xsl:apply-templates select="parent::node()/dri:div[@n='masked-page-control']/dri:div">
+                            <xsl:with-param name="position" select="$position"/>
+                        </xsl:apply-templates>
+                    </xsl:if>
                 </div>
             </xsl:when>
         </xsl:choose>
     </xsl:template>
-    
+
+    <xsl:template match="dri:div[@n = 'masked-page-control']" priority="5">
+        <!--Do not render this division, this is handled by the xsl-->
+    </xsl:template>
+
+    <xsl:template match="dri:div[@n ='search-controls-gear']">
+        <xsl:param name="position"/>
+        <div>
+            <xsl:call-template name="standardAttributes">
+                <xsl:with-param name="class"><xsl:value-of select="$position"/></xsl:with-param>
+            </xsl:call-template>
+
+            <xsl:apply-templates/>
+        </div>
+    </xsl:template>
+
+
+
     <!-- A quick helper function used by the @pagination template for repetitive tasks -->
     <xsl:template name="offset-link">
         <xsl:param name="pageOffset"/>
@@ -2820,7 +2848,7 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-        
+
     <!-- First, the detail list case -->
     <xsl:template match="dri:referenceSet[@type = 'detailList']" priority="2">
         <xsl:apply-templates select="dri:head"/>
@@ -2828,15 +2856,15 @@
             <xsl:apply-templates select="*[not(name()='head')]" mode="detailList"/>
         </ul>
     </xsl:template>
-    
-    
+
+
     <!-- Next up is the summary view case that at this point applies only to items, since communities and
         collections do not have two separate views. -->
     <xsl:template match="dri:referenceSet[@type = 'summaryView']" priority="2">
         <xsl:apply-templates select="dri:head"/>
         <xsl:apply-templates select="*[not(name()='head')]" mode="summaryView"/>
     </xsl:template>
-            
+
     <!-- Finally, we have the detailed view case that is applicable to items, communities and collections.
         In DRI it constitutes a standard view of collections/communities and a complete metadata listing
         view of items. -->
@@ -3487,6 +3515,274 @@
         <td>
             <xsl:apply-templates select="dri:field[@type='button']"/>
         </td>
+    </xsl:template>
+
+
+
+    <xsl:template match="dri:list[@type='dsolist']" priority="2">
+        <xsl:apply-templates select="dri:head"/>
+        <ul class="ds-artifact-list">
+            <xsl:apply-templates select="*[not(name()='head')]" mode="dsoList"/>
+        </ul>
+    </xsl:template>
+
+    <xsl:template match="dri:list/dri:list" mode="dsoList" priority="7">
+        <xsl:apply-templates select="dri:head"/>
+        <ul>
+            <xsl:apply-templates select="*[not(name()='head')]" mode="dsoList"/>
+        </ul>
+    </xsl:template>
+
+    <xsl:template match="dri:list/dri:list/dri:list" mode="dsoList" priority="8">
+        <li>
+            <xsl:attribute name="class">
+                <xsl:text>ds-artifact-item clearfix </xsl:text>
+                <xsl:choose>
+                    <xsl:when test="position() mod 2 = 0">even</xsl:when>
+                    <xsl:otherwise>odd</xsl:otherwise>
+                </xsl:choose>
+            </xsl:attribute>
+            <!--
+                Retrieve the type from our name, the name contains the following format:
+                    {handle}:{metadata}
+            -->
+            <xsl:variable name="handle">
+                <xsl:value-of select="substring-before(@n, ':')"/>
+            </xsl:variable>
+            <xsl:variable name="type">
+                <xsl:value-of select="substring-after(@n, ':')"/>
+            </xsl:variable>
+            <xsl:variable name="externalMetadataURL">
+                <xsl:text>cocoon://metadata/handle/</xsl:text>
+                <xsl:value-of select="$handle"/>
+                <xsl:text>/mets.xml</xsl:text>
+                <!-- Since this is a summary only grab the descriptive metadata, and the thumbnails -->
+                <xsl:text>?sections=dmdSec,fileSec&amp;fileGrpTypes=THUMBNAIL</xsl:text>
+                <!-- An example of requesting a specific metadata standard (MODS and QDC crosswalks only work for items)->
+                <xsl:if test="@type='DSpace Item'">
+                    <xsl:text>&amp;dmdTypes=DC</xsl:text>
+                </xsl:if>-->
+            </xsl:variable>
+
+
+            <xsl:choose>
+                <xsl:when test="$type='community'">
+                    <xsl:call-template name="communitySummaryList">
+                        <xsl:with-param name="handle">
+                            <xsl:value-of select="$handle"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="externalMetadataUrl">
+                            <xsl:value-of select="$externalMetadataURL"/>
+                        </xsl:with-param>
+                    </xsl:call-template>
+                </xsl:when>
+                <xsl:when test="$type='collection'">
+                    <xsl:call-template name="collectionSummaryList">
+                        <xsl:with-param name="handle">
+                            <xsl:value-of select="$handle"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="externalMetadataUrl">
+                            <xsl:value-of select="$externalMetadataURL"/>
+                        </xsl:with-param>
+                    </xsl:call-template>
+                </xsl:when>
+                <xsl:when test="$type='item'">
+                    <xsl:call-template name="itemSummaryList">
+                        <xsl:with-param name="handle">
+                            <xsl:value-of select="$handle"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="externalMetadataUrl">
+                            <xsl:value-of select="$externalMetadataURL"/>
+                        </xsl:with-param>
+                    </xsl:call-template>
+                </xsl:when>
+            </xsl:choose>
+        </li>
+    </xsl:template>
+
+    <xsl:template name="communitySummaryList">
+        <xsl:param name="handle"/>
+        <xsl:param name="externalMetadataUrl"/>
+
+        <xsl:variable name="metsDoc" select="document($externalMetadataUrl)"/>
+
+        <div class="artifact-title">
+            <a href="{$metsDoc/mets:METS/@OBJID}">
+                <xsl:choose>
+                    <xsl:when test="dri:list[@n=(concat($handle, ':dc.title'))]">
+                        <xsl:apply-templates select="dri:list[@n=(concat($handle, ':dc.title'))]/dri:item"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </a>
+            <!--Display community strengths (item counts) if they exist-->
+            <xsl:if test="string-length($metsDoc/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">
+                <xsl:text> [</xsl:text>
+                <xsl:value-of
+                        select="$metsDoc/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='format'][@qualifier='extent'][1]"/>
+                <xsl:text>]</xsl:text>
+            </xsl:if>
+        </div>
+    </xsl:template>
+
+    <xsl:template name="collectionSummaryList">
+        <xsl:param name="handle"/>
+        <xsl:param name="externalMetadataUrl"/>
+
+        <xsl:variable name="metsDoc" select="document($externalMetadataUrl)"/>
+
+        <div class="artifact-title">
+            <a href="{$metsDoc/mets:METS/@OBJID}">
+                <xsl:choose>
+                    <xsl:when test="dri:list[@n=(concat($handle, ':dc.title'))]">
+                        <xsl:apply-templates select="dri:list[@n=(concat($handle, ':dc.title'))]/dri:item"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </a>
+
+        </div>
+        <!--Display collection strengths (item counts) if they exist-->
+        <xsl:if test="string-length($metsDoc/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">
+            <xsl:text> [</xsl:text>
+            <xsl:value-of
+                    select="$metsDoc/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='format'][@qualifier='extent'][1]"/>
+            <xsl:text>]</xsl:text>
+        </xsl:if>
+
+
+    </xsl:template>
+
+    <xsl:template name="itemSummaryList">
+        <xsl:param name="handle"/>
+        <xsl:param name="externalMetadataUrl"/>
+
+        <xsl:variable name="metsDoc" select="document($externalMetadataUrl)"/>
+
+        <div class="artifact-description">
+            <div class="artifact-title">
+                <xsl:element name="a">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="$metsDoc/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/@withdrawn">
+                                <xsl:value-of select="$metsDoc/mets:METS/@OBJEDIT"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="concat($context-path, '/handle/', $handle)"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <xsl:choose>
+                        <xsl:when test="dri:list[@n=(concat($handle, ':dc.title'))]">
+                            <xsl:apply-templates select="dri:list[@n=(concat($handle, ':dc.title'))]/dri:item"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:element>
+                <!-- Generate COinS with empty content per spec but force Cocoon to not create a minified tag  -->
+                <span class="Z3988">
+                    <xsl:attribute name="title">
+                        <xsl:for-each select="$metsDoc/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim">
+                            <xsl:call-template name="renderCOinS"/>
+                        </xsl:for-each>
+                    </xsl:attribute>
+                    &#xFEFF; <!-- non-breaking space to force separating the end tag -->
+                </span>
+            </div>
+            <div class="artifact-info">
+                <span class="author">
+                    <xsl:choose>
+                        <xsl:when test="dri:list[@n=(concat($handle, ':dc.contributor.author'))]">
+                            <xsl:for-each select="dri:list[@n=(concat($handle, ':dc.contributor.author'))]/dri:item">
+                                <xsl:variable name="author">
+                                    <xsl:value-of select="."/>
+                                </xsl:variable>
+                                <span>
+                                    <!--Check authority in the mets document-->
+                                    <xsl:if test="$metsDoc/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='contributor' and @qualifier='author' and . = $author]/@authority">
+                                        <xsl:attribute name="class">
+                                            <xsl:text>ds-dc_contributor_author-authority</xsl:text>
+                                        </xsl:attribute>
+                                    </xsl:if>
+                                    <xsl:apply-templates select="."/>
+                                </span>
+
+                                <xsl:if test="count(following-sibling::dri:item) != 0">
+                                    <xsl:text>; </xsl:text>
+                                </xsl:if>
+                            </xsl:for-each>
+                        </xsl:when>
+                        <xsl:when test="dri:list[@n=(concat($handle, ':dc.creator'))]">
+                            <xsl:for-each select="dri:list[@n=(concat($handle, ':dc.creator'))]/dri:item">
+                                <xsl:apply-templates select="."/>
+                                <xsl:if test="count(following-sibling::dri:item) != 0">
+                                    <xsl:text>; </xsl:text>
+                                </xsl:if>
+                            </xsl:for-each>
+                        </xsl:when>
+                        <xsl:when test="dri:list[@n=(concat($handle, ':dc.contributor'))]">
+                            <xsl:for-each select="dri:list[@n=(concat($handle, ':dc.contributor'))]/dri:item">
+                                <xsl:apply-templates select="."/>
+                                <xsl:if test="count(following-sibling::dri:item) != 0">
+                                    <xsl:text>; </xsl:text>
+                                </xsl:if>
+                            </xsl:for-each>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-author</i18n:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </span>
+                <xsl:text> </xsl:text>
+                <xsl:if test="dri:list[@n=(concat($handle, ':dc.date.issued'))] or dri:list[@n=(concat($handle, ':dc.publisher'))]">
+                    <span class="publisher-date">
+                        <xsl:text>(</xsl:text>
+                        <xsl:if test="dri:list[@n=(concat($handle, ':dc.publisher'))]">
+                            <span class="publisher">
+                                <xsl:apply-templates select="dri:list[@n=(concat($handle, ':dc.publisher'))]/dri:item"/>
+                            </span>
+                            <xsl:text>, </xsl:text>
+                        </xsl:if>
+                        <span class="date">
+                            <xsl:value-of
+                                    select="substring(dri:list[@n=(concat($handle, ':dc.date.issued'))]/dri:item,1,10)"/>
+                        </span>
+                        <xsl:text>)</xsl:text>
+                    </span>
+                </xsl:if>
+                <xsl:choose>
+                    <xsl:when test="dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item/dri:hi">
+                        <div class="abstract">
+                            <xsl:for-each select="dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item">
+                                <xsl:apply-templates select="."/>
+                                <xsl:text>...</xsl:text>
+                                <br/>
+                            </xsl:for-each>
+
+                        </div>
+                    </xsl:when>
+                    <xsl:when test="dri:list[@n=(concat($handle, ':fulltext'))]">
+                        <div class="abstract">
+                            <xsl:for-each select="dri:list[@n=(concat($handle, ':fulltext'))]/dri:item">
+                                <xsl:apply-templates select="."/>
+                                <xsl:text>...</xsl:text>
+                                <br/>
+                            </xsl:for-each>
+                        </div>
+                    </xsl:when>
+                </xsl:choose>
+            </div>
+        </div>
+
+        <!--Generates thumbnails (if present)-->
+        <xsl:apply-templates select="$metsDoc/mets:METS/mets:fileSec" mode="artifact-preview"/>
+
     </xsl:template>
 
 </xsl:stylesheet>

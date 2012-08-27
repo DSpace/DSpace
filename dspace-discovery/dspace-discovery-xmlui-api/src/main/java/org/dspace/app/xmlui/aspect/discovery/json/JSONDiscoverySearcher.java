@@ -26,7 +26,6 @@ import org.dspace.handle.HandleManager;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -118,7 +117,7 @@ public class JSONDiscoverySearcher extends AbstractReader implements Recyclable 
 
         try {
             Context context = ContextUtil.obtainContext(objectModel);
-            JSONStream = getSearchService().searchJSON(queryArgs, getScope(context, objectModel), jsonWrf);
+            JSONStream = getSearchService().searchJSON(context, queryArgs, getScope(context, objectModel), jsonWrf);
         } catch (Exception e) {
             log.error("Error while retrieving JSON string for Discovery auto complete", e);
         }
