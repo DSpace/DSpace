@@ -215,12 +215,6 @@ public class WorkflowUtils extends Util{
         if(role.getScope() == Role.Scope.COLLECTION){
             CollectionRole ass = CollectionRole.find(context, collection.getID(), roleID);
             ass.delete();
-        }else
-        if(role.getScope() == Role.Scope.REPOSITORY){
-            Group groupToDelete = Group.findByName(context, roleID);
-            if(groupToDelete != null){
-                groupToDelete.delete();
-            }
         }
     }
 

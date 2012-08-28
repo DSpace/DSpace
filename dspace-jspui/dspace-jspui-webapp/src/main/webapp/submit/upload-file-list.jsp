@@ -47,7 +47,7 @@
     boolean showChecksums = ((Boolean) request.getAttribute("show.checksums")).booleanValue();
     
     request.setAttribute("LanguageSwitch", "hide");
-    boolean allowFileEditing = !subInfo.isInWorkflow() || (subInfo.isInWorkflow()) && ConfigurationManager.getBooleanProperty("workflow", "reviewer.file-edit");
+    boolean allowFileEditing = !subInfo.isInWorkflow() || ConfigurationManager.getBooleanProperty("workflow", "reviewer.file-edit");
 %>
 
 <dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.upload-file-list.title">
