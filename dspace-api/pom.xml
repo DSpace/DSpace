@@ -310,6 +310,10 @@
             <artifactId>rome-modules</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+	        <groupId>com.javabib</groupId>
+			<artifactId>javabib-bin</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
