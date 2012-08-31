@@ -11,9 +11,9 @@ var errorConfianzaSingular='Verifique el valor';
 var errorConfianzaPlural='Hay errores en el formulario';
 
 //-------------------Variable para el limite en el lookup
-var limit_lookup=20;
+var limit_lookup=100;
 //-------------------Variable para el limite en el suggest
-var limit_suggest=30;
+var limit_suggest=50;
 //-------------------Variable para el paginado del lookup
 var previous_start=0;
 

@@ -8,8 +8,8 @@ import ar.edu.unlp.sedici.sedici2003.model.JerarquiasTermino;
 public class SeDiCI2003Jerarquia extends SeDiCI2003Hierarchy {
 
 	@Override
-	protected List<Object> getSeDiCI2003HierarchyElements(String text, String[] parents, boolean includeChilds, int start, int limit) {
-		List<JerarquiasTermino> resultados = JerarquiasTermino.findAll(text, parents, includeChilds, start, limit);
+	protected List<Object> getSeDiCI2003HierarchyElements(String text, String[] parents, boolean includeChilds, boolean includeSelf, int start, int limit) {
+		List<JerarquiasTermino> resultados = JerarquiasTermino.findAll(text, parents, includeChilds, includeSelf, start, limit);
 		return new ArrayList<Object>(resultados);
 	}
 

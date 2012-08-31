@@ -46,11 +46,11 @@ public class TesaurosTermino {
 	
 	public static List<TesaurosTermino> findAll(String text, String[] parents, boolean includeChilds, int start, int count) {
 
-		if (text == null || text.length() == 0) throw new IllegalArgumentException("The text argument is required");
+		//if (text == null || text.length() == 0) throw new IllegalArgumentException("The text argument is required");
 		if (parents == null || parents.length == 0) throw new IllegalArgumentException("The parents argument is required");
 		
 		if (start < 0) start = 0;
-		if (count <= 0) count = 10;
+		if (count <= 0) count = 60;
 		
 		// Armamos el filtro de descendencia
 		String parentFilter = "(";
@@ -78,7 +78,10 @@ public class TesaurosTermino {
 
 		EntityManager em = TesaurosTermino.entityManager();
 		TypedQuery<TesaurosTermino> q = em.createQuery(sql, TesaurosTermino.class);
-		q.setParameter("filtro", "%"+text.trim()+"%");
+		if (text != null || text.length() != 0){
+			q.setParameter("filtro", "%"+text.trim()+"%");
+			
+		}
 		q.setFirstResult(start);
 		q.setMaxResults(count);
 		

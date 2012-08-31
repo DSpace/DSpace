@@ -43,7 +43,7 @@ import org.springframework.roo.addon.tostring.RooToString;
 @RooDbManaged(automaticallyDelete = true)
 public class JerarquiasTermino {
 	
-	public static List<JerarquiasTermino> findAll(String text, String[] parents, boolean includeChilds, int start, int count) {
+	public static List<JerarquiasTermino> findAll(String text, String[] parents, boolean includeChilds,boolean includeSelf , int start, int count) {
 
 		if (text == null || text.length() == 0) throw new IllegalArgumentException("The text argument is required");
 		if (parents == null || parents.length == 0) throw new IllegalArgumentException("The parents argument is required");
@@ -64,6 +64,16 @@ public class JerarquiasTermino {
 			}
 		}
 
+		if(includeSelf) {
+			for(String parentID : parents) {
+				if(parentID.endsWith(".")) parentID = parentID.substring(0, parentID.length()-1);
+				
+				parentFilter += " terminos.id LIKE '"+parentID+"' OR";
+			}
+		}
+		
+		
+		
 		//Sacamos el ultimo OR
 		parentFilter = parentFilter.substring(0, parentFilter.length()-2)+ ")";
 		
@@ -74,8 +84,8 @@ public class JerarquiasTermino {
 		
 		//Agrego el orden
 		sql=sql + " ORDER BY terminos.nombreEs ASC";
-
-
+       
+      //  System.out.println(sql);
 		EntityManager em = JerarquiasTermino.entityManager();
 		TypedQuery<JerarquiasTermino> q = em.createQuery(sql, JerarquiasTermino.class);
 		q.setParameter("filtro", "%"+text+"%");
