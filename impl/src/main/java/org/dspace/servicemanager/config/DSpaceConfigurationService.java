@@ -491,17 +491,20 @@ public final class DSpaceConfigurationService implements ConfigurationService {
                     int end = value.indexOf('}', start);
                     if (end > -1) {
                         String newKey = value.substring(start+2, end);
-                        if (newKey.equals(entry.getKey())) {
-                            log.warn("Found circular reference for key ("+newKey+") in config value: " + value);
-                            break;
-                        }
                         DSpaceConfig dsc = dsConfiguration.get(newKey);
                         if (dsc == null) {
                             log.warn("Could not find key ("+newKey+") for replacement in value: " + value);
                             break;
                         }
                         String newVal = dsc.getValue();
+                        String oldValue = value;
                         value = value.replace("${"+newKey+"}", newVal);
+                        if (value.equals(oldValue)) {
+                            log.warn("No change after variable replacement -- is "
+                                    + newKey + " = " + newVal +
+                                    " a circular reference?");
+                            break;
+                        }
                         entry.setValue( new DSpaceConfig(entry.getValue().getKey(), value) );
                     } else {
                         log.warn("Found '${' but could not find a closing '}' in the value: " + value);
