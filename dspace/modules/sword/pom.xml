@@ -20,6 +20,9 @@
    </parent>
 
    <build>
+       <filters>
+           <filter>${basedir}/../../../${filters.file}</filter>
+       </filters>
       <plugins>
 
          <plugin>
@@ -29,7 +32,7 @@
                <archiveClasses>false</archiveClasses>
                <webResources>
                   <resource>
-                     <filtering>true</filtering>
+                     <filtering>false</filtering>
                      <directory>${basedir}/src/main/webapp</directory>
                      <includes>
                         <include>WEB-INF/web.xml</include>
