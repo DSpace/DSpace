@@ -356,12 +356,12 @@
     </command>
 
     <command>
-		<name>update-discovery-index</name>
-		<description>Update Discovery Solr Search Index</description>
-		<step>
-			<class>org.dspace.discovery.IndexClient</class>
-		</step>
-	</command>
+        <name>update-discovery-index</name>
+        <description>Update Discovery Solr Search Index</description>
+        <step>
+            <class>org.dspace.discovery.IndexClient</class>
+        </step>
+    </command>
 
     <command>
         <name>migrate-embargo</name>
@@ -371,6 +371,12 @@
         </step>
     </command>
 
-
+    <command>
+        <name>oai</name>
+        <description>OAI script manager</description>
+        <step>
+            <class>org.dspace.xoai.app.XOAI</class>
+        </step>
+    </command>
 
 </commands>

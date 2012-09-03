@@ -84,5 +84,16 @@
         </plugins>
     </build>
 
-
+    <dependencies>
+    	<!-- Don't know how to add artifacts to dspace lib -->
+    	<dependency>
+    		<groupId>org.dspace</groupId>
+    		<artifactId>dspace-oai-api</artifactId>
+    	</dependency>
+    	<dependency>
+    		<groupId>javax.servlet</groupId>
+    		<artifactId>servlet-api</artifactId>
+    		<version>2.3</version>
+    	</dependency>
+    </dependencies>
 </project>
