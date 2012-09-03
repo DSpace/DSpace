@@ -28,7 +28,7 @@
 					<warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
 					<webResources>
 						<resource>
-							<filtering>true</filtering>
+							<filtering>false</filtering>
 							<directory>${basedir}/src/main/webapp</directory>
 							<includes>
 								<include>WEB-INF/web.xml</include>

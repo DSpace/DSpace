@@ -18,28 +18,9 @@
    </parent>
 
    <build>
-		<filters>
-            <filter>${basedir}/../../${filters.file}</filter>
-        </filters>
-		<resources>
-			<!-- Enumerate filtered files explicitly to avoid issues with other config tech. -->
-			<resource>
-				<directory>${basedir}</directory>
-				<filtering>true</filtering>
-				<includes>
-					<include>src/main/webapp/WEB-INF/web.xml</include>
-				</includes>
-			</resource>
-			<!-- Declare a mutually exclusive resource set for non-filtered files. -->
-			<resource>
-				<directory>${basedir}</directory>
-				<filtering>false</filtering>
-				<excludes>
-					<exclude>src/main/webapp/WEB-INF/web.xml</exclude>
-				</excludes>
-			</resource>
-		</resources>
-   
+      <filters>
+          <filter>${basedir}/../../${filters.file}</filter>
+      </filters>
       <plugins>
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -49,6 +30,15 @@
                <!-- In version 2.1-alpha-1, this was incorrectly named warSourceExcludes -->
                <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
                <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
+               <webResources>
+                    <resource>
+                        <filtering>false</filtering>
+                        <directory>${basedir}/src/main/webapp</directory>
+                        <includes>
+                            <include>WEB-INF/web.xml</include>
+                        </includes>
+                    </resource>
+                </webResources>
             </configuration>
             <executions>
                <execution>

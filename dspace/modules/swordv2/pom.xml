@@ -20,6 +20,9 @@
    </parent>
 
    <build>
+       <filters>
+           <filter>${basedir}/../../../${filters.file}</filter>
+       </filters>
       <plugins>
 
          <plugin>
