@@ -236,7 +236,7 @@
         </profile>
 
         <!--
-           Builds OAI Gateway WAR for DSpace
+           Builds XOAI Gateway WAR for DSpace
         -->
         <profile>
             <id>dspace-oai</id>
@@ -640,11 +640,6 @@
             <groupId>org.dspace</groupId>
             <artifactId>mets</artifactId>
             <version>1.5.2</version>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>oaicat</artifactId>
-            <version>1.5.48</version>
          </dependency>
          <dependency>
             <groupId>org.dspace.dependencies</groupId>
@@ -1197,5 +1192,4 @@
     <distributionManagement>
         <!-- further distribution management is found upstream in the sonatype parent -->
     </distributionManagement>
-    
 </project>

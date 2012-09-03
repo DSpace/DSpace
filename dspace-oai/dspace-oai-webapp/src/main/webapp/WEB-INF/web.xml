@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!--
 
     The contents of this file are subject to the license and copyright
@@ -8,67 +8,47 @@
     http://www.dspace.org/license/
 
 -->
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app id="XOAILynCode" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+	
+	<display-name>XOAI Data Provider</display-name>
+	
+	<context-param>
+		<description>
+			The location of the main DSpace configuration file
+		</description>
+		<param-name>dspace-config</param-name>
+		<param-value>${dspace.dir}/config/dspace.cfg</param-value>
+	</context-param>
+	
+	<context-param>
+		<description>
+			The location of the main DSpace configuration file
+		</description>
+		<param-name>dspace.dir</param-name>
+		<param-value>${dspace.dir}</param-value>
+	</context-param>
+	
+	<listener>
+		<listener-class>
+			org.dspace.app.util.DSpaceContextListener
+		</listener-class>
+	</listener>
+	
+	<servlet>
+		<servlet-name>oai</servlet-name>
+		<servlet-class>org.dspace.xoai.DSpaceOAIDataProvider</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>default</servlet-name>
+		<url-pattern>/static/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>oai</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
 
-<!--
-  - The is the servlet deployment descriptor for Tomcat 4.0, for the OAI
-  - Web application.
-  - OAICat Configuration file - see OAICat documentation for details
-  -
-  - '${dspace.dir}' will be replaced with the directory where DSpace is installed
-  -->
-
-<web-app>
-  <display-name>DSpace OAI-PMH 2.0</display-name>
-
-  <!-- DSpace configuration information -->
-  <context-param>
-    <param-name>dspace-config</param-name>
-    <param-value>${dspace.dir}/config/dspace.cfg</param-value>
-    <description>
-      The location of the main DSpace configuration file
-    </description>
-  </context-param>
-
-  <context-param>
-    <param-name>properties</param-name>
-    <param-value>${dspace.dir}/config/oaicat.properties</param-value>
-    <description>
-      The location of the oaicat.properties file containing
-      datapairs used to initialize the OAI repository software.
-    </description>
-  </context-param>
-
-    <!-- new ConfigurationService initialization for dspace.dir -->
-    <context-param>
-        <description>
-            The location of the main DSpace configuration file
-        </description>
-        <param-name>dspace.dir</param-name>
-        <param-value>${dspace.dir}</param-value>
-    </context-param>
-
-    <!--
-     Listener to initialise DSpace configuration and clean up the application
-    -->
-  <listener>
-     <listener-class>
-        org.dspace.app.util.DSpaceContextListener
-     </listener-class>
-  </listener>
-
-  <servlet>
-    <servlet-name>oai-handler</servlet-name>
-    <servlet-class>ORG.oclc.oai.server.OAIHandler</servlet-class>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>default</servlet-name>
-    <url-pattern>*.xsl</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>oai-handler</servlet-name>
-    <url-pattern>/request</url-pattern>
-  </servlet-mapping>
 </web-app>
