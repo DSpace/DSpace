@@ -131,9 +131,9 @@
     </contributors>
 
     <scm>
-      <connection>scm:git:git@github.com:dspace/DSpace.git</connection>
-      <developerConnection>scm:git:git@github.com:dspace/dspace-services</developerConnection>
-      <url>git@github.com:dspace/DSpace</url>
+      <connection>scm:git:git://github.com/DSpace/dspace-services.git</connection>
+      <developerConnection>scm:git:git@github.com:DSpace/dspace-services.git</developerConnection>
+      <url>https://github.com/DSpace/dspace-services</url>
     </scm>
 
 </project>
