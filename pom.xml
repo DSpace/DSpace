@@ -130,16 +130,10 @@
         </contributor>
     </contributors>
 
-    <!--
-        The Subversion repository location is used by Continuum to
-        update against when changes have occured, this spawns a new
-        build cycle and releases snapshots into the snapshot repository
-        below.
-    -->
     <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/modules/dspace-services/trunk</connection>
-        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-services/trunk</developerConnection>
-        <url>http://scm.dspace.org/svn/repo/modules/dspace-services/trunk</url>
+      <connection>scm:git:git@github.com:dspace/DSpace.git</connection>
+      <developerConnection>scm:git:git@github.com:dspace/dspace-services</developerConnection>
+      <url>git@github.com:dspace/DSpace</url>
     </scm>
 
 </project>
