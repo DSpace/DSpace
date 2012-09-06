@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package gr.ekt.webui.jsptag;
+package org.dspace.app.webui.util;
 
 import org.mcavallo.opencloud.Cloud.Case;
 
