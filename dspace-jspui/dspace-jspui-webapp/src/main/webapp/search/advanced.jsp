@@ -47,6 +47,32 @@
 
     QueryResults qResults = (QueryResults)request.getAttribute("queryresults");
 	
+	//Read the configuration to find out the date search indices dynamically
+	ArrayList<String> dateSearchIndices = new ArrayList<String>();
+	int dateIdx = 1;
+	String dateIndexConfig;
+	while ( ((dateIndexConfig = ConfigurationManager.getProperty("jspui.search.index.date." + dateIdx))) != null){
+		dateSearchIndices.add(dateIndexConfig);
+		dateIdx++;
+	}
+	
+	int idx = 1;
+	String definition;
+	ArrayList<String> searchIndices = new ArrayList<String>();
+	String dateIndexString = "";
+
+	while ( ((definition = ConfigurationManager.getProperty("search.index." + idx))) != null){
+	        
+		String index = definition.substring(0, definition.indexOf(":"));
+		searchIndices.add(index);
+		if (dateSearchIndices.contains(index)){
+			if (dateIndexString.equals(""))
+				dateIndexString += String.valueOf(idx);
+			else
+				dateIndexString += "_"+String.valueOf(idx);
+		}
+	    idx++;
+	 }
 %>
 
 <dspace:layout locbar="nolink" titlekey="jsp.search.advanced.title">
