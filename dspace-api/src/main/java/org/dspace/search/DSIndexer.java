@@ -1075,7 +1075,7 @@ public class DSIndexer
                             List newValues=new ArrayList<String>();
                             
                              //Get the display value of the respective stored value
-                             newValues = gr.ekt.repositories.dspace.utils.Utilities.getControlledVocabulariesDisplayValue(item, mydc,indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier);
+                             newValues = org.dspace.app.util.Util.getControlledVocabulariesDisplayValue(item, mydc,indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier);
 
                                 if (newValues!=null){
                                     for (int m=0;m<newValues.size();m++){
@@ -1103,7 +1103,7 @@ public class DSIndexer
                             
                              for (int k=0;k<supportedLocales.length;k++){
                              
-                                 displayValue = gr.ekt.repositories.dspace.utils.Utilities.getControlledVocabulariesDisplayValueLocalized(item, mydc,indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier,  supportedLocales[k]);
+                                 displayValue = org.dspace.app.util.Util.getControlledVocabulariesDisplayValueLocalized(item, mydc,indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier,  supportedLocales[k]);
                                  newValues.add(displayValue);
                                }
                                
@@ -1129,7 +1129,7 @@ public class DSIndexer
                             List newValues=new ArrayList<String>();
                             Locale[] supportedLocales=I18nUtil.getSupportedLocales();
                              //Get the display value of the respective stored value
-                             newValues = gr.ekt.repositories.dspace.utils.Utilities.getControlledVocabulariesMultilingualValues(item, mydc,indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier, supportedLocales);
+                             newValues = org.dspace.app.util.Util.getControlledVocabulariesMultilingualValues(item, mydc,indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier, supportedLocales);
 
                                 if (newValues!=null){
                                     for (int m=0;m<newValues.size();m++){
