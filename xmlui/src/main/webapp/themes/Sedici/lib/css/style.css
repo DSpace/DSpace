@@ -2971,14 +2971,27 @@ border-bottom:1px solid #dedede;
 	padding: 2px 15px 10px 15px;
 	border: solid 1px #C0C0C0;
 }
+.column_container {
+    display: table
+}
 .browse_column {
 	float: left;
 	margin-right: 10px;
+    /*max-width: 325px;*/
 }
 .browse_column table {
 	width: 215px;
 }
-#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-author-results, 
+.browse_column li {
+    padding: 3px 5px;
+}
+.browse_column ul {
+	margin-left: 0px;
+}
+.browse_column li a:hover {
+    color: #9C4F0A;
+}
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-author-results,
 #aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-subject-results,
 #aspect_discovery_SearchFacetFilter_div_browse-by-author-results,
 #aspect_discovery_SearchFacetFilter_div_browse-by-subject-results,

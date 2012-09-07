@@ -121,7 +121,7 @@
     <xsl:template match="dri:div[@n='community-view']">
          <xsl:apply-templates select="dri:referenceSet/dri:reference" mode='mi-community-view'/>
          <xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.artifactbrowser.CommunityViewer.div.community-home']/dri:div[@n='community-search-browse']"/>
-         <xsl:apply-templates select="dri:referenceSet/dri:reference/dri:referenceSet"/>        
+         <xsl:apply-templates select="dri:referenceSet/dri:reference/dri:referenceSet" mode="multiple_column_browse_community"/>
     </xsl:template>
     
     <xsl:template match='dri:reference' mode='mi-community-view'>
