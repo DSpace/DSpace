@@ -623,7 +623,8 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
 
             params.scope.setJumpToItem(RequestUtils.getIntParameter(request, BrowseParams.JUMPTO_ITEM));
             params.scope.setOrder(request.getParameter(BrowseParams.ORDER));
-            params.scope.setOffset(RequestUtils.getIntParameter(request, BrowseParams.OFFSET));
+            int offset = RequestUtils.getIntParameter(request, BrowseParams.OFFSET);
+            params.scope.setOffset(offset > 0 ? offset : 0);
             params.scope.setResultsPerPage(RequestUtils.getIntParameter(request,
                     BrowseParams.RESULTS_PER_PAGE));
             params.scope.setStartsWith(request.getParameter(BrowseParams.STARTS_WITH));
