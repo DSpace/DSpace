@@ -188,4 +188,5 @@
         <property name="metadataField" value="dc.date.issued"/>
         <property name="type" value="date"/>
     </bean>
+    
 </beans>

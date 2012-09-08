@@ -110,11 +110,15 @@ public class DiscoverResult {
     public static final class FacetResult{
         private String asFilterQuery;
         private String displayedValue;
+        private String authorityKey;
+        private String sortValue;
         private long count;
 
-        public FacetResult(String asFilterQuery, String displayedValue, long count) {
+        public FacetResult(String asFilterQuery, String displayedValue, String authorityKey, String sortValue, long count) {
             this.asFilterQuery = asFilterQuery;
             this.displayedValue = displayedValue;
+            this.authorityKey = authorityKey;
+            this.sortValue = sortValue;
             this.count = count;
         }
 
@@ -126,8 +130,18 @@ public class DiscoverResult {
             return displayedValue;
         }
 
+        public String getSortValue()
+        {
+            return sortValue;
+        }
+        
         public long getCount() {
             return count;
+        }
+
+        public String getAuthorityKey()
+        {
+            return authorityKey;
         }
     }
 
