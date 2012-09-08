@@ -446,5 +446,20 @@
     </attribute>    	  
   </tag>  
 
+  <tag>
+      <name>tagcloud</name>
+      <tag-class>gr.ekt.webui.jsptag.TagCloudTag</tag-class>
+      <body-content>empty</body-content>
+      <attribute>
+        <name>parameters</name>
+		<required>false</required>
+		<rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+		<name>index</name>
+		<required>true</required>
+		<rtexprvalue>true</rtexprvalue>
+      </attribute>
+  </tag>
 
 </taglib>

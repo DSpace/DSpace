@@ -30,6 +30,7 @@
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.browse.ItemCounter" %>
+<%@ page import="gr.ekt.webui.jsptag.TagCloudParameters" %>
 
 <%
     Community[] communities = (Community[]) request.getAttribute("communities");
@@ -134,6 +135,95 @@ for (int i = supportedLocales.length-1; i >= 0; i--)
             </td>
         </tr>
     </table>
+	
+<%
+	TagCloudParameters tcp = new TagCloudParameters();
+	tcp.setLocale(UIUtil.getSessionLocale(request).toString());
+	
+	String index = ConfigurationManager.getProperty("webui.tagcloud.home.bindex");
+	if (index==null)
+		index = "subject";
+	
+	String maxtags = ConfigurationManager.getProperty("webui.tagcloud.home.maxtags");
+	if (maxtags==null)
+		tcp.setTotalTags("20");
+	else
+		tcp.setTotalTags(maxtags);
+
+	String showScore = ConfigurationManager.getProperty("webui.tagcloud.home.showscore");
+	if (showScore==null)
+		tcp.setDisplayScore(false);
+	else
+		tcp.setDisplayScore(Boolean.parseBoolean(showScore));
+
+	String cutLevel = ConfigurationManager.getProperty("webui.tagcloud.home.cutlevel");
+	if (cutLevel==null)
+		tcp.setCuttingLevel("5");
+	else
+		tcp.setCuttingLevel(cutLevel);
+
+	String showCenter = ConfigurationManager.getProperty("webui.tagcloud.home.showcenter");
+	if (showCenter==null)
+		tcp.setShouldCenter(false);
+	else
+		tcp.setShouldCenter(Boolean.parseBoolean(showCenter));
+
+	String fontFrom = ConfigurationManager.getProperty("webui.tagcloud.home.fontfrom");
+	if (fontFrom==null)
+		tcp.setFontFrom("1.3");
+	else
+		tcp.setFontFrom(fontFrom);
+
+	String fontTo = ConfigurationManager.getProperty("webui.tagcloud.home.fontto");
+	if (fontTo==null)
+		tcp.setFontTo("2.8");
+	else
+		tcp.setFontTo(fontTo);
+
+	String tagCase = ConfigurationManager.getProperty("webui.tagcloud.home.tagcase");
+	if (tagCase==null)
+		tcp.setCloudCase("Case.PRESERVE_CASE");
+	else
+		tcp.setCloudCase(tagCase);
+
+	String randomColors = ConfigurationManager.getProperty("webui.tagcloud.home.randomcolors");
+	if (randomColors==null)
+		tcp.setRandomColors(false);
+	else
+		tcp.setRandomColors(Boolean.parseBoolean(randomColors));
+
+	String tagOrder = ConfigurationManager.getProperty("webui.tagcloud.home.tagorder");
+	if (tagOrder==null)
+		tcp.setOrdering("Tag.NameComparatorAsc");
+	else
+		tcp.setOrdering(tagOrder);
+
+	String tagColor1 = ConfigurationManager.getProperty("webui.tagcloud.home.tagcolor1");
+	if (tagColor1!=null)
+		tcp.setColorLevel1(tagColor1);
+
+	String tagColor2 = ConfigurationManager.getProperty("webui.tagcloud.home.tagcolor2");
+	if (tagColor2!=null)
+		tcp.setColorLevel2(tagColor2);
+
+	String tagColor3 = ConfigurationManager.getProperty("webui.tagcloud.home.tagcolor3");
+	if (tagColor3!=null)
+		tcp.setColorLevel3(tagColor3);
+
+	boolean allow = false;
+   	String allowStr;
+    	
+   	if ( ((allowStr = ConfigurationManager.getProperty("webui.tagcloud.home.show"))) != null)
+   		allow = Boolean.parseBoolean(allowStr);
+	
+	if (allow) {
+%>
+		<dspace:tagcloud parameters='<%= tcp %>' index='<%= index %>'/><br/><br/>
+<%
+	}
+%>
+
+
     <dspace:sidebar>
     <%= sideNews %>
     <%

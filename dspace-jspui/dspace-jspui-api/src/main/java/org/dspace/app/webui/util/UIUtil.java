@@ -14,6 +14,7 @@ import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,12 +38,20 @@ import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.browse.BrowseException;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.eperson.EPerson;
+import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.browse.BrowseIndex;
+
 
 /**
  * Miscellaneous UI utility methods
  * 
  * @author Robert Tansley
- * @version $Revision$
+ * @version $Revision: 5845 $
  */
 public class UIUtil extends Util
 {
@@ -469,5 +478,48 @@ public class UIUtil extends Util
 		{
 			response.setHeader("Content-Disposition", "attachment;filename=" + name);
 		}
+	}
+
+	public static HashMap<String, Integer> calculateMapFreqOfItems(String element) throws SQLException, AuthorizeException, BrowseException{
+		Long count;
+
+		Context c = new Context();
+		// find the EPerson, assign to context
+		EPerson myEPerson = null;
+
+		//@ sign, must be an email
+		myEPerson = EPerson.findByEmail(c, "kstamatis@ekt.gr");
+
+		//set current user
+		c.setCurrentUser(myEPerson);
+
+		c.setIgnoreAuthorization(true);
+
+		//int browseIndexID = getBrowseIndicesId(element);
+		//String disTable = "bi_"+Integer.toString(browseIndexID)+"_dis";
+		//String dmapTable = "bi_"+Integer.toString(browseIndexID)+"_dmap";
+
+		BrowseIndex bindex = BrowseIndex.getBrowseIndex(element);
+
+		String disTable = bindex.getDistinctTableName();
+		String dmapTable = bindex.getMapTableName();
+
+		String findAll = "SELECT "+disTable+".value as a, count(*) as frequency FROM "+disTable+","+dmapTable+" WHERE "+dmapTable+".distinct_id="+disTable+".id GROUP BY "+disTable+".value";
+
+		TableRowIterator iter = DatabaseManager.query(c, findAll);
+
+		HashMap<String, Integer> tmp = new HashMap<String, Integer>();
+
+		while (iter.hasNext()){
+			TableRow row = iter.next();
+			String value = row.getStringColumn("a");
+			long counter = row.getLongColumn("frequency");
+
+			tmp.put(value, new Integer(Integer.parseInt(Long.toString(counter))));
+		}
+		c.complete();
+
+		log.info("Result Size = " + tmp.size());
+		return tmp;
 	}
 }
