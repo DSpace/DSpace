@@ -22,4 +22,9 @@
 
     <alias name="solrServiceResourceIndexPlugin" alias="org.dspace.discovery.SolrServiceResourceRestrictionPlugin"/>
 
+    <!-- Additional indexing plugin to implement the browse system via SOLR -->
+    <bean id="solrBrowseIndexer" scope="prototype" 
+    	class="org.dspace.browse.SolrBrowseCreateDAO">
+    </bean>
+
 </beans>
