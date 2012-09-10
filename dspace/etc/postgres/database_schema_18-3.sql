@@ -21,6 +21,10 @@
 -- DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST.
 --
 
+-------------------------------------------
+-- DS-895 Advanced Embargo Project
+-------------------------------------------
+
 ALTER TABLE resourcepolicy ADD rpname VARCHAR(30);
 ALTER TABLE resourcepolicy ADD rptype VARCHAR(30);
 ALTER TABLE resourcepolicy ADD rpdescription VARCHAR(100);
@@ -28,3 +32,12 @@ ALTER TABLE resourcepolicy ADD rpdescription VARCHAR(100);
 ALTER TABLE item ADD discoverable BOOLEAN;
 
 update item set discoverable=true;
+
+
+-------------------------------------------
+-- New columns and longer hash for salted password hashing DS-861 --
+-------------------------------------------
+
+ALTER TABLE EPerson ALTER COLUMN password TYPE VARCHAR(128);
+ALTER TABLE EPerson ADD salt VARCHAR(32);
+ALTER TABLE EPerson ADD digest_algorithm VARCHAR(16);
