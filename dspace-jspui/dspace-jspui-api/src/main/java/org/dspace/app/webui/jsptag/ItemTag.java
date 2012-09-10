@@ -480,10 +480,12 @@ public class ItemTag extends TagSupport
                     {
                         if (j > 0)
                         {
-                            if (isNoBreakLine){
-								boolean includeSpace = Boolean.valueOf(ConfigurationManager.getProperty("webui.itemdisplay.inclusespace")).booleanValue();
-								String separator = ConfigurationManager.getProperty("webui.itemdisplay.separator");
-								out.print((includeSpace?"&nbsp;":"")+separator+"&nbsp;");
+                            if (isNoBreakLine){								
+								String separator = ConfigurationManager.getProperty("webui.itemdisplay.nobreakline.separator");
+								if (separator==null){
+									separator = ";&nbsp;"
+								}
+								out.print(separator);
 							}
 							else {
 								out.print("<br />");
