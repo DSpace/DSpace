@@ -121,7 +121,9 @@ function eliminarMetadato(metadatoCheckboxId){
 function DSpaceChoiceLookup(url, field, formID, valueInput, authInput,
                          confIndicatorID, collectionID, isName, isRepeating) {
  // fill in URL
- url += '?field=' + field + '&formID=' + formID + '&valueInput=' + valueInput +
+
+	
+	url += '?field=' + field + '&formID=' + formID + '&valueInput=' + valueInput +
          '&authorityInput=' + authInput + '&collection=' + collectionID +
          '&isName=' + isName + '&isRepeating=' + isRepeating + '&confIndicatorID=' + confIndicatorID + '&limit='+limit_lookup;
  // primary input field - for positioning popup.
@@ -139,12 +141,13 @@ function DSpaceChoiceLookup(url, field, formID, valueInput, authInput,
  var height = 470;
  var left;
  var top;
+ 
  if (window.screenX == null) {
-     left = window.screenLeft + cOffset.left - (width / 2);
+ 	 left = window.screenLeft + cOffset.left - (width / 2);
      top = window.screenTop + cOffset.top - (height / 2);
  } else {
-     left = window.screenX + cOffset.left - (width / 2);
-     top = window.screenY + cOffset.top - (height / 2);
+	 left = $(window).width()/2 - width/2;
+	  top = $(window).height()/2 - height/2;
  }
  if (left < 0) left = 0;
  if (top < 0) top = 0;
