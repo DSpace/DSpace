@@ -42,16 +42,19 @@ public class DepositConfirmedStep extends AbstractSubmissionStep{
         String doi = getDoiValue(item);
 
         Division main = body.addInteractiveDivision("deposit-confirmed", contextPath+"/deposit-confirmed", Division.METHOD_POST, "");
-        main.setHead("Dryad submission received and assigned a provisional DOI");
+        main.setHead("Dryad submission received");
 
         Division actionsDiv = main.addDivision("deposit-confirmed");
 
         Division dataPackageDiv = actionsDiv.addDivision("puboverviewdivision", "odd subdiv");
 
-        dataPackageDiv.addPara().addContent("Thank you for your submission! Your submission has been assigned a provisional DOI. This DOI can be placed in your article, though it will not be fully registered with the DOI system until your submission has been approved by the Dryad curation staff.");
+        dataPackageDiv.addPara().addContent("Thank you for your submission! Your submission has been forwarded to the Dryad curation staff. Once curation staff have reviewed your submission, you will receive a permanent DOI that can be used to cite the data package. You will hear from us within two business days.");
 
 	dataPackageDiv.addPara("data-label", "bold").addContent(item.getName());
-	dataPackageDiv.addPara("data-label", "bold").addContent("Provisional DOI: " + doi);
+
+	// Don't include the DOI for now, at the request of Evolution. In the future, we will need to make this configurable
+	// on a per-journal basis.
+	//dataPackageDiv.addPara("data-label", "bold").addContent("Provisional DOI: " + doi);
 
         Division dataFileDiv = actionsDiv.addDivision("dataFile", "even subdiv");
         dataFileDiv.addPara("data-label", "bold").addContent("Data Files");
