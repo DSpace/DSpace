@@ -1067,33 +1067,9 @@ public class DSIndexer
                     mydc = item.getMetadata(indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier, Item.ANY);
                 }
 
-
-				//Index the controlled vocabularies display values. The stored values will be indexed in the next for loop 
-                if ("controlledVocabulary".equalsIgnoreCase(indexConfigArr[i].type)){
-           
-                          
-                            List newValues=new ArrayList<String>();
-                            
-                             //Get the display value of the respective stored value
-                             newValues = org.dspace.app.util.Util.getControlledVocabulariesDisplayValue(item, mydc,indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier);
-
-                                if (newValues!=null){
-                                    for (int m=0;m<newValues.size();m++){
-                                        if (!"".equals(newValues.get(m))){
-
-                                            String toAdd=(String) newValues.get(m);
-                                            doc.add( new Field(indexConfigArr[i].indexName,
-                                               toAdd,
-                                               Field.Store.YES,
-                                               Field.Index.ANALYZED));
-                                        }
-                                    }
-                                }
-                
-                }
                
                 //Index the controlled vocabularies localized display values for all localized input-forms.xml (e.g. input-forms_el.xml)
-                if ("controlledVocabularyLocalized".equalsIgnoreCase(indexConfigArr[i].type)){
+                if ("inputform".equalsIgnoreCase(indexConfigArr[i].type)){
            
                           
                             List newValues=new ArrayList<String>();
@@ -1122,30 +1098,7 @@ public class DSIndexer
                 
                 }
                 
-                 //Index the controlled vocabularies localized display values (message properties). The stored values will be indexed in the next for loop 
-                if ("controlledVocabularyMultilingual".equalsIgnoreCase(indexConfigArr[i].type)){
-           
-                          
-                            List newValues=new ArrayList<String>();
-                            Locale[] supportedLocales=I18nUtil.getSupportedLocales();
-                             //Get the display value of the respective stored value
-                             newValues = org.dspace.app.util.Util.getControlledVocabulariesMultilingualValues(item, mydc,indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier, supportedLocales);
-
-                                if (newValues!=null){
-                                    for (int m=0;m<newValues.size();m++){
-                                        if (!"".equals(newValues.get(m))){
-
-                                            String toAdd=(String) newValues.get(m);
-                                            
-                                            doc.add( new Field(indexConfigArr[i].indexName,
-                                               toAdd,
-                                               Field.Store.YES,
-                                               Field.Index.ANALYZED));
-                                        }
-                                    }
-                                }
-                
-                }
+            
                 for (j = 0; j < mydc.length; j++)
                 {
                     if (!StringUtils.isEmpty(mydc[j].value))
