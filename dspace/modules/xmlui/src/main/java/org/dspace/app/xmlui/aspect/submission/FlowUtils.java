@@ -803,46 +803,54 @@ public class FlowUtils {
 
 
     private static void finishSubmission(Request request, Context context, Item publication) throws SQLException, AuthorizeException, IOException, TransformerException, WorkflowException, SAXException, WorkflowConfigurationException, MessagingException, ParserConfigurationException {
-        //We have completed everything time to start our dataset
-        WorkspaceItem wsPublication = WorkspaceItem.findByItemId(context, publication.getID());
 
-        //Retrieve the to upload bitstreams
-        String[] toExportHandles = request.getParameterValues("export_item");
-        if(toExportHandles != null && toExportHandles.length > 0){
-            new ExportHandlesThread(request, context.getCurrentUser(), publication.getHandle(), toExportHandles).start();
-        }
+       try{
+            //We have completed everything time to start our dataset
+            WorkspaceItem wsPublication = WorkspaceItem.findByItemId(context, publication.getID());
 
-
-        //Start off by installing our publication
-        WorkflowItem wfPublication = WorkflowManager.start(context, wsPublication);
-        wfPublication.getItem().clearMetadata("internal", "workflow", "submitted", Item.ANY);
-        wfPublication.getItem().update();
-
-        //TODO: make sure only ONE email is sent out
-        //The publication isn't archived, & we completed it so now get all the datasets linked to this publication & start em
-        Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, wfPublication.getItem());
-        for (Item dataFile : dataFiles) {
-            //Should always be the case
-            if(dataFile != null){
-                DCValue[] submitted = dataFile.getMetadata("internal", "workflow", "submitted", Item.ANY);
-                //Make sure that we have reached a state where the submitted param is to true
-                // Start the submission workflow
-                WorkspaceItem workspaceItem = WorkspaceItem.findByItemId(context, dataFile.getID());
-                if(workspaceItem != null){
-                    //Start the data files without a notify, the notification will come from the data package
-                    //TODO: no notify
-                    WorkflowItem workflowItem = WorkflowManager.start(context, workspaceItem);
-                    workflowItem.getItem().clearMetadata("internal", "workflow", "submitted", Item.ANY);
-                    workflowItem.update();
-                }
-
+            //Retrieve the to upload bitstreams
+            String[] toExportHandles = request.getParameterValues("export_item");
+            if(toExportHandles != null && toExportHandles.length > 0){
+                new ExportHandlesThread(request, context.getCurrentUser(), publication.getHandle(), toExportHandles).start();
             }
-        }
+            //Start off by installing our publication
+            WorkflowItem wfPublication = WorkflowManager.start(context, wsPublication);
+
+            wfPublication.getItem().clearMetadata("internal", "workflow", "submitted", Item.ANY);
+            wfPublication.getItem().update();
+
+            //TODO: make sure only ONE email is sent out
+            //The publication isn't archived, & we completed it so now get all the datasets linked to this publication & start em
+            Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, wfPublication.getItem());
+            for (Item dataFile : dataFiles) {
+                //Should always be the case
+                if(dataFile != null){
+                    DCValue[] submitted = dataFile.getMetadata("internal", "workflow", "submitted", Item.ANY);
+                    //Make sure that we have reached a state where the submitted param is to true
+                    // Start the submission workflow
+                    WorkspaceItem workspaceItem = WorkspaceItem.findByItemId(context, dataFile.getID());
+                    if(workspaceItem != null){
+                        //Start the data files without a notify, the notification will come from the data package
+                        //TODO: no notify
+                        WorkflowItem workflowItem = WorkflowManager.start(context, workspaceItem);
+                        workflowItem.getItem().clearMetadata("internal", "workflow", "submitted", Item.ANY);
+                        workflowItem.update();
+                    }
+
+                }
+            }
+        }catch (Exception e){
+            // adding an explicit rollback to save the integrity of the data
+            // when an exception happens most likely spring doesn't throw it to
+            // the Cocoon servlet that commit the transaction in every case.
+            context.getDBConnection().rollback();
+            log.error("Exception during CompleteSubmissionStep: ", e);
+            throw new RuntimeException(e);
+       }
 
     }
 
     /**
-     * Method that creates a new data file & after creation redirects to the submission workflow for this data file
      * It also puts the current data file into the awaiting completion workspace state
      * @param context the dspace context
      * @param request the request
