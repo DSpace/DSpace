@@ -11,11 +11,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Stack;
+
+import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.Logger;
 import org.dspace.eperson.EPerson;
@@ -23,7 +23,12 @@ import org.dspace.eperson.Group;
 import org.dspace.event.Dispatcher;
 import org.dspace.event.Event;
 import org.dspace.event.EventManager;
+import org.dspace.services.CachingService;
+import org.dspace.services.model.Cache;
+import org.dspace.services.model.CacheConfig;
 import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.util.XMLBindUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Class representing the context of a particular DSpace operation. This stores
@@ -41,6 +46,7 @@ import org.dspace.storage.rdbms.DatabaseManager;
  * 
  * 
  * @version $Revision$
+ * @author DSpace @ Lyncode <dspace@lyncode.com> - Contribution: Using Caching Service instead of old Map
  */
 public class Context
 {
@@ -69,9 +75,13 @@ public class Context
      * system check
      */
     private Stack<String> authStateClassCallHistory;
-
-    /** Object cache for this context */
-    private Map<String, Object> objectCache;
+    
+    /**
+     * Caching service
+     */
+    @Autowired
+	private CachingService cacheService;
+    private Cache cache;
 
     /** Group IDs of special groups user is a member of */
     private List<Integer> specialGroups;
@@ -100,7 +110,6 @@ public class Context
         extraLogInfo = "";
         ignoreAuth = false;
 
-        objectCache = new HashMap<String, Object>();
         specialGroups = new ArrayList<Integer>();
 
         authStateChangeHistory = new Stack<Boolean>();
@@ -463,8 +472,17 @@ public class Context
     public Object fromCache(Class<?> objectClass, int id)
     {
         String key = objectClass.getName() + id;
-
-        return objectCache.get(key);
+        return this.getCache().get(key);
+    }
+    
+    private Cache getCache () {
+    	if (this.cache == null) {
+    		/** 
+    		 * it will use the defaults which are configured for this cacheName (part of the underlying implementation) if the cacheConfig is nul
+    	     */
+    		this.cache = this.getCacheService().getCache(this.getClass().getName(), null);
+    	}
+    	return this.cache;
     }
 
     /**
@@ -478,7 +496,7 @@ public class Context
     public void cache(Object o, int id)
     {
         String key = o.getClass().getName() + id;
-        objectCache.put(key, o);
+        this.getCache().put(key, o);
     }
 
     /**
@@ -492,7 +510,7 @@ public class Context
     public void removeCached(Object o, int id)
     {
         String key = o.getClass().getName() + id;
-        objectCache.remove(key);
+        this.getCache().remove(key);
     }
 
     /**
@@ -500,7 +518,7 @@ public class Context
      */
     public void clearCache()
     {
-        objectCache.clear();
+    	this.getCache().clear();
     }
 
     /**
@@ -516,7 +534,7 @@ public class Context
      */
     public int getCacheSize()
     {
-        return objectCache.size();
+    	return this.getCache().size();
     }
 
     /**
@@ -581,4 +599,12 @@ public class Context
 
         super.finalize();
     }
+
+	public CachingService getCacheService() {
+		return cacheService;
+	}
+	
+	public void setChacheService (CachingService cachingService) {
+		cacheService = cachingService;
+	}
 }
