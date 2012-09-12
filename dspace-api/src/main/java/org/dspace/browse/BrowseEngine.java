@@ -414,13 +414,25 @@ public class BrowseEngine
             // tell the browse query whether we are ascending or descending on the value
             dao.setAscending(scope.isAscending());
 
+            // inform dao about the display frequencies flag
+            dao.setEnableBrowseFrequencies(browseIndex.isDisplayFrequencies());
+            
+            //inform dao about the tag cloud existence
+            dao.setTagCloudEnabled(browseIndex.isTagcloudEnabled());
+            
+            // if we want to display frequencies, we need to pass the map table
+            if (browseIndex.isDisplayFrequencies()){
+            	dao.setFilterMappingTables(null, browseIndex.getMapTableName());
+            }
+            
             // set our constraints on community or collection
             if (scope.inCollection() || scope.inCommunity())
             {
-                // Scoped browsing of distinct metadata requires the mapping
+            	// Scoped browsing of distinct metadata requires the mapping
                 // table to be specified.
-                dao.setFilterMappingTables(null, browseIndex.getMapTableName());
-
+            	if (!browseIndex.isDisplayFrequencies())
+            		dao.setFilterMappingTables(null, browseIndex.getMapTableName());
+                
                 if (scope.inCollection())
                 {
                     Collection col = (Collection) scope.getBrowseContainer();
@@ -440,6 +452,12 @@ public class BrowseEngine
             // this is the total number of results in answer to the query
             int total = getTotalResults(true);
 
+            // if we want to display frequencies, pass to dao both count and select values
+            if (browseIndex.isDisplayFrequencies()){
+            	dao.setSelectValues(new String[]{"value", "authority"});
+            	dao.setCountValues(new String[]{"*"});
+            }
+            
             // set the ordering field (there is only one option)
             dao.setOrderField("sort_value");
 
@@ -747,7 +765,7 @@ public class BrowseEngine
         dao.setOrderField(null);
         dao.setLimit(-1);
         dao.setOffset(-1);
-
+        
         // perform the query and get the result
         int count = dao.doCountQuery();
 

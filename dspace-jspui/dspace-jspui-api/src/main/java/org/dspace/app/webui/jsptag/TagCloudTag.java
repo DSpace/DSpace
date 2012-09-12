@@ -14,20 +14,23 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.net.URLEncoder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.tagext.SimpleTagSupport;
+import javax.servlet.jsp.jstl.fmt.LocaleSupport;
+import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.TagCloudParameters;
-import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.BrowseException;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.browse.BrowseInfo;
+import org.dspace.browse.BrowseIndex;
+
 import org.mcavallo.opencloud.Cloud;
 import org.mcavallo.opencloud.Tag;
 import org.mcavallo.opencloud.Cloud.Case;
@@ -38,12 +41,12 @@ import org.mcavallo.opencloud.formatters.HTMLFormatter;
  * @author kstamatis
  *
  */
-public class TagCloudTag extends SimpleTagSupport{
+public class TagCloudTag extends TagSupport{
 
 	private static Logger log = Logger.getLogger(TagCloudTag.class);
 
 	TagCloudParameters parameters;
-	String index;
+	BrowseInfo bi;
 
 	/**
 	 * 
@@ -54,7 +57,6 @@ public class TagCloudTag extends SimpleTagSupport{
 
 	public void doTag() throws JspException { 
 
-		PageContext pageContext = (PageContext) getJspContext(); 
 		JspWriter out = pageContext.getOut(); 
 
 		if (parameters == null)
@@ -75,34 +77,32 @@ public class TagCloudTag extends SimpleTagSupport{
 			cloud.setMaxWeight(Double.parseDouble(parameters.getFontTo()));   // max font size
 			cloud.setMinWeight(Double.parseDouble(parameters.getFontFrom()));
 			if (parameters.getTotalTags().equals("all"))
-				cloud.setMaxTagsToDisplay(10000);
+				cloud.setMaxTagsToDisplay(1000000);
 			else
 				cloud.setMaxTagsToDisplay(Integer.parseInt(parameters.getTotalTags()));
 
-
-			//cloud.setNormThreshold(0.4);
-
-			HashMap<String, Integer> subjects = new HashMap<String, Integer>();
-			try {
-				subjects = UIUtil.calculateMapFreqOfItems(index);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (AuthorizeException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (BrowseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			log.info("INSIDE: size = " + subjects.size());
+			BrowseIndex bix = bi.getBrowseIndex();
+			String linkBase = ((HttpServletRequest)pageContext.getRequest()).getContextPath() + "/";
+			String direction = (bi.isAscending() ? "ASC" : "DESC");
 			
-			for (String subject : subjects.keySet()){
-				if (subjects.get(subject).intValue() > Integer.parseInt(parameters.getCuttingLevel())){
-					for (int i=0; i<subjects.get(subject).intValue(); i++){
-						Tag tag2 = new Tag(subject, ((HttpServletRequest) pageContext.getRequest()).getContextPath()+"/browse?type="+index+"&order=DESC&rpp=250&value="+subject+"&sort_by=1");   // creates a tag
-						//tag2.setScore(subjects.get(subject).doubleValue());
+			String[][] results = bi.getStringResults();
+			
+			for (String[] result : results){
+				String freq = result[2]; 
+				String sharedLink = linkBase + "browse?type=" + URLEncoder.encode(bix.getName()) + 
+						"&amp;order=" + URLEncoder.encode(direction) + 
+						"&amp;rpp=" + URLEncoder.encode(Integer.toString(bi.getResultsPerPage()));
+				if (freq.equals("")) freq="0";
+				if (Integer.parseInt(freq) > Integer.parseInt(parameters.getCuttingLevel())){
+					if (result[1] != null) 
+					{ 
+						sharedLink = sharedLink + "&amp;authority="+ URLEncoder.encode(result[1], "UTF-8");
+					}
+					else {
+						sharedLink = sharedLink + "&amp;value="+ URLEncoder.encode(result[0], "UTF-8");
+					}
+					for (int i=0; i<Integer.parseInt(freq); i++){
+						Tag tag2 = new Tag(result[0], sharedLink/*"http://www.ekt.gr"*//*((HttpServletRequest) pageContext.getRequest()).getContextPath()+"/browse?type="+index+"&order=DESC&rpp=250&value="+subject+"&sort_by=1"*/);   // creates a tag
 						cloud.addTag(tag2); 
 					}
 				}
@@ -204,8 +204,6 @@ public class TagCloudTag extends SimpleTagSupport{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-
 	}
 
 	/**
@@ -218,11 +216,7 @@ public class TagCloudTag extends SimpleTagSupport{
 	/**
 	 * @param index the index to set
 	 */
-	public void setIndex(String index) {
-		this.index = index;
+	public void setBi(BrowseInfo bi) {
+		this.bi = bi;
 	}
-
-
-
-
 }

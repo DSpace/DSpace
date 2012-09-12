@@ -448,17 +448,17 @@
 
   <tag>
       <name>tagcloud</name>
-      <tag-class>gr.ekt.webui.jsptag.TagCloudTag</tag-class>
+      <tag-class>org.dspace.app.webui.jsptag.TagCloudTag</tag-class>
       <body-content>empty</body-content>
       <attribute>
-        <name>parameters</name>
-		<required>false</required>
-		<rtexprvalue>true</rtexprvalue>
+         <name>parameters</name>
+	 <required>false</required>
+	 <rtexprvalue>true</rtexprvalue>
       </attribute>
       <attribute>
-		<name>index</name>
-		<required>true</required>
-		<rtexprvalue>true</rtexprvalue>
+	 <name>bi</name>
+	 <required>true</required>
+	 <rtexprvalue>true</rtexprvalue>
       </attribute>
   </tag>
 

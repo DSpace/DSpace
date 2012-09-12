@@ -30,7 +30,12 @@
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.browse.ItemCounter" %>
-<%@ page import="gr.ekt.webui.jsptag.TagCloudParameters" %>
+<%@ page import="org.dspace.app.webui.util.TagCloudParameters" %>
+<%@ page import="org.dspace.browse.BrowseInfo" %>
+<%@ page import="org.dspace.browse.BrowseIndex" %>
+<%@ page import="org.dspace.browse.BrowserScope" %>
+<%@ page import="org.dspace.browse.BrowseEngine" %>
+<%@ page import="org.dspace.core.Context" %>
 
 <%
     Community[] communities = (Community[]) request.getAttribute("communities");
@@ -135,7 +140,7 @@ for (int i = supportedLocales.length-1; i >= 0; i--)
             </td>
         </tr>
     </table>
-	
+
 <%
 	TagCloudParameters tcp = new TagCloudParameters();
 	tcp.setLocale(UIUtil.getSessionLocale(request).toString());
@@ -216,13 +221,35 @@ for (int i = supportedLocales.length-1; i >= 0; i--)
    	if ( ((allowStr = ConfigurationManager.getProperty("webui.tagcloud.home.show"))) != null)
    		allow = Boolean.parseBoolean(allowStr);
 	
-	if (allow) {
-%>
-		<dspace:tagcloud parameters='<%= tcp %>' index='<%= index %>'/><br/><br/>
-<%
-	}
-%>
+   	BrowseIndex bi = null;
+    if (index != null && !"".equals(index))
+    {
+        bi = BrowseIndex.getBrowseIndex(index);
+    }
+    
+    bi.setDisplayFrequencies(true);
+    bi.setTagcloudEnabled(true);
+    
+    Context context = UIUtil.obtainContext(request);
+    BrowserScope scope = new BrowserScope(context);
+    scope.setBrowseIndex(bi);
+    if (maxtags==null)
+    	scope.setResultsPerPage(20);
+	else 
+		scope.setResultsPerPage(Integer.parseInt(maxtags));
+    
+    BrowseEngine be = new BrowseEngine(context);
+    BrowseInfo binfo = be.browse(scope);
+    
+    binfo.setResultsPerPage(20);
+    
+	if (allow && bi!=null) {
+		%>
+<dspace:tagcloud parameters='<%= tcp %>' bi='<%= binfo %>'/><br/><br/>
 
+<%
+		}
+%>
 
     <dspace:sidebar>
     <%= sideNews %>

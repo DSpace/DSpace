@@ -386,4 +386,16 @@ public interface BrowseDAO
     public void setAuthorityValue(String value);
 
     public String getAuthorityValue();
+    
+    public boolean isEnableBrowseFrequencies();
+
+	public void setEnableBrowseFrequencies(boolean enableBrowseFrequencies);
+	
+	public boolean isTagCloudEnabled();
+
+	public void setTagCloudEnabled(boolean isTagCloudEnabled);
+	
+	public int getTagCloudCuttingLevel();
+
+	public void setTagCloudCuttingLevel(int tagCloudCuttingLevel);
 }

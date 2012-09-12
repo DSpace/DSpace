@@ -57,6 +57,12 @@ public final class BrowseIndex
 
     /** default order (asc / desc) for this index */
     private String defaultOrder = SortOption.ASCENDING;
+    
+    /** whether to display frequencies or not, in case of a "metadata" browse index*/
+    private boolean displayFrequencies = true;
+    
+    /** If this browse index in intened for tagcloud*/
+    private boolean tagcloudEnabled = false;
 
     /** additional 'internal' tables that are always defined */
     private static BrowseIndex itemIndex      = new BrowseIndex("bi_item");
@@ -301,6 +307,22 @@ public final class BrowseIndex
 	    return sortOption;
 	}
 	
+	public boolean isDisplayFrequencies() {
+		return displayFrequencies;
+	}
+
+	public void setDisplayFrequencies(boolean displayFrequencies) {
+		this.displayFrequencies = displayFrequencies;
+	}
+
+	public boolean isTagcloudEnabled() {
+		return tagcloudEnabled;
+	}
+
+	public void setTagcloudEnabled(boolean tagcloudEnabled) {
+		this.tagcloudEnabled = tagcloudEnabled;
+	}
+
 	/**
 	 * Populate the internal array containing the bits of metadata, for
 	 * ease of use later
@@ -592,7 +614,7 @@ public final class BrowseIndex
     /**
      * Is the browse index of display type single?
      * 
-     * @return true if single, false if not
+     * @return true if singe, false if not
      */
     public boolean isMetadataIndex()
     {
@@ -680,6 +702,12 @@ public final class BrowseIndex
         while ( ((definition = ConfigurationManager.getProperty("webui.browse.index." + idx))) != null)
         {
             BrowseIndex bi = new BrowseIndex(definition, idx);
+            
+            //Load the frequency configuration
+            String freqDefinition = ConfigurationManager.getProperty("webui.browse.metadata.show-freq." + idx);
+            if (freqDefinition!=null)
+            	bi.displayFrequencies = Boolean.valueOf(freqDefinition);
+            
             browseIndices.add(bi);
             idx++;
         }
