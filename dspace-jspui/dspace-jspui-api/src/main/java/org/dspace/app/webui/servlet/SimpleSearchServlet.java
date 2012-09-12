@@ -384,6 +384,24 @@ public class SimpleSearchServlet extends DSpaceServlet
         {
             exportMetadata(context, response, resultsItems);
         }
+		else if ((fromAdvanced != null) &&fromAdvanced.equals("true")) {
+            Community[] communities = Community.findAll(context);
+
+            request.setAttribute("communities", communities);
+            request.setAttribute("no_results", "yes");
+
+            Map<String, String> queryHash = qArgs.buildQueryMap(request);
+
+            if (queryHash != null)
+            {
+                for (Map.Entry<String, String> entry : queryHash.entrySet())
+                {
+                    request.setAttribute(entry.getKey(), entry.getValue());
+                }
+            }
+            
+            JSPManager.showJSP(request, response, "/search/resultsAdvanced.jsp");
+        }
         else
         {
             JSPManager.showJSP(request, response, "/search/results.jsp");
