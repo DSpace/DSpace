@@ -44,7 +44,7 @@
 <html>
     <head>
         <title><%= siteName %>: <%= title %></title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />        
         <meta name="Generator" content="<%= generator %>" />
         <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css" type="text/css" />
         <link rel="stylesheet" href="<%= request.getContextPath() %>/print.css" media="print" type="text/css" />

@@ -12,6 +12,7 @@
 --%>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
@@ -28,6 +29,7 @@
 <%@ page import="org.dspace.browse.BrowseIndex" %>
 <%@ page import="org.dspace.browse.BrowseInfo" %>
 <%@ page import="java.util.Map" %>
+
 <%
     // Is anyone logged in?
     EPerson user = (EPerson) request.getAttribute("dspace.current.user");
@@ -72,6 +74,7 @@
     			browseCurrent = bix.getName();
         }
     }
+
 %>
 
 <%-- Search Box --%>
@@ -241,4 +244,61 @@
       <a href="http://www.dspace.org/"><fmt:message key="jsp.layout.navbar-default.about"/></a>
     </td>
   </tr>
+
+  <c:if test="${researcher_page_menu && !empty researcher}">
+  <tr>
+    <td colspan="2">&nbsp;</td>
+  </tr>
+  
+  <tr>
+    <td nowrap="nowrap" colspan="2" class="navigationBarSublabel"><fmt:message key="jsp.layout.navbar-hku.staffmode.title"/></td>
+  </tr>
+
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/editDynamicData" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16"/>
+    </td>
+    <td nowrap="nowrap" class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/rp/tools/editDynamicData.htm?id=${researcher.id}&anagraficaId=${researcher.dynamicField.id}<c:if test='${!empty tabIdForRedirect}'>&tabId=${tabIdForRedirect}</c:if>"><fmt:message key="jsp.layout.navbar-hku.staff-mode.edit.primary-data"/></a>
+    </td>
+  </tr>  
+   <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/rebindItemsToRP" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16"/>
+    </td>
+    <td nowrap="nowrap" class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/rp/tools/rebindItemsToRP.htm?id=${researcher.id}"><fmt:message key="jsp.layout.navbar-hku.staff-mode.bind.items"/></a>
+    </td>
+  </tr>
+   <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/help#ResearcherPages" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16"/>
+    </td>
+    <td nowrap="nowrap" class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/help.jsp#ResearcherPages">Help</a>
+    </td>
+  </tr>
+  </c:if>
+  
+  <% if (isAdmin) { %>
+  <tr> 
+  <td colspan="2">
+	<c:if test="${!empty researcher}">
+	
+		
+			<p><b>Staff no. ${researcher.staffNo} </b><br/>
+			<br />
+			record created at:
+			${researcher.timeStampInfo.timestampCreated.timestamp} <br/>
+			<br />
+			last updated at:
+			${researcher.timeStampInfo.timestampLastModified.timestamp}<br/>
+			</p>
+		
+	
+	</c:if>
+	</td>
+  </tr>
+<% } %>
+
 </table>

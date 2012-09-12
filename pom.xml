@@ -231,6 +231,21 @@
         </profile>
 
 
+	    <!--
+           Builds LNI WAR for DSpace
+        -->
+        <profile>
+            <id>dspace-cris</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>dspace-cris</module>
+            </modules>
+        </profile>
+
+
+
       <!--
          Use 'mvn deploy -Paddons' while doing Continuous Integration
          and deploying addons to the Maven repository.
@@ -251,6 +266,7 @@
             <module>dspace-sword</module>
             <module>dspace-swordv2</module>
             <module>dspace-sword-client</module>
+            <module>dspace-cris</module>
          </modules>
       </profile>
 
@@ -757,11 +773,11 @@
             <artifactId>icu4j</artifactId>
             <version>3.8</version>
          </dependency>
-         <dependency>
-            <groupId>postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>8.1-408.jdbc3</version>
-         </dependency>
+		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>9.0-801.jdbc3</version>
+		</dependency>
          <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
@@ -800,7 +816,22 @@
             <artifactId>contiperf</artifactId>
             <version>1.06</version>
             <scope>test</scope>
-        </dependency>
+        </dependency>	    
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-cris-api</artifactId>
+			<version>1.8.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-cris-jspui-api</artifactId>
+			<version>1.8.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-cris-jspui-webapp</artifactId>
+			<version>1.8.2</version>
+		</dependency>        
       </dependencies>
    </dependencyManagement>
 
@@ -811,7 +842,7 @@
             <distribution>repo</distribution>
         <comments>
             A BSD compatable OSS license for the DSpace codebase.
-         </comments>
+         </comments>         
       </license>
     </licenses>
 

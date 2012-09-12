@@ -34,6 +34,8 @@
     {
         currentPage = currentPage.substring(0, c);
     }
+    
+    boolean crisModuleEnabled = ConfigurationManager.getBooleanProperty("feature.cris.enabled");
 %>
 
 <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
@@ -176,7 +178,26 @@
   <tr>
      <td colspan="2">&nbsp;</td>
   </tr>
-  
+  <%
+	if (crisModuleEnabled == true)
+	{	
+  %>
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/authority/administrator.jsp") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
+    </td>
+    <td nowrap="nowrap" class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/rp/administrator/index.htm"><fmt:message key="jsp.layout.navbar-admin.rp"/></a>
+    </td>
+  </tr>
+
+  <tr>
+     <td colspan="2">&nbsp;</td>
+  </tr>
+
+  <%
+	}
+  %>    
   <tr class="navigationBarItem">
      <td>
          <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="16" height="16"/>

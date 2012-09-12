@@ -1,0 +1,3 @@
+[submodule "dspace-cris"]
+	path = dspace-cris
+	url = https://github.com/lap82/dspace-cris.git
