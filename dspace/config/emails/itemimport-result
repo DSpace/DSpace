@@ -1,0 +1,21 @@
+# Email sent at the end of background import
+#
+#	Parameters: {0} number of records supplied
+#				{1} number of success
+#				{2} number of warning
+#				{3} number of error
+#				{4} import plugin
+#				{5} import operation stack trace
+#
+Subject: DSpace - import completed
+
+The import of {0} records using {4} has been completed.
+This is the summary:
+- Success: {1}
+- Warning: {2}
+- Error: {3}
+
+Below the details for any records:
+{5}
+  
+The DSpace Team

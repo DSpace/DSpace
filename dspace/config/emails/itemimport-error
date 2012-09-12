@@ -1,0 +1,13 @@
+# E-mail sent when an error occurs during background import
+#
+# Parameters: {0} plugin name
+#			  {1} Data
+#	          {2} Exception stack trace
+#
+Subject: DSpace: Item import background Error
+An error has been occcured when importing items using the plugin {0}:
+
+Date:       {1}
+
+Exception:
+{2}

@@ -874,6 +874,11 @@
             <version>3.1</version>
          </dependency>
          <dependency>
+	        <groupId>com.javabib</groupId>
+			<artifactId>javabib-bin</artifactId>
+			<version>20040801</version>
+        </dependency>
+         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.8.1</version>

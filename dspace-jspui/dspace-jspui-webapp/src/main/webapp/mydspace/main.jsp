@@ -225,6 +225,7 @@
                 <tr>
                     <td align="left">
                         <input type="submit" name="submit_new" value="<fmt:message key="jsp.mydspace.main.start.button"/>" />
+                        <a href="<%= request.getContextPath() %>/tools/import"><fmt:message key="jsp.mydspace.main.import.button"/></a>
                     </td>
                     <td align="right">
                         <input type="submit" name="submit_own" value="<fmt:message key="jsp.mydspace.main.view.button"/>" />
