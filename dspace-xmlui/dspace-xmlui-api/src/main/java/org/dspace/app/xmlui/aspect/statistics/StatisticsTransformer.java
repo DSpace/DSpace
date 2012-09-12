@@ -292,7 +292,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 
 		if (dataset != null) {
 
-			String[][] matrix = dataset.getMatrixFormatted();
+			String[][] matrix = dataset.getMatrix();
 
 			/** Generate Table */
 			Division wrapper = mainDiv.addDivision("tablewrapper");
@@ -305,12 +305,12 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 
 			/** Generate Header Row */
 			Row headerRow = table.addRow();
-			headerRow.addCell("spacer", Cell.ROLE_DATA, "labelcell");
+			headerRow.addCell("spacer", Cell.ROLE_HEADER, "labelcell");
 
 			String[] cLabels = dataset.getColLabels().toArray(new String[0]);
 			for (int row = 0; row < cLabels.length; row++) {
 				Cell cell = headerRow.addCell(0 + "-" + row + "-h",
-						Cell.ROLE_DATA, "labelcell");
+                        Cell.ROLE_HEADER, "labelcell");
 				cell.addContent(cLabels[row]);
 			}
 
@@ -348,7 +348,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 
 		if (dataset != null) {
 
-			String[][] matrix = dataset.getMatrixFormatted();
+			String[][] matrix = dataset.getMatrix();
 
 			// String[] rLabels = dataset.getRowLabels().toArray(new String[0]);
 
@@ -361,9 +361,9 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 
 			Row headerRow = table.addRow();
 
-			headerRow.addCell("", Cell.ROLE_DATA, "labelcell");
+			headerRow.addCell("", Cell.ROLE_HEADER, "labelcell");
 			
-			headerRow.addCell("", Cell.ROLE_DATA, "labelcell").addContent(message(T_head_visits_views));
+			headerRow.addCell("", Cell.ROLE_HEADER, "labelcell").addContent(message(T_head_visits_views));
 
 			/** Generate Table Body */
 			for (int col = 0; col < matrix[0].length; col++) {

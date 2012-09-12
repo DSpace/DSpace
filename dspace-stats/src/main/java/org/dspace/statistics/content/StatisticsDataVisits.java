@@ -7,6 +7,7 @@
  */
 package org.dspace.statistics.content;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.content.*;
 import org.dspace.statistics.Dataset;
 import org.dspace.statistics.ObjectCount;
@@ -148,12 +149,8 @@ public class StatisticsDataVisits extends StatisticsData
         }
 
         // Determine our filterQuery
-        String filterQuery = null;
+        String filterQuery = "";
         for (int i = 0; i < getFilters().size(); i++) {
-            if(filterQuery == null)
-            {
-                filterQuery = "";
-            }
             StatisticsFilter filter = getFilters().get(i);
 
             filterQuery += "(" + filter.toQuery() + ")";
@@ -162,6 +159,14 @@ public class StatisticsDataVisits extends StatisticsData
                 filterQuery += " AND ";
             }
         }
+        if(StringUtils.isNotBlank(filterQuery)){
+            filterQuery += " AND ";
+        }
+        //Only use the view type and make sure old data (where no view type is present) is also supported
+        //Solr doesn't explicitly apply boolean logic, so this query cannot be simplified to an OR query
+        filterQuery += "-(statistics_type:[* TO *] AND -statistics_type:" + SolrLogger.StatisticsType.VIEW.text() + ")";
+
+
 //        System.out.println("FILTERQUERY: " + filterQuery);
 
         // We determine our values on the queries resolved above

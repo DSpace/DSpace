@@ -141,8 +141,19 @@
 		<dependency>
 			<groupId>org.apache.solr</groupId>
 			<artifactId>solr-solrj</artifactId>
-			<version>3.3.0</version>
+            <version>3.5.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>jcl-over-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
 		</dependency>
+        <dependency>
+        	<groupId>commons-configuration</groupId>
+        	<artifactId>commons-configuration</artifactId>
+        	<version>1.8</version>
+        </dependency>
 		<dependency>
 			<groupId>org.dspace.dependencies</groupId>
 			<artifactId>dspace-geoip</artifactId>
