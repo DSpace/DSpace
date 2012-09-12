@@ -102,7 +102,7 @@ public class TagCloudTag extends TagSupport{
 						sharedLink = sharedLink + "&amp;value="+ URLEncoder.encode(result[0], "UTF-8");
 					}
 					for (int i=0; i<Integer.parseInt(freq); i++){
-						Tag tag2 = new Tag(result[0], sharedLink/*"http://www.ekt.gr"*//*((HttpServletRequest) pageContext.getRequest()).getContextPath()+"/browse?type="+index+"&order=DESC&rpp=250&value="+subject+"&sort_by=1"*/);   // creates a tag
+						Tag tag2 = new Tag(result[0], sharedLink);
 						cloud.addTag(tag2); 
 					}
 				}
