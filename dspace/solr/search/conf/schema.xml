@@ -498,8 +498,11 @@
     <!-- Internal DSpaceObject Type ID -->
    <field name="search.resourcetype" type="sint" indexed="true" stored="true" required="true" omitNorms="true" />
 
-    <!-- All Items/Communities/Collections placed in Discovery must have a unique handle -->
-   <field name="handle" type="string" indexed="true" stored="true" required="true" omitNorms="true" />
+    <!-- All object placed in Discovery must have an unique id (for standard DSpaceObject it is resourceID-resourceTypeID) -->
+   <field name="search.uniqueid" type="string" indexed="true" stored="true" required="true" omitNorms="true" />
+   
+    <!-- All Items/Communities/Collections placed in Discovery should have an handle -->
+   <field name="handle" type="string" indexed="true" stored="true" omitNorms="true" />
 
    <field name="withdrawn" type="string" indexed="true" stored="true" omitNorms="true" />
 
@@ -526,10 +529,12 @@
     <dynamicField name="*_stored" type="dspaceMetadataProjection" indexed="false" stored="true" multiValued="true"/>
 
      <!--Dynamic field used for search autocompletion-->
-    <dynamicField name="*_ac" type="dspaceAutoComplete" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
-
+    <dynamicField name="*_ac" type="keywordFilter" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
+	<dynamicField name="*_acid" type="keywordFilter" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
+	
      <!--Dynamic field used for sidebar filters & SOLR browse by value -->
      <dynamicField name="*_filter" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
+     <dynamicField name="*_authority" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
      <dynamicField name="*_keyword" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
 
 	<!--Dynamic field used for SOLR browse by partial value -->
@@ -589,7 +594,7 @@
  <!-- Field to use to determine and enforce document uniqueness.
       Unless this field is marked with required="false", it will be a required field
    -->
- <uniqueKey>handle</uniqueKey>
+ <uniqueKey>search.uniqueid</uniqueKey>
 
  <!-- field for the QueryParser to use when an explicit fieldname is absent -->
  <defaultSearchField>text</defaultSearchField>

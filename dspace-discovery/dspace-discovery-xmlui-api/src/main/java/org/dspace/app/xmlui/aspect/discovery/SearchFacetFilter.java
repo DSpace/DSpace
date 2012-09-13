@@ -399,7 +399,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         Cell cell = singleTable.addRow().addCell();
 
         //No use in selecting the same filter twice
-        if(filterQueries.contains(searchService.toFilterQuery(context,  facetField, "equals", displayedValue).getFilterQuery())){
+        if(filterQueries.contains(searchService.toFilterQuery(context,  facetField, value.getFilterType(), value.getAsFilterQuery()).getFilterQuery())){
             cell.addContent(displayedValue + " (" + value.getCount() + ")");
         } else {
             //Add the basics
@@ -410,7 +410,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
             url = addFilterQueriesToUrl(url);
             //Last add the current filter query
             url += "&filtertype=" + facetField;
-            url += "&filter_relational_operator=equals";
+            url += "&filter_relational_operator="+value.getFilterType();
             url += "&filter=" + URLEncoder.encode(displayedValue, "UTF-8");
             cell.addXref(url, displayedValue + " (" + value.getCount() + ")"
             );

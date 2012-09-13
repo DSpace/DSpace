@@ -231,7 +231,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                             if (i < shownFacets - 1) {
                                 String displayedValue = value.getDisplayedValue();
                                 String filterQuery = value.getAsFilterQuery();
-
+                                String filterType = value.getFilterType();
                                 if (fqs.contains(getSearchService().toFilterQuery(context, field.getIndexFieldName(), "equals", value.getDisplayedValue()).getFilterQuery())) {
                                     filterValsList.addItem(Math.random() + "", "selected").addContent(displayedValue + " (" + value.getCount() + ")");
                                 } else {
@@ -243,7 +243,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                                                     "/discover?" +
                                                     paramsQuery +
                                                     "filtertype=" + field.getIndexFieldName() +
-                                                    "&filter_relational_operator=equals"  +
+                                                    "&filter_relational_operator="+ filterType  +
                                                     "&filter=" + encodeForURL(filterQuery),
                                             displayedValue + " (" + value.getCount() + ")"
                                     );

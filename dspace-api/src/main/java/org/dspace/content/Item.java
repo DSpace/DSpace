@@ -221,6 +221,24 @@ public class Item extends DSpaceObject
 
         return new ItemIterator(context, rows);
     }
+    
+    /**
+     * Get all "final" items in the archive, both archived ("in archive" flag) or
+     * withdrawn items are included. The order of the list is indeterminate.
+     *
+     * @param context
+     *            DSpace context object
+     * @return an iterator over the items in the archive.
+     * @throws SQLException
+     */
+	public static ItemIterator findAllUnfiltered(Context context) throws SQLException
+    {
+        String myQuery = "SELECT * FROM item WHERE in_archive='1' or withdrawn='1'";
+
+        TableRowIterator rows = DatabaseManager.queryTable(context, "item", myQuery);
+
+        return new ItemIterator(context, rows);
+	}
 
     /**
      * Find all the items in the archive by a given submitter. The order is
