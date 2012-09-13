@@ -8,6 +8,7 @@
 package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -397,7 +398,8 @@ public class ItemTag extends TagSupport
             boolean isDate = false;
             boolean isLink = false;
             boolean isResolver = false;
-            
+            boolean isNoBreakLine = false;
+
             String style = null;
             Matcher fieldStyleMatcher = fieldStylePatter.matcher(field);
             if (fieldStyleMatcher.matches()){
@@ -419,9 +421,10 @@ public class ItemTag extends TagSupport
 
             if (style != null)
             {
-                isDate = style.equals("date");
-                isLink = style.equals("link");
-                isResolver = style.equals("resolver") || urn2baseurl.keySet().contains(style);
+                isDate = style.contains("date");
+                isLink = style.contains("link");
+				isNoBreakLine = style.contains("nobreakline");
+                isResolver = style.contains("resolver") || urn2baseurl.keySet().contains(style);
                 field = field.replaceAll("\\("+style+"\\)", "");
             } 
 
@@ -477,7 +480,20 @@ public class ItemTag extends TagSupport
                     {
                         if (j > 0)
                         {
-                            out.print("<br />");
+                            if (isNoBreakLine)
+                            {
+                                String separator = ConfigurationManager
+                                        .getProperty("webui.itemdisplay.nobreakline.separator");
+                                if (separator == null)
+                                {
+                                    separator = ";&nbsp;";
+                                }
+                                out.print(separator);
+                            }
+                            else
+                            {
+                                out.print("<br />");
+                            }
                         }
 
                         if (isLink)
