@@ -185,6 +185,7 @@ else
         <fmt:param><%=qResults.getStart()+1%></fmt:param>
         <fmt:param><%=qResults.getStart()+qResults.getHitHandles().size()%></fmt:param>
         <fmt:param><%=qResults.getHitCount()%></fmt:param>
+        <fmt:param><%=(float) qResults.getQueryTime() / 1000 %></fmt:param>
     </fmt:message></p>
 
 <% } %>

@@ -14,28 +14,56 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.dspace.app.webui.util.JSPManager;
+import org.apache.log4j.Logger;
+import org.dspace.app.webui.search.LuceneSearchProcessor;
+import org.dspace.app.webui.search.SearchProcessorException;
+import org.dspace.app.webui.search.SearchRequestProcessor;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Community;
 import org.dspace.core.Context;
+import org.dspace.core.PluginConfigurationError;
+import org.dspace.core.PluginManager;
 
 /**
- * Servlet for constructing the advanced search form
+ * Servlet for constructing/processing an advanced search form
  * 
- * @author gam
- * @version $Revision$
  */
 public class AdvancedSearchServlet extends DSpaceServlet
 {
+    private SearchRequestProcessor internalLogic;
+
+    /** log4j category */
+    private static Logger log = Logger.getLogger(AdvancedSearchServlet.class);
+
+    public void init()
+    {
+        try
+        {
+            internalLogic = (SearchRequestProcessor) PluginManager
+                    .getSinglePlugin(SearchRequestProcessor.class);
+        }
+        catch (PluginConfigurationError e)
+        {
+            log.warn(
+                    "AdvancedSearchServlet not properly configurated, please configure the SearchRequestProcessor plugin",
+                    e);
+        }
+        if (internalLogic == null)
+        { // backward compatibility
+            internalLogic = new LuceneSearchProcessor();
+        }
+    }
+
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        // just build a list of top-level communities and pass along to the jsp
-        Community[] communities = Community.findAllTop(context);
-
-        request.setAttribute("communities", communities);
-
-        JSPManager.showJSP(request, response, "/search/advanced.jsp");
+        try
+        {
+            internalLogic.doAdvancedSearch(context, request, response);
+        }
+        catch (SearchProcessorException e)
+        {
+            throw new ServletException(e.getMessage(), e);
+        }
     }
 }

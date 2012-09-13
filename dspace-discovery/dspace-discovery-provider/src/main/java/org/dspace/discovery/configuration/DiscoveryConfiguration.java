@@ -34,6 +34,8 @@ public class DiscoveryConfiguration implements InitializingBean{
 
     private DiscoverySortConfiguration searchSortConfiguration;
 
+    private int defaultRpp = 10;
+    
     private String id;
     private DiscoveryHitHighlightingConfiguration hitHighlightingConfiguration;
     private DiscoveryMoreLikeThisConfiguration moreLikeThisConfiguration;
@@ -93,6 +95,16 @@ public class DiscoveryConfiguration implements InitializingBean{
     public void setSearchSortConfiguration(DiscoverySortConfiguration searchSortConfiguration) {
         this.searchSortConfiguration = searchSortConfiguration;
     }
+    
+    public void setDefaultRpp(int defaultRpp)
+    {
+        this.defaultRpp = defaultRpp;
+    }
+    
+    public int getDefaultRpp()
+    {
+        return defaultRpp;
+    }
 
     public void setHitHighlightingConfiguration(DiscoveryHitHighlightingConfiguration hitHighlightingConfiguration) {
         this.hitHighlightingConfiguration = hitHighlightingConfiguration;
@@ -134,5 +146,5 @@ public class DiscoveryConfiguration implements InitializingBean{
             throw new DiscoveryConfigurationException(error.toString());
         }
 
-    }
+    }   
 }

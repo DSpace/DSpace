@@ -362,6 +362,8 @@
     }
 %>
     <%= sidebar %>
+    
+    <%@ include file="discovery/static-sidebar-facet.jsp" %>
   </dspace:sidebar>
 
 </dspace:layout>

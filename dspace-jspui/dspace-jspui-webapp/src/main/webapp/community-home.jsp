@@ -403,7 +403,7 @@
 %>
 
     <%= sidebar %>
-
+	<%@ include file="discovery/static-sidebar-facet.jsp" %>
   </dspace:sidebar>
 
          <div align="center">

@@ -72,6 +72,10 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     private static final Message T_filters_show = message("xmlui.Discovery.AbstractSearch.filters.display");
     private static final Message T_filter_contain = message("xmlui.Discovery.SimpleSearch.filter.contains");
     private static final Message T_filter_equals = message("xmlui.Discovery.SimpleSearch.filter.equals");
+    private static final Message T_filter_notcontain = message("xmlui.Discovery.SimpleSearch.filter.notcontains");
+    private static final Message T_filter_notequals = message("xmlui.Discovery.SimpleSearch.filter.notequals");
+    private static final Message T_filter_authority = message("xmlui.Discovery.SimpleSearch.filter.authority");
+    private static final Message T_filter_notauthority = message("xmlui.Discovery.SimpleSearch.filter.notauthority");
 
     private SearchService searchService = null;
 
@@ -228,6 +232,11 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         Select typeSelect = row.addCell("", Cell.ROLE_DATA, "selection").addSelect("filter_relational_operator_" + index);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "contains"), "contains", T_filter_contain);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "equals"), "equals", T_filter_equals);
+        typeSelect.addOption(StringUtils.equals(relationalOperator, "authority"), "authority", T_filter_authority);
+        typeSelect.addOption(StringUtils.equals(relationalOperator, "notcontains"), "notcontains", T_filter_notcontain);
+        typeSelect.addOption(StringUtils.equals(relationalOperator, "notequals"), "notequals", T_filter_notequals);
+        typeSelect.addOption(StringUtils.equals(relationalOperator, "notauthority"), "notauthority", T_filter_notauthority);
+         
 
 
 
