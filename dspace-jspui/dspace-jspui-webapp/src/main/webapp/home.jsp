@@ -238,6 +238,8 @@ for (int i = supportedLocales.length-1; i >= 0; i--)
 	else 
 		scope.setResultsPerPage(Integer.parseInt(maxtags));
     
+	scope.setTagCloudCuttingLevel(Integer.parseInt(cutLevel));
+
     BrowseEngine be = new BrowseEngine(context);
     BrowseInfo binfo = be.browse(scope);
     

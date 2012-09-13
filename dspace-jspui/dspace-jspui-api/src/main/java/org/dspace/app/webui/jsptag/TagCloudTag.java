@@ -55,7 +55,7 @@ public class TagCloudTag extends TagSupport{
 		// TODO Auto-generated constructor stub
 	}
 
-	public void doTag() throws JspException { 
+	public int doStartTag() throws JspException{ 
 
 		JspWriter out = pageContext.getOut(); 
 
@@ -204,6 +204,8 @@ public class TagCloudTag extends TagSupport{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		 return SKIP_BODY;
 	}
 
 	/**

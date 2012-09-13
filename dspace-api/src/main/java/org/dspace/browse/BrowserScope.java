@@ -80,7 +80,9 @@ public class BrowserScope
 
     private String authority = null;
 
-    /**
+	private int tagCloudCuttingLevel = 0;
+
+	/**
      * Construct a new BrowserScope using the given Context
      *
      * @param context   the DSpace Context
@@ -629,4 +631,12 @@ public class BrowserScope
     public void setAuthorityValue(String value) {
         authority = value;
     }
+
+	public int getTagCloudCuttingLevel() {
+		return tagCloudCuttingLevel;
+	}
+
+	public void setTagCloudCuttingLevel(int tagCloudCuttingLevel) {
+		this.tagCloudCuttingLevel = tagCloudCuttingLevel;
+	}
 }

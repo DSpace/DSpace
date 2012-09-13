@@ -420,6 +420,9 @@ public class BrowseEngine
             //inform dao about the tag cloud existence
             dao.setTagCloudEnabled(browseIndex.isTagcloudEnabled());
             
+			//inform dao about the tag cloud cutting level
+			dao.setTagCloudCuttingLevel(bs.getTagCloudCuttingLevel());
+
             // if we want to display frequencies, we need to pass the map table
             if (browseIndex.isDisplayFrequencies()){
             	dao.setFilterMappingTables(null, browseIndex.getMapTableName());
