@@ -20,6 +20,8 @@
         <module>dspace-discovery-solr</module>
         <module>dspace-discovery-xmlui-api</module>
         <module>dspace-discovery-xmlui-webapp</module>
+        <module>dspace-discovery-jspui-api</module>
+        <module>dspace-discovery-jspui-webapp</module>
     </modules>
 
     <build>

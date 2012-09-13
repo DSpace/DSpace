@@ -28,9 +28,15 @@ public interface IndexingService {
     void indexContent(Context context, DSpaceObject dso,
                       boolean force) throws SQLException;
 
+    void indexContent(Context context, DSpaceObject dso,
+            boolean force, boolean commit) throws SQLException, SearchServiceException;
+    
     void unIndexContent(Context context, DSpaceObject dso)
             throws SQLException, IOException;
 
+    void unIndexContent(Context context, DSpaceObject dso, boolean commit)
+            throws SQLException, IOException;
+    
     void unIndexContent(Context context, String handle)
             throws SQLException, IOException;
 
@@ -49,5 +55,7 @@ public interface IndexingService {
     void cleanIndex(boolean force) throws IOException,
             SQLException, SearchServiceException;
 
-    void optimize();
+    void commit() throws SearchServiceException;
+
+    void optimize() throws SearchServiceException;
 }

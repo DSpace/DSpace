@@ -37,6 +37,8 @@
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.core.LogManager" %>
+<%@ page import="org.dspace.core.PluginManager" %>
+<%@ page import="org.dspace.plugin.SiteHomeProcessor" %>
 
 <%
     Context context = null;
@@ -48,6 +50,21 @@
     {
         // Obtain a context so that the location bar can display log in status
         context = UIUtil.obtainContext(request);
+        
+        try
+        {
+            SiteHomeProcessor[] chp = (SiteHomeProcessor[]) PluginManager.getPluginSequence(SiteHomeProcessor.class);
+            for (int i = 0; i < chp.length; i++)
+            {
+                chp[i].process(context, request, response);
+            }
+        }
+        catch (Exception e)
+        {
+            Logger log = Logger.getLogger("org.dspace.jsp");
+            log.error("caught exception: ", e);
+            throw new ServletException(e);
+        }
         
         // Home page shows community list
         Community[] communities = Community.findAllTop(context);

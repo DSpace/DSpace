@@ -143,6 +143,11 @@ public class DiscoverResult {
         {
             return authorityKey;
         }
+
+        public String getFilterType()
+        {
+            return authorityKey != null?"authority":"equals";
+        }
     }
 
     public static final class DSpaceObjectHighlightResult

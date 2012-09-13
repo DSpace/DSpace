@@ -85,6 +85,8 @@
                 <property name="max" value="5"/>
             </bean>
         </property>
+        <!--Default result per page  -->
+        <property name="defaultRpp" value="10" />
         <property name="hitHighlightingConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightingConfiguration">
         <property name="metadataFields">
