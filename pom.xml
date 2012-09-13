@@ -425,6 +425,12 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services-impl</artifactId>
             <version>2.0.4</version>
+            <exclusions>
+					<exclusion>
+						<artifactId>ehcache-core</artifactId>
+						<groupId>net.sf.ehcache</groupId>
+					</exclusion>			
+			</exclusions>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>

@@ -119,6 +119,12 @@
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-jspui-api</artifactId>
+			  <exclusions>
+					<exclusion>
+						<artifactId>ehcache-core</artifactId>
+						<groupId>net.sf.ehcache</groupId>
+					</exclusion>			
+			</exclusions>
 		</dependency>
 
 		<dependency>
