@@ -59,7 +59,7 @@ public class DSpaceMetadataExistsFilter extends DSpaceFilter
     @Override
     public boolean isShown(DSpaceDatabaseItem item)
     {
-        if (item.getMetadata(this.getField()+".*").size() > 0)
+        if (item.getMetadata(this.getField()).size() > 0)
             return true;
 
         return false;

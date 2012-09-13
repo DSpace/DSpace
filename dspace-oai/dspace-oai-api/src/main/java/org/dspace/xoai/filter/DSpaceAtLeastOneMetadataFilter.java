@@ -105,7 +105,7 @@ public class DSpaceAtLeastOneMetadataFilter extends DSpaceFilter
     {
         if (this.getField() == null)
             return true;
-        List<String> values = item.getMetadata(this.getField()+".*");
+        List<String> values = item.getMetadata(this.getField());
         for (String praticalValue : values)
         {
             for (String theoreticValue : this.getValues())
