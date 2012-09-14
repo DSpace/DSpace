@@ -185,14 +185,15 @@ public class LDAPAuthentication
         SpeakerToLDAP ldap = new SpeakerToLDAP(log);
 
 		// Get the DN of the user
+		boolean anonymousSearch = ConfigurationManager.getBooleanProperty("authentication-ldap", "search.anonymous");
 		String adminUser = ConfigurationManager.getProperty("authentication-ldap", "search.user");
 		String adminPassword = ConfigurationManager.getProperty("authentication-ldap", "search.password");
 		String objectContext = ConfigurationManager.getProperty("authentication-ldap", "object_context");
 		String idField = ConfigurationManager.getProperty("authentication-ldap", "id_field");
 		String dn = "";
 
-		// If adminUser is blank, then we can't search so assume the DN
-		if (StringUtils.isBlank(adminUser) || StringUtils.isBlank(adminPassword))
+		// If adminUser is blank and anonymous search is not allowed, then we can't search so construct the DN instead of searching it
+		if ((StringUtils.isBlank(adminUser) || StringUtils.isBlank(adminPassword)) && !anonymousSearch)
 		{
 			dn = idField + "=" + netid + "," + objectContext;
 		}
