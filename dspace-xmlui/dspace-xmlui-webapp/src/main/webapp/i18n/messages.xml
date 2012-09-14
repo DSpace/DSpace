@@ -2144,4 +2144,16 @@
   <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.title">LC Name Authority author lookup</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.nonauthority">Local value "@1@" (not in Naming Authority)</message>
 
+  <!-- mobile theme -->
+  <message key="xmlui.mobile.home_mobile">DSpace Mobile</message>
+  <message key="xmlui.mobile.search_all">Search ALL</message>
+  <message key="xmlui.mobile.browse_all">Browse ALL by</message>
+  <message key="xmlui.mobile.browse_date">Date</message>
+  <message key="xmlui.mobile.browse_author">Author</message>
+  <message key="xmlui.mobile.browse_title">Title</message>
+  <message key="xmlui.mobile.browse_subject">Subject</message>
+  <message key="xmlui.mobile.related_google_scholar">Related</message>
+  <message key="xmlui.mobile.items_in_google_scholar">Items in Google Scholar</message>
+  <message key="xmlui.mobile.download">Download</message>
+
 </catalogue>

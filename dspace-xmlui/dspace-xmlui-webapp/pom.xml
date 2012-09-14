@@ -60,6 +60,8 @@
                         <exclude>**/jquery*</exclude>
                         <exclude>**/modernizr*</exclude>
                         <exclude>**/DD_belated*</exclude>
+                        <exclude>**/detectmobile*</exclude>
+                        <exclude>**/sc-mobile*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
