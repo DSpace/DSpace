@@ -1071,30 +1071,34 @@ public class DSIndexer
                 //Index the controlled vocabularies localized display values for all localized input-forms.xml (e.g. input-forms_el.xml)
                 if ("inputform".equalsIgnoreCase(indexConfigArr[i].type)){
 
+                    List newValues=new ArrayList<String>();
+                    String displayValue;
+                    Locale[] supportedLocales=I18nUtil.getSupportedLocales();
 
-                	List newValues=new ArrayList<String>();
-                	String displayValue;
-                	Locale[] supportedLocales=I18nUtil.getSupportedLocales();
+                    //Get the display value of the respective stored value
+                    for (int k=0;k<supportedLocales.length;k++){
+                        List displayValues=new ArrayList<String>();
+                        displayValues = org.dspace.app.util.Util.getControlledVocabulariesDisplayValueLocalized(item, mydc,indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier,  supportedLocales[k]);
+                        if (displayValues!=null && !displayValues.isEmpty()){
+                            for (int d=0;d<displayValues.size();d++){
+                                newValues.add(displayValues.get(d));
+                            }
+                        }
 
-                	//Get the display value of the respective stored value
-                	for (int k=0;k<supportedLocales.length;k++){
+                    }
 
-                		displayValue = org.dspace.app.util.Util.getControlledVocabulariesDisplayValueLocalized(item, mydc,indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier,  supportedLocales[k]);
-                		newValues.add(displayValue);
-                	}
+                    if (newValues!=null){
+                        for (int m=0;m<newValues.size();m++){
+                            if (!"".equals(newValues.get(m))){
 
-                	if (newValues!=null){
-                		for (int m=0;m<newValues.size();m++){
-                			if (!"".equals(newValues.get(m))){
-
-                				String toAdd=(String) newValues.get(m);
-                				doc.add( new Field(indexConfigArr[i].indexName,
-                						toAdd,
-                						Field.Store.YES,
-                						Field.Index.ANALYZED));
-                			}
-                		}
-                	}
+                                String toAdd=(String) newValues.get(m);
+                                doc.add( new Field(indexConfigArr[i].indexName,
+                                        toAdd,
+                                        Field.Store.YES,
+                                        Field.Index.ANALYZED));
+                            }
+                        }
+                    }
 
                 }
 
