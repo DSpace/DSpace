@@ -19,7 +19,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.app.bulkedit.MetadataExport;
@@ -37,8 +36,8 @@ import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
-import org.dspace.discovery.DiscoverFilterQuery;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchServiceException;
@@ -47,8 +46,6 @@ import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
-import org.dspace.discovery.configuration.SidebarFacetConfiguration;
-import org.dspace.search.QueryResults;
 import org.w3c.dom.Document;
 
 public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
@@ -61,15 +58,20 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
     // locale-sensitive metadata labels
     private Map<String, Map<String, String>> localeLabels = null;
 
-    public void init()
+    public synchronized void init()
     {
-        localeLabels = new HashMap<String, Map<String, String>>();
+        if (localeLabels == null)
+        {
+            localeLabels = new HashMap<String, Map<String, String>>();
+        }
     }
 
     public void doOpenSearch(Context context, HttpServletRequest request,
             HttpServletResponse response) throws SearchProcessorException,
             IOException, ServletException
     {
+        init();
+        
         // dispense with simple service document requests
         String scope = request.getParameter("scope");
         if (scope != null && "".equals(scope))
@@ -143,9 +145,9 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         DSpaceObject[] dsoResults = new DSpaceObject[qResults
                 .getDspaceObjects().size()];
         qResults.getDspaceObjects().toArray(dsoResults);
-        QueryResults qR = DiscoverUtility.toQueryResults(qResults);
-        Document resultsDoc = OpenSearch.getResultsDoc(format, query, qR,
-                container, dsoResults, labelMap);
+        Document resultsDoc = OpenSearch.getResultsDoc(format, query,
+                (int)qResults.getTotalSearchResults(), qResults.getStart(),
+                qResults.getMaxResults(), container, dsoResults, labelMap);
         try
         {
             Transformer xf = TransformerFactory.newInstance().newTransformer();
@@ -163,7 +165,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
     private Map<String, String> getLabels(HttpServletRequest request)
     {
         // Get access to the localized resource bundle
-        Locale locale = request.getLocale();
+        Locale locale = UIUtil.getSessionLocale(request);
         Map<String, String> labelMap = localeLabels.get(locale.toString());
         if (labelMap == null)
         {
@@ -176,19 +178,13 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
     private Map<String, String> getLocaleLabels(Locale locale)
     {
         Map<String, String> labelMap = new HashMap<String, String>();
-        ResourceBundle labels = ResourceBundle.getBundle("Messages", locale);
-
-        labelMap.put(SyndicationFeed.MSG_UNTITLED,
-                labels.getString(msgKey + ".notitle"));
-        labelMap.put(SyndicationFeed.MSG_LOGO_TITLE,
-                labels.getString(msgKey + ".logo.title"));
-        labelMap.put(SyndicationFeed.MSG_FEED_DESCRIPTION,
-                labels.getString(msgKey + ".general-feed.description"));
+        labelMap.put(SyndicationFeed.MSG_UNTITLED, I18nUtil.getMessage(msgKey + ".notitle", locale));
+        labelMap.put(SyndicationFeed.MSG_LOGO_TITLE, I18nUtil.getMessage(msgKey + ".logo.title", locale));
+        labelMap.put(SyndicationFeed.MSG_FEED_DESCRIPTION, I18nUtil.getMessage(msgKey + ".general-feed.description", locale));
         labelMap.put(SyndicationFeed.MSG_UITYPE, SyndicationFeed.UITYPE_JSPUI);
         for (String selector : SyndicationFeed.getDescriptionSelectors())
         {
-            labelMap.put("metadata." + selector,
-                    labels.getString(SyndicationFeed.MSG_METADATA + selector));
+            labelMap.put("metadata." + selector, I18nUtil.getMessage(SyndicationFeed.MSG_METADATA + selector, locale));
         }
         return labelMap;
     }

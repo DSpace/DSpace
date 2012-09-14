@@ -18,7 +18,9 @@
                         <map:generator name="DSpaceFeedGenerator" src="org.dspace.app.xmlui.cocoon.DSpaceFeedGenerator"/>
                         <map:generator name="DSpaceMETSGenerator" src="org.dspace.app.xmlui.cocoon.DSpaceMETSGenerator"/>
                         <map:generator name="DSpaceOREGenerator" src="org.dspace.app.xmlui.cocoon.DSpaceOREGenerator"/>
-                        <map:generator name="OpenSearchGenerator" src="org.dspace.app.xmlui.cocoon.OpenSearchGenerator"/>
+                        <map:generator name="DescriptionOpenSearchGenerator" src="org.dspace.app.xmlui.opensearch.DescriptionOpenSearchGenerator"/>
+                        <map:generator name="StandardOpenSearchGenerator" src="org.dspace.app.xmlui.opensearch.StandardOpenSearchGenerator"/>
+                        <map:generator name="DiscoveryOpenSearchGenerator" src="org.dspace.app.xmlui.opensearch.DiscoveryOpenSearchGenerator"/>
                         <map:generator name="notifying" src="org.apache.cocoon.sitemap.NotifyingGenerator"/>
                         <map:generator name="exception" src="org.apache.cocoon.generation.ExceptionGenerator"/>
                         <map:generator name="AJAXMenuGenerator"
@@ -474,36 +476,40 @@
                         <map:serialize type="xml"/>
                     </map:match>
 
-                    <!-- OpenSearch results for whole repo or community/collection -->
+                    <!-- OpenSearch description document for whole repo or community/collection -->
+                    <map:match pattern="open-search/description.xml">
+                        <map:generate type="DescriptionOpenSearchGenerator"/>
+                        <map:serialize type="opensearch"/>
+                    </map:match>
+
+                    <!-- OpenSearch results document for whole repo or community/collection -->
                     <map:match pattern="open-search/**">
-
-                        <map:match pattern="open-search/description.xml">
-                            <map:generate type="OpenSearchGenerator">
-                                <map:parameter name="type" value="description"/>
-                            </map:generate>
-                            <map:serialize type="opensearch"/>
+                        <map:match pattern="open-search/">
+                            <map:generate type="StandardOpenSearchGenerator"/>
                         </map:match>
 
-                        <map:match pattern="open-search/**">
-                            <map:generate type="OpenSearchGenerator"/>
-                            <map:act type="locale">
-                                  <map:transform type="i18n">
-                                          <map:parameter name="locale" value="{locale}"/>
-                                  </map:transform>
-                            </map:act>
-                            <map:select type="request-parameter">
-                                <map:parameter name="parameter-name" value="format"/>
-                                <map:when test="rss">
-                                    <map:serialize type="rss"/>
-                                </map:when>
-                                <map:when test="atom">
-                                    <map:serialize type="atom"/>
-                                </map:when>
-                                <map:otherwise>
-                                    <map:serialize type="html"/>
-                                </map:otherwise>
-                            </map:select>
+                        <map:match pattern="open-search/discover">
+                            <map:generate type="DiscoveryOpenSearchGenerator"/>
                         </map:match>
+
+                        <map:act type="locale">
+                            <map:transform type="i18n">
+                                <map:parameter name="locale" value="{locale}"/>
+                            </map:transform>
+                        </map:act>
+
+                        <map:select type="request-parameter">
+                            <map:parameter name="parameter-name" value="format"/>
+                            <map:when test="rss">
+                                <map:serialize type="rss"/>
+                            </map:when>
+                            <map:when test="atom">
+                                <map:serialize type="atom"/>
+                            </map:when>
+                            <map:otherwise>
+                                <map:serialize type="xml"/>
+                            </map:otherwise>
+                        </map:select>
                     </map:match>
 
                     <!-- HTML Sitemaps and Sitemaps.org Sitemaps for whole repo -->
