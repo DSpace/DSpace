@@ -54,7 +54,7 @@ public class DSpaceConfigurationServiceTest {
     /**
      * Test method for {@link org.dspace.servicemanager.config.DSpaceConfigurationService#replaceVariables(java.util.Map)}.
      */
-    @Test
+    @Test(timeout=10000)
     public void testReplaceVariables() {
 
         List<DSpaceConfig> l = new ArrayList<DSpaceConfig>();
@@ -64,6 +64,10 @@ public class DSpaceConfigurationServiceTest {
         l.add( new DSpaceConfig("test.key1", "This is a value") );
         l.add( new DSpaceConfig("test.key2", "This is key1=${test.key1}") );
         l.add( new DSpaceConfig("test.key3", "This is key2=${test.key2}") );
+        int dirIdx = l.size();
+        l.add( new DSpaceConfig("circular", "${circular}"));
+        int indirIdx = l.size();
+        l.add( new DSpaceConfig("indirect.circular", "${circular} square"));
 
         Map<String, DSpaceConfig> configMap = new HashMap<String, DSpaceConfig>();
         for (DSpaceConfig config : l) {
@@ -71,13 +75,18 @@ public class DSpaceConfigurationServiceTest {
         }
         configurationService.replaceVariables(configMap);
 
-        assertEquals(6, configMap.size());
+        assertEquals("all configuration list members should be map members",
+                l.size(), configMap.size());
         assertEquals("DSpace", configMap.get("service.name").getValue());
         assertEquals("Aaron Zeckoski", configMap.get("aaronz").getValue());
         assertEquals("Aaron Zeckoski", configMap.get("current.user").getValue());
         assertEquals("This is a value", configMap.get("test.key1").getValue());
         assertEquals("This is key1=This is a value", configMap.get("test.key2").getValue());
         assertEquals("This is key2=This is key1=This is a value", configMap.get("test.key3").getValue());
+        assertEquals("Direct circular reference should not be replaced",
+                configMap.get("circular").getValue(), l.get(dirIdx).getValue());
+        assertEquals("Indirect circular reference should not be replaced",
+                configMap.get("indirect.circular").getValue(), l.get(indirIdx).getValue());
     }
 
     /**
