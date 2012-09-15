@@ -391,8 +391,8 @@ public class Util {
 
         if (collection == null)
         {
-            // col_handle = "db-id/" + item.getID();
-            return null;
+            // set an empty handle so to get the default input set
+            col_handle = "";
         }
         else
         {
