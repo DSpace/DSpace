@@ -8,20 +8,19 @@
 package org.dspace.app.xmlui.aspect.administrative;
 
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.PolicySet;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.dspace.content.*;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
@@ -113,7 +112,8 @@ public class FlowAuthorizationUtils {
 	 * @param actionID The ID of the action (dependent on the objectType) to be associated with this policy
 	 * @return A process result's object.
 	 */
-	public static FlowResult processEditPolicy(Context context, int objectType, int objectID, int policyID, int groupID, int actionID) throws SQLException, AuthorizeException 
+	public static FlowResult processEditPolicy(Context context, int objectType, int objectID, int policyID, int groupID, int actionID, 
+                                                    String name, String description, String startDateParam, String endDateParam) throws SQLException, AuthorizeException
 	{
 		FlowResult result = new FlowResult();
 		boolean added = false;
@@ -136,9 +136,72 @@ public class FlowAuthorizationUtils {
 			result.setContinue(false);
 			result.addError("group_id");
 			return result;
-		}	
-		
-		/* If the policy doesn't exist, cretae a new one and set its parent resource */
+		}
+
+
+        // check dates
+        Date startDate = null;
+        Date endDate = null;
+
+        // 05/01/2012 valid date
+        if(StringUtils.isNotBlank(startDateParam)){
+
+            try {
+                startDate = DateUtils.parseDate(startDateParam, new String[]{"yyyy-MM-dd", "yyyy-MM", "yyyy"});
+            } catch (ParseException e) {
+                startDate = null;
+            }
+            if(startDate==null){
+                result.setContinue(false);
+                result.addError("startDate");
+                return result;
+            }
+        }
+
+        if(StringUtils.isNotBlank(endDateParam)){
+            try {
+                endDate = DateUtils.parseDate(endDateParam, new String[]{"yyyy-MM-dd", "yyyy-MM", "yyyy"});
+            } catch (ParseException e) {
+                endDate = null;
+            }
+
+            if(endDate==null){
+                result.setContinue(false);
+                result.addError("endDate");
+                return result;
+            }
+        }
+
+        if(endDate!=null && startDate!=null){
+            if(startDate.after(endDate)){
+                result.setContinue(false);
+                result.addError("startDateGreaterThenEndDate");
+                return result;
+            }
+        }
+        // end check dates
+
+        // check if a similar policy is already in place
+        if(policy==null){
+            if(AuthorizeManager.isAnIdenticalPolicyAlreadyInPlace(context, objectType, objectID, groupID, actionID, -1)){
+                result.setContinue(false);
+                result.addError("duplicatedPolicy");
+                return result;
+            }
+        }
+        else{
+            if(AuthorizeManager.isAnIdenticalPolicyAlreadyInPlace(context, objectType, objectID, groupID, actionID, policy.getID())){
+                result.setContinue(false);
+                result.addError("duplicatedPolicy");
+                return result;
+            }
+        }
+
+
+            
+
+
+        /* If the policy doesn't exist, create a new one and set its parent resource */
 		DSpaceObject policyParent = null;
 		if (policy == null) 
 		{
@@ -178,6 +241,7 @@ public class FlowAuthorizationUtils {
 			}
 			policy = ResourcePolicy.create(context);
 			policy.setResource(policyParent);
+            policy.setRpType(ResourcePolicy.TYPE_CUSTOM);
 			added = true;
 		}
 		
@@ -186,6 +250,17 @@ public class FlowAuthorizationUtils {
 	    //  modify the policy
 	    policy.setAction(actionID);
 	    policy.setGroup(group);
+
+        policy.setRpName(name);
+        policy.setRpDescription(description);
+
+        if(endDate!=null) policy.setEndDate(endDate);
+        else policy.setEndDate(null);
+
+
+        if(startDate!=null) policy.setStartDate(startDate);
+        else policy.setStartDate(null);
+
 	      
 	    // propagate the changes to the logo, which is treated on the same level as the parent object
 	    Bitstream logo = null;
@@ -227,9 +302,11 @@ public class FlowAuthorizationUtils {
 	    
 		return result;
 	}
-	
-	
-	/**
+
+
+
+
+    /**
 	 * Delete the policies specified by the policyIDs parameter. This assumes that the
 	 * deletion has been confirmed.
 	 * 
@@ -268,23 +345,79 @@ public class FlowAuthorizationUtils {
 	 * @return A process result's object.
 	 */
 	public static FlowResult processAdvancedPolicyAdd(Context context, String[] groupIDs, int actionID,
-			int resourceID, String [] collectionIDs) throws NumberFormatException, SQLException, AuthorizeException
+			int resourceID, String [] collectionIDs, String name, String description, String startDateParam, String endDateParam) throws NumberFormatException, SQLException, AuthorizeException
 	{
 	    AuthorizeUtil.requireAdminRole(context);
 		FlowResult result = new FlowResult();
+
+
+        if(groupIDs==null){
+            result.setContinue(false);
+            result.addError("groupIDs");
+            return result;
+        }
+
+        if(collectionIDs==null){
+            result.setContinue(false);
+            result.addError("collectionIDs");
+            return result;
+        }
+
+         // check dates
+        Date startDate = null;
+        Date endDate = null;
+
+        // 05/01/2012 valid date
+        if(StringUtils.isNotBlank(startDateParam)){
+            try {
+                startDate = DateUtils.parseDate(startDateParam, new String[]{"yyyy-MM-dd", "yyyy-MM", "yyyy"});
+            } catch (ParseException e) {
+                startDate = null;
+            }
+            if(startDate==null){
+                result.setContinue(false);
+                result.addError("startDate");
+                return result;
+            }
+        }
+
+        if(StringUtils.isNotBlank(endDateParam)){
+            try {
+                endDate = DateUtils.parseDate(endDateParam, new String[]{"yyyy-MM-dd", "yyyy-MM", "yyyy"});
+            } catch (ParseException e) {
+                endDate = null;
+            }
+            if(endDate==null){
+                result.setContinue(false);
+                result.addError("endDate");
+                return result;
+            }
+        }
+
+        if(endDate!=null && startDate!=null){
+            if(startDate.after(endDate)){
+                result.setContinue(false);
+                result.addError("startDateGreaterThenEndDate");
+                return result;
+            }
+        }
+        // end check dates
+
+
+
 		
 		for (String groupID : groupIDs) 
 		{
 			for (String collectionID : collectionIDs) 
 			{
 				PolicySet.setPolicies(context, Constants.COLLECTION, Integer.valueOf(collectionID),
-			            resourceID, actionID, Integer.valueOf(groupID), false, false);
+			            resourceID, actionID, Integer.valueOf(groupID), false, false, name, description, startDate, endDate);
 				
 				// if it's a bitstream, do it to the bundle too
 			    if (resourceID == Constants.BITSTREAM)
 			    {
 			    	PolicySet.setPolicies(context, Constants.COLLECTION, Integer.valueOf(collectionID),
-			    			Constants.BUNDLE, actionID, Integer.valueOf(groupID), false, false);
+			    			Constants.BUNDLE, actionID, Integer.valueOf(groupID), false, false, name, description, startDate, endDate);
 			    }
 			}
 	    }	
@@ -331,5 +464,4 @@ public class FlowAuthorizationUtils {
 		
 		return result;
 	}
-
 }

@@ -18,6 +18,9 @@
    </parent>
 
    <build>
+	  <filters>
+            <filter>${basedir}/../../${filters.file}</filter>
+      </filters>
       <plugins>
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -28,13 +31,13 @@
                <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
                <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
                <webResources>
-                  <resource>
-                     <filtering>true</filtering>
-                     <directory>${basedir}/src/main/webapp</directory>
-                     <includes>
-                        <include>WEB-INF/web.xml</include>
-                     </includes>
-                  </resource>
+                    <resource>
+                        <filtering>false</filtering>
+                        <directory>${basedir}/src/main/webapp</directory>
+                        <includes>
+                            <include>WEB-INF/web.xml</include>
+                        </includes>
+                    </resource>
                </webResources>
             </configuration>
             <executions>
@@ -47,26 +50,6 @@
    </build>
 
    <profiles>
-      <!--
-         when activated a dspace.config configuration
-         file location passed on the commandline
-         (-Ddspace.config=...) can be passed through
-         to be used as a filter source by projects for
-         tasks such as updating the ${dspace.dir} in
-         web.xml etc.
-      -->
-      <profile>
-         <activation>
-            <property>
-               <name>dspace.config</name>
-            </property>
-         </activation>
-         <build>
-            <filters>
-               <filter>${dspace.config}</filter>
-            </filters>
-         </build>
-      </profile>
       <profile>
          <id>oracle-support</id>
          <activation>

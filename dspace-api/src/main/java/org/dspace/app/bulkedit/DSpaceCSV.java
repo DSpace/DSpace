@@ -54,6 +54,13 @@ public class DSpaceCSV implements Serializable
     /** The field separator in an escaped form for using in regexs */
     protected static String escapedFieldSeparator;
 
+    /** The authority separator (defaults to dobule colon '::') */
+    protected static String authoritySeparator;
+
+    /** The authority separator in an escaped form for using in regexs */
+    protected static String escapedAuthoritySeparator;
+
+
     /** Whether to export all metadata such as handles and provenance information */
     private boolean exportAll;
 
@@ -226,6 +233,9 @@ public class DSpaceCSV implements Serializable
         // Set the field separator
         setFieldSeparator();
 
+        // Set the authority separator
+        setAuthoritySeparator();
+
         // Create the headings
         headings = new ArrayList<String>();
 
@@ -340,6 +350,32 @@ public class DSpaceCSV implements Serializable
         escapedFieldSeparator = match.replaceAll("\\\\$1");
     }
 
+     /**
+     * Set the authority separator for value with authority data.
+     *
+     * Is set in dspace.cfg as bulkedit.authorityseparator
+     *
+     * If not set, defaults to double colon '::'
+     */
+    private void setAuthoritySeparator()
+    {
+        // Get the value separator
+        authoritySeparator = ConfigurationManager.getProperty("bulkedit", "authorityseparator");
+        if ((authoritySeparator != null) && (!"".equals(authoritySeparator.trim())))
+        {
+            authoritySeparator = authoritySeparator.trim();
+        }
+        else
+        {
+            authoritySeparator = "::";
+        }
+
+        // Now store the escaped version
+        Pattern spchars = Pattern.compile("([\\\\*+\\[\\](){}\\$.?\\^|])");
+        Matcher match = spchars.matcher(authoritySeparator);
+        escapedAuthoritySeparator = match.replaceAll("\\\\$1");
+    }
+
     /**
      * Add a DSpace item to the CSV file
      *
@@ -390,7 +426,13 @@ public class DSpaceCSV implements Serializable
             // Store the item
             if (exportAll || okToExport(value))
             {
-                line.add(key, value.value);
+                // Add authority and confidence if authority is not null
+                String mdValue = value.value;
+                if (value.authority != null && !"".equals(value.authority))
+                {
+                    mdValue += authoritySeparator + value.authority + authoritySeparator + value.confidence;
+                }
+                line.add(key, mdValue);
                 if (!headings.contains(key))
                 {
                     headings.add(key);

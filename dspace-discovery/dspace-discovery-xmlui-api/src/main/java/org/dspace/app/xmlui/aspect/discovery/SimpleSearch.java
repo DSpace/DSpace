@@ -10,12 +10,11 @@ package org.dspace.app.xmlui.aspect.discovery;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
@@ -55,21 +54,28 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
             message("xmlui.ArtifactBrowser.SimpleSearch.trail");
 
     private static final Message T_search_scope =
-        message("xmlui.ArtifactBrowser.SimpleSearch.search_scope");
+        message("xmlui.Discovery.SimpleSearch.search_scope");
 
     private static final Message T_head =
             message("xmlui.ArtifactBrowser.SimpleSearch.head");
 
-    private static final Message T_search_label =
-            message("xmlui.discovery.SimpleSearch.search_label");
+//    private static final Message T_search_label =
+//            message("xmlui.discovery.SimpleSearch.search_label");
 
-    private static final Message T_go =
-            message("xmlui.general.go");
+    private static final Message T_go = message("xmlui.general.go");
     private static final Message T_filter_label = message("xmlui.Discovery.SimpleSearch.filter_head");
     private static final Message T_filter_help = message("xmlui.Discovery.SimpleSearch.filter_help");
-    private static final Message T_add_filter = message("xmlui.Discovery.SimpleSearch.filter_add");
-    private static final Message T_filter_apply = message("xmlui.Discovery.SimpleSearch.filter_apply");
-    private static final Message T_FILTERS_SELECTED = message("xmlui.ArtifactBrowser.SimpleSearch.filter.selected");
+    private static final String T_filter_new_filters = "xmlui.Discovery.AbstractSearch.filters.controls.new-filters.head";
+    private static final Message T_filter_controls_apply = message("xmlui.Discovery.AbstractSearch.filters.controls.apply-filters");
+    private static final Message T_filter_controls_add = message("xmlui.Discovery.AbstractSearch.filters.controls.add-filter");
+    private static final Message T_filter_controls_remove = message("xmlui.Discovery.AbstractSearch.filters.controls.remove-filter");
+    private static final Message T_filters_show = message("xmlui.Discovery.AbstractSearch.filters.display");
+    private static final Message T_filter_contain = message("xmlui.Discovery.SimpleSearch.filter.contains");
+    private static final Message T_filter_equals = message("xmlui.Discovery.SimpleSearch.filter.equals");
+    private static final Message T_filter_notcontain = message("xmlui.Discovery.SimpleSearch.filter.notcontains");
+    private static final Message T_filter_notequals = message("xmlui.Discovery.SimpleSearch.filter.notequals");
+    private static final Message T_filter_authority = message("xmlui.Discovery.SimpleSearch.filter.authority");
+    private static final Message T_filter_notauthority = message("xmlui.Discovery.SimpleSearch.filter.notauthority");
 
     private SearchService searchService = null;
 
@@ -88,7 +94,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if ((dso instanceof org.dspace.content.Collection) || (dso instanceof Community)) {
-            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath);
+            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath, true);
         }
 
         pageMeta.addTrail().addContent(T_trail);
@@ -117,15 +123,18 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         }
         search.addHidden("contextpath").setValue(contextPath);
 
-        String[] fqs = getFilterQueries();
+        Map<String, String[]> fqs = getParameterFilterQueries();
 
-        Division mainSearchDiv = search.addInteractiveDivision("general-query",
-                "discover", Division.METHOD_GET, "discover-search-box search");
+        Division searchBoxDivision = search.addDivision("discovery-search-box", "discoverySearchBox");
+
+        Division mainSearchDiv = searchBoxDivision.addInteractiveDivision("general-query",
+                "discover", Division.METHOD_GET, "discover-search-box");
 
         List searchList = mainSearchDiv.addList("primary-search", List.TYPE_FORM);
 
-        searchList.setHead(T_search_label);
-        if (variableScope()) {
+//        searchList.setHead(T_search_label);
+        if (variableScope())
+        {
             Select scope = searchList.addItem().addSelect("scope");
             scope.setLabel(T_search_scope);
             buildScopeList(scope);
@@ -134,99 +143,66 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         Item searchBoxItem = searchList.addItem();
         Text text = searchBoxItem.addText("query");
         text.setValue(queryString);
-        text.setSize(75);
-        searchBoxItem.addButton("submit").setValue(T_go);
-        addHiddenFormFields("search", request, fqs, mainSearchDiv);
-
+        searchBoxItem.addButton("submit", "search-icon").setValue(T_go);
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(dso);
         java.util.List<DiscoverySearchFilter> filterFields = discoveryConfiguration.getSearchFilters();
-        if(0 < fqs.length || 0 < filterFields.size()){
-            Division searchFiltersDiv = search.addInteractiveDivision("search-filters",
-                    "discover", Division.METHOD_GET, "discover-search-box search");
+        java.util.List<String> filterTypes = DiscoveryUIUtils.getRepeatableParameters(request, "filtertype");
+        java.util.List<String> filterOperators = DiscoveryUIUtils.getRepeatableParameters(request, "filter_relational_operator");
+        java.util.List<String> filterValues = DiscoveryUIUtils.getRepeatableParameters(request,  "filter");
 
-            List secondarySearchList = searchFiltersDiv.addList("secondary-search", List.TYPE_FORM);
-            secondarySearchList.setHead(T_filter_label);
+        if(0 < filterFields.size() && filterTypes.size() == 0)
+        {
+            //Display the add filters url ONLY if we have no filters selected & fitlers can be added
+            searchList.addItem().addXref("display-filters", T_filters_show);
+        }
+        addHiddenFormFields("search", request, fqs, mainSearchDiv);
 
 
-    //        queryList.addItem().addContent("Filters");
+        if(0 < filterFields.size())
+        {
+            Division searchFiltersDiv = searchBoxDivision.addInteractiveDivision("search-filters",
+                    "discover", Division.METHOD_GET, "discover-filters-box " + (0 < filterTypes.size() ? "" : "hidden"));
+
+            Division filtersWrapper = searchFiltersDiv.addDivision("discovery-filters-wrapper");
+            filtersWrapper.setHead(T_filter_label);
+            filtersWrapper.addPara(T_filter_help);
+            Table filtersTable = filtersWrapper.addTable("discovery-filters", 1, 4, "discovery-filters");
+
+
             //If we have any filters, show them
-            if(fqs.length > 0){
-                //if(filters != null && filters.size() > 0){
-                Item item = secondarySearchList.addItem("used-filters", "used-filters-list");
+            if(filterTypes.size() > 0)
+            {
 
+                for (int i = 0; i <  filterTypes.size(); i++)
+                {
+                    String filterType = filterTypes.get(i);
+                    String filterValue = filterValues.get(i);
+                    String filterOperator = filterOperators.get(i);
 
-//                Composite composite = item.addComposite("facet-controls");
-
-//                composite.setLabel(T_FILTERS_SELECTED);
-
-
-                for (int i = 0; i <  fqs.length; i++) {
-                    String filterQuery = fqs[i];
-                    DiscoverFilterQuery fq = searchService.toFilterQuery(context, filterQuery);
-
-//                    CheckBox box = item.addCheckBox("fq");
-                    CheckBox box = item.addCheckBox("fq");
-                    if(i == 0){
-                        box.setLabel(T_FILTERS_SELECTED);
+                    if(StringUtils.isNotBlank(filterValue))
+                    {
+                        Row row = filtersTable.addRow("used-filters-" + i, Row.ROLE_DATA, "search-filter used-filter");
+                        addFilterRow(filterFields, i, row, filterType, filterOperator, filterValue);
                     }
-                    Option option = box.addOption(true, fq.getFilterQuery());
-                    String field = fq.getField();
-                    option.addContent(message("xmlui.ArtifactBrowser.SimpleSearch.filter." + field));
-
-                    //We have a filter query get the display value
-                    //Check for a range query
-                    Pattern pattern = Pattern.compile("\\[(.*? TO .*?)\\]");
-                    Matcher matcher = pattern.matcher(fq.getDisplayedValue());
-                    boolean hasPattern = matcher.find();
-                    if (hasPattern) {
-                        String[] years = matcher.group(0).replace("[", "").replace("]", "").split(" TO ");
-                        option.addContent(": " + years[0] + " - " + years[1]);
-                        continue;
-                    }
-
-                    option.addContent(": " + fq.getDisplayedValue());
                 }
-                secondarySearchList.addItem().addButton("submit_update_filters", "update-filters").setValue(T_filter_apply);
+                filtersTable.addRow(Row.ROLE_HEADER).addCell("", Cell.ROLE_HEADER, 1, 4, "new-filter-header").addContent(message(T_filter_new_filters));
             }
 
 
+            int index = filterTypes.size() + 1;
+            Row row = filtersTable.addRow("filter-new-" + index, Row.ROLE_DATA, "search-filter");
 
-            if(0 < filterFields.size()){
-                //We have at least one filter so add our filter box
-                Item item = secondarySearchList.addItem("search-filter-list", "search-filter-list");
-                Composite filterComp = item.addComposite("search-filter-controls");
-                filterComp.setLabel(T_add_filter);
-                filterComp.setHelp(T_filter_help);
+            addFilterRow(filterFields, index, row, null, null, null);
 
-    //            filterComp.setLabel("");
-
-                Select select = filterComp.addSelect("filtertype");
-
-                //For each field found (at least one) add options
-                for (DiscoverySearchFilter searchFilter : filterFields) {
-                    select.addOption(searchFilter.getIndexFieldName(), message("xmlui.ArtifactBrowser.SimpleSearch.filter." + searchFilter.getIndexFieldName()));
-                }
-
-                //Add a box so we can search for our value
-                filterComp.addText("filter").setSize(30);
-
-                //And last add an add button
-                filterComp.enableAddOperation();
-            }
+            Row filterControlsItem = filtersTable.addRow("filter-controls", Row.ROLE_DATA, "apply-filter");
+            filterControlsItem.addCell(1, 3).addContent("");
+            filterControlsItem.addCell().addButton("submit_apply_filter", "discovery-apply-filter-button").setValue(T_filter_controls_apply);
 
             addHiddenFormFields("filter", request, fqs, searchFiltersDiv);
 
         }
-
-
-
-        Division searchControlsDiv = search.addInteractiveDivision("search-controls",
-                "discover", Division.METHOD_GET, "discover-sort-box search");
-
-        buildSearchControls(searchControlsDiv);
-        addHiddenFormFields("sort", request, fqs, searchControlsDiv);
 
 
 //        query.addPara(null, "button-list").addButton("submit").setValue(T_go);
@@ -234,6 +210,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         // Build the DRI Body
         //Division results = body.addDivision("results", "primary");
         //results.setHead(T_head);
+        buildMainForm(search);
 
         // Add the result division
         try {
@@ -244,61 +221,54 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
     }
 
-    /**
-     * Returns a list of the filter queries for use in rendering pages, creating page more urls, ....
-     * @return an array containing the filter queries
-     */
-    protected String[] getParameterFilterQueries() {
-        Request request = ObjectModelHelper.getRequest(objectModel);
-        java.util.List<String> fqs = new ArrayList<String>();
-        if(request.getParameterValues("fq") != null)
-        {
-            fqs.addAll(Arrays.asList(request.getParameterValues("fq")));
-        }
+    protected void addFilterRow(java.util.List<DiscoverySearchFilter> filterFields, int index, Row row, String selectedFilterType, String relationalOperator, String value) throws WingException {
+        Select select = row.addCell("", Cell.ROLE_DATA, "selection").addSelect("filtertype_" + index);
 
-        //Have we added a filter using the UI
-        if(request.getParameter("filter") != null && !"".equals(request.getParameter("filter")))
+        //For each field found (at least one) add options
+        for (DiscoverySearchFilter searchFilter : filterFields)
         {
-            fqs.add((request.getParameter("filtertype")) + ":" + request.getParameter("filter"));
+            select.addOption(StringUtils.equals(searchFilter.getIndexFieldName(), selectedFilterType), searchFilter.getIndexFieldName(), message("xmlui.ArtifactBrowser.SimpleSearch.filter." + searchFilter.getIndexFieldName()));
         }
-        return fqs.toArray(new String[fqs.size()]);
+        Select typeSelect = row.addCell("", Cell.ROLE_DATA, "selection").addSelect("filter_relational_operator_" + index);
+        typeSelect.addOption(StringUtils.equals(relationalOperator, "contains"), "contains", T_filter_contain);
+        typeSelect.addOption(StringUtils.equals(relationalOperator, "equals"), "equals", T_filter_equals);
+        typeSelect.addOption(StringUtils.equals(relationalOperator, "authority"), "authority", T_filter_authority);
+        typeSelect.addOption(StringUtils.equals(relationalOperator, "notcontains"), "notcontains", T_filter_notcontain);
+        typeSelect.addOption(StringUtils.equals(relationalOperator, "notequals"), "notequals", T_filter_notequals);
+        typeSelect.addOption(StringUtils.equals(relationalOperator, "notauthority"), "notauthority", T_filter_notauthority);
+         
+
+
+
+        //Add a box so we can search for our value
+        row.addCell("", Cell.ROLE_DATA, "discovery-filter-input-cell").addText("filter_" + index, "discovery-filter-input").setValue(value == null ? "" : value);
+
+        //And last add an add button
+        Cell buttonsCell = row.addCell("filter-controls_" + index, Cell.ROLE_DATA, "filter-controls");
+        buttonsCell.addButton("add-filter_" + index, "filter-control filter-add").setValue(T_filter_controls_add);
+        buttonsCell.addButton("remove-filter_" + index, "filter-control filter-remove").setValue(T_filter_controls_remove);
+
     }
 
+    @Override
+    protected String getBasicUrl() throws SQLException {
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+
+        return request.getContextPath() + (dso == null ? "" : "/handle/" + dso.getHandle()) + "/discover";
+    }
+
+    protected Map<String, String[]> getParameterFilterQueries(){
+        return DiscoveryUIUtils.getParameterFilterQueries(ObjectModelHelper.getRequest(objectModel));
+
+    }
     /**
      * Returns all the filter queries for use by discovery
      *  This method returns more expanded filter queries then the getParameterFilterQueries
      * @return an array containing the filter queries
      */
     protected String[] getFilterQueries() {
-        try {
-            java.util.List<String> allFilterQueries = new ArrayList<String>();
-            Request request = ObjectModelHelper.getRequest(objectModel);
-            java.util.List<String> fqs = new ArrayList<String>();
-
-            if(request.getParameterValues("fq") != null)
-            {
-                fqs.addAll(Arrays.asList(request.getParameterValues("fq")));
-            }
-
-            String type = request.getParameter("filtertype");
-            String value = request.getParameter("filter");
-
-            if(value != null && !value.equals("")){
-                allFilterQueries.add(searchService.toFilterQuery(context, (type.equals("*") ? "" : type), value).getFilterQuery());
-            }
-
-            //Add all the previous filters also
-            for (String fq : fqs) {
-                allFilterQueries.add(searchService.toFilterQuery(context, fq).getFilterQuery());
-            }
-
-            return allFilterQueries.toArray(new String[allFilterQueries.size()]);
-        }
-        catch (RuntimeException re) {
-            throw re;
-        } catch (Exception e) {
-            return null;
-        }
+        return DiscoveryUIUtils.getFilterQueries(ObjectModelHelper.getRequest(objectModel), context);
     }
 
 
@@ -375,7 +345,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
      * @param division the division that requires the hidden fields
      * @throws WingException will never occur
      */
-    private void addHiddenFormFields(String type, Request request, String[] fqs, Division division) throws WingException {
+    private void addHiddenFormFields(String type, Request request, Map<String, String[]> fqs, Division division) throws WingException {
         if(type.equals("filter") || type.equals("sort")){
             if(request.getParameter("query") != null){
                 division.addHidden("query").setValue(request.getParameter("query"));
@@ -386,9 +356,14 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         }
 
         //Add the filter queries, current search settings so these remain saved when performing a new search !
-        if(type.equals("search") || type.equals("sort")){
-            for (String fq : fqs) {
-                division.addHidden("fq").setValue(fq);
+        if(type.equals("search") || type.equals("sort"))
+        {
+            for (String parameter : fqs.keySet())
+            {
+                String[] values = fqs.get(parameter);
+                for (String value : values) {
+                    division.addHidden(parameter).setValue(value);
+                }
             }
         }
 

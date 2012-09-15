@@ -58,6 +58,9 @@ public class ConfirmItemForm extends AbstractDSpaceTransformer {
 	private static final Message T_submit_withdraw = message("xmlui.administrative.item.ConfirmItemForm.submit_withdraw");
 	private static final Message T_submit_reinstate = message("xmlui.administrative.item.ConfirmItemForm.submit_reinstate");
 
+    private static final Message T_submit_private = message("xmlui.administrative.item.ConfirmItemForm.submit_private");
+    private static final Message T_submit_public = message("xmlui.administrative.item.ConfirmItemForm.submit_public");
+
 
 	public void addPageMeta(PageMeta pageMeta) throws WingException
 	{
@@ -127,6 +130,14 @@ public class ConfirmItemForm extends AbstractDSpaceTransformer {
 		{
 			confirmButton.setValue(T_submit_reinstate);
 		}
+        else if ("private".equals(confirm))
+        {
+            confirmButton.setValue(T_submit_private);
+        }
+        else if ("public".equals(confirm))
+        {
+            confirmButton.setValue(T_submit_public);
+        }
 		else if ("withdraw".equals(confirm))
 		{
 			confirmButton.setValue(T_submit_withdraw);

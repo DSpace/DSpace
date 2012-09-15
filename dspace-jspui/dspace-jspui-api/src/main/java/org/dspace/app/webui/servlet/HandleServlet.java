@@ -43,6 +43,7 @@ import org.dspace.eperson.Subscribe;
 import org.dspace.handle.HandleManager;
 import org.dspace.plugin.CollectionHomeProcessor;
 import org.dspace.plugin.CommunityHomeProcessor;
+import org.dspace.plugin.ItemHomeProcessor;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import org.jdom.Element;
@@ -290,6 +291,9 @@ public class HandleServlet extends DSpaceServlet
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
+        // perform any necessary pre-processing
+        preProcessItemHome(context, request, response, item);
+        
         // Tombstone?
         if (item.isWithdrawn())
         {
@@ -414,6 +418,25 @@ public class HandleServlet extends DSpaceServlet
         request.setAttribute("collections", collections);
         request.setAttribute("dspace.layout.head", headMetadata);
         JSPManager.showJSP(request, response, "/display-item.jsp");
+    }
+    
+    private void preProcessItemHome(Context context, HttpServletRequest request,
+            HttpServletResponse response, Item item)
+        throws ServletException, IOException, SQLException
+    {
+        try
+        {
+            ItemHomeProcessor[] chp = (ItemHomeProcessor[]) PluginManager.getPluginSequence(ItemHomeProcessor.class);
+            for (int i = 0; i < chp.length; i++)
+            {
+                chp[i].process(context, request, response, item);
+            }
+        }
+        catch (Exception e)
+        {
+            log.error("caught exception: ", e);
+            throw new ServletException(e);
+        }
     }
 
     /**

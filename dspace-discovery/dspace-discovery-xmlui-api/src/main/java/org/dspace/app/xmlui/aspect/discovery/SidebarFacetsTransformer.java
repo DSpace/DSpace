@@ -11,6 +11,7 @@ import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
+import org.apache.commons.lang.StringUtils;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -28,14 +29,14 @@ import org.dspace.core.LogManager;
 import org.dspace.discovery.*;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
-import org.dspace.discovery.configuration.SidebarFacetConfiguration;
+import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.handle.HandleManager;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URLEncoder;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -134,7 +135,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
 
                     java.util.List<DiscoverResult.FacetResult> facetValues = queryResults.getFacetResults().get(facetField);
                     for (DiscoverResult.FacetResult facetValue : facetValues) {
-                        val.add(facetValue.getAsFilterQuery() + facetValue.getCount());
+                        val.add(facetField + facetValue.getAsFilterQuery() + facetValue.getCount());
                     }
                 }
 
@@ -151,9 +152,9 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
 
     public void performSearch() throws SearchServiceException, UIException, SQLException {
         DSpaceObject dso = getScope();
-        queryArgs = getQueryArgs(context, dso, getAllFilterQueries());
-        //If we are on a search page performing a search a query may be used
         Request request = ObjectModelHelper.getRequest(objectModel);
+        queryArgs = getQueryArgs(context, dso, DiscoveryUIUtils.getFilterQueries(request, context));
+        //If we are on a search page performing a search a query may be used
         String query = request.getParameter("query");
         if(query != null && !"".equals(query)){
             queryArgs.setQuery(query);
@@ -179,22 +180,16 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
 
         if (this.queryResults != null) {
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-            java.util.List<String> fqs = new ArrayList<String>();
-            if(request.getParameterValues("fq") != null){
-                for (int i = 0; i < request.getParameterValues("fq").length; i++) {
-                    String fq = request.getParameterValues("fq")[i];
-                    fqs.add(getSearchService().toFilterQuery(context, fq).getFilterQuery());
-                }
-            }
+            java.util.List<String> fqs = Arrays.asList(DiscoveryUIUtils.getFilterQueries(request, context));
 
             DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(dso);
-            java.util.List<SidebarFacetConfiguration> facets = discoveryConfiguration.getSidebarFacets();
+            java.util.List<DiscoverySearchFilterFacet> facets = discoveryConfiguration.getSidebarFacets();
 
             if (facets != null && 0 < facets.size()) {
 
                 List browse = null;
 
-                for (SidebarFacetConfiguration field : facets) {
+                for (DiscoverySearchFilterFacet field : facets) {
                     //Retrieve our values
                     java.util.List<DiscoverResult.FacetResult> facetValues = queryResults.getFacetResult(field.getIndexFieldName());
                     //Check if we are dealing with a date, sometimes the facet values arrive as dates !
@@ -224,6 +219,10 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
 
                             if (!iter.hasNext())
                             {
+                                //When we have an hierarchical facet always show the view more they may want to filter the children of the top nodes
+                                if(field.getType().equals(DiscoveryConfigurationParameters.TYPE_HIERARCHICAL)){
+                                    addViewMoreUrl(filterValsList, dso, request, field.getIndexFieldName());
+                                }
                                 break;
                             }
 
@@ -232,8 +231,8 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                             if (i < shownFacets - 1) {
                                 String displayedValue = value.getDisplayedValue();
                                 String filterQuery = value.getAsFilterQuery();
-
-                                if (fqs.contains(filterQuery)) {
+                                String filterType = value.getFilterType();
+                                if (fqs.contains(getSearchService().toFilterQuery(context, field.getIndexFieldName(), "equals", value.getDisplayedValue()).getFilterQuery())) {
                                     filterValsList.addItem(Math.random() + "", "selected").addContent(displayedValue + " (" + value.getCount() + ")");
                                 } else {
                                     String paramsQuery = retrieveParameters(request);
@@ -243,15 +242,15 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                                                     (dso == null ? "" : "/handle/" + dso.getHandle()) +
                                                     "/discover?" +
                                                     paramsQuery +
-                                                    "fq=" +
-                                                    URLEncoder.encode(filterQuery, "UTF-8"),
+                                                    "filtertype=" + field.getIndexFieldName() +
+                                                    "&filter_relational_operator="+ filterType  +
+                                                    "&filter=" + encodeForURL(filterQuery),
                                             displayedValue + " (" + value.getCount() + ")"
                                     );
                                 }
                             }
                             //Show a view more url should there be more values, unless we have a date
                             if (i == shownFacets - 1 && !field.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)/*&& facetField.getGap() == null*/) {
-
                                 addViewMoreUrl(filterValsList, dso, request, field.getIndexFieldName());
                             }
                         }
@@ -266,26 +265,42 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
      * @param request the cocoon request
      * @return the parameters used on this page
      */
-    private String retrieveParameters(Request request) {
-        StringBuffer result = new StringBuffer();
-        Enumeration keys = request.getParameterNames();
-        if(keys != null){
-            while (keys.hasMoreElements()){
-                String key = (String) keys.nextElement();
-                //Ignore the page and submit button keys
-                if(key != null && !"page".equals(key) && !key.startsWith("submit")){
-                    String[] vals = request.getParameterValues(key);
-                    for(String paramValue : vals){
-                        result.append(key).append("=").append(paramValue);
-                        result.append("&");
-                    }
-                }
-            }
+    private String retrieveParameters(Request request) throws UnsupportedEncodingException, UIException {
+        java.util.List<String> parameters = new ArrayList<String>();
+        if(StringUtils.isNotBlank(request.getParameter("query"))){
+            parameters.add("query=" + encodeForURL(request.getParameter("query")));
         }
-        return result.toString();
+
+        if(StringUtils.isNotBlank(request.getParameter("scope"))){
+            parameters.add("scope=" + request.getParameter("scope"));
+        }
+        if(StringUtils.isNotBlank(request.getParameter("sort_by"))){
+            parameters.add("sort_by=" + request.getParameter("sort_by"));
+        }
+        if(StringUtils.isNotBlank(request.getParameter("order"))){
+            parameters.add("order=" + request.getParameter("order"));
+        }
+        if(StringUtils.isNotBlank(request.getParameter("rpp"))){
+            parameters.add("rpp=" + request.getParameter("rpp"));
+        }
+
+        Map<String, String[]> parameterFilterQueries = DiscoveryUIUtils.getParameterFilterQueries(request);
+        for(String parameter : parameterFilterQueries.keySet()){
+            for (int i = 0; i < parameterFilterQueries.get(parameter).length; i++) {
+                String value = parameterFilterQueries.get(parameter)[i];
+                parameters.add(parameter + "=" + encodeForURL(value));
+            }
+
+        }
+        //Join all our parameters by using an "&" sign
+        String parametersString = StringUtils.join(parameters.toArray(new String[parameters.size()]), "&");
+        if(StringUtils.isNotEmpty(parametersString)){
+            parametersString += "&";
+        }
+        return parametersString;
     }
 
-    private void addViewMoreUrl(List facet, DSpaceObject dso, Request request, String fieldName) throws WingException {
+    private void addViewMoreUrl(List facet, DSpaceObject dso, Request request, String fieldName) throws WingException, UnsupportedEncodingException {
         String parameters = retrieveParameters(request);
         facet.addItem().addXref(
                 contextPath +
@@ -300,7 +315,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
         DiscoverQuery queryArgs = new DiscoverQuery();
 
         DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(scope);
-        java.util.List<SidebarFacetConfiguration> facets = discoveryConfiguration.getSidebarFacets();
+        java.util.List<DiscoverySearchFilterFacet> facets = discoveryConfiguration.getSidebarFacets();
 
         log.info("facets for scope, " + scope + ": " + (facets != null ? facets.size() : null));
 
@@ -317,7 +332,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
 
         /** enable faceting of search results */
         if (facets != null){
-            for (SidebarFacetConfiguration facet : facets) {
+            for (DiscoverySearchFilterFacet facet : facets) {
                 if(facet.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)){
                     String dateFacet = facet.getIndexFieldName() + ".year";
                     try{
@@ -447,48 +462,11 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                     int facetLimit = facet.getFacetLimit();
                     //Add one to our facet limit to make sure that if we have more then the shown facets that we show our show more url
                     facetLimit++;
-                    queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), DiscoveryConfigurationParameters.TYPE_TEXT, facetLimit, facet.getSortOrder()));
+                    queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), facetLimit, facet.getSortOrder()));
                 }
             }
         }
         return queryArgs;
-    }
-
-    /**
-     * Returns all the filter queries for use by discovery
-     *  This method returns more expanded filter queries then the getParameterFilterQueries
-     * @return an array containing the filter queries
-     */
-    protected String[] getAllFilterQueries() {
-        try {
-            java.util.List<String> allFilterQueries = new ArrayList<String>();
-            Request request = ObjectModelHelper.getRequest(objectModel);
-            java.util.List<String> fqs = new ArrayList<String>();
-
-            if(request.getParameterValues("fq") != null)
-            {
-                fqs.addAll(Arrays.asList(request.getParameterValues("fq")));
-            }
-
-            String type = request.getParameter("filtertype");
-            String value = request.getParameter("filter");
-
-            if(value != null && !value.equals("")){
-                allFilterQueries.add(getSearchService().toFilterQuery(context, (type.equals("*") ? "" : type), value).getFilterQuery());
-            }
-
-            //Add all the previous filters also
-            for (String fq : fqs) {
-                allFilterQueries.add(getSearchService().toFilterQuery(context, fq).getFilterQuery());
-            }
-
-            return allFilterQueries.toArray(new String[allFilterQueries.size()]);
-        }
-        catch (RuntimeException re) {
-            throw re;
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     /**

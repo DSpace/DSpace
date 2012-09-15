@@ -10,6 +10,7 @@ package org.dspace.search;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -115,6 +116,9 @@ public class DSQuery
 
         try
         {
+            // calculate execution time 
+            Date startTime = new Date();
+            
             // grab a searcher, and do the search
             IndexSearcher searcher = getSearcher(c);
 
@@ -133,7 +137,11 @@ public class DSQuery
             Query myquery = qp.parse(querystring);
             //Retrieve enough docs to get all the results we need !
             TopDocs  hits = performQuery(args, searcher, myquery, args.getPageSize() * (args.getStart() + 1));
-
+            
+            Date endTime = new Date();
+            
+            qr.setQueryTime(endTime.getTime() - startTime.getTime());
+            
             // set total number of hits
             qr.setHitCount(hits.totalHits);
 

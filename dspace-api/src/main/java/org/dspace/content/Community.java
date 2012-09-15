@@ -1282,4 +1282,11 @@ public class Community extends DSpaceObject
             return null;
         }       
     }
+
+    @Override
+    public void updateLastModified()
+    {
+        //Also fire a modified event since the community HAS been modified
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, getID(), null));
+    }
 }

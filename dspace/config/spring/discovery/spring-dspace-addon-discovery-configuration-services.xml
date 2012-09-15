@@ -42,9 +42,9 @@
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>
-                <ref bean="sidebarFacetAuthor" />
-                <ref bean="sidebarFacetSubject" />
-                <ref bean="sidebarFacetDateIssued" />
+                <ref bean="searchFilterAuthor" />
+                <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterIssued" />
             </list>
         </property>
         <!--The search filters which can be used on the discovery search page-->
@@ -85,6 +85,54 @@
                 <property name="max" value="5"/>
             </bean>
         </property>
+        <!--Default result per page  -->
+        <property name="defaultRpp" value="10" />
+        <property name="hitHighlightingConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightingConfiguration">
+        <property name="metadataFields">
+            <list>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="dc.title"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="dc.contributor.author"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="dc.description.abstract"/>
+                            <property name="maxSize" value="250"/>
+                            <property name="snippets" value="2"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="fulltext"/>
+                            <property name="maxSize" value="250"/>
+                            <property name="snippets" value="2"/>
+                        </bean>
+            </list>
+        </property>
+    </bean>
+        </property>
+        <property name="moreLikeThisConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration">
+                <!--When altering this list also alter the "xmlui.Discovery.RelatedItems.help" key as it describes
+                the metadata fields below-->
+                <property name="similarityMetadataFields">
+            <list>
+                        <value>dc.title</value>
+                <value>dc.contributor.author</value>
+                <value>dc.creator</value>
+                        <value>dc.subject</value>
+            </list>
+        </property>
+                <!--The minimum number of matching terms across the metadata fields above before an item is found as related -->
+                <property name="minTermFrequency" value="5"/>
+                <!--The maximum number of related items displayed-->
+                <property name="max" value="3"/>
+                <!--The minimum word length below which words will be ignored-->
+                <property name="minWordLength" value="5"/>
+    </bean>
+        </property>
     </bean>
 
 
@@ -97,45 +145,9 @@
                 <value>dc.title</value>
             </list>
         </property>
-        <property name="fullAutoComplete" value="false"/>
     </bean>
 
-    <bean id="searchFilterAuthor" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
-        <property name="indexFieldName" value="author"/>
-        <property name="metadataFields">
-            <list>
-                <value>dc.contributor.author</value>
-                <value>dc.creator</value>
-            </list>
-        </property>
-        <property name="fullAutoComplete" value="true"/>
-    </bean>
-
-    <bean id="searchFilterSubject" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
-        <property name="indexFieldName" value="subject"/>
-        <property name="metadataFields">
-            <list>
-                <value>dc.subject.*</value>
-            </list>
-        </property>
-        <property name="fullAutoComplete" value="true"/>
-    </bean>
-
-    <bean id="searchFilterIssued" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
-        <property name="indexFieldName" value="dateIssued"/>
-        <property name="metadataFields">
-            <list>
-                <value>dc.date.issued</value>
-            </list>
-        </property>
-        <property name="type" value="date"/>
-        <property name="fullAutoComplete" value="false"/>
-    </bean>
-
-
-
-    <!--Sidebar facet configuration beans-->
-    <bean id="sidebarFacetAuthor" class="org.dspace.discovery.configuration.SidebarFacetConfiguration">
+    <bean id="searchFilterAuthor" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="author"/>
         <property name="metadataFields">
             <list>
@@ -147,7 +159,7 @@
         <property name="sortOrder" value="COUNT"/>
     </bean>
 
-    <bean id="sidebarFacetSubject" class="org.dspace.discovery.configuration.SidebarFacetConfiguration">
+    <bean id="searchFilterSubject" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="subject"/>
         <property name="metadataFields">
             <list>
@@ -158,7 +170,7 @@
         <property name="sortOrder" value="COUNT"/>
     </bean>
 
-    <bean id="sidebarFacetDateIssued" class="org.dspace.discovery.configuration.SidebarFacetConfiguration">
+    <bean id="searchFilterIssued" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="dateIssued"/>
         <property name="metadataFields">
             <list>
@@ -169,7 +181,6 @@
         <property name="sortOrder" value="VALUE"/>
     </bean>
 
-
     <!--Sort properties-->
     <bean id="sortTitle" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
         <property name="metadataField" value="dc.title"/>
@@ -179,4 +190,5 @@
         <property name="metadataField" value="dc.date.issued"/>
         <property name="type" value="date"/>
     </bean>
+    
 </beans>

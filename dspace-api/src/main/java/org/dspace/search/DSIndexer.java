@@ -67,6 +67,7 @@ import org.dspace.sort.SortOption;
 import org.dspace.sort.OrderFormat;
 
 import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.app.util.Util;
 
 /**
  * DSIndexer contains the methods that index Items and their metadata,
@@ -1071,16 +1072,22 @@ public class DSIndexer
                 //Index the controlled vocabularies localized display values for all localized input-forms.xml (e.g. input-forms_el.xml)
                 if ("inputform".equalsIgnoreCase(indexConfigArr[i].type)){
 
-                    List newValues=new ArrayList<String>();
-                    String displayValue;
+                    List<String> newValues = new ArrayList<String>();
                     Locale[] supportedLocales=I18nUtil.getSupportedLocales();
 
-                    //Get the display value of the respective stored value
-                    for (int k=0;k<supportedLocales.length;k++){
-                        List displayValues=new ArrayList<String>();
-                        displayValues = org.dspace.app.util.Util.getControlledVocabulariesDisplayValueLocalized(item, mydc,indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier,  supportedLocales[k]);
-                        if (displayValues!=null && !displayValues.isEmpty()){
-                            for (int d=0;d<displayValues.size();d++){
+                    // Get the display value of the respective stored value
+                    for (int k = 0; k < supportedLocales.length; k++)
+                    {
+                        List<String> displayValues = Util
+                                .getControlledVocabulariesDisplayValueLocalized(
+                                        item, mydc, indexConfigArr[i].schema,
+                                        indexConfigArr[i].element,
+                                        indexConfigArr[i].qualifier,
+                                        supportedLocales[k]);
+                        if (displayValues != null && !displayValues.isEmpty())
+                        {
+                            for (int d = 0; d < displayValues.size(); d++)
+                            {
                                 newValues.add(displayValues.get(d));
                             }
                         }
@@ -1094,7 +1101,7 @@ public class DSIndexer
                                 String toAdd=(String) newValues.get(m);
                                 doc.add( new Field(indexConfigArr[i].indexName,
                                         toAdd,
-                                        Field.Store.YES,
+                                        Field.Store.NO,
                                         Field.Index.ANALYZED));
                             }
                         }

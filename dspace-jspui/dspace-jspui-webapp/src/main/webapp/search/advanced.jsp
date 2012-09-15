@@ -18,6 +18,8 @@
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.search.QueryResults" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -37,6 +39,35 @@
 
         QueryResults qResults = (QueryResults)request.getAttribute("queryresults");
 
+	//Read the configuration to find out the search indices dynamically
+	int idx = 1;
+	String definition;
+	ArrayList<String> searchIndices = new ArrayList<String>();
+	int dateIndex = -1;
+	String dateIndexConfig = ConfigurationManager.getProperty("search.index.date");
+
+	while ( ((definition = ConfigurationManager.getProperty("jspui.search.index.display." + idx))) != null){
+	        
+		String index = definition;
+		searchIndices.add(index);
+		if (index.equals(dateIndexConfig))
+			dateIndex = idx+1;
+	    idx++;
+	 }
+	
+	// backward compatibility
+	if (searchIndices.size() == 0)
+	{
+	    searchIndices.add("ANY");
+	    searchIndices.add("author");
+        searchIndices.add("title");
+        searchIndices.add("keyword");
+        searchIndices.add("abstract");
+        searchIndices.add("series");
+        searchIndices.add("sponsor");
+        searchIndices.add("identifier");
+        searchIndices.add("language");
+	}
 %>
 
 <dspace:layout locbar="nolink" titlekey="jsp.search.advanced.title">
@@ -70,15 +101,15 @@
                 <%-- Search type: <br> --%>
                 <label for="tfield1"><fmt:message key="jsp.search.advanced.type"/></label> <br/>
                   <select name="field1" id="tfield1">
-                    <option value="ANY" <%= field1.equals("ANY") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.keyword"/></option>
-                    <option value="author" <%= field1.equals("author") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.author"/></option>
-                    <option value="title" <%= field1.equals("title") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.title"/></option>
-                    <option value="keyword" <%= field1.equals("keyword") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.subject"/></option>
-                    <option value="abstract" <%= field1.equals("abstract") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.abstract"/></option>
-                    <option value="series" <%= field1.equals("series") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.series"/></option>
-                    <option value="sponsor" <%= field1.equals("sponsor") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.sponsor"/></option>
-                    <option value="identifier" <%= field1.equals("identifier") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.id"/></option>
-                    <option value="language" <%= field1.equals("language") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.language"/></option>
+					<%
+						for (String index : searchIndices)
+						{
+							String key = "jsp.search.advanced.type." + index;
+					%>
+							<option value="<%= index %>" <%= field1.equals(index) ? "selected=\"selected\"" : "" %>><fmt:message key="<%= key %>"/></option>
+					<%
+						}
+					%>
                   </select>
             </td>
 
@@ -100,15 +131,15 @@
             </td>
             <td width="20%" align="left" valign="top" nowrap="nowrap">
                   <select name="field2">
-                    <option value="ANY" <%= field2.equals("ANY") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.keyword"/></option>
-                    <option value="author" <%= field2.equals("author") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.author"/></option>
-                    <option value="title" <%= field2.equals("title") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.title"/></option>
-                    <option value="keyword" <%= field2.equals("keyword") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.subject"/></option>
-                    <option value="abstract" <%= field2.equals("abstract") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.abstract"/></option>
-                    <option value="series" <%= field2.equals("series") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.series"/></option>
-                    <option value="sponsor" <%= field2.equals("sponsor") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.sponsor"/></option>
-                    <option value="identifier" <%= field2.equals("identifier") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.id"/></option>
-                    <option value="language" <%= field2.equals("language") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.language"/></option>
+                    <%
+						for (String index : searchIndices)
+						{
+							String key = "jsp.search.advanced.type." + index;
+					%>
+							<option value="<%= index %>" <%= field2.equals(index) ? "selected=\"selected\"" : "" %>><fmt:message key="<%= key %>"/></option>
+					<%
+						}
+					%>
                   </select>
            </td>
             <td align="left" valign="top" nowrap="nowrap" width="68%">
@@ -126,15 +157,15 @@
             <td width="20%" align="left" valign="top" nowrap="nowrap">
 
                   <select name="field3">
-                    <option value="ANY" <%= field3.equals("ANY") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.keyword"/></option>
-                    <option value="author" <%= field3.equals("author") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.author"/></option>
-                    <option value="title" <%= field3.equals("title") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.title"/></option>
-                    <option value="keyword" <%= field3.equals("keyword") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.subject"/></option>
-                    <option value="abstract" <%= field3.equals("abstract") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.abstract"/></option>
-                    <option value="series" <%= field3.equals("series") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.series"/></option>
-                    <option value="sponsor" <%= field3.equals("sponsor") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.sponsor"/></option>
-                    <option value="identifier" <%= field3.equals("identifier") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.id"/></option>
-                    <option value="language" <%= field3.equals("language") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.language"/></option>
+                    <%
+						for (String index : searchIndices)
+						{
+							String key = "jsp.search.advanced.type." + index;
+					%>
+							<option value="<%= index %>" <%= field3.equals(index) ? "selected=\"selected\"" : "" %>><fmt:message key="<%= key %>"/></option>
+					<%
+						}
+					%>
                   </select>
                   <br/>
             </td>

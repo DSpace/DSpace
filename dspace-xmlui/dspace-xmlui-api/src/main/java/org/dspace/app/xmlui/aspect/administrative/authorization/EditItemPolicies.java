@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.aspect.administrative.authorization;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -69,6 +70,12 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
 		message("xmlui.administrative.authorization.EditContainerPolicies.head_action");
 	private static final Message T_head_group =
 		message("xmlui.administrative.authorization.EditContainerPolicies.head_group");
+    private static final Message T_head_name =
+            message("xmlui.administrative.authorization.EditContainerPolicies.head_name");
+    private static final Message T_head_start_date =
+            message("xmlui.administrative.authorization.EditContainerPolicies.head_start_date");
+    private static final Message T_head_end_date =
+            message("xmlui.administrative.authorization.EditContainerPolicies.head_end_date");
 	
 	private static final Message T_group_edit =
 		message("xmlui.administrative.authorization.EditContainerPolicies.group_edit");
@@ -115,18 +122,21 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
 		main.addPara().addHighlight("italic").addContent(T_main_para1);
 		main.addPara().addHighlight("italic").addContent(T_main_para2);
 		
-    	Table table = main.addTable("policies-confirm-delete",itemPolicies.size() + 3, 5);
+    	Table table = main.addTable("policies-confirm-delete",itemPolicies.size() + 3, 8);
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCell();
         header.addCell().addContent(T_head_id);
+        header.addCell().addContent(T_head_name);
         header.addCell().addContent(T_head_action);
         header.addCell().addContent(T_head_group);
         header.addCell();
+        header.addCell().addContent(T_head_start_date);
+        header.addCell().addContent(T_head_end_date);
 
-        
+
         // First, the item's policies are listed
         Row subheader = table.addRow(null,Row.ROLE_HEADER,"subheader");
-        subheader.addCell(1, 4).addHighlight("bold").addContent(T_subhead_item);
+        subheader.addCell(1, 7).addHighlight("bold").addContent(T_subhead_item);
         subheader.addCell().addHighlight("bold").addXref(baseURL + "&submit_add_item", T_add_itemPolicy_link);
         
         this.rowBuilder(baseURL, table, itemPolicies, item.getID(), Constants.ITEM, highlightID);
@@ -134,7 +144,7 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
     	// Next, one by one, we get the bundles
     	for (Bundle bundle : bundles) {
     		subheader = table.addRow(null,Row.ROLE_HEADER,"subheader");
-    		subheader.addCell(null, null, 1, 4, "indent").addHighlight("bold").addContent(T_subhead_bundle.parameterize(bundle.getName(),bundle.getID()));
+    		subheader.addCell(null, null, 1, 7, "indent").addHighlight("bold").addContent(T_subhead_bundle.parameterize(bundle.getName(),bundle.getID()));
     		subheader.addCell().addHighlight("bold").addXref(baseURL + "&submit_add_bundle_" + bundle.getID(), T_add_bundlePolicy_link);
 
     		ArrayList<ResourcePolicy> bundlePolicies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, bundle);
@@ -144,7 +154,7 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
     		bitstreams = bundle.getBitstreams();
     		for (Bitstream bitstream : bitstreams) {
     			subheader = table.addRow(null,Row.ROLE_HEADER,"subheader");
-        		subheader.addCell(null, null, 1, 4, "doubleIndent").addContent(T_subhead_bitstream.parameterize(bitstream.getName(),bitstream.getID()));
+        		subheader.addCell(null, null, 1, 7, "doubleIndent").addContent(T_subhead_bitstream.parameterize(bitstream.getName(),bitstream.getID()));
         		subheader.addCell().addXref(baseURL + "&submit_add_bitstream_" + bitstream.getID(), T_add_bitstreamPolicy_link);
 
         		ArrayList<ResourcePolicy> bitstreamPolicies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, bitstream);
@@ -165,7 +175,7 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
 	{
 		// If the list of policies is empty, say so
 		if (policies == null || policies.size() == 0) {
-			table.addRow().addCell(1, 4).addHighlight("italic").addContent(T_no_policies);
+			table.addRow().addCell(1, 8).addHighlight("italic").addContent(T_no_policies);
 		}
 		// Otherwise, iterate over the given policies, creating a new table row for each one
 		else {
@@ -206,6 +216,13 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
 	        	
 	        	row.addCell().addXref(baseURL + "&submit_edit&policy_id=" + policy.getID() + 
 	        			"&object_id=" + objectID + "&object_type=" + objectType, String.valueOf(policy.getID()));
+
+                // name
+                String name = "";
+                if(policy.getRpName() != null)
+                    name=policy.getRpName();
+                row.addCell().addContent(name);
+
 	        	row.addCell().addXref(baseURL + "&submit_edit&policy_id=" + policy.getID() + 
 	        			"&object_id=" + objectID + "&object_type=" + objectType, policy.getActionText());
 	        	if (policyGroup != null) {
@@ -219,9 +236,23 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
 	        	else {
 	            	row.addCell(1,2).addContent("...");
 	        	}
-		    }
+
+                // startDate
+                if(policy.getStartDate()!=null){
+                    row.addCell().addContent(DateFormatUtils.format(policy.getStartDate(), "yyyy-MM-dd"));
+                }
+                else{
+                    row.addCell().addContent("");
+                }
+
+                // endDate
+                if(policy.getEndDate()!=null){
+                    row.addCell().addContent(DateFormatUtils.format(policy.getEndDate(), "yyyy-MM-dd"));
+                }
+                else{
+                    row.addCell().addContent("");
+                }
+            }
 		}
 	}
-	
-	
 }

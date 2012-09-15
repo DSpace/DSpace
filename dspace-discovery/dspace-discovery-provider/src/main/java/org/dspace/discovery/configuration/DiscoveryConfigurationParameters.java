@@ -16,7 +16,10 @@ public class DiscoveryConfigurationParameters {
 
     public static final String TYPE_TEXT = "text";
     public static final String TYPE_DATE = "date";
-    public static final String TYPE_AC = "date";
+    public static final String TYPE_HIERARCHICAL = "hierarchical";
+    public static final String TYPE_AC = "ac";
+    public static final String TYPE_AUTHORITY = "authority";
+    public static final String TYPE_STANDARD = "standard";
 
     public static enum SORT {VALUE, COUNT}
 

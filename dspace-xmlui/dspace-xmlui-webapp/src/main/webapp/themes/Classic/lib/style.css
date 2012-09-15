@@ -288,6 +288,8 @@ div.pagination {
 div.pagination-masked {
 		position: relative;
 		margin: 10px 20px 10px 20px;
+    /*Property below is required for IE7 when using discovery*/
+    z-index: 9999;
 }
 
 a.previous-page-link {
@@ -886,3 +888,81 @@ margin: 2px 2px 0px 2px;
 /* border: 1px solid rgb(240, 240, 210); */
 }
 
+/* Start discovery layout DSpace 3.x*/
+div.discoverySearchBox label{
+    width: auto;
+}
+
+input#aspect_discovery_SimpleSearch_field_query{
+    width: 700px;
+}
+
+input.search-icon{
+    background-image: url('../images/search_icon_000000_20x20.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    text-indent: -1000px;
+    /*Css props below are required for IE*/
+    font-size: 0;
+    line-height: 0;
+    background-color: #F3F3F3;
+    border: 1px solid #000000;
+}
+
+
+div.controls-gear-wrapper{
+    float: none;
+    position: absolute;
+    top: 0;
+}
+
+div.gear-icon{
+    background-image: url('../images/gear_000000_25x25.png');
+}
+
+ul.gear-selection li.gear-option-selected{
+    background: url('../images/check_606060_15x15.png') no-repeat 3px center;
+}
+
+
+table.discovery-filters input.filter-control {
+    width: 30px;
+    margin-left: 5px;
+    text-indent: -1000px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    height: 22px;
+    float: left;
+    /*Css props below are required for IE*/
+    font-size: 0;
+    display:block;
+    line-height: 0;
+}
+
+table.discovery-filters input.filter-control.filter-remove{
+    margin-left: 15px;
+    background-image: url('../images/remove_icon_000000_16x16.png');
+    background-color: #F3F3F3;
+    border: 1px solid #000000;
+}
+
+table.discovery-filters input.filter-control.filter-add{
+    background-image: url('../images/plus_icon_000000_16x16.png');
+    background-color: #F3F3F3;
+    border: 1px solid #000000;
+}
+
+ul.gear-selection{
+    left: 0;
+    right: auto;
+}
+
+ul.gear-selection li {
+    margin-left: 0;
+}
+
+div#aspect_discovery_SimpleSearch_div_search a.previous-page-link {
+    left: 80px;
+}
+
+/* End discovery layout DSpace 3.x*/

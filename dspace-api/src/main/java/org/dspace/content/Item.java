@@ -10,6 +10,7 @@ package org.dspace.content;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -186,6 +187,9 @@ public class Item extends DSpaceObject
         TableRow row = DatabaseManager.create(context, "item");
         Item i = new Item(context, row);
 
+        // set discoverable to true (default)
+        i.setDiscoverable(true);
+
         // Call update to give the item a last modified date. OK this isn't
         // amazingly efficient but creates don't happen that often.
         context.turnOffAuthorisationSystem();
@@ -217,6 +221,24 @@ public class Item extends DSpaceObject
 
         return new ItemIterator(context, rows);
     }
+    
+    /**
+     * Get all "final" items in the archive, both archived ("in archive" flag) or
+     * withdrawn items are included. The order of the list is indeterminate.
+     *
+     * @param context
+     *            DSpace context object
+     * @return an iterator over the items in the archive.
+     * @throws SQLException
+     */
+	public static ItemIterator findAllUnfiltered(Context context) throws SQLException
+    {
+        String myQuery = "SELECT * FROM item WHERE in_archive='1' or withdrawn='1'";
+
+        TableRowIterator rows = DatabaseManager.queryTable(context, "item", myQuery);
+
+        return new ItemIterator(context, rows);
+	}
 
     /**
      * Find all the items in the archive by a given submitter. The order is
@@ -250,6 +272,11 @@ public class Item extends DSpaceObject
     {
         return itemRow.getIntColumn("item_id");
     }
+
+
+
+
+
 
     /**
      * @see org.dspace.content.DSpaceObject#getHandle()
@@ -288,6 +315,16 @@ public class Item extends DSpaceObject
     }
 
     /**
+     * Find out if the item is discoverable
+     *
+     * @return true if the item is discoverable
+     */
+    public boolean isDiscoverable()
+    {
+        return itemRow.getBooleanColumn("discoverable");
+    }
+
+    /**
      * Get the date the item was last modified, or the current date if
      * last_modified is null
      *
@@ -308,11 +345,18 @@ public class Item extends DSpaceObject
 
     /**
      * Method that updates the last modified date of the item
-     * The modified boolean will be set to true and the actual date update will occur on item.update().
      */
-    void updateLastModified()
+    public void updateLastModified()
     {
-        modified = true;
+        try {
+            Date lastModified = new Timestamp(new Date().getTime());
+            itemRow.setColumn("last_modified", lastModified);
+            DatabaseManager.updateQuery(ourContext, "UPDATE item SET last_modified = ? WHERE item_id= ? ", lastModified, getID());
+            //Also fire a modified event since the item HAS been modified
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null));
+        } catch (SQLException e) {
+            log.error(LogManager.getHeader(ourContext, "Error while updating last modified timestamp", "Item: " + getID()));
+        }
     }
 
     /**
@@ -325,6 +369,18 @@ public class Item extends DSpaceObject
     public void setArchived(boolean isArchived)
     {
         itemRow.setColumn("in_archive", isArchived);
+        modified = true;
+    }
+
+    /**
+     * Set the "discoverable" flag. This is public and only
+     *
+     * @param discoverable
+     *            new value for the flag
+     */
+    public void setDiscoverable(boolean discoverable)
+    {
+        itemRow.setColumn("discoverable", discoverable);
         modified = true;
     }
 
@@ -1735,6 +1791,12 @@ public class Item extends DSpaceObject
                 itemRow.setColumn("withdrawn", false);
             }
 
+            if (itemRow.isColumnNull("discoverable"))
+            {
+                itemRow.setColumn("discoverable", false);
+            }
+
+
             DatabaseManager.update(ourContext, itemRow);
 
             if (dublinCoreChanged)
@@ -1838,9 +1900,8 @@ public class Item extends DSpaceObject
 
         ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), "WITHDRAW"));
 
-        // and all of our authorization policies
-        // FIXME: not very "multiple-inclusion" friendly
-        AuthorizeManager.removeAllPolicies(ourContext, this);
+        // remove all authorization policies, saving the custom ones
+        AuthorizeManager.removeAllPoliciesByDSOAndTypeNotEqualsTo(ourContext, this, ResourcePolicy.TYPE_CUSTOM);
 
         // Write log
         log.info(LogManager.getHeader(ourContext, "withdraw_item", "user="
@@ -2188,51 +2249,79 @@ public class Item extends DSpaceObject
     public void inheritCollectionDefaultPolicies(Collection c)
             throws java.sql.SQLException, AuthorizeException
     {
-        List<ResourcePolicy> policies;
+        adjustItemPolicies(c);
+        adjustBundleBitstreamPolicies(c);
 
-        // remove the submit authorization policies
-        // and replace them with the collection's default READ policies
-        policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c,
-                Constants.DEFAULT_ITEM_READ);
+        log.debug(LogManager.getHeader(ourContext, "item_inheritCollectionDefaultPolicies",
+                                                   "item_id=" + getID()));
+    }
 
-        // MUST have default policies
-        if (policies.size() < 1)
-        {
-            throw new java.sql.SQLException("Collection " + c.getID()
-                    + " (" + c.getHandle() + ")"
-                    + " has no default item READ policies");
-        }
+    public void adjustBundleBitstreamPolicies(Collection c) throws SQLException, AuthorizeException {
 
-        // change the action to just READ
-        // just don't call update on the resourcepolicies!!!
-        for (ResourcePolicy rp : policies)
-        {
-            rp.setAction(Constants.READ);
-        }
+        List<ResourcePolicy> defaultCollectionPolicies = AuthorizeManager.getPoliciesActionFilter(ourContext, c, Constants.DEFAULT_BITSTREAM_READ);
 
-        replaceAllItemPolicies(policies);
-
-        policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c,
-                Constants.DEFAULT_BITSTREAM_READ);
-
-        if (policies.size() < 1)
-        {
-            throw new java.sql.SQLException("Collection " + c.getID()
+        if (defaultCollectionPolicies.size() < 1){
+            throw new SQLException("Collection " + c.getID()
                     + " (" + c.getHandle() + ")"
                     + " has no default bitstream READ policies");
         }
 
-        // change the action to just READ
-        // just don't call update on the resourcepolicies!!!
-        for (ResourcePolicy rp : policies)
+        // remove all policies from bundles, add new ones
+        // Remove bundles
+        Bundle[] bunds = getBundles();
+        for (int i = 0; i < bunds.length; i++){
+            Bundle mybundle = bunds[i];
+
+            // if come from InstallItem: remove all submission/workflow policies
+            AuthorizeManager.removeAllPoliciesByDSOAndType(ourContext, mybundle, ResourcePolicy.TYPE_SUBMISSION);
+            AuthorizeManager.removeAllPoliciesByDSOAndType(ourContext, mybundle, ResourcePolicy.TYPE_WORKFLOW);
+
+            List<ResourcePolicy> policiesBundleToAdd = filterPoliciesToAdd(defaultCollectionPolicies, mybundle);
+            AuthorizeManager.addPolicies(ourContext, policiesBundleToAdd, mybundle);
+
+            for(Bitstream bitstream : mybundle.getBitstreams()){
+                // if come from InstallItem: remove all submission/workflow policies
+                AuthorizeManager.removeAllPoliciesByDSOAndType(ourContext, bitstream, ResourcePolicy.TYPE_SUBMISSION);
+                AuthorizeManager.removeAllPoliciesByDSOAndType(ourContext, bitstream, ResourcePolicy.TYPE_WORKFLOW);
+
+                List<ResourcePolicy> policiesBitstreamToAdd = filterPoliciesToAdd(defaultCollectionPolicies, bitstream);
+                AuthorizeManager.addPolicies(ourContext, policiesBitstreamToAdd, bitstream);
+            }
+        }
+    }
+
+    public void adjustItemPolicies(Collection c) throws SQLException, AuthorizeException {
+        // read collection's default READ policies
+        List<ResourcePolicy> defaultCollectionPolicies = AuthorizeManager.getPoliciesActionFilter(ourContext, c, Constants.DEFAULT_ITEM_READ);
+
+        // MUST have default policies
+        if (defaultCollectionPolicies.size() < 1)
         {
-            rp.setAction(Constants.READ);
+            throw new SQLException("Collection " + c.getID()
+                    + " (" + c.getHandle() + ")"
+                    + " has no default item READ policies");
         }
 
-        replaceAllBitstreamPolicies(policies);
+        // if come from InstallItem: remove all submission/workflow policies
+        AuthorizeManager.removeAllPoliciesByDSOAndType(ourContext, this, ResourcePolicy.TYPE_SUBMISSION);
+        AuthorizeManager.removeAllPoliciesByDSOAndType(ourContext, this, ResourcePolicy.TYPE_WORKFLOW);
 
-        log.debug(LogManager.getHeader(ourContext, "item_inheritCollectionDefaultPolicies",
-                                                   "item_id=" + getID()));
+        // add default policies only if not already in place
+        List<ResourcePolicy> policiesToAdd = filterPoliciesToAdd(defaultCollectionPolicies, this);
+        AuthorizeManager.addPolicies(ourContext, policiesToAdd, this);
+    }
+
+    private List<ResourcePolicy> filterPoliciesToAdd(List<ResourcePolicy> defaultCollectionPolicies, DSpaceObject dso) throws SQLException {
+        List<ResourcePolicy> policiesToAdd = new ArrayList<ResourcePolicy>();
+        for (ResourcePolicy rp : defaultCollectionPolicies){
+            rp.setAction(Constants.READ);
+            // if an identical policy is already in place don't add it
+            if(!AuthorizeManager.isAnIdenticalPolicyAlreadyInPlace(ourContext, dso, rp)){
+                rp.setRpType(ResourcePolicy.TYPE_INHERITED);
+                policiesToAdd.add(rp);
+            }
+        }
+        return policiesToAdd;
     }
 
     /**

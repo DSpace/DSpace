@@ -356,12 +356,27 @@
     </command>
 
     <command>
-		<name>update-discovery-index</name>
-		<description>Update Discovery Solr Search Index</description>
-		<step>
-			<class>org.dspace.discovery.IndexClient</class>
-		</step>
-	</command>
+        <name>update-discovery-index</name>
+        <description>Update Discovery Solr Search Index</description>
+        <step>
+            <class>org.dspace.discovery.IndexClient</class>
+        </step>
+    </command>
 
+    <command>
+        <name>migrate-embargo</name>
+        <description>Embargo manager tool used to migrate old version of Embargo to the new one included in dspace3</description>
+        <step>
+            <class>org.dspace.embargo.EmbargoManager</class>
+        </step>
+    </command>
+
+    <command>
+        <name>oai</name>
+        <description>OAI script manager</description>
+        <step>
+            <class>org.dspace.xoai.app.XOAI</class>
+        </step>
+    </command>
 
 </commands>

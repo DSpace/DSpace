@@ -482,10 +482,13 @@
 
     <xsl:template match="dri:list[not(@type)]/dri:item" priority="2" mode="nested">
         <li>
-            <xsl:apply-templates />
+            <xsl:call-template name="standardAttributes">
+                <xsl:with-param name="class">ds-simple-list-item</xsl:with-param>
+            </xsl:call-template>
             <!-- Wrap orphaned sub-lists into the preceding item -->
             <xsl:variable name="node-set1" select="./following-sibling::dri:list"/>
             <xsl:variable name="node-set2" select="./following-sibling::dri:item[1]/following-sibling::dri:list"/>
+            <xsl:apply-templates />
             <xsl:apply-templates select="$node-set1[count(.|$node-set2) != count($node-set2)]"/>
         </li>
     </xsl:template>
@@ -512,6 +515,9 @@
     <!-- Generic item handling for cases where nothing special needs to be done -->
     <xsl:template match="dri:item" mode="nested">
         <li>
+            <xsl:call-template name="standardAttributes">
+                <xsl:with-param name="class">ds-simple-list-item</xsl:with-param>
+            </xsl:call-template>
             <xsl:apply-templates />
         </li>
     </xsl:template>

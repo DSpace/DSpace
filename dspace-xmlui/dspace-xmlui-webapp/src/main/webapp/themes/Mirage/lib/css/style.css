@@ -816,52 +816,73 @@ td select.ds-select-field {
     margin-left: 5px;
 }
 
-form.search {
+form.search,
+div.discoverySearchBox
+{
     background-color: #fafafa;
     border: 1px solid #ebebeb;
     padding: 10px;
     margin-bottom: 15px;
 }
 
-form.search label {
+form.search label,
+div.discoverySearchBox label
+{
     font-weight: bold;
 }
 
-form.search p.ds-paragraph.button-list {
+form.search p.ds-paragraph.button-list,
+div.discoverySearchBox p.ds-paragraph.button-list
+{
     text-align: center;
     margin: 0;
 }
 
-form.search fieldset {
+form.search fieldset,
+div.discoverySearchBox fieldset {
     margin: 0;
 }
 
-form.search .ds-form-item {
+form.search .ds-form-item,
+div.discoverySearchBox .ds-form-item
+{
     margin: 0;
     padding-bottom: 5px;
 }
 
-form.search .ds-form-item select{
+form.search .ds-form-item select,
+div.discoverySearchBox .ds-form-item select
+{
     margin-top: 0;
 }
 
-form.search label.ds-composite-component .ds-select-field{
+form.search label.ds-composite-component .ds-select-field,
+div.discoverySearchBox label.ds-composite-component .ds-select-field
+{
     margin-top: 6px;
 }
 
-form.search .ds-form-item label {
+form.search .ds-form-item label,
+div.discoverySearchBox .ds-form-item label
+{
     font-size: 100%;
 }
 
-form.search .ds-form-content {
+form.search .ds-form-content,
+div.discoverySearchBox .ds-form-content
+{
     display: inline;
 }
 
-form.search table input.ds-text-field {
+form.search table input.ds-text-field,
+div.discoverySearchBox table input.ds-text-field
+{
    margin: 0;
 }
 
-form.search .field-help {
+form.search .field-help,
+div.discoverySearchBox .field-help
+{
     margin: 3px 0;
 }
 
@@ -1071,11 +1092,6 @@ form.discover-search-box{
     margin-bottom: 10px;
 }
 
-li.search-filter-list,
-li.used-filters-list
-{
-    padding-top: 5px;
-}
 
 form.discover-sort-box select{
     margin: 0 4px;
@@ -1145,4 +1161,149 @@ height: 100%;
 background-color: rgb(255, 255, 255);
 margin: 2px 2px 0px 2px;
 /* border: 1px solid rgb(240, 240, 210); */
+}
+
+#aspect_administrative_authorization_EditPolicyForm_field_start_date{
+    width: 100px;
+}
+#aspect_administrative_authorization_EditPolicyForm_field_end_date{
+    width: 100px;
+}
+#aspect_administrative_authorization_EditItemPolicies_table_policies-confirm-delete tr,
+#aspect_administrative_authorization_EditItemPolicies_table_policies-confirm-delete td
+{
+    border: 1px solid lightgray;
+}
+
+
+#aspect_administrative_authorization_AdvacedAuthorizationsForm_field_end_date{
+    width: 100px;
+}
+#aspect_administrative_authorization_AdvacedAuthorizationsForm_field_start_date{
+    width: 100px;
+}
+#aspect_submission_StepTransformer_field_embargo_until_date{
+    width: 100px;
+}
+
+#aspect_administrative_item_AddBitstreamForm_field_embargo_until_date{
+    width: 100px;
+}
+
+#aspect_administrative_item_EditBitstreamForm_field_embargo_until_date{
+    width: 100px;
+}
+
+#aspect_submission_StepTransformer_table_policies tr,
+#aspect_submission_StepTransformer_table_policies td
+{
+    border: 1px solid lightgray;
+}
+
+
+span.highlight{
+    font-weight: bold;
+}
+
+div.gear-icon{
+    background-image: url('../../images/gear_ffffff_25x25.png');
+}
+
+ul.gear-selection li.gear-option-selected{
+    background: url('../../images/check_606060_15x15.png') no-repeat 3px center;
+}
+
+input#aspect_discovery_SimpleSearch_field_query{
+    width: 565px;
+}
+
+input.search-icon{
+    background-image: url('../../images/search_icon_ffffff_20x20.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    text-indent: -1000px;
+        /*Css props below are required for IE*/
+    font-size: 0;
+    display:block;
+    line-height: 0;
+}
+
+div#aspect_discovery_SimpleSearch_div_search p.pagination-info{
+    display: none;
+}
+
+div#aspect_discovery_SimpleSearch_div_search .pagination-links{
+    float: left;
+}
+
+table.discovery-filters{
+    width: 100%;
+    background-color: #FFFFFF;
+}
+
+table.discovery-filters tr{
+    border-top: 1px solid #EBEBEB;
+}
+table.discovery-filters td{
+    padding: 0;
+}
+
+table.discovery-filters td.selection{
+    width: 1%;
+}
+
+table.discovery-filters th.new-filter-header{
+    text-align: left;
+    padding-top: 20px;
+}
+
+
+table.discovery-filters td.discovery-filter-input-cell {
+    padding-left: 3px;
+}
+
+
+table.discovery-filters tr.apply-filter{
+    background-color: #FAFAFA;
+}
+
+table.discovery-filters tr.apply-filter input{
+    width: 75px;
+    height: 33px;
+    margin-left: 5px;
+    font-size: 108%;
+}
+
+
+table.discovery-filters td.filter-controls{
+    width: 80px;
+}
+
+table.discovery-filters input.filter-control {
+    width: 30px;
+    margin-left: 5px;
+    text-indent: -1000px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    height: 22px;
+    float: left;
+    /*Css props below are required for IE*/
+    font-size: 0;
+    display:block;
+    line-height: 0;
+}
+
+table.discovery-filters input.filter-control.filter-remove{
+    margin-left: 15px;
+    background-image: url('../../images/remove_icon_ffffff_16x16.png');
+}
+
+table.discovery-filters input.filter-control.filter-add{
+    background-image: url('../../images/plus_icon_ffffff_16x16.png');
+}
+
+
+
+.searchTime{
+    color: #999999;
 }

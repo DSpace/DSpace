@@ -85,7 +85,6 @@
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.title">Title</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Subject</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued">Date issued</message>
-    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.selected">Selected filters</message>
 
 
 
@@ -102,9 +101,23 @@
 
     <message key="xmlui.Discovery.AbstractSearch.startswith">Starts with</message>
     <message key="xmlui.Discovery.AbstractSearch.startswith.help">Or enter first few letters:</message>
-    
-    <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.title_sort">Title</message>
-    <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.date.issued_dt">Issue Date</message>
+
+    <message key="xmlui.Discovery.AbstractSearch.sort_by.head">Sort Options:</message>
+    <message key="xmlui.Discovery.AbstractSearch.sort_by.relevance">Relevance</message>
+    <message key="xmlui.Discovery.AbstractSearch.sort_by.dc.title_sort_desc">Title Desc</message>
+    <message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.issued_dt_desc">Issue Date Desc</message>
+
+    <message key="xmlui.Discovery.AbstractSearch.sort_by.dc.title_sort_asc">Title Asc</message>
+    <message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.issued_dt_asc">Issue Date Asc</message>
+
+    <message key="xmlui.Discovery.AbstractSearch.rpp">Results Per Page:</message>
+
+
+    <message key="xmlui.Discovery.AbstractSearch.filters.controls.add-filter">Add Filter</message>
+    <message key="xmlui.Discovery.AbstractSearch.filters.controls.apply-filters">Apply</message>
+    <message key="xmlui.Discovery.AbstractSearch.filters.controls.remove-filter">Remove</message>
+    <message key="xmlui.Discovery.AbstractSearch.filters.controls.new-filters.head">New Filters:</message>
+    <message key="xmlui.Discovery.AbstractSearch.filters.display">Add filters</message>
 
     <message key="xmlui.discovery.SearchFacetFilter.no-results">No filter values found</message>
 
@@ -112,13 +125,26 @@
     <message key="xmlui.discovery.AbstractFiltersTransformer.filters.view-more">... View More</message>
 
 
+    <message key="xmlui.Discovery.SimpleSearch.search_scope">Search</message>
     <message key="xmlui.discovery.SimpleSearch.search_label">Search</message>
     <message key="xmlui.Discovery.SimpleSearch.filter_head">Filters</message>
-    <message key="xmlui.Discovery.SimpleSearch.filter_add">Add Filters</message>
     <message key="xmlui.Discovery.SimpleSearch.filter_help">Use filters to refine the search results.</message>
-    <message key="xmlui.Discovery.SimpleSearch.filter_apply">Update filters</message>
 
-    <message key="xmlui.Discovery.SimpleSearch.sort_head">Sort options</message>
-    <message key="xmlui.Discovery.SimpleSearch.sort_apply">Apply</message>
+    <message key="xmlui.Discovery.SimpleSearch.filter.contains">Contains</message>
+    <message key="xmlui.Discovery.SimpleSearch.filter.equals">Equals</message>
+    <message key="xmlui.Discovery.SimpleSearch.filter.authority">ID</message>
+	<message key="xmlui.Discovery.SimpleSearch.filter.notcontains">Not Contains</message>
+    <message key="xmlui.Discovery.SimpleSearch.filter.notequals">Not Equals</message>
+    <message key="xmlui.Discovery.SimpleSearch.filter.notauthority">Not ID</message>
+    
+    <message key="xmlui.Discovery.RelatedItems.head">Related items</message>
+    <message key="xmlui.Discovery.RelatedItems.help">Showing items related by title, author, creator and subject.</message>
+
+    <message key="xmlui.Discovery.AbstractSearch.head1_community">Showing {0} out of a total of {1} results for community: {2}. <span class="searchTime">({3} seconds)</span></message>
+   	<message key="xmlui.Discovery.AbstractSearch.head1_collection">Showing {0} out of a total of {1} results for collection: {2}. <span class="searchTime">({3} seconds)</span></message>
+   	<message key="xmlui.Discovery.AbstractSearch.head1_none">Showing {0} out of a total of {1} results. <span class="searchTime">({2} seconds)</span></message>
+
+    <message key="xmlui.Discovery.AbstractSearch.head2">Communities or Collections matching your query</message>
+   	<message key="xmlui.Discovery.AbstractSearch.head3">Items matching your query</message>
 
 </catalogue>

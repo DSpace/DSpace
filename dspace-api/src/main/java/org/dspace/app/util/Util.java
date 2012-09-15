@@ -358,97 +358,105 @@ public class Util {
         return sourceVersion;
     }
 
- 
-   
-
-
     /**
-     * Get a list of all the respective "displayed-value(s)" from the given 
-     * "stored-value(s)" for a specific metadata field of a DSpace Item, by reading
-     * input-forms.xml
+     * Get a list of all the respective "displayed-value(s)" from the given
+     * "stored-value(s)" for a specific metadata field of a DSpace Item, by
+     * reading input-forms.xml
      * 
      * @param item
-     *           The Dspace Item
+     *            The Dspace Item
      * @param values
-     *           A DCValue[] array of the specific "stored-value(s)"
+     *            A DCValue[] array of the specific "stored-value(s)"
      * @param schema
-     *           A String with the schema name of the metadata field
+     *            A String with the schema name of the metadata field
      * @param element
-     *           A String with the element name of the metadata field
+     *            A String with the element name of the metadata field
      * @param qualifier
-     *           A String with the qualifier name of the metadata field
-     * @return A list of the respective "displayed-values" 
+     *            A String with the qualifier name of the metadata field
+     * @return A list of the respective "displayed-values"
      */
 
-    public static List getControlledVocabulariesDisplayValueLocalized(Item item, DCValue[] values, String schema, String element, String qualifier,  Locale locale) throws SQLException, DCInputsReaderException{
-
-        List toReturn=new ArrayList<String>();
+    public static List<String> getControlledVocabulariesDisplayValueLocalized(
+            Item item, DCValue[] values, String schema, String element,
+            String qualifier, Locale locale) throws SQLException,
+            DCInputsReaderException
+    {
+        List<String> toReturn = new ArrayList<String>();
         DCInput myInputs = null;
-        boolean myInputsFound=false;
+        boolean myInputsFound = false;
         String formFileName = I18nUtil.getInputFormsFileName(locale);
-        DCInputSet inputSet = null;
-
-        //Read the input form file for the specific collection
-        DCInputsReader inputsReader = null;
         String col_handle = "";
 
         Collection collection = item.getOwningCollection();
 
-        if (collection==null)
+        if (collection == null)
         {
-           // col_handle = "db-id/" + item.getID();
-            return null;
+            // set an empty handle so to get the default input set
+            col_handle = "";
         }
-        else {
-            col_handle = collection.getHandle(); 
+        else
+        {
+            col_handle = collection.getHandle();
         }
-        if (inputsReader == null) {
-            // read configurable submissions forms data
-            inputsReader = new DCInputsReader(formFileName);
 
-        }
-        inputSet = inputsReader.getInputs(col_handle);
+        // Read the input form file for the specific collection
+        DCInputsReader inputsReader = new DCInputsReader(formFileName);
 
+        DCInputSet inputSet = inputsReader.getInputs(col_handle);
 
-        //Replace the values of DCValue[] with the correct ones in case of controlled vocabularies
-        String currentField = schema+"."+element+(qualifier==null?"":"."+qualifier);
+        // Replace the values of DCValue[] with the correct ones in case of
+        // controlled vocabularies
+        String currentField = schema + "." + element
+                + (qualifier == null ? "" : "." + qualifier);
 
-        if (inputSet!=null){
+        if (inputSet != null)
+        {
 
-            int pageNums= inputSet.getNumberPages();
+            int pageNums = inputSet.getNumberPages();
 
-            for (int p=0;p<pageNums;p++){
+            for (int p = 0; p < pageNums; p++)
+            {
 
                 DCInput[] inputs = inputSet.getPageRows(p, false, false);
 
+                if (inputs != null)
+                {
 
-                if (inputs!=null){
-
-
-                    for (int i=0; i<inputs.length;i++){
-                        String inputField=inputs[i].getSchema()+"."+inputs[i].getElement()+(inputs[i].getQualifier()==null?"":"."+inputs[i].getQualifier());
-                        if (currentField.equals(inputField)){
+                    for (int i = 0; i < inputs.length; i++)
+                    {
+                        String inputField = inputs[i].getSchema()
+                                + "."
+                                + inputs[i].getElement()
+                                + (inputs[i].getQualifier() == null ? "" : "."
+                                        + inputs[i].getQualifier());
+                        if (currentField.equals(inputField))
+                        {
 
                             myInputs = inputs[i];
-                            myInputsFound=true;
+                            myInputsFound = true;
                             break;
 
                         }
                     }
                 }
-                if (myInputsFound) break;
+                if (myInputsFound)
+                    break;
             }
-        }           
+        }
 
-        if (myInputsFound) {    
+        if (myInputsFound)
+        {
 
-            for (int j = 0; j < values.length; j++){
+            for (int j = 0; j < values.length; j++)
+            {
 
                 String pairsName = myInputs.getPairsType();
                 String stored_value = values[j].value;
-                String displayVal = myInputs.getDisplayString(pairsName,stored_value);
+                String displayVal = myInputs.getDisplayString(pairsName,
+                        stored_value);
 
-                if (displayVal!=null && !"".equals(displayVal)){
+                if (displayVal != null && !"".equals(displayVal))
+                {
 
                     toReturn.add(displayVal);
                 }

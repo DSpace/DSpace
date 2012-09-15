@@ -7,18 +7,21 @@
  */
 package org.dspace.discovery.configuration;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public class DiscoveryConfiguration {
+public class DiscoveryConfiguration implements InitializingBean{
 
     /** The configuration for the sidebar facets **/
-    private List<SidebarFacetConfiguration> sidebarFacets = new ArrayList<SidebarFacetConfiguration>();
+    private List<DiscoverySearchFilterFacet> sidebarFacets = new ArrayList<DiscoverySearchFilterFacet>();
 
     /** The default filter queries which will be applied to any search & the recent submissions **/
     private List<String> defaultFilterQueries;
@@ -31,7 +34,11 @@ public class DiscoveryConfiguration {
 
     private DiscoverySortConfiguration searchSortConfiguration;
 
+    private int defaultRpp = 10;
+    
     private String id;
+    private DiscoveryHitHighlightingConfiguration hitHighlightingConfiguration;
+    private DiscoveryMoreLikeThisConfiguration moreLikeThisConfiguration;
 
     public String getId() {
         return id;
@@ -41,12 +48,12 @@ public class DiscoveryConfiguration {
         this.id = id;
     }
 
-    public List<SidebarFacetConfiguration> getSidebarFacets() {
+    public List<DiscoverySearchFilterFacet> getSidebarFacets() {
         return sidebarFacets;
     }
 
     @Required
-    public void setSidebarFacets(List<SidebarFacetConfiguration> sidebarFacets) {
+    public void setSidebarFacets(List<DiscoverySearchFilterFacet> sidebarFacets) {
         this.sidebarFacets = sidebarFacets;
     }
 
@@ -88,4 +95,56 @@ public class DiscoveryConfiguration {
     public void setSearchSortConfiguration(DiscoverySortConfiguration searchSortConfiguration) {
         this.searchSortConfiguration = searchSortConfiguration;
     }
+    
+    public void setDefaultRpp(int defaultRpp)
+    {
+        this.defaultRpp = defaultRpp;
+    }
+    
+    public int getDefaultRpp()
+    {
+        return defaultRpp;
+    }
+
+    public void setHitHighlightingConfiguration(DiscoveryHitHighlightingConfiguration hitHighlightingConfiguration) {
+        this.hitHighlightingConfiguration = hitHighlightingConfiguration;
+    }
+
+    public DiscoveryHitHighlightingConfiguration getHitHighlightingConfiguration() {
+        return hitHighlightingConfiguration;
+    }
+
+    public void setMoreLikeThisConfiguration(DiscoveryMoreLikeThisConfiguration moreLikeThisConfiguration) {
+        this.moreLikeThisConfiguration = moreLikeThisConfiguration;
+    }
+
+    public DiscoveryMoreLikeThisConfiguration getMoreLikeThisConfiguration() {
+        return moreLikeThisConfiguration;
+    }
+
+    /**
+     * After all the properties are set check that the sidebar facets are a subset of our search filters
+     *
+     * @throws Exception throws an exception if this isn't the case
+     */
+    @Override
+    public void afterPropertiesSet() throws Exception
+    {
+        Collection missingSearchFilters = CollectionUtils.subtract(getSidebarFacets(), getSearchFilters());
+        if(CollectionUtils.isNotEmpty(missingSearchFilters))
+        {
+            StringBuilder error = new StringBuilder();
+            error.append("The following sidebar facet configurations are not present in the search filters list: ");
+            for (Object missingSearchFilter : missingSearchFilters)
+            {
+                DiscoverySearchFilter searchFilter = (DiscoverySearchFilter) missingSearchFilter;
+                error.append(searchFilter.getIndexFieldName()).append(" ");
+
+            }
+            error.append("all the sidebar facets MUST be a part of the search filters list.");
+
+            throw new DiscoveryConfigurationException(error.toString());
+        }
+
+    }   
 }
