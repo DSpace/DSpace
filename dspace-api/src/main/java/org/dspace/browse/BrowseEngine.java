@@ -418,11 +418,11 @@ public class BrowseEngine
             dao.setEnableBrowseFrequencies(browseIndex.isDisplayFrequencies());
             
             //inform dao about the tag cloud existence
-            dao.setTagCloudEnabled(browseIndex.isTagcloudEnabled());
+            dao.setOrdered(browseIndex.isTagcloudEnabled());
             
-			//inform dao about the tag cloud cutting level
-			dao.setTagCloudCuttingLevel(bs.getTagCloudCuttingLevel());
-
+            //inform dao about the tag cloud cutting level
+            dao.setCuttingLevel(bs.getTagCloudCuttingLevel());
+            
             // if we want to display frequencies, we need to pass the map table
             if (browseIndex.isDisplayFrequencies()){
             	dao.setFilterMappingTables(null, browseIndex.getMapTableName());
@@ -455,12 +455,6 @@ public class BrowseEngine
             // this is the total number of results in answer to the query
             int total = getTotalResults(true);
 
-            // if we want to display frequencies, pass to dao both count and select values
-            if (browseIndex.isDisplayFrequencies()){
-            	dao.setSelectValues(new String[]{"value", "authority"});
-            	dao.setCountValues(new String[]{"*"});
-            }
-            
             // set the ordering field (there is only one option)
             dao.setOrderField("sort_value");
 

@@ -391,11 +391,11 @@ public interface BrowseDAO
 
 	public void setEnableBrowseFrequencies(boolean enableBrowseFrequencies);
 	
-	public boolean isTagCloudEnabled();
+	public boolean isOrdered();
 
-	public void setTagCloudEnabled(boolean isTagCloudEnabled);
-	
-	public int getTagCloudCuttingLevel();
+    public void setOrdered(boolean isOrdered);
+    
+    public int getCuttingLevel();
 
-	public void setTagCloudCuttingLevel(int tagCloudCuttingLevel);
+    public void setCuttingLevel(int cuttingLevel);
 }

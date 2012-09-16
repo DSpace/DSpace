@@ -118,9 +118,10 @@ public class BrowseDAOOracle implements BrowseDAO
     private boolean itemsWithdrawn = false;
 
     private boolean enableBrowseFrequencies = true;
-    private boolean isCountQuery = false;
-    private boolean isTagCloudEnabled = false;
-    private int tagCloudCuttingLevel = 0;
+    
+    //Tag cloud specific parameters
+    private boolean isOrdered = false;
+    private int cuttingLevel = 0;
     
     public BrowseDAOOracle(Context context)
         throws BrowseException
@@ -136,8 +137,6 @@ public class BrowseDAOOracle implements BrowseDAO
      */
     public int doCountQuery() throws BrowseException
     {
-    	isCountQuery = true;
-    	
         String   query  = getQuery();
         Object[] params = getQueryParams();
 
@@ -344,8 +343,6 @@ public class BrowseDAOOracle implements BrowseDAO
      */
     public List<BrowseItem> doQuery() throws BrowseException
     {
-    	isCountQuery = false;
-    	
         String query = getQuery();
         Object[] params = getQueryParams();
 
@@ -392,8 +389,6 @@ public class BrowseDAOOracle implements BrowseDAO
      */
     public List<String[]> doValueQuery() throws BrowseException
     {
-    	isCountQuery = false;
-    	
         String query = getQuery();
         Object[] params = getQueryParams();
 
@@ -417,11 +412,11 @@ public class BrowseDAOOracle implements BrowseDAO
                 String valueResult = row.getStringColumn("value");
                 String authorityResult = row.getStringColumn("authority");
                 if (enableBrowseFrequencies){
-                	long frequency = row.getLongColumn("num");
-                	results.add(new String[]{valueResult,authorityResult, String.valueOf(frequency)});
+                    long frequency = row.getLongColumn("num");
+                    results.add(new String[]{valueResult,authorityResult, String.valueOf(frequency)});
                 }
                 else
-                	results.add(new String[]{valueResult,authorityResult, ""});
+                    results.add(new String[]{valueResult,authorityResult, ""});
             }
 
             return results;
@@ -757,9 +752,7 @@ public class BrowseDAOOracle implements BrowseDAO
     {
         StringBuffer queryBuf = new StringBuffer();
 
-        // if we want frequencies and it is not a count query, add both select and count fields in the sql query
-        if (!buildSelectListCount(queryBuf) || (enableBrowseFrequencies && !isCountQuery))
-        
+        if (!buildSelectListCount(queryBuf))
         {
             if (!buildSelectListValues(queryBuf))
             {
@@ -780,16 +773,23 @@ public class BrowseDAOOracle implements BrowseDAO
         // and include container support
         buildWhereClauseDistinctConstraints(queryBuf, params);
 
-        // Add a group by element
-        buildGroupBy(queryBuf);
-        
         // assemble the order by field
         buildOrderBy(queryBuf);
 
         // prepare the limit and offset clauses
-        if (!enableBrowseFrequencies || isCountQuery)
-        	buildRowLimitAndOffset(queryBuf, params);
+        buildRowLimitAndOffset(queryBuf, params);
 
+        //If we want frequencies and this is not a count query, enchance the query accordingly
+        if (isEnableBrowseFrequencies() && countValues==null){
+            String before = "SELECT count(*) AS num, values.value, values.authority, values."+orderField+" FROM (";
+            String after = ") values , "+tableMap+" WHERE values.id = "+tableMap+".distinct_id GROUP BY "+tableMap+
+                    ".distinct_id, values.value, values.authority, values.sort_value";
+            
+            queryBuf.insert(0, before);
+            queryBuf.append(after);
+            buildOrderBy(queryBuf);
+        }
+        
         return queryBuf.toString();
     }
 
@@ -837,38 +837,6 @@ public class BrowseDAOOracle implements BrowseDAO
     }
 
     /**
-     * Get the clause to perform search result grouping in case frequencies are enabled.  This will
-     * return something of the form:
-     *
-     * <code>
-     * GROUP BY [field]
-     * </code>
-     *
-     * @return  the ORDER BY clause
-     */
-    private void buildGroupBy(StringBuffer queryBuf)
-    {
-    	// add group by only if we want frequencies and it nota count query
-    	if (selectValues != null && selectValues.length > 0 && enableBrowseFrequencies && !isCountQuery)
-        {
-    		String distable = table;
-    		if (enableBrowseFrequencies && !isCountQuery){
-        		distable = "distable";
-        	}
-        	
-            queryBuf.append(" GROUP BY ");
-            queryBuf.append(distable).append(".").append(selectValues[0]);
-            for (int i = 1; i < selectValues.length; i++)
-            {
-                queryBuf.append(", ");
-                queryBuf.append(distable).append(".").append(selectValues[i]);
-            }
-            queryBuf.append(", ");
-            queryBuf.append(distable).append(".").append("sort_value");
-        }
-    }
-    
-    /**
      * Get the clause to perform search result ordering.  This will
      * return something of the form:
      *
@@ -878,7 +846,13 @@ public class BrowseDAOOracle implements BrowseDAO
      */
     private void buildOrderBy(StringBuffer queryBuf)
     {
-        if (orderField != null)
+        if ((countValues == null || countValues.length == 0) && isOrdered){
+            queryBuf.append(" ORDER BY ");
+            queryBuf.append("freqtable.freq");
+            queryBuf.append(" DESC ");
+            queryBuf.append(" NULLS LAST ");
+        }
+        else if (orderField != null)
         {
             queryBuf.append(" ORDER BY ");
             queryBuf.append(orderField);
@@ -1012,16 +986,14 @@ public class BrowseDAOOracle implements BrowseDAO
     {
         if (containerTable != null)
         {
-        	if (!enableBrowseFrequencies || isCountQuery || !isDistinct())
-        		queryBuf.append(containerTable);
+            queryBuf.append(containerTable);
         }
 
         if (tableMap != null)
         {
             if (containerTable != null)
             {
-            	if (!enableBrowseFrequencies || isCountQuery || !isDistinct())
-            		queryBuf.append(", ");
+                queryBuf.append(", ");
             }
 
             queryBuf.append(tableMap);
@@ -1090,24 +1062,18 @@ public class BrowseDAOOracle implements BrowseDAO
     {
         if (selectValues != null && selectValues.length > 0)
         {
-        	// if we want frequencies, count select is already added so add the comma
-        	if (countValues != null && countValues.length > 0 && enableBrowseFrequencies){
-        		queryBuf.append(", ");
-        	}
-        	
-        	String distable = table;
-        	if (enableBrowseFrequencies && !isCountQuery && isDistinct()){
-        		distable = "distable";
-        	}
-        	
-            queryBuf.append(distable).append(".").append(selectValues[0]);
-            
+            queryBuf.append(table).append(".").append(selectValues[0]);
             for (int i = 1; i < selectValues.length; i++)
             {
                 queryBuf.append(", ");
-                queryBuf.append(distable).append(".").append(selectValues[i]);
+                queryBuf.append(table).append(".").append(selectValues[i]);
             }
 
+            //in case of ordered query
+            if ((countValues == null || countValues.length == 0) && isOrdered){
+                queryBuf.append(", freqtable.freq");
+            }
+            
             return true;
         }
 
@@ -1141,17 +1107,20 @@ public class BrowseDAOOracle implements BrowseDAO
         // Then append the table
         queryBuf.append(" FROM ");
         queryBuf.append(table);
-        if (/*containerTable != null && */tableMap != null)
+        if (containerTable != null || (value != null && valueField != null && tableDis != null && tableMap != null))
         {
-        	// If we don't want frequencies, distinct element is added for a faster sql query
-        	if (containerTable != null && !enableBrowseFrequencies)
-        		queryBuf.append(", (SELECT DISTINCT ").append(tableMap).append(".distinct_id ");
-        	else //otherwise... remove distinct
-        		queryBuf.append(", (SELECT ").append(tableMap).append(".distinct_id ");
+            queryBuf.append(", (SELECT ");
+            if (containerTable != null)
+            {
+                queryBuf.append(containerTable).append(".item_id");
+            }
+            else
+            {
+                queryBuf.append("DISTINCT ").append(tableMap).append(".item_id");
+            }
             queryBuf.append(" FROM ");
             buildFocusedSelectTables(queryBuf);
-            if (containerTable != null && tableMap != null)
-            	queryBuf.append(" WHERE ");
+            queryBuf.append(" WHERE ");
             buildFocusedSelectClauses(queryBuf, params);
             queryBuf.append(") mappings");
         }
@@ -1187,52 +1156,26 @@ public class BrowseDAOOracle implements BrowseDAO
 
         // Then append the table
         queryBuf.append(" FROM ");
-        if (enableBrowseFrequencies && !isCountQuery && containerTable==null){
-        	if (isTagCloudEnabled){
-        		queryBuf.append("(SELECT DISTINCT "+table+".*, temp1.num2 FROM "+table+
-        				", (SELECT COUNT(*) AS num2, "+tableMap+".distinct_id AS distinctid from "+tableMap+
-        				" GROUP BY "+tableMap+".distinct_id ORDER BY num2 DESC) temp1 WHERE "+table+
-        				".id=temp1.distinctid and temp1.num2>"+tagCloudCuttingLevel+
-        				" ORDER BY temp1.num2 DESC LIMIT "+limit+") distable");
-        	}
-        	else {
-        		queryBuf.append("(SELECT "+table+".* FROM "+table+" ORDER BY "+orderField+" ASC NULLS LAST");//
-        		buildRowLimitAndOffset(queryBuf, queryParams);
-        		queryBuf.append(") distable");
-        	}
+        queryBuf.append(table);
+        if ((countValues == null || countValues.length == 0) && isOrdered){
+            if (containerTable != null && tableMap != null){
+                queryBuf.append(", (SELECT COUNT(*) AS freq, "+tableMap+".distinct_id AS distinctid from "+containerTable+
+                        ", "+tableMap+" WHERE "+tableMap+".item_id="+containerTable+".item_id AND "+containerTable+
+                        "."+containerIDField+"="+containerID+
+                        " GROUP BY "+tableMap+".distinct_id ORDER BY freq DESC) freqtable");
+            }
+            else { 
+                queryBuf.append(", (SELECT COUNT(*) AS freq, "+tableMap+".distinct_id AS distinctid from "+tableMap+
+                    " GROUP BY "+tableMap+".distinct_id ORDER BY freq DESC) freqtable");
+            }
         }
-        else if (enableBrowseFrequencies && !isCountQuery && containerTable!=null){
-        	if (isTagCloudEnabled){
-        		queryBuf.append("(SELECT DISTINCT "+table+".*, temp1.num2 FROM "+table+
-        				", (SELECT COUNT(*) AS num2, "+tableMap+".distinct_id AS distinctid from "+tableMap+
-        				", "+containerTable+" WHERE "+tableMap+".item_id="+containerTable+".item_id AND "+containerTable+
-        				".collection_id="+containerID+" GROUP BY "+tableMap+".distinct_id ORDER BY num2 DESC)"+
-        				" temp1 WHERE "+table+
-        				".id=temp1.distinctid and temp1.num2>"+tagCloudCuttingLevel+
-        				" ORDER BY temp1.num2 DESC LIMIT "+limit+") distable");
-        	}
-        	else {
-        		queryBuf.append("(SELECT "+table+".* FROM "+table+", (SELECT DISTINCT "+tableMap+
-            			".distinct_id FROM "+containerTable+", "+tableMap+" WHERE "+tableMap+".item_id="+containerTable+
-            			".item_id AND "+containerTable+".collection_id="+containerID+" ) mappings WHERE "+table+
-            			".id=mappings.distinct_id  ORDER BY "+orderField+" ASC NULLS LAST");
-            	buildRowLimitAndOffset(queryBuf, queryParams);
-            	queryBuf.append(") distable");
-        	}
-        }
-        else {
-        	queryBuf.append(table);
-        }
-        if (containerTable != null && tableMap != null)
+        else if (containerTable != null && tableMap != null)
         {
             queryBuf.append(", (SELECT DISTINCT ").append(tableMap).append(".distinct_id ");
             queryBuf.append(" FROM ");
             buildFocusedSelectTables(queryBuf);
-            if (!enableBrowseFrequencies || isCountQuery){
-            	if (containerTable != null && tableMap != null)
-            		queryBuf.append(" WHERE ");
-            	buildFocusedSelectClauses(queryBuf, params);
-            }
+            queryBuf.append(" WHERE ");
+            buildFocusedSelectClauses(queryBuf, params);
             queryBuf.append(") mappings");
         }
         queryBuf.append(" ");
@@ -1257,15 +1200,14 @@ public class BrowseDAOOracle implements BrowseDAO
     {
         // add the constraint to community or collection if necessary
         // and desired
-        if (containerIDField != null && containerID != -1 && containerTable != null)
-        {
-        	String distable = table;
-        	if (enableBrowseFrequencies && !isCountQuery){
-        		distable = "distable";
-        	}
-        	
+        if ((countValues == null || countValues.length == 0) && isOrdered){
             buildWhereClauseOpInsert(queryBuf);
-            queryBuf.append(" ").append(distable).append(".id=mappings.distinct_id ");
+            queryBuf.append(" ").append(table+".id=freqtable.distinctid and freqtable.freq>"+cuttingLevel);
+        }
+        else if (containerIDField != null && containerID != -1 && containerTable != null)
+        {
+            buildWhereClauseOpInsert(queryBuf);
+            queryBuf.append(" ").append(table).append(".id=mappings.distinct_id ");
         }
     }
 
@@ -1292,13 +1234,8 @@ public class BrowseDAOOracle implements BrowseDAO
         {
             if (containerIDField != null && containerID != -1)
             {
-            	String distable = table;
-            	if (enableBrowseFrequencies && !isCountQuery && containerTable==null && isDistinct()){
-            		distable = "distable";
-            	}
-            	
                 buildWhereClauseOpInsert(queryBuf);
-                queryBuf.append(" ").append(distable).append(".item_id=mappings.item_id ");
+                queryBuf.append(" ").append(table).append(".item_id=mappings.item_id ");
             }
         }
     }
@@ -1369,12 +1306,7 @@ public class BrowseDAOOracle implements BrowseDAO
             queryBuf.append(" ");
             if (tableDis != null && tableMap != null)
             {
-            	String distable = table;
-            	if (enableBrowseFrequencies && !isCountQuery && containerTable==null && isDistinct()){
-            		distable = "distable";
-            	}
-            	
-                queryBuf.append(distable).append(".item_id=mappings.item_id ");
+                queryBuf.append(table).append(".item_id=mappings.item_id ");
             }
             else
             {
@@ -1514,26 +1446,30 @@ public class BrowseDAOOracle implements BrowseDAO
     }
     
     public boolean isEnableBrowseFrequencies() {
-		return enableBrowseFrequencies;
-	}
+        return enableBrowseFrequencies;
+    }
 
-	public void setEnableBrowseFrequencies(boolean enableBrowseFrequencies) {
-		this.enableBrowseFrequencies = enableBrowseFrequencies;
-	}
-	
-	 public boolean isTagCloudEnabled() {
- 		return isTagCloudEnabled;
- 	}
+    public void setEnableBrowseFrequencies(boolean enableBrowseFrequencies) {
+        this.enableBrowseFrequencies = enableBrowseFrequencies;
+    }
+    
+    public boolean isOrdered()
+    {
+        return isOrdered;
+    }
 
- 	public void setTagCloudEnabled(boolean isTagCloudEnabled) {
- 		this.isTagCloudEnabled = isTagCloudEnabled;
- 	}
- 	
- 	public int getTagCloudCuttingLevel() {
-		return tagCloudCuttingLevel;
-	}
+    public void setOrdered(boolean isOrdered)
+    {
+        this.isOrdered = isOrdered;
+    }
 
-	public void setTagCloudCuttingLevel(int tagCloudCuttingLevel) {
-		this.tagCloudCuttingLevel = tagCloudCuttingLevel;
-	}
+    public int getCuttingLevel()
+    {
+        return cuttingLevel;
+    }
+
+    public void setCuttingLevel(int cuttingLevel)
+    {
+        this.cuttingLevel = cuttingLevel;
+    }
 }
