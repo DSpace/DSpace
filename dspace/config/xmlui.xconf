@@ -121,8 +121,6 @@
         <!-- <theme name="Test Theme 1" handle="123456789/1" path="theme1/"/>    -->
         <!-- <theme name="Test Theme 2" regex="community-list" path="theme2/"/> -->
 
-			    <theme name="Elastic Search Statistics Theme" regex="stats" path="dashboard/" />
-
         <!-- Mirage theme, @mire contributed theme, default since DSpace 3.0 -->
         <theme name="Atmire Mirage Theme" regex=".*" path="Mirage/" />
 

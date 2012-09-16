@@ -6,6 +6,10 @@
 (function (context) {
 
     (function ($) {
+        // ## Add jQuery datepicker functionality to the ReportGenerator
+        $(".date-picker").datepicker({dateFormat: "mm/dd/yy"});
+
+
         var dateStart = new Date($('input[name=dateStart]').val());
         var dateEnd = new Date($('input[name=dateEnd]').val());
 
@@ -118,7 +122,7 @@
 
             // Add a child element
             var par = $('#' + c.parentElement);
-            par.append("<div style='height:280px; width:750px;' " +
+            par.append("<div style='height:280px; width:675px;' " +
                 "id='dspaceChart_" + c.name + "'> </div>");
             this.charts[c.name] = {
               chart: new google.visualization[c.chartType](
