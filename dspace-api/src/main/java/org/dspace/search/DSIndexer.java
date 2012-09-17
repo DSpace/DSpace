@@ -66,6 +66,9 @@ import org.dspace.handle.HandleManager;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.OrderFormat;
 
+import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.app.util.Util;
+
 /**
  * DSIndexer contains the methods that index Items and their metadata,
  * collections, communities, etc. It is meant to either be invoked from the
@@ -251,7 +254,7 @@ public class DSIndexer
      * @throws SQLException
      * @throws IOException
      */
-    public static void indexContent(Context context, DSpaceObject dso) throws SQLException
+    public static void indexContent(Context context, DSpaceObject dso) throws SQLException, DCInputsReaderException
     {
     	indexContent(context, dso, false);
     }
@@ -267,7 +270,7 @@ public class DSIndexer
      * @throws SQLException
      * @throws IOException
      */
-    public static void indexContent(Context context, DSpaceObject dso, boolean force) throws SQLException
+    public static void indexContent(Context context, DSpaceObject dso, boolean force) throws SQLException, DCInputsReaderException
     {
         try
         {
@@ -649,7 +652,7 @@ public class DSIndexer
     }
 
 
-    static IndexingTask prepareIndexingTask(DSpaceObject dso, boolean force) throws SQLException, IOException
+    static IndexingTask prepareIndexingTask(DSpaceObject dso, boolean force) throws SQLException, IOException, DCInputsReaderException
     {
         String handle = dso.getHandle();
         Term term = new Term("handle", handle);
@@ -1037,7 +1040,7 @@ public class DSIndexer
      * @throws SQLException
      * @throws IOException
      */
-    private static Document buildDocumentForItem(Item item) throws SQLException, IOException
+    private static Document buildDocumentForItem(Item item) throws SQLException, IOException, DCInputsReaderException
     {
     	String handle = item.getHandle();
 
@@ -1065,7 +1068,49 @@ public class DSIndexer
                     mydc = item.getMetadata(indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier, Item.ANY);
                 }
 
-                for (j = 0; j < mydc.length; j++)
+               
+                //Index the controlled vocabularies localized display values for all localized input-forms.xml (e.g. input-forms_el.xml)
+                if ("inputform".equalsIgnoreCase(indexConfigArr[i].type)){
+
+                    List<String> newValues = new ArrayList<String>();
+                    Locale[] supportedLocales=I18nUtil.getSupportedLocales();
+
+                    // Get the display value of the respective stored value
+                    for (int k = 0; k < supportedLocales.length; k++)
+                    {
+                        List<String> displayValues = Util
+                                .getControlledVocabulariesDisplayValueLocalized(
+                                        item, mydc, indexConfigArr[i].schema,
+                                        indexConfigArr[i].element,
+                                        indexConfigArr[i].qualifier,
+                                        supportedLocales[k]);
+                        if (displayValues != null && !displayValues.isEmpty())
+                        {
+                            for (int d = 0; d < displayValues.size(); d++)
+                            {
+                                newValues.add(displayValues.get(d));
+                            }
+                        }
+
+                    }
+
+                    if (newValues!=null){
+                        for (int m=0;m<newValues.size();m++){
+                            if (!"".equals(newValues.get(m))){
+
+                                String toAdd=(String) newValues.get(m);
+                                doc.add( new Field(indexConfigArr[i].indexName,
+                                        toAdd,
+                                        Field.Store.NO,
+                                        Field.Index.ANALYZED));
+                            }
+                        }
+                    }
+
+                }
+
+           
+             for (j = 0; j < mydc.length; j++)
                 {
                     if (!StringUtils.isEmpty(mydc[j].value))
                     {
