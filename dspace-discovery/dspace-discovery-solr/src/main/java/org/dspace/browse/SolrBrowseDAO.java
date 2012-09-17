@@ -134,6 +134,8 @@ public class SolrBrowseDAO implements BrowseDAO
 
     private boolean itemsWithdrawn = false;
     private boolean itemsPrivate = false;
+
+    private boolean showFrequencies;
     
     private DiscoverResult getSolrResponse() throws BrowseException
     {
@@ -265,8 +267,10 @@ public class SolrBrowseDAO implements BrowseDAO
             for (int i = start; i < (start + max) && i < count; i++)
             {
                 FacetResult c = facet.get(i);
+                String freq = showFrequencies ? String.valueOf(c.getCount())
+                        : "";
                 result.add(new String[] { c.getDisplayedValue(),
-                        c.getAuthorityKey() });
+                        c.getAuthorityKey(), freq });
             }
         }
         else
@@ -275,8 +279,10 @@ public class SolrBrowseDAO implements BrowseDAO
                     && i >= 0; i--)
             {
                 FacetResult c = facet.get(i);
+                String freq = showFrequencies ? String.valueOf(c.getCount())
+                        : "";
                 result.add(new String[] { c.getDisplayedValue(),
-                        c.getAuthorityKey() });
+                        c.getAuthorityKey(), freq });
             }
         }
 
@@ -374,6 +380,18 @@ public class SolrBrowseDAO implements BrowseDAO
         {
             return doCountQuery() - ascValue;
         }
+    }
+    
+    @Override
+    public boolean isEnableBrowseFrequencies()
+    {
+        return showFrequencies;
+    }
+    
+    @Override
+    public void setEnableBrowseFrequencies(boolean enableBrowseFrequencies)
+    {
+        showFrequencies = enableBrowseFrequencies;        
     }
 
     /*

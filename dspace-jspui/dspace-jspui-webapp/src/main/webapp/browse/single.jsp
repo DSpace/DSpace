@@ -25,6 +25,7 @@
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="org.dspace.core.Utils" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 
 <%
     request.setAttribute("LanguageSwitch", "hide");
@@ -308,6 +309,7 @@
             <tr>
                 <td class="<%= row %>RowOddCol">
                     <a href="<%= sharedLink %><% if (results[i][1] != null) { %>&amp;authority=<%= URLEncoder.encode(results[i][1], "UTF-8") %>" class="authority <%= bix.getName() %>"><%= Utils.addEntities(results[i][0]) %></a> <% } else { %>&amp;value=<%= URLEncoder.encode(results[i][0], "UTF-8") %>"><%= Utils.addEntities(results[i][0]) %></a> <% } %>
+					<%= StringUtils.isNotBlank(results[i][2])?" ["+results[i][2]+"]":""%>
                 </td>
             </tr>
 <%

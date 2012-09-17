@@ -18,6 +18,7 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.util.HashUtil;
+import org.apache.commons.lang.StringUtils;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -328,6 +329,10 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                     Cell cell = singleTable.addRow().addCell();
                     cell.addXref(super.generateURL(BROWSE_URL_BASE, queryParams),
                           singleEntry[0]);
+                    if (StringUtils.isNotEmpty(singleEntry[2]))
+                    {
+                        cell.addContent(" ["+singleEntry[2]+"]");
+                    }
                 }  
             }
         }
