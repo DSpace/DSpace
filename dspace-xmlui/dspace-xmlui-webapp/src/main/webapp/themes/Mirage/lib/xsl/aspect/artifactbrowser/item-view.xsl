@@ -31,7 +31,9 @@
     xmlns:xalan="http://xml.apache.org/xalan"
     xmlns:encoder="xalan://java.net.URLEncoder"
     xmlns:util="org.dspace.app.xmlui.utils.XSLUtils"
-    exclude-result-prefixes="xalan encoder i18n dri mets dim xlink xsl util">
+    xmlns:jstring="java.lang.String"
+    xmlns:rights="http://cosimo.stanford.edu/sdr/metsrights/"
+    exclude-result-prefixes="xalan encoder i18n dri mets dim xlink xsl util jstring rights">
 
     <xsl:output indent="yes"/>
 
@@ -481,16 +483,57 @@
                 </xsl:if>
             </div>
             <div class="file-link" style="height: {$thumbnail.maxheight}px;">
-                <a>
-                    <xsl:attribute name="href">
-                        <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
-                    </xsl:attribute>
-                    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-viewOpen</i18n:text>
-                </a>
+                <xsl:choose>
+                    <xsl:when test="@ADMID">
+                        <xsl:call-template name="display-rights"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:call-template name="view-open"/>
+                    </xsl:otherwise>
+                </xsl:choose>
             </div>
         </div>
+    </xsl:template>
 
+    <xsl:template name="view-open">
+        <a>
+            <xsl:attribute name="href">
+                <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+            </xsl:attribute>
+            <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-viewOpen</i18n:text>
+        </a>
+    </xsl:template>
 
+    <xsl:template name="display-rights">
+        <xsl:variable name="file_id" select="jstring:replaceAll(jstring:replaceAll(string(@ADMID), '_METSRIGHTS', ''), 'rightsMD_', '')"/>
+        <xsl:variable name="rights_declaration" select="../../../mets:amdSec/mets:rightsMD[@ID = concat('rightsMD_', $file_id, '_METSRIGHTS')]/mets:mdWrap/mets:xmlData/rights:RightsDeclarationMD"/>
+        <xsl:variable name="rights_context" select="$rights_declaration/rights:Context"/>
+        <xsl:variable name="users">
+            <xsl:for-each select="$rights_declaration/*">
+                <xsl:value-of select="rights:UserName"/>
+                <xsl:choose>
+                    <xsl:when test="rights:UserName/@USERTYPE = 'GROUP'">
+                       <xsl:text> (group)</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="rights:UserName/@USERTYPE = 'INDIVIDUAL'">
+                       <xsl:text> (individual)</xsl:text>
+                    </xsl:when>
+                </xsl:choose>
+                <xsl:if test="position() != last()">, </xsl:if>
+            </xsl:for-each>
+        </xsl:variable>
+
+        <xsl:choose>
+            <xsl:when test="not ($rights_context/@CONTEXTCLASS = 'GENERAL PUBLIC') and ($rights_context/rights:Permissions/@DISPLAY = 'true')">
+                <a href="{mets:FLocat[@LOCTYPE='URL']/@xlink:href}">
+                    <img width="64" height="64" src="{concat($theme-path,'/images/Crystal_Clear_action_lock3_64px.png')}" title="Read access available for {$users}"/>
+                    <!-- icon source: http://commons.wikimedia.org/wiki/File:Crystal_Clear_action_lock3.png -->
+                </a>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:call-template name="view-open"/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
 </xsl:stylesheet>
