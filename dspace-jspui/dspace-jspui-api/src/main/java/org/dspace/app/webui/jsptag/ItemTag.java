@@ -11,7 +11,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.StringTokenizer;
@@ -26,7 +29,9 @@ import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.MetadataExposure;
+import org.dspace.app.util.Util;
 import org.dspace.app.webui.util.StyleSelection;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.browse.BrowseException;
@@ -291,6 +296,11 @@ public class ItemTag extends TagSupport
         {
             throw new JspException(ie);
         }
+        catch (DCInputsReaderException ex)
+        {
+            throw new JspException(ex);
+        }
+
 
         return SKIP_BODY;
     }
@@ -368,12 +378,12 @@ public class ItemTag extends TagSupport
     /**
      * Render an item in the given style
      */
-    private void render() throws IOException, SQLException
+    private void render() throws IOException, SQLException, DCInputsReaderException
     {
         JspWriter out = pageContext.getOut();
         HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
         Context context = UIUtil.obtainContext(request);
-        
+        Locale sessionLocale = UIUtil.getSessionLocale(request);
         String configLine = styleSelection.getConfigurationForStyle(style);
 
         if (configLine == null)
@@ -399,6 +409,7 @@ public class ItemTag extends TagSupport
             boolean isLink = false;
             boolean isResolver = false;
             boolean isNoBreakLine = false;
+            boolean isDisplay = false;
 
             String style = null;
             Matcher fieldStyleMatcher = fieldStylePatter.matcher(field);
@@ -424,6 +435,7 @@ public class ItemTag extends TagSupport
                 isDate = style.contains("date");
                 isLink = style.contains("link");
 				isNoBreakLine = style.contains("nobreakline");
+				isDisplay = style.equals("inputform");
                 isResolver = style.contains("resolver") || urn2baseurl.keySet().contains(style);
                 field = field.replaceAll("\\("+style+"\\)", "");
             } 
@@ -473,7 +485,26 @@ public class ItemTag extends TagSupport
                 
                 out.print(label);
                 out.print(":&nbsp;</td><td class=\"metadataFieldValue\">");
+                
+                //If the values are in controlled vocabulary and the display value should be shown
+                if (isDisplay){
+                    List<String> displayValues = new ArrayList<String>();
+                   
 
+                    displayValues = Util.getControlledVocabulariesDisplayValueLocalized(item, values, schema, element, qualifier, sessionLocale);
+                                
+                        if (displayValues != null && !displayValues.isEmpty())
+                        {
+                            for (int d = 0; d < displayValues.size(); d++)
+                            {
+                                out.print(displayValues.get(d));
+                                if (d<displayValues.size()-1)  out.print(" <br/>");
+                                
+                            }
+                        }
+                    out.print("</td>");
+                    continue;
+                 }   
                 for (int j = 0; j < values.length; j++)
                 {
                     if (values[j] != null && values[j].value != null)
