@@ -1,0 +1,92 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.dspace</groupId>
+    <artifactId>dspace-services-api</artifactId>
+    <name>DSpace Services API</name>
+    <description>The core services API for DSpace</description>
+    <url>http://projects.dspace.org</url>
+    <inceptionYear>Monday, September 1, 2008</inceptionYear>
+    <organization>
+        <name>The DSpace Foundation</name>
+        <url>http://www.dspace.org</url>
+    </organization>
+    <packaging>jar</packaging>
+
+    <parent>
+        <artifactId>dspace-services</artifactId>
+        <groupId>org.dspace</groupId>
+        <version>3.0-SNAPSHOT</version>
+    </parent>
+
+    <!--
+        The Subversion repository location is used by Continuum to
+        update against when changes have occured, this spawns a new
+        build cycle and releases snapshots into the snapshot repository
+        below.
+    -->
+    <scm>
+        <connection>scm:svn:http://scm.dspace.org/svn/repo/modules/dspace-services/trunk/api</connection>
+        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-services/trunk/api
+        </developerConnection>
+        <url>http://scm.dspace.org/svn/repo/modules/dspace-services/trunk/api</url>
+    </scm>
+
+    <dependencies>
+        <!-- should be an absolutely minimal set of dependencies -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.4</version>
+            <scope>provided</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.5.6</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.4</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <!-- include the readme.txt file and the java source files -->
+            <resource>
+                <directory>${basedir}/src/main/java</directory>
+                <includes>
+                    <include>**/*.java</include>
+                    <include>**/*.html</include>
+                    <include>**/*.xml</include>
+                    <include>**/*.properties</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
