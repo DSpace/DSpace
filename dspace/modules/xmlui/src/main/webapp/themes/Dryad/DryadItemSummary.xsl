@@ -1656,6 +1656,24 @@
                          alt="Ecological Monographs cover"/>
                 </a>
             </xsl:when>
+            <xsl:when test='$journal-name = "eLife"'>
+                <a>
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                    select="string('http://http://www.elifesciences.org/the-journal/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/elife-full-color-vertical.png"
+                        alt="eLife logo"/>
+                </a>
+            </xsl:when>
             <xsl:when test='$journal-name = "Evolution"'>
                 <a>
                     <xsl:attribute name="href">
