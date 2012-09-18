@@ -1,0 +1,172 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.dspace</groupId>
+    <artifactId>dspace-services-impl</artifactId>
+    <name>DSpace Services Implementation</name>
+    <description>The implementation of the DSpace 2 services</description>
+    <url>http://projects.dspace.org</url>
+    <inceptionYear>Monday, September 1, 2008</inceptionYear>
+    <organization>
+        <name>The DSpace Foundation</name>
+        <url>http://www.dspace.org</url>
+    </organization>
+    <packaging>jar</packaging>
+
+    <parent>
+        <artifactId>dspace-services</artifactId>
+        <groupId>org.dspace</groupId>
+        <version>3.0-SNAPSHOT</version>
+    </parent>
+
+    <developers>
+        <developer>
+            <id>azeckoski</id>
+            <name>Aaron Zeckoski</name>
+            <email>azeckoski@gmail.com</email>
+            <organization>CARET, Univeristy of Cambridge</organization>
+            <organizationUrl>http://caret.cam.ac.uk/</organizationUrl>
+            <timezone>0</timezone>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>mdiggory</id>
+            <name>Mark Diggory</name>
+            <email>mdiggory@gmail.com</email>
+            <organization>MIT Libraries, Massachusetts Institute of Technology</organization>
+            <organizationUrl>http://libraries.mit.edu</organizationUrl>
+            <timezone>+8</timezone>
+            <roles>
+                <role>architect</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <!--
+        The Subversion repository location is used by Continuum to
+        update against when changes have occured, this spawns a new
+        build cycle and releases snapshots into the snapshot repository
+        below.
+    -->
+    <scm>
+        <connection>scm:svn:http://scm.dspace.org/svn/repo/modules/dspace-services/trunk/impl</connection>
+        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-services/trunk/impl
+        </developerConnection>
+        <url>http://scm.dspace.org/svn/repo/modules/dspace-services/trunk/impl</url>
+    </scm>
+
+    <dependencies>
+        <!-- common modules -->
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-api</artifactId>
+            <version>3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-utils</artifactId>
+            <version>3.0-SNAPSHOT</version>
+        </dependency>
+        <!-- logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.5.6</version>
+        </dependency>
+        <!-- spring service manager -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>3.0.5.RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.4</version>
+        </dependency>
+        <!-- this needs to eventually go into common/lib for tomcat 5 -->
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache-core</artifactId>
+            <version>1.7.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- for filters -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- SPECIAL CASE - need JUNIT at build time and testing time -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.5</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- testing only -->
+        <dependency>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty</artifactId>
+            <version>6.1.14</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty-servlet-tester</artifactId>
+            <version>6.1.14</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.5.6</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.14</version>
+        </dependency>
+        <dependency>
+            <!-- needed to ensure that all JCL is 1.1.1 -->
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
