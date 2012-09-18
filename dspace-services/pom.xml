@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.dspace</groupId>
+    <artifactId>dspace-services</artifactId>
+    <version>2.0.5-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>DSpace Services Modules</name>
+    <url>http://projects.dspace.org/dspace-services</url>
+
+    <organization>
+        <name>DuraSpace</name>
+        <url>http://www.dspace.org</url>
+    </organization>
+    
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.6</maven.compiler.source>
+        <maven.compiler.target>1.6</maven.compiler.target>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <version>1.9.0</version>
+                <configuration>
+                    <!-- external and absolute URL for use in external addon builds -->
+                    <header>https://raw.github.com/DSpace/DSpace/master/LICENSE_HEADER</header>
+                    <!--Just check headers of everything in the /src directory -->
+                    <includes>
+                        <include>src/**</include>
+                    </includes>
+                    <!--Use all default exclusions for IDE files & Maven files, see:
+                        http://code.google.com/p/maven-license-plugin/wiki/Configuration#Default_excludes -->
+                    <useDefaultExcludes>true</useDefaultExcludes>
+                    <!-- Add some default DSpace exclusions not covered by <useDefaultExcludes>
+                         Individual Maven projects may choose to override these defaults. -->
+                    <excludes>
+                        <exclude>**/src/test/resources/**</exclude>
+                        <exclude>**/src/test/data/**</exclude>
+                        <exclude>**/META-INF/**</exclude>
+                        <exclude>**/robots.txt</exclude>
+                        <exclude>**/*.LICENSE</exclude>
+                        <exclude>**/LICENSE*</exclude>
+                        <exclude>**/README*</exclude>
+                        <exclude>**/readme*</exclude>
+                        <exclude>**/.gitignore</exclude>
+                    </excludes>
+                    <mapping>
+                        <!-- Custom DSpace file extensions which are not recognized by maven-release-plugin:
+                             *.xmap, *.xslt, *.wsdd, *.wsdl, *.LICENSE -->
+                        <xmap>XML_STYLE</xmap>
+                        <xslt>XML_STYLE</xslt>
+                        <wsdd>XML_STYLE</wsdd>
+                        <wsdl>XML_STYLE</wsdl>
+                        <LICENSE>TEXT</LICENSE>
+                    </mapping>
+                    <encoding>UTF-8</encoding>
+                    <!-- maven-license-plugin recommends a strict check (e.g. check spaces/tabs too) -->
+                    <strictCheck>true</strictCheck>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>check-headers</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <modules>
+        <module>api</module>
+        <module>impl</module>
+        <module>utils</module>
+    </modules>
+
+    <developers>
+        <developer>
+            <id>azeckoski</id>
+            <name>Aaron Zeckoski</name>
+            <email>azeckoski@gmail.com</email>
+            <url>http://wiki.sakaiproject.org/confluence/display/~aaronz
+            </url>
+            <organization>CARET, University of Cambridge</organization>
+            <organizationUrl>http://caret.cam.ac.uk/
+            </organizationUrl>
+            <roles>
+                <role>architect</role>
+                <role>committer</role>
+            </roles>
+            <timezone>0</timezone>
+        </developer>
+        <developer>
+            <id>mdiggory</id>
+            <name>Mark Diggory</name>
+            <email>mdiggory@atmire.com</email>
+            <roles>
+                <role>architect</role>
+                <role>committer</role>
+            </roles>
+            <organization>@mire</organization>
+            <organizationUrl>http://www.atmire.com</organizationUrl>
+            <timezone>-8</timezone>
+        </developer>
+    </developers>
+
+    <contributors>
+        <contributor>
+            <name>Add Your Name Here and submit a patch!</name>
+            <email>contributor at myu.edu</email>
+            <url>http://www.myu.edu/me</url>
+            <organization>My University</organization>
+            <organizationUrl>http://www.myu.edu</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>0</timezone>
+        </contributor>
+    </contributors>
+
+    <scm>
+      <connection>scm:git:git://github.com/DSpace/dspace-services.git</connection>
+      <developerConnection>scm:git:git@github.com:DSpace/dspace-services.git</developerConnection>
+      <url>https://github.com/DSpace/dspace-services</url>
+    </scm>
+
+</project>
