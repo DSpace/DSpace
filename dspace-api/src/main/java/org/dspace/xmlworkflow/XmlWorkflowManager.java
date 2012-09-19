@@ -632,6 +632,41 @@ public class XmlWorkflowManager {
         return wsi;
     }
 
+    public static WorkspaceItem abort(Context c, XmlWorkflowItem wi, EPerson e) throws AuthorizeException, SQLException, IOException {
+        if (!AuthorizeManager.isAdmin(c))
+        {
+            throw new AuthorizeException(
+                    "You must be an admin to abort a workflow");
+        }
+
+        deleteAllTasks(c, wi);
+
+        c.turnOffAuthorisationSystem();
+        //Also clear all info for this step
+        WorkflowRequirementsManager.clearInProgressUsers(c, wi);
+
+        // Remove (if any) the workflowItemroles for this item
+        WorkflowItemRole[] workflowItemRoles = WorkflowItemRole.findAllForItem(c, wi.getID());
+        for (WorkflowItemRole workflowItemRole : workflowItemRoles) {
+            workflowItemRole.delete();
+        }
+
+        //Restore permissions for the submitter
+        Item item = wi.getItem();
+        grantUserAllItemPolicies(c, item, item.getSubmitter());
+        // convert into personal workspace
+        WorkspaceItem wsi = returnToWorkspace(c, wi);
+
+        log.info(LogManager.getHeader(c, "abort_workflow", "workflow_item_id="
+                + wi.getID() + "item_id=" + item.getID()
+                + "collection_id=" + wi.getCollection().getID() + "eperson_id="
+                + e.getID()));
+
+
+        c.restoreAuthSystemState();
+        return wsi;
+    }
+
     /**
      * Return the workflow item to the workspace of the submitter. The workflow
      * item is removed, and a workspace item created.
