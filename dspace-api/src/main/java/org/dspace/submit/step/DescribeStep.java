@@ -310,7 +310,8 @@ public class DescribeStep extends AbstractProcessingStep
                 DCValue[] values = item.getMetadata(inputs[i].getSchema(),
                         inputs[i].getElement(), inputs[i].getQualifier(), Item.ANY);
 
-                if (inputs[i].isRequired() && values.length == 0)
+                if ((inputs[i].isRequired() && values.length == 0) &&
+                     inputs[i].isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE))
                 {
                     // since this field is missing add to list of error fields
                     addErrorField(request, getFieldName(inputs[i]));

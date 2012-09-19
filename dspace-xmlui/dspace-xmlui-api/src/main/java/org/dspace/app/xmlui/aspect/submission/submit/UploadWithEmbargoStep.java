@@ -159,7 +159,8 @@ public class UploadWithEmbargoStep extends AbstractSubmissionStep
         isAdvancedFormEnabled=ConfigurationManager.getBooleanProperty("xmlui.submission.restrictstep.enableAdvancedForm", false);
     }
 
-    public void addPageMeta(PageMeta pageMeta) throws WingException{
+    public void addPageMeta(PageMeta pageMeta) throws WingException, AuthorizeException, IOException, SAXException, SQLException {
+        super.addPageMeta(pageMeta);
         pageMeta.addMetadata("javascript", "static").addContent("static/js/accessFormUtil.js");
     }
     
@@ -186,7 +187,7 @@ public class UploadWithEmbargoStep extends AbstractSubmissionStep
 		Item item = submission.getItem();
 		Collection collection = submission.getCollection();
 		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
-		boolean workflow = submission instanceof WorkflowItem;
+		boolean disableFileEditing = (submissionInfo.isInWorkflow()) && !ConfigurationManager.getBooleanProperty("workflow", "reviewer.file-edit");
 		Bundle[] bundles = item.getBundles("ORIGINAL");
 		Bitstream[] bitstreams = new Bitstream[0];
 		if (bundles.length > 0)
@@ -202,7 +203,7 @@ public class UploadWithEmbargoStep extends AbstractSubmissionStep
     	
     	
     	List upload = null;
-    	if (!workflow)
+    	if (!disableFileEditing)
     	{
     		// Only add the upload capabilities for new item submissions
 	    	upload = div.addList("submit-upload-new", List.TYPE_FORM);
@@ -257,7 +258,7 @@ public class UploadWithEmbargoStep extends AbstractSubmissionStep
         
         // Part B:
         //  If the user has already uploaded files provide a list for the user.
-        if (bitstreams.length > 0 || workflow)
+        if (bitstreams.length > 0 || disableFileEditing)
 		{
 	        Table summary = div.addTable("submit-upload-summary",(bitstreams.length * 2) + 2,7);
 	        summary.setHead(T_head2);
@@ -294,7 +295,7 @@ public class UploadWithEmbargoStep extends AbstractSubmissionStep
                     primary.setOptionSelected(String.valueOf(id));
                 }
 	        	
-	        	if (!workflow)
+	        	if (!disableFileEditing)
 	        	{
 	        		// Workflow users can not remove files.
 		            CheckBox remove = row.addCell().addCheckBox("remove");
@@ -358,7 +359,7 @@ public class UploadWithEmbargoStep extends AbstractSubmissionStep
 	            checksumCell.addContent(algorithm + ":" + checksum);
 	        }
 	        
-	        if (!workflow)
+	        if (!disableFileEditing)
 	        {
 	        	// Workflow users can not remove files.
 		        Row actionRow = summary.addRow();

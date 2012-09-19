@@ -1599,6 +1599,7 @@
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_submitters">Submitters</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_default_read">Default read access</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.sysadmins_only"><nobr>(system administrators only)</nobr></message>
+	<message key="xmlui.administrative.collection.AssignCollectionRoles.repository_role"><br/>(Repository level group, system administrators only)</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.not_allowed"><nobr>(you are not allowed to configure this)</nobr></message>
 
         <!-- org.dspace.app.xmlui.administrative.collection.CurateCollectionForm.java -->

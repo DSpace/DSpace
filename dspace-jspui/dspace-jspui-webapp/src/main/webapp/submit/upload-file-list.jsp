@@ -31,6 +31,7 @@
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 <%@ page import="org.dspace.content.Bundle" %>
+<%@ page import="org.dspace.core.ConfigurationManager" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -46,6 +47,7 @@
     boolean showChecksums = ((Boolean) request.getAttribute("show.checksums")).booleanValue();
     
     request.setAttribute("LanguageSwitch", "hide");
+    boolean allowFileEditing = !subInfo.isInWorkflow() || ConfigurationManager.getBooleanProperty("workflow", "reviewer.file-edit");
 %>
 
 <dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.upload-file-list.title">
@@ -90,7 +92,7 @@
     }
     
     // Don't display last column ("Remove") in workflow mode
-    if (!subInfo.isInWorkflow())
+    if (allowFileEditing)
     {
         // Whether it's an odd or even column depends on whether we're showing checksums
         String column = (showChecksums ? "Even" : "Odd");
@@ -163,7 +165,7 @@
         }
 
         // Don't display "remove" button in workflow mode
-        if (!subInfo.isInWorkflow())
+        if (allowFileEditing)
         {
             // Whether it's an odd or even column depends on whether we're showing checksums
             String column = (showChecksums ? "Even" : "Odd");
@@ -188,7 +190,7 @@
 <%-- Show information about how to verify correct upload, but not in workflow
      mode! --%>
 <%
-    if (!subInfo.isInWorkflow())
+    if (allowFileEditing)
     {
 %>
         <p class="uploadHelp"><fmt:message key="jsp.submit.upload-file-list.info3"/></p>
@@ -223,7 +225,7 @@
         <center>
 <%
     // Don't allow files to be added in workflow mode
-    if (!subInfo.isInWorkflow())
+    if (allowFileEditing)
     {
 %>
             <p><input type="submit" name="submit_more" value="<fmt:message key="jsp.submit.upload-file-list.button4"/>" /></p>
