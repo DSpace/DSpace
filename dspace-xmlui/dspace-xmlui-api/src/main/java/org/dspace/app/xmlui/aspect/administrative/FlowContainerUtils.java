@@ -488,17 +488,23 @@ public class FlowContainerUtils
     }
 		
     private static Group getXMLWorkflowRole(Context context, int collectionID, String roleName, Collection collection, Group roleGroup) throws IOException, WorkflowConfigurationException, SQLException, AuthorizeException {
-        Role role = WorkflowUtils.getCollectionRoles(collection).get(roleName);
-        if(role.getScope() == Role.Scope.COLLECTION){
+        Role role = WorkflowUtils.getCollectionAndRepositoryRoles(collection).get(roleName);
+        if(role.getScope() == Role.Scope.COLLECTION || role.getScope() == Role.Scope.REPOSITORY){
             roleGroup = WorkflowUtils.getRoleGroup(context, collectionID, role);
             if(roleGroup == null){
                 AuthorizeManager.authorizeAction(context, collection, Constants.WRITE);
                 roleGroup = Group.create(context);
-                roleGroup.setName("COLLECTION_" + collection.getID() + "_WORKFLOW_ROLE_" + roleName);
+                if(role.getScope() == Role.Scope.COLLECTION){
+                    roleGroup.setName("COLLECTION_" + collection.getID() + "_WORKFLOW_ROLE_" + roleName);
+                }else{
+                    roleGroup.setName(role.getName());
+                }
                 roleGroup.update();
                 AuthorizeManager.addPolicy(context, collection, Constants.ADD, roleGroup);
-                WorkflowUtils.createCollectionWorkflowRole(context, collectionID, roleName, roleGroup);
-	        }
+                if(role.getScope() == Role.Scope.COLLECTION){
+                    WorkflowUtils.createCollectionWorkflowRole(context, collectionID, roleName, roleGroup);
+                }
+           }
         }
         return roleGroup;
     }
@@ -513,8 +519,8 @@ public class FlowContainerUtils
 	 * @param groupID The id of the group associated with this role.
 	 * @return A process result's object.
 	 */
-	public static FlowResult processDeleteCollectionRole(Context context, int collectionID, String roleName, int groupID) throws SQLException, UIException, IOException, AuthorizeException
-	{
+	public static FlowResult processDeleteCollectionRole(Context context, int collectionID, String roleName, int groupID) throws SQLException, UIException, IOException, AuthorizeException, WorkflowConfigurationException
+    {
 		FlowResult result = new FlowResult();
 		
 		Collection collection = Collection.find(context,collectionID);
@@ -530,7 +536,7 @@ public class FlowContainerUtils
 			collection.removeSubmitters();
 		}
         else{
-            WorkflowUtils.deleteRoleGroup(context, collectionID, roleName);
+            WorkflowUtils.deleteRoleGroup(context, collection, roleName);
 		}
 //		else if (ROLE_WF_STEP1.equals(roleName))
 //		{

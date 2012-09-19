@@ -37,6 +37,7 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.workflow.WorkflowItem;
 import org.xml.sax.SAXException;
 
@@ -166,7 +167,7 @@ public class UploadStep extends AbstractSubmissionStep
 		Item item = submission.getItem();
 		Collection collection = submission.getCollection();
 		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
-		boolean workflow = submission instanceof WorkflowItem;
+		boolean disableFileEditing = (submissionInfo.isInWorkflow()) && !ConfigurationManager.getBooleanProperty("workflow", "reviewer.file-edit");
 		Bundle[] bundles = item.getBundles("ORIGINAL");
 		Bitstream[] bitstreams = new Bitstream[0];
 		if (bundles.length > 0)
@@ -182,7 +183,7 @@ public class UploadStep extends AbstractSubmissionStep
     	
     	
     	List upload = null;
-    	if (!workflow)
+    	if (!disableFileEditing)
     	{
     		// Only add the upload capabilities for new item submissions
 	    	upload = div.addList("submit-upload-new", List.TYPE_FORM);
@@ -227,7 +228,7 @@ public class UploadStep extends AbstractSubmissionStep
         
         // Part B:
         //  If the user has already uploaded files provide a list for the user.
-        if (bitstreams.length > 0 || workflow)
+        if (bitstreams.length > 0 || disableFileEditing)
 		{
 	        Table summary = div.addTable("submit-upload-summary",(bitstreams.length * 2) + 2,7);
 	        summary.setHead(T_head2);
@@ -264,7 +265,7 @@ public class UploadStep extends AbstractSubmissionStep
                     primary.setOptionSelected(String.valueOf(id));
                 }
 	        	
-	        	if (!workflow)
+	        	if (!disableFileEditing)
 	        	{
 	        		// Workflow users can not remove files.
 		            CheckBox remove = row.addCell().addCheckBox("remove");
@@ -323,7 +324,7 @@ public class UploadStep extends AbstractSubmissionStep
 	            checksumCell.addContent(algorithm + ":" + checksum);
 	        }
 	        
-	        if (!workflow)
+	        if (!disableFileEditing)
 	        {
 	        	// Workflow users can not remove files.
 		        Row actionRow = summary.addRow();

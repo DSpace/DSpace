@@ -232,7 +232,7 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
 	        HandleUtil.buildHandleTrail(collection,pageMeta,contextPath, true);
 	        pageMeta.addTrail().addContent(T_submission_trail);
 		}
-		else if (submission instanceof WorkflowItem)
+		else if (submissionInfo != null && submissionInfo.isInWorkflow())
 		{
 			pageMeta.addMetadata("title").addContent(T_workflow_title);
 			

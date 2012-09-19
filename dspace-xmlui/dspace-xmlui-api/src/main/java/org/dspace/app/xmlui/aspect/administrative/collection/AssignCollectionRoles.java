@@ -90,6 +90,7 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	private static final Message T_label_default_read = message("xmlui.administrative.collection.AssignCollectionRoles.label_default_read");
 	
 	private static final Message T_sysadmins_only = message("xmlui.administrative.collection.AssignCollectionRoles.sysadmins_only");
+	private static final Message T_sysadmins_only_repository_role = message("xmlui.administrative.collection.AssignCollectionRoles.repository_role");
 	private static final Message T_not_allowed = message("xmlui.administrative.collection.AssignCollectionRoles.not_allowed");
 
 	
@@ -116,7 +117,7 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
         HashMap<String, Role> roles = null;
 
         try {
-            roles = WorkflowUtils.getCollectionRoles(thisCollection);
+            roles = WorkflowUtils.getAllExternalRoles(thisCollection);
         } catch (WorkflowConfigurationException e) {
             log.error(LogManager.getHeader(context, "error while getting collection roles", "Collection id: " + thisCollection.getID()));
         } catch (IOException e) {
@@ -361,16 +362,35 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
             for(String roleId: roles.keySet()){
                 Role role = roles.get(roleId);
 
-                if (role.getScope() == Role.Scope.COLLECTION) {
+                if (role.getScope() == Role.Scope.COLLECTION || role.getScope() == Role.Scope.REPOSITORY) {
                     tableRow = rolesTable.addRow(Row.ROLE_DATA);
                     tableRow.addCell(Cell.ROLE_HEADER).addContent(role.getName());
                     Group roleGroup = WorkflowUtils.getRoleGroup(context, thisCollection.getID(), role);
                     if (roleGroup != null) {
-                        tableRow.addCell().addXref(baseURL + "&submit_edit_wf_role_" + roleId, roleGroup.getName());
-                        addAdministratorOnlyButton(tableRow.addCell(), "submit_delete_wf_role_" + roleId, T_delete);
+                        if(role.getScope() == Role.Scope.REPOSITORY){
+                            if(AuthorizeManager.isAdmin(context)){
+                                tableRow.addCell().addXref(baseURL + "&submit_edit_wf_role_" + roleId, roleGroup.getName());
+                            }else{
+                                Cell cell = tableRow.addCell();
+                                cell.addContent(roleGroup.getName());
+                                cell.addHighlight("fade").addContent(T_sysadmins_only_repository_role);
+                            }
+                        }else{
+                            tableRow.addCell().addXref(baseURL + "&submit_edit_wf_role_" + roleId, roleGroup.getName());
+                        }
+
+                        if (role.getScope() == Role.Scope.COLLECTION) {
+                            addAdministratorOnlyButton(tableRow.addCell(), "submit_delete_wf_role_" + roleId, T_delete);
+                        } else {
+                            tableRow.addCell();
+                        }
                     } else {
                         tableRow.addCell().addContent(T_no_role);
-                        addAdministratorOnlyButton(tableRow.addCell(), "submit_create_wf_role_" + roleId, T_create);
+                        if (role.getScope() == Role.Scope.COLLECTION || role.getScope() == Role.Scope.REPOSITORY) {
+                            addAdministratorOnlyButton(tableRow.addCell(), "submit_create_wf_role_" + roleId, T_create);
+                        } else {
+                            tableRow.addCell();
+                        }
                     }
                     // help and directions row
                     tableRow = rolesTable.addRow(Row.ROLE_DATA);
@@ -379,6 +399,19 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
                         tableRow.addCell(1,2).addHighlight("fade offset").addContent(role.getDescription());
                     }
 
+                } else {
+                    tableRow = rolesTable.addRow(Row.ROLE_DATA);
+                    tableRow.addCell(Cell.ROLE_HEADER).addContent(role.getName());
+
+                    tableRow.addCell().addContent(T_no_role);
+                    tableRow.addCell();
+
+                    // help and directions row
+                    tableRow = rolesTable.addRow(Row.ROLE_DATA);
+                    tableRow.addCell();
+                    if (role.getDescription() != null){
+                        tableRow.addCell(1,2).addHighlight("fade offset").addContent(role.getDescription());
+                    }
                 }
             }
         }
