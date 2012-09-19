@@ -127,17 +127,17 @@
     -->
   <filter-mapping>
     <filter-name>CocoonMultipartFilter</filter-name>
-    <servlet-name>Cocoon</servlet-name>
+    <servlet-name>spring</servlet-name>
   </filter-mapping>
 
   <filter-mapping>
     <filter-name>DSpaceCocoonServletFilter</filter-name>
-    <servlet-name>Cocoon</servlet-name>
+    <servlet-name>spring</servlet-name>
   </filter-mapping>
 
   <filter-mapping>
     <filter-name>SetCharacterEncoding</filter-name>
-    <servlet-name>Cocoon</servlet-name>
+    <servlet-name>spring</servlet-name>
   </filter-mapping>
   
   <!--
@@ -188,15 +188,23 @@
         Servlet Configuration ==========================================
     -->
 
-    <servlet>
+    <!--servlet>
         <description>Cocoon</description>
         <display-name>Cocoon</display-name>
         <servlet-name>Cocoon</servlet-name>
-        <servlet-class>org.apache.cocoon.servletservice.DispatcherServlet</servlet-class>
+        <servlet-class>org.apache.cocoon.servletservice.DispatcherServlet</servlet-class-->
         <!--
             This parameter allows you to startup Cocoon2 immediately after startup
             of your servlet engine.
         -->
+        <!--load-on-startup>1</load-on-startup>
+    </servlet-->
+
+
+    <!-- Spring Servlet -->
+    <servlet>
+        <servlet-name>spring</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
 
@@ -209,7 +217,7 @@
         to change this parameter.
     -->
     <servlet-mapping>
-        <servlet-name>Cocoon</servlet-name>
+        <servlet-name>spring</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
 
@@ -218,7 +226,7 @@
         by '/' mapping, but must be overriden explicitly.
     -->
     <servlet-mapping>
-        <servlet-name>Cocoon</servlet-name>
+        <servlet-name>spring</servlet-name>
         <url-pattern>*.jsp</url-pattern>
     </servlet-mapping>
     <!--
@@ -226,7 +234,7 @@
         by '/' mapping, but must be overriden explicitly.
     -->
     <servlet-mapping>
-        <servlet-name>Cocoon</servlet-name>
+        <servlet-name>spring</servlet-name>
         <url-pattern>*.html</url-pattern>
     </servlet-mapping>
 

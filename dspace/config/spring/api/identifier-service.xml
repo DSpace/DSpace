@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2002-2010, DuraSpace.  All rights reserved
+    Licensed under the DuraSpace License.
+
+    A copy of the DuraSpace License has been included in this
+    distribution and is available at: http://www.dspace.org/license
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+    <!-- Identifier Service Application Interface.  Will be autowired with
+         any Identifier Providers present in Spring context.
+    -->
+    <bean id="org.dspace.identifier.IdentifierService"
+          class="org.dspace.identifier.IdentifierServiceImpl"
+          autowire="byType"
+          scope="singleton"/>
+
+
+   <!-- provider for using the versioned handle identifier instead of the default one. -->
+    <!--<bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider"-->
+          <!--scope="singleton">-->
+        <!--<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>-->
+    <!--</bean>-->
+
+</beans>
