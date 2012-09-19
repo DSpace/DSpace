@@ -97,7 +97,7 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
         pageMeta.addMetadata("title").addContent("Statistics Report for : " + dso.getName());
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-        HandleUtil.buildHandleTrail(dso,pageMeta,contextPath);
+        HandleUtil.buildHandleTrail(dso,pageMeta,contextPath, true);
         pageMeta.addTrail().addContent("View Statistics");
     }
 
