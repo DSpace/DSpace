@@ -9,13 +9,7 @@ package org.dspace.core;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.EmptyStackException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.dspace.eperson.EPerson;
@@ -24,6 +18,7 @@ import org.dspace.event.Dispatcher;
 import org.dspace.event.Event;
 import org.dspace.event.EventManager;
 import org.dspace.storage.rdbms.DatabaseManager;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Class representing the context of a particular DSpace operation. This stores
@@ -77,7 +72,7 @@ public class Context
     private List<Integer> specialGroups;
 
     /** Content events */
-    private List<Event> events = null;
+    private LinkedList<Event> events = null;
 
     /** Event dispatcher name */
     private String dispName = null;
@@ -375,7 +370,7 @@ public class Context
     {
         if (events == null)
         {
-            events = new ArrayList<Event>();
+            events = new LinkedList<Event>();
         }
 
         events.add(event);
@@ -385,15 +380,30 @@ public class Context
      * Get the current event list. If there is a separate list of events from
      * already-committed operations combine that with current list.
      * 
-     * TODO WARNING: events uses an ArrayList, a class not ready for concurrency.
-     * Read http://download.oracle.com/javase/6/docs/api/java/util/Collections.html#synchronizedList%28java.util.List%29
-     * on how to properly synchronize the class when calling this method
-     *
      * @return List of all available events.
      */
-    public List<Event> getEvents()
+    public LinkedList<Event> getEvents()
     {
         return events;
+    }
+
+    public boolean hasEvents()
+    {
+        return !CollectionUtils.isEmpty(events);
+    }
+
+    /**
+     * Retrieves the first element in the events list & removes it from the list of events once retrieved
+     * @return The first event of the list or <code>null</code> if the list is empty
+     */
+    public Event pollEvent()
+    {
+        if(hasEvents())
+        {
+            return events.poll();
+        }else{
+            return null;
+        }
     }
 
     /**

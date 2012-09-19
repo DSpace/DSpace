@@ -974,7 +974,7 @@ public class Collection extends DSpaceObject
      * @throws IOException
      * @throws AuthorizeException
      */
-    public void update() throws SQLException, IOException, AuthorizeException
+    public void update() throws SQLException, AuthorizeException
     {
         // Check authorisation
         canEdit(true);

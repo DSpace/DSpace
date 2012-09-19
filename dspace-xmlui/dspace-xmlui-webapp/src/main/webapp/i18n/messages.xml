@@ -2163,4 +2163,68 @@
   <message key="xmlui.mobile.items_in_google_scholar">Items in Google Scholar</message>
   <message key="xmlui.mobile.download">Download</message>
 
+
+    <!-- Versioning -->
+    <message key="xmlui.aspect.versioning.VersioningNavigation.context_create_version">Create version of this item</message>
+    <message key="xmlui.aspect.versioning.VersioningNavigation.context_show_version_history">Show version history</message>
+
+    <message key="xmlui.aspect.versioning.VersionItemForm.title">Create Version</message>
+    <message key="xmlui.aspect.versioning.VersionItemForm.trail">Version</message>
+    <message key="xmlui.aspect.versioning.VersionItemForm.head1">Create new version of item: {0}</message>
+    <message key="xmlui.aspect.versioning.VersionItemForm.submit_version">Version</message>
+    <message key="xmlui.aspect.versioning.VersionItemForm.submit_update_version">Update Version</message>
+    <message key="xmlui.aspect.versioning.VersionItemForm.summary">Reason for creating new version</message>
+
+    <message key="xmlui.aspect.versioning.VersionUpdateForm.title">Update Version</message>
+    <message key="xmlui.aspect.versioning.VersionUpdateForm.trail">Version</message>
+    <message key="xmlui.aspect.versioning.VersionUpdateForm.head1">Update version of item: {0}</message>
+    <message key="xmlui.aspect.versioning.VersionUpdateForm.submit_version">Version</message>
+    <message key="xmlui.aspect.versioning.VersionUpdateForm.submit_update_version">Update Version</message>
+    <message key="xmlui.aspect.versioning.VersionUpdateForm.summary">Summary</message>
+
+
+    <message key="xmlui.aspect.versioning.DeleteVersionsConfirm.title">Confirm Deletion</message>
+    <message key="xmlui.aspect.versioning.DeleteVersionsConfirm.trail">Confirm deletion</message>
+    <message key="xmlui.aspect.versioning.DeleteVersionsConfirm.head1">Confirm Deletion(s)</message>
+    <message key="xmlui.aspect.versioning.DeleteVersionsConfirm.para1">Are you sure you want to delete these versions. </message>
+    <message key="xmlui.aspect.versioning.DeleteVersionsConfirm.para2">PLEASE NOTE: That by deleting these versions, the associated items will no longer be accessible.</message>
+    <message key="xmlui.aspect.versioning.DeleteVersionsConfirm.column1">Version</message>
+    <message key="xmlui.aspect.versioning.DeleteVersionsConfirm.column2">Item</message>
+    <message key="xmlui.aspect.versioning.DeleteVersionsConfirm.column3">Editor</message>
+    <message key="xmlui.aspect.versioning.DeleteVersionsConfirm.column4">Date</message>
+    <message key="xmlui.aspect.versioning.DeleteVersionsConfirm.column5">Summary</message>
+
+
+    <message key="xmlui.aspect.versioning.RestoreVersionForm.title">Restore Version</message>
+    <message key="xmlui.aspect.versioning.RestoreVersionForm.trail">Restore Version</message>
+    <message key="xmlui.aspect.versioning.RestoreVersionForm.head1">Restore Version</message>
+    <message key="xmlui.aspect.versioning.RestoreVersionForm.para1">Are you sure you want to restore this version:</message>
+    <message key="xmlui.aspect.versioning.RestoreVersionForm.column1">Version</message>
+    <message key="xmlui.aspect.versioning.RestoreVersionForm.column2">Editor</message>
+    <message key="xmlui.aspect.versioning.RestoreVersionForm.column3">Date</message>
+    <message key="xmlui.aspect.versioning.RestoreVersionForm.column4">Summary</message>
+    <message key="xmlui.aspect.versioning.RestoreVersionForm.restore">Restore</message>
+
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.title">Version History</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.trail">Version history</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.head2">Version History</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.column1">Version</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.column2">Item</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.column3">Editor</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.column4">Date</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.column5">Summary</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.column6">Actions</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.restore">Restore</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.update">Update</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.legend">*Selected version</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.delete">Delete Versions</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.return">Return</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.collection_admins_only">(collection administrators only)</message>
+
+    <message key="xmlui.aspect.versioning.VersionNoticeTransformer.notice.new_version_head">Notice</message>
+    <message key="xmlui.aspect.versioning.VersionNoticeTransformer.notice.new_version_help">This is not the latest version of this item. The latest version can be found at: </message>
+    <message key="xmlui.aspect.versioning.VersionNoticeTransformer.notice.workflow_version_head">Notice</message>
+    <message key="xmlui.aspect.versioning.VersionNoticeTransformer.notice.workflow_version_help">A more recent version of this item is in the Workflow.</message>
+
+    <!-- End Versioning -->
 </catalogue>

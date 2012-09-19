@@ -63,7 +63,7 @@ public class XmlWorkflowItem implements InProgressSubmission {
      */
 //    private ArrayList<StepRecord> activeSteps;
 
-    XmlWorkflowItem(Context context, TableRow row) throws SQLException {
+    XmlWorkflowItem(Context context, TableRow row) throws SQLException, AuthorizeException, IOException {
         ourContext = context;
         wfRow = row;
  //       activeSteps = new ArrayList<StepRecord>();
@@ -360,35 +360,36 @@ public class XmlWorkflowItem implements InProgressSubmission {
 
     /**
      * Check to see if a particular item is currently under Workflow.
-     * If so, its XmlWorkflowItem is returned.  If not, null is returned
+     * If so, its WorkflowItem is returned.  If not, null is returned
      *
      * @param context
      *            the context object
-     * @param i
+     * @param item
      *            the item
      *
-     * @return XmlWorkflow item corresponding to the item, or null
+     * @return workflow item corresponding to the item, or null
      */
-    public static XmlWorkflowItem findByItem(Context context, Item i)
-            throws SQLException
-    {
-        // Look for the unique workflowitem entry where 'item_id' references this item
-        TableRow row =  DatabaseManager.findByUnique(context, "cwf_workflowitem", "item_id", i.getID());
+    public static XmlWorkflowItem findByItem(Context context, Item item) throws SQLException {
+        TableRow row = DatabaseManager.findByUnique(context, "cwf_workflowitem", "item_id", item.getID());
 
-        if (row == null)
-        {
-            return null;
+        XmlWorkflowItem wi = null;
+        if(row != null){
+            // Check the cache
+            wi = (XmlWorkflowItem) context.fromCache(XmlWorkflowItem.class, row.getIntColumn("workflowitem_id"));
+
+            // not in cache? turn row into workflowitem
+            if (wi == null)
+            {
+                wi = new XmlWorkflowItem(context, row);
+            }
         }
-        else
-        {
-            return new XmlWorkflowItem(context, row);
-        }
+        return wi;
     }
 
     /**
      * Update the workflow item, including the unarchived item.
      */
-    public void update() throws SQLException, IOException, AuthorizeException {
+    public void update() throws SQLException, AuthorizeException {
         // FIXME check auth
         log.info(LogManager.getHeader(ourContext, "update_workflow_item",
                 "workflowitem_id=" + getID()));

@@ -509,7 +509,7 @@ public class Community extends DSpaceObject
     /**
      * Update the community metadata (including logo) to the database.
      */
-    public void update() throws SQLException, IOException, AuthorizeException
+    public void update() throws SQLException, AuthorizeException
     {
         // Check authorisation
         canEdit();
