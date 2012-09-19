@@ -20,7 +20,7 @@ public class ElasticSearchLoggerEventListener extends AbstractUsageEventListener
 
     public void receiveEvent(Event event) {
 
-        if(event instanceof UsageEvent)
+        if(event instanceof UsageEvent && (((UsageEvent) event).getAction() == UsageEvent.Action.VIEW))
         {
             try{
 
