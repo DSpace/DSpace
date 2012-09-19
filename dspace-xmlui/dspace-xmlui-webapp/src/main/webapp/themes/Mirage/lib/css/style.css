@@ -1163,6 +1163,43 @@ margin: 2px 2px 0px 2px;
 /* border: 1px solid rgb(240, 240, 210); */
 }
 
+/* Controlled vocabulary support css START*/
+ul.vocabulary {
+    margin-left: 0;
+}
+
+ul.vocabulary,
+ul.vocabulary ul,
+ul.vocabulary li
+{
+    list-style: none;
+}
+
+ul.vocabulary div.vocabulary-node-icon{
+    cursor: pointer;
+    width: 15px;
+    height: 12px;
+    display: inline-block;
+}
+
+ul.vocabulary div.vocabulary-node-icon.vocabulary-doc{
+    background-image: url(../../images/controlledvocabulary/voc_doc_222222.png);
+}
+
+ul.vocabulary div.vocabulary-node-icon.vocabulary-open{
+    background-image: url(../../images/controlledvocabulary/voc_open_222222.png);
+}
+
+ul.vocabulary div.vocabulary-node-icon.vocabulary-closed{
+    background-image: url(../../images/controlledvocabulary/voc_closed_222222.png);
+    background-repeat: no-repeat;
+}
+
+div.vocabulary-container li.error{
+    color: #c22121;
+}
+/* Controlled vocabulary support css END*/
+
 #aspect_administrative_authorization_EditPolicyForm_field_start_date{
     width: 100px;
 }

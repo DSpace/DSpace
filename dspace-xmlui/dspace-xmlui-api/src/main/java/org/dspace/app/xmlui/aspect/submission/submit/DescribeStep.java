@@ -48,6 +48,7 @@ import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.Choices;
 
+import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
 /**
@@ -92,7 +93,8 @@ public class DescribeStep extends AbstractSubmissionStep
      * that configuration file.
      */
     private static DCInputsReader INPUTS_READER = null;
-    
+    private static final Message T_vocabulary_link = message("xmlui.Submission.submit.DescribeStep.controlledvocabulary.link");
+
     /**
      * Ensure that the inputs reader has been initialized, this method may be
      * called multiple times with no ill-effect.
@@ -1146,8 +1148,17 @@ public class DescribeStep extends AbstractSubmissionStep
                 // as twobox should be listed in a two column format. Since this
                 // decision is not something the Aspect can effect we merely place
                 // as a render hint.
-                Text text = form.addItem().addText(fieldName,"submit-text");
+            org.dspace.app.xmlui.wing.element.Item item = form.addItem();
+            Text text = item.addText(fieldName, "submit-text");
 
+            if(dcInput.getVocabulary() != null){
+                String vocabularyUrl = new DSpace().getConfigurationService().getProperty("dspace.url");
+                vocabularyUrl += "/JSON/controlled-vocabulary?vocabularyIdentifier=" + dcInput.getVocabulary();
+                //Also hand down the field name so our summoning script knows the field the selected value is to end up in
+                vocabularyUrl += "&metadataFieldName=" + fieldName;
+                item.addXref("vocabulary:" + vocabularyUrl).addContent(T_vocabulary_link);
+            }
+            
                 // Setup the select field
                 text.setLabel(dcInput.getLabel());
                 text.setHelp(cleanHints(dcInput.getHints()));
@@ -1212,7 +1223,7 @@ public class DescribeStep extends AbstractSubmissionStep
                                         ti.setAuthorityValue(dcValue.authority, Choices.getConfidenceText(dcValue.confidence));
                                     }
                         }
-                }
+                    }
                 }
                 else if (dcValues.length == 1)
                 {
@@ -1228,11 +1239,11 @@ public class DescribeStep extends AbstractSubmissionStep
                                 text.setAuthorityValue(dcValues[0].authority, Choices.getConfidenceText(dcValues[0].confidence));
                             }
                 }
+            }
         }
-        }
-        
-        
-        
+
+
+
         /**
          * Check if the given fieldname is listed as being in error.
          *
