@@ -623,7 +623,23 @@ placeholders for header images -->
 				});
 			});
 		 </script>
-		
+
+
+        <!-- When on submission process, disable buttons on submission -->
+        <xsl:if test="dri:body/dri:div[contains(@rend,'submission')]">
+            <script type="text/javascript">
+                $(function() {
+                $('form.submission').submit(function() {
+                //alert($(this).data("submitted"));
+                if($(this).data("submitted") === true)
+                return false;
+                else
+                $(this).data("submitted", true);
+                });
+                });
+            </script>
+        </xsl:if>
+
     </xsl:template>
     
         <!--
