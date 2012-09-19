@@ -71,6 +71,7 @@
         <aspect name="E-Person" path="resource://aspects/EPerson/" />
         <aspect name="Submission and Workflow" path="resource://aspects/Submission/" />
 	    <aspect name="Statistics" path="resource://aspects/Statistics/" />
+	    <aspect name="Statistics - Elastic Search" path="resource://aspects/StatisticsElasticSearch/" />
 	    <aspect name="Original Workflow" path="resource://aspects/Workflow/" />
 	    <!--<aspect name="XMLWorkflow" path="resource://aspects/XMLWorkflow/" />-->
         <!--

@@ -7,41 +7,50 @@
  */
 package org.dspace.statistics.util;
 
+import com.maxmind.geoip.Location;
+import com.maxmind.geoip.LookupService;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.dspace.content.*;
-import org.dspace.content.Collection;
-import org.dspace.core.Context;
-import org.dspace.core.Constants;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.statistics.ElasticSearchLogger;
 import org.dspace.statistics.SolrLogger;
+import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.client.Client;
+import org.elasticsearch.client.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.index.mapper.geo.GeoPoint;
 
-import java.text.*;
 import java.io.*;
-import java.util.*;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Random;
 
-import com.maxmind.geoip.LookupService;
-import com.maxmind.geoip.Location;
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
- * Class to load intermediate statistics files into solr
- *
- * @author Stuart Lewis
+ * Created by IntelliJ IDEA.
+ * User: peterdietz
+ * Date: 8/15/12
+ * Time: 2:46 PM
+ * To change this template use File | Settings | File Templates.
  */
-public class StatisticsImporter
-{
-    private static final Logger log = Logger.getLogger(StatisticsImporter.class);
+public class StatisticsImporterElasticSearch {
+    private static final Logger log = Logger.getLogger(StatisticsImporterElasticSearch.class);
 
-    /** Date format (for solr) */
+    /** Date format */
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
-    /** Solr server connection */
-    private static CommonsHttpSolrServer solr;
+    //TODO ES Client
 
     /** GEOIP lookup service */
     private static LookupService geoipLookup;
@@ -52,88 +61,12 @@ public class StatisticsImporter
     /** Whether to skip the DNS reverse lookup or not */
     private static boolean skipReverseDNS = false;
 
-    /** Local items */
-    private List<Integer> localItems;
-
-    /** Local collections */
-    private List<Integer> localCollections;
-
-    /** Local communities */
-    private List<Integer> localCommunities;
-
-    /** Local bitstreams */
-    private List<Integer> localBitstreams;
-
-    /** Whether or not to replace item IDs with local values (for testing) */
-    private boolean useLocal;
+    private static ElasticSearchLogger elasticSearchLoggerInstance;
+    private static Client client;
+    private static BulkRequestBuilder bulkRequest;
 
     /**
-     * Constructor. Optionally loads local data to replace foreign data
-     * if using someone else's log files
-     *
-     * @param local Whether to use local data
-     */
-    public StatisticsImporter(boolean local)
-    {
-        // Setup the lists of communities, collections, items & bitstreams if required
-        useLocal = local;
-        if (local)
-        {
-            try
-            {
-                System.out.print("Loading local communities... ");
-                Context c = new Context();
-                Community[] communities = Community.findAll(c);
-                localCommunities = new ArrayList<Integer>();
-                for (Community community : communities)
-                {
-                    localCommunities.add(community.getID());
-                }
-                System.out.println("Found " + localCommunities.size());
-
-                System.out.print("Loading local collections... ");
-                Collection[] collections = Collection.findAll(c);
-                localCollections = new ArrayList<Integer>();
-                for (Collection collection : collections)
-                {
-                    localCollections.add(collection.getID());
-                }
-                System.out.println("Found " + localCollections.size());
-
-                System.out.print("Loading local items... ");
-                ItemIterator items = Item.findAll(c);
-                localItems = new ArrayList<Integer>();
-                Item i;
-                while (items.hasNext())
-                {
-                    i = items.next();
-                    localItems.add(i.getID());
-                }
-                System.out.println("Found " + localItems.size());
-
-                System.out.print("Loading local bitstreams... ");
-                Bitstream[] bitstreams = Bitstream.findAll(c);
-                localBitstreams = new ArrayList<Integer>();
-                for (Bitstream bitstream : bitstreams)
-                {
-                    if (bitstream.getName() != null)
-                    {
-                        localBitstreams.add(bitstream.getID());
-                    }
-                }
-                System.out.println("Found " + localBitstreams.size());
-
-            } catch (Exception e)
-            {
-                System.err.println("Error retrieving items from DSpace database:");
-                e.printStackTrace();
-                System.exit(1);
-            }
-        }
-    }
-
-    /**
-     * Read lines from the statistics file and load their data into solr.
+     * Read lines from the statistics file and load their data into Elastic Search.
      *
      * @param filename The filename of the file to load
      * @param context The DSpace Context
@@ -183,7 +116,6 @@ public class StatisticsImporter
             while ((line = input.readLine()) != null)
             {
                 // Tokenise the line
-                String data = "";
                 counter++;
                 errors++;
                 if (verbose)
@@ -221,11 +153,15 @@ public class StatisticsImporter
                     }
                 }
 
+
+                
+
+                String data = "";
                 data += ("ip addr = " + ip);
                 data += (", dns name = " + dns);
                 if ((dns.endsWith(".googlebot.com.")) ||
-                    (dns.endsWith(".crawl.yahoo.net.")) ||
-                    (dns.endsWith(".search.msn.com.")))
+                        (dns.endsWith(".crawl.yahoo.net.")) ||
+                        (dns.endsWith(".search.msn.com.")))
                 {
                     if (verbose)
                     {
@@ -268,34 +204,18 @@ public class StatisticsImporter
                 if ("view_bitstream".equals(action))
                 {
                     type = Constants.BITSTREAM;
-                    if (useLocal)
-                    {
-                        id = "" + localBitstreams.get(rand.nextInt(localBitstreams.size()));
-                    }
                 }
                 else if ("view_item".equals(action))
                 {
                     type = Constants.ITEM;
-                    if (useLocal)
-                    {
-                        id = "" + localItems.get(rand.nextInt(localItems.size()));
-                    }
                 }
                 else if ("view_collection".equals(action))
                 {
                     type = Constants.COLLECTION;
-                    if (useLocal)
-                    {
-                        id = "" + localCollections.get(rand.nextInt(localCollections.size()));
-                    }
                 }
                 else if ("view_community".equals(action))
                 {
                     type = Constants.COMMUNITY;
-                    if (useLocal)
-                    {
-                        id = "" + localCommunities.get(rand.nextInt(localCommunities.size()));
-                    }
                 }
 
                 DSpaceObject dso = DSpaceObject.find(context, type, Integer.parseInt(id));
@@ -316,50 +236,63 @@ public class StatisticsImporter
                     eperson.getID();
                 }
 
+                //TODO Is there any way to reuse ElasticSearchLogger.post() ?
+
                 // Save it in our server
-                SolrInputDocument sid = new SolrInputDocument();
-                sid.addField("ip", ip);
-                sid.addField("type", dso.getType());
-                sid.addField("id", dso.getID());
-                sid.addField("time", DateFormatUtils.format(date, SolrLogger.DATE_FORMAT_8601));
-                sid.addField("continent", continent);
-                sid.addField("country", country);
-                sid.addField("countryCode", countryCode);
-                sid.addField("city", city);
-                sid.addField("latitude", latitude);
-                sid.addField("longitude", longitude);
+                XContentBuilder postBuilder = jsonBuilder().startObject()
+                        .field("id", dso.getID())
+                        .field("typeIndex", dso.getType())
+                        .field("type", dso.getTypeText())
+
+                        .field("geo", new GeoPoint(latitude, longitude))
+                        .field("continent", continent)
+                        .field("countryCode", countryCode)
+                        .field("country", country)
+                        .field("city", city)
+
+                        .field("ip", ip)
+
+                        .field("time", DateFormatUtils.format(date, SolrLogger.DATE_FORMAT_8601));
+
+                // Unable to get UserAgent from logs. .field("userAgent")
+
+                if (dso instanceof Bitstream) {
+                    Bitstream bit = (Bitstream) dso;
+                    Bundle[] bundles = bit.getBundles();
+                    postBuilder = postBuilder.field("bundleName").startArray();
+                    for (Bundle bundle : bundles) {
+                        postBuilder = postBuilder.value(bundle.getName());
+                    }
+                    postBuilder = postBuilder.endArray();
+                }
+
                 if (epersonId > 0)
                 {
-                    sid.addField("epersonid", epersonId);
+                    postBuilder = postBuilder.field("epersonid", epersonId);
                 }
                 if (dns != null)
                 {
-                    sid.addField("dns", dns.toLowerCase());
+                    postBuilder = postBuilder.field("dns", dns.toLowerCase());
                 }
 
-                if (dso instanceof Item) {
-                    Item item = (Item) dso;
-                    // Store the metadata
-                    for (String storedField : metadataStorageInfo.keySet()) {
-                        String dcField = metadataStorageInfo.get(storedField);
 
-                        DCValue[] vals = item.getMetadata(dcField.split("\\.")[0],
-                                dcField.split("\\.")[1], dcField.split("\\.")[2],
-                                Item.ANY);
-                        for (DCValue val1 : vals) {
-                            String val = val1.value;
-                            sid.addField(String.valueOf(storedField), val);
-                            sid.addField(String.valueOf(storedField + "_search"),
-                                    val.toLowerCase());
-                        }
-                    }
-                }
+                //Save for later: .field("isBot")
 
-                SolrLogger.storeParents(sid, dso);
-                solr.add(sid);
+                elasticSearchLoggerInstance.storeParents(postBuilder, elasticSearchLoggerInstance.getParents(dso));
+
+                bulkRequest.add(client.prepareIndex(elasticSearchLoggerInstance.getIndexName(), elasticSearchLoggerInstance.getIndexType())
+                        .setSource(postBuilder.endObject()));
+
+
                 errors--;
             }
 
+            if(bulkRequest.numberOfActions() > 0) {
+                BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                if(bulkResponse.hasFailures()) {
+                    log.error("Bulk Request Failed due to: " + bulkResponse.buildFailureMessage());
+                }
+            }
         }
         catch (RuntimeException re)
         {
@@ -377,33 +310,15 @@ public class StatisticsImporter
         if (counter > 0)
         {
             Double committedpercentage = 100d * committed / counter;
-            System.out.println(" - " + committed + " entries added to solr: " + percentage.format(committedpercentage) + "%");
+            System.out.println(" - " + committed + " entries added to ElasticSearch: " + percentage.format(committedpercentage) + "%");
             Double errorpercentage = 100d * errors / counter;
             System.out.println(" - " + errors + " errors: " + percentage.format(errorpercentage) + "%");
             Double sepercentage = 100d * searchengines / counter;
             System.out.println(" - " + searchengines + " search engine activity skipped: " + percentage.format(sepercentage) + "%");
-            System.out.print("About to commit data to solr...");
-
-            // Commit at the end because it takes a while
-            try
-            {
-                solr.commit();
-            }
-            catch (SolrServerException sse)
-            {
-                System.err.println("Error committing statistics to solr server!");
-                sse.printStackTrace();
-                System.exit(1);
-            }
-            catch (IOException ioe)
-            {
-                System.err.println("Error writing to solr server!");
-                ioe.printStackTrace();
-                System.exit(1);
-            }
         }
         System.out.println(" done!");
-	}
+    }
+
 
     /**
      * Print the help message
@@ -415,9 +330,10 @@ public class StatisticsImporter
     {
         // print the help message
         HelpFormatter myhelp = new HelpFormatter();
-        myhelp.printHelp("StatisticsImporter\n", options);
+        myhelp.printHelp("StatisticsImporterElasticSearch\n", options);
         System.exit(exitCode);
     }
+
 
     /**
      * Main method to run the statistics importer.
@@ -425,20 +341,19 @@ public class StatisticsImporter
      * @param args The command line arguments
      * @throws Exception If something goes wrong
      */
-	public static void main(String[] args) throws Exception
+    public static void main(String[] args) throws Exception
     {
-		CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new PosixParser();
 
-		Options options = new Options();
+        Options options = new Options();
 
         options.addOption("i", "in", true, "the input file ('-' or omit for standard input)");
-        options.addOption("l", "local", false, "developers tool - map external log file to local handles");
         options.addOption("m", "multiple", false, "treat the input file as having a wildcard ending");
         options.addOption("s", "skipdns", false, "skip performing reverse DNS lookups on IP addresses");
         options.addOption("v", "verbose", false, "display verbose output (useful for debugging)");
         options.addOption("h", "help", false, "help");
 
-		CommandLine line = parser.parse(options, args);
+        CommandLine line = parser.parse(options, args);
 
         // Did the user ask to see the help?
         if (line.hasOption('h'))
@@ -451,25 +366,23 @@ public class StatisticsImporter
             skipReverseDNS = true;
         }
 
-        // Whether or not to convert handles to handles used in a local system
-        // (useful if using someone else's log file for testing)
-        boolean local = line.hasOption('l');
+        elasticSearchLoggerInstance = new ElasticSearchLogger();
 
-		// We got all our parameters now get the rest
-		Context context = new Context();
+        log.info("Getting ElasticSearch Transport Client for StatisticsImporterElasticSearch...");
+
+        // This is only invoked via terminal, do not use _this_ node as that data storing node.
+        // Need to get a NodeClient or TransportClient, but definitely do not want to get a local data storing client.
+        client = elasticSearchLoggerInstance.getClient(ElasticSearchLogger.ClientType.TRANSPORT);
+
+        client.admin().indices().prepareRefresh(ElasticSearchLogger.getIndexName()).execute().actionGet();
+        bulkRequest = client.prepareBulk();
+
+        // We got all our parameters now get the rest
+        Context context = new Context();
 
         // Verbose option
         boolean verbose = line.hasOption('v');
 
-        // Find our solr server
-        String sserver = ConfigurationManager.getProperty("solr-statistics", "server");
-        if (verbose)
-        {
-            System.out.println("Writing to solr server at: " + sserver);
-        }
-		solr = new CommonsHttpSolrServer(sserver);
-
-		metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
         String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
         try
         {
@@ -477,7 +390,7 @@ public class StatisticsImporter
         }
         catch (FileNotFoundException fe)
         {
-            log.error("The GeoLite Database file is missing (" + dbfile + ")! Solr Statistics cannot generate location based reports! Please see the DSpace installation instructions for instructions to install this file.", fe);
+            log.error("The GeoLite Database file is missing (" + dbfile + ")! Elastic Search  Statistics cannot generate location based reports! Please see the DSpace installation instructions for instructions to install this file.", fe);
         }
         catch (IOException e)
         {
@@ -485,7 +398,7 @@ public class StatisticsImporter
         }
 
 
-        StatisticsImporter si = new StatisticsImporter(local);
+        StatisticsImporterElasticSearch elasticSearchImporter = new StatisticsImporterElasticSearch();
         if (line.hasOption('m'))
         {
             // Convert all the files
@@ -502,13 +415,13 @@ public class StatisticsImporter
             for (String in : children)
             {
                 System.out.println(in);
-                si.load(dir.getAbsolutePath() + System.getProperty("file.separator") + in, context, verbose);
+                elasticSearchImporter.load(dir.getAbsolutePath() + System.getProperty("file.separator") + in, context, verbose);
             }
         }
         else
         {
             // Just convert the one file
-            si.load(line.getOptionValue('i'), context, verbose);
+            elasticSearchImporter.load(line.getOptionValue('i'), context, verbose);
         }
     }
 

@@ -56,7 +56,7 @@ public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements M
             //We have always got rights to view stats on the home page (admin rights will be checked later)
             boolean authorized = dso == null || AuthorizeManager.authorizeActionBoolean(context, dso, action, false);
             //If we are authorized check for any other authorization actions present
-            if(authorized && ConfigurationManager.getBooleanProperty("solr-statistics", "authorization.admin"))
+            if(authorized && ConfigurationManager.getBooleanProperty("usage-statistics", "authorization.admin"))
             {
                 //If we have no user, we cannot be admin
                 if(context.getCurrentUser() == null)

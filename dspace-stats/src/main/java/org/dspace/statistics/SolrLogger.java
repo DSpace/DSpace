@@ -77,7 +77,7 @@ public class SolrLogger
     {
         log.info("solr-statistics.spidersfile:" + ConfigurationManager.getProperty("solr-statistics", "spidersfile"));
         log.info("solr-statistics.server:" + ConfigurationManager.getProperty("solr-statistics", "server"));
-        log.info("solr-statistics.dbfile:" + ConfigurationManager.getProperty("solr-statistics", "dbfile"));
+        log.info("usage-statistics.dbfile:" + ConfigurationManager.getProperty("usage-statistics", "dbfile"));
     	
         CommonsHttpSolrServer server = null;
         
@@ -100,7 +100,7 @@ public class SolrLogger
 
         LookupService service = null;
         // Get the db file for the location
-        String dbfile = ConfigurationManager.getProperty("solr-statistics", "dbfile");
+        String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
         if (dbfile != null)
         {
             try
@@ -119,7 +119,7 @@ public class SolrLogger
         }
         else
         {
-            log.error("The required 'dbfile' configuration is missing in solr-statistics.cfg!");
+            log.error("The required 'dbfile' configuration is missing in usage-statistics.cfg!");
         }
         locationService = service;
 
@@ -168,7 +168,7 @@ public class SolrLogger
         try
         {
             if(isSpiderBot &&
-                    !ConfigurationManager.getBooleanProperty("solr-statistics", "logBots",true))
+                    !ConfigurationManager.getBooleanProperty("usage-statistics", "logBots",true))
             {
                 return;
             }
@@ -295,6 +295,7 @@ public class SolrLogger
         }
     }
 
+    //@TODO remove metadataStorage object from all see: DS-421
     public static Map<String, String> getMetadataStorageInfo()
     {
         return metadataStorageInfo;

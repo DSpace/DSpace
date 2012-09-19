@@ -7,12 +7,12 @@
  */
 package org.dspace.content;
 
-import java.sql.SQLException;
-
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+
+import java.sql.SQLException;
 
 /**
  * Abstract base class for DSpace objects
@@ -64,6 +64,15 @@ public abstract class DSpaceObject
      * @return type of the object
      */
     public abstract int getType();
+
+    /**
+     * Provide the text name of the type of this DSpaceObject. It is most likely all uppercase.
+     * @return Object type as text
+     */
+    public String getTypeText()
+    {
+        return Constants.typeText[this.getType()];
+    }
 
     /**
      * Get the internal ID (database primary key) of this object

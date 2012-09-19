@@ -55,7 +55,7 @@ public class DisplayStatisticsServlet extends DSpaceServlet
     {
 
 	// is the statistics data publically viewable?
-	boolean privatereport = ConfigurationManager.getBooleanProperty("solr-statistics", "authorization.admin");
+	boolean privatereport = ConfigurationManager.getBooleanProperty("usage-statistics", "authorization.admin");
 
         // is the user a member of the Administrator (1) group?
         boolean admin = Group.isMember(context, 1);

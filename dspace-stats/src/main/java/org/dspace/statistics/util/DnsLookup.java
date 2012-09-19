@@ -24,7 +24,7 @@ public class DnsLookup {
          Resolver res = new ExtendedResolver();
          
          // set the timeout, defaults to 200 milliseconds
-         int timeout = ConfigurationManager.getIntProperty("solr-statistics", "resolver.timeout", 200);
+         int timeout = ConfigurationManager.getIntProperty("usage-statistics", "resolver.timeout", 200);
          res.setTimeout(0, timeout);
 
          Name name = ReverseMap.fromAddress(hostIp);

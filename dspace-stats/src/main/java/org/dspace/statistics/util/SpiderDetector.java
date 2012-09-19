@@ -9,7 +9,6 @@ package org.dspace.statistics.util;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.statistics.SolrLogger;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
@@ -31,6 +30,8 @@ import java.util.Set;
 public class SpiderDetector {
 
     private static Logger log = Logger.getLogger(SpiderDetector.class);
+
+    private static Boolean useProxies;
 
     /**
      * Sparse HashTable structure to hold IP address ranges.
@@ -138,7 +139,7 @@ public class SpiderDetector {
      */
     public static boolean isSpider(HttpServletRequest request) {
 
-        if (SolrLogger.isUseProxies() && request.getHeader("X-Forwarded-For") != null) {
+        if (isUseProxies() && request.getHeader("X-Forwarded-For") != null) {
             /* This header is a comma delimited list */
             for (String xfip : request.getHeader("X-Forwarded-For").split(",")) {
                 if (isSpider(xfip))
@@ -176,5 +177,21 @@ public class SpiderDetector {
 
 
     }
+
+    private static boolean isUseProxies() {
+        if(useProxies == null) {
+            if ("true".equals(ConfigurationManager.getProperty("useProxies")))
+            {
+                useProxies = true;
+            }
+            else
+            {
+                useProxies = false;
+            }
+        }
+
+        return useProxies;
+    }
+
 
 }

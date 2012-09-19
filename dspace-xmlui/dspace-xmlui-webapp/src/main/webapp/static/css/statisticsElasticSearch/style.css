@@ -1,0 +1,24 @@
+#chart_div {
+    /*width: 700px;*/
+    /*height: 240px;*/
+}
+
+#aspect_artifactbrowser_DashboardViewer_table_items_added_monthly {
+    display: none;
+}
+
+.small-icon:before {
+    padding-right: 5px;
+}
+
+.left-arrow-icon:before {
+    content: url(../../../static/icons/arrow_left.png);
+}
+
+.print-icon:before {
+    content: url(../../../static/icons/printer.png);
+}
+
+.excel-icon:before {
+    content: url(../../../static/icons/page_excel.png);
+}

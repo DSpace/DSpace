@@ -199,7 +199,7 @@ public class StatisticsDataGenerator {
 		Map<String, String> metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
 
 		String prevIp = null;
-		String dbfile = ConfigurationManager.getProperty("solr-statistics", "dbfile");
+		String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
 		LookupService cl = new LookupService(dbfile,
 				LookupService.GEOIP_STANDARD);
 		int countryErrors = 0;
