@@ -37,11 +37,9 @@ import java.util.*;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: peterdietz
- * Date: 3/7/12
- * Time: 11:54 AM
- * To change this template use File | Settings | File Templates.
+ * Usage Statistics viewer, powered by Elastic Search.
+ * Allows for the user to dig deeper into the statistics for topDownloads, topCountries, etc.
+ * @author Peter Dietz (pdietz84@gmail.com)
  */
 public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
     private static Logger log = Logger.getLogger(ElasticSearchStatsViewer.class);

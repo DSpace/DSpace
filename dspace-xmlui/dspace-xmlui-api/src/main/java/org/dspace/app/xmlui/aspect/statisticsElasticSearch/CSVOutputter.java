@@ -40,11 +40,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: peterdietz
- * Date: 4/20/12
- * Time: 3:28 PM
- * To change this template use File | Settings | File Templates.
+ * Provides the usage statistics in CSV form
+ * @author Peter Dietz (pdietz84@gmail.com)
  */
 public class CSVOutputter extends AbstractReader implements Recyclable 
 {

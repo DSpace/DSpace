@@ -26,6 +26,7 @@ import java.util.Map;
  * Use a form to dynamically generate a variety of reports.
  *
  * @author "Ryan McGowan" ("mcgowan.98@osu.edu")
+ * @author Peter Dietz (pdietz84@gmail.com)
  * @version
  */
 public class ReportGenerator
@@ -153,77 +154,4 @@ public class ReportGenerator
         }
     }
 
-    /**
-     * Checks the parameters of the given request to see if they fit the
-     * necessary criteria to run generate a report. The following must be true:
-     *
-     *  * from - Must be convertable to a valid date that is greater than the
-     *    miniumum date and also less than or equal to the current date.
-     *  * to - Must be convertable to a valid date that is greater than from
-     *    and equal to or less than the current date.
-     *
-     * @return A map of valid parameters to their values.
-     * @throws InvalidFormatException
-     * @throws ParseException
-     */
-    private Map<String,String> checkAndNormalizeParameters(Map<String,String> params)  {
-        try {
-
-            //Create dateValidator and min and max dates
-            DateValidator dateValidator = new DateValidator(false, DateFormat.SHORT);
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-
-            Date maximumDate = new Date();
-            Date minimumDate = dateFormat.parse(ReportGenerator.MINIMUM_DATE);
-
-            //Check the to and from dates
-            Date fromDate = null;
-            Date toDate = null;
-            boolean validToAndFrom = true;
-            boolean hasFrom = params.containsKey("from") && params.get("from").length() > 0;
-            boolean hasTo = params.containsKey("to") && params.get("to").length() > 0;
-
-            if (hasFrom || hasTo) {
-                if (hasFrom) {
-                    fromDate = tryParse(params.get("from"));
-                    params.put("from", dateFormat.format(fromDate));
-                    validToAndFrom = validToAndFrom && dateValidator.compareDates(minimumDate, fromDate, null) <= 0;
-                }
-                if (hasTo) {
-                    toDate = tryParse(params.get("to"));
-                    params.put("to", dateFormat.format(toDate));
-                    validToAndFrom = validToAndFrom && dateValidator.compareDates(toDate, maximumDate, null) <= 0;
-                }
-                if (hasFrom && hasTo) {
-                    //Make sure hasFrom <= hasTo
-                    validToAndFrom = validToAndFrom && dateValidator.compareDates(fromDate, toDate, null) <= 0;
-                } else if (hasFrom && !hasTo) {
-                    //Make sure hasFrom <= the max date
-                    validToAndFrom = validToAndFrom && dateValidator.compareDates(fromDate, maximumDate, null) <= 0;
-                } else {
-                    //hasTo && !hasFrom
-                    //Make sure hasTo >= the min date
-                    validToAndFrom = validToAndFrom && dateValidator.compareDates(minimumDate, toDate, null) <= 0;
-                }
-                // Short circuit if the to and from dates are not valid
-                if (!validToAndFrom) {
-                    log.error("To and from dates are not within max/min or are not in order. "+ params.get("from") + " -> " + params.get("to"));
-                    return null;
-                }
-
-                //Check fiscal
-                if (params.containsKey("fiscal")) {
-                    log.debug("fiscal: " + params.get("fiscal"));
-                    if (Integer.parseInt(params.get("fiscal")) != 1) {
-                        log.error("Fiscal field did not contain a proper value: " + params.get("fiscal"));
-                    }
-                }
-
-            }
-            return params;
-        } catch (ParseException e) {
-            log.error("ParseFormatException likely means a date format failed. "+e.getMessage());  //To change body of catch statement use File | Settings | File Templates.
-            return null;
-        }
-    }
 }

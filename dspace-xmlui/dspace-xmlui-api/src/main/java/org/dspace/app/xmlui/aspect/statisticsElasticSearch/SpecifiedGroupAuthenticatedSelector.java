@@ -20,9 +20,7 @@ import java.util.Map;
 /**
  * Part of cocoon authentication for resource. Requires that user (eperson) is a member of a specified group.
  *
- * Author: Peter Dietz dietz.72@osu.edu - The Ohio State University Libraries
- * Date: 5/11/12
- * Time: 2:29 PM
+ * @author Peter Dietz (pdietz84@gmailcom)
  */
 public class SpecifiedGroupAuthenticatedSelector implements Selector {
     private static Logger log = Logger.getLogger(SpecifiedGroupAuthenticatedSelector.class);
