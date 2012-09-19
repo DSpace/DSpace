@@ -63,7 +63,7 @@ public class XmlWorkflowItem implements InProgressSubmission {
      */
 //    private ArrayList<StepRecord> activeSteps;
 
-    XmlWorkflowItem(Context context, TableRow row) throws SQLException, AuthorizeException, IOException {
+    XmlWorkflowItem(Context context, TableRow row) throws SQLException {
         ourContext = context;
         wfRow = row;
  //       activeSteps = new ArrayList<StepRecord>();
@@ -356,6 +356,33 @@ public class XmlWorkflowItem implements InProgressSubmission {
         wsArray = (XmlWorkflowItem[]) wsItems.toArray(wsArray);
 
         return wsArray;
+    }
+
+    /**
+     * Check to see if a particular item is currently under Workflow.
+     * If so, its XmlWorkflowItem is returned.  If not, null is returned
+     *
+     * @param context
+     *            the context object
+     * @param i
+     *            the item
+     *
+     * @return XmlWorkflow item corresponding to the item, or null
+     */
+    public static XmlWorkflowItem findByItem(Context context, Item i)
+            throws SQLException
+    {
+        // Look for the unique workflowitem entry where 'item_id' references this item
+        TableRow row =  DatabaseManager.findByUnique(context, "cwf_workflowitem", "item_id", i.getID());
+
+        if (row == null)
+        {
+            return null;
+        }
+        else
+        {
+            return new XmlWorkflowItem(context, row);
+        }
     }
 
     /**
