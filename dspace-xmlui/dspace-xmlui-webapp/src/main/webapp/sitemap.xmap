@@ -95,6 +95,7 @@
                         <map:transformer name="LDAPLogin" src="org.dspace.app.xmlui.aspect.eperson.LDAPLogin"/>
                         <map:transformer name="notice" src="org.dspace.app.xmlui.aspect.general.NoticeTransformer"/>
                         <map:transformer name="NamespaceFilter" src="org.dspace.app.xmlui.cocoon.NamespaceFilterTransformer"/>
+                        <map:transformer name="RestrictedItem" src="org.dspace.app.xmlui.aspect.artifactbrowser.RestrictedItem"/>
                 </map:transformers>
                 <map:matchers default="wildcard">
                         <map:matcher logger="sitemap.matcher.wildcard" name="wildcard"
@@ -122,6 +123,7 @@
                                 <map:parameter name="ignore-missing-tables" value="true"/>
                         </map:matcher>
                         <map:matcher name="request" src="org.apache.cocoon.matching.RequestParameterMatcher"/>
+                        <map:matcher name="StatisticsAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.statistics.StatisticsAuthorizedMatcher"/>
                 </map:matchers>
                 <map:selectors>
                         <map:selector name="browser" src="org.apache.cocoon.selection.BrowserSelector"
@@ -177,6 +179,8 @@
                                 <!-- The statement below tells the selector to unroll as much exceptions as possible -->
                                 <exception class="java.lang.Throwable" unroll="true"/>
                         </map:selector>
+                        <!-- AuthenticatedSelector for forcing user to login if not authorized - PMD -->
+                        <map:selector name="AuthenticatedSelector" src="org.dspace.app.xmlui.aspect.general.AuthenticatedSelector"/>
                 </map:selectors>
                 <map:readers default="resource">
                     <map:reader name="resource" src="org.apache.cocoon.reading.ResourceReader"
@@ -186,6 +190,9 @@
                     <map:reader name="BitstreamReader" src="org.dspace.app.xmlui.cocoon.BitstreamReader"/>
                     <map:reader name="ExportReader" src="org.dspace.app.xmlui.cocoon.ItemExportDownloadReader"/>
                     <map:reader name="MetadataExportReader" src="org.dspace.app.xmlui.cocoon.MetadataExportReader"/>
+
+                    <map:reader name="CSVOutputter" src="org.dspace.app.xmlui.aspect.statisticsElasticSearch.CSVOutputter"/>
+
                     <map:reader name="OpenURLReader" src="org.dspace.app.xmlui.cocoon.OpenURLReader"/>
                     <map:reader name="SitemapReader" src="org.dspace.app.xmlui.cocoon.SitemapReader"/>
                     <map:reader name="ConcatenationReader" src="org.dspace.app.xmlui.cocoon.ConcatenationReader"/>
@@ -376,6 +383,50 @@
                                 <map:read type="MetadataExportReader">
                                     <map:parameter name="handle" value="{1}/{2}" />
                                 </map:read>
+                        </map:match>
+
+                        <map:match pattern="handle/*/*/stats/csv">
+                            <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
+                                <map:read type="CSVOutputter"/>
+                            </map:match>
+
+                            <map:match type="StatisticsAuthorizedMatcher" pattern="!READ">
+                                <map:select type="AuthenticatedSelector">
+                                    <map:when test="eperson">
+                                        <map:transform type="RestrictedItem"/>
+                                        <map:serialize/>
+                                    </map:when>
+                                    <map:otherwise>
+                                        <map:act type="StartAuthentication">
+                                            <map:parameter name="header" value="xmlui.ArtifactBrowser.RestrictedItem.auth_header"/>
+                                            <map:parameter name="message" value="xmlui.ArtifactBrowser.RestrictedItem.auth_message"/>
+                                        </map:act>
+                                        <map:serialize/>
+                                    </map:otherwise>
+                                </map:select>
+                            </map:match>
+                        </map:match>
+
+                        <map:match pattern="handle/*/*/stats/csv/*">
+                            <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
+                                <map:read type="CSVOutputter"/>
+                            </map:match>
+
+                            <map:match type="StatisticsAuthorizedMatcher" pattern="!READ">
+                                <map:select type="AuthenticatedSelector">
+                                    <map:when test="eperson">
+                                        <map:transform type="RestrictedItem"/>
+                                        <map:serialize/>
+                                    </map:when>
+                                    <map:otherwise>
+                                        <map:act type="StartAuthentication">
+                                            <map:parameter name="header" value="xmlui.ArtifactBrowser.RestrictedItem.auth_header"/>
+                                            <map:parameter name="message" value="xmlui.ArtifactBrowser.RestrictedItem.auth_message"/>
+                                        </map:act>
+                                        <map:serialize/>
+                                    </map:otherwise>
+                                </map:select>
+                            </map:match>
                         </map:match>
 
                         <map:match pattern="JSON/discovery/**">

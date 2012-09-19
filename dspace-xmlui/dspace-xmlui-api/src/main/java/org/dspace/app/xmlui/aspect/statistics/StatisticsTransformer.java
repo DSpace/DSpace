@@ -7,24 +7,34 @@
  */
 package org.dspace.app.xmlui.aspect.statistics;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.text.ParseException;
-
+import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.Message;
+import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.statistics.Dataset;
+import org.dspace.statistics.ObjectCount;
 import org.dspace.statistics.content.*;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class StatisticsTransformer extends AbstractDSpaceTransformer {
 
@@ -39,6 +49,30 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
     private static final String T_head_visits_countries = "xmlui.statistics.visits.countries";
     private static final String T_head_visits_cities = "xmlui.statistics.visits.cities";
     private static final String T_head_visits_bitstream = "xmlui.statistics.visits.bitstreams";
+
+    private Date dateStart = null;
+    private Date dateEnd = null;
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+    public StatisticsTransformer(Date dateStart, Date dateEnd) {
+        this.dateStart = dateStart;
+        this.dateEnd = dateEnd;
+
+        try {
+            this.context = new Context();
+        } catch (SQLException e) {
+            log.error("Error getting context in StatisticsTransformer:" + e.getMessage());
+        }
+    }
+
+    public StatisticsTransformer() {
+        try {
+            this.context = new Context();
+        } catch (SQLException e) {
+            log.error("Error getting context in StatisticsTransformer:" + e.getMessage());
+        }
+    }
 
     /**
      * Add a page title and trail links
@@ -387,4 +421,5 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 		}
 
 	}
+
 }

@@ -24,6 +24,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <filters.file>build.properties</filters.file>
+        <lucene.version>3.5.0</lucene.version>
     </properties>
 
     <build>
@@ -632,12 +633,12 @@
          <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
-            <version>3.3.0</version>
+            <version>${lucene.version}</version>
          </dependency>
          <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers</artifactId>
-            <version>3.3.0</version>
+            <version>${lucene.version}</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
@@ -1205,4 +1206,13 @@
     <distributionManagement>
         <!-- further distribution management is found upstream in the sonatype parent -->
     </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>sonatype-releases</id>
+            <name>Sonatype Releases Repository</name>
+            <url>http://oss.sonatype.org/content/repositories/releases/</url>
+        </repository>
+    </repositories>
+    
 </project>
