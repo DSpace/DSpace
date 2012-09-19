@@ -19,6 +19,7 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
         </dependency>
+
         <!-- Custom build DSpace cocoon -->
         <dependency>
             <groupId>jdom</groupId>
