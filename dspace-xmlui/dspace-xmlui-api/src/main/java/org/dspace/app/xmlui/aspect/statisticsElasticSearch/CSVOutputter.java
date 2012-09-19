@@ -132,24 +132,6 @@ public class CSVOutputter extends AbstractReader implements Recyclable
                 DateHistogramFacet monthlyDownloadsFacet = searchResponse.getFacets().facet(DateHistogramFacet.class, "monthly_downloads");
                 addDateHistogramFacetToWriter(monthlyDownloadsFacet);
             }
-            else if (requestedReport.equalsIgnoreCase("itemsAdded"))
-            {
-                // 1 - Number of Items in The Container (Community/Collection) (monthly and cumulative for the year)
-                writer.writeNext(new String[]{"Date", "Items Added"});
-                List<TableRow> tableRowList = statisticsTransformerInstance.addItemsInContainer(dso);
-                for(TableRow row: tableRowList) {
-                    writer.writeNext(new String[]{row.getStringColumn("yearmo"), row.getLongColumn("countitem") + ""});
-                }
-            }
-            else if(requestedReport.equalsIgnoreCase("filesAdded"))
-            {
-                // 2 - Number of Files in The Container (monthly and cumulative)
-                writer.writeNext(new String[]{"Date", "Files Added"});
-                List<TableRow> tableRowList = statisticsTransformerInstance.addFilesInContainerQuery(dso);
-                for(TableRow row: tableRowList) {
-                    writer.writeNext(new String[]{row.getStringColumn("yearmo"), row.getLongColumn("countitem") + ""});
-                }
-            }
             else if(requestedReport.equalsIgnoreCase("topDownloads"))
             {
                 SearchRequestBuilder requestBuilder = esStatsViewer.facetedQueryBuilder(esStatsViewer.facetTopBitstreamsAllTime);

@@ -213,25 +213,6 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
                     TermsFacet bitstreamsFacet = resp.getFacets().facet(TermsFacet.class, "top_bitstreams_lastmonth");
                     addTermFacetToTable(bitstreamsFacet, division, "Bitstream", "Top Downloads for " + getLastMonthString());
                 }
-                else if(requestedReport.equalsIgnoreCase("itemsAdded"))
-                {
-                    StatisticsTransformer statisticsTransformerInstance = new StatisticsTransformer(dateStart, dateEnd);
-
-                    // 1 - Number of Items in The Container (Community/Collection) (monthly and cumulative for the year)
-                    if(dso instanceof org.dspace.content.Collection || dso instanceof Community) {
-                        statisticsTransformerInstance.addItemsInContainer(dso, division);
-                        division.addDivision("chart_div");
-                    }
-                }
-                else if(requestedReport.equalsIgnoreCase("filesAdded"))
-                {
-                    StatisticsTransformer statisticsTransformerInstance = new StatisticsTransformer(dateStart, dateEnd);
-                    // 2 - Number of Files in The Container (monthly and cumulative)
-                    if(dso instanceof org.dspace.content.Collection || dso instanceof Community) {
-                        statisticsTransformerInstance.addFilesInContainer(dso, division);
-                        division.addDivision("chart_div");
-                    }
-                }
             }
 
         } finally {
@@ -240,20 +221,6 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
     }
     
     public void showAllReports() throws WingException, SQLException{
-        // Show some non-usage-stats.
-        // @TODO Refactor the non-usage stats out of the StatsTransformer
-        StatisticsTransformer statisticsTransformerInstance = new StatisticsTransformer(dateStart, dateEnd);
-
-        // 1 - Number of Items in The Container (Community/Collection) (monthly and cumulative for the year)
-        if(dso instanceof org.dspace.content.Collection || dso instanceof Community) {
-            statisticsTransformerInstance.addItemsInContainer(dso, division);
-        }
-
-        // 2 - Number of Files in The Container (monthly and cumulative)
-        if(dso instanceof org.dspace.content.Collection || dso instanceof Community) {
-            statisticsTransformerInstance.addFilesInContainer(dso, division);
-        }
-
         List<AbstractFacetBuilder> summaryFacets = new ArrayList<AbstractFacetBuilder>();
         summaryFacets.add(facetTopTypes);
         summaryFacets.add(facetTopUniqueIP);
