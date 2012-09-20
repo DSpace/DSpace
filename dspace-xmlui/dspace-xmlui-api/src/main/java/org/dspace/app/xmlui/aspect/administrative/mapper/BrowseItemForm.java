@@ -106,7 +106,7 @@ public class BrowseItemForm extends AbstractDSpaceTransformer {
 			String itemID = String.valueOf(item.getID());
 			Collection owningCollection = item.getOwningCollection();
 			String owning = owningCollection.getMetadata("name");
-			String author = "unkown";
+			String author = "unknown";
 			DCValue[] dcAuthors = item.getDC("contributor",Item.ANY,Item.ANY);
 			if (dcAuthors != null && dcAuthors.length >= 1)
             {
