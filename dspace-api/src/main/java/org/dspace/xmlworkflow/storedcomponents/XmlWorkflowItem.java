@@ -369,7 +369,7 @@ public class XmlWorkflowItem implements InProgressSubmission {
      *
      * @return workflow item corresponding to the item, or null
      */
-    public static XmlWorkflowItem findByItem(Context context, Item item) throws SQLException {
+    public static XmlWorkflowItem findByItem(Context context, Item item) throws SQLException, AuthorizeException, IOException {
         TableRow row = DatabaseManager.findByUnique(context, "cwf_workflowitem", "item_id", item.getID());
 
         XmlWorkflowItem wi = null;
