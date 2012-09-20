@@ -270,7 +270,7 @@ public class Email
             props.put("mail.smtp.auth", "true");
             SMTPAuthenticator smtpAuthenticator = new SMTPAuthenticator(
                     username, password);
-            session = Session.getDefaultInstance(props, smtpAuthenticator);
+            session = Session.getInstance(props, smtpAuthenticator);
         }
         else
         {

@@ -86,7 +86,7 @@ public class DailyReportEmailer
         props.put("mail.smtp.host", server);
 
         // Get session
-        Session session = Session.getDefaultInstance(props, null);
+        Session session = Session.getInstance(props, null);
 
         MimeMessage msg = new MimeMessage(session);
         Multipart multipart = new MimeMultipart();
