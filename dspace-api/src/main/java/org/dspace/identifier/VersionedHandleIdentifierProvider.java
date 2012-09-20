@@ -480,10 +480,13 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
 
         if(handle==null){
             handle = DatabaseManager.create(context, "Handle");
-            handleId = createId(handle.getIntColumn("handle_id"));
         }
 
+        if(handleId==null)
+            handleId = createId(handle.getIntColumn("handle_id"));
+
         modifyHandleRecord(context, dso, handle, handleId);
+
         return handleId;
     }
 

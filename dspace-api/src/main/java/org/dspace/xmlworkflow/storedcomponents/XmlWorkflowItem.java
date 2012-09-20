@@ -63,7 +63,7 @@ public class XmlWorkflowItem implements InProgressSubmission {
      */
 //    private ArrayList<StepRecord> activeSteps;
 
-    XmlWorkflowItem(Context context, TableRow row) throws SQLException, AuthorizeException, IOException {
+    XmlWorkflowItem(Context context, TableRow row) throws SQLException {
         ourContext = context;
         wfRow = row;
  //       activeSteps = new ArrayList<StepRecord>();
@@ -369,7 +369,7 @@ public class XmlWorkflowItem implements InProgressSubmission {
      *
      * @return workflow item corresponding to the item, or null
      */
-    public static XmlWorkflowItem findByItem(Context context, Item item) throws SQLException, AuthorizeException, IOException {
+    public static XmlWorkflowItem findByItem(Context context, Item item) throws SQLException{
         TableRow row = DatabaseManager.findByUnique(context, "cwf_workflowitem", "item_id", item.getID());
 
         XmlWorkflowItem wi = null;
