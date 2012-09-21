@@ -94,11 +94,11 @@
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 		</dependency>
-		<dependency>
+<!--		<dependency>
              <groupId>org.dspace</groupId>
             <artifactId>dspace-xoai-api</artifactId>
             <version>${project.version}</version>
-        </dependency>
+        </dependency>-->
 	</dependencies>
 
 </project>

@@ -34,6 +34,12 @@
             <scope>provided</scope>
         </dependency>
         
+        <dependency>
+        	<!-- Esta dependencia es por las extensiones para xoai ... -->
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-xoai-api</artifactId>
+            <version>1.8.2</version>
+        </dependency>
     </dependencies>
 
     <build>

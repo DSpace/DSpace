@@ -16,9 +16,9 @@
 	<Contexts>
 		<Context baseurl="request">
 			<Format refid="oaidc" />
-			<Format refid="mets" />
-			<Format refid="xoai" />
-			<Format refid="didl" />
+<!-- 			<Format refid="mets" /> -->
+<!-- 			<Format refid="xoai" /> -->
+<!-- 			<Format refid="didl" /> -->
 		</Context>
 		
 		<!--
@@ -73,7 +73,55 @@
 			<Set refid="openaireSet" />
 			<!-- Metadata Formats -->
 			<Format refid="oaidc" />
-			<Format refid="mets" />
+<!-- 			<Format refid="mets" /> -->
+		</Context>
+		
+		<Context baseurl="snrd">
+		
+			<!-- Date format, field prefixes, etc are ensured by the transformer -->
+			<Transformer refid="snrdTransformer" />
+
+			<!-- Regla 3 -->
+			<Filter refid="fulltextOnlyFilter"/>
+			
+			<!-- Regla 4 -->
+			<Filter refid="titleexistsFilter" />
+			
+			<!-- Regla 5 -->
+			<Filter refid="authorexistsFilter"/>
+			
+			<!-- Regla 7 -->
+<!-- 	TBD		<Filter refid="directorExisteParaTesisFilter"/> -->
+			
+			<!-- Regla 8
+			al dope 
+			<Filter refid="dateExistsFilter"/>
+			-->
+			
+			<!-- Regla 9 
+			Deberia ser postfilter 
+			<Filter refid="driverdocumenttypeFilter"/>
+			-->
+			
+			<!-- Regla 10
+			Deberia ser postfilter  
+			<Filter refid="snrddocumenttypeFilter"/>
+			-->
+			<!-- Regla 11
+			no se puede aplicar aqui porque el mime es del bitstream!
+			<Filter refid="formatExistsFilter"/>
+			 -->
+			
+			<!-- Regla 13 
+			al dope
+			<Filter refid="identifierExistsFilter"/>
+			-->
+			
+			<!-- Just an alias, if fact it returns all items within the driver context -->
+			<Set refid="snrdSet" />
+			
+			<!-- Metadata Formats -->
+			<Format refid="oaidc" />
 		</Context>
 	</Contexts>
 	
@@ -113,14 +161,19 @@
 		<Transformer id="openaireTransformer">
 			<XSLT>transformers/openaire.xsl</XSLT>
 		</Transformer>
+		<Transformer id="snrdTransformer">
+			<XSLT>transformers/snrd.xsl</XSLT>
+		</Transformer>
 	</Transformers>
 	
 
 	<Filters>
+		
 		<Filter id="authorexistsFilter">
-			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
-			<Parameter key="field">
-				<Value>dc.contributor.author</Value>
+			<Class>ar.edu.unlp.sedici.dspace.xoai.filters.DSpaceAnyMetadataExistsFilter</Class>
+			<Parameter key="fields">
+				<Value>sedici.creator.person</Value>
+				<Value>sedici.creator.corporate</Value>
 			</Parameter>
 		</Filter>
 		
@@ -131,31 +184,59 @@
 			</Parameter>
 		</Filter>
 		
+<!-- 		<Filter id="authorexistsFilter"> -->
+<!-- 			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class> -->
+<!-- 			<Parameter key="field"> -->
+<!-- 				<Value>dc.contributor.author</Value> -->
+<!-- 			</Parameter> -->
+<!-- 		</Filter> -->
+		
+		<Filter id="dateExistsFilter">
+			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+			<Parameter key="field">
+				<Value>dc.date</Value>
+			</Parameter>
+		</Filter>
+		
+		<Filter id="formatExistsFilter">
+			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+			<Parameter key="field">
+				<Value>dc.format</Value>
+			</Parameter>
+		</Filter>
+		
+		<Filter id="identifierExistsFilter">
+			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+			<Parameter key="field">
+				<Value>dc.format</Value>
+			</Parameter>
+		</Filter>
+		
 		<Filter id="driverdocumenttypeFilter">
 			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
 			<Parameter key="field">
 				<Value>dc.type</Value>
 			</Parameter>
 			<Parameter key="operator">
-				<Value>ends_with</Value>
+				<Value>equal</Value>
 			</Parameter>
 			<Parameter key="value">
-				<Value>article</Value>
-				<Value>bachelorThesis</Value>
-				<Value>masterThesis</Value>
-				<Value>doctoralThesis</Value>
-				<Value>book</Value>
-				<Value>bookPart</Value>
-				<Value>review</Value>
-				<Value>conferenceObject</Value>
-				<Value>lecture</Value>
-				<Value>workingPaper</Value>
-				<Value>preprint</Value>
-				<Value>report</Value>
-				<Value>annotation</Value>
-				<Value>contributionToPeriodical</Value>
-				<Value>patent</Value>
-				<Value>other</Value>
+				<Value>info:eu-repo/semantics/article</Value>
+				<Value>info:eu-repo/semantics/bachelorThesis</Value>
+				<Value>info:eu-repo/semantics/masterThesis</Value>
+				<Value>info:eu-repo/semantics/doctoralThesis</Value>
+				<Value>info:eu-repo/semantics/book</Value>
+				<Value>info:eu-repo/semantics/bookPart</Value>
+				<Value>info:eu-repo/semantics/review</Value>
+				<Value>info:eu-repo/semantics/conferenceObject</Value>
+				<Value>info:eu-repo/semantics/lecture</Value>
+				<Value>info:eu-repo/semantics/workingPaper</Value>
+				<Value>info:eu-repo/semantics/preprint</Value>
+				<Value>info:eu-repo/semantics/report</Value>
+				<Value>info:eu-repo/semantics/annotation</Value>
+				<Value>info:eu-repo/semantics/contributionToPeriodical</Value>
+				<Value>info:eu-repo/semantics/patent</Value>
+				<Value>info:eu-repo/semantics/other</Value>
 			</Parameter>
 		</Filter>
 		<Filter id="driveraccessFilter">
@@ -186,6 +267,65 @@
 				<Value>info:eurepo/grantAgreement/EC/FP</Value>
 			</Parameter>
 		</Filter>
+		
+		<Filter id="snrddocumenttypeFilter">
+			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+			<Parameter key="field">
+				<Value>dc.type</Value>
+			</Parameter>
+			<Parameter key="operator">
+				<Value>equal</Value>
+			</Parameter>
+			<Parameter key="value">
+				<Value>artículo</Value>
+				<Value>libro</Value>
+				<Value>parte de libro</Value>
+				<Value>documento de</Value>
+				<Value>conferencia</Value>
+				<Value>tesis doctoral</Value>
+				<Value>tesis de maestría</Value>
+				<Value>tesis de grado</Value>
+				<Value>trabajo final de grado</Value>
+				<Value>patente</Value>
+				<Value>marca</Value>
+				<Value>modelo industrial</Value>
+				<Value>modelo de utilidad</Value>
+				<Value>documento legal</Value>
+				<Value>reseña artículo</Value>
+				<Value>revisión literaria</Value>
+				<Value>documento de trabajo</Value>
+				<Value>informe técnico</Value>
+				<Value>fotografía</Value>
+				<Value>plano</Value>
+				<Value>mapa</Value>
+				<Value>diapositiva</Value>
+				<Value>póster</Value>
+				<Value>imagen satelital</Value>
+				<Value>radiografía</Value>
+				<Value>transparencia</Value>
+				<Value>diapositiva de microscopio</Value>
+				<Value>película</Value>
+				<Value>documental</Value>
+				<Value>videograbación</Value>
+				<Value>conjunto de dato</Value>
+				<Value>proyecto de investigación</Value>
+			</Parameter>
+		</Filter>
+		
+		<Filter id="fulltextOnlyFilter">
+			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+			<Parameter key="field">
+				<Value>sedici.fulltext</Value>
+			</Parameter>
+			<Parameter key="operator">
+				<Value>equal</Value>
+			</Parameter>
+			<Parameter key="value">
+				<Value>true</Value>
+				<Value>si</Value>
+			</Parameter>
+		</Filter>
+		
 	</Filters>
 	
 	<Sets>
@@ -199,5 +339,11 @@
 			<Name>EC_fundedresources set</Name>
 			<!-- Just an alias -->
 		</Set>
+		<Set id="snrdSet">
+			<Pattern>snrd</Pattern>
+			<Name>Conjunto de recursos para Sistema Nacional de Repositorios Digitales, Argentina SNRD</Name>
+			<!-- Just an alias -->
+		</Set>
+	
 	</Sets>
 </Configuration>

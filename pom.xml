@@ -54,7 +54,9 @@
 
 		</profile>
 
+
 		<profile>
+			<!-- Esto habria que sacarlo una vez que figuren las dependencias de xoai en los repos de maven -->
 			<id>xoai</id>
 			<activation>
 				<property>
