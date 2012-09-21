@@ -335,7 +335,7 @@
 		<dependency>
 			<groupId>gr.ekt</groupId>
 			<artifactId>biblio-transformation-engine</artifactId>
-			<version>0.81</version>
+			<version>0.82</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.opencsv</groupId>
