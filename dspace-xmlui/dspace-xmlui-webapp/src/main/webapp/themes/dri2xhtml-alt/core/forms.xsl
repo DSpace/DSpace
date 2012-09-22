@@ -837,6 +837,7 @@
             <xsl:when test="@type= 'textarea'">
                                 <textarea>
                                     <xsl:call-template name="fieldAttributes"/>
+                                    <xsl:attribute name="onkeydown">event.cancelBubble=true;</xsl:attribute>
 
                                     <!--
                                         if the cols and rows attributes are not defined we need to call
