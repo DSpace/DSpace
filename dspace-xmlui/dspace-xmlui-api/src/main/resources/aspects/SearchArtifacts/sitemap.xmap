@@ -51,6 +51,10 @@ and searching the repository.
             <map:selector name="IfModifiedSinceSelector"
                           src="org.dspace.app.xmlui.aspect.general.IfModifiedSinceSelector"/>
         </map:selectors>
+        <map:actions>
+            <map:action name="SimpleSearchLoggerAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.SimpleSearchLoggerAction" />
+            <map:action name="AdvancedSearchLoggerAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.AdvancedSearchLoggerAction" />
+        </map:actions>
 
     </map:components>
         <map:pipelines>
@@ -83,16 +87,19 @@ and searching the repository.
 
                         <!-- Search -->
                         <map:match pattern="search">
-                                <map:transform type="SimpleSearch"/>
-                                <map:serialize type="xml"/>
+                            <map:act type="SimpleSearchLoggerAction"/>
+                            <map:transform type="SimpleSearch"/>
+                            <map:serialize type="xml"/>
                         </map:match>
                         <map:match pattern="simple-search">
-                                <map:transform type="SimpleSearch"/>
-                                <map:serialize type="xml"/>
+                            <map:act type="SimpleSearchLoggerAction"/>
+                            <map:transform type="SimpleSearch"/>
+                            <map:serialize type="xml"/>
                         </map:match>
                         <map:match pattern="advanced-search">
-                                <map:transform type="AdvancedSearch"/>
-                                <map:serialize type="xml"/>
+                            <map:act type="AdvancedSearchLoggerAction"/>
+                            <map:transform type="AdvancedSearch"/>
+                            <map:serialize type="xml"/>
                         </map:match>
 
 
@@ -119,20 +126,23 @@ and searching the repository.
 
                                                 <!-- Simple search -->
                                                 <map:match pattern="handle/*/*/search">
-                                                        <map:transform type="SimpleSearch"/>
-                                                        <map:serialize type="xml"/>
+                                                    <map:act type="SimpleSearchLoggerAction"/>
+                                                    <map:transform type="SimpleSearch"/>
+                                                    <map:serialize type="xml"/>
                                                 </map:match>
 
                                                 <!-- Simple search again, but this time they said it -->
                                                 <map:match pattern="handle/*/*/simple-search">
-                                                        <map:transform type="SimpleSearch"/>
-                                                        <map:serialize type="xml"/>
+                                                    <map:act type="SimpleSearchLoggerAction"/>
+                                                    <map:transform type="SimpleSearch"/>
+                                                    <map:serialize type="xml"/>
                                                 </map:match>
 
                                                 <!-- Advanced search -->
                                                 <map:match pattern="handle/*/*/advanced-search">
-                                                        <map:transform type="AdvancedSearch"/>
-                                                        <map:serialize type="xml"/>
+                                                    <map:act type="AdvancedSearchLoggerAction"/>
+                                                    <map:transform type="AdvancedSearch"/>
+                                                    <map:serialize type="xml"/>
                                                 </map:match>
 
                                         </map:match> <!-- End match community or collection -->

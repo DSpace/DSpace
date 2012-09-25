@@ -28,7 +28,9 @@ public class LoggerUsageEventListener extends AbstractUsageEventListener{
     
 	public void receiveEvent(Event event) {
 		
-		if(event instanceof UsageEvent)
+        //Search events are already logged
+		//UsageSearchEvent is already logged in the search classes, no need to repeat this logging
+		if(event instanceof UsageEvent && !(event instanceof UsageSearchEvent))
 		{
 			UsageEvent ue = (UsageEvent)event;
 
