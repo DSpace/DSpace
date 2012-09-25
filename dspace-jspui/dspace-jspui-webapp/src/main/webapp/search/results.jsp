@@ -92,6 +92,10 @@
 
 <dspace:layout titlekey="jsp.search.results.title">
 
+<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.6.2.min.js"> </script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/search-results.js"> </script>
+
+
     <%-- <h1>Search Results</h1> --%>
 
 <h1><fmt:message key="jsp.search.results.title"/></h1>
@@ -293,6 +297,10 @@ else
    </form>
    </div>
 
+<%
+    if(0 < communities.length || 0 < collections.length || 0 < items.length){
+%>
+<div id="search-results-division">
 <% if (communities.length > 0 ) { %>
     <%-- <h3>Community Hits:</h3> --%>
     <h3><fmt:message key="jsp.search.results.comhits"/></h3>
@@ -312,6 +320,10 @@ else
     <h3><fmt:message key="jsp.search.results.itemhits"/></h3>
     <dspace:itemlist items="<%= items %>" sortOption="<%= so %>" authorLimit="<%= qResults.getEtAl() %>" />
 <% } %>
+</div>
+<%
+    }
+%>
 
 <p align="center">
 
@@ -382,6 +394,16 @@ if (pageTotal > pageCurrent)
 %>
 
 </p>
+
+<form id="dso-display" action="<%=request.getContextPath()%>/dso-display" method="post">
+    <input type="hidden" name="query"   value="<%=query%>"/>
+    <input type="hidden" name="rpp"     value="<%=rpp%>"/>
+    <input type="hidden" name="page"   value="<%=pageCurrent%>"/>
+    <input type="hidden" name="sort_by" value="<%=(so != null ? so.getNumber() : 0)%>"/>
+    <input type="hidden" name="order"   value="<%=order%>"/>
+    <input type="hidden" name="scope"   value="<%=collection != null ? collection.getHandle() : (community != null ? community.getHandle() : "")%>"/>
+    <input type="hidden" name="redirectUrl"   value=""/>
+</form>
 
 </dspace:layout>
 

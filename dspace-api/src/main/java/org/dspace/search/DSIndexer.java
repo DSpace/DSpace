@@ -103,7 +103,8 @@ public class DSIndexer
 
     private static int batchFlushAfterDocuments = ConfigurationManager.getIntProperty("search.batch.documents", 20);
     private static boolean batchProcessingMode = false;
-    
+    static final Version luceneVersion = Version.LUCENE_35;
+
     // Class to hold the index configuration (one instance per config line)
     private static class IndexConfig
     {
@@ -637,7 +638,7 @@ public class DSIndexer
                 Class analyzerClass = Class.forName(analyzerClassName);
                 Constructor constructor = analyzerClass.getDeclaredConstructor(Version.class);
                 constructor.setAccessible(true);
-                analyzer = (Analyzer) constructor.newInstance(Version.LUCENE_33);
+                analyzer = (Analyzer) constructor.newInstance(luceneVersion);
             }
             catch (Exception e)
             {
@@ -914,7 +915,7 @@ public class DSIndexer
             throws IOException
     {
         Directory dir = FSDirectory.open(new File(indexDirectory));
-        IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_33, getAnalyzer());
+        IndexWriterConfig iwc = new IndexWriterConfig(luceneVersion, getAnalyzer());
         if(wipeExisting){
             iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         }else{

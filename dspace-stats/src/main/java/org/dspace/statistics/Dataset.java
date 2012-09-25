@@ -18,13 +18,14 @@ import java.util.Map;
 
 import com.Ostermiller.util.ExcelCSVPrinter;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
- * 
+ *
  * @author kevinvandevelde at atmire.com
  * Date: 21-jan-2009
  * Time: 13:44:48
- * 
+ *
  */
 public class Dataset {
 
@@ -41,14 +42,14 @@ public class Dataset {
     /* The attributes for the rows */
     private List<Map<String, String>> rowLabelsAttrs;
     /* The data in a matrix */
-    private float[][]matrix;
+    private String[][]matrix;
     /* The format in which we format our floats */
     private String format = "0";
 
 
 
     public Dataset(int rows, int cols){
-        matrix = new float[rows][cols];
+        matrix = new String[rows][cols];
         nbRows = rows;
         nbCols = cols;
         initColumnLabels(cols);
@@ -56,7 +57,7 @@ public class Dataset {
     }
 
     public Dataset(float[][] matrix){
-        this.matrix = (float[][]) ArrayUtils.clone(matrix);
+        this.matrix = (String[][]) ArrayUtils.clone(matrix);
         nbRows = matrix.length;
         if(0 < matrix.length && 0 < matrix[0].length)
         {
@@ -146,10 +147,6 @@ public class Dataset {
         return rowLabels;
     }
 
-    public float[][] getMatrix() {
-        return (float[][]) ArrayUtils.clone(matrix);
-    }
-
     public int getNbRows() {
         return nbRows;
     }
@@ -166,40 +163,32 @@ public class Dataset {
         this.format = format;
     }
 
-    public String[][] getMatrixFormatted(){
-        DecimalFormat decimalFormat = new DecimalFormat(format);
+    public String[][] getMatrix(){
         if (matrix.length == 0) {
             return new String[0][0];
         } else {
-            String[][] strMatrix = new String[matrix.length][matrix[0].length];
-            for (int i = 0; i < matrix.length; i++) {
-                for (int j = 0; j < matrix[i].length; j++) {
-                    strMatrix[i][j] = decimalFormat.format(matrix[i][j]);
-                }
-            }
-            return strMatrix;
+            return matrix;
         }
     }
 
     public void addValueToMatrix(int row, int coll, float value) {
-        matrix[row][coll] = value;
+        DecimalFormat decimalFormat = new DecimalFormat(format);
+        matrix[row][coll] = decimalFormat.format(value);
     }
 
 
     public void addValueToMatrix(int row, int coll, String value) throws ParseException {
-        DecimalFormat decimalFormat = new DecimalFormat(format);
-        Number number = decimalFormat.parse(value);
-        matrix[row][coll] = number.floatValue();
+        matrix[row][coll] = value;
     }
 
     /**
-     * Returns false if this dataset only contains zero's. 
+     * Returns false if this dataset only contains zero's.
      */
     public boolean containsNonZeroValues(){
         if (matrix != null) {
-            for (float[] vector : matrix) {
-                for (float v : vector) {
-                    if (v != 0)
+            for (String[] vector : matrix) {
+                for (String v : vector) {
+                    if (StringUtils.isBlank(v) || v.equals("0"))
                     {
                         return true;
                     }
@@ -215,7 +204,7 @@ public class Dataset {
         //Lets make sure we at least have something to flip
         if(0 < matrix.length && 0 < matrix[0].length){
             //Flip the data first
-            float[][] newMatrix = new float[matrix[0].length][matrix.length];
+            String[][] newMatrix = new String[matrix[0].length][matrix.length];
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length; j++) {
                     newMatrix[j][i] = matrix[i][j];
@@ -258,7 +247,7 @@ public class Dataset {
         ecsvp.writeln();
         List<String> rowLabels = getRowLabels();
 
-        String[][] matrix = getMatrixFormatted();
+        String[][] matrix = getMatrix();
         for (int i = 0; i < rowLabels.size(); i++) {
             String rowLabel = rowLabels.get(i);
             ecsvp.write(rowLabel);

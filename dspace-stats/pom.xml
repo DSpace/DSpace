@@ -145,14 +145,19 @@
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
+                    <artifactId>jcl-over-slf4j</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
-                    <artifactId>jcl-over-slf4j</artifactId>
+                    <artifactId>slf4j-api</artifactId>
                 </exclusion>
             </exclusions>
 		</dependency>
+        <dependency>
+        	<groupId>commons-configuration</groupId>
+        	<artifactId>commons-configuration</artifactId>
+        	<version>1.8</version>
+        </dependency>
 		<dependency>
 			<groupId>org.dspace.dependencies</groupId>
 			<artifactId>dspace-geoip</artifactId>

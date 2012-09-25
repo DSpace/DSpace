@@ -32,6 +32,8 @@ public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements M
 
 
     public Map match(String pattern, Map objectModel, Parameters parameters) throws PatternException {
+        String[] statisticsDisplayTypes = parameters.getParameter("type", "").split(",");
+
         // Are we checking for *NOT* the action or the action.
         boolean not = false;
         int action = Constants.READ; // the action to check
@@ -55,8 +57,22 @@ public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements M
 
             //We have always got rights to view stats on the home page (admin rights will be checked later)
             boolean authorized = dso == null || AuthorizeManager.authorizeActionBoolean(context, dso, action, false);
+            //Check if (one of our) display type is admin only
+            //If one of the given ones isn't admin only, no need to check !
+            boolean  adminCheckNeeded = true;
+            for (String statisticsDisplayType : statisticsDisplayTypes) {
+                //Only usage statics are available on an item level
+                if(!"usage".equals(statisticsDisplayType) && dso != null && dso.getType() == Constants.ITEM){
+                    continue;
+                }
+                //If one isn't admin enabled no need to check for admin
+                if(!ConfigurationManager.getBooleanProperty("usage-statistics", "authorization.admin." + statisticsDisplayType, true)){
+                    adminCheckNeeded = false;
+                }
+            }
+
             //If we are authorized check for any other authorization actions present
-            if(authorized && ConfigurationManager.getBooleanProperty("usage-statistics", "authorization.admin"))
+            if(authorized && adminCheckNeeded)
             {
                 //If we have no user, we cannot be admin
                 if(context.getCurrentUser() == null)
