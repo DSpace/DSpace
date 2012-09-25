@@ -132,7 +132,7 @@ public class DisplayStatisticsServlet extends DSpaceServlet
 
             if (dataset != null)
             {
-                String[][] matrix = dataset.getMatrixFormatted();
+                String[][] matrix = dataset.getMatrix();
                 List<String> colLabels = dataset.getColLabels();
                 List<String> rowLabels = dataset.getRowLabels();
 
@@ -178,7 +178,7 @@ public class DisplayStatisticsServlet extends DSpaceServlet
 
             if (dataset != null)
             {
-                String[][] matrix = dataset.getMatrixFormatted();
+                String[][] matrix = dataset.getMatrix();
                 List<String> colLabels = dataset.getColLabels();
                 List<String> rowLabels = dataset.getRowLabels();
 
@@ -221,7 +221,7 @@ public class DisplayStatisticsServlet extends DSpaceServlet
 
                 if (dataset != null)
                 {
-                    String[][] matrix = dataset.getMatrixFormatted();
+                    String[][] matrix = dataset.getMatrix();
                     List<String> colLabels = dataset.getColLabels();
                     List<String> rowLabels = dataset.getRowLabels();
 
@@ -264,7 +264,7 @@ public class DisplayStatisticsServlet extends DSpaceServlet
 
                 if (dataset != null)
                 {
-                    String[][] matrix = dataset.getMatrixFormatted();
+                    String[][] matrix = dataset.getMatrix();
                     List<String> colLabels = dataset.getColLabels();
                     List<String> rowLabels = dataset.getRowLabels();
 
@@ -306,7 +306,7 @@ public class DisplayStatisticsServlet extends DSpaceServlet
 
                 if (dataset != null)
                 {
-                    String[][] matrix = dataset.getMatrixFormatted();
+                    String[][] matrix = dataset.getMatrix();
                     List<String> colLabels = dataset.getColLabels();
                     List<String> rowLabels = dataset.getRowLabels();
 

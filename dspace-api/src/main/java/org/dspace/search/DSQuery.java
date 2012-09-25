@@ -122,7 +122,7 @@ public class DSQuery
             // grab a searcher, and do the search
             IndexSearcher searcher = getSearcher(c);
 
-            QueryParser qp = new QueryParser(Version.LUCENE_33, "default", DSIndexer.getAnalyzer());
+            QueryParser qp = new QueryParser(DSIndexer.luceneVersion, "default", DSIndexer.getAnalyzer());
             log.debug("Final query string: " + querystring);
             
             if (operator == null || operator.equals("OR"))

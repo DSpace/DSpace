@@ -10,14 +10,12 @@ package org.dspace.app.xmlui.aspect.artifactbrowser;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
-import org.apache.oro.text.perl.Perl5Util;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -98,10 +96,9 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
     
     /** How many conjunction fields to display */
     private static final int FIELD_DISPLAY_COUNT = 3;
-    private static final int FIELD_MAX_COUNT = 12;
-    
+
     /** A cache of extracted search fields */
-    private java.util.List<SearchField> fields;
+    private java.util.List<AdvancedSearchUtils.SearchField> fields;
     
     /**
      * Add Page metadata.
@@ -167,7 +164,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
             buildQueryField(i, row.addCell());
         }
 
-        for (SearchField field : fields)
+        for (AdvancedSearchUtils.SearchField field : fields)
         {
         	// Skip over all the fields we've displayed.
         	int i = field.getIndex();
@@ -315,7 +312,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
             parameters.put("scope", scope);
         }
         
-        for (SearchField searchField : getSearchFields(request))
+        for (AdvancedSearchUtils.SearchField searchField : getSearchFields(request))
         {
         	int index = searchField.getIndex();
         	String field = searchField.getField();
@@ -363,188 +360,13 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
     protected String getQuery() throws UIException
     {
         Request request = ObjectModelHelper.getRequest(objectModel);   
-        return buildQuery(getSearchFields(request));
+        return AdvancedSearchUtils.buildQuery(getSearchFields(request));
     }
-    
-    
-    /**
-     * Given a list of search fields buld a lucene search query string.
-     * 
-     * @param fields The search fields
-     * @return A string
-     */
-    private String buildQuery(java.util.List<SearchField> fields)
-    {
-    	Perl5Util util = new Perl5Util();
-    	
-    	StringBuilder query = new StringBuilder();
-        query.append("(");
-    	
-    	// Loop through the fields building the search query as we go.
-    	for (SearchField field : fields)
-    	{	
-    		// if the field is empty, then skip it and try a later one.
-    		if (field.getQuery() == null)
-            {
-                continue;
-            }
-    		
-    		// Add the conjunction for everything but the first field.
-    		if (fields.indexOf(field) > 0)
-            {
-                query.append(" ").append(field.getConjunction()).append(" ").toString();
-            }
-            
-    		// Two cases, one if a specific search field is specified or if 
-    		// ANY is given then just a general search is performed.
-            if ("ANY".equals(field.getField()))
-            {
-            	// No field specified, 
-            	query.append("(").append(field.getQuery()).append(")").toString();
-            }
-            else
-            {   
-            	// Specific search field specified, add the field specific field.
-            	
-            	// Replace single quotes with double quotes (only if they match)
-            	String subQuery = util.substitute("s/\'(.*)\'/\"$1\"/g", field.getQuery());
-            	
-            	// If the field is not quoted ...
-            	if (!util.match("/\".*\"/", subQuery))
-                {
-            		// ... then separate each word and re-specify the search field.
-                    subQuery = util.substitute("s/[ ]+/ " + field.getField() + ":/g", subQuery);
-                }
-            	
-            	// Put the subQuery into the general query
-            	query.append("(").append(field.getField()).append(":").append(subQuery).append(")").toString();
-            }
-    	}
 
-
-    	if (query.length() == 1)
-        {
-    		return "";
+    private java.util.List<AdvancedSearchUtils.SearchField> getSearchFields(Request request) throws UIException {
+        if (fields == null){
+            fields = AdvancedSearchUtils.getSearchFields(request);
         }
-
-    	return query.append(")").toString();
+        return fields;
     }
-
-   
-    /**
-     * Get a list of search fields from the request object
-     * and parse them into a linear array of fileds. The field's
-     * index is preserved, so if it comes in as index 17 it will 
-     * be outputted as field 17.
-     * 
-     * @param request The http request object
-     * @return Array of search fields
-     * @throws UIException 
-     */
-    public java.util.List<SearchField> getSearchFields(Request request) throws UIException
-	{
-    	if (this.fields != null)
-        {
-            return this.fields;
-        }
-    	
-    	// Get how many fields to search
-	    int numSearchField;
-	    try {
-	    	String numSearchFieldStr = request.getParameter("num_search_field");
-	    	numSearchField = Integer.valueOf(numSearchFieldStr);
-	    } 
-	    catch (NumberFormatException nfe)
-	    {
-	    	numSearchField = FIELD_MAX_COUNT;
-	    }
-	    	
-    	// Iterate over all the possible fields and add each one to the list of fields.
-		ArrayList<SearchField> fields = new ArrayList<SearchField>();
-		for (int i = 1; i <= numSearchField; i++)
-		{
-			String field = request.getParameter("field"+i);
-			String query = decodeFromURL(request.getParameter("query"+i));
-			String conjunction = request.getParameter("conjunction"+i);
-			
-			if (field != null)
-			{
-				field = field.trim();
-				if (field.length() == 0)
-                {
-                    field = null;
-                }
-			}
-			
-			
-			if (query != null)
-			{
-				query = query.trim();
-				if (query.length() == 0)
-                {
-                    query = null;
-                }
-			}
-			
-			if (conjunction != null)
-			{
-				conjunction = conjunction.trim();
-				if (conjunction.length() == 0)
-                {
-                    conjunction = null;
-                }
-			}
-			
-			if (field == null)
-            {
-                field = "ANY";
-            }
-			if (conjunction == null)
-            {
-                conjunction = "AND";
-            }
-			
-			if (query != null)
-            {
-                fields.add(new SearchField(i, field, query, conjunction));
-            }
-		}
-		
-		this.fields = fields;
-		
-		return this.fields;
-	}
-    
-    /**
-     * A private record keeping class to relate the various 
-     * components of a search field together.
-     */
-    private static class SearchField {
-    	
-    	/** What index the search field is, typically there are just three - but the theme may expand this number */
-    	private int index;
-    	
-    	/** The field to search, ANY if none specified */
-    	private String field;
-    	
-    	/** The query string to search for */
-    	private String query;
-    	
-    	/** the conjunction: either "AND" or "OR" */
-    	private String conjuction;
-    	
-    	public SearchField(int index, String field, String query, String conjunction)
-    	{
-    		this.index = index;
-    		this.field = field;
-    		this.query = query;
-    		this.conjuction = conjunction;
-    	}
-    	
-    	public int    getIndex() { return this.index;}
-    	public String getField() { return this.field;}
-    	public String getQuery() { return this.query;}
-    	public String getConjunction() { return this.conjuction;} 
-    }
-    
 }

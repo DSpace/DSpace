@@ -1237,6 +1237,20 @@ div.vocabulary-container li.error{
     border: 1px solid lightgray;
 }
 
+table.detailtable {
+    background-color: #D8E8EB;
+}
+
+table.detailtable th{
+    background-color: #F0F2F5;
+    word-wrap: normal;
+}
+
+table.detailtable td{
+    background-color: #FFFFFF;
+    text-align: right;
+}
+
 
 span.highlight{
     font-weight: bold;

@@ -428,6 +428,11 @@
       <servlet-class>org.dspace.app.webui.servlet.AuthorityChooseServlet</servlet-class>
   </servlet>
 
+  <servlet>
+      <servlet-name>SearchResultLogServlet</servlet-name>
+      <servlet-class>org.dspace.app.webui.servlet.SearchResultLogServlet</servlet-class>
+  </servlet>
+
   <!-- shibbolized dspace -->
   <servlet>
     <servlet-name>shibboleth-login</servlet-name>
@@ -720,6 +725,11 @@
   <servlet-mapping>
   	<servlet-name>json</servlet-name>
   	<url-pattern>/json/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+      <servlet-name>SearchResultLogServlet</servlet-name>
+      <url-pattern>/dso-display</url-pattern>
   </servlet-mapping>
 
   <!-- Icon MIME type -->
