@@ -121,10 +121,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         // add metadata for OpenSearch auto-discovery links if enabled
         if (ConfigurationManager.getBooleanProperty("websvc.opensearch.autolink"))
         {
-            pageMeta.addMetadata("opensearch", "shortName").addContent(
-                                ConfigurationManager.getProperty("websvc.opensearch.shortname"));
-            pageMeta.addMetadata("opensearch", "context").addContent(
-                        ConfigurationManager.getProperty("websvc.opensearch.svccontext"));
+            pageMeta.addMetadata("opensearch", "shortName").addContent( ConfigurationManager.getProperty("websvc.opensearch.shortname") );
+            pageMeta.addMetadata("opensearch", "autolink").addContent( "open-search/description.xml" );
         }
 
         pageMeta.addMetadata("page","contactURL").addContent(contextPath + "/contact");
