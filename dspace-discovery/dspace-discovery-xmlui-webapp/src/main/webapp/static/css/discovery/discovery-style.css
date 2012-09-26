@@ -18,10 +18,12 @@ div.controls-gear-wrapper{
 }
 
 div.controls-gear-wrapper .discovery-controls-gear{
-    padding: 3px 24px;
+    padding: 0;
     margin-right: 3px;
     margin-bottom: 0;
     margin-top: 0;
+    background: none;
+    border: none;
 }
 
 ul.gear-selection{
@@ -133,4 +135,14 @@ div#aspect_discovery_SimpleSearch_div_search-results ul{
 
 div#aspect_discovery_SimpleSearch_div_search-results ul li{
     list-style: none;
+}
+
+ul.pagination-links{
+    line-height: 25px;
+}
+
+div#aspect_discovery_SimpleSearch_div_search .pagination,
+div#aspect_discovery_SimpleSearch_div_search .pagination-masked
+{
+    padding: 3px 3px 3px 6px;
 }

@@ -117,6 +117,7 @@
     <message key="xmlui.Discovery.AbstractSearch.filters.controls.apply-filters">Apply</message>
     <message key="xmlui.Discovery.AbstractSearch.filters.controls.remove-filter">Remove</message>
     <message key="xmlui.Discovery.AbstractSearch.filters.controls.new-filters.head">New Filters:</message>
+    <message key="xmlui.Discovery.AbstractSearch.filters.controls.current-filters.head">Current Filters:</message>
     <message key="xmlui.Discovery.AbstractSearch.filters.display">Add filters</message>
 
     <message key="xmlui.discovery.SearchFacetFilter.no-results">No filter values found</message>
