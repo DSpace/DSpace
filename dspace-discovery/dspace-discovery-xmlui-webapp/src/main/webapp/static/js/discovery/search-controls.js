@@ -119,6 +119,11 @@
             //Hide ourselves & clear our values!
             parentRow.find('input[type=text]", select').val('');
         }else{
+            if(parentRow.parents('table:first').find('tr[id^="aspect_discovery_SimpleSearch_row_used-filters-"]').length == 1)
+            {
+                parentRow.next().remove();
+                parentRow.prev().remove();
+            }
             parentRow.remove();
         }
     }

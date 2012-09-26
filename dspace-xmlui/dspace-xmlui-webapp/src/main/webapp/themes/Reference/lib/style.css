@@ -1383,13 +1383,15 @@ ul.gear-selection li.gear-option-selected{
 }
 
 table.discovery-filters input.filter-control {
-    width: 30px;
+    width: 17px;
     margin-left: 5px;
     text-indent: -1000px;
     background-repeat: no-repeat;
     background-position: center center;
-    height: 22px;
+    height: 17px;
     float: left;
+    background-color: transparent;
+    border: 0;
     /*Css props below are required for IE*/
     font-size: 0;
     display:block;
@@ -1398,13 +1400,13 @@ table.discovery-filters input.filter-control {
 
 table.discovery-filters input.filter-control.filter-remove{
     margin-left: 15px;
-    background-image: url('../images/remove_icon_DF6E00_16x16.png');
-    border: 1px solid #000000;
+    background-image: url('../images/button_minus.png');
+    /*border: 1px solid #000000;*/
 }
 
 table.discovery-filters input.filter-control.filter-add{
-    background-image: url('../images/plus_icon_DF6E00_16x16.png');
-    border: 1px solid #000000;
+    background-image: url('../images/button_plus.png');
+    /*border: 1px solid #000000;*/
 }
 
 ul.gear-selection{
