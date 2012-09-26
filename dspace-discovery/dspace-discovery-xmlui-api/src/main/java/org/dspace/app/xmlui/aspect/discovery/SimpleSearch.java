@@ -65,7 +65,8 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     private static final Message T_go = message("xmlui.general.go");
     private static final Message T_filter_label = message("xmlui.Discovery.SimpleSearch.filter_head");
     private static final Message T_filter_help = message("xmlui.Discovery.SimpleSearch.filter_help");
-    private static final String T_filter_new_filters = "xmlui.Discovery.AbstractSearch.filters.controls.new-filters.head";
+    private static final Message T_filter_current_filters = message("xmlui.Discovery.AbstractSearch.filters.controls.current-filters.head");
+    private static final Message T_filter_new_filters = message("xmlui.Discovery.AbstractSearch.filters.controls.new-filters.head");
     private static final Message T_filter_controls_apply = message("xmlui.Discovery.AbstractSearch.filters.controls.apply-filters");
     private static final Message T_filter_controls_add = message("xmlui.Discovery.AbstractSearch.filters.controls.add-filter");
     private static final Message T_filter_controls_remove = message("xmlui.Discovery.AbstractSearch.filters.controls.remove-filter");
@@ -175,6 +176,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
             if(filterTypes.size() > 0)
             {
 
+                filtersTable.addRow(Row.ROLE_HEADER).addCell("", Cell.ROLE_HEADER, 1, 4, "new-filter-header").addContent(T_filter_current_filters);
                 for (int i = 0; i <  filterTypes.size(); i++)
                 {
                     String filterType = filterTypes.get(i);
@@ -187,7 +189,8 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
                         addFilterRow(filterFields, i, row, filterType, filterOperator, filterValue);
                     }
                 }
-                filtersTable.addRow(Row.ROLE_HEADER).addCell("", Cell.ROLE_HEADER, 1, 4, "new-filter-header").addContent(message(T_filter_new_filters));
+                filtersTable.addRow("filler-row", Row.ROLE_DATA, "search-filter filler").addCell(1, 4).addContent("");
+                filtersTable.addRow(Row.ROLE_HEADER).addCell("", Cell.ROLE_HEADER, 1, 4, "new-filter-header").addContent(T_filter_new_filters);
             }
 
 
@@ -197,8 +200,8 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
             addFilterRow(filterFields, index, row, null, null, null);
 
             Row filterControlsItem = filtersTable.addRow("filter-controls", Row.ROLE_DATA, "apply-filter");
-            filterControlsItem.addCell(1, 3).addContent("");
-            filterControlsItem.addCell().addButton("submit_apply_filter", "discovery-apply-filter-button").setValue(T_filter_controls_apply);
+//            filterControlsItem.addCell(1, 3).addContent("");
+            filterControlsItem.addCell(1, 4).addButton("submit_apply_filter", "discovery-apply-filter-button").setValue(T_filter_controls_apply);
 
             addHiddenFormFields("filter", request, fqs, searchFiltersDiv);
 
