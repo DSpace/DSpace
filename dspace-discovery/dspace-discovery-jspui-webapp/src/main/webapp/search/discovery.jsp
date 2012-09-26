@@ -109,7 +109,7 @@
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
 %>
 
-<c:set var="dspace.layout.head" scope="request">
+<c:set var="dspace.layout.head.last" scope="request">
 <script type="text/javascript">
 	var jQ = jQuery.noConflict();
 	jQ(document).ready(function() {
@@ -683,6 +683,7 @@ if (pageTotal > pageCurrent)
                 + "&amp;etal=" + etAl  
                 + "&amp;"+f+"_page="+(currFp+1) %>"><fmt:message key="jsp.search.facet.refine.next" /></a></li>
 	            <%
+	            idx++;
 	        }
 	        else if(!appliedFilterQueries.contains(f+"::"+fvalue.getFilterType()+"::"+fvalue.getAsFilterQuery()))
 	        {
@@ -700,8 +701,12 @@ if (pageTotal > pageCurrent)
                 + "&amp;filtertype="+URLEncoder.encode(fvalue.getFilterType(),"UTF-8") %>"
                 title="<fmt:message key="jsp.search.facet.narrow"><fmt:param><%=fvalue.getDisplayedValue() %></fmt:param></fmt:message>">
                 <%= StringUtils.abbreviate(fvalue.getDisplayedValue(),32) + " (" + fvalue.getCount()+")" %></a></li><%
+                idx++;
 	        }
-	        idx++;
+	        if (idx > limit)
+	        {
+	            break;
+	        }
 	    }
 	    %></ul></div><%
 	}

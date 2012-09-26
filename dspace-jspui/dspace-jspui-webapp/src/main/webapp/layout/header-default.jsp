@@ -36,6 +36,7 @@
     String osName = ConfigurationManager.getProperty("websvc.opensearch.shortname");
     List parts = (List)request.getAttribute("dspace.layout.linkparts");
     String extraHeadData = (String)request.getAttribute("dspace.layout.head");
+    String extraHeadDataLast = (String)request.getAttribute("dspace.layout.head.last");
     String dsVersion = Util.getSourceVersion();
     String generator = dsVersion == null ? "DSpace" : "DSpace "+dsVersion;
     String analyticsKey = ConfigurationManager.getProperty("jspui.google.analytics.key");
@@ -103,6 +104,11 @@
         </script>
     <%
     }
+    if (extraHeadDataLast != null)
+    { %>
+		<%= extraHeadDataLast %>
+		<%
+		    }
     %>
 
     </head>
