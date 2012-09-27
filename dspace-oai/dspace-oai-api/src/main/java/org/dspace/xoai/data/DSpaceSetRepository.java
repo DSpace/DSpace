@@ -158,7 +158,7 @@ public class DSpaceSetRepository extends AbstractSetRepository
     }
 
     @Override
-    protected ListSetsResult retrieveSets(int offset, int length)
+    public ListSetsResult retrieveSets(int offset, int length)
     {
         // Only database sets (virtual sets are added by lyncode common library)
         log.debug("Quering sets. Offset: " + offset + " - Length: " + length);
@@ -198,7 +198,7 @@ public class DSpaceSetRepository extends AbstractSetRepository
     }
 
     @Override
-    protected boolean exists(String setSpec)
+    public boolean exists(String setSpec)
     {
         if (setSpec.startsWith("col_"))
         {

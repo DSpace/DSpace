@@ -17,7 +17,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.core.Context;
-import org.dspace.xoai.data.DSpaceDatabaseItem;
+import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
 import org.dspace.xoai.filter.data.DSpaceMetadataFilterOperator;
 import org.dspace.xoai.util.MetadataFieldManager;
@@ -101,11 +101,11 @@ public class DSpaceAtLeastOneMetadataFilter extends DSpaceFilter
     }
 
     @Override
-    public boolean isShown(DSpaceDatabaseItem item)
+    public boolean isShown(DSpaceItem item)
     {
         if (this.getField() == null)
             return true;
-        List<String> values = item.getMetadata(this.getField()+".*");
+        List<String> values = item.getMetadata(this.getField());
         for (String praticalValue : values)
         {
             for (String theoreticValue : this.getValues())

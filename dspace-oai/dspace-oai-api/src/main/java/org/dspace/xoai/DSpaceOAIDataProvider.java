@@ -60,12 +60,15 @@ public class DSpaceOAIDataProvider extends HttpServlet
         }
         catch (com.lyncode.xoai.dataprovider.exceptions.ConfigurationException e)
         {
-            System.out.println("Unable to configure XOAI (OAI 2.0 Core)");
+            System.out.println("Unable to configure XOAI (XOAI 2.0 Core)");
             e.printStackTrace();
         }
         catch (SolrServerException e)
         {
-            System.out.println("Unable to configure XOAI (OAI 2.0 Core)");
+            System.out.println("Unable to connect to Solr Server");
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("Unable to initialize XOAI.");
             e.printStackTrace();
         }
     }

@@ -13,6 +13,7 @@ import org.apache.solr.client.solrj.util.ClientUtils;
 
 import org.dspace.core.Context;
 import org.dspace.xoai.data.DSpaceDatabaseItem;
+import org.dspace.xoai.data.DSpaceItem;
 
 /**
  * 
@@ -35,7 +36,7 @@ public class DateUntilFilter extends DSpaceFilter
     }
 
     @Override
-    public boolean isShown(DSpaceDatabaseItem item)
+    public boolean isShown(DSpaceItem item)
     {
         if (item.getDatestamp().compareTo(_date) <= 0)
             return true;
