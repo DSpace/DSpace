@@ -2042,6 +2042,9 @@
   <!-- Choice Lookup - sample config for dc.publisher field -->
   <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.help">Name of Publisher</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.title">Look up Publisher</message>
+  
+    <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.help">Nombre del Termino del Tesuaro</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.title">Buscar Termino del Tesauro</message>
   <!-- Params are: search-value -->
   <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.nonauthority">Non-authority value: @1@</message>
 

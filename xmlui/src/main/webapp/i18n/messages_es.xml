@@ -2205,6 +2205,9 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
   <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.help">Nombre de la Editorial</message>
 <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.title">Buscar Editorial</message>
 
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.help">Nombre del Termino del Tesuaro</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.title">Buscar Termino del Tesauro</message>
+
   <!-- Params are: search-value -->
 <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.nonauthority">No es valor de Autoridad: @1@</message>
 
