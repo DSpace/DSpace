@@ -59,11 +59,6 @@
         /xmlui/cocoon/aspects/ directory followed by a slash.
     -->
     <aspects>
-        <!--
-            @deprecated: the Artifact Browser has been devided into ViewArtifacts,
-            BrowseArtifacts, SearchArtifacts
-            <aspect name="Artifact Browser" path="resource://aspects/ArtifactBrowser/" />
-        -->
         <aspect name="Versioning Aspect" path="resource://aspects/Versioning/" />
         <aspect name="Displaying Artifacts" path="resource://aspects/ViewArtifacts/" />
         <!--<aspect name="Browsing Artifacts" path="resource://aspects/BrowseArtifacts/" />-->
