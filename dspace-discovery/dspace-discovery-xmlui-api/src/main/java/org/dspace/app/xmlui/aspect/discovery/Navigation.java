@@ -10,6 +10,8 @@ package org.dspace.app.xmlui.aspect.discovery;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -20,11 +22,20 @@ import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
+import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.discovery.SearchUtils;
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
+import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
+import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.xml.sax.SAXException;
 
 /**
@@ -36,6 +47,22 @@ import org.xml.sax.SAXException;
  */
 public class Navigation extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
+    /** Language Strings */
+    private static final Message T_head_all_of_dspace =
+        message("xmlui.ArtifactBrowser.Navigation.head_all_of_dspace");
+
+    private static final Message T_head_browse =
+        message("xmlui.ArtifactBrowser.Navigation.head_browse");
+
+    private static final Message T_communities_and_collections =
+        message("xmlui.ArtifactBrowser.Navigation.communities_and_collections");
+
+    private static final Message T_head_this_collection =
+        message("xmlui.ArtifactBrowser.Navigation.head_this_collection");
+
+    private static final Message T_head_this_community =
+        message("xmlui.ArtifactBrowser.Navigation.head_this_community");
+
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
@@ -121,19 +148,96 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     */
 
         /* regulate the ordering */
+        List browse = options.addList("browse");
         options.addList("discovery");
-        options.addList("browse");
         options.addList("account");
         options.addList("context");
         options.addList("administrative");
 
+        browse.setHead(T_head_browse);
+
+        List browseGlobal = browse.addList("global");
+        List browseContext = browse.addList("context");
+
+        browseGlobal.setHead(T_head_all_of_dspace);
+
+        browseGlobal.addItemXref(contextPath + "/community-list",T_communities_and_collections);
+
+        Map<String, String> browseTitleParams = new HashMap<String, String>();
+        browseTitleParams.put("sort_by", "dc.title_sort");
+        browseTitleParams.put("order", "asc");
+
+        browseGlobal.addItemXref(generateURL(contextPath + "/discover", browseTitleParams),
+                message("xmlui.ArtifactBrowser.AdvancedSearch.type_title"));
+
+        // Add the configured browse lists for 'top level' browsing
+        addBrowseOptions(browseGlobal, contextPath + "/search-filter", null);
+
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        if (dso != null)
+        {
+            if (dso instanceof Item)
+            {
+                // If we are an item change the browse scope to the parent
+                // collection.
+                dso = ((Item) dso).getOwningCollection();
+            }
+
+            if (dso instanceof Collection)
+            {
+                browseContext.setHead(T_head_this_collection);
+            }
+            if (dso instanceof Community)
+            {
+                browseContext.setHead(T_head_this_community);
+            }
+
+            // Add the configured browse lists for scoped browsing
+            String handle = dso.getHandle();
+            browseContext.addItemXref(generateURL(contextPath + "/handle/" + handle + "/discover", browseTitleParams),
+                    message("xmlui.ArtifactBrowser.AdvancedSearch.type_title"));
+            addBrowseOptions(browseContext, contextPath + "/handle/" + handle + "/search-filter", dso);
+        }
     }
+
+    /**
+     * Add navigation for the configured browse tables to the supplied list.
+     *
+     * @param browseList
+     * @param browseURL
+     * @throws WingException
+     */
+    private void addBrowseOptions(List browseList, String browseURL, DSpaceObject scope) throws WingException
+    {
+        // Get a Map of all the browse tables
+        DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(scope);
+        java.util.List<DiscoverySearchFilterFacet> facets = discoveryConfiguration.getSidebarFacets();
+
+        for (DiscoverySearchFilterFacet facet : facets)
+        {
+            if(facet.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE))
+            {
+                //Browse by date isn't support for our facets.
+                continue;
+            }
+
+            // Create a Map of the query parameters for this link
+            Map<String, String> queryParams = new HashMap<String, String>();
+
+            queryParams.put("field", facet.getIndexFieldName());
+
+            // Add a link to this browse
+            browseList.addItemXref(generateURL(browseURL, queryParams),
+                    message("xmlui.ArtifactBrowser.AdvancedSearch.type_" + facet.getIndexFieldName()));
+        }
+    }
+
 
     /**
      * Ensure that the context path is added to the page meta.
      */
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
-            WingException, UIException, SQLException, IOException,
+            WingException, SQLException, IOException,
             AuthorizeException
     {
 
