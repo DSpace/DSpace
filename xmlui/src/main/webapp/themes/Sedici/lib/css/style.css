@@ -1276,9 +1276,9 @@ text-decoration:underline;
 
 .localizacion_electronica  {
 background-image:url(../../images/acceso_web.png);
-background-position:left;
+background-position:left 3px;
 background-repeat:no-repeat;
-padding-left:15px;
+padding-left:15px !important;
 height:25px;
 color:#607890;
 
@@ -2542,6 +2542,9 @@ bottom:10px;
 	font-weight: bold;
 }
 
+.intro-text .localizacion_electronica .label, .intro-text .localizacion_fisica .label {
+	display: none;
+}
 .intro-text .localizacion_electronica, .intro-text .localizacion_fisica {
 	margin-top: 10px;
 	float: right;
@@ -2556,6 +2559,9 @@ bottom:10px;
 	font-size: 110%;
 	color: #9C4F0A;
 	margin-bottom: 10px;
+}
+.intro-text .subtitulo_de_la_serie .label {
+    display: none;
 }
 .intro-text .licencia span a {
 	display: block;

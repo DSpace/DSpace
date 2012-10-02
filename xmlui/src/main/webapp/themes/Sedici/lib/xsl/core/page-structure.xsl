@@ -1,22 +1,22 @@
 
 <xsl:stylesheet xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
-	xmlns:dri="http://di.tamu.edu/DRI/1.0/"
-	xmlns:mets="http://www.loc.gov/METS/"
-	xmlns:xlink="http://www.w3.org/TR/xlink/"
-	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-	xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
-	xmlns:xhtml="http://www.w3.org/1999/xhtml"
-	xmlns:xalan="http://xml.apache.org/xalan"
-    xmlns:java="http://xml.apache.org/xalan/java"
-	xmlns:mods="http://www.loc.gov/mods/v3"
-	xmlns:dc="http://purl.org/dc/elements/1.1/"
-    xmlns:confman="org.dspace.core.ConfigurationManager"
-	xmlns="http://www.w3.org/1999/xhtml"
-	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman">
+                xmlns:dri="http://di.tamu.edu/DRI/1.0/"
+                xmlns:mets="http://www.loc.gov/METS/"
+                xmlns:xlink="http://www.w3.org/TR/xlink/"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+                xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
+                xmlns:xhtml="http://www.w3.org/1999/xhtml"
+                xmlns:xalan="http://xml.apache.org/xalan"
+                xmlns:java="http://xml.apache.org/xalan/java"
+                xmlns:mods="http://www.loc.gov/mods/v3"
+                xmlns:dc="http://purl.org/dc/elements/1.1/"
+                xmlns:confman="org.dspace.core.ConfigurationManager"
+                xmlns="http://www.w3.org/1999/xhtml"
+                exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman">
 
     <xsl:output indent="yes"/>
-    
-        
+
+
     <!-- Se redefine este template para insertar el menu superior -->
     <xsl:template match="dri:document">
         <html class="no-js">
@@ -32,14 +32,14 @@
                 &lt;!--[if (gt IE 9)|!(IE)]&gt;&lt;!--&gt;&lt;body&gt;&lt;!--&lt;![endif]--&gt;</xsl:text>
 
             <xsl:choose>
-              <xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='framing'][@qualifier='popup']">
-                <xsl:apply-templates select="dri:body/*"/>
-              </xsl:when>
-                  <xsl:otherwise>
+                <xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='framing'][@qualifier='popup']">
+                    <xsl:apply-templates select="dri:body/*"/>
+                </xsl:when>
+                <xsl:otherwise>
                     <div id="ds-main">
                         <!--The header div, complete with title, subtitle and other junk-->
                         <xsl:call-template name="buildHeader"/>
-                        
+
                         <xsl:call-template name="menuSuperior"/>
 
                         <!--The trail is built by applying a template over pageMeta's trail children. -->
@@ -73,15 +73,15 @@
                         <!--
                             The footer div, dropping whatever extra information is needed on the page. It will
                             most likely be something similar in structure to the currently given example. -->
-                         <xsl:call-template name="buildRedesSociales"/>
+                        <xsl:call-template name="buildRedesSociales"/>
                         <xsl:call-template name="buildFooter"/>
 
                     </div>
 
                 </xsl:otherwise>
             </xsl:choose>
-                <!-- Javascript at the bottom for fast page loading -->
-              <xsl:call-template name="addJavascript"/>
+            <!-- Javascript at the bottom for fast page loading -->
+            <xsl:call-template name="addJavascript"/>
 
             <xsl:text disable-output-escaping="yes">&lt;/body&gt;</xsl:text>
         </html>
@@ -146,6 +146,15 @@
                     </xsl:attribute>
                 </link>
             </xsl:for-each>
+
+            <link rel="stylesheet" type="text/css" media="screen">
+                <xsl:attribute name="href">
+                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                    <xsl:text>/themes/</xsl:text>
+                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                    <xsl:text>/lib/css/metadataGenerator.css</xsl:text>
+                </xsl:attribute>
+            </link>
 
             <!-- Add syndication feeds -->
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='feed']">
@@ -309,28 +318,28 @@ placeholders for header images -->
 
                 <xsl:choose>
                     <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
-                    <!-- Genero la seccion de la cuenta del usuario -->
-                    <div id="ds-user-box">
-    				   <div id='div-menu-lateral-cuenta-superior'>
-    				      <div id='div-menu-lateral-cuenta-superior-izquierdo'>
-<!--     				      	<h1><i18n:text>sedici.menuLateral.cuenta.usuario</i18n:text></h1> -->
-    				      	<h2><xsl:call-template name="buildUsuarioName"/></h2>
-    				      </div>
-    				      <div id='div-menu-lateral-cuenta-superior-derecho'>
-    				      	<a href="{$context-path}/logout"><i18n:text>sedici.menuLateral.cuenta.logout</i18n:text></a>
-    				      </div>
-    				   </div>
-    				   <div id='div-menu-lateral-cuenta-inferior'>
-    				       <ul>
-    				          <li><a href="{$context-path}/profile"><i18n:text>sedici.menuLateral.cuenta.perfil</i18n:text></a></li>
-    				          <li><a href="{$context-path}/submissions"><i18n:text>sedici.menuLateral.cuenta.submissions</i18n:text></a></li>
-    				          <xsl:if test="count(dri:list[@id='aspect.viewArtifacts.Navigation.list.account']/dri:item)>3">
-    				          	<li><a href="{$context-path}/admin/export"><i18n:text>sedici.menuLateral.cuenta.export</i18n:text></a></li>
-    				          </xsl:if>
-    				       </ul>
-    				   </div>
-    				
-    				</div>
+                        <!-- Genero la seccion de la cuenta del usuario -->
+                        <div id="ds-user-box">
+                            <div id='div-menu-lateral-cuenta-superior'>
+                                <div id='div-menu-lateral-cuenta-superior-izquierdo'>
+                                    <!--     				      	<h1><i18n:text>sedici.menuLateral.cuenta.usuario</i18n:text></h1> -->
+                                    <h2><xsl:call-template name="buildUsuarioName"/></h2>
+                                </div>
+                                <div id='div-menu-lateral-cuenta-superior-derecho'>
+                                    <a href="{$context-path}/logout"><i18n:text>sedici.menuLateral.cuenta.logout</i18n:text></a>
+                                </div>
+                            </div>
+                            <div id='div-menu-lateral-cuenta-inferior'>
+                                <ul>
+                                    <li><a href="{$context-path}/profile"><i18n:text>sedici.menuLateral.cuenta.perfil</i18n:text></a></li>
+                                    <li><a href="{$context-path}/submissions"><i18n:text>sedici.menuLateral.cuenta.submissions</i18n:text></a></li>
+                                    <xsl:if test="count(dri:list[@id='aspect.viewArtifacts.Navigation.list.account']/dri:item)>3">
+                                        <li><a href="{$context-path}/admin/export"><i18n:text>sedici.menuLateral.cuenta.export</i18n:text></a></li>
+                                    </xsl:if>
+                                </ul>
+                            </div>
+
+                        </div>
                     </xsl:when>
                     <xsl:otherwise>
                         <div id="ds-user-box">
@@ -349,95 +358,95 @@ placeholders for header images -->
             </div>
         </div>
     </xsl:template>
-          <xsl:template name="buildRedesSociales">
-    		<div id="redesSociales">
-			<img width="274" height="72" border="0" usemap="#Map">
-				<xsl:attribute name="src">
-					<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-					<xsl:text>/themes/Sedici/images/redes3.png</xsl:text>
-				</xsl:attribute>
-			</img>
-						
-			<map name="Map">
-			<area title="RSS" alt="RSS - Sedici" coords="4,0,69,74" shape="rect" >
-			<xsl:attribute name="href">
-				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='feed_site' and @qualifier='atom+xml']" />
-			</xsl:attribute>
-			</area>
-			<area target="_blank" title="Twitter" alt="Twitter - Sedici" href="http://twitter.com/sedici_unlp" coords="72,0,136,74" shape="rect" />
-			<area title="Blog" alt="Blog- Sedici" href="http://sedici.unlp.edu.ar/blog/" target="_blank" coords="139,0,195,74" shape="rect" />
-			<area target="_blank" title="Facebook" alt="Facebook - Sedici" href="http://www.facebook.com/home.php#!/pages/SeDiCI/106194779404955?ref=ts" coords="198,0,266,74" shape="rect" />
-			</map>
-						</div>
+    <xsl:template name="buildRedesSociales">
+        <div id="redesSociales">
+            <img width="274" height="72" border="0" usemap="#Map">
+                <xsl:attribute name="src">
+                    <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+                    <xsl:text>/themes/Sedici/images/redes3.png</xsl:text>
+                </xsl:attribute>
+            </img>
+
+            <map name="Map">
+                <area title="RSS" alt="RSS - Sedici" coords="4,0,69,74" shape="rect" >
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='feed_site' and @qualifier='atom+xml']" />
+                    </xsl:attribute>
+                </area>
+                <area target="_blank" title="Twitter" alt="Twitter - Sedici" href="http://twitter.com/sedici_unlp" coords="72,0,136,74" shape="rect" />
+                <area title="Blog" alt="Blog- Sedici" href="http://sedici.unlp.edu.ar/blog/" target="_blank" coords="139,0,195,74" shape="rect" />
+                <area target="_blank" title="Facebook" alt="Facebook - Sedici" href="http://www.facebook.com/home.php#!/pages/SeDiCI/106194779404955?ref=ts" coords="198,0,266,74" shape="rect" />
+            </map>
+        </div>
     </xsl:template>
     <!-- Creo el footer especifico para SeDiCI -->
     <xsl:template name="buildFooter">
-		<div id="footer">
-	
-			<div id="footercol1">
-				<div class="datos_unlp">
-					<strong>2003-2012 &#xA9; <a href="http://prebi.unlp.edu.ar/" target="_blank">PrEBi</a></strong>
-					<br/>
-					<a href="http://www.unlp.edu.ar" target="_blank">Universidad Nacional de La Plata</a>
-					<br/>
-					Todos los derechos reservados conforme a la ley 11.723
-				</div>
-			</div>
-			<div id="footercol2">
-				<div class="datos_sedici">
-					<strong>SeDiCI - Servicio de Difusión de la Creación Intelectual</strong>
-					<br/>
-			  		Calle 49 y 115 s/n 1er piso - Edificio ex Liceo
-			  		<br/>
-			  		1900 La Plata, Buenos Aires - Tel 0221 423 6696/6677 (int. 141) 
-			  		<div id="comollegar">
-			  			<a title="Como llegar a SeDiCI">
-			    			<xsl:attribute name="href">
-			    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-			    				<xsl:text>/pages/comoLlegar</xsl:text>
-			    			</xsl:attribute>
-				  			<img class="vermapa">
-				    			<xsl:attribute name="src">
-				    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-				    				<xsl:text>/themes/Sedici/images/img1.png</xsl:text>
-				    			</xsl:attribute>
-				  			</img>
-			  			</a>
-			  		</div>
-			  	</div>
-			  	<div id="news-contacto-etc">
-		  			<a href="http://mail.prebi.unlp.edu.ar:8080/lists" target="_blank" title="Suscríbase al newsletter">
-				  		<img class="newsletter">
-			    			<xsl:attribute name="src">
-			    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-			    				<xsl:text>/themes/Sedici/images/img2.png</xsl:text>
-			    			</xsl:attribute>
-				  		</img>
-		  			</a>
+        <div id="footer">
 
-		  			<a title="Contáctese">
-		    			<xsl:attribute name="href">
-		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-		    				<xsl:text>/feedback</xsl:text>
-		    			</xsl:attribute>
-				  		<img class="contacto">
-			    			<xsl:attribute name="src">
-			    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-			    				<xsl:text>/themes/Sedici/images/img3.png</xsl:text>
-			    			</xsl:attribute>
-				  		</img>
-				  	</a>
-			  	</div>
-			</div>
-		</div>
+            <div id="footercol1">
+                <div class="datos_unlp">
+                    <strong>2003-2012 &#xA9; <a href="http://prebi.unlp.edu.ar/" target="_blank">PrEBi</a></strong>
+                    <br/>
+                    <a href="http://www.unlp.edu.ar" target="_blank">Universidad Nacional de La Plata</a>
+                    <br/>
+                    Todos los derechos reservados conforme a la ley 11.723
+                </div>
+            </div>
+            <div id="footercol2">
+                <div class="datos_sedici">
+                    <strong>SeDiCI - Servicio de Difusión de la Creación Intelectual</strong>
+                    <br/>
+                    Calle 49 y 115 s/n 1er piso - Edificio ex Liceo
+                    <br/>
+                    1900 La Plata, Buenos Aires - Tel 0221 423 6696/6677 (int. 141)
+                    <div id="comollegar">
+                        <a title="Como llegar a SeDiCI">
+                            <xsl:attribute name="href">
+                                <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+                                <xsl:text>/pages/comoLlegar</xsl:text>
+                            </xsl:attribute>
+                            <img class="vermapa">
+                                <xsl:attribute name="src">
+                                    <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+                                    <xsl:text>/themes/Sedici/images/img1.png</xsl:text>
+                                </xsl:attribute>
+                            </img>
+                        </a>
+                    </div>
+                </div>
+                <div id="news-contacto-etc">
+                    <a href="http://mail.prebi.unlp.edu.ar:8080/lists" target="_blank" title="Suscríbase al newsletter">
+                        <img class="newsletter">
+                            <xsl:attribute name="src">
+                                <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+                                <xsl:text>/themes/Sedici/images/img2.png</xsl:text>
+                            </xsl:attribute>
+                        </img>
+                    </a>
+
+                    <a title="Contáctese">
+                        <xsl:attribute name="href">
+                            <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+                            <xsl:text>/feedback</xsl:text>
+                        </xsl:attribute>
+                        <img class="contacto">
+                            <xsl:attribute name="src">
+                                <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+                                <xsl:text>/themes/Sedici/images/img3.png</xsl:text>
+                            </xsl:attribute>
+                        </img>
+                    </a>
+                </div>
+            </div>
+        </div>
     </xsl:template>
-    
+
     <xsl:template name="buildUsuarioName">
         <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='firstName']"/>
         <xsl:text> </xsl:text>
         <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='lastName']"/>
     </xsl:template>
-  
+
     <xsl:template name="addJavascript">
         <xsl:variable name="jqueryVersion">
             <xsl:text>1.6.2</xsl:text>
@@ -456,7 +465,7 @@ placeholders for header images -->
         <script type="text/javascript" src="{concat($protocol, 'ajax.googleapis.com/ajax/libs/jquery/', $jqueryVersion ,'/jquery.min.js')}">&#160;</script>
 
         <xsl:variable name="localJQuerySrc">
-                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+            <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
             <xsl:text>/static/js/jquery-</xsl:text>
             <xsl:value-of select="$jqueryVersion"/>
             <xsl:text>.min.js</xsl:text>
@@ -469,14 +478,14 @@ placeholders for header images -->
 
         <!-- Add theme javascipt  -->
         <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)]">
-               <script type="text/javascript">
-	                <xsl:attribute name="src">
-	                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-	                    <xsl:text>/themes/</xsl:text>
-	                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-	                    <xsl:text>/</xsl:text>
-	                    <xsl:value-of select="."/>
-	                </xsl:attribute>&#160;</script>
+            <script type="text/javascript">
+                <xsl:attribute name="src">
+                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                    <xsl:text>/themes/</xsl:text>
+                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                    <xsl:text>/</xsl:text>
+                    <xsl:value-of select="."/>
+                </xsl:attribute>&#160;</script>
         </xsl:for-each>
 
         <!-- add "shared" javascript from static, path is relative to webapp root-->
@@ -484,20 +493,20 @@ placeholders for header images -->
             <!--This is a dirty way of keeping the scriptaculous stuff from choice-support
             out of our theme without modifying the administrative and submission sitemaps.
             This is obviously not ideal, but adding those scripts in those sitemaps is far
-            from ideal as well--> 
+            from ideal as well-->
             <!-- En caso de que cargamos en el DRI un choice-support especial (el NO ESTATICO) en el DRI, el choice-support.js viejo debe obviarse. -->
             <xsl:choose>
                 <xsl:when test="text() = 'static/js/choice-support.js'">
-                   <xsl:if test="not(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)][text()='lib/js/choice-support.js'])"> 
-	                   <script type="text/javascript">
-	                        <xsl:attribute name="src">
-	                            <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-	                            <xsl:text>/themes/</xsl:text>
-	                            <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-	                            <xsl:text>/lib/js/choice-support.js</xsl:text>
-	                        </xsl:attribute>&#160;
-	                   </script>
-                   </xsl:if>
+                    <xsl:if test="not(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)][text()='lib/js/choice-support.js'])">
+                        <script type="text/javascript">
+                            <xsl:attribute name="src">
+                                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                                <xsl:text>/themes/</xsl:text>
+                                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                                <xsl:text>/lib/js/choice-support.js</xsl:text>
+                            </xsl:attribute>&#160;
+                        </script>
+                    </xsl:if>
                 </xsl:when>
                 <xsl:when test="not(starts-with(text(), 'static/js/scriptaculous'))">
                     <script type="text/javascript">
@@ -508,37 +517,37 @@ placeholders for header images -->
                         </xsl:attribute>&#160;</script>
                 </xsl:when>
             </xsl:choose>
-            
-            
-<!--             <xsl:choose> -->
-<!--                 <xsl:when test="(text() = 'static/js/choice-support.js') and (/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)][text()='lib/js/choice-support.js'])"> -->
-                            				
-<!--                 </xsl:when> -->
-                
-<!--                 <xsl:otherwise> -->
-<!--                 <script type="text/javascript"> -->
-<!-- 	                        <xsl:attribute name="src"> -->
-<!-- 	                            <xsl:value-of -->
-<!-- 	                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/> -->
-<!-- 	                            <xsl:text>/</xsl:text> -->
-<!-- 	                            <xsl:value-of select="."/> -->
-<!-- 	                        </xsl:attribute>&#160;</script> -->
-<!-- 	                <xsl:if test="not(starts-with(text(), 'static/js/scriptaculous'))"> -->
-<!-- 	                    <script type="text/javascript"> -->
-<!-- 	                        <xsl:attribute name="src"> -->
-<!-- 	                            <xsl:value-of -->
-<!-- 	                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/> -->
-<!-- 	                            <xsl:text>/</xsl:text> -->
-<!-- 	                            <xsl:value-of select="."/> -->
-<!-- 	                        </xsl:attribute>&#160;</script> -->
-<!-- 	                </xsl:if> -->
-<!--                 </xsl:otherwise> -->
-<!--             </xsl:choose> -->
+
+
+            <!--             <xsl:choose> -->
+            <!--                 <xsl:when test="(text() = 'static/js/choice-support.js') and (/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)][text()='lib/js/choice-support.js'])"> -->
+
+            <!--                 </xsl:when> -->
+
+            <!--                 <xsl:otherwise> -->
+            <!--                 <script type="text/javascript"> -->
+            <!-- 	                        <xsl:attribute name="src"> -->
+            <!-- 	                            <xsl:value-of -->
+            <!-- 	                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/> -->
+            <!-- 	                            <xsl:text>/</xsl:text> -->
+            <!-- 	                            <xsl:value-of select="."/> -->
+            <!-- 	                        </xsl:attribute>&#160;</script> -->
+            <!-- 	                <xsl:if test="not(starts-with(text(), 'static/js/scriptaculous'))"> -->
+            <!-- 	                    <script type="text/javascript"> -->
+            <!-- 	                        <xsl:attribute name="src"> -->
+            <!-- 	                            <xsl:value-of -->
+            <!-- 	                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/> -->
+            <!-- 	                            <xsl:text>/</xsl:text> -->
+            <!-- 	                            <xsl:value-of select="."/> -->
+            <!-- 	                        </xsl:attribute>&#160;</script> -->
+            <!-- 	                </xsl:if> -->
+            <!--                 </xsl:otherwise> -->
+            <!--             </xsl:choose> -->
         </xsl:for-each>
 
         <!-- add setup JS code if this is a choices lookup page -->
         <xsl:if test="dri:body/dri:div[@n='lookup']">
-          <xsl:call-template name="choiceLookupPopUpSetup"/>
+            <xsl:call-template name="choiceLookupPopUpSetup"/>
         </xsl:if>
 
         <!--PNG Fix for IE6-->
@@ -574,19 +583,19 @@ placeholders for header images -->
                    })();
            </xsl:text></script>
         </xsl:if>
-        
-		<script type="text/javascript">
+
+        <script type="text/javascript">
 			<xsl:text>
 			$(document).ready(function() {
 				//add indicators and hovers to submenu parents
 				$("#topNav li.main").each(function() {
 					if ($(this).children("ul").length) {
-		
+
 						//show subnav on hover
 						$(this).mouseenter(function() {
 							$(this).children("ul").show();
 						});
-		
+
 						//hide submenus on exit
 						$(this).mouseleave(function() {
 							$(this).children("ul").hide();
@@ -603,27 +612,36 @@ placeholders for header images -->
 			});
 
 			</xsl:text>
-		</script>
-        
-		<script type="text/javascript">
-			<xsl:attribute name="src">
-               <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]" />
-               <xsl:text>/themes/</xsl:text>
-               <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']" />
-               <xsl:text>/lib/js/slides.min.jquery.js</xsl:text>
-           </xsl:attribute>
-			&#160;
-		</script>
-		
-		 <script type="text/javascript">
-			$(function() {
-				$( "#community-tabs" ).tabs({
-					collapsible: false,
-					fx: {opacity: 'toggle', duration: 'fast'}
-				});
-			});
-		 </script>
+        </script>
 
+        <script type="text/javascript">
+            <xsl:attribute name="src">
+                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]" />
+                <xsl:text>/themes/</xsl:text>
+                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']" />
+                <xsl:text>/lib/js/slides.min.jquery.js</xsl:text>
+            </xsl:attribute>
+            &#160;
+        </script>
+
+        <script type="text/javascript">
+            <xsl:attribute name="src">
+                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]" />
+                <xsl:text>/themes/</xsl:text>
+                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']" />
+                <xsl:text>/lib/js/metadataGenerator.js</xsl:text>
+            </xsl:attribute>
+            &#160;
+        </script>
+
+        <script type="text/javascript">
+            $(function() {
+            $( "#community-tabs" ).tabs({
+            collapsible: false,
+            fx: {opacity: 'toggle', duration: 'fast'}
+            });
+            });
+        </script>
 
         <!-- When on submission process, disable buttons on submission -->
         <xsl:if test="dri:body/dri:div[contains(@rend,'submission')]">
@@ -640,9 +658,19 @@ placeholders for header images -->
             </script>
         </xsl:if>
 
+        <!-- When on submission process, disable buttons on submission -->
+        <xsl:if test="dri:body/dri:div[contains(@rend,'administrative community') or contains(@rend,'administrative collection')]">
+            <script type="text/javascript">
+                $(function() {
+                    $("form.administrative.community textarea[name='introductory_text']").metadataGenerator();
+                    $("form.administrative.collection textarea[name='introductory_text']").metadataGenerator();
+                });
+            </script>
+        </xsl:if>
+
     </xsl:template>
-    
-        <!--
+
+    <!--
         The template to handle the dri:body element. It simply creates the ds-body div and applies
         templates of the body's child elements (which consists entirely of dri:div tags).
     -->
@@ -655,61 +683,61 @@ placeholders for header images -->
                     </p>
                 </div>
             </xsl:if>
-            
+
             <xsl:if test="/dri:document/dri:body/dri:div[@id='ar.edu.unlp.sedici.util.FlashMessagesTransformer.div.flash-message']">
-                        <xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='ar.edu.unlp.sedici.util.FlashMessagesTransformer.div.flash-message']">
-                        	<xsl:with-param name="muestra">true</xsl:with-param>
-                        </xsl:apply-templates>
+                <xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='ar.edu.unlp.sedici.util.FlashMessagesTransformer.div.flash-message']">
+                    <xsl:with-param name="muestra">true</xsl:with-param>
+                </xsl:apply-templates>
             </xsl:if>
-            
-           
- 
+
+
+
             <xsl:apply-templates select="dri:div[@id='aspect.discovery.SiteViewer.div.front-page-search']">
-            <xsl:with-param name="muestra">true</xsl:with-param>
+                <xsl:with-param name="muestra">true</xsl:with-param>
             </xsl:apply-templates>
 
-            
-            
+
+
             <xsl:apply-templates/>
 
-                        
+
             <!-- <xsl:if test="not(java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.matches(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'], 'handle/\d+/\d+/submit(.*)'))">
-				<xsl:apply-templates select='/dri:document/dri:options/dri:list[@id="aspect.statistics.Navigation.list.statistics"]'/> 
-            </xsl:if>    -->  
-            
+            <xsl:apply-templates select='/dri:document/dri:options/dri:list[@id="aspect.statistics.Navigation.list.statistics"]'/>
+        </xsl:if>    -->
+
 
 
         </div>
     </xsl:template>
-    
+
     <xsl:template match="dri:div[@id='ar.edu.unlp.sedici.util.FlashMessagesTransformer.div.flash-message']">
         <xsl:param name="muestra">false</xsl:param>
         <xsl:if test="$muestra='true'">
-        	<div>
-        		<xsl:attribute name="id">ar_edu_unlp_sedici_util_FlashMessagesTransformer_div_flash-message</xsl:attribute>
-        		<xsl:attribute name="class">ds-notice-div <xsl:value-of select="@rend"/></xsl:attribute>
-            	<xsl:apply-templates select="dri:p"/>
-			</div>
-         </xsl:if>
-     </xsl:template>
-            
-
-    <xsl:template name="busqueda_inicio" match="dri:div[@id='aspect.discovery.SiteViewer.div.front-page-search']">
-        <xsl:param name="muestra">false</xsl:param>    
-        <xsl:if test="$muestra = 'true'">
-        <form>
-           <xsl:attribute name="action">
-             <xsl:value-of select="@action"/>
-           </xsl:attribute>
-           <xsl:attribute name="method">
-             <xsl:value-of select="@method"/>
-           </xsl:attribute>
-        	<xsl:apply-templates/>
-        </form>
+            <div>
+                <xsl:attribute name="id">ar_edu_unlp_sedici_util_FlashMessagesTransformer_div_flash-message</xsl:attribute>
+                <xsl:attribute name="class">ds-notice-div <xsl:value-of select="@rend"/></xsl:attribute>
+                <xsl:apply-templates select="dri:p"/>
+            </div>
         </xsl:if>
     </xsl:template>
-    
-         
+
+
+    <xsl:template name="busqueda_inicio" match="dri:div[@id='aspect.discovery.SiteViewer.div.front-page-search']">
+        <xsl:param name="muestra">false</xsl:param>
+        <xsl:if test="$muestra = 'true'">
+            <form>
+                <xsl:attribute name="action">
+                    <xsl:value-of select="@action"/>
+                </xsl:attribute>
+                <xsl:attribute name="method">
+                    <xsl:value-of select="@method"/>
+                </xsl:attribute>
+                <xsl:apply-templates/>
+            </form>
+        </xsl:if>
+    </xsl:template>
+
+
     <xsl:template name="buildTrail">
         <div id="ds-trail-wrapper">
             <ul id="ds-trail">
@@ -719,56 +747,56 @@ placeholders for header images -->
                         <xsl:apply-templates select="/dri:document/dri:meta/dri:pageMeta/dri:trail"/>
                     </xsl:when>
                     <xsl:otherwise>
-                        
+
                     </xsl:otherwise>
                 </xsl:choose>
             </ul>
         </div>
     </xsl:template>
-        
-<!-- The header (distinct from the HTML head element) contains the title, subtitle, login box and various
-     placeholders for header images -->
+
+    <!-- The header (distinct from the HTML head element) contains the title, subtitle, login box and various
+placeholders for header images -->
 
     <xsl:template match="dri:trail">
         <!-- Este if controla que la ultima ocurrencia del trail no se muestre -->
         <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:trail) - 1 > (position()-1)">
-        <!--put an arrow between the parts of the trail-->
-        <xsl:if test="position()>1">        
-	        <xsl:if test="position()>2">
-	            <li class="ds-trail-arrow">
-	                <xsl:text>&#8594;</xsl:text>
-	            </li>
-	        </xsl:if>
-	        <li>
-	            <xsl:attribute name="class">
-	                <xsl:text>ds-trail-link </xsl:text>
-	                <xsl:if test="position()=2">
-	                    <xsl:text>first-link </xsl:text>
-	                </xsl:if>
-	                <xsl:if test="position()=(last()-1)">
-	                    <xsl:text>last-link</xsl:text>
-	                </xsl:if>
-	            </xsl:attribute>
-	            <!-- Determine whether we are dealing with a link or plain text trail link -->
-	            <xsl:choose>
-	                <xsl:when test="./@target">
-	                    <a>
-	                        <xsl:attribute name="href">
-	                            <xsl:value-of select="./@target"/>
-	                        </xsl:attribute>
-	                        <xsl:apply-templates />
-	                    </a>
-	                </xsl:when>
-	                <xsl:otherwise>
-	                    <xsl:apply-templates />
-	                </xsl:otherwise>
-	            </xsl:choose>
-	        </li>
-	     </xsl:if>
-	     </xsl:if>
+            <!--put an arrow between the parts of the trail-->
+            <xsl:if test="position()>1">
+                <xsl:if test="position()>2">
+                    <li class="ds-trail-arrow">
+                        <xsl:text>&#8594;</xsl:text>
+                    </li>
+                </xsl:if>
+                <li>
+                    <xsl:attribute name="class">
+                        <xsl:text>ds-trail-link </xsl:text>
+                        <xsl:if test="position()=2">
+                            <xsl:text>first-link </xsl:text>
+                        </xsl:if>
+                        <xsl:if test="position()=(last()-1)">
+                            <xsl:text>last-link</xsl:text>
+                        </xsl:if>
+                    </xsl:attribute>
+                    <!-- Determine whether we are dealing with a link or plain text trail link -->
+                    <xsl:choose>
+                        <xsl:when test="./@target">
+                            <a>
+                                <xsl:attribute name="href">
+                                    <xsl:value-of select="./@target"/>
+                                </xsl:attribute>
+                                <xsl:apply-templates />
+                            </a>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:apply-templates />
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </li>
+            </xsl:if>
+        </xsl:if>
     </xsl:template>
-    
-    
+
+
     <xsl:template name="cc-license">
         <xsl:param name="metadataURL"/>
         <xsl:variable name="externalMetadataURL">
@@ -779,58 +807,58 @@ placeholders for header images -->
 
         <xsl:variable name="ccLicenseName"
                       select="document($externalMetadataURL)//dim:field[@element='rights']"
-                      />
+                />
         <xsl:variable name="ccLicenseUri"
                       select="document($externalMetadataURL)//dim:field[@element='rights'][@qualifier='uri']"
-                      />
+                />
         <xsl:variable name="handleUri">
-                    <xsl:for-each select="document($externalMetadataURL)//dim:field[@element='identifier' and @qualifier='uri']">
-                        <a>
-                            <xsl:attribute name="href">
-                                <xsl:copy-of select="./node()"/>
-                            </xsl:attribute>
-                            <xsl:copy-of select="./node()"/>
-                        </a>
-                        <xsl:if test="count(following-sibling::dim:field[@element='identifier' and @qualifier='uri']) != 0">
-                            <xsl:text>, </xsl:text>
-                        </xsl:if>
-                </xsl:for-each>
+            <xsl:for-each select="document($externalMetadataURL)//dim:field[@element='identifier' and @qualifier='uri']">
+                <a>
+                    <xsl:attribute name="href">
+                        <xsl:copy-of select="./node()"/>
+                    </xsl:attribute>
+                    <xsl:copy-of select="./node()"/>
+                </a>
+                <xsl:if test="count(following-sibling::dim:field[@element='identifier' and @qualifier='uri']) != 0">
+                    <xsl:text>, </xsl:text>
+                </xsl:if>
+            </xsl:for-each>
         </xsl:variable>
 
-   		<xsl:if test="$ccLicenseName and $ccLicenseUri and contains($ccLicenseUri, 'creativecommons')">
-	        <div about="{$handleUri}">
-	            <xsl:attribute name="style">
-	                <xsl:text>margin:0em 2em 0em 2em; padding-bottom:0em;</xsl:text>
-	            </xsl:attribute>
-	            <a rel="license"
-	                href="{$ccLicenseUri}"
-	                alt="{$ccLicenseName}"
-	                title="{$ccLicenseName}"
-	                >
-	                <img>
-	                     <xsl:attribute name="src">
-	                        <xsl:value-of select="concat($theme-path,'/images/cc-ship.gif')"/>
-	                     </xsl:attribute>
-	                     <xsl:attribute name="alt">
-	                         <xsl:value-of select="$ccLicenseName"/>
-	                     </xsl:attribute>
-	                     <xsl:attribute name="style">
-	                         <xsl:text>float:left; margin:0em 1em 0em 0em; border:none;</xsl:text>
-	                     </xsl:attribute>
-	                </img>
-	            </a>
-	            <span>
-	                <xsl:attribute name="style">
-	                    <xsl:text>vertical-align:middle; text-indent:0 !important;</xsl:text>
-	                </xsl:attribute>
-	                <i18n:text>xmlui.dri2xhtml.METS-1.0.cc-license-text</i18n:text>
-	                <xsl:value-of select="$ccLicenseName"/>
-	            </span>
-	        </div>
+        <xsl:if test="$ccLicenseName and $ccLicenseUri and contains($ccLicenseUri, 'creativecommons')">
+            <div about="{$handleUri}">
+                <xsl:attribute name="style">
+                    <xsl:text>margin:0em 2em 0em 2em; padding-bottom:0em;</xsl:text>
+                </xsl:attribute>
+                <a rel="license"
+                   href="{$ccLicenseUri}"
+                   alt="{$ccLicenseName}"
+                   title="{$ccLicenseName}"
+                        >
+                    <img>
+                        <xsl:attribute name="src">
+                            <xsl:value-of select="concat($theme-path,'/images/cc-ship.gif')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name="alt">
+                            <xsl:value-of select="$ccLicenseName"/>
+                        </xsl:attribute>
+                        <xsl:attribute name="style">
+                            <xsl:text>float:left; margin:0em 1em 0em 0em; border:none;</xsl:text>
+                        </xsl:attribute>
+                    </img>
+                </a>
+                <span>
+                    <xsl:attribute name="style">
+                        <xsl:text>vertical-align:middle; text-indent:0 !important;</xsl:text>
+                    </xsl:attribute>
+                    <i18n:text>xmlui.dri2xhtml.METS-1.0.cc-license-text</i18n:text>
+                    <xsl:value-of select="$ccLicenseName"/>
+                </span>
+            </div>
         </xsl:if>
     </xsl:template>
-    
-    
-    
-   
+
+
+
+
 </xsl:stylesheet>
