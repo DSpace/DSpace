@@ -14,21 +14,6 @@
 	</parent>
 
 	<profiles>
-
-		<profile>
-			<id>postgres-support</id>
-			<activation>
-				<property>
-					<name>!db.name</name>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>postgresql</groupId>
-					<artifactId>postgresql</artifactId>
-				</dependency>
-			</dependencies>
-		</profile>
 		<profile>
 			<id>oracle-support</id>
 			<activation>
@@ -70,12 +55,7 @@
 						<overlay></overlay>
 						<overlay>
 							<groupId>org.dspace</groupId>
-							<artifactId>dspace-discovery-jspui-webapp</artifactId>
-							<type>war</type>
-						</overlay>
-						<overlay>
-							<groupId>org.dspace</groupId>
-							<artifactId>dspace-jspui-webapp</artifactId>
+							<artifactId>dspace-jspui</artifactId>
 							<type>war</type>
 						</overlay>
 					</overlays>
@@ -98,32 +78,16 @@
 
 		<dependency>
 			<groupId>org.dspace</groupId>
-			<artifactId>dspace-jspui-webapp</artifactId>
+			<artifactId>dspace-jspui</artifactId>
 			<type>war</type>
 		</dependency>
 
 		<dependency>
 			<groupId>org.dspace</groupId>
-			<artifactId>dspace-discovery-jspui-api</artifactId>
-			<version>3.0-SNAPSHOT</version>
+			<artifactId>dspace-jspui</artifactId>
+            <type>jar</type>
+            <classifier>classes</classifier>
 		</dependency>
-	
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-discovery-jspui-webapp</artifactId>
-			<version>3.0-SNAPSHOT</version>
-			<type>war</type>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-jspui-api</artifactId>
-		</dependency>
-
-		<dependency>
-           <groupId>org.dspace</groupId>
-           <artifactId>dspace-discovery-provider</artifactId>
-        </dependency>
 
 		<dependency>
 		   <groupId>javax.servlet</groupId>
