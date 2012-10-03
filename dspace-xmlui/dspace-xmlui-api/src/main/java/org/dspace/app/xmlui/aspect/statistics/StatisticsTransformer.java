@@ -20,6 +20,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.statistics.Dataset;
+import org.dspace.statistics.content.*;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
