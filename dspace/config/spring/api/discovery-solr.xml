@@ -18,13 +18,6 @@
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
-    <bean class="org.dspace.discovery.SolrServiceResourceRestrictionPlugin" id="solrServiceResourceIndexPlugin" scope="prototype"/>
 
-    <alias name="solrServiceResourceIndexPlugin" alias="org.dspace.discovery.SolrServiceResourceRestrictionPlugin"/>
-
-    <!-- Additional indexing plugin to implement the browse system via SOLR -->
-    <bean id="solrBrowseIndexer" scope="prototype" 
-    	class="org.dspace.browse.SolrBrowseCreateDAO">
-    </bean>
 
 </beans>
