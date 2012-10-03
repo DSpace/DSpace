@@ -3,7 +3,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-jspui</artifactId>
    <name>DSpace JSP-UI</name>
-   <packaging>pom</packaging>
+   <packaging>war</packaging>
    <description>DSpace JSP Based Webapplication</description>
 
    <!-- 

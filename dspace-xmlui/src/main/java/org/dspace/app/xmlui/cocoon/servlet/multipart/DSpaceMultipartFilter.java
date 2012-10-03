@@ -13,7 +13,7 @@ import org.apache.cocoon.servlet.ServletSettings;
 import org.apache.cocoon.servlet.multipart.MultipartConfigurationHelper;
 import org.apache.cocoon.servlet.multipart.MultipartHttpServletRequest;
 import org.apache.cocoon.util.AbstractLogEnabled;
-import org.apache.tools.ant.types.FilterChain;
+
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -52,7 +52,8 @@ public class DSpaceMultipartFilter extends AbstractLogEnabled
     /**
      * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
      */
-    public void init(FilterConfig config) throws ServletException {
+    public void init(FilterConfig config) throws ServletException
+    {
         this.servletContext = config.getServletContext();
     }
 
