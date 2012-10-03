@@ -1,9 +1,9 @@
 --
 -- update-sequences.sql
 --
--- Version: $Revision$
+-- Version: $Revision: 4427 $
 --
--- Date:    $Date$
+-- Date:    $Date: 2009-10-09 17:42:19 -0500 (Fri, 09 Oct 2009) $
 --
 -- Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
 -- 
@@ -64,6 +64,7 @@ SELECT setval('item_seq', max(item_id)) FROM item;
 SELECT setval('bundle_seq', max(bundle_id)) FROM bundle;
 SELECT setval('item2bundle_seq', max(id)) FROM item2bundle;
 SELECT setval('bundle2bitstream_seq', max(id)) FROM bundle2bitstream;
+SELECT setval('dctyperegistry_seq', max(dc_type_id)) FROM dctyperegistry;
 SELECT setval('dcvalue_seq', max(dc_value_id)) FROM dcvalue;
 SELECT setval('community_seq', max(community_id)) FROM community;
 SELECT setval('community2community_seq', max(id)) FROM community2community;
@@ -72,31 +73,21 @@ SELECT setval('community2collection_seq', max(id)) FROM community2collection;
 SELECT setval('collection2item_seq', max(id)) FROM collection2item;
 SELECT setval('resourcepolicy_seq', max(policy_id)) FROM resourcepolicy;
 SELECT setval('epersongroup2eperson_seq', max(id)) FROM epersongroup2eperson;
+SELECT setval('handle_seq', max(handle_id)) FROM handle;
 SELECT setval('workspaceitem_seq', max(workspace_item_id)) FROM workspaceitem;
 SELECT setval('workflowitem_seq', max(workflow_id)) FROM workflowitem;
 SELECT setval('tasklistitem_seq', max(tasklist_id)) FROM tasklistitem;
 SELECT setval('registrationdata_seq', max(registrationdata_id)) FROM registrationdata;
 SELECT setval('subscription_seq', max(subscription_id)) FROM subscription;
+SELECT setval('history_seq', max(history_id)) FROM history;
+SELECT setval('historystate_seq', max(history_state_id)) FROM historystate;
 SELECT setval('communities2item_seq', max(id)) FROM communities2item;
+SELECT setval('itemsbyauthor_seq', max(items_by_author_id)) FROM itemsbyauthor;
+SELECT setval('itemsbytitle_seq', max(items_by_title_id)) FROM itemsbytitle;
+SELECT setval('itemsbydate_seq', max(items_by_date_id)) FROM itemsbydate;
+SELECT setval('itemsbydateaccessioned_seq', max(items_by_date_accessioned_id)) FROM itemsbydateaccessioned;
 SELECT setval('epersongroup2workspaceitem_seq', max(id)) FROM epersongroup2workspaceitem;
 SELECT setval('metadatafieldregistry_seq', max(metadata_field_id)) FROM metadatafieldregistry;
 SELECT setval('metadatavalue_seq', max(metadata_value_id)) FROM metadatavalue;
-SELECT setval('metadataschemaregistry_seq', max(metadata_schema_id)) FROM metadataschemaregistry;
-SELECT setval('harvested_collection_seq', max(id)) FROM harvested_collection;
+SELECT setval('metadataschemaregistry_seq', max(metadata_schema_id)) FROM metadataschemaregistry;SELECT setval('harvested_collection_seq', max(id)) FROM harvested_collection;
 SELECT setval('harvested_item_seq', max(id)) FROM harvested_item;
-
--- Handle Sequence is a special case.  Since Handles minted by DSpace use the 'handle_seq',
--- we need to ensure the next assigned handle will *always* be unique.  So, 'handle_seq'
--- always needs to be set to the value of the *largest* handle suffix.  That way when the
--- next handle is assigned, it will use the next largest number. This query does the following:
---  For all 'handle' values which have a number in their suffix (after '/'), find the maximum
---  suffix value, convert it to a 'bigint' type, and set the 'handle_seq' to that max value.
-SELECT setval('handle_seq',
-              CAST (
-                    max(
-                        to_number(regexp_replace(handle, '.*/', ''), '999999999999')
-                       )
-                    AS BIGINT)
-             )
-    FROM handle
-    WHERE handle SIMILAR TO '%/[0123456789]*';

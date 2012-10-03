@@ -1,9 +1,9 @@
 --
 -- database_schema.sql
 --
--- Version: $Revision$
+-- Version: $Revision: 4427 $
 --
--- Date:    $Date$
+-- Date:    $Date: 2009-10-09 17:42:19 -0500 (Fri, 09 Oct 2009) $
 --
 -- Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
 --
@@ -84,6 +84,7 @@ CREATE SEQUENCE item_seq;
 CREATE SEQUENCE bundle_seq;
 CREATE SEQUENCE item2bundle_seq;
 CREATE SEQUENCE bundle2bitstream_seq;
+CREATE SEQUENCE dctyperegistry_seq;
 CREATE SEQUENCE dcvalue_seq;
 CREATE SEQUENCE community_seq;
 CREATE SEQUENCE collection_seq;
@@ -98,11 +99,14 @@ CREATE SEQUENCE workflowitem_seq;
 CREATE SEQUENCE tasklistitem_seq;
 CREATE SEQUENCE registrationdata_seq;
 CREATE SEQUENCE subscription_seq;
+CREATE SEQUENCE history_seq;
+CREATE SEQUENCE historystate_seq;
 CREATE SEQUENCE communities2item_seq;
 CREATE SEQUENCE epersongroup2workspaceitem_seq;
 CREATE SEQUENCE metadataschemaregistry_seq;
 CREATE SEQUENCE metadatafieldregistry_seq;
 CREATE SEQUENCE metadatavalue_seq;
+
 CREATE SEQUENCE group2group_seq;
 CREATE SEQUENCE group2groupcache_seq;
 CREATE SEQUENCE harvested_collection_seq;
@@ -572,6 +576,10 @@ CREATE TABLE epersongroup2workspaceitem
 
 CREATE INDEX epg2wi_group_fk_idx ON epersongroup2workspaceitem(eperson_group_id);
 CREATE INDEX epg2wi_workspace_fk_idx ON epersongroup2workspaceitem(workspace_item_id);
+
+------------------------------------------------------------
+-- Browse subsystem tables and views
+------------------------------------------------------------
 
 -------------------------------------------------------
 --  Communities2Item table

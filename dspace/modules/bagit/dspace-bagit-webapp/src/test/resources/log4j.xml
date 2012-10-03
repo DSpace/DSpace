@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd" >
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	
+	<appender name="BAGIT_TESTING_FILE" class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="target/surefire-reports/dspace-bagit.log" />
+		<param name="MaxFileSize" value="1048576" />
+		<param name="MaxBackupIndex" value="500" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" 
+				value="%d %-5p %c @ %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="DEBUG" />
+			<param name="LevelMax" value="FATAL" />
+		</filter>
+	</appender>
+
+	<appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" 
+				value="%d{ISO8601} [%F:%L] %-5p &lt;%m&gt; %n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="WARN" />
+			<param name="LevelMax" value="FATAL" />
+		</filter>
+	</appender>
+	
+	<appender name="STDERR" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.err" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" 
+				value="%d{ISO8601} [%F:%L] %-5p &lt;%m&gt; %n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="WARN" />
+			<param name="LevelMax" value="FATAL" />
+		</filter>
+	</appender>
+    
+	<logger name="org.dspace.app.bagit">
+		<level value="DEBUG" />
+		<appender-ref ref="BAGIT_TESTING_FILE"/>
+	</logger>
+	
+	<!-- Add appenders you want live here -->
+	<root>
+		<level value="ERROR" />
+		<appender-ref ref="STDERR" />
+	</root>
+    
+</log4j:configuration>

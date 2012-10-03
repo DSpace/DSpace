@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+	<!-- DSpace Configuration Information -->
+	<context-param>
+		<param-name>dspace.config</param-name>
+		<param-value>${dspace.dir}/config/dspace.cfg</param-value>
+	</context-param>
+	
+	<!-- new ConfigurationService initialization for dspace.dir -->
+	<context-param>
+		<param-name>dspace.dir</param-name>
+		<param-value>${dspace.dir}</param-value>
+	</context-param>
+	
+	<servlet>
+		<servlet-name>DOIServlet</servlet-name>
+		<servlet-class>org.dspace.doi.DOIServlet</servlet-class>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>BatchServlet</servlet-name>
+		<servlet-class>org.dspace.doi.BatchServlet</servlet-class>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>CitationServlet</servlet-name>
+		<servlet-class>org.dspace.doi.CitationServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>CitationServlet</servlet-name>
+		<url-pattern>/citation/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>BatchServlet</servlet-name>
+		<url-pattern>/batch/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>DOIServlet</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
+</web-app>

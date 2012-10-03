@@ -1,0 +1,16 @@
+#! /bin/bash
+
+# Registers a single DOI with a target; does not update the local DOI db or
+#   DSpace db. The batch script should still be run to do these two things.
+#
+# Usage: bin/register-doi cdl_username cdl_password doi_id target_url
+
+export DOI_CP=lib/doi-service-0.0.1.jar:lib/commons-codec-1.3.jar:lib/log4j-1.2.14.jar
+
+echo 'The password you used will be in ~/.bash_history; if you care, remove it'
+java -cp $DOI_CP org.dspace.doi.CDLDataCiteService $1 $2 $3 $4
+
+# TODO: make this more robust:
+#   1) Test for ${dspace.home} and change to it if not there already
+#   2) Check that correct number of parameters are supplied
+#   3) Prompt for password instead of getting it on the command line

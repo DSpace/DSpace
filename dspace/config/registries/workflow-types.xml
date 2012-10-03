@@ -1,0 +1,79 @@
+<dspace-dc-types>
+
+  <dspace-header>
+    <title>DSpace Submission Workflow Types Registry</title>
+    <contributor.author>Kevin Van de Velde</contributor.author>
+  </dspace-header>
+
+  <dc-schema>
+      <name>workflow</name>
+      <namespace>http://www.dspace.org/workflow</namespace>
+  </dc-schema>
+
+  <!--Do not remove any of these types they are used by the submission workflow system -->
+
+  <dc-type>
+	<schema>workflow</schema>
+    <element>step</element>
+    <qualifier>inProgressUsers</qualifier>
+    <scope_note>Contains the userIds of the users who are performing a step</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>workflow</schema>
+    <element>step</element>
+    <qualifier>finishedUsers</qualifier>
+    <scope_note>Contains the userIds of the users who are performed a step</scope_note>
+  </dc-type>
+
+    <!--DRYAD ONLY-->
+  <dc-type>
+	<schema>workflow</schema>
+    <element>step</element>
+    <qualifier>reviewerKey</qualifier>
+  </dc-type>
+
+  <dc-type>
+	<schema>workflow</schema>
+    <element>step</element>
+    <qualifier>approved</qualifier>
+  </dc-type>
+
+  <dc-type>
+	<schema>workflow</schema>
+    <element>step</element>
+    <qualifier>rejectDate</qualifier>
+  </dc-type>
+
+  <dc-type>
+      <schema>workflow</schema>
+      <element>submit</element>
+      <qualifier>toworkflow</qualifier>
+  </dc-type>
+
+  <dc-type>
+      <schema>workflow</schema>
+      <element>submit</element>
+      <qualifier>skipReviewStage</qualifier>
+  </dc-type>
+
+  <dc-type>
+      <schema>workflow</schema>
+      <element>archive</element>
+      <qualifier>mailUsers</qualifier>
+  </dc-type>
+
+  <dc-type>
+      <schema>workflow</schema>
+      <element>review</element>
+      <qualifier>mailUsers</qualifier>
+  </dc-type>
+
+    <dc-type>
+      <schema>workflow</schema>
+      <element>genbank</element>
+      <qualifier>token</qualifier>
+  </dc-type>
+
+
+</dspace-dc-types>

@@ -4,13 +4,12 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace Account Registration
-To complete registration for a DSpace account, please click the link
+Subject: Dryad Account Registration
+To complete registration for a Dryad account, please click the link
 below:
 
   {0}
 
-If you need assistance with your account, please email
-dspace-help@myu.edu or call us at xxx-555-xxxx.
+If you need assistance with your account, please email help@datadryad.org
 
-The DSpace Team
+The Dryad Team

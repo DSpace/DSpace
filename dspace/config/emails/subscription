@@ -4,9 +4,9 @@
 # Parameters: {0} is the details of the new collections and items
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace Subscription
+Subject: Dryad Subscription
 New items are available in the collections you have subscribed to:
 
 {0}
 
-DSpace
+The Dryad Team

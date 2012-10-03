@@ -5,22 +5,22 @@
     - xmlui.xconf
     -
     - Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
-    - 
+    -
     - Redistribution and use in source and binary forms, with or without
     - modification, are permitted provided that the following conditions are
     - met:
-    - 
+    -
     - - Redistributions of source code must retain the above copyright
     - notice, this list of conditions and the following disclaimer.
-    - 
+    -
     - - Redistributions in binary form must reproduce the above copyright
     - notice, this list of conditions and the following disclaimer in the
     - documentation and/or other materials provided with the distribution.
-    - 
+    -
     - Neither the name of the DSpace Foundation nor the names of its
     - contributors may be used to endorse or promote products derived from
     - this software without specific prior written permission.
-    - 
+    -
     - THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
     - ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
     - LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -40,87 +40,100 @@
     - The XMLUI (Manakin Release) configuration file
     -
     - Authors: Scott Phillips
-    - Version: $Revision$
-    - Date:    $Date$
+    - Version: $Revision: 4445 $
+    - Date:    $Date: 2009-10-10 19:32:54 -0500 (Sat, 10 Oct 2009) $
 -->
 
 <xmlui>
     <!--
-        This section configures the Aspect "chain". An Aspect provides a set 
+        This section configures the Aspect "chain". An Aspect provides a set
         of coupled features for the system. All Aspects are chained together
         such that together they form the complete DSpace website. This is where
-        the chain is defined, the order in which each aspect is declared 
-        determines it's order in the chain. Aspects at the top are invoked 
-        first. 
-        
-        The <aspect> element has two attributes, name & path. The name is used 
-        to identify the Aspect, while the path determines the directory. The 
+        the chain is defined, the order in which each aspect is declared
+        determines it's order in the chain. Aspects at the top are invoked
+        first.
+
+        The <aspect> element has two attributes, name & path. The name is used
+        to identify the Aspect, while the path determines the directory. The
         path attribute should be listed exactly as it is found in the
         /xmlui/cocoon/aspects/ directory followed by a slash.
     -->
     <aspects>
-        <!--
-            @deprecated: the Artifact Browser has been devided into ViewArtifacts,
-            BrowseArtifacts, SearchArtifacts
-            <aspect name="Artifact Browser" path="resource://aspects/ArtifactBrowser/" />
-        -->
-        <aspect name="Displaying Artifacts" path="resource://aspects/ViewArtifacts/" />
-        <aspect name="Browsing Artifacts" path="resource://aspects/BrowseArtifacts/" />
-        <aspect name="Searching Artifacts" path="resource://aspects/SearchArtifacts/" />
-        <aspect name="Administration" path="resource://aspects/Administrative/" />
+
+		<aspect name="Submission and Workflow" path="resource://aspects/Submission/" />
+
+        <aspect name="Feedback" path="resource://aspects/Feedback/" />
+
+        <aspect name="Discovery" path="resource://aspects/Discovery/" />
+
+		<aspect name="Administration" path="resource://aspects/Administrative/" />
+
         <aspect name="E-Person" path="resource://aspects/EPerson/" />
-        <aspect name="Submission and Workflow" path="resource://aspects/Submission/" />
+
 	    <aspect name="Statistics" path="resource://aspects/Statistics/" />
+	    
+	    <aspect name="Dryad Browse" path="resource://aspects/DryadBrowse/" />
+	    
+	    <aspect name="Dryad Information" path="resource://aspects/DryadInfo/" />
+	    
+
+
+	    <aspect name="Versioning Aspect" path="resource://aspects/Versioning/" />	    
+
+	<aspect name="AME" path="resource://aspects/AME/" />
+
+
+	    
+	    
         <!--
-            To enable Discovery, uncomment this Aspect that will enable it
-            within your existing XMLUI
-            Also make sure to comment the SearchArtifacts aspect
-            as leaving it on together with discovery will cause UI overlap issues
-            <aspect name="Discovery" path="resource://aspects/Discovery/" />
-        -->
-        <!--
-            This aspect tests the various possible DRI features, 
-            it helps a theme developer create themes 
+            This aspect tests the various possible DRI features,
+            it helps a theme developer create themes
         -->
         <!-- <aspect name="XML Tests" path="resource://aspects/XMLTest/"/> -->
     </aspects>
 
     <!--
-        This section configures which Theme should apply to a particular URL. 
+        This section configures which Theme should apply to a particular URL.
         Themes stylize an abstract DRI document (generated by the Aspect
-        chain from above) and produce XHTML (or possibly another format) for 
-        display to the user. Each theme rule is processed in the order that it 
+        chain from above) and produce XHTML (or possibly another format) for
+        display to the user. Each theme rule is processed in the order that it
         is listed below, the first rule that matches is the theme that is applied.
-        
-        The <theme> element has several attributes including: name, id, regex, 
+
+        The <theme> element has several attributes including: name, id, regex,
         handle, and path. The name attribute is used to identify the theme, while
-        the path determines the directory. The path attribute should be listed 
+        the path determines the directory. The path attribute should be listed
         exactly as it is found in the /xmlui/cocoon/themes/ directory. Both the
         regex and handle attributes determine if the theme rule matches the URL.
-        If either the pattern or handle attribute is left off then the only the 
-        other component is used to determine matching. 
-        
-        Keep in mind that the order of <theme> elements matters in the case of 
+        If either the pattern or handle attribute is left off then the only the
+        other component is used to determine matching.
+
+        Keep in mind that the order of <theme> elements matters in the case of
         overlapping matching rules. For example, a theme rule with a very broad
-        matching rule (like regex=".*") will override a more specific theme 
-        declaration (like handle="1234/23") if placed before it. 
-        
+        matching rule (like regex=".*") will override a more specific theme
+        declaration (like handle="1234/23") if placed before it.
+
         Finally, theme application also "cascades" down to pages derived from the
-        one that the theme directly applies to. Thus, a theme applied to a 
-        specific community will also apply to that community's collections and 
-        their respective items.    
+        one that the theme directly applies to. Thus, a theme applied to a
+        specific community will also apply to that community's collections and
+        their respective items.
     -->
     <themes>
+
+    <!-- Mirage theme, @mire contribution of new theme to support easier development and branding -->
+        <!-- <theme name="Atmire Mirage Theme" regex=".*" path="Mirage/" /> -->
+
         <!-- Example configuration -->
 
         <!-- <theme name="Test Theme 1" handle="123456789/1" path="theme1/"/>    -->
         <!-- <theme name="Test Theme 2" regex="community-list" path="theme2/"/> -->
 
-        <!-- Default theme -->
-        <theme name="Default Reference Theme" regex=".*" path="Reference/" />
+	<!-- Use the DryadLab theme for anything with "dryadlab" in the URL or anything in 
+	     the DryadLab activities collection. -->
+        <theme name="Dryad Lab Theme" regex="dryadlab" path="DryadLab/" />
+        <theme name="Dryad Lab Theme" handle="10255/dryad.7872" path="DryadLab/" />
 
-        <!-- Mirage theme, @mire contribution of new theme to support easier development and branding -->
-        <!-- <theme name="Atmire Mirage Theme" regex=".*" path="Mirage/" /> -->
+        <!-- Default theme for all other pages -->
+        <theme name="Dryad Theme" regex=".*" path="Dryad/" />
 
         <!-- Classic theme, inspired by the JSP UI -->
         <!-- <theme name="Classic" regex=".*" path="Classic/" /> -->

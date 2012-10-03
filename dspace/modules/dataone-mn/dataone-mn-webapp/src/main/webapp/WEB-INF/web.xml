@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+	<!-- DSpace Configuration Information -->
+	<context-param>
+		<param-name>dspace.config</param-name>
+		<param-value>${dspace.dir}/config/dspace.cfg</param-value>
+	</context-param>
+	
+	<!-- new ConfigurationService initialization for dspace.dir -->
+	<context-param>
+		<param-name>dspace.dir</param-name>
+		<param-value>${dspace.dir}</param-value>
+	</context-param>
+
+
+    <listener>
+        <listener-class>org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener</listener-class>
+    </listener>
+
+	
+	<servlet>
+		<servlet-name>DataOneMN</servlet-name>
+		<servlet-class>org.dspace.dataonemn.DataOneMN</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>DataOneMN</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
+	
+	<session-config>
+		<session-timeout>60</session-timeout> 
+	</session-config>
+	
+	<mime-mapping>
+		<extension>nex</extension>
+		<mime-type>text/plain</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>nexus</extension>
+		<mime-type>text/plain</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>doc</extension>
+		<mime-type>application/msword</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>docx</extension>
+		<mime-type>application/vnd.openxmlformats-officedocument.wordprocessingml.document</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>xls</extension>
+		<mime-type>application/vnd.ms-excel</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>ppt</extension>
+		<mime-type>application/vnd.ms-powerpoint</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>pptx</extension>
+		<mime-type>application/vnd.openxmlformats-officedocument.presentationml.presentation</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>xlsx</extension>
+		<mime-type>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</mime-type>
+	</mime-mapping>
+</web-app>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+
+    <map:components>
+
+        <map:readers>
+            <map:reader name="AJAXSuggestReader" src="org.datadryad.app.xmlui.aspect.ame.AJAXSuggestReader"/>
+        </map:readers>
+        
+        <map:serializers>
+            <map:serializer name="text" src="org.apache.cocoon.serialization.TextSerializer" 
+            	mime-type="text/plain" logger="sitemap.serializer.text" />
+        </map:serializers>
+
+    </map:components>
+
+    <map:pipelines>
+       <map:pipeline>
+	        <map:match pattern="suggest/*/*" >
+		  <map:read type="AJAXSuggestReader">
+		    <map:parameter name="itemID" value="{1}"/>
+		    <map:parameter name="field" value="{2}"/>
+		  </map:read>
+		  <map:serialize type="text"/>
+	        </map:match>
+	    </map:pipeline>
+    </map:pipelines>
+</map:sitemap>

@@ -1,0 +1,29 @@
+BODY { font-family: "verdana", Arial, Helvetica, sans-serif;
+       font-size: 10pt;
+       font-style: normal;
+       color: #000000;
+       background: #ffffff;
+       margin: 30px }
+
+P { text-align: justify }
+
+H1 { text-align: center }
+
+TABLE { text-align: center }
+
+TH { text-align: center;
+     font-size: 10pt;
+     font-weight: bold }
+
+TD { text-align: left;
+     font-size: 10pt;
+     padding: 4px }
+
+DT { font-weight: bold }
+
+.figure { text-align: center;
+          margin-bottom: 2px }
+
+.caption { text-align: center;
+           margin-top: 0;
+           font-size: 8pt }

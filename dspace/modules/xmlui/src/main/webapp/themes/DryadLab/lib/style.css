@@ -1,0 +1,1426 @@
+/************************************************************************
+  Name: style.css
+  Version: $Revision: 1.15 $
+  Date: $Date: 2006/07/27 22:54:53 $
+  ***********************************************************************
+  Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+  Institute of Technology.  All rights reserved.
+  ***********************************************************************
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+  - Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+  - Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+  - Neither the name of the Hewlett-Packard Company nor the name of the
+  Massachusetts Institute of Technology nor the names of their
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+  OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+  DAMAGE.
+ ***********************************************************************/
+* {
+	margin: 0;
+	padding: 0;
+}
+body {
+	background: white;
+	margin: 0;
+	padding: 0;
+	font-family: "Arial", verdana, Helvetica, sans-serif;
+	font-size: 10pt;
+	font-style: normal;
+	height: 100%;
+	min-width:800px;
+}
+/*
+  ******************************
+  *****  General elements  *****
+  ******************************
+ */
+a {
+	color: rgb(49, 102, 22);
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+ul {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	list-style-type: none;
+}
+ul li {
+	color: rgb(99,0,0);
+	margin-left: 15px;
+}
+ol li {
+    margin-left: 35px;
+}
+p {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	margin-left: 15px;
+	margin-right: 60px;
+}
+h1, h2, h3, h4, h5 {
+	color: #555555;
+}
+blockquote {
+	margin-left: 50px;
+	margin-right: 70px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+span.bold {
+	font-weight: bolder;
+}
+span.italics,span.italic {
+	font-style: italic;
+}
+span.underline {
+	text-decoration: underline;
+}
+span.fade {
+	color: blue;
+	font-size: 90%;
+}
+span.fade a {
+	color: black;
+	text-decoration: none;
+}
+span.fade a:hover {
+	color: blue;
+	text-decoration: underline;
+}
+span.warn, p.warning {
+	color: red;
+	font-weight: bolder;
+}
+p.hidden, span.hidden {
+	display: none;
+}
+hr.item-separator {
+    width: 85%;
+}
+img {
+	-ms-interpolation-mode: bicubic;
+	border-style: none;
+}
+/*
+  ******************************
+  *****  Major components  *****
+  ******************************
+ */
+ul#ds-trail {
+	margin: 5px 0 10px 190px;
+}
+div#ds-main {
+	height: 100%;
+}
+div#ds-body {
+	margin: 5px 0 10px 265px;
+	padding-right: 10px;
+	top: 155px;
+}
+/* amol's additon */
+div#ds-header {
+	top: 0px;
+	height: 119px;
+	background-color: rgb(152, 187, 143);
+    position:relative;
+}
+div#ds-options {
+	padding: 0px 0px;
+	position: absolute;
+	top: 119px;
+	left: 0;
+	width: 251px;
+	overflow: hidden;
+	background: #FEFECD;
+/* height: 100%; */
+}
+div#ds-footer {
+	clear: both;
+	margin: 106px 0px 0px 265px;
+	top: 476px;
+}
+/*
+  ******************************
+  **********  Header  **********
+  ******************************
+ */
+div#ds-header {
+/* background-color: #40841F; */
+}
+div#ds-header span.ds-trail {
+	position: relative;
+	top: -38px;
+	left: 256px;
+	color: rgb(255, 255, 255)
+}
+div#ds-header span.ds-header-name {
+	font-size: 5em;
+	top: 25px;
+	position: absolute;
+	left: 230px;
+	text-align: right;
+	color: white;
+}
+div#ds-header a img#ds-header-logo {
+	border: 0;
+	width: 251px;
+	height: 119px;
+	left: 9px;
+	float: left;
+	background-repeat: no-repeat;
+	background: #868E72;
+}
+div#ds-header a {
+	text-decoration: none;
+	color: rgb(255, 255, 255);
+}
+div#ds-header h1 {
+	display: none;
+}
+div#ds-header h2 {
+	clear: both;
+	height: 15px;
+/* visibility: none; */
+	font-size: 0.001em;
+/* yeah it's still there but not really visible */
+}
+/* User box (login / profile) */
+div#ds-user-box {
+	position: absolute;
+	top: 35px;
+	right: 20px;
+}
+div#ds-user-box p {
+	color: gray;
+}
+div#ds-user-box a {
+	text-decoration: none;
+	color: gray;
+}
+div#ds-user-box a:hover {
+	text-decoration: underline;
+}
+/* Trail */
+span.ds-trail-link {
+	top: 10px;
+	left: 50px;
+	list-style: none;
+	margin-left:0px;
+    color: #FFFFFF;
+}
+span.ds-trail-link a:hover {
+	text-decoration: underline;
+}
+span.ds-trail-link:after {
+	/*content: " > ";*/
+    color: #FFFFFF;
+}
+
+span.ds-trail-shown{
+    position: absolute;
+    bottom: 0;
+}
+
+/*
+  ******************************
+  *******  Options list  *******
+  ******************************
+ */
+div#ds-options h3 {
+	color: black;
+	font-size: 1em;
+}
+div#ds-options h4 {
+	color: black;
+	font-size: 10pt;
+	margin-top: 10px;
+}
+div#ds-options li {
+	margin-top: 5px;
+	margin-bottom: 5px;
+	font-size: 10pt;
+	margin-left: 25px;
+}
+div#ds-options div#artifactbrowser_Navigation_list_browse li {
+	list-style: none;
+	margin-left: 0px;
+}
+div#ds-options div#artifactbrowser_Navigation_list_browse ul ul li {
+	list-style-image: url(../images/arrow.gif);
+	margin-left: 25px;
+}
+div#ds-options div#artifactbrowser_Navigation_list_account ul li {
+	list-style-image: url(../images/arrow.gif);
+	margin-left: 25px;
+}
+div#ds-options div#artifactbrowser_Navigation_list_context ul li {
+	list-style-image: url(../images/arrow.gif);
+	margin-left: 25px;
+}
+div.ds-option-set {
+	margin-bottom: 30px;
+}
+/* search box, in the option list */
+#ds-search-option-head {
+	background-color: rgb(207, 189, 106);
+	padding-left: 4px;
+}
+div#ds-search-option {
+	background-color: #fefecd;
+}
+form#ds-search-form fieldset {
+	border: none;
+	padding-left: 25px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+div#ds-search-option input.ds-text-field {
+	width: 110px;
+	font-size: 1em;
+}
+div#ds-search-option label {
+	display: none;
+}
+div#ds-search-option a {
+	font-weight: bold;
+	font-size: .9em;
+	padding-left: 25px;
+}
+/*
+  ******************************
+  **********  Footer  **********
+  ******************************
+ */
+div#ds-footer div#ds-footer-links div#ds-footer-credit {
+	position: relative;
+	right: 0px;
+	margin: 5px 0 10px 15px;
+}
+div#ds-footer span.ds-footer-msg {
+	position: absolute;
+	right: 40px;
+}
+div#ds-footer a {
+	text-decoration: none;
+}
+div#ds-footer-links {
+	border-top: 1px solid gray;
+}
+div#ds-footer a:hover {
+	text-decoration: underline;
+}
+
+/*
+  ******************************
+  ********  pagination  ********
+  ******************************
+ */
+div.pagination {
+	position: relative;
+	text-align: center;
+	width: 95%;
+}
+div.pagination-masked.top {
+	position: relative;
+	margin: 0px 60px 0px 0px;
+	padding: 0px;
+	text-align: right;
+}
+div.pagination-masked.bottom {
+	position: relative;
+	margin: 0px 60px 0px 0px;
+	padding: 0px;
+	text-align: center;
+}
+a.previous-page-link {
+	font-weight: bolder;
+	font-size: larger;
+	margin: 0px;
+	padding: 0px;
+}
+a.next-page-link {
+	font-weight: bolder;
+	font-size: larger;
+	margin: 0px;
+	padding: 0px;
+}
+p.pagination-info {
+	position: relative;
+	margin: 0px;
+	padding: 0px;
+}
+span.pagination-info {
+	padding-right: 20px;
+	padding-left: 20px;
+}
+ul.pagination-links {
+	position: relative;
+	margin: 0px;
+	padding: 0px;
+}
+*.pagination-links li {
+	list-style: none;
+	display: inline;
+	margin-right: 5px;
+	font-size: 90%;
+}
+/*
+  ******************************
+  ******  Progress Lists  ******
+  ******************************
+ */
+ul.ds-progress-list {
+	margin: 0px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	text-align: center;
+}
+ul.ds-progress-list li {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	color: gray;
+	overflow: hidden;
+	display: inline;
+	line-height: 20px;
+}
+ul.ds-progress-list li.current {
+	color: black;
+}
+ul.ds-progress-list li.arrow {
+	font-size: 200%;
+	font-weight: bold;
+	position: relative;
+	top: 6px;
+}
+/*
+  ******************************
+  *******  Artifact List  ******
+  ******************************
+ */
+ul.ds-artifact-list {
+	border: 1px solid gray;
+	list-style-type: none;
+	width: 95%;
+}
+ul.ds-artifact-list li.odd {
+	background-color: rgb(255, 255, 255);
+}
+ul.ds-artifact-list li.even {
+	background-color: rgb(238, 238, 238);
+}
+ul.ds-artifact-list li {
+	position: relative;
+	padding-bottom: 3px;
+	padding-top: 3px;
+	margin: 0 0 0 0;
+	padding: 2px 5px 2px 5px;
+}
+ul.ds-artifact-list li div.artifact-description {
+	width: 80%;
+}
+ul.ds-artifact-list li div.artifact-preview {
+	margin: -30px 0px 0 auto;
+	width: 15%;
+}
+ul.ds-artifact-list li div.artifact-info {
+	font-size: 90%;
+	padding-left: 25px;
+}
+ul.ds-artifact-list li div.artifact-title {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 100%;
+	font-weight: bolder;
+}
+span.date {
+	font-style: italic;
+}
+/*
+  ******************************
+  *********  Tables  ***********
+  ******************************
+ */
+table {
+	clear: both;
+	border-spacing: 0px;
+/* border: 1px solid gray; */
+	margin-top: 5px;
+	width: 95%;
+}
+
+table.license-line{
+    width: 85%;
+}
+tr.ds-table-header-row {
+	color: inherit;
+	background-color: rgb(218, 218, 218);
+}
+tr.ds-table-header-row.subheader {
+	background-color: rgb(250, 250, 214);
+}
+th {
+	padding: 4px 10px;
+}
+.subheader th {
+	padding-left: 5px;
+	font-weight: 100;
+}
+tr.ds-table-row.odd {
+	color: inherit;
+	background-color: rgb(238, 238, 238);
+}
+tr.ds-table-row.even {
+	color: inherit;
+	background-color: rgb(255, 255, 255);
+}
+td {
+	padding: 3px 10px 5px 10px;
+	border: none;
+	font-size: inherit;
+	background-color: inherit;
+	color: inherit;
+	vertical-align: top;
+}
+*.first-cell {
+	vertical-align: middle;
+	text-align: center;
+}
+.indent {
+	padding-left: 35px;
+	padding-right: 0;
+}
+.doubleIndent {
+	padding-left: 55px;
+	padding-right: 0;
+}
+th.indent {
+	padding-left: 30px;
+	padding-right: 0;
+}
+th.doubleIndent {
+	padding-left: 50px;
+	padding-right: 0;
+}
+/*
+  ******************************
+  ***********  forms  **********
+  ******************************
+ */
+form.ds-interactive-div {
+	width: 95%;
+}
+form.ds-interactive-div li.ds-form-item {
+/* display: block; */
+	padding: 2px 0;
+	width: 100%;
+}
+form.ds-interactive-div li {
+	margin: 0;
+}
+form.ds-interactive-div li.odd {
+	background-color: rgb(255, 255, 255);
+}
+form.ds-interactive-div li.even {
+	background-color: rgb(255, 255, 255);
+}
+form.ds-interactive-div li.last {
+
+}
+li.ds-form-item {
+	float: left;
+	clear: both;
+	width: 100%;
+}
+div.ds-form-content {
+	float: left;
+	clear: right;
+	display: block;
+	padding: 7px;
+	width: 600px;
+}
+span.ds-form-label,label.ds-form-label {
+	display: block;
+	float: left;
+	clear: left;
+	padding: 5px 20px 5px 10px;
+	/*width: 200px;*/
+	font-weight: bold;
+	vertical-align: middle;
+	overflow: hidden;
+}
+/* Help, error, & in-line labels */
+label.ds-composite-component {
+	display: block;
+	float: left;
+	padding: 0px 5px 0 0px;
+	font-size: 80%;
+	color: black;
+	background-color: inherit;
+	text-align: left;
+}
+span.error {
+	display: block;
+	font-size: 100%;
+	color: red;
+	background-color: inherit;
+	margin: 0;
+}
+span.field-help {
+	display: block;
+	margin-left: 5px;
+	font-size: 90%;
+	color: gray;
+	background-color: inherit;
+}
+input.error,textarea.error,select.error {
+	color: inherit;
+	background-color: rgb(255, 245, 245);
+	border-color: red;
+}
+span.composite-help {
+	display: block;
+	font-size: 90%;
+	color: gray;
+	background-color: inherit;
+	text-align: left;
+}
+span.composite-help {
+	display: block;
+	font-size: 80%;
+	color: black;
+	background-color: inherit;
+	text-align: left;
+}
+div.spacer {
+	margin: 0;
+	padding: 0;
+	line-height: 0px;
+	clear: both;
+}
+/* The composite field */
+span.ds-composite-field {
+	display: table-row;
+	padding: 2px;
+}
+*.ds-composite-field.ds-composite-component {
+	display: table-cell;
+	text-align: left;
+	width: auto;
+	padding-right: 10px;
+}
+*.ds-composite-field input,*.ds-composite-field textarea,*.ds-composite-field select {
+	margin-right: 5px;
+	margin-bottom: -2px;
+}
+/* Checkboxes and Radio buttons */
+fieldset.ds-checkbox-field,fieldset.ds-radio-field {
+	border: none;
+	margin: 0;
+	padding: 0;
+}
+fieldset.ds-checkbox-field legend,fieldset.ds-radio-field legend {
+	display: none;
+}
+fieldset.ds-checkbox-field label,fieldset.ds-radio-field label {
+	display: block;
+}
+/* Sub sections within a form */
+fieldset.ds-form-list {
+	border: 2px solid gray;
+	padding: 0;
+	margin-left: 0;
+	margin-right: 0;
+}
+fieldset.ds-form-list ol {
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	list-style-type: none;
+}
+fieldset.ds-form-list legend {
+	color: #336699;
+	background-color: inherit;
+	font-size: 115%;
+	font-weight: bolder;
+	margin-left: 10px;
+}
+/*fieldset.thick legend {
+	color: #336699;
+	padding-left: 10px;
+	padding-right: 30px;
+}*/
+fieldset.ds-form-sublist {
+	border: 1px solid rgb(238, 238, 238);
+	padding: 0;
+	margin: 5px;
+}
+/*
+  ***********************************
+  ******  Bulleted Text Lists  ******
+  ***********************************
+ */
+ul.text-list {
+	list-style-type: circle;
+	margin-left: 25px;
+}
+ul.text-list li {
+	margin-left: 50px;
+}
+/*
+  ******************************
+  ******  Numbered Lists  ******
+  ******************************
+ */
+ol.number-list {
+	list-style-type: decimal;
+}
+ol.text-list {
+	margin-left: 25px;
+}
+ol.ds-ordered-list {
+	margin-left: 25px;
+}
+ol.text-list li {
+	margin-left: 50px;
+}
+ol.ds-ordered-list li {
+	margin-left: 50px;
+}
+/*
+  ******************************
+  ******  Alphabet Lists  ******
+  ******************************
+ */
+ul.alphabet {
+	text-align: center;
+}
+ul.alphabet li {
+	list-style: none;
+	display: inline;
+	margin: 0 5px 0 5px;
+	font-weight: bolder;
+}
+ul.alphabet a:hover {
+	color: black;
+}
+/*
+  ******************************
+  *  Rules for specific pages  *
+  ******************************
+ */
+/* Navigation bar for browse-by pages */
+form.navigation {
+	max-width: 750px;
+	margin: 0 auto 0 auto;
+	border: 1px solid gray;
+	background-color: rgb(238, 238, 238);
+}
+form.navigation p {
+	text-align: center;
+}
+/* System wide alerts */
+div#ds-system-wide-alert {
+	background-color: rgb(255,240,220);
+	border: 2px solid rgb(213,80,40);
+	padding: 6px;
+	margin: 10px 30px 10px 30px;
+	color: rgb(213, 80, 40);
+}
+/* License text, used during submission to show a license */
+div.license-text {
+	border: 1px solid #666;
+	background-color: #EEE;
+	padding: 20px;
+	margin: 20px;
+	margin-top: 5px;
+	font-family: monospace;
+	font-size: 125%;
+}
+/*
+  System generated notices, typicaly these follow any action in the
+  administrative section, or validation errors in the submission
+  system.
+ */
+div.notice {
+	background-color: rgb(238, 238, 238);
+	border: 2px solid gray;
+	padding: 6px;
+	text-align: center;
+	margin: 10px 30px 10px 30px;
+}
+div.validation-error {
+	background-color: rgb(255,240,220);
+	border: 2px solid rgb(213,80,40);
+	padding: 6px;
+	margin-top:10px;
+	margin-bottom:10px;
+	margin-right: 46px;
+	color: rgb(213, 80, 40);
+}
+li.error-text {
+	color: rgb(213, 80, 40);
+}
+/* Community & Collection homepage */
+div.search-browse {
+	border: 2px solid gray;
+	background-color: rgb(238,238,238);
+	padding: 0px 5px 0px 10px;
+	width: 350px;
+}
+div.detail-view div.ds-logo-wrapper {
+	text-align: right;
+	margin-right: 30px;
+	margin: -150px 30px 0px auto;
+}
+div.detail-view p {
+	clear: both;
+}
+p.copyright-text {
+	margin-top: 30px;
+	width: 90%;
+	font-style: italic;
+	text-align: center;
+	margin: 30px auto 0px auto;
+}
+/*
+  *************************
+  *** Amol's new addons ***
+  *************************
+ */
+h3.ds-option-set-head {
+	background-color: rgb(207, 189, 106);
+	padding-left: 4px;
+}
+p#ds-button-field {
+	background-color: #cfbd69;
+}
+
+/*
+  ***************************
+  *** Misc span defs      ***
+  *** from Peter Midford  ***
+  ***************************
+  */
+  span.filename {
+    font-size: 1.5em;
+	font-weight: bolder;
+  }
+  span.versionNotice {
+      font-size: smaller; 
+      font-weight: bold;
+      background-color: rgb(255,0,0);
+  }
+/*
+  ************************
+  *** @Mire's additions **
+  ************************
+ */
+div.publication {
+}
+div.dataset {
+	padding-left:50px;
+}
+/* Reduce heeding sizes */
+div#ds-body h1 {
+	font-size: 1.5em;
+	margin-top: 10px;
+	margin-bottom: 5px;
+}
+div#ds-body h2 {
+	font-size: 1.3em;
+	margin-bottom: 0px;
+	margin-top: 20px;
+	background-color: inherit;
+}
+div#ds-body h3 {
+	margin-bottom: 15px;
+}
+/* DryadSubmit styles */
+div#aspect_submission_Navigation_list_submitNow {
+	padding: 20px 10px 20px 10px;
+	margin: 0px;
+	background-color: #FEFECD;
+	border: 0px;
+}
+div#aspect_submission_Navigation_list_submitNow ul {
+	list-style-type:none;
+}
+div#aspect_submission_Navigation_list_submitNow ul li {
+	margin: 6px 0px 0px 0px;
+}
+div#aspect_submission_Navigation_list_submitNow ul li a {
+    margin-right: 60px;
+	margin-left: 60px;
+}
+div#aspect_submission_Navigation_list_submitNow ul li a.button-link {
+/* Background right image */
+	background: transparent url('../images/dryadsubmit-right.jpg') no-repeat scroll top right;
+	display: block;
+	padding-right: 12px;
+/* Change this value according to right image width */
+	margin-right: 15px;
+	margin-left: 15px;
+/* Font properties */
+	text-decoration: none;
+	color: #fff;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:14px;
+	font-weight:bold;
+}
+div#aspect_submission_Navigation_list_submitNow ul li a.button-link span {
+/* Background left image */
+	background: transparent url('../images/dryadsubmit-left.jpg') no-repeat;
+	display: block;
+	line-height: 16px;
+/* Change this value according to button height */
+	padding: 10px 0px 10px 38px;
+}
+div#aspect_dryadsubmit_Navigation_list_DryadSubmit ul li a:hover span {
+	text-decoration:underline;
+}
+table.componentTable {
+	border: none;
+	width: auto;
+}
+table.componentTable td {
+	vertical-align: top;
+}
+ul#aspect_submission_StepTransformer_list_submit-progress li.last {
+	background-color:#FFFFFF;
+	border: none;
+}
+
+/* page license notice*/
+div.page-license {
+    font-size: small; 
+    text-align:left; 
+    padding-top: 15px;
+}
+
+/* last revised */
+div.lastmodified {
+	font-style: italic;
+/* text-align: center; */
+	font-size: small;
+/* below, a hack until dri namespace coming out in footer is removed */
+	margin-bottom: -100px;
+	padding-top: 10px;
+}
+div#embargo_notice {
+	margin-bottom: 35px;
+	margin-top: 10px;
+	padding: 10px;
+	border: solid 1px;
+	border-color: #ddd;
+	background-color: #FEFECD;
+	font-weight: bold;
+	font-size: larger;
+	color: #555;
+}
+div.citation-view {
+    float: left;
+	border: solid 1px;
+	border-color: #ddd;
+	background-color: #FEFECD;
+	width: 80%;
+	min-height: 198px;  /* fixed to match the journal cover image height (adjusted by -2) */
+}
+div.journal-cover-view{
+    float: right;
+	margin-left: -25px;
+	margin-top: 0px;
+	margin-right: 25px;
+	width: 15%;
+}
+blockquote a {
+	white-space: nowrap;
+}
+td.inlineRow {
+	padding-left: 25px;
+}
+td.data-file{
+    background-color: #FEFECD;
+}
+div#aspect_submission_submit_OverviewStep_div_submit-completed-overview {
+	border: 2px solid gray;
+}
+div#aspect_submission_submit_OverviewStep_div_submit-completed-overview div.odd {
+	background-color:#EEEEEE;
+}
+.bold {
+	font-weight: bold;
+}
+div#aspect_submission_submit_OverviewStep_div_submit-completed-overview p {
+	margin: 0;
+	padding: 5px 0;
+}
+div#aspect_submission_submit_OverviewStep_div_submit-completed-overview div.subdiv {
+	padding-left: 5px;
+}
+ul#aspect_submission_submit_OverviewStep_list_datasets li {
+	padding: 2px;
+}
+ul#aspect_submission_StepTransformer_list_journal-select-sublist label {
+	width: 140px;
+}
+li.journalerror div {
+	color:red;
+	float:none;
+}
+form#aspect_submission_StepTransformer_div_submit-preview-journal li.last {
+	border-top: none;
+}
+form#aspect_submission_StepTransformer_div_submit-preview-journal h2,
+form#aspect_submission_StepTransformer_div_submit-preview-journal table.file-list {
+	display: none;
+}
+table.submittable td,
+table.submittable th {
+	padding-left: 0;
+	text-align: left;
+}
+table.selectPubSubmitTable {
+	width: auto;
+}
+table.selectPubSubmitTable td {
+	padding: 3px;
+}
+table.selectPubSubmitTable td label {
+	padding: 0;
+	width: auto;
+}
+table.datafiletable {
+	width: auto;
+}
+table.datafiletable td {
+	padding: 10px;
+}
+input.inputhint {
+	color: #777777;
+}
+.hidden {
+    display: none;
+}
+input#aspect_submission_StepTransformer_field_datafile_identifier {
+	width: 220px;
+}
+#tooltip {
+	position: absolute;
+	z-index: 3000;
+	border: 1px solid #000000;
+	background-color: #FEFECD;
+	padding: 5px;
+/* opacity: 0.85; */
+	width: 500px;
+	font-size: 90%;
+}
+#tooltip h3, #tooltip div {
+	margin: 0;
+}
+div#aspect_discovery_SiteRecentSubmissions_div_site-home {
+        margin-top: 50px;
+}
+div#dryad_blog {
+	float: right;
+	margin-left: 40px;
+	margin-top: -10px;
+	margin-right: -10px;
+	width: 300px;
+	padding: 10px 20px 10px 20px;
+	background-color: rgb(238, 238, 238);
+}
+div#dryad_blog h3 {
+	text-align: center;
+}
+div#dryad_blog ul {
+	list-style-type: circle;
+}
+div#dryad_blog ul li {
+	padding: 2px;
+}
+li.current-page-link {
+	font-weight: bolder;
+	font-size: larger;
+	padding-bottom: 5px;
+}
+
+ul#aspect_submission_submit_OverviewStep_list_upload-external-list fieldset{
+    display: inline;
+}
+
+.center {
+	   display: block;   
+	   text-align: center;
+	   margin-left: auto;   
+	   margin-right: auto;
+}
+
+.vcenter {
+	 position: absolute;  
+	 top: 50%;
+	 display: table-cell; 
+	 vertical-align: middle;
+}
+
+/*
+  ***************************
+  SEARCH TABS
+  ***************************
+ */
+#searchTabs ul {
+	list-style: none;
+	padding: 0px;
+	/*margin: 0px 0px -7px 0px;*/
+	margin: 0px 0px -.55em 0px;	
+}
+#searchTabs li {
+	display: inline;
+	border: solid gray;
+	border-width: 1px;
+	margin: 0 0.5em 0 0;
+	background-color: rgb(238, 238, 238);
+	/* padding: 3px;*/
+	padding: .25em;
+}
+#searchTabs li a {
+	padding: 0 1em;
+}
+#searchTabs #selected {
+	background: white;
+	border-width: 1px 1px 0px 1px;
+	/*padding-bottom: 4px;*/
+	padding-bottom: .5em;
+}
+/*
+  ***************************
+  Login-Registration Page
+  ***************************
+ */
+#aspect_eperson_PasswordLogin_div_register, #aspect_eperson_PasswordLogin_div_login {
+    padding: 10px;
+    width: auto;
+    float: left;
+    background: white;
+    background: #eee;
+    border: 2px solid gray;
+} 
+#aspect_eperson_PasswordLogin_div_login {
+    margin: 20px 0px 40px 15px; /* top right bottom left */
+}
+#aspect_eperson_PasswordLogin_div_register {
+    margin: 20px 5px 20px 15px;
+}
+#aspect_eperson_PasswordLogin_div_register h3, #aspect_eperson_PasswordLogin_div_login h3 {
+    color: #3c8219; 
+}
+#aspect_eperson_PasswordLogin_table_register.ds-table {
+    padding-bottom: 58px;  /* 4.3em */
+}
+#aspect_eperson_PasswordLogin_div_register table tr td, #aspect_eperson_PasswordLogin_div_login table tr td {
+    background: #eee;
+    padding: 5px;
+}
+#aspect_eperson_PasswordLogin_div_login p {
+    width: 100%;
+    margin: 10px 0px 0px 0px;
+}
+#aspect_eperson_PasswordLogin_div_reglogin-header p.ds-paragraph {
+    font-size: x-large;
+    color: gray;
+    font-weight: bolder;
+    padding-top: 10px;
+}
+#cc-label {
+    margin-left: 15px;                 
+}
+
+div#embargo_notice_new {
+	margin-bottom: 0px;
+	margin-top: 0px;
+	padding: 5px;
+	border-color: #ddd;
+	font-weight: bold;
+	color: #8b0000;
+}
+
+div#aspect_submission_submit_DepositConfirmedStep_div_deposit-confirmed {
+	border: 2px solid gray;
+}
+
+/** Additions for Authority Control elements **/
+/* for scriptaculous autocomplete */
+div.autocomplete {
+  position:absolute;
+  width:250px;
+  background-color:white;
+  border:1px solid #888;
+  margin:0;
+  padding:0;
+}
+div.autocomplete ul {
+  list-style-type:none;
+  margin:0;
+  padding:0;
+}
+div.autocomplete ul li.selected { background-color: #ffb;}
+div.autocomplete ul li {
+  list-style-type:none;
+  display:block;
+  margin:0;
+  padding:2px;
+/*  height:32px; */
+  cursor:pointer;
+}
+div.autocomplete ul li span.value { display:none; }
+
+/* this magic gets the 16x16 icon to show up.. setting height/width didn't
+   do it, but adding padding actually made it show up. */
+img.ds-authority-confidence
+{ width: 16px; height: 16px; margin: 0px 2px; padding: 0px; vertical-align: bottom;}
+
+img.ds-authority-confidence.cf-unset
+  { background: transparent url(../images/confidence/4-question.gif); }
+img.ds-authority-confidence.cf-novalue
+  /* { background: transparent } */
+  { background: transparent url(../images/confidence/3-circleslash.gif); }
+img.ds-authority-confidence.cf-rejected,
+img.ds-authority-confidence.cf-failed
+  { background: transparent url(../images/confidence/2-errortriangle.gif); }
+img.ds-authority-confidence.cf-notfound
+  { background: transparent url(../images/confidence/3-thumb2.gif); }
+img.ds-authority-confidence.cf-ambiguous
+  { background: transparent url(../images/confidence/4-question.gif); }
+img.ds-authority-confidence.cf-uncertain
+  { background: transparent url(../images/confidence/5-pinion.gif); }
+img.ds-authority-confidence.cf-accepted
+  { background: transparent url(../images/confidence/6-greencheck.gif); }
+
+/* hide authority-value inputs in forms */
+input.ds-authority-value { display:none; }
+/** XXX Change to this to get the authority value to show up for debugging:
+ input.ds-authority-value { display:inline; }
+**/
+
+/* ..except, show authority-value inputs in on the Item EditMetadata page */
+input.ds-authority-value.ds-authority-visible { display: inline; }
+
+/* for lock button */
+input.ds-authority-lock
+  { vertical-align: bottom; height: 24px; width:
+    24px; background-repeat: no-repeat; background-color: transparent; }
+input.ds-authority-lock.is-locked
+  { background-image: url(../images/lock24.png); }
+input.ds-authority-lock.is-unlocked
+  { background-image: url(../images/unlock24.png); }
+
+
+/* Example of authority display: this makes authors with an authority
+   value show up as red in the item summary view: */
+span.ds-dc_contributor_author-authority { color: #982521; }
+
+/* Automatic metadata extraction aspect styles */
+.ame-add-item div {
+    #margin-left: 32px;
+    margin-bottom: 0px;
+    padding: 2px;
+}
+.ame-item div {
+    margin-left: 0px;
+    margin-bottom: 0px;
+    padding: 2px;
+}
+
+.ame-actions
+{
+  display: block;
+  clear:both;
+}
+
+.ame-field-table
+{
+  display: block;
+  clear: both;
+}
+
+.ame-field-list
+{
+  font-weight: bold;
+  margin-left: 5px;
+  width: 400px;
+  float:left;
+}
+
+.ame-suggest-container
+{
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+   display: none;
+   float:right;
+   width: 45%;
+   margin-right: 50px;
+   white-space: nowrap;
+   margin-top: 20px;
+   border: 1px solid gray;
+}
+
+.ame-suggest-buttons
+{
+   padding: 2px;
+   float: left;
+   font-size: 9pt;
+   height: 25px;
+}
+
+.ame-suggest-header {
+  font-weight: bold;
+   height: 23px;
+   margin: 0px;
+   border-bottom: 1px solid gray;
+   width: 100%;
+}
+
+.ame-suggest-header font {
+   padding-left: 5px;
+   padding-top: 2px;
+}
+
+.ame-suggest-control 
+{
+   max-height: 100px;
+   overflow: auto;
+   border: none;
+   overflow-x: hidden;
+   border-bottom: 1px solid gray;
+}
+
+ul.dynatree-container
+{
+   font-size: 9pt;
+   white-space: nowrap;
+   padding-top: 3px;
+   margin-top: -3px;
+   background-color: #FFFFFF;
+   border:none;
+   overflow: auto;
+}
+
+.dynatree-path
+{
+   font-size: 8pt;
+   color: gray;
+   font-style: italic;
+   padding-left: 30px;
+   padding-top: 3px;
+}
+
+.ame-suggest-add
+{
+   margin: 3px;
+}
+.ame-suggest-end
+{
+   display: block;
+   clear:both;
+}
+
+.ame-item-field,
+.ame-add-item
+{
+   padding: 3px 3px 3px 70px;
+}
+
+.ame-tooltip {
+	display:none;
+	background-color:#ffa;
+	border:1px solid #cc9;
+	padding:3px;
+	font-size:12px;
+        max-width: 300px;
+	-moz-box-shadow: 2px 2px 11px #666;
+	-webkit-box-shadow: 2px 2px 11px #666;
+}
+
+
+.ame-instructions {
+   font-style: italic;
+}
+
+ul.dynatree-container a:hover
+{
+    text-decoration: underline; 
+    background: #FFFFFF; 
+    border-color: #FFFFFF; 
+}
+
+ul.dynatree-container a:focus,
+span.dynatree-focused a:link  /* @IE */
+{
+    border: none;
+    background-color: #FFFFF; 
+}
+
+span.dynatree-selected a
+{
+    font-style: italic;
+}
+
+span.dynatree-active a
+{
+    background-color: #FFFFFF; 
+    border: none;
+}
+
+.ds-form-label-select-publication {
+	display: block;
+	padding: 2px;
+	font-weight: bold;
+}
+
+#aspect_submission_StepTransformer_list_submit-create-publication{
+	width:920px;
+}
+
+
+/*Autocomplete*/
+.ui-autocomplete{
+  position:absolute;
+  width:250px;
+  background-color:white;
+  border:1px solid #888;
+  margin:0;
+  padding:0;
+
+}
+
+#aspect_submission_StepTransformer_field_prism_publicationName_container{
+	display:none;
+}
+
+.ui-menu-item{
+list-style-type:none;
+  display:block;
+  margin:0;
+  padding:2px;
+  cursor:pointer;
+}
+
+img.ds-authority-confidence
+{ width: 16px; height: 16px; margin: 0px 2px; padding: 0px; vertical-align: bottom;}
+

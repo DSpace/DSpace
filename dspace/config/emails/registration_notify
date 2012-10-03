@@ -8,7 +8,7 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace: Registration Notification
+Subject: Dryad: Registration Notification
 
 A new user has registered on {0} at {1}:
 

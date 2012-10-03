@@ -1,0 +1,39 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>com.atmire</groupId>
+    <artifactId>atmire-workflow-xmlui-api</artifactId>
+    <packaging>jar</packaging>
+    <name>Atmire configurable workflow xmlui api</name>
+    <url>atmire.com</url>
+
+    <parent>
+       <groupId>com.atmire</groupId>
+       <artifactId>atmire-workflow</artifactId>
+       <version>1.7.2</version>
+    </parent>
+
+
+
+    <!--TODO: add db profiles ?-->
+
+    <dependencies>
+        <dependency>
+            <groupId>com.atmire</groupId>
+            <artifactId>atmire-workflow-api</artifactId>
+            <version>1.7.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-xmlui-api</artifactId>
+            <version>1.7.2</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+
+</project>
+

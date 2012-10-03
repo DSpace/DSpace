@@ -1,0 +1,24 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>com.atmire</groupId>
+   <artifactId>atmire-workflow</artifactId>
+   <packaging>pom</packaging>
+   <name>Atmire configurable workflow</name>
+   <url>http://atmire.com/workflow</url>
+   <description>
+      Atmire configurable workflow system
+   </description>
+
+   <parent>
+		<groupId>org.dspace</groupId>
+		<artifactId>modules</artifactId>
+		<version>1.7.2</version>
+   </parent>
+
+
+   <modules>
+       <module>atmire-workflow-api</module>
+       <module>atmire-workflow-xmlui-api</module>
+   </modules>
+
+</project>

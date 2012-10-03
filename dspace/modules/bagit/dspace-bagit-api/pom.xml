@@ -1,0 +1,81 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.dspace.modules</groupId>
+	<artifactId>bagit-api</artifactId>
+	<packaging>jar</packaging>
+	<name>DSpace BagIt :: API</name>
+	<version>0.0.1</version>
+
+	<description> DSpace BagIt Scripts </description>
+
+	<parent>
+		<groupId>org.dspace.modules</groupId>
+		<artifactId>bagit-modules</artifactId>
+		<version>0.0.1</version>
+	</parent>
+
+	<!--
+
+		mvn install:install-file -Dfile=target/bagit-3.6.jar
+		-DgroupId=loc-repository \ -DartifactId=bagit -Dversion=3.6
+		-Dpackaging=jar -DgeneratePom=true sudo -u tomcat6 bin/dspace packager
+		-d -i 10255/dryad.630 -e ksclarke@nescent.org \ -o asdf=fdsa -t BAGIT
+		exports/out.xml
+	-->
+
+	<profiles>
+		<!--
+			when activated a dspace.config configuration file location passed on
+			the commandline (-Ddspace.config=...) can be passed through to be
+			used as a filter source by projects for tasks such as updating the
+			${dspace.dir} in web.xml etc.
+		-->
+		<profile>
+			<activation>
+				<property>
+					<name>dspace.config</name>
+				</property>
+			</activation>
+			<build>
+				<filters>
+					<filter>${dspace.config}</filter>
+				</filters>
+			</build>
+		</profile>
+	</profiles>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-api</artifactId>
+			<version>1.7.2</version>
+		</dependency>
+		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>8.1-407.jdbc3</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.5</version>
+		</dependency>
+				<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-client</artifactId>
+			<version>1.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey.contribs</groupId>
+			<artifactId>jersey-apache-client</artifactId>
+			<version>1.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey.contribs</groupId>
+			<artifactId>jersey-multipart</artifactId>
+			<version>1.4</version>
+		</dependency>
+	</dependencies>
+
+</project>

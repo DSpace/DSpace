@@ -1,0 +1,61 @@
+# Dryad added IPs of spiders/bots
+
+# localhost
+::1
+127.0.0.1
+
+# NESCent's Nagios server (checks to ensure Dryad is running)
+152.3.104.75
+
+# Elena's RoadRunner IP
+174.109.198.35
+
+# Total-Impact
+72.14.190.127
+72.14.190.255
+
+# Yandex enterprise search (Moscow)
+77.88.26.25
+95.108.151.244
+
+# Korean search engine
+211.43.152.54
+211.43.152.49
+
+# Yahoo Slurp
+67.195.112.251
+67.195.112.185
+
+# Baiduspider (Japanese search engine)
+119.63.198.69
+119.63.198.102
+119.63.198.112
+119.63.198.100
+119.63.198.126
+119.63.198.111
+119.63.198.95
+119.63.198.93
+119.63.198.113
+119.63.198.81
+
+# Sosospider
+124.115.0.111
+124.115.4.193
+124.115.0.27
+124.115.0.108
+124.115.0.19
+124.115.4.205
+124.115.4.204
+124.115.0.109
+124.115.0.107
+124.115.0.18
+
+# European SiteBot
+212.113.35.162
+
+# Universite Joseph Fourier - Grenoble 1
+# Centre de Ressources Informatiques
+# 152.77.214.85 (not going to filter for now)
+
+# Other (ambiguous in whois db)
+208.115.111.243

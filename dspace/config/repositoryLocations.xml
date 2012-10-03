@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    List of partner repositories for which the submission system
+    allows users to submit a link rather than just uploading the file.
+    (dryad.externalIdentifier)
+-->
+
+<repositories>
+    <repo
+            label="TreeBASE"
+            filter="http://purl.org/phylo/treebase/phylows/study/TB2:%externalresource%?format=html"
+            contact-url="http://www.treebase.org"/>
+    <repo
+            label="GenBank"
+            filter="http://www.ncbi.nlm.nih.gov/nuccore/%externalresource%"
+            contact-url="http://www.ncbi.nlm.nih.gov/genbank/"/>
+    <repo
+            label="KNB"
+            filter="http://knb.ecoinformatics.org/knb/metacat?action=read&amp;qformat=knb&amp;sessionid=0&amp;docid=%externalresource%"
+            contact-url="http://knb.ecoinformatics.org"/>
+</repositories>        

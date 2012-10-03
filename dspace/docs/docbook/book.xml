@@ -1,0 +1,119 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN' 'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd' [
+
+<!ENTITY art01 SYSTEM "introduction.xml">
+<!ENTITY art02 SYSTEM "functional.xml">
+<!ENTITY art03 SYSTEM "install.xml">
+<!ENTITY art04 SYSTEM "update.xml">
+<!ENTITY art05 SYSTEM "configure.xml">
+<!ENTITY art06 SYSTEM "jspui.xml">
+<!ENTITY art07 SYSTEM "xmlui.xml">
+<!ENTITY art08 SYSTEM "sys_admin.xml">
+<!ENTITY art09 SYSTEM "storage.xml">
+<!ENTITY art10 SYSTEM "directories.xml">
+<!ENTITY art11 SYSTEM "architecture.xml">
+<!ENTITY art12 SYSTEM "application.xml">
+<!ENTITY art13 SYSTEM "business.xml">
+<!ENTITY art14 SYSTEM "submission.xml">
+<!ENTITY art15 SYSTEM "DRISchemaReference.xml">
+<!ENTITY art16 SYSTEM "history.xml">
+<!ENTITY appa SYSTEM "appendix.xml">
+]>
+<book>
+	<bookinfo>
+		<title>DSpace Manual</title>
+		<subtitle>Release 1.6.2</subtitle>
+		<author>
+			<surname>DuraSpace</surname>
+			<affiliation>
+				<address><email>webmaster@dspace.org</email></address>
+			</affiliation>
+		</author>
+		<edition>1.6.2</edition>
+		<pubdate>2010-06-13 08:00:00 EST</pubdate>
+		<copyright>
+			<year>2002-2010</year>
+			<holder>
+				<ulink url="http://www.duraspace.org/">DuraSpace</ulink>
+			</holder>
+		</copyright>
+		<legalnotice>
+			<para>
+				<ulink url="http://creativecommons.org/licenses/by/3.0/us/">
+					<inlinemediaobject>
+						<imageobject>
+							<imagedata fileref="http://i.creativecommons.org/l/by/3.0/us/88x31.png" format="PNG"/>
+						</imageobject>
+					</inlinemediaobject>
+				</ulink>
+			</para>
+			<para>Licensed under a Creative Commons Attribution 3.0 United States License</para>
+		</legalnotice>
+		<revhistory>
+			<revision>
+				<revnumber>Version 1.6.2 </revnumber>
+				<date>This text generated: 2010-06-13 08:00:00 EST EST</date>
+				<authorinitials>JAT</authorinitials>
+			</revision>
+		</revhistory>
+		<abstract>
+			<para/>
+		</abstract>
+	</bookinfo>
+	<preface>
+		<title>Preface</title>
+		<para/>
+		<para>Welcome to Release 1.6.2. This is a "fix" release. The committers have volunteered many hours to fix, re-write and contribute new software code for this release. Documentation has been updated. No new features have been added to this release.</para>
+		<para>The following is a list of the new features included (not an exhaustive list) for release 1.6.0 and are also contained in 1.6.2:</para>
+		<itemizedlist>
+			<listitem>
+				<para>SOLR Statistics.</para>
+			</listitem>
+			<listitem>
+				<para>Authority Control.</para>
+			</listitem>
+			<listitem>
+				<para>Embargos</para>
+			</listitem>
+			<listitem>
+				<para>Dspace Command Launcher</para>
+			</listitem>
+			<listitem>
+				<para>OpenSearch</para>
+			</listitem>
+			<listitem>
+				<para>Batch Metadata Editing</para>
+			</listitem>
+			<listitem>
+				<para>Configurable OAI-PMH Dublin Core Ouput</para>
+			</listitem>
+			<listitem>
+				<para>Delegated Administration</para>
+			</listitem>
+		</itemizedlist>
+		<para>The following people have contributed to this release of DSpace: @mire, BioMed Central, Andrea Bollini, Ben Bosman, Flavio Botelho, Peter Dietz, Mark Diggory, Tim Donohue, Serhij Dubyk, Enovation Solutions, Javier Garrido, Keith Gilbertson, Ladd Hanson, Leonie Hayes, Paulo Jobim, Claudia Juergen, Keller, Fabio Kepler, Yin Yin Latt, Stuart Lewis, Bram Luyten, Van Ly, Ivan Masar, Alexey Maslov, Gabriela Mircea, Hardik Mishra, Caryn, Neiswender, Venessa Newton-Wade, OhioLINK, Ekaterina Pechekhonova, Dale Poulter, Toni Prieto, Richard Rodgers, Ricardo Saraiva, Andreas Schwander, Kim Shepherd, Elin Stangeland, Larry Stone, Keiji Suzuki, Robin Taylor, Graham Triggs, Jeffrey Trimble, Kevin Van de velde, Steve Williams and Mark Wood. Many of them could not do this work without the support (release time and financial) of their institutions that they are associated with. We offer thanks to those institutions for supporting their staff to take time to contribute to the DSpace project.</para>
+		<para>We apologize to any committer left off this list. DSpace has such a large, arctive development community that we sometimes loose track of all our contributors. Our ongoing list of all known people/institutions that contribute to DSpace can be found on our DSpace Contributors Wiki page (http://wiki.dspace.org/confluence/display/DSPACE/DSpaceContributors). Acknowledgements to those left off will be made in future releases.</para>
+		<para>The Documentation Gardener for this release was Jeffrey Trimble with input from everyone. All typos are his fault. </para>
+		<para>Kim Shepherd is the Release Co-ordinator of this release.</para>
+		<para>Additional thanks to Tim Donohue from DuraSpace on keeping all of us focused on the work at hand, and calming us when we got excited and for the general support for the DSpace project.</para>
+	</preface>
+	<toc/>
+	&art01;
+	&art02;
+	&art03;
+	&art04;
+	&art05;
+	&art06;
+	&art07;
+	&art08;
+	&art09;
+	&art10;
+	&art11;
+	&art12;
+	&art13;
+	&art14;
+	&art15;
+	&art16;
+	&appa;
+	<index/>
+</book>

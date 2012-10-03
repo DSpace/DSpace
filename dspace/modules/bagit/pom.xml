@@ -1,0 +1,23 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.dspace.modules</groupId>
+	<artifactId>bagit-modules</artifactId>
+	<packaging>pom</packaging>
+	<name>DSpace BagIt</name>
+	<description>Parent for DSpace BagIt Module</description>
+	<version>0.0.1</version>
+	
+	<!-- 
+		Parent POM from which Maven inherits DSpace Default POM atrributes
+	-->
+	<parent>
+		<groupId>org.dspace</groupId>
+		<artifactId>modules</artifactId>
+		<version>1.7.2</version>
+	</parent>
+	
+	<modules>
+		<module>dspace-bagit-api</module>
+		<module>dspace-bagit-webapp</module>
+	</modules>
+</project>

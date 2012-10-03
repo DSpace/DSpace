@@ -1,0 +1,103 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.dspace.modules</groupId>
+	<artifactId>versioning-webapp</artifactId>
+	<packaging>war</packaging>
+	<name>DSpace Versioning :: Web Application</name>
+	<description>DSpace Versioning Web Application</description>
+
+	<parent>
+		<groupId>org.dspace.modules</groupId>
+		<artifactId>versioning</artifactId>
+		<version>1.7.2</version>
+	</parent>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<archiveClasses>true</archiveClasses>
+                    <attachClasses>true</attachClasses>
+                    <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
+                    <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
+					<webResources>
+						<resource>
+							<filtering>true</filtering>
+							<directory>${basedir}/src/main/webapp</directory>
+							<includes>
+								<include>WEB-INF/web.xml</include>
+							</includes>
+						</resource>
+					</webResources>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<!--
+			when activated a dspace.config configuration file location passed on
+			the commandline (-Ddspace.config=...) can be passed through to be
+			used as a filter source by projects for tasks such as updating the
+			${dspace.dir} in web.xml etc.
+		-->
+		<profile>
+			<activation>
+				<property>
+					<name>dspace.config</name>
+				</property>
+			</activation>
+			<build>
+				<filters>
+					<filter>${dspace.config}</filter>
+				</filters>
+			</build>
+		</profile>
+	</profiles>
+
+	<dependencies>		
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-api</artifactId>
+		</dependency>
+
+        <dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-xmlui-api</artifactId>
+		</dependency>
+
+        <dependency>
+           <groupId>org.dspace.modules</groupId>
+           <artifactId>versioning-api</artifactId>
+        </dependency>   
+        
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.4</version>
+			<scope>provided</scope>
+		</dependency>
+
+        <dependency>
+           <groupId>com.atmire</groupId>
+           <artifactId>atmire-workflow-xmlui-api</artifactId>
+           <version>1.7.2</version>
+           <exclusions>
+                <exclusion>
+                    <artifactId>ehcache</artifactId>
+                    <groupId>net.sf.ehcache</groupId>
+                </exclusion>
+            </exclusions>
+       </dependency>
+        
+	</dependencies>
+</project>

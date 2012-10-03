@@ -1,0 +1,746 @@
+<?xml version='1.0' encoding='UTF-8'?>
+  <chapter remap="h1">
+    <title><anchor id="docbook-index.html"/>DSpace System Documentation: Contents</title>
+    <para>Authors: Robert Tansley, Mick Bass, Margret Branschofsky, Grace Carpenter, Greg McClellan, David Stuve, and others</para>
+    <para>For DSpace Version: <emphasis role="bold">1.5</emphasis> (January-2008)</para>
+    <para>Documentation for other versions of DSpace are included with the source code.</para>
+    <itemizedlist>
+      <listitem>
+        <para>
+          <link linkend="docbook-introduction.html">Introduction</link>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <link linkend="docbook-functional.html">Functional Overview</link>
+          <itemizedlist>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-data_model">Data Model</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-plugin">Plugin Manager</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-metadata">Metadata</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-packager">Packager Plugins</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-crosswalk">Crosswalk Plugins</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-epeople">E-people and Groups</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-authentication">Authentication</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-auth">Authorization</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-ingest">Ingest Process and Workflow</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-supervision">Supervision and Collaboration</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-handles">Handles</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-bitstream_ids">Bitstream &apos;Persistent&apos; Identifiers</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-srb">Storage Resource Broker (SRB) Support</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-search_browse">Search and Browse</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-html">HTML Support</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-oai">OAI Support</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-openurl">OpenURL Support</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-creativecommons">Creative Commons Support</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-subscriptions">Subscriptions</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-history">History</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-history">Import and Export</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-registration">Registration</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-statistics">Statistical Reports</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-functional.html-checker">Checksum Checker</link>
+              </para>
+            </listitem>
+            <listitem>
+            	<para>
+            		<link linkend="docbook-functional.html-usage">Usage Instrumentation</link>
+            	</para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <link linkend="docbook-install.html">Installation</link>
+          <itemizedlist>
+            <listitem>
+              <para>
+                <link linkend="docbook-install.html-prerequisite">Prerequisite Software</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-install.html-installsteps">Quick Installation Steps</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-install.html-advancedinstall">Advanced Installation</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-install.html-windows">Windows Installation</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-install.html-knownbugs">Known Bugs</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-install.html-problems">Common Problems</link>
+              </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <link linkend="docbook-update.html">Updating a DSpace Installation</link>
+          <itemizedlist>
+            <listitem>
+              <para>
+                <link linkend="docbook-update.html-142_15">Updating from 1.4.2 to 1.5</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-update.html-14_141">Updating From 1.4 to 1.4.1</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-update.html-132_14">Updating From 1.3.x to 1.4.x</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-update.html-131_132">Updating From 1.3.1 to 1.3.2</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-update.html-12_13">Updating From 1.2.x to 1.3.x</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-update.html-121_122">Updating From 1.2.1 to 1.2.2</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-update.html-12_121">Updating From 1.2 to 1.2.1</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-update.html-11_12">Updating From 1.1 (or 1.1.1) to 1.2</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-update.html-11_111">Updating From 1.1 to 1.1.1</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-update.html-101_11">Updating From 1.0.1 to 1.1</link>
+              </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <link linkend="docbook-configure.html">Configuration and Customization</link>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <itemizedlist>
+            <listitem>
+              <para>
+                <link linkend="docbook-configure.html-general">General Configuration</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <itemizedlist>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-general-dspacecfg">dspace.cfg</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-general-search">Search Indexes</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-general-browse">Browse Configuration</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-general-mediafilter">Configuring Media Filters</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-general-email">Email Messages</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-general-registries">Metadata and Bitstream Format Registries</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-general-license">Default Submission License</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-submission.html">Submission Configuration</link>
+                      <itemizedlist>
+                        <listitem>
+                          <para>
+                            <link linkend="docbook-submission.html-configurationFile">Understanding the Submission Configuration File</link>
+                          </para>
+                        </listitem>
+                        <listitem>
+                          <para>
+                            <link linkend="docbook-submission.html-stepOrdering">Reordering/Removing Submission Steps</link>
+                          </para>
+                        </listitem>
+                        <listitem>
+                          <para>
+                            <link linkend="docbook-submission.html-collectionSubmission">Assigning a custom Submission Process to a Collection</link>
+                          </para>
+                        </listitem>
+                        <listitem>
+                          <para>
+                            <link linkend="docbook-submission.html-metadataEntry">Customizing the Metadata-entry pages</link>
+                          </para>
+                        </listitem>
+                        <listitem>
+                          <para>
+                            <link linkend="docbook-submission.html-uploadStep">Configuring the File Upload step</link>
+                          </para>
+                        </listitem>
+                        <listitem>
+                          <para>
+                            <link linkend="docbook-submission.html-createStep">Creating new Submission Steps</link>
+                          </para>
+                        </listitem>
+                      </itemizedlist>
+                    </para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-configure.html-xmlui">XMLUI Interface Customizations (Manakin)</link>
+                <itemizedlist>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-xmlui-dspacecfg">dspace.cfg</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-xmlui-configure">Configuring Themes and Aspects</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-xmlui-multilingual">Multilingual Support</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-xmlui-newtheme">Creating a New Theme</link>
+                    </para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-configure.html-jspui">JSPUI Interface Customizations</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <itemizedlist>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-jspui-dspacecfg">dspace.cfg</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-jspui-controlledvocabulary">Configuring Controlled Vocabularies</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-jspui-multilingual">Configuring Multilingual Support</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-jspui-jsp">Customizing the JSP Pages</link>
+                    </para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-configure.html-advanced">Advanced DSpace Customizations</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <itemizedlist>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-checksum">Checksum Checker</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-authentication">Custom Authentication</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-statistics">Configuring Statistical Reports</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-oai">Activating Additional OAI-PMH Crosswalks</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-packager">Configuring Packager Plugins</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-crosswalk">Configuring Crosswalk Plugins</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-mediafilters">Creating new Media/Format Filters</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-templates">Configuration Files for Other Applications</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-configure.html-browse-index">Browse Index Creation</link>
+                    </para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <link linkend="docbook-directories.html">Directories and Files</link>
+          <itemizedlist>
+            <listitem>
+              <para>
+                <link linkend="docbook-directories.html-sourcedir">Source Directory Layout</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-directories.html-installdir">Installed Directory Layout</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-directories.html-webapp">Contents of Web Application</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-directories.html-logfiles">Log Files</link>
+              </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <link linkend="docbook-architecture.html">Architecture</link>
+          <itemizedlist>
+            <listitem>
+              <para>
+                <link linkend="docbook-architecture.html-overview">Overview</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-storage.html">Storage Layer</link>
+                <itemizedlist>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-storage.html-rdbms">RDBMS</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-storage.html-bitstreams">Bitstream Store</link>
+                    </para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-business.html">Business Logic Layer</link>
+                <itemizedlist>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-business.html-core">Core Classes</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-business.html-content">Content Management API</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-business.html-plugin">Plugin Manager</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-business.html-workflow">Workflow System</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-business.html-administer">Administration Toolkit</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-business.html-eperson">E-person/Group Manager</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-business.html-authorize">Authorization</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-business.html-handle">Handle Manager/Handle Plugin</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-business.html-search">Search</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-business.html-browse">Browse API</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-business.html-history">History Recorder</link>
+                    </para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-application.html">Application Layer</link>
+                <itemizedlist>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-application.html-webui">Web User Interface</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-application.html-oai">OAI-PMH Data Provider</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-application.html-structbuilder">Community and Collection Structure Importer</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-application.html-packager">Package Importer and Exporter</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-application.html-itemimporter">Item Importer and Exporter</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-application.html-transferitem">Transferring Items Between DSpace Instances</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-application.html-registration">Registering (Not Importing) Bitstreams</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-application.html-mets">METS Tools</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-application.html-mediafilters">Media Filters</link>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <link linkend="docbook-application.html-filiator">Sub-Community Management</link>
+                    </para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <link linkend="docbook-DRISchemaReference.html">DRI Schema Reference</link>
+          <itemizedlist>
+            <listitem>
+              <para>
+                <link linkend="docbook-DRISchemaReference.html-Introduction">Introduction</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-DRISchemaReference.html-DRI_in_Manakin">DRI in Manakin</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-DRISchemaReference.html-Common_Design_Patterns">Common Design Patterns</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-DRISchemaReference.html-Schema_Overview">Schema Overview</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-DRISchemaReference.html-Merging_of_DRI_Documents">Merging of DRI Documents</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-DRISchemaReference.html-Version_Changes">Version Changes</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-DRISchemaReference.html-Element_Reference">Element Reference</link>
+              </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <link linkend="docbook-history.html">Version History</link>
+          <itemizedlist>
+            <listitem>
+              <para>
+                <link linkend="docbook-history.html-version1_5">Changes in DSpace 1.5</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-history.html-version1_4_1">Changes in DSpace 1.4.1</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-history.html-version1_4">Changes in DSpace 1.4</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-history.html-version1_3_2">Changes in DSpace 1.3.2</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-history.html-version1_3_1">Changes in DSpace 1.3.1</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-history.html-version1_3">Changes in DSpace 1.3</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-history.html-version1_2_2">Changes in DSpace 1.2.2</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-history.html-version1_2_1">Changes in DSpace 1.2.1</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-history.html-version1_2">Changes in DSpace 1.2</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-history.html-version1_1_1">Changes in DSpace 1.1.1</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-history.html-version1_1">Changes in DSpace 1.1</link>
+              </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <link linkend="docbook-appendix.html">Appendices</link>
+          <itemizedlist>
+            <listitem>
+              <para>
+                <link linkend="docbook-appendix.html-dublincoreregistry">Default Dublin Core Metadata Registry</link>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <link linkend="docbook-appendix.html-bitstreamformatregistry">Default Bitstream Format Registry</link>
+              </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </listitem>
+    </itemizedlist>
+  </chapter>
+
+

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="modules/api/target/classes" path="modules/api/src/main/java"/>
+	<classpathentry kind="src" path="modules/dataone-mn/dataone-mn-api/src/main/java"/>
+	<classpathentry kind="src" path="modules/dataone-mn/dataone-mn-webapp/src/main/java"/>
+	<classpathentry kind="src" output="modules/doi/dspace-doi-api/target/classes" path="modules/doi/dspace-doi-api/src/main/java"/>
+	<classpathentry excluding="**" kind="src" output="modules/doi/dspace-doi-api/target/classes" path="modules/doi/dspace-doi-api/src/main/resources"/>
+	<classpathentry kind="src" output="modules/xmlui/target/classes" path="modules/xmlui/src/main/java"/>
+	<classpathentry excluding="**" kind="src" output="modules/xmlui/target/classes" path="modules/xmlui/src/main/resources"/>
+	<classpathentry kind="src" output="modules/doi/dspace-doi-webapp/target/classes" path="modules/doi/dspace-doi-webapp/src/main/java"/>
+	<classpathentry excluding="**" kind="src" output="modules/doi/dspace-doi-webapp/target/classes" path="modules/doi/dspace-doi-webapp/src/main/resources"/>
+	<classpathentry kind="src" output="modules/doi/dspace-doi-webapp/target/test-classes" path="modules/doi/dspace-doi-webapp/src/test/java"/>
+	<classpathentry excluding="**" kind="src" output="modules/doi/dspace-doi-webapp/target/test-classes" path="modules/doi/dspace-doi-webapp/src/test/resources"/>
+	<classpathentry kind="src" path="modules/xmlui/src/main/webapp/themes/Dryad"/>
+	<classpathentry kind="src" path="modules/journal-submit/src/main/java"/>
+	<classpathentry kind="src" path="modules/xmlui/src/test/java"/>
+	<classpathentry kind="src" path="modules/api-stats/src/main/java"/>
+	<classpathentry kind="src" path="modules/identifier-services/src/main/java"/>
+	<classpathentry kind="src" path="modules/doi/dspace-doi-api/src/test/java"/>
+	<classpathentry kind="src" path="modules/bagit/dspace-bagit-api/src/main/java"/>
+	<classpathentry kind="src" path="modules/bagit/dspace-bagit-webapp/src/main/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
+	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
+	<classpathentry kind="lib" path="/home/kevin/.m2/repository/org/dspace/dependencies/dspace-perst/4.21/dspace-perst-4.21.jar"/>
+	<classpathentry kind="lib" path="/home/kevin/.m2/repository/com/atmire/atmire-workflow-xmlui-api/1.6.2-SNAPSHOT/atmire-workflow-xmlui-api-1.6.2-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="/home/kevin/.m2/repository/org/dspace/dspace-xmlui-wing/1.6.2/dspace-xmlui-wing-1.6.2.jar"/>
+	<classpathentry kind="lib" path="/home/kevin/.m2/repository/org/dspace/dspace-xmlui-api/1.6.2/dspace-xmlui-api-1.6.2.jar"/>
+	<classpathentry kind="lib" path="/home/kevin/.m2/repository/org/apache/avalon/framework/avalon-framework-api/4.3.1/avalon-framework-api-4.3.1.jar"/>
+	<classpathentry kind="lib" path="/home/kevin/.m2/repository/org/apache/cocoon/cocoon-pipeline-api/1.0.0/cocoon-pipeline-api-1.0.0.jar"/>
+	<classpathentry kind="lib" path="/home/kevin/.m2/repository/org/apache/cocoon/cocoon-pipeline-impl/1.0.0/cocoon-pipeline-impl-1.0.0.jar"/>
+	<classpathentry kind="lib" path="/home/kevin/.m2/repository/org/apache/cocoon/cocoon-util/1.0.0/cocoon-util-1.0.0.jar"/>
+	<classpathentry kind="lib" path="/home/kevin/.m2/repository/org/apache/excalibur/components/excalibur-pool-api/2.2.1/excalibur-pool-api-2.2.1.jar"/>
+	<classpathentry kind="lib" path="/home/kevin/.m2/repository/org/apache/excalibur/components/excalibur-xmlutil/2.2.1/excalibur-xmlutil-2.2.1.jar"/>
+	<classpathentry kind="lib" path="/home/kevin/.m2/repository/org/apache/cocoon/cocoon-sitemap-api/1.0.0/cocoon-sitemap-api-1.0.0.jar"/>
+	<classpathentry kind="lib" path="/home/kevin/.m2/repository/org/apache/excalibur/components/excalibur-sourceresolve/2.2.3/excalibur-sourceresolve-2.2.3.jar"/>
+	<classpathentry kind="lib" path="modules/journal-submit/target/journal-submit-0.0.1.war"/>
+	<classpathentry kind="output" path="modules/target/classes"/>
+</classpath>

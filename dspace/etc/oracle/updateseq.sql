@@ -10,7 +10,7 @@
 --   3: attribute name
 --
 -- Sample usage:
---   @updateseq.sql my_sequence my_table my_attribute where-clause
+--   @updateseq.sql my_sequence my_table my_attribute
 --
 --------------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ SET SERVEROUTPUT ON SIZE 1000000;
 DECLARE
   curr  NUMBER := 0;
 BEGIN
-  SELECT max(&3) INTO curr FROM &2 &4;
+  SELECT max(&3) INTO curr FROM &2 ;
 
   curr := curr + 1;
 

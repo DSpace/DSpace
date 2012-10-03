@@ -1,0 +1,93 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>Internal Types used by the system for dryad</title>
+        <contributor.author>Kevin Van de Velde</contributor.author>
+        <contributor.author>Ryan Scherle</contributor.author>
+    </dspace-header>
+
+    <dc-schema>
+        <name>internal</name>
+        <namespace>http://www.dspace.org/system</namespace>
+    </dc-schema>
+
+    <dc-schema>
+        <name>workflow</name>
+        <namespace>http://www.dspace.org/workflow</namespace>
+    </dc-schema>
+
+
+
+    <dc-type>
+        <schema>internal</schema>
+        <element>workflow</element>
+        <qualifier>submitted</qualifier>
+    </dc-type>
+
+    <dc-type>
+        <schema>internal</schema>
+        <element>workflow</element>
+        <qualifier>selectjournal</qualifier>
+    </dc-type>
+
+    <dc-type>
+        <schema>internal</schema>
+        <element>submit</element>
+        <qualifier>showEmbargo</qualifier>
+    </dc-type>
+
+    <dc-type>
+        <schema>workflow</schema>
+        <element>archive</element>
+        <qualifier>mailUsers</qualifier>
+    </dc-type>
+
+    <dc-type>
+        <schema>workflow</schema>
+        <element>review</element>
+        <qualifier>mailUsers</qualifier>
+    </dc-type>
+    
+    <dc-type>
+        <schema>workflow</schema>
+        <element>step</element>
+        <qualifier>approved</qualifier>
+    </dc-type>
+
+    <dc-type>
+        <schema>workflow</schema>
+        <element>step</element>
+        <qualifier>finishedUsers</qualifier>
+    </dc-type>
+
+    <dc-type>
+        <schema>workflow</schema>
+        <element>step</element>
+        <qualifier>inProgressUsers</qualifier>
+    </dc-type>
+
+    <dc-type>
+        <schema>workflow</schema>
+        <element>step</element>
+        <qualifier>rejectDate</qualifier>
+    </dc-type>
+
+    <dc-type>
+        <schema>workflow</schema>
+        <element>step</element>
+        <qualifier>reviewerKey</qualifier>
+    </dc-type>
+
+    <dc-type>
+        <schema>workflow</schema>
+        <element>submit</element>
+        <qualifier>skipReviewStage</qualifier>
+    </dc-type>
+
+    <dc-type>
+        <schema>workflow</schema>
+        <element>submit</element>
+        <qualifier>toworkflow</qualifier>
+    </dc-type>
+
+</dspace-dc-types>

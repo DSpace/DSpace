@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+    xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+    
+    <bean id="dryadAcceptRejectEditActionAPI" class="org.dspace.workflow.actions.processingaction.EditMetadataAction" scope="prototype"/>
+    <bean id="reviewActionAPI" class="org.dspace.workflow.actions.processingaction.DryadReviewAction"/>
+    <bean id="pendingDeleteAPI" class="org.dspace.workflow.actions.processingaction.DryadPendingDeleteAction"/>
+    <bean id="requiresReviewActionAPI" class="org.dspace.workflow.actions.processingaction.ReviewRequiredAction"/>
+    <bean id="assignOriginalSubmitterActionAPI" class="org.dspace.workflow.actions.userassignment.AssignOriginalSubmitterAction" scope="prototype"/>
+    <bean id="noUserSelectionActionAPI" class="org.dspace.workflow.actions.userassignment.NoUserSelectionAction" scope="prototype"/>
+    <bean id="claimActionAPI" class="org.dspace.workflow.actions.userassignment.ClaimAction" scope="prototype"/>
+
+    <bean id="pendingPublicationActionAPI" class="org.dspace.workflow.actions.processingaction.PendingPublicationAction" scope="prototype"/>
+
+
+    <bean id="dryadAcceptEditRejectAction" class="org.dspace.workflow.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="dryadAcceptEditRejectAction"/>
+
+        <property name="processingAction" ref="dryadAcceptRejectEditActionAPI"/>
+        <property name="requiresUI" value="true"/>
+    </bean>
+
+    <bean id="reviewAction" class="org.dspace.workflow.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="reviewAction"/>
+
+        <property name="processingAction" ref="reviewActionAPI"/>
+        <property name="requiresUI" value="true"/>
+    </bean>
+
+    
+    <bean id="pendingdelete" class="org.dspace.workflow.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="pendingdelete"/>
+
+        <property name="processingAction" ref="pendingDeleteAPI"/>
+        <property name="requiresUI" value="false"/>
+    </bean>
+
+    <bean id="requiresReviewAction" class="org.dspace.workflow.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="requiresReviewAction"/>
+
+        <property name="processingAction" ref="requiresReviewActionAPI"/>
+        <property name="requiresUI" value="false"/>
+    </bean>
+
+    <bean id="pendingPublicationAction" class="org.dspace.workflow.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="pendingPublicationAction"/>
+
+        <property name="processingAction" ref="pendingPublicationActionAPI"/>
+        <property name="requiresUI" value="false"/>
+    </bean>
+
+
+
+    <!--User selection actions-->
+    <bean id="assignOriginalSubmitterAction" class="org.dspace.workflow.actions.UserSelectionActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="assignOriginalSubmitterAction"/>
+
+        <property name="processingAction" ref="assignOriginalSubmitterActionAPI"/>
+        <property name="requiresUI" value="false"/>
+    </bean>
+
+    <bean id="noUserSelectionAction" class="org.dspace.workflow.actions.UserSelectionActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="noUserSelectionAction"/>
+
+        <property name="processingAction" ref="noUserSelectionActionAPI"/>
+        <property name="requiresUI" value="false"/>
+    </bean>
+
+    <bean id="claimAction" class="org.dspace.workflow.actions.UserSelectionActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="claimAction"/>
+
+        <property name="processingAction" ref="claimActionAPI"/>
+        <property name="requiresUI" value="true"/>
+    </bean>
+
+
+
+
+</beans>

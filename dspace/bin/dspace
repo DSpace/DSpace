@@ -39,7 +39,6 @@
 # DAMAGE.
 #
 ###########################################################################
-
 #
 # This is a simple shell script for running a command-line DSpace tool.
 # It sets the CLASSPATH appropriately before invoking Java.
@@ -54,19 +53,12 @@ JARS=`echo $DSPACEDIR/lib/*.jar | sed 's/ /\:/g'`
 #   Any existing classpath
 #   The JARs (WEB-INF/lib/*.jar)
 #   The WEB-INF/classes directory
-if [ "$CLASSPATH" = "" ]; then
-    FULLPATH=$JARS:$DSPACEDIR/config
-else
-    FULLPATH=$CLASSPATH:$JARS:$DSPACEDIR/config
-fi
-
-
-
+FULLPATH=$CLASSPATH:$JARS:$DSPACEDIR/config
 
 #Allow user to specify java options through JAVA_OPTS variable
 if [ "$JAVA_OPTS" = "" ]; then
-  #Default Java to use 256MB of memory
-  JAVA_OPTS=-Xmx256m
+  #Default Java to use 512MB of memory (256MB wasn't enough)
+  JAVA_OPTS=-Xmx512m
 fi
 
 # Now invoke Java

@@ -88,6 +88,11 @@
           <namespace>http://dublincore.org/documents/dcmi-terms/</namespace>
   </dc-schema>
 
+  <dc-schema>
+          <name>dwc</name>
+          <namespace>http://rs.tdwg.org/dwc/dwcore/</namespace>
+  </dc-schema>
+
   <dc-type>
 	<schema>dc</schema>
     <element>contributor</element>
@@ -583,5 +588,73 @@
     <!-- unqualified -->
     <scope_note>Nature or genre of content.</scope_note>
   </dc-type>
+
+  <!-- dryad additions -->
+    <dc-type>
+        <schema>dc</schema>
+        <element>date</element>
+        <qualifier>embargoedUntil</qualifier>
+        <scope_note>Embargo</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>relation</element>
+        <qualifier>ispartofseries</qualifier>
+        <scope_note>JournalName</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>contributor</element>
+        <qualifier>correspondingAuthor</qualifier>
+        <scope_note>Primary Contact</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dwc</schema>
+        <element>ScientificName</element>
+        <scope_note>Taxonomic names</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>workflow</element>
+        <qualifier>submitted</qualifier>
+        <scope_note>Boolean used in the submission process only.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>dc</schema>
+        <element>workflow</element>
+        <qualifier>selectjournal</qualifier>
+        <scope_note>Boolean used in the submission process only.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>type</element>
+        <qualifier>embargo</qualifier>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>submit</element>
+        <qualifier>showEmbargo</qualifier>
+        <scope_note>Boolean used in the submission process only.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>identifier</element>
+        <qualifier>manuscriptNumber</qualifier>
+        <scope_note>Manuscript number</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>identifier</element>
+        <qualifier>externalresourceXml</qualifier>
+        <scope_note>External source xml value</scope_note>
+    </dc-type>
 
 </dspace-dc-types>

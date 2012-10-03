@@ -55,8 +55,6 @@
 
     <!-- boolean type: "true" or "false" -->
     <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="true"/>
-    <!--Binary data type. The data should be sent/retrieved in as Base64 encoded Strings -->
-    <fieldtype name="binary" class="solr.BinaryField"/>
 
     <!-- The optional sortMissingLast and sortMissingFirst attributes are
          currently supported on types that are sorted internally as strings.
@@ -291,9 +289,11 @@
    <field name="owningComm" type="integer" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="owningColl" type="integer" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="owningItem" type="integer" indexed="true" stored="true" required="false" multiValued="true" /> 
-   <field name="dns" type="string" indexed="true" stored="true" required="false"/>
+  <field name="dns" type="string" indexed="true" stored="true" required="false"/>
    <field name="userAgent" type="string" indexed="true" stored="true" required="false"/>
    <field name="isBot" type="boolean" indexed="true" stored="true" required="false"/>
+
+     <field name="referrer" type="string" indexed="true" stored="true" required="false" />
 
  </fields>
 

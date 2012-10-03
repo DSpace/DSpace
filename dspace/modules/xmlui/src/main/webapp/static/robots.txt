@@ -1,0 +1,4 @@
+# For our non-production servers, we do not allow any indexing.
+# Settings for the production servers are in robots.txt.production
+User-agent: *
+Disallow: /

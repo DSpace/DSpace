@@ -14,17 +14,19 @@
  <!ATTLIST form name NMTOKEN #REQUIRED>
  <!ELEMENT page (field)+ >
  <!ATTLIST page number NMTOKEN #REQUIRED>
- <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, repeatable?, label, input-type, hint, required?, vocabulary?) >
+ <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, repeatable?, label, input-type, hint, required?, vocabulary?, split?) >
  <!ELEMENT dc-schema (#PCDATA) >
  <!ELEMENT dc-element (#PCDATA) >
  <!ELEMENT dc-qualifier (#PCDATA) >
- 
+
  <!ELEMENT repeatable (#PCDATA) >
  <!ELEMENT label (#PCDATA) >
  <!ELEMENT input-type (#PCDATA)>
   
  <!ELEMENT hint (#PCDATA) >
+ <!ELEMENT split (#PCDATA) >
  <!ELEMENT required (#PCDATA)>
+
 
  <!ELEMENT form-value-pairs (value-pairs)* >
  <!ELEMENT value-pairs (pair)+ >

@@ -1,5 +1,6 @@
 Installation instructions are included in this release package under
 
+<<<<<<< HEAD
  - docs/html/index.html
 or
  - docs/pdf/DSpace-Manual.pdf
@@ -38,11 +39,32 @@ To contribute to DSpace, please see:
 
  - https://wiki.duraspace.org/display/DSPACE/How+to+Contribute+to+DSpace
 
+=======
+- http://code.google.com/p/dryad/wiki/DryadHowto
+
+Documentation for the most recent stable release may be viewed online at
+dspace.org:
+
+ - http://www.dspace.org/quick-start-guide
+
+Installation instructions for other version may be different, so you
+are encouraged to obtain the corresponding documentation package from
+SourceForge, or to download the latest documentation snapshot from SVN
+
+To obtain files from the SVN repository and build, please see:
+
+ - http://code.google.com/p/dryad/source/checkout
+
+Please refer any further problems to the Dryad users mailing list. 
+
+ - https://lists.nescent.org/mailman/listinfo/dryad-users
+>>>>>>> dryad-1.11.2
 
 For more details about DSpace, including a list of service providers,
 places to seek help, news articles and lists of other users, please see:
 
  - http://www.dspace.org/
+<<<<<<< HEAD
  
 
 DSpace source code licensing information available online at:
@@ -50,3 +72,5 @@ DSpace source code licensing information available online at:
 
 Copyright (c) 2002-2011, DuraSpace.  All rights reserved.
 
+=======
+>>>>>>> dryad-1.11.2

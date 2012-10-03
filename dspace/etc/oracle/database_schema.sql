@@ -46,6 +46,7 @@ CREATE SEQUENCE item_seq;
 CREATE SEQUENCE bundle_seq;
 CREATE SEQUENCE item2bundle_seq;
 CREATE SEQUENCE bundle2bitstream_seq;
+CREATE SEQUENCE dctyperegistry_seq;
 CREATE SEQUENCE dcvalue_seq;
 CREATE SEQUENCE community_seq;
 CREATE SEQUENCE collection_seq;
@@ -60,6 +61,8 @@ CREATE SEQUENCE workflowitem_seq;
 CREATE SEQUENCE tasklistitem_seq;
 CREATE SEQUENCE registrationdata_seq;
 CREATE SEQUENCE subscription_seq;
+CREATE SEQUENCE history_seq;
+CREATE SEQUENCE historystate_seq;
 CREATE SEQUENCE communities2item_seq;
 CREATE SEQUENCE epersongroup2workspaceitem_seq;
 CREATE SEQUENCE metadataschemaregistry_seq START WITH 2;
@@ -68,8 +71,6 @@ CREATE SEQUENCE metadatafieldregistry_seq;
 CREATE SEQUENCE metadatavalue_seq;
 CREATE SEQUENCE group2group_seq;
 CREATE SEQUENCE group2groupcache_seq;
-CREATE SEQUENCE harvested_collection_seq;
-CREATE SEQUENCE harvested_item_seq;
 
 -------------------------------------------------------
 -- BitstreamFormatRegistry table
@@ -207,10 +208,12 @@ CREATE INDEX item_submitter_fk_idx ON Item(submitter_id);
 CREATE TABLE Bundle
 (
   bundle_id          INTEGER PRIMARY KEY,
+  mets_bitstream_id  INTEGER REFERENCES Bitstream(bitstream_id),
   name               VARCHAR2(16),  -- ORIGINAL | THUMBNAIL | TEXT
   primary_bitstream_id  INTEGER REFERENCES Bitstream(bitstream_id)
 );
 
+CREATE INDEX bundle_mets_fk_idx ON Bundle(mets_bitstream_id);
 CREATE INDEX bundle_primary_fk_idx ON Bundle(primary_bitstream_id);
 
 -------------------------------------------------------
@@ -268,7 +271,7 @@ CREATE TABLE MetadataValue
   item_id       INTEGER REFERENCES Item(item_id),
   metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
   text_value CLOB,
-  text_lang  VARCHAR(24),
+  text_lang  VARCHAR(64),
   place              INTEGER,
   authority VARCHAR(100),
   confidence INTEGER DEFAULT -1
@@ -306,7 +309,7 @@ CREATE TABLE Community
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
   copyright_text    CLOB,
   side_bar_text     VARCHAR2(2000),
-  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id )
+  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id )      
 );
 
 CREATE INDEX community_logo_fk_idx ON Community(logo_bitstream_id);
@@ -470,12 +473,14 @@ CREATE TABLE WorkflowItem
   collection_id  INTEGER REFERENCES Collection(collection_id),
   state          INTEGER,
   owner          INTEGER REFERENCES EPerson(eperson_id),
+
   -- Answers to questions on first page of submit UI
   multiple_titles       NUMBER(1),
   published_before      NUMBER(1),
   multiple_files        NUMBER(1)
   -- Note: stage reached not applicable here - people involved in workflow
   -- can always jump around submission UI
+
 );
 
 CREATE INDEX workflow_coll_fk_idx ON WorkflowItem(collection_id);
@@ -521,6 +526,27 @@ CREATE INDEX subs_eperson_fk_idx ON Subscription(eperson_id);
 CREATE INDEX subs_collection_fk_idx ON Subscription(collection_id);
 
 
+-------------------------------------------------------
+--  History table
+-------------------------------------------------------
+CREATE TABLE History
+(
+  history_id           INTEGER PRIMARY KEY,
+  -- When it was stored
+  creation_date        TIMESTAMP,
+  -- A checksum to keep INTEGERizations from being stored more than once
+  checksum             VARCHAR2(32) UNIQUE
+);
+
+-------------------------------------------------------
+--  HistoryState table
+-------------------------------------------------------
+CREATE TABLE HistoryState
+(
+  history_state_id           INTEGER PRIMARY KEY,
+  object_id                  VARCHAR2(64)
+);
+
 -------------------------------------------------------------------------------
 -- EPersonGroup2WorkspaceItem table
 -------------------------------------------------------------------------------
@@ -535,6 +561,9 @@ CREATE TABLE EPersonGroup2WorkspaceItem
 CREATE INDEX epg2wi_group_fk_idx ON epersongroup2workspaceitem(eperson_group_id);
 CREATE INDEX epg2wi_workspace_fk_idx ON epersongroup2workspaceitem(workspace_item_id);
 
+------------------------------------------------------------
+-- Browse subsystem tables and views
+------------------------------------------------------------
 
 -------------------------------------------------------
 --  Communities2Item table
@@ -699,36 +728,3 @@ values
     'BITSTREAM_MARKED_DELETED',
     'Bitstream marked deleted in bitstream table'
 );
-
--------------------------------------------------------
--- Create the harvest settings table
--------------------------------------------------------
--- Values used by the OAIHarvester to harvest a collection
--- HarvestInstance is the DAO class for this table
-
-CREATE TABLE harvested_collection
-(
-    collection_id INTEGER REFERENCES collection(collection_id) ON DELETE CASCADE,
-    harvest_type INTEGER,
-    oai_source VARCHAR(256),
-    oai_set_id VARCHAR(256),
-    harvest_message VARCHAR2(512),
-    metadata_config_id VARCHAR(256),
-    harvest_status INTEGER,
-    harvest_start_time TIMESTAMP,
-    last_harvested TIMESTAMP,
-    id INTEGER PRIMARY KEY
-);
-
-CREATE INDEX harvested_collection_fk_idx ON harvested_collection(collection_id);
-
-
-CREATE TABLE harvested_item
-(
-    item_id INTEGER REFERENCES item(item_id) ON DELETE CASCADE,
-    last_harvested TIMESTAMP,
-    oai_id VARCHAR(64),
-    id INTEGER PRIMARY KEY
-);
-
-CREATE INDEX harvested_item_fk_idx ON harvested_item(item_id);

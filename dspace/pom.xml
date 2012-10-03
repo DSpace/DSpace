@@ -1,38 +1,39 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.dspace</groupId>
-    <artifactId>dspace</artifactId>
-    <name>DSpace Assembly and Configuration</name>
-    <packaging>pom</packaging>
-    <description>
-        The DSpace Project provides all the functionality required to
-        build, install and upgrade and dspace instance.
-    </description>
-    <url>http://projects.dspace.org/dspace</url>
-    <!--
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.dspace</groupId>
+	<artifactId>dspace</artifactId>
+	<name>DSpace Assembly and Configuration</name>
+	<packaging>pom</packaging>
+	<description> The DSpace Project provides all the functionality required to build, install and
+		upgrade and dspace instance. </description>
+	<url>http://projects.dspace.org/dspace</url>
+	<!--
        A Parent POM that Maven inherits DSpace Default
        POM atrributes from.
     -->
-    <parent>
-        <groupId>org.dspace</groupId>
-        <artifactId>dspace-parent</artifactId>
-        <version>1.7.3-SNAPSHOT</version>
-    </parent>
+	<parent>
+		<groupId>org.dspace</groupId>
+		<artifactId>dspace-parent</artifactId>
+		<version>1.7.2</version>
+	</parent>
 
-    <!--
+
+	<!--
          The Subversion repository location is used by Continuum to update against
          when changes have occured, this spawns a new build cycle and releases snapshots
          into the snapshot repository below.
     -->
-    <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace</connection>
-        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace</developerConnection>
-        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace</url>
-    </scm>
+	<scm>
+		<connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2/dspace</connection>
+		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2/dspace</developerConnection>
+		<url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2/dspace</url>
+	</scm>
 
-    <profiles>
+	<profiles>
 
-        <!--
+		<!--
            This profile is used by all children such that
            when activated a dspace.config configuration
            file location passed on the commandline
@@ -44,348 +45,497 @@
            When activated, the child project will inherit
            the configuration.
         -->
-        <profile>
-            <activation>
-                <property>
-                    <name>dspace.config</name>
-                </property>
-            </activation>
-            <build>
-                <filters>
-                    <filter>${dspace.config}</filter>
-                </filters>
-            </build>
-        </profile>
+		<profile>
+			<activation>
+				<property>
+					<name>dspace.config</name>
+				</property>
+			</activation>
+			<build>
+				<filters>
+					<filter>${dspace.config}</filter>
+				</filters>
+			</build>
+		</profile>
 
 
-        <!--
+		<!--
            These profiles activate the inclusion of various modules into
            the DSpace Build process. They activate automatically if the
            source module is in the local file system, correctly located
            relative to this file.
         -->
 
-        <!--
+		<!--
            Builds central API for DSpace
         -->
-        <profile>
-            <id>dspace-api</id>
-            <activation>
-                <file>
-                    <exists>../dspace-api/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-api</module>
-            </modules>
-        </profile>
+		<profile>
+			<id>dspace-api</id>
+			<activation>
+				<file>
+					<exists>../dspace-api/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-api</module>
+			</modules>
+		</profile>
 
-        <!--
+		<!--
            Builds DSpace Solr Stats for DSpace
         -->
-        <profile>
-            <id>dspace-stats</id>
-            <activation>
-                <file>
-                    <exists>../dspace-stats/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-stats</module>
-            </modules>
-        </profile>
+		<profile>
+			<id>dspace-stats</id>
+			<activation>
+				<file>
+					<exists>../dspace-stats/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-stats</module>
+			</modules>
+		</profile>
 
-        <!--
-            Builds DSpace discovery for DSpace
-        -->
-        <profile>
-            <id>dspace-discovery</id>
-            <activation>
-                <file>
-                    <exists>../dspace-discovery/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-discovery</module>
-            </modules>
-        </profile>
-
-        <!--
+		<!--
            Builds OAI Gateway WAR for DSpace
         -->
-        <profile>
-            <id>dspace-oai-api</id>
-            <activation>
-                <file>
-                    <exists>../dspace-oai-api/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-oai-api</module>
-            </modules>
-        </profile>
+		<profile>
+			<id>dspace-oai-api</id>
+			<activation>
+				<file>
+					<exists>../dspace-oai-api/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-oai-api</module>
+			</modules>
+		</profile>
 
-        <!--
+		<!--
            Builds OAI Gateway WAR for DSpace
         -->
-        <profile>
-            <id>dspace-oai-webapp</id>
-            <activation>
-                <file>
-                    <exists>../dspace-oai-webapp/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-oai-webapp</module>
-            </modules>
-        </profile>
+		<profile>
+			<id>dspace-oai-webapp</id>
+			<activation>
+				<file>
+					<exists>../dspace-oai-webapp/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-oai-webapp</module>
+			</modules>
+		</profile>
 
-        <!--
+		<!--
            Builds OAI Gateway WAR for DSpace
         -->
-        <profile>
-            <id>dspace-oai</id>
-            <activation>
-                <file>
-                    <exists>../dspace-oai/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-oai</module>
-            </modules>
-        </profile>
+		<profile>
+			<id>dspace-oai</id>
+			<activation>
+				<file>
+					<exists>../dspace-oai/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-oai</module>
+			</modules>
+		</profile>
 
-        <!--
+
+		<!--
+    		Builds dataone-mn Gateway WAR for DSpace
+    	-->
+		<profile>
+			<id>dataone-mn-api</id>
+			<activation>
+				<file>
+					<exists>../dataone-mn-api/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dataone-mn-api</module>
+			</modules>
+		</profile>
+
+		<!--
+    		Builds dataone-mn Gateway WAR for DSpace
+    	-->
+		<profile>
+			<id>dataone-mn-webapp</id>
+			<activation>
+				<file>
+					<exists>../dataone-mn-webapp/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dataone-mn-webapp</module>
+			</modules>
+		</profile>
+
+		<!--
+    		Builds dataone-mn Gateway WAR for DSpace
+    	-->
+		<profile>
+			<id>dataone-mn</id>
+			<activation>
+				<file>
+					<exists>../dataone-mn/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dataone-mn</module>
+			</modules>
+		</profile>
+
+
+		<!--
+    		Builds BagIt API for DSpace
+    	-->
+		<profile>
+			<id>dspace-bagit-api</id>
+			<activation>
+				<file>
+					<exists>../dspace-bagit-api/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-bagit-api</module>
+			</modules>
+		</profile>
+
+		<!--
+    		Builds BagIt Gateway WAR for DSpace
+    	-->
+		<profile>
+			<id>dspace-bagit-webapp</id>
+			<activation>
+				<file>
+					<exists>../dspace-bagit-webapp/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-bagit-webapp</module>
+			</modules>
+		</profile>
+
+		<!--
+    		Builds BagIt Module for DSpace
+    	-->
+		<profile>
+			<id>dspace-bagit</id>
+			<activation>
+				<file>
+					<exists>../dspace-bagit/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-bagit</module>
+			</modules>
+		</profile>
+
+		<!--
+    		Builds DOI Gateway WAR for DSpace
+    	-->
+		<profile>
+			<id>dspace-doi-webapp</id>
+			<activation>
+				<file>
+					<exists>../dspace-doi-webapp/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-doi-webapp</module>
+			</modules>
+		</profile>
+
+		<!--
+    		Builds DOI API for DSpace
+    	-->
+		<profile>
+			<id>dspace-doi-api</id>
+			<activation>
+				<file>
+					<exists>../dspace-doi-api/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-doi-api</module>
+			</modules>
+		</profile>
+
+		<!--
+    		Builds DOI Module for DSpace
+    	-->
+		<profile>
+			<id>dspace-doi</id>
+			<activation>
+				<file>
+					<exists>../dspace-doi/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-doi</module>
+			</modules>
+		</profile>
+
+		<!-- 
+				Builds Journal Submit Gateway WAR for DSpace
+			-->
+		<profile>
+			<id>journal-submit</id>
+			<activation>
+				<file>
+					<exists>../journal-submit/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../journal-submit</module>
+			</modules>
+		</profile>
+
+		<profile>
+			<id>dspace-ui-shared</id>
+			<activation>
+				<file>
+					<exists>../dspace-ui-shared/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-ui-shared</module>
+			</modules>
+		</profile>
+
+		<!--
            Builds JSPUI WAR for DSpace
         -->
-        <profile>
+		<profile>
 
-            <id>dspace-jspui-api</id>
-            <activation>
-                <file>
-                    <exists>../dspace-jspui-api/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-jspui-api</module>
-            </modules>
-        </profile>
+			<id>dspace-jspui-api</id>
+			<activation>
+				<file>
+					<exists>../dspace-jspui-api/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-jspui-api</module>
+			</modules>
+		</profile>
 
-        <!--
+		<!--
            Builds JSPUI WAR for DSpace
         -->
-        <profile>
+		<profile>
 
-            <id>dspace-jspui-webapp</id>
-            <activation>
-                <file>
-                    <exists>../dspace-jspui-webapp/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-jspui-webapp</module>
-            </modules>
-        </profile>
+			<id>dspace-jspui-webapp</id>
+			<activation>
+				<file>
+					<exists>../dspace-jspui-webapp/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-jspui-webapp</module>
+			</modules>
+		</profile>
 
-        <!--
+		<!--
            Builds JSPUI WAR for DSpace
         -->
-        <profile>
+		<profile>
 
-            <id>dspace-jspui</id>
-            <activation>
-                <file>
-                    <exists>../dspace-jspui/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-jspui</module>
-            </modules>
-        </profile>
+			<id>dspace-jspui</id>
+			<activation>
+				<file>
+					<exists>../dspace-jspui/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-jspui</module>
+			</modules>
+		</profile>
 
-        <!--
+		<!--
            Builds SWORD WAR for DSpace
         -->
-        <profile>
+		<profile>
 
-            <id>dspace-sword-api</id>
-            <activation>
-                <file>
-                    <exists>../dspace-sword-api/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-sword-api</module>
-            </modules>
-        </profile>
+			<id>dspace-sword-api</id>
+			<activation>
+				<file>
+					<exists>../dspace-sword-api/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-sword-api</module>
+			</modules>
+		</profile>
 
-        <!--
+		<!--
            Builds SWORD WAR for DSpace
         -->
-        <profile>
+		<profile>
 
-            <id>dspace-sword-webapp</id>
-            <activation>
-                <file>
-                    <exists>../dspace-sword-webapp/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-sword-webapp</module>
-            </modules>
-        </profile>
+			<id>dspace-sword-webapp</id>
+			<activation>
+				<file>
+					<exists>../dspace-sword-webapp/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-sword-webapp</module>
+			</modules>
+		</profile>
 
-        <!--
+		<!--
            Builds SWORD WAR for DSpace
         -->
-        <profile>
-            <id>dspace-sword</id>
-            <activation>
-                <file>
-                    <exists>../dspace-sword/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-sword</module>
-            </modules>
-        </profile>
+		<profile>
+			<id>dspace-sword</id>
+			<activation>
+				<file>
+					<exists>../dspace-sword/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-sword</module>
+			</modules>
+		</profile>
 
-        <!--
+		<!--
            Builds each separate XMLUI module for the XMLUI war (for development/Eclipse)
         -->
-        <profile>
-            <id>dspace-xmlui-api</id>
-            <activation>
-                <file>
-                    <exists>../dspace-xmlui-api/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-xmlui-api</module>
-            </modules>
-        </profile>
+		<profile>
+			<id>dspace-xmlui-api</id>
+			<activation>
+				<file>
+					<exists>../dspace-xmlui-api/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-xmlui-api</module>
+			</modules>
+		</profile>
 
-        <profile>
-            <id>dspace-xmlui-wing</id>
-            <activation>
-                <file>
-                    <exists>../dspace-xmlui-wing/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-xmlui-wing</module>
-            </modules>
-        </profile>
+		<profile>
+			<id>dspace-xmlui-wing</id>
+			<activation>
+				<file>
+					<exists>../dspace-xmlui-wing/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-xmlui-wing</module>
+			</modules>
+		</profile>
 
-        <profile>
-            <id>dspace-xmlui-webapp</id>
-            <activation>
-                <file>
-                    <exists>../dspace-xmlui-webapp/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-xmlui-webapp</module>
-            </modules>
-        </profile>
+		<profile>
+			<id>dspace-xmlui-webapp</id>
+			<activation>
+				<file>
+					<exists>../dspace-xmlui-webapp/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-xmlui-webapp</module>
+			</modules>
+		</profile>
 
-        <profile>
-            <id>dspace-xmlui-lang</id>
-            <activation>
-                <file>
-                    <exists>../dspace-xmlui-lang/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-xmlui-lang</module>
-            </modules>
-        </profile>
+		<profile>
+			<id>dspace-xmlui-lang</id>
+			<activation>
+				<file>
+					<exists>../dspace-xmlui-lang/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-xmlui-lang</module>
+			</modules>
+		</profile>
 
-        <!--
+		<!--
            Builds XMLUI WAR for DSpace
         -->
-        <profile>
-            <id>dspace-xmlui</id>
-            <activation>
-                <file>
-                    <exists>../dspace-xmlui/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-xmlui</module>
-            </modules>
-        </profile>
+		<profile>
+			<id>dspace-xmlui</id>
+			<activation>
+				<file>
+					<exists>../dspace-xmlui/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-xmlui</module>
+			</modules>
+		</profile>
 
-        <!--
+		<!--
            Builds each separate LNI module for the LNI war (for development/Eclipse)
         -->
-        <profile>
-            <id>dspace-lni-core</id>
-            <activation>
-                <file>
-                    <exists>../dspace-lni-core/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-lni-core</module>
-            </modules>
-        </profile>
+		<profile>
+			<id>dspace-lni-core</id>
+			<activation>
+				<file>
+					<exists>../dspace-lni-core/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-lni-core</module>
+			</modules>
+		</profile>
 
-        <profile>
-            <id>dspace-lni-webapp</id>
-            <activation>
-                <file>
-                    <exists>../dspace-lni-webapp/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-lni-webapp</module>
-            </modules>
-        </profile>
+		<profile>
+			<id>dspace-lni-webapp</id>
+			<activation>
+				<file>
+					<exists>../dspace-lni-webapp/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-lni-webapp</module>
+			</modules>
+		</profile>
 
-        <profile>
-            <id>dspace-lni-client</id>
-            <activation>
-                <file>
-                    <exists>../dspace-lni-client/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-lni-client</module>
-            </modules>
-        </profile>
+		<profile>
+			<id>dspace-lni-client</id>
+			<activation>
+				<file>
+					<exists>../dspace-lni-client/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-lni-client</module>
+			</modules>
+		</profile>
 
-        <!--
+		<!--
            Builds LNI WAR for DSpace
         -->
-        <profile>
-            <id>dspace-lni</id>
-            <activation>
-                <file>
-                    <exists>../dspace-lni/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-lni</module>
-            </modules>
-        </profile>
+		<profile>
+			<id>dspace-lni</id>
+			<activation>
+				<file>
+					<exists>../dspace-lni/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-lni</module>
+			</modules>
+		</profile>
 
-        <!--
+		<!--
            Builds Language Packs for DSpace
         -->
-        <profile>
-            <id>dspace-api-lang</id>
-            <activation>
-                <file>
-                    <exists>../dspace-api-lang/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-api-lang</module>
-            </modules>
-        </profile>
+		<profile>
+			<id>dspace-api-lang</id>
+			<activation>
+				<file>
+					<exists>../dspace-api-lang/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dspace-api-lang</module>
+			</modules>
+		</profile>
 
-        <!--
+		<!--
            These profiles setup properties and build configuration
            appropriate to the database that DSpace will be installed
            against.
@@ -393,172 +543,248 @@
            They are activated by using the profile id - ie. -Ppostgres,
            or defining db.name - ie. -Ddb.name=oracle
         -->
-        <!--
+		<!--
            Default profile for Postgres database configuration
            Use -Ppostgres to activate.
         -->
 
-        <profile>
-            <id>postgres</id>
-            <activation>
-                <property>
-                    <name>!db.name</name>
-                </property>
-            </activation>
-            <properties>
-                <default.db.name>postgres</default.db.name>
-                <default.db.driver>org.postgresql.Driver</default.db.driver>
-                <default.db.url>
-                    jdbc:postgresql://localhost:5432/dspace
-                </default.db.url>
-                <default.db.username>dspace</default.db.username>
-                <default.db.password>dspace</default.db.password>
-            </properties>
-        </profile>
+		<profile>
+			<id>postgres</id>
+			<activation>
+				<property>
+					<name>!db.name</name>
+				</property>
+			</activation>
+			<properties>
+				<default.db.name>postgres</default.db.name>
+				<default.db.driver>org.postgresql.Driver</default.db.driver>
+				<default.db.url> jdbc:postgresql://localhost:5432/dspace </default.db.url>
+				<default.db.username>dspace</default.db.username>
+				<default.db.password>dspace</default.db.password>
+			</properties>
+		</profile>
 
-        <profile>
-            <id>postgres-support</id>
-            <activation>
-                <property>
-                    <name>!db.name</name>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>postgresql</groupId>
-                    <artifactId>postgresql</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
+		<profile>
+			<id>postgres-support</id>
+			<activation>
+				<property>
+					<name>!db.name</name>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>postgresql</groupId>
+					<artifactId>postgresql</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
 
 
-        <!--
+		<!--
            Default profile for Oracle database configuration
            Use -Poracle or -Ddb.name=oracle to activate.
         -->
-        <profile>
-            <id>oracle</id>
-            <activation>
-                <property>
-                    <name>db.name</name>
-                    <value>oracle</value>
-                </property>
-            </activation>
-            <properties>
-                <default.db.name>oracle</default.db.name>
-                <default.db.driver>
-                    oracle.jdbc.OracleDriver
-                </default.db.driver>
-                <default.db.url>
-                    jdbc:oracle:thin:@//localhost:1521/xe
-                </default.db.url>
-                <default.db.username>dspace</default.db.username>
-                <default.db.password>dspace</default.db.password>
-            </properties>
-        </profile>
+		<profile>
+			<id>oracle</id>
+			<activation>
+				<property>
+					<name>db.name</name>
+					<value>oracle</value>
+				</property>
+			</activation>
+			<properties>
+				<default.db.name>oracle</default.db.name>
+				<default.db.driver> oracle.jdbc.OracleDriver </default.db.driver>
+				<default.db.url> jdbc:oracle:thin:@//localhost:1521/xe </default.db.url>
+				<default.db.username>dspace</default.db.username>
+				<default.db.password>dspace</default.db.password>
+			</properties>
+		</profile>
 
-        <profile>
-            <id>oracle-support</id>
-            <activation>
-                <property>
-                    <name>db.name</name>
-                    <value>oracle</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.oracle</groupId>
-                    <artifactId>ojdbc6</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
+		<profile>
+			<id>oracle-support</id>
+			<activation>
+				<property>
+					<name>db.name</name>
+					<value>oracle</value>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>com.oracle</groupId>
+					<artifactId>ojdbc14</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
 
-        <!--
+		<!--
            Using xpdf filters requires the inclusion
            Of Sun dependencies these are not redistributable
            and you will need to install them locally in your
            maven repository prior to building your dspace instance
         -->
-        <profile>
-            <id>xpdf-mediafilter-support</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun.media</groupId>
-                    <artifactId>jai_imageio</artifactId>
-                    <version>1.0_01</version>
-                </dependency>
-                <dependency>
-                    <groupId>javax.media</groupId>
-                    <artifactId>jai_core</artifactId>
-                    <version>1.1.2_01</version>
-                </dependency>
-            </dependencies>
-        </profile>
+		<profile>
+			<id>xpdf-mediafilter-support</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>com.sun.media</groupId>
+					<artifactId>jai_imageio</artifactId>
+					<version>1.0_01</version>
+				</dependency>
+				<dependency>
+					<groupId>javax.media</groupId>
+					<artifactId>jai_core</artifactId>
+					<version>1.1.2_01</version>
+				</dependency>
+			</dependencies>
+		</profile>
 
-    </profiles>
+	</profiles>
 
-    <!--
+	<!--
        Builds Overlay Modules for DSpace
     -->
-    <modules>
-        <module>modules</module>
-    </modules>
+	<modules>
+		<module>modules</module>
+	</modules>
 
-    <build>
-        <plugins>
-            <!--  overall project assembly -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2-beta-1</version>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/assemble/assembly.xml</descriptor>
-                    </descriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>directory-single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+	<build>
+		<plugins>
+			<!--  overall project assembly -->
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2-beta-1</version>
+				<configuration>
+					<descriptors>
+						<descriptor>src/assemble/assembly.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>directory-single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-api-lang</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-services-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-services-utils</artifactId>
-        </dependency>
-        <dependency>
-             <groupId>org.dspace</groupId>
-             <artifactId>dspace-stats</artifactId>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-discovery-provider</artifactId>
-         </dependency>
-         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>
+    <dependencyManagement>
+            <dependencies>
+
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-services-api</artifactId>
+                    <version>2.0.3</version>
+                </dependency>
+                 <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-services-impl</artifactId>
+                    <version>2.0.3</version>
+                </dependency>
+                            <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-services-utils</artifactId>
+                    <version>2.0.3</version>
+                </dependency>
+
     </dependencies>
+    </dependencyManagement>
+
+	<dependencies>
+
+		<!-- Customized API (included here to get this in /home/dspace/dspace/lib/) -->
+		<dependency>
+			<groupId>org.dspace.modules</groupId>
+			<artifactId>api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+        <dependency>
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>api-stats</artifactId>
+            <version>1.7.2</version>
+        </dependency>
+        <!--dependency>
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>solr-load-tester</artifactId>
+            <version>0.0.1</version>
+        </dependency-->
+
+		<dependency>
+			<groupId>org.dspace.discovery</groupId>
+			<artifactId>discovery-solr-provider</artifactId>
+			<version>0.9.4-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-stats</artifactId>
+			<version>1.7.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-api-lang</artifactId>
+		</dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-api</artifactId>
+            <version>2.0.3</version>
+        </dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-services-impl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-services-utils</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace.modules</groupId>
+			<artifactId>bagit-api</artifactId>
+			<version>0.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace.modules</groupId>
+			<artifactId>doi-service</artifactId>
+			<version>${pom.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>ehcache</artifactId>
+                    <groupId>net.sf.ehcache</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency><!--
+		<dependency>
+			<groupId>org.dspace.modules</groupId>
+			<artifactId>dataone-mn-api</artifactId>
+			<version>0.0.1</version>
+		</dependency>
+		--><dependency>
+			<groupId>xom</groupId>
+			<artifactId>xom</artifactId>
+			<version>1.2.5</version>
+		</dependency>
+
+        <dependency>
+            <groupId>com.atmire</groupId>
+            <artifactId>atmire-authority</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+
+	</dependencies>
+
+
 
 </project>

@@ -1,0 +1,132 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace.modules</groupId>
+   <artifactId>api</artifactId>
+   <!--<packaging>war</packaging>-->
+   <name>Dryad :: Customized API and Implementation</name>
+   <url>http://projects.dspace.org/dspace-api</url>
+   <description>
+      Changes to the API specific for the Dryad repository
+   </description>
+
+   <!--
+      A Parent POM that Maven inherits DSpace Defaults
+      POM atrributes from.
+   -->
+   <parent>
+      <groupId>org.dspace</groupId>
+      <artifactId>modules</artifactId>
+      <version>1.7.2</version>
+   </parent>
+
+
+   <!--
+      The Subversion repository location is used by Continuum to update against
+      when changes have occured, this spawns a new build cycle and releases snapshots
+      into the snapshot repository below.
+   -->
+   <scm>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace</url>
+   </scm>
+
+   <!--
+      Runtime and Compile Time dependencies for DSpace.
+   -->
+
+   <dependencies>
+
+       <!-- DSpace API -->
+       <dependency>
+           <groupId>com.atmire</groupId>
+           <artifactId>atmire-workflow-api</artifactId>
+           <version>1.7.2</version>
+       </dependency>
+
+       <dependency>
+           <groupId>org.dspace.discovery</groupId>
+           <artifactId>discovery-solr-provider</artifactId>
+           <version>0.9.4-SNAPSHOT</version>
+       </dependency>
+
+       <dependency>
+          <groupId>org.dspace</groupId>
+          <artifactId>dspace-api</artifactId>
+       </dependency>
+
+        <!-- external -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.4</version>
+            <scope>provided</scope>
+        </dependency>
+
+       <dependency>
+           <groupId>org.dspace.dependencies.solr</groupId>
+           <artifactId>dspace-solr-solrj</artifactId>
+           <version>1.4.0.1-SNAPSHOT</version>
+       </dependency>
+       <!---->
+       <!--<dependency>-->
+           <!--<groupId>org.apache.solr</groupId>-->
+           <!--<artifactId>solr-solrj</artifactId>-->
+           <!--<version>1.4.1</version>-->
+       <!--</dependency>-->
+
+       <dependency>
+           <groupId>org.dspace.modules</groupId>
+           <artifactId>identifier-services</artifactId>
+       </dependency>
+
+        <dependency>
+            <groupId>org.dspace.modules</groupId>
+	        <artifactId>doi-service</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.4</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--dependency>
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>versioning-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency-->
+
+
+       <!-- New dependencies -->
+       <dependency>
+			<groupId>axis</groupId>
+			<artifactId>axis</artifactId>
+			<version>1.4</version>
+		</dependency>
+
+       <dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>8.1-407.jdbc3</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace.dependencies</groupId>
+			<artifactId>dspace-perst</artifactId>
+			<version>4.21</version>
+		</dependency>
+
+   </dependencies>
+
+</project>

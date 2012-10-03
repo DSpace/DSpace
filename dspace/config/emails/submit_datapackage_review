@@ -1,0 +1,30 @@
+# Data file review email message
+# Sent when a datapackage is submitted, but the associated journal 
+# article is listed as "in review". Submissions that go to the curation stage receive 
+# a similar message, submit_datapackage_confirm.
+#
+# {0}  Title of submission
+# {1}  Doi of the data package
+# {2}  Title of the data package
+# {3}  Submitter name/email
+# {4}  Url for the review
+# {5}  The manuscript identifier (or "none available" if the metadata doesn't contain one)
+Subject: Dryad: Data package received for review {1}
+
+Dryad has received the following data package:
+Title:        {0}
+Journal manuscript number: {5}
+Submitted by: {3}
+Data file(s):
+{2}
+
+Dryad has assigned the following provisional DOI to the submission. This DOI may be included in the article manuscript. Although this DOI is not yet fully registered with the DOI system, it will be registered when the manuscript is ready for publication.
+
+{1}
+
+Journal editors and anonymous peer reviewers may view the submission for review purposes using the following url:
+{4}
+
+Many thanks!
+
+The Dryad Team

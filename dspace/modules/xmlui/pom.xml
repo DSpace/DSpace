@@ -13,13 +13,14 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>1.7.3-SNAPSHOT</version>
+      <version>1.7.2</version>
    </parent>
 
+
    <scm>
-      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/xmlui</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/xmlui</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/xmlui</url>
+      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2/dspace/modules/xmlui</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2/dspace/modules/xmlui</url>
    </scm>
 
    <build>
@@ -118,13 +119,65 @@
          <dependencies>
             <dependency>
                <groupId>com.oracle</groupId>
-               <artifactId>ojdbc6</artifactId>
+               <artifactId>ojdbc14</artifactId>
             </dependency>
          </dependencies>
       </profile>
    </profiles>
 
    <dependencies>
+
+       <!-- Dryad API -->
+      <dependency>
+         <groupId>org.dspace.modules</groupId>
+         <artifactId>api</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.dspace.modules</groupId>
+         <artifactId>api-stats</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.dspace.modules</groupId>
+         <artifactId>bagit-api</artifactId>
+         <version>0.0.1</version>
+      </dependency>
+
+       <dependency>
+           <groupId>com.atmire</groupId>
+           <artifactId>atmire-workflow-xmlui-api</artifactId>
+           <version>1.7.2</version>
+           <exclusions>
+                <exclusion>
+                    <artifactId>ehcache</artifactId>
+                    <groupId>net.sf.ehcache</groupId>
+                </exclusion>
+            </exclusions>
+       </dependency>
+
+
+      <!-- Add in discovery overlays -->
+      <dependency>
+         <groupId>org.dspace.discovery</groupId>
+         <artifactId>discovery-xmlui-block</artifactId>
+         <version>0.9.4-SNAPSHOT</version>
+         <exclusions>
+                <exclusion>
+                    <artifactId>ehcache</artifactId>
+                    <groupId>net.sf.ehcache</groupId>
+                </exclusion>
+            </exclusions>
+      </dependency>
+
+       <dependency>
+           <groupId>org.dspace.discovery</groupId>
+           <artifactId>discovery-xmlui-webapp</artifactId>
+           <version>0.9.4-SNAPSHOT</version>
+           <type>war</type>
+       </dependency>
 
       <!-- DSpace XMLUI Languages -->
       <dependency>
@@ -140,25 +193,23 @@
          <type>war</type>
       </dependency>
 
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-discovery-xmlui-api</artifactId>
-         <version>1.7.3-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-discovery-xmlui-webapp</artifactId>
-         <version>1.7.3-SNAPSHOT</version>
-         <type>war</type>
-      </dependency>
-
-
       <!-- DSpace XMLUI API -->
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-xmlui-api</artifactId>
+                      <exclusions>
+                <exclusion>
+                    <artifactId>ehcache</artifactId>
+                    <groupId>net.sf.ehcache</groupId>
+                </exclusion>
+            </exclusions>
       </dependency>
+
+       <dependency>
+           <groupId>com.yahoo.platform.yui</groupId>
+           <artifactId>yuicompressor</artifactId>
+           <version>2.3.6</version>
+       </dependency>
 
       <dependency>
          <groupId>javax.servlet</groupId>
@@ -166,6 +217,59 @@
          <version>2.3</version>
          <scope>provided</scope>
       </dependency>
+
+
+       <dependency>
+          <groupId>org.dspace.modules</groupId>
+          <artifactId>versioning-webapp</artifactId>
+          <type>jar</type>
+           <classifier>classes</classifier>
+                       <exclusions>
+                <exclusion>
+                    <artifactId>ehcache</artifactId>
+                    <groupId>net.sf.ehcache</groupId>
+                </exclusion>
+            </exclusions>
+       </dependency>
+       
+       <dependency>
+          <groupId>org.dspace.modules</groupId>
+          <artifactId>versioning-webapp</artifactId>
+          <type>war</type>
+       </dependency>
+
+       <dependency>
+          <groupId>org.dspace.modules</groupId>
+          <artifactId>versioning-api</artifactId>
+                       <exclusions>
+                <exclusion>
+                    <artifactId>ehcache</artifactId>
+                    <groupId>net.sf.ehcache</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>dspace-cocoon-servlet-service-impl</artifactId>
+                    <groupId>org.dspace.dependencies.cocoon</groupId>
+                </exclusion>
+            </exclusions>
+       </dependency>
+
+       <dependency>
+           <groupId>org.springframework</groupId>
+           <artifactId>spring-webmvc</artifactId>
+           <version>3.0.5.RELEASE</version>
+       </dependency>
+
+
+       <dependency>
+           <groupId>com.atmire</groupId>
+           <artifactId>atmire-authority</artifactId>
+       </dependency>
+
+       <dependency>
+           <artifactId>dspace-cocoon-servlet-service-impl</artifactId>
+           <groupId>org.dspace.dependencies.cocoon</groupId>
+           <version>1.0.3</version>
+       </dependency>
 
    </dependencies>
 

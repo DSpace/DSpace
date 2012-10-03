@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE LinkSet PUBLIC "-//NLM//DTD LinkOut 1.0//EN" "http://www.ncbi.nlm.nih.gov/entrez/linkout/doc/LinkOut.dtd">
+<LinkSet>
+    <Link>
+        <LinkId>dryad.pubmed.2011-10-31</LinkId>
+        <ProviderId>7893</ProviderId>
+        <IconUrl>http://www.nescent.org/wg/dryad/images/7/7f/DryadLogo-Button.png</IconUrl>
+        <ObjectSelector>
+            <Database>PubMed</Database>
+            <ObjectList>
+                <ObjId>19549004</ObjId><!-- DOI: 10.1111/j.1469-7580.2009.01108.x -->
+                <ObjId>17348941</ObjId><!-- DOI: 10.1111/j.1558-5646.2007.00022.x -->
+                <ObjId>17513248</ObjId><!-- DOI: 10.1098/rspb.2007.0505 -->
+            </ObjectList>
+        </ObjectSelector>
+        <ObjectUrl>
+            <Base>http://datadryad.org/discover?</Base>
+            <Rule>query=&lo.doi;</Rule>
+            <!-- For some reason UrlName is actually not allowed for us - it
+                 needs to be "record-specific", but I still don't understand
+                 how the examples given at NCBI ("Homo sapiens" for a resource
+                 that links out from all Homo sapiens sequences, for example)
+                 are more specific than this one here.
+              -->
+            <!-- <UrlName>Data package for publication</UrlName> -->
+            <SubjectType>supplemental materials</SubjectType>
+        </ObjectUrl>
+    </Link>
+</LinkSet>
