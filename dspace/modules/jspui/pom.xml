@@ -70,11 +70,6 @@
 						<overlay></overlay>
 						<overlay>
 							<groupId>org.dspace</groupId>
-							<artifactId>dspace-discovery-jspui-webapp</artifactId>
-							<type>war</type>
-						</overlay>
-						<overlay>
-							<groupId>org.dspace</groupId>
 							<artifactId>dspace-jspui-webapp</artifactId>
 							<type>war</type>
 						</overlay>
@@ -104,26 +99,8 @@
 
 		<dependency>
 			<groupId>org.dspace</groupId>
-			<artifactId>dspace-discovery-jspui-api</artifactId>
-			<version>3.0-SNAPSHOT</version>
-		</dependency>
-	
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-discovery-jspui-webapp</artifactId>
-			<version>3.0-SNAPSHOT</version>
-			<type>war</type>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.dspace</groupId>
 			<artifactId>dspace-jspui-api</artifactId>
 		</dependency>
-
-		<dependency>
-           <groupId>org.dspace</groupId>
-           <artifactId>dspace-discovery-provider</artifactId>
-        </dependency>
 
 		<dependency>
 		   <groupId>javax.servlet</groupId>

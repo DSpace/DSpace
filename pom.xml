@@ -224,19 +224,6 @@
         </profile>
 
         <!--
-            Builds DSpace discovery for DSpace
-        -->
-        <profile>
-            <id>dspace-discovery</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <module>dspace-discovery</module>
-            </modules>
-        </profile>
-
-        <!--
            Builds XOAI Gateway WAR for DSpace
         -->
         <profile>
@@ -291,19 +278,6 @@
         </profile>
 
         <!--
-           Builds DSpace Sword Client from local source if present
-        -->
-        <profile>
-            <id>dspace-sword-client</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <module>dspace-sword-client</module>
-            </modules>
-        </profile>
-
-        <!--
            Builds XMLUI WAR for DSpace
         -->
         <profile>
@@ -341,15 +315,12 @@
          </activation>
          <modules>
             <module>dspace-api</module>
-            <module>dspace-stats</module>
-            <module>dspace-discovery</module>
             <module>dspace-jspui</module>
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
             <module>dspace-oai</module>
             <module>dspace-sword</module>
             <module>dspace-swordv2</module>
-            <module>dspace-sword-client</module>
          </modules>
       </profile>
 
@@ -530,16 +501,6 @@
             <version>[1.8.0.0,1.9.0.0)</version>
             <type>war</type>
          </dependency>
-          <dependency>
-              <groupId>org.dspace</groupId>
-              <artifactId>dspace-discovery-provider</artifactId>
-              <version>3.0-SNAPSHOT</version>
-          </dependency>
-          <dependency>
-              <groupId>org.dspace</groupId>
-              <artifactId>dspace-discovery-solr</artifactId>
-              <version>3.0-SNAPSHOT</version>
-          </dependency>
          <!-- DSpace third Party Dependencies -->
 
                  <!-- Explicitly Specify Latest Version of Spring -->

@@ -15,10 +15,6 @@
 package org.dspace.discovery.configuration;
 
 
-import org.apache.commons.collections.iterators.ArrayListIterator;
-import org.dspace.discovery.DiscoverQuery;
-import org.springframework.beans.factory.annotation.Required;
-
 import java.util.ArrayList;
 import java.util.List;
 

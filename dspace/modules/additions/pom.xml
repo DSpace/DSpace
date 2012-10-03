@@ -80,14 +80,6 @@
          <artifactId>dspace-services-utils</artifactId>
       </dependency>
       <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-discovery-provider</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-discovery-solr</artifactId>
-      </dependency>
-      <dependency>
          <groupId>javax.servlet</groupId>
          <artifactId>servlet-api</artifactId>
       </dependency>
