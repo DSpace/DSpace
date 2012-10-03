@@ -14,21 +14,6 @@
 	</parent>
 
 	<profiles>
-
-		<profile>
-			<id>postgres-support</id>
-			<activation>
-				<property>
-					<name>!db.name</name>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>postgresql</groupId>
-					<artifactId>postgresql</artifactId>
-				</dependency>
-			</dependencies>
-		</profile>
 		<profile>
 			<id>oracle-support</id>
 			<activation>
@@ -93,13 +78,15 @@
 
 		<dependency>
 			<groupId>org.dspace</groupId>
-			<artifactId>dspace-jspui-webapp</artifactId>
+			<artifactId>dspace-jspui</artifactId>
 			<type>war</type>
 		</dependency>
 
 		<dependency>
 			<groupId>org.dspace</groupId>
-			<artifactId>dspace-jspui-api</artifactId>
+			<artifactId>dspace-jspui</artifactId>
+            <type>jar</type>
+            <classifier>classes</classifier>
 		</dependency>
 
 		<dependency>

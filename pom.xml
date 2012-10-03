@@ -397,12 +397,14 @@
 
           <dependency>
               <groupId>org.dspace</groupId>
-              <artifactId>dspace-sword-api</artifactId>
+              <artifactId>dspace-sword</artifactId>
               <version>3.0-SNAPSHOT</version>
+              <type>jar</type>
+              <classifier>classes</classifier>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
-              <artifactId>dspace-sword-webapp</artifactId>
+              <artifactId>dspace-sword</artifactId>
               <version>3.0-SNAPSHOT</version>
               <type>war</type>
           </dependency>
@@ -422,30 +424,36 @@
 
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-jspui-api</artifactId>
+            <artifactId>dspace-jspui</artifactId>
             <version>3.0-SNAPSHOT</version>
+             <type>jar</type>
+             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-jspui-webapp</artifactId>
+            <artifactId>dspace-jspui</artifactId>
             <version>3.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-oai-api</artifactId>
+            <artifactId>dspace-oai</artifactId>
             <version>3.0-SNAPSHOT</version>
+             <type>jar</type>
+             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-oai-webapp</artifactId>
+            <artifactId>dspace-oai</artifactId>
             <version>3.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-lni-core</artifactId>
+            <artifactId>dspace-lni</artifactId>
             <version>3.0-SNAPSHOT</version>
+             <type>jar</type>
+             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
@@ -454,25 +462,22 @@
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-lni-webapp</artifactId>
+            <artifactId>dspace-lni</artifactId>
             <version>3.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-api</artifactId>
+            <artifactId>dspace-xmlui</artifactId>
             <version>3.0-SNAPSHOT</version>
+             <type>jar</type>
+             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-webapp</artifactId>
+            <artifactId>dspace-xmlui</artifactId>
             <version>3.0-SNAPSHOT</version>
             <type>war</type>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-wing</artifactId>
-            <version>3.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>

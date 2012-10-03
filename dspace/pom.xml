@@ -88,7 +88,9 @@
     	<!-- Don't know how to add artifacts to dspace lib -->
     	<dependency>
     		<groupId>org.dspace</groupId>
-    		<artifactId>dspace-oai-api</artifactId>
+    		<artifactId>dspace-oai</artifactId>
+            <type>jar</type>
+            <classifier>classes</classifier>
     	</dependency>
     	<dependency>
     		<groupId>javax.servlet</groupId>

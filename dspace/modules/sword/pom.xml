@@ -66,20 +66,6 @@
             </dependency>
          </dependencies>
       </profile>
-      <profile>
-         <id>postgres-support</id>
-         <activation>
-            <property>
-               <name>!db.name</name>
-            </property>
-         </activation>
-         <dependencies>
-            <dependency>
-               <groupId>postgresql</groupId>
-               <artifactId>postgresql</artifactId>
-            </dependency>
-         </dependencies>
-      </profile>
    </profiles>
 
    <dependencies>
@@ -89,12 +75,14 @@
       </dependency>
       <dependency>
          <groupId>org.dspace</groupId>
-         <artifactId>dspace-sword-webapp</artifactId>
+         <artifactId>dspace-sword</artifactId>
          <type>war</type>
       </dependency>
       <dependency>
          <groupId>org.dspace</groupId>
-         <artifactId>dspace-sword-api</artifactId>
+         <artifactId>dspace-sword</artifactId>
+          <type>jar</type>
+          <classifier>classes</classifier>
       </dependency>
       <dependency>
          <groupId>javax.servlet</groupId>
