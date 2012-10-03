@@ -150,6 +150,11 @@
             <version>1.3</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.swordapp</groupId>
+            <artifactId>sword-common</artifactId>
+        </dependency>
+
         <!-- Explicitly Specify Latest Version of Spring -->
         <dependency>
             <artifactId>spring-core</artifactId>

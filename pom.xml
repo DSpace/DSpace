@@ -498,6 +498,11 @@
          </dependency>
          <!-- DSpace third Party Dependencies -->
 
+          <dependency>
+              <groupId>org.swordapp</groupId>
+              <artifactId>sword-common</artifactId>
+              <version>1.1</version>
+          </dependency>
                  <!-- Explicitly Specify Latest Version of Spring -->
         <dependency>
             <artifactId>spring-core</artifactId>
