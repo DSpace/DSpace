@@ -55,7 +55,7 @@
 						<overlay></overlay>
 						<overlay>
 							<groupId>org.dspace</groupId>
-							<artifactId>dspace-jspui-webapp</artifactId>
+							<artifactId>dspace-jspui</artifactId>
 							<type>war</type>
 						</overlay>
 					</overlays>
