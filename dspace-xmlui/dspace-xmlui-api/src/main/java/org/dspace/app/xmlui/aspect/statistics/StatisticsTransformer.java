@@ -7,7 +7,6 @@
  */
 package org.dspace.app.xmlui.aspect.statistics;
 
-import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -21,20 +20,13 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.statistics.Dataset;
-import org.dspace.statistics.ObjectCount;
-import org.dspace.statistics.content.*;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 public class StatisticsTransformer extends AbstractDSpaceTransformer {
 

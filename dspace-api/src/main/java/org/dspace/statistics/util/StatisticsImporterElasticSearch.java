@@ -239,7 +239,7 @@ public class StatisticsImporterElasticSearch {
                 //TODO Is there any way to reuse ElasticSearchLogger.post() ?
 
                 // Save it in our server
-                XContentBuilder postBuilder = jsonBuilder().startObject()
+                XContentBuilder postBuilder = XContentFactory.jsonBuilder().startObject()
                         .field("id", dso.getID())
                         .field("typeIndex", dso.getType())
                         .field("type", dso.getTypeText())

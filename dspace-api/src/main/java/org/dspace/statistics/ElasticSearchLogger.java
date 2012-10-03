@@ -221,7 +221,7 @@ public class ElasticSearchLogger {
                     "} } }";
 
             client.prepareIndex(indexName, indexType, "1")
-                    .setSource(jsonBuilder()
+                    .setSource(XContentFactory.jsonBuilder()
                                 .startObject()
                                     .field("user", "kimchy")
                                     .field("postDate", new Date())

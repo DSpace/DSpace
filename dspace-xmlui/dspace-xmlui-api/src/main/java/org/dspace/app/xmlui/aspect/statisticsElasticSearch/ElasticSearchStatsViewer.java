@@ -10,7 +10,6 @@ package org.dspace.app.xmlui.aspect.statisticsElasticSearch;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.log4j.Logger;
-import org.dspace.app.xmlui.aspect.statistics.StatisticsTransformer;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.wing.Message;
