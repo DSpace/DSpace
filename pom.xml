@@ -24,6 +24,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <filters.file>build.properties</filters.file>
+        <lucene.version>3.5.0</lucene.version>
     </properties>
 
     <build>
@@ -210,33 +211,20 @@
         </profile>
 
         <!--
-           Builds DSpace Solr Stats for DSpace
+           Builds Services for DSpace
         -->
         <profile>
-            <id>dspace-stats</id>
+            <id>dspace-services</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
-                <module>dspace-stats</module>
+                <module>dspace-services</module>
             </modules>
         </profile>
 
         <!--
-            Builds DSpace discovery for DSpace
-        -->
-        <profile>
-            <id>dspace-discovery</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <module>dspace-discovery</module>
-            </modules>
-        </profile>
-
-        <!--
-           Builds OAI Gateway WAR for DSpace
+           Builds XOAI Gateway WAR for DSpace
         -->
         <profile>
             <id>dspace-oai</id>
@@ -290,19 +278,6 @@
         </profile>
 
         <!--
-           Builds DSpace Sword Client from local source if present
-        -->
-        <profile>
-            <id>dspace-sword-client</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <module>dspace-sword-client</module>
-            </modules>
-        </profile>
-
-        <!--
            Builds XMLUI WAR for DSpace
         -->
         <profile>
@@ -340,15 +315,12 @@
          </activation>
          <modules>
             <module>dspace-api</module>
-            <module>dspace-stats</module>
-            <module>dspace-discovery</module>
             <module>dspace-jspui</module>
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
             <module>dspace-oai</module>
             <module>dspace-sword</module>
             <module>dspace-swordv2</module>
-            <module>dspace-sword-client</module>
          </modules>
       </profile>
 
@@ -425,12 +397,14 @@
 
           <dependency>
               <groupId>org.dspace</groupId>
-              <artifactId>dspace-sword-api</artifactId>
+              <artifactId>dspace-sword</artifactId>
               <version>3.0-SNAPSHOT</version>
+              <type>jar</type>
+              <classifier>classes</classifier>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
-              <artifactId>dspace-sword-webapp</artifactId>
+              <artifactId>dspace-sword</artifactId>
               <version>3.0-SNAPSHOT</version>
               <type>war</type>
           </dependency>
@@ -447,49 +421,39 @@
               <version>3.0-SNAPSHOT</version>
               <type>war</type>
           </dependency>
-           <dependency>
-              <groupId>org.dspace</groupId>
-              <artifactId>dspace-sword-client-api</artifactId>
-              <version>3.0-SNAPSHOT</version>
-          </dependency>
-          <dependency>
-              <groupId>org.dspace</groupId>
-              <artifactId>dspace-sword-client-xmlui-api</artifactId>
-              <version>3.0-SNAPSHOT</version>
-          </dependency>
-          <dependency>
-              <groupId>org.dspace</groupId>
-              <artifactId>dspace-sword-client-xmlui-webapp</artifactId>
-              <version>3.0-SNAPSHOT</version>
-              <type>war</type>
-          </dependency>
 
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-jspui-api</artifactId>
+            <artifactId>dspace-jspui</artifactId>
             <version>3.0-SNAPSHOT</version>
+             <type>jar</type>
+             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-jspui-webapp</artifactId>
+            <artifactId>dspace-jspui</artifactId>
             <version>3.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-oai-api</artifactId>
+            <artifactId>dspace-oai</artifactId>
             <version>3.0-SNAPSHOT</version>
+             <type>jar</type>
+             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-oai-webapp</artifactId>
+            <artifactId>dspace-oai</artifactId>
             <version>3.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-lni-core</artifactId>
+            <artifactId>dspace-lni</artifactId>
             <version>3.0-SNAPSHOT</version>
+             <type>jar</type>
+             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
@@ -498,44 +462,26 @@
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-lni-webapp</artifactId>
+            <artifactId>dspace-lni</artifactId>
             <version>3.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-api</artifactId>
+            <artifactId>dspace-xmlui</artifactId>
             <version>3.0-SNAPSHOT</version>
+             <type>jar</type>
+             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-webapp</artifactId>
+            <artifactId>dspace-xmlui</artifactId>
             <version>3.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-wing</artifactId>
-            <version>3.0-SNAPSHOT</version>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-services-impl</artifactId>
-            <version>2.0.4</version>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-services-api</artifactId>
-            <version>2.0.4</version>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-services-utils</artifactId>
-            <version>2.0.4</version>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-stats</artifactId>
+            <artifactId>dspace-services</artifactId>
             <version>3.0-SNAPSHOT</version>
          </dependency>
          <!-- DSpace Localization Packages -->
@@ -550,18 +496,13 @@
             <version>[1.8.0.0,1.9.0.0)</version>
             <type>war</type>
          </dependency>
-          <dependency>
-              <groupId>org.dspace</groupId>
-              <artifactId>dspace-discovery-provider</artifactId>
-              <version>3.0-SNAPSHOT</version>
-          </dependency>
-          <dependency>
-              <groupId>org.dspace</groupId>
-              <artifactId>dspace-discovery-solr</artifactId>
-              <version>3.0-SNAPSHOT</version>
-          </dependency>
          <!-- DSpace third Party Dependencies -->
 
+          <dependency>
+              <groupId>org.swordapp</groupId>
+              <artifactId>sword-common</artifactId>
+              <version>1.1</version>
+          </dependency>
                  <!-- Explicitly Specify Latest Version of Spring -->
         <dependency>
             <artifactId>spring-core</artifactId>
@@ -619,12 +560,12 @@
          <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
-            <version>3.3.0</version>
+            <version>${lucene.version}</version>
          </dependency>
          <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers</artifactId>
-            <version>3.3.0</version>
+            <version>${lucene.version}</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
@@ -640,11 +581,6 @@
             <groupId>org.dspace</groupId>
             <artifactId>mets</artifactId>
             <version>1.5.2</version>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>oaicat</artifactId>
-            <version>1.5.48</version>
          </dependency>
          <dependency>
             <groupId>org.dspace.dependencies</groupId>
@@ -685,7 +621,7 @@
          <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>1.4</version>
+            <version>2.3</version>
          </dependency>
          <dependency>
             <groupId>commons-lang</groupId>
@@ -1197,5 +1133,13 @@
     <distributionManagement>
         <!-- further distribution management is found upstream in the sonatype parent -->
     </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>sonatype-releases</id>
+            <name>Sonatype Releases Repository</name>
+            <url>http://oss.sonatype.org/content/repositories/releases/</url>
+        </repository>
+    </repositories>
     
 </project>

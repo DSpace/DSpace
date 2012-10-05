@@ -15,7 +15,9 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.embargo.EmbargoManager;
 import org.dspace.event.Event;
-import org.dspace.handle.HandleManager;
+import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.IdentifierService;
+import org.dspace.utils.DSpace;
 
 /**
  * Support to install an Item in the archive.
@@ -58,21 +60,18 @@ public class InstallItem
             IOException, AuthorizeException
     {
         Item item = is.getItem();
-        String handle;
-        
-        // if no previous handle supplied, create one
-        if (suppliedHandle == null)
-        {
-            // create a new handle for this item
-            handle = HandleManager.createHandle(c, item);
-        }
-        else
-        {
-            // assign the supplied handle to this item
-            handle = HandleManager.createHandle(c, item, suppliedHandle);
+        IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
+        try {
+            if(suppliedHandle == null)
+            {
+                identifierService.register(c, item);
+            }else{
+                identifierService.register(c, item, suppliedHandle);
+            }
+        } catch (IdentifierException e) {
+            throw new RuntimeException("Can't create an Identifier!");
         }
 
-        populateHandleMetadata(item, handle);
 
         populateMetadata(c, item);
 
@@ -102,21 +101,17 @@ public class InstallItem
         throws SQLException, IOException, AuthorizeException
     {
         Item item = is.getItem();
-        String handle;
 
-        // if no handle supplied
-        if (suppliedHandle == null)
-        {
-            // create a new handle for this item
-            handle = HandleManager.createHandle(c, item);
-            //only populate handle metadata for new handles
-            // (existing handles should already be in the metadata -- as it was restored by ingest process)
-            populateHandleMetadata(item, handle);
-        }
-        else
-        {
-            // assign the supplied handle to this item
-            handle = HandleManager.createHandle(c, item, suppliedHandle);
+        IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
+        try {
+            if(suppliedHandle == null)
+            {
+                identifierService.register(c, item);
+            }else{
+                identifierService.register(c, item, suppliedHandle);
+            }
+        } catch (IdentifierException e) {
+            throw new RuntimeException("Can't create an Identifier!");
         }
 
         // Even though we are restoring an item it may not have the proper dates. So let's
@@ -144,28 +139,6 @@ public class InstallItem
 		item.addDC("description", "provenance", "en", provDescription);
 
         return finishItem(c, item, is);
-    }
-
-    private static void populateHandleMetadata(Item item, String handle)
-        throws SQLException, IOException, AuthorizeException
-    {
-        String handleref = HandleManager.getCanonicalForm(handle);
-
-        // Add handle as identifier.uri DC value.
-        // First check that identifier doesn't already exist.
-        boolean identifierExists = false;
-        DCValue[] identifiers = item.getDC("identifier", "uri", Item.ANY);
-        for (DCValue identifier : identifiers)
-        {
-        	if (handleref.equals(identifier.value))
-            {
-        		identifierExists = true;
-            }
-        }
-        if (!identifierExists)
-        {
-        	item.addDC("identifier", "uri", null, handleref);
-        }
     }
 
 

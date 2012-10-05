@@ -250,7 +250,7 @@ Common usage:
 
         <echo>
 
-  * To properly merge your previous configuration files, its
+  * To properly merge your previous configuration files, it's
     best to try to take the newer version and copy your
     previous changes into it.
 ====================================================================
@@ -309,7 +309,7 @@ Common usage:
 
         <echo>
 
-  * To properly merge your previous configuration files, its
+  * To properly merge your previous configuration files, it's
     best to try to take the newer version and copy your
     previous changes into it. Delete the old and remove the
     ".new" suffix from the new file.
@@ -424,7 +424,7 @@ Common usage:
 
         <echo>
 
-  * To properly merge your previous configuration files, its
+  * To properly merge your previous configuration files, it's
     best to try to take the newer version and copy your
     previous changes into it.
 ====================================================================
@@ -491,7 +491,7 @@ Common usage:
 
         <echo>
 
-  * To properly merge your previous configuration files, its
+  * To properly merge your previous configuration files, it's
     best to try to take the newer version and copy your
     previous changes into it. Delete the old and remove the
     ".new" suffix from the new file.
@@ -730,6 +730,10 @@ Common usage:
 
     	<mkdir dir="${dspace.dir}/solr" />
 
+    	<!-- Runtime files (Could be erased - just for performing purposes) -->
+    	<mkdir dir="${dspace.dir}/var" />
+    	<!-- Runtime files for OAI 2.0 -->
+    	<mkdir dir="${dspace.dir}/var/oai" />
     </target>
 
 

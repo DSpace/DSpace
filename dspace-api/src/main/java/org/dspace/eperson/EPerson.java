@@ -604,7 +604,7 @@ public class EPerson extends DSpaceObject
     /**
      * Get the e-person's language
      * 
-     * @return  language
+     * @return language code (or null if the column is an SQL NULL)
      */
      public String getLanguage()
      {
@@ -617,7 +617,7 @@ public class EPerson extends DSpaceObject
      * e.g. "en", "en_US", "pt_BR" (the latter is Brazilian Portugese).
      * 
      * @param language
-     *            language
+     *            language code
      */
      public void setLanguage(String language)
      {
@@ -625,8 +625,11 @@ public class EPerson extends DSpaceObject
      }
   
 
-
-
+    /**
+     * Get the e-person's handle
+     * 
+     * @return current implementation always returns null
+     */
     public String getHandle()
     {
         // No Handles for e-people
@@ -636,7 +639,7 @@ public class EPerson extends DSpaceObject
     /**
      * Get the e-person's email address
      * 
-     * @return their email address
+     * @return their email address (or null if the column is an SQL NULL)
      */
     public String getEmail()
     {
@@ -663,7 +666,7 @@ public class EPerson extends DSpaceObject
     /**
      * Get the e-person's netid
      * 
-     * @return their netid
+     * @return their netid (DB constraints ensure it's never NULL)
      */
     public String getNetid()
     {
@@ -686,7 +689,7 @@ public class EPerson extends DSpaceObject
      * Get the e-person's full name, combining first and last name in a
      * displayable string.
      * 
-     * @return their full name
+     * @return their full name (first + last name; if both are NULL, returns email)
      */
     public String getFullName()
     {
@@ -710,7 +713,7 @@ public class EPerson extends DSpaceObject
     /**
      * Get the eperson's first name.
      * 
-     * @return their first name
+     * @return their first name (or null if the column is an SQL NULL)
      */
     public String getFirstName()
     {
@@ -732,7 +735,7 @@ public class EPerson extends DSpaceObject
     /**
      * Get the eperson's last name.
      * 
-     * @return their last name
+     * @return their last name (or null if the column is an SQL NULL)
      */
     public String getLastName()
     {
@@ -788,7 +791,7 @@ public class EPerson extends DSpaceObject
     /**
      * Get require certificate or not
      * 
-     * @return boolean, yes/no
+     * @return boolean, yes/no (or false if the column is an SQL NULL)
      */
     public boolean getRequireCertificate()
     {
@@ -810,7 +813,7 @@ public class EPerson extends DSpaceObject
     /**
      * Can the user log in?
      * 
-     * @return boolean, yes/no
+     * @return boolean, yes/no (or false if the column is an SQL NULL)
      */
     public boolean getSelfRegistered()
     {
@@ -823,7 +826,7 @@ public class EPerson extends DSpaceObject
      * @param field
      *            the name of the metadata field to get
      * 
-     * @return the value of the metadata field
+     * @return the value of the metadata field (or null if the column is an SQL NULL)
      * 
      * @exception IllegalArgumentException
      *                if the requested metadata field doesn't exist
@@ -837,7 +840,7 @@ public class EPerson extends DSpaceObject
      * Set a metadata value
      * 
      * @param field
-     *            the name of the metadata field to get
+     *            the name of the metadata field to set
      * @param value
      *            value to set the field to
      * 

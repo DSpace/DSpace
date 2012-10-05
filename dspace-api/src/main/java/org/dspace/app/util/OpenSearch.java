@@ -7,12 +7,17 @@
  */
 package org.dspace.app.util;
 
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.handle.HandleManager;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.net.URLEncoder;
 import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
 
 import org.w3c.dom.Document;
 
@@ -26,7 +31,6 @@ import org.apache.log4j.Logger;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.search.QueryResults;
 
 import com.sun.syndication.feed.module.opensearch.OpenSearchModule;
 import com.sun.syndication.feed.module.opensearch.entity.OSQuery;
@@ -139,57 +143,60 @@ public class OpenSearch
      * 
      * @param format results format - html, rss or atom
      * @param query - the search query
-     * @param qResults - the query results to be formatted
+     * @param totalResults - the hit count
+     * @param start - start result index
+     * @param pageSize - page size
      * @param scope - search scope, null or community/collection handle
      * @param results the retreived DSpace objects satisfying search
      * @param labels labels to apply - format specific
      * @return formatted search results
      * @throws IOException
      */
-    public static String getResultsString(String format, String query, QueryResults qResults,
+    public static String getResultsString(String format, String query, int totalResults, int start, int pageSize,
     		                          	  DSpaceObject scope, DSpaceObject[] results,
     		                          	  Map<String, String> labels) throws IOException
     {
-            try
-            {
-            return getResults(format, query, qResults, scope, results, labels).outputString();
-            }
+        try
+        {
+            return getResults(format, query, totalResults, start, pageSize, scope, results, labels).outputString();
+        }
         catch (FeedException e)
-            {
+        {
             log.error(e.toString(), e);
             	throw new IOException("Unable to generate feed", e);
-            }
         }
+    }
     
     /**
      * Returns a formatted set of search results as a document
      * 
      * @param format results format - html, rss or atom
      * @param query - the search query
-     * @param qResults - the query results to be formatted
+     * @param totalResults - the hit count
+     * @param start - start result index
+     * @param pageSize - page size
      * @param scope - search scope, null or community/collection handle
      * @param results the retreived DSpace objects satisfying search
      * @param labels labels to apply - format specific
      * @return formatted search results
      * @throws IOException
      */
-    public static Document getResultsDoc(String format, String query, QueryResults qResults,
+    public static Document getResultsDoc(String format, String query, int totalResults, int start, int pageSize,
     		                          DSpaceObject scope, DSpaceObject[] results, Map<String, String> labels)
                                       throws IOException
     {
-        	try
-        	{
-            return getResults(format, query, qResults, scope, results, labels).outputW3CDom();
-        	}
+        try
+        {
+            return getResults(format, query, totalResults, start, pageSize, scope, results, labels).outputW3CDom();
+        }
         catch (FeedException e)
-        	{
+        {
             log.error(e.toString(), e);
             throw new IOException("Unable to generate feed", e);
-        	}
-    
         }
-    
-    private static SyndicationFeed getResults(String format, String query, QueryResults qResults,
+    }
+
+    private static SyndicationFeed getResults(String format, String query, int totalResults, int start, int pageSize,
                                           DSpaceObject scope, DSpaceObject[] results, Map<String, String> labels)
     {
         // Encode results in requested format
@@ -205,7 +212,7 @@ public class OpenSearch
         SyndicationFeed feed = new SyndicationFeed(labels.get(SyndicationFeed.MSG_UITYPE));
         feed.populate(null, scope, results, labels);
         feed.setType(format);
-        feed.addModule(openSearchMarkup(query, qResults));
+        feed.addModule(openSearchMarkup(query, totalResults, start, pageSize));
     	return feed;
 	}
     
@@ -217,26 +224,26 @@ public class OpenSearch
      * @param qRes the search results
      * @return module
      */
-    private static OpenSearchModule openSearchMarkup(String query, QueryResults qRes)
-    { 
+    private static OpenSearchModule openSearchMarkup(String query, int totalResults, int start, int pageSize)
+    {
     	OpenSearchModule osMod = new OpenSearchModuleImpl();
-    	osMod.setTotalResults(qRes.getHitCount());
-    	osMod.setStartIndex(qRes.getStart());
-    	osMod.setItemsPerPage(qRes.getPageSize());
+    	osMod.setTotalResults(totalResults);
+    	osMod.setStartIndex(start);
+    	osMod.setItemsPerPage(pageSize);
     	OSQuery osq = new OSQuery();
     	osq.setRole("request");
         try
         {
             osq.setSearchTerms(URLEncoder.encode(query, "UTF-8"));
-        	}
+        }
         catch(UnsupportedEncodingException e)
-        	{
+        {
             log.error(e);
-        	}
-        osq.setStartPage(1 + (qRes.getStart() / qRes.getPageSize()));
+        }
+        osq.setStartPage(1 + (start / pageSize));
         osMod.addQuery(osq);
         return osMod;
-        	}
+    }
     
     /**
      * Returns as a document the OpenSearch service document
@@ -327,4 +334,16 @@ public class OpenSearch
         	throw new IOException("JDOM output exception", jde);
         }
     }
+
+    public static DSpaceObject resolveScope(Context context, String scope) throws SQLException
+    {
+        if(scope == null || "".equals(scope))
+            return null;
+
+        DSpaceObject dso = HandleManager.resolveToObject(context, scope);
+        if(dso == null || dso.getType() == Constants.ITEM)
+            throw new IllegalArgumentException("Scope handle "+scope+" should point to a valid Community or Collection");
+        return dso;
+    }
+
 }

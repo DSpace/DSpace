@@ -106,13 +106,35 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!--
+                The ant plugin below ensures that the dspace "woven" configuration file ends up in the dspace directory
+                The dspace service manager needs this "woven" configuration file when it starts
+            -->
+            <plugin>
+              <artifactId>maven-antrun-plugin</artifactId>
+              <executions>
+                <execution>
+                  <phase>process-test-resources</phase>
+                  <configuration>
+                    <tasks>
+                        <copy file="${project.build.directory}/testing/dspace.cfg.woven" tofile="${project.build.directory}/testing/dspace/config/dspace.cfg"/>
+                    </tasks>
+                  </configuration>
+                  <goals>
+                    <goal>run</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
                         <dspace.dir>${project.build.directory}/testing/dspace</dspace.dir>
                         <dspace.dir.static>${basedir}/src/test/data/dspaceFolder</dspace.dir.static>
-                        <dspace.configuration>${project.build.directory}/testing/dspace.cfg.woven</dspace.configuration>
+                        <dspace.configuration>${project.build.directory}/testing/dspace/config/dspace.cfg</dspace.configuration>
                         <db.schema.path>${project.build.directory}/testing/dspace/etc/h2/database_schema.sql</db.schema.path>
                         <dspace.log.init.disable>true</dspace.log.init.disable>
                     </systemPropertyVariables>
@@ -166,6 +188,12 @@
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -275,11 +303,7 @@
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-services-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-services-impl</artifactId>
+            <artifactId>dspace-services</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-httpclient</groupId>
@@ -310,6 +334,81 @@
             <artifactId>rome-modules</artifactId>
             <version>1.0</version>
         </dependency>
+		<dependency>
+			<groupId>gr.ekt</groupId>
+			<artifactId>biblio-transformation-engine</artifactId>
+			<version>0.82</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>2.3</version>
+		</dependency>
+		<dependency>
+		  	<groupId>org.jbibtex</groupId>
+		  	<artifactId>jbibtex</artifactId>
+		  	<version>1.0.0</version>
+		</dependency>
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-solrj</artifactId>
+            <version>${lucene.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>jcl-over-slf4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+            <version>1.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace.dependencies</groupId>
+            <artifactId>dspace-geoip</artifactId>
+            <version>1.2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace.dnsjava</groupId>
+            <artifactId>dnsjava</artifactId>
+            <version>2.0.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ostermiller</groupId>
+            <artifactId>utils</artifactId>
+            <version>1.07.00</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>0.18.6</version>
+        </dependency>
+
+        <!--  Gson: Java to Json conversion -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

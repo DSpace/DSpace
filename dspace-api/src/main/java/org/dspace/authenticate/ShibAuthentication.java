@@ -736,7 +736,7 @@ public class ShibAuthentication implements AuthenticationMethod
 
 
 	/**
-	 * After we sucessfully authenticated a user, this method will update the users attributes. The
+	 * After we successfully authenticated a user, this method will update the user's attributes. The
 	 * user's email, name, or other attribute may have been changed since the last time they
 	 * logged into DSpace. This method will update the database with their most recent information.
 	 * 

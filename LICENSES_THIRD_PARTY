@@ -82,6 +82,10 @@ libraries, CSS Frameworks) may have their own open source license. In that
 scenario, we place a copy of the full text of the license alongside the 
 licensed files. You can locate these additional licenses in our codebase 
 by searching for files with a ".LICENSE" file extension.
+
+For example, on Linux you can use the 'find' command from the source directory:
+
+find . -type f -name "*.LICENSE"
 ----
 
 ----

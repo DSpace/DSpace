@@ -8,6 +8,7 @@
 package org.dspace.browse;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 import org.dspace.core.Constants;
@@ -382,6 +383,12 @@ public class BrowseItem extends DSpaceObject
         	log.error("caught exception: ", sqle);
 			return null;
 		}
+    }
+
+    @Override
+    public void update() throws SQLException, AuthorizeException
+    {
+
     }
 
     @Override

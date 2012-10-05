@@ -14,21 +14,6 @@
 	</parent>
 
 	<profiles>
-
-		<profile>
-			<id>postgres-support</id>
-			<activation>
-				<property>
-					<name>!db.name</name>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>postgresql</groupId>
-					<artifactId>postgresql</artifactId>
-				</dependency>
-			</dependencies>
-		</profile>
 		<profile>
 			<id>oracle-support</id>
 			<activation>
@@ -44,10 +29,11 @@
 				</dependency>
 			</dependencies>
 		</profile>
-
-	</profiles>
-
+	</profiles>	
 	<build>
+        <filters>
+            <filter>${basedir}/../../../${filters.file}</filter>
+        </filters>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -56,7 +42,7 @@
 					<archiveClasses>false</archiveClasses>
 					<webResources>
 						<resource>
-							<filtering>true</filtering>
+							<filtering>false</filtering>
 							<directory>
 								${basedir}/src/main/webapp
 							</directory>
@@ -65,6 +51,14 @@
 							</includes>
 						</resource>
 					</webResources>
+					<overlays>
+						<overlay></overlay>
+						<overlay>
+							<groupId>org.dspace</groupId>
+							<artifactId>dspace-jspui</artifactId>
+							<type>war</type>
+						</overlay>
+					</overlays>
 				</configuration>
 				<executions>
 					<execution>
@@ -76,27 +70,24 @@
 	</build>
 
 	<dependencies>
-
-      <dependency>
-         <groupId>org.dspace.modules</groupId>
-         <artifactId>additions</artifactId>
-      </dependency>
+		
+		<dependency>
+			<groupId>org.dspace.modules</groupId>
+			<artifactId>additions</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.dspace</groupId>
-			<artifactId>dspace-jspui-webapp</artifactId>
+			<artifactId>dspace-jspui</artifactId>
 			<type>war</type>
 		</dependency>
 
 		<dependency>
 			<groupId>org.dspace</groupId>
-			<artifactId>dspace-jspui-api</artifactId>
+			<artifactId>dspace-jspui</artifactId>
+            <type>jar</type>
+            <classifier>classes</classifier>
 		</dependency>
-
-		<dependency>
-           <groupId>org.dspace</groupId>
-           <artifactId>dspace-discovery-provider</artifactId>
-        </dependency>
 
 		<dependency>
 		   <groupId>javax.servlet</groupId>

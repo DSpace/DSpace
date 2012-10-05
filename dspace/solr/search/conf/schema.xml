@@ -422,7 +422,16 @@
         <filter class="solr.TrimFilterFactory" />
       </analyzer>
     </fieldType>
-
+    
+    <!-- This field is used for store metadatavalue (with authority, prefered label, variants and 
+    	 language) to use in projection  -->
+    <fieldType name="dspaceMetadataProjection" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+        <analyzer>
+            <!--Treats the entire field as a single token, regardless of its content-->
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+        </analyzer>
+    </fieldType>
+    
     <!--This field is used for auto complete features in the discovery search-->
     <fieldType name="dspaceAutoComplete" class="solr.TextField" sortMissingLast="true" omitNorms="true">
         <analyzer>
@@ -489,9 +498,18 @@
     <!-- Internal DSpaceObject Type ID -->
    <field name="search.resourcetype" type="sint" indexed="true" stored="true" required="true" omitNorms="true" />
 
-    <!-- All Items/Communities/Collections placed in Discovery must have a unique handle -->
-   <field name="handle" type="string" indexed="true" stored="true" required="true" omitNorms="true" />
+    <!-- All object placed in Discovery must have an unique id (for standard DSpaceObject it is resourceID-resourceTypeID) -->
+   <field name="search.uniqueid" type="string" indexed="true" stored="true" required="true" omitNorms="true" />
+   
+    <!-- All Items/Communities/Collections placed in Discovery should have an handle -->
+   <field name="handle" type="string" indexed="true" stored="true" omitNorms="true" />
 
+   <field name="withdrawn" type="string" indexed="true" stored="true" omitNorms="true" />
+
+   <field name="discoverable" type="string" indexed="true" stored="true" omitNorms="true" />
+      
+   <field name="read" type="string" indexed="true" stored="true" omitNorms="true" />
+   
     <!-- Community and collection hierarchy of the Item of interest (candidate for hierarchical facetting ) -->
    <field name="location" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
     <field name="location.comm" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
@@ -507,16 +525,24 @@
    <!--<copyField source="dc.creator" dest="dc.contributor.author_sort"/>-->
 
 
-     <!--Dynamic field used for search autocompletion-->
-    <dynamicField name="*_ac" type="dspaceAutoComplete" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
+ 	<!--Dynamic field used to store metadata for projection-->
+    <dynamicField name="*_stored" type="dspaceMetadataProjection" indexed="false" stored="true" multiValued="true"/>
 
-     <!--Dynamic field used for sidebar filters-->
+     <!--Dynamic field used for search autocompletion-->
+    <dynamicField name="*_ac" type="keywordFilter" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
+	<dynamicField name="*_acid" type="keywordFilter" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
+	
+     <!--Dynamic field used for sidebar filters & SOLR browse by value -->
      <dynamicField name="*_filter" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
+     <dynamicField name="*_authority" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
      <dynamicField name="*_keyword" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
 
+	<!--Dynamic field used for SOLR browse by partial value -->
+     <dynamicField name="*_partial" type="text" indexed="true" stored="true" multiValued="true" omitNorms="true" />
+     
      <!--Dynamic field used for hit highlighting-->
      <dynamicField name="*_hl" type="text" indexed="true" stored="true" multiValued="true" omitNorms="true"/>
-
+     
      <dynamicField name="*_sort" type="lowerCaseSort" indexed="true" stored="true" multiValued="false" omitNorms="true"/>
 
      <!--Dynamic field used for related item searches-->
@@ -527,7 +553,7 @@
     <dynamicField name="*_dt" type="date" indexed="true" stored="true" multiValued="false" omitNorms="true" />
 
 
-    <!--Used for matching on all other fields-->
+    <!--Used for matching on all other fields -->
      <dynamicField name="*" type="text" multiValued="true"/>
 
    <!-- non-tokenized version of manufacturer to make it easier to sort or group
@@ -568,7 +594,7 @@
  <!-- Field to use to determine and enforce document uniqueness.
       Unless this field is marked with required="false", it will be a required field
    -->
- <uniqueKey>handle</uniqueKey>
+ <uniqueKey>search.uniqueid</uniqueKey>
 
  <!-- field for the QueryParser to use when an explicit fieldname is absent -->
  <defaultSearchField>text</defaultSearchField>

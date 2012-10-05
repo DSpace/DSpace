@@ -38,9 +38,13 @@ import org.dspace.event.Event;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
+import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.IdentifierService;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.utils.DSpace;
+import org.dspace.versioning.VersioningService;
 
 /**
  * Class representing an item in DSpace.
@@ -221,6 +225,24 @@ public class Item extends DSpaceObject
 
         return new ItemIterator(context, rows);
     }
+    
+    /**
+     * Get all "final" items in the archive, both archived ("in archive" flag) or
+     * withdrawn items are included. The order of the list is indeterminate.
+     *
+     * @param context
+     *            DSpace context object
+     * @return an iterator over the items in the archive.
+     * @throws SQLException
+     */
+	public static ItemIterator findAllUnfiltered(Context context) throws SQLException
+    {
+        String myQuery = "SELECT * FROM item WHERE in_archive='1' or withdrawn='1'";
+
+        TableRowIterator rows = DatabaseManager.queryTable(context, "item", myQuery);
+
+        return new ItemIterator(context, rows);
+	}
 
     /**
      * Find all the items in the archive by a given submitter. The order is
@@ -2021,10 +2043,30 @@ public class Item extends DSpaceObject
         // Remove any Handle
         HandleManager.unbindHandle(ourContext, this);
         
+        // remove version attached to the item
+        removeVersion();
+
+
         // Finally remove item row
         DatabaseManager.delete(ourContext, itemRow);
     }
     
+    private void removeVersion() throws AuthorizeException, SQLException
+    {
+        VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
+        if(versioningService.getVersion(ourContext, this)!=null)
+        {
+            versioningService.removeVersion(ourContext, this);
+        }else{
+            IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
+            try {
+                identifierService.delete(ourContext, this);
+            } catch (IdentifierException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     /**
      * Remove item and all its sub-structure from the context cache.
      * Useful in batch processes where a single context has a long,
