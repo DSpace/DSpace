@@ -22,7 +22,10 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.handle.HandleManager;
 import org.dspace.xoai.data.DSpaceDatabaseItem;
+import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.util.XOAIDatabaseManager;
+
+import com.lyncode.xoai.dataprovider.core.ReferenceSet;
 
 /**
  * 
@@ -79,34 +82,11 @@ public class DspaceSetSpecFilter extends DSpaceFilter
     }
 
     @Override
-    public boolean isShown(DSpaceDatabaseItem item)
+    public boolean isShown(DSpaceItem item)
     {
-        try
-        {
-            Item dsitem = item.getItem();
-            if (_setSpec.startsWith("col_"))
-            {
-                String handle = _setSpec.replace("col_", "");
-                for (Collection c : dsitem.getCollections())
-                    if (c.getHandle().replace('/', '_').equals(handle))
-                        return true;
-                return false;
-            }
-            else if (_setSpec.startsWith("com_"))
-            {
-                String handle = _setSpec.replace("com_", "");
-                for (Community c : XOAIDatabaseManager
-                        .flatParentCommunities(dsitem))
-                    if (c.getHandle().replace('/', '_').equals(handle))
-                        return true;
-                return false;
-            }
-        }
-        catch (SQLException ex)
-        {
-            log.error(ex.getMessage(), ex);
-        }
-
+        for (ReferenceSet s : item.getSets())
+            if (s.getSetSpec().equals(_setSpec))
+                return true;
         return false;
     }
 
