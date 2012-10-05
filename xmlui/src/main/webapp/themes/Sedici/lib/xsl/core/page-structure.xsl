@@ -647,13 +647,33 @@ placeholders for header images -->
         <xsl:if test="dri:body/dri:div[contains(@rend,'submission')]">
             <script type="text/javascript">
                 $(function() {
-                $('form.submission').submit(function() {
-                //alert($(this).data("submitted"));
-                if($(this).data("submitted") === true)
-                return false;
-                else
-                $(this).data("submitted", true);
-                });
+
+                    $('form.submission').submit(function() {
+                        if($(this).data("submitted") === true)
+                            return false;
+                        else
+                            $(this).data("submitted", true);
+                    });
+
+                    // Variable que guarda el valor del select para chequear si hay que disparar el alert() o no
+                    var dcTypeElement = $('form.submission select[name="dc_type"]');
+                    var oldTypeValue = dcTypeElement.val();
+                    $('form.submission select[name="dc_type"]').change(function() {
+                        var permitirSubmit = false;
+                        if(oldTypeValue == "")
+                            permitirSubmit = true;
+                        else
+                            permitirSubmit = confirm("¿Está seguro que desea cambiar el tipo de documento?");
+
+                        if(permitirSubmit) {
+                            //Limpiamos el subtype para evitar que quede inconsistente
+                            $('form.submission select[name="sedici_subtype"]').val("");
+                            $('form.submission').submit();
+                        } else {
+                            dcTypeElement.val(oldTypeValue);
+                        }
+                    });
+
                 });
             </script>
         </xsl:if>
