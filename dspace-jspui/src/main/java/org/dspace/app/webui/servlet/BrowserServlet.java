@@ -209,7 +209,7 @@ public class BrowserServlet extends AbstractBrowserServlet
         }
         catch (BrowseException be)
         {
-            // Not sure what happended here!
+            // Not sure what happened here!
             JSPManager.showIntegrityError(request, response);
         }
     }

@@ -197,7 +197,7 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         }
         if (error)
         {
-            checkBox.addError("You are incorrect you actually do like Tootse Rolls.");
+            checkBox.addError("You are incorrect you actually do like Tootsie Rolls.");
         }
         checkBox.setLabel("fruits");
         checkBox.addOption("apple","Apples");

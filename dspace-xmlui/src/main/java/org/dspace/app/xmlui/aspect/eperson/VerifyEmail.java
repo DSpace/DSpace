@@ -23,13 +23,13 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.xml.sax.SAXException;
 
 /**
- * Display to the user that a verification email has been set.
+ * Notify the user that a verification email has been sent.
  * 
  * There are two parameters this transformer expects:
  * 
- * email - The email of the to-be-verrified account.
+ * email - The email of the account to be verified.
  * 
- * forgot - A boolean value indicating that this is part of the forgotten password workflow.
+ * forgot - A boolean value indicating whether this is part of the forgotten password workflow.
  * 
  * @author Scott Phillips
  */
@@ -56,7 +56,7 @@ public class VerifyEmail extends AbstractDSpaceTransformer
         message("xmlui.EPerson.VerifyEmail.para");
     
 
-    /** The email address being verrified */
+    /** The email address being verified */
     private String email;
 
     /** Determine if this is part of the forgot password workflow */

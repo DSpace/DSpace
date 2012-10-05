@@ -8,7 +8,7 @@
 
    <!--
    A Parent POM that Maven inherits DSpace Defaults
-   POM atrributes from.
+   POM attributes from.
    -->
    <parent>
       <groupId>org.dspace</groupId>

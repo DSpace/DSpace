@@ -127,7 +127,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 this.requireSubmission = true;
                 this.requireStep = true;
                 
-                //Ensure that the InputsReader is initialized.
+                // Ensure that the InputsReader is initialized.
                 try
                 {
                     initializeInputsReader();
@@ -377,7 +377,7 @@ public class DescribeStep extends AbstractSubmissionStep
                         displayValue = value.value;
                     }
 
-                    //Only display this field if we have a value to display
+                    // Only display this field if we have a value to display
                     if (displayValue!=null && displayValue.length()>0)
                     {
 
@@ -398,9 +398,9 @@ public class DescribeStep extends AbstractSubmissionStep
                     }
                 } // For each DCValue
             } // If values exist
-        }// For each input
+        } // For each input
         
-        //return this new "describe" section
+        // return this new "describe" section
         return describeSection;
     }
     
@@ -411,7 +411,7 @@ public class DescribeStep extends AbstractSubmissionStep
          * all other names).
          *
          * @param form
-         *                      The form list to add the field too
+         *                      The form list to add the field to
          * @param fieldName
          *                      The field's name.
          * @param dcInput
@@ -528,7 +528,7 @@ public class DescribeStep extends AbstractSubmissionStep
          * box for the month, and a 2 character text field for the day.
          *
          * @param form
-         *                      The form list to add the field too
+         *                      The form list to add the field to
          * @param fieldName
          *                      The field's name.
          * @param dcInput
@@ -617,7 +617,7 @@ public class DescribeStep extends AbstractSubmissionStep
                         month.setOptionSelected(dcDate.getMonth());
                         
                         // Check if the day field is not specified, if so then just
-                        // put a blank value in instead of the wiered looking -1.
+                        // put a blank value in instead of the weird looking -1.
                         if (dcDate.getDay() == -1)
                         {
                             day.setValue("");
@@ -630,15 +630,15 @@ public class DescribeStep extends AbstractSubmissionStep
         }
         
         /**
-         * Render a series field to the DRI document. The series field conist of
+         * Render a series field to the DRI document. The series field conists of
          * two component text fields. When interpreted each of these fields are
          * combined back together to be a single value joined together by a
-         * semicolen. The primary use case is for the journal or report number
+         * semicolon. The primary use case is for the journal or report number
          * the left hand side is the journal and the right hand side in a
          * unique number within the journal.
          *
          * @param form
-         *                      The form list to add the field too
+         *                      The form list to add the field to
          * @param fieldName
          *                      The field's name.
          * @param dcInput
@@ -648,7 +648,7 @@ public class DescribeStep extends AbstractSubmissionStep
          */
         private void renderSeriesField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
         {
-                // The seiries field consists of two parts, a series name (text field)
+                // The series field consists of two parts, a series name (text field)
                 // and report or paper number (also a text field).
                 Composite fullSeries = form.addItem().addComposite(fieldName,"submit-"+dcInput.getInputType());
                 Text series = fullSeries.addText(fieldName+"_series");
@@ -716,12 +716,12 @@ public class DescribeStep extends AbstractSubmissionStep
         /**
          * Render a qualdrop field to the DRI document. Qualdrop fields are complicated,
          * widget wise they are composed of two fields, a select and text box field.
-         * The select field selects the metedata's qualifier and the text box is the
+         * The select field selects the metadata's qualifier and the text box is the
          * value. This means that that there is not just one metadata element that is
          * represented so the confusing part is that the name can change.
          *
          * @param form
-         *                      The form list to add the field too
+         *                      The form list to add the field to
          * @param fieldName
          *                      The field's name.
          * @param dcInput
@@ -802,7 +802,7 @@ public class DescribeStep extends AbstractSubmissionStep
          * multi row and column text field.
          *
          * @param form
-         *                      The form list to add the field too
+         *                      The form list to add the field to
          * @param fieldName
          *                      The field's name.
          * @param dcInput
@@ -899,11 +899,11 @@ public class DescribeStep extends AbstractSubmissionStep
         
         /**
          * Render a dropdown field for a choice-controlled input of the
-         * 'select' presentation  to the DRI document. The dropdown field
+         * 'select' presentation to the DRI document. The dropdown field
          * consists of an HTML select box.
          *
          * @param form
-         *                      The form list to add the field too
+         *                      The form list to add the field to
          * @param fieldName
          *                      The field's name.
          * @param dcInput
@@ -979,7 +979,7 @@ public class DescribeStep extends AbstractSubmissionStep
          * of an HTML select box.
          *
          * @param form
-         *                      The form list to add the field too
+         *                      The form list to add the field to
          * @param fieldName
          *                      The field's name.
          * @param dcInput
@@ -1050,7 +1050,7 @@ public class DescribeStep extends AbstractSubmissionStep
          * similarly named.
          *
          * @param form
-         *                      The form list to add the field too
+         *                      The form list to add the field to
          * @param fieldName
          *                      The field's name.
          * @param dcInput
@@ -1132,7 +1132,7 @@ public class DescribeStep extends AbstractSubmissionStep
          * Render a simple text field to the DRI document
          *
          * @param form
-         *                      The form list to add the field too
+         *                      The form list to add the field to
          * @param fieldName
          *                      The field's name.
          * @param dcInput

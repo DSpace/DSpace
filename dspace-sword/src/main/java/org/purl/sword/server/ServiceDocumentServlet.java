@@ -163,7 +163,7 @@ public class ServiceDocumentServlet extends HttpServlet {
 	}
 
 	/**
-	 * Utiliy method to return the username and password (separated by a colon
+	 * Utility method to return the username and password (separated by a colon
 	 * ':')
 	 * 
 	 * @param request

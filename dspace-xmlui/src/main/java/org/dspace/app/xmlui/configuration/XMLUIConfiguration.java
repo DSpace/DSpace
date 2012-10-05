@@ -72,7 +72,7 @@ public class XMLUIConfiguration
         	}
         	else
         	{
-        		log.debug("Faild to load XMLUI configuration from: "+configPath);
+        		log.debug("Failed to load XMLUI configuration from: "+configPath);
         	}
         }
         

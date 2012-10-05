@@ -34,7 +34,7 @@ import org.xml.sax.SAXException;
  * Query the user for their authentication credentials.
  * 
  * The parameter "return-url" may be passed to give a location where to redirect
- * the user to after sucessfully authenticating.
+ * the user to after successfully authenticating.
  * 
  * @author Jay Paz
  */

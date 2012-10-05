@@ -94,7 +94,7 @@ public class DailyReportEmailer
         // create the first part of the email
         BodyPart messageBodyPart = new MimeBodyPart();
         messageBodyPart
-                .setText("This is the checksum checker report see attachment for details \n"
+                .setText("This is the checksum checker report, see attachment for details \n"
                         + numberOfBitstreams
                         + " Bitstreams found with POSSIBLE issues");
         multipart.addBodyPart(messageBodyPart);

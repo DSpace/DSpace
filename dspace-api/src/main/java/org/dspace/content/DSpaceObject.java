@@ -132,7 +132,7 @@ public abstract class DSpaceObject
      * <p>
      * Default behaviour is ADMIN right on the object grant right on all other
      * action on the object itself. Subclass should override this method as
-     * need.
+     * needed.
      * 
      * @param action
      *            ID of action being attempted, from

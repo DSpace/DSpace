@@ -3,14 +3,14 @@
    <groupId>org.dspace.modules</groupId>
    <artifactId>swordv2</artifactId>
    <packaging>war</packaging>
-   <name>DSpace SWORDv2 :: Web Application</name>
+   <name>DSpace SWORD v2 :: Web Application</name>
    <description>
-      DSpace SWORDv2 Deposit Service Provider Web Application
+      DSpace SWORD v2 Deposit Service Provider Web Application
    </description>
 
    <!--
       A Parent POM that Maven inherits DSpace Default
-      POM atrributes from.
+      POM attributes from.
    -->
    <parent>
       <groupId>org.dspace</groupId>

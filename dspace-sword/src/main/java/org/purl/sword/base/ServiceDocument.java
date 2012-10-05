@@ -78,7 +78,7 @@ public class ServiceDocument {
 	}
 
 	/**
-	 * Return the Service Document in it's XML form.
+	 * Return the Service Document in its XML form.
 	 * 
 	 * @return The ServiceDocument
 	 */
