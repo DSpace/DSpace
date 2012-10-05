@@ -267,6 +267,14 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
     //it's used to step back and forth between pages!
     var stepsInSubmission = getSubmissionSteps(submissionInfo);
 
+    //si es un administrador y no está en el workflow, saltamos el proceso de submission
+    //(en realidad, ejecutamos el ultimo paso directamente)
+    var collectionObject = HandleManager.resolveToObject(getDSContext(), collectionHandle);
+    var isAdmin = AuthorizeManager.isAdmin(getDSContext(), collectionObject);
+    if(isAdmin && !submissionInfo.isInWorkflow()) {
+        initStepAndPage = stepsInSubmission[ stepsInSubmission.length - 1 ];
+        state.progressIterator = stepsInSubmission.length - 1;
+    }
 
     //if we didn't have a page passed in, go to first page in process
     if(initStepAndPage==null)
@@ -298,7 +306,7 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
 
     	//Pass it all the info it needs, including any response/error flags
     	//in case an error occurred
-    	response_flag = doNextPage(collectionHandle, workspaceID, stepConfig, state.stepAndPage, response_flag); 
+    	response_flag = doNextPage(collectionHandle, workspaceID, stepConfig, state.stepAndPage, response_flag);
 
     	var maxStep = FlowUtils.getMaximumStepReached(getDSContext(),workspaceID);
         var maxPage = FlowUtils.getMaximumPageReached(getDSContext(),workspaceID);
