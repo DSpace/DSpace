@@ -795,7 +795,11 @@
 		</value-pairs>
 
 		<value-pairs value-pairs-name="common_types" dc-term="type">
-			<pair>
+            <pair>
+                <displayed-value>- Seleccione un Tipo -</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
 				<displayed-value>Articulo</displayed-value>
 				<stored-value>Articulo</stored-value>
 			</pair>
@@ -830,7 +834,11 @@
 		</value-pairs>
 		
 		<value-pairs value-pairs-name="common_subtypes_articulo" dc-term="type">
-			<pair>
+            <pair>
+                <displayed-value>- Seleccione un Subtipo -</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
 				<displayed-value>Preprint</displayed-value>
 				<stored-value>Preprint</stored-value>
 			</pair>
@@ -861,7 +869,11 @@
 		</value-pairs>
 		
 		<value-pairs value-pairs-name="common_subtypes_tesis" dc-term="type">
-			<pair>
+            <pair>
+                <displayed-value>- Seleccione un Subtipo -</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
 				<displayed-value>Tesis de doctorado</displayed-value>
 				<stored-value>Tesis de doctorado</stored-value>
 			</pair>
@@ -880,7 +892,11 @@
 		</value-pairs>
 		
 		<value-pairs value-pairs-name="common_subtypes_libro" dc-term="type">
-			<pair>
+            <pair>
+                <displayed-value>- Seleccione un Subtipo -</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
 				<displayed-value>Libro</displayed-value>
 				<stored-value>Libro</stored-value>
 			</pair>
@@ -891,14 +907,22 @@
 		</value-pairs>
 
 		<value-pairs value-pairs-name="common_subtypes_objeto_conferencia" dc-term="type">
-			<pair>
+            <pair>
+                <displayed-value>- Seleccione un Subtipo -</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
 				<displayed-value>Objeto de conferencia</displayed-value>
 				<stored-value>Objeto de conferencia</stored-value>
 			</pair>
 		</value-pairs>
 
 		<value-pairs value-pairs-name="common_subtypes_documento_institucional" dc-term="type">
-			<pair>
+            <pair>
+                <displayed-value>- Seleccione un Subtipo -</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
 				<displayed-value>Resolución</displayed-value>
 				<stored-value>Resolucion</stored-value>
 			</pair>
@@ -909,21 +933,33 @@
 		</value-pairs>
 
 		<value-pairs value-pairs-name="common_subtypes_imagen_fija" dc-term="type">
-			<pair>
+            <pair>
+                <displayed-value>- Seleccione un Subtipo -</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
 				<displayed-value>Imagen fija</displayed-value>
 				<stored-value>Imagen fija</stored-value>
 			</pair>
 		</value-pairs>
 
 		<value-pairs value-pairs-name="common_subtypes_imagen_movimiento" dc-term="type">
-			<pair>
+            <pair>
+                <displayed-value>- Seleccione un Subtipo -</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
 				<displayed-value>Imagen en movimiento</displayed-value>
 				<stored-value>Imagen en movimiento</stored-value>
 			</pair>
 		</value-pairs>
 
 		<value-pairs value-pairs-name="common_subtypes_audio" dc-term="type">
-			<pair>
+            <pair>
+                <displayed-value>- Seleccione un Subtipo -</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
 				<displayed-value>Audio</displayed-value>
 				<stored-value>Audio</stored-value>
 			</pair>
