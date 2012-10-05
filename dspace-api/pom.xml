@@ -73,6 +73,38 @@
                     </execution>
                 </executions>
             </plugin>
+			<!-- This plugin allows us to run a Groovy script in our Maven POM
+				(see: http://gmaven.codehaus.org/Executing+Groovy+Code )
+				We are generating a OS-agnostic version (agnostic.build.dir) of
+				the ${project.build.directory} property (full path of target dir).
+				This is necessary so that the FileWeaver & Surefire plugins can
+				use it to initialize the Unit Test Framework's dspace.cfg file.
+				Otherwise, the Unit Test Framework will not work on Windows OS.
+				This Groovy code was mostly borrowed from:
+				http://stackoverflow.com/questions/3872355/how-to-convert-file-separator-in-maven
+			-->
+            <plugin>
+                <groupId>org.codehaus.gmaven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>setproperty</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <source>
+                            pom.properties['agnostic.build.dir']=project.build.directory.replace('\\','/');
+                            println("Initializing Maven property 'agnostic.build.dir' to: " + project.properties['agnostic.build.dir']);
+                            </source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- FileWeaver plugin is in charge of initializing & "weaving" together
+				 the dspace.cfg file to be used by the Unit Testing framework -->
             <plugin>
                 <groupId>edu.iu.ul.maven.plugins</groupId>
                 <artifactId>fileweaver</artifactId>
@@ -80,18 +112,18 @@
                 <configuration>
                     <outputs>
                         <output>
-                            <outputPath>${project.build.directory}/testing</outputPath>
+                            <outputPath>${agnostic.build.dir}/testing</outputPath>
                             <name>dspace.cfg.woven</name>
                             <parts>
                                 <part>
-                                    <path>${project.build.directory}/testing/dspace/config/dspace.cfg</path>
+                                    <path>${agnostic.build.dir}/testing/dspace/config/dspace.cfg</path>
                                 </part>
                                 <part>
-                                    <path>${project.build.directory}/testing/dspace.cfg.more</path>
+                                    <path>${agnostic.build.dir}/testing/dspace.cfg.more</path>
                                 </part>
                             </parts>
                             <properties>
-                                <dspace.dir>${project.build.directory}/testing/dspace</dspace.dir>
+                                <dspace.dir>${agnostic.build.dir}/testing/dspace</dspace.dir>
                             </properties>
                         </output>
                     </outputs>
@@ -118,7 +150,7 @@
                   <phase>process-test-resources</phase>
                   <configuration>
                     <tasks>
-                        <copy file="${project.build.directory}/testing/dspace.cfg.woven" tofile="${project.build.directory}/testing/dspace/config/dspace.cfg"/>
+                        <copy file="${agnostic.build.dir}/testing/dspace.cfg.woven" tofile="${agnostic.build.dir}/testing/dspace/config/dspace.cfg"/>
                     </tasks>
                   </configuration>
                   <goals>
@@ -132,10 +164,10 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
-                        <dspace.dir>${project.build.directory}/testing/dspace</dspace.dir>
+                        <dspace.dir>${agnostic.build.dir}/testing/dspace</dspace.dir>
                         <dspace.dir.static>${basedir}/src/test/data/dspaceFolder</dspace.dir.static>
-                        <dspace.configuration>${project.build.directory}/testing/dspace/config/dspace.cfg</dspace.configuration>
-                        <db.schema.path>${project.build.directory}/testing/dspace/etc/h2/database_schema.sql</db.schema.path>
+                        <dspace.configuration>${agnostic.build.dir}/testing/dspace/config/dspace.cfg</dspace.configuration>
+                        <db.schema.path>${agnostic.build.dir}/testing/dspace/etc/h2/database_schema.sql</db.schema.path>
                         <dspace.log.init.disable>true</dspace.log.init.disable>
                     </systemPropertyVariables>
                 </configuration>
