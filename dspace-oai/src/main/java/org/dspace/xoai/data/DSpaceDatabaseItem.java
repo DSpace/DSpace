@@ -9,7 +9,6 @@ package org.dspace.xoai.data;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -19,14 +18,18 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.xoai.util.MetadataNamePredicate;
 import org.dspace.xoai.util.XOAICacheManager;
 import org.dspace.xoai.util.XOAIDatabaseManager;
 
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.lyncode.xoai.dataprovider.core.ItemMetadata;
 import com.lyncode.xoai.dataprovider.core.ReferenceSet;
 import com.lyncode.xoai.dataprovider.data.AbstractAbout;
 import com.lyncode.xoai.dataprovider.exceptions.MetadataBindException;
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
+import com.lyncode.xoai.dataprovider.xml.xoai.Element.Field;
 
 /**
  * 
@@ -35,7 +38,9 @@ import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 public class DSpaceDatabaseItem extends DSpaceItem
 {
     private static Logger log = LogManager.getLogger(DSpaceDatabaseItem.class);
-
+    
+    
+    
     private static List<ReferenceSet> getSets(Item item)
     {
         List<ReferenceSet> sets = new ArrayList<ReferenceSet>();
@@ -125,80 +130,6 @@ public class DSpaceDatabaseItem extends DSpaceItem
             }
         }
         return metadata;
-    }
-
-    private List<String> getMetadata(List<Element> elems, String[] parts)
-    {
-        List<String> list = new ArrayList<String>();
-        if (parts.length > 1)
-        {
-            if (parts[0].equals("*"))
-            {
-                for (Element e : elems)
-                {
-                    if (e.getElement() != null)
-                        list.addAll(this.getMetadata(e.getElement(),
-                                Arrays.copyOfRange(parts, 1, parts.length)));
-                }
-            }
-            else
-            {
-                Element e = getElement(elems, parts[0]);
-                if (e != null)
-                    list.addAll(this.getMetadata(e.getElement(),
-                            Arrays.copyOfRange(parts, 1, parts.length)));
-            }
-        }
-        else if (parts.length == 1)
-        {
-            // Here we could have reached our target (named fields)
-            for (Element e : elems)
-            {
-                for (Element.Field f : e.getField())
-                {
-                    if (parts[0].equals("*"))
-                        list.add(f.getValue());
-                    else if (parts[0].equals(f.getName()))
-                        list.add(f.getValue());
-                }
-            }
-
-            if (parts[0].equals("*"))
-            {
-                for (Element e : elems)
-                {
-                    if (e.getElement() != null)
-                        list.addAll(this.getMetadata(e.getElement(),
-                                Arrays.copyOfRange(parts, 1, parts.length)));
-                }
-            }
-            else
-            {
-                Element e = getElement(elems, parts[0]);
-                if (e != null)
-                    list.addAll(this.getMetadata(e.getElement(),
-                            Arrays.copyOfRange(parts, 1, parts.length)));
-            }
-        }
-        else
-        {
-            // Here we have reached our target (unnamed fields)
-            for (Element e : elems)
-            {
-                for (Element.Field f : e.getField())
-                {
-                    if (f.getName() == null || f.getName().equals(""))
-                        list.add(f.getValue());
-                }
-            }
-        }
-        return list;
-    }
-
-    public List<String> getMetadata(String field)
-    {
-        String[] parts = field.split(Pattern.quote("."));
-        return getMetadata(this.getMetadata().getMetadata().getElement(), parts);
     }
 
     public Item getItem()

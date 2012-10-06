@@ -64,7 +64,7 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository
     }
 
     @Override
-    protected ListItemIdentifiersResult getItemIdentifiers(
+    public ListItemIdentifiersResult getItemIdentifiers(
             List<Filter> filters, int offset, int length)
     {
         List<String> whereCond = new ArrayList<String>();
@@ -92,7 +92,7 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository
     }
 
     @Override
-    protected ListItemsResults getItems(List<Filter> filters, int offset,
+    public ListItemsResults getItems(List<Filter> filters, int offset,
             int length)
     {
         List<String> whereCond = new ArrayList<String>();
