@@ -11,6 +11,7 @@ package org.dspace.xoai.filter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -19,7 +20,8 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.xoai.data.DSpaceDatabaseItem;
+import org.dspace.handle.HandleManager;
+import org.dspace.xoai.data.DSpaceItem;
 
 /**
  * 
@@ -44,12 +46,14 @@ public class DSpaceAuthorizationFilter extends DSpaceFilter
     }
 
     @Override
-    public boolean isShown(DSpaceDatabaseItem item)
+    public boolean isShown(DSpaceItem item)
     {
         try
         {
             Context ctx = super.getContext();
-            Item dsitem = item.getItem();
+            String handle = DSpaceItem.parseHandle(item.getIdentifier());
+            if (handle == null) return false;
+            Item dsitem = (Item) HandleManager.resolveToObject(ctx, handle);
             AuthorizeManager.authorizeAction(ctx, dsitem, Constants.READ);
             for (Bundle b : dsitem.getBundles())
                 AuthorizeManager.authorizeAction(ctx, b, Constants.READ);
@@ -60,6 +64,10 @@ public class DSpaceAuthorizationFilter extends DSpaceFilter
             log.debug(ex.getMessage());
         }
         catch (SQLException ex)
+        {
+            log.error(ex.getMessage());
+        }
+        catch (Exception ex)
         {
             log.error(ex.getMessage());
         }
