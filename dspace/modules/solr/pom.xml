@@ -21,8 +21,6 @@
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
-             <!--Upgraded version required since we need to use the exclude option !-->
-             <version>2.1-alpha-2</version>
              <configuration>
                <!-- This 'dspace-solr' WAR overlays the Apache Solr Web Application
                     available in Maven Central -->
