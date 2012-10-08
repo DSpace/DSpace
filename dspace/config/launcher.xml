@@ -142,6 +142,10 @@
             <class>org.dspace.search.DSIndexer</class>
             <argument>-b</argument>
         </step>
+        <step passuserargs="false">
+            <class>org.dspace.discovery.IndexClient</class>
+            <argument>-f</argument>
+        </step>
     </command>
 
     <command>
@@ -156,6 +160,9 @@
         </step>
         <step passuserargs="false">
             <class>org.dspace.search.DSIndexer</class>
+        </step>
+        <step passuserargs="false">
+            <class>org.dspace.discovery.IndexClient</class>
         </step>
      </command>
 
