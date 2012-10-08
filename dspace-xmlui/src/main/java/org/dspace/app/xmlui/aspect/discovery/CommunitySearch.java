@@ -10,8 +10,6 @@ package org.dspace.app.xmlui.aspect.discovery;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.util.HashUtil;
@@ -23,35 +21,31 @@ import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.*;
+import org.dspace.app.xmlui.wing.element.Body;
+import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.PageMeta;
+import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.LogManager;
-import org.dspace.discovery.SearchUtils;
-import org.dspace.discovery.configuration.DiscoveryConfiguration;
-import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
-import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.xml.sax.SAXException;
 
 /**
- * Renders the search box & browse urls for a community
+ * Renders the search box for a community
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
  */
-public class CommunitySearchBrowse extends AbstractDSpaceTransformer implements CacheableProcessingComponent
+public class CommunitySearch extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
-    private static final Logger log = Logger.getLogger(CommunitySearchBrowse.class);
+    private static final Logger log = Logger.getLogger(CommunitySearch.class);
 
     /** Language Strings */
     private static final Message T_full_text_search =
         message("xmlui.ArtifactBrowser.CommunityViewer.full_text_search");
-
-    private static final Message T_head_browse =
-        message("xmlui.ArtifactBrowser.CommunityViewer.head_browse");
 
     private static final Message T_go =
         message("xmlui.general.go");
@@ -187,38 +181,11 @@ public class CommunitySearchBrowse extends AbstractDSpaceTransformer implements 
         // The search / browse box.
 
         {
-            Division searchBrowseDivision = home.addDivision("community-search-browse",
+            Division search = home.addDivision("community-search-browse",
                     "secondary search-browse");
 
-            List browse = searchBrowseDivision.addList("community-browse", List.TYPE_SIMPLE,
-                    "community-browse");
-            browse.setHead(T_head_browse);
-            String url = contextPath + "/handle/" + community.getHandle();
-
-            addBrowseTitle(browse, url);
-            // Get a Map of all the browse tables
-            DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(community);
-            java.util.List<DiscoverySearchFilterFacet> facets = discoveryConfiguration.getSidebarFacets();
-            for (DiscoverySearchFilterFacet facet : facets)
-            {
-                if(facet.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE))
-                {
-                    //Browse by date isn't support for our facets.
-                    continue;
-                }
-
-                // Create a Map of the query parameters for this link
-                Map<String, String> queryParams = new HashMap<String, String>();
-
-                queryParams.put("field", facet.getIndexFieldName());
-
-                // Add a link to this browse
-                browse.addItemXref(generateURL(url + "/search-filter", queryParams),
-                        message("xmlui.ArtifactBrowser.Navigation.browse_" + facet.getIndexFieldName()));
-            }
-
             // Search query
-            Division query = searchBrowseDivision.addInteractiveDivision("community-search",
+            Division query = search.addInteractiveDivision("community-search",
                     contextPath + "/handle/" + community.getHandle() + "/discover",
                     Division.METHOD_POST, "secondary search");
 
@@ -229,16 +196,18 @@ public class CommunitySearchBrowse extends AbstractDSpaceTransformer implements 
             para.addContent(" ");
             para.addButton("submit").setValue(T_go);
            //query.addPara().addXref(contextPath + "/handle/" + community.getHandle() + "/advanced-search", T_advanced_search_link);
+
+            // Browse by list
+       //     Division browseDiv = search.addDivision("community-browse","secondary browse");
+         //   List browse = browseDiv.addList("community-browse", List.TYPE_SIMPLE,
+        //            "community-browse");
+      //      browse.setHead(T_head_browse);
+    //        String url = contextPath + "/handle/" + community.getHandle();
+  //          browse.addItemXref(url + "/browse?type=title",T_browse_titles);
+  //          browse.addItemXref(url + "/browse?type=author",T_browse_authors);
+//            browse.addItemXref(url + "/browse?type=dateissued",T_browse_dates);
         }
 
-    }
-
-    private void addBrowseTitle(List browse, String url) throws WingException {
-        Map<String, String> browseTitleParams = new HashMap<String, String>();
-        browseTitleParams.put("sort_by", "dc.title_sort");
-        browseTitleParams.put("order", "asc");
-        browse.addItemXref(generateURL(url + "/discover", browseTitleParams),
-                message("xmlui.ArtifactBrowser.AdvancedSearch.type_title"));
     }
 
     /**
@@ -250,4 +219,7 @@ public class CommunitySearchBrowse extends AbstractDSpaceTransformer implements 
         this.validity = null;
         super.recycle();
     }
+
+
+
 }

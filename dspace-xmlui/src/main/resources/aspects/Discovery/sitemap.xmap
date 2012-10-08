@@ -23,7 +23,6 @@ and searching the repository.
         <map:transformers>
 
             <map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.discovery.Navigation"/>
-            <map:transformer name="CommunityBrowser" src="org.dspace.app.xmlui.aspect.artifactbrowser.CommunityBrowser"/>
             <map:transformer name="SimpleSearch" src="org.dspace.app.xmlui.aspect.discovery.SimpleSearch"/>
             <map:transformer name="BrowseFacet" src="org.dspace.app.xmlui.aspect.discovery.BrowseFacet"/>
             <map:transformer name="SearchFacetFilter" src="org.dspace.app.xmlui.aspect.discovery.SearchFacetFilter"/>
@@ -32,11 +31,11 @@ and searching the repository.
             <map:transformer name="SidebarFacetsTransformer" src="org.dspace.app.xmlui.aspect.discovery.SidebarFacetsTransformer"/>
 
 
-            <map:transformer name="CommunitySearch" src="org.dspace.app.xmlui.aspect.discovery.CommunitySearchBrowse"/>
+            <map:transformer name="CommunitySearch" src="org.dspace.app.xmlui.aspect.discovery.CommunitySearch"/>
             <map:transformer name="CommunityRecentSubmissions" src="org.dspace.app.xmlui.aspect.discovery.CommunityRecentSubmissions"/>
 
 
-            <map:transformer name="CollectionSearch" src="org.dspace.app.xmlui.aspect.discovery.CollectionSearchBrowse"/>
+            <map:transformer name="CollectionSearch" src="org.dspace.app.xmlui.aspect.discovery.CollectionSearch"/>
             <map:transformer name="CollectionRecentSubmissions" src="org.dspace.app.xmlui.aspect.discovery.CollectionRecentSubmissions"/>
 
 
@@ -82,9 +81,6 @@ and searching the repository.
                     -->
             <map:match pattern="">
                 <map:transform type="SidebarFacetsTransformer"/>
-                <map:transform type="CommunityBrowser">
-                    <map:parameter name="depth" value="1"/>
-                </map:transform>
                 <map:transform type="FrontPageSearch"/>
 
                 <map:transform type="SiteRecentSubmissions"/>
@@ -93,13 +89,13 @@ and searching the repository.
             </map:match>
 
 
-            <!-- List all communities & collections in DSpace -->
+            <!-- List all communities & collections in DSpace
             <map:match pattern="community-list">
                 <map:transform type="CommunityBrowser">
                     <map:parameter name="depth" value="999"/>
                 </map:transform>
                 <map:serialize type="xml"/>
-            </map:match>
+            </map:match>  -->
 
 
 			<!-- Search -->
