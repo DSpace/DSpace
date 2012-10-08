@@ -13,7 +13,6 @@ import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.httpclient.StatusLine;
@@ -22,7 +21,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
@@ -49,6 +47,32 @@ public class DataCiteIdentifierProvider
 {
     private static final Logger log = LoggerFactory.getLogger(DataCiteIdentifierProvider.class);
 
+    private static final Pattern DOIpattern = Pattern.compile("doi:[\\S]+");
+    // private static final Pattern ARKpattern = Pattern.compile("ark:[\\S]+");
+    private static final ContentType CONTENT_UTF8_TEXT = ContentType.create("text/plain", "UTF-8");
+
+    private static String EZID_SCHEME; // = "https";
+    private static String EZID_HOST; // = "n2t.net";
+    private static String EZID_PATH; // = "/ezid/shoulder/";
+
+    /** Map DataCite metadata into local metadata. */
+    private static Map<String, String> crosswalk = new HashMap<String, String>();
+    /* default mapping */
+    /*
+    static
+    {
+        crosswalk.put("datacite.creator", "dc.creator.author");
+        crosswalk.put("datacite.title", "dc.title");
+        crosswalk.put("datacite.publisher", "dc.publisher");
+        crosswalk.put("datacite.publicationyear", "dc.date.published");
+    }
+    */
+
+    // TODO move these to MetadataSchema or some such
+    public static final String MD_SCHEMA_DSPACE = "dspace";
+    public static final String DSPACE_DOI_ELEMENT = "identifier";
+    public static final String DSPACE_DOI_QUALIFIER = "doi";
+
     @Override
     public boolean supports(Class<? extends Identifier> identifier)
     {
@@ -62,7 +86,34 @@ public class DataCiteIdentifierProvider
     }
 
     @Override
-    public String register(Context context, DSpaceObject item)
+    public String register(Context context, DSpaceObject dso)
+            throws IdentifierException
+    {
+        Item item;
+
+        if (dso instanceof Item)
+            item = (Item)dso;
+        else
+            throw new IdentifierException("Unsupported object type " + dso.getTypeText());
+
+        String id;
+        DCValue[] previous = item.getMetadata(MD_SCHEMA_DSPACE, DSPACE_DOI_ELEMENT, DSPACE_DOI_QUALIFIER, null);
+        if ((previous.length > 0) && (null != previous[0].value))
+            return previous[0].value;
+
+        id = mint(context, item);
+        item.addMetadata(MD_SCHEMA_DSPACE, DSPACE_DOI_ELEMENT, DSPACE_DOI_QUALIFIER, null, id);
+        return id;
+    }
+
+    @Override
+    public void register(Context context, DSpaceObject object, String identifier)
+    {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void reserve(Context context, DSpaceObject dso, String identifier)
             throws IdentifierException
     {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -72,7 +123,8 @@ public class DataCiteIdentifierProvider
     public String mint(Context context, DSpaceObject dso)
             throws IdentifierException
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        String doi = request(generatePostBody(dso));
+        return doi;
     }
 
     @Override
@@ -87,7 +139,17 @@ public class DataCiteIdentifierProvider
     public String lookup(Context context, DSpaceObject object)
             throws IdentifierNotFoundException, IdentifierNotResolvableException
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Item item;
+        if (!(object instanceof Item))
+            throw new IllegalArgumentException("Unsupported type " + object.getTypeText());
+
+        item = (Item)object;
+        DCValue[] metadata = item.getMetadata(MD_SCHEMA_DSPACE, DSPACE_DOI_ELEMENT, DSPACE_DOI_QUALIFIER, null);
+        if (metadata.length > 0)
+            return metadata[0].value;
+        else
+            throw new IdentifierNotFoundException(object.getTypeText() + " "
+                    + object.getID() + " has no DOI");
     }
 
     @Override
@@ -104,88 +166,12 @@ public class DataCiteIdentifierProvider
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    public void reserve(Context context, DSpaceObject dso, String identifier)
-            throws IdentifierException
-    {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void register(Context context, DSpaceObject object, String identifier)
-    {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    private static String EZID_SCHEME; // = "https";
-    private static String EZID_HOST; // = "n2t.net";
-    private static String EZID_PATH; // = "/ezid/shoulder/";
-
-    /** Map DataCite metadata into local metadata */
-    private static Map<String, String> crosswalk = new HashMap<String, String>();
-    /* default mapping */
-    /*
-    static
-    {
-        crosswalk.put("datacite.creator", "dc.creator.author");
-        crosswalk.put("datacite.title", "dc.title");
-        crosswalk.put("datacite.publisher", "dc.publisher");
-        crosswalk.put("datacite.publicationyear", "dc.date.published");
-    }
-    */
-
-    /**
-     * @param aEZID_SCHEME the EZID URL scheme to set
-     */
-    @Autowired
-    @Required
-    public static void setEZID_SCHEME(String aEZID_SCHEME)
-    {
-        EZID_SCHEME = aEZID_SCHEME;
-    }
-
-    /**
-     * @param aEZID_HOST the EZID host to set
-     */
-    @Autowired
-    @Required
-    public static void setEZID_HOST(String aEZID_HOST)
-    {
-        EZID_HOST = aEZID_HOST;
-    }
-
-    /**
-     * @param aEZID_PATH the EZID path to set
-     */
-    @Autowired
-    @Required
-    public static void setEZID_PATH(String aEZID_PATH)
-    {
-        EZID_PATH = aEZID_PATH;
-    }
-
-    /**
-     * @param aCrosswalk the crosswalk to set
-     */
-    @Autowired
-    public static void setCrosswalk(Map<String, String> aCrosswalk)
-    {
-        crosswalk = aCrosswalk;
-    }
-
-    private static final Pattern DOIpattern = Pattern.compile("doi:[\\S]+");
-    private static final Pattern ARKpattern = Pattern.compile("ark:[\\S]+");
-    private static final ContentType CONTENT_UTF8_TEXT = ContentType.create("text/plain", "UTF-8");
-
-    private String doi = null;
-    private String ark = null;
-
     /**
      * Submit some object details and request identifiers for the object.
      *
      * @param postBody the details, formatted for EZID.
      */
-    public void request(String postBody)
+    private String request(String postBody)
             throws IdentifierException
     {
 	// Address the service
@@ -245,31 +231,20 @@ public class DataCiteIdentifierProvider
             throw new IdentifierException("EZID response not understood:  " + ex.getMessage());
         }
 
-	// Extract the identifiers from the content blob
-
-	Matcher matcher;
-
-	// DOI
-	matcher = DOIpattern.matcher(content);
+	// Extract the DOI from the content blob
+	Matcher matcher = DOIpattern.matcher(content);
 	if (matcher.find())
-	    doi = matcher.group();
-
-	// ARK
-	matcher = ARKpattern.matcher(content);
-	if (matcher.find())
-	    ark = matcher.group();
+	    return matcher.group();
+        else
+            throw new IdentifierException("No DOI returned");
     }
-
-    public String getDoi() { return doi; }
-
-    public String getArk() { return ark; }
 
     /**
      * Assemble the identifier request document, one field per line.
      * 
      * @param dso the object we want to identify.
      */
-    static public String generatePostBody(DSpaceObject dso)
+    static private String generatePostBody(DSpaceObject dso)
     {
         if ((null == dso) || !(dso instanceof Item))
             throw new IllegalArgumentException("Must be an Item");
@@ -293,5 +268,44 @@ public class DataCiteIdentifierProvider
         }
 
 	return bupher.toString();
+    }
+
+    /**
+     * @param aEZID_SCHEME the EZID URL scheme to set
+     */
+    @Autowired
+    @Required
+    public static void setEZID_SCHEME(String aEZID_SCHEME)
+    {
+        EZID_SCHEME = aEZID_SCHEME;
+    }
+
+    /**
+     * @param aEZID_HOST the EZID host to set
+     */
+    @Autowired
+    @Required
+    public static void setEZID_HOST(String aEZID_HOST)
+    {
+        EZID_HOST = aEZID_HOST;
+    }
+
+    /**
+     * @param aEZID_PATH the EZID path to set
+     */
+    @Autowired
+    @Required
+    public static void setEZID_PATH(String aEZID_PATH)
+    {
+        EZID_PATH = aEZID_PATH;
+    }
+
+    /**
+     * @param aCrosswalk the crosswalk to set
+     */
+    @Autowired
+    public static void setCrosswalk(Map<String, String> aCrosswalk)
+    {
+        crosswalk = aCrosswalk;
     }
 }
