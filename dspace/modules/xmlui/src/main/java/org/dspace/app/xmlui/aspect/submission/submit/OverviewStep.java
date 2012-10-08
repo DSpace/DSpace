@@ -137,6 +137,8 @@ public class OverviewStep extends AbstractStep {
             addDataFileItem.addButton("submit_adddataset").setValue(T_BUTTON_DATAFILE_ADD);
         }
         //Thirdly add the the upload data files to external repos (this is optional)
+	// Commented out because there is a bug somewhere in this code -- Clicking the checkbox for TreeBASE upload causes the Tomcat server to crash!
+	/*
         {
             if(submission instanceof WorkspaceItem){
 
@@ -202,6 +204,7 @@ public class OverviewStep extends AbstractStep {
                 }
             }
         }
+	*/
 
         // Add GenBank button
 //        Division genBankDiv = actionsDiv.addDivision("genbankdivision", "odd subdiv");
