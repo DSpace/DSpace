@@ -48,25 +48,14 @@ public class DataCiteIdentifierProvider
     private static final Logger log = LoggerFactory.getLogger(DataCiteIdentifierProvider.class);
 
     private static final Pattern DOIpattern = Pattern.compile("doi:[\\S]+");
-    // private static final Pattern ARKpattern = Pattern.compile("ark:[\\S]+");
     private static final ContentType CONTENT_UTF8_TEXT = ContentType.create("text/plain", "UTF-8");
 
-    private static String EZID_SCHEME; // = "https";
-    private static String EZID_HOST; // = "n2t.net";
-    private static String EZID_PATH; // = "/ezid/shoulder/";
+    private static String EZID_SCHEME;
+    private static String EZID_HOST;
+    private static String EZID_PATH;
 
     /** Map DataCite metadata into local metadata. */
     private static Map<String, String> crosswalk = new HashMap<String, String>();
-    /* default mapping */
-    /*
-    static
-    {
-        crosswalk.put("datacite.creator", "dc.creator.author");
-        crosswalk.put("datacite.title", "dc.title");
-        crosswalk.put("datacite.publisher", "dc.publisher");
-        crosswalk.put("datacite.publicationyear", "dc.date.published");
-    }
-    */
 
     // TODO move these to MetadataSchema or some such
     public static final String MD_SCHEMA_DSPACE = "dspace";
@@ -304,6 +293,7 @@ public class DataCiteIdentifierProvider
      * @param aCrosswalk the crosswalk to set
      */
     @Autowired
+    @Required
     public static void setCrosswalk(Map<String, String> aCrosswalk)
     {
         crosswalk = aCrosswalk;
