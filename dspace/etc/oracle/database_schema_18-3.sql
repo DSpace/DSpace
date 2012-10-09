@@ -49,3 +49,11 @@ CREATE TABLE versionitem
 
 CREATE SEQUENCE versionitem_seq;
 CREATE SEQUENCE versionhistory_seq;
+
+
+-------------------------------------------
+-- New columns and longer hash for salted password hashing DS-861 --
+-------------------------------------------
+ALTER TABLE EPerson ALTER COLUMN password TYPE VARCHAR(128);
+ALTER TABLE EPerson ADD salt VARCHAR(32);
+ALTER TABLE EPerson ADD digest_algorithm VARCHAR(16);
