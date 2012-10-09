@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>modules</artifactId>
 		<groupId>org.dspace</groupId>
-		<version>3.0-rc1</version>
+		<version>3.0-rc2-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<groupId>org.dspace.modules</groupId>
@@ -82,7 +82,7 @@
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-oai</artifactId>
-			<version>3.0-rc1</version>
+			<version>3.0-rc2-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
 		</dependency>

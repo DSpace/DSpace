@@ -9,7 +9,7 @@
     <parent>
         <artifactId>dspace-parent</artifactId>
         <groupId>org.dspace</groupId>
-        <version>3.0-rc1</version>
+        <version>3.0-rc2-SNAPSHOT</version>
     </parent>
 
     <build>
