@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean id="DataCiteIdentifierProvider"
+        class="org.dspace.identifier.DataCiteIdentifierProvider"
+        scope="prototype">
+            <property name="EZID_SCHEME">https</property>
+            <property name="EZID_HOST">n2t.net</property>
+            <property name="EZID_PATH">/ezid/shoulder/</property>
+            <property name="crosswalk">
+                <map>
+                    <entry key="datacite.creator">dc.creator.author</entry>
+                    <entry key="datacite.title">dc.title</entry>
+                    <entry key="datacite.publisher">dc.publisher</entry>
+                    <entry key="datacite.publicationyear">dc.date.published</entry>
+                </map>
+            </property>
+    </bean>
+</beans>
