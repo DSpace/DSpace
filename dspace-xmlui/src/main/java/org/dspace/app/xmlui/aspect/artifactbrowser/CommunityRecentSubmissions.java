@@ -48,6 +48,9 @@ public class CommunityRecentSubmissions extends AbstractDSpaceTransformer implem
     private static final Message T_head_recent_submissions =
         message("xmlui.ArtifactBrowser.CommunityViewer.head_recent_submissions");
 
+    private static final Message T_more_submissions_linktext =
+        message("xmlui.ArtifactBrowser.CommunityViewer.more_submissions_linktext");
+
     /** How many recent submissions to list */
     private static final int RECENT_SUBMISSIONS = 5;
 
@@ -144,6 +147,14 @@ public class CommunityRecentSubmissions extends AbstractDSpaceTransformer implem
         for (BrowseItem item : items)
         {
             lastSubmitted.addReference(item);
+        }
+
+        int numRecentSubmissions = ConfigurationManager.getIntProperty("recent.submissions.count", RECENT_SUBMISSIONS);
+        if (numRecentSubmissions <= items.size()) {
+            String url = contextPath + "/handle/" + dso.getHandle() + "/browse?type=title";
+
+            Division moreSubmissions = home.addDivision("community-more-submissions", "more-submissions");
+            moreSubmissions.addPara().addXref(url, T_more_submissions_linktext);
         }
 
     }
