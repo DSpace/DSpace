@@ -35,6 +35,7 @@ import org.dspace.xoai.filter.DatabaseFilterResult;
 /**
  * 
  * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author Domingo Iglesias <diglesias@ub.edu>
  */
 public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
 {
@@ -198,8 +199,8 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
         else
         {
             // Oracle
-            query = "SELECT *, ROWNUM r FROM (" + query
-                    + ") WHERE r BETWEEN ? AND ?";
+        	query = "SELECT * FROM (" + query
+                    + ") WHERE ROWNUM BETWEEN ? AND ?";
             length = length + offset;
         }
         parameters.add(offset);

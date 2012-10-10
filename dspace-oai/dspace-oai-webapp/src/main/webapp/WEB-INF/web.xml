@@ -41,8 +41,13 @@
 		<servlet-class>org.dspace.xoai.DSpaceOAIDataProvider</servlet-class>
 	</servlet>
 	
+	<servlet>
+		<servlet-name>static</servlet-name>
+		<servlet-class>org.dspace.xoai.util.FileServlet</servlet-class>
+	</servlet>
+	
 	<servlet-mapping>
-		<servlet-name>default</servlet-name>
+		<servlet-name>static</servlet-name>
 		<url-pattern>/static/*</url-pattern>
 	</servlet-mapping>
 	
