@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.xoai.util;
 
 import java.io.BufferedInputStream;
@@ -16,6 +23,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+/**
+ * 
+ * @author "João Melo <jmelo@lyncode.com>"
+ */
 public final class FileServlet extends HttpServlet {
 	private static final long serialVersionUID = 8191397166155668213L;
 	private static Logger log = LogManager.getLogger(FileServlet.class);
