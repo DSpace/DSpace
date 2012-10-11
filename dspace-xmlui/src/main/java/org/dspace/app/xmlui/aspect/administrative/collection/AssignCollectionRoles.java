@@ -114,15 +114,6 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 		Group admins = thisCollection.getAdministrators();
 		Group submitters = thisCollection.getSubmitters();
 
-        HashMap<String, Role> roles = null;
-
-        try {
-            roles = WorkflowUtils.getAllExternalRoles(thisCollection);
-        } catch (WorkflowConfigurationException e) {
-            log.error(LogManager.getHeader(context, "error while getting collection roles", "Collection id: " + thisCollection.getID()));
-        } catch (IOException e) {
-            log.error(LogManager.getHeader(context, "error while getting collection roles", "Collection id: " + thisCollection.getID()));
-        }
 		Group defaultRead = null;
 		int defaultReadID = FlowContainerUtils.getCollectionDefaultRead(context, collectionID);
 		if (defaultReadID >= 0)
@@ -256,7 +247,14 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 
 
          if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
-             addXMLWorkflowRoles(thisCollection, baseURL, roles, rolesTable);
+             try{
+                 HashMap<String, Role> roles = WorkflowUtils.getAllExternalRoles(thisCollection);
+                 addXMLWorkflowRoles(thisCollection, baseURL, roles, rolesTable);
+             } catch (WorkflowConfigurationException e) {
+                log.error(LogManager.getHeader(context, "error while getting collection roles", "Collection id: " + thisCollection.getID()));
+             } catch (IOException e) {
+                 log.error(LogManager.getHeader(context, "error while getting collection roles", "Collection id: " + thisCollection.getID()));
+             }
          }else{
              addOriginalWorkflowRoles(thisCollection, baseURL, rolesTable);
          }
