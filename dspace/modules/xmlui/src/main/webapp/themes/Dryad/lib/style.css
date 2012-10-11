@@ -827,6 +827,23 @@ p#ds-button-field {
       font-weight: bold;
       background-color: rgb(255,0,0);
   }
+/* Defns for the BoD bio list
+ */
+ div.bioBlock{
+    position:relative;
+    display:inline-block;
+ }
+ div.bioImage{
+     float:left;
+     display:inline;
+     padding-right:2%;
+ }
+ div.bioText{
+     float:left;
+     display:inline;
+     width:70%;
+ }
+  
 /*
   ************************
   *** @Mire's additions **
