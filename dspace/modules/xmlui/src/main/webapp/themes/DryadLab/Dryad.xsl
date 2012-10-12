@@ -932,7 +932,6 @@
                     <xsl:variable name="translatedParentId">
                         <xsl:value-of select="translate(../@id, '.', '_')"/>
                     </xsl:variable>
-                    <xsl:attribute name="dojoType">dijit.Tooltip</xsl:attribute>
                     <xsl:attribute name="connectId">
                         <xsl:value-of select="$translatedParentId"/>
                     </xsl:attribute>
