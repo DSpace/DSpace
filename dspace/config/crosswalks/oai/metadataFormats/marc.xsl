@@ -23,7 +23,7 @@
 			xmlns:dcterms="http://purl.org/dc/terms/"
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 			xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
-			<leader>am 3u</leader>
+			<leader>00925njm 22002777a 4500</leader>
 			<datafield ind2=" " ind1=" " tag="042">
 				<subfield code="a">dc</subfield>
 			</datafield>
