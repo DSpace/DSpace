@@ -18,23 +18,31 @@ import com.lyncode.xoai.dataprovider.core.Set;
  */
 public class DSpaceSet extends Set
 {
+	private static final String DefaultName = "undefined";
+	public static String checkName (String name) {
+		if (name == null || name.trim().equals(""))
+			return DefaultName;
+		else return name;
+	}
+	
     public static Set newDSpaceCommunitySet(String handle, String name)
     {
-        return new Set("com_" + handle.replace('/', '_'), name);
+    	
+        return new Set("com_" + handle.replace('/', '_'), checkName(name));
     }
 
     public static Set newDSpaceCollectionSet(String handle, String name)
     {
-        return new Set("col_" + handle.replace('/', '_'), name);
+        return new Set("col_" + handle.replace('/', '_'), checkName(name));
     }
 
     public DSpaceSet(Community c)
     {
-        super("com_" + c.getHandle().replace('/', '_'), c.getName());
+        super("com_" + c.getHandle().replace('/', '_'), checkName(c.getName()));
     }
 
     public DSpaceSet(Collection c)
     {
-        super("col_" + c.getHandle().replace('/', '_'), c.getName());
+        super("col_" + c.getHandle().replace('/', '_'), checkName(c.getName()));
     }
 }
