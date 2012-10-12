@@ -90,6 +90,9 @@ public class DSpaceOAIDataProvider extends HttpServlet
             log.debug("OAI 2.0 request received");
             context = new Context();
 
+            if (XOAIManager.getManager() == null)
+            	throw new ServletException("OAI 2.0 wasn't correctly initialized, please check the log for previous errors");
+            
             // Filters require database connection -> dependency injection?
             for (AbstractFilter filter : XOAIManager.getManager()
                     .getFilterManager().getFilters())
