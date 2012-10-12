@@ -34,7 +34,6 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -155,6 +154,10 @@ public class DataCiteIdentifierProvider
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    private static final String CFG_SHOULDER = "identifier.doi.ezid.shoulder";
+    private static final String CFG_USER = "identifier.doi.ezid.user";
+    private static final String CFG_PASSWORD = "identifier.doi.ezid.password";
+
     /**
      * Submit some object details and request identifiers for the object.
      *
@@ -163,11 +166,21 @@ public class DataCiteIdentifierProvider
     private String request(String postBody)
             throws IdentifierException
     {
-	// Address the service
+        // Get configured
+        String shoulder = configurationService.getProperty(CFG_SHOULDER);
+        if (null == shoulder)
+            throw new IdentifierException("Unconfigured:  define " + CFG_SHOULDER);
+
+        String user = configurationService.getProperty(CFG_USER);
+        String password = configurationService.getProperty(CFG_PASSWORD);
+        if (null == user || null == password)
+            throw new IdentifierException("Unconfigured:  define " + CFG_USER + " and " + CFG_PASSWORD);
+
+        // Address the service
 	URIBuilder mintURL = new URIBuilder();
 	mintURL.setScheme(EZID_SCHEME)
 	    .setHost(EZID_HOST)
-	    .setPath(EZID_PATH + configurationService.getProperty("identifier.doi.ezid.shoulder"));
+	    .setPath(EZID_PATH + shoulder);
 
         // Compose the request
         HttpPost request;
@@ -182,9 +195,7 @@ public class DataCiteIdentifierProvider
 	AbstractHttpClient mint = new DefaultHttpClient();
         mint.getCredentialsProvider().setCredentials(
                 new AuthScope(mintURL.getHost(), mintURL.getPort()),
-                new UsernamePasswordCredentials(
-                    configurationService.getProperty("identifier.doi.ezid.user"),
-                    configurationService.getProperty("identifier.doi.ezid.password")));
+                new UsernamePasswordCredentials(user, password));
 
         // Send the request
         HttpResponse response;
@@ -262,9 +273,8 @@ public class DataCiteIdentifierProvider
     /**
      * @param aEZID_SCHEME the EZID URL scheme to set
      */
-    @Autowired
     @Required
-    public static void setEZID_SCHEME(String aEZID_SCHEME)
+    public void setEZID_SCHEME(String aEZID_SCHEME)
     {
         EZID_SCHEME = aEZID_SCHEME;
     }
@@ -272,9 +282,8 @@ public class DataCiteIdentifierProvider
     /**
      * @param aEZID_HOST the EZID host to set
      */
-    @Autowired
     @Required
-    public static void setEZID_HOST(String aEZID_HOST)
+    public void setEZID_HOST(String aEZID_HOST)
     {
         EZID_HOST = aEZID_HOST;
     }
@@ -282,9 +291,8 @@ public class DataCiteIdentifierProvider
     /**
      * @param aEZID_PATH the EZID path to set
      */
-    @Autowired
     @Required
-    public static void setEZID_PATH(String aEZID_PATH)
+    public void setEZID_PATH(String aEZID_PATH)
     {
         EZID_PATH = aEZID_PATH;
     }
@@ -292,9 +300,8 @@ public class DataCiteIdentifierProvider
     /**
      * @param aCrosswalk the crosswalk to set
      */
-    @Autowired
     @Required
-    public static void setCrosswalk(Map<String, String> aCrosswalk)
+    public void setCrosswalk(Map<String, String> aCrosswalk)
     {
         crosswalk = aCrosswalk;
     }
