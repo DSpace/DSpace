@@ -203,6 +203,7 @@
 			</amdSec>
 			</xsl:for-each>
 			</xsl:for-each>
+			<xsl:if test="count(doc:metadata/doc:element[@name='bundles']/doc:element/doc:field[text()='ORIGINAL']) &gt; 0">
 			<fileSec>
 				<xsl:for-each select="doc:metadata/doc:element[@name='bundles']/doc:element/doc:field[text()='ORIGINAL']">
 				<fileGrp USE="ORIGINAL">
@@ -279,6 +280,7 @@
 				</fileGrp>
 				</xsl:for-each>
 			</fileSec>
+			</xsl:if>
 			<structMap LABEL="DSpace Object" TYPE="LOGICAL">
 				<div TYPE="DSpace Object Contents">
 					<xsl:attribute name="ADMID">
