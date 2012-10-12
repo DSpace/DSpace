@@ -1,10 +1,10 @@
 package org.dspace.versioning;
 
-import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DCDate;
+import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
@@ -36,7 +36,15 @@ public class PluggableVersioningService implements VersioningService{
             if(vh==null){
                 // first time: create 2 versions, .1(old version) and .2(new version)
                 vh=versionHistoryDAO.create(c);
-                version = createVersion(c, vh, item, "");
+
+		// get dc:date.accessioned to be set as first version date...
+                DCValue[] values = item.getMetadata("dc", "date", "accessioned", Item.ANY);
+                Date versionDate = new Date();
+                if(values!=null && values.length > 0){
+                    String date = values[0].value;
+                    versionDate = new DCDate(date).toDate();
+                }
+                version = createVersion(c, vh, item, "", versionDate);
             }
 
             ItemVersionProvider provider = getProvider();
@@ -45,7 +53,7 @@ public class PluggableVersioningService implements VersioningService{
             Item itemNew = provider.createNewItemAndAddItInWorkspace(c, item);
 
             // create new version
-            version=createVersion(c, vh, itemNew, summary);
+            version=createVersion(c, vh, itemNew, summary, new Date());
 
             // Complete any update of the Item and new Identifier generation that needs to happen
             provider.updateItemState(c, itemNew, item);
@@ -108,7 +116,7 @@ public class PluggableVersioningService implements VersioningService{
         Item itemNew = provider.createNewItemAndAddItInWorkspace(c, ItemToRestore);
 
         // create current version
-        VersionImpl versionNew = createVersion(c, history, itemNew, "current version");
+        VersionImpl versionNew = createVersion(c, history, itemNew, "current version", new Date());
 
         return versionNew;        
     }
@@ -130,12 +138,12 @@ public class PluggableVersioningService implements VersioningService{
 
 // **** PRIVATE METHODS!!
 
-    private VersionImpl createVersion(Context c, VersionHistory vh, Item item, String summary) {
+    private VersionImpl createVersion(Context c, VersionHistory vh, Item item, String summary, Date versionDate) {
         try {
             VersionImpl version = versionDAO.create(c);
 
             version.setVersionNumber(getNextVersionNumer(vh.getLatestVersion()));
-            version.setVersionDate(new Date());
+            version.setVersionDate(versionDate);
             version.setEperson(item.getSubmitter());
             version.setItemID(item.getID());
             version.setSummary(summary);
