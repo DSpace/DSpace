@@ -254,6 +254,7 @@
     <td nowrap="nowrap" colspan="2" class="navigationBarSublabel"><fmt:message key="jsp.layout.navbar-hku.staffmode.title"/></td>
   </tr>
 
+  <c:if test="${!empty addModeType && addModeType=='display'}">
   <tr class="navigationBarItem">
     <td>
       <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/editDynamicData" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16"/>
@@ -262,6 +263,7 @@
       <a href="<%= request.getContextPath() %>/rp/tools/editDynamicData.htm?id=${researcher.id}&anagraficaId=${researcher.dynamicField.id}<c:if test='${!empty tabIdForRedirect}'>&tabId=${tabIdForRedirect}</c:if>"><fmt:message key="jsp.layout.navbar-hku.staff-mode.edit.primary-data"/></a>
     </td>
   </tr>  
+  </c:if>
    <tr class="navigationBarItem">
     <td>
       <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/rebindItemsToRP" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16"/>
@@ -300,5 +302,48 @@
 	</td>
   </tr>
 <% } %>
+
+<c:if test="${!empty researcher && (!empty addModeType && addModeType=='display')}">    
+ <% if (!isAdmin) { %>
+ <tr>
+    <td colspan="2">&nbsp;</td>
+  </tr>
+<% } %>	
+ <tr> 
+  <td colspan="2">
+		
+	    <c:forEach items="${tabList}" var="tabfornavigation">				
+			
+				<div id="cris-tabs-navigation-${tabfornavigation.shortName}" class="navigation-tabs" style="display: none">		
+
+					<div id="menu-${tabfornavigation.shortName}" class="showMoreLessBox1-dark box">
+						<h3 class="showMoreLessControlElement control ${tabfornavigation.id != tabId?"":"expanded"}">
+						<img src="<%=request.getContextPath() %>/image/cris/btn_lite_expand.gif"  ${tabfornavigation.id != tabId?"":"class=\"hide\""}/>
+						<img src="<%=request.getContextPath() %>/image/cris/btn_lite_collapse.gif" ${tabfornavigation.id != tabId?"class=\"hide\"":""} />
+							${tabfornavigation.title}
+						</h3>		
+						<div class="collapsable expanded-content" ${tabfornavigation.id != tabId?"style=\"display: none;\"":""}>
+						<div id="nav-sublocal">
+						<ul>
+						<div id="snavmenu-${tabfornavigation.shortName}">
+							<div class="log">
+							<img
+								src="<%=request.getContextPath()%>/image/jdyna/indicator.gif"
+			    				class="loader" />
+			    			</div>
+						</div>
+						</ul>
+						</div>
+						</div>
+					</div>
+		
+
+				</div>
+			
+		 </c:forEach>
+	   
+	</td>
+  </tr> 
+</c:if>
 
 </table>
