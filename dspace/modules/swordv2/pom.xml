@@ -3,19 +3,19 @@
    <groupId>org.dspace.modules</groupId>
    <artifactId>swordv2</artifactId>
    <packaging>war</packaging>
-   <name>DSpace SWORDv2 :: Web Application</name>
+   <name>DSpace SWORD v2 :: Web Application</name>
    <description>
-      DSpace SWORDv2 Deposit Service Provider Web Application
+      DSpace SWORD v2 Deposit Service Provider Web Application
    </description>
 
    <!--
       A Parent POM that Maven inherits DSpace Default
-      POM atrributes from.
+      POM attributes from.
    -->
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>3.0-SNAPSHOT</version>
+      <version>3.0-rc2-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -102,11 +102,6 @@
         <artifactId>dspace-swordv2</artifactId>
         <type>jar</type>
         <classifier>classes</classifier>
-      </dependency>
-
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-discovery-provider</artifactId>
       </dependency>
 
       <dependency>

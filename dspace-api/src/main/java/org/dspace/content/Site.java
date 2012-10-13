@@ -96,7 +96,7 @@ public class Site extends DSpaceObject
     }
 
     public void update()
-        throws SQLException, AuthorizeException, IOException
+        throws SQLException, AuthorizeException
     {
     }
 

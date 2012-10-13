@@ -321,7 +321,7 @@ public class IndexBrowse
         {
             indexItem(new ItemMetadataProxy(item), addingNewItem);
         }
-        else if (item.isWithdrawn())
+        else if (item.isWithdrawn() || !item.isArchived())
         {
             indexItem(new ItemMetadataProxy(item), false);
         }

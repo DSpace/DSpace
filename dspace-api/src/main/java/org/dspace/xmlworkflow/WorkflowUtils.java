@@ -15,12 +15,10 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.apache.log4j.Logger;
-import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 
-import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -211,9 +209,13 @@ public class WorkflowUtils extends Util{
     /*
      * Deletes a role group linked to a given role and a collection
      */
-    public static void deleteRoleGroup(Context context, int collectionID, String roleID) throws SQLException {
-        CollectionRole ass = CollectionRole.find(context,collectionID,roleID);
-        ass.delete();
+    public static void deleteRoleGroup(Context context, Collection collection, String roleID) throws SQLException, IOException, WorkflowConfigurationException {
+        Workflow workflow = WorkflowFactory.getWorkflow(collection);
+        Role role = workflow.getRoles().get(roleID);
+        if(role.getScope() == Role.Scope.COLLECTION){
+            CollectionRole ass = CollectionRole.find(context, collection.getID(), roleID);
+            ass.delete();
+        }
     }
 
 
@@ -228,6 +230,46 @@ public class WorkflowUtils extends Util{
                 Role role = allRoles.get(roleId);
                 // We just require the roles which have a scope of collection
                 if(role.getScope() == Role.Scope.COLLECTION && !role.isInternal()){
+                    result.put(roleId, role);
+                }
+            }
+
+        }
+        return result;
+    }
+
+
+    public static HashMap<String, Role> getCollectionAndRepositoryRoles(Collection thisCollection) throws IOException, WorkflowConfigurationException {
+        Workflow workflow = WorkflowFactory.getWorkflow(thisCollection);
+        LinkedHashMap<String, Role> result = new LinkedHashMap<String, Role>();
+        if(workflow != null){
+            //Make sure we find one
+            HashMap<String, Role> allRoles = workflow.getRoles();
+            //We have retrieved all our roles, not get the ones which can be configured by the collection
+            for(String roleId : allRoles.keySet()){
+                Role role = allRoles.get(roleId);
+                // We just require the roles which have a scope of collection
+                if((role.getScope() == Role.Scope.COLLECTION || role.getScope() == Role.Scope.REPOSITORY) && !role.isInternal()){
+                    result.put(roleId, role);
+                }
+            }
+
+        }
+        return result;
+    }
+
+
+    public static HashMap<String, Role> getAllExternalRoles(Collection thisCollection) throws IOException, WorkflowConfigurationException {
+        Workflow workflow = WorkflowFactory.getWorkflow(thisCollection);
+        LinkedHashMap<String, Role> result = new LinkedHashMap<String, Role>();
+        if(workflow != null){
+            //Make sure we find one
+            HashMap<String, Role> allRoles = workflow.getRoles();
+            //We have retrieved all our roles, not get the ones which can be configured by the collection
+            for(String roleId : allRoles.keySet()){
+                Role role = allRoles.get(roleId);
+                // We just require the roles which have a scope of collection
+                if(!role.isInternal()){
                     result.put(roleId, role);
                 }
             }
