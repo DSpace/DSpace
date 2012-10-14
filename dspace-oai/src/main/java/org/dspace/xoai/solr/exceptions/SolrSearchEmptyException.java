@@ -10,7 +10,7 @@ package org.dspace.xoai.solr.exceptions;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author João Melo <jmelo@lyncode.com>
  */
 @SuppressWarnings("serial")
 public class SolrSearchEmptyException extends Exception

@@ -30,7 +30,7 @@ import com.lyncode.xoai.dataprovider.data.AbstractIdentify;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author João Melo <jmelo@lyncode.com>
  * @author Domingo Iglesias <diglesias@ub.edu>
  */
 public class DSpaceIdentify extends AbstractIdentify

@@ -34,7 +34,7 @@ import org.dspace.xoai.filter.DatabaseFilterResult;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author João Melo <jmelo@lyncode.com>
  * @author Domingo Iglesias <diglesias@ub.edu>
  */
 public class DSpaceItemDatabaseRepository extends DSpaceItemRepository

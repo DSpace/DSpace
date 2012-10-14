@@ -14,7 +14,7 @@ import com.lyncode.xoai.dataprovider.core.Set;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author João Melo <jmelo@lyncode.com>
  */
 public class DSpaceSet extends Set {
 	private static final String DefaultName = "undefined";

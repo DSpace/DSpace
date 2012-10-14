@@ -23,7 +23,7 @@ import com.lyncode.xoai.dataprovider.xml.xoai.Element.Field;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author João Melo <jmelo@lyncode.com>
  */
 public abstract class DSpaceItem extends AbstractItem
 {

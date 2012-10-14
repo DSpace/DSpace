@@ -20,7 +20,7 @@ import com.lyncode.xoai.dataprovider.core.ReferenceSet;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author João Melo <jmelo@lyncode.com>
  */
 public class DSpaceSolrItem extends DSpaceItem
 {
@@ -35,6 +35,7 @@ public class DSpaceSolrItem extends DSpaceItem
     private boolean deleted;
     
     public DSpaceSolrItem (SolrDocument doc) {
+    	log.debug("Creating instance of DSpace Item using a Solr Document");
         unparsedMD = (String) doc.getFieldValue("item.compile");
         handle = (String) doc.getFieldValue("item.handle");
         lastMod = (Date) doc.getFieldValue("item.lastmodified");

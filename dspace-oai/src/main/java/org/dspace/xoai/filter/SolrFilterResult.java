@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author João Melo <jmelo@lyncode.com>
  */
 public class SolrFilterResult
 {

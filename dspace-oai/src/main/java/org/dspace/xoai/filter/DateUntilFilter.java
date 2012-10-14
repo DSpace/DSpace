@@ -9,15 +9,14 @@ package org.dspace.xoai.filter;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.apache.solr.client.solrj.util.ClientUtils;
 
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.core.Context;
-import org.dspace.xoai.data.DSpaceDatabaseItem;
 import org.dspace.xoai.data.DSpaceItem;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author João Melo <jmelo@lyncode.com>
  */
 public class DateUntilFilter extends DSpaceFilter
 {

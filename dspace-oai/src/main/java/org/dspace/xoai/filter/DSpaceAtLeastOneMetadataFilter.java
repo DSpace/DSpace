@@ -24,7 +24,7 @@ import org.dspace.xoai.util.MetadataFieldManager;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author João Melo <jmelo@lyncode.com>
  */
 public class DSpaceAtLeastOneMetadataFilter extends DSpaceFilter
 {

@@ -20,7 +20,7 @@ import org.dspace.xoai.solr.exceptions.SolrSearchEmptyException;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author João Melo <jmelo@lyncode.com>
  */
 public class DSpaceSolrSearch
 {

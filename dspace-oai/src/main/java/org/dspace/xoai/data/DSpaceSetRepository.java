@@ -30,7 +30,7 @@ import org.dspace.handle.HandleManager;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author João Melo <jmelo@lyncode.com>
  */
 public class DSpaceSetRepository extends AbstractSetRepository
 {

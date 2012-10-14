@@ -43,7 +43,7 @@ import com.lyncode.xoai.dataprovider.filter.AbstractFilter;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author João Melo <jmelo@lyncode.com>
  */
 @SuppressWarnings("serial")
 public class DSpaceOAIDataProvider extends HttpServlet
