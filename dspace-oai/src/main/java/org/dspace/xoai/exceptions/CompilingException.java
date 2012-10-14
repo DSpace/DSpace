@@ -10,7 +10,7 @@ package org.dspace.xoai.exceptions;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author João Melo <jmelo@lyncode.com>
  */
 @SuppressWarnings("serial")
 public class CompilingException extends Exception

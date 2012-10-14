@@ -33,7 +33,7 @@ import com.lyncode.xoai.dataprovider.xml.xoai.ObjectFactory;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author João Melo <jmelo@lyncode.com>
  */
 @SuppressWarnings("deprecation")
 public class ItemUtils
@@ -53,13 +53,6 @@ public class ItemUtils
     {
         Element e = factory.createElement();
         e.setName(name);
-        return e;
-    }
-
-    private static Element.Field createValue(ObjectFactory factory, String value)
-    {
-        Element.Field e = factory.createElementField();
-        e.setValue(value);
         return e;
     }
 

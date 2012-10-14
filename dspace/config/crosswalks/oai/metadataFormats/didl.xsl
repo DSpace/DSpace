@@ -24,14 +24,14 @@
 			xsi:schemaLocation="urn:mpeg:mpeg21:2002:02-DIDL-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/did/didl.xsd">
 			<xsl:if test="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='available']/doc:element/doc:field[@name='value']">
 			<d:DIDLInfo>
-				<dcterms:created xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://purl.org/dc/terms/ ">
+				<dcterms:created xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://purl.org/dc/terms/ http://dublincore.org/schemas/xmls/qdc/dcterms.xsd">
 					<xsl:value-of select="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='available']/doc:element/doc:field/text()" />
 				</dcterms:created>
 			</d:DIDLInfo>
 			</xsl:if>
 			<d:Item>
 				<xsl:attribute name="id">
-					<xsl:value-of select="doc:metadata/doc:element[@name='others']/doc:field[@name='handle']/text()" />
+					<xsl:value-of select="translate(doc:metadata/doc:element[@name='others']/doc:field[@name='handle']/text(),'/','_')" />
 				</xsl:attribute>
 				<d:Descriptor>
 					<d:Statement mimeType="application/xml; charset=utf-8">
@@ -112,7 +112,7 @@
 						<xsl:for-each select="doc:element[@name='bitstreams']/doc:element">
 							<d:Component>
 								<xsl:attribute name="id">
-									<xsl:value-of select="/doc:metadata/doc:element[@name='others']/doc:field[@name='handle']/text()"></xsl:value-of>/<xsl:value-of select="doc:field[@name='sid']/text()"></xsl:value-of>
+									<xsl:value-of select="translate(/doc:metadata/doc:element[@name='others']/doc:field[@name='handle']/text(),'/','_')"></xsl:value-of>_<xsl:value-of select="doc:field[@name='sid']/text()"></xsl:value-of>
 								</xsl:attribute>
 								<d:Resource>
 									<xsl:attribute name="ref">

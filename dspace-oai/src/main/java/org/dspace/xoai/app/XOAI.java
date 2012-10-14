@@ -57,7 +57,7 @@ import com.lyncode.xoai.dataprovider.util.MarshallingUtils;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author João Melo <jmelo@lyncode.com>
  */
 @SuppressWarnings("deprecation")
 public class XOAI

@@ -25,7 +25,7 @@ import org.dspace.xoai.data.DSpaceItem;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author João Melo <jmelo@lyncode.com>
  */
 public class DSpaceAuthorizationFilter extends DSpaceFilter
 {

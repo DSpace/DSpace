@@ -22,7 +22,7 @@ import com.lyncode.xoai.dataprovider.filter.FilterScope;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author João Melo <jmelo@lyncode.com>
  */
 public abstract class DSpaceItemRepository extends AbstractItemRepository
 {

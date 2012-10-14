@@ -39,7 +39,7 @@
 				<description><xsl:value-of select="." /></description>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element/doc:element/doc:field[@name='value']">
-				<date><xsl:value-of select="." /></date>
+				<date><xsl:value-of select="substring(.,0,11)" /></date>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='type']/doc:element/doc:field[@name='value']">
 				<type><xsl:value-of select="." /></type>

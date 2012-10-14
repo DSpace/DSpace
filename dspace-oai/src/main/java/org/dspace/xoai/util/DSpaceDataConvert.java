@@ -14,7 +14,7 @@ import org.dspace.content.DCValue;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author João Melo <jmelo@lyncode.com>
  */
 @SuppressWarnings("deprecation")
 public class DSpaceDataConvert

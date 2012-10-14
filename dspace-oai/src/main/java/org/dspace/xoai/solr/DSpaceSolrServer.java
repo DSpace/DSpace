@@ -19,7 +19,7 @@ import org.dspace.core.ConfigurationManager;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author João Melo <jmelo@lyncode.com>
  */
 public class DSpaceSolrServer
 {
