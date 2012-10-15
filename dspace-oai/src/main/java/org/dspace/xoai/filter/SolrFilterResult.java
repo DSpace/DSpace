@@ -7,13 +7,16 @@
  */
 package org.dspace.xoai.filter;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 /**
  * 
  * @author Lyncode Development Team <dspace@lyncode.com>
  */
 public class SolrFilterResult
 {
-
+	private static Logger log = LogManager.getLogger(SolrFilterResult.class);
     private String _where;
 
     private boolean _nothing;
@@ -25,6 +28,7 @@ public class SolrFilterResult
 
     public SolrFilterResult(String query)
     {
+    	log.debug("XOAI SolrQuery: "+ query);
         _nothing = false;
         _where = query;
     }

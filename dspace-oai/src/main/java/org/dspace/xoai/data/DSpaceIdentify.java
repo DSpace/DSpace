@@ -31,6 +31,7 @@ import com.lyncode.xoai.dataprovider.data.AbstractIdentify;
 /**
  * 
  * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author Domingo Iglesias <diglesias@ub.edu>
  */
 public class DSpaceIdentify extends AbstractIdentify
 {
@@ -92,9 +93,20 @@ public class DSpaceIdentify extends AbstractIdentify
         // Look at the database!
         try
         {
+            String query = "SELECT MIN(text_value) as value FROM metadatavalue WHERE metadata_field_id = ?";
+            String db = ConfigurationManager.getProperty("db.name");
+            boolean postgres = true;
+            // Assuming Postgres as default
+            if ("oracle".equals(db))
+                postgres = false;
+            
+            if (!postgres) {
+            	query = "SELECT MIN(TO_CHAR(text_value)) as value FROM metadatavalue WHERE metadata_field_id = ?";
+            }
+        	
             TableRowIterator iterator = DatabaseManager
                     .query(_context,
-                            "SELECT MIN(text_value) as value FROM metadatavalue WHERE metadata_field_id = ?",
+                            query,
                             MetadataFieldManager.getFieldID(_context,
                                     "dc.date.available"));
 
