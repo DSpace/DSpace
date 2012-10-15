@@ -44,8 +44,7 @@ public class MailReporter {
 		} catch (IOException e) {
 			//Si es un mail de reporte diferente al de UnknownException, mando reporte de UnknownException
 			if (!EXCEPTION_MAIL_TEMPLATE.equals(templateName)){
-				reportUnknownException(context, e , null);
-				//no puedo levantar el template de error ...
+				reportUnknownException(context,"ups, no puedo levantar el template de error", e , null, null);
 			}
 			log.error("No se pudo levantar el template "+templateName, e);
 			throw new MessagingException("No se pudo levantar el template "+templateName, e);
@@ -116,11 +115,13 @@ public class MailReporter {
 	/**
 	 * Envia (segun la configuracion de debug) un reporte de exception por mail
 	 * @param context
+	 * @param message 
 	 * @param thr
 	 * @param url La url que se trató de acceder
+	 * @param parameters 
 	 * @throws MessagingException
 	 */
-	public static void reportUnknownException(Context context, Throwable fullThr, String url) {
+	public static void reportUnknownException(Context context, String message, Throwable fullThr, String url, String parameters) {
 
 		if (isDebugMode()) {
 			log.error("Se produjo una exception ", fullThr);
@@ -139,8 +140,18 @@ public class MailReporter {
 			cause=cause.getCause();
 
 		//{5} Cause
-		args.add(cause.getMessage());
+		if (message == null)
+			message = "";
+		else
+			message += ", ";
+		message += cause.getMessage();
+		args.add(message);
 		
+		//{6} Parameters
+		if (parameters == null)
+			parameters = "";
+		args.add(parameters);
+
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
 		cause.printStackTrace(pw);
@@ -148,7 +159,7 @@ public class MailReporter {
 		fullThr.printStackTrace(pw);
 		pw.flush();
 		
-		//{6} Exception stack trace
+		//{7} Exception stack trace
 		args.add(sw.toString());
 		try{
 			sendMail(context,getAdminEmail(), EXCEPTION_MAIL_TEMPLATE, args);
@@ -166,33 +177,62 @@ public class MailReporter {
 	 * @param url La url que se trató de acceder
 	 * @throws MessagingException
 	 */
-	public static void reportMissingAuthorityKey(Context context, String field, String key) {
-
-		//            {4} Field
-		//            {5} Key
-		List<String> args = new ArrayList<String>();
-		args.add(field);
-		args.add(key);
-		try{
-			sendMail(context,getFeedbackEmail(), MISSING_AUTHORITY_MAIL_TEMPLATE, args);
-		}  catch (MessagingException e) {
-			log.error("Se produjo un error al intentar enviar un mail de reportMissingAuthorityKey", e);
-			//Silenciosamente dejo pasar el error porque la operacion en curso no tiene nada que ver con el envio de email
-			//throw new RuntimeException(e);
-		}
-	}
-
-	public static void reportUnknownException(String message, Throwable e, String url) {
+	public static void reportMissingAuthorityKey(String field, String key) {
 		Context context;
 		try {
 			context = new Context();
 		} catch (SQLException e2) {
-			log.error("No se pudo instancia el Context ... algo raro pasa", e);
+			log.error("No se pudo instanciar el Context ... algo raro pasa", e2);
 			throw new RuntimeException(e2);
 		} 
 
-		MailReporter.reportUnknownException(context, e, url);
-		
+		try {
+			//            {4} Field
+			//            {5} Key
+			List<String> args = new ArrayList<String>();
+			args.add(field);
+			args.add(key);
+			try{
+				sendMail(context,getFeedbackEmail(), MISSING_AUTHORITY_MAIL_TEMPLATE, args);
+			}  catch (MessagingException e) {
+				log.error("Se produjo un error al intentar enviar un mail de reportMissingAuthorityKey", e);
+				//Silenciosamente dejo pasar el error porque la operacion en curso no tiene nada que ver con el envio de email
+				//throw new RuntimeException(e);
+			}
+		}finally{
+			try {
+				context.complete();	
+			} catch (SQLException e3) {
+				log.error("No se pudo cerrar el Context ... algo raro pasa", e3);
+				throw new RuntimeException(e3);
+			} 
+		}
+	}
+
+	public static void reportUnknownException(String message, Throwable e, String url) {
+		reportUnknownException( message, e, url, null);
+	}
+	
+	public static void reportUnknownException(String message, Throwable e, String url, String parameters) {
+		Context context;
+		try {
+			context = new Context();
+		} catch (SQLException e2) {
+			log.error("No se pudo instanciar el Context ... algo raro pasa", e2);
+			throw new RuntimeException(e2);
+		} 
+
+		try {
+			MailReporter.reportUnknownException(context, message, e, url, parameters);
+		}finally{
+			try {
+				context.complete();	
+			} catch (SQLException e3) {
+				log.error("No se pudo cerrar el Context ... algo raro pasa", e3);
+				throw new RuntimeException(e3);
+			} 
+		}
+
 	}
 
 }

@@ -17,9 +17,10 @@ Subject: [Dspace@SeDiCI] Excepción {5}
 * ID de sesión y dirección de IP: {2}
 * URL del error: {4}
 * Causa: {5}
+* Parametros: {6}
 * Stack trace del error:
 
-{6} 
+{7} 
 
 
 Servicio de Difusión de la Creación Intelectual (http://sedici.unlp.edu.ar)

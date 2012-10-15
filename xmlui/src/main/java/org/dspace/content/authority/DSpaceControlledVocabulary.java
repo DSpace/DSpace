@@ -239,11 +239,12 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     		Node node = (Node)xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODE);
     		return node.getAttributes().getNamedItem("label").getNodeValue();
     	} catch(Exception e) {
-    		String url = "url://get-label-url/?field="+field+"&key="+key+"&locale="+locale;
+    		String url = "org.dspace.content.authority.getMatches()";
+    		String parameters = "field="+field+"&key="+key+"&locale="+locale;
     		String message = "Exception on expression "+xpathExpression;
     		log.warn(message,e);
     		
-    		MailReporter.reportUnknownException(message, e, url);
+    		MailReporter.reportUnknownException(message, e, url,parameters);
     		//continue
     	}
     	return key;

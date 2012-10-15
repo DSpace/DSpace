@@ -15,7 +15,7 @@
  */
 package ar.edu.unlp.sedici.aspect.redirect;
 
-import java.sql.SQLException;
+import java.io.PrintStream;
 import java.util.Map;
 
 import org.apache.avalon.framework.parameters.Parameters;
@@ -24,8 +24,8 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
-import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.core.Context;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 
 import ar.edu.unlp.sedici.dspace.utils.MailReporter;
 
@@ -36,21 +36,17 @@ import ar.edu.unlp.sedici.dspace.utils.MailReporter;
 public class ExceptionAction extends AbstractAction {
 	public Map act(Redirector redirector, SourceResolver resolver, Map objectModel, String source, Parameters parameters) {
 		
-		Context context;
-		try {
-			context = ContextUtil.obtainContext(objectModel);
-		} catch (SQLException e) {
-			this.getLogger().error("Se produjo un error al levantar el context desde ExceptionAction", e);
-			return null;
-		}
-		Request request = ObjectModelHelper.getRequest(objectModel);
-		String url = request.getRequestURI();
-		Throwable thr = ObjectModelHelper.getThrowable(objectModel);
-		if (thr == null) {
-			this.getLogger().error("En teoria, se produjo una exception, pero no se puede recuperar la excepcion para imprimir su stack trace. Es raro");
-		}else{
-			MailReporter.reportUnknownException(context, thr, url);
-		}
+			Request request = ObjectModelHelper.getRequest(objectModel);
+			String url = request.getRequestURI();
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			MapUtils.verbosePrint(new PrintStream(os), "Parameters:", request.getParameters());
+			
+			Throwable thr = ObjectModelHelper.getThrowable(objectModel);
+			if (thr == null) {
+				this.getLogger().error("En teoria, se produjo una exception, pero no se puede recuperar la excepcion para imprimir su stack trace. Es raro");
+			}else{
+				MailReporter.reportUnknownException("Error en xmlui", thr, url,os.toString());
+			}
 		return null;
 		
 	}

@@ -68,19 +68,29 @@ public class DaysSinceStartDateEmbargoSetter extends DaysEmbargoSetter {
 	    	throw new IllegalStateException(
 				 "Invalid DSpace configuration property 'embargo.field.startDate' for EmbargoSetter, it should be like dc.element.qualifier or at least dc.element");
 
+	    Context context;
 		try {
-			Context context = new Context();
+			context = new Context();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new IllegalStateException(e);
+		}
+		
+		try {
 			MetadataSchema schema = MetadataSchema.find(context, startDate_schema);
 			if (schema == null) 
 				throw new IllegalStateException("Unknown MetadataSchema '"+startDate_schema+"' on DSpace configuration property 'embargo.field.startDate' ("+startDate+")");
 			MetadataField field = MetadataField.findByElement(context, schema.getSchemaID(), startDate_element, startDate_qualifier);
 			if (field == null) 
 				throw new IllegalStateException("Unknown MetadataField '"+startDate+"' on DSpace configuration property 'embargo.field.startDate'");
+			context.complete();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			context.abort();
 			throw new IllegalStateException(e);
 		} catch (AuthorizeException e) {
 			e.printStackTrace();
+			context.abort();
 			throw new IllegalStateException(e);
 		}
 	    

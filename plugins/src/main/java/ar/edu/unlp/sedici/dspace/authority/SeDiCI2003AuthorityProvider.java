@@ -140,16 +140,7 @@ public abstract class SeDiCI2003AuthorityProvider implements ChoiceAuthority {
     
     protected void reportMissingAuthorityKey(String field, String key){
     	//TODO check for some kind of flag mail.reporter.reportMissingAuthorityKey = true
-		Context context;
-		try {
-			context = new Context();
-		} catch (SQLException e) {
-			log.error("No se pudo instancia el Context ... algo raro pasa", e);
-			throw new RuntimeException(e);
-		} 
-
-		MailReporter.reportMissingAuthorityKey(context, field, key);
-		
-    }
+		MailReporter.reportMissingAuthorityKey(field, key);
+	}
 	
 }
