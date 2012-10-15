@@ -35,6 +35,7 @@ public class DSpaceSolrItem extends DSpaceItem
     private boolean deleted;
     
     public DSpaceSolrItem (SolrDocument doc) {
+    	log.debug("Creating OAI Item from Solr source");
         unparsedMD = (String) doc.getFieldValue("item.compile");
         handle = (String) doc.getFieldValue("item.handle");
         lastMod = (Date) doc.getFieldValue("item.lastmodified");

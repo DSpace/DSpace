@@ -20,10 +20,9 @@ public class DSpaceSet extends Set {
 	private static final String DefaultName = "undefined";
 
 	public static String checkName(String name) {
-		if (name == null || name.trim().equals(""))
-			return DefaultName;
-		else
+		if (name != null && !name.trim().equals(""))
 			return name;
+		return DefaultName;
 	}
 
 	public static Set newDSpaceCommunitySet(String handle, String name) {
