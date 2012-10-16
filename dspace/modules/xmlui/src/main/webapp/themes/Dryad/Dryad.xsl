@@ -147,7 +147,7 @@
                 </i18n:text>
                 <xsl:text>&#160;&#160;</xsl:text>
                 <a href="http://blog.datadryad.org/feed/">
-                    <img src="/themes/Dryad/images/rss.jpg" style="border: 0px;"/>
+                    <img src="/themes/Dryad/images/rss.jpg" style="border: 0px;" alt="RSS icon"/>
                 </a>
             </h3>
             <ul>
@@ -315,19 +315,19 @@
                 </xsl:attribute>
                 <xsl:choose>
                     <xsl:when test="$meta[@element='request'][@qualifier='realServerPort'][. = '9999']">
-                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo-dev.png"/>
+                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo-dev.png" alt="dryad dev logo"/>
                     </xsl:when>
                     <xsl:when test="$meta[@element='request'][@qualifier='realServerPort'][. = '7777']">
-                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo-demo.png"/>
+                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo-demo.png" alt="dryad dev logo"/>
                     </xsl:when>
                     <xsl:when test="$meta[@element='request'][@qualifier='realServerPort'][. = '8888']">
-                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo-staging.png"/>
+                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo-staging.png" alt="dryad staging logo"/>
                     </xsl:when>
                     <xsl:when test="$meta[@element='request'][@qualifier='realServerPort'][. = '6666']">
-                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo-mrc.png"/>
+                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo-mrc.png" alt="dryad mrc logo"/>
                     </xsl:when>
                     <xsl:otherwise>
-                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo.png"/>
+                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo.png" alt="dryad logo"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </a>
