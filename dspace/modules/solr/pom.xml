@@ -2,7 +2,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace.modules</groupId>
    <artifactId>solr</artifactId>
-   <version>3.0-SNAPSHOT</version>
+   <version>3.0-rc2-SNAPSHOT</version>
    <packaging>war</packaging>
    <name>DSpace SOLR :: Web Application</name>
    <description>
@@ -12,7 +12,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>3.0-SNAPSHOT</version>
+      <version>3.0-rc2-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -21,8 +21,6 @@
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
-             <!--Upgraded version required since we need to use the exclude option !-->
-             <version>2.1-alpha-2</version>
              <configuration>
                <!-- This 'dspace-solr' WAR overlays the Apache Solr Web Application
                     available in Maven Central -->
