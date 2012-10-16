@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>3.0-rc2-SNAPSHOT</version>
+        <version>3.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -150,7 +150,7 @@
                   <phase>process-test-resources</phase>
                   <configuration>
                     <tasks>
-                        <copy file="${agnostic.build.dir}/testing/dspace.cfg.woven" tofile="${agnostic.build.dir}/testing/dspace/config/dspace.cfg" />
+                        <copy file="${agnostic.build.dir}/testing/dspace.cfg.woven" tofile="${agnostic.build.dir}/testing/dspace/config/dspace.cfg"/>
                     </tasks>
                   </configuration>
                   <goals>
