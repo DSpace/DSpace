@@ -45,6 +45,8 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.utils.DSpace;
+import org.dspace.versioning.Version;
+import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.VersioningService;
 import org.dspace.workflow.DryadWorkflowUtils;
 
@@ -1960,6 +1962,17 @@ public class Item extends DSpaceObject
 //               Remove from indices
             IndexBrowse ib = new IndexBrowse(ourContext);
             ib.itemRemoved(this);
+
+            // Reinstate previous version if present
+            VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
+            VersionHistory history = versioningService.findVersionHistory(ourContext, this.getID());
+            if(history!=null){
+                Version version  = versioningService.getVersion(ourContext, this);
+                Version previousVersion = history.getPrevious(version);
+                if(previousVersion!=null){
+                    ib.indexItem(previousVersion.getItem());
+                }
+            }
         }
         catch (BrowseException e)
         {
