@@ -36,7 +36,6 @@ import java.sql.SQLException;
  */
 public class VersionHistoryForm extends AbstractDSpaceTransformer {
     /** Language strings */
-    private static final Message T_dspace_home = message("xmlui.general.dspace_home");
 
     private static final Message T_head2 = message("xmlui.aspect.versioning.VersionHistoryForm.head2");
     private static final Message T_column1 = message("xmlui.aspect.versioning.VersionHistoryForm.column1");
@@ -45,27 +44,10 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
     private static final Message T_column4 = message("xmlui.aspect.versioning.VersionHistoryForm.column4");
     private static final Message T_column5 = message("xmlui.aspect.versioning.VersionHistoryForm.column5");
     private static final Message T_column6 = message("xmlui.aspect.versioning.VersionHistoryForm.column6");
-    private static final Message T_title = message("xmlui.aspect.versioning.VersionHistoryForm.title");
-    private static final Message T_trail = message("xmlui.aspect.versioning.VersionHistoryForm.trail");
     private static final Message T_submit_update = message("xmlui.aspect.versioning.VersionHistoryForm.update");
     private static final Message T_submit_cancel = message("xmlui.aspect.versioning.VersionHistoryForm.return");
     private static final Message T_submit_delete = message("xmlui.aspect.versioning.VersionHistoryForm.delete");
     private static final Message T_legend = message("xmlui.aspect.versioning.VersionHistoryForm.legend");
-
-
-    public void addPageMeta(PageMeta pageMeta) throws WingException, SQLException
-    {
-        pageMeta.addMetadata("title").addContent(T_title);
-        pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-
-        Item item = getItem();
-        if(item != null)
-        {
-            HandleUtil.buildHandleTrail(item, pageMeta, contextPath);
-            pageMeta.addTrailLink(contextPath + "/handle/" +  item.getHandle(), item.getName());
-        }
-        pageMeta.addTrail().addContent(T_trail);
-    }
 
 
     public void addBody(Body body) throws WingException, SQLException, AuthorizeException
