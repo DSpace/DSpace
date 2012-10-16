@@ -3,7 +3,7 @@
     <body>    
          <xref rend="embed" target="depositing.xhtml"/>
     </body>
-    <xi:include href="navigation.xml"/>
+
     <meta>
         <userMeta/>
         <pageMeta>
