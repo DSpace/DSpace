@@ -132,12 +132,12 @@ public class CCLicenseStep extends AbstractSubmissionStep
 	    selectList.addOption(T_no_license.getKey(), T_no_license);
 	    if (selectedLicense  !=  null) {
 	    	// output the license fields chooser for the license class type
-	    	if (cclookup.getLicenseFields(selectedLicense) == null ) {
+	    	if (cclookup.getLicenseFields(selectedLicense, ConfigurationManager.getProperty("default.locale")) == null ) {
 	    		// do nothing
 	    	} 
 	    	else 
 	    	{
-		    Iterator outerIterator = cclookup.getLicenseFields(selectedLicense).iterator();
+		    Iterator outerIterator = cclookup.getLicenseFields(selectedLicense, ConfigurationManager.getProperty("default.locale")).iterator();
 		    while (outerIterator.hasNext()) 
 		    {
 			CCLicenseField cclicensefield = (CCLicenseField)outerIterator.next();
