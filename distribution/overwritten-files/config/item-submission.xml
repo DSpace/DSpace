@@ -170,7 +170,7 @@
       <!--Step sediciAutomaticData cagará datos fijos en el item. No tendrá interface-->
       <step id="sediciAutomaticData">
         <processing-class>ar.edu.unlp.sedici.aspect.extraSubmission.submit.AutomaticIssuedMetadataStep</processing-class>
-		<workflow-editable>false</workflow-editable>
+		<workflow-editable>true</workflow-editable>
       </step> 
       
       <!--Step para controlar si el item fue revisado. No tendrá interface-->
