@@ -11,7 +11,7 @@ var errorConfianzaSingular='Verifique el valor';
 var errorConfianzaPlural='Hay errores en el formulario';
 
 //-------------------Variable para el limite en el lookup
-var limit_lookup=100;
+var limit_lookup=150;
 //-------------------Variable para el limite en el suggest
 var limit_suggest=50;
 //-------------------Variable para el paginado del lookup
@@ -204,14 +204,14 @@ function DSpaceChoicesLoad(form) {
      // if this is a repeating input, clear the source value so that e.g.
      // clicking "Next" on a submit-describe page will not *add* the proposed
      // lookup text as a metadata value:
-     if (isRepeating) {
+    /* if (isRepeating) {
          if (isName) {
              of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_last') + ']').val('');
              of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_first') + ']').val('');
          }
          else
              of.find('*[name = ' + valueInput + ']').val(null);
-     }
+     }*/
  }
 
  // start spinner
@@ -243,6 +243,7 @@ function DSpaceChoicesLoad(form) {
          //var oldStart = 1 * Choices.attr('start');
          //actualizo el start viejo
          var oldStart = 1 * Choices.attr('start');
+         
          previous_start=oldStart-(1*limit_lookup);
          if (previous_start<0) previous_start=0;
          
@@ -250,7 +251,7 @@ function DSpaceChoicesLoad(form) {
          var nextStart = oldStart + lastTotal;
          var resultMore = Choices.attr('more');
          if(!(resultMore != null && resultMore == 'true')){
-        	 $('*[name = more]').attr('disabled', 'disabled');
+        	// $('*[name = more]').attr('disabled', 'disabled');
          } else {
         	 $('*[name = more]').attr('class','ds-button-field choices-lookup');
              $('*[name = more]').attr('disabled',null); 
