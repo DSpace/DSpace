@@ -128,6 +128,11 @@
 		<level value="DEBUG"/>
 		<appender-ref ref="MINTER_FILE"/>
 	</logger>
+
+	<logger name="org.dspace.identifier">
+		<level value="DEBUG"/>
+		<appender-ref ref="MINTER_FILE"/>
+	</logger>
 	
 	<logger name="org.datadryad.submission">
 		<level value="DEBUG"/>
