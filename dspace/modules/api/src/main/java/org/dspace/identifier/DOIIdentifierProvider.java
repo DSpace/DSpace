@@ -191,6 +191,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         if(item.isArchived()){
             if(!collection.equals(myDataPkgColl)){
                 if(lookup(doi)!=null){
+		    log.debug("case A -- updating DOI info for versioned data file");
                     DOI doi_= upgradeDOIDataFile(context, doi, item, history);
                     if(doi_!=null){
                         remove(doi);
@@ -217,6 +218,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         else{
             // only if it is in workflow.
             // MINT Identifier || .
+	    log.debug("CASE B: New DataPackage or New version");
             DOI doi_ = calculateDOI(context, doi, item, history);
 
             log.info("DOI just minted: " + doi_);
@@ -225,6 +227,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             mint(doi_, register, createListMetadata(item));
 
             if (history != null) {
+		log.debug("it's a new version; need to move the canonical identifier");
                  Version version = history.getVersion(item);
                 // if it is the first time that is called "create version": mint identifier ".1"
                 Version previous = history.getPrevious(version);
