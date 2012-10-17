@@ -117,7 +117,7 @@ Scott Phillips adapted it for Manakin's need.
         <xsl:apply-templates select="ex:full-stacktrace"/>
 
         <p class="topped">
-          The <a href="http://di.tamu.edu/projects/xmlui/">Manakin</a> / <a href="http://dspace.org/">DSpace</a> digital repository software.
+          The <a href="https://wiki.duraspace.org/display/DSPACE/Manakin">Manakin</a> interface of the <a href="http://dspace.org/">DSpace</a> digital repository software.
         </p>
       </body>
     </html>
