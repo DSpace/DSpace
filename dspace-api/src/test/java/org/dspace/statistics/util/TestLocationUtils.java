@@ -61,7 +61,7 @@ public class TestLocationUtils
     @Test
     public void testGetCountryNameString()
     {
-        assertEquals("United States", LocationUtils.getCountryName(
+        assertEquals(Locale.US.getDisplayCountry(), LocationUtils.getCountryName(
                 "US"));
         assertEquals(UNKNOWN_COUNTRY, LocationUtils.getCountryName(null));
         assertEquals("XX", LocationUtils.getCountryName("XX"));
