@@ -165,9 +165,9 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                     DOI canonical=null;
 
                     if (collection.equals(myDataPkgColl)) {
-                        canonical = getCanonicalDataPackage(doi_, item);
+                        canonical = getCanonicalDataPackage(doi_, previous);
                     } else {
-                        canonical = getCanonicalDataFile(doi_, item);
+                        canonical = getCanonicalDataFile(doi_, previous);
 
                     }
                     mint(canonical, true, null);
@@ -191,6 +191,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         if(item.isArchived()){
             if(!collection.equals(myDataPkgColl)){
                 if(lookup(doi)!=null){
+		    log.debug("case A -- updating DOI info for versioned data file");
                     DOI doi_= upgradeDOIDataFile(context, doi, item, history);
                     if(doi_!=null){
                         remove(doi);
@@ -217,6 +218,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         else{
             // only if it is in workflow.
             // MINT Identifier || .
+	    log.debug("CASE B: New DataPackage or New version");
             DOI doi_ = calculateDOI(context, doi, item, history);
 
             log.info("DOI just minted: " + doi_);
@@ -225,6 +227,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             mint(doi_, register, createListMetadata(item));
 
             if (history != null) {
+		log.debug("it's a new version; need to move the canonical identifier");
                  Version version = history.getVersion(item);
                 // if it is the first time that is called "create version": mint identifier ".1"
                 Version previous = history.getPrevious(version);
@@ -287,12 +290,21 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     public DSpaceObject resolve(Context context, String identifier, String... attributes) throws IdentifierNotFoundException, IdentifierNotResolvableException {
         log.debug("start resolve() identifier ==>>  " + identifier);
 
+	// convert http DOIs to short form
+	if (identifier.startsWith("http://dx.doi.org/")) {
+	    identifier = "doi:" + identifier.substring("http://dx.doi.org/".length());
+	}
+	// correct http DOIs to short form if a slash was removed by the browser/server
+	if (identifier.startsWith("http:/dx.doi.org/")) {
+	    identifier = "doi:" + identifier.substring("http:/dx.doi.org/".length());
+	}
+
+	
         if (identifier != null && identifier.startsWith("doi:")) {
-
             DOI dbDOI = perstMinter.getKnownDOI(identifier);
-            if(dbDOI==null)
+            if(dbDOI==null) {
                 throw new IdentifierNotFoundException();
-
+	    }
             String value = dbDOI.getInternalIdentifier();
 
             log.debug("resolve to (before replace) ==>>" + value);

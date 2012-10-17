@@ -43,12 +43,15 @@ import java.util.Calendar;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.embargo.EmbargoManager;
+import org.dspace.event.Event;
 import org.dspace.handle.HandleManager;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierService;
 import org.dspace.utils.DSpace;
+
 
 /**
  * Support to install item in the archive
@@ -261,6 +264,7 @@ public class InstallItem
 
         // save changes ;-)
         item.update();
+        c.addEvent(new Event(Event.INSTALL, Constants.ITEM, item.getID(), item.getHandle()));
 
         // remove in-progress submission
         is.deleteWrapper();
