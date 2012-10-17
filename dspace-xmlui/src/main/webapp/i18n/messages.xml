@@ -2256,8 +2256,6 @@
     <message key="xmlui.aspect.versioning.RestoreVersionForm.column4">Summary</message>
     <message key="xmlui.aspect.versioning.RestoreVersionForm.restore">Restore</message>
 
-    <message key="xmlui.aspect.versioning.VersionHistoryForm.title">Version History</message>
-    <message key="xmlui.aspect.versioning.VersionHistoryForm.trail">Version history</message>
     <message key="xmlui.aspect.versioning.VersionHistoryForm.head2">Version History</message>
     <message key="xmlui.aspect.versioning.VersionHistoryForm.column1">Version</message>
     <message key="xmlui.aspect.versioning.VersionHistoryForm.column2">Item</message>
