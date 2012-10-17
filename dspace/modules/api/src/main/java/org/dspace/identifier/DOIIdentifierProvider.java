@@ -165,9 +165,9 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                     DOI canonical=null;
 
                     if (collection.equals(myDataPkgColl)) {
-                        canonical = getCanonicalDataPackage(doi_, item);
+                        canonical = getCanonicalDataPackage(doi_, previous);
                     } else {
-                        canonical = getCanonicalDataFile(doi_, item);
+                        canonical = getCanonicalDataFile(doi_, previous);
 
                     }
                     mint(canonical, true, null);
