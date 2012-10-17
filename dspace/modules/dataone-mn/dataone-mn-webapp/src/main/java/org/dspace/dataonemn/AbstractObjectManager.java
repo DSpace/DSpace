@@ -53,7 +53,7 @@ public abstract class AbstractObjectManager implements Constants {
 	protected Item getDSpaceItem(String aID, String aFormat)
 			throws NotFoundException {
 	    log.debug(aID + " requested in " + aFormat + " format");
-		
+	    
 	    DOIIdentifierProvider doiService = new DSpace().getSingletonService(DOIIdentifierProvider.class);
 	    Item item = null;
 	    try {
@@ -174,10 +174,10 @@ public abstract class AbstractObjectManager implements Constants {
 	 * request, Exceptions.NotFound will be raised even if the object exists on
 	 * another node in the DataONE system.
 	 **/
-	public void getObject(String aID, String aFormat, OutputStream aOutputStream)
-			throws IOException, SQLException, NotFoundException {
-		try {
-			DOIIdentifierProvider doiService = new DSpace().getSingletonService(DOIIdentifierProvider.class);
+    public void getObject(String aID, String aFormat, OutputStream aOutputStream)
+	throws IOException, SQLException, NotFoundException {
+	try {
+	    DOIIdentifierProvider doiService = new DSpace().getSingletonService(DOIIdentifierProvider.class);
             Item item = null;
             try {
                 item = (Item) doiService.resolve(myContext, aID, new String[] {});
@@ -186,100 +186,109 @@ public abstract class AbstractObjectManager implements Constants {
             } catch (IdentifierNotResolvableException e) {
                 throw new NotFoundException(aID);
             }
+
+	    if(item == null) {
+                throw new NotFoundException(aID);
+	    }
+	    
             Format ppFormat = Format.getPrettyFormat();
-
-			if (aFormat.equals("dap")) {
-			    log.debug("Retrieving metadata for " + aID
-				      + " (DSO_ID: " + item.getID() + ") -- "
-				      + item.getHandle());
+	    
+	    if (aFormat.equals("dap")) {
+		log.debug("Retrieving metadata for " + aID
+			  + " (DSO_ID: " + item.getID() + ") -- "
+			  + item.getHandle());
+		
+		
+		DisseminationCrosswalk xWalk = (DisseminationCrosswalk) PluginManager
+		    .getNamedPlugin(DisseminationCrosswalk.class,
+				    DRYAD_CROSSWALK);
+		try {
+		    if (!xWalk.canDisseminate(item)) {
+			log.warn("xWalk says item cannot be disseminated: "
+				 + item.getHandle());
+			
+		    }
+		    
+		    Element result = xWalk.disseminateElement(item);
+		    Namespace dcTermsNS = Namespace.getNamespace(DC_TERMS_NAMESPACE);
+		    Namespace dryadNS = result.getNamespace();
+		    Element file = result.getChild("DryadDataFile", dryadNS);
+		    Element idElem;
+		    
+		    if (file != null) {
+			result = file;
+		    }
+		    
+		    idElem = result.getChild("identifier", dcTermsNS);
+		    
+		    // adjust the identifier to be a full DOI if it isn't one already
+		    if (idElem != null) {
+			String theID = idElem.getText();
+			if(theID.startsWith("doi:")) {
+			    theID = "http://dx.doi.org/" + theID.substring("doi:".length());
+			    idElem.setText(theID);
+			}
+		    }
+		    
+		    new XMLOutputter(ppFormat).output(result, aOutputStream);
+		    aOutputStream.close();
+		}
+		catch (AuthorizeException details) {
+		    // We've disabled authorization for this context, so this should never happen
+		    log.warn("Shouldn't see this exception!", details);
+		}
+		catch (CrosswalkException details) {
+		    log.error(details.getMessage(), details);
+		    
+		    // programming error
+		    throw new RuntimeException(details);
+		}
+	    }
+	    else {
+		Bundle[] bundles = item.getBundles("ORIGINAL");
+		boolean found = false;
+		
+		if (bundles.length == 0) {
+		    log.debug("Didn't find any original bundles for "
+			      + item.getHandle());
+		    
+		    
+		    throw new NotFoundException(aFormat + "data bundle for "
+						+ item.getHandle() + " not found");
+		}
+		
+		log.debug("Retrieving scientific data for " + aID);
+		
+		for (Bitstream bitstream : bundles[0].getBitstreams()) {
+		    String name = bitstream.getName();
+		    
+		    if (!name.equalsIgnoreCase("readme.txt")
+			&& !name.equalsIgnoreCase("readme.txt.txt")
+			&& name.endsWith(aFormat)) {
+			try {
+			    log.debug("Retrieving bitstream " + name);
 			    
-
-				DisseminationCrosswalk xWalk = (DisseminationCrosswalk) PluginManager
-						.getNamedPlugin(DisseminationCrosswalk.class,
-								DRYAD_CROSSWALK);
-				try {
-					if (!xWalk.canDisseminate(item)) {
-					    log.warn("xWalk says item cannot be disseminated: "
-						     + item.getHandle());
-					       
-					}
-
-					Element result = xWalk.disseminateElement(item);
-					Namespace dcTermsNS = Namespace.getNamespace(DC_TERMS_NAMESPACE);
-					Namespace dryadNS = result.getNamespace();
-					Element file = result.getChild("DryadDataFile", dryadNS);
-					Element idElem;
-					
-					if (file != null) {
-						result = file;
-					}
-					
-					idElem = result.getChild("identifier", dcTermsNS);
-					
-					// add the MN identifier suffix for metadata records
-					if (idElem != null) {
-						idElem.setText(idElem.getText() + "/dap");
-					}
-
-					new XMLOutputter(ppFormat).output(result, aOutputStream);
-					aOutputStream.close();
-				}
-				catch (AuthorizeException details) {
-				    // We've disabled authorization for this context, so this should never happen
-				    log.warn("Shouldn't see this exception!", details);
-				}
-				catch (CrosswalkException details) {
-					log.error(details.getMessage(), details);
-
-					// programming error
-					throw new RuntimeException(details);
-				}
+			    writeBitstream(bitstream.retrieve(), aOutputStream);
+			    found = true;
 			}
-			else {
-				Bundle[] bundles = item.getBundles("ORIGINAL");
-				boolean found = false;
-
-				if (bundles.length == 0) {
-				    log.debug("Didn't find any original bundles for "
-					      + item.getHandle());
-				
-
-					throw new NotFoundException(aFormat + "data bundle for "
-							+ item.getHandle() + " not found");
-				}
-
-				log.debug("Retrieving scientific data for " + aID);
-				
-				for (Bitstream bitstream : bundles[0].getBitstreams()) {
-					String name = bitstream.getName();
-
-					if (!name.equalsIgnoreCase("readme.txt")
-							&& !name.equalsIgnoreCase("readme.txt.txt")
-							&& name.endsWith(aFormat)) {
-						try {
-						    log.debug("Retrieving bitstream " + name);
-						    
-							writeBitstream(bitstream.retrieve(), aOutputStream);
-							found = true;
-						}
-						catch (AuthorizeException details) {
-							// we've disabled authorization; everyone welcome!
-						}
-					}
-				}
-
-				if (!found) {
-					throw new NotFoundException(aID + "/" + aFormat
-							+ " wasn't found");
-				}
+			catch (AuthorizeException details) {
+			    // we've disabled authorization; everyone welcome!
 			}
+		    }
 		}
-		catch (MalformedURLException details) {
-			// throw RuntimeException?
+		
+		if (!found) {
+		    throw new NotFoundException(aID + "/" + aFormat
+						+ " wasn't found");
 		}
+	    }
 	}
-
-	private void writeBitstream(InputStream aInputStream,
+	catch (MalformedURLException details) {
+	    log.error("Malformed URL!", details);
+	}
+    }
+    
+    private void writeBitstream(InputStream aInputStream,
 			OutputStream aOutputStream) throws IOException {
 		BufferedInputStream iStream = new BufferedInputStream(aInputStream);
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
