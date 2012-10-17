@@ -62,40 +62,40 @@ public class Navigation extends AbstractDSpaceTransformer
 
 
     @Override
-	public void addPageMeta(PageMeta pageMeta) throws SAXException,
-			WingException, UIException, SQLException, IOException,
-			AuthorizeException {
-		super.addPageMeta(pageMeta);
-		
-		// We do this here because this is on every page
-		String port = ConfigurationManager.getProperty("dspace.port");
-		String nodeName = ConfigurationManager.getProperty("dryad.home");
-		
-		// If we're using Apache, we may not have the real port in serverPort
-		if (port != null) {
-			pageMeta.addMetadata("request", "realServerPort").addContent(port);
-		}
-		else {
-			pageMeta.addMetadata("request", "realServerPort").addContent("80");
-		}
-		
-		if (nodeName != null) {
-			pageMeta.addMetadata("dryad", "node").addContent(nodeName);
-		}
-	}
+    public void addPageMeta(PageMeta pageMeta) throws SAXException,
+            WingException, UIException, SQLException, IOException,
+            AuthorizeException {
+        super.addPageMeta(pageMeta);
 
-	public void addOptions(Options options) throws SAXException, WingException,
+        // We do this here because this is on every page
+        String port = ConfigurationManager.getProperty("dspace.port");
+        String nodeName = ConfigurationManager.getProperty("dryad.home");
+
+        // If we're using Apache, we may not have the real port in serverPort
+        if (port != null) {
+            pageMeta.addMetadata("request", "realServerPort").addContent(port);
+        }
+        else {
+            pageMeta.addMetadata("request", "realServerPort").addContent("80");
+        }
+
+        if (nodeName != null) {
+            pageMeta.addMetadata("dryad", "node").addContent(nodeName);
+        }
+    }
+
+    public void addOptions(Options options) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
         List info = options.addList("DryadInfo");
-        
+
         info.setHead("Information");
-        info.addItemXref(contextPath + "/depositing", "Depositing Data");
-        info.addItemXref(contextPath + "/using", "Using Data");
-        info.addItemXref(contextPath + "/members", "Dryad Members");
-        info.addItemXref(contextPath + "/jdap", "Journal Archiving Policy");
-        info.addItemXref(contextPath + "/about", "About Dryad");
+        info.addItemXref(contextPath + "/pages/depositing", "Depositing Data");
+        info.addItemXref(contextPath + "/pages/using", "Using Data");
+        info.addItemXref(contextPath + "/pages/members", "Dryad Members");
+        info.addItemXref(contextPath + "/pages/jdap", "Journal Archiving Policy");
+        info.addItemXref(contextPath + "/pages/about", "About Dryad");
         info.addItemXref("http://blog.datadryad.org", "Dryad Blog");
-	info.addItemXref("http://wiki.datadryad.org", "Dryad Documentation");
+        info.addItemXref("http://wiki.datadryad.org", "Dryad Documentation");
     }
 }

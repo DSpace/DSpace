@@ -31,7 +31,17 @@
       -->
     <xsl:variable name="meta" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata"/>
     <xsl:variable name="pageName" select="$meta[@element='request'][@qualifier='URI']"/>
-    <xsl:variable name="doc" select="document(concat('pages/', $pageName, '.xhtml'))"/>
+    <!--xsl:variable name="doc" select="document(concat('pages/', $pageName, '.xhtml'))"/-->
+
+
+    <xsl:template match="dri:xref[@rend='embed']">
+               <xsl:variable name="url" select="concat('pages/',@target)" />
+               <xsl:copy-of select="document(string($url))/html/*"/>
+           </xsl:template>
+
+
+
+
 
 
     <!-- Overwriting the default DSpace dri:body template to check for pages -->
@@ -45,27 +55,27 @@
                 </div>
             </xsl:if>
             <xsl:choose>
-                <xsl:when test="$doc">
-                    <xsl:copy-of select="$doc//div[@id='ds-body']/*"/>
-                    <!-- hint 'error=' is used to indicate we should append a feedback form -->
-                    <xsl:if test="$meta[@qualifier='queryString'][starts-with(., 'error=')]">
-                        <div style="margin-top: 20px;">
-                            <xsl:variable name="report_text">
-                                <xsl:call-template name="parse-query-param">
-                                    <xsl:with-param name="param-name">body</xsl:with-param>
-                                </xsl:call-template>
-                            </xsl:variable>
-                            <form action="/feedback" method="post" onsubmit="javascript:tSubmit(this);">
-                                <input name="email" type="hidden" value="help@datadryad.org"/>
-                                <textarea name="comments" onfocus="javascript:tFocus(this);" cols="60" rows="15">
-                                    <xsl:value-of select="decoder:decode($report_text)"/>
-                                </textarea>
-                                <br/>
-                                <input name="submit" type="submit" value="Send Feedback"/>
-                            </form>
-                        </div>
-                    </xsl:if>
-                </xsl:when>
+                <!--<xsl:when test="$doc">-->
+                    <!--<xsl:copy-of select="$doc//div[@id='ds-body']/*"/>-->
+                    <!--&lt;!&ndash; hint 'error=' is used to indicate we should append a feedback form &ndash;&gt;-->
+                    <!--<xsl:if test="$meta[@qualifier='queryString'][starts-with(., 'error=')]">-->
+                        <!--<div style="margin-top: 20px;">-->
+                            <!--<xsl:variable name="report_text">-->
+                                <!--<xsl:call-template name="parse-query-param">-->
+                                    <!--<xsl:with-param name="param-name">body</xsl:with-param>-->
+                                <!--</xsl:call-template>-->
+                            <!--</xsl:variable>-->
+                            <!--<form action="/feedback" method="post" onsubmit="javascript:tSubmit(this);">-->
+                                <!--<input name="email" type="hidden" value="help@datadryad.org"/>-->
+                                <!--<textarea name="comments" onfocus="javascript:tFocus(this);" cols="60" rows="15">-->
+                                    <!--<xsl:value-of select="decoder:decode($report_text)"/>-->
+                                <!--</textarea>-->
+                                <!--<br/>-->
+                                <!--<input name="submit" type="submit" value="Send Feedback"/>-->
+                            <!--</form>-->
+                        <!--</div>-->
+                    <!--</xsl:if>-->
+                <!--</xsl:when>-->
                 <xsl:otherwise>
                     <xsl:apply-templates/>
                 </xsl:otherwise>
@@ -147,7 +157,7 @@
                 </i18n:text>
                 <xsl:text>&#160;&#160;</xsl:text>
                 <a href="http://blog.datadryad.org/feed/">
-                    <img src="/themes/Dryad/images/rss.jpg" style="border: 0px;"/>
+                    <img src="/themes/Dryad/images/rss.jpg" style="border: 0px;" alt="RSS"/>
                 </a>
             </h3>
             <ul>
@@ -162,9 +172,13 @@
         </div>
     </xsl:template>
 
-    <!-- Overwriting the default DSpace head element template to check for pages -->
+    <!-- ########################## Head statement ######################## -->
     <xsl:template name="buildHead">
         <head>
+	  <meta name="viewport" content="width=device-width, initial-scale=1.0" />      
+	  <!--[if lt IE 9]>
+	<script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>
+	<![endif]-->
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
             <meta name="google-site-verification" content="IqB7A6dUGs-0ncAgB3f0PXxeO_OcjyVAtRNdBFie4AM"/>
             <!-- Add stylsheets -->
@@ -253,9 +267,9 @@
             <xsl:variable name="file_page_title" select="$meta[@element='title' and @qualifier='package']"/>
             <title>
                 <xsl:choose>
-                    <xsl:when test="$doc">
-                        <xsl:value-of select="$doc/html/head/title"/>
-                    </xsl:when>
+                    <!--<xsl:when test="$doc">-->
+                        <!--<xsl:value-of select="$doc/html/head/title"/>-->
+                    <!--</xsl:when>-->
                     <xsl:when test="$file_page_title">
                         <i18n:text>xmlui.dryad.page_title</i18n:text>
                         <xsl:value-of
@@ -315,19 +329,19 @@
                 </xsl:attribute>
                 <xsl:choose>
                     <xsl:when test="$meta[@element='request'][@qualifier='realServerPort'][. = '9999']">
-                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo-dev.png"/>
+                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo-dev.png" alt="dryad dev logo"/>
                     </xsl:when>
                     <xsl:when test="$meta[@element='request'][@qualifier='realServerPort'][. = '7777']">
-                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo-demo.png"/>
+                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo-demo.png" alt="dryad dev logo"/>
                     </xsl:when>
                     <xsl:when test="$meta[@element='request'][@qualifier='realServerPort'][. = '8888']">
-                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo-staging.png"/>
+                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo-staging.png" alt="dryad staging logo"/>
                     </xsl:when>
                     <xsl:when test="$meta[@element='request'][@qualifier='realServerPort'][. = '6666']">
-                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo-mrc.png"/>
+                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo-mrc.png" alt="dryad mrc logo"/>
                     </xsl:when>
                     <xsl:otherwise>
-                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo.png"/>
+                        <img id="ds-header-logo" src="{$theme-path}/images/dryadLogo.png" alt="dryad logo"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </a>
@@ -497,10 +511,10 @@
                         </xsl:attribute>
                         <xsl:apply-templates/>
                     </a>
-                    &gt;
-                    <xsl:if test="position()=last() and $doc">
-                        <xsl:value-of select="$doc/html/head/title"/>
-                    </xsl:if>
+                    <!--&gt;-->
+                    <!--<xsl:if test="position()=last() and $doc">-->
+                        <!--<xsl:value-of select="$doc/html/head/title"/>-->
+                    <!--</xsl:if>-->
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:apply-templates/>

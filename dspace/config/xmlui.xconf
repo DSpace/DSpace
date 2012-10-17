@@ -75,14 +75,12 @@
 	    <aspect name="Dryad Browse" path="resource://aspects/DryadBrowse/" />
 	    
 	    <aspect name="Dryad Information" path="resource://aspects/DryadInfo/" />
-	    
 
+	    <aspect name="Versioning Aspect" path="resource://aspects/Versioning/" />
 
-	    <aspect name="Versioning Aspect" path="resource://aspects/Versioning/" />	    
+	    <aspect name="AME" path="resource://aspects/AME/" />
 
-	<aspect name="AME" path="resource://aspects/AME/" />
-
-
+        <aspect name="StaticPage" path="resource://aspects/StaticPage/"/>
 	    
 	    
         <!--
