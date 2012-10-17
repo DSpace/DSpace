@@ -168,8 +168,7 @@ public class CDLDataCiteService {
             }
         }
 
-	log.debug("Anvl form of metadata:");
-	log.debug(encodeAnvl(target, metadata));
+	log.debug("Anvl form of metadata:" + log.debug(encodeAnvl(target, metadata));
     }
 
 
