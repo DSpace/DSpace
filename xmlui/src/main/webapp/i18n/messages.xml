@@ -2282,4 +2282,7 @@
 <message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.delete_submit">Delete item</message>
 <message key="xmlui.Submission.workflow.DeleteTaskStep.info1">Are you sure?</message>
 <message key="xmlui.Submission.workflow.DeleteTaskStep.submit_delete">Delete</message>
+
+<message key="sedici.XMLWorkflow.workflowitem.notfound">Requested workflow item does not exist</message>
+
 </catalogue>

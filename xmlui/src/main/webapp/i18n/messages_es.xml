@@ -2519,4 +2519,6 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.Submission.workflow.DeleteTaskStep.info1">¿Está seguro de querer eliminar el item?</message>
 <message key="xmlui.Submission.workflow.DeleteTaskStep.submit_delete">Confirmar</message>
 
+<message key="sedici.XMLWorkflow.workflowitem.notfound">El ítem solicitado no existe en el workflow</message>
+
 </catalogue>

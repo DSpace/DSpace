@@ -25,14 +25,19 @@ public class FlashMessagesTransformer extends AbstractDSpaceTransformer{
 	 */
 	public void addBody(Body body) throws WingException, SQLException, AuthorizeException 
 	{
-		Request request = ObjectModelHelper.getRequest(objectModel);
-		HttpSession sesion=request.getSession();
-		
-		List<ar.edu.unlp.sedici.util.FlashMessage> mensajes=FlashMessagesUtil.consume(sesion);
-		
-		for (FlashMessage flashMessage : mensajes) {
-			agregarMensaje(flashMessage, body);
-		}
+        // Verificamos que no sea un redirect, porque si no, los mensajes se pierden
+        if (!ObjectModelHelper.getResponse(objectModel).containsHeader("Location"))
+        {
+            Request request = ObjectModelHelper.getRequest(objectModel);
+            HttpSession sesion=request.getSession();
+
+            List<ar.edu.unlp.sedici.util.FlashMessage> mensajes=FlashMessagesUtil.consume(sesion);
+
+            for (FlashMessage flashMessage : mensajes)
+            {
+                agregarMensaje(flashMessage, body);
+            }
+        }
 	}
 
 	private void agregarMensaje(FlashMessage flashMessage, Body body) throws WingException {

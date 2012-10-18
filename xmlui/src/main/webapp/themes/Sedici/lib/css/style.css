@@ -1498,9 +1498,10 @@ div.spacer{
 	background-image:url(../../images/alerta2.png);
 	background-repeat:no-repeat;
 	background-position: right center;
+	color: red;
 }
 
-#ds-system-wide-alert p {
+#ds-system-wide-alert p, .notice.failure p {
     margin: 0;
 }
 

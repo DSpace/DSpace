@@ -20,6 +20,8 @@ importClass(Packages.org.dspace.authorize.AuthorizeManager);
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
 importClass(Packages.org.dspace.app.xmlui.cocoon.HttpServletRequestCocoonWrapper);
 
+importClass(Packages.ar.edu.unlp.sedici.util.FlashMessagesUtil);
+
 /* Global variable which stores a comma-separated list of all fields
  * which errored out during processing of the last step.
  */
@@ -110,9 +112,18 @@ function sendPage(uri,bizData)
  */
 function doWorkflow()
 {
+    var contextPath = cocoon.request.getContextPath();
     var workflowItemId = cocoon.request.get("workflowID");
     // Get the collection handle for this item.
-    var coll = XmlWorkflowItem.find(getDSContext(), workflowItemId).getCollection();
+    var xmlWorkflowItem = XmlWorkflowItem.find(getDSContext(), workflowItemId);
+    if(xmlWorkflowItem == null) {
+        FlashMessagesUtil.setErrorMessage(getHttpRequest().getSession(), "sedici.XMLWorkflow.workflowitem.notfound");
+        cocoon.sendPage("xmlworkflow/finalize");
+        cocoon.redirectTo(contextPath+"/submissions",true);
+        cocoon.exit();
+    }
+
+    var coll = xmlWorkflowItem.getCollection();
     var handle = coll.getHandle();
     var workflow = WorkflowFactory.getWorkflow(coll);
     var step = workflow.getStep(cocoon.request.get("stepID"));
@@ -149,7 +160,6 @@ function doWorkflow()
                 cocoon.exit();
             }
             if(action == null){
-                var contextPath = cocoon.request.getContextPath();
                 cocoon.sendPage("xmlworkflow/finalize");
                 cocoon.redirectTo(contextPath+"/submissions",true);
                 //getDSContext().complete();
