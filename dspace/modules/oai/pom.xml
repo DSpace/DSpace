@@ -85,7 +85,6 @@
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
-            <version>3.0-rc2-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
         </dependency>
