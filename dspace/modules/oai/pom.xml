@@ -10,9 +10,12 @@
 	<groupId>org.dspace.modules</groupId>
 	<artifactId>oai</artifactId>
 	<packaging>war</packaging>
-	<name>DSpace OAI 2.0 :: Web Application</name>
+	<name>DSpace OAI 2.0 :: Local Customizations</name>
 	<url>http://www.lyncode.com</url>
-	<description>XOAI Interface</description>
+	<description>
+            This project allows you to overlay your own local OAI customizations
+            on top of the default OAI 2.0 web application provided with DSpace.
+        </description>
 
 	<build>
         <filters>

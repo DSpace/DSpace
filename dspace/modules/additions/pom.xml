@@ -2,7 +2,12 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace.modules</groupId>
    <artifactId>additions</artifactId>
-   <name>DSpace Kernel :: Additions and Local Customization</name>
+   <name>DSpace Kernel :: Additions and Local Customizations</name>
+   <description>
+       This project allows you to easily create your own "additions.jar"
+       including custom Java classes. This JAR will be automatically included
+       in all DSpace web applications.
+   </description>
    <packaging>jar</packaging>
 
    <!--

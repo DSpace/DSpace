@@ -3,8 +3,11 @@
 	<groupId>org.dspace.modules</groupId>
 	<artifactId>jspui</artifactId>
 	<packaging>war</packaging>
-	<name>DSpace JSP-UI :: Web Application</name>
-	<description>DSpace JSP-UI :: Web Application</description>
+	<name>DSpace JSP-UI :: Local Customizations</name>
+	<description>
+            This project allows you to overlay your own local JSP-UI customizations
+            on top of the default JSP-UI web application provided with DSpace.
+        </description>
 
 	<parent>
 		<groupId>org.dspace</groupId>

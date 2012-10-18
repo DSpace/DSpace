@@ -3,10 +3,10 @@
    <groupId>org.dspace.modules</groupId>
    <artifactId>xmlui</artifactId>
    <packaging>war</packaging>
-   <name>DSpace XML-UI (Manakin) :: Web Application</name>
+   <name>DSpace XML-UI (Manakin) :: Local Customizations</name>
    <description>
-      DSpace/Manakin XML-UI Based Webapplication using the Cocoon and
-      Wing frameworks
+      This project allows you to overlay your own local XML-UI customizations
+        on top of the default XML-UI web application provided with DSpace.
    </description>
 
    <parent>

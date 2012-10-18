@@ -3,9 +3,11 @@
    <groupId>org.dspace.modules</groupId>
    <artifactId>lni</artifactId>
    <packaging>war</packaging>
-   <name>DSpace LNI :: Web Application</name>
+   <name>DSpace LNI :: Local Customizations</name>
    <description>
-      DSpace Lightweight Network Interface Webapplication
+      This project allows you to overlay your own local LNI customizations
+      on top of the default Lightweight Network Interface (LNI) web application
+      provided with DSpace.
    </description>
 
    <parent>

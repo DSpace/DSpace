@@ -4,8 +4,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-services</artifactId>
     <packaging>jar</packaging>
-    <name>DSpace Services Modules</name>
-    <url>http://projects.dspace.org/dspace-services</url>
+    <name>DSpace Services Framework :: API and Implementation</name>
     
     <parent>
         <groupId>org.dspace</groupId>
