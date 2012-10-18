@@ -503,7 +503,7 @@
               <artifactId>sword-common</artifactId>
               <version>1.1</version>
           </dependency>
-                 <!-- Explicitly Specify Latest Version of Spring -->
+        <!-- Explicitly Specify Latest Version of Spring -->
         <dependency>
             <artifactId>spring-core</artifactId>
             <groupId>org.springframework</groupId>

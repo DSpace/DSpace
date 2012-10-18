@@ -66,12 +66,12 @@
            <type>jar</type>
        </dependency>
 
-    <!-- support odd cases where JAXP cannot be found in JVM -->
-    <dependency>
-        <groupId>xalan</groupId>
-        <artifactId>xalan</artifactId>
-        <version>2.7.0</version>
-    </dependency>
+       <!-- support odd cases where JAXP cannot be found in JVM -->
+       <dependency>
+           <groupId>xalan</groupId>
+           <artifactId>xalan</artifactId>
+           <version>2.7.0</version>
+       </dependency>
 
    </dependencies>
 

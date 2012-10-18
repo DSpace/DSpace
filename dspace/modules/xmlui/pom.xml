@@ -6,7 +6,7 @@
    <name>DSpace XML-UI (Manakin) :: Local Customizations</name>
    <description>
       This project allows you to overlay your own local XML-UI customizations
-        on top of the default XML-UI web application provided with DSpace.
+      on top of the default XML-UI web application provided with DSpace.
    </description>
 
    <parent>
@@ -112,8 +112,8 @@
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-xmlui</artifactId>
-          <type>jar</type>
-          <classifier>classes</classifier>
+         <type>jar</type>
+         <classifier>classes</classifier>
       </dependency>
 
       <dependency>
