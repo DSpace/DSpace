@@ -33,6 +33,7 @@
     <core name="statistics" instanceDir="statistics" />
     <core name="dryad" instanceDir="dryad/" dataDir="data"/>
     <core name="authority" instanceDir="authority" />
+    <core name="dataoneMNlog" instanceDir="dataoneMNlog" />
   </cores>
   
 </solr>
