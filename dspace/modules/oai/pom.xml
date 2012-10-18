@@ -1,21 +1,20 @@
-<?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <groupId>org.dspace.modules</groupId>
+    <artifactId>oai</artifactId>
+    <packaging>war</packaging>
+    <name>DSpace OAI 2.0 :: Local Customizations</name>
+    <description>
+        This project allows you to overlay your own local OAI customizations
+        on top of the default OAI 2.0 web application provided with DSpace.
+    </description>
+
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
         <version>3.0-rc2-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
-    <groupId>org.dspace.modules</groupId>
-    <artifactId>oai</artifactId>
-    <packaging>war</packaging>
-    <name>DSpace OAI 2.0 :: Local Customizations</name>
-    <url>http://www.lyncode.com</url>
-    <description>
-        This project allows you to overlay your own local OAI customizations
-        on top of the default OAI 2.0 web application provided with DSpace.
-    </description>
 
     <build>
         <filters>
@@ -48,18 +47,6 @@
 
     <profiles>
         <profile>
-            <activation>
-                <property>
-                    <name>dspace.config</name>
-                </property>
-            </activation>
-            <build>
-                <filters>
-                    <filter>${dspace.config}</filter>
-                </filters>
-            </build>
-        </profile>
-        <profile>
             <id>oracle-support</id>
             <activation>
                 <property>
@@ -77,6 +64,10 @@
     </profiles>
 
     <dependencies>
+        <dependency>
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>additions</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>

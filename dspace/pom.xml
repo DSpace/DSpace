@@ -83,17 +83,19 @@
     </build>
 
     <dependencies>
-    	<!-- Don't know how to add artifacts to dspace lib -->
+    	<!-- This dependency ensures DSpace OAI JAR is added to [dspace]/lib/,
+             so that the 'dspace oai' launcher.xml command works.  -->
     	<dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
             <type>jar</type>
             <classifier>classes</classifier>
     	</dependency>
+        <!-- The Servlet API is also needed by the 'dspace oai' launcher.xml
+             command. -->
     	<dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <scope>provided</scope>
     	</dependency>
     </dependencies>
 </project>
