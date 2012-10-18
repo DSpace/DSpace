@@ -183,17 +183,16 @@
   %>
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/authority/administrator.jsp") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/cris/administrator.jsp") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
     </td>
     <td nowrap="nowrap" class="navigationBarItem">
-      <a href="<%= request.getContextPath() %>/rp/administrator/index.htm"><fmt:message key="jsp.layout.navbar-admin.rp"/></a>
+      <a href="<%= request.getContextPath() %>/cris/administrator/index.htm"><fmt:message key="jsp.layout.navbar-admin.cris"/></a>
     </td>
   </tr>
 
   <tr>
      <td colspan="2">&nbsp;</td>
   </tr>
-
   <%
 	}
   %>    
