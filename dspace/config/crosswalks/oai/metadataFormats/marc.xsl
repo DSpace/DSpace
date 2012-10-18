@@ -34,22 +34,22 @@
 			</datafield>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='issued']/doc:element/doc:field[@name='value']">
-			<datafield tag="260">
+			<datafield ind2=" " ind1=" " tag="260">
 				<subfield code="c"><xsl:value-of select="." /></subfield>
 			</datafield>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='description']/doc:element[@name='abstract']/doc:element/doc:field[@name='value']">
-			<datafield tag="520">
+			<datafield ind2=" " ind1=" " tag="520">
 				<subfield code="a"><xsl:value-of select="." /></subfield>
 			</datafield>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']/doc:element/doc:element/doc:field[@name='value']">
-			<datafield ind1="8" tag="024">
+			<datafield ind1="8" ind2=" " tag="024">
 				<subfield code="a"><xsl:value-of select="." /></subfield>
 			</datafield>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='subject']/doc:element/doc:field[@name='value']">
-			<datafield tag="653">
+			<datafield tag="653" ind2=" " ind1=" " >
 				<subfield code="a"><xsl:value-of select="." /></subfield>
 			</datafield>
 			</xsl:for-each>
