@@ -18,4 +18,8 @@
             label="KNB"
             filter="http://knb.ecoinformatics.org/knb/metacat?action=read&amp;qformat=knb&amp;sessionid=0&amp;docid=%externalresource%"
             contact-url="http://knb.ecoinformatics.org"/>
+    <repo
+            label="GEO"
+            filter="http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=%externalresource%"
+            contact-url="http://www.ncbi.nlm.nih.gov/geo/"/>
 </repositories>        
