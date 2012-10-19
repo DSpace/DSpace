@@ -216,9 +216,9 @@
             <span></span>
         </div>
 
-        <!-- cc-zero.png && opendata.png -->
         <xsl:choose>
             <xsl:when test=".//dim:field[@element='rights'][.='http://creativecommons.org/publicdomain/zero/1.0/']">
+              <!-- For items with the normal CC0 license, display cc-zero.png && opendata.png -->
                 <table class="license-line">
                 <tr>
                     <td style="padding-left:2px">
@@ -240,16 +240,15 @@
             <xsl:text> &#160; </xsl:text>
             </xsl:when>
             <xsl:when test=".//dim:field[@element='rights'][.='http://opensource.org/licenses/gpl-3.0']">
+	      <!-- It has a GPL license -->
                 <i18n:text>xmlui.dri2xhtml.METS-1.0.license-text</i18n:text>
                 <xsl:text> &#160; </xsl:text>
                 <a href="http://opensource.org/licenses/gpl-3.0">
                     GPL 3.0
                 </a>
             </xsl:when>
-            <xsl:otherwise>
-                <!-- <xsl:variable name="license"
-                    select="/mets:METS/mets:fileSec" />
-                     select="./mets:METS/mets:fileSec/mets:fileGrp[@USE='']/mets:file" /> -->     
+	    <xsl:when test=".//dim:field[@element='rights']">
+	      <!-- It has some license explicitly stored in DSpace -->
                 <xsl:variable name="license"
                     select=".//dim:field[@element='rights']" />
                 <i18n:text>xmlui.dri2xhtml.METS-1.0.license-text</i18n:text>
@@ -260,6 +259,9 @@
                     </xsl:attribute>        
                     License
                 </a>
+	    </xsl:when>
+            <xsl:otherwise>
+	      <!-- If there isn't a license, do nothing. -->
             </xsl:otherwise>
         </xsl:choose>
 
