@@ -73,16 +73,16 @@
                     </execution>
                 </executions>
             </plugin>
-			<!-- This plugin allows us to run a Groovy script in our Maven POM
-				(see: http://gmaven.codehaus.org/Executing+Groovy+Code )
-				We are generating a OS-agnostic version (agnostic.build.dir) of
-				the ${project.build.directory} property (full path of target dir).
-				This is necessary so that the FileWeaver & Surefire plugins can
-				use it to initialize the Unit Test Framework's dspace.cfg file.
-				Otherwise, the Unit Test Framework will not work on Windows OS.
-				This Groovy code was mostly borrowed from:
-				http://stackoverflow.com/questions/3872355/how-to-convert-file-separator-in-maven
-			-->
+            <!-- This plugin allows us to run a Groovy script in our Maven POM
+                    (see: http://gmaven.codehaus.org/Executing+Groovy+Code )
+                    We are generating a OS-agnostic version (agnostic.build.dir) of
+                    the ${project.build.directory} property (full path of target dir).
+                    This is necessary so that the FileWeaver & Surefire plugins can
+                    use it to initialize the Unit Test Framework's dspace.cfg file.
+                    Otherwise, the Unit Test Framework will not work on Windows OS.
+                    This Groovy code was mostly borrowed from:
+                    http://stackoverflow.com/questions/3872355/how-to-convert-file-separator-in-maven
+            -->
             <plugin>
                 <groupId>org.codehaus.gmaven</groupId>
                 <artifactId>gmaven-plugin</artifactId>
@@ -104,7 +104,7 @@
                 </executions>
             </plugin>
             <!-- FileWeaver plugin is in charge of initializing & "weaving" together
-				 the dspace.cfg file to be used by the Unit Testing framework -->
+                 the dspace.cfg file to be used by the Unit Testing framework -->
             <plugin>
                 <groupId>edu.iu.ul.maven.plugins</groupId>
                 <artifactId>fileweaver</artifactId>
@@ -362,21 +362,21 @@
             <artifactId>rome-modules</artifactId>
             <version>1.0</version>
         </dependency>
-		<dependency>
-			<groupId>gr.ekt</groupId>
-			<artifactId>biblio-transformation-engine</artifactId>
-			<version>0.82</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.opencsv</groupId>
-			<artifactId>opencsv</artifactId>
-			<version>2.3</version>
-		</dependency>
-		<dependency>
-		  	<groupId>org.jbibtex</groupId>
-		  	<artifactId>jbibtex</artifactId>
-		  	<version>1.0.0</version>
-		</dependency>
+        <dependency>
+            <groupId>gr.ekt</groupId>
+            <artifactId>biblio-transformation-engine</artifactId>
+            <version>0.82</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jbibtex</groupId>
+            <artifactId>jbibtex</artifactId>
+            <version>1.0.0</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>

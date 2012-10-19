@@ -3,7 +3,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-swordv2</artifactId>
     <packaging>war</packaging>
-    <name>DSpace SWORD v2 :: Web Application Resources</name>
+    <name>DSpace SWORD v2</name>
     <description>DSpace SWORD v2 Deposit Service Provider Web Application</description>
 
     <!--
@@ -21,7 +21,7 @@
         <filters>
             <filter>${basedir}/../${filters.file}</filter>
         </filters>
-		<plugins>
+        <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
@@ -113,7 +113,6 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.15</version>
             <exclusions>
                 <exclusion>
                     <artifactId>jmxtools</artifactId>

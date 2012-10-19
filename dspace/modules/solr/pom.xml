@@ -4,9 +4,10 @@
    <artifactId>solr</artifactId>
    <version>3.0-rc2-SNAPSHOT</version>
    <packaging>war</packaging>
-   <name>DSpace SOLR :: Web Application</name>
+   <name>DSpace SOLR :: Local Customizations</name>
    <description>
-      DSpace SOLR Service Provider Web Application
+      This project allows you to overlay your own local SOLR customizations
+      on top of the default SOLR web application provided with DSpace.
    </description>
 
    <parent>
@@ -65,12 +66,11 @@
            <type>jar</type>
        </dependency>
 
-    <!-- support odd cases where JAXP cannot be found in JVM -->
-    <dependency>
-        <groupId>xalan</groupId>
-        <artifactId>xalan</artifactId>
-        <version>2.7.0</version>
-    </dependency>
+       <!-- support odd cases where JAXP cannot be found in JVM -->
+       <dependency>
+           <groupId>xalan</groupId>
+           <artifactId>xalan</artifactId>
+       </dependency>
 
    </dependencies>
 
