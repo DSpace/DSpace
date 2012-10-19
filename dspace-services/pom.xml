@@ -4,8 +4,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-services</artifactId>
     <packaging>jar</packaging>
-    <name>DSpace Services Modules</name>
-    <url>http://projects.dspace.org/dspace-services</url>
+    <name>DSpace Services Framework :: API and Implementation</name>
     
     <parent>
         <groupId>org.dspace</groupId>
@@ -30,7 +29,6 @@
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
-            <version>2.4</version>
         </dependency>
         <!-- this needs to eventually go into common/lib for tomcat 5 -->
         <dependency>
@@ -43,14 +41,12 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.4</version>
             <scope>provided</scope>
         </dependency>
         <!-- SPECIAL CASE - need JUNIT at build time and testing time -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.5</version>
             <scope>provided</scope>
         </dependency>
         <!-- testing only -->
@@ -67,6 +63,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.dspace.dependencies.jmockit</groupId>
+            <artifactId>dspace-jmockit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.5.6</version>
@@ -74,20 +75,17 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.14</version>
         </dependency>
         <dependency>
             <!-- needed to ensure that all JCL is 1.1.1 -->
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.1.1</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-            <version>3.2</version>
         </dependency>
     </dependencies>
 

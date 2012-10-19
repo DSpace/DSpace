@@ -1,18 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>dspace-oai</artifactId>
-	<packaging>war</packaging>
-	<name>DSpace OAI 2.0</name>
-	<description>Parent project for the OAI API and Webapp</description>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>dspace-oai</artifactId>
+    <packaging>war</packaging>
+    <name>DSpace OAI 2.0</name>
+    <description>Parent project for the OAI API and Webapp</description>
 
     <parent>
         <artifactId>dspace-parent</artifactId>
         <groupId>org.dspace</groupId>
         <version>3.0-rc2-SNAPSHOT</version>
+        <relativePath>..</relativePath>
     </parent>
 
     <build>
+        <filters>
+            <filter>${basedir}/../${filters.file}</filter>
+        </filters>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -42,18 +45,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <activation>
-                <property>
-                    <name>dspace.config</name>
-                </property>
-            </activation>
-            <build>
-                <filters>
-                    <filter>${dspace.config}</filter>
-                </filters>
-            </build>
-        </profile>
         <profile>
             <id>oracle-support</id>
             <activation>
@@ -89,6 +80,7 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -107,18 +99,17 @@
         </dependency>
     </dependencies>
 
-
-	<developers>
-		<developer>
-			<name>DSpace @ Lyncode</name>
-			<email>dspace@lyncode.com</email>
-			<organization>Lyncode</organization>
-			<organizationUrl>http://www.lyncode.com</organizationUrl>
-		</developer>
-		<developer>
-			<id>helix84</id>
-			<name>Ivan Másar</name>
-			<email>helix84@centrum.sk</email>
-		</developer>
-	</developers>
+    <developers>
+        <developer>
+            <name>DSpace @ Lyncode</name>
+            <email>dspace@lyncode.com</email>
+            <organization>Lyncode</organization>
+            <organizationUrl>http://www.lyncode.com</organizationUrl>
+        </developer>
+        <developer>
+            <id>helix84</id>
+            <name>Ivan Másar</name>
+            <email>helix84@centrum.sk</email>
+        </developer>
+    </developers>
 </project>

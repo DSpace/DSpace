@@ -3,9 +3,10 @@
    <groupId>org.dspace.modules</groupId>
    <artifactId>swordv2</artifactId>
    <packaging>war</packaging>
-   <name>DSpace SWORD v2 :: Web Application</name>
+   <name>DSpace SWORD v2 :: Local Customizations</name>
    <description>
-      DSpace SWORD v2 Deposit Service Provider Web Application
+      This project allows you to overlay your own local SWORD v2 customizations
+      on top of the default SWORD v2 web application provided with DSpace.
    </description>
 
    <!--

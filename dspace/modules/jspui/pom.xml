@@ -1,99 +1,103 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.dspace.modules</groupId>
-	<artifactId>jspui</artifactId>
-	<packaging>war</packaging>
-	<name>DSpace JSP-UI :: Web Application</name>
-	<description>DSpace JSP-UI :: Web Application</description>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.dspace.modules</groupId>
+    <artifactId>jspui</artifactId>
+    <packaging>war</packaging>
+    <name>DSpace JSP-UI :: Local Customizations</name>
+    <description>
+        This project allows you to overlay your own local JSP-UI customizations
+        on top of the default JSP-UI web application provided with DSpace.
+    </description>
 
-	<parent>
-		<groupId>org.dspace</groupId>
-		<artifactId>modules</artifactId>
-		<version>3.0-rc2-SNAPSHOT</version>
-      <relativePath>..</relativePath>
-	</parent>
+    <parent>
+        <groupId>org.dspace</groupId>
+        <artifactId>modules</artifactId>
+        <version>3.0-rc2-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
 
-	<profiles>
-		<profile>
-			<id>oracle-support</id>
-			<activation>
-				<property>
-					<name>db.name</name>
-					<value>oracle</value>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>com.oracle</groupId>
-					<artifactId>ojdbc6</artifactId>
-				</dependency>
-			</dependencies>
-		</profile>
-	</profiles>	
-	<build>
+    <profiles>
+        <profile>
+            <id>oracle-support</id>
+            <activation>
+                <property>
+                    <name>db.name</name>
+                    <value>oracle</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle</groupId>
+                    <artifactId>ojdbc6</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+    
+    <build>
         <filters>
             <filter>${basedir}/../../../${filters.file}</filter>
         </filters>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-					<archiveClasses>false</archiveClasses>
-					<webResources>
-						<resource>
-							<filtering>false</filtering>
-							<directory>
-								${basedir}/src/main/webapp
-							</directory>
-							<includes>
-								<include>WEB-INF/web.xml</include>
-							</includes>
-						</resource>
-					</webResources>
-					<overlays>
-						<overlay />
-						<overlay>
-							<groupId>org.dspace</groupId>
-							<artifactId>dspace-jspui</artifactId>
-							<type>war</type>
-						</overlay>
-					</overlays>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>prepare-package</phase>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <archiveClasses>false</archiveClasses>
+                    <webResources>
+                        <resource>
+                            <filtering>false</filtering>
+                            <directory>
+                                ${basedir}/src/main/webapp
+                            </directory>
+                            <includes>
+                                <include>WEB-INF/web.xml</include>
+                            </includes>
+                        </resource>
+                    </webResources>
+                    <overlays>
+                        <overlay />
+                        <overlay>
+                            <groupId>org.dspace</groupId>
+                            <artifactId>dspace-jspui</artifactId>
+                            <type>war</type>
+                        </overlay>
+                    </overlays>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
-	<dependencies>
-		
-		<dependency>
-			<groupId>org.dspace.modules</groupId>
-			<artifactId>additions</artifactId>
-		</dependency>
+    <dependencies>
 
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-jspui</artifactId>
-			<type>war</type>
-		</dependency>
+        <dependency>
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>additions</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-jspui</artifactId>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-jspui</artifactId>
+            <type>war</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-jspui</artifactId>
             <type>jar</type>
             <classifier>classes</classifier>
-		</dependency>
+        </dependency>
 
-		<dependency>
-		   <groupId>javax.servlet</groupId>
-		   <artifactId>servlet-api</artifactId>
-		   <scope>provided</scope>
-		</dependency>
-	</dependencies>
+        <dependency>
+           <groupId>javax.servlet</groupId>
+           <artifactId>servlet-api</artifactId>
+           <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
 </project>

@@ -3,9 +3,10 @@
    <groupId>org.dspace.modules</groupId>
    <artifactId>sword</artifactId>
    <packaging>war</packaging>
-   <name>DSpace SWORD :: Web Application</name>
+   <name>DSpace SWORD :: Local Customizations</name>
    <description>
-      DSpace SWORD Deposit Service Provider Web Application
+      This project allows you to overlay your own local SWORD customizations
+      on top of the default SWORD web application provided with DSpace.
    </description>
 
    <!--
