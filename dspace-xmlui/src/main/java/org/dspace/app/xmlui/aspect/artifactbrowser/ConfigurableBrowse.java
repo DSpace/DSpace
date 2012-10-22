@@ -12,21 +12,20 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.*;
 
+import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.app.xmlui.utils.DSpaceValidity;
-import org.dspace.app.xmlui.utils.HandleUtil;
-import org.dspace.app.xmlui.utils.RequestUtils;
-import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.*;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -133,6 +132,22 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     private Message titleMessage = null;
     private Message trailMessage = null;
+
+    @Override
+    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
+        super.setup(resolver, objectModel, src, parameters);
+
+        //Verify if we have received valid parameters
+        try {
+            getUserParams();
+        } catch (ResourceNotFoundException e) {
+            throw new BadRequestException("Invalid parameters");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (UIException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public Serializable getKey()
     {

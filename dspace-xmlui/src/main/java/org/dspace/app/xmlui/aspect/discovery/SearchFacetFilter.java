@@ -7,18 +7,19 @@
  */
 package org.dspace.app.xmlui.aspect.discovery;
 
+import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.util.HashUtil;
+import org.apache.commons.lang.StringUtils;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.utils.DSpaceValidity;
-import org.dspace.app.xmlui.utils.HandleUtil;
-import org.dspace.app.xmlui.utils.RequestUtils;
-import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.*;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
@@ -82,6 +83,19 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         DSpace dspace = new DSpace();
         searchService = dspace.getServiceManager().getServiceByName(SearchService.class.getName(),SearchService.class);
 
+    }
+
+    @Override
+    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
+        super.setup(resolver, objectModel, src, parameters);
+
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        String facetField = request.getParameter(SearchFilterParam.FACET_FIELD);
+
+        if(StringUtils.isBlank(facetField))
+        {
+            throw new BadRequestException("Invalid " + SearchFilterParam.FACET_FIELD + " parameter");
+        }
     }
 
     /**
