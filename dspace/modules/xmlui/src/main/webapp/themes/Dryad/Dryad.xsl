@@ -157,7 +157,7 @@
                 </i18n:text>
                 <xsl:text>&#160;&#160;</xsl:text>
                 <a href="http://blog.datadryad.org/feed/">
-                    <img src="/themes/Dryad/images/rss.jpg" style="border: 0px;" alt="RSS"/>
+                    <img src="/themes/Dryad/images/rss.jpg" style="border: 0px;" alt="RSS icon"/>
                 </a>
             </h3>
             <ul>
