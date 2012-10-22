@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The contents of this file are subject to the license and copyright detailed 
-	in the LICENSE and NOTICE files at the root of the source tree and available 
-	online at http://www.dspace.org/license/ -->
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
 <xsl:stylesheet version="1.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:oai="http://www.openarchives.org/OAI/2.0/"
 	xmlns:lyn="http://www.lyncode.com/fakeNamespace" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
