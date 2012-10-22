@@ -10,7 +10,6 @@ package org.dspace.xoai.filter;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
-import org.dspace.xoai.data.DSpaceDatabaseItem;
 import org.dspace.xoai.data.DSpaceItem;
 
 import com.lyncode.xoai.dataprovider.data.AbstractItemIdentifier;

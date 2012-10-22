@@ -12,16 +12,10 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.dspace.core.Context;
-
-import java.sql.SQLException;
 import org.apache.solr.client.solrj.util.ClientUtils;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
-import org.dspace.xoai.data.DSpaceDatabaseItem;
 import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.util.XOAIDatabaseManager;
 

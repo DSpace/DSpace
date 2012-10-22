@@ -11,25 +11,19 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
-import org.dspace.xoai.util.MetadataNamePredicate;
 import org.dspace.xoai.util.XOAICacheManager;
 import org.dspace.xoai.util.XOAIDatabaseManager;
 
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 import com.lyncode.xoai.dataprovider.core.ItemMetadata;
 import com.lyncode.xoai.dataprovider.core.ReferenceSet;
 import com.lyncode.xoai.dataprovider.data.AbstractAbout;
 import com.lyncode.xoai.dataprovider.exceptions.MetadataBindException;
-import com.lyncode.xoai.dataprovider.xml.xoai.Element;
-import com.lyncode.xoai.dataprovider.xml.xoai.Element.Field;
 
 /**
  * 
@@ -101,15 +95,6 @@ public class DSpaceDatabaseItem extends DSpaceItem
     public boolean isDeleted()
     {
         return item.isWithdrawn();
-    }
-
-    private static Element getElement(List<Element> list, String name)
-    {
-        for (Element e : list)
-            if (name.equals(e.getName()))
-                return e;
-
-        return null;
     }
 
     private ItemMetadata metadata = null;

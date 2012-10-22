@@ -31,7 +31,7 @@
 			</xsl:if>
 			<d:Item>
 				<xsl:attribute name="id">
-					<xsl:value-of select="translate(doc:metadata/doc:element[@name='others']/doc:field[@name='handle']/text(),'/','_')" />
+					<xsl:value-of select="concat('hdl_', translate(doc:metadata/doc:element[@name='others']/doc:field[@name='handle']/text(),'/','_'))" />
 				</xsl:attribute>
 				<d:Descriptor>
 					<d:Statement mimeType="application/xml; charset=utf-8">
