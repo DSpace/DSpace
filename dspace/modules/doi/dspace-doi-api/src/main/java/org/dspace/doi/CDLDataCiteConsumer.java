@@ -43,10 +43,8 @@ public class CDLDataCiteConsumer implements Consumer {
                     if (et == Event.MODIFY) {
                         Item item = (Item) event.getSubject(ctx);
                         if (item != null && item.isArchived()){
-
+			    log.debug("updating DataCite settings for " + item.getHandle() + ", internal itemid=" + item.getID());
                             CDLDataCiteService dataCiteService = new CDLDataCiteService(ConfigurationManager.getProperty("doi.username"), ConfigurationManager.getProperty("doi.password"));
-                            // for Local TEST
-                            //String doi = "10.5061/DRYAD.2222";
 
                             String doi = getDoiValue(item);
 
@@ -72,6 +70,7 @@ public class CDLDataCiteConsumer implements Consumer {
         }
         catch (Exception e) {
             ctx.abort();
+	    log.error("Problem updating DataCite settings for an item based on event " + event, e);
         }
         finally {
             ctx.complete();

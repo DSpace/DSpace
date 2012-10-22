@@ -36,61 +36,58 @@ public class Minter implements org.springframework.beans.factory.InitializingBea
 	 */
 	public Minter() {}
 
-    public DOI register(DOI aDOI, Map<String, String> metadata) throws IOException
-    {
-        log.debug("Entering register(DOI) method");
+	public DOI register(DOI aDOI, Map<String, String> metadata) throws IOException {
+	    log.debug("Entering register(DOI) method");
+	    
+	    try {
+		String target = aDOI.getTargetURL().toString();
+		String doi = aDOI.toID();
+		log.debug("doi to register: " + doi + ", target: " + target);
 
-        try{
-            String target = aDOI.getTargetURL().toString();
-            String doi = aDOI.toID();
+		// open connection to the DOI URL
+		URL url = aDOI.toURL();
+		HttpURLConnection http = (HttpURLConnection) url.openConnection();
+		http.connect();
 
-            if (myDataCiteConnectionIsLive){
-                log.debug("doi to register: " + doi + ", target: " + target);
+		// if the URL issues a redirect, the DOI is already registered, so try to update it
+		if (http.getResponseCode() == 303) {
+		    if (!http.getHeaderField("Location").equals(target)) {
+			if (myDataCiteConnectionIsLive) {
+			    String response = myDoiService.update(doi, target, metadata);
+			    log.debug("Response from DOI service: " + response);
+			} else {
+			    log.info("Dryad URL updated: " + aDOI + " = " + target);
+			}
+		    } else {
+			log.debug("Ignored: URL " + target + " already registered");
+		    }
+		} else {
+		    // DOI is not registered, create a new registration
+		    if (myDataCiteConnectionIsLive) {
+			String response = myDoiService.registerDOI(doi, target, metadata);
+			response = response.toUpperCase();
+			
+			if(!response.contains("OK") &&
+			   !response.contains("CREATED") &&
+			   !response.contains("SUCCESS")) {
+			    log.error("DOI Service reports problem: " + response);
+			    myDoiService.emailException(response, doi, "registration");
+			} else {
+			    log.debug("DOI registered: " + response);
+			}
+		    } else {
+			log.info("DOI service not connected, registration skipped.");
+		    }
+		}
 
-                // open connection to the DOI URL
-                URL url = aDOI.toURL();
-                HttpURLConnection http = (HttpURLConnection) url.openConnection();
-                http.connect();
-
-                // if the URL issues a redirect, the DOI is already registered, so try to update it
-                if (http.getResponseCode() == 303){
-                    if (!http.getHeaderField("Location").equals(target))
-                    {
-                        String response = myDoiService.update(doi, target, metadata);
-                        log.debug("Response from DOI service: " + response);
-                    }
-                    else{
-                        log.debug("Ignored: URL " + target + " already registered");
-                    }
-                }
-                else{
-                    String response = myDoiService.registerDOI(doi, target, metadata);
-                    response = response.toUpperCase();
-
-                    if (!response.contains("OK") &&
-                            !response.contains("CREATED") &&
-                            !response.contains("SUCCESS"))
-                    {
-                        log.error("DOI Service reports problem: " + response);
-                        myDoiService.emailException(response, doi, "registration");
-                    }
-                    else{
-                        log.debug("DOI registered: " + response);
-                    }
-                }
-                http.disconnect();
-            }
-            else{
-                log.info("DOI service not connected, registration skipped.");
-            }
-        }
-        catch (MalformedURLException details){
-            log.error("Malformed URL", details);
-            throw new RuntimeException(details);
-        }
-
-        return aDOI;
-    }
+		http.disconnect();
+	    } catch (MalformedURLException details) {
+		log.error("Malformed URL", details);
+		throw new RuntimeException(details);
+	    }
+	
+	    return aDOI;
+	}
 
     /**
      * Creates a DOI from the supplied DSpace URL string
