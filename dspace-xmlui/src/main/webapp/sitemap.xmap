@@ -176,6 +176,7 @@
                         <map:selector logger="sitemap.selector.exception" name="exception" src="org.apache.cocoon.selection.ExceptionSelector">
                                 <exception name="not-found" class="org.apache.cocoon.ResourceNotFoundException"/>
                                 <exception name="invalid-continuation" class="org.apache.cocoon.components.flow.InvalidContinuationException"/>
+                                <exception name="bad-request" class="org.dspace.app.xmlui.utils.BadRequestException"/>
                                 <!-- The statement below tells the selector to unroll as much exceptions as possible -->
                                 <exception class="java.lang.Throwable" unroll="true"/>
                         </map:selector>
@@ -654,6 +655,20 @@
 
                 <map:handle-errors>
                         <map:select type="exception">
+
+                                <map:when test="bad-request">
+                                        <map:generate type="exception"/>
+                                        <map:transform src="exception2html.xslt">
+                                                <map:parameter name="contextPath" value="{request:contextPath}"/>
+                                                <map:parameter name="pageTitle" value="Bad request"/>
+                                        </map:transform>
+                                        <map:act type="locale">
+                                            <map:transform type="i18n">
+                                                    <map:parameter name="locale" value="{locale}"/>
+                                            </map:transform>
+                                        </map:act>
+                                        <map:serialize type="xhtml" status-code="400"/>
+                                </map:when>
 
                                 <map:when test="not-found">
                                         <map:generate type="exception"/>
