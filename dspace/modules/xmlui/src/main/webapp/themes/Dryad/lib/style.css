@@ -1441,3 +1441,26 @@ list-style-type:none;
 img.ds-authority-confidence
 { width: 16px; height: 16px; margin: 0px 2px; padding: 0px; vertical-align: bottom;}
 
+
+/* ********************* Modifications to default settings for devices/browsers with smaller widths **************** */
+
+@media screen and (max-width : 600px) {
+    div#dryad_blog {
+	display: none;
+    }
+    
+    /* ensure the width of the screen is the width of the device */
+    ds-main {
+	width:94%;
+    }
+    
+    /* make the body the full width of the device */
+    ds-body {
+ 	width:94%;
+    }
+ 	
+    /* make the menus hidden */
+    ds-options {
+ 	display:none;
+    }
+}
