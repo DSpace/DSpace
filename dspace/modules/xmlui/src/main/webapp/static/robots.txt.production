@@ -20,6 +20,13 @@ Disallow: /handle/10255/1/search
 Disallow: /handle/10255/1/browse
 Disallow: /handle/10255/1/discover
 
+# Disable DryadLab pages
+Disallow: /dryadlab
+Disallow: /handle/10255/dryad.40383
+Disallow: /handle/10255/dryad.40382
+Disallow: /handle/10255/dryad.40384
+Disallow: /handle/10255/dryad.40381
+
 # Collection-specific search/browse for Data Files
 Disallow: /handle/10255/2/search
 Disallow: /handle/10255/2/browse
