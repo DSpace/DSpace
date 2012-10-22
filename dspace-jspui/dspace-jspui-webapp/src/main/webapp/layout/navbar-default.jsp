@@ -303,7 +303,44 @@
   </tr>
 <% } %>
 
-<c:if test="${!empty researcher && (!empty addModeType && addModeType=='display')}">    
+
+<c:if test="${grant_page_menu && !empty project}">
+
+
+  <tr>
+    <td colspan="2">&nbsp;</td>
+  </tr>
+  
+  <tr>
+    <td nowrap="nowrap" colspan="2" class="navigationBarSublabel"><fmt:message key="jsp.layout.navbar-hku.staffmode.title"/></td>
+  </tr>
+  
+
+  <c:if test="${!empty addModeType && addModeType=='display'}">
+  
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/editDynamicData" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16"/>
+    </td>
+    <td nowrap="nowrap" class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/cris/tools/project/editDynamicData.htm?id=${project.id}&anagraficaId=${project.dynamicField.id}<c:if test='${!empty tabIdForRedirect}'>&tabId=${tabIdForRedirect}</c:if>"><fmt:message key="jsp.layout.navbar.entity.edit"/></a>
+    </td>
+  </tr>  
+ </c:if>
+  
+   <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/help#Projects" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16"/>
+    </td>
+    <td nowrap="nowrap" class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/help.jsp#Projects">Help</a>
+    </td>
+  </tr>
+ 
+ </c:if>
+
+
+<c:if test="${!empty entity && (!empty addModeType && addModeType=='display')}">    
  <% if (!isAdmin) { %>
  <tr>
     <td colspan="2">&nbsp;</td>
@@ -345,5 +382,5 @@
 	</td>
   </tr> 
 </c:if>
-
+ 
 </table>
