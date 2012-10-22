@@ -19,7 +19,7 @@
 	<xsl:template match="/">
 		<atom:entry xmlns:atom="http://www.w3.org/2005/Atom"
 			xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:oreatom="http://www.openarchives.org/ore/atom/"
-			xmlns:dcterms="http://purl.org/dc/terms/">
+			xmlns:dcterms="http://purl.org/dc/terms/" xsi:schemaLocation="http://www.w3.org/2005/Atom http://www.kbcafe.com/rss/atom.xsd.xml">
 			<atom:id>
 				<xsl:value-of select="concat(doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']/doc:element[@name='uri']/doc:element/doc:field[@name='value']/text(), '/ore.xml')"></xsl:value-of>
 			</atom:id>

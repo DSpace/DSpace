@@ -9,10 +9,9 @@ package org.dspace.xoai.filter;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.apache.solr.client.solrj.util.ClientUtils;
 
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.core.Context;
-import org.dspace.xoai.data.DSpaceDatabaseItem;
 import org.dspace.xoai.data.DSpaceItem;
 
 /**
