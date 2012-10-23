@@ -113,6 +113,8 @@
                 <!-- During release:perform, enable the "addons" profile -->
                 <releaseProfiles>addons</releaseProfiles>
                 <goals>deploy</goals>
+                <!-- Suggest tagging the release in SCM as "dspace-[version]" -->
+                <tagNameFormat>dspace-@{project.version}</tagNameFormat>
                 <!-- Auto-Version all modules the same as the parent module -->
                 <autoVersionSubmodules>true</autoVersionSubmodules>
             </configuration>
