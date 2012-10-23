@@ -1148,8 +1148,8 @@
 	<!-- my account items -->
 	<message key="xmlui.administrative.Navigation.account_export">My Exports</message>
 
-    <message key="xmlui.aspect.versioning.VersioningNavigation.context_create_version">Create version of this item</message>
-    <message key="xmlui.aspect.versioning.VersioningNavigation.context_show_version_history">Show version history</message>
+	<message key="xmlui.aspect.versioning.VersioningNavigation.context_create_version">Add to or modify this data</message>
+	<message key="xmlui.aspect.versioning.VersioningNavigation.context_show_version_history">Show modification history</message>
 
 
 
