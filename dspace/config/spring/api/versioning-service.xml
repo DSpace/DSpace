@@ -17,23 +17,32 @@
     <!-- Versioning Service Application Interface for DSpace Will be autowired with
          a Versioning Provider present in Spring context.
          Default Item Versioning Provider, defines behavior for replicating
-         Item, Metadata, BUndles and Bitstreams. Autowired at this time.
-
+         Item, Metadata, Bundles and Bitstreams. Autowired at this time.
+     -->
     <bean id="org.dspace.versioning.VersioningService"
           class="org.dspace.versioning.VersioningServiceImpl"
           autowire="byType"
           scope="singleton">
-        <property name="versionDAO">
-            <bean class="org.dspace.versioning.VersionDAO"/>
-        </property>
-        <property name="versionHistoryDAO">
-            <bean class="org.dspace.versioning.VersionHistoryDAO"/>
-        </property>
-        <property name="provider">
-
-            <bean class="org.dspace.versioning.DefaultItemVersionProvider"/>
-        </property>
-
+       <property name="versionDAO">
+          <bean class="org.dspace.versioning.VersionDAO"/>
+       </property>
+       <property name="versionHistoryDAO">
+          <bean class="org.dspace.versioning.VersionHistoryDAO"/>
+       </property>
+       <property name="provider">
+           <!-- Default Item Versioning Provider, defines behavior for replicating
+                Item, Metadata, Budles and Bitstreams. Autowired at this time. -->
+           <bean class="org.dspace.versioning.DefaultItemVersionProvider">
+               <property name="ignoredMetadataFields">
+                   <set>
+                       <value>dc.date.accessioned</value>
+                       <value>dc.description.provenance</value>
+                   </set>
+               </property>
+               
+           </bean>
+       </property>
+ 
     </bean>
-     -->
+    
 </beans>

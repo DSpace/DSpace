@@ -13,6 +13,7 @@ import org.dspace.core.Context;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 
 import java.sql.SQLException;
+import java.util.Set;
 
 /**
  *
@@ -23,21 +24,19 @@ import java.sql.SQLException;
  */
 public abstract class AbstractVersionProvider {
 
+    private Set<String> ignoredMetadataFields;
 
     protected void copyMetadata(Item itemNew, Item nativeItem){
         DCValue[] md = nativeItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         for (DCValue aMd : md) {
-            if ((aMd.schema.equals(MetadataSchema.DC_SCHEMA) && aMd.element.equals("relation") && (aMd.qualifier != null && aMd.qualifier.equals("haspart")))
-                    || (aMd.schema.equals(MetadataSchema.DC_SCHEMA) && aMd.element.equals("relation") && (aMd.qualifier != null && aMd.qualifier.equals("ispartof")))
-                    || (aMd.schema.equals(MetadataSchema.DC_SCHEMA) && aMd.element.equals("identifier"))
-                    || (aMd.schema.equals(MetadataSchema.DC_SCHEMA) && aMd.element.equals("relation") && (aMd.qualifier != null && aMd.qualifier.equals("isversionof")))
-                    || (aMd.schema.equals(MetadataSchema.DC_SCHEMA) && aMd.element.equals("date") && (aMd.qualifier != null && aMd.qualifier.equals("accessioned")))
-                    || (aMd.schema.equals(MetadataSchema.DC_SCHEMA) && aMd.element.equals("date") && (aMd.qualifier != null && aMd.qualifier.equals("available")))
-                    || (aMd.schema.equals(MetadataSchema.DC_SCHEMA) && aMd.element.equals("description") && (aMd.qualifier != null && aMd.qualifier.equals("provenance"))))
+            String unqualifiedMetadataField = aMd.schema + "." + aMd.element;
+            String qualifiedMetadataField = unqualifiedMetadataField + (aMd.qualifier == null ? "" : "." + aMd.qualifier);
+            if(getIgnoredMetadataFields().contains(qualifiedMetadataField) ||
+                    getIgnoredMetadataFields().contains(unqualifiedMetadataField + "." + Item.ANY))
             {
+                //Skip this metadata field
                 continue;
             }
-
 
             itemNew.addMetadata(aMd.schema, aMd.element, aMd.qualifier, aMd.language, aMd.value);
         }
@@ -66,5 +65,13 @@ public abstract class AbstractVersionProvider {
     protected Bitstream createBitstream(Context context, Bitstream nativeBitstream) throws AuthorizeException, SQLException {
         int idNew = BitstreamStorageManager.clone(context, nativeBitstream.getID());
         return Bitstream.find(context, idNew);
+    }
+
+    public void setIgnoredMetadataFields(Set<String> ignoredMetadataFields) {
+        this.ignoredMetadataFields = ignoredMetadataFields;
+    }
+
+    public Set getIgnoredMetadataFields() {
+        return ignoredMetadataFields;
     }
 }
