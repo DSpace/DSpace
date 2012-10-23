@@ -45,7 +45,7 @@
     that avoids logging every request
 -->
 
-<schema name="dataone mn logging" version="1.5">
+<schema name="example" version="1.5">
   <!-- attribute "name" is the name of this schema and is only used for display purposes.
        Applications should change this to reflect the nature of the search collection.
        version="x.y" is Solr's version number for the schema syntax and semantics.  It should
@@ -206,35 +206,7 @@
     </fieldType>
     -->
 
-    <!-- A text field that only splits on whitespace for exact matching of words -->
-    <fieldType name="text_ws" class="solr.TextField" positionIncrementGap="100">
-      <analyzer>
-        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
-      </analyzer>
-    </fieldType>
-
-    <!-- A general text field that has reasonable, generic
-         cross-language defaults: it tokenizes with StandardTokenizer,
-	 removes stop words from case-insensitive "stopwords.txt"
-	 (empty by default), and down cases.  At query time only, it
-	 also applies synonyms. -->
-    <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100">
-      <analyzer type="index">
-        <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" enablePositionIncrements="true" />
-        <!-- in this example, we will only use synonyms at query time
-        <filter class="solr.SynonymFilterFactory" synonyms="index_synonyms.txt" ignoreCase="true" expand="false"/>
-        -->
-        <filter class="solr.LowerCaseFilterFactory"/>
-      </analyzer>
-      <analyzer type="query">
-        <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" enablePositionIncrements="true" />
-        <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
-        <filter class="solr.LowerCaseFilterFactory"/>
-      </analyzer>
-    </fieldType>
-
+ </types>
 
 
  <fields>
@@ -262,11 +234,8 @@
        when adding a document.
    -->
 
-   <!-- log fields here -->
 
-   <!-- -->
-   <field name="entryId" type="string" stored="true"/>
-   <!-- -->
+
    <field name="identifier" type="string" stored="true"/>
    <!-- -->
    <field name="ipAddress" type="string" stored="true"/>
@@ -275,30 +244,29 @@
    <!-- -->
    <field name="subject" type="string" stored="true"/>
    <!-- -->
-   <field name="event" type="string" stored="true"/>
+   <field name="event" type="string" stored="true" indexed="true"/>
    <!-- -->
-   <field name="dateLogged" type="string" stored="true"/>
+   <field name="dateLogged" type="date" stored="true" indexed="true"/>
    <!-- -->
    <field name="nodeIdentifier" type="string" stored="true"/>
+   <!-- -->
+   <field name="entryId" type="tlong" stored="true" indexed="true"/>
    
 
-   <!-- Uncommenting the following will create a "timestamp" field using
-        a default value of "NOW" to indicate when each document was indexed.
-     -->
-   <!--
-   <field name="timestamp" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>
-     -->
 
+
+
+
+   
  </fields>
 
  <!-- Field to use to determine and enforce document uniqueness. 
       Unless this field is marked with required="false", it will be a required field
    -->
- <uniqueKey>id</uniqueKey>
+ <uniqueKey>entryId</uniqueKey>
 
-  <!-- field for the QueryParser to use when an explicit fieldname is absent
- DEPRECATED: specify "df" in your request handler instead.
- <defaultSearchField>text</defaultSearchField> -->
+  <!-- field for the QueryParser to use when an explicit fieldname is absent -->
+ <defaultSearchField>entryId</defaultSearchField>
 
   <!-- SolrQueryParser configuration: defaultOperator="AND|OR"
  DEPRECATED: specify "q.op" in your request handler to switch from the default of OR.
@@ -308,15 +276,7 @@
         is added to the index.  It's used either to index the same field differently,
         or to add multiple fields to the same field for easier/faster searching.  -->
 
-   <copyField source="cat" dest="text"/>
-   <copyField source="name" dest="text"/>
-   <copyField source="manu" dest="text"/>
-   <copyField source="features" dest="text"/>
-   <copyField source="includes" dest="text"/>
-   <copyField source="manu" dest="manu_exact"/>
 
-   <!-- Copy the price into a currency enabled field (default USD) -->
-   <copyField source="price" dest="price_c"/>
 	
    <!-- Above, multiple source fields are copied to the [text] field. 
 	  Another way to map multiple source fields to the same 
@@ -342,6 +302,6 @@
    <str name="paramkey">param value</str>
  </similarity>
  -->
-  </types>
+
 
 </schema>
