@@ -12,28 +12,25 @@
 		<version>3.0-rc2-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
-    
+
+    <!-- The 'additions' module must *always* be built, as it is included
+         as a dependency in most other modules in [src]/dspace/modules -->
+    <modules>
+        <module>additions</module>
+    </modules>
+
     <!-- 
-         List of enabled DSpace Modules to build/install.
+         List of enabled DSpace "addon" / local customization Modules to build/install.
          To disable building of modules, you can use the Maven '-P' commandline 
          option along with the profile's id.  For example, the following tells
          Maven to *disable* building of 'dspace-oai' and 'dspace-lni' modules:
          'mvn package -P !dspace-oai,!dspace-lni'
          
          Also note that the profile IDs below match the profile IDs of the source
-         modules in /dspace/pom.xml, so the above command will also disable the
+         modules in [dspace-src]/pom.xml, so the above command will also disable the
          compiling of the corresponding source module.
     -->
     <profiles>
-       <profile>
-          <id>dspace-additions</id>
-          <activation>
-             <activeByDefault>true</activeByDefault>
-          </activation>
-          <modules>
-             <module>additions</module>
-          </modules>
-       </profile>
         <profile>
             <id>dspace-xmlui</id>
             <activation>
@@ -89,7 +86,7 @@
             </modules>
         </profile>
         <profile>
-            <id>dspace-xoai</id>
+            <id>dspace-oai</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
