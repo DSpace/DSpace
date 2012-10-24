@@ -108,8 +108,8 @@
             <artifactId>maven-release-plugin</artifactId>
             <version>2.3.2</version>
             <configuration>
-                <!-- During release:perform, enable the "addons" profile -->
-                <releaseProfiles>addons</releaseProfiles>
+                <!-- During release:perform, enable the "release" profile (see below) -->
+                <releaseProfiles>release</releaseProfiles>
                 <goals>deploy</goals>
                 <!-- Suggest tagging the release in SCM as "dspace-[version]" -->
                 <tagNameFormat>dspace-@{project.version}</tagNameFormat>
@@ -321,14 +321,16 @@
 
 
       <!--
-         Use 'mvn deploy -Paddons' while doing Continuous Integration
-         and deploying addons to the Maven repository.
+         The 'release' profile is used by the 'maven-release-plugin' (see above)
+         to actually perform a DSpace software release to Maven central.
        -->
       <profile>
-         <id>addons</id>
+         <id>release</id>
          <activation>
             <activeByDefault>false</activeByDefault>
          </activation>
+         <!-- Activate all modules *except* for the 'dspace' module,
+              as it does not include any Java source code to release. -->
          <modules>
             <module>dspace-api</module>
             <module>dspace-jspui</module>
@@ -341,8 +343,8 @@
       </profile>
 
       <!--
-         Use 'mvn package -Pdistributions' to create distributions
-         to upload to S.F.
+         Run this profile (e.g. 'mvn package -Pdistributions') to create
+         zip / tarball distributions to upload to SourceForge or similar.
        -->
       <profile>
          <id>distributions</id>
