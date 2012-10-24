@@ -1,12 +1,13 @@
 package com.atmire.authority.indexer;
 
 import com.atmire.authority.SolrDocumentFields;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
+import org.dspace.content.*;
 
+import org.dspace.content.Collection;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.handle.HandleManager;
 import org.dspace.services.ConfigurationService;
 import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 import org.dspace.utils.DSpace;
@@ -36,7 +37,7 @@ public class LocalIndexer implements com.atmire.authority.indexer.IndexerInterfa
     LinkedList<Map<String, String>> authorities = new LinkedList();
 
     Context context;
-   
+
 
 
     @Override
@@ -46,7 +47,10 @@ public class LocalIndexer implements com.atmire.authority.indexer.IndexerInterfa
 
             if(authorityControlledFields==null || authorityControlledFields.length==0) return;
 
-            itemIterator = Item.findAll(getContext());
+            context =getContext();
+            DSpaceObject dso = HandleManager.resolveToObject(context, ConfigurationManager.getProperty("stats.datapkgs.coll"));
+            itemIterator = ((Collection)dso).getAllItems();
+            //itemIterator = Item.findAll(getContext());
         } catch (SQLException e) {
             e.printStackTrace();
             return;
