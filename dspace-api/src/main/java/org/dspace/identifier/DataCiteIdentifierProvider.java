@@ -15,10 +15,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.httpclient.StatusLine;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
+import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpPost;
@@ -70,7 +70,7 @@ public class DataCiteIdentifierProvider
     @Override
     public boolean supports(String identifier)
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return identifier.startsWith("doi:"); // XXX more thorough test?
     }
 
     @Override

@@ -11,19 +11,16 @@
  */
 package org.dspace.identifier;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Locale;
-import java.util.Map;
+import java.util.List;
 import org.dspace.AbstractUnitTest;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
-import org.dspace.storage.rdbms.TableRow;
+import org.dspace.kernel.ServiceManager;
+import org.dspace.services.ConfigurationService;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -34,6 +31,12 @@ import static org.junit.Assert.*;
 public class DataCiteIdentifierProviderTest
         extends AbstractUnitTest
 {
+    private static final String TEST_SHOULDER = "doi:10.5072/FK2";
+
+    private static ServiceManager sm = null;
+
+    private static ConfigurationService config = null;
+
     private static Item item = null;
 
     public DataCiteIdentifierProviderTest()
@@ -44,6 +47,7 @@ public class DataCiteIdentifierProviderTest
     public static void setUpClass()
             throws Exception
     {
+        // Create an object to work with
         Context ctx = new Context();
         ctx.turnOffAuthorisationSystem();
         Community community = Community.create(null, ctx);
@@ -51,6 +55,16 @@ public class DataCiteIdentifierProviderTest
         WorkspaceItem wsItem = WorkspaceItem.create(ctx, collection, false);
         item = wsItem.getItem();
         ctx.complete();
+
+        // Find the usual kernel services
+        sm = kernelImpl.getServiceManager();
+
+        config = kernelImpl.getConfigurationService();
+
+        // Configure the service under test
+        config.setProperty("identifier.doi.ezid.shoulder", TEST_SHOULDER);
+        config.setProperty("identifier.doi.ezid.user", "apitest");
+        config.setProperty("identifier.doi.ezid.password", "apitest");
     }
 
     @AfterClass
@@ -92,11 +106,9 @@ public class DataCiteIdentifierProviderTest
         System.out.println("supports");
         DataCiteIdentifierProvider instance = new DataCiteIdentifierProvider();
 
-        String identifier = "";
+        String identifier = TEST_SHOULDER;
         boolean result = instance.supports(identifier);
-        assertTrue("blah should be supported", result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertTrue(identifier + " should be supported", result);
     }
 
     /**
@@ -107,14 +119,16 @@ public class DataCiteIdentifierProviderTest
             throws Exception
     {
         System.out.println("register");
-        DataCiteIdentifierProvider instance = new DataCiteIdentifierProvider();
+
+        List<DataCiteIdentifierProvider> instance
+                = (List<DataCiteIdentifierProvider>)
+                sm.getServicesByType(DataCiteIdentifierProvider.class);
 
         DSpaceObject dso = item;
-        String expResult = "";
-        String result = instance.register(context, dso);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+
+        String result = instance.get(0).register(context, dso);
+        assertTrue("Didn't get a DOI back", result.startsWith("doi:10.5072/"));
+        System.out.println(" got identifier:  " + result);
     }
 
     /**
@@ -124,13 +138,18 @@ public class DataCiteIdentifierProviderTest
     public void testRegister_3args()
     {
         System.out.println("register");
-        DataCiteIdentifierProvider instance = new DataCiteIdentifierProvider();
-
-        DSpaceObject object = item;
-        String identifier = "";
-        instance.register(context, object, identifier);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
+
+        List<DataCiteIdentifierProvider> instances
+                = (List<DataCiteIdentifierProvider>)
+                sm.getServicesByType(DataCiteIdentifierProvider.class);
+
+        DSpaceObject object = item;
+
+        String identifier = TEST_SHOULDER + "blarg"; // TODO a unique value
+
+        instances.get(0).register(context, object, identifier);
     }
 
     /**
@@ -141,13 +160,14 @@ public class DataCiteIdentifierProviderTest
             throws Exception
     {
         System.out.println("reserve");
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+
         DataCiteIdentifierProvider instance = new DataCiteIdentifierProvider();
 
         DSpaceObject dso = item;
         String identifier = "";
         instance.reserve(context, dso, identifier);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
@@ -158,14 +178,15 @@ public class DataCiteIdentifierProviderTest
             throws Exception
     {
         System.out.println("mint");
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+
         DataCiteIdentifierProvider instance = new DataCiteIdentifierProvider();
 
         DSpaceObject dso = item;
         String expResult = "";
         String result = instance.mint(context, dso);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
@@ -176,6 +197,9 @@ public class DataCiteIdentifierProviderTest
             throws Exception
     {
         System.out.println("resolve");
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+
         DataCiteIdentifierProvider instance = new DataCiteIdentifierProvider();
 
         String identifier = "";
@@ -183,8 +207,6 @@ public class DataCiteIdentifierProviderTest
         DSpaceObject expResult = null;
         DSpaceObject result = instance.resolve(context, identifier, attributes);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
@@ -195,14 +217,15 @@ public class DataCiteIdentifierProviderTest
             throws Exception
     {
         System.out.println("lookup");
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+
         DataCiteIdentifierProvider instance = new DataCiteIdentifierProvider();
 
         DSpaceObject object = item;
         String expResult = "";
         String result = instance.lookup(context, object);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
@@ -213,12 +236,13 @@ public class DataCiteIdentifierProviderTest
             throws Exception
     {
         System.out.println("delete");
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+
         DataCiteIdentifierProvider instance = new DataCiteIdentifierProvider();
 
         DSpaceObject dso = item;
         instance.delete(context, dso);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
@@ -229,12 +253,13 @@ public class DataCiteIdentifierProviderTest
             throws Exception
     {
         System.out.println("delete");
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+
         DataCiteIdentifierProvider instance = new DataCiteIdentifierProvider();
 
         DSpaceObject dso = item;
         String identifier = "";
         instance.delete(context, dso, identifier);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 }
