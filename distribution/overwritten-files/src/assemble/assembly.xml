@@ -96,7 +96,7 @@
 	<moduleSets>
 
 	<moduleSet>
-		<useAllReactorProjects>true</useAllReactorProjects>
+		<useAllReactorProjects>false</useAllReactorProjects>
 	
 		<includes>
 				<include>*:war:*</include>
