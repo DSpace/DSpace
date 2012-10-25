@@ -200,9 +200,6 @@
            relative to this file.
         -->
 
-       <!--
-           Builds central API for DSpace
-        -->
         <profile>
             <id>dspace</id>
             <activation>
@@ -219,7 +216,9 @@
         <profile>
             <id>dspace-api</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+ 		<file>
+                    <exists>dspace-api/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace-api</module>
@@ -232,7 +231,9 @@
         <profile>
             <id>dspace-services</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>dspace-services/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace-services</module>
@@ -245,7 +246,9 @@
         <profile>
             <id>dspace-oai</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>dspace-oai/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace-oai</module>
@@ -256,10 +259,11 @@
            Builds JSPUI WAR for DSpace
         -->
         <profile>
-
             <id>dspace-jspui</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>dspace-jspui/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace-jspui</module>
@@ -273,7 +277,9 @@
         <profile>
             <id>dspace-sword</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>dspace-sword/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace-sword</module>
@@ -286,7 +292,9 @@
         <profile>
             <id>dspace-swordv2</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>dspace-swordv2/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace-swordv2</module>
@@ -299,7 +307,9 @@
         <profile>
             <id>dspace-xmlui</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>dspace-xmlui/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace-xmlui</module>
@@ -312,7 +322,9 @@
         <profile>
             <id>dspace-lni</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>dspace-lni/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace-lni</module>
