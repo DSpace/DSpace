@@ -1,4 +1,4 @@
-create table cris_organizationunit (id int4 not null, sourceId varchar(255) unique, status bool, timestampCreated timestamp, timestampLastModified timestamp, uuid varchar(255) not null unique, primary key (id));
+create table cris_organizationunit (id int4 not null, sourceID varchar(255) unique, uuid varchar(255) not null unique, status bool, timestampCreated timestamp, timestampLastModified timestamp, primary key (id));
 create table cris_ou_box (id int4 not null, collapsed bool not null, priority int4 not null, shortName varchar(255) unique, title varchar(255), unrelevant bool not null, visibility int4, primary key (id));
 create table cris_ou_box2containable (cris_ou_box_id int4 not null, mask_id int4 not null);
 create table cris_ou_edittab (id int4 not null, ext varchar(255), mandatory bool not null, mime varchar(255), priority int4 not null, shortName varchar(255) unique, title varchar(255), visibility int4, displayTab_id int4, primary key (id));
@@ -13,7 +13,7 @@ create table cris_ou_propertiesdefinition (id int4 not null, accessLevel int4, a
 create table cris_ou_tab (id int4 not null, ext varchar(255), mandatory bool not null, mime varchar(255), priority int4 not null, shortName varchar(255) unique, title varchar(255), visibility int4, primary key (id));
 create table cris_ou_tab2box (cris_ou_tab_id int4 not null, mask_id int4 not null);
 create table cris_ou_widgetfile (id int4 not null, fileDescription text, labelAnchor varchar(255), showPreview bool not null, size int4 not null, primary key (id));
-create table cris_project (id int4 not null, sourceID varchar(255) unique, status bool, timestampCreated timestamp, timestampLastModified timestamp, uuid varchar(255) not null unique, primary key (id));
+create table cris_project (id int4 not null, sourceID varchar(255) unique, uuid varchar(255) not null unique, status bool, timestampCreated timestamp, timestampLastModified timestamp, primary key (id));
 create table cris_project_box (id int4 not null, collapsed bool not null, priority int4 not null, shortName varchar(255) unique, title varchar(255), unrelevant bool not null, visibility int4, primary key (id));
 create table cris_project_box2containable (cris_project_box_id int4 not null, mask_id int4 not null);
 create table cris_project_edittab (id int4 not null, ext varchar(255), mandatory bool not null, mime varchar(255), priority int4 not null, shortName varchar(255) unique, title varchar(255), visibility int4, displayTab_id int4, primary key (id));
@@ -28,7 +28,7 @@ create table cris_project_propertiesdefinition (id int4 not null, accessLevel in
 create table cris_project_tab (id int4 not null, ext varchar(255), mandatory bool not null, mime varchar(255), priority int4 not null, shortName varchar(255) unique, title varchar(255), visibility int4, primary key (id));
 create table cris_project_tab2box (cris_project_tab_id int4 not null, mask_id int4 not null);
 create table cris_project_widgetfile (id int4 not null, fileDescription text, labelAnchor varchar(255), showPreview bool not null, size int4 not null, primary key (id));
-create table cris_researcherpage (id int4 not null, epersonID int4, namesTimestampLastModified timestamp, sourceID varchar(255) unique, status bool, timestampCreated timestamp, timestampLastModified timestamp, uuid varchar(255) not null unique, primary key (id));
+create table cris_researcherpage (id int4 not null, sourceID varchar(255) unique, uuid varchar(255) not null unique, epersonID int4, namesTimestampLastModified timestamp, status bool, timestampCreated timestamp, timestampLastModified timestamp, primary key (id));
 create table cris_researcherpage_rejectItems (cris_researcherpage_id int4 not null, element int4);
 create table cris_rp_box (id int4 not null, collapsed bool not null, priority int4 not null, shortName varchar(255) unique, title varchar(255), unrelevant bool not null, visibility int4, primary key (id));
 create table cris_rp_box2containable (cris_rp_box_id int4 not null, mask_id int4 not null);
@@ -57,8 +57,8 @@ create table jdyna_widget_link (id int4 not null, labelHeaderLabel varchar(255),
 create table jdyna_widget_text (id int4 not null, collisioni bool, col int4 not null, row int4 not null, htmlToolbar varchar(255), multilinea bool not null, regex varchar(255), primary key (id));
 alter table cris_ou_box2containable add constraint FKA10F1DD457F736C foreign key (cris_ou_box_id) references cris_ou_box;
 alter table cris_ou_box2containable add constraint FKA10F1DD46760D09E foreign key (mask_id) references jdyna_containables;
-alter table cris_ou_edittab add constraint FKA92DB61883D0AD83 foreign key (displayTab_id) references cris_project_tab;
-alter table cris_ou_edittab2box add constraint FK50CD2271C66F8C94 foreign key (mask_id) references cris_project_box;
+alter table cris_ou_edittab add constraint FKA92DB61844BD38DB foreign key (displayTab_id) references cris_ou_tab;
+alter table cris_ou_edittab2box add constraint FK50CD2271E406B118 foreign key (mask_id) references cris_ou_box;
 alter table cris_ou_edittab2box add constraint FK50CD22713D6185CC foreign key (cris_ou_edittab_id) references cris_ou_edittab;
 alter table cris_ou_nestedobject add constraint FKCF310E4947D7AFC4 foreign key (typo_id) references cris_ou_nestedobject_typo;
 alter table cris_ou_nestedobject add constraint FKCF310E49A2617B42 foreign key (parent_id) references cris_organizationunit;
