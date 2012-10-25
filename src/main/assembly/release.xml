@@ -17,18 +17,18 @@
       <format>tar.gz</format>
       <format>tar.bz2</format>
    </formats>
-   <includeBaseDirectory>true</includeBaseDirectory>
    <baseDirectory>${finalName}-release</baseDirectory>
+   <includeBaseDirectory>true</includeBaseDirectory>
    <fileSets>
       <fileSet>
          <useDefaultExcludes>true</useDefaultExcludes>
          <includes>
             <include>dspace/**</include>
-            <include>LICENSE</include>
+            <include>LICENSE*</include>
             <include>NOTICE</include>
             <include>README</include>
-            <include>CHANGES</include>
-            <include>KNOWN_BUGS</include>
+            <include>build.properties</include>
+            <include>pom.xml</include>
          </includes>
          <excludes>
             <exclude>**/target/**</exclude>
