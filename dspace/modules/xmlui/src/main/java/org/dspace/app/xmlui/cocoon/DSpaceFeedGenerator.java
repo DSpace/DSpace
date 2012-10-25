@@ -286,16 +286,13 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     }
 
 
-    /**
-     * check also its datafiles before add it to the result list
-     * if a datafile is under embargo don't add the dataPackage to the result list.
-     */
-    private boolean isADataFileEmbargoed(Context context, Item item) throws SQLException {
+
+    private boolean isAtLeastOneDataFileVisible(Context context, Item item) throws SQLException {
         Item[] datafiles = DryadWorkflowUtils.getDataFiles(context, item);
         for (Item i : datafiles) {
             String lift = ConfigurationManager.getProperty("embargo.field.lift");
             DCValue[] values = i.getMetadata(lift);
-            if (values != null && values.length > 0)
+            if (values == null || values.length == 0)
                 return true;
 
         }
@@ -355,9 +352,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
                     for (Group group : AuthorizeManager.getAuthorizedGroups(context, item, Constants.READ)) {
                         if ((group.getID() == 0)) {
 
-                            // check also its datafiles before add it to the result list
-                            // if a datafile is under embargo don't add the dataPackage to the result list.
-                            if (!isADataFileEmbargoed(context, item)) {
+                            if (isAtLeastOneDataFileVisible(context, item)) {
                                 result.add(item);
                                 break checkAccess;
                             }
