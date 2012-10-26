@@ -51,9 +51,10 @@ create table jdyna_nestedobject_prop (id int4 not null, position int4 not null, 
 create table jdyna_nestedobject_propertiesdefinition (id int4 not null, accessLevel int4, advancedSearch bool not null, fieldmin_col int4, fieldmin_row int4, help text, label varchar(255), labelMinSize int4 not null, mandatory bool not null, newline bool not null, onCreation bool, priority int4 not null, repeatable bool not null, shortName varchar(255) unique, showInList bool not null, simpleSearch bool not null, rendering_id int4 unique, primary key (id));
 create table jdyna_nestedobject_typo (id int4 not null, label varchar(255), shortName varchar(255), accessLevel int4, help text, inline bool not null, mandatory bool not null, newline bool not null, priority int4 not null, repeatable bool not null, primary key (id));
 create table jdyna_nestedobject_typo2mask (jdyna_nestedobject_typo_id int4 not null, mask_id int4 not null);
-create table jdyna_values (DTYPE varchar(31) not null, id int4 not null, sortValue varchar(255), dateValue timestamp, testoValue text, linkdescription varchar(255), linkvalue text, fileextension varchar(255), filefolder varchar(255), filemime varchar(255), filevalue text, primary key (id));
+create table jdyna_values (DTYPE varchar(31) not null, id int4 not null, sortValue varchar(255), dateValue timestamp, testoValue text, linkdescription varchar(255), linkvalue text, fileextension varchar(255), filefolder varchar(255), filemime varchar(255), filevalue text, rpvalue int4, projectvalue int4, ouvalue int4, primary key (id));
 create table jdyna_widget_date (id int4 not null, maxYear int4, minYear int4, time bool not null, primary key (id));
 create table jdyna_widget_link (id int4 not null, labelHeaderLabel varchar(255), labelHeaderURL varchar(255), size int4 not null, primary key (id));
+create table jdyna_widget_pointer (id int4 not null, display text, filtro text, indexName varchar(255), size int4 not null, target varchar(255), primary key (id));
 create table jdyna_widget_text (id int4 not null, collisioni bool, col int4 not null, row int4 not null, htmlToolbar varchar(255), multilinea bool not null, regex varchar(255), primary key (id));
 alter table cris_ou_box2containable add constraint FKA10F1DD457F736C foreign key (cris_ou_box_id) references cris_ou_box;
 alter table cris_ou_box2containable add constraint FKA10F1DD46760D09E foreign key (mask_id) references jdyna_containables;
@@ -132,6 +133,9 @@ alter table jdyna_nestedobject_prop add constraint FKCCDC8C7F9B08C304 foreign ke
 alter table jdyna_nestedobject_typo2mask add constraint FKFA3161BE6E858C69 foreign key (mask_id) references jdyna_nestedobject_propertiesdefinition;
 alter table jdyna_nestedobject_typo2mask add constraint FKFA3161BE4F63CCE8 foreign key (jdyna_nestedobject_typo_id) references jdyna_nestedobject_typo;
 create index jdyna_values_idx_dtype on jdyna_values (DTYPE);
+alter table jdyna_values add constraint FK51AA118FE5220DBD foreign key (ouvalue) references cris_organizationunit;
+alter table jdyna_values add constraint FK51AA118F34F77D96 foreign key (projectvalue) references cris_project;
+alter table jdyna_values add constraint FK51AA118F3B074C05 foreign key (rpvalue) references cris_researcherpage;
 create sequence BOX_SEQ;
 create sequence CONTAINABLE_SEQ;
 create sequence CRIS_OU_SEQ;
