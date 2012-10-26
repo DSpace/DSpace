@@ -31,9 +31,10 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 	<h1>Diseño gráfico</h1>
 	<ul>
 		<li>Lucas Folegotto</li>
+		<li>Michael Dorka</li>
 	</ul>
 
-	<h1>Referencistas</h1>
+	<h1>Referencia</h1>
 	<ul>
 		<li>Carlos Nusch</li>
 		<li>Esteban Fernandez</li>
@@ -50,7 +51,6 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 		<li>José Daniel Texier</li>
 		<li>María Marta Vila</li>
 		<li>Néstor Oviedo</li>
-		<li>Nicolás Romagnoli</li>
 	</ul>
 
 
