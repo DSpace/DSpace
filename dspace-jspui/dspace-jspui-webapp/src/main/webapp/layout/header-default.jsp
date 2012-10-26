@@ -36,6 +36,7 @@
     String osName = ConfigurationManager.getProperty("websvc.opensearch.shortname");
     List parts = (List)request.getAttribute("dspace.layout.linkparts");
     String extraHeadData = (String)request.getAttribute("dspace.layout.head");
+    String extraHeadDataLast = (String)request.getAttribute("dspace.layout.head.last");
     String dsVersion = Util.getSourceVersion();
     String generator = dsVersion == null ? "DSpace" : "DSpace "+dsVersion;
 %>
