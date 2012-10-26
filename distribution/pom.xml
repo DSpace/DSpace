@@ -51,8 +51,8 @@
 	<modules>
 		<module>dspace-tag-files/modules/solr</module>
  		<module>dspace-tag-files/modules/oai</module> 
- 		<module>../dspace-xoai</module> 
- 		<module>overwritten-files/modules/xoai</module> 
+ 		<module>overwritten-files/modules/xoai</module>
+ 		<module>../xmlui</module>  
 	</modules>
 	
 	<dependencies>

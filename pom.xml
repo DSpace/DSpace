@@ -53,13 +53,10 @@
 			</build>
 
 		</profile>
-
-
 	</profiles>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
 		<slf4j.version>1.5.8</slf4j.version>
 	</properties>
 
@@ -69,10 +66,9 @@
 
 
 	<modules>
-		<module>xmlui</module>
 		<module>plugins</module>
 		<module>distribution</module>
-<!-- 		<module>sedici2003</module> Esta en un profile  -->
+		<module>dspace-xoai</module>
 	</modules>
 
 	<dependencies>
