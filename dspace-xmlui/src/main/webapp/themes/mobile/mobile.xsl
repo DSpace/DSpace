@@ -35,6 +35,7 @@
 
     <!-- mobile variable -->
     <xsl:variable name="mobile-url" select="confman:getProperty('dspace.mobileUrl')"/>
+    <xsl:variable name="dspace-url" select="confman:getProperty('dspace.url')"/>
              
      <!--
         The starting point of any XSL processing is matching the root element. In DRI the root element is document,
@@ -156,7 +157,7 @@
    	        </h2>
             <a>
                 <xsl:attribute name="href">
-                <xsl:text>/</xsl:text>
+                    <xsl:value-of select="$mobile-url"/>
                 </xsl:attribute>
                 <xsl:attribute name="data-icon">
                 <xsl:text>home</xsl:text>
@@ -264,7 +265,10 @@
           <br />
 		  
 		  <!-- link to full website -->
-            <a href="#" data-role="button" data-icon="forward" data-iconpos="left" onclick="createCookie('viewfull','true','','$dspace.hostname');window.location='$mobile-url';">View full website</a>
+            <a href="#" data-role="button" data-icon="forward" data-iconpos="left">
+                <xsl:attribute name="onclick">createCookie('viewfull','true','','$dspace.hostname');window.location='<xsl:value-of select="$dspace-url"/>';</xsl:attribute>
+                <xsl:text>View full website</xsl:text>
+            </a>
 	</xsl:when>
 
 </xsl:choose>
