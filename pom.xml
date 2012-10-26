@@ -203,7 +203,9 @@
         <profile>
             <id>dspace</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+            <file>
+                <exists>dspace/pom.xml</exists>
+            </file>
             </activation>
             <modules>
                 <module>dspace</module>
