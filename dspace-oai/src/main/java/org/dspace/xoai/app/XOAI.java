@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -48,6 +49,7 @@ import org.dspace.xoai.solr.DSpaceSolrSearch;
 import org.dspace.xoai.solr.DSpaceSolrServer;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrException;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrIndexerException;
+import org.dspace.xoai.util.DateUtils;
 import org.dspace.xoai.util.ItemUtils;
 import org.dspace.xoai.util.XOAICacheManager;
 import org.dspace.xoai.util.XOAIDatabaseManager;
@@ -224,7 +226,10 @@ public class XOAI
                 catch (MetadataBindException e)
                 {
                     log.error(e.getMessage(), e);
-                }
+                } catch (ParseException e) 
+                {
+                    log.error(e.getMessage(), e);
+				}
                 i++;
                 if (i % 100 == 0) System.out.println(i+" items imported so far...");
             }
@@ -245,8 +250,8 @@ public class XOAI
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
         }
     }
-
-    private SolrInputDocument index(Item item) throws SQLException, MetadataBindException
+    
+    private SolrInputDocument index(Item item) throws SQLException, MetadataBindException, ParseException
     {
         SolrInputDocument doc = new SolrInputDocument();
         doc.addField("item.id", item.getID());
@@ -254,7 +259,7 @@ public class XOAI
         doc.addField("item.public", pub);
         String handle = item.getHandle();
         doc.addField("item.handle", handle);
-        doc.addField("item.lastmodified", item.getLastModified());
+        doc.addField("item.lastmodified", DateUtils.toSolrDate(item.getLastModified()));
         doc.addField("item.submitter", item.getSubmitter().getEmail());
         doc.addField("item.deleted", item.isWithdrawn() ? "true" : "false");
         for (Collection col : item.getCollections())
