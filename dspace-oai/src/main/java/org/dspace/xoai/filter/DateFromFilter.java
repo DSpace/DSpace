@@ -42,16 +42,11 @@ public class DateFromFilter extends DSpaceFilter
         return false;
     }
 
-    private String dateToString(Date date)
-    {
-        return DateUtils.formatToSolr(date);
-    }
-
     @Override
     public SolrFilterResult getQuery()
     {
         return new SolrFilterResult("item.lastmodified:["
-                + ClientUtils.escapeQueryChars(this.dateToString(_date))
+                + ClientUtils.escapeQueryChars(DateUtils.formatToSolr(_date))
                 + " TO *]");
     }
 

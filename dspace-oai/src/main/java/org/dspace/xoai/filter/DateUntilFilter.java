@@ -7,12 +7,12 @@
  */
 package org.dspace.xoai.filter;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.core.Context;
 import org.dspace.xoai.data.DSpaceItem;
+import org.dspace.xoai.util.DateUtils;
 
 /**
  * 
@@ -42,18 +42,12 @@ public class DateUntilFilter extends DSpaceFilter
         return false;
     }
 
-    private String dateToString(Date date)
-    {
-        SimpleDateFormat formatDate = new SimpleDateFormat(
-                "yyyy-MM-dd'T'HH:mm:ss'Z'");
-        return formatDate.format(date);
-    }
-
     @Override
     public SolrFilterResult getQuery()
     {
+    	System.out.println("HEYYYY!!!!");
         return new SolrFilterResult("item.lastmodified:[* TO "
-                + ClientUtils.escapeQueryChars(this.dateToString(_date)) + "]");
+                + ClientUtils.escapeQueryChars(DateUtils.formatToSolr(_date, false)) + "]");
     }
 
 }

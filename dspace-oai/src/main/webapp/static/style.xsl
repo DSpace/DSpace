@@ -1267,7 +1267,7 @@
 		<xsl:choose>
 			<xsl:when test="$cursor">
 				<xsl:choose>
-					<xsl:when test="$path/../oai:resumptionToken/text() = ''">
+					<xsl:when test="normalize-space($path/../oai:resumptionToken/text()) = ''">
 					<!-- on the last page of results we have to assume that @completeListSize is available -->
 						<xsl:value-of
 							select="$total - $count" />
