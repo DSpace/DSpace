@@ -123,25 +123,21 @@ function startCreateNewVersionItem(){
 
 	assertEditItem(itemID);
 
-    var result= new FlowResult();
-	do{
-        result=doCreateNewVersion(itemID, result);
-    }while(result!=null);
+	doCreateNewVersion(itemID);
 
 	var item = Item.find(getDSContext(),itemID);
+    cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+item.getHandle(),true);
 
     getDSContext().complete();
-	item = null;
-
-//    var wsid = cocoon.request.get("wsid");
-//    cocoon.redirectTo(cocoon.request.getContextPath()+"/submit-overview?workspaceID=" + wsid,true);
-//	cocoon.exit();
+    item = null;
+    cocoon.exit();
 }
 
 /*
  * Move this item to another collection
  */
-function doCreateNewVersion(itemID, result){
+function doCreateNewVersion(itemID){
+    var result = new FlowResult();
     assertEditItem(itemID);
     do {
         sendPageAndWait("item/version/create",{"itemID":itemID, "summary":result.getParameter("summary")}, result);
