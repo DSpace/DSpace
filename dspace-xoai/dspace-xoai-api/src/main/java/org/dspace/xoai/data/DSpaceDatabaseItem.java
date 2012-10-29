@@ -9,10 +9,8 @@ package org.dspace.xoai.data;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -108,7 +106,7 @@ public class DSpaceDatabaseItem extends DSpaceItem
     }
 
     private ItemMetadata metadata = null;
-    
+    	
     @Override
     public ItemMetadata getMetadata()
     {
@@ -127,79 +125,6 @@ public class DSpaceDatabaseItem extends DSpaceItem
         return metadata;
     }
 
-    private List<String> getMetadata(List<Element> elems, String[] parts)
-    {
-        List<String> list = new ArrayList<String>();
-        if (parts.length > 1)
-        {
-            if (parts[0].equals("*"))
-            {
-                for (Element e : elems)
-                {
-                    if (e.getElement() != null)
-                        list.addAll(this.getMetadata(e.getElement(),
-                                Arrays.copyOfRange(parts, 1, parts.length)));
-                }
-            }
-            else
-            {
-                Element e = getElement(elems, parts[0]);
-                if (e != null)
-                    list.addAll(this.getMetadata(e.getElement(),
-                            Arrays.copyOfRange(parts, 1, parts.length)));
-            }
-        }
-        else if (parts.length == 1)
-        {
-            // Here we could have reached our target (named fields)
-            for (Element e : elems)
-            {
-                for (Element.Field f : e.getField())
-                {
-                    if (parts[0].equals("*"))
-                        list.add(f.getValue());
-                    else if (parts[0].equals(f.getName()))
-                        list.add(f.getValue());
-                }
-            }
-
-            if (parts[0].equals("*"))
-            {
-                for (Element e : elems)
-                {
-                    if (e.getElement() != null)
-                        list.addAll(this.getMetadata(e.getElement(),
-                                Arrays.copyOfRange(parts, 1, parts.length)));
-                }
-            }
-            else
-            {
-                Element e = getElement(elems, parts[0]);
-                if (e != null)
-                    list.addAll(this.getMetadata(e.getElement(),
-                            Arrays.copyOfRange(parts, 1, parts.length)));
-            }
-        }
-        else
-        {
-            // Here we have reached our target (unnamed fields)
-            for (Element e : elems)
-            {
-                for (Element.Field f : e.getField())
-                {
-                    if (f.getName() == null || f.getName().equals(""))
-                        list.add(f.getValue());
-                }
-            }
-        }
-        return list;
-    }
-
-    public List<String> getMetadata(String field)
-    {
-        String[] parts = field.split(Pattern.quote("."));
-        return getMetadata(this.getMetadata().getMetadata().getElement(), parts);
-    }
 
     public Item getItem()
     {

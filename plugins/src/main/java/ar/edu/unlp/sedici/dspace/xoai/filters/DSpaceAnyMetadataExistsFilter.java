@@ -8,6 +8,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.xoai.data.DSpaceDatabaseItem;
+import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
 import org.dspace.xoai.filter.DSpaceFilter;
 import org.dspace.xoai.filter.DatabaseFilterResult;
@@ -64,11 +65,11 @@ public class DSpaceAnyMetadataExistsFilter extends DSpaceFilter
     }
 
     @Override
-    public boolean isShown(DSpaceDatabaseItem item)
+    public boolean isShown(DSpaceItem item)
     {
     	for (String field : this.getFields()) {
 				
-	        if (item.getMetadata(field+".*").size() > 0)
+	        if (item.getMetadata(field).size() > 0)
 	            return true;
 
 		}

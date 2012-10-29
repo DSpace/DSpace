@@ -30,7 +30,7 @@ public abstract class DSpaceItemRepository extends AbstractItemRepository
     // private static Logger log =
     // LogManager.getLogger(DSpaceItemRepository.class);
     @Override
-    protected ListItemIdentifiersResult getItemIdentifiers(
+    public ListItemIdentifiersResult getItemIdentifiers(
             List<Filter> filters, int offset, int length, Date from)
     {
         filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
@@ -38,7 +38,7 @@ public abstract class DSpaceItemRepository extends AbstractItemRepository
     }
 
     @Override
-    protected ListItemIdentifiersResult getItemIdentifiers(
+    public ListItemIdentifiersResult getItemIdentifiers(
             List<Filter> filters, int offset, int length, String setSpec)
     {
         filters.add(new Filter(new DspaceSetSpecFilter(setSpec),
@@ -47,7 +47,7 @@ public abstract class DSpaceItemRepository extends AbstractItemRepository
     }
 
     @Override
-    protected ListItemIdentifiersResult getItemIdentifiers(
+    public ListItemIdentifiersResult getItemIdentifiers(
             List<Filter> filters, int offset, int length, Date from, Date until)
     {
         filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
@@ -56,7 +56,7 @@ public abstract class DSpaceItemRepository extends AbstractItemRepository
     }
 
     @Override
-    protected ListItemIdentifiersResult getItemIdentifiers(
+    public ListItemIdentifiersResult getItemIdentifiers(
             List<Filter> filters, int offset, int length, String setSpec,
             Date from)
     {
@@ -67,7 +67,7 @@ public abstract class DSpaceItemRepository extends AbstractItemRepository
     }
 
     @Override
-    protected ListItemIdentifiersResult getItemIdentifiers(
+    public ListItemIdentifiersResult getItemIdentifiers(
             List<Filter> filters, int offset, int length, String setSpec,
             Date from, Date until)
     {
@@ -79,7 +79,7 @@ public abstract class DSpaceItemRepository extends AbstractItemRepository
     }
 
     @Override
-    protected ListItemIdentifiersResult getItemIdentifiersUntil(
+    public ListItemIdentifiersResult getItemIdentifiersUntil(
             List<Filter> filters, int offset, int length, Date until)
     {
         filters.add(new Filter(new DateUntilFilter(until), FilterScope.Query));
@@ -87,7 +87,7 @@ public abstract class DSpaceItemRepository extends AbstractItemRepository
     }
 
     @Override
-    protected ListItemIdentifiersResult getItemIdentifiersUntil(
+    public ListItemIdentifiersResult getItemIdentifiersUntil(
             List<Filter> filters, int offset, int length, String setSpec,
             Date until)
     {
@@ -98,7 +98,7 @@ public abstract class DSpaceItemRepository extends AbstractItemRepository
     }
 
     @Override
-    protected ListItemsResults getItems(List<Filter> filters, int offset,
+    public ListItemsResults getItems(List<Filter> filters, int offset,
             int length, Date from)
     {
         filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
@@ -106,7 +106,7 @@ public abstract class DSpaceItemRepository extends AbstractItemRepository
     }
 
     @Override
-    protected ListItemsResults getItems(List<Filter> filters, int offset,
+    public ListItemsResults getItems(List<Filter> filters, int offset,
             int length, String setSpec)
     {
         filters.add(new Filter(new DspaceSetSpecFilter(setSpec),
@@ -115,7 +115,7 @@ public abstract class DSpaceItemRepository extends AbstractItemRepository
     }
 
     @Override
-    protected ListItemsResults getItems(List<Filter> filters, int offset,
+    public ListItemsResults getItems(List<Filter> filters, int offset,
             int length, Date from, Date until)
     {
         filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
@@ -124,7 +124,7 @@ public abstract class DSpaceItemRepository extends AbstractItemRepository
     }
 
     @Override
-    protected ListItemsResults getItems(List<Filter> filters, int offset,
+    public ListItemsResults getItems(List<Filter> filters, int offset,
             int length, String setSpec, Date from)
     {
         filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
@@ -134,7 +134,7 @@ public abstract class DSpaceItemRepository extends AbstractItemRepository
     }
 
     @Override
-    protected ListItemsResults getItems(List<Filter> filters, int offset,
+    public ListItemsResults getItems(List<Filter> filters, int offset,
             int length, String setSpec, Date from, Date until)
     {
         filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
@@ -145,7 +145,7 @@ public abstract class DSpaceItemRepository extends AbstractItemRepository
     }
 
     @Override
-    protected ListItemsResults getItemsUntil(List<Filter> filters, int offset,
+    public ListItemsResults getItemsUntil(List<Filter> filters, int offset,
             int length, Date until)
     {
         filters.add(new Filter(new DateUntilFilter(until), FilterScope.Query));
@@ -153,7 +153,7 @@ public abstract class DSpaceItemRepository extends AbstractItemRepository
     }
 
     @Override
-    protected ListItemsResults getItemsUntil(List<Filter> filters, int offset,
+    public ListItemsResults getItemsUntil(List<Filter> filters, int offset,
             int length, String setSpec, Date from)
     {
         filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));

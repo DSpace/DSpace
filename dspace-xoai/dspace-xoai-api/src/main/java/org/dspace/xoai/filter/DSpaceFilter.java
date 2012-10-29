@@ -7,8 +7,10 @@
  */
 package org.dspace.xoai.filter;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.dspace.core.Context;
-import org.dspace.xoai.data.DSpaceDatabaseItem;
+import org.dspace.xoai.data.DSpaceItem;
 
 import com.lyncode.xoai.dataprovider.data.AbstractItemIdentifier;
 import com.lyncode.xoai.dataprovider.filter.AbstractFilter;
@@ -20,7 +22,8 @@ import com.lyncode.xoai.dataprovider.filter.AbstractFilter;
 public abstract class DSpaceFilter extends AbstractFilter
 {
     private Context _ctx = null;
-
+    private static Logger log = LogManager.getLogger(DSpaceFilter.class);
+    
     public void initialize(Context ctx)
     {
         _ctx = ctx;
@@ -42,14 +45,16 @@ public abstract class DSpaceFilter extends AbstractFilter
 
     public abstract SolrFilterResult getQuery();
 
-    public abstract boolean isShown(DSpaceDatabaseItem item);
+    public abstract boolean isShown(DSpaceItem item);
 
     @Override
     public boolean isItemShown(AbstractItemIdentifier item)
     {
-        if (item instanceof DSpaceDatabaseItem)
+        if (item instanceof DSpaceItem)
         {
-            return this.isShown((DSpaceDatabaseItem) item);
+            boolean value = this.isShown((DSpaceItem) item);
+            if (!value) log.debug("Item "+item.getIdentifier()+" not shown because of filter "+this.getClass().getName());
+            return value;
         }
         return false;
     }

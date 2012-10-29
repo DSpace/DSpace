@@ -153,7 +153,7 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
     }
 
     @Override
-    protected ListItemsResults getItems(List<Filter> filters, int offset,
+    public ListItemsResults getItems(List<Filter> filters, int offset,
             int length)
     {
         List<Object> parameters = new ArrayList<Object>();
@@ -207,7 +207,7 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
     }
 
     @Override
-    protected ListItemIdentifiersResult getItemIdentifiers(
+    public ListItemIdentifiersResult getItemIdentifiers(
             List<Filter> filters, int offset, int length)
     {
         List<Object> parameters = new ArrayList<Object>();
