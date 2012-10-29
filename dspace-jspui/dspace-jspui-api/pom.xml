@@ -78,6 +78,10 @@
          <artifactId>spring-webmvc</artifactId>
          <type>jar</type>
       </dependency>
+      		<dependency>
+			<groupId>net.sf.flexjson</groupId>
+			<artifactId>flexjson</artifactId>
+	  </dependency>
    </dependencies>
 
 </project>
