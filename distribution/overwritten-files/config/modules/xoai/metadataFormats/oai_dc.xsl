@@ -20,10 +20,14 @@
 	
 	<xsl:template match="/">
 		<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" 
-			xmlns:dc="http://purl.org/dc/doc:elements/1.1/" 
+			xmlns:dc="http://purl.org/dc/elements/1.1/" 
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 			xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
-			<!-- first title and subtitle, then titles - dc.title -->
+			
+			<!--snrd.identifier.handle = identifier -->
+			<xsl:for-each select="doc:metadata/doc:element[@name='snrd']/doc:element[@name='identifier']/doc:element[@name='handle']/doc:element/doc:field[@name='value']">
+				<dc:identifier><xsl:value-of select="." /></dc:identifier>
+			</xsl:for-each>
 			
 			<!--dc.identifier.uri = identifier -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']/doc:element[@name='uri']/doc:element/doc:field[@name='value']">
@@ -62,13 +66,13 @@
 				<dc:creator><xsl:value-of select="." /></dc:creator>
 			</xsl:for-each>
 
-			<!--dc.date.issued  = date -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='issued']/doc:element/doc:field[@name='value']">
+			<!--sedici.date.exposure = date -->
+			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='date']/doc:element[@name='exposure']/doc:element/doc:field[@name='value']">
 				<dc:date><xsl:value-of select="." /></dc:date>
 			</xsl:for-each>
 			
-			<!--sedici.date.exposure = date -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='date']/doc:element[@name='exposure']/doc:element/doc:field[@name='value']">
+			<!--dc.date.issued  = date -->
+			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='issued']/doc:element/doc:field[@name='value']">
 				<dc:date><xsl:value-of select="." /></dc:date>
 			</xsl:for-each>
 			
@@ -166,7 +170,22 @@
 				<dc:description><xsl:value-of select="." /></dc:description>
 			</xsl:for-each>
 			
-			<!--dc.type = type -->
+			<!--snrd.type.driver = type -->
+			<xsl:for-each select="doc:metadata/doc:element[@name='snrd']/doc:element[@name='type']/doc:element[@name='driver']/doc:element/doc:field[@name='value']">
+				<dc:type><xsl:value-of select="." /></dc:type>
+			</xsl:for-each>
+ 			
+			<!--snrd.type.snrd = type -->
+ 			<xsl:for-each select="doc:metadata/doc:element[@name='snrd']/doc:element[@name='type']/doc:element[@name='snrd']/doc:element/doc:field[@name='value']">
+				<dc:type><xsl:value-of select="." /></dc:type>
+			</xsl:for-each>
+
+			<!--snrd.type.version = type -->
+ 			<xsl:for-each select="doc:metadata/doc:element[@name='snrd']/doc:element[@name='type']/doc:element[@name='version']/doc:element/doc:field[@name='value']">
+				<dc:type><xsl:value-of select="." /></dc:type>
+			</xsl:for-each>
+			
+ 			<!--dc.type = type -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='type']/doc:element/doc:field[@name='value']">
 				<dc:type><xsl:value-of select="." /></dc:type>
 			</xsl:for-each>
@@ -176,9 +195,15 @@
 				<dc:type><xsl:value-of select="." /></dc:type>
 			</xsl:for-each>
 
-			<!-- Si viene algo con dc.rigts lo pongo al principio. EN sedici no tenemos dc.rights, pero por ahi viene para el snrd el AccessType-->
-			<!-- dc.rights = rights -->	
-			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field[@name='value']">
+			<!-- AccessType de OpenAire opcional -->
+			<!-- snrd.rights.accessRights = rights -->	
+			<xsl:for-each select="doc:metadata/doc:element[@name='snrd']/doc:element[@name='rights']/doc:element[@name='accessRights']/doc:element/doc:field[@name='value']">
+				<dc:rights><xsl:value-of select="." /></dc:rights>
+			</xsl:for-each>
+			
+			
+			<!-- snrd.rights.embargoEndDate = rights -->	
+			<xsl:for-each select="doc:metadata/doc:element[@name='snrd']/doc:element[@name='rights']/doc:element[@name='embargoEndDate']/doc:element/doc:field[@name='value']">
 				<dc:rights><xsl:value-of select="." /></dc:rights>
 			</xsl:for-each>
 			
@@ -191,7 +216,7 @@
 			</xsl:for-each>
 			
 			<!--  bitstream.format --> 
- 			<xsl:for-each select="doc:metadata/doc:element[@name='bundles']/doc:element[@name='bundle' and doc:field[@name='name' and text()='ORIGINAL']]/doc:element[@name='bitstreams']/doc:element[@name='bitstream']/doc:field[@name='format']">
+ 			<xsl:for-each select="doc:metadata/doc:element[@name='bundles']/doc:element[@name='bundle' and doc:field[@name='name' and text()='ORIGINAL']]/doc:element[@name='bitstreams']/doc:element[@name='bitstream' and position()=1]/doc:field[@name='format']">
 				<dc:format><xsl:value-of select="." /></dc:format>
 			</xsl:for-each>
 			
