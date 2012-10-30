@@ -33,7 +33,22 @@ public class SeDiCI2003Authors extends SeDiCI2003AuthorityProvider{
 		List<Personas> personas = Personas.findPersonasesByApellidoYNombre(apellido, nombre, start, limit);
 		List<Choice> choices= new ArrayList<Choice>(personas.size());
 		for (Personas p : personas) {
-			choices.add(choiceFactory.createChoice(String.valueOf(p.getId()), p.getApellidoYNombre(), p.getApellidoYNombre()));
+			String contextInfo = "";
+			
+			if(p.getInstitucion() != null) {
+				contextInfo += p.getInstitucion().getNombre();
+			}
+			
+			if(p.getDependencia() != null) {
+				if(contextInfo != "")
+					contextInfo += "; ";
+				contextInfo += p.getDependencia().getNombre();
+			}
+
+			if(contextInfo != "")
+				contextInfo = " ("+contextInfo+")";
+			
+			choices.add(choiceFactory.createChoice(String.valueOf(p.getId()), p.getApellidoYNombre(), p.getApellidoYNombre()+contextInfo));
 		}
 		return choices;
 	}

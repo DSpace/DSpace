@@ -70,6 +70,19 @@ public class Personas {
 	        return q.getResultList();
 	        
 	    }
+	   
+
+	   public Instituciones getInstitucion() {
+		   if(this.getIdInstitucion() == 0)
+			   return null;
+		   return Instituciones.findInstituciones( this.getIdInstitucion() );
+	   }
+
+	   public Dependencias getDependencia() {
+		   if(this.getIdDependencia() == 0)
+			   return null;
+		   return Dependencias.findDependencias( this.getIdDependencia() );
+	   }
 
 	   
    public static int findPersonasesByApellidoYNombreCount(String apellido,String nombre) {
