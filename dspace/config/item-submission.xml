@@ -209,7 +209,7 @@
        </step>
        -->
 
-      <!--Step 4 will be to Upload the item-->
+      <!--Step 4 will be to Upload the item -->
       <step>
         <heading>submit.progressbar.upload</heading>
         <processing-class>org.dspace.submit.step.UploadStep</processing-class>
@@ -217,16 +217,18 @@
 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
         <workflow-editable>true</workflow-editable>
       </step>
+      
 
        <!-- Step 4 Upload Item with Embargo Features (not supported in JSPUI)
-            to enable this step, please make sure to comment-out the previous step "UploadStep"
+            to enable this step, please make sure to comment-out the previous step "UploadStep"  
        <step>
            <heading>submit.progressbar.upload</heading>
            <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class>
+           <jspui-binding>org.dspace.app.webui.submit.step.JSPUploadWithEmbargoStep</jspui-binding>
            <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadWithEmbargoStep</xmlui-binding>
            <workflow-editable>true</workflow-editable>
        </step>
-        -->
+       -->
 
  	  <!--Step 5 will be to Verify/Review everything -->
  	  <step>

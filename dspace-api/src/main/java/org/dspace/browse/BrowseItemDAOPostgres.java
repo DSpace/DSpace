@@ -74,7 +74,8 @@ public class BrowseItemDAOPostgres implements BrowseItemDAO
                 TableRow row = tri.next();
                 items.add(new BrowseItem(context, row.getIntColumn("item_id"),
                                                   row.getBooleanColumn("in_archive"),
-                                                  row.getBooleanColumn("withdrawn")));
+                                                  row.getBooleanColumn("withdrawn"),
+                                                  row.getBooleanColumn("discoverable")));
             }
         }
         finally
