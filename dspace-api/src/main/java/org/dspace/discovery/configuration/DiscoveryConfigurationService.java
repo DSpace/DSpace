@@ -18,6 +18,7 @@ import java.util.Map;
 public class DiscoveryConfigurationService {
 
     private Map<String, DiscoveryConfiguration> map;
+    private Map<Integer, List<String>> toIgnoreMetadataFields;
 
     public Map<String, DiscoveryConfiguration> getMap() {
         return map;
@@ -25,6 +26,14 @@ public class DiscoveryConfigurationService {
 
     public void setMap(Map<String, DiscoveryConfiguration> map) {
         this.map = map;
+    }
+
+    public Map<Integer, List<String>> getToIgnoreMetadataFields() {
+        return toIgnoreMetadataFields;
+    }
+
+    public void setToIgnoreMetadataFields(Map<Integer, List<String>> toIgnoreMetadataFields) {
+        this.toIgnoreMetadataFields = toIgnoreMetadataFields;
     }
 
     public static void main(String[] args) {
