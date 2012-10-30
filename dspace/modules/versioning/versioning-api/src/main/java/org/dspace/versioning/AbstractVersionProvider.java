@@ -20,14 +20,15 @@ public abstract class AbstractVersionProvider {
         DCValue[] md = nativeItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         for (int n = 0; n < md.length; n++){
 
-
             if( (md[n].schema.equals(MetadataSchema.DC_SCHEMA)  && md[n].element.equals("relation") &&  (md[n].qualifier!=null && md[n].qualifier.equals("haspart")) )
                     || (md[n].schema.equals(MetadataSchema.DC_SCHEMA)  && md[n].element.equals("relation") &&  (md[n].qualifier!=null && md[n].qualifier.equals("ispartof")) )
-                      || (md[n].schema.equals(MetadataSchema.DC_SCHEMA)  && md[n].element.equals("identifier"))
+                      || (md[n].schema.equals(MetadataSchema.DC_SCHEMA)  && md[n].element.equals("identifier") && md[n].qualifier==null)
                         || (md[n].schema.equals(MetadataSchema.DC_SCHEMA)  && md[n].element.equals("relation") &&  (md[n].qualifier!=null && md[n].qualifier.equals("isversionof")) )
                          || (md[n].schema.equals(MetadataSchema.DC_SCHEMA)  && md[n].element.equals("date") &&  (md[n].qualifier!=null && md[n].qualifier.equals("accessioned")) )
                           || (md[n].schema.equals(MetadataSchema.DC_SCHEMA)  && md[n].element.equals("date") &&  (md[n].qualifier!=null && md[n].qualifier.equals("available")) )
-                           || (md[n].schema.equals(MetadataSchema.DC_SCHEMA)  && md[n].element.equals("description") &&  (md[n].qualifier!=null && md[n].qualifier.equals("provenance")) ) )
+                           || (md[n].schema.equals(MetadataSchema.DC_SCHEMA)  && md[n].element.equals("description") &&  (md[n].qualifier!=null && md[n].qualifier.equals("provenance")) )
+                            || (md[n].schema.equals(MetadataSchema.DC_SCHEMA)  && md[n].element.equals("date") &&  (md[n].qualifier!=null && md[n].qualifier.equals("embargoedUntil"))  )
+                )
                 continue;
 
 
