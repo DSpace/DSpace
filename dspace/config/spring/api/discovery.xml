@@ -9,12 +9,15 @@
 
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:context="http://www.springframework.org/schema/context"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
            http://www.springframework.org/schema/context
-           http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util-3.0.xsd"
     default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
@@ -42,6 +45,46 @@
                <!--Use site to override the default configuration for the home page & default discovery page-->
                <!--<entry key="site" value-ref="defaultConfiguration" />-->
                <!--<entry key="123456789/7621" value-ref="defaultConfiguration"/>-->
+            </map>
+        </property>
+        <property name="toIgnoreMetadataFields">
+            <map>
+                <entry>
+                    <key><util:constant static-field="org.dspace.core.Constants.COMMUNITY"/></key>
+                    <list>
+                        <!--Introduction text-->
+                        <!--<value>dc.description</value>-->
+                        <!--Short description-->
+                        <!--<value>dc.description.abstract</value>-->
+                        <!--News-->
+                        <!--<value>dc.description.tableofcontents</value>-->
+                        <!--Copyright text-->
+                        <value>dc.rights</value>
+                        <!--Community name-->
+                        <!--<value>dc.title</value>-->
+                    </list>
+                </entry>
+                <entry>
+                    <key><util:constant static-field="org.dspace.core.Constants.COLLECTION"/></key>
+                    <list>
+                        <!--Introduction text-->
+                        <!--<value>dc.description</value>-->
+                        <!--Short description-->
+                        <!--<value>dc.description.abstract</value>-->
+                        <!--News-->
+                        <!--<value>dc.description.tableofcontents</value>-->
+                        <!--Copyright text-->
+                        <value>dc.rights</value>
+                        <!--Collection name-->
+                        <!--<value>dc.title</value>-->
+                    </list>
+                </entry>
+                <entry>
+                    <key><util:constant static-field="org.dspace.core.Constants.ITEM"/></key>
+                    <list>
+                        <value>dc.description.provenance</value>
+                    </list>
+                </entry>
             </map>
         </property>
     </bean>
