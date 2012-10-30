@@ -478,7 +478,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                   text-decoration: none;
                   vertical-align: middle }
 
-.searchBoxLabelSmall { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.searchBoxSmall { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                   font-size: 8pt;
                   font-style: normal;
                   font-weight: bold;
@@ -702,3 +702,87 @@ input.ds-authority-lock.is-locked
   { background-image: url(image/lock24.png); }
 input.ds-authority-lock.is-unlocked
   { background-image: url(image/unlock24.png); }
+
+textarea#reason {
+       font-size: 10pt;
+}
+.access-setting {
+    margin-left: 5%;
+}
+th.accessOdd {
+    width: 20%;
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-align: right;
+    text-decoration: none;
+    background: #eeeeee;
+}
+th.accessEven { 
+    width: 20%;
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-align: right;
+    text-decoration: none;
+    background: #dddddd;
+}
+td.accessOdd{ 
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-decoration: none;
+    background: #ffffff; 
+}
+td.accessEven{ 
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-decoration: none;
+    background: #eeeeee; 
+}
+th.accessHeadOdd {
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-align: center;
+    text-decoration: none;
+    background: #eeeeee;
+}
+th.accessHeadEven { 
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-align: center;
+    text-decoration: none;
+    background: #dddddd;
+}
+
+.accessButton{ 
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-decoration: none;
+    background: #ffffff; 
+}
