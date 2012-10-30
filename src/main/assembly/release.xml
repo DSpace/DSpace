@@ -29,6 +29,8 @@
             <include>README</include>
             <include>build.properties</include>
             <include>pom.xml</include>
+            <include>src/main/assembly/testEnvironment.xml</include>
+            <include>src/main/filters/testEnvironment.properties</include>
          </includes>
          <excludes>
             <exclude>**/target/**</exclude>
