@@ -80,7 +80,7 @@
 					<doc:element name='rights'>
 						<doc:element name='accessRights'>
 							<doc:element name='es'>
-								<doc:field name="value">info:eu-repo/semantics/embargoedAccess/</doc:field>
+								<doc:field name="value">info:eu-repo/semantics/embargoedAccess</doc:field>
 							</doc:element>
 						</doc:element>
 						<doc:element name='embargoEndDate'>
@@ -96,7 +96,7 @@
 					<doc:element name='rights'>
 						<doc:element name='accessRights'>
 							<doc:element name='es'>
-								<doc:field name="value">info:eu-repo/semantics/openAccess/</doc:field>
+								<doc:field name="value">info:eu-repo/semantics/openAccess</doc:field>
 							</doc:element>
 						</doc:element>
 					</doc:element>
@@ -211,70 +211,70 @@
 		<xsl:variable name="snrd_type_version">
 		<xsl:choose>
 			<xsl:when test="$subtype='Documento de trabajo'">
-				info:eu-repo/semantics/submitted
+				info:eu-repo/semantics/submittedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='Preprint'">
-				info:eu-repo/semantics/accepted
+				info:eu-repo/semantics/acceptedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='Articulo'">
-				info:eu-repo/semantics/published
+				info:eu-repo/semantics/publishedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='Comunicacion'">
-				info:eu-repo/semantics/published
+				info:eu-repo/semantics/publishedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='Revision'">
-				info:eu-repo/semantics/published
+				info:eu-repo/semantics/publishedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='Contribucion a revista'">
-				info:eu-repo/semantics/published
+				info:eu-repo/semantics/publishedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='Informe tecnico'">
-				info:eu-repo/semantics/published
+				info:eu-repo/semantics/publishedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='patente'">
-				info:eu-repo/semantics/published
+				info:eu-repo/semantics/publishedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='Tesis de doctorado'">
-				info:eu-repo/semantics/accepted
+				info:eu-repo/semantics/acceptedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='Tesis de maestria'">
-				info:eu-repo/semantics/accepted
+				info:eu-repo/semantics/acceptedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='Trabajo de especializacion'">
-				info:eu-repo/semantics/accepted
+				info:eu-repo/semantics/acceptedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='Tesis de grado'">
-				info:eu-repo/semantics/accepted
+				info:eu-repo/semantics/acceptedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='Trabajo final de grado'">
-				info:eu-repo/semantics/accepted
+				info:eu-repo/semantics/acceptedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='Libro'">
-				info:eu-repo/semantics/published
+				info:eu-repo/semantics/publishedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='Capitulo de libro'">
-				info:eu-repo/semantics/published
+				info:eu-repo/semantics/publishedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='Objeto de conferencia'">
-				info:eu-repo/semantics/published
+				info:eu-repo/semantics/publishedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='Documento institucional'">
-				info:eu-repo/semantics/published
+				info:eu-repo/semantics/publishedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='Resolucion'">
-				info:eu-repo/semantics/published
+				info:eu-repo/semantics/publishedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='Imagen fija'">
-				info:eu-repo/semantics/published
+				info:eu-repo/semantics/publishedVersion
 			</xsl:when> 
  			<xsl:when test="$subtype='Imagen en movimiento'">
-				info:eu-repo/semantics/published
+				info:eu-repo/semantics/publishedVersion
 			</xsl:when>
  			<xsl:when test="$subtype='Audio'">
-				info:eu-repo/semantics/published
+				info:eu-repo/semantics/publishedVersion
 			</xsl:when>
 			<xsl:otherwise>
-				info:eu-repo/semantics/published
+				info:eu-repo/semantics/publishedVersion
 			</xsl:otherwise>
 		</xsl:choose>
 		</xsl:variable>
