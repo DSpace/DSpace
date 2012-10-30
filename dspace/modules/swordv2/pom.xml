@@ -129,10 +129,10 @@
         <classifier>classes</classifier>
       </dependency>
 
-      <dependency>
+<!--       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-discovery-provider</artifactId>
-      </dependency>
+      </dependency> -->
 
       <dependency>
          <groupId>javax.servlet</groupId>

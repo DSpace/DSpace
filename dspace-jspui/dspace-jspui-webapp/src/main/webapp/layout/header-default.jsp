@@ -50,6 +50,8 @@
         <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css" type="text/css" />
         <link rel="stylesheet" href="<%= request.getContextPath() %>/print.css" media="print" type="text/css" />
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/css/discovery.css" type="text/css" />
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/jquery-ui-1.8.24.custom/redmond/jquery-ui-1.8.24.custom.css" type="text/css" />
 <%
     if (!"NONE".equals(feedRef))
     {
@@ -81,6 +83,14 @@
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/builder.js"> </script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/controls.js"> </script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/choice-support.js"> </script>
+	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-1.8.2.min.js'></script>
+	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.8.24.custom.min.js'></script>    
+ <% if (extraHeadDataLast != null)
+    { %>
+		<%= extraHeadDataLast %>
+		<%
+		    }
+    %>    
     </head>
 
     <%-- HACK: leftmargin, topmargin: for non-CSS compliant Microsoft IE browser --%>

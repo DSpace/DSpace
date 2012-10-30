@@ -48,7 +48,7 @@
        <dependency>
            <groupId>org.dspace</groupId>
            <artifactId>dspace-solr</artifactId>
-           <version>3.3.0.0</version>
+           <version>3.5.0.1</version>
            <classifier>skinny</classifier>
            <type>war</type>
        </dependency>
@@ -56,12 +56,12 @@
        <dependency>
            <groupId>org.dspace</groupId>
            <artifactId>dspace-solr</artifactId>
-           <version>3.3.0.0</version>
+           <version>3.5.0.1</version>
            <classifier>classes</classifier>
            <type>jar</type>
        </dependency>
 
-      <dependency>
+<!--      <dependency>
          <groupId>org.slf4j</groupId>
          <artifactId>slf4j-api</artifactId>
          <version>1.5.6</version>
@@ -71,7 +71,7 @@
          <groupId>org.slf4j</groupId>
          <artifactId>slf4j-jdk14</artifactId>
          <version>1.5.6</version>
-      </dependency>
+      </dependency>-->
 
 
     <!-- support odd cases where JAXP cannot be found in JVM -->

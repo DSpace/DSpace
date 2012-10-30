@@ -29,19 +29,34 @@ public class BrowseDAOFactory
 	public static BrowseDAO getInstance(Context context)
 		throws BrowseException
 	{
-		String db = ConfigurationManager.getProperty("db.name");
-		if ("postgres".equals(db))
-		{
-			return new BrowseDAOPostgres(context);
-		}
-		else if ("oracle".equals(db))
-		{
-            return new BrowseDAOOracle(context);
-		}
-		else
-		{
-			throw new BrowseException("The configuration for db.name is either invalid, or contains an unrecognised database");
-		}
+	    String className = ConfigurationManager.getProperty("browseDAO.class");
+        if (className == null)
+        {
+            // For compatibility with previous versions
+            String db = ConfigurationManager.getProperty("db.name");
+            if ("postgres".equals(db))
+            {
+                return new BrowseDAOPostgres(context);
+            }
+            else if ("oracle".equals(db))
+            {
+                return new BrowseDAOOracle(context);
+            }
+            else
+            {
+                throw new BrowseException("The configuration for db.name is either invalid, or contains an unrecognised database");
+            }    
+        }
+        try
+        {
+            return (BrowseDAO) Class
+                    .forName(ConfigurationManager.getProperty("browseDAO.class"))
+                    .getConstructor(Context.class).newInstance(context);
+        }
+        catch (Exception e)
+        {
+            throw new BrowseException("The configuration for browseDAO is invalid: "+className, e);
+        }
 	}
 	
 	/**
@@ -55,19 +70,34 @@ public class BrowseDAOFactory
 	public static BrowseCreateDAO getCreateInstance(Context context)
 		throws BrowseException
 	{
-		String db = ConfigurationManager.getProperty("db.name");
-		if ("postgres".equals(db))
-		{
-			return new BrowseCreateDAOPostgres(context);
-		}
-		else if ("oracle".equals(db))
-		{
-            return new BrowseCreateDAOOracle(context);
-		}
-		else
-		{
-			throw new BrowseException("The configuration for db.name is either invalid, or contains an unrecognised database");
-		}
+	    String className = ConfigurationManager.getProperty("browseCreateDAO.class");
+        if (className == null)
+        {
+            // For compatibility with previous versions
+            String db = ConfigurationManager.getProperty("db.name");
+            if ("postgres".equals(db))
+            {
+                return new BrowseCreateDAOPostgres(context);
+            }
+            else if ("oracle".equals(db))
+            {
+                return new BrowseCreateDAOOracle(context);
+            }
+            else
+            {
+                throw new BrowseException("The configuration for db.name is either invalid, or contains an unrecognised database");
+            }
+        }
+        try
+        {
+            return (BrowseCreateDAO) Class
+                    .forName(ConfigurationManager.getProperty("browseCreateDAO.class"))
+                    .getConstructor(Context.class).newInstance(context);
+        }
+        catch (Exception e)
+        {
+            throw new BrowseException("The configuration for browseCreateDAO is invalid: "+className, e);
+        }
 	}
 
     /**
