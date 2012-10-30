@@ -1745,7 +1745,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         return result;
     }
 
-    protected static DSpaceObject findDSpaceObject(Context context, SolrDocument doc) throws SQLException {
+    protected DSpaceObject findDSpaceObject(Context context, SolrDocument doc) throws SQLException {
 
         Integer type = (Integer) doc.getFirstValue("search.resourcetype");
         Integer id = (Integer) doc.getFirstValue("search.resourceid");

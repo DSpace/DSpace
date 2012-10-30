@@ -77,6 +77,9 @@ public class BrowseListTag extends TagSupport
     /** Config to disable cross links */
     private boolean disableCrossLinks = false;
 
+    /** Config to use a specific configuration */
+    private String config = null;
+    
     /** The default fields to be displayed when listing items */
     private static final String DEFAULT_LIST_FIELDS;
 
@@ -210,6 +213,12 @@ public class BrowseListTag extends TagSupport
                 browseListLine  = ConfigurationManager.getProperty("webui.itemlist." + bix.getName() + ".columns");
                 browseWidthLine = ConfigurationManager.getProperty("webui.itemlist." + bix.getName() + ".widths");
             }
+        }
+        
+        if (browseListLine == null && config != null)
+        {
+            browseListLine  = ConfigurationManager.getProperty("webui.itemlist."+config+".columns");
+            browseWidthLine = ConfigurationManager.getProperty("webui.itemlist."+config+".widths");
         }
 
         if (browseListLine == null)
@@ -728,12 +737,23 @@ public class BrowseListTag extends TagSupport
     {
         emphColumn = emphColumnIn;
     }
+    
+    public void setConfig(String config)
+    {
+        this.config = config;
+    }
+    
+    public String getConfig()
+    {
+        return config;
+    }
 
     public void release()
     {
         highlightRow = -1;
         emphColumn = null;
         items = null;
+        config = null;
     }
 
     /* get the required thumbnail config items */

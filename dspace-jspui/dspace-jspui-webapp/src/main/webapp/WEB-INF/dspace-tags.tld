@@ -256,7 +256,12 @@
     </attribute>
     <attribute>
       <name>browseInfo</name>
-      <required>true</required>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>config</name>
+      <required>false</required>
       <rtexprvalue>true</rtexprvalue>
     </attribute>
     <attribute>

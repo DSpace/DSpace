@@ -27,6 +27,11 @@
     <bean id="solrBrowseIndexer" scope="prototype"
           class="org.dspace.browse.SolrBrowseCreateDAO">
     </bean>
+    
+    <!-- Additional indexing plugin to implement the CRIS browse system via SOLR -->
+    <bean id="crisBrowseIndexer" scope="prototype"
+          class="it.cilea.hku.authority.discovery.CrisBrowseSolrIndexPlugin">
+    </bean>
 
     <!--Bean that is used for mapping communities/collections to certain discovery configurations.-->
     <bean id="org.dspace.discovery.configuration.DiscoveryConfigurationService" class="org.dspace.discovery.configuration.DiscoveryConfigurationService">

@@ -177,7 +177,6 @@ public class SolrBrowseDAO implements BrowseDAO
                 }
                 // filter on item to be sure to don't include any other object
                 // indexed in the Discovery Search core
-                query.addFilterQueries("search.resourcetype:" + Constants.ITEM);
                 if (orderField != null)
                 {
                     query.setSortField("bi_" + orderField + "_sort",
@@ -299,9 +298,17 @@ public class SolrBrowseDAO implements BrowseDAO
         {
             // FIXME introduce project, don't retrieve Item immediately when
             // processing the query...
-            Item item = (Item) solrDoc;
-            BrowseItem bitem = new BrowseItem(context, item.getID(),
-                    item.isArchived(), item.isWithdrawn());
+            BrowseItem bitem = null;
+            if (solrDoc instanceof Item)
+            {
+                Item item = (Item) solrDoc;
+                bitem = new BrowseItem(context, item.getID(),
+                        item.isArchived(), item.isWithdrawn());
+            }
+            else
+            {
+                bitem = new BrowseDSpaceObject(context, (BrowsableDSpaceObject) solrDoc);
+            }
             bitems.add(bitem);
         }
         return bitems;
@@ -313,7 +320,7 @@ public class SolrBrowseDAO implements BrowseDAO
     {
         DiscoverQuery query = new DiscoverQuery();
         query.setQuery("search.resourceid:" + itemID
-                + " AND search.resourcetype:" + Constants.ITEM);
+                );
         query.setMaxResults(1);
         DiscoverResult resp = null;
         try
@@ -341,7 +348,6 @@ public class SolrBrowseDAO implements BrowseDAO
         addLocationScopeFilter(query);
         addStatusFilter(query);
         query.setMaxResults(0);
-        query.addFilterQueries("search.resourcetype:" + Constants.ITEM);
         if (isAscending)
         {
             query.setQuery("bi_"+column + "_sort" + ": [* TO \"" + value + "\"]");

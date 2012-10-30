@@ -225,6 +225,11 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                                                             values[x].authority,
                                                             values[x].language);
                                         }
+                                        else
+                                        {
+                                            preferedLabel = values[x].value;
+                                        }
+                                        
                                         List<String> variants = null;
 
                                         boolean ignoreVariants = new DSpace()
