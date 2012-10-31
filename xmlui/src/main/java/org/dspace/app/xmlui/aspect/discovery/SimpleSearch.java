@@ -316,7 +316,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         }
         
         // deal with brackets in the main query
-        query = query.replace("(", "\\(").replace(")", "\\)").replace("\\\\", "\\");
+        query = query.replace("(", "\\(").replace(")", "\\)").replace("\\\\", "\\").replace(":", "\\:");
         return query.trim();
     }
 
