@@ -36,7 +36,7 @@ importClass(Packages.org.dspace.submit.AbstractProcessingStep);
 var ERROR_FIELDS = null;
 
 /**
- * Simple access method to access the current cocoon object model.
+ * Simple access method to access the current Cocoon object model.
  */
 function getObjectModel()
 {
@@ -45,7 +45,7 @@ function getObjectModel()
 
 /**
  * Return the DSpace context for this request since each HTTP request generates
- * a new context this object should never be stored and instead allways accessed
+ * a new context this object should never be stored and instead always accessed
  * through this method so you are ensured that it is the correct one.
  */
 function getDSContext()
@@ -61,13 +61,13 @@ function getHttpRequest()
 {
 	//return getObjectModel().get(HttpEnvironment.HTTP_REQUEST_OBJECT)
 
-	// Cocoon's request object handles form encoding, thus if the users enters
-	// non-ascii characters such as those found in foriegn languages they will
-	// come through corruped if they are not obtained through the cocoon request
+	// Cocoon's request object handles form encoding, thus if the user enters
+	// non-ASCII characters such as those found in foreign languages they will
+	// come through corrupted if they are not obtained through the Cocoon request
 	// object. However, since the dspace-api is built to accept only HttpServletRequest
-	// a wrapper class HttpServletRequestCocoonWrapper has bee built to translate
-	// the cocoon request back into a servlet request. This is not a fully complete
-	// translation as some methods are unimplemeted. But it is enough for our
+	// a wrapper class HttpServletRequestCocoonWrapper has been built to translate
+	// the Cocoon request back into a servlet request. This is not a fully complete
+	// translation as some methods are unimplemented. But it is enough for our
 	// purposes here.
 	return new HttpServletRequestCocoonWrapper(getObjectModel());
 }
@@ -175,7 +175,7 @@ function doVersionHistoryItem(itemID, result){
                     getDSContext().complete();
                     cocoon.exit();
                 }else{
-                    //Perhaps we have a new item (if we deleted the current version)
+                    // Perhaps we have a new item (if we deleted the current version)
                     itemID = result.getParameter("itemID");
                 }
             }
@@ -314,14 +314,14 @@ function sendPageAndWait(uri,bizData,result)
 }
 
 /**
- * Send the given page and DO NOT wait for the flow to be continued. Excution will
- * proccede as normal. This method will preform two usefull actions: set the flow
+ * Send the given page and DO NOT wait for the flow to be continued. Execution will
+ * proceed as normal. This method will preform two useful actions: set the flow
  * parameter & add result information.
  *
- * The flow parameter is used by the sitemap to seperate requests comming from a
+ * The flow parameter is used by the sitemap to separate requests comming from a
  * flow script from just normal urls.
  *
- * The result object could potentialy contain a notice message and a list of
+ * The result object could potentially contain a notice message and a list of
  * errors. If either of these are present then they are added to the sitemap's
  * parameters.
  */
