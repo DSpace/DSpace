@@ -56,13 +56,6 @@ public class ItemUtils
         return e;
     }
 
-    private static Element.Field createValue(ObjectFactory factory, String value)
-    {
-        Element.Field e = factory.createElementField();
-        e.setValue(value);
-        return e;
-    }
-
     private static Element.Field createValue(ObjectFactory factory,
             String name, String value)
     {
