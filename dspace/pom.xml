@@ -18,13 +18,6 @@
         <version>3.0-rc3-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
-    
-    <!--
-       Builds Overlay Modules for DSpace
-    -->
-    <modules>
-        <module>modules</module>
-    </modules>
 
     <build>
         <filters>
@@ -62,25 +55,87 @@
         </resources>
     
         <plugins>
-            <!--  overall project assembly -->
+            <!--  Default project assembly. Calls 'assembly.xml', which
+                  generates the DSpace build directory. -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
+                    <!-- Don't "attach" the assembly results to this project. As
+                         this assembly builds a directory, setting this to "true"
+                         (default value) will just result in a WARNING message.-->
+                    <attach>false</attach>
                     <descriptors>
-                        <descriptor>src/assemble/assembly.xml</descriptor>
+                        <descriptor>src/main/assembly/assembly.xml</descriptor>
                     </descriptors>
                 </configuration>
                 <executions>
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <goal>directory-single</goal>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+
+        <!-- Default Profile. This builds all Overlay modules for DSpace -->
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <!--
+                Builds Overlay Modules for DSpace
+            -->
+            <modules>
+                <module>modules</module>
+            </modules>
+        </profile>
+
+
+        <!--
+            Run this profile (e.g. 'mvn package -Pdistributions') to create
+            zip / tarball distributions to upload to SourceForge or similar.
+            When this profile is run, DSpace is NOT compiled as normal.
+            Instead, a zip/tarball is generated from the parent [dspace-src] directory.
+        -->
+        <profile>
+           <id>distributions</id>
+           <activation>
+              <activeByDefault>false</activeByDefault>
+           </activation>
+           <build>
+              <plugins>
+                 <plugin>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <inherited>false</inherited>
+                    <executions>
+                       <execution>
+                          <inherited>false</inherited>
+                          <configuration>
+                             <descriptors>
+                                <descriptor>src/main/assembly/release.xml</descriptor>
+                                <descriptor>src/main/assembly/src-release.xml</descriptor>
+                             </descriptors>
+                             <tarLongFileMode>gnu</tarLongFileMode>
+                             <finalName>dspace-${project.version}</finalName>
+                          </configuration>
+                          <phase>package</phase>
+                          <goals>
+                             <goal>single</goal>
+                          </goals>
+                       </execution>
+                    </executions>
+                 </plugin>
+              </plugins>
+           </build>
+        </profile>
+
+    </profiles>
 
     <dependencies>
     	<!-- This dependency ensures DSpace OAI JAR is added to [dspace]/lib/,

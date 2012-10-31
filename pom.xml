@@ -378,42 +378,6 @@
          </modules>
       </profile>
 
-      <!--
-         Run this profile (e.g. 'mvn package -Pdistributions') to create
-         zip / tarball distributions to upload to SourceForge or similar.
-       -->
-      <profile>
-         <id>distributions</id>
-         <activation>
-            <activeByDefault>false</activeByDefault>
-         </activation>
-         <build>
-            <plugins>
-               <plugin>
-                  <artifactId>maven-assembly-plugin</artifactId>
-                  <inherited>false</inherited>
-                  <executions>
-                     <execution>
-                        <inherited>false</inherited>
-                        <configuration>
-                           <descriptors>
-                              <descriptor>src/main/assembly/release.xml</descriptor>
-                              <descriptor>src/main/assembly/src-release.xml</descriptor>
-                           </descriptors>
-                           <tarLongFileMode>gnu</tarLongFileMode>
-                           <finalName>dspace-${project.version}</finalName>
-                        </configuration>
-                        <phase>package</phase>
-                        <goals>
-                           <goal>single</goal>
-                        </goals>
-                     </execution>
-                  </executions>
-               </plugin>
-            </plugins>
-         </build>
-      </profile>
-
       <!-- Skip Unit Tests by default, but allow override on command line
            by setting property "-Dmaven.test.skip=false" -->
       <profile>
