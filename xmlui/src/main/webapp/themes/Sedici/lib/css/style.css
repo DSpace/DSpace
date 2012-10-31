@@ -2570,7 +2570,9 @@ bottom:10px;
 	width: 150px;
 	height: 50px;
 }
-
+.intro-text .texto_libre .label {
+    display: none;
+}
 #aspect_submission_StepTransformer_field_submit_jump_2_1:hover,
 #aspect_submission_StepTransformer_field_submit_jump_2_2:hover,
 #aspect_submission_StepTransformer_field_submit_jump_3_1:hover,

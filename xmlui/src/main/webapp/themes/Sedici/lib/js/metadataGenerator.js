@@ -6,6 +6,10 @@
     // Guardamos la referencia al textarea sobre el que se aplica este plugin
     var self = this;
 
+    // Si no hay elementos que matcheen con el selector, se termina la ejecucion
+    if(self.length == 0)
+    	return;
+
     // Lista de metadatos para ofrecer
     // TODO Sería genial si esto pudiese levantarse de la base de datos o de la configuracion
     var metadataList = {
@@ -35,12 +39,13 @@
         secretaria_de_redaccion: 'Secretaría de redacción',
         subdirector: 'Subdirector',
         subtitulo_de_la_serie: 'Subtítulo de la serie',
-        titulo_de_la_serie: 'Título de la serie'
+        titulo_de_la_serie: 'Título de la serie',
+        texto_libre: 'Texto libre'
     };
 
 
     //////////////////////////////////////////////////////////////////
-    // Creación de los elementos DOM necesario
+    // Creación de los elementos DOM necesarios
     //////////////////////////////////////////////////////////////////
 
     var selectContainer = $("<div class='selection'></div>");
@@ -63,14 +68,17 @@
     var agregar = $("<input type='button' class='add_metadata' value='Agregar'></input>");
     selectContainer.append(agregar);
 
+    // Boton de agregar como link
     var agregar_link = $("<input type='button' class='add_metadata_link' value='Agregar como Link'></input>");
     selectContainer.append(agregar_link);
 
 
+    //////////////////////////////////////////////////////////////////
     // Contenedor para los metadatos cargados
+    // Crea el contenedor principal y junta todos los controles
+    //////////////////////////////////////////////////////////////////
     var resultsContainer = $("<div id='loaded_"+self.attr('name')+"' class='generator_list'></div>");
 
-    // Crea el contenedor principal y junta todos los controles
     var mainContainer = $("<div class='metadataGenerator' id='generator_"+self.attr('name')+"'></div>");
     mainContainer.append(selectContainer);
     mainContainer.append(resultsContainer);
@@ -84,7 +92,6 @@
 
     // Se cargan los metadatos pre-existentes
     resultsContainer.append( self.val() );
-
 
     // Creacion del Sortable de jQuery
     resultsContainer.sortable({
