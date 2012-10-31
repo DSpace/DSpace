@@ -78,8 +78,6 @@ public class SolrLogger
 
     private static final boolean useProxies;
 
-    private static Map<String, String> metadataStorageInfo;
-
     private static List<String> statisticYearCores = new ArrayList<String>();
 
     public static enum StatisticsType {
@@ -179,19 +177,6 @@ public class SolrLogger
         }
 
         log.info("useProxies=" + useProxies);
-
-        metadataStorageInfo = new HashMap<String, String>();
-        int count = 1;
-        String metadataVal;
-        while ((metadataVal = ConfigurationManager.getProperty("solr-statistics","metadata.item." + count)) != null)
-        {
-            String storeVal = metadataVal.split(":")[0];
-            String metadataField = metadataVal.split(":")[1];
-
-            metadataStorageInfo.put(storeVal, metadataField);
-            log.info("solr-statistics.metadata.item." + count + "=" + metadataVal);
-            count++;
-        }
     }
 
     /**
@@ -228,29 +213,6 @@ public class SolrLogger
         {
             SolrInputDocument doc1 = getCommonSolrDoc(dspaceObject, request, currentUser);
             if (doc1 == null) return;
-
-            if (dspaceObject instanceof Item)
-            {
-                Item item = (Item) dspaceObject;
-                // Store the metadata
-                for (Object storedField : metadataStorageInfo.keySet())
-                {
-                    String dcField = metadataStorageInfo
-                            .get(storedField);
-
-                    DCValue[] vals = item.getMetadata(dcField.split("\\.")[0],
-                            dcField.split("\\.")[1], dcField.split("\\.")[2],
-                            Item.ANY);
-                    for (DCValue val1 : vals)
-                    {
-                        String val = val1.value;
-                        doc1.addField(String.valueOf(storedField), val);
-                        doc1.addField(storedField + "_search", val
-                                .toLowerCase());
-                    }
-                }
-            }
-
             if(dspaceObject instanceof Bitstream)
             {
                 Bitstream bit = (Bitstream) dspaceObject;
