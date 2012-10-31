@@ -306,9 +306,15 @@ public class DescribeStep extends AbstractProcessingStep
                 {
                 	continue;
                 }
-            	
+
+                String qualifier = inputs[i].getQualifier();
+                if (qualifier == null
+                        && inputs[i].getInputType().equals("qualdrop_value"))
+                {
+                    qualifier = Item.ANY;
+                }
                 DCValue[] values = item.getMetadata(inputs[i].getSchema(),
-                        inputs[i].getElement(), inputs[i].getQualifier(), Item.ANY);
+                        inputs[i].getElement(), qualifier, Item.ANY);
 
                 if ((inputs[i].isRequired() && values.length == 0) &&
                      inputs[i].isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE))
