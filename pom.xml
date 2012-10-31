@@ -414,13 +414,12 @@
          </build>
       </profile>
 
-      <!-- skip tests by default, but allow override
-      on command line by setting property "-Dmaven.test.skip"-->
-      <!-- Disabled by default, change activeByDefault to true to enable -->
+      <!-- Skip Unit Tests by default, but allow override on command line
+           by setting property "-Dmaven.test.skip=false" -->
       <profile>
         <id>skiptests</id>
         <activation>
-            <activeByDefault>false</activeByDefault>
+            <activeByDefault>true</activeByDefault>
          </activation>
         <properties>
          <maven.test.skip>true</maven.test.skip>
