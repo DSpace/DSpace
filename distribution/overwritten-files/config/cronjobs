@@ -1,14 +1,23 @@
+# m h  dom mon dow   command
 # ########## MAILS ######################
 # Send out subscription e-mails at 01:00 every day
 0 1 * * *  /var/dspace/bin/dspace sub-daily
 # Run the media filter at 02:00 every day
-0 2 * * *  /var/dspace/bin/dspace filter-media
+#0 2 * * *  /var/dspace/bin/dspace filter-media
+0 2 * * *  /var/dspace/bin/dspace filter-media -s 10915/5621,10915/2618,10915/2762,10915/15912,10915/2272,10915/15920,10915/5226
 # Run the checksum checker at 03:00
 0 3 * * *  /var/dspace/bin/dspace checker -lp
 # Mail the results to the sysadmin at 04:00
 0 4 * * *  /var/dspace/bin/dspace checker-emailer -c
 
-0 6 * * *  /var/dspace/bin/generate-sitemaps 
+#Generate Sitemaps
+0 6 * * *  /var/dspace/bin/dspace generate-sitemaps 
+
+#Check for pendign embargoes
+0 3 * * 1  /var/dspace/bin/dspace embargo-lifter 
+
+#Actualizacion de la bbdd geolite. ver mas en http://trac.prebi.unlp.edu.ar/issues/1702
+0 5 2 * *  ant -f /var/dspace-src/distribution/target/dspace-sedici-distribution-bin/build.xml update_geolite
 
 # ########## STATS ######################
 0 1 * * * /var/dspace/bin/dspace stat-general
@@ -19,3 +28,5 @@
 # ########## POSTGRES ######################
 # Clean up the database nightly at 4.20am
 # 20 4 * * * vacuumdb --analyze dspace > /dev/null 2>&1
+
+
