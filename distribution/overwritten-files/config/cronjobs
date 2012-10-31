@@ -10,6 +10,9 @@
 # Mail the results to the sysadmin at 04:00
 0 4 * * *  /var/dspace/bin/dspace checker-emailer -c
 
+#actualizo la lista de spiders ips                                           
+10 6 3 * * /var/dspace/bin/dspace/dspace stats-util -u && /var/dspace/bin/dspace/dspace stats-util -m  
+
 #Generate Sitemaps
 0 6 * * *  /var/dspace/bin/dspace generate-sitemaps 
 
