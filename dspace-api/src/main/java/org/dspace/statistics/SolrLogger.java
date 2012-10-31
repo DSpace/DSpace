@@ -76,6 +76,8 @@ public class SolrLogger
 
     private static final LookupService locationService;
 
+    private static Map<String, String> metadataStorageInfo;
+
     private static final boolean useProxies;
 
     private static List<String> statisticYearCores = new ArrayList<String>();
