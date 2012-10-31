@@ -67,6 +67,11 @@ public class SearchUtils {
         return manager.getServiceByName(DiscoveryConfigurationService.class.getName(), DiscoveryConfigurationService.class);
     }
 
+    public static List<String> getIgnoredMetadataFields(int type)
+    {
+        return getConfigurationService().getToIgnoreMetadataFields().get(type);
+    }
+
     /**
      * Method that retrieves a list of all the configuration objects from the given item
      * A configuration object can be returned for each parent community/collection

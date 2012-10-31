@@ -82,7 +82,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     public static final String STORE_SEPARATOR = "\n|||\n";
     
     public static final String VARIANTS_STORE_SEPARATOR = "###";
-    
+
     /**
      * Non-Static CommonsHttpSolrServer for processing indexing events.
      */
@@ -636,11 +636,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         String rights = community.getMetadata("copyright_text");
         String title = community.getMetadata("name");
 
-        addContainerMetadataField(doc, highlightedMetadataFields, "dc.description", description);
-        addContainerMetadataField(doc, highlightedMetadataFields, "dc.description.abstract", description_abstract);
-        addContainerMetadataField(doc, highlightedMetadataFields, "dc.description.tableofcontents", description_table);
-        addContainerMetadataField(doc, highlightedMetadataFields, "dc.rights", rights);
-        addContainerMetadataField(doc, highlightedMetadataFields, "dc.title", title);
+        List<String> toIgnoreMetadataFields = SearchUtils.getIgnoredMetadataFields(community.getType());
+        addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.description", description);
+        addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.description.abstract", description_abstract);
+        addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.description.tableofcontents", description_table);
+        addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.rights", rights);
+        addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.title", title);
 
         //Do any additional indexing, depends on the plugins
         List<SolrServiceIndexPlugin> solrServiceIndexPlugins = new DSpace().getServiceManager().getServicesByType(SolrServiceIndexPlugin.class);
@@ -688,13 +689,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         String rights_license = collection.getMetadata("license");
         String title = collection.getMetadata("name");
 
-        addContainerMetadataField(doc, highlightedMetadataFields, "dc.description", description);
-        addContainerMetadataField(doc, highlightedMetadataFields, "dc.description.abstract", description_abstract);
-        addContainerMetadataField(doc, highlightedMetadataFields, "dc.description.tableofcontents", description_table);
-        addContainerMetadataField(doc, highlightedMetadataFields, "dc.provenance", provenance);
-        addContainerMetadataField(doc, highlightedMetadataFields, "dc.rights", rights);
-        addContainerMetadataField(doc, highlightedMetadataFields, "dc.rights.license", rights_license);
-        addContainerMetadataField(doc, highlightedMetadataFields, "dc.title", title);
+        List<String> toIgnoreMetadataFields = SearchUtils.getIgnoredMetadataFields(collection.getType());
+        addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.description", description);
+        addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.description.abstract", description_abstract);
+        addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.description.tableofcontents", description_table);
+        addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.provenance", provenance);
+        addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.rights", rights);
+        addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.rights.license", rights_license);
+        addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.title", title);
 
 
         //Do any additional indexing, depends on the plugins
@@ -715,14 +717,17 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @param metadataField the metadata field added
      * @param value the value (can be NULL !)
      */
-    protected void addContainerMetadataField(SolrInputDocument doc, List<String> highlightedMetadataFields, String metadataField, String value)
+    protected void addContainerMetadataField(SolrInputDocument doc, List<String> highlightedMetadataFields, List<String> toIgnoreMetadataFields, String metadataField, String value)
     {
-        if(StringUtils.isNotBlank(value))
+        if(toIgnoreMetadataFields == null || !toIgnoreMetadataFields.contains(metadataField))
         {
-            doc.addField(metadataField, value);
-            if(highlightedMetadataFields.contains(metadataField))
+            if(StringUtils.isNotBlank(value))
             {
-                doc.addField(metadataField + "_hl", value);
+                doc.addField(metadataField, value);
+                if(highlightedMetadataFields.contains(metadataField))
+                {
+                    doc.addField(metadataField + "_hl", value);
+                }
             }
         }
     }
@@ -822,21 +827,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
             }
 
-            List<String> toIgnoreFields = new ArrayList<String>();
-            String ignoreFieldsString = new DSpace().getConfigurationService().getProperty("discovery.index.ignore");
-            if(ignoreFieldsString != null)
-            {
-                if(ignoreFieldsString.contains(","))
-                {
-                    for (int i = 0; i < ignoreFieldsString.split(",").length; i++)
-                    {
-                        toIgnoreFields.add(ignoreFieldsString.split(",")[i].trim());
-                    }
-                } else {
-                    toIgnoreFields.add(ignoreFieldsString);
-                }
-            }
-            
+
             List<String> toProjectionFields = new ArrayList<String>();
             String projectionFieldsString = new DSpace().getConfigurationService().getProperty("discovery.index.projection");
             if(projectionFieldsString != null){
@@ -867,8 +858,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     field += "." + meta.qualifier;
                 }
 
+                List<String> toIgnoreMetadataFields = SearchUtils.getIgnoredMetadataFields(item.getType());
                 //We are not indexing provenance, this is useless
-                if (toIgnoreFields.contains(field) || toIgnoreFields.contains(unqualifiedField + "." + Item.ANY))
+                if (toIgnoreMetadataFields != null && (toIgnoreMetadataFields.contains(field) || toIgnoreMetadataFields.contains(unqualifiedField + "." + Item.ANY)))
                 {
                     continue;
                 }
