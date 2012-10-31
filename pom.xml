@@ -117,27 +117,7 @@
                 <autoVersionSubmodules>true</autoVersionSubmodules>
             </configuration>
          </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-test-resources</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>src/main/assembly/testEnvironment.xml</descriptor>
-                            </descriptors>
-                            <filters>
-                                <filter>src/main/filters/testEnvironment.properties</filter>
-                            </filters>
-                        </configuration>
-                    </execution>
-                </executions>
-                <inherited>false</inherited>
-            </plugin>
-            <plugin>
+         <plugin>
                 <groupId>com.mycila.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>
                 <configuration>
@@ -187,25 +167,67 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+         </plugin>
       </plugins>
    </build>
    
    <profiles>
 
-      <!--
+        <!-- This profile ensures that we ONLY generate the Unit Test Environment
+             if the testEnvironment.xml file is found. That way the Test Environment
+             is NOT built when running a 'mvn package' on a "binary" release. -->
+        <profile>
+            <id>generate-test-env</id>
+            <activation>
+                <file>
+                    <exists>src/main/assembly/testEnvironment.xml</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- This plugin builds the testEnvironment.zip package
+                         based on the specifications in testEnvironment.xml -->
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/testEnvironment.xml</descriptor>
+                                    </descriptors>
+                                    <filters>
+                                        <filter>src/main/filters/testEnvironment.properties</filter>
+                                    </filters>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <inherited>false</inherited>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+
+        <!--
            These profiles activate the inclusion of various modules into
            the DSpace Build process. They activate automatically if the
            source module is in the local file system, correctly located
            relative to this file.
         -->
 
+        <!--
+           Builds DSpace "Assembly & Configuration" project
+        -->
         <profile>
             <id>dspace</id>
             <activation>
-            <file>
-                <exists>dspace/pom.xml</exists>
-            </file>
+                <file>
+                    <exists>dspace/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace</module>
@@ -218,7 +240,7 @@
         <profile>
             <id>dspace-api</id>
             <activation>
- 		<file>
+                <file>
                     <exists>dspace-api/pom.xml</exists>
                 </file>
             </activation>
