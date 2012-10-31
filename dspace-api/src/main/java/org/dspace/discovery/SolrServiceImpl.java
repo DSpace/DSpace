@@ -1813,7 +1813,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             {
                 SolrDocument doc = (SolrDocument) iter.next();
 
-                DSpaceObject o = DSpaceObject.find(context, (Integer) doc.getFirstValue("search.resourcetype"), (Integer) doc.getFirstValue("search.resourceid"));
+                DSpaceObject o = findDSpaceObject(context, doc);
+                //DSpaceObject o = DSpaceObject.find(context, (Integer) doc.getFirstValue("search.resourcetype"), (Integer) doc.getFirstValue("search.resourceid"));
 
                 if (o != null)
                 {
