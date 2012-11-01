@@ -945,19 +945,8 @@
 	<!-- Listado de los items recientemente subidos -->
 	<xsl:template match="dim:dim" mode="itemSummaryList-DIM-metadata">
 		<xsl:param name="href"/>
-		<div class="artifact-description">
-			<div class="artifact-type">
-					<xsl:choose>
-						<xsl:when test="dim:field[@element='subtype']"> 
-								<xsl:copy-of select="dim:field[@element='subtype']/node()"/> 
-						</xsl:when>
-						<xsl:when test="dim:field[@element='type']"> 
-								<xsl:copy-of select="dim:field[@element='type']/node()"/> 
-						</xsl:when>
-						<!-- No hay otherwise -->
-					</xsl:choose>
-			</div>
-			<div class="artifact-title">
+			<div  class="artifact-title">
+				<span class="title">
 				<xsl:element name="a">
 					<xsl:attribute name="href">
                         <xsl:value-of select="$href"/>
@@ -971,15 +960,18 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:element>
-				<span class="Z3988">
-					<xsl:attribute name="title">
-                        <xsl:call-template name="renderCOinS"/>
-                    </xsl:attribute>
-					&#xFEFF; <!-- non-breaking space to force separating the end tag -->
+				</span>				
+				<span class="publisher-date">
+				<!-- date.issued -->
+					<xsl:if test="dim:field[@element='date' and @qualifier='issued'] ">
+						<xsl:call-template name="render-date">
+							<xsl:with-param name="dateString" select="dim:field[@element='date' and @qualifier='issued'] "/>
+						</xsl:call-template>
+					</xsl:if>
 				</span>
 			</div>
-			<div class="artifact-info">
-				<span class="author">
+		<div class="artifact-description">			
+				<div class="author">
 					<xsl:choose>
 						<xsl:when test="dim:field[@element='creator']">
 							<xsl:for-each select="dim:field[@element='creator']">
@@ -1001,57 +993,68 @@
 							<i18n:text>xmlui.dri2xhtml.METS-1.0.no-author</i18n:text>
 						</xsl:otherwise>
 					</xsl:choose>
-				</span>
-				<span class="publisher-date">
-				<!-- date.issued -->
-					<xsl:if test="dim:field[@element='date' and @qualifier='issued'] ">
-						<xsl:call-template name="render-date">
-							<xsl:with-param name="dateString" select="dim:field[@element='date' and @qualifier='issued'] "/>
-						</xsl:call-template>
-					</xsl:if>
+				</div>
+				<div class="originInfo">
+				<!-- Solo para el tipo tesis  institución otorgante-->
+				<xsl:choose>					
+				<xsl:when  test="dim:field[@element='type'] = 'Tesis' or dim:field[@element = 'relation' and @qualifier='journalTitle'] or dim:field[@element = 'relation' and @qualifier='event'] ">					
 				
+					<xsl:choose>
+						<xsl:when test="dim:field[@element='type'] = 'Tesis'">
+							<xsl:value-of select="dim:field[@element='degree' and @qualifier='name']"	disable-output-escaping="yes"/>
+							<xsl:text>|</xsl:text>	
+							<xsl:value-of select="dim:field[@element='degree' and @qualifier='grantor']"	disable-output-escaping="yes"/> 
+							</xsl:when>
+					</xsl:choose>
 				<!-- journalTitle y journalVolumeAndIssue-->
 					<xsl:if test="dim:field[@element = 'relation' and @qualifier='journalTitle']">
-						<xsl:text>. </xsl:text>
 						<xsl:value-of select="dim:field[@element='relation' and @qualifier='journalTitle']" disable-output-escaping="yes"/>
 						<xsl:if test="dim:field[@element='relation' and @qualifier='journalVolumeAndIssue']">
 							<xsl:text>; </xsl:text>
 							<xsl:value-of select="dim:field[@element='relation' and @qualifier='journalVolumeAndIssue']" disable-output-escaping="yes"/>
 						</xsl:if>
-					</xsl:if>
-				<!-- Solo para el tipo tesis  institución otorgante-->
-					<xsl:choose>
-						<xsl:when test="dim:field[@element='type'] = 'Tesis'">
-							<xsl:text>. </xsl:text>
-							<xsl:value-of select="dim:field[@element='degree' and @qualifier='grantor']"
-								disable-output-escaping="yes"/>
-							</xsl:when>
-						<xsl:otherwise>
-							<!-- originInfo -->
-							<xsl:if test="dim:field[@element = 'originInfo']">
-								<xsl:text>. </xsl:text>
-								<xsl:value-of select="dim:field[@element='originInfo']"
-									disable-output-escaping="yes"/>
-							</xsl:if>
-						</xsl:otherwise>
-					</xsl:choose>					
+					</xsl:if>	
+				 						
 				<!-- evento-->
 					<xsl:if test="dim:field[@element = 'relation' and @qualifier='event']">
-						<xsl:text>. </xsl:text>
+						<xsl:text>| </xsl:text>
 						<xsl:value-of select="dim:field[@element='relation' and @qualifier='event']" disable-output-escaping="yes"/>
 					</xsl:if>
 				<!-- publisher-->
 					<xsl:if test="dim:field[@element='publisher']">
-						<xsl:text>. </xsl:text>
+						<xsl:text>| </xsl:text>
 						<xsl:copy-of select="dim:field[@element='publisher']/node()"/>
-					</xsl:if>					
-				</span>
-				<xsl:if test="dim:field[@element = 'description' and @qualifier='abstract']">
-					<xsl:variable name="abstract" select="dim:field[@element = 'description' and @qualifier='abstract']/node()"/>
-					<div class="artifact-abstract">
-						<xsl:value-of select="util:shortenString($abstract, 220, 10)" disable-output-escaping="yes"/>
-					</div>
-				</xsl:if>
+					</xsl:if>		
+				</xsl:when>
+				<xsl:otherwise><!-- originInfo -->
+					<xsl:if test="dim:field[@element = 'originInfo']">
+								<xsl:value-of select="dim:field[@element='originInfo']" disable-output-escaping="yes"/>
+					</xsl:if></xsl:otherwise>
+				</xsl:choose>			
+				</div>
+				<div class="type">
+					<xsl:choose>
+						<xsl:when test="dim:field[@element='subtype']"> 
+								<xsl:copy-of select="dim:field[@element='subtype']/node()"/> 
+						</xsl:when>
+						<xsl:when test="dim:field[@element='type']"> 
+								<xsl:copy-of select="dim:field[@element='type']/node()"/> 
+						</xsl:when>
+						<!-- No hay otherwise -->
+					</xsl:choose>
+				</div>	
+				<div> 			 
+						<xsl:choose>
+							 	<xsl:when test="../../../../mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']"> 
+									    <xsl:attribute name="class">file_local</xsl:attribute>
+									    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-file-local</i18n:text>
+						            </xsl:when>					
+								<!-- Localizacion Electronica -->
+								<xsl:when test="dim:field[@element='identifier'  and @qualifier='uri' and @mdschema='sedici']"> 
+									    <xsl:attribute name="class">file_externo</xsl:attribute>
+						                <i18n:text>xmlui.dri2xhtml.METS-1.0.item-file-externo</i18n:text>
+								</xsl:when> 
+						</xsl:choose>  
 			</div>
         </div>
 	</xsl:template>
