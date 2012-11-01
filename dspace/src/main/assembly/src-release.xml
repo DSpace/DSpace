@@ -8,6 +8,11 @@
     http://www.dspace.org/license/
 
 -->
+<!--
+    DSpace "Source" Release Package Assembly
+    This assembly creates the full source code 'zip/tarball' distribution
+    of DSpace which can be made available via SourceForge or similar.
+-->
 <assembly xmlns="http://maven.apache.org/POM/4.0.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/assembly-1.1.0-SNAPSHOT.xsd">
@@ -21,10 +26,12 @@
    <includeBaseDirectory>true</includeBaseDirectory>
    <fileSets>
       <fileSet>
+         <!-- Select files from the parent directory (i.e. [dspace-src])-->
+         <directory>..</directory>
          <useDefaultExcludes>true</useDefaultExcludes>
+         <!-- Include all files except target directories & dot files -->
          <excludes>
             <exclude>**/target/**</exclude>
-            <exclude>make-release-package</exclude>
             <exclude>.*</exclude>
          </excludes>
       </fileSet>
