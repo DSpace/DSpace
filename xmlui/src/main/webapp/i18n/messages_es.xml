@@ -864,7 +864,7 @@
 	<message key="xmlui.administrative.Navigation.context_head">Contexto</message>
 <message key="xmlui.administrative.Navigation.context_edit_item">Administrar Item</message>
 <message key="xmlui.administrative.Navigation.context_edit_collection">Editar colección</message>
-<message key="xmlui.administrative.Navigation.context_item_mapper">Relacionador de ítems</message>
+<message key="xmlui.administrative.Navigation.context_item_mapper">ASIGNADOR DE COLECCIONES</message>
 <message key="xmlui.administrative.Navigation.context_edit_community">Editar comunidad</message>
 <message key="xmlui.administrative.Navigation.context_create_collection">Crear colección</message>
 <message key="xmlui.administrative.Navigation.context_create_subcommunity">Crear subcomunidad</message>
@@ -1488,14 +1488,16 @@
 <message key="xmlui.administrative.metadataimport.MetadataImportUpload.hint">Los cambios pendientes se relacionan a continuación para su revisión</message>
 
 	<!-- general mapper messages -->
-<message key="xmlui.administrative.mapper.general.mapper_trail">Relacionador de ítems</message>
+<message key="xmlui.administrative.mapper.general.mapper_trail">ASIGNADOR DE COLECCIONES</message>
 
 
 	<!-- org.dspace.app.xmlui.administrative.mapper.MapperMain -->
-<message key="xmlui.administrative.mapper.MapperMain.title">Relacionador de ítems</message>
-<message key="xmlui.administrative.mapper.MapperMain.head1">Relacionador de ítems - Relaciona ítems de otras colecciones</message>
+<message key="xmlui.administrative.mapper.MapperMain.title">ASIGNADOR DE COLECCIONES</message>
+<message key="xmlui.administrative.mapper.MapperMain.head1">ASIGNADOR DE COLECCIONES - Asigne un item a esta colección</message>
 <message key="xmlui.administrative.mapper.MapperMain.para1">Colección: "<strong>{0}</strong>"</message>
-<message key="xmlui.administrative.mapper.MapperMain.para2">Esta es la herramienta relacionadora de ítems que permite a los administradores de colecciones relacionar ítems de otras colecciones en ésta. Puede buscar ítems de otra colección y relacionarlos, o ver la lista de ítems relacionados.</message>
+<message key="xmlui.administrative.mapper.MapperMain.para2">Esta es la función que permite a los administradores asignar un item a otra colección sin moverlo de su colección original. Recuerde que para utilizarlo debe ingresar a la colección a la cual quiere asignar el item (colección de destino), no a la colección de origen del item. Aquí también puede ver la lista de items que ya están asignados a esta colección.
+
+Para asignar un item a esta colección, cerciórese de estar en la colección correcta (en la de destino y no en la de origen), búsquelo por autor o palabras del título, selecciónelo y presione "Asignar item a esta colección".</message>
 <message key="xmlui.administrative.mapper.MapperMain.stat_label">Estadísticas</message>
 <message key="xmlui.administrative.mapper.MapperMain.stat_info"><strong>{0} de {1}</strong> ítems en esta colección están relacionados con otras colecciones</message>
 <message key="xmlui.administrative.mapper.MapperMain.search_label">Buscar</message>
@@ -1936,7 +1938,7 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 <message key="xmlui.dri2xhtml.METS-1.0.tesis-info">Información de la Tesis</message>
 <message key="xmlui.dri2xhtml.METS-1.0.general-info">Información general</message>
 
-<message key="xmlui.dri2xhtml.METS-1.0.item-date-available">Disponible desde</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-date-available">Disponible en {0} desde</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-date-accessioned">Creado el</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-title-subtitle">Subtítulo</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-embargo-liftDate">Fecha fin de embargo</message>
