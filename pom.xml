@@ -117,27 +117,7 @@
                 <autoVersionSubmodules>true</autoVersionSubmodules>
             </configuration>
          </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-test-resources</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>src/main/assembly/testEnvironment.xml</descriptor>
-                            </descriptors>
-                            <filters>
-                                <filter>src/main/filters/testEnvironment.properties</filter>
-                            </filters>
-                        </configuration>
-                    </execution>
-                </executions>
-                <inherited>false</inherited>
-            </plugin>
-            <plugin>
+         <plugin>
                 <groupId>com.mycila.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>
                 <configuration>
@@ -187,26 +167,67 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+         </plugin>
       </plugins>
    </build>
    
    <profiles>
 
-      <!--
+        <!-- This profile ensures that we ONLY generate the Unit Test Environment
+             if the testEnvironment.xml file is found. That way the Test Environment
+             is NOT built when running a 'mvn package' on a "binary" release. -->
+        <profile>
+            <id>generate-test-env</id>
+            <activation>
+                <file>
+                    <exists>src/main/assembly/testEnvironment.xml</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- This plugin builds the testEnvironment.zip package
+                         based on the specifications in testEnvironment.xml -->
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/testEnvironment.xml</descriptor>
+                                    </descriptors>
+                                    <filters>
+                                        <filter>src/main/filters/testEnvironment.properties</filter>
+                                    </filters>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <inherited>false</inherited>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+
+        <!--
            These profiles activate the inclusion of various modules into
            the DSpace Build process. They activate automatically if the
            source module is in the local file system, correctly located
            relative to this file.
         -->
 
-       <!--
-           Builds central API for DSpace
+        <!--
+           Builds DSpace "Assembly & Configuration" project
         -->
         <profile>
             <id>dspace</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>dspace/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace</module>
@@ -219,7 +240,9 @@
         <profile>
             <id>dspace-api</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>dspace-api/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace-api</module>
@@ -232,7 +255,9 @@
         <profile>
             <id>dspace-services</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>dspace-services/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace-services</module>
@@ -245,7 +270,9 @@
         <profile>
             <id>dspace-oai</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>dspace-oai/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace-oai</module>
@@ -256,10 +283,11 @@
            Builds JSPUI WAR for DSpace
         -->
         <profile>
-
             <id>dspace-jspui</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>dspace-jspui/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace-jspui</module>
@@ -273,7 +301,9 @@
         <profile>
             <id>dspace-sword</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>dspace-sword/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace-sword</module>
@@ -286,7 +316,9 @@
         <profile>
             <id>dspace-swordv2</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>dspace-swordv2/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace-swordv2</module>
@@ -299,7 +331,9 @@
         <profile>
             <id>dspace-xmlui</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>dspace-xmlui/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace-xmlui</module>
@@ -312,7 +346,9 @@
         <profile>
             <id>dspace-lni</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>dspace-lni/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace-lni</module>
@@ -342,49 +378,12 @@
          </modules>
       </profile>
 
-      <!--
-         Run this profile (e.g. 'mvn package -Pdistributions') to create
-         zip / tarball distributions to upload to SourceForge or similar.
-       -->
-      <profile>
-         <id>distributions</id>
-         <activation>
-            <activeByDefault>false</activeByDefault>
-         </activation>
-         <build>
-            <plugins>
-               <plugin>
-                  <artifactId>maven-assembly-plugin</artifactId>
-                  <inherited>false</inherited>
-                  <executions>
-                     <execution>
-                        <inherited>false</inherited>
-                        <configuration>
-                           <descriptors>
-                              <descriptor>src/main/assembly/release.xml</descriptor>
-                              <descriptor>src/main/assembly/src-release.xml</descriptor>
-                           </descriptors>
-                           <tarLongFileMode>gnu</tarLongFileMode>
-                           <finalName>dspace-${project.version}</finalName>
-                        </configuration>
-                        <phase>package</phase>
-                        <goals>
-                           <goal>single</goal>
-                        </goals>
-                     </execution>
-                  </executions>
-               </plugin>
-            </plugins>
-         </build>
-      </profile>
-
-      <!-- skip tests by default, but allow override
-      on command line by setting property "-Dmaven.test.skip"-->
-      <!-- Disabled by default, change activeByDefault to true to enable -->
+      <!-- Skip Unit Tests by default, but allow override on command line
+           by setting property "-Dmaven.test.skip=false" -->
       <profile>
         <id>skiptests</id>
         <activation>
-            <activeByDefault>false</activeByDefault>
+            <activeByDefault>true</activeByDefault>
          </activation>
         <properties>
          <maven.test.skip>true</maven.test.skip>
