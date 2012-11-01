@@ -21,3 +21,7 @@ nbdist/
 nbactions.xml
 nb-configuration.xml
 META-INF/
+
+## Ignore all *.properties file, EXCEPT build.properties (the default)
+*.properties
+!build.properties
