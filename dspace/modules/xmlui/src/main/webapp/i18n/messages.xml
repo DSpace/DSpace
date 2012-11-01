@@ -352,11 +352,14 @@
 
 	<!--  Dryad Custom Front Page I18N -->
 	<message key="xmlui.Site.head">&#160;</message>
-	<message key="xmlui.Site.para1">Dryad is a nonprofit organization, governed by its member organizations, 
-		including journals, publishers, scientific societies, funding agencies, and other stakeholders, 
-		and an international repository of data underlying scientific and medical publications. Dryad Members, 
-		through an elected Board of Directors, set priorities for the repository, participate in planning, 
-		and share knowledge and coordinate action around data policies. For more information see <a href="http://wiki.datadryad.org/Governance">Governance</a>.</message>
+	<message key="xmlui.Site.para1">
+		<p>Dryad is a nonprofit organization and an international repository of data underlying scientific and medical publications.</p>
+		<p>The scientific, educational, and charitable mission of Dryad is to promote the availability of data underlying findings in 
+			the scientific literature for research and educational reuse. </p>
+		<p>The vision of Dryad is a scholarly communication system in which learned societies, publishers, institutions of research 
+			and education, funding bodies and other stakeholders collaboratively sustain and promote the preservation and reuse of data 
+			underlying the scholarly literature.</p>
+	</message>	
 	<message key="xmlui.Site.stats">As of {0}, Dryad contains <span class="bold">{1} data
 			packages</span> and <span class="bold">{2} data files</span>, associated with articles in <span class="bold"
 			>{3} journals</span>.</message>
