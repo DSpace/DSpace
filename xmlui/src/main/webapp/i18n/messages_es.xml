@@ -1510,7 +1510,7 @@ Para asignar un item a esta colección, cerciórese de estar en la colección co
 <message key="xmlui.administrative.mapper.SearchItemForm.title">Buscar ítems</message>
 <message key="xmlui.administrative.mapper.SearchItemForm.trail">Buscar ítems</message>
 <message key="xmlui.administrative.mapper.SearchItemForm.head1">Buscar ítems del autor: "{0}"</message>
-<message key="xmlui.administrative.mapper.SearchItemForm.submit_map">Relacionar los ítems marcados</message>
+<message key="xmlui.administrative.mapper.SearchItemForm.submit_map">Asignar item a esta colección</message>
 <message key="xmlui.administrative.mapper.SearchItemForm.column1"></message>
 <message key="xmlui.administrative.mapper.SearchItemForm.column2">Colección</message>
 <message key="xmlui.administrative.mapper.SearchItemForm.column3">Autor</message>
