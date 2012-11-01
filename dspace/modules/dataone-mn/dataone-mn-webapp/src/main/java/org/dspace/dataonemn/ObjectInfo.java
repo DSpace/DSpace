@@ -2,19 +2,17 @@ package org.dspace.dataonemn;
 
 import nu.xom.Elements;
 import nu.xom.Element;
+import nu.xom.Attribute;
 
-public class ObjectInfo extends AbstractObject implements Constants {
+public class ObjectInfo extends Element implements Constants {
 
-    // We don't store these in DSpace so we have to set them here on the fly
     private String myXMLChecksum;
     private String myChecksumAlgo;
     private long myXMLSize;
-    
-    // Not used for XML generation, but for appending to the identifiers
-    private String myFormatExtension;
-    
+      
     public ObjectInfo(String aIdentifier) {
-	super("objectInfo", aIdentifier);
+	super("objectInfo"); 
+	addElement("identifier", aIdentifier);
     }
     
     public String getNamespace() {
@@ -38,21 +36,17 @@ public class ObjectInfo extends AbstractObject implements Constants {
     }
 
     
-    public void setFormatExtension(String aExtension) {
-	myFormatExtension = aExtension;
-    }
-    
     /**
        Split this object into two separate elements -- one for the metadata and one for the primary bitstream.
     **/
     public Element[] createInfoElements() {    
 	Element[] elements = new Element[2];
-
+	
 	// create objects and set identifiers
 	Element thisID = getChildElements("identifier").get(0);
 	String baseID = thisID.getValue();
-	ObjectInfo metadataElem = new ObjectInfo(baseID + "/dap");
-	ObjectInfo bitstreamElem = new ObjectInfo(baseID + "/" + myFormatExtension);
+	ObjectInfo metadataElem = new ObjectInfo(baseID);
+	ObjectInfo bitstreamElem = new ObjectInfo(baseID + "/bitstream");
 	
 	// formats
 	Element thisFormat = getChildElements("formatId").get(0);
@@ -76,10 +70,61 @@ public class ObjectInfo extends AbstractObject implements Constants {
 	bitstreamElem.appendChild((Element)this.getChildElements("size").get(0).copy());
 	
 	
-	    // fill out our results array
-	    elements[0] = metadataElem;
-	    elements[1] = bitstreamElem;
+	// fill out our results array
+	elements[0] = metadataElem;
+	elements[1] = bitstreamElem;
+	
+	return elements;
+    }
+    
+    
+    
+    public void setObjectFormat(String aFormat) {
+	addElement("formatId", aFormat);
+    }
+    
+    public void setSize(int aSize) {
+	addElement("size", Integer.toString(aSize));
+    }
+    
+    public void setChecksum(String aAlgorithm, String aHash) {
+	addElement("checksum", aHash).addAttribute(
+						   new Attribute("algorithm", aAlgorithm));
+    }
+
+    public void setLastModified(String aModDate) {
+	addElement("dateSysMetadataModified", aModDate);
+    }
+
+    
+    public void setSize(long aSize) {
+	addElement("size", Long.toString(aSize));
+    }
+    
+    public int getSize() {
+	try {
+	    Elements elements = getChildElements("size", getNamespace());
 	    
-	    return elements;
+	    if (elements.size() < 1) {
+		return -1;
+	    }
+	    
+	    return Integer.parseInt(elements.get(0).getValue());
+	} catch (NumberFormatException details) {
+	    return -1;
 	}
+    }
+    
+    
+    /**
+       Adds a new element as a child of this element. The added element will be appended
+       to the list of children, so it will always occur at the end.
+    **/
+    private Element addElement(String aName, String aValue) {
+	Element element = new Element(aName, getNamespace());
+	element.appendChild(aValue);
+	appendChild(element);
+	return element;
+    }
+    
 }
