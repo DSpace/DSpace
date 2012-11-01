@@ -443,8 +443,9 @@ public class DataOneMN extends HttpServlet implements Constants {
                 pw.write(r.getLogRecords());
             }
             else{
-                //TBD
-            }
+		RuntimeException e = new RuntimeException("DataONE logging system is not present!");
+		log.error("unable to get log records from nonexistent logger", e);
+	    }
         } catch (ParseException e) {
             log.error("unable to parse request info", e);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST,
