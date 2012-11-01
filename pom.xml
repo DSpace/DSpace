@@ -23,7 +23,6 @@
     <!--Force UTF-8 encoding during build on all platforms-->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <filters.file>build.properties</filters.file>
         <lucene.version>3.5.0</lucene.version>
     </properties>
 
@@ -172,6 +171,38 @@
    </build>
    
    <profiles>
+
+       <!-- By default the main dspace.cfg file will be filtered during the build
+            using the "build.properties" file. This profile takes effect, unless
+            "-Denv" is passed in (see 'environment' profile below for more info). -->
+       <profile>
+           <id>default</id>
+           <activation>
+               <property>
+                    <name>!env</name>
+                </property>
+           </activation>
+           <properties>
+               <filters.file>build.properties</filters.file>
+           </properties>
+       </profile>
+
+       <!-- Users can pass in an environment flag "-Denv" to tell DSpace to use
+            a different properties file during its build process. 
+            For example: "mvn package -Denv=test" would build DSpace using the
+            settings in "test.properties" instead of those in "build.properties" -->
+       <profile>
+           <id>environment</id>
+           <activation>
+                <property>
+                    <name>env</name>
+                </property>
+           </activation>
+           <properties>
+                <filters.file>${env}.properties</filters.file>
+           </properties>
+       </profile>
+
 
         <!-- This profile ensures that we ONLY generate the Unit Test Environment
              if the testEnvironment.xml file is found. That way the Test Environment
@@ -383,10 +414,14 @@
       <profile>
         <id>skiptests</id>
         <activation>
-            <activeByDefault>true</activeByDefault>
-         </activation>
+            <!-- This profile should be active at all times, unless the user
+                 specifies a different value for "maven.test.skip" -->
+            <property>
+                <name>!maven.test.skip</name>
+            </property>
+        </activation>
         <properties>
-         <maven.test.skip>true</maven.test.skip>
+            <maven.test.skip>true</maven.test.skip>
         </properties>
       </profile>
    </profiles>
