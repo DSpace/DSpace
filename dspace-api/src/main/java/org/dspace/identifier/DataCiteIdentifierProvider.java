@@ -159,6 +159,8 @@ public class DataCiteIdentifierProvider
         if (!(dso instanceof Item))
             throw new IllegalArgumentException("Unsupported type " + dso.getTypeText());
 
+        String username, password; // TODO get these from configuration
+
         Item item = (Item)dso;
 
         // delete from EZID
@@ -167,7 +169,7 @@ public class DataCiteIdentifierProvider
         {
             EZIDResponse response;
             try {
-                EZIDRequest request = new EZIDRequest(id.value);
+                EZIDRequest request = new EZIDRequest(id.value, username, password);
                 response = request.delete();
             } catch (URISyntaxException e) {
                 throw new IdentifierException("Bad URI in metadata value", e);
@@ -220,25 +222,19 @@ public class DataCiteIdentifierProvider
 	    .setPath(EZID_PATH + shoulder);
 
         // Compose the request
-        HttpPost request;
+        EZIDRequest ezrequest;
         try {
-            request = new HttpPost(mintURL.build());
+            ezrequest = new EZIDRequest(mintURL, user, password);
         } catch (URISyntaxException ex) {
             log.error(ex.getMessage());
             throw new IdentifierException("DOI request not sent:  " + ex.getMessage());
         }
-        request.setEntity(new StringEntity(postBody, CONTENT_UTF8_TEXT));
-
-	AbstractHttpClient mint = new DefaultHttpClient();
-        mint.getCredentialsProvider().setCredentials(
-                new AuthScope(mintURL.getHost(), mintURL.getPort()),
-                new UsernamePasswordCredentials(user, password));
 
         // Send the request
-        HttpResponse response;
+        EZIDResponse response;
         try
         {
-            response = mint.execute(request);
+            response = ezrequest.create(postBody);
         } catch (IOException ex)
         {
             log.error("Failed to send EZID request:  {}", ex.getMessage());
@@ -246,25 +242,17 @@ public class DataCiteIdentifierProvider
         }
 
         // Good response?
-        EZIDResponse contents;
-        try {
-            contents = new EZIDResponse(response);
-        } catch (ParseException ex) {
-            log.error(ex.getMessage());
-            throw new IdentifierException("EZID response not understood:  " + ex.getMessage());
-        }
-
-        if (HttpURLConnection.HTTP_CREATED != contents.getHttpStatusCode())
+        if (HttpURLConnection.HTTP_CREATED != response.getHttpStatusCode())
             {
-                log.error("EZID responded:  {} {}", contents.getHttpStatusCode(),
-                        contents.getHttpReasonPhrase());
-                throw new IdentifierException("DOI not created:  " + contents.getHttpReasonPhrase());
+                log.error("EZID responded:  {} {}", response.getHttpStatusCode(),
+                        response.getHttpReasonPhrase());
+                throw new IdentifierException("DOI not created:  " + response.getHttpReasonPhrase());
             }
 
 	// Extract the DOI from the content blob
-        if (contents.isSuccess())
+        if (response.isSuccess())
         {
-            String value = contents.getEZIDStatusValue();
+            String value = response.getEZIDStatusValue();
             int end = value.indexOf('|'); // Following pipe is "shadow ARK"
             if (end < 0)
                 end = value.length();

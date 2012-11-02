@@ -11,6 +11,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -29,22 +31,23 @@ public class EZIDRequest
 {
     private final URIBuilder uri;
 
-    private final URI url;
+    private URI url;
 
-    private final AbstractHttpClient client;
+    private AbstractHttpClient client;
 
     /**
      * Prepare a context for requests concerning a specific identifier or
      * authority prefix.
      *
      * @param url an EZID URL for an identifier or authority.
+     * @param username an EZID user identity.
+     * @param password user's password, or null for none.
      */
-    public EZIDRequest(URIBuilder uri)
+    public EZIDRequest(URIBuilder uri, String username, String password)
             throws URISyntaxException
     {
         this.uri = uri;
-        url = this.uri.build();
-        client = new DefaultHttpClient();
+        init(username, password);
     }
 
     /**
@@ -52,15 +55,41 @@ public class EZIDRequest
      * authority prefix.
      *
      * @param url an EZID URL for an identifier or authority.
+     * @param username an EZID user identity.
+     * @param password user's password, or null for none.
      */
-    public EZIDRequest(String uri)
+    public EZIDRequest(String uri, String username, String password)
             throws URISyntaxException
     {
         this.uri = new URIBuilder(uri);
-        url = this.uri.build();
-        client = new DefaultHttpClient();
+        init(username, password);
     }
 
+    /**
+     * Common constructor code.
+     * 
+     * @param username
+     * @param password
+     * @throws URISyntaxException 
+     */
+    private void init(String username, String password)
+            throws URISyntaxException
+    {
+        url = this.uri.build();
+        client = new DefaultHttpClient();
+        if (null != username)
+            client.getCredentialsProvider().setCredentials(
+                    new AuthScope(url.getHost(), url.getPort()),
+                    new UsernamePasswordCredentials(username, password));
+    }
+
+    /**
+     * Fetch an identifier's metadata.
+     * 
+     * @return
+     * @throws IdentifierException if the response is error or body malformed.
+     * @throws IOException if the HTTP request fails.
+     */
     public EZIDResponse lookup()
             throws IdentifierException, IOException
     {
