@@ -28,7 +28,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
- 
+
 /**
 * Display a single collection. This includes a full text search, browse by
 * list, community display and a list of recent submissions.
