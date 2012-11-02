@@ -144,7 +144,33 @@ public class DataCiteIdentifierProvider
     public void delete(Context context, DSpaceObject dso)
             throws IdentifierException
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (!(dso instanceof Item))
+            throw new IllegalArgumentException("Unsupported type " + dso.getTypeText());
+
+        String username, password; // TODO get these from configuration
+
+        Item item = (Item)dso;
+
+        // delete from EZID
+        for (DCValue id : item.getMetadata(MD_SCHEMA_DSPACE, DSPACE_DOI_ELEMENT,
+                DSPACE_DOI_QUALIFIER, null))
+        {
+            EZIDResponse response;
+            try {
+                EZIDRequest request = new EZIDRequest(id.value, username, password);
+                response = request.delete();
+            } catch (URISyntaxException e) {
+                throw new IdentifierException("Bad URI in metadata value", e);
+            } catch (IOException e) {
+                throw new IdentifierException("Failed request to EZID", e);
+            }
+            if (!response.isSuccess())
+                throw new IdentifierException("Unable to delete " + id.value
+                        + "from DataCite:  " + response.getEZIDStatusValue());
+        }
+
+        // delete from item
+        item.clearMetadata(MD_SCHEMA_DSPACE, DSPACE_DOI_ELEMENT, DSPACE_DOI_QUALIFIER, null);
     }
 
     @Override
@@ -183,25 +209,19 @@ public class DataCiteIdentifierProvider
 	    .setPath(EZID_PATH + shoulder);
 
         // Compose the request
-        HttpPost request;
+        EZIDRequest ezrequest;
         try {
-            request = new HttpPost(mintURL.build());
+            ezrequest = new EZIDRequest(mintURL, user, password);
         } catch (URISyntaxException ex) {
             log.error(ex.getMessage());
             throw new IdentifierException("DOI request not sent:  " + ex.getMessage());
         }
-        request.setEntity(new StringEntity(postBody, CONTENT_UTF8_TEXT));
-
-	AbstractHttpClient mint = new DefaultHttpClient();
-        mint.getCredentialsProvider().setCredentials(
-                new AuthScope(mintURL.getHost(), mintURL.getPort()),
-                new UsernamePasswordCredentials(user, password));
 
         // Send the request
-        HttpResponse response;
+        EZIDResponse response;
         try
         {
-            response = mint.execute(request);
+            response = ezrequest.create(postBody);
         } catch (IOException ex)
         {
             log.error("Failed to send EZID request:  {}", ex.getMessage());
@@ -209,32 +229,22 @@ public class DataCiteIdentifierProvider
         }
 
         // Good response?
-        StatusLine status = (StatusLine) response.getStatusLine();
-        if (HttpURLConnection.HTTP_CREATED != status.getStatusCode())
+        if (HttpURLConnection.HTTP_CREATED != response.getHttpStatusCode())
             {
-                log.error("EZID responded:  {} {}", status.getStatusCode(),
-                        status.getReasonPhrase());
-                throw new IdentifierException("DOI not created:  " + status.getReasonPhrase());
+                log.error("EZID responded:  {} {}", response.getHttpStatusCode(),
+                        response.getHttpReasonPhrase());
+                throw new IdentifierException("DOI not created:  " + response.getHttpReasonPhrase());
             }
 
-        HttpEntity responseBody = response.getEntity();
-
-        // Collect the content of the response
-        String content;
-        try {
-            content = EntityUtils.toString(responseBody, "UTF-8");
-        } catch (IOException ex) {
-            log.error(ex.getMessage());
-            throw new IdentifierException("EZID response not understood:  " + ex.getMessage());
-        } catch (ParseException ex) {
-            log.error(ex.getMessage());
-            throw new IdentifierException("EZID response not understood:  " + ex.getMessage());
-        }
-
 	// Extract the DOI from the content blob
-	Matcher matcher = DOIpattern.matcher(content);
-	if (matcher.find())
-	    return matcher.group();
+        if (response.isSuccess())
+        {
+            String value = response.getEZIDStatusValue();
+            int end = value.indexOf('|'); // Following pipe is "shadow ARK"
+            if (end < 0)
+                end = value.length();
+            return value.substring(0, end).trim();
+        }
         else
             throw new IdentifierException("No DOI returned");
     }
