@@ -994,43 +994,49 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</div>
-				<div class="originInfo">
-				<!-- Solo para el tipo tesis  institución otorgante-->
-				<xsl:choose>					
-				<xsl:when  test="dim:field[@element='type'] = 'Tesis' or dim:field[@element = 'relation' and @qualifier='journalTitle'] or dim:field[@element = 'relation' and @qualifier='event'] ">					
-				
+
+				<xsl:variable name="originInfoContent">
 					<xsl:choose>
+						
+						<!-- Solo para el tipo tesis: grado alanzado e institución otorgante -->
 						<xsl:when test="dim:field[@element='type'] = 'Tesis'">
-							<xsl:value-of select="dim:field[@element='degree' and @qualifier='name']"	disable-output-escaping="yes"/>
-							<xsl:text>|</xsl:text>	
-							<xsl:value-of select="dim:field[@element='degree' and @qualifier='grantor']"	disable-output-escaping="yes"/> 
-							</xsl:when>
-					</xsl:choose>
-				<!-- journalTitle y journalVolumeAndIssue-->
-					<xsl:if test="dim:field[@element = 'relation' and @qualifier='journalTitle']">
-						<xsl:value-of select="dim:field[@element='relation' and @qualifier='journalTitle']" disable-output-escaping="yes"/>
-						<xsl:if test="dim:field[@element='relation' and @qualifier='journalVolumeAndIssue']">
+							<xsl:value-of select="dim:field[@element='degree' and @qualifier='name']"/>
 							<xsl:text>; </xsl:text>
-							<xsl:value-of select="dim:field[@element='relation' and @qualifier='journalVolumeAndIssue']" disable-output-escaping="yes"/>
-						</xsl:if>
-					</xsl:if>	
-				 						
-				<!-- evento-->
-					<xsl:if test="dim:field[@element = 'relation' and @qualifier='event']">
-						<xsl:text>| </xsl:text>
-						<xsl:value-of select="dim:field[@element='relation' and @qualifier='event']" disable-output-escaping="yes"/>
-					</xsl:if>
-				<!-- publisher-->
-					<xsl:if test="dim:field[@element='publisher']">
-						<xsl:text>| </xsl:text>
-						<xsl:copy-of select="dim:field[@element='publisher']/node()"/>
-					</xsl:if>		
-				</xsl:when>
-				<xsl:otherwise><!-- originInfo -->
-					<xsl:if test="dim:field[@element = 'originInfo']">
-								<xsl:value-of select="dim:field[@element='originInfo']" disable-output-escaping="yes"/>
-					</xsl:if></xsl:otherwise>
-				</xsl:choose>			
+							<xsl:value-of select="dim:field[@element='degree' and @qualifier='grantor']"/>
+						</xsl:when>
+
+						<!-- Solo para el tipo Objeto de coferencia: evento -->
+						<xsl:when test="dim:field[@element='type'] = 'Objeto de conferencia'">
+							<xsl:value-of select="dim:field[@element='relation' and @qualifier='event']"/>
+						</xsl:when>
+						
+						<!-- Si tiene journalTitle -->
+						<xsl:when test="dim:field[@element = 'relation' and @qualifier='journalTitle']">
+							<xsl:value-of select="dim:field[@element='relation' and @qualifier='journalTitle']"/>
+							<xsl:if test="dim:field[@element='relation' and @qualifier='journalVolumeAndIssue']">
+								<xsl:text>; </xsl:text>
+								<xsl:value-of select="dim:field[@element='relation' and @qualifier='journalVolumeAndIssue']"/>
+							</xsl:if>
+
+							<!-- Si además tiene evento, lo muestro -->
+							<xsl:if test="dim:field[@element = 'relation' and @qualifier='event']">
+								<xsl:text> | </xsl:text>
+								<xsl:value-of select="dim:field[@element='relation' and @qualifier='event']"/>
+							</xsl:if>
+						</xsl:when>
+					</xsl:choose>			
+				</xsl:variable>
+				
+				<div class="originInfo">
+					<xsl:choose>					
+						<xsl:when test="$originInfoContent != ''">
+							<xsl:value-of select="$originInfoContent"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<!-- si nada aplica, mostramos el originInfo -->
+							<xsl:value-of select="dim:field[@element='originInfo' and @qualifier='place']"/>
+						</xsl:otherwise>
+					</xsl:choose>			
 				</div>
 				<div class="type">
 					<xsl:choose>
