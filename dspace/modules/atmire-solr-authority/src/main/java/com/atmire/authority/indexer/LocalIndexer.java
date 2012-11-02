@@ -105,15 +105,16 @@ public class LocalIndexer implements com.atmire.authority.indexer.IndexerInterfa
                 String doi=null;
                 if(dcVaslues.length > 0) doi=dcVaslues[0].value;
 
-                System.out.println(" item.id ******************************* " + item.getID() + " - " + doi + " *******************************");
+                //System.out.println(" item.id ******************************* " + item.getID() + " - " + doi + " *******************************");
                 DCValue[] values = item.getMetadata(fieldName);
 
                 for (DCValue value : values) {
                     if (value.authority == null || value.authority.equals(SOURCE)) {
-                        System.out.println(" adding:  " + value.value);
-                        authorities.push(createHashMap(fieldName, value.value));
+                        //System.out.println(" adding:  " + value.value);
+                        Map<String, String> doc = createHashMap(fieldName, value.value);
+                        authorities.push(doc);
                     }
-                    else System.out.println("VALUE NOT PROCESSED! " + value.authority + " " + value.value);
+                    //else System.out.println("VALUE NOT PROCESSED! " + value.authority + " " + value.value);
                 }
             }
         }
@@ -124,15 +125,11 @@ public class LocalIndexer implements com.atmire.authority.indexer.IndexerInterfa
     public Map<String, String> createHashMap(String fieldName, String value){
         Map<String, String> values = new HashMap <String, String>();
 
-
         if(haveToAddAsterisk(value)){
             value+="*";
         }
 
-
-
-
-        values.put(DOC_ID, Utils.getMD5(SOURCE + fieldName + value));
+        values.put(DOC_ID, Utils.getMD5(value));
         values.put(DOC_SOURCE, SOURCE);
         values.put(DOC_FIELD, fieldName);
         values.put(DOC_DISPLAY_VALUE, value);
@@ -151,7 +148,7 @@ public class LocalIndexer implements com.atmire.authority.indexer.IndexerInterfa
     private String[] getAuthorityControlledFields() {
         ConfigurationService cs = new DSpace().getConfigurationService();
         String[] fields = cs.getPropertyAsType("solr.authority.indexes", new String[0]);
-        
+
         //printArray(fields);
 
 
