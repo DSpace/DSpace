@@ -465,19 +465,19 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
     /**
      * Method for constructing the discovery advanced search form
      * 
-     * @author Andrea Bollini
+     * author: Andrea Bollini
      */
     @Override
     public void doAdvancedSearch(Context context, HttpServletRequest request,
             HttpServletResponse response) throws SearchProcessorException,
             IOException, ServletException
-            {
-                // just redirect to the simple search servlet.
-                // The advanced form is always displayed with Discovery togheter with
-                // the search result
-                // the first access to the advanced form performs a search for
-                // "anythings" (SOLR *:*)
-                response.sendRedirect(request.getContextPath() + "/simple-search");
-            }
+    {
+	// just redirect to the simple search servlet.
+	// The advanced form is always displayed with Discovery togheter with
+	// the search result
+	// the first access to the advanced form performs a search for
+	// "anythings" (SOLR *:*)
+	response.sendRedirect(request.getContextPath() + "/simple-search");
+    }
 
 }

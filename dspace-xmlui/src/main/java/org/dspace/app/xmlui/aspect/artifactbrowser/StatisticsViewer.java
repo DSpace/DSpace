@@ -37,8 +37,9 @@ import java.text.SimpleDateFormat;
 /**
  * Transformer to display statistics data in XML UI.
  *
- * Unlike the JSP interface that pre-generates HTML and stores in the reports folder,
- * this class transforms the raw analysis data into a Wing representation
+ * Unlike the JSP interface that pre-generates HTML and stores in the reports
+ * folder, this class transforms the raw analysis data into a Wing
+ * representation.
  */
 public class StatisticsViewer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
@@ -60,8 +61,7 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
     private SourceValidity validity;
 
     /**
-     * Get the caching key for this report
-     * @return
+     * Get the caching key for this report.
      */
     public Serializable getKey()
     {
@@ -76,8 +76,7 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
     }
 
     /**
-     * Generate the validity for this cached entry
-     * @return
+     * Generate the validity for this cached entry.
      */
     public SourceValidity getValidity()
     {
@@ -308,9 +307,7 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
         }
 
         /**
-         * Get the header for the report - currently not supported
-         *
-         * @return
+         * Get the header for the report - currently not supported.
          */
         public String header()
         {
@@ -324,8 +321,8 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
         }
 
         /**
-         * Add the main title to the report
-         * @return
+         * Add the main title to the report.
+         * @return null.
          */
         public String mainTitle()
         {
@@ -341,8 +338,8 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
         }
 
         /**
-         * Output the date range for this report
-         * @return
+         * Output the date range for this report.
+         * @return null.
          */
         public String dateRange()
         {
@@ -381,9 +378,9 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
         }
 
         /**
-         * Output the section header
+         * Output the section header.
          * @param title
-         * @return
+         * @return null.
          */
         public String sectionHeader(String title)
         {
@@ -400,9 +397,9 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
         }
 
         /**
-         * Output the current statistics block
+         * Output the current statistics block.
          * @param content
-         * @return
+         * @return null.
          */
         public String statBlock(Statistics content)
         {
@@ -472,9 +469,10 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
         }
 
         /**
-         * Output any information about the lower boundary restriction for this section
+         * Output any information about the lower boundary restriction for
+	 * this section.
          * @param floor
-         * @return
+         * @return null.
          */
         public String floorInfo(int floor)
         {
@@ -494,10 +492,10 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
         }
 
         /**
-         * Output an explanation for this section
+         * Output an explanation for this section.
          * 
          * @param explanation
-         * @return
+         * @return null.
          */
         public String blockExplanation(String explanation)
         {
@@ -517,9 +515,9 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
         }
 
         /**
-         * Output the footer
+         * Output the footer.
          * 
-         * @return
+         * @return an empty string.
          */
         public String footer()
         {
@@ -560,8 +558,8 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
         }
 
         /**
-         * Render the statistics into an XML stream
-         * @return
+         * Render the statistics into an XML stream.
+         * @return null.
          */
         public String render()
         {
@@ -622,9 +620,11 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
     
     
     /**
-     * Protect the display from excessively wrong data, typically this occures if a long word finds it's way 
-     * into the data that is not breakable by the browser because there is no space, dash, period, or other 
-     * delimiter character. This just prevents the page from blowing up when bad data is being presented.
+     * Protect the display from excessively wrong data.  Typically this occurs
+     * if a long word finds its way into the data that is not breakable by
+     * the browser because there is no space, dash, period, or other 
+     * delimiter character. This just prevents the page from blowing up when
+     * bad data are being presented.
      */
     private static final int MAX_ENTRY_LENGTH = 50;
     private static String entry(String entry) 

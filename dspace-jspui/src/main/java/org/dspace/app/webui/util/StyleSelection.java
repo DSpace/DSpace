@@ -32,7 +32,6 @@ public interface StyleSelection
      * The configuration has the following syntax: <code>schema.element[.qualifier|.*][(display-option)]</code> 
      * 
      * @param style
-     * @return
      */
     public String getConfigurationForStyle(String style);
 }

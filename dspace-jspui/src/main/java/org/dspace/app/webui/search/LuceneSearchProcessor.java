@@ -82,7 +82,7 @@ public class LuceneSearchProcessor implements SearchRequestProcessor
      * location), a the ID of a community (e.g. "123"), or a community ID, then
      * a slash, then a collection ID, e.g. "123/456".
      * 
-     * @author Robert Tansley
+     * author: Robert Tansley
      */
     @Override
     public void doSimpleSearch(Context context, HttpServletRequest request,
@@ -465,7 +465,7 @@ public class LuceneSearchProcessor implements SearchRequestProcessor
     /**
      * Method for constructing the advanced search form
      * 
-     * @author gam
+     * author: gam
      */
     @Override
     public void doAdvancedSearch(Context context, HttpServletRequest request,
@@ -496,7 +496,7 @@ public class LuceneSearchProcessor implements SearchRequestProcessor
      * parameters exactly match those of the SearchServlet.
      * </p>
      * 
-     * @author Richard Rodgers
+     * author: Richard Rodgers
      */
     @Override
     public void doOpenSearch(Context context, HttpServletRequest request,

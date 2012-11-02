@@ -129,7 +129,7 @@ public class SAXFilter implements ContentHandler, LexicalHandler
 	 * 
 	 * @param minimumElementLevel 
 	 * 				the minimum level required.
-	 * @return
+	 * @return this SAXFilter instance.
 	 */
 	public SAXFilter allowElements(int minimumElementLevel)
 	{
