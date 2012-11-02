@@ -375,46 +375,46 @@ public class MetadataUtilities {
     }
     
     /**
-     * 		rewrite of ItemImport's functionality
-     *      but just the parsing of the file, not the processing of its elements
-     *      
-     *      
-     * @validate  flag to verify matching files in tree
-     * @return
+     * rewrite of ItemImport's functionality
+     * but just the parsing of the file, not the processing of its elements.
+     *
+     * @param f file of item metadata.
+     * @validate  flag to verify matching files in tree.
+     * @return parsed content of {@code f}.
      */
     public static List<ContentsEntry> readContentsFile(File f)
     throws FileNotFoundException, IOException, ParseException
     {
     	List<ContentsEntry> list = new ArrayList<ContentsEntry>();
-    	
+
     	BufferedReader in = null;
-    	
+
     	try
     	{
-	    	in = new BufferedReader(new FileReader(f));
-	    	String line = null;
-	    	
-	    	while ((line = in.readLine()) != null)
-	    	{
-	    		line = line.trim();
-	            if ("".equals(line))
-	            {
-	                continue;
-	            }
-	            ItemUpdate.pr("Contents entry: " + line);	            
-	    		list.add(ContentsEntry.parse(line));	 
-	    	}
+	    in = new BufferedReader(new FileReader(f));
+	    String line = null;
+
+	    while ((line = in.readLine()) != null)
+	    {
+	    	line = line.trim();
+		if ("".equals(line))
+	        {
+		    continue;
+	        }
+		ItemUpdate.pr("Contents entry: " + line);	            
+		list.add(ContentsEntry.parse(line));	 
+	    }
     	}
     	finally
     	{
-    		try
-    		{
-    			in.close();
-    		}
-    		catch(IOException e)
-    		{
-    			//skip
-    		}
+	    try
+            {
+		in.close();
+    	    }
+	    catch(IOException e)
+	    {
+		//skip
+    	    }
     	}
     	
     	return list;
@@ -423,7 +423,6 @@ public class MetadataUtilities {
     /**
      * 
      * @param f
-     * @return
      * @throws FileNotFoundException
      * @throws IOException
      */
@@ -441,7 +440,7 @@ public class MetadataUtilities {
 	    	
 	    	while ((line = in.readLine()) != null)
 	    	{
-	    		line = line.trim();
+		    line = line.trim();
 	            if ("".equals(line))
 	            {
 	                continue;
@@ -451,7 +450,7 @@ public class MetadataUtilities {
 	            try
 	            {
 	            	n = Integer.parseInt(line);
-		    		list.add(n);	    		
+			list.add(n);	    		
 	            }
 	            catch(NumberFormatException e)
 	            {
@@ -461,13 +460,13 @@ public class MetadataUtilities {
     	}
     	finally
     	{
-    		try
+	    try
     		{
-    			in.close();
+		    in.close();
     		}
     		catch(IOException e)
     		{
-    			//skip
+		    //skip
     		}
     	}
     	
@@ -476,7 +475,7 @@ public class MetadataUtilities {
 
     /**
      *    Get display of DCValue    
-	 *
+     *
      * @param dcv
      * @return string displaying elements of the DCValue
      */
@@ -486,47 +485,47 @@ public class MetadataUtilities {
     	       "; language: " + dcv.language + "; value: " + dcv.value;
     }
 
-	/**
-	 * 
-	 * @return a String representation of the two- or three-part form of a metadata element
-	 *         e.g. dc.identifier.uri
-	 */
-	public static  String getCompoundForm(String schema, String element, String qualifier)
-	{
-		StringBuilder sb = new StringBuilder();
-		sb.append(schema).append(".").append(element);
-		
-		if (qualifier != null)
-		{
-			sb.append(".").append(qualifier);
-		}
-		return sb.toString();
-	}
+    /**
+     * 
+     * @return a String representation of the two- or three-part form of a metadata element
+     *         e.g. dc.identifier.uri
+     */
+    public static  String getCompoundForm(String schema, String element, String qualifier)
+    {
+	StringBuilder sb = new StringBuilder();
+	sb.append(schema).append(".").append(element);
+
+	if (qualifier != null)
+	    {
+		sb.append(".").append(qualifier);
+	    }
+	return sb.toString();
+    }
 	
-	/**
-	 *    Parses metadata field given in the form <schema>.<element>[.<qualifier>|.*]
-	 *    checks for correct number of elements (2 or 3) and for empty strings
-	 *    
-	 *    @return String Array
-	 *    @throws ParseException if validity checks fail
-	 *    
-	 */
-	public static String[] parseCompoundForm(String compoundForm)
+    /**
+     *    Parses metadata field given in the form "<schema>.<element>[.<qualifier>|.*]".
+     *    Checks for correct number of elements (2 or 3) and for empty strings.
+     *    
+     *    @return String Array
+     *    @throws ParseException if validity checks fail
+     *    
+     */
+    public static String[] parseCompoundForm(String compoundForm)
 	throws ParseException
-	{
-		String[] ar = compoundForm.split("\\s*\\.\\s*");  //trim ends
-				
-		if ("".equals(ar[0]))
-		{
-			throw new ParseException("schema is empty string: " + compoundForm, 0);
-		}
-		
-		if ((ar.length < 2) || (ar.length > 3) || "".equals(ar[1]))
-		{
-			throw new ParseException("element is malformed or empty string: " + compoundForm, 0);
-		}
-		
-		return ar;
-	}
-	
+    {
+	String[] ar = compoundForm.split("\\s*\\.\\s*");  //trim ends
+
+	if ("".equals(ar[0]))
+	    {
+		throw new ParseException("schema is empty string: " + compoundForm, 0);
+	    }
+
+	if ((ar.length < 2) || (ar.length > 3) || "".equals(ar[1]))
+	    {
+		throw new ParseException("element is malformed or empty string: " + compoundForm, 0);
+	    }
+
+	return ar;
+    }
+
 } 

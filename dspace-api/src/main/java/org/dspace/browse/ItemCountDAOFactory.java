@@ -19,33 +19,32 @@ import org.dspace.core.ConfigurationManager;
  */
 public class ItemCountDAOFactory
 {
-	/**
-	 * Get an instance of ItemCountDAO which supports the correct database
-	 * for the specific DSpace instance.
-	 * 
-	 * @param context
-	 * @return
-	 * @throws ItemCountException
-	 */
-	public static ItemCountDAO getInstance(Context context)
-		throws ItemCountException
-	{
-		String db = ConfigurationManager.getProperty("db.name");
-		ItemCountDAO dao;
-		if ("postgres".equals(db))
-		{
-			dao = new ItemCountDAOPostgres();
-		}
-		else if ("oracle".equals(db))
-		{
-			dao = new ItemCountDAOOracle();
-		}
-		else
-		{
-			throw new ItemCountException("Database type: " + db + " is not currently supported");
-		}
-		
-		dao.setContext(context);
-		return dao;
-	}
+    /**
+     * Get an instance of ItemCountDAO which supports the correct database
+     * for the specific DSpace instance.
+     * 
+     * @param context
+     * @throws ItemCountException
+     */
+    public static ItemCountDAO getInstance(Context context)
+	throws ItemCountException
+    {
+	String db = ConfigurationManager.getProperty("db.name");
+	ItemCountDAO dao;
+	if ("postgres".equals(db))
+	    {
+		dao = new ItemCountDAOPostgres();
+	    }
+	else if ("oracle".equals(db))
+	    {
+		dao = new ItemCountDAOOracle();
+	    }
+	else
+	    {
+		throw new ItemCountException("Database type: " + db + " is not currently supported");
+	    }
+	
+	dao.setContext(context);
+	return dao;
+    }
 }

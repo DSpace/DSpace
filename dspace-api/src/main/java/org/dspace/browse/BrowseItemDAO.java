@@ -37,7 +37,7 @@ public interface BrowseItemDAO
      * @param element
      * @param qualifier
      * @param lang
-     * @return
+     * @return matching metadata values.
      * @throws SQLException
      */
     public DCValue[] queryMetadata(int itemId, String schema, String element, String qualifier, String lang)

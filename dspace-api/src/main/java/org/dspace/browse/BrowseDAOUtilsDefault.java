@@ -10,8 +10,9 @@ package org.dspace.browse;
 import org.dspace.core.ConfigurationManager;
 
 /**
- * Utility class for retrieving the size of the columns to be used in the browse tables,
- * and applying truncation to the strings that will be inserted into the tables.
+ * Utility class for retrieving the size of the columns to be used in the
+ * browse tables, and applying truncation to the strings that will be inserted
+ * into the tables.
  * 
  * Can be configured in dspace.cfg, with the following entries:
  * 
@@ -27,16 +28,17 @@ import org.dspace.core.ConfigurationManager;
  *   - a string to append to truncated values that will be entered into
  *     the value columns (ie. '...')
  *     
- * By default, the column sizes are '0' (unlimited), and no truncation is applied,
- * EXCEPT for Oracle, where we have to truncate the columns for it to work! (in which
- * case, both value and sort columns are by default limited to 2000 characters).
- *  
+ * By default, the column sizes are '0' (unlimited), and no truncation is
+ * applied, EXCEPT for Oracle, where we have to truncate the columns for it
+ * to work! (in which case, both value and sort columns are by default limited
+ * to 2000 characters).
+ * 
  * @author Graham Triggs
  * @author Richard Jones
  */
 public class BrowseDAOUtilsDefault implements BrowseDAOUtils
 {
-	/** Maximum number of characters for value columns */
+    /** Maximum number of characters for value columns */
     public int valueColumnMaxChars;
     
     /** Maximum number of characters for sort columns */
@@ -81,8 +83,6 @@ public class BrowseDAOUtilsDefault implements BrowseDAOUtils
     
     /**
      * Get the size to use for the 'value' columns in characters
-     * 
-     * @return
      */
     public int getValueColumnMaxChars()
     {
@@ -91,8 +91,6 @@ public class BrowseDAOUtilsDefault implements BrowseDAOUtils
 
     /**
      * Get the size to use for the sort columns in characters
-     * 
-     * @return
      */
     public int getSortColumnMaxChars()
     {
@@ -103,7 +101,7 @@ public class BrowseDAOUtilsDefault implements BrowseDAOUtils
      * Truncate strings that are to be used for the 'value' columns
      * 
      * @param value
-     * @return
+     * @return the truncated value.
      */
     public String truncateValue(String value)
     {
@@ -114,7 +112,7 @@ public class BrowseDAOUtilsDefault implements BrowseDAOUtils
      * Truncate strings that are to be used for sorting
      *  
      * @param value
-     * @return
+     * @return the truncated value.
      */
     public String truncateSortValue(String value)
     {
@@ -129,7 +127,7 @@ public class BrowseDAOUtilsDefault implements BrowseDAOUtils
      * 
      * @param value
      * @param chars
-     * @return
+     * @return the truncated value.
      * @deprecated
      */
     public String truncateValue(String value, int chars)
@@ -145,7 +143,7 @@ public class BrowseDAOUtilsDefault implements BrowseDAOUtils
      * 
      * @param value
      * @param chars
-     * @return
+     * @return the truncated value.
      * @deprecated
      */
     public String truncateSortValue(String value, int chars)
@@ -159,7 +157,7 @@ public class BrowseDAOUtilsDefault implements BrowseDAOUtils
      * @param value
      * @param maxChars
      * @param omissionMark
-     * @return
+     * @return the truncated value.
      */
     private String trunctateString(String value, int maxChars, String omissionMark)
     {

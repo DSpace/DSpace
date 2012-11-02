@@ -22,10 +22,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * For handling digested secrets (such as passwords).
- * Use {@link PasswordHash(String, byte[], byte[])} to package and manipulate
- * secrets that have already been hashed, and {@link PasswordHash(String)} for
+ * Use {@link #PasswordHash(String, byte[], byte[])} to package and manipulate
+ * secrets that have already been hashed, and {@link #PasswordHash(String)} for
  * plaintext secrets.  Compare a plaintext candidate to a hashed secret with
- * {@link matches(String)}.
+ * {@link #matches(String)}.
  *
  * @author mwood
  */
@@ -78,7 +78,7 @@ public class PasswordHash
     }
 
     /**
-     * Convenience:  like {@link PasswordHash(String, byte[], byte[])} but with
+     * Convenience:  like {@link #PasswordHash(String, byte[], byte[])} but with
      *          hexadecimal-encoded {@code String}s.
      * @param algorithm the digest algorithm used in producing {@code hash}.
      *          If empty, set to null.  Other methods will treat this as unsalted MD5.

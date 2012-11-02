@@ -37,17 +37,17 @@ import java.util.List;
  */
 public class BrowseItem extends DSpaceObject
 {
-	/** Logger */
+    /** Logger */
     private static Logger log = Logger.getLogger(BrowseItem.class);
     
     /** DSpace context */
-	private Context context;
+    private Context context;
 	
-	/** a List of all the metadata */
-	private List<DCValue> metadata = new ArrayList<DCValue>();
+    /** a List of all the metadata */
+    private List<DCValue> metadata = new ArrayList<DCValue>();
 	
-	/** database id of the item */
-	private int id = -1;
+    /** database id of the item */
+    private int id = -1;
 
     /** is the item in the archive */
     private boolean in_archive = true;
@@ -56,37 +56,37 @@ public class BrowseItem extends DSpaceObject
     private boolean withdrawn  = false;
 
     /** item handle */
-	private String handle = null;
+    private String handle = null;
 
     /**
-	 * Construct a new browse item with the given context and the database id
-	 * 
-	 * @param context	the DSpace context
+     * Construct a new browse item with the given context and the database id
+     * 
+     * @param context	the DSpace context
      * @param id		the database id of the item
      * @param in_archive
      * @param withdrawn
      */
-	public BrowseItem(Context context, int id, boolean in_archive, boolean withdrawn)
-	{
-		this.context = context;
-		this.id = id;
+    public BrowseItem(Context context, int id, boolean in_archive, boolean withdrawn)
+    {
+	this.context = context;
+	this.id = id;
         this.in_archive = in_archive;
         this.withdrawn = withdrawn;
     }
 
-	/**
-	 * Get String array of metadata values matching the given parameters
-	 * 
-	 * @param schema	metadata schema
-	 * @param element	metadata element
-	 * @param qualifier	metadata qualifier
-	 * @param lang		metadata language
-	 * @return			array of matching values
-	 * @throws SQLException
-	 */
-	public DCValue[] getMetadata(String schema, String element, String qualifier, String lang)
-		throws SQLException
-	{
+    /**
+     * Get String array of metadata values matching the given parameters
+     * 
+     * @param schema	metadata schema
+     * @param element	metadata element
+     * @param qualifier	metadata qualifier
+     * @param lang		metadata language
+     * @return			array of matching values
+     * @throws SQLException
+     */
+    public DCValue[] getMetadata(String schema, String element, String qualifier, String lang)
+	throws SQLException
+    {
         try
         {
             BrowseItemDAO dao = BrowseDAOFactory.getItemInstance(context);
@@ -146,55 +146,55 @@ public class BrowseItem extends DSpaceObject
         }
     }
 	
-	/**
-	 * Get the type of object.  This object masquerades as an Item, so this
-	 * returns the value of Constants.ITEM
-	 * 
-	 *@return Constants.ITEM
-	 */
-	public int getType()
-	{
+    /**
+     * Get the type of object.  This object masquerades as an Item, so this
+     * returns the value of Constants.ITEM
+     * 
+     *@return Constants.ITEM
+     */
+    public int getType()
+    {
+	return Constants.ITEM;
+    }
+
+    /**
+     * @deprecated
+     * @param real
+     * @return real type, or Constants.ITEM.
+     */
+    public int getType(boolean real)
+    {
+	if (!real)
+	    {
 		return Constants.ITEM;
-	}
+	    }
+	else
+	    {
+		return getType();
+	    }
+    }
 
-	/**
-	 * @deprecated
-	 * @param real
-	 * @return
-	 */
-	public int getType(boolean real)
-	{
-		if (!real)
-		{
-			return Constants.ITEM;
-		}
-		else
-		{
-			return getType();
-		}
-	}
-	
-	/**
-	 * get the database id of the item
-	 * 
-	 *	@return database id of item
-	 */
-	public int getID()
-	{
-		return id;
-	}
+    /**
+     * get the database id of the item
+     * 
+     *	@return database id of item
+     */
+    public int getID()
+    {
+	return id;
+    }
 
-	/**
-	 * Set the database id of the item
-	 * 
-	 * @param id	the database id of the item
-	 */
-	public void setID(int id)
-	{
-		this.id = id;
-	}
-	
-	/**
+    /**
+     * Set the database id of the item
+     * 
+     * @param id	the database id of the item
+     */
+    public void setID(int id)
+    {
+	this.id = id;
+    }
+
+    /**
      * Utility method for pattern-matching metadata elements.  This
      * method will return <code>true</code> if the given schema,
      * element, qualifier and language match the schema, element,
@@ -273,37 +273,36 @@ public class BrowseItem extends DSpaceObject
         return true;
     }
 
-	/* (non-Javadoc)
-	 * @see org.dspace.content.DSpaceObject#getHandle()
-	 */
-	public String getHandle()
-	{
-		// Get our Handle if any
-		if (this.handle == null)
-		{
-			try
-			{
-				this.handle = HandleManager.findHandle(context, this);
-			}
-			catch (SQLException e)
-			{
-				log.error("caught exception: ", e);
-			}
-		}
-		return this.handle;
-	}
-    
-	/**
-	 * Get a thumbnail object out of the item.
-	 * 
-	 * Warning: using this method actually instantiates an Item, which has a
-	 * corresponding performance hit on the database during browse listing
-	 * rendering.  That's your own fault for wanting to put images on your
-	 * browse page!
-	 * 
-	 * @return
-	 * @throws SQLException
-	 */
+    /* (non-Javadoc)
+     * @see org.dspace.content.DSpaceObject#getHandle()
+     */
+    public String getHandle()
+    {
+	// Get our Handle if any
+	if (this.handle == null)
+	    {
+		try
+		    {
+			this.handle = HandleManager.findHandle(context, this);
+		    }
+		catch (SQLException e)
+		    {
+			log.error("caught exception: ", e);
+		    }
+	    }
+	return this.handle;
+    }
+
+    /**
+     * Get a thumbnail object out of the item.
+     * 
+     * Warning: using this method actually instantiates an Item, which has a
+     * corresponding performance hit on the database during browse listing
+     * rendering.  That's your own fault for wanting to put images on your
+     * browse page!
+     * 
+     * @throws SQLException
+     */
     public Thumbnail getThumbnail()
     	throws SQLException
     {
@@ -370,19 +369,19 @@ public class BrowseItem extends DSpaceObject
         return null;
     }
 
-	public String getName()
+    public String getName()
     {
         // FIXME: there is an exception handling problem here
-		try
-		{
-			DCValue t[] = getMetadata("dc", "title", null, Item.ANY);
-			return (t.length >= 1) ? t[0].value : null;
-		}
-		catch (SQLException sqle)
-		{
+	try
+	    {
+		DCValue t[] = getMetadata("dc", "title", null, Item.ANY);
+		return (t.length >= 1) ? t[0].value : null;
+	    }
+	catch (SQLException sqle)
+	    {
         	log.error("caught exception: ", sqle);
-			return null;
-		}
+		return null;
+	    }
     }
 
     @Override

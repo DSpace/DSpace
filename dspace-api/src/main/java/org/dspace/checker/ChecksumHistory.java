@@ -176,8 +176,6 @@ public class ChecksumHistory
 
     /**
      * Return the processing result.
-     * 
-     * @return
      */
     public String getResult()
     {
