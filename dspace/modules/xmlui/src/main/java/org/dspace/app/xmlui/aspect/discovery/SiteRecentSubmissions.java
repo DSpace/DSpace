@@ -66,6 +66,7 @@ public class SiteRecentSubmissions extends AbstractFiltersTransformer {
         }
 
         boolean includeRestrictedItems = ConfigurationManager.getBooleanProperty("harvest.includerestricted.rss", false);
+        int numberOfItemsToShow= SearchUtils.getConfig().getInt("solr.recent-submissions.size", 5);
 
         Division home = body.addDivision("site-home", "primary repository");
 
@@ -78,6 +79,7 @@ public class SiteRecentSubmissions extends AbstractFiltersTransformer {
                 "site-last-submitted", ReferenceSet.TYPE_SUMMARY_LIST,
                 null, "recent-submissions");
 
+        int numberOfItemsAdded=0;
         if (queryResults != null)  {
             for (SolrDocument doc : queryResults.getResults()) {
                 DSpaceObject obj = SearchUtils.findDSpaceObject(context, doc);
@@ -87,6 +89,9 @@ public class SiteRecentSubmissions extends AbstractFiltersTransformer {
                     if (!includeRestrictedItems) {
                         if (isAtLeastOneDataFileVisible(context, (Item)obj)) {
                             lastSubmitted.addReference(obj);
+                            numberOfItemsAdded++;
+                            if(numberOfItemsAdded==numberOfItemsToShow)
+                                return;
                         }
                     }
                 }
@@ -116,7 +121,7 @@ public class SiteRecentSubmissions extends AbstractFiltersTransformer {
 
         queryArgs.setQuery("search.resourcetype:" + Constants.ITEM);
 
-        queryArgs.setRows(SearchUtils.getConfig().getInt("solr.recent-submissions.size", 5));
+        queryArgs.setRows(1000);
 
         String sortField = SearchUtils.getConfig().getString("recent.submissions.sort-option");
         if(sortField != null){

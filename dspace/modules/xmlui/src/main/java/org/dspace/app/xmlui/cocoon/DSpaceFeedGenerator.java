@@ -327,11 +327,19 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
         List<Item> result = new ArrayList<Item>();
 
+        int numberOfItemsToShow = ConfigurationManager.getIntProperty("webui.feed.items");
+
+        int numberOfItemsAdded=0;
         for (SolrDocument doc : queryResults.getResults()) {
             Item item = (Item) SearchUtils.findDSpaceObject(context, doc);
             if (!includeRestrictedItems){
                 if (isAtLeastOneDataFileVisible(context, item)) {
                     result.add(item);
+                    numberOfItemsAdded++;
+                    if(numberOfItemsToShow==numberOfItemsAdded){
+                        break;
+                    }
+
                 }
             }
 
@@ -349,7 +357,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         SolrQuery queryArgs = fs.prepareDefaultFilters(getView(scope));
 
         queryArgs.setQuery("search.resourcetype:" + Constants.ITEM);
-        queryArgs.setRows(ConfigurationManager.getIntProperty("webui.feed.items"));
+        queryArgs.setRows(1000);
         String sortField = SearchUtils.getConfig().getString("recent.submissions.sort-option");
 
         if (sortField != null) {
