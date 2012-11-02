@@ -83,8 +83,6 @@ public class SiteRecentSubmissions extends AbstractFiltersTransformer {
                 DSpaceObject obj = SearchUtils.findDSpaceObject(context, doc);
                 if(obj != null)
                 {
-                    List<Item> result = new ArrayList<Item>();
-
                     // filter out Items that are not world-readable
                     if (!includeRestrictedItems) {
                         if (isAtLeastOneDataFileVisible(context, (Item)obj)) {
