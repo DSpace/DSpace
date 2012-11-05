@@ -85,11 +85,11 @@
     	var myrpstatus = new Object();
     	j(document).ready(function(){
     		j('#cris-rp-change-active').dialog({
-    			autoOpen: false, modal: true, width: 700,
+    			autoOpen: false, modal: true, width: 750, minHeight: 350,
    				buttons: {
    					"<fmt:message key="jsp.mydspace.cris.rp-status-change.go"/>": 
    						function(){
-   							j(window).attr('location','<%= request.getContextPath() %>/'+myrpstatus.url);
+   							j(window).attr('location','<%= request.getContextPath() %>'+myrpstatus.url);
    						},
    					"<fmt:message key="jsp.mydspace.cris.rp-status-change.inactive"/>": 
    						function(){
@@ -108,11 +108,11 @@
    				}
     		});
     		j('#cris-rp-change-inactive').dialog({
-    			autoOpen: false, modal: true, width: 700,
+    			autoOpen: false, modal: true, width: 750, minHeight: 350,
    				buttons: {
    					"<fmt:message key="jsp.mydspace.cris.rp-status-change.go"/>": 
    						function(){
-   							j(window).attr('location','<%= request.getContextPath() %>/'+myrpstatus.url);
+   							j(window).attr('location','<%= request.getContextPath() %>'+myrpstatus.url);
    						},
   					"<fmt:message key="jsp.mydspace.cris.rp-status-change.active"/>": 
   						function(){
@@ -121,17 +121,17 @@
         				},
     				"<fmt:message key="jsp.mydspace.cris.rp-status-change.remove"/>": 
     					function(){
-	    					myRP('activate');
-	    					j(this).dialog("remove");	
+	    					myRP('remove');
+	    					j(this).dialog("close");	
         				},
-    				"<fmt:message key="jsp.mydspace.cris.rp-status-change.keep-imactive"/>": 
+    				"<fmt:message key="jsp.mydspace.cris.rp-status-change.keep-inactive"/>": 
     					function(){
         					j(this).dialog("close");
         				}
         			} 
         	});
     		j('#cris-rp-change-undefined').dialog({
-    			autoOpen: false, modal: true, width: 700,
+    			autoOpen: false, modal: true, width: 750, minHeight: 300,
    				buttons: {
         			"<fmt:message key="jsp.mydspace.cris.rp-status-change.create"/>": 
         				function(){
@@ -147,7 +147,7 @@
     		
     		var myRP = function(myaction){
 	    		j.ajax( {
-					url : "<%= request.getContextPath() %>/cris/rp/myStatus.json",
+					url : "<%= request.getContextPath() %>/cris/rp/myRp.json",
 					data: {
 						"action" : myaction
 					},
@@ -157,7 +157,8 @@
 						{
 							j('#cris-rp-status-value').html('<fmt:message key="jsp.mydspace.cris.rp-status-active" />');
 							j('#cris-rp-status-value').addClass("cris-rp-status-active");
-							j('#cris-rp-changestatus').click(function(){
+							j('#cris-rp-changestatus').off('click');
+							j('#cris-rp-changestatus').on('click', function(){
 								j('#cris-rp-change-active').dialog("open");
 							});
 						} 
@@ -165,7 +166,8 @@
 						{
 							j('#cris-rp-status-value').html('<fmt:message key="jsp.mydspace.cris.rp-status-inactive" />');
 							j('#cris-rp-status-value').addClass("cris-rp-status-inactive");
-							j('#cris-rp-changestatus').click(function(){
+							j('#cris-rp-changestatus').off('click');
+							j('#cris-rp-changestatus').on('click', function(){
 								j('#cris-rp-change-inactive').dialog("open");
 							});
 						}
@@ -173,7 +175,8 @@
 						{
 							j('#cris-rp-status-value').html('<fmt:message key="jsp.mydspace.cris.rp-status-undefined" />');
 							j('#cris-rp-status-value').addClass("cris-rp-status-undefined");
-							j('#cris-rp-changestatus').click(function(){
+							j('#cris-rp-changestatus').off('click');
+							j('#cris-rp-changestatus').on('click', function(){
 								j('#cris-rp-change-undefined').dialog("open");
 							});
 						}										
