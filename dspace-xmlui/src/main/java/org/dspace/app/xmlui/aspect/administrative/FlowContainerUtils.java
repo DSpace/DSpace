@@ -331,61 +331,60 @@ public class FlowContainerUtils
 	 */
 	public static FlowResult testOAISettings(Context context, Request request)  
 	{
-	    FlowResult result  = new FlowResult();
-
-	    String oaiProvider = request.getParameter("oai_provider");
-	    String oaiSetId = request.getParameter("oai_setid");
-	    oaiSetId = request.getParameter("oai-set-setting");
-	    if(!"all".equals(oaiSetId))
-	    {
-		oaiSetId = request.getParameter("oai_setid");
-	    }
-	    String metadataKey = request.getParameter("metadata_format");
-	    String harvestType = request.getParameter("harvest_level");
-	    int harvestTypeInt = 0;
-
-	    if (oaiProvider == null || oaiProvider.length() == 0)
-	    {
-		result.addError("oai_provider");
-	    }
-	    if (oaiSetId == null || oaiSetId.length() == 0)
-	    {
-		result.addError("oai_setid");
-	    }
-	    if (metadataKey == null || metadataKey.length() == 0)
-	    {
-		result.addError("metadata_format");
-	    }
-	    if (harvestType == null || harvestType.length() == 0)
-	    {
-		result.addError("harvest_level");
-	    }
-	    else
-	    {
-		harvestTypeInt = Integer.parseInt(harvestType);
-	    }
-
-
-	    if (result.getErrors() == null) {
-		List<String> testErrors = OAIHarvester.verifyOAIharvester(oaiProvider, oaiSetId, metadataKey, (harvestTypeInt>1));
-		result.setErrors(testErrors);
-	    }
+		FlowResult result  = new FlowResult();
 		
-	    if (result.getErrors() == null || result.getErrors().isEmpty()) {
-		result.setOutcome(true);
-		// On a successful test we still want to stay in the loop,
-		// not continue out of it
-		//result.setContinue(true);
-		result.setMessage(new Message("default","Harvesting settings are valid."));
-	    }
-	    else {
-		result.setOutcome(false);
-		result.setContinue(false);
-		// don't really need a message when the errors are highlighted already
-		//result.setMessage(new Message("default","Harvesting is not properly configured."));
-	    }
+		String oaiProvider = request.getParameter("oai_provider");
+		String oaiSetId = request.getParameter("oai_setid");
+        oaiSetId = request.getParameter("oai-set-setting");
+        if(!"all".equals(oaiSetId))
+        {
+            oaiSetId = request.getParameter("oai_setid");
+        }
+		String metadataKey = request.getParameter("metadata_format");
+		String harvestType = request.getParameter("harvest_level");
+		int harvestTypeInt = 0;
+		
+		if (oaiProvider == null || oaiProvider.length() == 0)
+        {
+            result.addError("oai_provider");
+        }
+		if (oaiSetId == null || oaiSetId.length() == 0)
+        {
+            result.addError("oai_setid");
+        }
+		if (metadataKey == null || metadataKey.length() == 0)
+        {
+            result.addError("metadata_format");
+        }
+		if (harvestType == null || harvestType.length() == 0)
+        {
+            result.addError("harvest_level");
+        }
+		else
+        {
+            harvestTypeInt = Integer.parseInt(harvestType);
+        }
+			
+		
+		if (result.getErrors() == null) {
+			List<String> testErrors = OAIHarvester.verifyOAIharvester(oaiProvider, oaiSetId, metadataKey, (harvestTypeInt>1));
+			result.setErrors(testErrors);
+		}
+		
+		if (result.getErrors() == null || result.getErrors().isEmpty()) {
+			result.setOutcome(true);
+			// On a successful test we still want to stay in the loop, not continue out of it
+			//result.setContinue(true);
+			result.setMessage(new Message("default","Harvesting settings are valid."));
+		}
+		else {
+			result.setOutcome(false);
+			result.setContinue(false);
+			// don't really need a message when the errors are highlighted already
+			//result.setMessage(new Message("default","Harvesting is not properly configured."));
+		}
 
-	    return result;
+		return result;
 	}
 	
 	/**
