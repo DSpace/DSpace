@@ -18,16 +18,24 @@ import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
+import org.dspace.eperson.Group;
+import org.dspace.workflow.DryadWorkflowUtils;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Transformer that displays the recently submitted items on the dspace home page
@@ -57,6 +65,9 @@ public class SiteRecentSubmissions extends AbstractFiltersTransformer {
             log.error(e.getMessage(), e);
         }
 
+        boolean includeRestrictedItems = ConfigurationManager.getBooleanProperty("harvest.includerestricted.rss", false);
+        int numberOfItemsToShow= SearchUtils.getConfig().getInt("solr.recent-submissions.size", 5);
+
         Division home = body.addDivision("site-home", "primary repository");
 
         Division lastSubmittedDiv = home
@@ -68,12 +79,21 @@ public class SiteRecentSubmissions extends AbstractFiltersTransformer {
                 "site-last-submitted", ReferenceSet.TYPE_SUMMARY_LIST,
                 null, "recent-submissions");
 
+        int numberOfItemsAdded=0;
         if (queryResults != null)  {
             for (SolrDocument doc : queryResults.getResults()) {
                 DSpaceObject obj = SearchUtils.findDSpaceObject(context, doc);
                 if(obj != null)
                 {
-                    lastSubmitted.addReference(obj);
+                    // filter out Items that are not world-readable
+                    if (!includeRestrictedItems) {
+                        if (isAtLeastOneDataFileVisible(context, (Item)obj)) {
+                            lastSubmitted.addReference(obj);
+                            numberOfItemsAdded++;
+                            if(numberOfItemsAdded==numberOfItemsToShow)
+                                return;
+                        }
+                    }
                 }
             }
         }
@@ -101,7 +121,7 @@ public class SiteRecentSubmissions extends AbstractFiltersTransformer {
 
         queryArgs.setQuery("search.resourcetype:" + Constants.ITEM);
 
-        queryArgs.setRows(SearchUtils.getConfig().getInt("solr.recent-submissions.size", 5));
+        queryArgs.setRows(1000);
 
         String sortField = SearchUtils.getConfig().getString("recent.submissions.sort-option");
         if(sortField != null){
@@ -116,6 +136,18 @@ public class SiteRecentSubmissions extends AbstractFiltersTransformer {
         Context context = ContextUtil.obtainContext(objectModel);
         queryResults = service.search(context, queryArgs);
 
+    }
+
+    private boolean isAtLeastOneDataFileVisible(Context context, Item item) throws SQLException {
+        Item[] datafiles = DryadWorkflowUtils.getDataFiles(context, item);
+        for (Item i : datafiles) {
+            String lift = ConfigurationManager.getProperty("embargo.field.lift");
+            DCValue[] values = i.getMetadata(lift);
+            if (values == null || values.length == 0)
+                return true;
+
+        }
+        return false;
     }
 
 }
