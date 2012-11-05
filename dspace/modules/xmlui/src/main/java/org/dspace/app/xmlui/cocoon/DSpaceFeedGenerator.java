@@ -286,16 +286,13 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     }
 
 
-    /**
-     * check also its datafiles before add it to the result list
-     * if a datafile is under embargo don't add the dataPackage to the result list.
-     */
-    private boolean isADataFileEmbargoed(Context context, Item item) throws SQLException {
+
+    private boolean isAtLeastOneDataFileVisible(Context context, Item item) throws SQLException {
         Item[] datafiles = DryadWorkflowUtils.getDataFiles(context, item);
         for (Item i : datafiles) {
             String lift = ConfigurationManager.getProperty("embargo.field.lift");
             DCValue[] values = i.getMetadata(lift);
-            if (values != null && values.length > 0)
+            if (values == null || values.length == 0)
                 return true;
 
         }
@@ -316,6 +313,9 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     }
 
 
+
+
+
     private Item[] getRecentlySubmittedItemsUsingDiscovery(Context context, DSpaceObject dso) throws SQLException {
 
 
@@ -325,54 +325,27 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
         log.debug("getRecentlySubmittedItemsUsingDiscovery(Context context, DSpaceObject dso) - queryResults: " + queryResults);
 
-
-        Item[] items = new Item[queryResults.getResults().size()];
-        int index = 0;
-
-        log.debug("getRecentlySubmittedItemsUsingDiscovery(Context context, DSpaceObject dso) - items: " + items.length);
-
-
-        for (SolrDocument doc : queryResults.getResults()) {
-
-            items[index] = (Item) SearchUtils.findDSpaceObject(context, doc);
-            index++;
-
-        }
-
-
-        // test scope.
-        printfoundItems(items);
-
-
         List<Item> result = new ArrayList<Item>();
 
-        // filter out Items that are not world-readable
-        if (!includeRestrictedItems) {
+        int numberOfItemsToShow = ConfigurationManager.getIntProperty("webui.feed.items");
 
-            for (Item item : items) {
-                checkAccess:
-                {
-                    for (Group group : AuthorizeManager.getAuthorizedGroups(context, item, Constants.READ)) {
-                        if ((group.getID() == 0)) {
-
-                            // check also its datafiles before add it to the result list
-                            // if a datafile is under embargo don't add the dataPackage to the result list.
-                            if (!isADataFileEmbargoed(context, item)) {
-                                result.add(item);
-                                break checkAccess;
-                            }
-                        }
+        int numberOfItemsAdded=0;
+        for (SolrDocument doc : queryResults.getResults()) {
+            Item item = (Item) SearchUtils.findDSpaceObject(context, doc);
+            if (!includeRestrictedItems){
+                if (isAtLeastOneDataFileVisible(context, item)) {
+                    result.add(item);
+                    numberOfItemsAdded++;
+                    if(numberOfItemsToShow==numberOfItemsAdded){
+                        break;
                     }
+
                 }
             }
-            this.recentSubmissionItems = result.toArray(new Item[result.size()]);
-            items = recentSubmissionItems;
+
         }
-
-        // test scope.
-        printfoundItems(items);
-
-        return items;
+        this.recentSubmissionItems = result.toArray(new Item[result.size()]);
+        return recentSubmissionItems;
     }
 
 
@@ -384,7 +357,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         SolrQuery queryArgs = fs.prepareDefaultFilters(getView(scope));
 
         queryArgs.setQuery("search.resourcetype:" + Constants.ITEM);
-        queryArgs.setRows(ConfigurationManager.getIntProperty("webui.feed.items"));
+        queryArgs.setRows(1000);
         String sortField = SearchUtils.getConfig().getString("recent.submissions.sort-option");
 
         if (sortField != null) {
@@ -408,122 +381,6 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
 
     private String getView(DSpaceObject dso) {
-//        if (dso instanceof Collection) {
-//            log.debug("getView(). return: collection");
-//            return "collection";
-//        } else if (dso instanceof Community) {
-//            log.debug("getView(). return: community");
-//            return "community";
-//        }
-//        log.debug("getView(). return: site");
         return "site";
     }
-
-
-    private void printfoundItems(Item[] items) {
-        for (Item item : items) {
-
-            String id = "unknown id";
-            DCValue[] values = item.getMetadata("dc.identifier");
-            if (values != null && values.length > 0)
-                id = values[0].value;
-
-
-            String title = "unknown title";
-            values = item.getMetadata("dc.title");
-            if (values != null && values.length > 0)
-                title = values[0].value;
-
-            log.debug("item " + item.getID() + ": " + id + " - " + title);
-        }
-
-    }
-
-
-//    /**
-//     * Extend the standard DSpaceValidity object to support assumed
-//     * caching. Since feeds will constantly be requested we want to
-//     * assume that a feed is still valid instead of checking it
-//     * against the database anew everytime.
-//     * <p/>
-//     * This validity object will assume that a cache is still valid,
-//     * without rechecking it, for 24 hours.
-//     */
-//    private static class FeedValidity extends DSpaceValidity {
-//        private static final long serialVersionUID = 1L;
-//
-//        /**
-//         * When the cache's validity expires
-//         */
-//        private long expires = 0;
-//
-//        /**
-//         * When the validity is completed record a timestamp to check later.
-//         */
-//        public DSpaceValidity complete() {
-//
-//            log.debug("DSpaceFeedGenerator - complete() !!!!!");
-//
-//            this.expires = System.currentTimeMillis() + CACHE_AGE;
-//
-//            log.debug("DSpaceFeedGenerator - complete(). this.expires: " + this.expires);
-//
-//            return super.complete();
-//        }
-//
-//
-//        /**
-//         * Determine if the cache is still valid
-//         */
-//        public int isValid() {
-//
-//            log.debug("DSpaceFeedGenerator - isValid(). this.completed: " + this.completed);
-//
-//            // Return true if we have a hash.
-//            if (this.completed) {
-//                log.debug("DSpaceFeedGenerator - System.currentTimeMillis(): " + System.currentTimeMillis());
-//                log.debug("DSpaceFeedGenerator - this.expires: " + this.expires);
-//                if (System.currentTimeMillis() < this.expires) {
-//                    // If the cache hasn't expired the just assume that it is still valid.
-//                    log.debug("DSpaceFeedGenerator - SourceValidity.VALID !!!!!");
-//                    return SourceValidity.VALID;
-//                } else {
-//                    // The cache is past its age
-//                    log.debug("DSpaceFeedGenerator - SourceValidity.UNKNOWN !!!!!");
-//                    return SourceValidity.UNKNOWN;
-//                }
-//            } else {
-//                // This is an error, state. We are being asked whether we are valid before
-//                // we have been initialized.
-//                log.debug("DSpaceFeedGenerator - SourceValidity.INVALID !!!!!");
-//                return SourceValidity.INVALID;
-//            }
-//        }
-//
-//        /**
-//         * Determine if the cache is still valid based
-//         * upon the other validity object.
-//         *
-//         * @param otherValidity The other validity object.
-//         */
-//        public int isValid(SourceValidity otherValidity) {
-//            log.debug("DSpaceFeedGenerator - (SourceValidity otherValidity)");
-//
-//            if (this.completed && otherValidity instanceof FeedValidity) {
-//                FeedValidity other = (FeedValidity) otherValidity;
-//                if (hash == other.hash) {
-//                    // Update both cache's expiration time.
-//                    this.expires = System.currentTimeMillis() + CACHE_AGE;
-//                    other.expires = System.currentTimeMillis() + CACHE_AGE;
-//
-//                    log.debug("DSpaceFeedGenerator - SourceValidity.VALID !!!!!");
-//                    return SourceValidity.VALID;
-//                }
-//            }
-//            log.debug("DSpaceFeedGenerator - SourceValidity.INVALID !!!!!");
-//            return SourceValidity.INVALID;
-//        }
-//
-//    }
-
 }
