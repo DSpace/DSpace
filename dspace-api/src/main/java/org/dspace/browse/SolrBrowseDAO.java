@@ -12,9 +12,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverFacetField;
@@ -144,6 +146,7 @@ public class SolrBrowseDAO implements BrowseDAO
             DiscoverQuery query = new DiscoverQuery();
             addLocationScopeFilter(query);
             addStatusFilter(query);
+            addExtraFilter(table, query);
             if (distinct)
             {
                 DiscoverFacetField dff = new DiscoverFacetField(facetField,
@@ -193,6 +196,15 @@ public class SolrBrowseDAO implements BrowseDAO
             }
         }
         return sResponse;
+    }
+
+    private void addExtraFilter(String table, DiscoverQuery query)
+    {
+        String filter = ConfigurationManager.getProperty("browse.solr."+table+".filter");
+        if (StringUtils.isNotBlank(filter))
+        {
+            query.addFilterQueries(filter);
+        }
     }
 
     private void addStatusFilter(DiscoverQuery query)
@@ -695,6 +707,7 @@ public class SolrBrowseDAO implements BrowseDAO
 //            // items private are also withdrawn
 //            itemsWithdrawn = true;
 //        }
+        this.table = table;
         facetField = table;
     }
 

@@ -8,7 +8,6 @@
 package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,16 +25,20 @@ import javax.servlet.jsp.tagext.TagSupport;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.MetadataExposure;
+import org.dspace.app.webui.util.DateDisplayStrategy;
+import org.dspace.app.webui.util.DefaultDisplayStrategy;
+import org.dspace.app.webui.util.IDisplayMetadataValueStrategy;
+import org.dspace.app.webui.util.LinkDisplayStrategy;
+import org.dspace.app.webui.util.ResolverDisplayStrategy;
 import org.dspace.app.webui.util.StyleSelection;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.browse.BrowseException;
+import org.dspace.browse.BrowseIndex;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
-import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
-import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -366,8 +369,9 @@ public class ItemTag extends TagSupport
 
     /**
      * Render an item in the given style
+     * @throws JspException 
      */
-    private void render() throws IOException, SQLException
+    private void render() throws IOException, SQLException, JspException
     {
         JspWriter out = pageContext.getOut();
         HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
@@ -394,37 +398,37 @@ public class ItemTag extends TagSupport
         while (st.hasMoreTokens())
         {
         	String field = st.nextToken().trim();
-            boolean isDate = false;
-            boolean isLink = false;
-            boolean isResolver = false;
-            
-            String style = null;
+        	String displayStrategyName = null;
             Matcher fieldStyleMatcher = fieldStylePatter.matcher(field);
             if (fieldStyleMatcher.matches()){
-                style = fieldStyleMatcher.group(1);
+                displayStrategyName = fieldStyleMatcher.group(1);
+            }
+            
+            if (displayStrategyName != null)
+            {
+                field = field.replaceAll("\\("+displayStrategyName+"\\)", "");
+            }
+            else
+            {
+                displayStrategyName = "default";
             }
             
             String browseIndex;
+            boolean viewFull = false;
             try
             {
                 browseIndex = getBrowseField(field);
+                if (browseIndex != null)
+                {
+                    viewFull = BrowseIndex.getBrowseIndex(browseIndex).isItemIndex();
+                }
             }
             catch (BrowseException e)
             {
                 log.error(e);
                 browseIndex = null;
             }
-
-            // Find out if the field should rendered with a particular style
-
-            if (style != null)
-            {
-                isDate = style.equals("date");
-                isLink = style.equals("link");
-                isResolver = style.equals("resolver") || urn2baseurl.keySet().contains(style);
-                field = field.replaceAll("\\("+style+"\\)", "");
-            } 
-
+            
             // Get the separate schema + element + qualifier
 
             String[] eq = field.split("\\.");
@@ -471,105 +475,34 @@ public class ItemTag extends TagSupport
                 out.print(label);
                 out.print(":&nbsp;</td><td class=\"metadataFieldValue\">");
 
-                for (int j = 0; j < values.length; j++)
+                IDisplayMetadataValueStrategy strategy = (IDisplayMetadataValueStrategy) PluginManager
+                        .getNamedPlugin(IDisplayMetadataValueStrategy.class,
+                                displayStrategyName);
+                
+                if (strategy == null)
                 {
-                    if (values[j] != null && values[j].value != null)
+                    if (displayStrategyName.equalsIgnoreCase("link"))
                     {
-                        if (j > 0)
-                        {
-                            out.print("<br />");
-                        }
-
-                        if (isLink)
-                        {
-                            out.print("<a href=\"" + values[j].value + "\">"
-                                    + Utils.addEntities(values[j].value) + "</a>");
-                        }
-                        else if (isDate)
-                        {
-                            DCDate dd = new DCDate(values[j].value);
-
-                            // Parse the date
-                            out.print(UIUtil.displayDate(dd, false, false, (HttpServletRequest)pageContext.getRequest()));
-                        }
-                        else if (isResolver)
-                        {
-                            String value = values[j].value;
-                            if (value.startsWith("http://")
-                                    || value.startsWith("https://")
-                                    || value.startsWith("ftp://")
-                                    || value.startsWith("ftps://"))
-                            {
-                                // Already a URL, print as if it was a regular link
-                                out.print("<a href=\"" + value + "\">"
-                                        + Utils.addEntities(value) + "</a>");
-                            }
-                            else
-                            {
-                                String foundUrn = null;
-                                if (!style.equals("resolver"))
-                                {
-                                    foundUrn = style;
-                                }
-                                else
-                                {
-                                    for (String checkUrn : urn2baseurl.keySet())
-                                    {
-                                        if (value.startsWith(checkUrn))
-                                        {
-                                            foundUrn = checkUrn;
-                                        }
-                                    }
-                                }
-
-                                if (foundUrn != null)
-                                {
-
-                                    if (value.startsWith(foundUrn + ":"))
-                                    {
-                                        value = value.substring(foundUrn.length()+1);
-                                    }
-
-                                    String url = urn2baseurl.get(foundUrn);
-                                    out.print("<a href=\"" + url
-                                            + value + "\">"
-                                            + Utils.addEntities(values[j].value)
-                                            + "</a>");
-                                }
-                                else
-                                {
-                                    out.print(value);
-                                }
-                            }
-
-                        }
-                        else if (browseIndex != null)
-                        {
-	                        String argument, value;
-	                        if ( values[j].authority != null &&
-	                                            values[j].confidence >= MetadataAuthorityManager.getManager()
-	                                                .getMinConfidence( values[j].schema,  values[j].element,  values[j].qualifier))
-	                        {
-	                            argument = "authority";
-	                            value = values[j].authority;
-	                        }
-	                        else
-	                        {
-	                            argument = "value";
-	                            value = values[j].value;
-	                        }
-	                    	out.print("<a class=\"" + ("authority".equals(argument)?"authority ":"") + browseIndex + "\""
-	                                                + "href=\"" + request.getContextPath() + "/browse?type=" + browseIndex + "&amp;" + argument + "="
-	                    				+ URLEncoder.encode(value, "UTF-8") + "\">" + Utils.addEntities(values[j].value)
-	                    				+ "</a>");
-	                    }
-                        else
-                        {
-                            out.print(Utils.addEntities(values[j].value));
-                        }
+                        strategy = new LinkDisplayStrategy();
+                    }
+                    else if (displayStrategyName.equalsIgnoreCase("date"))
+                    {
+                        strategy = new DateDisplayStrategy();
+                    }
+                    else if (displayStrategyName.equalsIgnoreCase("resolver"))
+                    {
+                        strategy = new ResolverDisplayStrategy();
+                    }
+                    else
+                    {
+                        strategy = new DefaultDisplayStrategy();
                     }
                 }
-
+                
+                String metadata = strategy.getMetadataDisplay(request, -1, viewFull, browseIndex, 
+                        -1, field, values, item, false, false, pageContext);
+                
+                out.print(metadata);
                 out.println("</td></tr>");
             }
         }
