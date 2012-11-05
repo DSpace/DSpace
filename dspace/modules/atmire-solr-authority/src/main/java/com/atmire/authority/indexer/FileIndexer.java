@@ -47,7 +47,7 @@ public class FileIndexer implements IndexerInterface, SolrDocumentFields {
         return nextValue;
     }
 
-   @Override
+    @Override
     public boolean hasMore() {
         try {
 
@@ -79,8 +79,8 @@ public class FileIndexer implements IndexerInterface, SolrDocumentFields {
         if(integratedJournal!=null && integratedJournal.equals("true"))
             value+="*";
 
-        values.put(DOC_ID, Utils.getMD5(SOURCE + "prism.publicationName" + value));
-        values.put(DOC_SOURCE, SOURCE + "-DryadJournal");
+        values.put(DOC_ID, Utils.getMD5(value));
+        values.put(DOC_SOURCE, SOURCE);
         values.put(DOC_FIELD, "prism.publicationName");
         values.put(DOC_DISPLAY_VALUE, value);
         values.put(DOC_VALUE, value);
