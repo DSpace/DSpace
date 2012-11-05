@@ -27,7 +27,7 @@ import org.dspace.sort.SortException;
  */
 public final class BrowseIndex
 {
-    /** the configuration number, as specified in the config */
+	/** the configuration number, as specified in the config */
     /** used for single metadata browse tables for generating the table name */
     private int number;
     
@@ -75,7 +75,7 @@ public final class BrowseIndex
     }
     
     /**
-     * Constructor for creating generic / internal index objects.
+     * Constructor for creating generic / internal index objects
      * @param baseName The base of the table name
      */
     private BrowseIndex(String baseName)
@@ -223,25 +223,25 @@ public final class BrowseIndex
     }
 
     /**
-     * @return Returns the datatype.
-     */
-    public String getDataType()
-    {
+	 * @return Returns the datatype.
+	 */
+	public String getDataType()
+	{
         if (sortOption != null)
-	    {
-		return sortOption.getType();
-	    }
+        {
+            return sortOption.getType();
+        }
 
-	return datatype;
-    }
+		return datatype;
+	}
 
-    /**
-     * @return Returns the displayType.
-     */
-    public String getDisplayType()
-    {
+	/**
+	 * @return Returns the displayType.
+	 */
+	public String getDisplayType()
+	{
         return displayType;
-    }
+	}
 
     /**
      * @return Returns the number of metadata fields for this index
@@ -257,67 +257,67 @@ public final class BrowseIndex
     }
 
     /**
-     * @return Returns the mdBits.
-     */
-    public String[] getMdBits(int idx)
-    {
-	if (isMetadataIndex())
-	    {
-		return mdBits[idx];
-	    }
+	 * @return Returns the mdBits.
+	 */
+	public String[] getMdBits(int idx)
+	{
+	    if (isMetadataIndex())
+        {
+            return mdBits[idx];
+        }
+	    
+	    return null;
+	}
 
-	return null;
-    }
-
-    /**
-     * @return Returns the metadata.
-     */
-    public String getMetadata()
-    {
+	/**
+	 * @return Returns the metadata.
+	 */
+	public String getMetadata()
+	{
         return metadataAll;
-    }
+	}
 
     public String getMetadata(int idx)
     {
         return metadata[idx];
     }
 
-    /**
-     * @return Returns the name.
-     */
-    public String getName()
-    {
-	return name;
-    }
+	/**
+	 * @return Returns the name.
+	 */
+	public String getName()
+	{
+		return name;
+	}
 
-    /**
-     * @param name The name to set.
-     */
+	/**
+	 * @param name The name to set.
+	 */
 //	public void setName(String name)
 //	{
 //		this.name = name;
 //	}
 	
-    /**
-     * Get the SortOption associated with this index.
-     */
-    public SortOption getSortOption()
-    {
-	return sortOption;
-    }
+	/**
+	 * Get the SortOption associated with this index.
+	 */
+	public SortOption getSortOption()
+	{
+	    return sortOption;
+	}
+	
+	public boolean isDisplayFrequencies() {
+		return displayFrequencies;
+	}
 
-    public boolean isDisplayFrequencies() {
-	return displayFrequencies;
-    }
-
-    /**
-     * Populate the internal array containing the bits of metadata, for
-     * ease of use later
-     */
-    public void generateMdBits()
+	/**
+	 * Populate the internal array containing the bits of metadata, for
+	 * ease of use later
+	 */
+	public void generateMdBits()
     {
     	try
-	{
+    	{
     	    if (isMetadataIndex())
             {
                 mdBits = new String[metadata.length][];
@@ -334,13 +334,13 @@ public final class BrowseIndex
     	}
     }
     
-    /**
-     * Get the name of the sequence that will be used in the given circumstances
-     * 
-     * @param isDistinct	is a distinct table
-     * @param isMap		is a map table
-     * @return			the name of the sequence
-     */
+	/**
+	 * Get the name of the sequence that will be used in the given circumstances
+	 * 
+	 * @param isDistinct	is a distinct table
+	 * @param isMap			is a map table
+	 * @return				the name of the sequence
+	 */
     public String getSequenceName(boolean isDistinct, boolean isMap)
     {
         if (isDistinct || isMap)
@@ -369,6 +369,7 @@ public final class BrowseIndex
      * @param baseName
      * @param isDistinct
      * @param isMap
+     * @return
      */
     private static String getSequenceName(String baseName, boolean isDistinct, boolean isMap)
     {
@@ -411,7 +412,7 @@ public final class BrowseIndex
      * @param isCollection
      * @param isDistinct
      * @param isMap
-     * @return the name of the table.
+     * @return
      */
     private static String getTableName(String baseName, boolean isCommunity, boolean isCollection, boolean isDistinct, boolean isMap)
     {
@@ -442,7 +443,7 @@ public final class BrowseIndex
     }
     
     /**
-     * Get the name of the table in the given circumstances.
+     * Get the name of the table in the given circumstances
      * 
      * @param isCommunity	whether this is a community constrained index (view)
      * @param isCollection	whether this is a collection constrained index (view)
@@ -484,8 +485,6 @@ public final class BrowseIndex
      * <code>
      * getTableName(false, false, false, false);
      * </code>
-     * 
-     * @return the name of the table.
      */
     public String getTableName()
     {
@@ -493,7 +492,7 @@ public final class BrowseIndex
     }
     
     /**
-     * Get the table name for the given set of circumstances
+     * Get the table name for the given set of circumstances.
      * 
      * This is the same as calling:
      * 
@@ -504,7 +503,6 @@ public final class BrowseIndex
      * @param isDistinct	is this a distinct table
      * @param isCommunity
      * @param isCollection
-     * @return the name of the table.
      * @deprecated 1.5
      */
     public String getTableName(boolean isDistinct, boolean isCommunity, boolean isCollection)
@@ -518,8 +516,6 @@ public final class BrowseIndex
      * <code>
      * getTableName(false, false, false, true);
      * </code>
-     * 
-     * @return the name of the table.
      */
     public String getMapTableName()
     {
@@ -532,8 +528,6 @@ public final class BrowseIndex
      * <code>
      * getTableName(false, false, true, false);
      * </code>
-     *
-     * @return the name of the table.
      */
     public String getDistinctTableName()
     {
@@ -629,7 +623,6 @@ public final class BrowseIndex
     
     /**
      * Get the field for sorting associated with this index.
-     * @return the name of the field.
      * @throws BrowseException
      */
     public String getSortField(boolean isSecondLevel) throws BrowseException
@@ -655,11 +648,7 @@ public final class BrowseIndex
     }
     
     /**
-     * Get an array of the names of all the browse index tables in the current
-     * configuration.
-     *
      * @deprecated
-     * @return names of all the current browse index tables.
      * @throws BrowseException
      */
     public static String[] tables()
@@ -730,10 +719,9 @@ public final class BrowseIndex
     }
     
     /**
-     * Get the configured browse index that is defined to use this sort option
+     * Get the configured browse index that is defined to use this sort option.
      * 
      * @param so
-     * @return the associated BrowseIndex.
      * @throws BrowseException
      */
     public static BrowseIndex getBrowseIndex(SortOption so) throws BrowseException

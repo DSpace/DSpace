@@ -22,89 +22,89 @@ import org.dspace.core.ConfigurationManager;
  */
 public class ItemListConfig
 {
-    /** a map of column number to metadata value */
-    private Map<Integer, String[]> metadata = new HashMap<Integer, String[]>();
+	/** a map of column number to metadata value */
+	private Map<Integer, String[]> metadata = new HashMap<Integer, String[]>();
 	
-    /** a map of column number to data type */
-    private Map<Integer, Integer> types = new HashMap<Integer, Integer>();
+	/** a map of column number to data type */
+	private Map<Integer, Integer> types = new HashMap<Integer, Integer>();
 	
-    /** constant for a DATE column */
-    private static final int DATE = 1;
+	/** constant for a DATE column */
+	private static final int DATE = 1;
 	
-    /** constant for a TEXT column */
-    private static final int TEXT = 2;
+	/** constant for a TEXT column */
+	private static final int TEXT = 2;
 	
-    /**
-     * Create a new instance of the Item list configuration.  This loads
-     * all the required information from configuration
-     * 
-     * @throws BrowseException
-     */
-    public ItemListConfig()
-	throws BrowseException
-    {
-	try
-	    {
-		String configLine = ConfigurationManager.getProperty("webui.itemlist.columns");
+	/**
+	 * Create a new instance of the Item list configuration.  This loads
+	 * all the required information from configuration
+	 * 
+	 * @throws BrowseException
+	 */
+	public ItemListConfig()
+		throws BrowseException
+	{
+		try
+		{
+			String configLine = ConfigurationManager.getProperty("webui.itemlist.columns");
+			
+			if (configLine == null || "".equals(configLine))
+			{
+				throw new BrowseException("There is no configuration for webui.itemlist.columns");
+			}
+			
+			// parse the config
+			StringTokenizer st = new StringTokenizer(configLine, ",");
+			int i = 1;
+			while (st.hasMoreTokens())
+			{
+				Integer key = Integer.valueOf(i);
+				String token = st.nextToken();
+				
+				// find out if the field is a date
+				if (token.indexOf("(date)") > 0)
+				{
+					token = token.replaceAll("\\(date\\)", "");
+					types.put(key, Integer.valueOf(ItemListConfig.DATE));
+				}
+				else
+				{
+					types.put(key, Integer.valueOf(ItemListConfig.TEXT));
+				}
+				
+				String[] mdBits = interpretField(token.trim(), null);
+				metadata.put(key, mdBits);
+				
+				// don't forget to increment the key counter
+				i++;
+			}
+		}
+		catch (IOException e)
+		{
+			throw new BrowseException(e);
+		}
+	}
 
-		if (configLine == null || "".equals(configLine))
-		    {
-			throw new BrowseException("There is no configuration for webui.itemlist.columns");
-		    }
-
-		// parse the config
-		StringTokenizer st = new StringTokenizer(configLine, ",");
-		int i = 1;
-		while (st.hasMoreTokens())
-		    {
-			Integer key = Integer.valueOf(i);
-			String token = st.nextToken();
-
-			// find out if the field is a date
-			if (token.indexOf("(date)") > 0)
-			    {
-				token = token.replaceAll("\\(date\\)", "");
-				types.put(key, Integer.valueOf(ItemListConfig.DATE));
-			    }
-			else
-			    {
-				types.put(key, Integer.valueOf(ItemListConfig.TEXT));
-			    }
-
-			String[] mdBits = interpretField(token.trim(), null);
-			metadata.put(key, mdBits);
-
-			// don't forget to increment the key counter
-			i++;
-		    }
-	    }
-	catch (IOException e)
-	    {
-		throw new BrowseException(e);
-	    }
-    }
-
-    /**
-     * how many columns are there?
-     * 
-     * @return	the number of columns
-     */
-    public int numCols()
-    {
-	return metadata.size();
-    }
+	/**
+	 * how many columns are there?
+	 * 
+	 * @return	the number of columns
+	 */
+	public int numCols()
+	{
+		return metadata.size();
+	}
 	
-    /**
-     * what metadata is to go in the given column number
-     * 
-     * @param col
-     */
-    public String[] getMetadata(int col)
-    {
-	return metadata.get(Integer.valueOf(col));
-    }
-
-    /**
+	/**
+	 * What metadata is to go in the given column number?
+	 * 
+	 * @param col
+	 */
+	public String[] getMetadata(int col)
+	{
+		return metadata.get(Integer.valueOf(col));
+	}
+	
+	/**
      * Take a string representation of a metadata field, and return it as an array.
      * This is just a convenient utility method to basically break the metadata 
      * representation up by its delimiter (.), and stick it in an array, inserting

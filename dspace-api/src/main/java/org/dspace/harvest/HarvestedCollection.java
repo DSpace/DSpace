@@ -27,48 +27,48 @@ import java.util.List;
 
 public class HarvestedCollection 
 {
-    private Context context;
-    private TableRow harvestRow;
+	private Context context;
+	private TableRow harvestRow;
 
-    public static final int TYPE_NONE = 0;
-    public static final int TYPE_DMD = 1;
-    public static final int TYPE_DMDREF = 2;
-    public static final int TYPE_FULL = 3;
+	public static final int TYPE_NONE = 0;
+	public static final int TYPE_DMD = 1;
+	public static final int TYPE_DMDREF = 2;
+	public static final int TYPE_FULL = 3;
 	
-    public static final int STATUS_READY = 0;
-    public static final int STATUS_BUSY = 1;
-    public static final int STATUS_QUEUED = 2;
-    public static final int STATUS_OAI_ERROR = 3;
-    public static final int STATUS_UNKNOWN_ERROR = -1;
+	public static final int STATUS_READY = 0;
+	public static final int STATUS_BUSY = 1;
+	public static final int STATUS_QUEUED = 2;
+	public static final int STATUS_OAI_ERROR = 3;
+	public static final int STATUS_UNKNOWN_ERROR = -1;
 	
-    /*
-     * 	collection_id      | integer                  | not null
-     *  harvest_type       | integer                  | 
-     *  oai_source         | text                     | 
-     *	oai_set_id         | text                     | 
-     *	harvest_message    | text                     | 
-     *	metadata_config_id | text                     | 
-     *	harvest_status     | integer                  | 
-     *	harvest_start_time | timestamp with time zone | 
-     */
+	/*
+	 * 	collection_id      | integer                  | not null
+ 		harvest_type       | integer                  | 
+ 		oai_source         | text                     | 
+ 		oai_set_id         | text                     | 
+ 		harvest_message    | text                     | 
+ 		metadata_config_id | text                     | 
+ 		harvest_status     | integer                  | 
+ 		harvest_start_time | timestamp with time zone | 
+	 */  
 	
-    // TODO: make sure this guy knows to lock people out if the status is not zero.
-    // i.e. someone editing a collection's setting from the admin menu should have
-    // to stop an ongoing harvest before they can edit the settings. 
-
-
-    HarvestedCollection(Context c, TableRow row)
+	// TODO: make sure this guy knows to lock people out if the status is not zero.
+	// i.e. someone editing a collection's setting from the admin menu should have
+	// to stop an ongoing harvest before they can edit the settings. 
+   
+    
+	HarvestedCollection(Context c, TableRow row)
     {
         context = c;
         harvestRow = row;
     }
-
-
+    
+    
     public static void exists(Context c) throws SQLException {
     	DatabaseManager.queryTable(c, "harvested_collection", "SELECT COUNT(*) FROM harvested_collection");    	
     }
-
-
+    
+    
     /**
      * Find the harvest settings corresponding to this collection 
      * @return a HarvestInstance object corresponding to this collection's settings, null if not found.
@@ -76,14 +76,14 @@ public class HarvestedCollection
     public static HarvestedCollection find(Context c, int collectionId) throws SQLException 
     {
     	TableRow row = DatabaseManager.findByUnique(c, "harvested_collection", "collection_id", collectionId);
-
+    	
     	if (row == null) {
-	    return null;
+    		return null;
     	}
-
+    	
     	return new HarvestedCollection(c, row);
     }
-
+    
     /**
      * Create a new harvest instance row for a specified collection.  
      * @return a new HarvestInstance object
@@ -93,10 +93,10 @@ public class HarvestedCollection
     	row.setColumn("collection_id", collectionId);
     	row.setColumn("harvest_type", 0);
     	DatabaseManager.insert(c, row);
-
+    	
     	return new HarvestedCollection(c, row);    	
     }
-
+    
     /** Returns whether the specified collection is harvestable, i.e. whether its harvesting 
      * options are set up correctly. This is distinct from "ready", since this collection may
      * be in process of being harvested.
@@ -105,12 +105,12 @@ public class HarvestedCollection
     {
     	HarvestedCollection hc = HarvestedCollection.find(c, collectionId); 
     	if (hc != null && hc.getHarvestType() > 0 && hc.getOaiSource() != null && hc.getOaiSetId() != null && 
-	    hc.getHarvestStatus() != HarvestedCollection.STATUS_UNKNOWN_ERROR) {
-	    return true;
+    			hc.getHarvestStatus() != HarvestedCollection.STATUS_UNKNOWN_ERROR) {
+    		return true;
     	}
     	return false;   
     }
-
+    
     /** Returns whether this harvest instance is actually harvestable, i.e. whether its settings
      * options are set up correctly. This is distinct from "ready", since this collection may
      * be in process of being harvested.
@@ -118,13 +118,13 @@ public class HarvestedCollection
     public boolean isHarvestable() throws SQLException 
     {
     	if (this.getHarvestType() > 0 && this.getOaiSource() != null && this.getOaiSetId() != null && 
-	    this.getHarvestStatus() != HarvestedCollection.STATUS_UNKNOWN_ERROR) {
-	    return true;
+    			this.getHarvestStatus() != HarvestedCollection.STATUS_UNKNOWN_ERROR) {
+    		return true;
     	}
 
     	return false;   
     }
-
+    
     /** Returns whether the specified collection is ready for immediate harvest. 
      */
     public static boolean isReady(Context c, int collectionId) throws SQLException 
@@ -132,18 +132,18 @@ public class HarvestedCollection
     	HarvestedCollection hc = HarvestedCollection.find(c, collectionId);
     	return hc.isReady();
     }
-
+    
     public boolean isReady() throws SQLException 
     {
     	if (this.isHarvestable() &&	(this.getHarvestStatus() == HarvestedCollection.STATUS_READY || this.getHarvestStatus() == HarvestedCollection.STATUS_OAI_ERROR))
-	    {
-		return true;
-	    }
+        {
+            return true;
+        }
 
     	return false;   
     }
-
-
+    
+    
     /** Find all collections that are set up for harvesting 
      * 
      * return: list of collection id's
@@ -152,18 +152,18 @@ public class HarvestedCollection
     public static List<Integer> findAll(Context c) throws SQLException 
     {
     	TableRowIterator tri = DatabaseManager.queryTable(c, "harvested_collection",
-							  "SELECT * FROM harvested_collection");
-
+        	"SELECT * FROM harvested_collection");
+    	
     	List<Integer> collectionIds = new ArrayList<Integer>();
     	while (tri.hasNext())
-	    {
+    	{
     		TableRow row = tri.next();
     		collectionIds.add(row.getIntColumn("collection_id"));
-	    }
-
+    	}
+    	
     	return collectionIds;
     }
-
+    
     /** Find all collections that are ready for harvesting 
      * 
      * return: list of collection id's
@@ -173,10 +173,10 @@ public class HarvestedCollection
     {
     	int harvestInterval = ConfigurationManager.getIntProperty("oai", "harvester.harvestFrequency");
     	if (harvestInterval == 0)
-	    {
-		harvestInterval = 720;
-	    }
-
+        {
+            harvestInterval = 720;
+        }
+    	
     	int expirationInterval = ConfigurationManager.getIntProperty("oai", "harvester.threadTimeout");
     	if (expirationInterval == 0)
         {
@@ -185,69 +185,68 @@ public class HarvestedCollection
 
     	Date startTime;
         Date expirationTime;
-
+    	
     	Calendar calendar = Calendar.getInstance();
-	calendar.setTime(new Date());
-	calendar.add(Calendar.MINUTE, -1 * harvestInterval);
-	startTime = calendar.getTime();
-
-	calendar.setTime(startTime);
-	calendar.add(Calendar.HOUR, -2 * expirationInterval);
-	expirationTime = calendar.getTime();
-
+		calendar.setTime(new Date());
+		calendar.add(Calendar.MINUTE, -1 * harvestInterval);
+		startTime = calendar.getTime();
+		
+		calendar.setTime(startTime);
+		calendar.add(Calendar.HOUR, -2 * expirationInterval);
+		expirationTime = calendar.getTime();
+    	
     	/* Select all collections whose last_harvest is before our start time, whose harvest_type *is not* 0 and whose status *is* 0 (available) or 3 (OAI Error). */
     	TableRowIterator tri = DatabaseManager.queryTable(c, "harvested_collection",
         	"SELECT * FROM harvested_collection WHERE (last_harvested < ? or last_harvested is null) and harvest_type > ? and (harvest_status = ? or harvest_status = ? or (harvest_status=? and harvest_start_time < ?)) ORDER BY last_harvested",
         	new java.sql.Timestamp(startTime.getTime()), 0, HarvestedCollection.STATUS_READY, HarvestedCollection.STATUS_OAI_ERROR, HarvestedCollection.STATUS_BUSY, new java.sql.Timestamp(expirationTime.getTime()));
-
+    	
     	List<Integer> collectionIds = new ArrayList<Integer>();
 
     	while (tri.hasNext())
     	{
-	    TableRow row = tri.next();
-	    collectionIds.add(row.getIntColumn("collection_id"));
+    		TableRow row = tri.next();
+    		collectionIds.add(row.getIntColumn("collection_id"));
     	}
-
+    	
     	return collectionIds;
     }
-
+    
     /**
-     * Find all collections with the specified status flag 
+     * Find all collections with the specified status flag.
      * @param c
      * @param status see HarvestInstance.STATUS_...
-     * @return matching Collection IDs.
      * @throws SQLException
      */
     public static List<Integer> findByStatus(Context c, int status) throws SQLException {
     	TableRowIterator tri = DatabaseManager.queryTable(c, "harvested_collection",	
     			"SELECT * FROM harvested_collection WHERE harvest_status = ?", status);
-
-	List<Integer> collectionIds = new ArrayList<Integer>();
-	while (tri.hasNext())
-	    {
-		TableRow row = tri.next();
-		collectionIds.add(row.getIntColumn("collection_id"));
-	    }
-
-	return collectionIds;
+	
+		List<Integer> collectionIds = new ArrayList<Integer>();
+		while (tri.hasNext())
+		{
+			TableRow row = tri.next();
+			collectionIds.add(row.getIntColumn("collection_id"));
+		}
+		
+		return collectionIds;
     }
-
-
+    
+    
     /** Find the collection that was harvested the longest time ago. 
      * @throws SQLException 
      */
     public static Integer findOldestHarvest (Context c) throws SQLException {
     	String query = "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? order by last_harvested asc limit 1"; 
-
+        
     	if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-	{
+        {
             query = "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? and rownum <= 1  order by last_harvested asc";
         }
-
+    	    
         TableRowIterator tri = DatabaseManager.queryTable(c, "harvested_collection", 
-							  query, 0, 0);
+    			query, 0, 0);
     	TableRow row = tri.next();
-
+    	
     	if (row != null)
         {
             return row.getIntColumn("collection_id");
@@ -257,7 +256,7 @@ public class HarvestedCollection
             return -1;
         }
     }
-
+    
     /** Find the collection that was harvested most recently. 
      * @throws SQLException 
      */

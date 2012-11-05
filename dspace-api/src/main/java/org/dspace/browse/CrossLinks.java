@@ -22,55 +22,54 @@ import org.dspace.core.ConfigurationManager;
  */
 public class CrossLinks
 {
-    /** a map of the desired links */
-    private Map<String, String> links = new HashMap<String, String>();
+	/** a map of the desired links */
+	private Map<String, String> links = new HashMap<String, String>();
 	
-    /**
-     * Construct a new object which will obtain the configuration for itself
-     * 
-     * @throws BrowseException
-     */
-    public CrossLinks()
-	throws BrowseException
-    {
-	int i = 1;
-	while (true)
-	    {
-		String field = "webui.browse.link." + i;
-		String config = ConfigurationManager.getProperty(field);
-		if (config == null)
-		    {
-			break;
-		    }
+	/**
+	 * Construct a new object which will obtain the configuration for itself.
+	 * 
+	 * @throws BrowseException
+	 */
+	public CrossLinks()
+		throws BrowseException
+	{
+		int i = 1;
+		while (true)
+		{
+			String field = "webui.browse.link." + i;
+			String config = ConfigurationManager.getProperty(field);
+			if (config == null)
+			{
+				break;
+			}
+			
+			String[] parts = config.split(":");
+			if (parts.length != 2)
+			{
+				throw new BrowseException("Invalid configuration for " + field + ": " + config);
+			}
+			links.put(parts[1], parts[0]);
+			i++;
+		}
+	}
+
+	/**
+	 * Is there a link for the given canonical form of metadata (i.e. schema.element.qualifier)?
+	 * 
+	 * @param metadata	the metadata to check for a link on
+	 */
+	public boolean hasLink(String metadata)
+	{
+		return links.containsKey(metadata);
+	}
 	
-		String[] parts = config.split(":");
-		if (parts.length != 2)
-		    {
-			throw new BrowseException("Invalid configuration for " + field + ": " + config);
-		    }
-		links.put(parts[1], parts[0]);
-		i++;
-	    }
-    }
-
-    /**
-     * Is there a link for the given canonical form of metadata (i.e.
-     * schema.element.qualifier)?
-     *
-     * @param metadata	the metadata to check for a link on
-     */
-    public boolean hasLink(String metadata)
-    {
-	return links.containsKey(metadata);
-    }
-
-    /**
-     * get the type of link that the bit of metadata has.
-     * 
-     * @param metadata	the metadata to get the link type for
-     */
-    public String getLinkType(String metadata)
-    {
-	return links.get(metadata);
-    }
+	/**
+	 * Get the type of link that the bit of metadata has.
+	 * 
+	 * @param metadata	the metadata to get the link type for
+	 */
+	public String getLinkType(String metadata)
+	{
+		return links.get(metadata);
+	}
 }
