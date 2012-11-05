@@ -352,15 +352,14 @@
 
 	<!--  Dryad Custom Front Page I18N -->
 	<message key="xmlui.Site.head">&#160;</message>
-	<message key="xmlui.Site.para1">Dryad is an international
-		repository of data underlying peer-reviewed articles
-		in the basic and applied biosciences. Dryad enables
-		scientists to validate published findings, explore new
-		analysis methodologies, repurpose data for research questions
-		unanticipated by the original authors, and perform
-		synthetic studies. Dryad is governed by a <a href="/partners">consortium of
-		journals</a> that collaboratively promote data archiving and ensure
-		the sustainability of the repository.</message>
+	<message key="xmlui.Site.para1">
+		<p>Dryad is a nonprofit organization and an international repository of data underlying scientific and medical publications.</p>
+		<p>The scientific, educational, and charitable mission of Dryad is to promote the availability of data underlying findings in 
+			the scientific literature for research and educational reuse. </p>
+		<p>The vision of Dryad is a scholarly communication system in which learned societies, publishers, institutions of research 
+			and education, funding bodies and other stakeholders collaboratively sustain and promote the preservation and reuse of data 
+			underlying the scholarly literature.</p>
+	</message>	
 	<message key="xmlui.Site.stats">As of {0}, Dryad contains <span class="bold">{1} data
 			packages</span> and <span class="bold">{2} data files</span>, associated with articles in <span class="bold"
 			>{3} journals</span>.</message>
