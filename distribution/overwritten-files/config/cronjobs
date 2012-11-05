@@ -17,7 +17,7 @@
 0 6 * * *  /var/dspace/bin/dspace generate-sitemaps 
 
 #Check for pendign embargoes
-0 3 * * 1  /var/dspace/bin/dspace embargo-lifter 
+1 6 * * *  /var/dspace/bin/dspace embargo-lifter
 
 #Actualizacion de la bbdd geolite. ver mas en http://trac.prebi.unlp.edu.ar/issues/1702
 0 5 2 * *  ant -f /var/dspace-src/distribution/target/dspace-sedici-distribution-bin/build.xml update_geolite
