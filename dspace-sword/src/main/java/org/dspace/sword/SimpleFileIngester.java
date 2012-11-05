@@ -32,16 +32,15 @@ public class SimpleFileIngester implements SWORDIngester
 {
 
     /**
-	 * perform the ingest using the given deposit object onto the specified
-	 * target dspace object, using the sword service implementation
-	 *
-	 * @param service
-	 * @param deposit
-	 * @param target
-	 * @return
-	 * @throws DSpaceSWORDException
-	 * @throws SWORDErrorException
-	 */
+     * Perform the ingest using the given deposit object onto the specified
+     * target DSpace object, using the SWORD service implementation.
+     *
+     * @param service
+     * @param deposit
+     * @param target
+     * @throws DSpaceSWORDException
+     * @throws SWORDErrorException
+     */
 	public DepositResult ingest(SWORDService service, Deposit deposit, DSpaceObject target)
 			throws DSpaceSWORDException, SWORDErrorException
 	{

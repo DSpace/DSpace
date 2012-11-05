@@ -303,14 +303,14 @@ public class CmdClient implements ClientType
 	}
 
 	/**
-	 * Process the post response. The message contains the list of arguments 
-	 * for the post. The method will then print out the details of the 
-	 * response. 
+	 * Process the post response. The message contains the list of arguments
+	 * for the post. The method will then print out the details of the
+	 * response.
+	 *
+	 * @param message The post options.
 	 * 
-	 * @parma message The post options. 
-	 *  
-	 * @exception SWORDClientException if there is an error accessing the 
-	 *                                 post response. 
+	 * @exception SWORDClientException if there is an error accessing the
+	 *                                 post response.
 	 */
 	protected void processPost(PostMessage message)
 	throws SWORDClientException

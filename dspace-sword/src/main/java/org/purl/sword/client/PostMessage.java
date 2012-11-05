@@ -280,7 +280,7 @@ public class PostMessage
    /**
     * Set the packaging format. 
     * 
-    * @param formatNamespace The packaging format. 
+    * @param packaging The packaging format. 
     */
    public void setFormatNamespace(String packaging) 
    {
@@ -320,7 +320,7 @@ public class PostMessage
    /**
     * Set the state of the corrupt request flag.
     * 
-    * @param checksumError True if the item should corrupt the POST header.
+    * @param corruptRequest True if the item should corrupt the POST header.
     */
    public void setCorruptRequest(boolean corruptRequest)
    {

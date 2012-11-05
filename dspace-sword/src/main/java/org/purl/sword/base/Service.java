@@ -372,7 +372,6 @@ public class Service extends XmlElement implements SwordElementInterface
     * 
     * @param service
     * @param validationProperties
-    * @return
     * @throws org.purl.sword.base.UnmarshallException
     */
    public final SwordValidationInfo unmarshall( Element service, Properties validationProperties)
@@ -526,7 +525,6 @@ public class Service extends XmlElement implements SwordElementInterface
    /**
     *
     * @param existing
-    * @return
     */
    protected SwordValidationInfo validate(List<SwordValidationInfo> existing,
            Properties validationContext)

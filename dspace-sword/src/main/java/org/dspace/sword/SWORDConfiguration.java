@@ -119,9 +119,8 @@ public class SWORDConfiguration
 	}
 
 	/**
-	 * Get the bundle name that sword will store its original deposit packages in, when
-	 * storing them inside an item
-	 * @return
+	 * Get the bundle name that SWORD will store its original deposit
+	 * packages in, when storing them inside an item.
 	 */
 	public String getSwordBundle()
 	{
@@ -129,8 +128,8 @@ public class SWORDConfiguration
 	}
 
 	/**
-	 * Set the bundle name that sword will store its original deposit packages in, when
-	 * storing them inside an item
+	 * Set the bundle name that sword will store its original deposit
+	 * packages in, when storing them inside an item.
 	 * @param swordBundle
 	 */
 	public void setSwordBundle(String swordBundle)
@@ -139,8 +138,7 @@ public class SWORDConfiguration
 	}
 
 	/**
-	 * is this a no-op deposit
-	 * @return
+	 * Is this a no-op deposit?
 	 */
 	public boolean isNoOp()
 	{
@@ -148,7 +146,7 @@ public class SWORDConfiguration
 	}
 
 	/**
-	 * set whether this is a no-op deposit
+	 * Set whether this is a no-op deposit.
 	 *
 	 * @param noOp
 	 */
@@ -158,8 +156,7 @@ public class SWORDConfiguration
 	}
 
 	/**
-	 * is this a verbose deposit
-	 * @return
+	 * Is this a verbose deposit?
 	 */
 	public boolean isVerbose()
 	{
@@ -167,7 +164,7 @@ public class SWORDConfiguration
 	}
 
 	/**
-	 * set whether this is a verbose deposit
+	 * Set whether this is a verbose deposit.
 	 * @param verbose
 	 */
 	public void setVerbose(boolean verbose)
@@ -176,8 +173,7 @@ public class SWORDConfiguration
 	}
 
 	/**
-	 * what is the max upload size (in bytes) for the sword interface
-	 * @return
+	 * What is the max upload size (in bytes) for the sword interface?
 	 */
 	public int getMaxUploadSize()
 	{
@@ -194,8 +190,7 @@ public class SWORDConfiguration
 	}
 
 	/**
-	 * does the server support mediated deposit (aka on-behalf-of)
-	 * @return
+	 * Does the server support mediated deposit (aka on-behalf-of)?
 	 */
 	public boolean isMediated()
 	{
@@ -203,7 +198,7 @@ public class SWORDConfiguration
 	}
 
 	/**
-	 * set whether the server supports mediated deposit (aka on-behalf-of)
+	 * Set whether the server supports mediated deposit (aka on-behalf-of).
 	 * @param mediated
 	 */
 	public void setMediated(boolean mediated)
@@ -212,8 +207,7 @@ public class SWORDConfiguration
 	}
 
 	/**
-	 * should the repository keep the original package
-	 * @return
+	 * Should the repository keep the original package?
 	 */
 	public boolean isKeepOriginal()
 	{
@@ -221,7 +215,7 @@ public class SWORDConfiguration
 	}
 
 	/**
-	 * set whether the repository should keep copies of the original package
+	 * Set whether the repository should keep copies of the original package.
 	 * @param keepOriginal
 	 */
 	public void setKeepOriginal(boolean keepOriginal)
@@ -268,11 +262,10 @@ public class SWORDConfiguration
 
 	/**
 	 * Get the list of mime types that the given dspace object will
-	 * accept as packages
+	 * accept as packages.
 	 *
 	 * @param context
 	 * @param dso
-	 * @return
 	 * @throws DSpaceSWORDException
 	 */
 	public List<String> getAccepts(Context context, DSpaceObject dso)
@@ -334,7 +327,6 @@ public class SWORDConfiguration
 	 * how much  the server "likes" this packaging type
 	 *
 	 * @param col
-	 * @return
 	 */
 	public Map<String, Float> getAcceptPackaging(Collection col)
     {
@@ -408,11 +400,11 @@ public class SWORDConfiguration
     }
 
 	/**
-	 * is the given packaging/media type supported by the given dspace object
+	 * Is the given packaging/media type supported by the given DSpace
+	 * object?
 	 *
 	 * @param mediaType
 	 * @param dso
-	 * @return
 	 * @throws DSpaceSWORDException
 	 * @throws SWORDErrorException
 	 */
@@ -444,11 +436,10 @@ public class SWORDConfiguration
 	}
 
 	/**
-	 * is the given content mimetype acceptable to the given dspace object
+	 * Is the given content MIME type acceptable to the given DSpace object?
 	 * @param context
 	 * @param type
 	 * @param dso
-	 * @return
 	 * @throws DSpaceSWORDException
 	 */
 	public boolean isAcceptableContentType(Context context, String type, DSpaceObject dso)
@@ -459,9 +450,8 @@ public class SWORDConfiguration
 	}
 
 	/**
-	 * Get the temp directory for storing files during deposit
+	 * Get the temp directory for storing files during deposit.
 	 * 
-	 * @return
 	 * @throws DSpaceSWORDException
 	 */
 	public String getTempDir()

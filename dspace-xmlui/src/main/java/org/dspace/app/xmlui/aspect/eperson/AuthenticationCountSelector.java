@@ -32,7 +32,6 @@ public class AuthenticationCountSelector implements Selector{
     /**
      * Returns true if the expression (in this case a number) is equal to the
      * number of AuthenticationMethods defined in the dspace.cfg file.
-     * @return
      */
     public boolean select(String expression, Map objectModel, Parameters parameters) {
 	// get an iterator of all the AuthenticationMethods defined

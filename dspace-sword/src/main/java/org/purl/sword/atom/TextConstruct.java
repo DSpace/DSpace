@@ -149,7 +149,6 @@ implements SwordElementInterface
     * 
     * @param text
     * @param validationProperties
-    * @return
     * @throws org.purl.sword.base.UnmarshallException
     */
    public SwordValidationInfo unmarshall(Element text, Properties validationProperties)
@@ -250,7 +249,6 @@ implements SwordElementInterface
     *
     * @param existing
     * @param attributeItems
-    * @return
     */
    protected SwordValidationInfo validate(List<SwordValidationInfo> existing,
            List<SwordValidationInfo> attributeItems,

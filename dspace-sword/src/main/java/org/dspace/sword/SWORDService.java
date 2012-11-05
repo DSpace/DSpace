@@ -140,12 +140,11 @@ public class SWORDService
 	}
 
 	/**
-	 * Construct the most appropriate filename for the incoming deposit
+	 * Construct the most appropriate filename for the incoming deposit.
 	 *
 	 * @param context
 	 * @param deposit
 	 * @param original
-	 * @return
 	 * @throws DSpaceSWORDException
 	 */
 	public String getFilename(Context context, Deposit deposit, boolean original)
@@ -184,9 +183,7 @@ public class SWORDService
 	}
 
 	/**
-	 * Get the name of the temp files that should be used
-	 * 
-	 * @return
+	 * Get the name of the temp files that should be used.
 	 */
 	public String getTempFilename()
 	{

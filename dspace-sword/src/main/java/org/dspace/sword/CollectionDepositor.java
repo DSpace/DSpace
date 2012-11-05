@@ -69,10 +69,9 @@ public class CollectionDepositor extends Depositor
 	}
 
 	/**
-	 * Perform a deposit, using the supplied SWORD Deposit object
+	 * Perform a deposit, using the supplied SWORD Deposit object.
 	 *
 	 * @param deposit
-	 * @return
 	 * @throws SWORDErrorException
 	 * @throws DSpaceSWORDException
 	 */

@@ -304,7 +304,6 @@ public class Client implements SWORDClient {
 
     /**
      * 
-     * @return
      */
     public SwordValidationInfo getLastUnmarshallInfo()
     {

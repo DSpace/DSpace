@@ -188,7 +188,6 @@ public class Workspace extends XmlElement implements SwordElementInterface
     *
     * @param workspace
     * @param validationProperties
-    * @return
     * @throws org.purl.sword.base.UnmarshallException
     */
    public SwordValidationInfo unmarshall( Element workspace, Properties validationProperties )
@@ -273,7 +272,6 @@ public class Workspace extends XmlElement implements SwordElementInterface
    /**
     * 
     * @param existing
-    * @return
     */
    protected SwordValidationInfo validate(List<SwordValidationInfo> existing,
            Properties validationContext)

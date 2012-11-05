@@ -83,12 +83,11 @@ public class SWORDAuthenticator
 	}
 
 	/**
-	 * Authenticate the given service document request.  This extracts the appropriate
-	 * information from the request and forwards to the appropriate authentication
-	 * method
+	 * Authenticate the given service document request.  This extracts
+	 * the appropriate information from the request and forwards to the
+	 * appropriate authentication method.
 	 *
 	 * @param request
-	 * @return
 	 * @throws SWORDException
 	 * @throws SWORDErrorException
 	 * @throws SWORDAuthenticationException
@@ -138,11 +137,11 @@ public class SWORDAuthenticator
 	}
 
 	/**
-	 * Authenticate the given atom document request.  This extracts the appropriate information
-	 * from the request, and forwards to the appropriate authentication method
+	 * Authenticate the given ATOM document request.  This extracts the
+	 * appropriate information from the request, and forwards to the
+	 * appropriate authentication method.
 	 *
 	 * @param request
-	 * @return
 	 * @throws SWORDException
 	 * @throws SWORDErrorException
 	 * @throws SWORDAuthenticationException
@@ -227,7 +226,6 @@ public class SWORDAuthenticator
 	 * Authenticate the deposit request.
 	 *
 	 * @param deposit
-	 * @return
 	 * @throws SWORDException
 	 * @throws SWORDErrorException
 	 * @throws SWORDAuthenticationException
@@ -512,7 +510,6 @@ public class SWORDAuthenticator
 	 * or one of its sub groups?
 	 *
 	 * @param group
-	 * @return
 	 */
 	public boolean isUserInGroup(SWORDContext swordContext, Group group)
 	{
@@ -526,10 +523,9 @@ public class SWORDAuthenticator
 
 	/**
 	 * Is the onBehalfOf user a member of the given group or
-	 * one of its sub groups
+	 * one of its sub groups?
 	 *
 	 * @param group
-	 * @return
 	 */
 	public boolean isOnBehalfOfInGroup(SWORDContext swordContext, Group group)
 	{
@@ -948,7 +944,7 @@ public class SWORDAuthenticator
 
 	/**
 	 * Can the current SWORD Context permit deposit into the given
-	 * collection in the given DSpace Context
+	 * collection in the given DSpace Context?
 	 *
 	 * IF: the authenticated user is an administrator
 	 *   AND:
@@ -963,7 +959,6 @@ public class SWORDAuthenticator
 	 *
 	 * @param swordContext
 	 * @param collection
-	 * @return
 	 * @throws DSpaceSWORDException
 	 */
 	public boolean canSubmitTo(SWORDContext swordContext, org.dspace.content.Collection collection)
@@ -1121,7 +1116,6 @@ public class SWORDAuthenticator
 	 *
 	 * @param context
 	 * @param dso
-	 * @return
 	 * @throws DSpaceSWORDException
 	 */
 	public boolean canSubmitTo(SWORDContext context, DSpaceObject dso)
