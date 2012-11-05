@@ -1109,9 +1109,19 @@ background-repeat:repeat-x;
 	margin-top:3px;
 
 }
-
-
-
+.ds-artifact-list .publisher-date {
+	float: right;
+}
+.ds-artifact-list .title {
+	width: 600px; 
+	display: inline-block;
+}
+.ds-artifact-list .type {
+	display: inline;
+}
+.ds-artifact-list .availability {
+	float: right;
+}
 
 .community .artifact-title a {
     font-weight: bold;
@@ -2487,7 +2497,6 @@ margin-right:10px;
 .author {
 font-weight:bold;
 border-bottom:1px dashed #dedede;
-float:left;
 clear:right;
 }
 

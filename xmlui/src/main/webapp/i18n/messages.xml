@@ -1916,8 +1916,10 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.no-logo-alt">No logo</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.news">News</message>
 	
-	<message key="xmlui.dri2xhtml.METS-1.0.item-file-local">Document available in SeDiCI</message>
-	<message key="xmlui.dri2xhtml.METS-1.0.item-file-externo">Document outside SeDiCI</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-local">Direct download</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-local-help">You can download this document from SeDiCI</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-linked">External link</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-linked-help">A link to an external website is available</message>
 		
 
 	<!-- Internationalization elements specific to the Qualified Dublin Core metadata handler.

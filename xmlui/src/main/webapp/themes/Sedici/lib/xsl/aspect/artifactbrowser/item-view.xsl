@@ -962,11 +962,9 @@
 				</xsl:element>
 				</span>				
 				<span class="publisher-date">
-				<!-- date.issued -->
+					<!-- date.issued : extraemos el año solamente -->
 					<xsl:if test="dim:field[@element='date' and @qualifier='issued'] ">
-						<xsl:call-template name="render-date">
-							<xsl:with-param name="dateString" select="dim:field[@element='date' and @qualifier='issued'] "/>
-						</xsl:call-template>
+						<xsl:value-of select="substring(dim:field[@element='date' and @qualifier='issued'],1,4)"></xsl:value-of>
 					</xsl:if>
 				</span>
 			</div>
@@ -1049,19 +1047,21 @@
 						<!-- No hay otherwise -->
 					</xsl:choose>
 				</div>	
-				<div> 			 
-						<xsl:choose>
-							 	<xsl:when test="../../../../mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']"> 
-									    <xsl:attribute name="class">file_local</xsl:attribute>
-									    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-file-local</i18n:text>
-						            </xsl:when>					
-								<!-- Localizacion Electronica -->
-								<xsl:when test="dim:field[@element='identifier'  and @qualifier='uri' and @mdschema='sedici']"> 
-									    <xsl:attribute name="class">file_externo</xsl:attribute>
-						                <i18n:text>xmlui.dri2xhtml.METS-1.0.item-file-externo</i18n:text>
-								</xsl:when> 
-						</xsl:choose>  
-			</div>
+				<div i18n:attr="title">
+					<xsl:choose>
+						 	<xsl:when test="../../../../mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']"> 
+								    <xsl:attribute name="class">availability local</xsl:attribute>
+								    <xsl:attribute name="title">xmlui.dri2xhtml.METS-1.0.item-availability-local-help</xsl:attribute>
+								    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-availability-local</i18n:text>
+					            </xsl:when>					
+							<!-- Localizacion Electronica -->
+							<xsl:when test="dim:field[@element='identifier'  and @qualifier='uri' and @mdschema='sedici']"> 
+								    <xsl:attribute name="class">availability linked</xsl:attribute>
+								    <xsl:attribute name="title">xmlui.dri2xhtml.METS-1.0.item-availability-linked-help</xsl:attribute>
+					                <i18n:text>xmlui.dri2xhtml.METS-1.0.item-availability-linked</i18n:text>
+							</xsl:when>
+					</xsl:choose>  
+				</div>
         </div>
 	</xsl:template>
 

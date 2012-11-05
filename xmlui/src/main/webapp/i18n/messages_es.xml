@@ -2022,8 +2022,10 @@ La vista resumen de la comunidad no está actualmente en uso o implementada. Est
 <message key="xmlui.dri2xhtml.METS-1.0.news">Novedades</message>
 
 
-<message key="xmlui.dri2xhtml.METS-1.0.item-file-local">Documento disponible en SeDiCI</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-file-externo">Documento fuera de SeDiCI</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-availability-local">Descarga directa</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-availability-local-help">El documento se encuentra disponible para descarga directa desde SeDiCI</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-availability-linked">Link externo</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-availability-linked-help">El documento se encuentra alojado en un sitio web externo a SeDiCI</message>
 
 
 	<!-- Internationalization elements specific to the Qualified Dublin Core metadata handler.
