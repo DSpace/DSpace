@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The contents of this file are subject to the license and copyright detailed 
+	in the LICENSE and NOTICE files at the root of the source tree and available 
+	online at http://www.dspace.org/license/ -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+	default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+
+	<context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+
+	<bean id="rpComponentsService" class="it.cilea.hku.authority.dspace.CrisComponentsService">
+		<property name="components">
+			<map>
+				<entry key="dspaceitems" value-ref="publicationlist" />
+				<entry key="projects" value-ref="projectlist" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="publicationlist"
+		class="it.cilea.hku.authority.webui.components.ItemsListComponent">
+		<property name="componentIdentifier" value="publicationlist" />
+		<property name="objectType" value="2" />
+		<property name="types">
+			<map>
+				<entry key="selected" value-ref="selectedComponent" />
+				<entry key="journal" value-ref="journalComponent" />
+				<entry key="conference" value-ref="conferenceComponent" />
+				<entry key="book" value-ref="bookComponent" />
+				<entry key="patent" value-ref="patentComponent" />
+				<entry key="other" value-ref="otherComponent" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="selectedComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="selected" />
+		<property name="query"><value>selected:{0}</value></property>
+		<property name="order"><value>asc</value></property>
+		<property name="rpp"><value>20</value></property>		
+	</bean>
+	
+	<bean id="journalComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="journal" />
+		<property name="query"><value>authors_fauthority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="order"><value>desc</value></property>
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>1</value></property>	
+		<property name="filters">
+			<list>
+				<value>dc.type:Article</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="conferenceComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="conference" />
+		<property name="query"><value>authors_fauthority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="order"><value>desc</value></property>
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>1</value></property>			
+		<property name="filters">
+			<list>
+				<value>dc.type:Conference_Paper</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="bookComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="book" />
+		<property name="query"><value>authors_fauthority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="order"><value>desc</value></property>
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>1</value></property>		
+		<property name="filters">
+			<list>
+				<value>dc.type:Book OR dc.type:Book_Chapter</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="patentComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="patent" />
+		<property name="query"><value>authors_fauthority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="order"><value>desc</value></property>
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>1</value></property>		
+		<property name="filters">
+			<list>
+				<value>dc.type:Patent</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="otherComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="other" />
+		<property name="query"><value>authors_fauthority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="order"><value>desc</value></property>
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>1</value></property>		
+		<property name="filters">
+			<list>
+				<value>-dc.type:Article</value>
+				<value>-(dc.type:Book OR dc.type:Book_Chapter)</value>
+				<value>dc.type:Conference_Paper</value>
+				<value>-dc.type:Patent</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="projectlist"
+		class="it.cilea.hku.authority.webui.components.ProjectListComponent">
+		<property name="componentIdentifier" value="projectlist" />
+		<property name="objectType" value="10" />
+		<property name="types">
+			<map>
+				<entry key="coinvestigatored" value-ref="coinvestigatoredComponent" />				
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="coinvestigatoredComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="coinvestigatored" />
+		<property name="query"><value>crisproject.principalinvestigator:{0} or crisproject.coinvestigators:{0}</value></property>
+		<property name="order"><value>asc</value></property>
+		<property name="rpp"><value>20</value></property>		
+	</bean>
+</beans>
