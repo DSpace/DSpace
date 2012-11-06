@@ -10,6 +10,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -17,19 +20,21 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.dspace.identifier.IdentifierException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A request to EZID concerning a given (or expected) identifier.
+ *
  * @author Mark H. Wood
  */
 public class EZIDRequest
 {
-    private final URIBuilder uri;
+    private static final Logger log = LoggerFactory.getLogger(EZIDRequest.class);
 
     private URI url;
 
@@ -39,43 +44,13 @@ public class EZIDRequest
      * Prepare a context for requests concerning a specific identifier or
      * authority prefix.
      *
-     * @param url an EZID URL for an identifier or authority.
+     * @param url EZID API service point (and object) for this request.
      * @param username an EZID user identity.
      * @param password user's password, or null for none.
      */
-    public EZIDRequest(URIBuilder uri, String username, String password)
+    EZIDRequest(URI url, String username, String password)
             throws URISyntaxException
     {
-        this.uri = uri;
-        init(username, password);
-    }
-
-    /**
-     * Prepare a context for requests concerning a specific identifier or
-     * authority prefix.
-     *
-     * @param url an EZID URL for an identifier or authority.
-     * @param username an EZID user identity.
-     * @param password user's password, or null for none.
-     */
-    public EZIDRequest(String uri, String username, String password)
-            throws URISyntaxException
-    {
-        this.uri = new URIBuilder(uri);
-        init(username, password);
-    }
-
-    /**
-     * Common constructor code.
-     * 
-     * @param username
-     * @param password
-     * @throws URISyntaxException 
-     */
-    private void init(String username, String password)
-            throws URISyntaxException
-    {
-        url = this.uri.build();
         client = new DefaultHttpClient();
         if (null != username)
             client.getCredentialsProvider().setCredentials(
@@ -108,7 +83,7 @@ public class EZIDRequest
      * @param metadata ANVL-encoded key/value pairs.
      * @return
      */
-    public EZIDResponse create(String metadata)
+    public EZIDResponse create(Map<String, String> metadata)
             throws IOException, IdentifierException
     {
         // PUT path [+metadata]
@@ -117,7 +92,7 @@ public class EZIDRequest
         if (null != metadata)
         {
             try {
-                request.setEntity(new StringEntity(metadata, "UTF-8"));
+                request.setEntity(new StringEntity(formatMetadata(metadata), "UTF-8"));
             } catch (UnsupportedEncodingException ex) { /* SNH */ }
         }
         HttpResponse response = client.execute(request);
@@ -131,7 +106,7 @@ public class EZIDRequest
      * @param metadata ANVL-encoded key/value pairs.
      * @return
      */
-    public EZIDResponse mint(String metadata)
+    public EZIDResponse mint(Map<String, String> metadata)
             throws IOException, IdentifierException
     {
         // POST path [+metadata]
@@ -139,7 +114,7 @@ public class EZIDRequest
         request = new HttpPost(url);
         if (null != metadata)
         {
-            request.setEntity(new StringEntity(metadata, "UTF-8"));
+            request.setEntity(new StringEntity(formatMetadata(metadata), "UTF-8"));
         }
         HttpResponse response = client.execute(request);
         EZIDResponse myResponse = new EZIDResponse(response);
@@ -154,7 +129,7 @@ public class EZIDRequest
      *                 delete the field.
      * @return
      */
-    public EZIDResponse modify(String metadata)
+    public EZIDResponse modify(Map<String, String> metadata)
             throws IOException, IdentifierException
     {
         if (null == metadata)
@@ -164,7 +139,7 @@ public class EZIDRequest
         // POST path +metadata
         HttpPost request;
         request = new HttpPost(url);
-        request.setEntity(new StringEntity(metadata, "UTF-8"));
+        request.setEntity(new StringEntity(formatMetadata(metadata), "UTF-8"));
         HttpResponse response = client.execute(request);
         return new EZIDResponse(response);
     }
@@ -188,7 +163,9 @@ public class EZIDRequest
     public EZIDResponse withdraw()
             throws IOException, IdentifierException
     {
-        return modify("_status = unavailable");
+        Map<String, String> metadata = new HashMap<String, String>();
+        metadata.put("_status", "unavailable");
+        return modify(metadata);
     }
 
     /**
@@ -203,6 +180,31 @@ public class EZIDRequest
         try {
             reasonEncoded = URLEncoder.encode(reason, "UTF-8");
         } catch (UnsupportedEncodingException e) { /* XXX SNH */ }
-        return modify("_status = unavailable | " + reasonEncoded);
+        Map<String, String> metadata = new HashMap<String, String>();
+        metadata.put("_status", "unavailable | " + reasonEncoded);
+        return modify(metadata);
+    }
+
+    /**
+     * Create ANVL-formatted name/value pairs from a Map.
+     */
+    private String formatMetadata(Map<String, String> raw)
+    {
+        StringBuilder formatted = new StringBuilder();
+        for (Entry<String, String> entry : raw.entrySet())
+            formatted.append(entry.getKey())
+                    .append(": ")
+                    .append(entry.getValue())
+                    .append('\n');
+
+        // Body should be percent-encoded
+        String body = null;
+        try {
+            body = URLEncoder.encode(formatted.toString(), "UTF-8");
+        } catch (UnsupportedEncodingException ex) { // XXX SNH
+            log.error(ex.getMessage());
+        } finally {
+            return body;
+        }
     }
 }
