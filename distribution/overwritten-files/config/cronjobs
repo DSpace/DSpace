@@ -8,7 +8,7 @@
 # Run the checksum checker at 03:00
 0 3 * * *  /var/dspace/bin/dspace checker -lp
 # Mail the results to the sysadmin at 04:00
-0 4 * * *  /var/dspace/bin/dspace checker-emailer -c
+2 4 * * 1  /var/dspace/bin/dspace checker-emailer -c
 
 #actualizo la lista de spiders ips                                           
 10 6 3 * * /var/dspace/bin/dspace/dspace stats-util -u && /var/dspace/bin/dspace/dspace stats-util -m  
