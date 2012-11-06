@@ -14,20 +14,26 @@
         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
     <bean id="org.dspace.identifier.DataCiteIdentifierProvider"
-        class="org.dspace.identifier.DataCiteIdentifierProvider"
-        scope='singleton'>
-            <property name="configurationService"
-                ref="org.dspace.services.ConfigurationService"/>
-            <property name='EZID_SCHEME' value='https'/>
-            <property name='EZID_HOST' value='n2t.net'/>
-            <property name='EZID_PATH' value='/ezid/shoulder/'/>
-            <property name='crosswalk'>
-                <map>
-                    <entry key='datacite.creator' value='dc.creator.author'/>
-                    <entry key='datacite.title' value='dc.title'/>
-                    <entry key='datacite.publisher' value='dc.publisher'/>
-                    <entry key='datacite.publicationyear' value='dc.date.published'/>
-                </map>
-            </property>
+          class="org.dspace.identifier.DataCiteIdentifierProvider"
+          scope='singleton'>
+        <property name="configurationService"
+                      ref="org.dspace.services.ConfigurationService"/>
+        <property name='requestFactory'>
+            <bean id='org.dspace.identifier.ezid.EZIDRequestFactory'
+                class='org.dspace.identifier.ezid.EZIDRequestFactory'>
+                <property name='EZID_SCHEME' value='https'/>
+                <property name='EZID_HOST' value='n2t.net'/>
+                <property name='EZID_PATH' value='/ezid/shoulder/'/>
+            </bean>
+        </property>
+        <property name='crosswalk'>
+            <map>
+                <entry key='datacite.creator' value='dc.creator.author'/>
+                <entry key='datacite.title' value='dc.title'/>
+                <entry key='datacite.publisher' value='dc.publisher'/>
+                <entry key='datacite.publicationyear' value='dc.date.published'/>
+            </map>
+        </property>
     </bean>
+
 </beans>
