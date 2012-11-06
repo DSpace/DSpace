@@ -510,6 +510,14 @@
       
    <field name="read" type="string" indexed="true" stored="true" omitNorms="true" />
    
+   <!-- CRIS special fields -->
+   <field name="crisauthoritylookup" type="text" indexed="true" stored="true" multiValued="true"/>
+   <copyField source="crisrp.fullName" dest="crisauthoritylookup"/>
+   <copyField source="crisrp.preferredName" dest="crisauthoritylookup"/>
+   <copyField source="crisrp.translatedName" dest="crisauthoritylookup"/>
+   <copyField source="crisproject.title" dest="crisauthoritylookup"/>
+   <copyField source="crisou.name" dest="crisauthoritylookup"/>
+   
     <!-- Community and collection hierarchy of the Item of interest (candidate for hierarchical facetting ) -->
    <field name="location" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
     <field name="location.comm" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />

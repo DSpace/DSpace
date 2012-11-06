@@ -62,7 +62,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
         StringBuilder resourceQuery = new StringBuilder();
         //Always add the anonymous group id to the query
         resourceQuery.append("read:(g0");
-        EPerson currentUser = context.getCurrentUser();
+        EPerson currentUser = context!=null?context.getCurrentUser():null;
         if(currentUser != null){
             try {
                 resourceQuery.append(" OR e").append(currentUser.getID());
@@ -77,7 +77,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
         }
         resourceQuery.append(")");
         try {
-            if(AuthorizeManager.isAdmin(context)){
+            if(context != null && AuthorizeManager.isAdmin(context)){
                 //Admins always have read access even if no policies are present !
                 resourceQuery.append(" OR (!read[* TO *])");
 

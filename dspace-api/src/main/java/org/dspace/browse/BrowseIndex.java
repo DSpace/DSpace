@@ -732,6 +732,11 @@ public final class BrowseIndex
         return null;
     }
     
+    public static BrowseIndex getItemBrowseIndex()
+    {
+        return BrowseIndex.itemIndex;
+    }
+    
     /**
      * Get the internally defined browse index for archived items
      * 
