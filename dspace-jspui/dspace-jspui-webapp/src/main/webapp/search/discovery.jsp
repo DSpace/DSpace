@@ -177,7 +177,10 @@
     {
 %>
 									<option value="/"><fmt:message key="jsp.general.genericScope"/></option>
-<%  }      
+<%  }
+%>
+	<optgroup label="Repository">
+<%
     for (DSpaceObject dso : scopes)
     {
 %>
@@ -185,7 +188,13 @@
                                 	<%= dso.getName() %></option>
 <%
     }
-%>                                </select><br/>
+%>	</optgroup>
+	<optgroup label="CRIS">
+								<option value="researcherpages">Researcher profiles</option>
+								<option value="organizationunits">Organization Units</option>
+								<option value="projects">Projects</option>
+	</optgroup>							
+                                </select><br/>
                                 <label for="query"><fmt:message key="jsp.search.results.searchfor"/></label>
                                 <input type="text" size="50" name="query" value="<%= (query==null ? "" : StringEscapeUtils.escapeHtml(query)) %>"/>
                                 <input type="submit" value="<fmt:message key="jsp.general.go"/>" />

@@ -44,13 +44,19 @@ public class SearchUtils {
     }
 
     public static DiscoveryConfiguration getDiscoveryConfiguration(DSpaceObject dso){
+        return getDiscoveryConfigurationByName(dso!=null?dso.getHandle():null);
+    }
+
+    public static DiscoveryConfiguration getDiscoveryConfigurationByName(
+            String configurationName)
+    {
         DiscoveryConfigurationService configurationService = getConfigurationService();
 
         DiscoveryConfiguration result = null;
-        if(dso == null){
+        if(configurationName == null){
             result = configurationService.getMap().get("site");
         }else{
-            result = configurationService.getMap().get(dso.getHandle());
+            result = configurationService.getMap().get(configurationName);
         }
 
         if(result == null){
