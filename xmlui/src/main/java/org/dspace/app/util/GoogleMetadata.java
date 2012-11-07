@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -27,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -1061,10 +1063,15 @@ public class GoogleMetadata
 		path.append(".pdf?sequence=");
 		path.append(the_bitstream.getSequenceID());
 
-		// path.append(Util.encodeBitstreamName(bitstream.getName(),
-		// Constants.DEFAULT_ENCODING));
-		return path.toString();
-
+		DCDate online_date = new DCDate(resolveMetadataField(configuredFields.get(ONLINE_DATE)).value);
+		Date now= new Date();
+		if ( now.before(online_date.toDate()))  {
+			return "";   
+		}
+		else {
+			return path.toString();
+		
+		}
 	}
 
     /**
