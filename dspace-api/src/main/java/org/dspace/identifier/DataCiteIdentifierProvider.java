@@ -9,7 +9,6 @@
 package org.dspace.identifier;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -93,6 +92,8 @@ public class DataCiteIdentifierProvider
     public String register(Context context, DSpaceObject dso)
             throws IdentifierException
     {
+        log.debug("register {}", dso);
+
         Item item;
 
         if (dso instanceof Item)
@@ -107,12 +108,29 @@ public class DataCiteIdentifierProvider
 
         id = mint(context, item);
         item.addMetadata(MD_SCHEMA_DSPACE, DSPACE_DOI_ELEMENT, DSPACE_DOI_QUALIFIER, null, id);
+        try {
+            item.update();
+        } catch (SQLException ex) {
+            throw new IdentifierException("New identifier not stored", ex);
+        } catch (AuthorizeException ex) {
+            throw new IdentifierException("New identifier not stored", ex);
+        }
+        log.info("Registered {}", id);
         return id;
     }
 
     @Override
     public void register(Context context, DSpaceObject object, String identifier)
     {
+        log.debug("register {} as {}", object, identifier);
+
+        if (!(object instanceof Item))
+        {
+            // TODO throw new IdentifierException("Unsupported object type " + object.getTypeText());
+            log.error("Unsupported object type " + object.getTypeText());
+            return;
+        }
+
         EZIDResponse response;
         String doi = "unknown"; // In case we can't even build a name
         try {
@@ -136,6 +154,16 @@ public class DataCiteIdentifierProvider
             Item item = (Item)object;
             item.addMetadata(MD_SCHEMA_DSPACE, DSPACE_DOI_ELEMENT,
                     DSPACE_DOI_QUALIFIER, null, identifier);
+            try {
+                item.update();
+                log.info("registered {}", identifier);
+            } catch (SQLException ex) {
+                // TODO throw new IdentifierException("New identifier not stored", ex);
+                log.error("New identifier not stored", ex);
+            } catch (AuthorizeException ex) {
+                // TODO throw new IdentifierException("New identifier not stored", ex);
+                log.error("New identifier not stored", ex);
+            }
         }
         else
         {
@@ -148,6 +176,8 @@ public class DataCiteIdentifierProvider
     public void reserve(Context context, DSpaceObject dso, String identifier)
             throws IdentifierException
     {
+        log.debug("reserve {}", identifier);
+
         EZIDResponse response;
         String doi = "unknown"; // In case we can't even build a name
         try {
@@ -157,9 +187,6 @@ public class DataCiteIdentifierProvider
             Map<String, String> metadata = crosswalkMetadata(dso);
             metadata.put("_status", "reserved");
             response = request.create(metadata);
-        } catch (IdentifierException e) {
-            log.error("doi:{} not registered:  {}", doi, e.getMessage());
-            return;
         } catch (IOException e) {
             log.error("doi:{} not registered:  {}", doi, e.getMessage());
             return;
@@ -173,6 +200,14 @@ public class DataCiteIdentifierProvider
             Item item = (Item)dso;
             item.addMetadata(MD_SCHEMA_DSPACE, DSPACE_DOI_ELEMENT,
                     DSPACE_DOI_QUALIFIER, null, identifier);
+            try {
+                item.update();
+                log.info("reserved {}", identifier);
+            } catch (SQLException ex) {
+                throw new IdentifierException("New identifier not stored", ex);
+            } catch (AuthorizeException ex) {
+                throw new IdentifierException("New identifier not stored", ex);
+            }
         }
         else
         {
@@ -185,8 +220,52 @@ public class DataCiteIdentifierProvider
     public String mint(Context context, DSpaceObject dso)
             throws IdentifierException
     {
-        String doi = request(crosswalkMetadata(dso));
-        return doi;
+        log.debug("mint for {}", dso);
+
+        // Compose the request
+        EZIDRequest request;
+        try {
+            request = requestFactory.getInstance(getShoulder(), getUser(), getPassword());
+        } catch (URISyntaxException ex) {
+            log.error(ex.getMessage());
+            throw new IdentifierException("DOI request not sent:  " + ex.getMessage());
+        }
+
+        // Send the request
+        EZIDResponse response;
+        try
+        {
+            response = request.mint(crosswalkMetadata(dso));
+        } catch (IOException ex)
+        {
+            log.error("Failed to send EZID request:  {}", ex.getMessage());
+            throw new IdentifierException("DOI request not sent:  " + ex.getMessage());
+        }
+
+        // Good response?
+        if (HttpURLConnection.HTTP_CREATED != response.getHttpStatusCode())
+            {
+                log.error("EZID server responded:  {} {}", response.getHttpStatusCode(),
+                        response.getHttpReasonPhrase());
+                throw new IdentifierException("DOI not created:  " + response.getHttpReasonPhrase());
+            }
+
+	// Extract the DOI from the content blob
+        if (response.isSuccess())
+        {
+            String value = response.getEZIDStatusValue();
+            int end = value.indexOf('|'); // Following pipe is "shadow ARK"
+            if (end < 0)
+                end = value.length();
+            String doi = value.substring(0, end).trim();
+            log.info("Created {}", doi);
+            return doi;
+        }
+        else
+        {
+            log.error("EZID responded:  {}", response.getEZIDStatusValue());
+            throw new IdentifierException("No DOI returned");
+        }
     }
 
     @Override
@@ -194,6 +273,8 @@ public class DataCiteIdentifierProvider
             String... attributes)
             throws IdentifierNotFoundException, IdentifierNotResolvableException
     {
+        log.debug("resolve {}", identifier);
+
         try
         {
             ItemIterator found = Item.findByMetadataField(context, MD_SCHEMA_DSPACE, DSPACE_DOI_ELEMENT, DSPACE_DOI_QUALIFIER,
@@ -203,6 +284,7 @@ public class DataCiteIdentifierProvider
             Item found1 = found.next();
             if (found.hasNext())
                 log.error("DOI {} multiply bound!", identifier);
+            log.debug("Resolved to {}", found1);
             return found1;
         } catch (SQLException ex)
         {
@@ -223,6 +305,8 @@ public class DataCiteIdentifierProvider
     public String lookup(Context context, DSpaceObject object)
             throws IdentifierNotFoundException, IdentifierNotResolvableException
     {
+        log.debug("lookup {}", object);
+
         Item item;
         if (!(object instanceof Item))
             throw new IllegalArgumentException("Unsupported type " + object.getTypeText());
@@ -230,7 +314,10 @@ public class DataCiteIdentifierProvider
         item = (Item)object;
         DCValue[] metadata = item.getMetadata(MD_SCHEMA_DSPACE, DSPACE_DOI_ELEMENT, DSPACE_DOI_QUALIFIER, null);
         if (metadata.length > 0)
+        {
+            log.debug("Found {}", metadata[0].value);
             return metadata[0].value;
+        }
         else
             throw new IdentifierNotFoundException(object.getTypeText() + " "
                     + object.getID() + " has no DOI");
@@ -240,6 +327,8 @@ public class DataCiteIdentifierProvider
     public void delete(Context context, DSpaceObject dso)
             throws IdentifierException
     {
+        log.debug("delete {}", dso);
+
         if (!(dso instanceof Item))
             throw new IllegalArgumentException("Unsupported type " + dso.getTypeText());
 
@@ -277,6 +366,8 @@ public class DataCiteIdentifierProvider
     public void delete(Context context, DSpaceObject dso, String identifier)
             throws IdentifierException
     {
+        log.debug("delete {} from {}", identifier, dso);
+
         throw new UnsupportedOperationException("Not supported yet."); // TODO implement delete(specific)
         // TODO find metadata value == identifier
         // TODO delete from EZID
@@ -312,55 +403,6 @@ public class DataCiteIdentifierProvider
             return shoulder;
         else
             throw new IdentifierException("Unconfigured:  define " + CFG_SHOULDER);
-    }
-    
-    /**
-     * Submit some object details and request identifiers for the object.
-     *
-     * @param postBody the details, formatted for EZID.
-     */
-    private String request(Map<String, String> metadata)
-            throws IdentifierException
-    {
-        // Compose the request
-        EZIDRequest ezrequest;
-        try {
-            ezrequest = requestFactory.getInstance(getShoulder(), getUser(), getPassword());
-        } catch (URISyntaxException ex) {
-            log.error(ex.getMessage());
-            throw new IdentifierException("DOI request not sent:  " + ex.getMessage());
-        }
-
-        // Send the request
-        EZIDResponse response;
-        try
-        {
-            response = ezrequest.create(metadata);
-        } catch (IOException ex)
-        {
-            log.error("Failed to send EZID request:  {}", ex.getMessage());
-            throw new IdentifierException("DOI request not sent:  " + ex.getMessage());
-        }
-
-        // Good response?
-        if (HttpURLConnection.HTTP_CREATED != response.getHttpStatusCode())
-            {
-                log.error("EZID responded:  {} {}", response.getHttpStatusCode(),
-                        response.getHttpReasonPhrase());
-                throw new IdentifierException("DOI not created:  " + response.getHttpReasonPhrase());
-            }
-
-	// Extract the DOI from the content blob
-        if (response.isSuccess())
-        {
-            String value = response.getEZIDStatusValue();
-            int end = value.indexOf('|'); // Following pipe is "shadow ARK"
-            if (end < 0)
-                end = value.length();
-            return value.substring(0, end).trim();
-        }
-        else
-            throw new IdentifierException("No DOI returned");
     }
 
     /**
