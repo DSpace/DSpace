@@ -44,60 +44,90 @@ function DSpaceSetupAutocomplete(formID, args)
 {
     if (args.authorityName == null)
         args.authorityName = dspace_makeFieldInput(args.inputName,'_authority');
-    var form = document.getElementById(formID);
-    var inputID = form.elements[args.inputName].id;
-    var authorityID = null;
-    if (form.elements[args.authorityName] != null)
-        authorityID = form.elements[args.authorityName].id;
 
+    var authInput = jQuery('#'+formID + ' input[name=\''+args.authorityName+'\']');
+    var input = jQuery('#'+formID + ' input[name=\''+args.inputName+'\']');
+    input.parent('td').attr('style','white-space:nowrap;');
     // AJAX menu source, can add &query=TEXT
     var choiceURL = args.contextPath+"/choices/"+args.metadataField;
-
     var collID = args.collection == null ? -1 : args.collection;
-
-    // field in whcih to store authority value
-    var options =
-      {
-        // class name of spans that contain value in li elements
-        select: "value",
-        // make up query args for AJAX callback
-        parameters: 'collection='+collID+'&format=ul',
-        callback:
-          function(inField, querystring) {
-            return querystring+"&query="+inField.value;
-          },
-        // called after target field is updated
-        afterUpdateElement:
-          function(ignoreField, li)
-            {
-                // NOTE: lookup element late because it might not be in DOM
-                // at the time we evaluate the function..
-                var authInput = document.getElementById(authorityID);
-                var authValue = li == null ? "" : li.getAttribute("authority");
-                if (authInput != null)
+    if (authInput != null)
+	{
+    	input.data('previousData', {authority: authInput.val(), value: input.val()});
+	}
+    var options = {
+    		lenght: 2,
+    		search: function(event, ui) {
+    			jQuery('#'+args.indicatorID).show();
+    		},
+    		source: function( request, response ) {			
+    			jQuery.ajax({
+    				url: choiceURL,			
+    				dataType: "xml",
+    				data: {
+    					query: request.term,
+    					collection: collID,
+    					format: 'ul'
+    				},    			
+    				success: function( data ) {
+    					jQuery('#'+args.indicatorID).hide();
+    					
+    					response(jQuery("li", data ).map(function() {
+    						return {
+    							authority : jQuery(this).attr('authority'),
+    							label : jQuery('span.label',this).text(),
+    							value : jQuery('span.value',this).text()
+    						};
+    					}));
+    				}
+    			});
+    		},   				
+    		select: function(event, ui){
+    			input.data('previousData', ui.item);
+    			var authority = ui.item.authority;
+				var authValue = authority;
+				if (authInput != null)
                 {
-                    authInput.value = authValue;
+					authInput.val(authValue);
                     // update confidence input's value too if available.
                     if (args.confidenceName != null)
                     {
-                        var confInput = authInput.form.elements[args.confidenceName];
+                        var confInput = jQuery('#'+formID + ' input[name=\''+args.confidenceName+'\']');
                         if (confInput != null)
-                            confInput.value = 'accepted';
+                    	{
+                        	if (authority != '')
+                        	{
+                        		confInput.val('accepted');
+                        	}
+                        	else
+                    		{
+                        		confInput.val('');
+                        	}
+                    	}
                     }
                 }
-                // make indicator blank if no authority value
+				// make indicator blank if no authority value
                 DSpaceUpdateConfidence(document, args.confidenceIndicatorID,
                     authValue == null || authValue == '' ? 'blank' :'accepted');
-            }
-      };
-
-      if (args.indicatorID != null)
-          options.indicator = args.indicatorID;
-
-    // be sure to turn off autocomplete, it absorbs arrow-key events!
-    form.elements[args.inputName].setAttribute("autocomplete", "off");
-
-    new Ajax.Autocompleter(inputID, args.containerID, choiceURL, options);
+			}			
+    };
+    input.autocomplete(options).change(function(){
+		var lastSel = input.data('previousData');
+		var newauth = '';
+		var newval = input.val();
+		if (authInput != null)
+		{
+			newauth = authInput.val();
+		}
+		if (newauth != lastSel.authority || newval != lastSel.value)
+		{
+			if (authInput != null)
+			{
+				authInput.val(' ');
+				DSpaceUpdateConfidence(document, args.confidenceIndicatorID, 'blank');
+			}	
+		}
+	});
 }
 
 // -------------------- support for Lookup Popup

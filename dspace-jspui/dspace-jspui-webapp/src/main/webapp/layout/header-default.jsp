@@ -51,7 +51,7 @@
         <link rel="stylesheet" href="<%= request.getContextPath() %>/print.css" media="print" type="text/css" />
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
         <link rel="stylesheet" href="<%= request.getContextPath() %>/css/discovery.css" type="text/css" />
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/jquery-ui-1.8.24.custom/redmond/jquery-ui-1.8.24.custom.css" type="text/css" />
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/jquery-ui-1.8.24.custom/redmond/jquery-ui-1.8.24.custom.css" type="text/css" />    
         <link href="<%= request.getContextPath() %>/css/researcher.css" type="text/css" rel="stylesheet" />
 		<link href="<%= request.getContextPath() %>/css/jdyna.css" type="text/css" rel="stylesheet" />
 <%
@@ -86,7 +86,7 @@
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/builder.js"> </script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/controls.js"> </script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/choice-support.js"> </script>
-    <script type="text/javascript" src="<%=request.getContextPath()%>/js/jdyna/jdyna.js"></script>
+    <script type="text/javascript" src="<%=request.getContextPath()%>/js/jdyna/jdyna.js"></script>    
  <% if (extraHeadDataLast != null)
     { %>
 		<%= extraHeadDataLast %>

@@ -218,8 +218,10 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
             throw new SearchProcessorException(e.getMessage(), e);
         }
 
+        String configurationName = request.getParameter("location");
+        
         DiscoveryConfiguration discoveryConfiguration = SearchUtils
-                .getDiscoveryConfiguration(scope);
+                .getDiscoveryConfigurationByName(configurationName);
         List<DiscoverySortFieldConfiguration> sortFields = discoveryConfiguration
                 .getSearchSortConfiguration().getSortFields();
         List<String> sortOptions = new ArrayList<String>();
