@@ -90,8 +90,12 @@
     self.parent().append(mainContainer);
 
 
-    // Se cargan los metadatos pre-existentes
-    resultsContainer.append( self.val() );
+    // Se cargan los metadatos pre-existentes (si es un texto html valido)
+    var parsedContent = $( self.val() );
+    if(parsedContent.find("span.label").length == 0)
+    	parsedContent = "";
+
+	resultsContainer.append( parsedContent );
 
     // Creacion del Sortable de jQuery
     resultsContainer.sortable({
