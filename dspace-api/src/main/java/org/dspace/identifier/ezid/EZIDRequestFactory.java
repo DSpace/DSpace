@@ -1,12 +1,9 @@
-/*
- * Copyright 2012 Indiana University.  All rights reserved.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Mark H. Wood, IUPUI University Library, Nov 6, 2012
- */
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * http://www.dspace.org/license/
  */
 
 package org.dspace.identifier.ezid;
@@ -49,9 +46,27 @@ public class EZIDRequestFactory
             throws URISyntaxException
     {
         URIBuilder uri = new URIBuilder();
+
         uri.setScheme(EZID_SCHEME);
+
         uri.setHost(EZID_HOST);
-        uri.setPath(EZID_PATH + '/' + requestPath);
+
+        String head, tail;
+        if (EZID_PATH.endsWith("/"))
+            head = EZID_PATH.substring(0, EZID_PATH.length() - 1);
+        else
+            head = EZID_PATH;
+        if (requestPath.startsWith("/"))
+            tail = requestPath.substring( 0, requestPath.length() - 1);
+        else
+            tail = requestPath;
+
+        StringBuilder path = new StringBuilder();
+        path.append(head);
+        path.append('/');
+        path.append(tail);
+        uri.setPath(path.toString());
+
         return new EZIDRequest(uri.build(), username, password);
     }
 

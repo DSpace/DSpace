@@ -19,8 +19,7 @@
         <property name="configurationService"
                       ref="org.dspace.services.ConfigurationService"/>
         <property name='requestFactory'>
-            <bean id='org.dspace.identifier.ezid.EZIDRequestFactory'
-                class='org.dspace.identifier.ezid.EZIDRequestFactory'>
+            <bean class='org.dspace.identifier.ezid.EZIDRequestFactory'>
                 <property name='EZID_SCHEME' value='https'/>
                 <property name='EZID_HOST' value='n2t.net'/>
                 <property name='EZID_PATH' value='/ezid/shoulder/'/>

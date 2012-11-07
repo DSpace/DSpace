@@ -5,10 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.dspace.identifier;
 
 import java.util.List;

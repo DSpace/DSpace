@@ -1,7 +1,9 @@
-/*
- * Copyright 2012 Indiana University.  All rights reserved.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Mark H. Wood, IUPUI University Library, Nov 1, 2012
+ * http://www.dspace.org/license/
  */
 package org.dspace.identifier.ezid;
 
@@ -119,8 +121,6 @@ public class EZIDResponse
 
     /**
      * Value associated with the EZID status (identifier, error text, etc.)
-     *
-     * @return
      */
     public String getEZIDStatusValue()
     {
