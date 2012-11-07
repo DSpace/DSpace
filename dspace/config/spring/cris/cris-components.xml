@@ -134,6 +134,7 @@
 		<property name="componentIdentifier" value="coinvestigatored" />
 		<property name="query"><value>crisproject.principalinvestigator:{0} or crisproject.coinvestigators:{0}</value></property>
 		<property name="order"><value>asc</value></property>
-		<property name="rpp"><value>20</value></property>		
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>5</value></property>		
 	</bean>
 </beans>
