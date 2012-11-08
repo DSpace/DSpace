@@ -146,7 +146,7 @@ public class SolrLogger
 
         LookupService service = null;
         // Get the db file for the location
-        String dbfile = ConfigurationManager.getProperty("solr-statistics", "dbfile");
+        String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
         if (dbfile != null)
         {
             try
@@ -298,30 +298,33 @@ public class SolrLogger
 
             // Save the location information if valid, save the event without
             // location information if not valid
-            Location location = locationService.getLocation(ip);
-            if (location != null
-                    && !("--".equals(location.countryCode)
-                            && location.latitude == -180 && location.longitude == -180))
+            if(locationService != null)
             {
-                try
+                Location location = locationService.getLocation(ip);
+                if (location != null
+                        && !("--".equals(location.countryCode)
+                        && location.latitude == -180 && location.longitude == -180))
                 {
-                    doc1.addField("continent", LocationUtils
-                            .getContinentCode(location.countryCode));
-                }
-                catch (Exception e)
-                {
-                    System.out
-                            .println("COUNTRY ERROR: " + location.countryCode);
-                }
-                doc1.addField("countryCode", location.countryCode);
-                doc1.addField("city", location.city);
-                doc1.addField("latitude", location.latitude);
-                doc1.addField("longitude", location.longitude);
-                doc1.addField("isBot",isSpiderBot);
+                    try
+                    {
+                        doc1.addField("continent", LocationUtils
+                                .getContinentCode(location.countryCode));
+                    }
+                    catch (Exception e)
+                    {
+                        System.out
+                                .println("COUNTRY ERROR: " + location.countryCode);
+                    }
+                    doc1.addField("countryCode", location.countryCode);
+                    doc1.addField("city", location.city);
+                    doc1.addField("latitude", location.latitude);
+                    doc1.addField("longitude", location.longitude);
+                    doc1.addField("isBot",isSpiderBot);
 
-                if(request.getHeader("User-Agent") != null)
-                {
-                    doc1.addField("userAgent", request.getHeader("User-Agent"));
+                    if(request.getHeader("User-Agent") != null)
+                    {
+                        doc1.addField("userAgent", request.getHeader("User-Agent"));
+                    }
                 }
             }
         }
