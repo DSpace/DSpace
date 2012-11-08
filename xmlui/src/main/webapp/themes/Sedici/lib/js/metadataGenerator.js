@@ -91,7 +91,7 @@
 
 
     // Se cargan los metadatos pre-existentes (si es un texto html valido)
-    var parsedContent = $( self.val() );
+    var parsedContent = $( self.val().trim() );
     if(parsedContent.find("span.label").length == 0)
     	parsedContent = "";
 
