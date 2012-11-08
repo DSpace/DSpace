@@ -123,7 +123,7 @@
                                 </part>
                             </parts>
                             <properties>
-                                <dspace.dir>${agnostic.build.dir}/testing/dspace</dspace.dir>
+                                <dspace.install.dir>${agnostic.build.dir}/testing/dspace</dspace.install.dir>
                             </properties>
                         </output>
                     </outputs>
