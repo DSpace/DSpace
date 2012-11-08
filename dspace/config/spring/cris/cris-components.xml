@@ -12,6 +12,8 @@
 
 	<context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
+
+	<!-- Components -->
 	<bean id="rpComponentsService" class="it.cilea.hku.authority.dspace.CrisComponentsService">
 		<property name="components">
 			<map>
@@ -21,6 +23,9 @@
 		</property>
 	</bean>
 
+	
+		
+	<!-- Publication component for RP -->
 	<bean id="publicationlist"
 		class="it.cilea.hku.authority.webui.components.ItemsListComponent">
 		<property name="componentIdentifier" value="publicationlist" />
@@ -48,7 +53,7 @@
 	<bean id="journalComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="journal" />
-		<property name="query"><value>authors_fauthority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="query"><value>dc.contributor.author_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>1</value></property>	
@@ -62,7 +67,7 @@
 	<bean id="conferenceComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="conference" />
-		<property name="query"><value>authors_fauthority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="query"><value>dc.contributor.author_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>1</value></property>			
@@ -76,7 +81,7 @@
 	<bean id="bookComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="book" />
-		<property name="query"><value>authors_fauthority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="query"><value>dc.contributor.author_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>1</value></property>		
@@ -90,7 +95,7 @@
 	<bean id="patentComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="patent" />
-		<property name="query"><value>authors_fauthority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="query"><value>dc.contributor.author_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>1</value></property>		
@@ -104,7 +109,7 @@
 	<bean id="otherComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="other" />
-		<property name="query"><value>authors_fauthority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="query"><value>dc.contributor.author_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>1</value></property>		
@@ -118,22 +123,305 @@
 		</property>
 	</bean>
 	
+	<!-- Project list for RP entity -->
 	<bean id="projectlist"
-		class="it.cilea.hku.authority.webui.components.ProjectListComponent">
+		class="it.cilea.hku.authority.webui.components.BrowseItemListComponent">
 		<property name="componentIdentifier" value="projectlist" />
 		<property name="objectType" value="10" />
 		<property name="types">
 			<map>
+				<entry key="selectedproject" value-ref="selectedProjectComponent" />
+				<entry key="investigatored" value-ref="investigatoredComponent" />
 				<entry key="coinvestigatored" value-ref="coinvestigatoredComponent" />				
 			</map>
 		</property>
 	</bean>
 	
+	<bean id="selectedProjectComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="selectedproject" />
+		<property name="query"><value>selected:{0}</value></property>
+		<property name="order"><value>asc</value></property>
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>5</value></property>		
+	</bean>
+	
+	<bean id="investigatoredComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="investigatored" />
+		<property name="query"><value>crisproject.principalinvestigator:{0}</value></property>
+		<property name="order"><value>asc</value></property>
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>5</value></property>		
+	</bean>
+	
 	<bean id="coinvestigatoredComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="coinvestigatored" />
-		<property name="query"><value>crisproject.principalinvestigator:{0} or crisproject.coinvestigators:{0}</value></property>
+		<property name="query"><value>crisproject.coinvestigators:{0}</value></property>
+		<property name="order"><value>asc</value></property>
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>5</value></property>		
+	</bean>
+	
+	
+	<!-- Project Components -->
+	<bean id="projectComponentsService" class="it.cilea.hku.authority.dspace.CrisComponentsService">
+		<property name="components">
+			<map>
+				<entry key="dspaceitems" value-ref="publicationlistforproject" />				
+			</map>
+		</property>
+	</bean>
+	
+	
+	<!-- Publication list for Project entity -->
+	<bean id="publicationlistforproject"
+		class="it.cilea.hku.authority.webui.components.ItemsListComponent">
+		<property name="componentIdentifier" value="publicationlistforproject" />
+		<property name="objectType" value="2" />
+		<property name="types">
+			<map>
+				<entry key="selected" value-ref="selectedPublicationForProjectComponent" />				
+				<entry key="all" value-ref="allPublicationForProjectComponent" />
+			</map>
+		</property>
+	</bean>
+	
+	
+	<bean id="selectedPublicationForProjectComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="selected" />
+		<property name="query"><value>selected:{0} and dc.relation_authority:{0}</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>		
+	</bean>
+	
+	<bean id="allPublicationForProjectComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="all" />
+		<property name="query"><value>dc.relation_authority:{0}</value></property>
+		<property name="order"><value>asc</value></property>
+		<property name="rpp"><value>20</value></property>		
+	</bean>
+	
+	
+	
+	<!--  OU Components -->
+	<bean id="ouComponentsService" class="it.cilea.hku.authority.dspace.CrisComponentsService">
+		<property name="components">
+			<map>
+				<entry key="dspaceitems" value-ref="publicationlistforou" />
+				<entry key="dspaceitemsviarp" value-ref="publicationlistforouviarp" />
+				<entry key="projects" value-ref="projectlistforou" />
+				<entry key="projectsprincipal" value-ref="projectlistprincipalforou" />				
+				<entry key="persons" value-ref="personslist" />
+			</map>
+		</property>
+	</bean>
+	
+	<!-- Publication list for OU entity -->
+	<bean id="publicationlistforou"
+		class="it.cilea.hku.authority.webui.components.ItemsListComponent">
+		<property name="componentIdentifier" value="publicationlistforou" />
+		<property name="objectType" value="2" />
+		<property name="types">
+			<map>
+				<entry key="selected" value-ref="selectedPublicationForOUComponent" />
+				<entry key="journal" value-ref="journalForOUComponent" />
+				<entry key="conference" value-ref="conferenceForOUComponent" />
+				<entry key="book" value-ref="bookForOUComponent" />
+				<entry key="patent" value-ref="patentForOUComponent" />
+				<entry key="other" value-ref="otherForOUComponent" />
+			</map>
+		</property>
+	</bean>
+	
+	
+	<bean id="selectedPublicationForOUComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="selected" />
+		<property name="query"><value>selected:{0} and dc.description.sponsorship_authority:{0}</value></property>
+		<property name="order"><value>asc</value></property>
+		<property name="rpp"><value>20</value></property>		
+	</bean>
+		
+	
+	<bean id="journalForOUComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="journal" />
+		<property name="query"><value>dc.description.sponsorship_authority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="order"><value>desc</value></property>
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>1</value></property>	
+		<property name="filters">
+			<list>
+				<value>dc.type:Article</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="conferenceForOUComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="conference" />
+		<property name="query"><value>dc.description.sponsorship_authority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="order"><value>desc</value></property>
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>1</value></property>			
+		<property name="filters">
+			<list>
+				<value>dc.type:Conference_Paper</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="bookForOUComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="book" />
+		<property name="query"><value>dc.description.sponsorship_authority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="order"><value>desc</value></property>
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>1</value></property>		
+		<property name="filters">
+			<list>
+				<value>dc.type:Book OR dc.type:Book_Chapter</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="patentForOUComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="patent" />
+		<property name="query"><value>dc.description.sponsorship_authority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="order"><value>desc</value></property>
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>1</value></property>		
+		<property name="filters">
+			<list>
+				<value>dc.type:Patent</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="otherForOUComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="other" />
+		<property name="query"><value>dc.description.sponsorship_authority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="order"><value>desc</value></property>
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>1</value></property>		
+		<property name="filters">
+			<list>
+				<value>-dc.type:Article</value>
+				<value>-(dc.type:Book OR dc.type:Book_Chapter)</value>
+				<value>dc.type:Conference_Paper</value>
+				<value>-dc.type:Patent</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Publication list for OU entity via RP -->
+	<bean id="publicationlistforouviarp"
+		class="it.cilea.hku.authority.webui.components.ItemsListComponent">
+		<property name="componentIdentifier" value="publicationlistforouviarp" />
+		<property name="objectType" value="2" />
+		<property name="types">
+			<map>
+				<entry key="nestedrp" value-ref="nestedrpPublicationForOUComponent" />				
+			</map>
+		</property>
+	</bean>
+	
+	
+	<bean id="nestedrpPublicationForOUComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="nestedrp" />
+		<property name="query"><value></value></property>
+		<property name="order"><value>asc</value></property>
+		<property name="rpp"><value>20</value></property>		
+	</bean>
+	
+	<!-- Person list for OU entity -->
+	<bean id="personslist"
+		class="it.cilea.hku.authority.webui.components.BrowseItemListComponent">
+		<property name="componentIdentifier" value="personslist" />
+		<property name="objectType" value="9" />
+		<property name="types">
+			<map>
+				<entry key="persons" value-ref="personsForOUComponent" />				
+				<entry key="deptpersons" value-ref="personsOfDeptForOUComponent" />
+			</map>
+		</property>
+	</bean>
+	
+	
+	<bean id="personsForOUComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="persons" />
+		<property name="query"><value>crisrp.dept_authority:{0} or crisrp.workgroup_authority:{0}</value></property>
+		<property name="order"><value>asc</value></property>
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>4</value></property>			
+	</bean>
+	
+	<bean id="personsOfDeptForOUComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="deptpersons" />
+		<property name="query"><value>crisrp.dept_authority:{0}</value></property>
+		<property name="order"><value>asc</value></property>
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>4</value></property>			
+	</bean>
+		
+	<!-- Project list for OU entity -->
+	<bean id="projectlistforou"
+		class="it.cilea.hku.authority.webui.components.BrowseItemListComponent">
+		<property name="componentIdentifier" value="projectlist" />
+		<property name="objectType" value="10" />
+		<property name="types">
+			<map>
+				<entry key="selectedproject" value-ref="selectedProjectForOUComponent" />				
+				<entry key="agencies" value-ref="agenciesComponent" />				
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="selectedProjectForOUComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="selectedproject" />
+		<property name="query"><value>selected_ou:{0}</value></property>
+		<property name="order"><value>asc</value></property>
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>5</value></property>		
+	</bean>
+	
+	<bean id="agenciesComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="agencies" />
+		<property name="query"><value>crisproject.agencies_authority:{0}</value></property>
+		<property name="order"><value>asc</value></property>
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>5</value></property>		
+	</bean>
+		
+	<!-- Principal Project list for OU entity -->	
+	<bean id="projectlistprincipalforou"
+		class="it.cilea.hku.authority.webui.components.BrowseItemListComponent">
+		<property name="componentIdentifier" value="projectlistprincipalforou" />
+		<property name="objectType" value="10" />
+		<property name="types">
+			<map>
+				<entry key="deptproject" value-ref="deptProjectForOUComponent" />								
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="deptProjectForOUComponent"
+		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		<property name="componentIdentifier" value="deptproject" />
+		<property name="query"><value>crisproject.principalinvestigator.dept_authority:{0}</value></property>
+		<property name="order"><value>asc</value></property>
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>5</value></property>		
 	</bean>
 </beans>
