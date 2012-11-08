@@ -53,7 +53,7 @@
 	<bean id="journalComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="journal" />
-		<property name="query"><value>dc.contributor.author_authority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="query"><value>author_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>1</value></property>	
@@ -67,7 +67,7 @@
 	<bean id="conferenceComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="conference" />
-		<property name="query"><value>dc.contributor.author_authority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="query"><value>author_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>1</value></property>			
@@ -81,7 +81,7 @@
 	<bean id="bookComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="book" />
-		<property name="query"><value>dc.contributor.author_authority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="query"><value>author_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>1</value></property>		
@@ -95,7 +95,7 @@
 	<bean id="patentComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="patent" />
-		<property name="query"><value>dc.contributor.author_authority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="query"><value>author_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>1</value></property>		
@@ -109,7 +109,7 @@
 	<bean id="otherComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="other" />
-		<property name="query"><value>dc.contributor.author_authority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="query"><value>author_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>1</value></property>		
@@ -192,7 +192,7 @@
 	<bean id="selectedPublicationForProjectComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="selected" />
-		<property name="query"><value>selected:{0} and dc.relation_authority:{0}</value></property>
+		<property name="query"><value>selected:{0} and project_authority:{0}</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>		
 	</bean>
@@ -200,7 +200,7 @@
 	<bean id="allPublicationForProjectComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="all" />
-		<property name="query"><value>dc.relation_authority:{0}</value></property>
+		<property name="query"><value>project_authority:{0}</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>		
 	</bean>
@@ -241,7 +241,7 @@
 	<bean id="selectedPublicationForOUComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="selected" />
-		<property name="query"><value>selected:{0} and dc.description.sponsorship_authority:{0}</value></property>
+		<property name="query"><value>selected:{0} and orgunit_authority:{0}</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>		
 	</bean>
@@ -250,7 +250,7 @@
 	<bean id="journalForOUComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="journal" />
-		<property name="query"><value>dc.description.sponsorship_authority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="query"><value>orgunit_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>1</value></property>	
@@ -264,7 +264,7 @@
 	<bean id="conferenceForOUComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="conference" />
-		<property name="query"><value>dc.description.sponsorship_authority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="query"><value>orgunit_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>1</value></property>			
@@ -278,7 +278,7 @@
 	<bean id="bookForOUComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="book" />
-		<property name="query"><value>dc.description.sponsorship_authority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="query"><value>orgunit_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>1</value></property>		
@@ -292,7 +292,7 @@
 	<bean id="patentForOUComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="patent" />
-		<property name="query"><value>dc.description.sponsorship_authority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="query"><value>orgunit_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>1</value></property>		
@@ -306,7 +306,7 @@
 	<bean id="otherForOUComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="other" />
-		<property name="query"><value>dc.description.sponsorship_authority:{0} -hided:{0} -selected:{0}</value></property>
+		<property name="query"><value>orgunit_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>1</value></property>		
@@ -358,7 +358,7 @@
 	<bean id="personsForOUComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="persons" />
-		<property name="query"><value>crisrp.dept_authority:{0} or crisrp.workgroup_authority:{0}</value></property>
+		<property name="query"><value>dept_authority:{0} or workgroup_authority:{0}</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>4</value></property>			
@@ -367,7 +367,7 @@
 	<bean id="personsOfDeptForOUComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="deptpersons" />
-		<property name="query"><value>crisrp.dept_authority:{0}</value></property>
+		<property name="query"><value>dept_authority:{0}</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>4</value></property>			
@@ -389,7 +389,7 @@
 	<bean id="selectedProjectForOUComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="selectedproject" />
-		<property name="query"><value>selected_ou:{0}</value></property>
+		<property name="query"><value>selected:{0}</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>5</value></property>		
@@ -398,7 +398,7 @@
 	<bean id="agenciesComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="agencies" />
-		<property name="query"><value>crisproject.agencies_authority:{0}</value></property>
+		<property name="query"><value>agencies_authority:{0}</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>5</value></property>		
@@ -419,7 +419,7 @@
 	<bean id="deptProjectForOUComponent"
 		class="it.cilea.hku.authority.webui.components.BeanComponent">
 		<property name="componentIdentifier" value="deptproject" />
-		<property name="query"><value>crisproject.principalinvestigator.dept_authority:{0}</value></property>
+		<property name="query"><value>principalinvestigator.dept_authority:{0}</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>5</value></property>		
