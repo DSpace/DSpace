@@ -10,10 +10,10 @@
  * and analyze the responses.
  * 
  * <p>
- * Use {@link EZIDRequestFactory.getInstance} to configure an {@link EZIDRequest}
- * with your authority number and credentials.  {@link EZIDRequest} encapsulates
- * the defined EZID's operations (lookup, create/mint, modify, delete...).
- * An operation returns an {@link EZIDResponse} which gives easy access to
+ * Use {@link org.dspace.identifier.ezid.EZIDRequestFactory#getInstance} to configure an {@link org.dspace.identifier.ezid.EZIDRequest}
+ * with your authority number and credentials.  {@code EZIDRequest} encapsulates
+ * EZID's operations (lookup, create/mint, modify, delete...).
+ * An operation returns an {@link org.dspace.identifier.ezid.EZIDResponse} which gives easy access to
  * EZID's status code and value, status of the underlying HTTP request, and
  * key/value pairs found in the response body (if any).
  * <p>

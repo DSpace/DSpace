@@ -53,7 +53,7 @@ import org.springframework.beans.factory.annotation.Required;
  * object and their values set on mapped fully-qualified names in the object's
  * DataCite metadata.</p>
  *
- * @author mwood
+ * @author Mark H. Wood
  */
 public class DataCiteIdentifierProvider
     extends IdentifierProvider

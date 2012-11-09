@@ -24,6 +24,15 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Decoded response data evoked by a request made to EZID.
+ * These are returned by {@link EZIDRequest}.  There is probably no other reason
+ * to create one.
+ * 
+ * <p>The response body is parsed into key/value pairs which may
+ * be enumerated, and the values fetched individually by key.  The EZID status
+ * line, while returned by EZID in the form of such a pair, is not included
+ * among these response "attributes", but is accessed through its own getters. 
+ *
+ * @author Mark H. Wood
  */
 public class EZIDResponse
 {
@@ -39,7 +48,7 @@ public class EZIDResponse
 
     private final HttpResponse response;
 
-    public EZIDResponse(HttpResponse response)
+    EZIDResponse(HttpResponse response)
             throws IdentifierException
     {
         this.response = response;
@@ -145,9 +154,9 @@ public class EZIDResponse
     }
 
     /**
-     * Look up the value of a given response datum.
+     * Look up the value of a given response attribute.
      *
-     * @param key the datum to look up.
+     * @param key the attribute to look up.
      * @return the value of {@code key}, or null if {@code key} is undefined.
      */
     public String get(String key)

@@ -23,8 +23,9 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 /**
- *
- * @author mwood
+ * Tests for {@link DataCiteIdentifierProvider}.
+ * 
+ * @author Mark H. Wood
  */
 public class DataCiteIdentifierProviderTest
         extends AbstractUnitTest

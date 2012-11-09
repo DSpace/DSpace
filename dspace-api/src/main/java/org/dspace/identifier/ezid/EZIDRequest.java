@@ -30,7 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A request to EZID concerning a given (or expected) identifier.
+ * A request to EZID concerning a given (or expected) identifier.  Create
+ * configured instances of this class using
+ * {@link EZIDRequestFactory#getInstance(java.lang.String, java.lang.String, java.lang.String)}.
  *
  * @author Mark H. Wood
  */
@@ -58,8 +60,8 @@ public class EZIDRequest
      * Prepare a context for requests concerning a specific identifier or
      * authority prefix.
      * 
-     * @param scheme
-     * @param host
+     * @param scheme URL scheme for access to the EZID service.
+     * @param host Host name for access to the EZID service.
      * @param authority DOI authority prefix.
      * @param username an EZID user identity.
      * @param password user's password, or {@code null} for none.
@@ -103,9 +105,6 @@ public class EZIDRequest
      * Create an identifier with a given name. The name is the end of the
      * request path. Note: to "reserve" a given identifier, include "_status =
      * reserved" in {@link metadata}.
-     *
-     * @param metadata ANVL-encoded key/value pairs.
-     * @return
      */
     public EZIDResponse create(String name, Map<String, String> metadata)
             throws IOException, IdentifierException, URISyntaxException
@@ -127,9 +126,6 @@ public class EZIDRequest
     /**
      * Ask EZID to create a unique identifier and return its name. NOTE: to
      * "reserve" a unique identifier, include "_status = reserved" in {@link metadata}.
-     *
-     * @param metadata ANVL-encoded key/value pairs.
-     * @return
      */
     public EZIDResponse mint(Map<String, String> metadata)
             throws IOException, IdentifierException, URISyntaxException
@@ -150,7 +146,7 @@ public class EZIDRequest
     /**
      * Alter the metadata bound to an identifier.
      *
-     * @param metadata fields to be altered. Leave the value of a field's empty
+     * @param metadata fields to be altered. Leave the value of a field empty
      *                 to delete the field.
      * @return
      */
@@ -186,6 +182,7 @@ public class EZIDRequest
 
     /**
      * Remove a public identifier from view.
+     * Sets the identifier's status to "unavailable".
      */
     public EZIDResponse withdraw(String name)
             throws IOException, IdentifierException, URISyntaxException
@@ -197,6 +194,7 @@ public class EZIDRequest
 
     /**
      * Remove a public identifier from view, with a reason.
+     * Sets the identifier's status to "unavailable".
      *
      * @param reason annotation for the item's unavailability.
      */

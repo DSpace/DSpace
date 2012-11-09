@@ -11,7 +11,7 @@ package org.dspace.identifier;
 /**
  * DOI identifiers.
  *
- * @author mwood
+ * @author Mark H. Wood
  */
 public class DOI
         implements Identifier

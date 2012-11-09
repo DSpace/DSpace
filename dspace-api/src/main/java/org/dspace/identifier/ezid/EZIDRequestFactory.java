@@ -21,11 +21,16 @@ import org.springframework.beans.factory.annotation.Required;
  *  <dd>URL scheme (e.g. "https")</dd>
  *  <dt>EZID_HOST</dt>
  *  <dd>Name of the EZID API host</dd>
- *  <dt>EZID_PATH</dt>
- *  <dd>Path to the API endpoints</dd>
  * </dl>
  *
- * @author mwood
+ * <p>These are meant to be injected by a bean container such as Spring.</p>
+ *
+ * <p>Local information (identity, credentials) is passed to
+ * {@link #getInstance(java.lang.String, java.lang.String, java.lang.String)}
+ * and combined with injected information (which should be constant) to configure
+ * the request object.
+ *
+ * @author Mark H. Wood
  */
 public class EZIDRequestFactory
 {
@@ -38,7 +43,8 @@ public class EZIDRequestFactory
      * @param authority our DOI authority number.
      * @param username EZID user name.
      * @param password {@code username}'s password.
-     * @throws URISyntaxException 
+     * @throws URISyntaxException if the injected host or scheme (or the
+     *  combination thereof) is malformed.
      */
     public EZIDRequest getInstance(String authority, String username, String password)
             throws URISyntaxException
@@ -47,7 +53,7 @@ public class EZIDRequestFactory
     }
 
     /**
-     * @param aEZID_SCHEME the EZID URL scheme to set
+     * @param aEZID_SCHEME the EZID URL scheme to set.
      */
     @Required
     public static void setEZID_SCHEME(String aEZID_SCHEME)
