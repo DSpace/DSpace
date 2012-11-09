@@ -112,6 +112,14 @@
 
 		<dependency>
 			<groupId>org.dspace</groupId>
+			<artifactId>dspace-cris-jspui-webapp</artifactId>
+			<version>1.8.2</version>					
+			<type>war</type>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.dspace</groupId>
 			<artifactId>dspace-jspui-webapp</artifactId>
 			<type>war</type>
 		</dependency>
@@ -119,12 +127,13 @@
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-jspui-api</artifactId>
+			  <exclusions>
+					<exclusion>
+						<artifactId>ehcache-core</artifactId>
+						<groupId>net.sf.ehcache</groupId>
+					</exclusion>			
+			</exclusions>
 		</dependency>
-
-		<dependency>
-           <groupId>org.dspace</groupId>
-           <artifactId>dspace-discovery-provider</artifactId>
-        </dependency>
 
 		<dependency>
 		   <groupId>javax.servlet</groupId>
@@ -132,6 +141,47 @@
 		   <version>2.3</version>
 		   <scope>provided</scope>
 		</dependency>
+		
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-webmvc</artifactId>		
+	</dependency>
+	
+	<dependency>
+		<groupId>jdyna-web-api</groupId>
+		<artifactId>jdyna-web-api</artifactId>
+		<version>0.1</version>
+	</dependency>
+
+	<dependency>
+		<groupId>commons-cilea-webapi</groupId>
+		<artifactId>commons-cilea-webapi</artifactId>
+		<version>0.1</version>
+	</dependency>
+
+    <dependency>
+		<groupId>jdyna-webmvc-api</groupId>
+		<artifactId>jdyna-webmvc-api</artifactId>
+		<version>0.1</version>
+	</dependency>
+	<dependency>
+		<groupId>jdyna-webmvc-webapp</groupId>
+		<artifactId>jdyna-webmvc-webapp</artifactId>
+		<version>0.1</version>
+		<type>war</type>
+	</dependency>
+
+	<dependency>
+		<groupId>org.dspace</groupId>
+		<artifactId>dspace-cris-api</artifactId>		
+	</dependency>
+
+	<dependency>
+		<groupId>org.dspace</groupId>
+		<artifactId>dspace-cris-jspui-api</artifactId>		
+	</dependency>
+		
+		
 	</dependencies>
 
 </project>

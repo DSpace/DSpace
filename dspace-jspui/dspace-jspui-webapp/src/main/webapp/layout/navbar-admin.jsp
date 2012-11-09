@@ -10,7 +10,6 @@
 <%--
   - Navigation bar for admin pages
   --%>
-
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="java.util.LinkedList" %>
@@ -21,7 +20,7 @@
 <%@ page import="org.dspace.browse.BrowseInfo" %>
 <%@ page import="org.dspace.sort.SortOption" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
-
+<%@page import="org.dspace.core.ConfigurationManager"%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -34,6 +33,8 @@
     {
         currentPage = currentPage.substring(0, c);
     }
+    
+    boolean crisModuleEnabled = ConfigurationManager.getBooleanProperty("feature.cris.enabled");
 %>
 
 <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
@@ -176,7 +177,25 @@
   <tr>
      <td colspan="2">&nbsp;</td>
   </tr>
-  
+  <%
+	if (crisModuleEnabled == true)
+	{	
+  %>
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/cris/administrator.jsp") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
+    </td>
+    <td nowrap="nowrap" class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/cris/administrator/index.htm"><fmt:message key="jsp.layout.navbar-admin.cris"/></a>
+    </td>
+  </tr>
+
+  <tr>
+     <td colspan="2">&nbsp;</td>
+  </tr>
+  <%
+	}
+  %>    
   <tr class="navigationBarItem">
      <td>
          <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="16" height="16"/>

@@ -155,7 +155,7 @@ public final class BrowseIndex
                         }
                     }
 
-                    tableBaseName = getItemBrowseIndex().tableBaseName;
+                    tableBaseName = getItemBrowseIndex(displayType).tableBaseName;
                 }
                 else if (isItemIndex())
                 {
@@ -185,7 +185,7 @@ public final class BrowseIndex
                         }
                     }
 
-                    tableBaseName = getItemBrowseIndex().tableBaseName;
+                    tableBaseName = getItemBrowseIndex(displayType).tableBaseName;
                 }
                 else
                 {
@@ -616,7 +616,7 @@ public final class BrowseIndex
      */
     public boolean isItemIndex()
     {
-        return "item".equals(displayType);
+        return !isMetadataIndex();
     }
     
     /**
@@ -732,14 +732,27 @@ public final class BrowseIndex
         return null;
     }
     
+    public static BrowseIndex getItemBrowseIndex()
+    {
+        return BrowseIndex.itemIndex;
+    }
+    
     /**
      * Get the internally defined browse index for archived items
      * 
      * @return
      */
-    public static BrowseIndex getItemBrowseIndex()
+    public static BrowseIndex getItemBrowseIndex(String displayType)
     {
-        return BrowseIndex.itemIndex;
+        if ("item".equals(displayType))
+        {
+            return BrowseIndex.itemIndex;
+        }
+        else
+        {
+            return new BrowseIndex("bi_"+displayType);
+        }
+        
     }
     
     /**

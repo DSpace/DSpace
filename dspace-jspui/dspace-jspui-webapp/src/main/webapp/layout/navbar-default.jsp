@@ -12,6 +12,7 @@
 --%>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
@@ -28,6 +29,7 @@
 <%@ page import="org.dspace.browse.BrowseIndex" %>
 <%@ page import="org.dspace.browse.BrowseInfo" %>
 <%@ page import="java.util.Map" %>
+
 <%
     // Is anyone logged in?
     EPerson user = (EPerson) request.getAttribute("dspace.current.user");
@@ -72,6 +74,8 @@
     			browseCurrent = bix.getName();
         }
     }
+
+    String extraNavbarData = (String)request.getAttribute("dspace.cris.navbar");
 %>
 
 <%-- Search Box --%>
@@ -241,4 +245,16 @@
       <a href="http://www.dspace.org/"><fmt:message key="jsp.layout.navbar-default.about"/></a>
     </td>
   </tr>
+
+
+<%
+
+ if (extraNavbarData != null)
+ { 
+%>
+	<%= extraNavbarData %>
+<%
+ }
+%>
+ 
 </table>

@@ -322,7 +322,7 @@
 		}
 --%>
 <%
-	Set<SortOption> sortOptions = SortOption.getSortOptions();
+	Set<SortOption> sortOptions = SortOption.getSortOptions(bix.getName());
 	if (sortOptions.size() > 1) // && bi.getBrowseLevel() > 0
 	{
 %>

@@ -293,6 +293,48 @@ public class SortOption
     }
 
     /**
+     * Return all the configured sort options for a specific browse
+     * @return
+     * @throws SortException
+     */
+    public static Set<SortOption> getSortOptions(String browseName) throws SortException
+    {
+        if (SortOption.sortOptionsSet == null)
+        {
+            throw new SortException("Sort options not loaded");
+        }
+        
+        Set<SortOption> options = new HashSet<SortOption>();
+        try
+        {
+            String sortCfg = ConfigurationManager.getProperty("browse."
+                    + browseName + ".sort-options");
+            if (sortCfg != null)
+            {
+                String[] sorts = sortCfg.split(",");
+                for (String s: sorts)
+                {
+                    options.add(SortOption.getSortOption(Integer.parseInt(s.trim())));
+                }
+            }
+        }
+        catch (NumberFormatException e)
+        {
+            throw new SortException("Wrong sort options for browse: "+browseName);
+        }
+
+        if (options.size() == 0)
+        {
+            return sortOptionsSet;
+        }
+        else
+        {
+            return options;
+        }
+    }
+
+    
+    /**
      * Return all the configured sort options
      * @return
      * @throws SortException

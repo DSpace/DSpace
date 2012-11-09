@@ -44,7 +44,7 @@
          <dc-qualifier>author</dc-qualifier>
          <repeatable>true</repeatable>
          <label>Authors</label>
-         <input-type>name</input-type>
+         <input-type>onebox</input-type>
          <hint>Enter the names of the authors of this item below.</hint>
          <required></required>
        </field>
@@ -182,10 +182,20 @@ it, please enter the types and the actual numbers or codes below.</hint>
 		 <dc-schema>dc</dc-schema>
          <dc-element>description</dc-element>
          <dc-qualifier>sponsorship</dc-qualifier>
-         <repeatable>false</repeatable>
+         <repeatable>true</repeatable>
          <label>Sponsors</label>
-         <input-type>textarea</input-type>
-         <hint> Enter the names of any sponsors and/or funding codes in the box below. </hint>
+         <input-type>onebox</input-type>
+         <hint> Enter the name of any sponsors. </hint>
+         <required></required>
+       </field>
+       
+       <field>
+		 <dc-schema>dc</dc-schema>
+         <dc-element>relation</dc-element>
+         <repeatable>true</repeatable>
+         <label>Project</label>
+         <input-type>onebox</input-type>
+         <hint> Enter the name of project, if any, that has produced this publication. </hint>
          <required></required>
        </field>
 

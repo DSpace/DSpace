@@ -7,48 +7,39 @@
  */
 package org.dspace.app.webui.jsptag;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.dspace.app.webui.util.UIUtil;
-
-import org.dspace.browse.BrowseException;
-import org.dspace.browse.BrowseIndex;
-import org.dspace.browse.CrossLinks;
-
-import org.dspace.content.Bitstream;
-import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
-import org.dspace.content.Thumbnail;
-import org.dspace.content.service.ItemService;
-
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.Utils;
-
-import org.dspace.sort.SortOption;
-import org.dspace.storage.bitstore.BitstreamStorageManager;
-
-import java.awt.image.BufferedImage;
-
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-
 import java.net.URLEncoder;
-import java.sql.SQLException;
 import java.util.StringTokenizer;
-
-import javax.imageio.ImageIO;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
+
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.dspace.app.webui.util.DateDisplayStrategy;
+import org.dspace.app.webui.util.DefaultDisplayStrategy;
+import org.dspace.app.webui.util.IDisplayMetadataValueStrategy;
+import org.dspace.app.webui.util.LinkDisplayStrategy;
+import org.dspace.app.webui.util.ThumbDisplayStrategy;
+import org.dspace.app.webui.util.TitleDisplayStrategy;
+import org.dspace.app.webui.util.UIUtil;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.BrowseIndex;
+import org.dspace.browse.CrossLinks;
+import org.dspace.content.DCDate;
+import org.dspace.content.DCValue;
+import org.dspace.content.Item;
 import org.dspace.content.authority.MetadataAuthorityManager;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.PluginManager;
+import org.dspace.core.Utils;
+import org.dspace.sort.SortOption;
 
 /**
  * Tag for display a list of items
@@ -101,6 +92,9 @@ public class ItemListTag extends TagSupport
     private static String authorField = "dc.contributor.*";
 
     private int authorLimit = -1;
+    
+    /** regex pattern to capture the style of a field, ie <code>schema.element.qualifier(style)</code> */
+    private Pattern fieldStylePatter = Pattern.compile(".*\\((.*)\\)");    
 
     private transient SortOption sortOption = null;
 
@@ -108,7 +102,8 @@ public class ItemListTag extends TagSupport
 
     static
     {
-        getThumbSettings();
+        showThumbs = ConfigurationManager
+                .getBooleanProperty("webui.browse.thumbnail.show");
 
         if (showThumbs)
         {
@@ -247,6 +242,7 @@ public class ItemListTag extends TagSupport
         String[] widthArr  = widthLine  == null ? new String[0] : widthLine.split("\\s*,\\s*");
         boolean isDate[]   = new boolean[fieldArr.length];
         boolean emph[]     = new boolean[fieldArr.length];
+        String useRender[] = new String[fieldArr.length];
         boolean isAuthor[] = new boolean[fieldArr.length];
         boolean viewFull[] = new boolean[fieldArr.length];
         String[] browseType = new String[fieldArr.length];
@@ -314,11 +310,35 @@ public class ItemListTag extends TagSupport
                 String field = fieldArr[colIdx].toLowerCase().trim();
                 cOddOrEven[colIdx] = (((colIdx + 1) % 2) == 0 ? "Odd" : "Even");
 
-                // find out if the field is a date
-                if (field.indexOf("(date)") > 0)
+                String style = null;
+                
+                // backward compatibility, special fields
+                if (field.equals("thumbnail"))
                 {
-                    field = field.replaceAll("\\(date\\)", "");
-                    isDate[colIdx] = true;
+                    style = "thumbnail";
+                }
+                else if (field.equals(titleField))
+                {
+                    style = "title";
+                }
+                else if (field.equals(dateField))
+                {
+                    style = "date";
+                }
+                
+                Matcher fieldStyleMatcher = fieldStylePatter.matcher(field);
+                if (fieldStyleMatcher.matches()){
+                    style = fieldStyleMatcher.group(1);
+                }
+                
+                if (style != null)
+                {
+                    field = field.replaceAll("\\("+style+"\\)", "");
+                    useRender[colIdx] = style;
+                }
+                else
+                {
+                    useRender[colIdx] = "default";
                 }
 
                 // Cache any modifications to field
@@ -434,114 +454,51 @@ public class ItemListTag extends TagSupport
                     }
 
                     // now prepare the content of the table division
-                    String metadata = "-";
-                    if (field.equals("thumbnail"))
+                    int limit = -1;
+                    if (isAuthor[colIdx])
                     {
-                        metadata = getThumbMarkup(hrq, items[i]);
+                        limit = (authorLimit <= 0 ? metadataArray.length
+                                : authorLimit);
                     }
-                    if (metadataArray.length > 0)
+                    
+                    IDisplayMetadataValueStrategy strategy = (IDisplayMetadataValueStrategy) PluginManager
+                            .getNamedPlugin(
+                                    IDisplayMetadataValueStrategy.class,
+                                    useRender[colIdx]);
+                    
+                    // fallback compatibility
+                    if (strategy == null)
                     {
-                        // format the date field correctly
-                        if (isDate[colIdx])
+                        if (useRender[colIdx].equalsIgnoreCase("title"))
                         {
-                            DCDate dd = new DCDate(metadataArray[0].value);
-                            metadata = UIUtil.displayDate(dd, false, false, hrq);
+                            strategy = new TitleDisplayStrategy();
                         }
-                        // format the title field correctly for withdrawn items (ie. don't link)
-                        else if (field.equals(titleField) && items[i].isWithdrawn())
+                        else if (useRender[colIdx].equalsIgnoreCase("date"))
                         {
-                            metadata = Utils.addEntities(metadataArray[0].value);
+                            strategy = new DateDisplayStrategy();
                         }
-                        // format the title field correctly
-                        else if (field.equals(titleField))
+                        else if (useRender[colIdx].equalsIgnoreCase("thumbnail"))
                         {
-                            metadata = "<a href=\"" + hrq.getContextPath() + "/handle/"
-                            + items[i].getHandle() + "\">"
-                            + Utils.addEntities(metadataArray[0].value)
-                            + "</a>";
+                            strategy = new ThumbDisplayStrategy();
                         }
-                        // format all other fields
+                        else if (useRender[colIdx].equalsIgnoreCase("link"))
+                        {
+                            strategy = new LinkDisplayStrategy();
+                        }
                         else
                         {
-                            // limit the number of records if this is the author field (if
-                            // -1, then the limit is the full list)
-                            boolean truncated = false;
-                            int loopLimit = metadataArray.length;
-                            if (isAuthor[colIdx])
-                            {
-                                int fieldMax = (authorLimit > 0 ? authorLimit : metadataArray.length);
-                                loopLimit = (fieldMax > metadataArray.length ? metadataArray.length : fieldMax);
-                                truncated = (fieldMax < metadataArray.length);
-                                log.debug("Limiting output of field " + field + " to " + Integer.toString(loopLimit) + " from an original " + Integer.toString(metadataArray.length));
-                            }
-
-                            StringBuffer sb = new StringBuffer();
-                            for (int j = 0; j < loopLimit; j++)
-                            {
-                                String startLink = "";
-                                String endLink = "";
-                                if (!StringUtils.isEmpty(browseType[colIdx]) && !disableCrossLinks)
-                                {
-                                    String argument;
-                                    String value;
-                                    if (metadataArray[j].authority != null &&
-                                            metadataArray[j].confidence >= MetadataAuthorityManager.getManager()
-                                                .getMinConfidence(metadataArray[j].schema, metadataArray[j].element, metadataArray[j].qualifier))
-                                    {
-                                        argument = "authority";
-                                        value = metadataArray[j].authority;
-                                    }
-                                    else
-                                    {
-                                        argument = "value";
-                                        value = metadataArray[j].value;
-                                    }
-                                    if (viewFull[colIdx])
-                                    {
-                                        argument = "vfocus";
-                                    }
-                                    startLink = "<a href=\"" + hrq.getContextPath() + "/browse?type=" + browseType[colIdx] + "&amp;" +
-                                        argument + "=" + URLEncoder.encode(value,"UTF-8");
-
-                                    if (metadataArray[j].language != null)
-                                    {
-                                        startLink = startLink + "&amp;" +
-                                            argument + "_lang=" + URLEncoder.encode(metadataArray[j].language, "UTF-8");
-                                    }
-
-                                    if ("authority".equals(argument))
-                                    {
-                                        startLink += "\" class=\"authority " +browseType[colIdx] + "\">";
-                                    }
-                                    else
-                                    {
-                                        startLink = startLink + "\">";
-                                    }
-                                    endLink = "</a>";
-                                }
-                                sb.append(startLink);
-                                sb.append(Utils.addEntities(metadataArray[j].value));
-                                sb.append(endLink);
-                                if (j < (loopLimit - 1))
-                                {
-                                    sb.append("; ");
-                                }
-                            }
-                            if (truncated)
-                            {
-                                String etal = LocaleSupport.getLocalizedMessage(pageContext, "itemlist.et-al");
-                                sb.append(", ").append(etal);
-                            }
-                            metadata = "<em>" + sb.toString() + "</em>";
+                            strategy = new DefaultDisplayStrategy();
                         }
                     }
+                            
+                    String metadata = strategy.getMetadataDisplay(hrq, limit,
+                                    viewFull[colIdx], browseType[colIdx], colIdx, field,
+                                    metadataArray, items[i], disableCrossLinks, emph[colIdx], pageContext);
 
                     // prepare extra special layout requirements for dates
-                    String extras = "";
-                    if (isDate[colIdx])
-                    {
-                        extras = "nowrap=\"nowrap\" align=\"right\"";
-                    }
+                    String extras = strategy.getExtraCssDisplay(hrq, limit,
+                            viewFull[colIdx], browseType[colIdx], colIdx, field,
+                            metadataArray, items[i], disableCrossLinks, emph[colIdx], pageContext);
 
                     String id = "t" + Integer.toString(colIdx + 1);
                     out.print("<td headers=\"" + id + "\" class=\""
@@ -705,155 +662,4 @@ public class ItemListTag extends TagSupport
         items = null;
     }
 
-    /* get the required thumbnail config items */
-    private static void getThumbSettings()
-    {
-        showThumbs = ConfigurationManager
-                .getBooleanProperty("webui.browse.thumbnail.show");
-
-        if (showThumbs)
-        {
-            thumbItemListMaxHeight = ConfigurationManager
-                    .getIntProperty("webui.browse.thumbnail.maxheight");
-
-            if (thumbItemListMaxHeight == 0)
-            {
-                thumbItemListMaxHeight = ConfigurationManager
-                        .getIntProperty("thumbnail.maxheight");
-            }
-
-            thumbItemListMaxWidth = ConfigurationManager
-                    .getIntProperty("webui.browse.thumbnail.maxwidth");
-
-            if (thumbItemListMaxWidth == 0)
-            {
-                thumbItemListMaxWidth = ConfigurationManager
-                        .getIntProperty("thumbnail.maxwidth");
-            }
-        }
-
-        String linkBehaviour = ConfigurationManager
-                .getProperty("webui.browse.thumbnail.linkbehaviour");
-
-        if ("bitstream".equals(linkBehaviour))
-        {
-            linkToBitstream = true;
-        }
-    }
-
-    /*
-     * Get the (X)HTML width and height attributes. As the browser is being used
-     * for scaling, we only scale down otherwise we'll get hideously chunky
-     * images. This means the media filter should be run with the maxheight and
-     * maxwidth set greater than or equal to the size of the images required in
-     * the search/browse
-     */
-    private String getScalingAttr(HttpServletRequest hrq, Bitstream bitstream)
-            throws JspException
-    {
-        BufferedImage buf;
-
-        try
-        {
-            Context c = UIUtil.obtainContext(hrq);
-
-            InputStream is = BitstreamStorageManager.retrieve(c, bitstream
-                    .getID());
-
-            //AuthorizeManager.authorizeAction(bContext, this, Constants.READ);
-            // 	read in bitstream's image
-            buf = ImageIO.read(is);
-            is.close();
-        }
-        catch (SQLException sqle)
-        {
-            throw new JspException(sqle.getMessage(), sqle);
-        }
-        catch (IOException ioe)
-        {
-            throw new JspException(ioe.getMessage(), ioe);
-        }
-
-        // now get the image dimensions
-        float xsize = (float) buf.getWidth(null);
-        float ysize = (float) buf.getHeight(null);
-
-        // scale by x first if needed
-        if (xsize > (float) thumbItemListMaxWidth)
-        {
-            // calculate scaling factor so that xsize * scale = new size (max)
-            float scale_factor = (float) thumbItemListMaxWidth / xsize;
-
-            // now reduce x size and y size
-            xsize = xsize * scale_factor;
-            ysize = ysize * scale_factor;
-        }
-
-        // scale by y if needed
-        if (ysize > (float) thumbItemListMaxHeight)
-        {
-            float scale_factor = (float) thumbItemListMaxHeight / ysize;
-
-            // now reduce x size
-            // and y size
-            xsize = xsize * scale_factor;
-            ysize = ysize * scale_factor;
-        }
-
-        StringBuffer sb = new StringBuffer("width=\"").append(xsize).append(
-                "\" height=\"").append(ysize).append("\"");
-
-        return sb.toString();
-    }
-
-    /* generate the (X)HTML required to show the thumbnail */
-    private String getThumbMarkup(HttpServletRequest hrq, Item item)
-            throws JspException
-    {
-        try
-        {
-            Context c = UIUtil.obtainContext(hrq);
-            Thumbnail thumbnail = ItemService.getThumbnail(c, item.getID(), linkToBitstream);
-
-            if (thumbnail == null)
-            {
-                return "";
-            }
-            StringBuffer thumbFrag = new StringBuffer();
-
-            if (linkToBitstream)
-            {
-                Bitstream original = thumbnail.getOriginal();
-                String link = hrq.getContextPath() + "/bitstream/" + item.getHandle() + "/" + original.getSequenceID() + "/" +
-                                UIUtil.encodeBitstreamName(original.getName(), Constants.DEFAULT_ENCODING);
-                thumbFrag.append("<a target=\"_blank\" href=\"" + link + "\" />");
-            }
-            else
-            {
-                String link = hrq.getContextPath() + "/handle/" + item.getHandle();
-                thumbFrag.append("<a href=\"" + link + "\" />");
-            }
-
-            Bitstream thumb = thumbnail.getThumb();
-            String img = hrq.getContextPath() + "/retrieve/" + thumb.getID() + "/" +
-                        UIUtil.encodeBitstreamName(thumb.getName(), Constants.DEFAULT_ENCODING);
-            String alt = thumb.getName();
-            String scAttr = getScalingAttr(hrq, thumb);
-            thumbFrag.append("<img src=\"")
-                    .append(img)
-                    .append("\" alt=\"").append(alt).append("\" ")
-                     .append(scAttr)
-                     .append("/ border=\"0\"></a>");
-
-            return thumbFrag.toString();
-        }
-        catch (SQLException sqle)
-        {
-            throw new JspException(sqle.getMessage(), sqle);
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            throw new JspException("Server does not support DSpace's default encoding. ", e);
-        }
-	}
-    }
+}
