@@ -128,9 +128,11 @@ public class DataCiteIdentifierProviderTest
     public static void tearDownClass()
             throws Exception
     {
+        /*
         System.out.print("Tearing down\n\n");
         Context ctx = new Context();
         dumpMetadata(Item.find(ctx, itemID));
+        */
     }
     
     @Before
