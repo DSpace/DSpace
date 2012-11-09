@@ -94,7 +94,7 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
 
         try {
             SolrQuery query = new SolrQuery();
-            query= query.setQuery("location.col:2 AND DSpaceStatus:Archived");
+            query= query.setQuery("location:l2 AND DSpaceStatus:Archived");
             QueryResponse response = getSolr().query(query);
             dataPackageCount = response.getResults().getNumFound();
         }catch (SolrServerException details) {
