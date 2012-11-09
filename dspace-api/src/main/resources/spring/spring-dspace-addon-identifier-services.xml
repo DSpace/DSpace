@@ -22,12 +22,11 @@
             <bean class='org.dspace.identifier.ezid.EZIDRequestFactory'>
                 <property name='EZID_SCHEME' value='https'/>
                 <property name='EZID_HOST' value='n2t.net'/>
-                <property name='EZID_PATH' value='/ezid/shoulder/'/>
             </bean>
         </property>
         <property name='crosswalk'>
             <map>
-                <entry key='datacite.creator' value='dc.creator.author'/>
+                <entry key='datacite.creator' value='dc.contributor.author'/>
                 <entry key='datacite.title' value='dc.title'/>
                 <entry key='datacite.publisher' value='dc.publisher'/>
                 <entry key='datacite.publicationyear' value='dc.date.published'/>

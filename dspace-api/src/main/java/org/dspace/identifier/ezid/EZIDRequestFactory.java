@@ -9,7 +9,6 @@
 package org.dspace.identifier.ezid;
 
 import java.net.URISyntaxException;
-import org.apache.http.client.utils.URIBuilder;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -32,42 +31,19 @@ public class EZIDRequestFactory
 {
     private static String EZID_SCHEME;
     private static String EZID_HOST;
-    private static String EZID_PATH;
 
     /**
      * Configure an EZID request.
      * 
-     * @param requestPath specific request (DOI, shoulder).
-     * @param username
-     * @param password
+     * @param authority our DOI authority number.
+     * @param username EZID user name.
+     * @param password {@code username}'s password.
      * @throws URISyntaxException 
      */
-    public EZIDRequest getInstance(String requestPath, String username, String password)
+    public EZIDRequest getInstance(String authority, String username, String password)
             throws URISyntaxException
     {
-        URIBuilder uri = new URIBuilder();
-
-        uri.setScheme(EZID_SCHEME);
-
-        uri.setHost(EZID_HOST);
-
-        String head, tail;
-        if (EZID_PATH.endsWith("/"))
-            head = EZID_PATH.substring(0, EZID_PATH.length() - 1);
-        else
-            head = EZID_PATH;
-        if (requestPath.startsWith("/"))
-            tail = requestPath.substring( 0, requestPath.length() - 1);
-        else
-            tail = requestPath;
-
-        StringBuilder path = new StringBuilder();
-        path.append(head);
-        path.append('/');
-        path.append(tail);
-        uri.setPath(path.toString());
-
-        return new EZIDRequest(uri.build(), username, password);
+        return new EZIDRequest(EZID_SCHEME, EZID_HOST, authority, username, password);
     }
 
     /**
@@ -86,14 +62,5 @@ public class EZIDRequestFactory
     public static void setEZID_HOST(String aEZID_HOST)
     {
         EZID_HOST = aEZID_HOST;
-    }
-
-    /**
-     * @param aEZID_PATH the EZID path to set
-     */
-    @Required
-    public static void setEZID_PATH(String aEZID_PATH)
-    {
-        EZID_PATH = aEZID_PATH;
     }
 }

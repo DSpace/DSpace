@@ -29,6 +29,8 @@ public class EZIDResponse
 {
     private static final Logger log = LoggerFactory.getLogger(EZIDResponse.class);
 
+    private static final String UTF_8 = "UTF-8";
+
     private final String status;
 
     private final String statusValue;
@@ -48,7 +50,7 @@ public class EZIDResponse
         String body;
         try
         {
-            body = EntityUtils.toString(responseBody, "UTF-8");
+            body = EntityUtils.toString(responseBody, UTF_8);
         } catch (IOException ex)
         {
             log.error(ex.getMessage());
@@ -83,10 +85,10 @@ public class EZIDResponse
             parts = lines[i].split(":", 2);
             String key = null, value = null;
             try {
-                key = URLDecoder.decode(parts[0], "UTF-8").trim();
+                key = URLDecoder.decode(parts[0], UTF_8).trim();
                 if (parts.length > 1)
                 {
-                    value = URLDecoder.decode(parts[1], "UTF-8").trim();
+                    value = URLDecoder.decode(parts[1], UTF_8).trim();
                 }
                 else
                 {
@@ -120,7 +122,7 @@ public class EZIDResponse
     }
 
     /**
-     * Value associated with the EZID status (identifier, error text, etc.)
+     * Value associated with the EZID status (identifier, error text, etc.).
      */
     public String getEZIDStatusValue()
     {

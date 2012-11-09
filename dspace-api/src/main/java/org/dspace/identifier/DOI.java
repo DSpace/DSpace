@@ -16,4 +16,5 @@ package org.dspace.identifier;
 public class DOI
         implements Identifier
 {
+    public static final String SCHEME = "doi:";
 }

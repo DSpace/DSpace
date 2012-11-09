@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,6 +24,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.dspace.identifier.DOI;
 import org.dspace.identifier.IdentifierException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,42 +38,63 @@ public class EZIDRequest
 {
     private static final Logger log = LoggerFactory.getLogger(EZIDRequest.class);
 
-    private URI url;
+    private static final String ID_PATH = "/ezid/id/" + DOI.SCHEME;
 
-    private AbstractHttpClient client;
+    private static final String SHOULDER_PATH = "/ezid/shoulder/" + DOI.SCHEME;
+
+    private static final String UTF_8 = "UTF-8";
+
+    private static final String MD_KEY_STATUS = "_status";
+
+    private final AbstractHttpClient client;
+
+    private final String scheme;
+
+    private final String host;
+
+    private final String authority;
 
     /**
      * Prepare a context for requests concerning a specific identifier or
      * authority prefix.
-     *
-     * @param url EZID API service point (and object) for this request.
+     * 
+     * @param scheme
+     * @param host
+     * @param authority DOI authority prefix.
      * @param username an EZID user identity.
-     * @param password user's password, or null for none.
+     * @param password user's password, or {@code null} for none.
+     * @throws URISyntaxException if host or authority is bad.
      */
-    EZIDRequest(URI url, String username, String password)
+    EZIDRequest(String scheme, String host, String authority, String username, String password)
             throws URISyntaxException
     {
-        this.url = url;
+        this.scheme = scheme;
+        this.host = host;
+        this.authority = authority;
         client = new DefaultHttpClient();
         if (null != username)
+        {
+            URI uri = new URI(scheme, host, null, null);
             client.getCredentialsProvider().setCredentials(
-                    new AuthScope(url.getHost(), url.getPort()),
+                    new AuthScope(uri.getHost(), uri.getPort()),
                     new UsernamePasswordCredentials(username, password));
+        }
     }
 
     /**
-     * Fetch an identifier's metadata.
+     * Fetch the metadata bound to an identifier.
      * 
-     * @return
      * @throws IdentifierException if the response is error or body malformed.
      * @throws IOException if the HTTP request fails.
+     * @throws URISyntaxException
      */
-    public EZIDResponse lookup()
-            throws IdentifierException, IOException
+    public EZIDResponse lookup(String name)
+            throws IdentifierException, IOException, URISyntaxException
     {
         // GET path
         HttpGet request;
-        request = new HttpGet(url);
+        URI uri = new URI(scheme, host, ID_PATH + authority + name, null);
+        request = new HttpGet(uri);
         HttpResponse response = client.execute(request);
         return new EZIDResponse(response);
     }
@@ -86,16 +107,17 @@ public class EZIDRequest
      * @param metadata ANVL-encoded key/value pairs.
      * @return
      */
-    public EZIDResponse create(Map<String, String> metadata)
-            throws IOException, IdentifierException
+    public EZIDResponse create(String name, Map<String, String> metadata)
+            throws IOException, IdentifierException, URISyntaxException
     {
         // PUT path [+metadata]
         HttpPut request;
-        request = new HttpPut(url);
+        URI uri = new URI(scheme, host, ID_PATH + authority + name, null);
+        request = new HttpPut(uri);
         if (null != metadata)
         {
             try {
-                request.setEntity(new StringEntity(formatMetadata(metadata), "UTF-8"));
+                request.setEntity(new StringEntity(formatMetadata(metadata), UTF_8));
             } catch (UnsupportedEncodingException ex) { /* SNH */ }
         }
         HttpResponse response = client.execute(request);
@@ -110,30 +132,30 @@ public class EZIDRequest
      * @return
      */
     public EZIDResponse mint(Map<String, String> metadata)
-            throws IOException, IdentifierException
+            throws IOException, IdentifierException, URISyntaxException
     {
         // POST path [+metadata]
         HttpPost request;
-        request = new HttpPost(url);
+        URI uri = new URI(scheme, host, SHOULDER_PATH + authority, null);
+        request = new HttpPost(uri);
         if (null != metadata)
         {
-            request.setEntity(new StringEntity(formatMetadata(metadata), "UTF-8"));
+            request.setEntity(new StringEntity(formatMetadata(metadata), UTF_8));
         }
         HttpResponse response = client.execute(request);
         EZIDResponse myResponse = new EZIDResponse(response);
-        // TODO add the identifier to the path for subsequent operations?
         return myResponse;
     }
 
     /**
-     * Alter the identifier's metadata.
+     * Alter the metadata bound to an identifier.
      *
-     * @param metadata fields to be altered. Leave a field's value empty to
-     *                 delete the field.
+     * @param metadata fields to be altered. Leave the value of a field's empty
+     *                 to delete the field.
      * @return
      */
-    public EZIDResponse modify(Map<String, String> metadata)
-            throws IOException, IdentifierException
+    public EZIDResponse modify(String name, Map<String, String> metadata)
+            throws IOException, IdentifierException, URISyntaxException
     {
         if (null == metadata)
         {
@@ -141,8 +163,9 @@ public class EZIDRequest
         }
         // POST path +metadata
         HttpPost request;
-        request = new HttpPost(url);
-        request.setEntity(new StringEntity(formatMetadata(metadata), "UTF-8"));
+        URI uri = new URI(scheme, host, ID_PATH + authority + name, null);
+        request = new HttpPost(uri);
+        request.setEntity(new StringEntity(formatMetadata(metadata), UTF_8));
         HttpResponse response = client.execute(request);
         return new EZIDResponse(response);
     }
@@ -150,12 +173,13 @@ public class EZIDRequest
     /**
      * Destroy a reserved identifier. Fails if ID was ever public.
      */
-    public EZIDResponse delete()
-            throws IOException, IdentifierException
+    public EZIDResponse delete(String name)
+            throws IOException, IdentifierException, URISyntaxException
     {
         // DELETE path
         HttpDelete request;
-        request = new HttpDelete(url);
+        URI uri = new URI(scheme, host, ID_PATH + authority + name, null);
+        request = new HttpDelete(uri);
         HttpResponse response = client.execute(request);
         return new EZIDResponse(response);
     }
@@ -163,12 +187,12 @@ public class EZIDRequest
     /**
      * Remove a public identifier from view.
      */
-    public EZIDResponse withdraw()
-            throws IOException, IdentifierException
+    public EZIDResponse withdraw(String name)
+            throws IOException, IdentifierException, URISyntaxException
     {
         Map<String, String> metadata = new HashMap<String, String>();
-        metadata.put("_status", "unavailable");
-        return modify(metadata);
+        metadata.put(MD_KEY_STATUS, "unavailable");
+        return modify(name, metadata);
     }
 
     /**
@@ -176,38 +200,39 @@ public class EZIDRequest
      *
      * @param reason annotation for the item's unavailability.
      */
-    public EZIDResponse withdraw(String reason)
-            throws IOException, IdentifierException
+    public EZIDResponse withdraw(String name, String reason)
+            throws IOException, IdentifierException, URISyntaxException
     {
-        String reasonEncoded = null;
-        try {
-            reasonEncoded = URLEncoder.encode(reason, "UTF-8");
-        } catch (UnsupportedEncodingException e) { /* XXX SNH */ }
         Map<String, String> metadata = new HashMap<String, String>();
-        metadata.put("_status", "unavailable | " + reasonEncoded);
-        return modify(metadata);
+        metadata.put(MD_KEY_STATUS, "unavailable | " + escape(reason));
+        return modify(name, metadata);
     }
 
     /**
      * Create ANVL-formatted name/value pairs from a Map.
      */
-    private String formatMetadata(Map<String, String> raw)
+    private static String formatMetadata(Map<String, String> raw)
     {
         StringBuilder formatted = new StringBuilder();
         for (Entry<String, String> entry : raw.entrySet())
-            formatted.append(entry.getKey())
+        {
+            formatted.append(escape(entry.getKey()))
                     .append(": ")
-                    .append(entry.getValue())
+                    .append(escape(entry.getValue()))
                     .append('\n');
-
-        // Body should be percent-encoded
-        String body = null;
-        try {
-            body = URLEncoder.encode(formatted.toString(), "UTF-8");
-        } catch (UnsupportedEncodingException ex) { // XXX SNH
-            log.error(ex.getMessage());
-        } finally {
-            return body;
         }
+
+        return formatted.toString();
+    }
+
+    /**
+     * Percent-encode a few EZID-specific characters.
+     */
+    private static String escape(String s)
+    {
+        return s.replace("%", "%25")
+                .replace("\n", "%0A")
+                .replace("\r", "%0D")
+                .replace(":", "%3A");
     }
 }
