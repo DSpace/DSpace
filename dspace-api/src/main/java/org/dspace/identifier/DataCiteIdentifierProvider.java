@@ -11,10 +11,11 @@ package org.dspace.identifier;
 import java.io.IOException;
 import java.net.*;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
@@ -60,15 +61,17 @@ public class DataCiteIdentifierProvider
     private static final Logger log = LoggerFactory.getLogger(DataCiteIdentifierProvider.class);
 
     // Configuration property names
-    private static final String CFG_SHOULDER = "identifier.doi.ezid.shoulder";
-    private static final String CFG_USER = "identifier.doi.ezid.user";
-    private static final String CFG_PASSWORD = "identifier.doi.ezid.password";
+    static final String CFG_SHOULDER = "identifier.doi.ezid.shoulder";
+    static final String CFG_USER = "identifier.doi.ezid.user";
+    static final String CFG_PASSWORD = "identifier.doi.ezid.password";
 
     // Metadata field name elements
     // XXX move these to MetadataSchema or some such
-    public static final String MD_SCHEMA_DSPACE = "dspace";
-    public static final String DSPACE_DOI_ELEMENT = "identifier";
-    public static final String DSPACE_DOI_QUALIFIER = "doi";
+    public static final String MD_SCHEMA = "dc";
+    public static final String DOI_ELEMENT = "identifier";
+    public static final String DOI_QUALIFIER = null;
+
+    private static final String DOI_SCHEME = "doi:";
 
     /** Map DataCite metadata into local metadata. */
     private static Map<String, String> crosswalk = new HashMap<String, String>();
@@ -88,7 +91,7 @@ public class DataCiteIdentifierProvider
         if (null == identifier)
             return false;
         else
-            return identifier.startsWith("doi:"); // XXX more thorough test?
+            return identifier.startsWith(DOI_SCHEME); // XXX more thorough test?
     }
 
     @Override
@@ -97,22 +100,20 @@ public class DataCiteIdentifierProvider
     {
         log.debug("register {}", dso);
 
-        Item item;
-
-        if (dso instanceof Item)
-            item = (Item)dso;
-        else
+        if (!(dso instanceof Item))
             throw new IdentifierException("Unsupported object type " + dso.getTypeText());
 
-        String id;
-        DCValue[] previous = item.getMetadata(MD_SCHEMA_DSPACE, DSPACE_DOI_ELEMENT, DSPACE_DOI_QUALIFIER, null);
-        if ((previous.length > 0) && (null != previous[0].value))
-            return previous[0].value;
+        Item item = (Item)dso;
+        DCValue[] identifiers = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        for (DCValue identifier : identifiers)
+            if ((null != identifier.value) && (identifier.value.startsWith(DOI_SCHEME)))
+                return identifier.value;
 
-        id = mint(context, item);
-        item.addMetadata(MD_SCHEMA_DSPACE, DSPACE_DOI_ELEMENT, DSPACE_DOI_QUALIFIER, null, id);
+        String id = mint(context, item);
+        item.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, id);
         try {
             item.update();
+            context.commit();
         } catch (SQLException ex) {
             throw new IdentifierException("New identifier not stored", ex);
         } catch (AuthorizeException ex) {
@@ -135,30 +136,29 @@ public class DataCiteIdentifierProvider
         }
 
         EZIDResponse response;
-        String doi = "unknown"; // In case we can't even build a name
         try {
-            doi = getShoulder() + identifier;
-            EZIDRequest request = requestFactory.getInstance(doi,
-                    getUser(), getPassword());
-            response = request.create(crosswalkMetadata(object));
+            EZIDRequest request = requestFactory.getInstance(loadAuthority(),
+                    loadUser(), loadPassword());
+            response = request.create(identifier, crosswalkMetadata(object));
         } catch (IdentifierException e) {
-            log.error("doi:{} not registered:  {}", doi, e.getMessage());
+            log.error("Identifier '{}' not registered:  {}", identifier, e.getMessage());
             return;
         } catch (IOException e) {
-            log.error("doi:{} not registered:  {}", doi, e.getMessage());
+            log.error("Identifier '{}' not registered:  {}", identifier, e.getMessage());
             return;
         } catch (URISyntaxException e) {
-            log.error("doi:{} not registered:  {}", doi, e.getMessage());
+            log.error("Identifier '{}' not registered:  {}", identifier, e.getMessage());
             return;
         }
 
         if (response.isSuccess())
         {
             Item item = (Item)object;
-            item.addMetadata(MD_SCHEMA_DSPACE, DSPACE_DOI_ELEMENT,
-                    DSPACE_DOI_QUALIFIER, null, identifier);
             try {
+                item.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
+                        idToDOI(identifier));
                 item.update();
+                context.commit();
                 log.info("registered {}", identifier);
             } catch (SQLException ex) {
                 // TODO throw new IdentifierException("New identifier not stored", ex);
@@ -166,12 +166,14 @@ public class DataCiteIdentifierProvider
             } catch (AuthorizeException ex) {
                 // TODO throw new IdentifierException("New identifier not stored", ex);
                 log.error("New identifier not stored", ex);
+            } catch (IdentifierException ex) {
+                log.error("New identifier not stored", ex);
             }
         }
         else
         {
-            log.error("doi:{} not registered -- EZID returned: {}", doi,
-                    response.getEZIDStatusValue());
+            log.error("Identifier '{}' not registered -- EZID returned: {}",
+                    identifier, response.getEZIDStatusValue());
         }
     }
 
@@ -182,29 +184,27 @@ public class DataCiteIdentifierProvider
         log.debug("reserve {}", identifier);
 
         EZIDResponse response;
-        String doi = "unknown"; // In case we can't even build a name
         try {
-            doi = getShoulder() + identifier;
-            EZIDRequest request = requestFactory.getInstance(doi,
-                    getUser(), getPassword());
+            EZIDRequest request = requestFactory.getInstance(loadAuthority(),
+                    loadUser(), loadPassword());
             Map<String, String> metadata = crosswalkMetadata(dso);
             metadata.put("_status", "reserved");
-            response = request.create(metadata);
+            response = request.create(identifier, metadata);
         } catch (IOException e) {
-            log.error("doi:{} not registered:  {}", doi, e.getMessage());
+            log.error("Identifier '{}' not registered:  {}", identifier, e.getMessage());
             return;
         } catch (URISyntaxException e) {
-            log.error("doi:{} not registered:  {}", doi, e.getMessage());
+            log.error("Identifier '{}' not registered:  {}", identifier, e.getMessage());
             return;
         }
 
         if (response.isSuccess())
         {
             Item item = (Item)dso;
-            item.addMetadata(MD_SCHEMA_DSPACE, DSPACE_DOI_ELEMENT,
-                    DSPACE_DOI_QUALIFIER, null, identifier);
+            item.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, idToDOI(identifier));
             try {
                 item.update();
+                context.commit();
                 log.info("reserved {}", identifier);
             } catch (SQLException ex) {
                 throw new IdentifierException("New identifier not stored", ex);
@@ -214,8 +214,8 @@ public class DataCiteIdentifierProvider
         }
         else
         {
-            log.error("doi:{} not registered -- EZID returned: {}", doi,
-                    response.getEZIDStatusValue());
+            log.error("Identifier '{}' not registered -- EZID returned: {}",
+                    identifier, response.getEZIDStatusValue());
         }
     }
 
@@ -228,7 +228,7 @@ public class DataCiteIdentifierProvider
         // Compose the request
         EZIDRequest request;
         try {
-            request = requestFactory.getInstance(getShoulder(), getUser(), getPassword());
+            request = requestFactory.getInstance(loadAuthority(), loadUser(), loadPassword());
         } catch (URISyntaxException ex) {
             log.error(ex.getMessage());
             throw new IdentifierException("DOI request not sent:  " + ex.getMessage());
@@ -239,8 +239,10 @@ public class DataCiteIdentifierProvider
         try
         {
             response = request.mint(crosswalkMetadata(dso));
-        } catch (IOException ex)
-        {
+        } catch (IOException ex) {
+            log.error("Failed to send EZID request:  {}", ex.getMessage());
+            throw new IdentifierException("DOI request not sent:  " + ex.getMessage());
+        } catch (URISyntaxException ex) {
             log.error("Failed to send EZID request:  {}", ex.getMessage());
             throw new IdentifierException("DOI request not sent:  " + ex.getMessage());
         }
@@ -278,27 +280,33 @@ public class DataCiteIdentifierProvider
     {
         log.debug("resolve {}", identifier);
 
-        try
-        {
-            ItemIterator found = Item.findByMetadataField(context, MD_SCHEMA_DSPACE, DSPACE_DOI_ELEMENT, DSPACE_DOI_QUALIFIER,
-                    identifier);
+        ItemIterator found;
+        try {
+            found = Item.findByMetadataField(context,
+                    MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER,
+                    idToDOI(identifier));
+        } catch (IdentifierException ex) {
+            log.error(ex.getMessage());
+            throw new IdentifierNotResolvableException(ex);
+        } catch (SQLException ex) {
+            log.error(ex.getMessage());
+            throw new IdentifierNotResolvableException(ex);
+        } catch (AuthorizeException ex) {
+            log.error(ex.getMessage());
+            throw new IdentifierNotResolvableException(ex);
+        } catch (IOException ex) {
+            log.error(ex.getMessage());
+            throw new IdentifierNotResolvableException(ex);
+        }
+        try {
             if (!found.hasNext())
-                throw new IdentifierNotFoundException("No Item bound to DOI " + identifier);
+                throw new IdentifierNotFoundException("No object bound to " + identifier);
             Item found1 = found.next();
             if (found.hasNext())
-                log.error("DOI {} multiply bound!", identifier);
+                log.error("More than one object bound to {}!", identifier);
             log.debug("Resolved to {}", found1);
             return found1;
-        } catch (SQLException ex)
-        {
-            log.error(ex.getMessage());
-            throw new IdentifierNotResolvableException(ex);
-        } catch (AuthorizeException ex)
-        {
-            log.error(ex.getMessage());
-            throw new IdentifierNotResolvableException(ex);
-        } catch (IOException ex)
-        {
+        } catch (SQLException ex) {
             log.error(ex.getMessage());
             throw new IdentifierNotResolvableException(ex);
         }
@@ -310,16 +318,21 @@ public class DataCiteIdentifierProvider
     {
         log.debug("lookup {}", object);
 
-        Item item;
         if (!(object instanceof Item))
             throw new IllegalArgumentException("Unsupported type " + object.getTypeText());
 
-        item = (Item)object;
-        DCValue[] metadata = item.getMetadata(MD_SCHEMA_DSPACE, DSPACE_DOI_ELEMENT, DSPACE_DOI_QUALIFIER, null);
-        if (metadata.length > 0)
+        Item item = (Item)object;
+        DCValue found = null;
+        for (DCValue candidate : item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null))
+            if (candidate.value.startsWith(DOI_SCHEME))
+            {
+                found = candidate;
+                break;
+            }
+        if (null != found)
         {
-            log.debug("Found {}", metadata[0].value);
-            return metadata[0].value;
+            log.debug("Found {}", found.value);
+            return found.value;
         }
         else
             throw new IdentifierNotFoundException(object.getTypeText() + " "
@@ -335,34 +348,62 @@ public class DataCiteIdentifierProvider
         if (!(dso instanceof Item))
             throw new IllegalArgumentException("Unsupported type " + dso.getTypeText());
 
-        String username = configurationService.getProperty(CFG_USER);
-        String password = configurationService.getProperty(CFG_PASSWORD);
-        if (null == username || null == password)
-            throw new IdentifierException("Unconfigured:  define " + CFG_USER
-                    + " and " + CFG_PASSWORD);
-
         Item item = (Item)dso;
 
         // delete from EZID
-        for (DCValue id : item.getMetadata(MD_SCHEMA_DSPACE, DSPACE_DOI_ELEMENT,
-                DSPACE_DOI_QUALIFIER, null))
+        DCValue[] metadata = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        List<String> remainder = new ArrayList<String>();
+        int skipped = 0;
+        for (DCValue id : metadata)
         {
+            if (!id.value.startsWith(DOI_SCHEME))
+            {
+                remainder.add(id.value);
+                continue;
+            }
+
             EZIDResponse response;
             try {
-                EZIDRequest request = requestFactory.getInstance(id.value, username, password);
-                response = request.delete();
+                EZIDRequest request = requestFactory.getInstance(loadAuthority(),
+                        loadUser(), loadPassword());
+                response = request.delete(DOIToId(id.value));
             } catch (URISyntaxException e) {
-                throw new IdentifierException("Bad URI in metadata value", e);
+                log.error("Bad URI in metadata value:  {}", e.getMessage());
+                remainder.add(id.value);
+                skipped++;
+                continue;
             } catch (IOException e) {
-                throw new IdentifierException("Failed request to EZID", e);
+                log.error("Failed request to EZID:  {}", e.getMessage());
+                remainder.add(id.value);
+                skipped++;
+                continue;
             }
             if (!response.isSuccess())
-                throw new IdentifierException("Unable to delete " + id.value
-                        + "from DataCite:  " + response.getEZIDStatusValue());
+            {
+                log.error("Unable to delete {} from DataCite:  {}", id.value,
+                        response.getEZIDStatusValue());
+                remainder.add(id.value);
+                skipped++;
+                continue;
+            }
+            log.info("Deleted {}", id.value);
         }
 
         // delete from item
-        item.clearMetadata(MD_SCHEMA_DSPACE, DSPACE_DOI_ELEMENT, DSPACE_DOI_QUALIFIER, null);
+        item.clearMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        item.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
+                remainder.toArray(new String[remainder.size()]));
+        try {
+            item.update();
+            context.commit();
+        } catch (SQLException e) {
+            log.error("Failed to re-add identifiers:  {}", e.getMessage());
+        } catch (AuthorizeException e) {
+            log.error("Failed to re-add identifiers:  {}", e.getMessage());
+        }
+
+        if (skipped > 0)
+            throw new IdentifierException(skipped + " identifiers could not be deleted.");
     }
 
     @Override
@@ -371,14 +412,98 @@ public class DataCiteIdentifierProvider
     {
         log.debug("delete {} from {}", identifier, dso);
 
-        throw new UnsupportedOperationException("Not supported yet."); // TODO implement delete(specific)
-        // TODO find metadata value == identifier
-        // TODO delete from EZID
+        if (!(dso instanceof Item))
+            throw new IllegalArgumentException("Unsupported type " + dso.getTypeText());
 
-        // TODO delete from item NOTE!!! can't delete single MD values!
+        Item item = (Item)dso;
+
+        DCValue[] metadata = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        List<String> remainder = new ArrayList<String>();
+        int skipped = 0;
+        for (DCValue id : metadata)
+        {
+            if (!id.value.equals(idToDOI(identifier)))
+            {
+                remainder.add(id.value);
+                continue;
+            }
+
+            EZIDResponse response;
+            try {
+                EZIDRequest request = requestFactory.getInstance(loadAuthority(),
+                        loadUser(), loadPassword());
+                response = request.delete(DOIToId(id.value));
+            } catch (URISyntaxException e) {
+                log.error("Bad URI in metadata value {}:  {}", id.value, e.getMessage());
+                remainder.add(id.value);
+                skipped++;
+                continue;
+            } catch (IOException e) {
+                log.error("Failed request to EZID:  {}", e.getMessage());
+                remainder.add(id.value);
+                skipped++;
+                continue;
+            }
+
+            if (!response.isSuccess())
+            {
+                log.error("Unable to delete {} from DataCite:  {}", id.value,
+                        response.getEZIDStatusValue());
+                remainder.add(id.value);
+                skipped++;
+                continue;
+            }
+            log.info("Deleted {}", id.value);
+        }
+
+        // delete from item
+        item.clearMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        item.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
+                remainder.toArray(new String[remainder.size()]));
+        try {
+            item.update();
+            context.commit();
+        } catch (SQLException e) {
+            log.error("Failed to re-add identifiers:  {}", e.getMessage());
+        } catch (AuthorizeException e) {
+            log.error("Failed to re-add identifiers:  {}", e.getMessage());
+        }
+
+        if (skipped > 0)
+            throw new IdentifierException(identifier + " could not be deleted.");
     }
 
-    private String getUser()
+    /**
+     * Format a naked identifier as a DOI with our configured authority prefix.
+     * 
+     * @throws IdentifierException if authority prefix is not configured.
+     */
+    String idToDOI(String id)
+            throws IdentifierException
+    {
+        return "doi:" + loadAuthority() + id;
+    }
+
+    /**
+     * Remove scheme and our configured authority prefix from a doi: URI string.
+     * @return naked local identifier.
+     * @throws IdentifierException if authority prefix is not configured.
+     */
+    String DOIToId(String DOI)
+            throws IdentifierException
+    {
+        String prefix = "doi:" + loadAuthority();
+        if (DOI.startsWith(prefix))
+            return DOI.substring(prefix.length());
+        else
+            return DOI;
+    }
+
+    /**
+     * Get configured value of EZID username.
+     * @throws IdentifierException 
+     */
+    private String loadUser()
             throws IdentifierException
     {
         String user = configurationService.getProperty(CFG_USER);
@@ -388,7 +513,11 @@ public class DataCiteIdentifierProvider
             throw new IdentifierException("Unconfigured:  define " + CFG_USER);
     }
 
-    private String getPassword()
+    /**
+     * Get configured value of EZID password.
+     * @throws IdentifierException 
+     */
+    private String loadPassword()
             throws IdentifierException
     {
         String password = configurationService.getProperty(CFG_PASSWORD);
@@ -398,7 +527,11 @@ public class DataCiteIdentifierProvider
             throw new IdentifierException("Unconfigured:  define " + CFG_PASSWORD);
     }
 
-    private String getShoulder()
+    /**
+     * Get configured value of EZID "shoulder".
+     * @throws IdentifierException 
+     */
+    private String loadAuthority()
             throws IdentifierException
     {
         String shoulder = configurationService.getProperty(CFG_SHOULDER);
@@ -426,21 +559,18 @@ public class DataCiteIdentifierProvider
                 for (DCValue value : values)
                     mapped.put(datum.getKey(), value.value);
         }
+
+        // TODO find a way to get a current direct URL to the object and set _target
+        // mapped.put("_target", url);
+
         return mapped;
     }
 
-    /**
-     * @param aCrosswalk the crosswalk to set
-     */
     @Required
     public void setCrosswalk(Map<String, String> aCrosswalk)
     {
         crosswalk = aCrosswalk;
     }
-
-    /**
-     * @param aRequestFactory the requestFactory to set
-     */
     @Required
     public static void setRequestFactory(EZIDRequestFactory aRequestFactory)
     {
