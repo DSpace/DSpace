@@ -180,6 +180,7 @@
 <%  }
 %>
 	<optgroup label="Repository">
+		<option value="dspacebasic" <%="dspacebasic".equals(searchScope)?"selected=\"selected\"":"" %>>All the repository</option>
 <%
     for (DSpaceObject dso : scopes)
     {
@@ -190,9 +191,9 @@
     }
 %>	</optgroup>
 	<optgroup label="CRIS">
-								<option value="researcherpages">Researcher profiles</option>
-								<option value="organizationunits">Organization Units</option>
-								<option value="projects">Projects</option>
+								<option value="researcherpages" <%="researcherpages".equals(searchScope)?"selected=\"selected\"":"" %>>Researcher profiles</option>
+								<option value="organizationunits" <%="organizationunits".equals(searchScope)?"selected=\"selected\"":"" %>>Organization Units</option>
+								<option value="projects" <%="projects".equals(searchScope)?"selected=\"selected\"":"" %>>Projects</option>
 	</optgroup>							
                                 </select><br/>
                                 <label for="query"><fmt:message key="jsp.search.results.searchfor"/></label>
