@@ -111,5 +111,11 @@
             <name>Ivan Másar</name>
             <email>helix84@centrum.sk</email>
         </developer>
+        <developer>
+            <name>Ariel J. Lira</name>
+            <email>arieljlira@gmail.com</email>
+            <organization>SeDiCI</organization>
+            <organizationUrl>http://sedici.unlp.edu.ar</organizationUrl>
+        </developer>
     </developers>
 </project>
