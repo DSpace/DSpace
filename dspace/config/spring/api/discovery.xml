@@ -42,8 +42,7 @@
                     the value-ref is a reference to an identifier of the DiscoveryConfiguration format
                     -->
                 <!--The default entry, DO NOT REMOVE the system requires this-->
-               <entry key="default" value-ref="defaultConfiguration" />
-
+               <entry key="default" value-ref="defaultConfiguration" />			   
                <!--Use site to override the default configuration for the home page & default discovery page-->
                <!--<entry key="site" value-ref="defaultConfiguration" />-->
                <!--<entry key="123456789/7621" value-ref="defaultConfiguration"/>-->
@@ -59,6 +58,7 @@
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
+                <ref bean="searchFilterObjectType" />
             </list>
         </property>
         <!--The search filters which can be used on the discovery search page-->
@@ -68,12 +68,7 @@
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
-                <ref bean="searchFilterProject" />
-                <ref bean="searchFilterOU" />
-                <ref bean="searchFilterRPDept" />
-                <ref bean="searchFilterRPWorkgroup" />
-                <ref bean="searchFilterProjectAgencies" />
-                <ref bean="searchFilterProjectPrincipalDept" />
+                <ref bean="searchFilterObjectType" />                
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -158,6 +153,55 @@
 
 
     <!--Search filter configuration beans-->
+    <bean id="searchFilterObjectName" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="objectname"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.title</value>
+                <value>crisrp.fullName</value>
+                <value>crisproject.title</value>
+                <value>crisou.name</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="searchFilterObjectPeople" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="objectpeople"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.contributor.*</value>
+                <value>crisrp.fullName</value>
+                <value>crisproject.investigator.fullName</value>
+                <value>crisproject.coinvestigators.fullName</value>
+                <value>crisou.director.fullName</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="searchFilterObjectOU" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="objectou"/>
+        <property name="metadataFields">
+            <list>
+                <value>crisitem.author.dept</value>
+                <value>crisrp.dept</value>
+                <value>crisproject.agencies</value>
+                <value>crisproject.workgroups</value>
+                <value>crisproject.investigator.dept</value>
+                <value>crisproject.coinvestigators.dept</value>
+                <value>crisou.affiliates</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="searchFilterObjectType" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="resourcetype"/>
+        <property name="metadataFields">
+            <list>
+            	<value>placeholder.placeholder.placeholder</value>
+            </list>
+        </property>
+    </bean>
+    
     <bean id="searchFilterTitle" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
         <property name="indexFieldName" value="title"/>
         <property name="metadataFields">
@@ -200,72 +244,6 @@
         <property name="type" value="date"/>
         <property name="sortOrder" value="VALUE"/>
     </bean>
-    
-    <bean id="searchFilterProject" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
-        <property name="indexFieldName" value="project"/>
-        <property name="metadataFields">
-            <list>
-                <value>dc.relation</value>                
-            </list>
-        </property>
-        <property name="facetLimit" value="10"/>
-        <property name="sortOrder" value="COUNT"/>
-    </bean>
-
-    <bean id="searchFilterOU" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
-        <property name="indexFieldName" value="orgunit"/>
-        <property name="metadataFields">
-            <list>
-                <value>dc.description.sponsorship</value>                
-            </list>
-        </property>
-        <property name="facetLimit" value="10"/>
-        <property name="sortOrder" value="COUNT"/>
-    </bean>
-
-    <bean id="searchFilterRPDept" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
-        <property name="indexFieldName" value="dept"/>
-        <property name="metadataFields">
-            <list>
-                <value>crisrp.dept</value>                
-            </list>
-        </property>
-        <property name="facetLimit" value="10"/>
-        <property name="sortOrder" value="COUNT"/>
-    </bean>
-  
-  	<bean id="searchFilterRPWorkgroup" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
-        <property name="indexFieldName" value="workgroup"/>
-        <property name="metadataFields">
-            <list>
-                <value>crisrp.workgroup</value>                
-            </list>
-        </property>
-        <property name="facetLimit" value="10"/>
-        <property name="sortOrder" value="COUNT"/>
-    </bean>
-
-  	<bean id="searchFilterProjectAgencies" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
-        <property name="indexFieldName" value="agencies"/>
-        <property name="metadataFields">
-            <list>
-                <value>crisproject.agencies</value>                
-            </list>
-        </property>
-        <property name="facetLimit" value="10"/>
-        <property name="sortOrder" value="COUNT"/>
-    </bean>
-                    
-  	<bean id="searchFilterProjectPrincipalDept" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
-        <property name="indexFieldName" value="principalinvestigator.dept"/>
-        <property name="metadataFields">
-            <list>
-                <value>crisproject.principalinvestigator.dept</value>                
-            </list>
-        </property>
-        <property name="facetLimit" value="10"/>
-        <property name="sortOrder" value="COUNT"/>
-    </bean>                           
 
     <!--Sort properties-->
     <bean id="sortTitle" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
@@ -276,5 +254,5 @@
         <property name="metadataField" value="dc.date.issued"/>
         <property name="type" value="date"/>
     </bean>
-    
+            
 </beans>

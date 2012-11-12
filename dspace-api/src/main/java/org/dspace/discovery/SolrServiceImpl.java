@@ -1138,6 +1138,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
 
                 doc.addField(field, value);
+                if (authority != null)
+                {
+                    doc.addField(field + "_authority", authority);
+                }
                 if (toProjectionFields.contains(field) || toProjectionFields.contains(unqualifiedField + "." + Item.ANY))
                 {
                     StringBuffer variantsToStore = new StringBuffer();
