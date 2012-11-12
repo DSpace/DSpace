@@ -33,14 +33,17 @@
                 </p>
                 <p style="font-size: smaller; text-align:right; padding-top: 15px;">
                     <i18n:text>xmlui.dri2xhtml.structural.footer-promotional2</i18n:text>
-                    <xsl:value-of select="$dryadrelease/release/version"/> 
-                    (<xsl:value-of select="$dryadrelease/release/date"/>)
+                    <xsl:value-of select="$dryadrelease/release/date"/> 
                     <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dryad'][@qualifier='node']">
                     	<i18n:text>xmlui.dri2xhtml.structureal.footer-node</i18n:text>
                     	<xsl:value-of
                                 select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dryad'][@qualifier='node']"/>
                     </xsl:if>
-                    
+                    <!--Commit hash in comment-->
+                    <xsl:comment>Commit Hash: 
+                        <xsl:value-of select="$dryadrelease/release/version"/>
+                    </xsl:comment>
+
                     <!--Invisible link to HTML sitemap (for search engines) -->
                     <a>
                         <xsl:attribute name="href">
