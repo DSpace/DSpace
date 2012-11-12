@@ -40,7 +40,7 @@
        <dependency>
         <groupId>org.dspace.dependencies.solr</groupId>
         <artifactId>dspace-solr-webapp</artifactId>
-        <version>1.4.0.1-SNAPSHOT</version>
+        <version>1.4.0.1</version>
         <classifier>skinny</classifier>
         <type>war</type>
     </dependency>
@@ -84,7 +84,7 @@
    	<dependency>
    		<groupId>org.dspace.dependencies.solr</groupId>
    		<artifactId>dspace-solr-webapp</artifactId>
-   		<version>1.4.0.1-SNAPSHOT</version>
+   		<version>1.4.0.1</version>
    		<classifier>classes</classifier>
         <type>jar</type>
    	</dependency>
