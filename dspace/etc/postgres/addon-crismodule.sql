@@ -1,3 +1,16 @@
+--   The contents of this file are subject to the license and copyright
+--   detailed in the LICENSE and NOTICE files at the root of the source
+--   tree and available online at
+--   
+--   https://github.com/CILEA/dspace-cris/wiki/License
+--
+-- SQL commands to upgrade the database schema of a live DSpace-CRIS
+-- to the DSpace 1.8 database schema
+--
+-- DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST.
+-- DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST.
+-- DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST.
+
 create table cris_organizationunit (id int4 not null, sourceID varchar(255) unique, status bool, uuid varchar(255) not null unique, timestampCreated timestamp, timestampLastModified timestamp, primary key (id));
 create table cris_ou_box (id int4 not null, collapsed bool not null, externalJSP varchar(255), priority int4 not null, shortName varchar(255) unique, title varchar(255), unrelevant bool not null, visibility int4, primary key (id));
 create table cris_ou_box2containable (cris_ou_box_id int4 not null, mask_id int4 not null);
