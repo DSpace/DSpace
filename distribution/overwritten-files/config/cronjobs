@@ -10,6 +10,9 @@
 # Mail the results to the sysadmin at 04:00
 2 4 * * 1  /var/dspace/bin/dspace checker-emailer -c
 
+#actualizo el indice de xoai
+1 9,12,15,19 * * *  /var/dspace/bin/dspace import > /dev/null
+
 #actualizo la lista de spiders ips                                           
 10 6 3 * * /var/dspace/bin/dspace/dspace stats-util -u && /var/dspace/bin/dspace/dspace stats-util -m  
 
