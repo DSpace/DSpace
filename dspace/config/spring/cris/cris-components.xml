@@ -30,6 +30,7 @@
 		class="it.cilea.hku.authority.webui.components.ItemsListComponent">
 		<property name="componentIdentifier" value="publicationlist" />
 		<property name="objectType" value="2" />
+		<property name="target" value="it.cilea.hku.authority.model.ResearcherPage" />
 		<property name="types">
 			<map>
 				<entry key="selected" value-ref="selectedComponent" />
@@ -128,6 +129,7 @@
 		class="it.cilea.hku.authority.webui.components.BrowseItemListComponent">
 		<property name="componentIdentifier" value="projectlist" />
 		<property name="objectType" value="10" />
+		<property name="target" value="it.cilea.hku.authority.model.ResearcherPage" />
 		<property name="types">
 			<map>
 				<entry key="selectedproject" value-ref="selectedProjectComponent" />
@@ -180,6 +182,7 @@
 		class="it.cilea.hku.authority.webui.components.ItemsListComponent">
 		<property name="componentIdentifier" value="publicationlistforproject" />
 		<property name="objectType" value="2" />
+		<property name="target" value="it.cilea.hku.authority.model.Project" />
 		<property name="types">
 			<map>
 				<entry key="selected" value-ref="selectedPublicationForProjectComponent" />				
@@ -225,6 +228,7 @@
 		class="it.cilea.hku.authority.webui.components.ItemsListComponent">
 		<property name="componentIdentifier" value="publicationlistforou" />
 		<property name="objectType" value="2" />
+		<property name="target" value="it.cilea.hku.authority.model.OrganizationUnit" />
 		<property name="types">
 			<map>
 				<entry key="selected" value-ref="selectedPublicationForOUComponent" />
@@ -325,6 +329,7 @@
 		class="it.cilea.hku.authority.webui.components.ItemsListComponent">
 		<property name="componentIdentifier" value="publicationlistforouviarp" />
 		<property name="objectType" value="2" />
+		<property name="target" value="it.cilea.hku.authority.model.OrganizationUnit" />
 		<property name="types">
 			<map>
 				<entry key="nestedrp" value-ref="nestedrpPublicationForOUComponent" />				
@@ -346,6 +351,7 @@
 		class="it.cilea.hku.authority.webui.components.BrowseItemListComponent">
 		<property name="componentIdentifier" value="personslist" />
 		<property name="objectType" value="9" />
+		<property name="target" value="it.cilea.hku.authority.model.OrganizationUnit" />
 		<property name="types">
 			<map>
 				<entry key="persons" value-ref="personsForOUComponent" />				
@@ -369,6 +375,7 @@
 		class="it.cilea.hku.authority.webui.components.BrowseItemListComponent">
 		<property name="componentIdentifier" value="projectlist" />
 		<property name="objectType" value="10" />
+		<property name="target" value="it.cilea.hku.authority.model.OrganizationUnit" />
 		<property name="types">
 			<map>
 				<entry key="selectedproject" value-ref="selectedProjectForOUComponent" />				
@@ -400,6 +407,7 @@
 		class="it.cilea.hku.authority.webui.components.BrowseItemListComponent">
 		<property name="componentIdentifier" value="projectlistprincipalforou" />
 		<property name="objectType" value="10" />
+		<property name="target" value="it.cilea.hku.authority.model.OrganizationUnit" />
 		<property name="types">
 			<map>
 				<entry key="deptproject" value-ref="deptProjectForOUComponent" />								
