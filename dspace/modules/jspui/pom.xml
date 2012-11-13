@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.dspace</groupId>
 		<artifactId>modules</artifactId>
-		<version>1.8.2</version>
+		<version>1.8.3-SNAPSHOT</version>
         <relativePath>..</relativePath>
 	</parent>
 
@@ -75,9 +75,9 @@
 	</profiles>
 
 	<scm>
-		<connection>scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.2</connection>
-		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.2</developerConnection>
-		<url>http://scm.dspace.org/svn/repo/tags/dspace-1.8.2</url>
+		<connection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace/modules/jspui</connection>
+		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace/modules/jspui</developerConnection>
+		<url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace/modules/jspui</url>
 	</scm>
 
 	<build>

@@ -95,6 +95,14 @@ public class Item extends DSpaceObject
      */
     private boolean modified;
 
+    
+    /**
+     * Empty constructor to allow Item proxing
+     */
+    protected Item()
+    {
+        
+    }
     /**
      * Construct an item with the given table row
      *
