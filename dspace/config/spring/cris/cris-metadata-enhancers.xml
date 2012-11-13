@@ -34,7 +34,7 @@
 		<property name="clazz">
 			<value>it.cilea.hku.authority.model.Project</value>
 		</property>
-		<property name="alias" value="coinvestigator" />
+		<property name="alias" value="coinvestigators" />
 		<property name="qualifiers2path">
 			<map>
 				<entry key="dept"><value>dept</value></entry>		
