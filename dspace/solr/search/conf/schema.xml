@@ -455,6 +455,18 @@
             <filter class="solr.TrimFilterFactory" />
         </analyzer>
     </fieldType>
+    
+   <fieldType name="resourcetype" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+      <analyzer>
+        <!-- KeywordTokenizer does no actual tokenizing, so the entire
+             input string is preserved as a single token
+          -->
+        <tokenizer class="solr.KeywordTokenizerFactory"/>
+        <filter class="solr.SynonymFilterFactory" synonyms="synresourcetype.txt" ignoreCase="false"
+          expand="false"/>  
+      </analyzer>
+    </fieldType>
+    
  </types>
 
 
@@ -517,6 +529,12 @@
    <copyField source="crisrp.translatedName" dest="crisauthoritylookup"/>
    <copyField source="crisproject.title" dest="crisauthoritylookup"/>
    <copyField source="crisou.name" dest="crisauthoritylookup"/>
+   
+    <!-- index for build a facet on the resource type -->
+   <field name="resourcetype_filter" type="resourcetype" indexed="true" stored="true" required="true" omitNorms="true" />
+   <field name="resourcetype_keyword" type="resourcetype" indexed="true" stored="true" required="true" omitNorms="true" />
+   <copyField source="search.resourcetype" dest="resourcetype_filter"/>
+   <copyField source="search.resourcetype" dest="resourcetype_keyword"/>
    
     <!-- Community and collection hierarchy of the Item of interest (candidate for hierarchical facetting ) -->
    <field name="location" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />

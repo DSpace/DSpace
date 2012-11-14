@@ -235,7 +235,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         request.setAttribute("sortOptions", sortOptions);
         
         DiscoverQuery queryArgs = DiscoverUtility.getDiscoverQuery(context,
-                request, scope, true);
+                request, scope, configurationName, true);
 
         List<DiscoverySearchFilterFacet> availableFacet = discoveryConfiguration
                 .getSidebarFacets();
