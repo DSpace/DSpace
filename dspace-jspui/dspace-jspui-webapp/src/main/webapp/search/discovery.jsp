@@ -69,7 +69,11 @@
 <%
     // Get the attributes
     DSpaceObject scope = (DSpaceObject) request.getAttribute("scope" );
-    String searchScope = scope!=null?scope.getHandle():"";
+    String searchScope = (String) request.getParameter("location" );
+    if (searchScope == null)
+    {
+        searchScope = "";
+    }
     List<DSpaceObject> scopes = (List<DSpaceObject>) request.getAttribute("scopes");
     List<String> sortOptions = (List<String>) request.getAttribute("sortOptions");
 
@@ -171,12 +175,12 @@
         // "all of DSpace" and the communities.
 %>
                                     <%-- <option selected value="/">All of DSpace</option> --%>
-                                    <option selected="selected" value="/"><fmt:message key="jsp.general.genericScope"/></option>
+                                    <option selected="selected" value="site"><fmt:message key="jsp.general.genericScope"/></option>
 <%  }
     else
     {
 %>
-									<option value="/"><fmt:message key="jsp.general.genericScope"/></option>
+									<option value="site"><fmt:message key="jsp.general.genericScope"/></option>
 <%  }
 %>
 	<optgroup label="Repository">
@@ -191,9 +195,9 @@
     }
 %>	</optgroup>
 	<optgroup label="CRIS">
-								<option value="researcherpages" <%="researcherpages".equals(searchScope)?"selected=\"selected\"":"" %>>Researcher profiles</option>
-								<option value="organizationunits" <%="organizationunits".equals(searchScope)?"selected=\"selected\"":"" %>>Organization Units</option>
-								<option value="projects" <%="projects".equals(searchScope)?"selected=\"selected\"":"" %>>Projects</option>
+								<option value="crisrp" <%="crisrp".equals(searchScope)?"selected=\"selected\"":"" %>>Researcher profiles</option>
+								<option value="crisou" <%="crisou".equals(searchScope)?"selected=\"selected\"":"" %>>Organization Units</option>
+								<option value="crisproject" <%="crisproject".equals(searchScope)?"selected=\"selected\"":"" %>>Projects</option>
 	</optgroup>							
                                 </select><br/>
                                 <label for="query"><fmt:message key="jsp.search.results.searchfor"/></label>
@@ -436,10 +440,10 @@ else if( qResults != null)
     long pageFirst   = ((Long)request.getAttribute("pagefirst"  )).longValue();
     
     // create the URLs accessing the previous and next search result pages
-    String baseURL =  request.getContextPath()
-                    + searchScope
+    String baseURL =  request.getContextPath()                    
                     + "/simple-search?query="
                     + URLEncoder.encode(query,"UTF-8")
+                    + "&amp;location="+ searchScope
                     + httpFilters
                     + "&amp;sort_by=" + sortedBy
                     + "&amp;order=" + order
@@ -684,10 +688,10 @@ if (pageTotal > pageCurrent)
 	    }
 	    if (currFp > 0)
 	    {
-	        %><li class="facet-previous"><a href="<%= request.getContextPath()
-	                + (searchScope!=""?"/handle/"+searchScope:"")
+	        %><li class="facet-previous"><a href="<%= request.getContextPath()	                
 	                + "/simple-search?query="
 	                + URLEncoder.encode(query,"UTF-8")
+	                + "&amp;location=" + searchScope
 	                + "&amp;sort_by=" + sortedBy
 	                + "&amp;order=" + order
 	                + "&amp;rpp=" + rpp
@@ -700,10 +704,10 @@ if (pageTotal > pageCurrent)
 	    { 
 	        if (idx == limit)
 	        {
-	            %><li class="facet-next"><a href="<%= request.getContextPath()
-	            + (searchScope!=""?"/handle/"+searchScope:"")
+	            %><li class="facet-next"><a href="<%= request.getContextPath()	            
                 + "/simple-search?query="
                 + URLEncoder.encode(query,"UTF-8")
+                + "&amp;location=" + searchScope
                 + "&amp;sort_by=" + sortedBy
                 + "&amp;order=" + order
                 + "&amp;rpp=" + rpp
@@ -716,9 +720,9 @@ if (pageTotal > pageCurrent)
 	        else if(!appliedFilterQueries.contains(f+"::"+fvalue.getFilterType()+"::"+fvalue.getAsFilterQuery()))
 	        {
 	        %><li><a href="<%= request.getContextPath()
-                + (searchScope!=""?"/handle/"+searchScope:"")
                 + "/simple-search?query="
                 + URLEncoder.encode(query,"UTF-8")
+                + "&amp;location=" + searchScope
                 + "&amp;sort_by=" + sortedBy
                 + "&amp;order=" + order
                 + "&amp;rpp=" + rpp
