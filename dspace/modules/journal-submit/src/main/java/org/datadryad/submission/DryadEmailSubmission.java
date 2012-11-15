@@ -434,6 +434,10 @@ public class DryadEmailSubmission extends HttpServlet {
                     }
                 }
 
+                // Stop reading lines at EndDryadContent
+                if(line.equals("EndDryadContent")) {
+                    break;
+                }
                 lines.add(line);
             }
         }
