@@ -281,10 +281,16 @@ public class DryadEmailSubmission extends HttpServlet {
             // server at this time  PEM 13 June 2011.
             //String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
             //File propFile = new File(journalPropFile);
+            if(!ConfigurationManager.isConfigured()) {
+                // not configured
+                // Get config parameter
+                String config = getServletContext().getInitParameter("dspace.config");
 
-            // Non-maven configuration
-            ServletContext context = getServletContext();
-            String cfgDir = context.getInitParameter("dspace.dir") + "/config";
+                // Load in DSpace config
+                ConfigurationManager.loadConfig(config);                
+            }
+
+            String cfgDir = ConfigurationManager.getProperty("dspace.dir") + System.getProperty("file.separator") + "config";
             File propFile = new File(cfgDir, PROPERTIES_FILENAME);
 
             if (!propFile.exists()) {
