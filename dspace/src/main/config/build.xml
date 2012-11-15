@@ -970,7 +970,7 @@ Common usage:
 
  You should also be able to access the administrator UI:
 
-   ${dspace.url}/dspace-admin
+ ${dspace.url}/admin/panel
 ====================================================================
         </echo>
 
