@@ -1839,7 +1839,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         DiscoverFilterQuery result = new DiscoverFilterQuery();
 
         StringBuilder filterQuery = new StringBuilder();
-        if(StringUtils.isNotBlank(field))
+        if(StringUtils.isNotBlank(field) && StringUtils.isNotEmpty(value))
         {
             filterQuery.append(field);
             if("equals".equals(operator))

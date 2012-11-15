@@ -220,7 +220,7 @@ public class DiscoverUtility
             String newFilterQuery = SearchUtils.getSearchService()
                     .toFilterQuery(context, f[0], f[1], f[2])
                     .getFilterQuery();
-            if (newFilterQuery != null)
+            if (StringUtils.isNotBlank(newFilterQuery))
             {
                 queryArgs.addFilterQueries(newFilterQuery);
                 userFilters.add(newFilterQuery);
