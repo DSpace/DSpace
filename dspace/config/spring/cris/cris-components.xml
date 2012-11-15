@@ -14,7 +14,7 @@
 
 
 	<!-- Components -->
-	<bean id="rpComponentsService" class="it.cilea.hku.authority.dspace.CrisComponentsService">
+	<bean id="rpComponentsService" class="org.dspace.app.cris.dspace.CrisComponentsService">
 		<property name="components">
 			<map>
 				<entry key="dspaceitems" value-ref="publicationlist" />
@@ -27,10 +27,10 @@
 		
 	<!-- Publication component for RP -->
 	<bean id="publicationlist"
-		class="it.cilea.hku.authority.webui.components.ItemsListComponent">
+		class="org.dspace.app.webui.cris.components.ItemsListComponent">
 		<property name="componentIdentifier" value="publicationlist" />
 		<property name="objectType" value="2" />
-		<property name="target" value="it.cilea.hku.authority.model.ResearcherPage" />
+		<property name="target" value="org.dspace.app.cris.model.ResearcherPage" />
 		<property name="types">
 			<map>
 				<entry key="selected" value-ref="selectedComponent" />
@@ -44,7 +44,7 @@
 	</bean>
 
 	<bean id="selectedComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="selected" />
 		<property name="query"><value>selected:{0}</value></property>
 		<property name="order"><value>asc</value></property>
@@ -52,7 +52,7 @@
 	</bean>
 	
 	<bean id="journalComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="journal" />
 		<property name="query"><value>author_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
@@ -66,7 +66,7 @@
 	</bean>
 	
 	<bean id="conferenceComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="conference" />
 		<property name="query"><value>author_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
@@ -80,7 +80,7 @@
 	</bean>
 	
 	<bean id="bookComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="book" />
 		<property name="query"><value>author_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
@@ -94,7 +94,7 @@
 	</bean>
 	
 	<bean id="patentComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="patent" />
 		<property name="query"><value>author_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
@@ -108,7 +108,7 @@
 	</bean>
 	
 	<bean id="otherComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="other" />
 		<property name="query"><value>author_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
@@ -126,10 +126,10 @@
 	
 	<!-- Project list for RP entity -->
 	<bean id="projectlist"
-		class="it.cilea.hku.authority.webui.components.BrowseItemListComponent">
+		class="org.dspace.app.webui.cris.components.BrowseItemListComponent">
 		<property name="componentIdentifier" value="projectlist" />
 		<property name="objectType" value="10" />
-		<property name="target" value="it.cilea.hku.authority.model.ResearcherPage" />
+		<property name="target" value="org.dspace.app.cris.model.ResearcherPage" />
 		<property name="types">
 			<map>
 				<entry key="selectedproject" value-ref="selectedProjectComponent" />
@@ -140,7 +140,7 @@
 	</bean>
 	
 	<bean id="selectedProjectComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="selectedproject" />
 		<property name="query"><value>selected:{0}</value></property>
 		<property name="order"><value>asc</value></property>
@@ -149,7 +149,7 @@
 	</bean>
 	
 	<bean id="investigatoredComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="investigatored" />
 		<property name="query"><value>crisproject.principalinvestigator:{0}</value></property>
 		<property name="order"><value>asc</value></property>
@@ -158,7 +158,7 @@
 	</bean>
 	
 	<bean id="coinvestigatoredComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="coinvestigatored" />
 		<property name="query"><value>crisproject.coinvestigators:{0}</value></property>
 		<property name="order"><value>asc</value></property>
@@ -168,7 +168,7 @@
 	
 	
 	<!-- Project Components -->
-	<bean id="projectComponentsService" class="it.cilea.hku.authority.dspace.CrisComponentsService">
+	<bean id="projectComponentsService" class="org.dspace.app.cris.dspace.CrisComponentsService">
 		<property name="components">
 			<map>
 				<entry key="dspaceitems" value-ref="publicationlistforproject" />				
@@ -179,10 +179,10 @@
 	
 	<!-- Publication list for Project entity -->
 	<bean id="publicationlistforproject"
-		class="it.cilea.hku.authority.webui.components.ItemsListComponent">
+		class="org.dspace.app.webui.cris.components.ItemsListComponent">
 		<property name="componentIdentifier" value="publicationlistforproject" />
 		<property name="objectType" value="2" />
-		<property name="target" value="it.cilea.hku.authority.model.Project" />
+		<property name="target" value="org.dspace.app.cris.model.Project" />
 		<property name="types">
 			<map>
 				<entry key="selected" value-ref="selectedPublicationForProjectComponent" />				
@@ -193,7 +193,7 @@
 	
 	
 	<bean id="selectedPublicationForProjectComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="selected" />
 		<property name="query"><value>selected:{0} and dc.relation_authority:{0}</value></property>
 		<property name="order"><value>asc</value></property>
@@ -201,7 +201,7 @@
 	</bean>
 	
 	<bean id="allPublicationForProjectComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="all" />
 		<property name="query"><value>dc.relation_authority:{0}</value></property>
 		<property name="order"><value>asc</value></property>
@@ -211,7 +211,7 @@
 	
 	
 	<!--  OU Components -->
-	<bean id="ouComponentsService" class="it.cilea.hku.authority.dspace.CrisComponentsService">
+	<bean id="ouComponentsService" class="org.dspace.app.cris.dspace.CrisComponentsService">
 		<property name="components">
 			<map>
 				<entry key="dspaceitems" value-ref="publicationlistforou" />
@@ -225,10 +225,10 @@
 	
 	<!-- Publication list for OU entity -->
 	<bean id="publicationlistforou"
-		class="it.cilea.hku.authority.webui.components.ItemsListComponent">
+		class="org.dspace.app.webui.cris.components.ItemsListComponent">
 		<property name="componentIdentifier" value="publicationlistforou" />
 		<property name="objectType" value="2" />
-		<property name="target" value="it.cilea.hku.authority.model.OrganizationUnit" />
+		<property name="target" value="org.dspace.app.cris.model.OrganizationUnit" />
 		<property name="types">
 			<map>
 				<entry key="selected" value-ref="selectedPublicationForOUComponent" />
@@ -243,7 +243,7 @@
 	
 	
 	<bean id="selectedPublicationForOUComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="selected" />
 		<property name="query"><value>selected:{0} and dc.description.sponsorship_authority:{0}</value></property>
 		<property name="order"><value>asc</value></property>
@@ -252,7 +252,7 @@
 		
 	
 	<bean id="journalForOUComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="journal" />
 		<property name="query"><value>dc.description.sponsorship_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
@@ -266,7 +266,7 @@
 	</bean>
 	
 	<bean id="conferenceForOUComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="conference" />
 		<property name="query"><value>dc.description.sponsorship_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
@@ -280,7 +280,7 @@
 	</bean>
 	
 	<bean id="bookForOUComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="book" />
 		<property name="query"><value>dc.description.sponsorship_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
@@ -294,7 +294,7 @@
 	</bean>
 	
 	<bean id="patentForOUComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="patent" />
 		<property name="query"><value>dc.description.sponsorship_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
@@ -308,7 +308,7 @@
 	</bean>
 	
 	<bean id="otherForOUComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="other" />
 		<property name="query"><value>dc.description.sponsorship_authority:{0} -hided:{0} -selected:{0}</value></property>
 		<property name="order"><value>desc</value></property>
@@ -326,10 +326,10 @@
 	
 	<!-- Publication list for OU entity via RP -->
 	<bean id="publicationlistforouviarp"
-		class="it.cilea.hku.authority.webui.components.ItemsListComponent">
+		class="org.dspace.app.webui.cris.components.ItemsListComponent">
 		<property name="componentIdentifier" value="publicationlistforouviarp" />
 		<property name="objectType" value="2" />
-		<property name="target" value="it.cilea.hku.authority.model.OrganizationUnit" />
+		<property name="target" value="org.dspace.app.cris.model.OrganizationUnit" />
 		<property name="types">
 			<map>
 				<entry key="nestedrp" value-ref="nestedrpPublicationForOUComponent" />				
@@ -339,7 +339,7 @@
 	
 	
 	<bean id="nestedrpPublicationForOUComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="nestedrp" />
 		<property name="query"><value>crisitem.author.dept:{0}</value></property>
 		<property name="order"><value>asc</value></property>
@@ -348,10 +348,10 @@
 	
 	<!-- Person list for OU entity -->
 	<bean id="personslist"
-		class="it.cilea.hku.authority.webui.components.BrowseItemListComponent">
+		class="org.dspace.app.webui.cris.components.BrowseItemListComponent">
 		<property name="componentIdentifier" value="personslist" />
 		<property name="objectType" value="9" />
-		<property name="target" value="it.cilea.hku.authority.model.OrganizationUnit" />
+		<property name="target" value="org.dspace.app.cris.model.OrganizationUnit" />
 		<property name="types">
 			<map>
 				<entry key="persons" value-ref="personsForOUComponent" />				
@@ -361,7 +361,7 @@
 	
 	
 	<bean id="personsForOUComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="persons" />
 		<property name="query"><value>crisrp.dept:{0}</value></property>
 		<property name="order"><value>asc</value></property>
@@ -372,10 +372,10 @@
 		
 	<!-- Project list for OU entity -->
 	<bean id="projectlistforou"
-		class="it.cilea.hku.authority.webui.components.BrowseItemListComponent">
+		class="org.dspace.app.webui.cris.components.BrowseItemListComponent">
 		<property name="componentIdentifier" value="projectlist" />
 		<property name="objectType" value="10" />
-		<property name="target" value="it.cilea.hku.authority.model.OrganizationUnit" />
+		<property name="target" value="org.dspace.app.cris.model.OrganizationUnit" />
 		<property name="types">
 			<map>
 				<entry key="selectedproject" value-ref="selectedProjectForOUComponent" />				
@@ -385,7 +385,7 @@
 	</bean>
 	
 	<bean id="selectedProjectForOUComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="selectedproject" />
 		<property name="query"><value>selected:{0}</value></property>
 		<property name="order"><value>asc</value></property>
@@ -394,7 +394,7 @@
 	</bean>
 	
 	<bean id="agenciesComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="agencies" />
 		<property name="query"><value>crisproject.agencies:{0}</value></property>
 		<property name="order"><value>asc</value></property>
@@ -404,10 +404,10 @@
 		
 	<!-- Principal Project list for OU entity -->	
 	<bean id="projectlistprincipalforou"
-		class="it.cilea.hku.authority.webui.components.BrowseItemListComponent">
+		class="org.dspace.app.webui.cris.components.BrowseItemListComponent">
 		<property name="componentIdentifier" value="projectlistprincipalforou" />
 		<property name="objectType" value="10" />
-		<property name="target" value="it.cilea.hku.authority.model.OrganizationUnit" />
+		<property name="target" value="org.dspace.app.cris.model.OrganizationUnit" />
 		<property name="types">
 			<map>
 				<entry key="deptproject" value-ref="deptProjectForOUComponent" />								
@@ -416,7 +416,7 @@
 	</bean>
 	
 	<bean id="deptProjectForOUComponent"
-		class="it.cilea.hku.authority.webui.components.BeanComponent">
+		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="deptproject" />
 		<property name="query"><value>crisproject.principalinvestigator.dept:{0}</value></property>
 		<property name="order"><value>asc</value></property>

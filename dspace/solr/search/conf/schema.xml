@@ -467,6 +467,17 @@
       </analyzer>
     </fieldType>
     
+     <fieldType name="resourcetypeAutocomplete" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+      <analyzer>
+        <!-- KeywordTokenizer does no actual tokenizing, so the entire
+             input string is preserved as a single token
+          -->
+        <tokenizer class="solr.KeywordTokenizerFactory"/>
+        <filter class="solr.SynonymFilterFactory" synonyms="synresourcetype.txt" ignoreCase="false"
+          expand="false"/>  
+        <filter class="solr.PatternReplaceFilterFactory" pattern="([^a-zA-Z])" replacement="$1//\L|||$2" replace="all"/>
+      </analyzer>
+    </fieldType>
  </types>
 
 
@@ -533,7 +544,7 @@
     <!-- index for build a facet on the resource type -->
    <field name="resourcetype_filter" type="resourcetype" indexed="true" stored="true" required="true" omitNorms="true" />
    <field name="resourcetype_keyword" type="resourcetype" indexed="true" stored="true" required="true" omitNorms="true" />
-   <field name="resourcetype_ac" type="resourcetype" indexed="true" stored="true" required="true" omitNorms="true" />
+   <field name="resourcetype_ac" type="resourcetypeAutocomplete" indexed="true" stored="true" required="true" omitNorms="true" />
    <copyField source="search.resourcetype" dest="resourcetype_filter"/>
    <copyField source="search.resourcetype" dest="resourcetype_keyword"/>
    <copyField source="search.resourcetype" dest="resourcetype_ac"/>

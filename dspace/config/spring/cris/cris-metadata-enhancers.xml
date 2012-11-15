@@ -13,7 +13,7 @@
 	<context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
 	<!-- CRIS Item enhanced metadata -->
-	<bean class="it.cilea.hku.authority.discovery.CrisItemEnhancer">
+	<bean class="org.dspace.app.cris.discovery.CrisItemEnhancer">
 		<property name="alias" value="author" />
 		<property name="metadata">
 			<list>
@@ -21,7 +21,7 @@
 			</list>
 		</property>
 		<property name="clazz">
-			<value>it.cilea.hku.authority.model.ResearcherPage</value>
+			<value>org.dspace.app.cris.model.ResearcherPage</value>
 		</property>
 		<property name="qualifiers2path">
 			<map>
@@ -30,9 +30,9 @@
 		</property>
 	</bean>
 	
-	<bean class="it.cilea.hku.authority.discovery.CrisEnhancer">
+	<bean class="org.dspace.app.cris.discovery.CrisEnhancer">
 		<property name="clazz">
-			<value>it.cilea.hku.authority.model.Project</value>
+			<value>org.dspace.app.cris.model.Project</value>
 		</property>
 		<property name="alias" value="coinvestigators" />
 		<property name="qualifiers2path">

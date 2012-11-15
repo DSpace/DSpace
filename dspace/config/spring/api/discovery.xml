@@ -30,7 +30,7 @@
     
     <!-- Additional indexing plugin to implement the CRIS browse system via SOLR -->
     <bean id="crisBrowseIndexer" scope="prototype"
-          class="it.cilea.hku.authority.discovery.CrisBrowseSolrIndexPlugin">
+          class="org.dspace.app.cris.discovery.CrisBrowseSolrIndexPlugin">
     </bean>
 
     <!--Bean that is used for mapping communities/collections to certain discovery configurations.-->
