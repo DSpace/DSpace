@@ -533,8 +533,10 @@
     <!-- index for build a facet on the resource type -->
    <field name="resourcetype_filter" type="resourcetype" indexed="true" stored="true" required="true" omitNorms="true" />
    <field name="resourcetype_keyword" type="resourcetype" indexed="true" stored="true" required="true" omitNorms="true" />
+   <field name="resourcetype_ac" type="resourcetype" indexed="true" stored="true" required="true" omitNorms="true" />
    <copyField source="search.resourcetype" dest="resourcetype_filter"/>
    <copyField source="search.resourcetype" dest="resourcetype_keyword"/>
+   <copyField source="search.resourcetype" dest="resourcetype_ac"/>
    
     <!-- Community and collection hierarchy of the Item of interest (candidate for hierarchical facetting ) -->
    <field name="location" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
