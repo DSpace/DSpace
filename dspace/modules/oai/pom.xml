@@ -28,7 +28,7 @@
                     <archiveClasses>false</archiveClasses>
                     <webResources>
                         <resource>
-                            <filtering>false</filtering>
+                            <filtering>true</filtering>
                             <directory>${basedir}/src/main/webapp</directory>
                             <includes>
                                     <include>WEB-INF/web.xml</include>
