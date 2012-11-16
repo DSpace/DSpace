@@ -94,9 +94,10 @@ Common usage:
     <!-- Load the configuration -->
     <property file="${config}" />
 
-    <!-- Timestamp date used when creating backup directories -->
+    <!-- Timestamp date used when creating backup directories and displaying build date -->
     <tstamp>
         <format property="build.date" pattern="yyyyMMdd-HHmmss" />
+        <format property="build.date.web" pattern="EEE, d MMM yyyy HH:mm:ss z"/>
     </tstamp>
 
 
@@ -709,6 +710,8 @@ Common usage:
             </filterchain>
         </copy>
 
+        <antcall target="update_version"/>
+
         <antcall target="build_webapps_wars"/>
 
     </target>
@@ -1013,4 +1016,20 @@ Common usage:
         <antcall target="update_geolite" />
     </target>
 
+    <!-- Creates version.xml based on git status -->
+	<target name="git_information" description="Store commit hash in ${git.revision}">
+		<exec executable="git" outputproperty="git.revision" failifexecutionfails="true" errorproperty="">
+			<arg value="rev-parse"/>
+			<arg value="HEAD"/>
+		</exec>
+	</target>
+    <target name="update_version" depends="git_information">
+    	<echo>Generating version.xml with version ${git.revision} on ${build.date.web}</echo>
+    	<echoxml file="${dspace.dir}/webapps/xmlui/themes/Dryad/meta/version.xml" append="false">
+<release>
+	<version>${git.revision}</version>
+	<date>${build.date.web}</date>
+</release>
+    	</echoxml>
+    </target>    
 </project>

@@ -2569,7 +2569,7 @@
 		and UNC <a class="footerLink" href="http://ils.unc.edu/mrc/">Metadata Research Center</a> in
 		collaboration with several <a class="footerLink" href="/partners">Partner
 		Organizations</a>.</message>
-	<message key="xmlui.dri2xhtml.structural.footer-promotional2">Dryad version </message>
+	<message key="xmlui.dri2xhtml.structural.footer-promotional2">Dryad built on </message>
 	<message key="xmlui.dri2xhtml.structureal.footer-node"> served by </message>
 
 	<message key="xmlui.dri2xhtml.structural.contact-link">Contact Us</message>
