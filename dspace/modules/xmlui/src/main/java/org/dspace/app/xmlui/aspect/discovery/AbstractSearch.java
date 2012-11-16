@@ -203,13 +203,21 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
                     if (resultDSO instanceof Item){
                         Item item =  (Item) resultDSO;
                         DCValue[] value = item.getMetadata("dc","identifier",null,Item.ANY) ;
-                        String doi = value[0].value;
-                        //httpResponse.sendRedirect("http://localhost:8091/handle/10255/dryad.484");
-                        String buildURL = baseURL+"/resource/"+doi;
-                        httpResponse.sendRedirect(buildURL);
+                        String buildURL = null;
+                        if(value!=null && value.length > 0){
+                            String doi = value[0].value;
+                            buildURL = baseURL+"/resource/"+doi;
+                        }
+                        else{
+                            if(item.getHandle()!=null)
+                                buildURL = baseURL+"/handle/"+item.getHandle();
+                        }
+                        if(buildURL!=null) {
+                            httpResponse.sendRedirect(buildURL);
+                            return;
+                        }
                     }
                 }
-                return;
             }
 
 
