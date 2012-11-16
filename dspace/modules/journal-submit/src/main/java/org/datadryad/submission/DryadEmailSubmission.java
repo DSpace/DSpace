@@ -8,7 +8,6 @@ import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -42,7 +41,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -68,8 +66,12 @@ public class DryadEmailSubmission extends HttpServlet {
 
     private static String EMAIL_TEMPLATE = "journal_submit_error";
 
-    // Not a concurrent map but we only access, don't write to except at init()
-    private static Map<String, PartnerJournal> myJournals;
+    // Maps not concurrent but we only access, don't write to except at init()
+    // map of Journal Codes to Journals
+    private static Map<String, PartnerJournal> myJournals; 
+    
+    // map of Journal Names to Journal Codes (in case code is not preent in submission)
+    private static Map<String, String> myJournalNames;
 
     /**
      * Handles the HTTP <code>GET</code> method by informing the caller that
@@ -181,16 +183,16 @@ public class DryadEmailSubmission extends HttpServlet {
                 Format format = Format.getPrettyFormat();
                 XMLOutputter toFile = new XMLOutputter(format);
                 Document doc = saxBuilder.build(xmlReader);
-                String journalName = result.getJournalName();
+                String journalCode = result.getJournalCode();
 
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Getting metadata dir for " + journalName);
+                    LOGGER.debug("Getting metadata dir for " + journalCode);
                 }
 
-                PartnerJournal journal = myJournals.get(journalName);
+                PartnerJournal journal = myJournals.get(journalCode);
 
                 if (journal == null ) {
-                    throw new SubmissionRuntimeException("Journal (" + journalName + ") not properly registered");
+                    throw new SubmissionRuntimeException("Journal (" + journalCode + ") not properly registered");
                 }
 
                 File dir = journal.getMetadataDir();
@@ -358,6 +360,8 @@ public class DryadEmailSubmission extends HttpServlet {
 
         // Returns validated map or throws an exception if there are problems
         myJournals = validate(journals);
+        // Returns a mapping of Journal Names to Journal Codes
+        myJournalNames = mapJournalNamesToCodes(journals);
     }
 
     /**
@@ -412,6 +416,7 @@ public class DryadEmailSubmission extends HttpServlet {
         List<String> lines = new ArrayList<String>();
         Scanner emailScanner = new Scanner(aMessage);
         String journalName = null;
+        String journalCode = null;
 
         while (emailScanner.hasNextLine()) {
             String line = emailScanner.nextLine();
@@ -424,11 +429,22 @@ public class DryadEmailSubmission extends HttpServlet {
                 continue;
             }
             else {
-                Pattern p = Pattern.compile("^(JOURNAL|Journal Name):(.+)");
-                Matcher m = p.matcher(line);
+                Pattern journalCodePattern = Pattern.compile("^(Journal Code):(.+)");
+                Matcher journalCodeMatcher = journalCodePattern.matcher(line);
 
-                if (m.find()) {
-                    journalName = StringUtils.stripToEmpty(m.group(2));
+                if(journalCodeMatcher.find()) {
+                    journalCode = StringUtils.stripToEmpty(journalCodeMatcher.group(2));
+                    // strip out leading NBSP if present
+                    if (journalCode.codePointAt(0) == 160){
+                        journalCode = journalCode.substring(1);
+                    }
+                }
+                
+                Pattern journalNamePattern = Pattern.compile("^(JOURNAL|Journal Name):(.+)");
+                Matcher journalNameMatcher = journalNamePattern.matcher(line);
+
+                if (journalNameMatcher.find()) {
+                    journalName = StringUtils.stripToEmpty(journalNameMatcher.group(2));
                     if (journalName.codePointAt(0) == 160){          //Journal of Heredity has started inserting NBSP in several fields, including journal title
                         journalName = journalName.substring(1);
                     }
@@ -442,48 +458,71 @@ public class DryadEmailSubmission extends HttpServlet {
             }
         }
 
-        if (journalName != null) {
-            PartnerJournal journal = myJournals.get(journalName);
+        // After reading the entire message, attempt to find the PartnerJournal object by
+        // Journal Code.  If Journal Code is not present, fall back to Journal Name
+        if(journalCode == null) {
+            LOGGER.debug("Journal Code not found in message, trying by journal name: " + journalName);
+            if(journalName != null) {
+                journalCode = myJournalNames.get(journalName);
+            } else {
+                throw new SubmissionException("Journal Code not present and Journal Name not found in message");
+            }
+            if(journalCode == null) {
+                throw new SubmissionException("Journal Name " + journalName + " did not match a known Journal Code");
+            }
+        }
+        
+        if (journalCode != null) {
+            PartnerJournal journal = myJournals.get(journalCode);
             if (journal != null){
                 EmailParser parser = journal.getParser();
                 ParsingResult result = parser.parseMessage(lines);
 
-                // We use journal name to determine to which directory to write
+                result.setJournalCode(journalCode);
                 result.setJournalName(journalName);
 
                 return result;
             }
             else {
-                throw new SubmissionException("Journal " + journalName + " not found in configuration");
+                throw new SubmissionException("Journal " + journalCode + " not found in configuration");
             }
         }
         else {
-            throw new SubmissionException("Journal name not found in message");
+            throw new SubmissionException("Journal code not found in message");
         }
     }
 
     private Map<String, PartnerJournal> validate(
             Map<String, PartnerJournal> aJournalMap) {
         Map<String, PartnerJournal> results = new HashMap<String, PartnerJournal>();
-        Iterator<PartnerJournal> iterator = aJournalMap.values().iterator();
 
-        while (iterator.hasNext()) {
-            PartnerJournal journal = iterator.next();
-
+        for (String journalCode : aJournalMap.keySet()) {
+            PartnerJournal journal = aJournalMap.get(journalCode);
             if (!journal.isComplete()) {
                 throw new SubmissionRuntimeException(journal.getName()
                         + "'s configuration isn't complete");
             }
             else {
                 // now store our metadata by the journal name instead of code
-                results.put(journal.getName(), journal);
+                results.put(journalCode, journal);
             }
 
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Registered journal: " + journal.toString());
             }
         }
+        
+        return results;
+    }
 
+    private Map<String, String> mapJournalNamesToCodes(
+            Map<String, PartnerJournal> aJournalMap) {
+        Map<String, String> results = new HashMap<String, String>();
+
+        for (String journalCode : aJournalMap.keySet()) {
+            PartnerJournal journal = aJournalMap.get(journalCode);
+            results.put(journal.getName(), journalCode);
+        }
         return results;
     }
 
