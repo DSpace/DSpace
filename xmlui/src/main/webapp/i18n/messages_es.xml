@@ -1938,7 +1938,7 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 <message key="xmlui.dri2xhtml.METS-1.0.tesis-info">Información de la Tesis</message>
 <message key="xmlui.dri2xhtml.METS-1.0.general-info">Información general</message>
 
-<message key="xmlui.dri2xhtml.METS-1.0.item-date-available">Disponible en SeDiCI - UNLP desde</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-date-available">Disponible en SeDiCI desde</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-date-accessioned">Creado el</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-title-subtitle">Subtítulo</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-embargo-liftDate">Fecha fin de embargo</message>
