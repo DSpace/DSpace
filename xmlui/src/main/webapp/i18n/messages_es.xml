@@ -864,7 +864,7 @@
 	<message key="xmlui.administrative.Navigation.context_head">Contexto</message>
 <message key="xmlui.administrative.Navigation.context_edit_item">Administrar Item</message>
 <message key="xmlui.administrative.Navigation.context_edit_collection">Editar colección</message>
-<message key="xmlui.administrative.Navigation.context_item_mapper">ASIGNADOR DE COLECCIONES</message>
+<message key="xmlui.administrative.Navigation.context_item_mapper">Asignador de colecciones</message>
 <message key="xmlui.administrative.Navigation.context_edit_community">Editar comunidad</message>
 <message key="xmlui.administrative.Navigation.context_create_collection">Crear colección</message>
 <message key="xmlui.administrative.Navigation.context_create_subcommunity">Crear subcomunidad</message>
@@ -1488,12 +1488,12 @@
 <message key="xmlui.administrative.metadataimport.MetadataImportUpload.hint">Los cambios pendientes se relacionan a continuación para su revisión</message>
 
 	<!-- general mapper messages -->
-<message key="xmlui.administrative.mapper.general.mapper_trail">ASIGNADOR DE COLECCIONES</message>
+<message key="xmlui.administrative.mapper.general.mapper_trail">Asignador de colecciones</message>
 
 
 	<!-- org.dspace.app.xmlui.administrative.mapper.MapperMain -->
-<message key="xmlui.administrative.mapper.MapperMain.title">ASIGNADOR DE COLECCIONES</message>
-<message key="xmlui.administrative.mapper.MapperMain.head1">ASIGNADOR DE COLECCIONES - Asigne un item a esta colección</message>
+<message key="xmlui.administrative.mapper.MapperMain.title">Asignador de colecciones</message>
+<message key="xmlui.administrative.mapper.MapperMain.head1">Asignador de colecciones - Asigne un item a esta colección</message>
 <message key="xmlui.administrative.mapper.MapperMain.para1">Colección: "<strong>{0}</strong>"</message>
 <message key="xmlui.administrative.mapper.MapperMain.para2">Esta es la función que permite a los administradores asignar un item a otra colección sin moverlo de su colección original. Recuerde que para utilizarlo debe ingresar a la colección a la cual quiere asignar el item (colección de destino), no a la colección de origen del item. Aquí también puede ver la lista de items que ya están asignados a esta colección.
 
