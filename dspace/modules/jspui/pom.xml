@@ -16,6 +16,11 @@
         <relativePath>..</relativePath>
     </parent>
 
+    <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/../../..</root.basedir>
+    </properties>
+
     <profiles>
         <profile>
             <id>oracle-support</id>
@@ -36,7 +41,8 @@
     
     <build>
         <filters>
-            <filter>${basedir}/../../../${filters.file}</filter>
+            <!-- Filter using the properties file defined by dspace-parent POM -->
+            <filter>${filters.file}</filter>
         </filters>
         <plugins>
             <plugin>
