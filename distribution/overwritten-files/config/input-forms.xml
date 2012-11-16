@@ -336,7 +336,7 @@
 					<dc-qualifier>period</dc-qualifier>
 					<label>Período de Embargo</label>
 					<input-type value-pairs-name="embargo_periods">dropdown</input-type>
-					<hint>Si usted desea que su obra sea embargada, debe indicarlo aquí seleccionando el período apropiado. Luego deberá concurrir al SeDiCI para completar y firmar el formulario de solicitud de embargo</hint>
+					<hint>Seleccione el período de embargo que se aplicará sobre la obra</hint>
 				    <visibility>workflow</visibility>
 				</field>
 
@@ -733,7 +733,7 @@
 					<dc-element>note</dc-element>
 					<label>Notas</label>
 					<input-type>textarea</input-type>
-					<hint>Si usted desea que su obra sea embargada, debe indicarlo aquí seleccionando el período apropiado. Luego deberá adjuntar nota escrita en la que se justifique debidamente dicho pedido.</hint>
+					<hint>Si usted desea que su obra sea embargada debe indicarlo aquí. El período de embargo se contabiliza a partir de la fecha de presentación de la tesis o trabajo y puede abarcar desde tres (3) meses hasta un máximo de veinticuatro (24) meses. Indique por favor un período dentro de ese rango. Luego, deberá adjuntar una nota escrita en la que se justifique debidamente la solicitud de embargo para su obra.</hint>
 				</field>
 
 			</page>
