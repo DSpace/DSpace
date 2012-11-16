@@ -514,9 +514,11 @@
 					</xsl:if>
 			
 					<!-- fulltext row -->
-					<li class="metadata fulltext">
-						<i18n:text>xmlui.dri2xhtml.METS-1.0.item-<xsl:value-of select="dim:field[@element='fulltext']"/>-fulltext</i18n:text>
-					</li>
+					<xsl:if test="dim:field[@element='fulltext']">
+						<li class="metadata fulltext">
+							<i18n:text>xmlui.dri2xhtml.METS-1.0.item-<xsl:value-of select="dim:field[@element='fulltext']"/>-fulltext</i18n:text>
+						</li>
+					</xsl:if>
 				</ul>
 			</div>
 		</xsl:if>
