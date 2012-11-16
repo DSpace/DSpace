@@ -39,8 +39,9 @@
                     	<xsl:value-of
                                 select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dryad'][@qualifier='node']"/>
                     </xsl:if>
-                    <!--Commit hash in comment-->
-                    <xsl:comment>Commit Hash: 
+                    <xsl:text>&#10;</xsl:text>
+                    <!--Git Commit hash rendered in HTML comment-->
+                    <xsl:comment>Git Commit Hash: 
                         <xsl:value-of select="$dryadrelease/release/version"/>
                     </xsl:comment>
 
