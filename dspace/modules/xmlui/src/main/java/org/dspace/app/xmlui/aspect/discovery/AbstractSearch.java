@@ -8,6 +8,8 @@
 package org.dspace.app.xmlui.aspect.discovery;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
@@ -25,11 +27,13 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.*;
 import org.dspace.sort.SortOption;
 import org.xml.sax.SAXException;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -189,6 +193,33 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
                 queryResults.getResults().getNumFound() > 0) {
 
             SolrDocumentList solrResults = queryResults.getResults();
+
+            if(solrResults.size()==1){
+                HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+
+                String baseURL = ConfigurationManager.getProperty("dspace.baseUrl");
+                for (SolrDocument doc : solrResults) {
+                    DSpaceObject resultDSO = SearchUtils.findDSpaceObject(context, doc);
+                    if (resultDSO instanceof Item){
+                        Item item =  (Item) resultDSO;
+                        DCValue[] value = item.getMetadata("dc","identifier",null,Item.ANY) ;
+                        String buildURL = null;
+                        if(value!=null && value.length > 0){
+                            String doi = value[0].value;
+                            buildURL = baseURL+"/resource/"+doi;
+                        }
+                        else{
+                            if(item.getHandle()!=null)
+                                buildURL = baseURL+"/handle/"+item.getHandle();
+                        }
+                        if(buildURL!=null) {
+                            httpResponse.sendRedirect(buildURL);
+                            return;
+                        }
+                    }
+                }
+            }
+
 
             // Pagination variables.
             int itemsTotal = (int) solrResults.getNumFound();
