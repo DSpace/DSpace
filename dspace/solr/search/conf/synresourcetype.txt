@@ -1,6 +1,6 @@
-2 => Items
-3 => Collections
-4 => Communities
-9 => Researchers
-10 => Projects
-11 => OrgUnits
+2 => items|||Items
+3 => collections|||Collections
+4 => communities|||Communities
+9 => researchers|||Researchers
+10 => projects|||Projects
+11 => orgunits|||OrgUnits

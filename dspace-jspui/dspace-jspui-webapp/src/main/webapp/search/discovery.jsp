@@ -48,7 +48,7 @@
 <%@page import="org.dspace.discovery.DiscoverResult"%>
 <%@page import="org.dspace.content.DSpaceObject"%>
 <%@page import="java.util.List"%>
-<%@page import="it.cilea.hku.authority.model.ACrisObject" %>
+<%@page import="org.dspace.app.cris.model.ACrisObject" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"

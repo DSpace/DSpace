@@ -14,7 +14,7 @@
 
 
 	<!-- Components -->
-	<bean id="rpComponentsService" class="org.dspace.app.cris.dspace.CrisComponentsService">
+	<bean id="rpComponentsService" class="org.dspace.app.cris.integration.CrisComponentsService">
 		<property name="components">
 			<map>
 				<entry key="dspaceitems" value-ref="publicationlist" />
@@ -168,7 +168,7 @@
 	
 	
 	<!-- Project Components -->
-	<bean id="projectComponentsService" class="org.dspace.app.cris.dspace.CrisComponentsService">
+	<bean id="projectComponentsService" class="org.dspace.app.cris.integration.CrisComponentsService">
 		<property name="components">
 			<map>
 				<entry key="dspaceitems" value-ref="publicationlistforproject" />				
@@ -211,7 +211,7 @@
 	
 	
 	<!--  OU Components -->
-	<bean id="ouComponentsService" class="org.dspace.app.cris.dspace.CrisComponentsService">
+	<bean id="ouComponentsService" class="org.dspace.app.cris.integration.CrisComponentsService">
 		<property name="components">
 			<map>
 				<entry key="dspaceitems" value-ref="publicationlistforou" />
