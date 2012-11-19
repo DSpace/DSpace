@@ -454,6 +454,7 @@ public class ItemUpdate {
     		catch(Exception e)
     		{
     			pr("Exception processing item " + dirname + ": " + e.toString());
+                e.printStackTrace();
     		}
         }  
         
