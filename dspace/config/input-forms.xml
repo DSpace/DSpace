@@ -44,7 +44,7 @@
          <dc-qualifier>author</dc-qualifier>
          <repeatable>true</repeatable>
          <label>Authors</label>
-         <input-type>onebox</input-type>
+         <input-type>name</input-type>
          <hint>Enter the names of the authors of this item below.</hint>
          <required></required>
        </field>
@@ -220,7 +220,7 @@ it, please enter the types and the actual numbers or codes below.</hint>
          <dc-qualifier>author</dc-qualifier>
          <repeatable>true</repeatable>
          <label>One: Authors</label>
-                 <input-type>name</input-type>
+         <input-type>name</input-type>
          <hint>Enter the names of the authors of this item below.</hint>
          <required></required>
        </field>

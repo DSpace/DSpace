@@ -95,7 +95,13 @@ public class SearchUtils {
         if(!result.containsKey(configuration.getId())){
             result.put(configuration.getId(), configuration);
         }
-
+        
+        //Add special dspacebasic discoveryConfiguration
+        DiscoveryConfiguration configurationExtra = getDiscoveryConfigurationByName("dspacebasic");
+        if(!result.containsKey(configurationExtra.getId())){
+            result.put(configurationExtra.getId(), configurationExtra);
+        }
+        
         return Arrays.asList(result.values().toArray(new DiscoveryConfiguration[result.size()]));
     }
 

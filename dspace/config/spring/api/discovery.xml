@@ -55,7 +55,7 @@
     </bean>
 
     <!--The default configuration settings for discovery-->
-        <bean id="defaultConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+    <bean id="defaultConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">        
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>
@@ -152,7 +152,8 @@
         </property>
     </bean>
     
-    <bean id="dspaceConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+    <bean id="dspaceConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">    	
+    	<property name="id" value="dspaceConfiguration"/>
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>
@@ -252,7 +253,8 @@
     </bean>
 
 
-<bean id="crisRPConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+<bean id="crisRPConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">		
+		<property name="id" value="crisRPConfiguration"/>
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>
@@ -346,7 +348,8 @@
         </property>
     </bean>
 
-<bean id="crisPJConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+	<bean id="crisPJConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">		
+		<property name="id" value="crisPJConfiguration"/>
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>
@@ -453,6 +456,7 @@
     </bean>
     
     <bean id="crisOUConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+    	<property name="id" value="crisOUConfiguration"/>
         <!--Which sidebar facets are to be displayed -->
         <property name="sidebarFacets">
             <list>
