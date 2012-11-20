@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
 
 import org.jdom.Document;
 import org.jdom.JDOMException;
@@ -42,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
@@ -59,8 +61,6 @@ public class DryadEmailSubmission extends HttpServlet {
 
     private static Logger LOGGER = LoggerFactory
     .getLogger(DryadEmailSubmission.class);
-
-    private static String PROPERTIES_FILENAME = "DryadJournalSubmission.properties";
 
     private static String PROPERTIES_PROPERTY = "dryad.properties.filename";
 
@@ -279,10 +279,6 @@ public class DryadEmailSubmission extends HttpServlet {
         }
         // Otherwise, we're running in the standard DSpace Tomcat
         else {
-            // These lines support reading configuration from maven, which isn't fully set up for the journal-submission
-            // server at this time  PEM 13 June 2011.
-            //String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
-            //File propFile = new File(journalPropFile);
             if(!ConfigurationManager.isConfigured()) {
                 // not configured
                 // Get config parameter
@@ -291,9 +287,8 @@ public class DryadEmailSubmission extends HttpServlet {
                 // Load in DSpace config
                 ConfigurationManager.loadConfig(config);                
             }
-
-            String cfgDir = ConfigurationManager.getProperty("dspace.dir") + System.getProperty("file.separator") + "config";
-            File propFile = new File(cfgDir, PROPERTIES_FILENAME);
+            String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
+            File propFile = new File(journalPropFile);
 
             if (!propFile.exists()) {
                 throw new SubmissionException("Can't find properties file: "
@@ -307,9 +302,6 @@ public class DryadEmailSubmission extends HttpServlet {
                 throw new SubmissionException(details);
             }
 
-            //if (LOGGER.isDebugEnabled()) {
-            //	LOGGER.debug("Using properties from {}", journalPropFile);
-            //}
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Using properties from {}",propFile);
             }
@@ -381,7 +373,7 @@ public class DryadEmailSubmission extends HttpServlet {
                 StringBuilder message = new StringBuilder(exceptionMessage);
                 String admin = ConfigurationManager.getProperty("mail.admin");
                 String logDir = ConfigurationManager.getProperty("log.dir");
-                Email email = ConfigurationManager.getEmail(EMAIL_TEMPLATE);
+                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), EMAIL_TEMPLATE));
 
                 if (logDir == null || admin == null) {
                     throw new SubmissionException(
