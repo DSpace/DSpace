@@ -151,7 +151,7 @@
 	<bean id="investigatoredComponent"
 		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="investigatored" />
-		<property name="query"><value>crisproject.principalinvestigator:{0}</value></property>
+		<property name="query"><value>crisproject.principalinvestigator_authority:{0}</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>5</value></property>		
@@ -160,7 +160,7 @@
 	<bean id="coinvestigatoredComponent"
 		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="coinvestigatored" />
-		<property name="query"><value>crisproject.coinvestigators:{0}</value></property>
+		<property name="query"><value>crisproject.coinvestigators_authority:{0}</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>5</value></property>		
@@ -195,7 +195,7 @@
 	<bean id="selectedPublicationForProjectComponent"
 		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="selected" />
-		<property name="query"><value>selected:{0} and dc.relation_authority:{0}</value></property>
+		<property name="query"><value>selected:{0} AND dc.relation_authority:{0}</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>		
 	</bean>
@@ -245,7 +245,7 @@
 	<bean id="selectedPublicationForOUComponent"
 		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="selected" />
-		<property name="query"><value>selected:{0} and dc.description.sponsorship_authority:{0}</value></property>
+		<property name="query"><value>selected:{0} AND dc.description.sponsorship_authority:{0}</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>		
 	</bean>
@@ -341,7 +341,7 @@
 	<bean id="nestedrpPublicationForOUComponent"
 		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="nestedrp" />
-		<property name="query"><value>crisitem.author.dept:{0}</value></property>
+		<property name="query"><value>crisitem.author.dept_authority:{0}</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>		
 	</bean>
@@ -363,7 +363,7 @@
 	<bean id="personsForOUComponent"
 		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="persons" />
-		<property name="query"><value>crisrp.dept:{0}</value></property>
+		<property name="query"><value>crisrp.dept_authority:{0}</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>4</value></property>			
@@ -396,7 +396,7 @@
 	<bean id="agenciesComponent"
 		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="agencies" />
-		<property name="query"><value>crisproject.agencies:{0}</value></property>
+		<property name="query"><value>crisproject.agencies_authority:{0}</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>5</value></property>		
@@ -418,7 +418,7 @@
 	<bean id="deptProjectForOUComponent"
 		class="org.dspace.app.webui.cris.components.BeanComponent">
 		<property name="componentIdentifier" value="deptproject" />
-		<property name="query"><value>crisproject.principalinvestigator.dept:{0}</value></property>
+		<property name="query"><value>crisproject.principalinvestigator.dept_authority:{0}</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>5</value></property>		
