@@ -150,24 +150,24 @@
 	<dependency>
 		<groupId>jdyna-web-api</groupId>
 		<artifactId>jdyna-web-api</artifactId>
-		<version>0.1</version>
+		<version>3.0-alpha</version>
 	</dependency>
 
 	<dependency>
 		<groupId>commons-cilea-webapi</groupId>
 		<artifactId>commons-cilea-webapi</artifactId>
-		<version>0.1</version>
+		<version>1.0</version>
 	</dependency>
 
     <dependency>
 		<groupId>jdyna-webmvc-api</groupId>
 		<artifactId>jdyna-webmvc-api</artifactId>
-		<version>0.1</version>
+		<version>3.0-alpha</version>
 	</dependency>
 	<dependency>
 		<groupId>jdyna-webmvc-webapp</groupId>
 		<artifactId>jdyna-webmvc-webapp</artifactId>
-		<version>0.1</version>
+		<version>3.0-alpha</version>
 		<type>war</type>
 	</dependency>
 
