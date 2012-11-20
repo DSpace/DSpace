@@ -32,7 +32,7 @@
          compiling of the corresponding source module.
     -->
     <profiles>
-        <profile>
+<!--         <profile>
             <id>dspace-xmlui</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -49,7 +49,7 @@
             <modules>
                 <module>lni</module>
             </modules>
-        </profile>
+        </profile> -->
         <profile>
             <id>dspace-oai</id>
             <activation>
