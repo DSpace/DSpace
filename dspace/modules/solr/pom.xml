@@ -17,6 +17,11 @@
       <relativePath>..</relativePath>
    </parent>
 
+   <properties>
+       <!-- This is the path to the root [dspace-src] directory. -->
+       <root.basedir>${basedir}/../../..</root.basedir>
+   </properties>
+
    <build>
       <plugins>
          <plugin>
