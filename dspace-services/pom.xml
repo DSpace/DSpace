@@ -12,6 +12,11 @@
         <version>3.0-rc4-SNAPSHOT</version>
     </parent>
 
+    <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/..</root.basedir>
+    </properties>
+
     <dependencies>
         <!-- logging -->
         <dependency>

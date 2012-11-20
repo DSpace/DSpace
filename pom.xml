@@ -24,6 +24,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lucene.version>3.5.0</lucene.version>
+        <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
+             as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
+        <root.basedir>${basedir}</root.basedir>
     </properties>
 
     <build>
@@ -121,7 +124,7 @@
                 <artifactId>maven-license-plugin</artifactId>
                 <configuration>
                     <!-- License header file (can be a URL, but that's less stable if external site is down on occasion) -->
-                    <header>LICENSE_HEADER</header>
+                    <header>${root.basedir}/LICENSE_HEADER</header>
                     <!--Just check headers of everything in the /src directory -->
                     <includes>
                         <include>src/**</include>
@@ -183,7 +186,8 @@
                 </property>
            </activation>
            <properties>
-               <filters.file>build.properties</filters.file>
+               <!-- 'root.basedir' is the relative path to the [dspace-src] root folder -->
+               <filters.file>${root.basedir}/build.properties</filters.file>
            </properties>
        </profile>
 
@@ -199,7 +203,8 @@
                 </property>
            </activation>
            <properties>
-                <filters.file>${env}.properties</filters.file>
+                <!-- 'root.basedir' is the relative path to the [dspace-src] root folder -->
+                <filters.file>${root.basedir}/${env}.properties</filters.file>
            </properties>
        </profile>
 
