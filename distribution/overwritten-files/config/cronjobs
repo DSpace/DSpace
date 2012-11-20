@@ -4,7 +4,7 @@
 0 1 * * *  /var/dspace/bin/dspace sub-daily
 # Run the media filter at 02:00 every day
 #0 2 * * *  /var/dspace/bin/dspace filter-media
-0 2 * * *  /var/dspace/bin/dspace filter-media -s 10915/5621,10915/2618,10915/2762,10915/15912,10915/2272,10915/15920,10915/5226 | grep -v SKIPPED | grep -v FILTERED
+1 23 * * *  /var/dspace/bin/dspace filter-media -s 10915/5621,10915/2618,10915/2762,10915/15912,10915/2272,10915/15920,10915/5226 | grep -v SKIPPED | grep -v FILTERED
 # Run the checksum checker at 03:00
 0 3 * * *  /var/dspace/bin/dspace checker -lp | grep -v " old results from the database"
 
