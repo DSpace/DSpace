@@ -242,7 +242,6 @@ public class ChoiceLookupTransformer extends AbstractDSpaceTransformer
         Button accept = buttItem.addButton("accept", "choices-lookup");
         accept.setValue(isRepeating ? T_add : T_accept);
         Button more = buttItem.addButton("more", "choices-lookup");
-        more.setDisabled();
         more.setValue(T_more);
         Button cancel = buttItem.addButton("cancel", "choices-lookup");
         cancel.setValue(T_cancel);
