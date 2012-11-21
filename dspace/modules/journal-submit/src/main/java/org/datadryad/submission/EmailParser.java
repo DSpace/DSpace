@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
  * @author Akio Sone
  * @author Kevin S. Clarke
  * @author Peter E. Midford
+ * @author Dan Leehr
  */
 public abstract class EmailParser {
 
@@ -22,12 +23,51 @@ public abstract class EmailParser {
 
 	public abstract ParsingResult parseMessage(List<String> aMessage);
 
+        /**
+         * Strips characters that can't be output to XML.  Implementation from
+         * http://blog.mark-mclaren.info/2007/02/invalid-xml-characters-when-valid-utf8_5873.html.
+         * In 
+         * @param inputString string to sanitize
+         * @return String after removing certain control characters and other 
+         * characters that cause XML building to fail.
+         * 
+         * Prior to stripping the non valid XML characters, issues were seen when 
+         * decoding special characters from quoted-printable encoded messages.  
+         * The control characters (e.g. 0xB) that prefix the specials were still
+         * in the String.
+         * 
+         * This method strips out these control characters, as well as others
+         * that may prevent XML output.
+         */
+        private static String stripNonValidXMLCharacters(String inputString) {
+            if(inputString == null || inputString.length() == 0) {
+                return "";
+            }
+            StringBuilder builder = new StringBuilder();
+            char c;
+            // Check for XML-valid characters
+            for (int i=0; i < inputString.length(); i++) {
+                c = inputString.charAt(i);
+                if ((c == 0x9) ||
+                    (c == 0xA) ||
+                    (c == 0xD) ||
+                    ((c >= 0x20) && (c <= 0xD7FF)) ||
+                    ((c >= 0xE000) && (c <= 0xFFFD)) ||
+                    ((c >= 0x10000) && (c <= 0x10FFFF))) {
+                    builder.append(c);
+                }            
+            }
+            return builder.toString();
+        }
+        
 	protected static String getStrippedText(String aInputString) {
 		SAXBuilder builder = new SAXBuilder();
 		// We have to replace characters used for XML syntax with entity refs
 		String text = aInputString.replace("&", "&amp;").replace("<", "&lt;")
 				.replace(">", "&gt;").replace("\"", "&quot;")
 				.replace("'", "&apos;");
+                
+                text = stripNonValidXMLCharacters(text);
 
 		// Check that we have well-formed XML
 		try {
@@ -39,12 +79,12 @@ public abstract class EmailParser {
 			return text.replaceAll("\\s+", " ");
 		}
 		catch (Exception details) {
-			if (LOGGER.isWarnEnabled()) {
-				LOGGER.warn("The following couldn't be parsed: \n" + text
-						+ "\n" + details.getMessage());
-			}
+                    if (LOGGER.isWarnEnabled()) {
+                        LOGGER.warn("The following couldn't be parsed: \n" + text
+                                    + "\n" + details.getMessage());
+                    }
 
-			return aInputString; // just return what we're given if problems
+                    return aInputString; // just return what we're given if problems
 		}
 	}
 
