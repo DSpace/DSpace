@@ -38,28 +38,4 @@
             <bean class="org.dspace.versioning.VersionHistoryDAO"/>
         </property>
     </bean>
-
-
-   <!-- !!!!!!!!!!!!!!!!!!!!! ITEM LEVEL VERSIONING SERVICES !!!!!!!!!!!!!!!!!!!!! -->
-
-   <!-- Versioning Service Application Interface for DSpace Will be autowired with
-         a Versioning Provider present in Spring context.-->
-   <bean id="org.dspace.versioning.VersioningService"
-         class="org.dspace.versioning.VersioningServiceImpl"
-         autowire="byType"
-         scope="singleton">
-      <property name="versionDAO">
-         <bean class="org.dspace.versioning.VersionDAO"/>
-      </property>
-      <property name="versionHistoryDAO">
-         <bean class="org.dspace.versioning.VersionHistoryDAO"/>
-      </property>
-      <property name="provider">
-          <!-- Default Item Versioning Provider, defines behavior for replicating
-               Item, Metadata, BUndles and Bitstreams. Autowired at this time. -->
-          <bean class="org.dspace.versioning.DefaultItemVersionProvider"/>
-      </property>
-
-   </bean>
-
 </beans>
