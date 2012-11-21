@@ -127,10 +127,11 @@ function DSpaceSetupAutocomplete(formID, args) {
 // This is intended to be called by onClick of a "Lookup" or "Add"  button.
 function DSpaceChoiceLookup(url, field, formID, valueInput, authInput,
                             confIndicatorID, collectionID, isName, isRepeating) {
-    // fill in URL
+    // fill in parameters for URL of popup window
     url += '?field=' + field + '&formID=' + formID + '&valueInput=' + valueInput +
             '&authorityInput=' + authInput + '&collection=' + collectionID +
-            '&isName=' + isName + '&isRepeating=' + isRepeating + '&confIndicatorID=' + confIndicatorID;
+            '&isName=' + isName + '&isRepeating=' + isRepeating + '&confIndicatorID=' + confIndicatorID +
+            '&limit=50'; //limit to 50 results at once (make configurable?)
 
     // primary input field - for positioning popup.
     var inputFieldName = isName ? dspace_makeFieldInput(valueInput, '_last') : valueInput;
@@ -174,7 +175,7 @@ function DSpaceChoicesSetup(form) {
 }
 
 
-// populate the "select" with options from ajax request
+// Populate the "select" (in popup window) with options from ajax request
 // stash some parameters as properties of the "select" so we can add to
 // the last start index to query for next set of results.
 function DSpaceChoicesLoad(form) {
@@ -199,6 +200,8 @@ function DSpaceChoicesLoad(form) {
 
     // get value from form inputs in opener if not explicitly supplied
     if (value.length == 0) {
+        // This bit of javascript is accessing the form that opened the popup window,
+        // so that we can grab the value the user entered before pressing the "Lookup & Add" button
         var of = $(window.opener.document).find('#' + formID);
         if (isName)
             value = makePersonName(of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_last') + ']').val(),
@@ -217,6 +220,11 @@ function DSpaceChoicesLoad(form) {
             else
                 of.find('*[name = ' + valueInput + ']').val(null);
         }
+
+        // Save passed-in value to hidden 'paramValue' field in the popup window
+        // (This will allow the user to get "more results" for the same query,
+        // if results are on more than one page.)
+        $('*[name = paramValue]').val(value);
     }
 
     // start spinner
@@ -228,6 +236,10 @@ function DSpaceChoicesLoad(form) {
         if (indicator != null) indicator.style.display = "none";
     });
 
+    // AJAX to send off the query to the "/choices" URL, and
+    // then parse the response based on whether it was successful or error occurred
+    // NOTE: you can send this same query manually to see result sample.
+    // Just enter the URL & pass all data values on query string.
     $.ajax({
         url: contextPath + "/choices/" + field,
         type: "GET",
@@ -249,7 +261,12 @@ function DSpaceChoicesLoad(form) {
             var nextStart = oldStart + opts.length;
             var lastTotal = Choices.attr('total');
             var resultMore = Choices.attr('more');
-            $('*[name = more]').attr('disabled', !(resultMore != null && resultMore == 'true'));
+            //if no more results to display, then disable the "more" button
+            if(resultMore==null || resultMore == 'false')
+                $('*[name = more]').attr('disabled', 'true');
+            else //otherwise, enable the "more" button
+                $('*[name = more]').removeAttr('disabled');
+            // save next starting index to hidden field
             $('*[name = paramStart]').val(nextStart);
 
             // clear select first
@@ -304,12 +321,12 @@ function DSpaceChoicesLoad(form) {
             // turn off spinner
             indicator.hide('fast');
 
-            // "results" status line
-            var statLast = nextStart + (isClosed ? 2 : 1);
-
+            //If no results, make sure to display "0 to 0 of 0"
+            var startNum = (nextStart==0 ? 0 : oldStart+1);
+            //Fill out the counter values in the "Results x to y of z" line
             var legend = $('#aspect_general_ChoiceLookupTransformer_list_choicesList :header:first');
             legend.html(dspace_formatMessage(legend.data('template'),
-                            oldStart + 1, statLast, Math.max(lastTotal, statLast), value));
+                            startNum, nextStart, lastTotal, value));
         }
     });
 }
@@ -397,7 +414,8 @@ function DSpaceChoicesAcceptOnClick() {
 
 // handler for lookup popup's more button
 function DSpaceChoicesMoreOnClick() {
-    DSpaceChoicesLoad(this.form);
+    //reload the window -- this should return the next results set
+    location.reload();
 }
 
 // handler for lookup popup's cancel button
