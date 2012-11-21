@@ -504,15 +504,24 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
         {
             // add a new Identifier for previous item: 12345/100.1
             String identifierPreviousItem=canonical + DOT + 1;
-            TableRow handle = DatabaseManager.create(context, "Handle");
-            modifyHandleRecord(context, previous.getItem(), handle, identifierPreviousItem);
+            //Make sure that this hasn't happened already
+            if(findHandleInternal(context, identifierPreviousItem) == null)
+            {
+                TableRow handle = DatabaseManager.create(context, "Handle");
+                modifyHandleRecord(context, previous.getItem(), handle, identifierPreviousItem);
+            }
         }
 
 
         // add a new Identifier for this item: 12345/100.x
         String idNew = canonical + DOT + version.getVersionNumber();
-        TableRow handle = DatabaseManager.create(context, "Handle");
-        modifyHandleRecord(context, dso, handle, idNew);
+        //Make sure we don't have an old handle hanging around (if our previous version was deleted in the workspace)
+        TableRow handleRow = findHandleInternal(context, idNew);
+        if(handleRow == null)
+        {
+            handleRow = DatabaseManager.create(context, "Handle");
+        }
+        modifyHandleRecord(context, dso, handleRow, idNew);
 
         return handleId;
     }
