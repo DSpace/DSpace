@@ -508,7 +508,7 @@
 
    <field name="discoverable" type="string" indexed="true" stored="true" omitNorms="true" />
       
-   <field name="read" type="string" indexed="true" stored="true" omitNorms="true" />
+   <field name="read" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" />
    
     <!-- Community and collection hierarchy of the Item of interest (candidate for hierarchical facetting ) -->
    <field name="location" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
