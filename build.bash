@@ -8,6 +8,10 @@ BASE_DIR=$(cd `dirname $0` && pwd)
 source $BASE_DIR/build.defaults
 current_user=`whoami`
 
+MVN_ARGS=" -Ddefault.dspace.dir=$INSTALL_DIR "
+
+#MVN_ARGS="$MVN_ARGS -Pxpdf-mediafilter-support "
+
 #=============================================================================
 
 print_help()
@@ -139,7 +143,7 @@ do_install()
 	mkdir $INSTALL_DIR
 
 	print_sec "EMPAQUETADO DEL PROYECTO"
-	MVN_ARGS=" -Ddefault.dspace.dir=$INSTALL_DIR -Ddefault.db.username=$dspace_dbuser -Ddefault.db.password=$dspace_dbpassword -Ddefault.db.url=jdbc:postgresql://$pg_connection_host:5432/$dspace_dbname"
+	MVN_ARGS="$MVN_ARGS -Ddefault.db.username=$dspace_dbuser -Ddefault.db.password=$dspace_dbpassword -Ddefault.db.url=jdbc:postgresql://$pg_connection_host:5432/$dspace_dbname"
 	mvn clean license:format install $MVN_ARGS $EXTRA_ARGS
 
 	print_sec "CREACION DE LA BBDD"
@@ -199,8 +203,6 @@ do_update(){
 		print_err "El diretorio de instalacion no existe ($INSTALL_DIR)"
 	fi
     
-	MVN_ARGS=" -Ddefault.dspace.dir=$INSTALL_DIR "
-
 	if [ "x$1" = "x--full"  ]; then
 		print_sec "EMPAQUETADO DEL PROYECTO FULL!!!";
 	else

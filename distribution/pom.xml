@@ -23,6 +23,26 @@
 		<default.solr.server>http://localhost:8080/solr</default.solr.server>
 	</properties>
 
+	<profiles>
+	        <profile>
+            <id>xpdf-mediafilter-support</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.media</groupId>
+                    <artifactId>jai_imageio</artifactId>
+                    <version>1.2</version>
+                </dependency>
+                <dependency>
+                    <groupId>javax.media</groupId>
+                    <artifactId>jai_core</artifactId>
+                    <version>1.1.4	</version>
+                </dependency>
+            </dependencies>
+        </profile>
+	</profiles>
 
 	<build>
 		<plugins>
