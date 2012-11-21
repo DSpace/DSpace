@@ -17,7 +17,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
-import org.dspace.handle.HandleManager;
 
 /**
  * Class for updating search indices from content events.
