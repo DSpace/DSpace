@@ -1654,7 +1654,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
                 if(solrQueryResponse.getHighlighting() != null)
                 {
-                    Map<String, List<String>> highlightedFields = solrQueryResponse.getHighlighting().get(dso.getHandle());
+                    Map<String, List<String>> highlightedFields = solrQueryResponse.getHighlighting().get(dso.getType() + "-" + dso.getID());
                     if(MapUtils.isNotEmpty(highlightedFields))
                     {
                         //We need to remove all the "_hl" appendix strings from our keys
