@@ -1,0 +1,11 @@
+--   The contents of this file are subject to the license and copyright
+--   detailed in the LICENSE and NOTICE files at the root of the source
+--   tree and available online at
+--   
+--   https://github.com/CILEA/dspace-cris/wiki/License
+--
+-- SQL commands to populate CRIS with default metadata definitions
+--
+-- DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST.
+-- DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST.
+-- DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST.
