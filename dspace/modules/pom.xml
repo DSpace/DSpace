@@ -50,7 +50,7 @@
                 <module>lni</module>
             </modules>
         </profile> -->
-        <profile>
+        <!-- <profile>
             <id>dspace-oai</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -58,7 +58,7 @@
             <modules>
                 <module>oai</module>
             </modules>
-        </profile>
+        </profile> -->
         <profile>
             <id>dspace-jspui</id>
             <activation>
@@ -68,7 +68,7 @@
                 <module>jspui</module>
             </modules>
         </profile>
-        <profile>
+      <!--   <profile>
             <id>dspace-sword</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -85,7 +85,7 @@
             <modules>
                 <module>swordv2</module>
             </modules>
-        </profile>
+        </profile> -->
         <profile>
             <id>dspace-solr</id>
             <activation>
