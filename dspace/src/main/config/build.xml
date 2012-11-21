@@ -34,6 +34,15 @@ Common usage:
 
 ========================================================================
   </description>
+  
+  	<!-- DS-1391: Ant 1.8.0+ is required, fail if not available. -->
+	<fail message="Ant 1.8.0+ is required, ${ant.version} is not supported">
+        <condition>
+			<not>
+				<antversion atleast="1.8.0"/>
+			</not>
+        </condition>
+    </fail>
 
     <!-- ============================================================= -->
     <!-- Will be using various environment variables                   -->
