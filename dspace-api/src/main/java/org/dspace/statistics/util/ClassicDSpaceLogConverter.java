@@ -130,7 +130,7 @@ public class ClassicDSpaceLogConverter {
 
             while ((line = input.readLine()) != null)
             {
-                // Read inthe line and covnert it to a LogLine
+                // Read in the line and convert it to a LogLine
                 lines++;
                 if (verbose)
                 {
