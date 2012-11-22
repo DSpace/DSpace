@@ -68,7 +68,12 @@
         <!-- =====================
              Item Level Versioning
              ===================== -->
-        <!-- To enable Item Level Versioning features, uncomment this aspect. -->
+        <!--
+             To enable Item Level Versioning features, uncomment this aspect.
+             This is currently disabled by default because of two known issues:
+             DS-1382 and DS-1349. Please, review them to see whether they apply
+             to you before enabling versioning.
+        -->
         <!--<aspect name="Versioning Aspect" path="resource://aspects/Versioning/" />-->
         
         <!-- =====================
@@ -88,8 +93,11 @@
         <!-- By default, DSpace uses a Statistics engine based on SOLR -->
         <aspect name="Statistics" path="resource://aspects/Statistics/" />
 
-        <!-- If you prefer to use "Elastic Search" Statistics, you can uncomment the below
-             aspect and COMMENT OUT the default "Statistics" aspect above -->
+        <!--
+             If you prefer to use "Elastic Search" Statistics, you can uncomment the below
+             aspect and COMMENT OUT the default "Statistics" aspect above.
+             You must also enable the ElasticSearchLoggerEventListener.
+        -->
         <!-- <aspect name="Statistics - Elastic Search" path="resource://aspects/StatisticsElasticSearch/" /> -->
 
         <!-- =========================
@@ -99,7 +107,7 @@
         <aspect name="Original Workflow" path="resource://aspects/Workflow/" />
 
         <!-- If you prefer, a Configurable XML-based Workflow is available. To enable it, you can
-             uncomment the below aspect an comment out the "Original Workflow" aspect above.
+             uncomment the below aspect and comment out the "Original Workflow" aspect above.
              PLEASE NOTE: in order to use the configurable workflow you must also run the
              database migration scripts as detailed in the DSpace Documentation -->
         <!-- <aspect name="XMLWorkflow" path="resource://aspects/XMLWorkflow/" /> -->
@@ -127,6 +135,7 @@
         <!--
             This demo aspect tests the various possible DRI features.
             It may be useful to developers in developing new aspects or themes.
+            It's accessible for admins in the XMLTest menu or via the /XMLTest/ URL.
         -->
         <!-- <aspect name="XML Tests" path="resource://aspects/XMLTest/"/> -->
     </aspects>
@@ -174,5 +183,9 @@
         <!-- The Kubrick theme -->
         <!-- <theme name="Kubrick" regex=".*" path="Kubrick/" /> -->
 
+        <!--
+             For information on configuring the mobile theme, see:
+             dspace-xmlui/src/main/webapp/themes/mobile/readme.txt
+        -->
     </themes>
 </xmlui>
