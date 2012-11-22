@@ -219,6 +219,7 @@
 				<entry key="projects" value-ref="projectlistforou" />
 				<entry key="projectsprincipal" value-ref="projectlistprincipalforou" />				
 				<entry key="persons" value-ref="personslist" />
+				<entry key="organizations" value-ref="organizationslist" />
 			</map>
 		</property>
 	</bean>
@@ -422,5 +423,28 @@
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>5</value></property>		
+	</bean>
+	
+	<!-- Workgroup list for OU entity -->
+	<bean id="organizationslist"
+		class="org.dspace.app.webui.cris.components.BrowseItemListComponent">
+		<property name="componentIdentifier" value="organizationslist" />
+		<property name="objectType" value="11" />
+		<property name="target" value="org.dspace.app.cris.model.OrganizationUnit" />
+		<property name="types">
+			<map>
+				<entry key="organizations" value-ref="organizationsForOUComponent" />				
+			</map>
+		</property>
+	</bean>
+	
+	
+	<bean id="organizationsForOUComponent"
+		class="org.dspace.app.webui.cris.components.BeanComponent">
+		<property name="componentIdentifier" value="organizations" />
+		<property name="query"><value>crisou.workgroups_authority:{0}</value></property>
+		<property name="order"><value>asc</value></property>
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>5</value></property>			
 	</bean>
 </beans>
