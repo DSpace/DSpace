@@ -211,6 +211,15 @@ ant fresh_install
 BUILD SUCCESSFUL
 Total time: 49 seconds
 -----------------------
+8.1) Create CRIS folders:
+
+usercris@servercris [dspace-source]/dspace/target/dspace-[version]-build
+cd [dspace]
+
+usercris@servercris [dspace]
+$ mkdir rp-files
+$ mkdir rg-files
+$ mkdir ou-files
 
 9) Update database to CRIS: run sql update
 [dspace]/etc/postgres/addon-crismodule.sql
