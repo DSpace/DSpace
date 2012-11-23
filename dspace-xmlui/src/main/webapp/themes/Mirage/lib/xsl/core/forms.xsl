@@ -243,7 +243,7 @@
                 <xsl:if test="@disabled='yes'">
                     <xsl:text>disabled </xsl:text>
                 </xsl:if>
-                <xsl:if test="dri:error">
+                <xsl:if test="dri:error or parent::node()[@type='composite']/dri:error">
                     <xsl:text>error </xsl:text>
                 </xsl:if>
                 <xsl:if test="dri:params/@multiple='yes'">
