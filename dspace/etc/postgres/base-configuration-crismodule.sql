@@ -148,7 +148,7 @@ INSERT INTO "public"."cris_project_propertiesdefinition" VALUES ('1601', '1', 'f
 -- ----------------------------
 -- Records of cris_project_tab
 -- ----------------------------
-INSERT INTO "public"."cris_project_tab" VALUES ('102', 'gif', 'f', 'image/gif', '10', 'grants', 'Grants', '3');
+INSERT INTO "public"."cris_project_tab" VALUES ('102', null, 'f', null, '10', 'grants', 'Grants', '3');
 INSERT INTO "public"."cris_project_tab" VALUES ('350', null, 'f', null, '0', 'informations', 'Informations', '3');
 
 -- ----------------------------
@@ -178,7 +178,7 @@ INSERT INTO "public"."cris_rp_box" VALUES ('550', 'f', null, '1000', 'namecard',
 -- ----------------------------
 -- Records of cris_rp_edittab
 -- ----------------------------
-INSERT INTO "public"."cris_rp_edittab" VALUES ('101', 'gif', 'f', 'image/gif', '0', 'editinformation', 'Edit Personal Information', '2', null);
+INSERT INTO "public"."cris_rp_edittab" VALUES ('101', null, 'f', null, '0', 'editinformation', 'Edit Personal Information', '2', null);
 INSERT INTO "public"."cris_rp_edittab" VALUES ('251', null, 'f', null, '0', 'editotherinfo', 'Edit Other', '1', null);
 
 
@@ -237,8 +237,8 @@ INSERT INTO "public"."cris_rp_propertiesdefinition" VALUES ('1400', '3', 'f', '0
 -- ----------------------------
 -- Records of cris_rp_tab
 -- ----------------------------
-INSERT INTO "public"."cris_rp_tab" VALUES ('100', 'gif', 'f', 'image/gif', '0', 'information', 'Profile', '3');
-INSERT INTO "public"."cris_rp_tab" VALUES ('250', 'gif', 'f', 'image/gif', '10', 'otherinfo', 'Other', '3');
+INSERT INTO "public"."cris_rp_tab" VALUES ('100', null, 'f', null, '0', 'information', 'Profile', '3');
+INSERT INTO "public"."cris_rp_tab" VALUES ('250', null, 'f', null, '10', 'otherinfo', 'Other', '3');
 
 
 -- ----------------------------
