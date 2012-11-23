@@ -20,8 +20,7 @@ usercris@servercris /e
 $ cd crisinstallation/
 
 usercris@servercris /e/crisinstallation
-$ git clone https://github.com/CILEA/DSpace.git --branch dspace-1_8_x-cris dspa
-ce-parent/
+$ git clone https://github.com/CILEA/DSpace.git --branch dspace-1_8_x-cris dspace-parent/
 Cloning into 'dspace-parent'...
 remote: Counting objects: 72473, done.
 remote: Compressing objects: 100% (20138/20138), done.
@@ -55,7 +54,7 @@ $ git clone https://github.com/CILEA/CCommons.git --branch master ccommons/
 Cloning into 'ccommons'...
 remote: Counting objects: 304, done.
 remote: Compressing objects: 100% (148/148), done.
-rRemote: Total 304 (delta 101), reused 289 (delta 86)eceiving objects:  87% (265
+Remote: Total 304 (delta 101), reused 289 (delta 86)
 
 Receiving objects: 100% (304/304), 57.86 KiB, done.
 Resolving deltas: 100% (101/101), done.
@@ -100,9 +99,9 @@ Resolving deltas: 100% (2069/2069), done.
     alert.recipient - mailbox for server errors/alerts (not essential but very useful!)
     registration.notify - mailbox for emails when new users register (optional) 
 
-3.1) Edit [dspace-source]/dspace-cris/api/src/main/resources/hibernate-rp.properties 
+3.1) Edit [dspace-source]/dspace-cris/api/src/main/resources/hibernate/hibernate-rp.properties 
 		
-		hibernate.connection.url=<INSERTHERETHEPROPERTYVALUE-db.url-SEEDSPACECONFIGURATIONFILE>
+	hibernate.connection.url=<INSERTHERETHEPROPERTYVALUE-db.url-SEEDSPACECONFIGURATIONFILE>
     hibernate.connection.username=<INSERTHERETHEPROPERTYVALUE-db.username-SEEDSPACECONFIGURATIONFILE>
     hibernate.connection.password=<INSERTHERETHEPROPERTYVALUE-db.password-SEEDSPACECONFIGURATIONFILE>
 
@@ -124,8 +123,7 @@ chown dspace [dspace]
 5.1) prerequisite install dwr artifact download in /e/crisinstallation from https://java.net/downloads/dwr/Version%202.0.6/dwr.jar
 
 usercris@servercris /e/crisinstallation
-$ mvn install:install-file -Dfile=dwr.jar -DgroupId=org.directwebremoting -Dart
-ifactId=dwr -Dversion=2.0.6 -Dpackaging=jar
+$ mvn install:install-file -Dfile=dwr.jar -DgroupId=org.directwebremoting -DartifactId=dwr -Dversion=2.0.6 -Dpackaging=jar
 [INFO] Scanning for projects...
 [INFO]
 [INFO] ------------------------------------------------------------------------
@@ -214,7 +212,7 @@ Total time: 49 seconds
 8.1) Create CRIS folders:
 
 usercris@servercris [dspace-source]/dspace/target/dspace-[version]-build
-cd [dspace]
+$ cd [dspace]
 
 usercris@servercris [dspace]
 $ mkdir rp-files
