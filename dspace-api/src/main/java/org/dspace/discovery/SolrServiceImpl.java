@@ -166,7 +166,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                          * Make sure the item is not in the index if it is not in
                          * archive or withwrawn.
                          */
-                        unIndexContent(context, handle);
+                        unIndexContent(context, item);
                         log.info("Removed Item: " + handle + " from Index");
                     }
                     break;

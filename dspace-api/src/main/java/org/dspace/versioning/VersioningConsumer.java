@@ -50,6 +50,7 @@ public class VersioningConsumer implements Consumer {
                     if(previous != null){
                         Item previousItem = previous.getItem();
                         if(previousItem != null){
+                            previousItem.setArchived(false);
                             itemsToProcess.add(previousItem);
                             //Fire a new modify event for our previous item
                             //Due to the need to reindex the item in the search & browse index we need to fire a new event
@@ -66,7 +67,6 @@ public class VersioningConsumer implements Consumer {
             for(Item item : itemsToProcess){
                 ctx.turnOffAuthorisationSystem();
                 try {
-                    item.setArchived(false);
                     item.update();
                 } finally {
                     ctx.restoreAuthSystemState();
