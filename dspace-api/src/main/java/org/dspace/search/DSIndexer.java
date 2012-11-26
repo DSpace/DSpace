@@ -275,7 +275,7 @@ public class DSIndexer
     {
         try
         {
-            IndexingTask task = prepareIndexingTask(dso, force);
+            IndexingTask task = prepareIndexingTask(context, dso, force);
             if (task != null)
             {
                 processIndexingTask(task);
@@ -653,9 +653,9 @@ public class DSIndexer
     }
 
 
-    static IndexingTask prepareIndexingTask(DSpaceObject dso, boolean force) throws SQLException, IOException, DCInputsReaderException
+    static IndexingTask prepareIndexingTask(Context context, DSpaceObject dso, boolean force) throws SQLException, IOException, DCInputsReaderException
     {
-        String handle = dso.getHandle();
+        String handle = HandleManager.findHandle(context, dso);
         Term term = new Term("handle", handle);
         IndexingTask action = null;
         switch (dso.getType())
@@ -668,7 +668,7 @@ public class DSIndexer
                 if (requiresIndexing(term, ((Item)dso).getLastModified()) || force)
                 {
                     log.info("Writing Item: " + handle + " to Index");
-                    action = new IndexingTask(IndexingTask.Action.UPDATE, term, buildDocumentForItem((Item)dso));
+                    action = new IndexingTask(IndexingTask.Action.UPDATE, term, buildDocumentForItem(context, (Item)dso));
                 }
             }
             else
@@ -1041,9 +1041,9 @@ public class DSIndexer
      * @throws SQLException
      * @throws IOException
      */
-    private static Document buildDocumentForItem(Item item) throws SQLException, IOException, DCInputsReaderException
+    private static Document buildDocumentForItem(Context context, Item item) throws SQLException, IOException, DCInputsReaderException
     {
-    	String handle = item.getHandle();
+    	String handle = HandleManager.findHandle(context, item);
 
     	// get the location string (for searching by collection & community)
         String location = buildItemLocationString(item);
