@@ -59,3 +59,8 @@ JDBC driver is reporting INTEGERS as type DECIMAL.
 Oracle doesn't like it when you reference table names in lower case when
 getting JDBC metadata for the tables, so they are converted in TableRow
 to upper case.
+
+==UPDATE 27 November 2012==
+Oracle complains with ORA-01408 if you attempt to create an index on a column which
+has already had the UNIQUE contraint added (such an index is implicit in maintaining the uniqueness
+of the column). See DS-1370 for details.

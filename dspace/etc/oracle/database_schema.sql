@@ -143,12 +143,6 @@ CREATE TABLE EPerson
   language            VARCHAR2(64)
 );
 
--- index by email
-CREATE INDEX eperson_email_idx ON EPerson(email);
-
--- index by netid
-CREATE INDEX eperson_netid_idx ON EPerson(netid);
-
 -------------------------------------------------------
 -- EPersonGroup table
 -------------------------------------------------------
