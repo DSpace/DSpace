@@ -7,7 +7,7 @@
 
 var query = clean_count_query(jQuery('#dryadCount').attr('class'), 'l2');
 
-jQuery.get("/solr/search/select/?indent=on&rows=1&fq=location:l2&" + query,
+jQuery.get("/solr/search/select/?indent=on&rows=1&fq=location:l2&q=DSpaceStatus:Archived&" + query,
 	function(xml){
 		var count = jQuery(xml).find('result').attr('numFound');
 		jQuery('#dryadCount').append(document.createTextNode('(' + count + ')'));
