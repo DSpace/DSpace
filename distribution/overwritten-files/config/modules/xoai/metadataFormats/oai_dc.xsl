@@ -40,7 +40,7 @@
 			<!--sedici.identifier.issn = identifier -->
 			<!--sedici.identifier.expediente = NO VA -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='identifier']/doc:element[@name!='other' and @name!='expediente']/doc:element/doc:field[@name='value']">
-				<dc:identifier><xsl:value-of select="../@name" />:<xsl:value-of select="." /></dc:identifier>
+				<dc:identifier><xsl:value-of select="../../@name" />:<xsl:value-of select="." /></dc:identifier>
 			</xsl:for-each>
 
 			<!-- dc.title=dc.title+': '+sedici.title.subtitle -->
