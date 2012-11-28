@@ -23,8 +23,8 @@
 
 ALTER TABLE resourcepolicy
   ADD (
-        rpname VARCHAR2(30);
-        rptype VARCHAR2(30);
+        rpname VARCHAR2(30),
+        rptype VARCHAR2(30),
         rpdescription VARCHAR2(100)
       );
 
@@ -54,6 +54,6 @@ CREATE SEQUENCE versionhistory_seq;
 -------------------------------------------
 -- New columns and longer hash for salted password hashing DS-861 --
 -------------------------------------------
-ALTER TABLE EPerson ALTER COLUMN password TYPE VARCHAR(128);
+ALTER TABLE EPerson modify( password VARCHAR(128));
 ALTER TABLE EPerson ADD salt VARCHAR(32);
 ALTER TABLE EPerson ADD digest_algorithm VARCHAR(16);
