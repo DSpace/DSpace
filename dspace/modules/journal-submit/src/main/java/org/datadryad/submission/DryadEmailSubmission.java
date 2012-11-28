@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
+import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 
 import org.jdom.Document;
 import org.jdom.JDOMException;
@@ -196,7 +197,9 @@ public class DryadEmailSubmission extends HttpServlet {
                 }
 
                 File dir = journal.getMetadataDir();
-                File file = new File(dir, result.getSubmissionId() + ".xml");
+                String submissionId = result.getSubmissionId();
+                String filename = DryadJournalSubmissionUtils.escapeFilename(submissionId + ".xml");
+                File file = new File(dir, filename);
                 FileOutputStream out = new FileOutputStream(file);
                 OutputStreamWriter writer = new OutputStreamWriter(out, "UTF-8");
 
