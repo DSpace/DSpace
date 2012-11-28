@@ -116,6 +116,10 @@ public class DSpaceAtLeastOneMetadataFilter extends DSpaceFilter
                     if (praticalValue.contains(theoreticValue))
                         return true;
                     break;
+                case STARTS_WITH:
+                    if (praticalValue.startsWith(theoreticValue))
+                        return true;
+                    break;
                 case ENDS_WITH:
                     if (praticalValue.endsWith(theoreticValue))
                         return true;

@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.webui.search.LuceneSearchProcessor;
+import org.dspace.app.webui.search.LuceneSearchRequestProcessor;
 import org.dspace.app.webui.search.SearchProcessorException;
 import org.dspace.app.webui.search.SearchRequestProcessor;
 import org.dspace.authorize.AuthorizeException;
@@ -49,7 +49,7 @@ public class SimpleSearchServlet extends DSpaceServlet
         }
         if (internalLogic == null)
         {   // backward compatibility
-            internalLogic = new LuceneSearchProcessor();
+            internalLogic = new LuceneSearchRequestProcessor();
         }
     }
 

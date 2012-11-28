@@ -52,7 +52,7 @@ import org.dspace.usage.UsageSearchEvent;
 import org.dspace.utils.DSpace;
 import org.w3c.dom.Document;
 
-public class LuceneSearchProcessor implements SearchRequestProcessor
+public class LuceneSearchRequestProcessor implements SearchRequestProcessor
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(SimpleSearchServlet.class);

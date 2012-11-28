@@ -23,6 +23,8 @@
     prefix="fmt" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core"
+    prefix="c" %>
 
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.HashMap" %>
@@ -179,15 +181,16 @@
     }
 %>
 
+<c:set var="dspace.layout.head.last" scope="request">
+    <script type="text/javascript" src="<%= request.getContextPath() %>/dspace-admin/js/bitstream-ordering.js"></script>
+</c:set>
+
 <dspace:layout titlekey="jsp.tools.edit-item-form.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin"
                nocache="true">
-
-    <script type="text/javascript" src="<%= request.getContextPath() %>/dspace-admin/js/jquery-1.4.2.min.js"></script>
-    <script type="text/javascript" src="<%= request.getContextPath() %>/dspace-admin/js/bitstream-ordering.js"></script>
 
 
     <%-- <h1>Edit Item</h1> --%>

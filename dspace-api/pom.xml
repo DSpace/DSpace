@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>3.0-rc3-SNAPSHOT</version>
+        <version>3.0-rc4-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -123,7 +123,7 @@
                                 </part>
                             </parts>
                             <properties>
-                                <dspace.dir>${agnostic.build.dir}/testing/dspace</dspace.dir>
+                                <dspace.install.dir>${agnostic.build.dir}/testing/dspace</dspace.install.dir>
                             </properties>
                         </output>
                     </outputs>

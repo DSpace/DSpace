@@ -8,7 +8,7 @@
     <parent>
         <artifactId>dspace-parent</artifactId>
         <groupId>org.dspace</groupId>
-        <version>3.0-rc3-SNAPSHOT</version>
+        <version>3.0-rc4-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -27,7 +27,7 @@
                     <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
                     <webResources>
                         <resource>
-                            <filtering>false</filtering>
+                            <filtering>true</filtering>
                             <directory>${basedir}/src/main/webapp</directory>
                             <includes>
                                 <include>WEB-INF/web.xml</include>
@@ -110,6 +110,12 @@
             <id>helix84</id>
             <name>Ivan Másar</name>
             <email>helix84@centrum.sk</email>
+        </developer>
+        <developer>
+            <name>Ariel J. Lira</name>
+            <email>arieljlira@gmail.com</email>
+            <organization>SeDiCI</organization>
+            <organizationUrl>http://sedici.unlp.edu.ar</organizationUrl>
         </developer>
     </developers>
 </project>
