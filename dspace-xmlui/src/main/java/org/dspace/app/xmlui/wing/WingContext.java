@@ -51,8 +51,6 @@ public class WingContext
 
     /**
      * Return the current transformer's name.
-     * 
-     * @return
      */
     public String getComponentName()
     {
@@ -120,7 +118,6 @@ public class WingContext
      * @param subName
      *            An additional name to the original name to further identify it
      *            in cases when just the name alone does not accomplish this.
-     * @return
      */
     public String generateID(String application, String name, String subName)
     {

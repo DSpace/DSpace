@@ -124,16 +124,15 @@ public abstract class AbstractSwordContentIngester implements SwordContentIngest
 	}
 
 	/**
-	 * utility method to turn given metadata fields of the form
+	 * Utility method to turn given metadata fields of the form
 	 * schema.element.qualifier into DCValue objects which can be
 	 * used to access metadata in items.
 	 *
 	 * The def parameter should be null, * or "" depending on how
-	 * you intend to use the DCValue object
+	 * you intend to use the DCValue object.
 	 *
 	 * @param config
 	 * @param def
-	 * @return
 	 */
 	protected DCValue configToDC(String config, String def)
 	{

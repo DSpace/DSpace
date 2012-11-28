@@ -23,7 +23,7 @@ import org.dspace.authenticate.AuthenticationMethod;
 
 /**
  * Selector will count the number of interactive AuthenticationMethods defined in the 
- * dspace configuration file
+ * dspace configuration file.
  * @author Jay Paz
  * @author Scott Phillips
  *
@@ -31,8 +31,7 @@ import org.dspace.authenticate.AuthenticationMethod;
 public class AuthenticationCountSelector implements Selector{
     /**
      * Returns true if the expression (in this case a number) is equal to the number
-     * of AuthenticationMethods defined in the dspace.cfg file
-     * @return
+     * of AuthenticationMethods defined in the dspace.cfg file.
      */
 	public boolean select(String expression, Map objectModel, Parameters parameters) {
 		// get an iterator of all the AuthenticationMethods defined

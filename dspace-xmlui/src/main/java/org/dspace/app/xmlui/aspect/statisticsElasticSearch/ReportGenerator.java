@@ -27,7 +27,6 @@ import java.util.Map;
  *
  * @author "Ryan McGowan" ("mcgowan.98@osu.edu")
  * @author Peter Dietz (pdietz84@gmail.com)
- * @version
  */
 public class ReportGenerator
 {
@@ -107,7 +106,6 @@ public class ReportGenerator
 
 
     /**
-     * {@inheritDoc}
      * @see org.dspace.app.xmlui.cocoon.DSpaceTransformer#addBody(Body)
      */
     public void addReportGeneratorForm(Division parentDivision, Request request) {

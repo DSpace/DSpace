@@ -30,12 +30,11 @@ public class MediaEntryManager
 	}
 
 	/**
-	 * Get the media entry for the given URL request.  If the url is unavailable
-	 * this method will throw the appropriate sword errors, with DSpace custom
-	 * URLs
+	 * Get the media entry for the given URL request.  If the URL is
+	 * unavailable this method will throw the appropriate SWORD errors,
+	 * with DSpace custom URLs.
 	 * 
 	 * @param url
-	 * @return
 	 * @throws DSpaceSWORDException
 	 * @throws SWORDErrorException
 	 */

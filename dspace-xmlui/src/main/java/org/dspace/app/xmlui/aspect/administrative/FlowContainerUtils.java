@@ -328,7 +328,6 @@ public class FlowContainerUtils
 	 * 
 	 * @param context
 	 * @param request
-	 * @return
 	 */
 	public static FlowResult testOAISettings(Context context, Request request)  
 	{
@@ -1110,7 +1109,6 @@ public class FlowContainerUtils
      * 
      * @param context
      * @param collectionID
-     * @return
      * @throws SQLException
      * @throws AuthorizeException
      * @throws IOException

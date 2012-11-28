@@ -40,11 +40,10 @@ public class DiscoverUtility
     private static Logger log = Logger.getLogger(DiscoverUtility.class);
 
     /**
-     * Get the scope of the search using the parameter found in the request
+     * Get the scope of the search using the parameter found in the request.
      * 
      * @param context
      * @param request
-     * @return
      * @throws IllegalStateException
      * @throws SQLException
      */
@@ -74,7 +73,7 @@ public class DiscoverUtility
      * Build a DiscoverQuery object using the parameter in the request
      * 
      * @param request
-     * @return
+     * @return the query.
      * @throws SearchServiceException
      */
     public static DiscoverQuery getDiscoverQuery(Context context,
@@ -107,7 +106,7 @@ public class DiscoverUtility
      * @param context
      * @param request
      * @param scope
-     * @return
+     * @return the query.
      */
     public static DiscoverQuery getDiscoverAutocomplete(Context context,
             HttpServletRequest request, DSpaceObject scope)

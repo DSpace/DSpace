@@ -226,7 +226,7 @@ public abstract class RichTextContainer extends TextContainer
      * @param target
      *            (May be null) The target reference for the image if the image
      *            is to operate as a link.
-     * @title
+     * @param title
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
@@ -238,47 +238,7 @@ public abstract class RichTextContainer extends TextContainer
         contents.add(figure);
         return figure;
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     /**
      * Add a button input control that when activated by the user will submit
      * the form, including all the fields, back to the server for processing.
@@ -466,7 +426,7 @@ public abstract class RichTextContainer extends TextContainer
      *            the element from its siblings within an interactive division.
      *            This is the name of the field use when data is submitted back
      *            to the server.
-     * @return
+     * @return a new hidden field.
      */
     public Hidden addHidden(String name) throws WingException
     {

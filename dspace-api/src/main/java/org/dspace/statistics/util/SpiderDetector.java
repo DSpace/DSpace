@@ -77,9 +77,7 @@ public class SpiderDetector {
     }
 
     /**
-     * Get an immutable Set representing all the Spider Addresses here
-     *
-     * @return
+     * Get an immutable Set representing all the Spider Addresses here.
      */
     public static Set<String> getSpiderIpAddresses() {
 

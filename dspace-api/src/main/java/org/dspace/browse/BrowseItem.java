@@ -160,7 +160,6 @@ public class BrowseItem extends DSpaceObject
 	/**
 	 * @deprecated
 	 * @param real
-	 * @return
 	 */
 	public int getType(boolean real)
 	{
@@ -301,7 +300,6 @@ public class BrowseItem extends DSpaceObject
 	 * rendering.  That's your own fault for wanting to put images on your
 	 * browse page!
 	 * 
-	 * @return
 	 * @throws SQLException
 	 */
     public Thumbnail getThumbnail()

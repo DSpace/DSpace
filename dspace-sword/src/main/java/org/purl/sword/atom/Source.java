@@ -96,7 +96,6 @@ public class Source extends XmlElement implements SwordElementInterface
     * 
     * @param source
     * @param validationProperties
-    * @return
     * @throws org.purl.sword.base.UnmarshallException
     */
    public SwordValidationInfo unmarshall(Element source, Properties validationProperties)

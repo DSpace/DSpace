@@ -132,7 +132,6 @@ public class ServiceDocument {
      * 
      * @param xml
      * @param validationProperties
-     * @return
      * @throws org.purl.sword.base.UnmarshallException
      */
     public SwordValidationInfo unmarshall(String xml, Properties validationProperties)
@@ -170,7 +169,6 @@ public class ServiceDocument {
      * 
      * @param element
      * @param validationProperties
-     * @return
      * @throws org.purl.sword.base.UnmarshallException
      */
     public SwordValidationInfo unmarshall(Element element, Properties validationProperties)

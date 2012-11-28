@@ -38,7 +38,6 @@ public class SWORDIngesterFactory
 	 * 
 	 * @param context
 	 * @param deposit
-	 * @return
 	 * @throws DSpaceSWORDException
 	 */
 	public static SWORDIngester getInstance(Context context, Deposit deposit, DSpaceObject dso)

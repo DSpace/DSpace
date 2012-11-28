@@ -37,10 +37,9 @@ public abstract class Depositor
 	}
 
 	/**
-	 * Execute the deposit process with the given sword deposit
+	 * Execute the deposit process with the given sword deposit.
 	 *
 	 * @param deposit
-	 * @return
 	 * @throws SWORDErrorException
 	 * @throws DSpaceSWORDException
 	 */

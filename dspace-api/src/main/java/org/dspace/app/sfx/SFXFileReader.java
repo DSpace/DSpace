@@ -94,18 +94,18 @@ public class SFXFileReader {
    }
 
     /**
-     * Process the item
+     * Process the item.
      *
      * @param node
      * @param item
-     * @return
+     * @return processed fields.
      * @throws IOException
      */
    public static String doNodes(Node node, Item item) throws IOException
    {
         if (node == null)
         {
-                   log.error (" Empty Node ");
+	    log.error (" Empty Node ");
             return null;
         }
         Node e = getElement(node);
@@ -135,11 +135,11 @@ public class SFXFileReader {
    }
 
     /**
-     * Process the fields
+     * Process the fields.
      *
      * @param e
      * @param item
-     * @return
+     * @return assembled query.
      * @throws IOException
      */
    private static String processFields(Node e, Item item) throws IOException
@@ -315,7 +315,7 @@ public class SFXFileReader {
    		short type = kid.getNodeType();
    		if (type == Node.TEXT_NODE)
    		{
-   			return kid.getNodeValue().trim();
+		    return kid.getNodeValue().trim();
    		}
    	}
    	// Didn't find a text node

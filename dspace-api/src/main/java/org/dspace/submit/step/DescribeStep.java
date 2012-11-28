@@ -995,7 +995,6 @@ public class DescribeStep extends AbstractProcessingStep
      * Return the HTML / DRI field name for the given input.
      *
      * @param input
-     * @return
      */
     public static String getFieldName(DCInput input)
     {

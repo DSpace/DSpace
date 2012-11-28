@@ -465,7 +465,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
     /**
      * Method for constructing the discovery advanced search form
      * 
-     * @author Andrea Bollini
+     * author: Andrea Bollini
      */
     @Override
     public void doAdvancedSearch(Context context, HttpServletRequest request,

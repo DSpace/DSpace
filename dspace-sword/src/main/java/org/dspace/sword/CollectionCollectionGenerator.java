@@ -37,9 +37,8 @@ public class CollectionCollectionGenerator extends ATOMCollectionGenerator
 
 	/**
 	 * Build the collection for the given DSpaceObject.  In this implementation,
-	 * if the object is not a DSpace COllection, it will throw an exception
+	 * if the object is not a DSpace Collection, it will throw an exception.
 	 * @param dso
-	 * @return
 	 * @throws DSpaceSWORDException
 	 */
 	public Collection buildCollection(DSpaceObject dso) throws DSpaceSWORDException

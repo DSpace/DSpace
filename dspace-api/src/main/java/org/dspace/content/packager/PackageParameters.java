@@ -168,7 +168,6 @@ public class PackageParameters extends Properties
      * Utility method to enable/disable workflow for Item ingestion.
      *
      * @param value boolean value (true = workflow enabled, false = workflow disabled)
-     * @return boolean result
      */
     public void setWorkflowEnabled(boolean value)
     {
@@ -212,7 +211,6 @@ public class PackageParameters extends Properties
      * either skip-over (keep) or replace existing objects.
      *
      * @param value boolean value (true = restore enabled, false = restore disabled)
-     * @return boolean result
      */
     public void setRestoreModeEnabled(boolean value)
     {
@@ -244,7 +242,6 @@ public class PackageParameters extends Properties
      * of "restore", where the current object is being restored to a previous state.
      *
      * @param value boolean value (true = replace enabled, false = replace disabled)
-     * @return boolean result
      */
     public void setReplaceModeEnabled(boolean value)
     {
@@ -276,7 +273,6 @@ public class PackageParameters extends Properties
      * essentially restores all missing objects, but keeps existing ones intact.
      *
      * @param value boolean value (true = replace enabled, false = replace disabled)
-     * @return boolean result
      */
     public void setKeepExistingModeEnabled(boolean value)
     {
@@ -303,7 +299,6 @@ public class PackageParameters extends Properties
      * Item Template
      *
      * @param value boolean value (true = template enabled, false = template disabled)
-     * @return boolean result
      */
     public void setUseCollectionTemplate(boolean value)
     {
@@ -336,7 +331,6 @@ public class PackageParameters extends Properties
      * recursively performs the same action on all related objects.
      *
      * @param value boolean value (true = recursion enabled, false = recursion disabled)
-     * @return boolean result
      */
     public void setRecursiveModeEnabled(boolean value)
     {

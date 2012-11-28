@@ -1128,11 +1128,10 @@ public class ItemExport
     }
 
     /**
-     * Get the file size of the export archive represented by the file name
+     * Get the file size of the export archive represented by the file name.
      * 
      * @param fileName
-     *            name of the file to get the size
-     * @return
+     *            name of the file to get the size.
      * @throws Exception
      */
     public static long getExportFileSize(String fileName) throws Exception

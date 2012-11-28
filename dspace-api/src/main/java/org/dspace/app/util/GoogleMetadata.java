@@ -772,7 +772,6 @@ public class GoogleMetadata
 
     /**
      * Produce meta elements that can easily be put into the head.
-     * @return
      */
     public List<Element> disseminateList()
     {
