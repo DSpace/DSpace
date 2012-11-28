@@ -245,7 +245,6 @@ public class Content extends XmlElement implements SwordElementInterface
     * 
     * @param elements
     * @param attributes
-    * @return
     */
    protected SwordValidationInfo validate(List<SwordValidationInfo> elements,
            List<SwordValidationInfo> attributes,

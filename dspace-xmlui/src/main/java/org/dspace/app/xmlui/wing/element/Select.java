@@ -79,7 +79,7 @@ public class Select extends Field
     /**
      * Set the event behavior attribute of the select item
      *
-     * @param action
+     * @param behavior
      *             javascript to instantiate on @evtbehavior
      */
     public void setEvtBehavior(String behavior) {

@@ -43,10 +43,8 @@ public class SWORDUrlManager
 	}
 
 	/**
-	 * Get the generator url for atom entry documents.  This can be
-	 * overridden from the default in configuration
-	 *
-	 * @return
+	 * Get the generator URL for ATOM entry documents.  This can be
+	 * overridden from the default in configuration.
 	 */
 	public String getGeneratorUrl()
 	{
@@ -198,11 +196,11 @@ public class SWORDUrlManager
 	}
 
 	/**
-	 * Construct the service document url for the given object, which will
-	 * be supplied in the sword:service element of other service document entries
+	 * Construct the service document URL for the given object, which will
+	 * be supplied in the sword:service element of other service document
+	 * entries.
 	 *
 	 * @param community
-	 * @return
 	 * @throws DSpaceSWORDException
 	 */
 	public String constructSubServiceUrl(Community community)
@@ -214,11 +212,11 @@ public class SWORDUrlManager
 	}
 
 	/**
-	 * Construct the service document url for the given object, which will
-	 * be supplied in the sword:service element of other service document entries
+	 * Construct the service document URL for the given object, which will
+	 * be supplied in the sword:service element of other service document
+	 * entries.
 	 *
 	 * @param collection
-	 * @return
 	 * @throws DSpaceSWORDException
 	 */
 	public String constructSubServiceUrl(Collection collection)
@@ -230,11 +228,10 @@ public class SWORDUrlManager
 	}
 
 	/**
-	 * Extract a DSpaceObject from the given url.  If this method is unable to
-	 * locate a meaningful and appropriate dspace object it will throw the
-	 * appropriate sword error
+	 * Extract a DSpaceObject from the given URL.  If this method is unable to
+	 * locate a meaningful and appropriate DSpace object it will throw the
+	 * appropriate SWORD error.
 	 * @param url
-	 * @return
 	 * @throws DSpaceSWORDException
 	 * @throws SWORDErrorException
 	 */
@@ -303,9 +300,8 @@ public class SWORDUrlManager
 	}
 
 	/**
-	 * get the base url for service document requests
+	 * Get the base URL for service document requests.
 	 *
-	 * @return
 	 * @throws DSpaceSWORDException
 	 */
 	public String getBaseServiceDocumentUrl()
@@ -383,10 +379,9 @@ public class SWORDUrlManager
 	}
 
 	/**
-	 * is the given url the base service document url
+	 * Is the given URL the base service document URL?
 	 *
 	 * @param url
-	 * @return
 	 * @throws DSpaceSWORDException
 	 */
 	public boolean isBaseServiceDocumentUrl(String url)
@@ -396,10 +391,9 @@ public class SWORDUrlManager
 	}
 
 	/**
-	 * is the given url the base media link url
+	 * Is the given URL the base media link URL?
 	 *
 	 * @param url
-	 * @return
 	 * @throws DSpaceSWORDException
 	 */
 	public boolean isBaseMediaLinkUrl(String url)
@@ -409,11 +403,10 @@ public class SWORDUrlManager
 	}
 
 	/**
-	 * Central location for constructing usable urls for dspace bitstreams.  There
-	 * is no place in the main DSpace code base for doing this.
+	 * Central location for constructing usable URLs for DSpace bitstreams.
+	 * There is no place in the main DSpace code base for doing this.
 	 *
 	 * @param bitstream
-	 * @return
 	 * @throws DSpaceSWORDException
 	 */
 	public String getBitstreamUrl(Bitstream bitstream)
@@ -464,9 +457,8 @@ public class SWORDUrlManager
 	}
 
 	/**
-	 * get the base media link url
+	 * Get the base media link url.
 	 *
-	 * @return
 	 * @throws DSpaceSWORDException
 	 */
 	public String getBaseMediaLinkUrl()
@@ -518,10 +510,9 @@ public class SWORDUrlManager
 	}
 
 	/**
-	 * get the media link url for the given bitstream
+	 * Get the media link URL for the given bitstream.
 	 * 
 	 * @param bitstream
-	 * @return
 	 * @throws DSpaceSWORDException
 	 */
 	public String getMediaLink(Bitstream bitstream)

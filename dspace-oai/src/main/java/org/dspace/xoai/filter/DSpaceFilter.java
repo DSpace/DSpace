@@ -21,7 +21,7 @@ import com.lyncode.xoai.dataprovider.filter.AbstractFilter;
  */
 public abstract class DSpaceFilter extends AbstractFilter
 {
-	private static Logger log = LogManager.getLogger(DSpaceFilter.class);
+    private static Logger log = LogManager.getLogger(DSpaceFilter.class);
     private Context _ctx = null;
 
     public void initialize(Context ctx)
@@ -38,8 +38,6 @@ public abstract class DSpaceFilter extends AbstractFilter
      * Returns null if no where given. Or non empty if some where is given.
      * 
      * @param context
-     * @param item
-     * @return
      */
     public abstract DatabaseFilterResult getWhere(Context context);
 

@@ -158,11 +158,11 @@ public class Body extends AbstractWingElement implements WingMergeableElement
      *            The qualified name for this element
      * @param attributes
      *            The element's attributes
-     * @return
+     * @return the matching Division, or null.
      */
     public WingMergeableElement mergeChild(String namespace, String localName,
-            String qName, Attributes attributes) throws SAXException,
-            WingException
+            String qName, Attributes attributes)
+	throws SAXException, WingException
     {
         Division found = null;
         for (Division candidate : divisions)

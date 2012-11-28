@@ -214,7 +214,6 @@ implements SwordElementInterface
     *
     * @param existing
     * @param attributeItems
-    * @return
     */
    protected SwordValidationInfo validate(List<SwordValidationInfo> existing,
            List<SwordValidationInfo> attributeItems,

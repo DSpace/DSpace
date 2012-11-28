@@ -561,10 +561,8 @@ public class Context
     }
 
     /**
-     * gets an array of all of the special groups that current user is a member
-     * of
-     * 
-     * @return
+     * Get an array of all of the special groups that current user is a member
+     * of.
      * @throws SQLException
      */
     public Group[] getSpecialGroups() throws SQLException

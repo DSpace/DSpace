@@ -28,10 +28,11 @@ import org.dspace.eperson.EPerson;
 
 /**
  * 
- * This action simply records pipeline events that it sees, keeping track of the users and
- * pages they are viewing. Later the control panel's activity viewer can access this data to
- * get a realtime snap shot of current activity of the repository.
- * 
+ * This action simply records pipeline events that it sees, keeping track of
+ * the users and pages they are viewing. Later the control panel's activity
+ * viewer can access this data to get a realtime snap shot of current activity
+ * of the repository.
+ *
  * @author Scott Phillips
  */
 
@@ -242,7 +243,6 @@ public class CurrentActivityAction extends AbstractAction
     	
     	/**
     	 * Is this event anonymous?
-    	 * @return
     	 */
     	public boolean isAnonymous()
     	{
@@ -251,28 +251,28 @@ public class CurrentActivityAction extends AbstractAction
     	
     	/**
     	 * Is this event from a bot?
-    	 * @return
     	 */
     	public boolean isBot()
     	{
-    		if (userAgent == null)
+	    if (userAgent == null)
             {
                 return false;
             }
-    		String ua = userAgent.toLowerCase();
-    		
-    		return (ua.contains("google/") ||
-    			ua.contains("msnbot/") ||
-    			ua.contains("googlebot/") || 
-    			ua.contains("webcrawler/") ||
-    			ua.contains("inktomi") ||
-    			ua.contains("teoma") ||
-    			ua.contains("bot"));
+	    String ua = userAgent.toLowerCase();
+
+	    return (ua.contains("google/") ||
+		    ua.contains("msnbot/") ||
+		    ua.contains("googlebot/") || 
+		    ua.contains("webcrawler/") ||
+		    ua.contains("inktomi") ||
+		    ua.contains("teoma") ||
+		    ua.contains("bot"));
     	}
     	
     	/**
-    	 * Return the activity viewer's best guess as to what browser or bot was initiating the request.
-    	 * 
+    	 * Return the activity viewer's best guess as to what browser or bot
+	 * was initiating the request.
+    	 *
     	 * @return A short name for the browser or bot.
     	 */
     	public String getDectectedBrowser()

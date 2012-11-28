@@ -710,8 +710,8 @@ public class BitstreamStorageManager
     /**
      *
      * @param context
-     * @param id of the bitstream to clone
-     * @return
+     * @param id of the bitstream to clone.
+     * @return id of the clone bitstream.
      * @throws SQLException
      */
     public static int clone(Context context, int id) throws SQLException

@@ -31,7 +31,7 @@ public class DataTermsFacet {
      *
      * An example of the output could be of the format:
      * [{"term":"247166","count":10},{"term":"247168","count":6}]
-     * @return
+     * @return JSON-formatted data.
      */
     public String toJson() {
         Gson gson = new Gson();

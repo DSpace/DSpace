@@ -71,12 +71,12 @@ public abstract class DSpaceATOMEntry
 	}
 
 	/**
-	 * get the sword entry for the given dspace object.  In this case, we should be
-	 * responding to requests for the media link, so this method will throw an error
-	 * unless the dspace object is an instance of the Bitstream
+	 * Get the SWORD entry for the given DSpace object.  In this case,
+	 * we should be responding to requests for the media link, so this
+	 * method will throw an error unless the DSpace object is an instance
+	 * of the Bitstream.
 	 *
 	 * @param dso
-	 * @return
 	 * @throws DSpaceSWORDException
 	 */
 	public SWORDEntry getSWORDEntry(DSpaceObject dso)

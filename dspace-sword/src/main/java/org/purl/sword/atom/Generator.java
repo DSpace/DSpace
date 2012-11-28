@@ -214,7 +214,6 @@ public class Generator extends XmlElement implements SwordElementInterface
 
    /**
     *
-    * @return
     */
    public SwordValidationInfo validate(Properties validationContext)
    {
@@ -225,7 +224,6 @@ public class Generator extends XmlElement implements SwordElementInterface
     * 
     * @param existing
     * @param attributeItems
-    * @return
     */
    public SwordValidationInfo validate(List<SwordValidationInfo> existing,
            List<SwordValidationInfo> attributeItems,

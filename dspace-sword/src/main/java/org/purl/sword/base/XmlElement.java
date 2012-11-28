@@ -246,7 +246,6 @@ public abstract class XmlElement
     * 
     * @param element
     * @param xmlName
-    * @return
     */
    protected boolean isInstanceOf(Element element, XmlName xmlName)
    {

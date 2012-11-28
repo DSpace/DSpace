@@ -55,7 +55,7 @@ public class AttributeMap extends HashMap<String, String>
      *            The attribute's name.
      * @param value
      *            The value of the attribute.
-     * @return
+     * @return previous value bound to the key, if any.
      */
     public String put(String key, int value)
     {
@@ -69,7 +69,7 @@ public class AttributeMap extends HashMap<String, String>
      * 
      * @param key
      * @param value
-     * @return
+     * @return previous value bound to the key, if any.
      */
     public String put(String key, boolean value)
     {

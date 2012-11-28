@@ -424,9 +424,10 @@ public class AuthenticationUtil
      *              The Cocoon object model
      * @param email
      *              The email address of the EPerson.
-     * @return
+     * @return true if allowed.
      */
-    public static boolean allowSetPassword(Map objectModel, String email) throws SQLException
+    public static boolean allowSetPassword(Map objectModel, String email)
+	throws SQLException
     {
         final HttpServletRequest request = (HttpServletRequest) objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
         Context context = ContextUtil.obtainContext(objectModel);
@@ -435,8 +436,8 @@ public class AuthenticationUtil
     }
     
     /**
-     * Construct a new, mostly blank, eperson for the given email address. This should
-     * only be called once the email address has been verified.
+     * Construct a new, mostly blank, eperson for the given email address.
+     * This should only be called once the email address has been verified.
      * 
      * @param objectModel 
      *              The Cocoon object model.
@@ -497,9 +498,9 @@ public class AuthenticationUtil
     
     
     /**
-     * Interrupt the current request and store if for later resumption. This request will
-     * send an HTTP redirect telling the client to authenticate first. Once that has been finished
-     * then the request can be resumed.
+     * Interrupt the current request and store if for later resumption. This
+     * request will send an HTTP redirect telling the client to authenticate
+     * first. Once that has been finished then the request can be resumed.
      * 
      * @param objectModel The Cocoon object Model
      * @param header A message header (i18n tag)
@@ -536,7 +537,7 @@ public class AuthenticationUtil
      * interrupted request.
      * 
      * @param objectModel The Cocoon object Model
-     * @return
+     * @return null.
      */
     public static String resumeInterruptedRequest(Map objectModel)
     {

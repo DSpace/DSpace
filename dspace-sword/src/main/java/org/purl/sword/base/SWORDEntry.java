@@ -399,7 +399,6 @@ public class SWORDEntry extends Entry
    /**
     * 
     * @param elementName
-    * @return
     */
    protected boolean isElementChecked(XmlName elementName)
    {

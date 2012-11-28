@@ -31,13 +31,9 @@ public interface SearchService {
      * repository)
      * 
      * @param context
-     *            DSpace Context object
-     * @param dso
-     *            a DSpace Object to use as scope of the search (only results
-     *            within this object)
+     *            DSpace Context object.
      * @param query
-     *            the discovery query object
-     * @return
+     *            the discovery query object.
      * @throws SearchServiceException
      */
     DiscoverResult search(Context context, DiscoverQuery query)
@@ -54,7 +50,6 @@ public interface SearchService {
      *            within this object)
      * @param query
      *            the discovery query object
-     * @return
      * @throws SearchServiceException
      */
     DiscoverResult search(Context context, DSpaceObject dso, DiscoverQuery query)
@@ -63,14 +58,12 @@ public interface SearchService {
     /**
      * 
      * @param context
-     *            DSpace Context object
-     * @param dso
-     *            a DSpace Object to use as scope of the search (only results
-     *            within this object)
+     *            DSpace Context object.
+     * @param query
+     *            the discovery query object.
      * @param includeWithdrawn
      *            use <code>true</code> to include in the results also withdrawn
-     *            items that match the query
-     * @return
+     *            items that match the query.
      * @throws SearchServiceException
      */
     DiscoverResult search(Context context, DiscoverQuery query,
@@ -89,7 +82,6 @@ public interface SearchService {
      *            use <code>true</code> to include in the results also withdrawn
      *            items that match the query
      * 
-     * @return
      * @throws SearchServiceException
      */
     DiscoverResult search(Context context, DSpaceObject dso, DiscoverQuery query, boolean includeWithdrawn) throws SearchServiceException;

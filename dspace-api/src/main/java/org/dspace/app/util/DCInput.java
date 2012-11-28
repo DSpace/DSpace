@@ -17,7 +17,6 @@ import org.dspace.content.MetadataSchema;
  * Class representing a line in an input form.
  * 
  * @author Brian S. Hughes, based on work by Jenny Toves, OCLC
- * @version
  */
 public class DCInput
 {

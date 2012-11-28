@@ -599,7 +599,6 @@ public class IndexBrowse
 	 * remove all the indices for the given item
 	 * 
 	 * @param item		the item to be removed
-	 * @return
 	 * @throws BrowseException
 	 */
 	public boolean itemRemoved(Item item)

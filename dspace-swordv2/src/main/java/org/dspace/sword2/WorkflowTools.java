@@ -27,14 +27,13 @@ import java.sql.SQLException;
 public class WorkflowTools
 {
     /**
-     * Is the given item in the DSpace workflow
+     * Is the given item in the DSpace workflow?
      *
      * This method queries the database directly to determine if this is the
-     * case rather than using the DSpace API (which is very slow)
+     * case rather than using the DSpace API (which is very slow).
      *
      * @param context
      * @param item
-     * @return
      * @throws DSpaceSwordException
      */
     public boolean isItemInWorkflow(Context context, Item item)
@@ -58,11 +57,10 @@ public class WorkflowTools
      * Is the given item in a DSpace workspace?
      *
      * This method queries the database directly to determine if this is the
-     * case rather than using the DSpace API (which is very slow)
+     * case rather than using the DSpace API (which is very slow).
      *
      * @param context
      * @param item
-     * @return
      * @throws DSpaceSwordException
      */
     public boolean isItemInWorkspace(Context context, Item item)
@@ -79,14 +77,13 @@ public class WorkflowTools
     }
 
     /**
-     * Obtain the WorkflowItem object which wraps the given Item
+     * Obtain the WorkflowItem object which wraps the given Item.
      *
      * This method queries the database directly to determine if this is the
-     * case rather than using the DSpace API (which is very slow)
+     * case rather than using the DSpace API (which is very slow).
      *
      * @param context
      * @param item
-     * @return
      * @throws DSpaceSwordException
      */
     public InProgressSubmission getWorkflowItem(Context context, Item item)
@@ -107,14 +104,13 @@ public class WorkflowTools
     }
 
     /**
-     * Obtain the WorkspaceItem object which wraps the given Item
+     * Obtain the WorkspaceItem object which wraps the given Item.
      *
      * This method queries the database directly to determine if this is the
-     * case rather than using the DSpace API (which is very slow)
+     * case rather than using the DSpace API (which is very slow).
      *
      * @param context
      * @param item
-     * @return
      * @throws DSpaceSwordException
      */
     public WorkspaceItem getWorkspaceItem(Context context, Item item)

@@ -567,7 +567,6 @@ public class Entry extends XmlElement implements SwordElementInterface
 
    /**
     *
-    * @return
     */
    public SwordValidationInfo validate(Properties validationContext)
    {
@@ -578,7 +577,6 @@ public class Entry extends XmlElement implements SwordElementInterface
     *
     * @param info
     * @param validationContext
-    * @return
     */
    protected SwordValidationInfo validate(SwordValidationInfo info,
             Properties validationContext)

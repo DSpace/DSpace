@@ -58,8 +58,6 @@ public class SWORDErrorDocument extends SWORDEntry
 
    /**
     * Get the element name.
-    * 
-    * @return
     */
    public static XmlName elementName()
    {
@@ -102,7 +100,6 @@ public class SWORDErrorDocument extends SWORDEntry
     * 
     * @param entry
     * @param validationProperties
-    * @return
     * @throws org.purl.sword.base.UnmarshallException
     */
    public SwordValidationInfo unmarshall(Element entry, Properties validationProperties)
@@ -156,7 +153,7 @@ public class SWORDErrorDocument extends SWORDEntry
 
    /**
     *
-    * @return
+    * @param validationContext
     */
    public SwordValidationInfo validate(Properties validationContext)
    {
@@ -167,7 +164,6 @@ public class SWORDErrorDocument extends SWORDEntry
     * 
     * @param info
     * @param validationContext
-    * @return
     */
    protected SwordValidationInfo validate(SwordValidationInfo info,
             Properties validationContext)

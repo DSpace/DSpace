@@ -23,25 +23,28 @@ import java.sql.SQLException;
 public interface IdentifierService {
 
     /**
+     * Get an identifier for a given object which is assignment-compatible
+     * with a given Identifier type.
      *
      * @param context
-     * @param dso
-     * @param identifier
-     * @return
+     * @param dso the object to be identified.
+     * @param identifier instance of an Identifier of the required type.
+     * @return the matching identifier, or the site identifier if the object
+     *  is a Site, or null if no matching identifier is found.
      */
     String lookup(Context context, DSpaceObject dso, Class<? extends Identifier> identifier);
 
     /**
      *
-     * This will resolve a DSpaceObject based on a provided Identifier.  The Service will interrogate the providers in
-     * no particular order and return the first successful result discovered.  If no resolution is successful,
-     * the method will return null if no object is found.
+     * This will resolve a DSpaceObject based on a provided Identifier.
+     * The Service will interrogate the providers in no particular order
+     * and return the first successful result discovered.  If no resolution
+     * is successful, the method will return null if no object is found.
      *
      * TODO: Verify null is returned.
      *
      * @param context
      * @param identifier
-     * @return
      * @throws IdentifierNotFoundException
      * @throws IdentifierNotResolvableException
      */
@@ -78,7 +81,6 @@ public interface IdentifierService {
      *
      * @param context
      * @param dso
-     * @return
      * @throws org.dspace.authorize.AuthorizeException
      * @throws java.sql.SQLException
      * @throws IdentifierException
@@ -87,14 +89,14 @@ public interface IdentifierService {
 
     /**
      *
-     * Used to Register a Specific Identifier (for example a Handle,  hdl:1234.5/6) The provider is responsible for
-     * Detecting and Processing the appropriate identifier, all Providers are interrogated, multiple providers
+     * Used to Register a specific Identifier (for example a Handle, hdl:1234.5/6)
+     * The provider is responsible for detecting and processing the appropriate
+     * identifier.  All Providers are interrogated.  Multiple providers
      * can process the same identifier.
      *
      * @param context
      * @param dso
      * @param identifier
-     * @return
      * @throws org.dspace.authorize.AuthorizeException
      * @throws java.sql.SQLException
      * @throws IdentifierException

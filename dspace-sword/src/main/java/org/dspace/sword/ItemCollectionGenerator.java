@@ -26,11 +26,11 @@ public class ItemCollectionGenerator extends ATOMCollectionGenerator
 	}
 
 	/**
-	 * Build the collection around the give DSpaceObject.  If the object is not an
-	 * instance of a DSpace Item this method will throw an exception
-	 * 
+	 * Build the collection around the give DSpaceObject.  If the object
+	 * is not an instance of a DSpace Item this method will throw an
+	 * exception.
+	 *
 	 * @param dso
-	 * @return
 	 * @throws DSpaceSWORDException
 	 */
 	public Collection buildCollection(DSpaceObject dso) throws DSpaceSWORDException
