@@ -52,11 +52,11 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
 
     private static final Message STATS_TEXT = message("xmlui.Site.stats");
 
+
     private static final String PUB_SEARCH = "/select/?q=DSpaceStatus:Archived&facet=on&rows=0&facet.field=prism.publicationName_filter&fq=location:l2&facet.limit=-1";
 
 
     private static final String PUB_COUNTER = "count(//lst[@name='prism.publicationName_filter']/int[.!='0'])";
-
 
 
     private SourceValidity validity;
@@ -79,7 +79,6 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
         catch (ClassCastException details) {
             LOGGER.error("stats.datafiles.coll property isn't set properly");
         }
-
         try {
             SolrQuery query = new SolrQuery();
             query= query.setQuery("location:l2 AND DSpaceStatus:Archived");
