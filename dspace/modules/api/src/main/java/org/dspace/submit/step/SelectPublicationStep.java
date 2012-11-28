@@ -380,7 +380,9 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
                     String journalPath = journalDirs.get(journalVals.indexOf(journalID));
                     //We have a valid journal
-                    PublicationBean pBean = ModelPublication.getDataFromPublisherFile(manuscriptNumber, journalID, journalPath);
+                    // Unescape the manuscriptNumber to get the filename
+                    String fileName = DryadJournalSubmissionUtils.unescapeFilename(manuscriptNumber);
+                    PublicationBean pBean = ModelPublication.getDataFromPublisherFile(fileName, journalID, journalPath);
                     if (pBean.getMessage().equals((""))) {
 
                         // check if the status is "in review" or "rejected"
