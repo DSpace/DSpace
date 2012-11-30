@@ -185,6 +185,10 @@ public class EmailParserForManuscriptCentral extends EmailParser {
                     if (!tagsTobeExcludedSet.contains(fieldName)) {
                         StoredLines = StoredLines +" "+ line; 
                         LOGGER.trace("new stored line=" + StoredLines);
+                        // The field name that was matched will not be used,
+                        // reset it to the previous field since we are storing
+                        // the entire line
+                        fieldName = previousField;
                     } else {
                         LOGGER.trace("\t*** line [" + line + "] is skipped");
                     }
