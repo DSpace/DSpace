@@ -5,6 +5,7 @@ import java.io.StringReader;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,15 +118,18 @@ public abstract class EmailParser {
 	 * but occasionally keyword phrase; keyword phrase
 	 */
 	public static String[] processKeywordList(String keywords){
-	    final boolean hasSemicolons = keywords.contains(";");
+            String unescapedKeywords = StringEscapeUtils.unescapeXml(keywords);
+	    final boolean hasSemicolons = unescapedKeywords.contains(";");
 	    String[] keywordArray = null;
 	    if (hasSemicolons){
-            keywordArray = keywords.split(";");
-        }
-        else //is this sufficient - will either split at commas or return singleton string
-            keywordArray = keywords.split(",");
-	    for (int i = 0; i< keywordArray.length; i++)
+                keywordArray = unescapedKeywords.split(";");
+            } else {
+                //is this sufficient - will either split at commas or return singleton string
+                keywordArray = unescapedKeywords.split(",");
+            }
+	    for (int i = 0; i< keywordArray.length; i++) {
 	        keywordArray[i] = getStrippedText(StringUtils.stripToEmpty(keywordArray[i]));
+            }
 	    return keywordArray;
 	}
 	
@@ -134,55 +138,59 @@ public abstract class EmailParser {
 	 * or as first last, first last and first last (sometimes with the Oxford comma before the 'and' token)
 	 */
 	public static String[] processAuthorList(String authors){
-	    final boolean hasSemicolons = authors.contains(";");
-	    final boolean hasCommas = authors.contains(",");
-	    final boolean hasLineBreaks = authors.contains("\n");
-        String[] authorArray = null;
-        if (hasSemicolons){
-            authorArray = authors.split(";");
-            if (hasCommas){
-                for (int i = 0; i< authorArray.length; i++){
-                    authorArray[i] = getStrippedText(StringUtils.stripToEmpty(authorArray[i]));
+            // Unescape the authors list since it may contain escaped-xml characters
+            // these would include semicolons (e.g. &amp; ) which should not be treated
+            // as a delimiter
+            String unescapedAuthors = StringEscapeUtils.unescapeXml(authors);
+            final boolean hasSemicolons = unescapedAuthors.contains(";");
+	    final boolean hasCommas = unescapedAuthors.contains(",");
+	    final boolean hasLineBreaks = unescapedAuthors.contains("\n");
+            String[] authorArray = null;
+            if (hasSemicolons){
+                authorArray = unescapedAuthors.split(";");
+                if (hasCommas){
+                    for (int i = 0; i< authorArray.length; i++){
+                        authorArray[i] = getStrippedText(StringUtils.stripToEmpty(authorArray[i]));
+                    }
+                }
+                else{
+                    for (int i = 0; i< authorArray.length; i++){
+                        authorArray[i] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[i]))));
+                    }
                 }
             }
-            else{
+            else if (hasCommas){
+                authorArray = unescapedAuthors.split(",");
+                // distinguish single author from author list
+                if (authorArray.length > 2 || StringUtils.stripToEmpty(authorArray[0]).contains(" ")){
+                    for (int i = 0; i< authorArray.length-1; i++){
+                        authorArray[i] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[i]))));
+                    }
+                    int lastAuthor = authorArray.length-1;
+                    if (lastAuthor > 0 && StringUtils.stripToEmpty(authorArray[lastAuthor]).startsWith("and "))
+                        authorArray[lastAuthor] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[lastAuthor]).substring(4))));
+                    else
+                        authorArray[lastAuthor] = StringUtils.stripToEmpty(flipName(getStrippedText(authorArray[lastAuthor])));  
+                }
+                else{
+                    authorArray = new String[1];
+                    authorArray[0] = authors;
+                }
+            }
+            else if (hasLineBreaks){
+                authorArray = unescapedAuthors.split("\n");
+                for (int i = 0; i< authorArray.length; i++){
+                    authorArray[i] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[i]))));
+                }
+                authorArray[0] = "found line breaks";
+            }
+            else {  //either a single author (first last) or two authors (first last and first last)
+                authorArray = unescapedAuthors.split(" and ");
                 for (int i = 0; i< authorArray.length; i++){
                     authorArray[i] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[i]))));
                 }
             }
-        }
-        else if (hasCommas){
-            authorArray = authors.split(",");
-            // distinguish single author from author list
-            if (authorArray.length > 2 || StringUtils.stripToEmpty(authorArray[0]).contains(" ")){
-                for (int i = 0; i< authorArray.length-1; i++){
-                    authorArray[i] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[i]))));
-                }
-                int lastAuthor = authorArray.length-1;
-                if (lastAuthor > 0 && StringUtils.stripToEmpty(authorArray[lastAuthor]).startsWith("and "))
-                    authorArray[lastAuthor] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[lastAuthor]).substring(4))));
-                else
-                    authorArray[lastAuthor] = StringUtils.stripToEmpty(flipName(getStrippedText(authorArray[lastAuthor])));  
-            }
-            else{
-                authorArray = new String[1];
-                authorArray[0] = authors;
-            }
-        }
-        else if (hasLineBreaks){
-            authorArray = authors.split("\n");
-            for (int i = 0; i< authorArray.length; i++){
-                authorArray[i] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[i]))));
-            }
-            authorArray[0] = "found line breaks";
-        }
-        else {  //either a single author (first last) or two authors (first last and first last)
-            authorArray = authors.split(" and ");
-            for (int i = 0; i< authorArray.length; i++){
-                authorArray[i] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[i]))));
-            }
-        }
-        return authorArray;
+            return authorArray;
 	}
 	
 	/**
@@ -190,7 +198,7 @@ public abstract class EmailParser {
 	 */
 
 	public static String processCorrespondingAuthorName(String authorName){
-	    return StringUtils.stripToEmpty(authorName);
+	    return StringUtils.stripToEmpty(StringEscapeUtils.unescapeXml(authorName));
 	}
 
 }
