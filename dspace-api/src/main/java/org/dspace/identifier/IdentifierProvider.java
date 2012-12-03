@@ -124,5 +124,12 @@ public abstract class IdentifierProvider {
      */
     public abstract void reserve(Context context, DSpaceObject dso, String identifier) throws IdentifierException;
 
+    /**
+     * Create a specific identifier and apply it to an object.
+     * 
+     * @param context
+     * @param object to be identified.
+     * @param identifier to be created.
+     */
     public abstract void register(Context context, DSpaceObject object, String identifier) throws IdentifierException;
 }
