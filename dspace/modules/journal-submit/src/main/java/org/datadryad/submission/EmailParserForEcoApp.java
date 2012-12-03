@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
 
 import nu.xom.Element;
 
@@ -180,8 +181,11 @@ public class EmailParserForEcoApp extends EmailParser {
 	            return xml.toString();
 	        }
 	        else if ("Manuscript".equalsIgnoreCase(name)) {
-	            myManuscriptID = aValue.trim();
-	            return ""; // we don't build xml element yet
+                    Matcher m = Pattern4MS_Dryad_ID.matcher(aValue.trim());
+                    if(m.matches()) {
+                        myManuscriptID = aValue.trim();
+                    }
+                    return ""; // we don't build xml element yet
 	        }
 	        else if ("ArticleTitle".equalsIgnoreCase(name)) {
 	            return new SubmissionMetadata(myManuscriptID, aValue.trim()).toXML();

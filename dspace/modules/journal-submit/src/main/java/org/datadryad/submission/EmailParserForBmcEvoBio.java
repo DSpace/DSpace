@@ -28,10 +28,6 @@ public class EmailParserForBmcEvoBio extends EmailParser {
     /** The Pattern for email field. */
     static Pattern Pattern4EmailField = Pattern.compile("^[^:]+:");
     
-    /** The Pattern or dryad_ id. */
-    static Pattern Pattern4MS_Dryad_ID = Pattern
-        .compile("[a-zA-Z0-9+/_\\-.$#]+");
-    
     /** The Pattern for nonbreaking space. */
     static Pattern Pattern4NonbreakingSpace = Pattern.compile("\\u00A0");
     

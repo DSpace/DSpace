@@ -3,6 +3,7 @@ package org.datadryad.submission;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -21,6 +22,18 @@ import org.slf4j.LoggerFactory;
 public abstract class EmailParser {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(EmailParser.class);
+
+        /** The Pattern for dryad_ id. */
+        /** Valid characters for Manuscript IDs, per DataCite conventions
+         * A-Z, a-z, 0-9
+         * - (dash)
+         * . (dot)
+         * _ (underscore)
+         * : (colon)
+         * / (slash, but only if followed by alphanumeric)
+         */
+        
+        protected static Pattern Pattern4MS_Dryad_ID = Pattern.compile("(([a-zA-Z0-9-._:]|(/[a-zA-Z0-9]))+)");
 
 	public abstract ParsingResult parseMessage(List<String> aMessage);
 
