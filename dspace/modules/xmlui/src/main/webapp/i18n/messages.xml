@@ -2478,8 +2478,8 @@
 			systems</strong>: System-wide alerts are only effective for the node on which it is activated.
 		You need to ensure that each node in the set receives the activate alert command.</message>
 	<message key="xmlui.administrative.ControlPanel.alerts_message_label">Alert message</message>
-	<message key="xmlui.administrative.ControlPanel.alerts_message_default">The system will be going
-		down for regular maintenance. Please save your work and logout.</message>
+	<message key="xmlui.administrative.ControlPanel.alerts_message_default">Submissions
+		will be temporarily disabled for regular maintenance.</message>
 	<message key="xmlui.administrative.ControlPanel.alerts_countdown_label">Count down</message>
 	<message key="xmlui.administrative.ControlPanel.alerts_countdown_none">No count down timer</message>
 	<message key="xmlui.administrative.ControlPanel.alerts_countdown_5">5 minutes</message>
@@ -2569,7 +2569,7 @@
 		and UNC <a class="footerLink" href="http://ils.unc.edu/mrc/">Metadata Research Center</a> in
 		collaboration with several <a class="footerLink" href="/partners">Partner
 		Organizations</a>.</message>
-	<message key="xmlui.dri2xhtml.structural.footer-promotional2">Dryad version </message>
+	<message key="xmlui.dri2xhtml.structural.footer-promotional2">Dryad built on </message>
 	<message key="xmlui.dri2xhtml.structureal.footer-node"> served by </message>
 
 	<message key="xmlui.dri2xhtml.structural.contact-link">Contact Us</message>

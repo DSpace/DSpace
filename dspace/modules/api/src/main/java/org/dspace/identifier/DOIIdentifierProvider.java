@@ -17,6 +17,7 @@ import org.dspace.utils.DSpace;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.VersioningService;
+import org.dspace.workflow.DryadWorkflowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Component;
@@ -191,7 +192,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         if(item.isArchived()){
             if(!collection.equals(myDataPkgColl)){
                 if(lookup(doi)!=null){
-		    log.debug("case A -- updating DOI info for versioned data file");
+		            log.debug("case A -- updating DOI info for versioned data file");
                     DOI doi_= upgradeDOIDataFile(context, doi, item, history);
                     if(doi_!=null){
                         remove(doi);
@@ -205,7 +206,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             }
         }
 
-        // CASE B: New DataPackage or New version
+        // CASE B: New Item or New version
         // FIRST time a VERSION is created 2 identifiers will be minted  and the canonical will be updated to point to the newer URL:
         //  - id.1-->old URL
         //  - id.2-->new URL
@@ -216,9 +217,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         // If it is a new ITEM just 1 identifier will be minted
 
         else{
-            // only if it is in workflow.
-            // MINT Identifier || .
-	    log.debug("CASE B: New DataPackage or New version");
             DOI doi_ = calculateDOI(context, doi, item, history);
 
             log.info("DOI just minted: " + doi_);
@@ -226,8 +224,9 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             doi = doi_.toString();
             mint(doi_, register, createListMetadata(item));
 
+            // CASE B1: Versioned DataPackage or DataFiles
             if (history != null) {
-		log.debug("it's a new version; need to move the canonical identifier");
+		        log.debug("it's a new version; need to move the canonical identifier");
                  Version version = history.getVersion(item);
                 // if it is the first time that is called "create version": mint identifier ".1"
                 Version previous = history.getPrevious(version);
@@ -236,21 +235,31 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                     mint(firstDOI, register, createListMetadata(previous.getItem()));
                 }
 
-                // move the canonical
-                DOI canonical = null;
-                if (collection.equals(myDataPkgColl)) {
-                    canonical = getCanonicalDataPackage(doi_, item);
-                } else {
-                    canonical = getCanonicalDataFile(doi_, item);
+                moveCanonical(item, register, collection, myDataPkgColl, doi_);
 
-                }
+            }
 
-                mint(canonical, register, createListMetadata(item));
-
-
+            // CASE B2: new DataFiles for a versioned DataPackage
+            Item dataPackage = DryadWorkflowUtils.getDataPackage(context, item);
+            if(!collection.equals(myDataPkgColl) && retrieveVersionHistory(context, dataPackage)!=null){
+                moveCanonical(item, register, collection, myDataPkgColl, doi_);
             }
         }
         return doi;
+    }
+
+    private void moveCanonical(Item item, boolean register, String collection, String myDataPkgColl, DOI doi_) throws IOException
+    {
+        // move the canonical
+        DOI canonical = null;
+        if (collection.equals(myDataPkgColl)) {
+            canonical = getCanonicalDataPackage(doi_, item);
+        } else {
+            canonical = getCanonicalDataFile(doi_, item);
+
+        }
+
+        mint(canonical, register, createListMetadata(item));
     }
 
 
@@ -339,7 +348,10 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                 throw new RuntimeException("Unknown DOI for URL: " + url);
 
             String result = "";
-            for (DOI d : dois) result += d.toString() + " ";
+            for (DOI d : dois)
+            {
+                result += d.toString() + " ";
+            }
 
             return result;
         }
@@ -606,9 +618,13 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
     private int countBitstreams(Item item) throws SQLException {
         int numberOfBitsream=0;
-        for(Bundle b : item.getBundles())
-            for(Bitstream bit : b.getBitstreams())
+        for (Bundle b : item.getBundles())
+        {
+            for (Bitstream bit : b.getBitstreams())
+            {
                 numberOfBitsream++;
+            }
+        }
         return numberOfBitsream;
     }
 
@@ -720,9 +736,10 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
 
         String canonicalDP = idDP.substring(0, idDP.lastIndexOf(DOT));
-        String canonicalDF = idDF.substring(0, idDF.lastIndexOf(DOT));
-
-
+        String canonicalDF = idDF;
+        if(idDF.lastIndexOf(DOT)!=-1){
+            canonicalDF=idDF.substring(0, idDF.lastIndexOf(DOT));
+        }
         DOI canonical = new DOI(canonicalDP + SLASH + canonicalDF, item);
         return canonical;
     }
