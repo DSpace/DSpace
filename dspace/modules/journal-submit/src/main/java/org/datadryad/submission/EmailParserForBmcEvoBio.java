@@ -101,7 +101,8 @@ public class EmailParserForBmcEvoBio extends EmailParser {
                 "Article_Title");
                 
         tagsTobeExcluded = Arrays.asList(
-            "MS Reference Number"
+            "MS Reference Number",
+            "Dryad author url"
         );
         
         tagsTobeExcludedSet = new LinkedHashSet<String>(tagsTobeExcluded);
@@ -175,6 +176,10 @@ public class EmailParserForBmcEvoBio extends EmailParser {
                     if (!tagsTobeExcludedSet.contains(fieldName)) {
                         StoredLines = StoredLines +" "+ line; 
                         LOGGER.trace("new stored line=" + StoredLines);
+                        // The field name that was matched will not be used,
+                        // reset it to the previous field since we are storing
+                        // the entire line
+                        fieldName = previousField;
                     } else {
                         LOGGER.trace("\t*** line [" + line + "] is skipped");
                     }

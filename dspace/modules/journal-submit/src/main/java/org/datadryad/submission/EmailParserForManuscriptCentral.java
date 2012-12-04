@@ -83,7 +83,7 @@ public class EmailParserForManuscriptCentral extends EmailParser {
 	fieldToXMLTagTable.put("Keywords","Classification");
 	fieldToXMLTagTable.put("Abstract","Abstract");
 	fieldToXMLTagTable.put("Article Status","Article_Status");
-	
+        	
         	
         xmlTagNameAuthorSubList= Arrays.asList(
             "Corresponding_Author",
@@ -100,7 +100,8 @@ public class EmailParserForManuscriptCentral extends EmailParser {
                 "Article_Title");
                 
         tagsTobeExcluded = Arrays.asList(
-            "MS Reference Number"
+            "MS Reference Number",
+            "Dryad author url"
         );
         
         tagsTobeExcludedSet = new LinkedHashSet<String>(tagsTobeExcluded);

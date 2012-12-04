@@ -103,7 +103,7 @@ public class EmailParserForAmNat extends EmailParser {
 				"Page charge notes", "Publication agreement received",
 				"Public Domain", "Erratum to MS #", "Resubmission of MS #",
 				"SOURCE FILES", "Item Type", "Item Description", "File Name",
-				"Appendixes");
+				"Appendixes", "Dryad author url");
 
 		tagsTobeExcludedSet = new LinkedHashSet<String>(tagsTobeExcluded);
 	}
