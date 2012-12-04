@@ -27,10 +27,6 @@ public class EmailParserForManuscriptCentral extends EmailParser {
     /** The Pattern for email field. */
     static Pattern Pattern4EmailField = Pattern.compile("^[^:]+:");
     
-    /** The Pattern for dryad_ id. */
-    static Pattern Pattern4MS_Dryad_ID = Pattern
-        .compile("[a-zA-Z0-9+/_\\-.$#]+");
-    
     /** The Pattern for nonbreaking space. */
     static Pattern Pattern4NonbreakingSpace = Pattern.compile("\\u00A0");
     
@@ -87,7 +83,7 @@ public class EmailParserForManuscriptCentral extends EmailParser {
 	fieldToXMLTagTable.put("Keywords","Classification");
 	fieldToXMLTagTable.put("Abstract","Abstract");
 	fieldToXMLTagTable.put("Article Status","Article_Status");
-	
+        	
         	
         xmlTagNameAuthorSubList= Arrays.asList(
             "Corresponding_Author",
@@ -104,7 +100,8 @@ public class EmailParserForManuscriptCentral extends EmailParser {
                 "Article_Title");
                 
         tagsTobeExcluded = Arrays.asList(
-            "MS Reference Number"
+            "MS Reference Number",
+            "Dryad author url"
         );
         
         tagsTobeExcludedSet = new LinkedHashSet<String>(tagsTobeExcluded);
@@ -185,6 +182,10 @@ public class EmailParserForManuscriptCentral extends EmailParser {
                     if (!tagsTobeExcludedSet.contains(fieldName)) {
                         StoredLines = StoredLines +" "+ line; 
                         LOGGER.trace("new stored line=" + StoredLines);
+                        // The field name that was matched will not be used,
+                        // reset it to the previous field since we are storing
+                        // the entire line
+                        fieldName = previousField;
                     } else {
                         LOGGER.trace("\t*** line [" + line + "] is skipped");
                     }

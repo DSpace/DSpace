@@ -44,10 +44,6 @@ public class EmailParserForAmNat extends EmailParser {
 	static Pattern Pattern4SenderEmailAddress = Pattern
 			.compile("(\"[^\"]*\"|)\\s*(<|)([^@]+@[^@>]+)(>|)");
 
-	/** The Pattern4 invalid id. */
-	static Pattern Pattern4InvalidId = Pattern
-			.compile("[^a-zA-Z0-9+/_\\-.$#]+");
-
 	/** The pattern for separator lines */
 	static Pattern Pattern4separatorLine = Pattern
 			.compile("^(-|\\+|\\*|/|=|_){2,}+");
@@ -107,7 +103,7 @@ public class EmailParserForAmNat extends EmailParser {
 				"Page charge notes", "Publication agreement received",
 				"Public Domain", "Erratum to MS #", "Resubmission of MS #",
 				"SOURCE FILES", "Item Type", "Item Description", "File Name",
-				"Appendixes");
+				"Appendixes", "Dryad author url");
 
 		tagsTobeExcludedSet = new LinkedHashSet<String>(tagsTobeExcluded);
 	}
@@ -234,8 +230,8 @@ public class EmailParserForAmNat extends EmailParser {
 						result.submissionId = fieldValue;
 						// outputFileName = fieldValue + ".xml";
 						LOGGER.info("submissionId = " + fieldValue);
-						Matcher mi = Pattern4InvalidId.matcher(fieldValue);
-						if (mi.find()) {
+                                                Matcher mi = Pattern4MS_Dryad_ID.matcher(fieldValue);
+                                                if(!mi.matches()) {
 							result.hasFlawedId = true;
 							LOGGER.error("invalid submission id found="
 									+ fieldValue);

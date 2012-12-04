@@ -98,6 +98,23 @@ public class ParsingResult {
         this.journalName = journalName;
     }
     
+    /** The journal code. */
+    String journalCode;
+    
+    /**
+     * @return the journalCode
+     */
+    public String getJournalCode() {
+        return journalCode;
+    }
+
+    /**
+     * @param journalCode the journalCode to set
+     */
+    public void setJournalCode(String journalCode) {
+        this.journalCode = journalCode;
+    }
+
     
     /** records a error message */
     String status = null;
