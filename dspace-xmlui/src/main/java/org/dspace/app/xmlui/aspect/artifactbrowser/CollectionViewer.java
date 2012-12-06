@@ -83,7 +83,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
      * 
      * The validity object will include the collection being viewed and 
      * all recently submitted items. This does not include the community / collection
-     * hierarch, when this changes they will not be reflected in the cache.
+     * hierarchy, when this changes they will not be reflected in the cache.
      */
     public SourceValidity getValidity()
     {

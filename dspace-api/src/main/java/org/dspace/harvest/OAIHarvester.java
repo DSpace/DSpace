@@ -159,7 +159,7 @@ public class OAIHarvester {
 
 
 	/**
-	 * Search the configuration options and find the ORE serializaition string
+	 * Search the configuration options and find the ORE serialization string
 	 * @return Namespace of the supported ORE format. Returns null if not found.
 	 */
 	private static Namespace getORENamespace() {

@@ -1695,7 +1695,7 @@ public class MockDatabaseManager
             //exist in the file
             String[] stmts = sb.toString().split(";");
 
-            //stablish the connection using the pool
+            //establish the connection using the pool
             Connection con = DriverManager.getConnection("jdbc:apache:commons:dbcp:" + poolName);
             Statement st = con.createStatement();
 

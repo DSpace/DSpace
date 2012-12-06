@@ -163,13 +163,13 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 	/**
 	 * Search the repository for items in other collections that can be mapped into this one.
 	 * 
-	 * @param collection The collection to mapp into
+	 * @param collection The collection to map into
 	 * @param query The search query.
 	 */
 	private java.util.List<Item> performSearch(Collection collection, String query) throws SQLException, IOException
 	{
 		
-		// Search the repository
+        // Search the repository
         QueryArgs queryArgs = new QueryArgs();
         queryArgs.setQuery(query);
         queryArgs.setPageSize(Integer.MAX_VALUE);

@@ -889,7 +889,7 @@
 	<message key="xmlui.Submission.workflow.PerformTaskStep.info1">Actions you may perform on this task:</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.take_help">Assign this task to yourself.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.take_submit">Take task</message>
-	<message key="xmlui.Submission.workflow.PerformTaskStep.leave_help">Leave this task in the pool for another to take.</message>
+	<message key="xmlui.Submission.workflow.PerformTaskStep.leave_help">Leave this task in the pool for another user to take.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.leave_submit">Leave task</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.approve_help">If you have reviewed the item and it is suitable for inclusion in the collection, select "Approve".</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.approve_submit">Approve item</message>

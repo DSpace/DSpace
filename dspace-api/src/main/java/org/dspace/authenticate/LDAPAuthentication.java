@@ -410,7 +410,7 @@ public class LDAPAuthentication
             if ((adminUser != null) && (!adminUser.trim().equals("")) &&
                 (adminPassword != null) && (!adminPassword.trim().equals("")))
             {
-                // Use admin credencials for search// Authenticate
+                // Use admin credentials for search// Authenticate
                 env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "simple");
                 env.put(javax.naming.Context.SECURITY_PRINCIPAL, adminUser);
                 env.put(javax.naming.Context.SECURITY_CREDENTIALS, adminPassword);
