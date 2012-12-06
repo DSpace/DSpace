@@ -175,14 +175,14 @@
 	<Filters>
 		<Filter id="authorexistsFilter">
 			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
-			<Parameter key="field">
+			<Parameter key="fields">
 				<Value>dc.contributor.author</Value>
 			</Parameter>
 		</Filter>
 		
 		<Filter id="titleexistsFilter">
 			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
-			<Parameter key="field">
+			<Parameter key="fields">
 				<Value>dc.title</Value>
 			</Parameter>
 		</Filter>
