@@ -441,7 +441,7 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
         }
 
 
-        queryArgs.setQuery(query != null && !query.trim().equals("") ? query : "*:*");
+        queryArgs.setQuery(query != null && !query.trim().equals("") ? query : "DSpaceStatus:Archived");
 
         if (page > 1)
         {
