@@ -8,7 +8,7 @@
     <parent>
         <artifactId>dspace-parent</artifactId>
         <groupId>org.dspace</groupId>
-        <version>3.0</version>
+        <version>4.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 

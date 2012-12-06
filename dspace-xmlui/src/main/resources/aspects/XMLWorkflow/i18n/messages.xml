@@ -15,7 +15,7 @@
 
 		xmlui.<Aspect>.<Java Class>.<name>
 
-		There are a few exceptions to this nameing format,
+		There are a few exceptions to this naming format,
 		1) Some general keys are in the xmlui.general namespace
 		   because they are used very frequently.
 		2) Some general keys which are specific to a particular aspect
