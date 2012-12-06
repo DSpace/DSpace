@@ -45,7 +45,7 @@ public class DSpaceMetadataExistsFilter extends DSpaceFilter
             this._fields = super.getParameters("fields");
 
             //backwards compatibility check for field parameter
-            if (this._fields == null)
+            if (this._fields.isEmpty())
                 this._fields = super.getParameters("field");
 
         }
