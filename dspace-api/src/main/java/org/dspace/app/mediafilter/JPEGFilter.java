@@ -23,6 +23,8 @@ import org.dspace.core.ConfigurationManager;
  * Filter image bitstreams, scaling the image to be within the bounds of
  * thumbnail.maxwidth, thumbnail.maxheight, the size we want our thumbnail to be
  * no bigger than. Creates only JPEGs.
+ *
+ * @author Jason Sherman <jsherman@usao.edu>
  */
 public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
 {
