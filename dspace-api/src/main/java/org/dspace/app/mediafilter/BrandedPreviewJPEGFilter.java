@@ -235,7 +235,7 @@ public class BrandedPreviewJPEGFilter extends MediaFilter
     {
         int type = (buf.getTransparency() == Transparency.OPAQUE) ?
             BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
-        BufferedImage blurbuf = (BufferedImage)buf;
+        BufferedImage scalebuf = (BufferedImage)buf;
         int w, h;
         if (higherQuality) {
             // Use multi-step technique: start with original size, then
@@ -268,12 +268,12 @@ public class BrandedPreviewJPEGFilter extends MediaFilter
             BufferedImage tmp = new BufferedImage(w, h, type);
             Graphics2D g2d = tmp.createGraphics();
             g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, hint);
-            g2d.drawImage(blurbuf, 0, 0, w, h, null);
+            g2d.drawImage(scalebuf, 0, 0, w, h, null);
             g2d.dispose();
 
-            blurbuf = tmp;
+            scalebuf = tmp;
         } while (w != targetWidth || h != targetHeight);
 
-        return blurbuf;
+        return scalebuf;
     }
 }
