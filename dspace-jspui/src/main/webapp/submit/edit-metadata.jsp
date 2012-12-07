@@ -1208,6 +1208,13 @@
 
     // owning Collection ID for choice authority calls
     int collectionID = si.getSubmissionItem().getCollection().getID();
+
+    // Fetch the document type (dc.type)
+    String documentType = "";
+    if( (item.getMetadata("dc.type") != null) && (item.getMetadata("dc.type").length >0) )
+    {
+        documentType = item.getMetadata("dc.type")[0].value;
+    }
 %>
 
 <dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.edit-metadata.title">
@@ -1254,6 +1261,13 @@
      for (int z = 0; z < inputs.length; z++)
      {
        boolean readonly = false;
+
+       // Omit fields not allowed for this document type
+       if(!inputs[z].isAllowedFor(documentType))
+       {
+           continue;
+       }
+
        // ignore inputs invisible in this scope
        if (!inputs[z].isVisible(scope))
        {
