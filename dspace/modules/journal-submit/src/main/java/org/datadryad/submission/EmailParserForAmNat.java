@@ -177,7 +177,7 @@ public class EmailParserForAmNat extends EmailParser {
 					if (me.find()) {
 						LOGGER.trace("how many groups=" + me.groupCount());
 						LOGGER.trace("email address captured:" + me.group(3));
-						result.senderEmailAddress = me.group(3);
+						result.setSenderEmailAddress(me.group(3));
 					}
 
 				}
@@ -227,12 +227,12 @@ public class EmailParserForAmNat extends EmailParser {
 					// i.e., ="Manuscript Number"
 					// assign outputFileField as the name for an XML file
 					if (fieldName.equals(outputFileField)) {
-						result.submissionId = fieldValue;
+						result.setSubmissionId(fieldValue);
 						// outputFileName = fieldValue + ".xml";
 						LOGGER.info("submissionId = " + fieldValue);
                                                 Matcher mi = Pattern4MS_Dryad_ID.matcher(fieldValue);
                                                 if(!mi.matches()) {
-							result.hasFlawedId = true;
+							result.setHasFlawedId(true);
 							LOGGER.error("invalid submission id found="
 									+ fieldValue);
 						}
@@ -287,7 +287,7 @@ public class EmailParserForAmNat extends EmailParser {
 		}
 
 		LOGGER.trace("***** end of separateEmailMessage() *****");
-		result.submissionData = BuildSubmissionDataAsXML(dataForXml);
+		result.setSubmissionData(BuildSubmissionDataAsXML(dataForXml));
 		return result;
 	}
 

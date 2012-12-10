@@ -83,19 +83,19 @@ public class EmailParserForEcoApp extends EmailParser {
 							final String resultValue = value.toString().trim();
 
 							if ("Journal Name".equalsIgnoreCase(lastLabel)) {
-								result.journalName = resultValue;
+								result.setJournalName(resultValue);
 							}
 							else
 								if ("ms reference number".equalsIgnoreCase(lastLabel)) {
-									result.submissionId = resultValue;
-								}
+                                                                    result.setSubmissionId(resultValue);
+                                                                }
 
 							try {
 								final String xml = makeElement(lastLabel, resultValue);
 								resultXML.append(xml);
 							}
 							catch (RuntimeException details) {
-								result.status = details.getMessage();
+								result.setStatus(details.getMessage());
 							}
 						}
 
@@ -123,19 +123,20 @@ public class EmailParserForEcoApp extends EmailParser {
                         lastLabel = label;
                     }
                     catch (RuntimeException details) {
-                        result.status = details.getMessage();
+                        result.setStatus(details.getMessage());
                     }
 
 				}
 			} // else ignore
 		}
 
-		if (lastLabel != null)
+		if (lastLabel != null) {
 		    resultXML.append(makeElement(lastLabel, value.toString()));
-		result.submissionData = resultXML;
+                }
+		result.setSubmissionData(resultXML);
 
 		if (myManuscriptID.equals("")) {
-			result.hasFlawedId = true;
+			result.setHasFlawedId(true);
 		}
 		
 		return result;

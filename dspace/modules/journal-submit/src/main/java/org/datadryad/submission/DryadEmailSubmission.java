@@ -155,7 +155,7 @@ public class DryadEmailSubmission extends HttpServlet {
             for (Address address : addresses) {
                 message = "From: " + address.toString()
                 + System.getProperty("line.separator") + message;
-                result.senderEmailAddress = address.toString();
+                result.setSenderEmailAddress(address.toString());
             }
 
             if (result.getStatus() != null) {
@@ -165,7 +165,7 @@ public class DryadEmailSubmission extends HttpServlet {
             // isHas?
             if (result.isHasFlawedId()) {
                 throw new SubmissionException("Result ID is flawed: "
-                        + result.submissionId);
+                        + result.getSubmissionId());
             }
 
             // We'll use JDOM b/c the libs are already included in DSpace
