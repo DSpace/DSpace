@@ -1,6 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
  */
 package org.dspace.identifier.doi;
 
@@ -25,9 +28,6 @@ import org.springframework.beans.factory.annotation.Required;
 public abstract class EZIDRegistrationAgency extends RegistrationAgency {
     private static final Logger log = LoggerFactory.getLogger(DOIIdentifierProvider.class);
     
-    protected ConfigurationService configurationService;
-    protected DOIIdentifierProvider parentService;
-    
     // Configuration property names
     static final String CFG_SHOULDER = "identifier.doi.ezid.shoulder";
     static final String CFG_USER = "identifier.doi.ezid.user";
@@ -35,16 +35,6 @@ public abstract class EZIDRegistrationAgency extends RegistrationAgency {
 
     /** Factory for EZID requests. */
     private static EZIDRequestFactory requestFactory;
-    
-    @Autowired
-    @Required
-    public void setConfigurationService(ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-
-    public void setParentService(DOIIdentifierProvider parentService) {
-        this.parentService = parentService;
-    }
     
     public boolean create(String identifier, Map<String,String> metadata) {
         EZIDResponse response;
