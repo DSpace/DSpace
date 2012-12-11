@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.util.Map;
+import java.util.logging.Level;
 import org.dspace.content.DSpaceObject;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierException;
@@ -22,6 +23,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
+ * Provide handling of EZID API to create, delete, mint and reserve DOIs.
+ * 
+ * <p>This class will be used by
+ * <link>org.dspace.identifier.DOIIdentifierProvider</link> to encapsulate all
+ * EZID specific code. Please also have a look to javadoc linked above.</p>
+ * 
+ * <p>Installation-specific configuration (credentials and the "shoulder" value
+ * which forms a prefix of the site's DOIs) is supplied from property files in
+ * [DSpace]/config**.</p>
+ *
+ * <dl>
+ *  <dt>identifier.doi.ezid.shoulder</dt>
+ *  <dd>base of the site's DOIs</dd>
+ *  <dt>identifier.doi.ezid.user</dt>
+ *  <dd>EZID username</dd>
+ *  <dt>identifier.doi.ezid.password</dt>
+ *  <dd>EZID password</dd>
+ * </dl>
+ * 
  * @author Mark H. Wood
  * @author Pascal-Nicolas Becker (p dot becker at tu hyphen berlin dot de)
  */
@@ -36,7 +56,16 @@ public abstract class EZIDRegistrationAgency extends RegistrationAgency {
     /** Factory for EZID requests. */
     private static EZIDRequestFactory requestFactory;
     
+    @Override
     public boolean create(String identifier, Map<String,String> metadata) {
+        try {
+            // remove doi prefix from id, as it EZIDRequest get's it as constructor attribute
+            identifier = DOIToId(identifier);
+        } catch (IdentifierException e) {
+            log.error("Unable to load doi prefix: " + e.getMessage());
+            return false;
+        }
+        
         EZIDResponse response;
         try {
             EZIDRequest request = requestFactory.getInstance(loadAuthority(),
@@ -61,7 +90,16 @@ public abstract class EZIDRegistrationAgency extends RegistrationAgency {
         return false;
     }
     
+    @Override
     public boolean reserve(String identifier, Map<String,String> metadata) throws IdentifierException {
+        try {
+            // remove doi prefix from id, as it EZIDRequest get's it as constructor attribute
+            identifier = DOIToId(identifier);
+        } catch (IdentifierException e) {
+            log.error("Unable to load doi prefix: " + e.getMessage());
+            return false;
+        }
+        
         EZIDResponse response;
         try {    
             EZIDRequest request = requestFactory.getInstance(loadAuthority(),
@@ -84,6 +122,7 @@ public abstract class EZIDRegistrationAgency extends RegistrationAgency {
         return false;
     }
     
+    @Override
     public String mint(Map<String,String> metadata) throws IdentifierException {
         // Compose the request
         EZIDRequest request;
@@ -136,6 +175,14 @@ public abstract class EZIDRegistrationAgency extends RegistrationAgency {
     
     @Override
     public boolean delete(String id) throws IdentifierException {
+        try {
+            // remove doi prefix from id, as it EZIDRequest get's it as constructor attribute
+            id = DOIToId(id);
+        } catch (IdentifierException e) {
+            log.error("Unable to load doi prefix: " + e.getMessage());
+            return false;
+        }
+        
         EZIDResponse response;
         try {
             EZIDRequest request = requestFactory.getInstance(loadAuthority(),
@@ -154,6 +201,41 @@ public abstract class EZIDRegistrationAgency extends RegistrationAgency {
         return true;
     }
     
+    /**
+     * Format a naked identifier as a DOI with our configured authority prefix.
+     * 
+     * @throws IdentifierException if authority prefix is not configured.
+     */
+    String idToDOI(String id)
+            throws IdentifierException
+    {
+        return "doi:" + loadAuthority() + id;
+    }
+
+    /**
+     * Remove scheme and our configured authority prefix from a doi: URI string.
+     * @return naked local identifier.
+     * @throws IdentifierException if authority prefix is not configured.
+     */
+    String DOIToId(String DOI)
+            throws IdentifierException
+    {
+        String id;
+        if(DOI.startsWith("doi:")) {
+            id = DOI.substring(4);
+        } else {
+            id = DOI;
+        }
+        String prefix = loadAuthority();
+        if (id.startsWith(prefix)) {
+            id = id.substring(prefix.length());
+        }
+        if (id.startsWith("/")) {
+            id = id.substring(1);
+        }
+        return DOI;
+    }
+   
     /**
      * Get configured value of EZID username.
      * @throws IdentifierException 

@@ -29,9 +29,9 @@ import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Provide service for DOIs through DataCite.
- *
+ * 
  * <p>Configuration of this class is is in two parts.</p>
- *
+ * 
  * <p>Installation-specific configuration (credentials and the "shoulder" value
  * which forms a prefix of the site's DOIs) is supplied from property files in
  * [DSpace]/config**.</p>
@@ -50,7 +50,7 @@ import org.springframework.beans.factory.annotation.Required;
  * the fully-qualified names of all metadata fields to be looked up on a DSpace
  * object and their values set on mapped fully-qualified names in the object's
  * DataCite metadata.</p>
- *
+ * 
  * @author Mark H. Wood
  * @author Pascal-Nicolas Becker (p dot becker at tu hyphen berlin dot de)
  */
@@ -58,18 +58,15 @@ public class DOIIdentifierProvider
     extends IdentifierProvider
 {
     private static final Logger log = LoggerFactory.getLogger(DOIIdentifierProvider.class);
-
-    // Same as in EZIDRegistrationAgency
-    // TODO: Is it realy neccessary here?
-    static final String CFG_SHOULDER = "identifier.doi.ezid.shoulder";
+    
     
     // Metadata field name elements
-    // XXX move these to MetadataSchema or some such
+    // TODO: move these to MetadataSchema or some such
     public static final String MD_SCHEMA = "dc";
     public static final String DOI_ELEMENT = "identifier";
     public static final String DOI_QUALIFIER = null;
-
-    private static final String DOI_SCHEME = "doi:";
+    
+    private static final String DOI_SCHEME = DOI.SCHEME;
     
     private static RegistrationAgency registrationAgency;
     
@@ -91,10 +88,12 @@ public class DOIIdentifierProvider
     @Override
     public boolean supports(String identifier)
     {
-        if (null == identifier)
+        try {
+            formatIdentifier(identifier);
+        } catch (IdentifierException e) {
             return false;
-        else
-            return identifier.startsWith(DOI_SCHEME); // XXX more thorough test?
+        }
+        return true;
     }
 
     @Override
@@ -130,7 +129,9 @@ public class DOIIdentifierProvider
     public void register(Context context, DSpaceObject object, String identifier) throws IdentifierException
     {
         log.debug("register {} as {}", object, identifier);
-
+        identifier = formatIdentifier(identifier);
+        log.debug("formated identifier as {}", identifier);
+        
         if (!(object instanceof Item))
         {
             // TODO throw new IdentifierException("Unsupported object type " + object.getTypeText());
@@ -143,8 +144,7 @@ public class DOIIdentifierProvider
         {
             Item item = (Item)object;
             try {
-                item.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
-                        idToDOI(identifier));
+                item.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, identifier);
                 item.update();
                 context.commit();
                 log.info("registered {}", identifier);
@@ -154,9 +154,6 @@ public class DOIIdentifierProvider
             } catch (AuthorizeException ex) {
                 // TODO throw new IdentifierException("New identifier not stored", ex);
                 log.error("New identifier not stored", ex);
-            } catch (IdentifierException ex) {
-                log.error("New identifier not stored", ex);
-                throw new IdentifierException(ex);
             }
         }
         else
@@ -170,12 +167,15 @@ public class DOIIdentifierProvider
             throws IdentifierException
     {
         log.debug("reserve {}", identifier);
+        identifier = formatIdentifier(identifier);
+        log.debug("formated identifier as {}", identifier);
+
         boolean response = registrationAgency.reserve(identifier, crosswalkMetadata(dso));
                     
         if (response == true)
         {
             Item item = (Item)dso;
-            item.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, idToDOI(identifier));
+            item.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, identifier);
             try {
                 item.update();
                 context.commit();
@@ -200,6 +200,14 @@ public class DOIIdentifierProvider
 
         String doi = registrationAgency.mint(crosswalkMetadata(dso));
         
+        try {
+            //ensure format
+            doi = formatIdentifier(doi);
+        } catch (IdentifierException e) {
+            log.error("Got an invalid DOI ({}) from the registration agency: ", doi, e.getMessage());
+            throw new RuntimeException("Got an invalid DOI (" + doi + ") from the registration agency.", e);
+        }
+        
         if (doi == null || doi.isEmpty()) {
             log.error("Error while minting DOI: Registration Agency did not return a DOI.");
             throw new IdentifierException("Error while minting DOI: Registration Agency did not return a DOI.");
@@ -213,16 +221,18 @@ public class DOIIdentifierProvider
             throws IdentifierNotFoundException, IdentifierNotResolvableException
     {
         log.debug("resolve {}", identifier);
-
+        try {
+            identifier = formatIdentifier(identifier);
+        } catch (IdentifierException e) {
+            throw new IdentifierNotFoundException(e.getMessage());
+        }
+        log.debug("formated identifier as {}", identifier);
+        
         ItemIterator found;
         try {
             found = Item.findByMetadataField(context,
                     MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER,
-                    // TODO: idToDOI adds the DOI-Prefix (also called Authority or Shoulder). Sure that it is not already part of identifier?
-                    idToDOI(identifier)); 
-        } catch (IdentifierException ex) {
-            log.error(ex.getMessage());
-            throw new IdentifierNotResolvableException(ex);
+                    identifier);
         } catch (SQLException ex) {
             log.error(ex.getMessage());
             throw new IdentifierNotResolvableException(ex);
@@ -299,7 +309,7 @@ public class DOIIdentifierProvider
             
             boolean response = false;
             try {
-                response = registrationAgency.delete(DOIToId(id.value));
+                response = registrationAgency.delete(id.value);
             } catch (IdentifierException e) {
                 log.error("Failed to delete DOI -- see logs of used registration agency implementation.");
                 log.error("Got following error message: {}", e.getMessage());
@@ -339,6 +349,8 @@ public class DOIIdentifierProvider
             throws IdentifierException
     {
         log.debug("delete {} from {}", identifier, dso);
+        identifier = formatIdentifier(identifier);
+        log.debug("formated identifier as {}", identifier);
 
         if (!(dso instanceof Item))
             throw new IllegalArgumentException("Unsupported type " + dso.getTypeText());
@@ -350,14 +362,14 @@ public class DOIIdentifierProvider
         int skipped = 0;
         for (DCValue id : metadata)
         {
-            if (!id.value.equals(idToDOI(identifier)))
+            if (!id.value.equals(identifier))
             {
                 remainder.add(id.value);
                 continue;
             }
             boolean response = false;
             try {
-                response = registrationAgency.delete(DOIToId(id.value));
+                response = registrationAgency.delete(id.value);
             } catch (IdentifierException e) {
                 log.error("Failed to delete DOI -- see logs of used registration agency implementation.");
                 log.error("Got following error message: {}", e.getMessage());
@@ -393,35 +405,6 @@ public class DOIIdentifierProvider
     }
 
     /**
-     * Format a naked identifier as a DOI with our configured authority prefix.
-     * 
-     * @throws IdentifierException if authority prefix is not configured.
-     */
-    // TODO: idToDOI adds DOI-Prefix. Consider refactoring so that a doi id string always cotains the prefix.
-    String idToDOI(String id)
-            throws IdentifierException
-    {
-        return "doi:" + loadAuthority() + id;
-    }
-
-    /**
-     * Remove scheme and our configured authority prefix from a doi: URI string.
-     * @return naked local identifier.
-     * @throws IdentifierException if authority prefix is not configured.
-     */
-    // TODO: DOItoID removes DOI-Prefix. Consider refactoring so that a doi id string always cotains the prefix.
-    String DOIToId(String DOI)
-            throws IdentifierException
-    {
-        String prefix = "doi:" + loadAuthority();
-        if (DOI.startsWith(prefix))
-            return DOI.substring(prefix.length());
-        else
-            return DOI;
-    }
-
-
-    /**
      * Map selected DSpace metadata to fields recognized by DataCite.
      */
     static private Map<String, String> crosswalkMetadata(DSpaceObject dso)
@@ -451,20 +434,41 @@ public class DOIIdentifierProvider
     {
         crosswalk = aCrosswalk;
     }
-
+    
     /**
-     * Get configured value of EZID "shoulder".
+     * This method helps to convert a DOI into a URL. It takes DOIs with or
+     * without leading DOI scheme (f.e. doi:10.123/456 as well as 10.123/456)
+     * and returns it as URL (f.e. http://dx.doi.org/10.123/456).
+     * 
+     * @param id A DOI that should be returned in external form.
+     * @return A String containing a URL to the official DOI resolver.
      * @throws IdentifierException 
      */
-    // Same as in EZIDRegistrationAgency
-    // TODO: refactor as far as idToDOI() and DOItoID() gets refactored (see comments there).
-    private String loadAuthority()
-            throws IdentifierException
-    {
-        String shoulder = configurationService.getProperty(CFG_SHOULDER);
-        if (null != shoulder)
-            return shoulder;
-        else
-            throw new IdentifierException("Unconfigured:  define " + CFG_SHOULDER);
+    public static String DOIToExternalForm(String id) throws IdentifierException{
+        if (id.startsWith("http://dx.doi.org/10.")) {
+            return id;
+        }
+        String doi = formatIdentifier(id);
+        return "http://dx.doi.org/" + doi.substring(DOI_SCHEME.length());
+    }
+    
+    /**
+     * Format any accepted identifier with DOI scheme.
+     * @param identifier Identifier to format, following format are accepted: f.e. 10.123/456, doi:10.123/456, http://dx.doi.org/10.123/456.
+     * @return Given Identifier with DOI-Scheme, f.e. doi:10.123/456.
+     * @throws IdentifierException 
+     */
+    public static String formatIdentifier(String identifier) throws IdentifierException {
+        if (null == identifier) 
+            throw new IdentifierException("Identifier is null.", new NullPointerException());
+        if (identifier.isEmpty())
+            throw new IdentifierException("Cannot format an empty identifier.");
+        if (identifier.startsWith("doi:"))
+            return identifier;
+        if (identifier.startsWith("10.") && identifier.contains("/"))
+            return DOI_SCHEME + identifier;
+        if (identifier.startsWith("http://dx.doi.org/10."))
+            return DOI_SCHEME + identifier.substring(18);
+        throw new IdentifierException(identifier + "does not seem to be a DOI.");
     }
 }
