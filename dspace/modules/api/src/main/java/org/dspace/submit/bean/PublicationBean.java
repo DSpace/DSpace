@@ -45,6 +45,12 @@ public class PublicationBean extends DataBean
 
     private String status=null;
 
+    public static final String TYPE_REGULAR = "Regular";
+    public static final String TYPE_GR_NOTE = "GR Note";
+
+    private String articleType = TYPE_REGULAR; // Default type is regular
+    private String citationTitle = "";
+    private String citationAuthors = "";
 
     public static String STATUS_SUBMITTED="submitted";
     public static String STATUS_IN_REVIEW="in review";
@@ -298,5 +304,35 @@ public class PublicationBean extends DataBean
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getArticleType() {
+        return articleType;
+    }
+
+    public void setArticleType(String articleType) {
+        if(articleType != null) {
+            this.articleType = articleType;
+        }
+    }
+
+    public String getCitationTitle() {
+        return citationTitle;
+    }
+
+    public void setCitationTitle(String citationTitle) {
+        if(citationTitle != null) {
+            this.citationTitle = citationTitle;
+        }
+    }
+
+    public String getCitationAuthors() {
+        return citationAuthors;
+    }
+
+    public void setCitationAuthors(String citationAuthors) {
+        if(citationAuthors != null) {
+            this.citationAuthors = citationAuthors;
+        }
     }
 }
