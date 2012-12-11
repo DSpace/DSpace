@@ -9,6 +9,7 @@
 package org.dspace.identifier;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,32 +25,39 @@ import org.dspace.core.Context;
 import org.dspace.identifier.doi.RegistrationAgency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Provide service for DOIs through DataCite.
  * 
- * <p>Configuration of this class is is in two parts.</p>
+ * <p>Different DataCite Members provides different APIs to handle DOIs. This
+ * class wraps the DOI handling within the DSpace API. It uses a
+ * <link>org.dspace.identifier.doi.RegistrationAgency</link> to perform API
+ * calls. It is configurable which <code>RegistrationAgency</code> is used. To
+ * do so, change <code>identifier.doi.registrationagency</code> in
+ * <code>dspace.cfg</code>. Per default it uses EZID.</p>
  * 
- * <p>Installation-specific configuration (credentials and the "shoulder" value
- * which forms a prefix of the site's DOIs) is supplied from property files in
- * [DSpace]/config**.</p>
+ * <p>Further configuration is dependent to the registration agency. See the
+ * particular documentation of the registration Agency
+ * (f.e. <link>org.dspace.identifier.doi.EZIDRegistrationAgency</link>).</p>
  *
- * <dl>
- *  <dt>identifier.doi.ezid.shoulder</dt>
- *  <dd>base of the site's DOIs</dd>
- *  <dt>identifier.doi.ezid.user</dt>
- *  <dd>EZID username</dd>
- *  <dt>identifier.doi.ezid.password</dt>
- *  <dd>EZID password</dd>
- * </dl>
- *
- * <p>There is also a Map (with the property name "crosswalk") from EZID
+ * <p>There is also a Map (with the property name "crosswalk") from DataCite
  * metadata field names into DSpace field names, injected by Spring.  Specify
  * the fully-qualified names of all metadata fields to be looked up on a DSpace
  * object and their values set on mapped fully-qualified names in the object's
  * DataCite metadata.</p>
+ * 
+ * <p>Every String named identifier any method of DOIIdentifierProvider gets can
+ * be in one of the following formats:
+ * <ul>
+ * <li>doi:10.123/456</li>
+ * <li>10.123/456</li>
+ * <li>http://dx.doi.org/10.123/456</li>
+ * </ul>
+ * Any identifier a method of this class returns as string is in the following
+ * format: doi:10.123/456. Every DOI that is assigned as string to the
+ * registrationAgency is in this format. Every DOI we get as string from a
+ * registrationAgency should be in the same format.
  * 
  * @author Mark H. Wood
  * @author Pascal-Nicolas Becker (p dot becker at tu hyphen berlin dot de)
@@ -59,6 +67,11 @@ public class DOIIdentifierProvider
 {
     private static final Logger log = LoggerFactory.getLogger(DOIIdentifierProvider.class);
     
+    /**
+     * Configuration property names to look which registration agency should be used.
+     * Set to identifier.doi.registrationagency.
+     */
+    static final String CFG_REGISTRATIONAGENCY = "identifier.doi.registrationagency";
     
     // Metadata field name elements
     // TODO: move these to MetadataSchema or some such
@@ -68,15 +81,45 @@ public class DOIIdentifierProvider
     
     private static final String DOI_SCHEME = DOI.SCHEME;
     
-    private static RegistrationAgency registrationAgency;
+    private RegistrationAgency registrationAgency;
     
     /** Map DataCite metadata into local metadata. */
     private static Map<String, String> crosswalk = new HashMap<String, String>();
 
-    @Autowired
-    @Required
-    public void setRegistrationAgency(RegistrationAgency registrationAgency) {
-        this.registrationAgency = registrationAgency;
+    public DOIIdentifierProvider() {
+        super();
+        this.loadRegistrationAgency();
+    }
+    
+    /**
+     * Load the DOI Registration Agency. It should be configured in dspace.cfg
+     * using the key defined in <link>#CFG_REGISTRATIONAGENCY</link>. If it is
+     * not configured
+     * <code>org.dspace.identifier.doi.EZIDRegistrationAgency</code> will be
+     * used as default.
+     * TODO: If we ever will support more than one DOI prefix we should perhaps
+     * support more than one registration agency as well.
+     *
+     * @throws IllegalStateException
+     *             if the configured registration agency can't be loaded
+     */
+    private void loadRegistrationAgency()
+    {
+        String registrationAgencyClassName = this.configurationService.getProperty(CFG_REGISTRATIONAGENCY);
+
+        if (registrationAgencyClassName == null) {
+            // Use default
+            registrationAgencyClassName = "org.dspace.identifier.doi.EZIDRegistrationAgency";
+        }
+
+        try {
+            Class registrationAgencyClass = Class.forName(registrationAgencyClassName);
+            Constructor constructor = registrationAgencyClass.getDeclaredConstructor();
+            this.registrationAgency = (RegistrationAgency) constructor.newInstance();
+        } catch (Exception e) {
+            log.error("Unable to load DOI registration Agency: " + e.getMessage());
+            throw new IllegalStateException(e);
+        }
     }
     
     @Override
@@ -93,7 +136,7 @@ public class DOIIdentifierProvider
         } catch (IdentifierException e) {
             return false;
         }
-        return true;
+            return true;
     }
 
     @Override
@@ -131,7 +174,7 @@ public class DOIIdentifierProvider
         log.debug("register {} as {}", object, identifier);
         identifier = formatIdentifier(identifier);
         log.debug("formated identifier as {}", identifier);
-        
+
         if (!(object instanceof Item))
         {
             // TODO throw new IdentifierException("Unsupported object type " + object.getTypeText());
@@ -227,7 +270,7 @@ public class DOIIdentifierProvider
             throw new IdentifierNotFoundException(e.getMessage());
         }
         log.debug("formated identifier as {}", identifier);
-        
+
         ItemIterator found;
         try {
             found = Item.findByMetadataField(context,
