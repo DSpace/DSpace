@@ -194,7 +194,7 @@
 <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.author">Navegar {0} por autor {1}</message>
 <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata.author">Navegar {0} por autor</message>
 
-<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.subject">Navegar{0} por tema {1}</message>
+<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.subject">Navegar {0} por tema {1}</message>
 <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata.subject">Navegar {0} por tema</message>
 
 <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.item.title">Navegar {0} por título {1}</message>
