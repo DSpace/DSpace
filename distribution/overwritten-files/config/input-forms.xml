@@ -226,7 +226,7 @@
 					<visibility>workflow</visibility>
 				</field>
 				
-				<!-- Fecha de publicación -->
+				<!-- Fecha de publicación (solo en el submit, para todos los tipos de documento excepto Tesis y Objetos de conferencia) -->
 				<field>
 					<dc-schema>dc</dc-schema>
 					<dc-element>date</dc-element>
@@ -234,6 +234,19 @@
 					<label>Fecha de Publicación</label>
 					<input-type>date</input-type>
 					<hint>Fecha en la que la obra fue publicada en una revista, libro, etc. No debe confundirse con la fecha de entrega o defensa de una tesis, que debe cargarse en el campo Fecha de Presentación. Los valores posibles para este campo son día/mes, mes/año o día/mes/año.</hint>
+					<visibility>submit</visibility>
+					<type-bind>Articulo,Libro,Documento institucional,Imagen fija,Imagen en movimiento,Audio</type-bind>
+				</field>
+
+				<!-- Fecha de publicación (solo en el workflow, para todos los tipos de documento) -->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>date</dc-element>
+					<dc-qualifier>issued</dc-qualifier>
+					<label>Fecha de Publicación</label>
+					<input-type>date</input-type>
+					<hint>Fecha en la que la obra fue publicada en una revista, libro, etc. No debe confundirse con la fecha de entrega o defensa de una tesis, que debe cargarse en el campo Fecha de Presentación. Los valores posibles para este campo son día/mes, mes/año o día/mes/año.</hint>
+					<visibility>workflow</visibility>
 				</field>
 
 				<!-- Localización fisica -->
@@ -465,7 +478,7 @@
 					<repeatable>true</repeatable>
 					<label>ISBN</label>
 					<input-type>onebox</input-type>
-					<hint>Si cuenta con un ISBN, éste debe ser ingresado aquí</hint>
+					<hint>Introduzca aquí el número de ISBN de su obra sólo si el mismo fué tramitado</hint>
 					<type-bind>Tesis,Objeto de conferencia</type-bind>
 				</field>
 
