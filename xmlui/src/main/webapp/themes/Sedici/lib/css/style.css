@@ -230,10 +230,7 @@ background-repeat: no-repeat;
 }
 
 #ds-footer {
-    border-top: 1px solid #9CACBA;
-    padding-top: 10px;
-    font-size: 93%;
-    line-height: 1.6em;
+	height: 57px;
 }
 
 #ds-footer-left {
@@ -2766,37 +2763,49 @@ position:relative;
 bottom:25px;
 } 
 
-#footercol1 {
-float:left;
-width:33%;
-margin-right:10px;
-/*width:380px;*/
-font-size:12px;
+#footer {
+	font-family: "Trebuchet MS", sans-serif;
+	font-size:11px;
+	width:100%;
+	border-top:1px solid #dedede;
+	padding-top:10px;
+}
+
+#footercol1, #footercol2 {
+	float:left;
 }
 
 #footercol2 {
-float: left;
+	margin-left: 50px;
 }
-
-#footer {
-font-family: "Trebuchet MS", sans-serif;
-font-size:11px;
-width:100%;
-border-top:1px solid #dedede;
-padding:10px;
+#footercol3 {
+	float: right;
 }
-
+#footer .column {
+	display: inline;
+}
+#footer #dspace-info {
+	float: right;
+}
+#footer #dspace-info a {
+	background: url('../../images/logo_dspace.gif') no-repeat right;
+	padding-right: 100px;
+	padding-top: 15px;
+	height: 19px;
+	display: inline-block;
+}
+#copyright-info {
+	font-size: 0.8em;	
+}
 .unlp {
-height:57px;
-widht:45px;
-float:left;
+	height:57px;
+	widht:45px;
+	float:left;
 }
 
 .datos_unlp {
 	padding-left: 52px;
-	float: left;
 	font-size: 11px;
-	margin: 6px 0px 0px 0px;
 	background: url('../../images/img_unlp.png') no-repeat left;
 	height: 57px;
 }
@@ -2808,31 +2817,19 @@ color:#e38338;
 .datos_unlp a:hover {
 color:#1f7297;
 }
-
-
-#news-contacto-etc {
-float:right;
+#footer .footer-icon {
+	display: inline;
 }
-
-#comollegar {
-width:91px;
-/*border:1px solid black;*/
-float:right;
-right:10px;
-position:relative;
-top:-27px;
+#footer .footer-icon a:hover {
+	border-bottom: solid 2px #607890;
 }
 
 .datos_sedici {
-float:left;
-/*border:1px solid black;*/
-width:450px;
 font-family: "Trebuchet MS", sans-serif;
 font-size:12px;
 }
 
-.newsletter,
-.contacto {
+.newsletter, .contacto {
 margin:0px 4px 0px 4px;
 }
 

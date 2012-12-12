@@ -2291,4 +2291,6 @@
 
 <message key="sedici.XMLWorkflow.workflowitem.notfound">Requested workflow item does not exist</message>
 
+<message key="sedici.common.dspace-info">Supported by</message>
+
 </catalogue>

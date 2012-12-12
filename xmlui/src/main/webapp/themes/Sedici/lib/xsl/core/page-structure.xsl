@@ -382,24 +382,33 @@ placeholders for header images -->
     <!-- Creo el footer especifico para SeDiCI -->
     <xsl:template name="buildFooter">
         <div id="footer">
-
-            <div id="footercol1">
-                <div class="datos_unlp">
-                    <strong>2003-2012 &#xA9; <a href="http://prebi.unlp.edu.ar/" target="_blank">PrEBi</a></strong>
-                    <br/>
-                    <a href="http://www.unlp.edu.ar" target="_blank">Universidad Nacional de La Plata</a>
-                    <br/>
-                    Todos los derechos reservados conforme a la ley 11.723
-                </div>
-            </div>
-            <div id="footercol2">
-                <div class="datos_sedici">
-                    <strong>SeDiCI - Servicio de Difusión de la Creación Intelectual</strong>
-                    <br/>
-                    Calle 49 y 115 s/n 1er piso - Edificio ex Liceo
-                    <br/>
-                    1900 La Plata, Buenos Aires - Tel 0221 423 6696/6677 (int. 141)
-                    <div id="comollegar">
+			<div id="ds-footer">
+	            <div class="column" id="footercol1">
+	                <div class="datos_unlp">
+	                    <strong>&#xA9; 2003-2012</strong>
+	                    <br/>
+	                    <strong>
+		                    <a href="http://prebi.unlp.edu.ar/" target="_blank">PrEBi</a>
+		                    <span> - </span>
+		                    <a href="http://sedici.unlp.edu.ar/" target="_blank">SeDiCI</a>
+		                    <br/>
+		                    <a href="http://www.unlp.edu.ar" target="_blank">Universidad Nacional de La Plata</a>
+	                    </strong>
+	                    <br/>
+	                    <span id="copyright-info">Todos los derechos reservados conforme a la ley 11.723</span>
+	                </div>
+	            </div>
+	            <div class="column" id="footercol2">
+	                <div class="datos_sedici">
+	                    <strong>SeDiCI - Servicio de Difusión de la Creación Intelectual</strong>
+	                    <br/>
+	                    Calle 49 y 115 s/n 1er piso - Edificio ex Liceo
+	                    <br/>
+	                    1900 La Plata, Buenos Aires - Tel 0221 423 6696/6677 (int. 141)
+	                </div>
+	            </div>
+	            <div class="column" id="footercol3">
+                    <div class="footer-icon">
                         <a title="Como llegar a SeDiCI">
                             <xsl:attribute name="href">
                                 <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
@@ -413,30 +422,28 @@ placeholders for header images -->
                             </img>
                         </a>
                     </div>
-                </div>
-                <div id="news-contacto-etc">
-                    <a href="http://mail.prebi.unlp.edu.ar:8080/lists" target="_blank" title="Suscríbase al newsletter">
-                        <img class="newsletter">
-                            <xsl:attribute name="src">
-                                <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-                                <xsl:text>/themes/Sedici/images/img2.png</xsl:text>
-                            </xsl:attribute>
-                        </img>
-                    </a>
-
-                    <a title="Contáctese">
-                        <xsl:attribute name="href">
-                            <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-                            <xsl:text>/feedback</xsl:text>
-                        </xsl:attribute>
-                        <img class="contacto">
-                            <xsl:attribute name="src">
-                                <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-                                <xsl:text>/themes/Sedici/images/img3.png</xsl:text>
-                            </xsl:attribute>
-                        </img>
-                    </a>
-                </div>
+                    <div class="footer-icon">
+	                    <a title="Contáctese">
+	                        <xsl:attribute name="href">
+	                            <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+	                            <xsl:text>/feedback</xsl:text>
+	                        </xsl:attribute>
+	                        <img class="contacto">
+	                            <xsl:attribute name="src">
+	                                <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+	                                <xsl:text>/themes/Sedici/images/img3.png</xsl:text>
+	                            </xsl:attribute>
+	                        </img>
+	                    </a>
+                    </div>
+	            </div>
+            </div>
+            <div id="ds-footer">
+				<div id="dspace-info">
+	            	<a href="http://www.dspace.org" target="_blank">
+	            		<i18n:text>sedici.common.dspace-info</i18n:text>
+	            	</a>
+	            </div>
             </div>
         </div>
     </xsl:template>

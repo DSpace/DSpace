@@ -2527,4 +2527,6 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 
 <message key="sedici.XMLWorkflow.workflowitem.notfound">El ítem solicitado no existe en el workflow</message>
 
+<message key="sedici.common.dspace-info">Soportado por</message>
+
 </catalogue>
