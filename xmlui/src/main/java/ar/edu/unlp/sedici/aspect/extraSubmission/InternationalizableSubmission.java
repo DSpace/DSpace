@@ -53,7 +53,7 @@ public class InternationalizableSubmission  extends AbstractDSpaceTransformer im
             AuthorizeException
     {
         // Adds supported locales from webui.supported.locales config property
-        String supportedLocalesString = ConfigurationManager.getProperty("webui.supported.locales");
+        String supportedLocalesString = ConfigurationManager.getProperty("sedici-dspace", "xmlui.submission.supported_locales");
         for (String locale : supportedLocalesString.split(",")) {
         	pageMeta.addMetadata("supported_locale").addContent(locale.trim());
 		}

@@ -546,6 +546,12 @@
 						<xsl:apply-templates select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='supported_locale']">
 							<xsl:with-param name="lang" select="$lang"/>
 						</xsl:apply-templates>
+						<option value="">
+							<xsl:if test="$lang = ''">
+								<xsl:attribute name="selected">true</xsl:attribute>
+							</xsl:if>
+							<i18n:text>xmlui.dri2xhtml.METS-1.0.code-value-other</i18n:text>
+						</option>
 					</select>
 				</xsl:when>
 

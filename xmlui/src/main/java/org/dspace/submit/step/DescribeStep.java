@@ -763,8 +763,11 @@ public class DescribeStep extends AbstractProcessingStep
             langs = new LinkedList<String>();
             String value = request.getParameter(metadataField);
             String selectedLang = LANGUAGE_QUALIFIER;
-            if(is18nable && request.getParameter(metadataField+"_lang") != null)
+            if(is18nable && request.getParameter(metadataField+"_lang") != null) {
             	selectedLang = request.getParameter(metadataField+"_lang");
+            	if(selectedLang.isEmpty())
+            		selectedLang = null;
+            }
             
             if (value != null)
             {
