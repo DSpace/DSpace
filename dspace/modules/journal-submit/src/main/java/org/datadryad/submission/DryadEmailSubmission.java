@@ -282,6 +282,8 @@ public class DryadEmailSubmission extends HttpServlet {
         }
         // Otherwise, we're running in the standard DSpace Tomcat
         else {
+
+	    
             if(!ConfigurationManager.isConfigured()) {
                 // not configured
                 // Get config parameter
@@ -290,6 +292,7 @@ public class DryadEmailSubmission extends HttpServlet {
                 // Load in DSpace config
                 ConfigurationManager.loadConfig(config);                
             }
+
             String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
             File propFile = new File(journalPropFile);
 
