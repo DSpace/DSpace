@@ -10,7 +10,7 @@ public class ParsingResult {
 
 
     /** The submission id. */
-    String submissionId;
+    private String submissionId;
     
     /**
      * @return the submissionId
@@ -28,7 +28,7 @@ public class ParsingResult {
 
 
     /** whether an parsed submission id is valid. */
-    boolean hasFlawedId = false;
+    private boolean hasFlawedId = false;
     /**
      * @return the hasFlawedId
      */
@@ -46,7 +46,7 @@ public class ParsingResult {
 
 
     /** The submission data as a String Builder instance. */
-    StringBuilder submissionData;
+    private StringBuilder submissionData;
     
     /**
      * @return the submissionData
@@ -64,7 +64,7 @@ public class ParsingResult {
 
 
     /** The sender's email address. */
-    String senderEmailAddress;
+    private String senderEmailAddress;
     
     /**
      * @return the senderEmailAddress
@@ -98,9 +98,26 @@ public class ParsingResult {
         this.journalName = journalName;
     }
     
+    /** The journal code. */
+    private String journalCode;
+    
+    /**
+     * @return the journalCode
+     */
+    public String getJournalCode() {
+        return journalCode;
+    }
+
+    /**
+     * @param journalCode the journalCode to set
+     */
+    public void setJournalCode(String journalCode) {
+        this.journalCode = journalCode;
+    }
+
     
     /** records a error message */
-    String status = null;
+    private String status = null;
     
     /**
      * @return the status message

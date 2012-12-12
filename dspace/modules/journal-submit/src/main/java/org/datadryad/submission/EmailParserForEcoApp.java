@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
 
 import nu.xom.Element;
 
@@ -82,19 +83,19 @@ public class EmailParserForEcoApp extends EmailParser {
 							final String resultValue = value.toString().trim();
 
 							if ("Journal Name".equalsIgnoreCase(lastLabel)) {
-								result.journalName = resultValue;
+								result.setJournalName(resultValue);
 							}
 							else
 								if ("ms reference number".equalsIgnoreCase(lastLabel)) {
-									result.submissionId = resultValue;
-								}
+                                                                    result.setSubmissionId(resultValue);
+                                                                }
 
 							try {
 								final String xml = makeElement(lastLabel, resultValue);
 								resultXML.append(xml);
 							}
 							catch (RuntimeException details) {
-								result.status = details.getMessage();
+								result.setStatus(details.getMessage());
 							}
 						}
 
@@ -122,19 +123,20 @@ public class EmailParserForEcoApp extends EmailParser {
                         lastLabel = label;
                     }
                     catch (RuntimeException details) {
-                        result.status = details.getMessage();
+                        result.setStatus(details.getMessage());
                     }
 
 				}
 			} // else ignore
 		}
 
-		if (lastLabel != null)
+		if (lastLabel != null) {
 		    resultXML.append(makeElement(lastLabel, value.toString()));
-		result.submissionData = resultXML;
+                }
+		result.setSubmissionData(resultXML);
 
 		if (myManuscriptID.equals("")) {
-			result.hasFlawedId = true;
+			result.setHasFlawedId(true);
 		}
 		
 		return result;
@@ -180,8 +182,11 @@ public class EmailParserForEcoApp extends EmailParser {
 	            return xml.toString();
 	        }
 	        else if ("Manuscript".equalsIgnoreCase(name)) {
-	            myManuscriptID = aValue.trim();
-	            return ""; // we don't build xml element yet
+                    Matcher m = Pattern4MS_Dryad_ID.matcher(aValue.trim());
+                    if(m.matches()) {
+                        myManuscriptID = aValue.trim();
+                    }
+                    return ""; // we don't build xml element yet
 	        }
 	        else if ("ArticleTitle".equalsIgnoreCase(name)) {
 	            return new SubmissionMetadata(myManuscriptID, aValue.trim()).toXML();

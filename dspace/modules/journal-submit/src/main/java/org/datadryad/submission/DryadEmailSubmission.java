@@ -8,7 +8,6 @@ import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
+import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 
 import org.jdom.Document;
 import org.jdom.JDOMException;
@@ -42,8 +43,8 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
@@ -62,14 +63,16 @@ public class DryadEmailSubmission extends HttpServlet {
     private static Logger LOGGER = LoggerFactory
     .getLogger(DryadEmailSubmission.class);
 
-    private static String PROPERTIES_FILENAME = "DryadJournalSubmission.properties";
-
     private static String PROPERTIES_PROPERTY = "dryad.properties.filename";
 
     private static String EMAIL_TEMPLATE = "journal_submit_error";
 
-    // Not a concurrent map but we only access, don't write to except at init()
-    private static Map<String, PartnerJournal> myJournals;
+    // Maps not concurrent but we only access, don't write to except at init()
+    // map of Journal Codes to Journals
+    private static Map<String, PartnerJournal> myJournals; 
+    
+    // map of Journal Names to Journal Codes (in case code is not preent in submission)
+    private static Map<String, String> myJournalNames;
 
     /**
      * Handles the HTTP <code>GET</code> method by informing the caller that
@@ -152,7 +155,7 @@ public class DryadEmailSubmission extends HttpServlet {
             for (Address address : addresses) {
                 message = "From: " + address.toString()
                 + System.getProperty("line.separator") + message;
-                result.senderEmailAddress = address.toString();
+                result.setSenderEmailAddress(address.toString());
             }
 
             if (result.getStatus() != null) {
@@ -162,7 +165,7 @@ public class DryadEmailSubmission extends HttpServlet {
             // isHas?
             if (result.isHasFlawedId()) {
                 throw new SubmissionException("Result ID is flawed: "
-                        + result.submissionId);
+                        + result.getSubmissionId());
             }
 
             // We'll use JDOM b/c the libs are already included in DSpace
@@ -181,20 +184,22 @@ public class DryadEmailSubmission extends HttpServlet {
                 Format format = Format.getPrettyFormat();
                 XMLOutputter toFile = new XMLOutputter(format);
                 Document doc = saxBuilder.build(xmlReader);
-                String journalName = result.getJournalName();
+                String journalCode = result.getJournalCode();
 
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Getting metadata dir for " + journalName);
+                    LOGGER.debug("Getting metadata dir for " + journalCode);
                 }
 
-                PartnerJournal journal = myJournals.get(journalName);
+                PartnerJournal journal = myJournals.get(journalCode);
 
                 if (journal == null ) {
-                    throw new SubmissionRuntimeException("Journal (" + journalName + ") not properly registered");
+                    throw new SubmissionRuntimeException("Journal (" + journalCode + ") not properly registered");
                 }
 
                 File dir = journal.getMetadataDir();
-                File file = new File(dir, result.getSubmissionId() + ".xml");
+                String submissionId = result.getSubmissionId();
+                String filename = DryadJournalSubmissionUtils.escapeFilename(submissionId + ".xml");
+                File file = new File(dir, filename);
                 FileOutputStream out = new FileOutputStream(file);
                 OutputStreamWriter writer = new OutputStreamWriter(out, "UTF-8");
 
@@ -277,10 +282,6 @@ public class DryadEmailSubmission extends HttpServlet {
         }
         // Otherwise, we're running in the standard DSpace Tomcat
         else {
-            // These lines support reading configuration from maven, which isn't fully set up for the journal-submission
-            // server at this time  PEM 13 June 2011.
-            //String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
-            //File propFile = new File(journalPropFile);
             if(!ConfigurationManager.isConfigured()) {
                 // not configured
                 // Get config parameter
@@ -289,9 +290,8 @@ public class DryadEmailSubmission extends HttpServlet {
                 // Load in DSpace config
                 ConfigurationManager.loadConfig(config);                
             }
-
-            String cfgDir = ConfigurationManager.getProperty("dspace.dir") + System.getProperty("file.separator") + "config";
-            File propFile = new File(cfgDir, PROPERTIES_FILENAME);
+            String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
+            File propFile = new File(journalPropFile);
 
             if (!propFile.exists()) {
                 throw new SubmissionException("Can't find properties file: "
@@ -305,9 +305,6 @@ public class DryadEmailSubmission extends HttpServlet {
                 throw new SubmissionException(details);
             }
 
-            //if (LOGGER.isDebugEnabled()) {
-            //	LOGGER.debug("Using properties from {}", journalPropFile);
-            //}
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Using properties from {}",propFile);
             }
@@ -358,6 +355,8 @@ public class DryadEmailSubmission extends HttpServlet {
 
         // Returns validated map or throws an exception if there are problems
         myJournals = validate(journals);
+        // Returns a mapping of Journal Names to Journal Codes
+        myJournalNames = mapJournalNamesToCodes(journals);
     }
 
     /**
@@ -377,7 +376,7 @@ public class DryadEmailSubmission extends HttpServlet {
                 StringBuilder message = new StringBuilder(exceptionMessage);
                 String admin = ConfigurationManager.getProperty("mail.admin");
                 String logDir = ConfigurationManager.getProperty("log.dir");
-                Email email = ConfigurationManager.getEmail(EMAIL_TEMPLATE);
+                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), EMAIL_TEMPLATE));
 
                 if (logDir == null || admin == null) {
                     throw new SubmissionException(
@@ -412,6 +411,7 @@ public class DryadEmailSubmission extends HttpServlet {
         List<String> lines = new ArrayList<String>();
         Scanner emailScanner = new Scanner(aMessage);
         String journalName = null;
+        String journalCode = null;
 
         while (emailScanner.hasNextLine()) {
             String line = emailScanner.nextLine();
@@ -424,62 +424,100 @@ public class DryadEmailSubmission extends HttpServlet {
                 continue;
             }
             else {
-                Pattern p = Pattern.compile("^(JOURNAL|Journal Name):(.+)");
-                Matcher m = p.matcher(line);
+                Pattern journalCodePattern = Pattern.compile("^(Journal Code):(.+)");
+                Matcher journalCodeMatcher = journalCodePattern.matcher(line);
 
-                if (m.find()) {
-                    journalName = StringUtils.stripToEmpty(m.group(2));
+                if(journalCodeMatcher.find()) {
+                    journalCode = StringUtils.stripToEmpty(journalCodeMatcher.group(2));
+                    // strip out leading NBSP if present
+                    if (journalCode.codePointAt(0) == 160){
+                        journalCode = journalCode.substring(1);
+                    }
+                }
+                
+                Pattern journalNamePattern = Pattern.compile("^(JOURNAL|Journal Name):(.+)");
+                Matcher journalNameMatcher = journalNamePattern.matcher(line);
+
+                if (journalNameMatcher.find()) {
+                    journalName = StringUtils.stripToEmpty(journalNameMatcher.group(2));
                     if (journalName.codePointAt(0) == 160){          //Journal of Heredity has started inserting NBSP in several fields, including journal title
                         journalName = journalName.substring(1);
                     }
                 }
 
+                // Stop reading lines at EndDryadContent
+                if(line.contains("EndDryadContent")) {
+                    break;
+                }
                 lines.add(line);
             }
         }
 
-        if (journalName != null) {
-            PartnerJournal journal = myJournals.get(journalName);
+        // After reading the entire message, attempt to find the PartnerJournal object by
+        // Journal Code.  If Journal Code is not present, fall back to Journal Name
+        if(journalCode == null) {
+            LOGGER.debug("Journal Code not found in message, trying by journal name: " + journalName);
+            if(journalName != null) {
+                journalCode = myJournalNames.get(journalName);
+            } else {
+                throw new SubmissionException("Journal Code not present and Journal Name not found in message");
+            }
+            if(journalCode == null) {
+                throw new SubmissionException("Journal Name " + journalName + " did not match a known Journal Code");
+            }
+        }
+        
+        if (journalCode != null) {
+            PartnerJournal journal = myJournals.get(journalCode);
             if (journal != null){
                 EmailParser parser = journal.getParser();
                 ParsingResult result = parser.parseMessage(lines);
 
-                // We use journal name to determine to which directory to write
+                result.setJournalCode(journalCode);
                 result.setJournalName(journalName);
 
                 return result;
             }
             else {
-                throw new SubmissionException("Journal " + journalName + " not found in configuration");
+                throw new SubmissionException("Journal " + journalCode + " not found in configuration");
             }
         }
         else {
-            throw new SubmissionException("Journal name not found in message");
+            throw new SubmissionException("Journal code not found in message");
         }
     }
 
     private Map<String, PartnerJournal> validate(
             Map<String, PartnerJournal> aJournalMap) {
         Map<String, PartnerJournal> results = new HashMap<String, PartnerJournal>();
-        Iterator<PartnerJournal> iterator = aJournalMap.values().iterator();
 
-        while (iterator.hasNext()) {
-            PartnerJournal journal = iterator.next();
-
+        for (String journalCode : aJournalMap.keySet()) {
+            PartnerJournal journal = aJournalMap.get(journalCode);
             if (!journal.isComplete()) {
                 throw new SubmissionRuntimeException(journal.getName()
                         + "'s configuration isn't complete");
             }
             else {
                 // now store our metadata by the journal name instead of code
-                results.put(journal.getName(), journal);
+                results.put(journalCode, journal);
             }
 
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Registered journal: " + journal.toString());
             }
         }
+        
+        return results;
+    }
 
+    private Map<String, String> mapJournalNamesToCodes(
+            Map<String, PartnerJournal> aJournalMap) {
+        Map<String, String> results = new HashMap<String, String>();
+
+        for (String journalCode : aJournalMap.keySet()) {
+            PartnerJournal journal = aJournalMap.get(journalCode);
+            results.put(journal.getName(), journalCode);
+        }
         return results;
     }
 

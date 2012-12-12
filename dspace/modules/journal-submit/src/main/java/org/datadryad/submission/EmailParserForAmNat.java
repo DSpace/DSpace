@@ -44,10 +44,6 @@ public class EmailParserForAmNat extends EmailParser {
 	static Pattern Pattern4SenderEmailAddress = Pattern
 			.compile("(\"[^\"]*\"|)\\s*(<|)([^@]+@[^@>]+)(>|)");
 
-	/** The Pattern4 invalid id. */
-	static Pattern Pattern4InvalidId = Pattern
-			.compile("[^a-zA-Z0-9+/_\\-.$#]+");
-
 	/** The pattern for separator lines */
 	static Pattern Pattern4separatorLine = Pattern
 			.compile("^(-|\\+|\\*|/|=|_){2,}+");
@@ -107,7 +103,7 @@ public class EmailParserForAmNat extends EmailParser {
 				"Page charge notes", "Publication agreement received",
 				"Public Domain", "Erratum to MS #", "Resubmission of MS #",
 				"SOURCE FILES", "Item Type", "Item Description", "File Name",
-				"Appendixes");
+				"Appendixes", "Dryad author url");
 
 		tagsTobeExcludedSet = new LinkedHashSet<String>(tagsTobeExcluded);
 	}
@@ -181,7 +177,7 @@ public class EmailParserForAmNat extends EmailParser {
 					if (me.find()) {
 						LOGGER.trace("how many groups=" + me.groupCount());
 						LOGGER.trace("email address captured:" + me.group(3));
-						result.senderEmailAddress = me.group(3);
+						result.setSenderEmailAddress(me.group(3));
 					}
 
 				}
@@ -231,12 +227,12 @@ public class EmailParserForAmNat extends EmailParser {
 					// i.e., ="Manuscript Number"
 					// assign outputFileField as the name for an XML file
 					if (fieldName.equals(outputFileField)) {
-						result.submissionId = fieldValue;
+						result.setSubmissionId(fieldValue);
 						// outputFileName = fieldValue + ".xml";
 						LOGGER.info("submissionId = " + fieldValue);
-						Matcher mi = Pattern4InvalidId.matcher(fieldValue);
-						if (mi.find()) {
-							result.hasFlawedId = true;
+                                                Matcher mi = Pattern4MS_Dryad_ID.matcher(fieldValue);
+                                                if(!mi.matches()) {
+							result.setHasFlawedId(true);
 							LOGGER.error("invalid submission id found="
 									+ fieldValue);
 						}
@@ -291,7 +287,7 @@ public class EmailParserForAmNat extends EmailParser {
 		}
 
 		LOGGER.trace("***** end of separateEmailMessage() *****");
-		result.submissionData = BuildSubmissionDataAsXML(dataForXml);
+		result.setSubmissionData(BuildSubmissionDataAsXML(dataForXml));
 		return result;
 	}
 
