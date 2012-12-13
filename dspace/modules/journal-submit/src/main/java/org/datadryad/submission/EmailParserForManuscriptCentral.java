@@ -171,7 +171,7 @@ public class EmailParserForManuscriptCentral extends EmailParser {
                     if (me.find()){
                         LOGGER.trace("how many groups="+me.groupCount());
                         LOGGER.trace("email address captured:"+me.group(3));
-                        result.senderEmailAddress = me.group(3);
+                        result.setSenderEmailAddress(me.group(3));
                     }
                 } 
                 
@@ -235,15 +235,15 @@ public class EmailParserForManuscriptCentral extends EmailParser {
                     if (fieldName.equalsIgnoreCase("MS Dryad ID") || fieldName.equalsIgnoreCase("MS Reference Number")){
                         Matcher mid = Pattern4MS_Dryad_ID.matcher(fieldValue);
                         if (mid.find()){
-                            result.submissionId = mid.group(0);
-                            LOGGER.trace("submissionId="+result.submissionId);
+                            result.setSubmissionId(mid.group(0));
+                            LOGGER.trace("submissionId="+result.getSubmissionId());
                             
-                            if (fieldValue.equals(result.submissionId)){
+                            if (fieldValue.equals(result.getSubmissionId())){
                                 LOGGER.trace("value and ID are the same");
                             } else {
                                 LOGGER.warn("fieldvalue=["+fieldValue+"]"+
-                                    "\tid="+result.submissionId+" differ");
-                                result.hasFlawedId= true;
+                                    "\tid="+result.getSubmissionId()+" differ");
+                                result.setHasFlawedId(true);
                             }
                         }
                     }
@@ -312,7 +312,7 @@ public class EmailParserForManuscriptCentral extends EmailParser {
         }
             
 		LOGGER.trace("***** end of parseEmailMessage() *****");
-        result.submissionData = BuildSubmissionDataAsXML(dataForXml);
+        result.setSubmissionData(BuildSubmissionDataAsXML(dataForXml));
 
         return result;
     }
