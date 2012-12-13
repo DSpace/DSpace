@@ -478,9 +478,10 @@ public class SolrLogger
         else if (dso instanceof Collection)
         {
             Collection coll = (Collection) dso;
-            for (int i = 0; i < coll.getCommunities().length; i++)
+            Community[] communities = coll.getCommunities();
+            for (int i = 0; i < communities.length; i++)
             {
-                Community community = coll.getCommunities()[i];
+                Community community = communities[i];
                 doc1.addField("owningComm", community.getID());
                 storeParents(doc1, community);
             }
@@ -488,9 +489,10 @@ public class SolrLogger
         else if (dso instanceof Item)
         {
             Item item = (Item) dso;
-            for (int i = 0; i < item.getCollections().length; i++)
+            Collection[] collections = item.getCollections();
+            for (int i = 0; i < collections.length; i++)
             {
-                Collection collection = item.getCollections()[i];
+                Collection collection = collections[i];
                 doc1.addField("owningColl", collection.getID());
                 storeParents(doc1, collection);
             }
@@ -498,12 +500,14 @@ public class SolrLogger
         else if (dso instanceof Bitstream)
         {
             Bitstream bitstream = (Bitstream) dso;
-            for (int i = 0; i < bitstream.getBundles().length; i++)
+            Bundle[] bundles = bitstream.getBundles();
+            for (int i = 0; i < bundles.length; i++)
             {
-                Bundle bundle = bitstream.getBundles()[i];
-                for (int j = 0; j < bundle.getItems().length; j++)
+                Bundle bundle = bundles[i];
+                Item[] items = bundle.getItems();
+                for (int j = 0; j < items.length; j++)
                 {
-                    Item item = bundle.getItems()[j];
+                    Item item = items[j];
                     doc1.addField("owningItem", item.getID());
                     storeParents(doc1, item);
                 }
