@@ -54,5 +54,5 @@ public abstract class IdentifierProvider {
 
     public abstract void reserve(Context context, DSpaceObject dso, String identifier) throws IdentifierException;
 
-    public abstract void register(Context context, DSpaceObject object, String identifier);
+    public abstract void register(Context context, DSpaceObject object, String identifier) throws IdentifierException;
 }
