@@ -478,7 +478,7 @@
 					<repeatable>true</repeatable>
 					<label>ISBN</label>
 					<input-type>onebox</input-type>
-					<hint>Introduzca aquí el código ISBN de su obra sólo si el mismo fué tramitado oportunamente</hint>
+					<hint>Introduzca aquí el número de ISBN de su obra sólo si ésta ya lo tiene</hint>
 					<type-bind>Tesis,Objeto de conferencia</type-bind>
 				</field>
 
