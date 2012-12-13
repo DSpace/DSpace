@@ -2064,7 +2064,7 @@ background-repeat:no-repeat;
 color: #949494;
 background-color:white;
 position:relative;
-left:520px;
+left:465px;
 bottom:40px;
 }
 
@@ -3284,6 +3284,11 @@ a.link-community-view-all {
 	font-size: 12px;
 	line-height: 22px;
 	float: right;
+}
+
+#aspect_discovery_SimpleSearch_item_search-filter-list input.ds-add-button {
+	margin-top: 12px;
+	margin-left: 10px;
 }
 
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
