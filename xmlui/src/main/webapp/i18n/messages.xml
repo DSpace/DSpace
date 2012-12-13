@@ -2293,4 +2293,6 @@
 
 <message key="sedici.common.dspace-info">Supported by</message>
 
+<message key="sedici.EPerson.string-too-long">Field {0} exceded maximun length ({1} characteres) and was cut</message>
+
 </catalogue>

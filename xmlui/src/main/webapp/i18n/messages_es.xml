@@ -2530,4 +2530,6 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 
 <message key="sedici.common.dspace-info">Soportado por</message>
 
+<message key="sedici.EPerson.string-too-long">El campo {0} excedía el máximo de {1} caracteres y fue cortado</message>
+
 </catalogue>
