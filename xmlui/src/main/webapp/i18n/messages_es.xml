@@ -2475,6 +2475,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.Discovery.AbstractSearch.startswith.help">O ingrese las primeras letras:</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.title_sort">Título</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.date.issued_dt">Fecha de publicación</message>
+<message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.date.accessioned_dt">Fecha de carga</message>
 <message key="xmlui.discovery.SearchFacetFilter.no-results">No se encontarron valores acordes a los filtros.</message>
 <message key="xmlui.discovery.AbstractFiltersTransformer.filters.head">Navegar por</message>
 <message key="xmlui.discovery.AbstractFiltersTransformer.filters.view-more">... Ver más</message>
