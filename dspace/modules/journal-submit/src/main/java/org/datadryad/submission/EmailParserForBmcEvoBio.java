@@ -28,10 +28,6 @@ public class EmailParserForBmcEvoBio extends EmailParser {
     /** The Pattern for email field. */
     static Pattern Pattern4EmailField = Pattern.compile("^[^:]+:");
     
-    /** The Pattern or dryad_ id. */
-    static Pattern Pattern4MS_Dryad_ID = Pattern
-        .compile("[a-zA-Z0-9+/_\\-.$#]+");
-    
     /** The Pattern for nonbreaking space. */
     static Pattern Pattern4NonbreakingSpace = Pattern.compile("\\u00A0");
     
@@ -105,7 +101,8 @@ public class EmailParserForBmcEvoBio extends EmailParser {
                 "Article_Title");
                 
         tagsTobeExcluded = Arrays.asList(
-            "MS Reference Number"
+            "MS Reference Number",
+            "Dryad author url"
         );
         
         tagsTobeExcludedSet = new LinkedHashSet<String>(tagsTobeExcluded);
@@ -168,7 +165,7 @@ public class EmailParserForBmcEvoBio extends EmailParser {
                     if (me.find()){
                         LOGGER.trace("how many groups="+me.groupCount());
                         LOGGER.trace("email address captured:"+me.group(3));
-                        result.senderEmailAddress = me.group(3);
+                        result.setSenderEmailAddress(me.group(3));
                     }
                 } 
                 
@@ -179,6 +176,10 @@ public class EmailParserForBmcEvoBio extends EmailParser {
                     if (!tagsTobeExcludedSet.contains(fieldName)) {
                         StoredLines = StoredLines +" "+ line; 
                         LOGGER.trace("new stored line=" + StoredLines);
+                        // The field name that was matched will not be used,
+                        // reset it to the previous field since we are storing
+                        // the entire line
+                        fieldName = previousField;
                     } else {
                         LOGGER.trace("\t*** line [" + line + "] is skipped");
                     }
@@ -228,15 +229,15 @@ public class EmailParserForBmcEvoBio extends EmailParser {
                     if (fieldName.equalsIgnoreCase("MS Dryad ID") || fieldName.equalsIgnoreCase("MS Reference Number")){
                         Matcher mid = Pattern4MS_Dryad_ID.matcher(fieldValue);
                         if (mid.find()){
-                            result.submissionId = mid.group(0);
-                            LOGGER.info("submissionId="+result.submissionId);
+                            result.setSubmissionId(mid.group(0));
+                            LOGGER.info("submissionId="+result.getSubmissionId());
                             
-                            if (fieldValue.equals(result.submissionId)){
+                            if (fieldValue.equals(result.getSubmissionId())){
                                 LOGGER.trace("value and ID are the same");
                             } else {
                                 LOGGER.warn("fieldvalue=["+fieldValue+"]"+
-                                    "\tid="+result.submissionId+" differ");
-                                result.hasFlawedId= true;
+                                    "\tid="+result.getSubmissionId()+" differ");
+                                result.setHasFlawedId(true);
                             }
                         }
                     }
@@ -303,7 +304,7 @@ public class EmailParserForBmcEvoBio extends EmailParser {
         }
             
 		LOGGER.trace("***** end of parseEmailMessage() *****");
-        result.submissionData = BuildSubmissionDataAsXML(dataForXml);
+        result.setSubmissionData(BuildSubmissionDataAsXML(dataForXml));
 
         return result;
     }
