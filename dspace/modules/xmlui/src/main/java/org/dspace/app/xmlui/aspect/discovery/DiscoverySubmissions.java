@@ -49,6 +49,8 @@ public class DiscoverySubmissions extends SimpleSearch {
         message("xmlui.Submission.Submissions.trail");
     protected static final Message T_untitled =
         message("xmlui.Submission.Submissions.untitled");
+    protected static final Message T_s_submit_remove =
+            message("xmlui.Submission.Submissions.submit_submit_remove");
 
 
 
@@ -153,7 +155,8 @@ public class DiscoverySubmissions extends SimpleSearch {
         //Perform a search with our workflow step filter in place !
         QueryResponse queryResults = performSearch(queryArgs);
 
-        Division workflowResultsDiv  = results.addDivision("search-results-" + count.getName());
+        Division workflowResultsDiv  = results.addInteractiveDivision("search-results-" + count.getName(),contextPath+"/submissions", Division.METHOD_POST);
+
         workflowResultsDiv.setHead(message("xmlui.Submission.Submissions.step.head." + count.getName()));
 
 
@@ -196,6 +199,11 @@ public class DiscoverySubmissions extends SimpleSearch {
         }
 
         Row headerRow = resultTable.addRow(Row.ROLE_HEADER);
+
+        if(count.getName().equalsIgnoreCase("Submission")){
+            headerRow.addCell().addContent(message(""));
+        }
+
         headerRow.addCell().addContent(message("xmlui.Submission.result-table.head.title"));
         headerRow.addCell().addContent(message("xmlui.Submission.result-table.head.datafiles"));
 
@@ -210,14 +218,22 @@ public class DiscoverySubmissions extends SimpleSearch {
                     //Add the item url
                     itemRow.addCell().addXref(HandleManager.resolveToURL(context, item.getHandle()), item.getName());
                 }else{
+
                     WorkspaceItem workspaceItem = WorkspaceItem.findByItem(context, item);
+
                     if(workspaceItem != null){
+
+                        CheckBox selected = itemRow.addCell("workspaceitemcell_checkbox", Cell.ROLE_DATA, "inlineRow").addCheckBox("workspaceID");
+                        selected.setLabel("select");
+                        selected.addOption(workspaceItem.getID());
+
                         String title = item.getName();
                         if(title == null){
                             itemRow.addCell().addXref(contextPath + "/submit?workspaceID=" + workspaceItem.getID(), T_untitled);
                         }else{
                             itemRow.addCell().addXref(contextPath + "/submit?workspaceID=" + workspaceItem.getID(), title);
                         }
+
                     }else{
 
                         try {
@@ -250,7 +266,15 @@ public class DiscoverySubmissions extends SimpleSearch {
                 }
 
                 itemRow.addCell().addContent(DryadWorkflowUtils.getDataFiles(context, item).length);
+
             }
+        }
+
+
+        if (count.getName().equalsIgnoreCase("Submission")) {
+            headerRow = resultTable.addRow();
+            Cell lastCell = headerRow.addCell(0,5);
+            lastCell.addButton("submit_submissions_remove").setValue(T_s_submit_remove);
         }
 
         if(showMoreUrl && !isStepFilterPage()){
