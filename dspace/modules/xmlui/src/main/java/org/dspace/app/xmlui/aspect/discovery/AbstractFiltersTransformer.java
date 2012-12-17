@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.aspect.discovery;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
@@ -16,6 +17,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
@@ -26,7 +28,10 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.SearchService;
@@ -37,6 +42,7 @@ import org.dspace.handle.HandleManager;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URLEncoder;
@@ -155,7 +161,32 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
 			}
 		    }
                 }
+                SolrDocumentList solrResults = queryResults.getResults();
 
+                if(solrResults.size()==1){
+                    HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+
+                    String baseURL = ConfigurationManager.getProperty("dspace.baseUrl");
+                    for (SolrDocument doc : solrResults) {
+                        DSpaceObject resultDSO = SearchUtils.findDSpaceObject(context, doc);
+                        if (resultDSO instanceof Item){
+                            Item item =  (Item) resultDSO;
+                            DCValue[] value = item.getMetadata("dc","identifier",null,Item.ANY) ;
+                            String buildURL = null;
+                            if(value!=null && value.length > 0){
+                                String doi = value[0].value;
+                                buildURL = baseURL+"/resource/"+doi;
+                            }
+                            else{
+                                if(item.getHandle()!=null)
+                                    buildURL = baseURL+"/handle/"+item.getHandle();
+                            }
+                            if(buildURL!=null) {
+                                httpResponse.sendRedirect(buildURL);
+                            }
+                        }
+                    }
+                }
 
                 this.validity = val.complete();
             }
