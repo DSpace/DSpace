@@ -3,9 +3,13 @@ package org.dspace.workflow.actions.processingaction;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
+import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.PluginManager;
+import org.dspace.embargo.EmbargoLifter;
 import org.dspace.workflow.*;
 import org.dspace.workflow.actions.ActionResult;
 
@@ -51,6 +55,23 @@ public class EditMetadataAction extends ProcessingAction {
         if(request.getParameter("submit_approve") != null){
             //Delete the tasks
             addApprovedProvenance(c, wfi);
+
+            // in case the Curator approve the item in pendingPublicationStep
+            // if(embargo is "untilArticleAppears"): Remove it!
+            if(step.getId().equals("pendingPublicationStep")){
+                Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wfi.getItem());
+                for(Item i : dataFiles){
+                    DCValue[] values = i.getMetadata("dc.type.embargo");
+                    if(values!=null && values.length > 0){
+                        if(values[0].value.equals("untilArticleAppears")){
+                            i.clearMetadata("dc", "type", "embargo", Item.ANY);
+                            i.addMetadata("dc", "type", "embargo", "en", "none");
+                        }
+                    }
+                    i.update();
+                }
+
+            }
 
             return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
         } else if(request.getParameter("submit_reject") != null){
