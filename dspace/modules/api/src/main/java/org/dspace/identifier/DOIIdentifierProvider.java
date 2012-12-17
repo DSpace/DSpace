@@ -297,8 +297,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     }
 
     public DSpaceObject resolve(Context context, String identifier, String... attributes) throws IdentifierNotFoundException, IdentifierNotResolvableException {
-        log.debug("start resolve() identifier ==>>  " + identifier);
-
 	// convert http DOIs to short form
 	if (identifier.startsWith("http://dx.doi.org/")) {
 	    identifier = "doi:" + identifier.substring("http://dx.doi.org/".length());
@@ -315,8 +313,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                 throw new IdentifierNotFoundException();
 	    }
             String value = dbDOI.getInternalIdentifier();
-
-            log.debug("resolve to (before replace) ==>>" + value);
 
             if (value != null) {
                 // Ask Parent Service to retrieve internal reference to resource identified in the value.
