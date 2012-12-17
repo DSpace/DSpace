@@ -174,11 +174,17 @@ public class XOAI
         System.out
                 .println("Incremental import. Searching for documents modified after: "
                         + last.toString());
+
+        String sqlQuery = "SELECT item_id FROM item WHERE in_archive=TRUE AND last_modified > ?";
+        if(DatabaseManager.isOracle()){
+                sqlQuery = "SELECT item_id FROM item WHERE in_archive=1 AND last_modified > ?";
+        }
+
         try
         {
             TableRowIterator iterator = DatabaseManager
                     .query(_context,
-                            "SELECT item_id FROM item WHERE in_archive=TRUE AND last_modified > ?",
+                            sqlQuery,
                             new java.sql.Timestamp(last.getTime()));
             return this.index(iterator);
         }
@@ -193,8 +199,14 @@ public class XOAI
         System.out.println("Full import");
         try
         {
+
+            String sqlQuery = "SELECT item_id FROM item WHERE in_archive=TRUE";
+            if(DatabaseManager.isOracle()){
+                sqlQuery = "SELECT item_id FROM item WHERE in_archive=1";
+            }
+
             TableRowIterator iterator = DatabaseManager.query(_context,
-                    "SELECT item_id FROM item WHERE in_archive=TRUE");
+                    sqlQuery);
             return this.index(iterator);
         }
         catch (SQLException ex)
