@@ -224,6 +224,12 @@
 		<scope_note>Entidad de origen. Institución donde se creó el documento</scope_note>
 	</dc-type>
 	<dc-type>
+		<schema>mods</schema>
+		<element>recordInfo</element>
+		<qualifier>recordContentSource</qualifier>
+		<scope_note>Registra el nombre de la entidad y/o sitio web desde donde se obtuvo la información del registro</scope_note>
+	</dc-type>
+	<dc-type>
 		<schema>dc</schema>
 		<element>type</element>
 		<!-- sin calificar -->

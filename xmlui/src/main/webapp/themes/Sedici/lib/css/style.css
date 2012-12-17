@@ -2946,6 +2946,13 @@ span.ds-dc_contributor_author-authority {
 	font-style:italic;
 	
 }
+.item-summary-view-metadata .metadata.record-source {
+	float: right;
+}
+.item-summary-view-metadata .metadata.record-source span.metadata-value {
+	font-size: 81%;
+	font-style: italic;
+}
 .item-summary-view-metadata #view-item-metadata {
 	float: right;
 	clear: both;

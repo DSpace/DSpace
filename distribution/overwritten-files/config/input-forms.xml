@@ -740,6 +740,17 @@
 					<visibility>workflow</visibility>
 				</field>
 				
+				<!-- Entidad fuente -->
+				<field>
+					<dc-schema>mods</dc-schema>
+					<dc-element>recordInfo</dc-element>
+					<dc-qualifier>recordContentSource</dc-qualifier>
+					<label>Fuente</label>
+					<input-type value-pairs-name="record_content_sources">dropdown</input-type>
+					<hint>Nombre de la entidad y/o sitio web desde donde se obtuvo la información del registro</hint>
+					<visibility>workflow</visibility>
+				</field>
+
 				<!-- Notas -->
 				<field>
 					<dc-schema>sedici</dc-schema>
@@ -1052,6 +1063,22 @@
 			<pair>
 				<displayed-value>24 meses</displayed-value>
 				<stored-value>730</stored-value>
+			</pair>
+		</value-pairs>
+
+		<!-- Alternativas de fuentes -->
+		<value-pairs value-pairs-name="record_content_sources">
+			<pair>
+				<displayed-value>No aplica</displayed-value>
+				<stored-value></stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Memoria académica</displayed-value>
+				<stored-value>&lt;a href="http://www.memoria.fahce.unlp.edu.ar" target="_blank"&gt;Memoria académica&lt;/a&gt;</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Naturalis</displayed-value>
+				<stored-value>&lt;a href="http://naturalis.fcnym.unlp.edu.ar" target="_blank"&gt;Naturalis&lt;/a&gt;</stored-value>
 			</pair>
 		</value-pairs>
 
