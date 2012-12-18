@@ -1464,3 +1464,7 @@ img.ds-authority-confidence
  	display:none;
     }
 }
+
+#aspect_discovery_DiscoverySubmissions_cell_workspaceitemcell_checkbox{
+  width:10px;
+}
