@@ -440,9 +440,9 @@ public class SelectPublicationStep extends AbstractProcessingStep {
        the pBean, it will take precedence over the journal metadata.
      **/
     private void importJournalMetadata(Context context, Item item, PublicationBean pBean){
+        // These values are common to both Article Types
         addSingleMetadataValueFromJournal(context, item, "journalName", pBean.getJournalName());
         addSingleMetadataValueFromJournal(context, item, "journalVolume", pBean.getJournalVolume());
-        addSingleMetadataValueFromJournal(context, item, "title", pBean.getTitle());
         addSingleMetadataValueFromJournal(context, item, "abstract", pBean.getAbstract());
         addSingleMetadataValueFromJournal(context, item, "correspondingAuthor", pBean.getCorrespondingAuthor());
         addSingleMetadataValueFromJournal(context, item, "doi", pBean.getDOI());
@@ -458,6 +458,16 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         addSingleMetadataValueFromJournal(context, item, "manuscriptNumber", pBean.getManuscriptNumber());
         addSingleMetadataValueFromJournal(context, item, "journalID", pBean.getJournalID());
         addSingleMetadataValueFromJournal(context, item, "status", String.valueOf(pBean.isSkipReviewStep()));
+        
+        // These values differ based on the Article Type
+        if(pBean.getArticleType() == null || pBean.getArticleType().equals(PublicationBean.TYPE_REGULAR)) {
+            addSingleMetadataValueFromJournal(context, item, "title", pBean.getTitle());
+        } else if(pBean.getArticleType().equals(PublicationBean.TYPE_GR_NOTE)) {
+            final String title = String.format("\"%s\" in %s", pBean.getTitle(), pBean.getCitationTitle());
+            addSingleMetadataValueFromJournal(context, item, "title", title);
+            addSingleMetadataValueFromJournal(context, item, "citationTitle", pBean.getCitationTitle());
+            // Citation Authors are not stored in the Item
+        }
     }
 
 

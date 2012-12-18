@@ -57,7 +57,8 @@ public class ModelPublication
     static List<String>  xmlTagNameList = Arrays.asList(
         "Journal","ISSN", "Manuscript","Article_Title",
         "Article_Type","Author","Email","Corresponding_Author",
-        "keyword", "Abstract", "Article_Status"
+        "keyword", "Abstract", "Article_Status", "Citation_Title",
+        "Citation_Authors"
     );
 
 	/**
@@ -553,6 +554,15 @@ public class ModelPublication
 				}
 				 
 			    }
+                            if(tag.equals("Article_Type")) {
+                                pbean.setArticleType(StringEscapeUtils.unescapeXml(text).trim());
+                            }
+                            if(tag.equals("Citation_Title")) {
+                                pbean.setCitationTitle(StringEscapeUtils.unescapeXml(text).trim());
+                            }
+                            if(tag.equals("Citation_Authors")) {
+                                pbean.setCitationAuthors(StringEscapeUtils.unescapeXml(text).trim());
+                            }
 	            
 			}
 
