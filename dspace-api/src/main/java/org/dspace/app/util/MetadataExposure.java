@@ -64,6 +64,17 @@ public class MetadataExposure
 
     private static final String CONFIG_PREFIX = "metadata.hide.";
 
+    /**
+     * Returns whether the given metadata field should be exposed (visible). The metadata field is in the DSpace's DC notation: schema.element.qualifier
+     *
+     * @param context DSpace context
+     * @param schema metadata field schema (namespace), e.g. "dc"
+     * @param element metadata field element
+     * @param qualifier metadata field qualifier
+     *
+     * @return true (hidden) or false (exposed)
+     * @throws SQLException
+     */
     public static boolean isHidden(Context context, String schema, String element, String qualifier)
         throws SQLException
     {
@@ -98,12 +109,24 @@ public class MetadataExposure
         }
     }
 
+    /**
+     * Returns whether the maps from configuration have already been loaded
+     * into the hiddenElementSets property.
+     *
+     * @return true (initialized) or false (not initialized)
+     */
     private static boolean isInitialized()
     {
         return hiddenElementSets != null;
     }
 
-    // load maps from configuration unless it's already done.
+    /**
+     * Loads maps from configuration unless it's already done.
+     * The configuration properties are a map starting with the
+     * "metadata.hide." prefix followed by schema, element and
+     * qualifier separated by dots and the value is true (hidden)
+     * or false (exposed).
+     */
     private static synchronized void init()
     {
         if (!isInitialized())
