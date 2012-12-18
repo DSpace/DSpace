@@ -14,9 +14,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 
 /**
- * User: kevin (kevin at atmire.com)
- * Date: 3-aug-2011
- * Time: 11:26:34
+ * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class XMLUISpringLoader implements SpringLoader {
 
