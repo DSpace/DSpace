@@ -81,10 +81,22 @@ public class PluggableVersioningService implements VersioningService{
     private void removeVersion(Context c, Version version) {
         try{
             VersionHistory history = versionHistoryDAO.findById(c, version.getVersionHistoryID(), versionDAO);
-            Item itemToDelete = version.getItem();
             ItemVersionProvider provider = getProvider();
+            Item item = version.getItem();
+
+
+            Version previous = history.getPrevious(version);
+
+            // delete current
             provider.deleteVersionedItem(c, version, history);
             versionDAO.delete(c, version.getVersionId());
+
+
+            // first time: create 2 versions, .1(old version) and .2(new version)
+            // if removing .2 of an item not archived (Curator Reject it) is necessary to remove also .1
+            if(history!=null && history.size()==1 && !item.isArchived()){
+                versionDAO.delete(c, previous.getVersionId());
+            }
         }catch (Exception e) {
             c.abort();
             throw new RuntimeException(e.getMessage(), e);
