@@ -18,46 +18,31 @@ package ar.edu.unlp.sedici.aspect.extraSubmission;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URL;
 import java.sql.SQLException;
-import java.util.Iterator;
+import java.util.Map;
 
-import org.apache.avalon.framework.parameters.ParameterException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
-import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.Item;
-import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Metadata;
 import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
 
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.io.SyndFeedInput;
-import com.sun.syndication.io.XmlReader;
+import ar.edu.unlp.sedici.util.ConfigurationUtil;
 
 
 /**
  * Aspect para la generacion de metas de autoarchivo
  *
  * @author Nicolás Romagnoli
+ * @author Nestor Oviedo
+
  */
 public class GenerateHomeLinksPageMeta  extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
@@ -75,40 +60,15 @@ public class GenerateHomeLinksPageMeta  extends AbstractDSpaceTransformer implem
     }
     
     /** What page metadata to add to the document */
-    public void addPageMeta(PageMeta pageMeta) throws SAXException,
-            WingException, UIException, SQLException, IOException,
-            AuthorizeException
+    public void addPageMeta(PageMeta pageMeta) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException
     {
-    	//Guardo las communities que serán links
-    	String communitiesLinks = ConfigurationManager.getProperty("sedici-dspace", "xmlui.community-list.home-links");
-    	Metadata meta;
-    	int posicionInicial = 0;
-    	boolean continuar=true;
-    	int posicionFinal=communitiesLinks.indexOf("|", posicionInicial);
-    	if (posicionFinal==-1){
-    		continuar=false;
-    	}
-    	String elemento, nombre, valor="";
-    	while (continuar){   
-    		posicionFinal=communitiesLinks.indexOf("|", posicionInicial);
-        	if (posicionFinal==-1){
-        		posicionFinal=communitiesLinks.length();
-        		continuar=false;
-        	}
-    		elemento=communitiesLinks.substring(posicionInicial, posicionFinal);
-    		posicionInicial=posicionFinal+1;    		
-    		try{
-	    		nombre=elemento.substring(0, elemento.indexOf(":"));
-	    		valor=elemento.substring(elemento.indexOf(":")+1, elemento.length());
-	    		meta=pageMeta.addMetadata("home-link", nombre);
-	    		meta.addContent(valor);
-    		} catch (Exception e) {
-    			System.out.println("erorr");
-			}
-    	}
+    	// Guardo las communities que serán links
+    	Map<String,String> communityLinks = ConfigurationUtil.readMultipleProperties("sedici-dspace", "xmlui.community-list.home-link");
+    	String orderedHomeLinks = ConfigurationManager.getProperty("sedici-dspace","xmlui.community-list.ordered-home-links");
     	
-
-    	
+    	for(String key : orderedHomeLinks.split(",")) {
+    		pageMeta.addMetadata("home-link", key.trim()).addContent(communityLinks.get(key.trim()));
+    	}
 		
     }
 
