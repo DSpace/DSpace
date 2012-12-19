@@ -2265,6 +2265,8 @@
 <message key="sedici.comunidades.tesis.embargo">Embargoed document</message>
 <message key="sedici.comunidades.redunci.nombre">Red UNCI</message>
 <message key="sedici.comunidades.redunci.info">Journals and events from Red UNCI</message>
+<message key="sedici.comunidades.radio.nombre">University Radio</message>
+<message key="sedici.comunidades.radio.info">Interveiws and artistic productions, among other audios</message>
 
 <message key="sedici.noticias.head">News</message>
 <message key="sedici.noticias.titulo">News list</message>
