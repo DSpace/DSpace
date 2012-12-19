@@ -44,30 +44,39 @@ public class VersionManager {
     // Versioning
     public static FlowResult processCreateNewVersion(Context context, int itemID, String summary) throws SQLException, AuthorizeException, IOException {
         FlowResult result = new FlowResult();
-        try {
+
+        if(summary ==  null || summary.length() < 10) {
             result.setContinue(false);
+            result.setOutcome(false);
+            result.setMessage(new Message("error", "Reason should have at least 10 characters"));
+            result.addError("version_reason");
+        }
+         else{
+            try {
+                result.setContinue(false);
 
-            Item item = Item.find(context, itemID);
+                Item item = Item.find(context, itemID);
 
 
 
-            if (AuthorizeManager.isAdmin(context, item) || item.canEdit() || isCurrentEpersonItemSubmitter(context, item)) {
-                VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
-                Version version = versioningService.createNewVersion(context, itemID, summary);
-                WorkspaceItem wsi = WorkspaceItem.findByItem(context, version.getItem());
+                if (AuthorizeManager.isAdmin(context, item) || item.canEdit() || isCurrentEpersonItemSubmitter(context, item)) {
+                    VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
+                    Version version = versioningService.createNewVersion(context, itemID, summary);
+                    WorkspaceItem wsi = WorkspaceItem.findByItem(context, version.getItem());
 
-                context.commit();
+                    context.commit();
 
-                result.setParameter("wsid", wsi.getID());
-                result.setOutcome(true);
-                result.setContinue(true);
-                result.setMessage(T_version_created);
-                result.setParameter("summary", summary);
+                    result.setParameter("wsid", wsi.getID());
+                    result.setOutcome(true);
+                    result.setContinue(true);
+                    result.setMessage(T_version_created);
+                    result.setParameter("summary", summary);
 
+                }
+            } catch (Exception ex) {
+                context.abort();
+                throw new RuntimeException(ex);
             }
-        } catch (Exception ex) {
-            context.abort();
-            throw new RuntimeException(ex);
         }
         return result;
     }

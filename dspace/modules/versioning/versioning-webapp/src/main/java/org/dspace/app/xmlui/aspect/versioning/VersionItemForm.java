@@ -16,6 +16,7 @@ import org.dspace.versioning.VersionServiceUtil;
 import org.dspace.versioning.VersioningService;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Comparator;
 
 /**
@@ -39,6 +40,7 @@ public class VersionItemForm extends AbstractDSpaceTransformer {
     private static final Message T_submit_version= message("xmlui.aspect.versioning.VersionItemForm.submit_version");
 	private static final Message T_submit_update_version= message("xmlui.aspect.versioning.VersionItemForm.submit_update_version");
     private static final Message T_summary = message("xmlui.aspect.versioning.VersionItemForm.summary");
+    private static final Message T_reason = message("xmlui.aspect.versioning.VersionItemForm.reason");
 
 
 	public void addPageMeta(PageMeta pageMeta) throws WingException{
@@ -49,6 +51,16 @@ public class VersionItemForm extends AbstractDSpaceTransformer {
 	}
 
 	public void addBody(Body body) throws WingException, SQLException{
+
+        String errorString = parameters.getParameter("errors",null);
+        ArrayList<String> errors = new ArrayList<String>();
+        if (errorString != null)
+        {
+            for (String error : errorString.split(","))
+            {
+                errors.add(error);
+            }
+        }
 
         // Get our parameters and state
         int itemID = parameters.getParameterAsInteger("itemID",-1);
@@ -69,7 +81,11 @@ public class VersionItemForm extends AbstractDSpaceTransformer {
         Composite addComposite = fields.addItem().addComposite("summary");
         addComposite.setLabel(T_summary);
         TextArea addValue = addComposite.addTextArea("summary");
-        if(summary!=null) addValue.setValue(summary);
+        if (errors.contains("version_reason")) {
+            addValue.addError(T_reason);
+        }
+        else{ addValue.setValue(summary);
+        }
 
 
         // Buttons
