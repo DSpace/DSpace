@@ -496,9 +496,10 @@
                                   select=".//dim:field[@element='identifier'][@qualifier='citation'][position() = 1]"/>
                     <xsl:variable name="article_doi"
                                   select=".//dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'doi:')]"/>
+                    <xsl:variable name="article_pmid"
+                                  select=".//dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'PMID:')]"/>
                     <xsl:variable name="article_id"
-                                  select=".//dim:field[@element='relation'][@qualifier='isreferencedby'][not(starts-with(., 'doi:'))]"/>
-
+                                  select=".//dim:field[@element='relation'][@qualifier='isreferencedby'][not(starts-with(., 'doi:')) and not(starts-with(.,'PMID:'))]"/>
                     <p class="ds-paragraph">
                         <i18n:text>xmlui.DryadItemSummary.whenUsing</i18n:text>
                     </p>
@@ -531,6 +532,11 @@
                                             </xsl:attribute>
                                             <xsl:value-of select="$article_doi"/>
                                         </a>
+                                    </xsl:when>
+                                    <xsl:when test="$article_pmid">
+                                        <xsl:copy-of select="$citation"/>
+                                        <xsl:text> </xsl:text>
+                                        <xsl:value-of select="$article_pmid"/>
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <xsl:value-of select="$citation"/>
