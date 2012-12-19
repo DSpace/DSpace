@@ -231,7 +231,7 @@ public class DatabaseManager
         }
         catch (SQLException sqle)
 	    {
-		log.error("problem running query", sqle);
+		log.error("problem running query: " + query, sqle);
 		if (statement != null)
 		    {
 			try
