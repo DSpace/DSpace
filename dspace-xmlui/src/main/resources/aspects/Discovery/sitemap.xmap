@@ -89,13 +89,16 @@ and searching the repository.
             </map:match>
 
 
-            <!-- List all communities & collections in DSpace
+            <!-- List all communities & collections in DSpace -->
             <map:match pattern="community-list">
+                <map:transform type="SidebarFacetsTransformer"/>
+<!--
                 <map:transform type="CommunityBrowser">
                     <map:parameter name="depth" value="999"/>
                 </map:transform>
+-->
                 <map:serialize type="xml"/>
-            </map:match>  -->
+            </map:match>
 
 
 			<!-- Search -->
