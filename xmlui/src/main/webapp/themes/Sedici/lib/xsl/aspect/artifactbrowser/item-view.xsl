@@ -524,12 +524,14 @@
 		</xsl:if>
 		
 		<!-- mods.recordInfo.recordContentSource row -->
-		<div class="metadata simple-item-view-other record-source">
-			<span class="metadata-value">
-				<i18n:text>xmlui.dri2xhtml.METS-1.0.item-record-source</i18n:text>
-				<xsl:value-of select="dim:field[@element='recordInfo' and @qualifier='recordContentSource']" disable-output-escaping="yes"/>
-			</span>
-		</div>
+		<xsl:if test="dim:field[@element='recordInfo' and @qualifier='recordContentSource']">
+			<div class="metadata simple-item-view-other record-source">
+				<span class="metadata-value">
+					<i18n:text>xmlui.dri2xhtml.METS-1.0.item-record-source</i18n:text>
+					<xsl:value-of select="dim:field[@element='recordInfo' and @qualifier='recordContentSource']" disable-output-escaping="yes"/>
+				</span>
+			</div>
+		</xsl:if>
 		
 		<!-- Generate the Creative Commons license information from the file section (DSpace deposit license hidden by default) -->
 		<xsl:apply-templates select="mets:fileSec/mets:fileGrp[@USE='CC-LICENSE'] "/>
