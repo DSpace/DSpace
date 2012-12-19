@@ -83,7 +83,11 @@ public class EmailParserForManuscriptCentral extends EmailParser {
 	fieldToXMLTagTable.put("Keywords","Classification");
 	fieldToXMLTagTable.put("Abstract","Abstract");
 	fieldToXMLTagTable.put("Article Status","Article_Status");
-        	
+	
+	// New fields for MolEcol resources GR Note
+	fieldToXMLTagTable.put("Article Type", "Article_Type");
+	fieldToXMLTagTable.put("MS Citation Title", "Citation_Title");
+	fieldToXMLTagTable.put("MS Citation Authors", "Citation_Authors");
         	
         xmlTagNameAuthorSubList= Arrays.asList(
             "Corresponding_Author",
@@ -310,10 +314,14 @@ public class EmailParserForManuscriptCentral extends EmailParser {
             dataForXml.put(fieldToXMLTagTable.get("Abstract"), 
                 StoredLines);
         }
-            
+        
+        // If Article Type is not present, the default value should be Regular
+        if(!dataForXml.containsKey("Article_Type")) {
+            dataForXml.put("Article_Type", "Regular");
+        }
+
 		LOGGER.trace("***** end of parseEmailMessage() *****");
         result.setSubmissionData(BuildSubmissionDataAsXML(dataForXml));
-
         return result;
     }
     
@@ -376,6 +384,13 @@ public class EmailParserForManuscriptCentral extends EmailParser {
                     sb.append("\t<Author>"+ el +"</Author>\n");
                 }
                 sb.append("</Authors>\n");
+            } else if (et.getKey().equals("Citation Authors")) {
+                sb.append("<Citation_Authors>\n");
+                String[] citationAuthors = processAuthorList(et.getValue());
+                for (String el : citationAuthors) {
+                    sb.append("\t<Citation_Author>" + el + "</Citation_Author>\n");
+                }
+                sb.append("</Citation_Authors>\n");
             } else if (et.getKey().equals("Contact_Author")){
                 sb.append("<Corresponding_Author>\n\t<Name>"+
                         processCorrespondingAuthorName(et.getValue())

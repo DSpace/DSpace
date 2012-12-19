@@ -107,6 +107,7 @@ and searching the repository.
             <map:action name="BackToPoolAction" src="org.dspace.app.xmlui.aspect.discovery.BackToPoolAction"/>
             <map:action name="WithdrawSubmissionAction" src="org.dspace.app.xmlui.aspect.discovery.WithdrawSubmissionAction"/>
             <map:action name="AlterWorkflowStepAction" src="org.dspace.app.xmlui.aspect.discovery.AlterWorkflowStepAction"/>
+             <map:action name="RemoveSubmissionsAction" src="org.dspace.app.xmlui.aspect.submission.submit.RemoveSubmissionsAction"/>
         </map:actions>
 
         <map:selectors>
@@ -210,6 +211,9 @@ and searching the repository.
                     </map:match>
 
                     <map:match pattern="submissions">
+                        <map:match type="request" pattern="submit_submissions_remove">
+                            <map:act type="RemoveSubmissionsAction"/>
+                        </map:match>
                         <map:transform type="DiscoverySubmissions"/>
                         <map:transform type="IncludePageMeta">
                             <map:parameter name="stylesheet.screen.discovery#1" value="../../static/css/discovery/style.css"/>

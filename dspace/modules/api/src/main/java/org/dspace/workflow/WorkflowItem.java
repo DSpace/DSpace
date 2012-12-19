@@ -288,4 +288,20 @@ public class WorkflowItem implements InProgressSubmission {
         // FIXME - auth?
         DatabaseManager.delete(ourContext, wfRow);
     }
+
+    public void deleteAll() throws SQLException, IOException,
+            AuthorizeException
+    {
+        // Remove from cache
+        ourContext.removeCached(this, getID());
+
+        //TODO: delete any pending tasks
+        WorkflowManager.deleteAllTasks(ourContext, this);
+
+        // FIXME - auth?
+        DatabaseManager.delete(ourContext, wfRow);
+
+        // Delete item
+        item.delete();
+    }
 }
