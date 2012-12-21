@@ -121,9 +121,17 @@
 	        	<div class="tab-info">
 	        		<i18n:text>sedici.comunidades.<xsl:value-of select="@qualifier"/>.info</i18n:text>
 	        	</div>
-	           	<xsl:apply-templates select="$data[@url=$community-selector]/*" mode='community-list-page'/>
-	        </div>
 
+	        	<xsl:choose>
+	        		<!-- si no es una top-community, buscamos el handle en el arbol de comunidades (esto puede ser pesado) -->
+	        		<xsl:when test="not($data[@url=$community-selector]/*)">
+	        			<xsl:apply-templates select="$data//*[@url=$community-selector]/*" mode='community-list-page'/>
+	        		</xsl:when>
+	        		<xsl:otherwise>
+	        			<xsl:apply-templates select="$data[@url=$community-selector]/*" mode='community-list-page'/>
+	        		</xsl:otherwise>
+	        	</xsl:choose>
+	        </div>
     	</xsl:for-each>
     </xsl:template>
     
