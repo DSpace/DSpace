@@ -53,7 +53,6 @@ public class ConfigurationUtil {
 		while(propertyIterator.hasNext()) {
 			String currentKey = (String) propertyIterator.next();
 			if(currentKey.startsWith(propertyPrefix)) {
-				System.out.println("KEY: "+currentKey+" - EXTRACT: "+currentKey.substring(propertyPrefix.length())+" - VALUE: "+properties.getProperty(currentKey));
 				resultMap.put(currentKey.substring(propertyPrefix.length()+1), properties.getProperty(currentKey));
 			}
 		}
