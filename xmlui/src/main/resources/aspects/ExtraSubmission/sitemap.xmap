@@ -15,6 +15,7 @@
 		<map:transformer name="Navigation" src="ar.edu.unlp.sedici.aspect.extraSubmission.Navigation"/>
 		<map:transformer name="AutoArchive" src="ar.edu.unlp.sedici.aspect.extraSubmission.GenerateAutoArchivePageMeta"/>
 		<map:transformer name="HomeLinks" src="ar.edu.unlp.sedici.aspect.extraSubmission.GenerateHomeLinksPageMeta"/>
+		<map:transformer name="CommunityLinks" src="ar.edu.unlp.sedici.aspect.extraSubmission.GenerateCommunityLinksPageMeta"/>
 		<map:transformer name="InternationalizableSubmission" src="ar.edu.unlp.sedici.aspect.extraSubmission.InternationalizableSubmission"/>
 		<map:transformer name="FlashMessagesConsumer" src="ar.edu.unlp.sedici.util.FlashMessagesTransformer"/>
 	</map:transformers>
@@ -53,7 +54,7 @@
       </map:match>
       
       <map:match pattern="community-list">
-          <map:transform type="HomeLinks"/>
+          <map:transform type="CommunityLinks"/>
       </map:match>
 
       <!-- Make sure the user is atleast logged in -->

@@ -2504,6 +2504,8 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="sedici.comunidades.redunci.info">Artículos y ponencias de la Red UNCI</message>
 <message key="sedici.comunidades.radio.nombre">Radio Universidad</message>
 <message key="sedici.comunidades.radio.info">Entrevistas y producciones artísticas, entre otros audios</message>
+<message key="sedici.comunidades.bdigital.nombre">Biblioteca Digital</message>
+<message key="sedici.comunidades.bdigital.info">Documentos históricos y recursos digitales ajenos a la UNLP</message>
 
 <message key="sedici.noticias.head">Noticias</message>
 <message key="sedici.noticias.titulo">Lista de noticias</message>

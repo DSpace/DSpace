@@ -81,8 +81,8 @@
     <xsl:template name="community-list-page-tabs">
     	<xsl:param name="data"/>
     	
-    	<xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link']">
-    		<xsl:variable name="community-selector">/metadata/handle/<xsl:value-of select="."/>/mets.xml</xsl:variable>
+    	<xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='community-link']">
+    		<xsl:variable name="community-selector">/metadata/<xsl:value-of select="."/>/mets.xml</xsl:variable>
     		<xsl:call-template name="render-tab-header">
     			<xsl:with-param name="configData" select="."/>
     			<xsl:with-param name="element" select="$data[@url=$community-selector]"/>
@@ -94,7 +94,7 @@
 		<xsl:param name="configData"/>
 		<xsl:param name="element"/>
 	
-        <xsl:variable name="id" select="translate((translate(substring-after($element/@url,'/metadata/handle/'),'/','-')),'-mets.xml','')"/>
+        <xsl:variable name="id" select="$configData/@qualifier"/>
         
         <li id="tab-{$id}">
         	<xsl:attribute name="class"> ds-artifact-item tab 
@@ -102,7 +102,7 @@
         	</xsl:attribute>
 			<a>
 				<xsl:attribute name="href">#content-<xsl:value-of select="$id"/></xsl:attribute>
-				<i18n:text>sedici.comunidades.<xsl:value-of select="$configData/@qualifier"/>.nombre</i18n:text>
+				<i18n:text>sedici.comunidades.<xsl:value-of select="$id"/>.nombre</i18n:text>
 			</a>
         </li>
 	</xsl:template>
@@ -111,9 +111,9 @@
     <xsl:template name="community-list-page-content">
     	<xsl:param name="data"/>
     	
-    	<xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link']">
-	        <xsl:variable name="id" select="translate(.,'/','')"/>
-    		<xsl:variable name="community-selector">/metadata/handle/<xsl:value-of select="."/>/mets.xml</xsl:variable>
+    	<xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='community-link']">
+	        <xsl:variable name="id" select="@qualifier"/>
+    		<xsl:variable name="community-selector">/metadata/<xsl:value-of select="."/>/mets.xml</xsl:variable>
 
 	        <div id="content-{$id}">
 	        	<xsl:attribute name="class"><xsl:value-of select="@qualifier"></xsl:value-of></xsl:attribute>

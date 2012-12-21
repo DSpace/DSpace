@@ -3204,12 +3204,11 @@ h1.communities_header {
 	border: none !important;
 	border-bottom: solid 3px #a4a4a4 !important;
 	padding-bottom: 0px !important;
-	width: 164px;
+	/*width: 164px;*/
 }
 .ui-tabs-nav li.tab a {
-	width: 136px;
+	/*width: 100%;*/
 	color:#a4a4a4;
-
 }
 .ui-tabs-nav li.tab a:hover {
 	color: black;
@@ -3220,7 +3219,8 @@ h1.communities_header {
 .ui-tabs-nav li.ui-tabs-selected, .ui-tabs-nav li.ui-tabs-selected a {
 	color: #E27B2A;
 	border-color: #E27B2A !important;
-	font-weight: bold;
+	background-color: #DEDEDE;
+	border-radius: 7px 0px 7px 0px;
 }
 .ui-tabs .ui-tabs-nav {
 	border-bottom: none;

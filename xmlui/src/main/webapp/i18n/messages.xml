@@ -2267,6 +2267,8 @@
 <message key="sedici.comunidades.redunci.info">Journals and events from Red UNCI</message>
 <message key="sedici.comunidades.radio.nombre">University Radio</message>
 <message key="sedici.comunidades.radio.info">Interveiws and artistic productions, among other audios</message>
+<message key="sedici.comunidades.radio.nombre">Digital Library</message>
+<message key="sedici.comunidades.radio.info">Historical documents and other external digital resources</message>
 
 <message key="sedici.noticias.head">News</message>
 <message key="sedici.noticias.titulo">News list</message>
