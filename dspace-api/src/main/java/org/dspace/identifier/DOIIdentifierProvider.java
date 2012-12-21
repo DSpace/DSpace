@@ -83,9 +83,6 @@ public class DOIIdentifierProvider
     
     private RegistrationAgency registrationAgency;
     
-    /** Map DataCite metadata into local metadata. */
-    private static Map<String, String> crosswalk = new HashMap<String, String>();
-
     public DOIIdentifierProvider() {
         super();
         this.loadRegistrationAgency();
@@ -182,7 +179,7 @@ public class DOIIdentifierProvider
             return;
         }
 
-        boolean response = registrationAgency.create(identifier, crosswalkMetadata(object));
+        boolean response = registrationAgency.create(identifier, object);
         if (response == true)
         {
             Item item = (Item)object;
@@ -213,7 +210,7 @@ public class DOIIdentifierProvider
         identifier = formatIdentifier(identifier);
         log.debug("formated identifier as {}", identifier);
 
-        boolean response = registrationAgency.reserve(identifier, crosswalkMetadata(dso));
+        boolean response = registrationAgency.reserve(identifier, dso);
                     
         if (response == true)
         {
@@ -241,7 +238,7 @@ public class DOIIdentifierProvider
     {
         log.debug("mint for {}", dso);
 
-        String doi = registrationAgency.mint(crosswalkMetadata(dso));
+        String doi = registrationAgency.mint(dso);
         
         try {
             //ensure format
@@ -447,37 +444,6 @@ public class DOIIdentifierProvider
             throw new IdentifierException(identifier + " could not be deleted.");
     }
 
-    /**
-     * Map selected DSpace metadata to fields recognized by DataCite.
-     */
-    static private Map<String, String> crosswalkMetadata(DSpaceObject dso)
-    {
-        if ((null == dso) || !(dso instanceof Item))
-            throw new IllegalArgumentException("Must be an Item");
-        Item item = (Item) dso; // TODO generalize to DSO when all DSOs have metadata.
-
-        Map<String, String> mapped = new HashMap<String, String>();
-        
-        for (Entry<String, String> datum : crosswalk.entrySet())
-        {
-            DCValue[] values = item.getMetadata(datum.getValue());
-            if (null != values)
-                for (DCValue value : values)
-                    mapped.put(datum.getKey(), value.value);
-        }
-
-        // TODO find a way to get a current direct URL to the object and set _target
-        // mapped.put("_target", url);
-
-        return mapped;
-    }
-
-    @Required
-    public void setCrosswalk(Map<String, String> aCrosswalk)
-    {
-        crosswalk = aCrosswalk;
-    }
-    
     /**
      * This method helps to convert a DOI into a URL. It takes DOIs with or
      * without leading DOI scheme (f.e. doi:10.123/456 as well as 10.123/456)

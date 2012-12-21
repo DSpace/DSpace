@@ -10,9 +10,12 @@ package org.dspace.identifier.doi;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierService;
@@ -48,6 +51,41 @@ import org.springframework.beans.factory.annotation.Required;
 public abstract class EZIDRegistrationAgency extends RegistrationAgency {
     private static final Logger log = LoggerFactory.getLogger(DOIIdentifierProvider.class);
     
+    /** Map DataCite metadata into local metadata. */
+    protected static Map<String, String> crosswalk = new HashMap<String, String>();
+
+    
+    @Required
+    public void setCrosswalk(Map<String, String> aCrosswalk)
+    {
+        crosswalk = aCrosswalk;
+    }
+
+    /**
+     * Map selected DSpace metadata to fields recognized by DataCite.
+     */
+    static private Map<String, String> crosswalkMetadata(DSpaceObject dso)
+    {
+        if ((null == dso) || !(dso instanceof Item))
+            throw new IllegalArgumentException("Must be an Item");
+        Item item = (Item) dso; // TODO generalize to DSO when all DSOs have metadata.
+
+        Map<String, String> mapped = new HashMap<String, String>();
+        
+        for (Map.Entry<String, String> datum : crosswalk.entrySet())
+        {
+            DCValue[] values = item.getMetadata(datum.getValue());
+            if (null != values)
+                for (DCValue value : values)
+                    mapped.put(datum.getKey(), value.value);
+        }
+
+        // TODO find a way to get a current direct URL to the object and set _target
+        // mapped.put("_target", url);
+
+        return mapped;
+    }
+    
     // Configuration property names
     static final String CFG_SHOULDER = "identifier.doi.ezid.shoulder";
     static final String CFG_USER = "identifier.doi.ezid.user";
@@ -57,7 +95,7 @@ public abstract class EZIDRegistrationAgency extends RegistrationAgency {
     private static EZIDRequestFactory requestFactory;
     
     @Override
-    public boolean create(String identifier, Map<String,String> metadata) {
+    public boolean create(String identifier, DSpaceObject dso) {
         try {
             // remove doi prefix from id, as it EZIDRequest get's it as constructor attribute
             identifier = DOIToId(identifier);
@@ -70,7 +108,7 @@ public abstract class EZIDRegistrationAgency extends RegistrationAgency {
         try {
             EZIDRequest request = requestFactory.getInstance(loadAuthority(),
                     loadUser(), loadPassword());
-            response = request.create(identifier, metadata);
+            response = request.create(identifier, crosswalkMetadata(dso));
         } catch (IdentifierException e) {
             log.error("Identifier '{}' not registered:  {}", identifier, e.getMessage());
             return false;
@@ -91,7 +129,7 @@ public abstract class EZIDRegistrationAgency extends RegistrationAgency {
     }
     
     @Override
-    public boolean reserve(String identifier, Map<String,String> metadata) throws IdentifierException {
+    public boolean reserve(String identifier, DSpaceObject dso) throws IdentifierException {
         try {
             // remove doi prefix from id, as it EZIDRequest get's it as constructor attribute
             identifier = DOIToId(identifier);
@@ -104,6 +142,7 @@ public abstract class EZIDRegistrationAgency extends RegistrationAgency {
         try {    
             EZIDRequest request = requestFactory.getInstance(loadAuthority(),
                     loadUser(), loadPassword());
+            Map<String,String> metadata = crosswalkMetadata(dso);
             metadata.put("_status", "reserved");
             response = request.create(identifier, metadata);
         } catch (IOException e) {
@@ -123,7 +162,7 @@ public abstract class EZIDRegistrationAgency extends RegistrationAgency {
     }
     
     @Override
-    public String mint(Map<String,String> metadata) throws IdentifierException {
+    public String mint(DSpaceObject dso) throws IdentifierException {
         // Compose the request
         EZIDRequest request;
         try {
@@ -137,7 +176,7 @@ public abstract class EZIDRegistrationAgency extends RegistrationAgency {
         EZIDResponse response;
         try
         {
-            response = request.mint(metadata);
+            response = request.mint(crosswalkMetadata(dso));
         } catch (IOException ex) {
             log.error("Failed to send EZID request:  {}", ex.getMessage());
             throw new IdentifierException("DOI request not sent:  " + ex.getMessage());
