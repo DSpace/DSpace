@@ -21,7 +21,7 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.springframework.util.CollectionUtils;
 
 /**
- * User ContextV2 instead
+ * Use ContextV2 instead
  * 
  * Class representing the context of a particular DSpace operation. This stores
  * information such as the current authenticated user and the database
