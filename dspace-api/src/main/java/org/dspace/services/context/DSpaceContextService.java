@@ -7,7 +7,10 @@
  */
 package org.dspace.services.context;
 
+import java.sql.SQLException;
+
 import org.dspace.core.Context;
+import org.dspace.core.ContextV2;
 import org.dspace.orm.dao.api.IEpersonDao;
 import org.dspace.services.ContextService;
 import org.dspace.services.RequestService;
@@ -32,17 +35,24 @@ public class DSpaceContextService implements ContextService {
 	public Context newContext() {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-		Context ctx = new Context(session);
-		if (requestService != null) {
-			Request r = requestService.getCurrentRequest();
-			if (r != null)  {// There is one request running on this thread!
-				String userID = r.getSession().getUserId();
-				if (userID != null) 
-					ctx.setCurrentEperson(epersonDao.selectById(Integer.parseInt(userID)));
-				r.setAttribute(CONTEXT_ATTR, ctx);
+		ContextV2 ctx;
+		try {
+			ctx = new ContextV2(session);
+
+			if (requestService != null) {
+				Request r = requestService.getCurrentRequest();
+				if (r != null)  {// There is one request running on this thread!
+					String userID = r.getSession().getUserId();
+					if (userID != null) 
+						ctx.setCurrentEperson(epersonDao.selectById(Integer.parseInt(userID)));
+					r.setAttribute(CONTEXT_ATTR, ctx);
+				}
 			}
+			return ctx;
+		} catch (SQLException e) {
+			// IMPORTANT! This never happens because ContextV2 in fact, do not throw any exception!
+			return null;
 		}
-		return ctx;
 	}
 	
 	@Override
