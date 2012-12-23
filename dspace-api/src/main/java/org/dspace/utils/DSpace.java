@@ -11,6 +11,7 @@ import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.DSpaceKernelManager;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.ContextService;
 import org.dspace.services.EventService;
 import org.dspace.services.RequestService;
 import org.dspace.services.SessionService;
@@ -69,6 +70,10 @@ public final class DSpace {
 
     public ConfigurationService getConfigurationService() {
         return getServiceManager().getServiceByName(ConfigurationService.class.getName(), ConfigurationService.class);
+    }
+
+    public ContextService getContextService () {
+    	return getServiceManager().getServiceByName(ContextService.class.getName(), ContextService.class);
     }
 
     public EventService getEventService() {
