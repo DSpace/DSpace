@@ -16,6 +16,31 @@
            http://www.springframework.org/schema/context
            http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
+	<!-- Identifier Service Application Interface.  Will be autowired with
+         any Identifier Providers present in Spring context.
+    -->
+    <bean id="org.dspace.identifier.IdentifierService"
+          class="org.dspace.identifier.IdentifierServiceImpl"
+          autowire="byType"
+          scope="singleton"/>
+
+	<!-- provider for exposing default Handle services implementaion. -->
+    <!--bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.HandleIdentifierProvider"
+          scope="singleton">
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+    </bean-->
+
+    <bean id="org.dspace.identifier.VersionedHandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider"
+          scope="singleton">
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+        <property name="versionDAO">
+            <bean class="org.dspace.versioning.VersionDAO"/>
+        </property>
+        <property name="versionHistoryDAO">
+            <bean class="org.dspace.versioning.VersionHistoryDAO"/>
+        </property>
+     </bean>
+
     <!-- Place all DSpace core service bean definitions below here -->
 
     <!-- CACHING service beans -->
