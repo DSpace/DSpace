@@ -102,6 +102,7 @@ public class Context
         ignoreAuth = false;
 
         objectCache = new HashMap<String, Object>();
+        specialGroups = new ArrayList<Integer>();
 
         authStateChangeHistory = new Stack<Boolean>();
         authStateClassCallHistory = new Stack<String>();
