@@ -293,7 +293,8 @@ CREATE TABLE MetadataSchemaRegistry
 (
   metadata_schema_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadataschemaregistry_seq'),
   namespace          VARCHAR(256) UNIQUE,
-  short_id           VARCHAR(32) UNIQUE
+  short_id           VARCHAR(32) UNIQUE,
+  resource_type		 INTEGER
 );
 
 CREATE TABLE MetadataFieldRegistry
@@ -314,7 +315,9 @@ CREATE TABLE MetadataValue
   text_lang          VARCHAR(24),
   place              INTEGER,
   authority          VARCHAR(100),
-  confidence         INTEGER DEFAULT -1
+  confidence         INTEGER DEFAULT -1,
+  resource_id		 INTEGER,
+  resource_type		 INTEGER
 );
 
 -- Create a dcvalue view for backwards compatibilty
@@ -346,7 +349,9 @@ CREATE TABLE Community
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
   copyright_text    TEXT,
   side_bar_text     TEXT,
-  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id )
+  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id ),
+  istop				BOOL,
+  item_count		INTEGER
 );
 
 CREATE INDEX community_logo_fk_idx ON Community(logo_bitstream_id);
@@ -371,7 +376,8 @@ CREATE TABLE Collection
   workflow_step_2   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_3   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   submitter         INTEGER REFERENCES EPersonGroup( eperson_group_id ),
-  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id )
+  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id ),
+  item_count		INTEGER
 );
 
 CREATE INDEX collection_logo_fk_idx ON Collection(logo_bitstream_id);
