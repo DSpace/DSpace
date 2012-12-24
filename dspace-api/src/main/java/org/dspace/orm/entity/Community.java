@@ -26,14 +26,12 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.dspace.core.Constants;
-import org.dspace.orm.dao.api.IHandleDao;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
 @Entity
 @Table(name = "community")
 @Configurable
-public class Community implements IDSpaceObject, Serializable {
+public class Community extends DSpaceObject implements Serializable {
     private static final long serialVersionUID = 6681512980782299861L;
     private int id;
     private String name;
@@ -42,16 +40,12 @@ public class Community implements IDSpaceObject, Serializable {
     private Bitstream logo;
     private String copyrightText;
     private Integer admin;
-    private String handle;
     private List<Community> parents;
     private List<Community> childs;
     private List<Collection> collections;
     private List<Item> items;
     private boolean istop;
     private Integer itemCount;
-
-    @Autowired
-    IHandleDao handleDao;
 
     @Id
     @GeneratedValue
@@ -143,14 +137,6 @@ public class Community implements IDSpaceObject, Serializable {
     @Column(name = "admin", nullable = true)
     public Integer getAdmin() {
         return admin;
-    }
-
-    @Transient
-    public String getHandle() {
-        if (this.handle == null)
-            this.handle = handleDao.selectByResourceId(Constants.COMMUNITY,
-                    this.getID()).getHandle();
-        return this.handle;
     }
 
     @Transient

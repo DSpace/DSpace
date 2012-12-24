@@ -31,7 +31,7 @@ import org.dspace.core.Constants;
 
 @Entity
 @Table(name = "workspaceitem")
-public class WorkSpaceItem implements IDSpaceObject{
+public class WorkSpaceItem extends DSpaceObject {
     private int id;
     
     private Item item;

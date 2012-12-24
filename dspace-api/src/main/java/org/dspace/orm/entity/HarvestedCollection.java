@@ -27,7 +27,7 @@ import org.dspace.core.Constants;
 
 @Entity
 @Table(name = "harvested_collection")
-public class HarvestedCollection implements IDSpaceObject{
+public class HarvestedCollection extends DSpaceObject{
     private int id;
     private Collection collection;
     private Integer harvestType;

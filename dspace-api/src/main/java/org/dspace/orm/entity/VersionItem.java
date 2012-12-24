@@ -27,7 +27,7 @@ import org.dspace.core.Constants;
 
 @Entity
 @Table(name = "versionitem")
-public class VersionItem implements IDSpaceObject{
+public class VersionItem extends DSpaceObject{
     private int id;
     private Item item;
     private Eperson eperson;

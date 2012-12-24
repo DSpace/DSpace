@@ -7,7 +7,6 @@
  */
 package org.dspace.orm.entity;
 
-import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -17,6 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
 import org.dspace.core.Constants;
 
 /**
@@ -27,7 +27,7 @@ import org.dspace.core.Constants;
 
 @Entity
 @Table(name = "metadatavalue")
-public class MetadataValue implements IDSpaceObject{
+public class MetadataValue extends DSpaceObject {
     private int id;
     private MetadataFieldRegistry metadataField;
     private String textValue;

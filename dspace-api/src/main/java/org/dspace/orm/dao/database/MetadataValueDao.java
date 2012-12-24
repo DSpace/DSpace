@@ -7,9 +7,12 @@
  */
 package org.dspace.orm.dao.database;
 
+import java.util.List;
+
 import org.dspace.orm.dao.api.IMetadataValueDao;
 
 import org.dspace.orm.entity.MetadataValue;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,5 +27,15 @@ public class MetadataValueDao extends DSpaceDao<MetadataValue> implements IMetad
     
 	public MetadataValueDao() {
 		super(MetadataValue.class);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<MetadataValue> selectByResourceId(int resourceType,
+			int resourceId) {
+		return (List<MetadataValue>) this.getSession().createCriteria(MetadataValue.class)
+				.add(Restrictions.and(Restrictions.eq("resourceType", resourceType), Restrictions.eq("resourceId", resourceId)))
+				.list();
+				
 	}
 }

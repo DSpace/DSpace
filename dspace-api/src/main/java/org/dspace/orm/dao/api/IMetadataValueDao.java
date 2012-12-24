@@ -7,6 +7,8 @@
  */
 package org.dspace.orm.dao.api;
 
+import java.util.List;
+
 import org.dspace.orm.entity.MetadataValue;
 
 /**
@@ -15,5 +17,5 @@ import org.dspace.orm.entity.MetadataValue;
  */
 
 public interface IMetadataValueDao extends IDSpaceDao<MetadataValue>{
-    
-   }
+	List<MetadataValue> selectByResourceId(int resourceType, int resourceId);
+}

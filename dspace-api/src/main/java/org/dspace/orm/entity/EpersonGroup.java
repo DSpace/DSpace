@@ -24,7 +24,7 @@ import org.dspace.core.Constants;
 
 @Entity
 @Table(name = "epersongroup")
-public class EpersonGroup implements IDSpaceObject {
+public class EpersonGroup extends DSpaceObject {
     private int id;
     private String name;
     private List<Eperson> epersons;

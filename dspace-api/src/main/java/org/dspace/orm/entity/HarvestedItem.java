@@ -27,7 +27,7 @@ import org.dspace.core.Constants;
 
 @Entity
 @Table(name = "harvested_item")
-public class HarvestedItem implements IDSpaceObject{
+public class HarvestedItem extends DSpaceObject{
     private int id;
     private Item item;
     private Date lastHarvested;

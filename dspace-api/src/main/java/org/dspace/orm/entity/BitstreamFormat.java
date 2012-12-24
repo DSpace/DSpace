@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Configurable;
 @Entity
 @Table(name = "bitstreamformatregistry")
 @Configurable
-public class BitstreamFormat implements IDSpaceObject {
+public class BitstreamFormat extends DSpaceObject {
     private int id;
     private String mimetype;
     private String shortDescription;

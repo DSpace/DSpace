@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Configurable;
 @Entity
 @Table(name = "handle")
 @Configurable
-public class Handle implements IDSpaceObject {
+public class Handle extends DSpaceObject {
     private int id;
     private String handle;
     private int resourceType;
@@ -39,7 +39,7 @@ public class Handle implements IDSpaceObject {
     }
 
     @Column(name = "handle", unique = true)
-    public String getHandle() {
+    public String getIdentifier() {
         return handle;
     }
 
@@ -91,7 +91,7 @@ public class Handle implements IDSpaceObject {
 	 * 
 	 * @return DSpace Object
 	 */
-	public IDSpaceObject toObject() {
+	public DSpaceObject toObject() {
 		switch (this.getResourceType()) {
 			case Constants.COLLECTION:
 				return collDao.selectById(getResourceId());

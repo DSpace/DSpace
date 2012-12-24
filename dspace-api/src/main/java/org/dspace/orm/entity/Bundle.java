@@ -25,7 +25,7 @@ import org.dspace.core.Constants;
 
 @Entity
 @Table(name = "bundle")
-public class Bundle implements IDSpaceObject {
+public class Bundle extends DSpaceObject {
     private int id;
     private String name;
     private Integer primary;

@@ -416,7 +416,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
-            <version>3.1.1.RELEASE</version>
+            <version>${org.springframework.version}</version>
             <scope>compile</scope>
         </dependency>
         

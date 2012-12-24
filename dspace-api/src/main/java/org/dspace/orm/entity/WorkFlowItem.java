@@ -32,7 +32,7 @@ import org.dspace.eperson.EPerson;
 
 @Entity
 @Table(name = "workflowitem")
-public class WorkFlowItem implements IDSpaceObject{
+public class WorkFlowItem extends DSpaceObject {
     private int id;
     private Item item;
     private Collection collection;

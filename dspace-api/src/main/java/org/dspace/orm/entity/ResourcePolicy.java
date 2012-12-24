@@ -27,7 +27,7 @@ import org.dspace.core.Constants;
 
 @Entity
 @Table(name = "resourcepolicy")
-public class ResourcePolicy implements IDSpaceObject{
+public class ResourcePolicy extends DSpaceObject{
     private int id;
     private Integer resourceType;
     private Integer resource;

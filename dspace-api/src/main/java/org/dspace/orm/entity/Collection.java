@@ -25,14 +25,12 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.dspace.core.Constants;
-import org.dspace.orm.dao.api.IHandleDao;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
 @Entity
 @Table(name = "collection")
 @Configurable
-public class Collection implements IDSpaceObject {
+public class Collection extends DSpaceObject {
     private int id;
     private String name;
     private String shortDescription;
@@ -52,9 +50,6 @@ public class Collection implements IDSpaceObject {
     private List<Eperson> epersons;
     private Integer itemCount;
     private List<Item> items;
-    
-    @Autowired
-    IHandleDao handleDao;
 
     @Id
     @Column(name = "collection_id")
@@ -161,16 +156,6 @@ public class Collection implements IDSpaceObject {
     @Column(name = "admin", nullable = true)
     public Integer getAdmin() {
         return admin;
-    }
-
-    private String handle = null;
-
-    @Transient
-    public String getHandle() {
-        if (this.handle == null)
-            this.handle = handleDao.selectByResourceId(Constants.COLLECTION,
-                    this.getID()).getHandle();
-        return this.handle;
     }
 
     @Transient

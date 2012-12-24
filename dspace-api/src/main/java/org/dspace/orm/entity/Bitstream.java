@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Configurable;
 @Entity
 @Table(name = "bitstream")
 @Configurable
-public class Bitstream implements IDSpaceObject {
+public class Bitstream extends DSpaceObject {
     private int id;
     private BitstreamFormat format;
     private String name;

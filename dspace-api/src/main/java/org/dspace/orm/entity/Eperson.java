@@ -26,7 +26,7 @@ import org.dspace.core.Constants;
 
 @Entity
 @Table(name = "eperson")
-public class Eperson implements IDSpaceObject {
+public class Eperson extends DSpaceObject {
     private int id;
     private String email;
     private String password;

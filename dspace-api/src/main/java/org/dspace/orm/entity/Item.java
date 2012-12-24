@@ -21,12 +21,13 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.dspace.core.Constants;
 
 @Entity
 @Table(name = "item")
-public class Item implements IDSpaceObject {
+public class Item extends DSpaceObject {
     private int id;
     private Eperson submitter;
     private boolean inArchive;
@@ -125,6 +126,7 @@ public class Item implements IDSpaceObject {
     }
 
 	@Override
+	@Transient
 	public int getType() {
 		return Constants.ITEM;
 	}

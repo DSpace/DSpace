@@ -23,7 +23,7 @@ import org.dspace.core.Constants;
 
 @Entity
 @Table(name = "metadatafieldregistry")
-public class MetadataFieldRegistry implements IDSpaceObject{
+public class MetadataFieldRegistry extends DSpaceObject {
     private int id;
     private Integer metadataSchema;
     private String element;
