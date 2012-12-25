@@ -271,12 +271,6 @@
 			<version>${org.springframework.version}</version>
 			<scope>compile</scope>
 		</dependency>
-		
-		<dependency>
-			<groupId>com.lyncode</groupId>
-			<artifactId>xliff</artifactId>
-			<version>1.0.0</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.aspectj</groupId>

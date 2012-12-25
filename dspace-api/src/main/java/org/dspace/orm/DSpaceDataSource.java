@@ -11,6 +11,11 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
+/**
+ * 
+ * @author João Melo <jmelo@lyncode.com>
+ *
+ */
 public class DSpaceDataSource extends DriverManagerDataSource {
 	@Autowired ConfigurationService config;
 	
