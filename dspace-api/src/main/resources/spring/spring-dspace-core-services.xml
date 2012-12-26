@@ -8,13 +8,15 @@
     http://www.dspace.org/license/
 
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-
-    <!-- Identifier Service Application Interface.  Will be autowired with
+	<!-- Identifier Service Application Interface.  Will be autowired with
          any Identifier Providers present in Spring context.
     -->
     <bean id="org.dspace.identifier.IdentifierService"
@@ -22,7 +24,7 @@
           autowire="byType"
           scope="singleton"/>
 
-   <!-- provider for exposing default Handle services implementaion. -->
+	<!-- provider for exposing default Handle services implementaion. -->
     <!--bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.HandleIdentifierProvider"
           scope="singleton">
         <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
@@ -37,5 +39,35 @@
         <property name="versionHistoryDAO">
             <bean class="org.dspace.versioning.VersionHistoryDAO"/>
         </property>
+     </bean>
+
+    <!-- Place all DSpace core service bean definitions below here -->
+
+    <!-- CACHING service beans -->
+    <bean id="org.dspace.services.CachingService" class="org.dspace.services.caching.CachingServiceImpl" />
+
+    <!-- This is the main cache manager -->
+    <bean id="org.dspace.caching.ehcache.CacheManager"
+        class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+        <property name="configLocation">
+            <bean class="org.dspace.servicemanager.spring.ResourceFinder" factory-method="getResourceFromPaths">
+                <constructor-arg>
+                    <list>
+                        <value>ehcache-config.xml</value>
+                        <value>caching/ehcache-config.xml</value>
+                    </list>
+                </constructor-arg>
+            </bean>
+        </property>
     </bean>
+    <!-- CACHING end beans -->
+
+    <!-- SESSION - session and request services (implemented as a single bean) -->
+    <bean id="org.dspace.services.SessionService" class="org.dspace.services.sessions.SessionRequestServiceImpl" />
+    <alias alias="org.dspace.services.RequestService" name="org.dspace.services.SessionService" />
+    <!-- SESSION end beans -->
+
+	<!-- EVENTS -->
+    <bean id="org.dspace.services.EventService" class="org.dspace.services.events.SystemEventService" />
+
 </beans>

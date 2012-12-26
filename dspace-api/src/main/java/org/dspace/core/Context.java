@@ -21,6 +21,8 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.springframework.util.CollectionUtils;
 
 /**
+ * Use ContextV2 instead
+ * 
  * Class representing the context of a particular DSpace operation. This stores
  * information such as the current authenticated user and the database
  * connection being used.
@@ -37,6 +39,7 @@ import org.springframework.util.CollectionUtils;
  * 
  * @version $Revision$
  */
+@Deprecated
 public class Context
 {
     private static final Logger log = Logger.getLogger(Context.class);
@@ -84,6 +87,7 @@ public class Context
      * @exception SQLException
      *                if there was an error obtaining a database connection
      */
+    @Deprecated
     public Context() throws SQLException
     {
         // Obtain a non-auto-committing connection
@@ -107,6 +111,7 @@ public class Context
      * 
      * @return the database connection
      */
+    @Deprecated
     public Connection getDBConnection()
     {
         return connection;
@@ -120,6 +125,7 @@ public class Context
      *            the new current user, or <code>null</code> if no user is
      *            authenticated
      */
+    @Deprecated
     public void setCurrentUser(EPerson user)
     {
         currentUser = user;
@@ -131,6 +137,7 @@ public class Context
      * @return the current user, or <code>null</code> if no user is
      *         authenticated
      */
+    @Deprecated
     public EPerson getCurrentUser()
     {
         return currentUser;
@@ -141,6 +148,7 @@ public class Context
      * 
      * @return Locale the current Locale
      */
+    @Deprecated
     public Locale getCurrentLocale()
     {
         return currentLocale;
@@ -152,6 +160,7 @@ public class Context
      * @param locale
      *            the current Locale
      */
+    @Deprecated
     public void setCurrentLocale(Locale locale)
     {
         currentLocale = locale;
@@ -163,6 +172,7 @@ public class Context
      * @return <code>true</code> if authorisation should be ignored for this
      *         session.
      */
+    @Deprecated
     public boolean ignoreAuthorization()
     {
         return ignoreAuth;
@@ -172,6 +182,7 @@ public class Context
      * Turn Off the Authorisation System for this context and store this change
      * in a history for future use.
      */
+    @Deprecated
     public void turnOffAuthorisationSystem()
     {
         authStateChangeHistory.push(ignoreAuth);
@@ -196,6 +207,7 @@ public class Context
          * </code> If Context debug is enabled, the correct sequence calling will be
      * checked and a warning will be displayed if not.
      */
+    @Deprecated
     public void restoreAuthSystemState()
     {
         Boolean previousState;
@@ -245,6 +257,7 @@ public class Context
      *            if <code>true</code>, authorisation should be ignored for this
      *            session.
      */
+    @Deprecated
     public void setIgnoreAuthorization(boolean b)
     {
         ignoreAuth = b;
@@ -260,6 +273,7 @@ public class Context
      * @param info
      *            the extra information to log
      */
+    @Deprecated
     public void setExtraLogInfo(String info)
     {
         extraLogInfo = info;
@@ -271,6 +285,7 @@ public class Context
      * 
      * @return the extra log info - guaranteed non- <code>null</code>
      */
+    @Deprecated
     public String getExtraLogInfo()
     {
         return extraLogInfo;
@@ -285,6 +300,7 @@ public class Context
      *                if there was an error completing the database transaction
      *                or closing the connection
      */
+    @Deprecated
     public void complete() throws SQLException
     {
         // FIXME: Might be good not to do a commit() if nothing has actually
@@ -311,6 +327,7 @@ public class Context
      *                if there was an error completing the database transaction
      *                or closing the connection
      */
+    @Deprecated
     public void commit() throws SQLException
     {
         // Commit any changes made as part of the transaction
@@ -351,6 +368,7 @@ public class Context
      * Select an event dispatcher, <code>null</code> selects the default
      * 
      */
+    @Deprecated
     public void setDispatcher(String dispatcher)
     {
         if (log.isDebugEnabled())
@@ -366,6 +384,7 @@ public class Context
      * 
      * @param event
      */
+    @Deprecated
     public void addEvent(Event event)
     {
         if (events == null)
@@ -382,11 +401,13 @@ public class Context
      * 
      * @return List of all available events.
      */
+    @Deprecated
     public LinkedList<Event> getEvents()
     {
         return events;
     }
 
+    @Deprecated
     public boolean hasEvents()
     {
         return !CollectionUtils.isEmpty(events);
@@ -396,6 +417,7 @@ public class Context
      * Retrieves the first element in the events list & removes it from the list of events once retrieved
      * @return The first event of the list or <code>null</code> if the list is empty
      */
+    @Deprecated
     public Event pollEvent()
     {
         if(hasEvents())
@@ -413,6 +435,7 @@ public class Context
      * be called as part of an error-handling routine where an SQLException has
      * already been thrown.
      */
+    @Deprecated
     public void abort()
     {
         try
@@ -453,6 +476,7 @@ public class Context
      * @return <code>true</code> if the context is still valid, otherwise
      *         <code>false</code>
      */
+    @Deprecated
     public boolean isValid()
     {
         // Only return true if our DB connection is live
@@ -470,6 +494,7 @@ public class Context
      * @return the object from the cache, or <code>null</code> if it's not
      *         cached.
      */
+    @Deprecated
     public Object fromCache(Class<?> objectClass, int id)
     {
         String key = objectClass.getName() + id;
@@ -485,6 +510,7 @@ public class Context
      * @param id
      *            the object's ID
      */
+    @Deprecated
     public void cache(Object o, int id)
     {
         String key = o.getClass().getName() + id;
@@ -499,6 +525,7 @@ public class Context
      * @param id
      *            the object's ID
      */
+    @Deprecated
     public void removeCached(Object o, int id)
     {
         String key = o.getClass().getName() + id;
@@ -508,6 +535,7 @@ public class Context
     /**
      * Remove all the objects from the object cache
      */
+    @Deprecated
     public void clearCache()
     {
         objectCache.clear();
@@ -524,6 +552,7 @@ public class Context
      * 
      * @return the number of items in the cache
      */
+    @Deprecated
     public int getCacheSize()
     {
         return objectCache.size();
@@ -535,6 +564,7 @@ public class Context
      * @param groupID
      *            special group's ID
      */
+    @Deprecated
     public void setSpecialGroup(int groupID)
     {
         specialGroups.add(Integer.valueOf(groupID));
@@ -549,6 +579,7 @@ public class Context
      *            ID of special group to test
      * @return true if member
      */
+    @Deprecated
     public boolean inSpecialGroup(int groupID)
     {
         if (specialGroups.contains(Integer.valueOf(groupID)))
@@ -565,6 +596,7 @@ public class Context
      * of.
      * @throws SQLException
      */
+    @Deprecated
     public Group[] getSpecialGroups() throws SQLException
     {
         List<Group> myGroups = new ArrayList<Group>();
@@ -576,6 +608,7 @@ public class Context
         return myGroups.toArray(new Group[myGroups.size()]);
     }
 
+    @Deprecated
     protected void finalize() throws Throwable
     {
         /*
