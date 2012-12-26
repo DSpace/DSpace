@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Miguel Pinto <mpinto@lyncode.com>
  */
 @Transactional
-@Repository("IItemDao")
+@Repository("IEpersonDao")
 public class EpersonDao extends DSpaceDao<Eperson> implements IEpersonDao {
     
 	public EpersonDao() {

@@ -321,7 +321,9 @@ CREATE TABLE MetadataValue
   text_lang          VARCHAR(24),
   place              INTEGER,
   authority          VARCHAR(100),
-  confidence         INTEGER DEFAULT -1
+  confidence         INTEGER DEFAULT -1,
+  resource_type		 INTEGER DEFAULT -1,
+  resource_id		 INTEGER DEFAULT -1
 );
 
 -- Create a dcvalue view for backwards compatibilty
@@ -353,7 +355,9 @@ CREATE TABLE Community
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
   copyright_text    TEXT,
   side_bar_text     TEXT,
-  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id )
+  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id ),
+  istop				BOOL DEFAULT 0,
+  item_count		INTEGER DEFAULT 0
 );
 
 CREATE INDEX community_logo_fk_idx ON Community(logo_bitstream_id);
@@ -378,7 +382,8 @@ CREATE TABLE Collection
   workflow_step_2   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_3   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   submitter         INTEGER REFERENCES EPersonGroup( eperson_group_id ),
-  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id )
+  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id ),
+  item_count		INTEGER DEFAULT 0
 );
 
 CREATE INDEX collection_logo_fk_idx ON Collection(logo_bitstream_id);

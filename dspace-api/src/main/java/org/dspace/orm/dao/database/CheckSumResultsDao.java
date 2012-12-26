@@ -9,6 +9,8 @@ package org.dspace.orm.dao.database;
 
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.orm.dao.api.ICheckSumResultsDao;
@@ -17,6 +19,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
@@ -25,10 +29,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @version $Revision$
  */
 
-public abstract class CheckSumResultsDao implements ICheckSumResultsDao {
+@Transactional
+@Repository("ICheckSumResultsDao")
+public class CheckSumResultsDao implements ICheckSumResultsDao {
 	private static Logger log = LogManager.getLogger(CheckSumResults.class);
 	
-	@Autowired
+	@Resource(name="sessionFactory")
     SessionFactory sessionFactory;
 	
 	protected Session getSession() {

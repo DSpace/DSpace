@@ -10,11 +10,14 @@
 -->
 <beans xmlns="http://www.springframework.org/schema/beans" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:tx="http://www.springframework.org/schema/tx"
     xmlns:context="http://www.springframework.org/schema/context"
     xsi:schemaLocation="http://www.springframework.org/schema/beans 
-           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
            http://www.springframework.org/schema/context
-           http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd"
     default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
@@ -22,8 +25,44 @@
     <!-- 
     <context:component-scan base-package="org.dspace" name-generator="org.dspace.servicemanager.spring.FullPathBeanNameGenerator" />
     -->
+    <!-- Scan for Dao (ORM) -->
+    <context:component-scan base-package="org.dspace.orm.dao" />
 
     <!-- the bean processor interceptor -->
     <bean class="org.dspace.servicemanager.spring.DSpaceBeanPostProcessor" />
-
+	
+	<!-- Transactions annotation driven -->
+	<tx:annotation-driven />
+	<!-- Spring Configured Beans (Annotations) -->
+	<context:spring-configured />
+	
+	<!-- Hibernate Configuration -->
+    <bean id="dataSourceBuilder" class="org.dspace.orm.DSpaceDataSourceBuilder" />
+    <bean id="dataSource" factory-bean="dataSourceBuilder" factory-method="create" />
+    <bean 
+    	id="dspaceSessionBuilder" 
+    	class="org.dspace.orm.DSpaceSessionFactoryBuilder"
+    	depends-on="dataSource">
+    	<property name="dataSource">
+    		<ref bean="dataSource"/>
+    	</property>
+    </bean>
+    <bean id="sessionFactory" factory-bean="dspaceSessionBuilder" factory-method="create" />
+	
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager"
+		depends-on="sessionFactory">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+	<!-- Bean for DSpace Context Service -->
+	<bean id="org.dspace.services.ContextService" 
+		class="org.dspace.services.context.DSpaceContextService"
+		depends-on="sessionFactory">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
 </beans>

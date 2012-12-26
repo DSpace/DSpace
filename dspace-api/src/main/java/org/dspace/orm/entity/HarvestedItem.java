@@ -75,5 +75,7 @@ public class HarvestedItem extends DSpaceObject{
 		return item;
 	}
 
-	
+	public void setItem (Item i) {
+		this.item = i;
+	}
 }

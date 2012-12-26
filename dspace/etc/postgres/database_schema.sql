@@ -316,8 +316,8 @@ CREATE TABLE MetadataValue
   place              INTEGER,
   authority          VARCHAR(100),
   confidence         INTEGER DEFAULT -1,
-  resource_id		 INTEGER,
-  resource_type		 INTEGER
+  resource_id		 INTEGER DEFAULT -1,
+  resource_type		 INTEGER DEFAULT -1
 );
 
 -- Create a dcvalue view for backwards compatibilty
@@ -350,8 +350,8 @@ CREATE TABLE Community
   copyright_text    TEXT,
   side_bar_text     TEXT,
   admin             INTEGER REFERENCES EPersonGroup( eperson_group_id ),
-  istop				BOOL,
-  item_count		INTEGER
+  istop				BOOL DEFAULT 0,
+  item_count		INTEGER DEFAULT 0
 );
 
 CREATE INDEX community_logo_fk_idx ON Community(logo_bitstream_id);

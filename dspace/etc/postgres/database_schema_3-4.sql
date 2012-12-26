@@ -22,15 +22,15 @@
 --
 
 ALTER TABLE Community ADD (
-    istop NUMBER(1),
-    item_count INTEGER
+    istop BOOL DEFAULT 0,
+    item_count INTEGER DEFAULT 0
 );
 
 ALTER TABLE Collection ADD (
-	item_count INTEGER
+	item_count INTEGER DEFAULT 0
 );
 
 ALTER TABLE MetadataValue ADD (
-	resource_id		 INTEGER,
-	resource_type		 INTEGER
+	resource_id		 INTEGER DEFAULT -1,
+	resource_type		 INTEGER  DEFAULT -1
 );

@@ -23,7 +23,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.dspace.core.Constants;
-import org.dspace.eperson.EPerson;
 
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
@@ -41,7 +40,7 @@ public class WorkFlowItem extends DSpaceObject {
     private boolean multipleTitles;
     private boolean publishedBefore;
     private boolean multipleFiles;
-    private List<EPerson> epersons;
+    private List<Eperson> epersons;
     
     @Id
     @Column(name = "workflow_id")
@@ -130,11 +129,11 @@ public class WorkFlowItem extends DSpaceObject {
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
     @JoinTable(name = "tasklistitem", joinColumns = { @JoinColumn(name = "workflow_id", nullable = false) }, inverseJoinColumns = { @JoinColumn(name = "eperson_id", nullable = false) })
-	public List<EPerson> getEpersons() {
+	public List<Eperson> getEpersons() {
 		return epersons;
 	}
 
-	public void setEpersons(List<EPerson> epersons) {
+	public void setEpersons(List<Eperson> epersons) {
 		this.epersons = epersons;
 	}
 

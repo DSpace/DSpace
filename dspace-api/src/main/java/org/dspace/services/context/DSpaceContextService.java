@@ -27,9 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class DSpaceContextService implements ContextService {
 	private static final String CONTEXT_ATTR = "dspace.context";
 	
-	@Autowired SessionFactory sessionFactory;
-	@Autowired RequestService requestService;
-	@Autowired IEpersonDao epersonDao;
+	private SessionFactory sessionFactory;
+	@Autowired(required=false) RequestService requestService;
+	@Autowired(required=false) IEpersonDao epersonDao;
 
 	@Override
 	public Context newContext() {
@@ -43,7 +43,7 @@ public class DSpaceContextService implements ContextService {
 				Request r = requestService.getCurrentRequest();
 				if (r != null)  {// There is one request running on this thread!
 					String userID = r.getSession().getUserId();
-					if (userID != null) 
+					if (userID != null && epersonDao != null)  
 						ctx.setCurrentEperson(epersonDao.selectById(Integer.parseInt(userID)));
 					r.setAttribute(CONTEXT_ATTR, ctx);
 				}
@@ -66,5 +66,12 @@ public class DSpaceContextService implements ContextService {
 		}
 		return newContext();
 	}
-	
+
+	public SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
+
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
 }

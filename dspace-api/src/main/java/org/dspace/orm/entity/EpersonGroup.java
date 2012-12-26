@@ -19,6 +19,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.dspace.core.Constants;
 
@@ -83,6 +84,7 @@ public class EpersonGroup extends DSpaceObject {
 	}
 
 	@Override
+	@Transient
 	public int getType() {
 		return Constants.EPERSONGROUP;
 	}

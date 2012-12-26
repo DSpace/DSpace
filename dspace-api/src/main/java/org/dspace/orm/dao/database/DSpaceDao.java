@@ -9,13 +9,14 @@ package org.dspace.orm.dao.database;
 
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.orm.dao.api.IDSpaceDao;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
@@ -26,8 +27,7 @@ public abstract class DSpaceDao<T> implements IDSpaceDao<T> {
 	private static Logger log = LogManager.getLogger(DSpaceDao.class);
 	
 	private Class<T> clazz;
-	@Autowired
-    SessionFactory sessionFactory;
+	@Resource(name="sessionFactory") SessionFactory sessionFactory;
 	
 	protected Session getSession() {
         return sessionFactory.getCurrentSession();

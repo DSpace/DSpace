@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.dspace.core.Constants;
 import org.dspace.orm.dao.api.ICollectionDao;
@@ -39,7 +40,7 @@ public class Handle extends DSpaceObject {
     }
 
     @Column(name = "handle", unique = true)
-    public String getIdentifier() {
+    public String getHandleString() {
         return handle;
     }
 
@@ -57,7 +58,7 @@ public class Handle extends DSpaceObject {
         this.id = id;
     }
 
-    public void setHandle(String handle) {
+    public void setHandleString(String handle) {
         this.handle = handle;
     }
 
@@ -69,6 +70,7 @@ public class Handle extends DSpaceObject {
         this.resourceId = resourceId;
     }
 
+    @Transient
 	@Override
 	public int getType() {
 		return Constants.HANDLE;
