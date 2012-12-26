@@ -25,11 +25,15 @@ import org.mortbay.jetty.testing.ServletTester;
  * and correctly shut it down
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
+ * @author João Melo <jmelo@lyncode.com>
  */
 public class DSpaceKernelServletContextListenerTest {
 
     @Test
     public void testSampleRequest() {
+    	// Just to set the default kernel to null (as it was never initialized)
+    	DSpaceKernelManager.setDefaultKernel(null);
+    	
         // make sure no kernel yet
         try {
             new DSpaceKernelManager().getKernel();

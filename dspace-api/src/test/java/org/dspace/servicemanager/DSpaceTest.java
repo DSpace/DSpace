@@ -18,11 +18,15 @@ import org.junit.Test;
  * Make sure the DSpace static cover works
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
+ * @author João Melo <jmelo@lyncode.com>
  */
 public class DSpaceTest {
 
     @Test
     public void testDSpaceObject() {
+    	// Just to set the default kernel to null (as it was never initialized)
+    	DSpaceKernelManager.setDefaultKernel(null);
+    	
         try {
             DSpace dspace = new DSpace();
             dspace.getServiceManager();
