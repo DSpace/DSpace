@@ -40,13 +40,17 @@
     <!--The default configuration settings for discovery-->
     <bean id="defaultConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
         <!--Which sidebar facets are to be displayed-->
+        
         <property name="sidebarFacets">
             <list>
+                <!-- 
                 <ref bean="sidebarFacetAuthor" />
                 <ref bean="sidebarFacetSubject" />
                 <ref bean="sidebarFacetDateIssued" />
+                 -->
             </list>
         </property>
+        
         <!--The search filters which can be used on the discovery search page-->
         <property name="searchFilters">
             <list>
@@ -97,7 +101,6 @@
                 <value>dc.title</value>
             </list>
         </property>
-        <property name="fullAutoComplete" value="false"/>
     </bean>
 
     <bean id="searchFilterAuthor" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
@@ -108,7 +111,6 @@
                 <value>dc.creator</value>
             </list>
         </property>
-        <property name="fullAutoComplete" value="true"/>
     </bean>
 
     <bean id="searchFilterSubject" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
@@ -118,7 +120,6 @@
                 <value>dc.subject.*</value>
             </list>
         </property>
-        <property name="fullAutoComplete" value="true"/>
     </bean>
 
     <bean id="searchFilterIssued" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
@@ -129,7 +130,6 @@
             </list>
         </property>
         <property name="type" value="date"/>
-        <property name="fullAutoComplete" value="false"/>
     </bean>
 
 
