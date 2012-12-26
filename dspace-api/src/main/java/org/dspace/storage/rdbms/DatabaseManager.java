@@ -40,12 +40,14 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
 /**
+ * Use Hibernate instead
  * Executes SQL queries.
  * 
  * @author Peter Breton
  * @author Jim Downing
  * @version $Revision$
  */
+@Deprecated
 public class DatabaseManager
 {
     /** log4j category */

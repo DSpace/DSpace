@@ -9,7 +9,14 @@ package org.dspace.core;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EmptyStackException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.dspace.eperson.EPerson;
@@ -17,15 +24,18 @@ import org.dspace.eperson.Group;
 import org.dspace.event.Dispatcher;
 import org.dspace.event.Event;
 import org.dspace.event.EventManager;
-import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.orm.dao.api.IEpersonDao;
+import org.dspace.orm.entity.Eperson;
+import org.dspace.utils.DSpace;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Use ContextV2 instead
- * 
  * Class representing the context of a particular DSpace operation. This stores
  * information such as the current authenticated user and the database
- * connection being used.
+ * session being used.
  * <P>
  * Typical use of the context object will involve constructing one, and setting
  * the current user if one is authenticated. Several operations may be performed
@@ -36,19 +46,16 @@ import org.springframework.util.CollectionUtils;
  * <P>
  * The context object is also used as a cache for CM API objects.
  * 
- * 
+ * @author João Melo <jmelo@lyncode.com>
  * @version $Revision$
  */
-@Deprecated
-public class Context
-{
-    private static final Logger log = Logger.getLogger(Context.class);
-
-    /** Database connection */
-    private Connection connection;
-
+public class ContextV2 extends Context {
+    private static final Logger log = Logger.getLogger(ContextV2.class);
+    
+    /** Current hibernate session **/
+    private Session session;
     /** Current user - null means anonymous access */
-    private EPerson currentUser;
+    private Eperson currentUser;
 
     /** Current Locale */
     private Locale currentLocale;
@@ -73,7 +80,7 @@ public class Context
 
     /** Group IDs of special groups user is a member of */
     private List<Integer> specialGroups;
-
+    
     /** Content events */
     private LinkedList<Event> events = null;
 
@@ -81,19 +88,13 @@ public class Context
     private String dispName = null;
 
     /**
-     * Construct a new context object. A database connection is opened. No user
+     * Construct a new context object. No user
      * is authenticated.
-     * 
-     * @exception SQLException
-     *                if there was an error obtaining a database connection
      */
-    @Deprecated
-    public Context() throws SQLException
+    public ContextV2(Session session) throws SQLException //FIXME: remove this exception
     {
-        // Obtain a non-auto-committing connection
-        connection = DatabaseManager.getConnection();
-        connection.setAutoCommit(false);
-
+    	this.session = session;
+    	
         currentUser = null;
         currentLocale = I18nUtil.DEFAULTLOCALE;
         extraLogInfo = "";
@@ -107,16 +108,14 @@ public class Context
     }
 
     /**
-     * Get the database connection associated with the context
+     * Opens the session if it isn't opened yet.
      * 
-     * @return the database connection
+     * @return Hibernate session
      */
-    @Deprecated
-    public Connection getDBConnection()
-    {
-        return connection;
+    private Session getSession () {
+    	return session;
     }
-
+    
     /**
      * Set the current user. Authentication must have been performed by the
      * caller - this call does not attempt any authentication.
@@ -125,14 +124,43 @@ public class Context
      *            the new current user, or <code>null</code> if no user is
      *            authenticated
      */
-    @Deprecated
-    public void setCurrentUser(EPerson user)
+    public void setCurrentEperson(Eperson user)
     {
         currentUser = user;
     }
+    
 
     /**
-     * Get the current (authenticated) user
+     * Set the current user. Authentication must have been performed by the
+     * caller - this call does not attempt any authentication.
+     * 
+     * Use setCurrentEperson
+     * 
+     * @param user
+     *            the new current user, or <code>null</code> if no user is
+     *            authenticated
+     */
+    @Deprecated
+    public void setCurrentUser(org.dspace.eperson.EPerson user)
+    {
+    	IEpersonDao dao = new DSpace().getSingletonService(IEpersonDao.class);
+        currentUser = dao.selectById(user.getID());
+    }
+    
+    /**
+     * Get the current (authenticated) user.
+     * 
+     * @return the current user, or <code>null</code> if no user is
+     *         authenticated
+     */
+    public Eperson getCurrentEperson () {
+    	return this.currentUser;
+    }
+    
+
+    /**
+     * Get the current (authenticated) user.
+     * Use getCurrentEperson
      * 
      * @return the current user, or <code>null</code> if no user is
      *         authenticated
@@ -140,10 +168,18 @@ public class Context
     @Deprecated
     public EPerson getCurrentUser()
     {
-        return currentUser;
+    	if (this.currentUser != null)
+			try {
+				return EPerson.find(this, this.currentUser.getID());
+			} catch (SQLException e) {
+				log.error(e.getMessage(), e);
+				return null;
+			}
+		else return null;
     }
 
     /**
+     * Must use Spring!
      * Gets the current Locale
      * 
      * @return Locale the current Locale
@@ -155,6 +191,7 @@ public class Context
     }
 
     /**
+     * Use spring
      * set the current Locale
      * 
      * @param locale
@@ -172,7 +209,6 @@ public class Context
      * @return <code>true</code> if authorisation should be ignored for this
      *         session.
      */
-    @Deprecated
     public boolean ignoreAuthorization()
     {
         return ignoreAuth;
@@ -182,7 +218,6 @@ public class Context
      * Turn Off the Authorisation System for this context and store this change
      * in a history for future use.
      */
-    @Deprecated
     public void turnOffAuthorisationSystem()
     {
         authStateChangeHistory.push(ignoreAuth);
@@ -207,7 +242,6 @@ public class Context
          * </code> If Context debug is enabled, the correct sequence calling will be
      * checked and a warning will be displayed if not.
      */
-    @Deprecated
     public void restoreAuthSystemState()
     {
         Boolean previousState;
@@ -257,7 +291,6 @@ public class Context
      *            if <code>true</code>, authorisation should be ignored for this
      *            session.
      */
-    @Deprecated
     public void setIgnoreAuthorization(boolean b)
     {
         ignoreAuth = b;
@@ -273,7 +306,6 @@ public class Context
      * @param info
      *            the extra information to log
      */
-    @Deprecated
     public void setExtraLogInfo(String info)
     {
         extraLogInfo = info;
@@ -285,7 +317,6 @@ public class Context
      * 
      * @return the extra log info - guaranteed non- <code>null</code>
      */
-    @Deprecated
     public String getExtraLogInfo()
     {
         return extraLogInfo;
@@ -295,40 +326,23 @@ public class Context
      * Close the context object after all of the operations performed in the
      * context have completed successfully. Any transaction with the database is
      * committed.
-     * 
-     * @exception SQLException
-     *                if there was an error completing the database transaction
-     *                or closing the connection
      */
-    @Deprecated
-    public void complete() throws SQLException
+    public void complete()
     {
-        // FIXME: Might be good not to do a commit() if nothing has actually
-        // been written using this connection
-        try
-        {
-            // Commit any changes made as part of the transaction
-            commit();
-        }
-        finally
-        {
-            // Free the connection
-            DatabaseManager.freeConnection(connection);
-            connection = null;
-            clearCache();
-        }
+    	Session session = this.getSession();
+        Transaction transaction = session.getTransaction();
+        transaction.commit();
+        session.close();
+    	
+    	clearCache();
     }
 
     /**
      * Commit any transaction that is currently in progress, but do not close
      * the context.
      * 
-     * @exception SQLException
-     *                if there was an error completing the database transaction
-     *                or closing the connection
      */
-    @Deprecated
-    public void commit() throws SQLException
+    public void commit()
     {
         // Commit any changes made as part of the transaction
         Dispatcher dispatcher = null;
@@ -344,12 +358,17 @@ public class Context
                 }
 
                 dispatcher = EventManager.getDispatcher(dispName);
-                connection.commit();
+                Session session = this.getSession();
+                Transaction transaction = session.getTransaction();
+                transaction.commit();
+                
                 dispatcher.dispatch(this);
             }
             else
             {
-                connection.commit();
+            	Session session = this.getSession();
+                Transaction transaction = session.getTransaction();
+                transaction.commit();
             }
 
         }
@@ -368,7 +387,6 @@ public class Context
      * Select an event dispatcher, <code>null</code> selects the default
      * 
      */
-    @Deprecated
     public void setDispatcher(String dispatcher)
     {
         if (log.isDebugEnabled())
@@ -384,7 +402,6 @@ public class Context
      * 
      * @param event
      */
-    @Deprecated
     public void addEvent(Event event)
     {
         if (events == null)
@@ -401,13 +418,11 @@ public class Context
      * 
      * @return List of all available events.
      */
-    @Deprecated
     public LinkedList<Event> getEvents()
     {
         return events;
     }
 
-    @Deprecated
     public boolean hasEvents()
     {
         return !CollectionUtils.isEmpty(events);
@@ -417,7 +432,6 @@ public class Context
      * Retrieves the first element in the events list & removes it from the list of events once retrieved
      * @return The first event of the list or <code>null</code> if the list is empty
      */
-    @Deprecated
     public Event pollEvent()
     {
         if(hasEvents())
@@ -435,37 +449,14 @@ public class Context
      * be called as part of an error-handling routine where an SQLException has
      * already been thrown.
      */
-    @Deprecated
     public void abort()
     {
-        try
-        {
-            if (!connection.isClosed())
-            {
-                connection.rollback();
-            }
-        }
-        catch (SQLException se)
-        {
-            log.error(se.getMessage(), se);
-        }
-        finally
-        {
-            try
-            {
-                if (!connection.isClosed())
-                {
-                    DatabaseManager.freeConnection(connection);
-                }
-            }
-            catch (Exception ex)
-            {
-                log.error("Exception aborting context", ex);
-            }
-            connection = null;
-            events = null;
-            clearCache();
-        }
+    	Session session = this.getSession();
+	    Transaction transaction = session.getTransaction();
+	    if (!transaction.isActive())
+	        transaction.rollback();
+	    events = null;
+	    clearCache();
     }
 
     /**
@@ -476,11 +467,10 @@ public class Context
      * @return <code>true</code> if the context is still valid, otherwise
      *         <code>false</code>
      */
-    @Deprecated
     public boolean isValid()
-    {
-        // Only return true if our DB connection is live
-        return (connection != null);
+    {	
+    	return (session.getTransaction() != null &&
+        		session.getTransaction().isActive());
     }
 
     /**
@@ -494,7 +484,6 @@ public class Context
      * @return the object from the cache, or <code>null</code> if it's not
      *         cached.
      */
-    @Deprecated
     public Object fromCache(Class<?> objectClass, int id)
     {
         String key = objectClass.getName() + id;
@@ -510,7 +499,6 @@ public class Context
      * @param id
      *            the object's ID
      */
-    @Deprecated
     public void cache(Object o, int id)
     {
         String key = o.getClass().getName() + id;
@@ -525,7 +513,6 @@ public class Context
      * @param id
      *            the object's ID
      */
-    @Deprecated
     public void removeCached(Object o, int id)
     {
         String key = o.getClass().getName() + id;
@@ -535,7 +522,6 @@ public class Context
     /**
      * Remove all the objects from the object cache
      */
-    @Deprecated
     public void clearCache()
     {
         objectCache.clear();
@@ -552,12 +538,23 @@ public class Context
      * 
      * @return the number of items in the cache
      */
-    @Deprecated
     public int getCacheSize()
     {
         return objectCache.size();
     }
 
+   
+    protected void finalize() throws Throwable
+    {
+        /*
+         * If a context is garbage-collected, we roll back and free up the
+         * database connection if there is one.
+         */
+    	abort();
+
+    	super.finalize();
+    }
+    
     /**
      * set membership in a special group
      * 
@@ -608,18 +605,15 @@ public class Context
         return myGroups.toArray(new Group[myGroups.size()]);
     }
 
+    /**
+     * This method has been made deprecated. Instead you should use the Hibernate
+     * engine to query the database.
+     * 
+     * @return Database connection
+     */
     @Deprecated
-    protected void finalize() throws Throwable
-    {
-        /*
-         * If a context is garbage-collected, we roll back and free up the
-         * database connection if there is one.
-         */
-        if (connection != null)
-        {
-            abort();
-        }
-
-        super.finalize();
-    }
+	public Connection getDBConnection() {
+    	SessionImplementor session = (SessionImplementor) this.getSession();
+		return session.connection();
+	}
 }
