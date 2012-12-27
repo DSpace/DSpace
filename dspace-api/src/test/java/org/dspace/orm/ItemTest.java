@@ -5,37 +5,35 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.services.context;
+package org.dspace.orm;
 
 import static org.junit.Assert.*;
 
-import org.dspace.core.Context;
-import org.dspace.services.ContextService;
+import org.dspace.orm.dao.api.IItemDao;
 import org.dspace.test.DSpaceAbstractKernelTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
+ * 
  * @author João Melo <jmelo@lyncode.com>
  */
-public class DSpaceContextServiceTest extends DSpaceAbstractKernelTest {
-	private ContextService contextService;
+public class ItemTest extends DSpaceAbstractKernelTest {
+	private IItemDao itemDao;
 	
 	@Before
 	public void init () {
-		contextService = getService(ContextService.class);
+		itemDao = getService(IItemDao.class);
 	}
 	
 	@After
     public void tearDown() {
-		contextService = null;
+		itemDao = null;
 	}
 	
 	@Test
-	public void testContextService () {
-		assertNotNull(contextService);
-		Context ctx = contextService.getContext();
-		assertNotNull(ctx);
+	public void doTest () {
+		assertNotNull(itemDao);
 	}
 }
