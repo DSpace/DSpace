@@ -712,7 +712,7 @@
 					<repeatable>true</repeatable>
 					<label>Firmantes</label>
 					<input-type>onebox</input-type>
-					<hint>Personas que firman la resolución</hint>
+					<hint>Personas que firman la Resolución/Ordenanza</hint>
 					<type-bind>Documento institucional</type-bind>
 					<visibility>workflow</visibility>
 				</field>
@@ -949,6 +949,10 @@
             <pair>
 				<displayed-value>Resolución</displayed-value>
 				<stored-value>Resolucion</stored-value>
+			</pair>
+            <pair>
+				<displayed-value>Ordenanza</displayed-value>
+				<stored-value>Ordenanza</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Documento institucional</displayed-value>
