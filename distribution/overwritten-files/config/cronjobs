@@ -26,6 +26,9 @@
 #Actualizacion de la bbdd geolite. ver mas en http://trac.prebi.unlp.edu.ar/issues/1702
 0 5 2 * *  ant -f /var/dspace-src/distribution/target/dspace-sedici-distribution-bin/build.xml update_geolite
 
+#Backup en AIP una vez por semana
+5 22 * * sun  date && ./dspace packager -d -a -t AIP -e alira@sedici.unlp.edu.ar -u -i 10915/0 /var/dspace/backups/aip/aip-site.zip && date
+
 # ########## STATS ######################
 0 1 * * * /var/dspace/bin/dspace stat-general
 0 1 * * * /var/dspace/bin/dspace stat-monthly
