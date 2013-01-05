@@ -23,11 +23,15 @@
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
+<%@ page import="java.util.List" %>
+<%@ page import="org.apache.commons.lang.time.DateFormatUtils" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
+<%@ page import="org.dspace.authorize.AuthorizeManager" %>
 <%@ page import="org.dspace.submit.AbstractProcessingStep" %>
 <%@ page import="org.dspace.app.util.SubmissionInfo" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.authorize.ResourcePolicy" %>
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 <%@ page import="org.dspace.content.Bundle" %>
@@ -48,6 +52,29 @@
     
     request.setAttribute("LanguageSwitch", "hide");
     boolean allowFileEditing = !subInfo.isInWorkflow() || ConfigurationManager.getBooleanProperty("workflow", "reviewer.file-edit");
+
+    boolean withEmbargo = 
+        (SubmissionController.getCurrentStepConfig(request, subInfo).getProcessingClassName().equals("org.dspace.submit.step.UploadWithEmbargoStep") ? true : false);
+
+    List<ResourcePolicy> policies = null;
+    String startDate = "";
+    String globalReason = "";
+    if (withEmbargo)
+    {
+        // Policies List
+        policies = AuthorizeManager.findPoliciesByDSOAndType(context, subInfo.getSubmissionItem().getItem(), ResourcePolicy.TYPE_CUSTOM);
+    
+        startDate = "";
+        globalReason = "";
+        if (policies.size() > 0)
+        {
+            startDate = (policies.get(0).getStartDate() != null ? DateFormatUtils.format(policies.get(0).getStartDate(), "yyyy-MM-dd") : "");
+            globalReason = policies.get(0).getRpDescription();
+        }
+    }
+
+    boolean isAdvancedForm = ConfigurationManager.getBooleanProperty("xmlui.submission.restrictstep.enableAdvancedForm", false);
+
 %>
 
 <dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.upload-file-list.title">
@@ -83,21 +110,34 @@
                 <th id="t4" class="oddRowOddCol"><fmt:message key="jsp.submit.upload-file-list.tableheading4"/></th>
                 <th id="t5" class="oddRowEvenCol"><fmt:message key="jsp.submit.upload-file-list.tableheading5"/></th>
 <%
+    String headerClass = "oddRowEvenCol";
+
     if (showChecksums)
     {
+        headerClass = (headerClass == "oddRowEvenCol" ? "oddRowOddCol" : "oddRowEvenCol");
 %>
 
-                <th id="t6" class="oddRowOddCol"><fmt:message key="jsp.submit.upload-file-list.tableheading6"/></th>
+                <th id="t6" class="<%= headerClass %>"><fmt:message key="jsp.submit.upload-file-list.tableheading6"/></th>
 <%
     }
-    
+
+    if (withEmbargo)
+    {
+        // Access Setting
+        headerClass = (headerClass == "oddRowEvenCol" ? "oddRowOddCol" : "oddRowEvenCol");
+%>
+                <th id="t7" class="<%= headerClass %>"><fmt:message key="jsp.submit.upload-file-list.tableheading7"/></th>
+
+<%
+    }
+
     // Don't display last column ("Remove") in workflow mode
     if (allowFileEditing)
     {
         // Whether it's an odd or even column depends on whether we're showing checksums
-        String column = (showChecksums ? "Even" : "Odd");
+        headerClass = (headerClass == "oddRowEvenCol" ? "oddRowOddCol" : "oddRowEvenCol");
 %>
-                <th id="t7" class="oddRow<%= column %>Col">&nbsp;</th>
+                <th id="t8" class="<%= headerClass %>">&nbsp;</th>
 <%
     }
 %>
@@ -164,13 +204,24 @@
 <%
         }
 
+        String column = "";
+        if (withEmbargo)
+        {
+            column = (showChecksums ? "Even" : "Odd");
+%>
+                <td headers="t6" class="<%= row %>Row<%= column %>Col" style="text-align:center"> 
+                    <input type="submit" name="submit_editPolicy_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button1"/>" />
+                </td>
+<%
+        }
+
         // Don't display "remove" button in workflow mode
         if (allowFileEditing)
         {
             // Whether it's an odd or even column depends on whether we're showing checksums
-            String column = (showChecksums ? "Even" : "Odd");
+            column = (column == "Odd" ? "Even" : "Odd");
 %>
-                <td headers="t7" class="<%= row %>Row<%= column %>Col">
+                <td headers="t8" class="<%= row %>Row<%= column %>Col">
                     <input type="submit" name="submit_remove_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button2"/>" />
                 </td>
 <%
@@ -182,6 +233,7 @@
     }
 %>
         </table>
+
 
 <%-- HACK:  Need a space - is there a nicer way to do this than <br> or a --%>
 <%--        blank <p>? --%>

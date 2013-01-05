@@ -116,6 +116,7 @@ public class BrowseDAOOracle implements BrowseDAO
     /** flags for what the items represent */
     private boolean itemsInArchive = true;
     private boolean itemsWithdrawn = false;
+    private boolean itemsDiscoverable = true;
 
     private boolean enableBrowseFrequencies = true;
     
@@ -360,7 +361,7 @@ public class BrowseDAOOracle implements BrowseDAO
                 TableRow row = tri.next();
                 BrowseItem browseItem = new BrowseItem(context, row.getIntColumn("item_id"),
                                                   itemsInArchive,
-                                                  itemsWithdrawn);
+                                                  itemsWithdrawn, itemsDiscoverable);
                 results.add(browseItem);
             }
 
@@ -683,10 +684,16 @@ public class BrowseDAOOracle implements BrowseDAO
             itemsInArchive = false;
             itemsWithdrawn = true;
         }
+        else if (table.equals(BrowseIndex.getPrivateBrowseIndex().getTableName()))
+        {
+            itemsInArchive = false;
+            itemsDiscoverable = false;
+        }
         else
         {
             itemsInArchive = true;
             itemsWithdrawn = false;
+            itemsDiscoverable = true;
         }
 
         this.rebuildQuery = true;
