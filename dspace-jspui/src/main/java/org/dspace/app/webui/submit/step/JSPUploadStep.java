@@ -82,13 +82,13 @@ public class JSPUploadStep extends JSPStep
     private static final String FILE_FORMAT_JSP = "/submit/get-file-format.jsp";
 
     /** JSP to show any upload errors * */
-    private static final String UPLOAD_ERROR_JSP = "/submit/upload-error.jsp";
+    protected static final String UPLOAD_ERROR_JSP = "/submit/upload-error.jsp";
 
     /** JSP to show any upload errors * */
-    private static final String VIRUS_CHECKER_ERROR_JSP = "/submit/virus-checker-error.jsp";
+    protected static final String VIRUS_CHECKER_ERROR_JSP = "/submit/virus-checker-error.jsp";
 
     /** JSP to show any upload errors * */
-    private static final String VIRUS_ERROR_JSP = "/submit/virus-error.jsp";
+    protected static final String VIRUS_ERROR_JSP = "/submit/virus-error.jsp";
     
     /** JSP to review uploaded files * */
     private static final String REVIEW_JSP = "/submit/review-upload.jsp";
@@ -424,7 +424,7 @@ public class JSPUploadStep extends JSPStep
      * @param justUploaded
      *            true, if the user just finished uploading a file
      */
-    private void showUploadPage(Context context, HttpServletRequest request,
+    protected void showUploadPage(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo,
             boolean justUploaded) throws SQLException, ServletException,
             IOException
@@ -472,7 +472,7 @@ public class JSPUploadStep extends JSPStep
      * @param subInfo
      *            the SubmissionInfo object
      */
-    private void showChooseFile(Context context, HttpServletRequest request,
+    protected void showChooseFile(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
             throws SQLException, ServletException, IOException
     {
@@ -501,7 +501,7 @@ public class JSPUploadStep extends JSPStep
      * @param showChecksums
      *            pass in true if checksums should be displayed
      */
-    private void showUploadFileList(Context context,
+    protected void showUploadFileList(Context context,
             HttpServletRequest request, HttpServletResponse response,
             SubmissionInfo subInfo, boolean justUploaded, boolean showChecksums)
             throws SQLException, ServletException, IOException
@@ -537,7 +537,7 @@ public class JSPUploadStep extends JSPStep
      * @param subInfo
      *            the SubmissionInfo object
      */
-    private void showGetFileFormat(Context context, HttpServletRequest request,
+    protected void showGetFileFormat(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
             throws SQLException, ServletException, IOException
     {
@@ -577,7 +577,7 @@ public class JSPUploadStep extends JSPStep
      * @param subInfo
      *            the SubmissionInfo object
      */
-    private void showFileDescription(Context context,
+    protected void showFileDescription(Context context,
             HttpServletRequest request, HttpServletResponse response,
             SubmissionInfo subInfo) throws SQLException, ServletException,
             IOException

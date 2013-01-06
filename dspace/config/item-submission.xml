@@ -219,7 +219,7 @@
       </step>
       
 
-       <!-- Step 4 Upload Item with Embargo Features (not supported in JSPUI)
+       <!-- Step 4 Upload Item with Embargo Features
             to enable this step, please make sure to comment-out the previous step "UploadStep"  
        <step>
            <heading>submit.progressbar.upload</heading>

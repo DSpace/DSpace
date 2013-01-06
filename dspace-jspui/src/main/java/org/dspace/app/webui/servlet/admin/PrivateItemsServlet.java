@@ -29,23 +29,9 @@ import org.dspace.sort.SortOption;
 import org.apache.log4j.Logger;
 
 /**
- * Servlet for browsing through indices, as they are defined in 
- * the configuration.  This class can take a wide variety of inputs from
- * the user interface:
+ * Servlet for browsing through private items:
  * 
- * - type:	the type of browse (index name) being performed
- * - order: (ASC | DESC) the direction for result sorting
- * - value: A specific value to find items around.  For example the author name or subject
- * - month: integer specification of the month of a date browse
- * - year: integer specification of the year of a date browse
- * - starts_with: string value at which to start browsing
- * - vfocus: start browsing with a value of this string
- * - focus: integer id of the item at which to start browsing
- * - rpp: integer number of results per page to display
- * - sort_by: integer specification of the field to search on
- * - etal: integer number to limit multiple value items specified in config to
- * 
- * @author Richard Jones
+ * @author Keiji Suzuki
  * @version $Revision$
  */
 public class PrivateItemsServlet extends AbstractBrowserServlet
