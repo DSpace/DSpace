@@ -69,10 +69,6 @@ public final class DSpace {
     }
 
     // place methods to retrieve key services below here -AZ
-    public AuthorizationService getAuthorizationService () {
-    	return getServiceManager().getServiceByName(AuthorizationService.class.getName(), AuthorizationService.class);
-    }
-    
     public ConfigurationService getConfigurationService() {
         return getServiceManager().getServiceByName(ConfigurationService.class.getName(), ConfigurationService.class);
     }
@@ -91,10 +87,6 @@ public final class DSpace {
 
     public RequestService getRequestService() {
         return getServiceManager().getServiceByName(RequestService.class.getName(), RequestService.class);
-    }
-    
-    public StorageService getStorageService () {
-    	return getServiceManager().getServiceByName(StorageService.class.getName(), StorageService.class);
     }
     
     public <T> T getSingletonService(Class<T> type) {

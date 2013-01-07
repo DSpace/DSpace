@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.DSpaceContext;
 import org.dspace.storage.rdbms.DatabaseManager;
 
 /**
@@ -158,7 +157,6 @@ public final class BitstreamInfoDAO extends DAOSupport
      * History data access object for checksum_history table
      */
     private ChecksumHistoryDAO checksumHistoryDAO;
-    private DSpaceContext context;
 
     /**
      * Default constructor
@@ -167,10 +165,6 @@ public final class BitstreamInfoDAO extends DAOSupport
     {
         checksumHistoryDAO = new ChecksumHistoryDAO();
     }
-
-    public BitstreamInfoDAO(DSpaceContext context) {
-		this.context = context;
-	}
 
 	/**
      * Updates most_recent_checksum with latest checksum and result of
@@ -195,7 +189,7 @@ public final class BitstreamInfoDAO extends DAOSupport
 
         try
         {
-            conn = (this.context == null) ? DatabaseManager.getConnection() : context.getDBConnection();
+            conn = DatabaseManager.getConnection();
             stmt = conn.prepareStatement(UPDATE_CHECKSUM);
             stmt.setString(1, (info.getCalculatedChecksum() != null) ? info
                     .getCalculatedChecksum() : "");
@@ -241,7 +235,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         try
         {
             // create the connection and execute the statement
-            conn = (this.context == null) ? DatabaseManager.getConnection() : context.getDBConnection();;
+            conn = DatabaseManager.getConnection();
 
             prepStmt = conn.prepareStatement(FIND_BY_BITSTREAM_ID);
 
@@ -290,7 +284,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         try
         {
             LOG.debug("updating missing bitstreams");
-            conn = (this.context == null) ? DatabaseManager.getConnection() : context.getDBConnection();;
+            conn = DatabaseManager.getConnection();
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
             {
                 stmt = conn.prepareStatement(INSERT_MISSING_CHECKSUM_BITSTREAMS_ORACLE);
@@ -368,7 +362,7 @@ public final class BitstreamInfoDAO extends DAOSupport
 
         try
         {
-            conn = (this.context == null) ? DatabaseManager.getConnection() : context.getDBConnection();
+            conn = DatabaseManager.getConnection();
             deleteBitstreamInfo(id, conn);
             checksumHistoryDAO.deleteHistoryForBitstreamInfo(id, conn);
             conn.commit();
@@ -403,7 +397,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         try
         {
 
-            conn = (this.context == null) ? DatabaseManager.getConnection() : context.getDBConnection();
+            conn = DatabaseManager.getConnection();
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
             {
                 prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM_ORACLE);
@@ -450,7 +444,7 @@ public final class BitstreamInfoDAO extends DAOSupport
 
         try
         {
-            conn = (this.context == null) ? DatabaseManager.getConnection() : context.getDBConnection();
+            conn = DatabaseManager.getConnection();
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
             {
                 prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM_DATE_ORACLE);
@@ -542,7 +536,7 @@ public final class BitstreamInfoDAO extends DAOSupport
 
         try
         {
-            conn = (this.context == null) ? DatabaseManager.getConnection() : context.getDBConnection();
+            conn = DatabaseManager.getConnection();
             ps = conn.prepareStatement(COLLECTION_BITSTREAMS);
             ps.setInt(1, collectionId);
 
@@ -583,7 +577,7 @@ public final class BitstreamInfoDAO extends DAOSupport
 
         try
         {
-            conn = (this.context == null) ? DatabaseManager.getConnection() : context.getDBConnection();
+            conn = DatabaseManager.getConnection();
             ps = conn.prepareStatement(COMMUNITY_BITSTREAMS);
             ps.setInt(1, communityId);
 

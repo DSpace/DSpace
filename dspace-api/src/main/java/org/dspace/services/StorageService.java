@@ -31,16 +31,6 @@ public interface StorageService {
 	InputStream retrieve (Bitstream bitstream) throws StorageException;
 	
 	/**
-     * Clean up the bitstream storage area. This method deletes any bitstreams
-     * which are more than 1 hour old and marked deleted. The deletions cannot
-     * be undone.
-     * 
-     * @param deleteDatabase Delete database records too
-	 * @throws StorageException If something wrong happens
-	 */
-	void cleanup (boolean deleteDatabase, boolean verbose) throws StorageException;
-	
-	/**
      * <p>
      * Remove a bitstream from the asset store. This method does not delete any
      * bits, but simply marks the bitstreams as deleted (the context still needs
