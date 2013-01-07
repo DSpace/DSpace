@@ -13,7 +13,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import org.dspace.core.Constants;
 
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
@@ -43,9 +42,9 @@ public class MetadataSchemaRegistry extends DSpaceObject {
     
     @Override
     @Transient
-    public int getType()
+    public DSpaceObjectType getType()
     {
-    	return Constants.METADATA;
+    	return DSpaceObjectType.METADATA;
     }
 
 

@@ -17,7 +17,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import org.dspace.core.Constants;
 
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
@@ -49,9 +48,9 @@ public class VersionItem extends DSpaceObject{
     
     @Override
     @Transient
-    public int getType()
+    public DSpaceObjectType getType()
     {
-    	return Constants.VERSIONITEM;
+    	return DSpaceObjectType.VERSION_ITEM;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)

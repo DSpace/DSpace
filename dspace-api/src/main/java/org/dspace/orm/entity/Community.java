@@ -25,7 +25,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.dspace.core.Constants;
+import org.dspace.services.AuthorizationService;
+import org.dspace.services.auth.Action;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
 @Entity
@@ -33,13 +35,15 @@ import org.springframework.beans.factory.annotation.Configurable;
 @Configurable
 public class Community extends DSpaceObject implements Serializable {
     private static final long serialVersionUID = 6681512980782299861L;
+    
+    @Autowired AuthorizationService authService;
     private int id;
     private String name;
     private String shortDescription;
     private String introductoryText;
     private Bitstream logo;
     private String copyrightText;
-    private Integer admin;
+    private EpersonGroup admin;
     private List<Community> parents;
     private List<Community> childs;
     private List<Collection> collections;
@@ -132,10 +136,9 @@ public class Community extends DSpaceObject implements Serializable {
         return copyrightText;
     }
 
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name="admin", nullable = false)
-    @Column(name = "admin", nullable = true)
-    public Integer getAdmin() {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="admin", nullable = false)
+    public EpersonGroup getAdmin() {
         return admin;
     }
 
@@ -192,14 +195,14 @@ public class Community extends DSpaceObject implements Serializable {
         this.copyrightText = copyrightText;
     }
 
-    public void setAdmin(Integer admin) {
+    public void setAdmin(EpersonGroup admin) {
         this.admin = admin;
     }
 
     @Override
     @Transient
-    public int getType() {
-        return Constants.COMMUNITY;
+    public DSpaceObjectType getType() {
+        return DSpaceObjectType.COMMUNITY;
     }
 
     @Column(name="istop")
@@ -220,5 +223,39 @@ public class Community extends DSpaceObject implements Serializable {
 		this.itemCount = itemCount;
 	}
 
+	public IDSpaceObject getAdminObject(Action action)
+    {
+        IDSpaceObject adminObject = null;
+        switch (action)
+        {
+        case REMOVE:
+            if (authService.getConfiguration().canCommunityAdminPerformSubelementDeletion())
+            {
+                adminObject = this;
+            }
+            break;
+
+        case DELETE:
+            if (authService.getConfiguration().canCommunityAdminPerformSubelementDeletion())
+            {
+                adminObject = this.getParent();
+            }
+            break;
+        case ADD:
+            if (authService.getConfiguration().canCommunityAdminPerformSubelementCreation())
+            {
+                adminObject = this;
+            }
+            break;
+        default:
+            adminObject = this;
+            break;
+        }
+        return adminObject;
+    }
 	
+	public IDSpaceObject getParentObject()
+    {
+        return this.getParent();      
+    }
 }

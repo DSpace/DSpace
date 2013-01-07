@@ -22,8 +22,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.dspace.core.Constants;
-
 @Entity
 @Table(name = "eperson")
 public class Eperson extends DSpaceObject {
@@ -45,6 +43,7 @@ public class Eperson extends DSpaceObject {
     private List<Collection> collections;
     private List<EpersonGroup> epersonGroups;
     private List<WorkFlowItem> workFlowItems;
+    private List<EpersonGroup> specialGroups;
     
     @Id
     @Column(name = "eperson_id")
@@ -272,8 +271,8 @@ public class Eperson extends DSpaceObject {
 
 	@Override
 	@Transient
-	public int getType() {
-		return Constants.EPERSON;
+	public DSpaceObjectType getType() {
+		return DSpaceObjectType.EPERSON;
 	}
 	
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
@@ -284,5 +283,62 @@ public class Eperson extends DSpaceObject {
 
 	public void setWorkFlowItems(List<WorkFlowItem> workFlowItems) {
 		this.workFlowItems = workFlowItems;
+	}
+	
+	@Transient
+	public List<EpersonGroup> getSpecialGroups () {
+		// In memory!
+		return specialGroups;
+	}
+	
+	@Transient
+	public void addSpecialGroup (EpersonGroup e) {
+		this.specialGroups.add(e);
+	}
+	
+	@Transient
+	public void removeSpecialGroup (EpersonGroup e) {
+		this.specialGroups.remove(e);
+	}
+	
+	@Transient
+	public boolean memberOf (EpersonGroup g) {
+		// Optimized code
+		// First search for in-memory groups (special groups)
+		for (EpersonGroup e : this.getSpecialGroups())
+			if (e.getID() == g.getID())
+				return true;
+		// Next search for the current eperson group
+		for (EpersonGroup e : this.getEpersonGroups())
+			if (e.getID() == g.getID())
+				return true;
+		// At last, search in the hierarchy
+		// If user belongs to Group g then he belongs to all parent groups of it
+		for (EpersonGroup eg : this.getEpersonGroups())
+			for (EpersonGroup e : eg.getAllParents())
+				if (e.getID() == g.getID())
+					return true;
+		
+		return false;
+	}
+
+	public boolean memberOf(int groupId) {
+		// Optimized code
+		// First search for in-memory groups (special groups)
+		for (EpersonGroup e : this.getSpecialGroups())
+			if (e.getID() == groupId)
+				return true;
+		// Next search for the current eperson group
+		for (EpersonGroup e : this.getEpersonGroups())
+			if (e.getID() == groupId)
+				return true;
+		// At last, search in the hierarchy
+		// If user belongs to Group g then he belongs to all parent groups of it
+		for (EpersonGroup eg : this.getEpersonGroups())
+			for (EpersonGroup e : eg.getAllParents())
+				if (e.getID() == groupId)
+					return true;
+		
+		return false;
 	}
 }

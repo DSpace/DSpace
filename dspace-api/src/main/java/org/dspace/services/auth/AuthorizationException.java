@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.dspace.core.Constants;
 import org.dspace.orm.entity.Eperson;
 import org.dspace.orm.entity.IDSpaceObject;
 
@@ -21,47 +20,43 @@ import org.dspace.orm.entity.IDSpaceObject;
  */
 public class AuthorizationException extends Exception {
 	private static final long serialVersionUID = -6001782807840859656L;
-	private List<Integer> actions;
+	private List<Action> actions;
 	private Eperson eperson;
 	private IDSpaceObject object;
 	
-	public AuthorizationException(int action, Eperson eperson, IDSpaceObject object) {
+	public AuthorizationException(Action action, Eperson eperson, IDSpaceObject object) {
 		super(
 				((eperson != null) ? "User "+eperson.getEmail() : "") +
 				((object != null) ? "Unable to access object "+object.getClass().getSimpleName()+" with id "+object.getID() : "") +
-				((action != -1) ? " for action = "+transform(action) : "")
+				" for action = "+action.name()
 				);
-		this.actions = new ArrayList<Integer>();
+		this.actions = new ArrayList<Action>();
 		this.actions.add(action);
 		this.eperson = eperson;
 		this.object = object;
 	}
 	
-	private static String transform (int i) {
-		return Constants.actionText[i];
-	}
-	
-	private static String join (int[] values) {
+	private static String join (Action[] values) {
 		List<String> ints = new ArrayList<String>();
-		for (int i : values)
-			ints.add(transform(i));
+		for (Action i : values)
+			ints.add(i.name());
 		return StringUtils.join(ints, ", ");
 	}
 
-	public AuthorizationException(int[] action, Eperson eperson, IDSpaceObject object) {
+	public AuthorizationException(Action[] action, Eperson eperson, IDSpaceObject object) {
 		super(
 				((eperson != null) ? "User "+eperson.getEmail() +" ": "") +
 				((object != null) ? "Unable to access object "+object.getClass().getSimpleName()+" with id "+object.getID() : "") +
 				((action.length > 0) ? " for actions = "+join(action) : "")
 				);
-		this.actions = new ArrayList<Integer>();
-		for (int i : action)
+		this.actions = new ArrayList<Action>();
+		for (Action i : action)
 			this.actions.add(i);
 		this.eperson = eperson;
 		this.object = object;
 	}
 	
-	public List<Integer> getActions() {
+	public List<Action> getActions() {
 		return actions;
 	}
 	public Eperson getEperson() {

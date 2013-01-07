@@ -16,8 +16,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.dspace.core.Constants;
-
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
  * @version $Revision$
@@ -45,9 +43,9 @@ public class RegistrationData extends DSpaceObject {
     
     @Override
     @Transient
-    public int getType()
+    public DSpaceObjectType getType()
     {
-    	return Constants.RESOURCEPOLICY;
+    	return DSpaceObjectType.RESOURCE_POLICY;
     }
 
     @Column(name = "email", nullable = true)

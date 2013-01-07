@@ -19,12 +19,15 @@ import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.dspace.checker.BitstreamInfoDAO;
+import org.dspace.core.DSpaceContext;
 import org.dspace.core.Utils;
 import org.dspace.orm.dao.api.IBitstreamDao;
 import org.dspace.orm.dao.api.IBundleDao;
 import org.dspace.orm.entity.Bitstream;
 import org.dspace.orm.entity.Bundle;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.ContextService;
 import org.dspace.services.StorageService;
 import org.dspace.services.exceptions.StorageException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +65,8 @@ public class DSpaceStorageService implements StorageService {
 	IBitstreamDao bitstreamDao;
 	@Autowired
 	IBundleDao bundleDao;
+	@Autowired
+	ContextService contextService;
 
 	private List<Object> assetstores;
 	private int incoming;
@@ -258,10 +263,154 @@ public class DSpaceStorageService implements StorageService {
 	 * @see org.dspace.services.StorageService#cleanup()
 	 */
 	@Override
-	public void cleanup() throws StorageException {
+	public void cleanup(boolean deleteDatabase, boolean verbose)
+			throws StorageException {
 		this.init();
-		// FIXME: Implement it
-		throw new RuntimeException("Unimplemented method");
+
+		DSpaceContext context = contextService.getContext();
+		BitstreamInfoDAO bitstreamInfoDAO = new BitstreamInfoDAO(context);
+		int commitCounter = 0;
+
+		try {
+			List<Bitstream> deleted = bitstreamDao.selectAllDeleted();
+
+			for (Bitstream bitstream : deleted) {
+				GeneralFile file = getFile(bitstream);
+				// Make sure entries which do not exist are removed
+				if (file == null || !file.exists()) {
+					log.debug("file is null");
+					if (deleteDatabase) {
+						log.debug("deleting record");
+						if (verbose) {
+							System.out
+									.println(" - Deleting bitstream information (ID: "
+											+ bitstream.getID() + ")");
+						}
+						bitstreamInfoDAO
+								.deleteBitstreamInfoWithHistory(bitstream
+										.getID());
+						if (verbose) {
+							System.out
+									.println(" - Deleting bitstream record from database (ID: "
+											+ bitstream.getID() + ")");
+						}
+						bitstreamDao.delete(bitstream);
+					}
+					continue;
+				}
+
+				// This is a small chance that this is a file which is
+				// being stored -- get it next time.
+				if (isRecent(file)) {
+					log.debug("file is recent");
+					continue;
+				}
+
+				if (deleteDatabase) {
+					log.debug("deleting db record");
+					if (verbose) {
+						System.out
+								.println(" - Deleting bitstream information (ID: "
+										+ bitstream.getID() + ")");
+					}
+					bitstreamInfoDAO.deleteBitstreamInfoWithHistory(bitstream
+							.getID());
+					if (verbose) {
+						System.out
+								.println(" - Deleting bitstream record from database (ID: "
+										+ bitstream.getID() + ")");
+					}
+					bitstreamDao.delete(bitstream);
+				}
+
+				if (bitstream.isRegistered()) {
+					continue; // do not delete registered bitstreams
+				}
+
+				// Since versioning allows for multiple bitstreams, check if the
+				// internal identifier isn't used on another place
+				List<Bitstream> duplicateBitRow = bitstreamDao.selectDuplicateInternalIdentifier(bitstream);
+				
+				if (duplicateBitRow == null || duplicateBitRow.isEmpty()) {
+					boolean success = file.delete();
+
+					String message = ("Deleted bitstream " + bitstream.getID()
+							+ " (file " + file.getAbsolutePath()
+							+ ") with result " + success);
+					if (log.isDebugEnabled()) {
+						log.debug(message);
+					}
+					if (verbose) {
+						System.out.println(message);
+					}
+
+					// if the file was deleted then
+					// try deleting the parents
+					// Otherwise the cleanup script is set to
+					// leave the db records then the file
+					// and directories have already been deleted
+					// if this is turned off then it still looks like the
+					// file exists
+					if (success) {
+						this.deleteParents(file);
+					}
+				}
+
+				// Make sure to commit our outstanding work every 100
+				// iterations. Otherwise you risk losing the entire transaction
+				// if we hit an exception, which isn't useful at all for large
+				// amounts of bitstreams.
+				commitCounter++;
+				if (commitCounter % 100 == 0) {
+					System.out.print("Committing changes to the database...");
+					context.commit();
+					System.out.println(" Done!");
+				}
+			}
+
+			context.complete();
+		}
+		// Aborting will leave the DB objects around, even if the
+		// bitstreams are deleted. This is OK; deleting them next
+		// time around will be a no-op.
+		catch (IOException ioe) {
+			if (verbose) {
+				System.err.println("Error: " + ioe.getMessage());
+			}
+			context.abort();
+			throw new StorageException(ioe);
+		}
+	}
+
+    /**
+     * Delete empty parent directories.
+     * 
+     * @param file
+     *            The file with parent directories to delete
+     */
+	private void deleteParents(GeneralFile file) {
+		if (file == null )
+        {
+            return;
+        }
+ 
+		GeneralFile tmp = file;
+
+        for (int i = 0; i < directoryLevels; i++)
+        {
+
+			GeneralFile directory = tmp.getParentFile();
+			GeneralFile[] files = directory.listFiles();
+
+            // Only delete empty directories
+            if (files.length != 0)
+            {
+                break;
+            }
+
+            directory.delete();
+            tmp = directory;
+        }
 	}
 
 	/*
@@ -274,13 +423,13 @@ public class DSpaceStorageService implements StorageService {
 	@Override
 	public void delete(Bitstream bitstream) throws StorageException {
 		this.init();
-		
+
 		List<Bundle> primaries = bitstream.getPrimaryBundles();
 		for (Bundle b : primaries) {
 			b.setPrimary(null);
 			bundleDao.save(b);
 		}
-		
+
 		bitstream.setDeleted(true);
 		bitstreamDao.save(bitstream);
 	}
@@ -459,6 +608,29 @@ public class DSpaceStorageService implements StorageService {
 					+ file.getAbsolutePath());
 		}
 		return bitstream;
+	}
+
+	// //////////////////////////////////////
+	// Internal methods
+	// //////////////////////////////////////
+
+	/**
+	 * Return true if this file is too recent to be deleted, false otherwise.
+	 * 
+	 * @param file
+	 *            The file to check
+	 * @return True if this file is too recent to be deleted
+	 */
+	private static boolean isRecent(GeneralFile file) {
+		long lastmod = file.lastModified();
+		long now = new java.util.Date().getTime();
+
+		if (lastmod >= now) {
+			return true;
+		}
+
+		// Less than one hour old
+		return (now - lastmod) < (1 * 60 * 1000);
 	}
 
 }

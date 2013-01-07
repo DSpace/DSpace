@@ -146,7 +146,8 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
      * @param serviceChangeListener the listener
      * @return true if it should be notified, false otherwise
      */
-    private boolean checkNotifyServiceChange(List<Class<?>> implementedTypes,
+    @SuppressWarnings("unused")
+	private boolean checkNotifyServiceChange(List<Class<?>> implementedTypes,
             ServiceChangeListener serviceChangeListener) {
         boolean notify = false;
         Class<?>[] notifyTypes = serviceChangeListener.notifyForTypes();

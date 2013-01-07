@@ -35,9 +35,10 @@ public interface StorageService {
      * which are more than 1 hour old and marked deleted. The deletions cannot
      * be undone.
      * 
+     * @param deleteDatabase Delete database records too
 	 * @throws StorageException If something wrong happens
 	 */
-	void cleanup () throws StorageException;
+	void cleanup (boolean deleteDatabase, boolean verbose) throws StorageException;
 	
 	/**
      * <p>

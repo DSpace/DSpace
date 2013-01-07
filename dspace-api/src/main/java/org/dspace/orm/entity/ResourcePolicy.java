@@ -8,6 +8,7 @@
 package org.dspace.orm.entity;
 
 import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -17,7 +18,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import org.dspace.core.Constants;
+
+import org.dspace.services.auth.ResourcePolicyType;
 
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
@@ -53,9 +55,9 @@ public class ResourcePolicy extends DSpaceObject{
     
     @Override
     @Transient
-    public int getType()
+    public DSpaceObjectType getType()
     {
-    	return Constants.RESOURCEPOLICY;
+    	return DSpaceObjectType.RESOURCE_POLICY;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -150,5 +152,47 @@ public class ResourcePolicy extends DSpaceObject{
 
 	public void setRpDescription(String rpdescription) {
 		this.rpDescription = rpdescription;
+	}
+	
+	@Transient 
+	public ResourcePolicyType getResourcePolicyType () {
+		return ResourcePolicyType.valueOf(this.getRpType());
+	}
+	
+	@Transient
+	public DSpaceObjectType getDSpaceObjectType () {
+		return DSpaceObjectType.getById(this.getResource());
+	}
+	
+	@Transient
+	public boolean isDateValid () {
+		Date sd = getStartDate();
+        Date ed = getEndDate();
+
+        // if no dates set, return true (most common case)
+        if ((sd == null) && (ed == null))
+        {
+            return true;
+        }
+
+        // one is set, now need to do some date math
+        Date now = new Date();
+
+        // check start date first
+        if (sd != null && now.before(sd))
+        {
+            // start date is set, return false if we're before it
+            return false;
+        }
+
+        // now expiration date
+        if (ed != null && now.after(ed))
+        {
+            // end date is set, return false if we're after it
+            return false;
+        }
+
+        // if we made it this far, start < now < end
+        return true; // date must be okay
 	}
 }

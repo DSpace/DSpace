@@ -17,7 +17,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import org.dspace.core.Constants;
 
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
@@ -46,9 +45,9 @@ public class HarvestedItem extends DSpaceObject{
     
     @Override
     @Transient
-    public int getType()
+    public DSpaceObjectType getType()
     {
-    	return Constants.HARVESTEDITEM;
+    	return DSpaceObjectType.HARVESTED_ITEM;
     }
 
     @Column(name = "oai_id", nullable = true)

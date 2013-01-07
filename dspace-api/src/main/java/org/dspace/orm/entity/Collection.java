@@ -24,28 +24,32 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.dspace.core.Constants;
+import org.dspace.services.AuthorizationService;
+import org.dspace.services.auth.Action;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
 @Entity
 @Table(name = "collection")
 @Configurable
 public class Collection extends DSpaceObject {
+	@Autowired AuthorizationService authService;
+	
     private int id;
     private String name;
     private String shortDescription;
     private String introductoryText;
     private Bitstream logo;
-    private Integer templateItem;
+    private Item templateItem;
     private String provenanceDescription;
     private String license;
     private String copyrightText;
     private String sideBarText;
-    private Integer workflowStep1;
-    private Integer workflowStep2;
-    private Integer workflowStep3;
-    private Integer submitter;
-    private Integer admin;
+    private EpersonGroup workflowStep1;
+    private EpersonGroup workflowStep2;
+    private EpersonGroup workflowStep3;
+    private EpersonGroup submitter;
+    private EpersonGroup admin;
     private List<Community> parents;
     private List<Eperson> epersons;
     private Integer itemCount;
@@ -108,8 +112,9 @@ public class Collection extends DSpaceObject {
         return logo;
     }
 
-    @Column(name = "template_item_id", nullable = true)
-    public Integer getTemplateItem() {
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "template_item_id", nullable = true)
+    public Item getTemplateItem() {
         return templateItem;
     }
 
@@ -133,28 +138,33 @@ public class Collection extends DSpaceObject {
         return sideBarText;
     }
 
-    @Column(name = "workflow_step_1", nullable = true)
-    public Integer getWorkflowStep1() {
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "workflow_step_1", nullable = true)
+    public EpersonGroup getWorkflowStep1() {
         return workflowStep1;
     }
 
-    @Column(name = "workflow_step_2", nullable = true)
-    public Integer getWorkflowStep2() {
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "workflow_step_2", nullable = true)
+    public EpersonGroup getWorkflowStep2() {
         return workflowStep2;
     }
 
-    @Column(name = "workflow_step_3", nullable = true)
-    public Integer getWorkflowStep3() {
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "workflow_step_3", nullable = true)
+    public EpersonGroup getWorkflowStep3() {
         return workflowStep3;
     }
 
-    @Column(name = "submitter", nullable = true)
-    public Integer getSubmitter() {
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "submitter", nullable = true)
+    public EpersonGroup getSubmitter() {
         return submitter;
     }
 
-    @Column(name = "admin", nullable = true)
-    public Integer getAdmin() {
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "admin", nullable = true)
+    public EpersonGroup getAdmin() {
         return admin;
     }
 
@@ -197,7 +207,7 @@ public class Collection extends DSpaceObject {
         this.logo = logo;
     }
 
-    public void setTemplateItem(Integer templateItem) {
+    public void setTemplateItem(Item templateItem) {
         this.templateItem = templateItem;
     }
 
@@ -217,30 +227,30 @@ public class Collection extends DSpaceObject {
         this.sideBarText = sideBarText;
     }
 
-    public void setWorkflowStep1(Integer workflowStep1) {
+    public void setWorkflowStep1(EpersonGroup workflowStep1) {
         this.workflowStep1 = workflowStep1;
     }
 
-    public void setWorkflowStep2(Integer workflowStep2) {
+    public void setWorkflowStep2(EpersonGroup workflowStep2) {
         this.workflowStep2 = workflowStep2;
     }
 
-    public void setWorkflowStep3(Integer workflowStep3) {
+    public void setWorkflowStep3(EpersonGroup workflowStep3) {
         this.workflowStep3 = workflowStep3;
     }
 
-    public void setSubmitter(Integer submitter) {
+    public void setSubmitter(EpersonGroup submitter) {
         this.submitter = submitter;
     }
 
-    public void setAdmin(Integer admin) {
+    public void setAdmin(EpersonGroup admin) {
         this.admin = admin;
     }
 
     @Override
     @Transient
-    public int getType() {
-        return Constants.COLLECTION;
+    public DSpaceObjectType getType() {
+        return DSpaceObjectType.COLLECTION;
     }
     
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
@@ -261,5 +271,57 @@ public class Collection extends DSpaceObject {
    	public void setItemCount(Integer itemCount) {
    		this.itemCount = itemCount;
    	}
+   	
+
+    public IDSpaceObject getAdminObject(Action action)
+    {
+        DSpaceObject adminObject = null;
+        Community community = null;
+        List<Community> communities = this.getParents();
+        if (communities != null && !communities.isEmpty())
+        {
+            community = communities.get(0);
+        }
+
+        switch (action)
+        {
+        case REMOVE:
+            if (authService.getConfiguration().canCollectionAdminPerformItemDeletion())
+            {
+                adminObject = this;
+            }
+            else if (authService.getConfiguration().canCommunityAdminPerformItemDeletion())
+            {
+                adminObject = community;
+            }
+            break;
+
+        case DELETE:
+            if (authService.getConfiguration().canCommunityAdminPerformSubelementDeletion())
+            {
+                adminObject = community;
+            }
+            break;
+        default:
+            adminObject = this;
+            break;
+        }
+        return adminObject;
+    }
+    
+    @Override
+    public IDSpaceObject getParentObject()
+    {
+        List<Community> communities = this.getParents();
+        if (communities != null && (!communities.isEmpty() && communities.get(0) != null))
+        {
+            return communities.get(0);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     
 }

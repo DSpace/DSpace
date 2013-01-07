@@ -17,8 +17,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.dspace.core.Constants;
-
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
  * @version $Revision$
@@ -52,9 +50,9 @@ public class MetadataValue extends DSpaceObject {
     
     @Override
     @Transient
-    public int getType()
+    public DSpaceObjectType getType()
     {
-    	return Constants.METADATA;
+    	return DSpaceObjectType.METADATA;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)

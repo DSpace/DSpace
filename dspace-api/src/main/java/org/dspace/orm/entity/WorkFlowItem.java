@@ -22,8 +22,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.dspace.core.Constants;
-
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
  * @version $Revision$
@@ -55,9 +53,9 @@ public class WorkFlowItem extends DSpaceObject {
     
     @Override
     @Transient
-    public int getType()
+    public DSpaceObjectType getType()
     {
-    	return Constants.WORKFLOWITEM;
+    	return DSpaceObjectType.WORKFLOW_ITEM;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)

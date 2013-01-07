@@ -17,8 +17,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.dspace.core.Constants;
-
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
  * @version $Revision$
@@ -46,9 +44,9 @@ public class FileExtension extends DSpaceObject{
     
     @Override
     @Transient
-    public int getType()
+    public DSpaceObjectType getType()
     {
-    	return Constants.FILEEXTENSION;
+    	return DSpaceObjectType.FILE_EXTENSION;
     }
 
     @Column(name = "extension", nullable = true)

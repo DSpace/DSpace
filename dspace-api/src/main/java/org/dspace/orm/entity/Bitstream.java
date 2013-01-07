@@ -24,9 +24,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.dspace.core.Constants;
 import org.dspace.services.AuthorizationService;
 import org.dspace.services.StorageService;
+import org.dspace.services.auth.Action;
 import org.dspace.services.auth.AuthorizationException;
 import org.dspace.services.exceptions.StorageException;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -60,6 +60,9 @@ public class Bitstream extends DSpaceObject {
     private Integer sequenceId;
     private List<Bundle> bundles;
     private List<Bundle> primaryBundles;
+    private List<Community> communities;
+
+	private List<Collection> collections;
 
     @Id
     @Column(name = "bitstream_id")
@@ -200,15 +203,33 @@ public class Bitstream extends DSpaceObject {
         this.sequenceId = sequenceId;
     }
 
+    @OneToMany(fetch=FetchType.LAZY, mappedBy="logo")
+    public List<Community> getCommunities() {
+		return communities;
+	}
+
+	public void setCommunities(List<Community> communities) {
+		this.communities = communities;
+	}
+
+	@OneToMany(fetch=FetchType.LAZY, mappedBy="logo")
+    public List<Collection> getCollections() {
+		return collections;
+	}
+
+	public void setCollections(List<Collection> collections) {
+		this.collections = collections;
+	}
+
 	@Override
 	@Transient
-	public int getType() {
-		return Constants.BITSTREAM;
+	public DSpaceObjectType getType() {
+		return DSpaceObjectType.BITSTREAM;
 	}
 	
 	@Transient
 	public InputStream retrieve () throws StorageException, AuthorizationException {
-		authorization.authorized(this, Constants.READ);
+		authorization.authorized(this, Action.READ);
 		return storage.retrieve(this);
 	}
 
@@ -225,5 +246,18 @@ public class Bitstream extends DSpaceObject {
 	        return true;
 	    }
 	    return false;
+	}
+
+	@Override
+	@Transient
+	public IDSpaceObject getParentObject() {
+		if (this.getBundles() == null || !this.getBundles().isEmpty()) return this.getBundles().get(0);
+		else {
+			if (this.getCommunities() == null || !this.getCommunities().isEmpty())
+				return this.getCommunities().get(0);
+			if (this.getCollections() == null || !this.getCollections().isEmpty())
+				return this.getCollections().get(0);
+		}
+		return null;
 	}
 }

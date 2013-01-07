@@ -7,7 +7,11 @@
  */
 package org.dspace.orm.dao.api;
 
+import java.util.List;
+
+import org.dspace.orm.entity.IDSpaceObject;
 import org.dspace.orm.entity.ResourcePolicy;
+import org.dspace.services.auth.Action;
 
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
@@ -15,5 +19,5 @@ import org.dspace.orm.entity.ResourcePolicy;
  */
 
 public interface IResourcePolicyDao extends IDSpaceDao<ResourcePolicy>{
-    
-   }
+	List<ResourcePolicy> selectByObjectAndAction(IDSpaceObject dSpaceObject, Action admin);
+}

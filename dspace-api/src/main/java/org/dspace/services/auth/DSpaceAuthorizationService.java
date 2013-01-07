@@ -7,11 +7,15 @@
  */
 package org.dspace.services.auth;
 
-import org.dspace.core.Constants;
+import java.util.List;
+
 import org.dspace.core.DSpaceContext;
+import org.dspace.orm.dao.api.IResourcePolicyDao;
 import org.dspace.orm.entity.Eperson;
 import org.dspace.orm.entity.IDSpaceObject;
+import org.dspace.orm.entity.ResourcePolicy;
 import org.dspace.services.AuthorizationService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.ContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,9 +25,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class DSpaceAuthorizationService implements AuthorizationService {
 	@Autowired ContextService contextService;
+	@Autowired IResourcePolicyDao resourcePolicyDao;
+	@Autowired ConfigurationService configService;
+	private DSpaceAuthorizeConfiguration config = null;
 	
 	@Override
-	public void authorizedAnyOf(IDSpaceObject dspaceObject, int[] actions)
+	public void authorizedAnyOf(IDSpaceObject dspaceObject, Action[] actions)
 			throws AuthorizationException {
 
 		AuthorizationException ex = null;
@@ -48,76 +55,28 @@ public class DSpaceAuthorizationService implements AuthorizationService {
 	}
 
 	@Override
-	public void authorized(IDSpaceObject object, int action)
+	public void authorized(IDSpaceObject object, Action action)
 			throws AuthorizationException {
 		authorized(object, action, true);
 	}
 
 	@Override
-	public void authorized(IDSpaceObject object, int action, boolean inheritance)
+	public void authorized(IDSpaceObject object, Action action, boolean inheritance)
 			throws AuthorizationException {
 		DSpaceContext c = contextService.getContext();
+        Eperson e = c.getCurrentEperson();
 		if (object == null)
         {
-            // action can be -1 due to a null entry
-            String actionText;
-
-            if (action == -1)
-            {
-                actionText = "null";
-            } else
-            {
-                actionText = Constants.actionText[action];
-            }
-
-            Eperson e = c.getCurrentEperson();
-            int userid;
-
-            if (e == null)
-            {
-                userid = 0;
-            } else
-            {
-                userid = e.getID();
-            }
-
             throw new AuthorizationException(action, e, object);
         }
 
-        if (!authorize(object, action, c.getCurrentEperson(), inheritance))
+        if (!authorize(object, action, e, inheritance))
         {
-            // denied, assemble and throw exception
-            int otype = object.getType();
-            int oid = object.getID();
-            int userid;
-            Eperson e = c.getCurrentEperson();
-
-            if (e == null)
-            {
-                userid = 0;
-            } else
-            {
-                userid = e.getID();
-            }
-
-            //            AuthorizeException j = new AuthorizeException("Denied");
-            //            j.printStackTrace();
-            // action can be -1 due to a null entry
-            String actionText;
-
-            if (action == -1)
-            {
-                actionText = "null";
-            } else
-            {
-                actionText = Constants.actionText[action];
-            }
-
             throw new AuthorizationException(action, e, object);
         }
 	}
 
-	private boolean authorize(IDSpaceObject o, int action,
+	private boolean authorize(IDSpaceObject o, Action action,
 			Eperson e, boolean useInheritance) {
 		DSpaceContext c = contextService.getContext();
 		
@@ -133,34 +92,38 @@ public class DSpaceAuthorizationService implements AuthorizationService {
         }
 
         // is eperson set? if not, userid = 0 (anonymous)
-        /*
-        int userid = 0;
+        
         if (e != null)
         {
-            userid = e.getID();
-
             // perform isAdmin check to see
             // if user is an Admin on this object
-            DSpaceObject testObject = useInheritance ? o.getAdminObject(action) : null;
-
-            if (isAdmin(c, testObject))
+            IDSpaceObject testObject = useInheritance ? o.getAdminObject(action) : null;
+            
+            if (c.isAdmin() || testObject.isAdmin(e))
             {
+            	// if is admin or if the user has ADMIN permissions on object
                 return true;
             }
         }
 
-        for (ResourcePolicy rp : getPoliciesActionFilter(c, o, action))
+        return this.hasPermissions(e, o, action);
+	}
+	
+	private boolean hasPermissions (Eperson e, IDSpaceObject testObject, Action action) {
+		List<ResourcePolicy> policies = resourcePolicyDao.selectByObjectAndAction(testObject, action);
+
+        for (ResourcePolicy rp : policies)
         {
             // check policies for date validity
             if (rp.isDateValid())
             {
-                if ((rp.getEPersonID() != -1) && (rp.getEPersonID() == userid))
+                if ((rp.getEperson() != null) && (rp.getEperson().getID() == e.getID()))
                 {
                     return true; // match
                 }
 
-                if ((rp.getGroupID() != -1)
-                        && (Group.isMember(c, rp.getGroupID())))
+                if ((rp.getEpersonGroup() != null)
+                        && e.memberOf(rp.getEpersonGroup()))
                 {
                     // group was set, and eperson is a member
                     // of that group
@@ -168,11 +131,16 @@ public class DSpaceAuthorizationService implements AuthorizationService {
                 }
             }
         }
-
-        // default authorization is denial
         
-        */ // FIXME: Finish implementation
         return false;
 	}
 
+	
+	
+	@Override
+	public DSpaceAuthorizeConfiguration getConfiguration() {
+		if (this.config == null)
+			this.config = new DSpaceAuthorizeConfiguration(configService);
+		return this.config;
+	}
 }

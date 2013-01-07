@@ -10,5 +10,5 @@ package org.dspace.orm.dao.api;
 import org.dspace.orm.entity.Collection;
 
 public interface ICollectionDao extends IDSpaceDao<Collection> {
-
+	
 }

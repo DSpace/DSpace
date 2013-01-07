@@ -9,7 +9,9 @@
 package org.dspace.services;
 
 import org.dspace.orm.entity.IDSpaceObject;
+import org.dspace.services.auth.Action;
 import org.dspace.services.auth.AuthorizationException;
+import org.dspace.services.auth.DSpaceAuthorizeConfiguration;
 
 /**
  * AuthorizationService handles all authorization checks for DSpace. For better
@@ -39,7 +41,7 @@ public interface AuthorizationService {
      *         <code>org.dspace.core.Constants</code>
 	 * @throws AuthorizationServiceException if something goes wrong
 	 */
-	void authorizedAnyOf (IDSpaceObject dspaceObject, int[] actions) throws AuthorizationException;
+	void authorizedAnyOf (IDSpaceObject dspaceObject, Action[] actions) throws AuthorizationException;
 	/**
      * Checks that the context's current user can perform the given action on
      * the given object. Throws an exception if the user is not authorized,
@@ -49,7 +51,7 @@ public interface AuthorizationService {
 	 * @param action Action to check
 	 * @throws AuthorizationServiceException if something goes wrong
 	 */
-	void authorized (IDSpaceObject object, int action) throws AuthorizationException;
+	void authorized (IDSpaceObject object, Action action) throws AuthorizationException;
 	/**
      * Checks that the context's current user can perform the given action on
      * the given object. Throws an exception if the user is not authorized,
@@ -61,5 +63,12 @@ public interface AuthorizationService {
      *         object can be used
 	 * @throws AuthorizationServiceException if something goes wrong
 	 */
-	void authorized (IDSpaceObject object, int action, boolean inheritance) throws AuthorizationException;
+	void authorized (IDSpaceObject object, Action action, boolean inheritance) throws AuthorizationException;
+	
+	/**
+	 * Get authorize configurations
+	 * 
+	 * @return Authorization Configuration
+	 */
+	DSpaceAuthorizeConfiguration getConfiguration ();
 }

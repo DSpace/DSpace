@@ -7,8 +7,11 @@
  */
 package org.dspace.orm.dao.api;
 
+import java.util.List;
+
 import org.dspace.orm.entity.Bitstream;
 
 public interface IBitstreamDao extends IDSpaceDao<Bitstream> {
-
+	List<Bitstream> selectAllDeleted();
+	List<Bitstream> selectDuplicateInternalIdentifier(Bitstream bitstream);
 }

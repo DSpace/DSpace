@@ -14,7 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.dspace.core.Constants;
 import org.springframework.beans.factory.annotation.Configurable;
 
 @Entity
@@ -86,8 +85,7 @@ public class BitstreamFormat extends DSpaceObject {
 
 	@Override
 	@Transient
-	public int getType() {
-		return Constants.BITSTREAM_FORMAT;
+	public DSpaceObjectType getType() {
+		return DSpaceObjectType.BITSTREAM_FORMAT;
 	}
-
 }

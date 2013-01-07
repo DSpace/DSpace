@@ -72,8 +72,8 @@ public class Handle extends DSpaceObject {
 
     @Transient
 	@Override
-	public int getType() {
-		return Constants.HANDLE;
+	public DSpaceObjectType getType() {
+		return DSpaceObjectType.HANDLE;
 	}
 	
 	@Autowired ICommunityDao commDao;

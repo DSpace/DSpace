@@ -22,11 +22,17 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.dspace.core.Constants;
+import org.dspace.services.AuthorizationService;
+import org.dspace.services.auth.Action;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 @Entity
 @Table(name = "bundle")
+@Configurable
 public class Bundle extends DSpaceObject {
+	@Autowired AuthorizationService authService;
+	
     private int id;
     private String name;
     private Bitstream primary;
@@ -75,8 +81,8 @@ public class Bundle extends DSpaceObject {
 
 	@Override
 	@Transient
-	public int getType() {
-		return Constants.BUNDLE;
+	public DSpaceObjectType getType() {
+		return DSpaceObjectType.BUNDLE;
 	}
 
 	 @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
@@ -89,4 +95,79 @@ public class Bundle extends DSpaceObject {
 		this.bitstreams = bitstreams;
 	}
     
+	public IDSpaceObject getAdminObject(Action action)
+    {
+        DSpaceObject adminObject = null;
+        List<Item> items = this.getItems();
+        Item item = null;
+        Collection collection = null;
+        Community community = null;
+        if (items != null && !items.isEmpty())
+        {
+            item = items.get(0);
+            collection = item.getOwningCollection();
+            if (collection != null)
+            {
+                List<Community> communities = collection.getParents();
+                if (communities != null && !communities.isEmpty())
+                {
+                    community = communities.get(0);
+                }
+            }
+        }
+        switch (action)
+        {
+        
+        case REMOVE:
+            if (authService.getConfiguration().canItemAdminPerformBitstreamDeletion())
+            {
+                adminObject = item;
+            }
+            else if (authService.getConfiguration().canCollectionAdminPerformBitstreamDeletion())
+            {
+                adminObject = collection;
+            }
+            else if (authService.getConfiguration()
+                    .canCommunityAdminPerformBitstreamDeletion())
+            {
+                adminObject = community;
+            }
+            break;
+        case ADD:
+            if (authService.getConfiguration().canItemAdminPerformBitstreamCreation())
+            {
+                adminObject = item;
+            }
+            else if (authService.getConfiguration()
+                    .canCollectionAdminPerformBitstreamCreation())
+            {
+                adminObject = collection;
+            }
+            else if (authService.getConfiguration()
+                    .canCommunityAdminPerformBitstreamCreation())
+            {
+                adminObject = community;
+            }
+            break;
+
+        default:
+            adminObject = this;
+            break;
+        }
+        return adminObject;
+    }
+	
+	public IDSpaceObject getParentObject()
+    {
+        List<Item> items = getItems();
+       
+        if (items != null && (!items.isEmpty() && items.get(0) != null))
+        {
+            return items.get(0);
+        }
+        else
+        {
+            return null;
+        }
+    }
 }

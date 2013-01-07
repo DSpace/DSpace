@@ -20,14 +20,20 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.dspace.core.Constants;
+import org.dspace.services.AuthorizationService;
+import org.dspace.services.auth.Action;
+import org.dspace.services.auth.DSpaceAuthorizeConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Entity
 @Table(name = "item")
 public class Item extends DSpaceObject {
+	@Autowired AuthorizationService authService;
+	
     private int id;
     private Eperson submitter;
     private boolean inArchive;
@@ -36,7 +42,8 @@ public class Item extends DSpaceObject {
     private Date lastModified;
     private Collection owningCollection;
     private List<Bundle> bundles;
-    List<Collection> collections;
+    private List<Collection> collections;
+    private List<Collection> templateItemCollections;
     
     @Id
     @Column(name = "item_id")
@@ -127,7 +134,142 @@ public class Item extends DSpaceObject {
 
 	@Override
 	@Transient
-	public int getType() {
-		return Constants.ITEM;
+	public DSpaceObjectType getType() {
+		return DSpaceObjectType.ITEM;
+	}
+	
+
+    public IDSpaceObject getAdminObject(Action action)
+    {
+        DSpaceObject adminObject = null;
+        Collection collection = getOwningCollection();
+        Community community = null;
+        if (collection != null)
+        {
+            List<Community> communities = collection.getParents();
+            if (communities != null && !communities.isEmpty())
+            {
+                community = communities.get(0);
+            }
+        }
+        else
+        {
+            // is a template item?
+        	if (this.getTemplateItemCollections() != null && 
+        			!this.getTemplateItemCollections().isEmpty())
+        		return this.getTemplateItemCollections().get(0);
+        }
+        
+        DSpaceAuthorizeConfiguration config = authService.getConfiguration();
+        
+        switch (action)
+        {
+            case ADD:
+                // ADD a cc license is less general than add a bitstream but we can't/won't
+                // add complex logic here to know if the ADD action on the item is required by a cc or
+                // a generic bitstream so simply we ignore it.. UI need to enforce the requirements.
+                if (config.canItemAdminPerformBitstreamCreation())
+                {
+                    adminObject = this;
+                }
+                else if (config.canCollectionAdminPerformBitstreamCreation())
+                {
+                    adminObject = collection;
+                }
+                else if (config.canCommunityAdminPerformBitstreamCreation())
+                {
+                    adminObject = community;
+                }
+                break;
+            case REMOVE:
+                // see comments on ADD action, same things...
+                if (config.canItemAdminPerformBitstreamDeletion())
+                {
+                    adminObject = this;
+                }
+                else if (config.canCollectionAdminPerformBitstreamDeletion())
+                {
+                    adminObject = collection;
+                }
+                else if (config.canCommunityAdminPerformBitstreamDeletion())
+                {
+                    adminObject = community;
+                }
+                break;
+            case DELETE:
+                if (getOwningCollection() != null)
+                {
+                    if (config.canCollectionAdminPerformItemDeletion())
+                    {
+                        adminObject = collection;
+                    }
+                    else if (config.canCommunityAdminPerformItemDeletion())
+                    {
+                        adminObject = community;
+                    }
+                }
+                else
+                {
+                    if (config.canCollectionAdminManageTemplateItem())
+                    {
+                        adminObject = collection;
+                    }
+                    else if (config.canCommunityAdminManageCollectionTemplateItem())
+                    {
+                        adminObject = community;
+                    }
+                }
+                break;
+            case WRITE:
+                // if it is a template item we need to check the
+                // collection/community admin configuration
+                if (getOwningCollection() == null)
+                {
+                    if (config.canCollectionAdminManageTemplateItem())
+                    {
+                        adminObject = collection;
+                    }
+                    else if (config.canCommunityAdminManageCollectionTemplateItem())
+                    {
+                        adminObject = community;
+                    }
+                }
+                else
+                {
+                    adminObject = this;
+                }
+                break;
+            default:
+                adminObject = this;
+                break;
+            }
+        return adminObject;
+    }
+    
+    @Transient
+    public IDSpaceObject getParentObject()
+    {
+        Collection ownCollection = getOwningCollection();
+        if (ownCollection != null)
+        {
+            return ownCollection;
+        }
+        else
+        {
+            // is a template item?
+        	if (this.getTemplateItemCollections() != null && 
+        			!this.getTemplateItemCollections().isEmpty())
+        		return this.getTemplateItemCollections().get(0);
+            return null;
+        }
+    }
+
+    @OneToMany(fetch=FetchType.LAZY, mappedBy="")
+	public List<Collection> getTemplateItemCollections() {
+		return templateItemCollections;
+	}
+
+	public void setTemplateItemCollections(List<Collection> templateItemCollections) {
+		this.templateItemCollections = templateItemCollections;
 	}
 }

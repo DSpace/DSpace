@@ -616,4 +616,15 @@ public class DSpaceContext extends Context {
     	SessionImplementor session = (SessionImplementor) this.getSession();
 		return session.connection();
 	}
+    
+    /**
+     * Tell's if is admin in the current context
+     * 
+     * @return
+     */
+    public boolean isAdmin () {
+    	if (this.ignoreAuthorization()) return true;
+    	else if (this.getCurrentEperson() == null) return false;
+    	else return this.getCurrentEperson().memberOf(1);
+    }
 }

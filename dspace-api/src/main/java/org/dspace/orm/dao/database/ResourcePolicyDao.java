@@ -7,9 +7,14 @@
  */
 package org.dspace.orm.dao.database;
 
+import java.util.List;
+
 import org.dspace.orm.dao.api.IResourcePolicyDao;
 
+import org.dspace.orm.entity.IDSpaceObject;
 import org.dspace.orm.entity.ResourcePolicy;
+import org.dspace.services.auth.Action;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,5 +29,18 @@ public class ResourcePolicyDao extends DSpaceDao<ResourcePolicy> implements IRes
     
 	public ResourcePolicyDao() {
 		super(ResourcePolicy.class);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<ResourcePolicy> selectByObjectAndAction(
+			IDSpaceObject dSpaceObject, Action admin) {
+		return (List<ResourcePolicy>) super.getSession().createCriteria(ResourcePolicy.class)
+				.add(Restrictions.and(
+						Restrictions.eq("resourceType", dSpaceObject.getType().getId()),
+						Restrictions.eq("resourceId", dSpaceObject.getID()),
+						Restrictions.eq("action", admin.getId())
+				))
+				.list();
 	}
 }
