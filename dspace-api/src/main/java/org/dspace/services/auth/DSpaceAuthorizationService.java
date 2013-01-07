@@ -7,12 +7,8 @@
  */
 package org.dspace.services.auth;
 
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
-import org.dspace.core.ContextV2;
-import org.dspace.eperson.Group;
+import org.dspace.core.DSpaceContext;
 import org.dspace.orm.entity.Eperson;
 import org.dspace.orm.entity.IDSpaceObject;
 import org.dspace.services.AuthorizationService;
@@ -60,7 +56,7 @@ public class DSpaceAuthorizationService implements AuthorizationService {
 	@Override
 	public void authorized(IDSpaceObject object, int action, boolean inheritance)
 			throws AuthorizationException {
-		ContextV2 c = contextService.getContext();
+		DSpaceContext c = contextService.getContext();
 		if (object == null)
         {
             // action can be -1 due to a null entry
@@ -85,9 +81,7 @@ public class DSpaceAuthorizationService implements AuthorizationService {
                 userid = e.getID();
             }
 
-            throw new AuthorizeException(
-                    "Authorization attempted on null DSpace object "
-                            + actionText + " by user " + userid);
+            throw new AuthorizationException(action, e, object);
         }
 
         if (!authorize(object, action, c.getCurrentEperson(), inheritance))
@@ -125,7 +119,7 @@ public class DSpaceAuthorizationService implements AuthorizationService {
 
 	private boolean authorize(IDSpaceObject o, int action,
 			Eperson e, boolean useInheritance) {
-		ContextV2 c = contextService.getContext();
+		DSpaceContext c = contextService.getContext();
 		
 		if (o == null)
         {
@@ -139,6 +133,7 @@ public class DSpaceAuthorizationService implements AuthorizationService {
         }
 
         // is eperson set? if not, userid = 0 (anonymous)
+        /*
         int userid = 0;
         if (e != null)
         {
@@ -175,6 +170,8 @@ public class DSpaceAuthorizationService implements AuthorizationService {
         }
 
         // default authorization is denial
+        
+        */ // FIXME: Finish implementation
         return false;
 	}
 

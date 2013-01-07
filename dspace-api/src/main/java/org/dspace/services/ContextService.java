@@ -7,7 +7,7 @@
  */
 package org.dspace.services;
 
-import org.dspace.core.ContextV2;
+import org.dspace.core.DSpaceContext;
 
 /**
  * @author João Melo <jmelo@lyncode.com>
@@ -19,12 +19,12 @@ public interface ContextService {
 	 * 
 	 * @return DSpace Context
 	 */
-	ContextV2 getContext();
+	DSpaceContext getContext();
 	
 	/**
 	 * Creates a new DSpace Context.
 	 * 
 	 * @return DSpace Context
 	 */
-	ContextV2 newContext();
+	DSpaceContext newContext();
 }

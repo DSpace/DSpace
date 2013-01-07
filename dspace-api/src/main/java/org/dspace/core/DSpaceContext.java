@@ -49,8 +49,8 @@ import org.springframework.util.CollectionUtils;
  * @author João Melo <jmelo@lyncode.com>
  * @version $Revision$
  */
-public class ContextV2 extends Context {
-    private static final Logger log = Logger.getLogger(ContextV2.class);
+public class DSpaceContext extends Context {
+    private static final Logger log = Logger.getLogger(DSpaceContext.class);
     
     /** Current hibernate session **/
     private Session session;
@@ -91,7 +91,7 @@ public class ContextV2 extends Context {
      * Construct a new context object. No user
      * is authenticated.
      */
-    public ContextV2(Session session) throws SQLException //FIXME: remove this exception
+    public DSpaceContext(Session session) throws SQLException //FIXME: remove this exception
     {
     	this.session = session;
     	

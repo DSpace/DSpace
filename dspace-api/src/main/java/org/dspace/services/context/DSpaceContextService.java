@@ -9,7 +9,7 @@ package org.dspace.services.context;
 
 import java.sql.SQLException;
 
-import org.dspace.core.ContextV2;
+import org.dspace.core.DSpaceContext;
 import org.dspace.orm.dao.api.IEpersonDao;
 import org.dspace.services.ContextService;
 import org.dspace.services.RequestService;
@@ -31,12 +31,12 @@ public class DSpaceContextService implements ContextService {
 	@Autowired(required=false) IEpersonDao epersonDao;
 
 	@Override
-	public ContextV2 newContext() {
+	public DSpaceContext newContext() {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-		ContextV2 ctx;
+		DSpaceContext ctx;
 		try {
-			ctx = new ContextV2(session);
+			ctx = new DSpaceContext(session);
 
 			if (requestService != null) {
 				Request r = requestService.getCurrentRequest();
@@ -55,11 +55,11 @@ public class DSpaceContextService implements ContextService {
 	}
 	
 	@Override
-	public ContextV2 getContext() {
+	public DSpaceContext getContext() {
 		if (requestService != null) {
 			Request r = requestService.getCurrentRequest();
 			if (r != null) {// There is one request running on this thread!
-				ContextV2 ctx = (ContextV2) r.getAttribute(CONTEXT_ATTR);
+				DSpaceContext ctx = (DSpaceContext) r.getAttribute(CONTEXT_ATTR);
 				if (ctx != null) return ctx;
 			}
 		}
