@@ -7,7 +7,9 @@
  */
 package org.dspace.orm.entity;
 
+import java.io.InputStream;
 import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,16 +20,31 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Constants;
+import org.dspace.services.AuthorizationService;
+import org.dspace.services.StorageService;
+import org.dspace.services.exceptions.StorageException;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Entity
 @Table(name = "bitstream")
 @Configurable
 public class Bitstream extends DSpaceObject {
+
+	/**
+	 * This prefix string marks registered bitstreams in internal_id
+	 */
+	public static final String REGISTERED_FLAG = "-R";
+	
+	@Autowired StorageService storage;
+	@Autowired AuthorizationService authorization;
+	
     private int id;
     private BitstreamFormat format;
     private String name;
@@ -42,6 +59,7 @@ public class Bitstream extends DSpaceObject {
     private Integer storeNumber;
     private Integer sequenceId;
     private List<Bundle> bundles;
+    private List<Bundle> primaryBundles;
 
     @Id
     @Column(name = "bitstream_id")
@@ -54,6 +72,15 @@ public class Bitstream extends DSpaceObject {
     @JoinColumn(name = "bitstream_format_id", nullable = true)
     public BitstreamFormat getFormat() {
         return format;
+    }
+    
+    @OneToMany(mappedBy = "primary")
+    public List<Bundle> getPrimaryBundles () {
+    	return primaryBundles;
+    }
+    
+    public void setPrimaryBundles (List<Bundle> bundles) {
+    	this.primaryBundles = bundles;
     }
 
     @Column(name = "name", nullable = true)
@@ -178,5 +205,25 @@ public class Bitstream extends DSpaceObject {
 	public int getType() {
 		return Constants.BITSTREAM;
 	}
+	
+	@Transient
+	public InputStream retrieve () throws AuthorizeException, StorageException {
+		authorization.authorized(this, Constants.READ);
+		return storage.retrieve(this);
+	}
 
+	/**
+	 * The bitstream is a registered file
+	 *
+	 * @return true if the bitstream is a registered file
+	 */
+	@Transient
+	public boolean isRegistered () {
+		if (this.getInternalId().substring(0, REGISTERED_FLAG.length())
+	            .equals(REGISTERED_FLAG)) 
+	    {
+	        return true;
+	    }
+	    return false;
+	}
 }

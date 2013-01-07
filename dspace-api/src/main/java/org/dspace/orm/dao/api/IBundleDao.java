@@ -10,5 +10,5 @@ package org.dspace.orm.dao.api;
 import org.dspace.orm.entity.Bundle;
 
 public interface IBundleDao extends IDSpaceDao<Bundle> {
-
+	
 }

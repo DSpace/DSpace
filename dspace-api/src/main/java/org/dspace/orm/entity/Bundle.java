@@ -18,6 +18,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -28,7 +29,7 @@ import org.dspace.core.Constants;
 public class Bundle extends DSpaceObject {
     private int id;
     private String name;
-    private Integer primary;
+    private Bitstream primary;
     private List<Item> items;
     private List<Bitstream> bitstreams;
 
@@ -44,8 +45,9 @@ public class Bundle extends DSpaceObject {
         return name;
     }
 
-    @Column(name = "primary_bitstream_id", nullable = true)
-    public Integer getPrimary() {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "primary_bitstream_id", nullable = true)
+    public Bitstream getPrimary() {
         return primary;
     }
 
@@ -57,7 +59,7 @@ public class Bundle extends DSpaceObject {
         this.name = name;
     }
 
-    public void setPrimary(Integer primary) {
+    public void setPrimary(Bitstream primary) {
         this.primary = primary;
     }
 

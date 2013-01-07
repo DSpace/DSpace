@@ -9,7 +9,6 @@ package org.dspace.services.context;
 
 import java.sql.SQLException;
 
-import org.dspace.core.Context;
 import org.dspace.core.ContextV2;
 import org.dspace.orm.dao.api.IEpersonDao;
 import org.dspace.services.ContextService;
@@ -32,7 +31,7 @@ public class DSpaceContextService implements ContextService {
 	@Autowired(required=false) IEpersonDao epersonDao;
 
 	@Override
-	public Context newContext() {
+	public ContextV2 newContext() {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		ContextV2 ctx;
@@ -56,11 +55,11 @@ public class DSpaceContextService implements ContextService {
 	}
 	
 	@Override
-	public Context getContext() {
+	public ContextV2 getContext() {
 		if (requestService != null) {
 			Request r = requestService.getCurrentRequest();
 			if (r != null) {// There is one request running on this thread!
-				Context ctx = (Context) r.getAttribute(CONTEXT_ATTR);
+				ContextV2 ctx = (ContextV2) r.getAttribute(CONTEXT_ATTR);
 				if (ctx != null) return ctx;
 			}
 		}
