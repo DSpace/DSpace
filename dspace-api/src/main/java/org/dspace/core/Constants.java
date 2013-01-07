@@ -58,22 +58,22 @@ public class Constants
     /** Type of individual handle objects */
     public static final int HANDLE = 13;
     
-    /** Type of individual handle objects */
+    /** Type of individual resource policy objects */
     public static final int RESOURCEPOLICY = 14;
     
-    /** Type of individual handle objects */
+    /** Type of individual registration data objects */
     public static final int REGISTRATIONDATA = 15;
     
-    /** Type of individual handle objects */
+    /** Type of individual harvested item objects */
     public static final int HARVESTEDITEM = 16;
     
-    /** Type of individual handle objects */
+    /** Type of individual harvested collection objects */
     public static final int HARVESTEDCOLLECTION = 17;
     
     /** Type of individual metadata objects */
     public static final int METADATA = 18;
     
-    /** Type of individual metadata objects */
+    /** Type of individual file extension objects */
     public static final int FILEEXTENSION = 19;
     
     /**
