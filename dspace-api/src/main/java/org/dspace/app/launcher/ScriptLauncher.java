@@ -8,14 +8,9 @@
 package org.dspace.app.launcher;
 
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StreamTokenizer;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.ArrayList;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
@@ -34,6 +29,9 @@ public class ScriptLauncher
 {
     /** The service manager kernel */
     private static transient DSpaceKernelImpl kernelImpl;
+
+    /** Definitions of all commands. */
+    private static final Document commandConfigs = getConfig();
 
     /**
      * Execute the DSpace script launcher
@@ -74,25 +72,9 @@ public class ScriptLauncher
             throw new IllegalStateException(message, e);
         }
 
-        // Parse the configuration file.
-        Document doc = getConfig();
-
-        // Look up command(s) in the configuration, and execute.
+        // Look up command in the configuration, and execute.
         int status;
-        if ("read".equalsIgnoreCase(args[0]))
-        {
-            if (args.length < 2)
-            {
-                System.err.println("'read' must have a single filename argument");
-                System.exit(1);
-            }
-
-            status = runManyCommands(doc, args[1]);
-        }
-        else
-        {
-            status = runOneCommand(doc, args);
-        }
+        status = runOneCommand(args);
 
         // Destroy the service kernel if it is still alive
         if (kernelImpl != null)
@@ -105,69 +87,14 @@ public class ScriptLauncher
     }
 
     /**
-     * Read a file of command lines and execute each in turn.
-     *
-     * @param doc details of recognized commands.
-     * @param script the file of command lines to be executed.
-     * @return
-     * @throws FileNotFoundException
-     * @throws IOException 
-     */
-    static private int runManyCommands(Document doc, String script)
-            throws FileNotFoundException, IOException
-    {
-        Reader input;
-        if ("-".equals(script))
-        {
-            input = new InputStreamReader(System.in);
-        }
-        else
-        {
-            input = new FileReader(script);
-        }
-
-        StreamTokenizer tokenizer = new StreamTokenizer(input);
-
-        tokenizer.eolIsSignificant(true);
-        tokenizer.ordinaryChar('-');
-        tokenizer.wordChars('-', '-');
-        tokenizer.ordinaryChars('0', '9');
-        tokenizer.wordChars('0', '9');
-        tokenizer.ordinaryChar('.');
-        tokenizer.wordChars('.', '.');
-
-        int status = 0;
-        List<String> tokens = new ArrayList<String>();
-        while (StreamTokenizer.TT_EOF != tokenizer.nextToken())
-        {
-            if (StreamTokenizer.TT_EOL == tokenizer.ttype)
-            {
-                status = runOneCommand(doc,
-                        tokens.toArray(new String[tokens.size()]));
-                if (status > 0)
-                {
-                    break;
-                }
-                tokens.clear();
-            }
-            else
-            {
-                tokens.add(tokenizer.sval);
-            }
-        }
-
-        return status;
-    }
-
-    /**
      * Recognize and execute a single command.
      * @param doc
-     * @param args 
+     * @param args
      */
-    static private int runOneCommand(Document doc, String[] args)
+    static int runOneCommand(String[] args)
     {
         String request = args[0];
-        Element root = doc.getRootElement();
+        Element root = commandConfigs.getRootElement();
         List<Element> commands = root.getChildren("command");
         Element command = null;
         for (Element candidate : commands)
@@ -305,26 +232,12 @@ public class ScriptLauncher
                 // Failure occurred in the request so we destroy it
                 requestService.endRequest(e);
 
-                if (kernelImpl != null)
-                {
-                    kernelImpl.destroy();
-                    kernelImpl = null;
-                }
-
                 // Exceptions from the script are reported as a 'cause'
                 Throwable cause = e.getCause();
                 System.err.println("Exception: " + cause.getMessage());
                 cause.printStackTrace();
                 return 1;
             }
-
-        }
-
-        // Destroy the service kernel
-        if (kernelImpl != null)
-        {
-            kernelImpl.destroy();
-            kernelImpl = null;
         }
 
         // Everything completed OK
@@ -362,8 +275,7 @@ public class ScriptLauncher
      */
     private static void display()
     {
-        Document doc = getConfig();
-        List<Element> commands = doc.getRootElement().getChildren("command");
+        List<Element> commands = commandConfigs.getRootElement().getChildren("command");
         System.out.println("Usage: dspace [command-name] {parameters}");
         for (Element command : commands)
         {
