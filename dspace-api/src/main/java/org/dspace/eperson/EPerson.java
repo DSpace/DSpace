@@ -1289,6 +1289,7 @@ public class EPerson extends DSpaceObject
             try {
                 eperson.update();
                 context.commit();
+                System.out.printf("Created EPerson %d\n", eperson.getID());
             } catch (SQLException ex) {
                 context.abort();
                 System.err.println(ex.getMessage());
@@ -1341,6 +1342,7 @@ public class EPerson extends DSpaceObject
                 try {
                     eperson.delete();
                     context.commit();
+                    System.out.printf("Deleted EPerson %d\n", eperson.getID());
                 } catch (SQLException ex) {
                     System.err.println(ex.getMessage());
                     System.exit(1);
