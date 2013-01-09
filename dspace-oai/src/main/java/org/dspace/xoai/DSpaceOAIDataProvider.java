@@ -88,6 +88,7 @@ public class DSpaceOAIDataProvider extends HttpServlet
             HttpServletResponse response) throws ServletException, IOException
     {
         request.setCharacterEncoding("UTF-8");
+        
         Context context = null;
 
         try
@@ -126,11 +127,11 @@ public class DSpaceOAIDataProvider extends HttpServlet
                     repository);
 
             log.debug("Reading parameters from request");
+            response.setContentType("application/xml");
 
             OutputStream out = response.getOutputStream();
             OAIRequestParameters parameters = new OAIRequestParameters(buildParametersMap(request));
 
-            response.setContentType("application/xml");
 
             String identification = request.getPathInfo().replace("/", "")
                     + parameters.requestID();
@@ -147,6 +148,7 @@ public class DSpaceOAIDataProvider extends HttpServlet
         catch (SQLException e)
         {
             log.error(e.getMessage(), e);
+            response.setContentType("application/xml");
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
         catch (InvalidContextException e)
