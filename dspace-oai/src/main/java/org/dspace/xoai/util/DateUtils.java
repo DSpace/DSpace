@@ -91,29 +91,4 @@ public class DateUtils
         }
         return new Date();
     }
-
-    public static Date parseFromSolrDate(String date)
-    {
-        // 2008-01-01T00:00:00Z
-        SimpleDateFormat format = new SimpleDateFormat(
-                "yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
-        // format.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Date ret;
-        try
-        {
-            ret = format.parse(date);
-            return ret;
-        }
-        catch (ParseException e)
-        {
-            log.error(e.getMessage(), e);
-        }
-        return new Date();
-    }
-    
-    public static Date toSolrDate (Date date) throws ParseException {
-    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        Date indexFormatExpiryDate = sdf.parse(sdf.format(date));
-        return indexFormatExpiryDate;
-    }
 }

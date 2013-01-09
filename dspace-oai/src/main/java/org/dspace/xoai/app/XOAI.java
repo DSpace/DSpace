@@ -271,7 +271,7 @@ public class XOAI
         doc.addField("item.public", pub);
         String handle = item.getHandle();
         doc.addField("item.handle", handle);
-        doc.addField("item.lastmodified", DateUtils.toSolrDate(item.getLastModified()));
+        doc.addField("item.lastmodified", item.getLastModified());
         doc.addField("item.submitter", item.getSubmitter().getEmail());
         doc.addField("item.deleted", item.isWithdrawn() ? "true" : "false");
         for (Collection col : item.getCollections())
