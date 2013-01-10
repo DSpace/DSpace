@@ -1160,6 +1160,7 @@ public class EPerson extends DSpaceObject
         }
     }
 
+    @Override
     public String getName()
     {
         return getEmail();
@@ -1176,37 +1177,47 @@ public class EPerson extends DSpaceObject
     private static final Option VERB_LIST = new Option("L", "list", false, "list EPersons");
     private static final Option VERB_MODIFY = new Option("M", "modify", false, "modify an EPerson");
 
-    private static final OptionGroup verbs = new OptionGroup();
+    private static final OptionGroup VERBS = new OptionGroup();
     static {
-        verbs.addOption(VERB_ADD);
-        verbs.addOption(VERB_DELETE);
-        verbs.addOption(VERB_LIST);
-        verbs.addOption(VERB_MODIFY);
+        VERBS.addOption(VERB_ADD);
+        VERBS.addOption(VERB_DELETE);
+        VERBS.addOption(VERB_LIST);
+        VERBS.addOption(VERB_MODIFY);
     }
 
     private static final Option OPT_GIVENNAME = new Option("g", "givenname", true, "the person's actual first or personal name");
     private static final Option OPT_SURNAME = new Option("s", "surname", true, "the person's actual last or family name");
-    private static final Option OPT_TELEPHONE = new Option("t", "telephone", true, "telephone number, empty for none");
+    private static final Option OPT_PHONE = new Option("t", "telephone", true, "telephone number, empty for none");
     private static final Option OPT_LANGUAGE = new Option("l", "language", true, "the person's preferred language");
-    private static final Option OPT_REQUIRE_CERTIFICATE = new Option("c", "requireCertificate", false, "if specified, an X.509 certificate will be required for login");
-    private static final Option OPT_NO_CERTIFICATE = new Option("C", "noCertificate", false, "if specified, no X.509 certificate will be demanded for login");
+    private static final Option OPT_REQUIRE_CERTIFICATE = new Option("c", "requireCertificate", true, "if 'true', an X.509 certificate will be required for login");
+    private static final Option OPT_CAN_LOGIN = new Option("C", "canLogIn", true, "'true' if the user can log in");
 
     private static final Option OPT_EMAIL = new Option("m", "email", true, "the user's email address, empty for none");
     private static final Option OPT_NETID = new Option("n", "netid", true, "network ID associated with the person, empty for none");
 
     private static final Options globalOptions = new Options();
     static {
-        globalOptions.addOptionGroup(verbs);
+        globalOptions.addOptionGroup(VERBS);
         globalOptions.addOption("h", "help", false, "explain options");
     }
 
-    private static final OptionGroup identity = new OptionGroup();
+    private static final OptionGroup identityOptions = new OptionGroup();
     static {
-        identity.setRequired(true);
-        identity.addOption(OPT_EMAIL);
-        identity.addOption(OPT_NETID);
+        identityOptions.setRequired(true);
+        identityOptions.addOption(OPT_EMAIL);
+        identityOptions.addOption(OPT_NETID);
     }
 
+    private static final OptionGroup attributeOptions = new OptionGroup();
+    static {
+
+        attributeOptions.addOption(OPT_GIVENNAME);
+        attributeOptions.addOption(OPT_SURNAME);
+        attributeOptions.addOption(OPT_PHONE);
+        attributeOptions.addOption(OPT_LANGUAGE);
+        attributeOptions.addOption(OPT_REQUIRE_CERTIFICATE);
+    }
+    
     /**
      * Tool for manipulating user accounts.
      */
@@ -1241,20 +1252,19 @@ public class EPerson extends DSpaceObject
 
         if (command.hasOption('a'))
         {
-            cmd_add(context, parser, argv);
+            cmdAdd(context, parser, argv);
         }
         else if (command.hasOption('d'))
         {
-            cmd_delete(context, parser, argv);
+            cmdDelete(context, parser, argv);
         }
         else if (command.hasOption('m'))
         {
-            // TODO Modify a user.
-            // cmd_modify(context, parser, argv);
+            cmdModify(context, parser, argv);
         }
         else if (command.hasOption('L'))
         {
-            cmd_list(context, parser, argv);
+            cmdList(context, parser, argv);
         }
         else
         {
@@ -1264,25 +1274,20 @@ public class EPerson extends DSpaceObject
         }
     }
 
-    private static void cmd_add(Context context, CommandLineParser parser, String[] argv)
+    private static void cmdAdd(Context context, CommandLineParser parser, String[] argv)
     {
         // Create a user.
         Options options = new Options();
 
         options.addOption(VERB_ADD);
 
-        options.addOptionGroup(identity);
+        options.addOptionGroup(identityOptions);
+
+        options.addOptionGroup(attributeOptions);
 
         Option option = new Option("p", "password", true, "password to match the EPerson name");
         option.setRequired(true);
         options.addOption(option);
-
-        options.addOption(OPT_GIVENNAME);
-        options.addOption(OPT_SURNAME);
-        options.addOption(OPT_TELEPHONE);
-        options.addOption(OPT_LANGUAGE);
-        options.addOption(OPT_REQUIRE_CERTIFICATE);
-        options.addOption(OPT_NO_CERTIFICATE);
 
         options.addOption("h", "help", false, "explain -add options");
 
@@ -1296,7 +1301,7 @@ public class EPerson extends DSpaceObject
 
         if (command.hasOption('h'))
         {
-            new HelpFormatter().printHelp("user --add [options]", globalOptions);
+            new HelpFormatter().printHelp("user --add [options]", options);
             System.exit(0);
         }
 
@@ -1309,13 +1314,18 @@ public class EPerson extends DSpaceObject
             System.exit(1);
         } catch (AuthorizeException ex) { /* XXX SNH */ }
         eperson.setCanLogIn(true);
-        eperson.setEmail(command.getOptionValue('m'));
-        eperson.setFirstName(command.getOptionValue('g'));
-        eperson.setLastName(command.getOptionValue('s'));
-        eperson.setLanguage(command.getOptionValue('l'));
-        eperson.setNetid(command.getOptionValue('n'));
+        eperson.setEmail(command.getOptionValue(OPT_EMAIL.getOpt()));
+        eperson.setFirstName(command.getOptionValue(OPT_GIVENNAME.getOpt()));
+        eperson.setLastName(command.getOptionValue(OPT_SURNAME.getOpt()));
+        eperson.setLanguage(command.getOptionValue(OPT_LANGUAGE.getOpt()));
+        eperson.setMetadata("phone", command.getOptionValue(OPT_PHONE.getOpt()));
+        eperson.setNetid(command.getOptionValue(OPT_NETID.getOpt()));
         eperson.setPassword(command.getOptionValue('p'));
-        eperson.setRequireCertificate(command.hasOption('c'));
+        if (command.hasOption(OPT_REQUIRE_CERTIFICATE.getOpt()))
+        {
+            eperson.setRequireCertificate(Boolean.valueOf(command.getOptionValue(
+                OPT_REQUIRE_CERTIFICATE.getOpt())));
+        }
         eperson.setSelfRegistered(false);
         try {
             eperson.update();
@@ -1328,14 +1338,14 @@ public class EPerson extends DSpaceObject
         } catch (AuthorizeException ex) { /* XXX SNH */ }
     }
 
-    private static void cmd_delete(Context context, CommandLineParser parser, String[] argv)
+    private static void cmdDelete(Context context, CommandLineParser parser, String[] argv)
     {
         // Delete a user.
         Options options = new Options();
 
         options.addOption(VERB_DELETE);
 
-        options.addOptionGroup(identity);
+        options.addOptionGroup(identityOptions);
 
         CommandLine command = null;
         try {
@@ -1347,7 +1357,7 @@ public class EPerson extends DSpaceObject
 
         if (command.hasOption('h'))
         {
-            new HelpFormatter().printHelp("user --delete [options]", globalOptions);
+            new HelpFormatter().printHelp("user --delete [options]", options);
             System.exit(0);
         }
 
@@ -1389,12 +1399,89 @@ public class EPerson extends DSpaceObject
         }
     }
 
-    private static void cmd_modify(Context context, CommandLineParser parser, String[] argv)
+    private static void cmdModify(Context context, CommandLineParser parser, String[] argv)
     {
-        // TODO modify a user
+        Options options = new Options();
+
+        options.addOption(VERB_MODIFY);
+
+        options.addOptionGroup(identityOptions);
+
+        options.addOption(OPT_CAN_LOGIN);
+
+        CommandLine command = null;
+        try {
+            command = parser.parse(options, argv);
+        } catch (ParseException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
+        }
+
+        if (command.hasOption('h'))
+        {
+            new HelpFormatter().printHelp("user --modify [options]", options);
+            System.exit(0);
+        }
+
+        EPerson eperson = null;
+        try {
+            if (command.hasOption('n'))
+            {
+                eperson = findByNetid(context, command.getOptionValue('n'));
+            }
+            else
+            {
+                eperson = findByEmail(context, command.getOptionValue('m'));
+            }
+        } catch (SQLException e) {
+            System.err.append(e.getMessage());
+            System.exit(1);
+        } catch (AuthorizeException e) { /* XXX SNH */ }
+
+        if (null == eperson)
+        {
+            System.err.println("No such EPerson");
+        }
+        else
+        {
+            if (command.hasOption(OPT_GIVENNAME.getOpt()))
+            {
+                eperson.setFirstName(command.getOptionValue(OPT_GIVENNAME.getOpt()));
+            }
+            if (command.hasOption(OPT_SURNAME.getOpt()))
+            {
+                eperson.setLastName(command.getOptionValue(OPT_SURNAME.getOpt()));
+            }
+            if (command.hasOption(OPT_PHONE.getOpt()))
+            {
+                eperson.setMetadata("phone", command.getOptionValue(OPT_PHONE.getOpt()));
+            }
+            if (command.hasOption(OPT_LANGUAGE.getOpt()))
+            {
+                eperson.setLanguage(command.getOptionValue(OPT_LANGUAGE.getOpt()));
+            }
+            if (command.hasOption(OPT_REQUIRE_CERTIFICATE.getOpt()))
+            {
+                eperson.setRequireCertificate(Boolean.valueOf(command.getOptionValue(
+                        OPT_REQUIRE_CERTIFICATE.getOpt())));
+            }
+            if (command.hasOption(OPT_CAN_LOGIN.getOpt()))
+            {
+                eperson.setCanLogIn(Boolean.valueOf(command.getOptionValue(OPT_CAN_LOGIN.getOpt())));
+            }
+            try {
+                eperson.update();
+                context.commit();
+                System.out.printf("Modified EPerson %d\n", eperson.getID());
+            } catch (SQLException ex) {
+                context.abort();
+                System.err.println(ex.getMessage());
+                System.exit(1);
+            } catch (AuthorizeException ex) { /* XXX SNH */ }
+        }
     }
 
-    private static void cmd_list(Context context, CommandLineParser parser, String[] argv)
+    private static void cmdList(Context context, CommandLineParser parser, String[] argv)
     {
         // List users
         // XXX ideas:
