@@ -37,7 +37,7 @@ public class CommunityDao extends DSpaceDao<Community> implements ICommunityDao 
 	 */
 	public List<Community> selectTop() {
 		return (List<Community>) super.getSession().createCriteria(Community.class)
-				.add(Restrictions.eq("isTop", true))
+				.add(Restrictions.eq("top", true))
 				.list();
 	}
 }
