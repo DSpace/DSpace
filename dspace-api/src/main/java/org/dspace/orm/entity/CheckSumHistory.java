@@ -18,6 +18,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.springframework.beans.factory.annotation.Configurable;
+
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
  * @version $Revision$
@@ -26,6 +28,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "checksum_history")
+@Configurable
 public class CheckSumHistory{
     private long checkId;
     private Bitstream bitstream;

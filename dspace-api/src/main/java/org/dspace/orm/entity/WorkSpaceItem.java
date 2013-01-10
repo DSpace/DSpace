@@ -14,13 +14,17 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
@@ -29,9 +33,9 @@ import javax.persistence.Transient;
 
 @Entity
 @Table(name = "workspaceitem")
+@SequenceGenerator(name="workspaceitem_gen", sequenceName="workspaceitem_seq")
+@Configurable
 public class WorkSpaceItem extends DSpaceObject {
-    private int id;
-    
     private Item item;
     private Collection collection;
     private boolean multipleTitles;
@@ -43,13 +47,9 @@ public class WorkSpaceItem extends DSpaceObject {
     
     @Id
     @Column(name = "workspace_item_id")
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="workspaceitem_gen")
     public int getID() {
         return id;
-    }
-    
-    public int setID(int id) {
-        return this.id= id;
     }
     
     @Override

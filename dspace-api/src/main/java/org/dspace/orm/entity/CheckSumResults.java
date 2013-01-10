@@ -12,6 +12,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.springframework.beans.factory.annotation.Configurable;
+
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
  * @version $Revision$
@@ -19,6 +21,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "checksum_results")
+@Configurable
 public class CheckSumResults{
     private String resultCode;
     private String resultDescription;

@@ -12,9 +12,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -26,6 +28,7 @@ import javax.persistence.Transient;
 
 @Entity
 @Table(name = "harvested_item")
+@SequenceGenerator(name="harvested_item_gen", sequenceName="harvested_item_seq")
 public class HarvestedItem extends DSpaceObject{
     private int id;
     private Item item;
@@ -34,13 +37,9 @@ public class HarvestedItem extends DSpaceObject{
     
     @Id
     @Column(name = "id")
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="harvested_item_gen")
     public int getID() {
         return id;
-    }
-    
-    public int setID(int id) {
-        return this.id= id;
     }
     
     @Override

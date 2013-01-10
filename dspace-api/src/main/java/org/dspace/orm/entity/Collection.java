@@ -16,11 +16,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -32,10 +34,10 @@ import org.springframework.beans.factory.annotation.Configurable;
 @Entity
 @Table(name = "collection")
 @Configurable
+@SequenceGenerator(name="collection_gen", sequenceName="collection_seq")
 public class Collection extends DSpaceObject {
 	@Autowired AuthorizationService authService;
 	
-    private int id;
     private String name;
     private String shortDescription;
     private String introductoryText;
@@ -57,7 +59,7 @@ public class Collection extends DSpaceObject {
 
     @Id
     @Column(name = "collection_id")
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="collection_gen")
     public int getID() {
         return id;
     }
@@ -183,10 +185,7 @@ public class Collection extends DSpaceObject {
         return parents;
     }
 
-    public void setID(int id) {
-        this.id = id;
-    }
-
+    
     public void setParents(List<Community> coms) {
         this.parents = coms;
     }

@@ -15,17 +15,22 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.springframework.beans.factory.annotation.Configurable;
+
 @Entity
 @Table(name = "eperson")
+@SequenceGenerator(name="eperson_gen", sequenceName="eperson_seq")
+@Configurable
 public class Eperson extends DSpaceObject {
-    private int id;
     private String email;
     private String password;
     private String salt;
@@ -47,13 +52,9 @@ public class Eperson extends DSpaceObject {
     
     @Id
     @Column(name = "eperson_id")
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="eperson_gen")
     public int getID() {
         return id;
-    }
-
-    public void setID(int id) {
-        this.id = id;
     }
 
     @Column(name = "email", nullable = true)

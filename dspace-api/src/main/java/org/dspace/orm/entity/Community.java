@@ -17,11 +17,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -33,11 +35,11 @@ import org.springframework.beans.factory.annotation.Configurable;
 @Entity
 @Table(name = "community")
 @Configurable
+@SequenceGenerator(name="community_gen", sequenceName="community_seq")
 public class Community extends DSpaceObject implements Serializable {
     private static final long serialVersionUID = 6681512980782299861L;
     
     @Autowired AuthorizationService authService;
-    private int id;
     private String name;
     private String shortDescription;
     private String introductoryText;
@@ -52,7 +54,7 @@ public class Community extends DSpaceObject implements Serializable {
     private Integer itemCount;
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="community_gen")
     @Column(name = "community_id", unique = true, nullable = false)
     public int getID() {
         return id;
@@ -169,10 +171,6 @@ public class Community extends DSpaceObject implements Serializable {
     public void setParents(List<Community> comms) {
         this.parents = comms;
         this.setTop((comms == null || !comms.isEmpty()));
-    }
-
-    public void setID(int communityId) {
-        this.id = communityId;
     }
 
     public void setName(String name) {

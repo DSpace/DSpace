@@ -9,6 +9,7 @@ package org.dspace.orm.entity;
 
 import java.util.List;
 
+import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 
 import org.dspace.orm.dao.api.IResourcePolicyDao;
@@ -24,10 +25,15 @@ import org.springframework.beans.factory.annotation.Configurable;
  *
  */
 @Configurable
+@MappedSuperclass
 public abstract class DSpaceObject implements IDSpaceObject {
-
+	protected int id;
+	
 	@Override
 	public abstract int getID();
+	public void setID (int id) {
+		this.id = id;
+	}
 
 	@Autowired HandleDao handleDao;
 	@Autowired MetadataValueDao metadataDao;

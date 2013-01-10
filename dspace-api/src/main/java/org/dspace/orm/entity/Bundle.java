@@ -14,11 +14,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -30,10 +32,10 @@ import org.springframework.beans.factory.annotation.Configurable;
 @Entity
 @Table(name = "bundle")
 @Configurable
+@SequenceGenerator(name="bundle_gen", sequenceName="bundle_seq")
 public class Bundle extends DSpaceObject {
 	@Autowired AuthorizationService authService;
 	
-    private int id;
     private String name;
     private Bitstream primary;
     private List<Item> items;
@@ -41,7 +43,7 @@ public class Bundle extends DSpaceObject {
 
     @Id
     @Column(name = "bundle_id")
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="bundle_gen")
     public int getID() {
         return id;
     }
@@ -55,10 +57,6 @@ public class Bundle extends DSpaceObject {
     @JoinColumn(name = "primary_bitstream_id", nullable = true)
     public Bitstream getPrimary() {
         return primary;
-    }
-
-    public void setID(int id) {
-        this.id = id;
     }
 
     public void setName(String name) {

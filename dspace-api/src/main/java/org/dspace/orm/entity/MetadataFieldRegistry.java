@@ -10,9 +10,13 @@ package org.dspace.orm.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
@@ -22,8 +26,9 @@ import javax.persistence.Transient;
 
 @Entity
 @Table(name = "metadatafieldregistry")
+@SequenceGenerator(name="metadatafieldregistry_gen", sequenceName="metadatafieldregistry_seq")
+@Configurable
 public class MetadataFieldRegistry extends DSpaceObject {
-    private int id;
     private Integer metadataSchema;
     private String element;
     private String qualifier;
@@ -31,13 +36,9 @@ public class MetadataFieldRegistry extends DSpaceObject {
     
     @Id
     @Column(name = "metadata_field_id")
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="metadatafieldregistry_gen")
     public int getID() {
         return id;
-    }
-    
-    public int setID(int id) {
-        return this.id= id;
     }
     
     @Override

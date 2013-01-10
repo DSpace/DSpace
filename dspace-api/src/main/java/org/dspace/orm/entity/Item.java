@@ -15,12 +15,14 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -28,13 +30,15 @@ import org.dspace.services.AuthorizationService;
 import org.dspace.services.auth.Action;
 import org.dspace.services.auth.DSpaceAuthorizeConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 @Entity
 @Table(name = "item")
+@SequenceGenerator(name="item_gen", sequenceName="item_seq")
+@Configurable
 public class Item extends DSpaceObject {
 	@Autowired AuthorizationService authService;
 	
-    private int id;
     private Eperson submitter;
     private boolean inArchive;
     private boolean withDrawn;
@@ -47,15 +51,11 @@ public class Item extends DSpaceObject {
     
     @Id
     @Column(name = "item_id")
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="item_gen")
     public int getID() {
         return id;
     }
 
-    public void setID(int id) {
-        this.id = id;
-    }
-    
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
     @JoinTable(name = "collection2item", joinColumns = { @JoinColumn(name = "item_id", nullable = false) }, inverseJoinColumns = { @JoinColumn(name = "collection_id", nullable = false) })
     public List<Collection> getCollections() {

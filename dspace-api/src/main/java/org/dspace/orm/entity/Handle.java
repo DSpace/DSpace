@@ -10,7 +10,9 @@ package org.dspace.orm.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -25,16 +27,16 @@ import org.springframework.beans.factory.annotation.Configurable;
 
 @Entity
 @Table(name = "handle")
+@SequenceGenerator(name="handle_gen", sequenceName="handle_seq")
 @Configurable
 public class Handle extends DSpaceObject {
-    private int id;
     private String handle;
     private int resourceType;
     private int resourceId;
 
     @Id
     @Column(name = "handle_id")
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="handle_gen")
     public int getID() {
         return id;
     }
@@ -52,10 +54,6 @@ public class Handle extends DSpaceObject {
     @Column(name = "resource_id")
     public int getResourceId() {
         return resourceId;
-    }
-
-    public void setID(int id) {
-        this.id = id;
     }
 
     public void setHandleString(String handle) {

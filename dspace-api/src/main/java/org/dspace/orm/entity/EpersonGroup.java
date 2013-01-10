@@ -14,11 +14,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -26,14 +28,16 @@ import org.dspace.orm.dao.api.ICollectionDao;
 import org.dspace.services.AuthorizationService;
 import org.dspace.services.auth.DSpaceAuthorizeConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 @Entity
 @Table(name = "epersongroup")
+@SequenceGenerator(name="epersongroup_gen", sequenceName="epersongroup_seq")
+@Configurable
 public class EpersonGroup extends DSpaceObject {
 	@Autowired AuthorizationService authService;
 	@Autowired ICollectionDao collectionDao;
 	
-    private int id;
     private String name;
     private List<Eperson> epersons;
     private List<WorkSpaceItem> workSpaceItems;
@@ -50,13 +54,9 @@ public class EpersonGroup extends DSpaceObject {
     
     @Id
     @Column(name = "eperson_group_id")
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="epersongroup_gen")
     public int getID() {
         return id;
-    }
-
-    public void setID(int id) {
-        this.id = id;
     }
     
     @Column(name = "name", nullable = true)

@@ -15,12 +15,14 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -34,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Entity
 @Table(name = "bitstream")
+@SequenceGenerator(name="bitstream_gen", sequenceName="bitstream_seq")
 @Configurable
 public class Bitstream extends DSpaceObject {
 
@@ -45,7 +48,6 @@ public class Bitstream extends DSpaceObject {
 	@Autowired StorageService storage;
 	@Autowired AuthorizationService authorization;
 	
-    private int id;
     private BitstreamFormat format;
     private String name;
     private Long size;
@@ -66,7 +68,7 @@ public class Bitstream extends DSpaceObject {
 
     @Id
     @Column(name = "bitstream_id")
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="bitstream_gen")
     public int getID() {
         return id;
     }
@@ -149,10 +151,6 @@ public class Bitstream extends DSpaceObject {
 
     public void setBundles(List<Bundle> bundles) {
         this.bundles = bundles;
-    }
-
-    public void setID(int id) {
-        this.id = id;
     }
 
     public void setFormat(BitstreamFormat format) {

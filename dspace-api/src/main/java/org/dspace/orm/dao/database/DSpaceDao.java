@@ -14,6 +14,7 @@ import javax.annotation.Resource;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.orm.dao.api.IDSpaceDao;
+import org.dspace.orm.entity.DSpaceObject;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -23,7 +24,7 @@ import org.hibernate.SessionFactory;
  * @version $Revision$
  */
 
-public abstract class DSpaceDao<T> implements IDSpaceDao<T> {
+public abstract class DSpaceDao<T extends DSpaceObject> implements IDSpaceDao<T> {
 	private static Logger log = LogManager.getLogger(DSpaceDao.class);
 	
 	private Class<T> clazz;
@@ -50,12 +51,17 @@ public abstract class DSpaceDao<T> implements IDSpaceDao<T> {
         Integer id = null;
         try {
             id = (Integer) session.save(c);
+            c.setID(id);
             log.debug(c.getClass().getSimpleName() + " saved");
         } catch (HibernateException e) {
         	log.error(e.getMessage(), e);
         }
         return id;
     }
+	
+	public void update (T c) {
+		getSession().update(c);
+	}
 	
 	@Override
     public boolean delete(T c) {

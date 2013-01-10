@@ -12,11 +12,15 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
@@ -26,8 +30,9 @@ import javax.persistence.Transient;
 
 @Entity
 @Table(name = "harvested_collection")
+@SequenceGenerator(name="harvested_collection_gen", sequenceName="harvested_collection_seq")
+@Configurable
 public class HarvestedCollection extends DSpaceObject{
-    private int id;
     private Collection collection;
     private Integer harvestType;
     private String oaiSource;
@@ -44,13 +49,9 @@ public class HarvestedCollection extends DSpaceObject{
     
     @Id
     @Column(name = "id")
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="harvested_collection_gen")
     public int getID() {
         return id;
-    }
-    
-    public int setID(int id) {
-        return this.id= id;
     }
     
     @Override

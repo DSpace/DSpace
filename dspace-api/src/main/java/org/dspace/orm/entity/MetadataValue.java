@@ -11,11 +11,15 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
@@ -25,8 +29,9 @@ import javax.persistence.Transient;
 
 @Entity
 @Table(name = "metadatavalue")
+@SequenceGenerator(name="metadatavalue_gen", sequenceName="metadatavalue_seq")
+@Configurable
 public class MetadataValue extends DSpaceObject {
-    private int id;
     private MetadataFieldRegistry metadataField;
     private String textValue;
     private String textLang;
@@ -39,13 +44,9 @@ public class MetadataValue extends DSpaceObject {
     
     @Id
     @Column(name = "metadata_value_id")
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="metadatavalue_gen")
     public int getID() {
         return id;
-    }
-    
-    public int setID(int id) {
-        return this.id= id;
     }
     
     @Override

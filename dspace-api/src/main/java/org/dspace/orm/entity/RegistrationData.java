@@ -12,9 +12,13 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import org.springframework.beans.factory.annotation.Configurable;
 
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
@@ -24,21 +28,18 @@ import javax.persistence.Transient;
 
 @Entity
 @Table(name = "registrationdata")
+@SequenceGenerator(name="registrationdata_gen", sequenceName="registrationdata_seq")
+@Configurable
 public class RegistrationData extends DSpaceObject {
-    private int id;
     private String email;
     private String token;
     private Date expires;
     
     @Id
     @Column(name = "registrationdata_id")
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="registrationdata_gen")
     public int getID() {
         return id;
-    }
-    
-    public int setID(int id) {
-        return this.id= id;
     }
     
     @Override

@@ -10,7 +10,9 @@ package org.dspace.orm.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -19,8 +21,8 @@ import org.springframework.beans.factory.annotation.Configurable;
 @Entity
 @Table(name = "bitstreamformatregistry")
 @Configurable
+@SequenceGenerator(name="bitstreamformatregistry_gen", sequenceName="bitstreamformatregistry_seq")
 public class BitstreamFormat extends DSpaceObject {
-    private int id;
     private String mimetype;
     private String shortDescription;
     private String description;
@@ -29,7 +31,7 @@ public class BitstreamFormat extends DSpaceObject {
 
     @Id
     @Column(name = "bitstream_format_id")
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="bitstreamformatregistry_gen")
     public int getID() {
         return id;
     }
@@ -57,10 +59,6 @@ public class BitstreamFormat extends DSpaceObject {
     @Column(name = "internal")
     public boolean isInternal() {
         return internal;
-    }
-
-    public void setID(int id) {
-        this.id = id;
     }
 
     public void setMimetype(String mimetype) {
