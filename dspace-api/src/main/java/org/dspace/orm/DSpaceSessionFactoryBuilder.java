@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 
 /**
+ * This session factory builder uses the DSpace configuration.
  * 
  * @author João Melo <jmelo@lyncode.com>
  */

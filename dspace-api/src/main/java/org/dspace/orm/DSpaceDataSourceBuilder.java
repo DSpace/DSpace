@@ -12,9 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 /**
+ * This data source builder uses the current DSpace configuration file.
  * 
  * @author João Melo <jmelo@lyncode.com>
- *
  */
 public class DSpaceDataSourceBuilder {
 	@Autowired ConfigurationService config;

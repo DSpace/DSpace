@@ -1,5 +1,18 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.services.auth;
 
+/**
+ * The action enum is intended to replace the use of some contants
+ * defined in the org.dspace.core.Constants class. 
+ * 
+ * @author João Melo <jmelo@lyncode.com>
+ */
 public enum Action {
 	NONE(-1),
 	READ(0),

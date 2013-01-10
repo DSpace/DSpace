@@ -20,6 +20,7 @@ import org.dspace.services.ContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * An implementation of an authorization service based on resource policies.
  * 
  * @author João Melo <jmelo@lyncode.com>
  */
