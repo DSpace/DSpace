@@ -94,7 +94,8 @@ public class Bundle extends DSpaceObject {
 	public void setBitstreams(List<Bitstream> bitstreams) {
 		this.bitstreams = bitstreams;
 	}
-    
+
+	@Transient
 	public IDSpaceObject getAdminObject(Action action)
     {
         DSpaceObject adminObject = null;
@@ -156,7 +157,8 @@ public class Bundle extends DSpaceObject {
         }
         return adminObject;
     }
-	
+
+	@Transient
 	public IDSpaceObject getParentObject()
     {
         List<Item> items = getItems();

@@ -139,6 +139,7 @@ public class Item extends DSpaceObject {
 	}
 	
 
+	@Transient
     public IDSpaceObject getAdminObject(Action action)
     {
         DSpaceObject adminObject = null;

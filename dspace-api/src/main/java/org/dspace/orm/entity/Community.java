@@ -223,6 +223,7 @@ public class Community extends DSpaceObject implements Serializable {
 		this.itemCount = itemCount;
 	}
 
+	@Transient
 	public IDSpaceObject getAdminObject(Action action)
     {
         IDSpaceObject adminObject = null;
@@ -254,6 +255,7 @@ public class Community extends DSpaceObject implements Serializable {
         return adminObject;
     }
 	
+	@Transient
 	public IDSpaceObject getParentObject()
     {
         return this.getParent();      

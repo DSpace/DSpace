@@ -273,6 +273,7 @@ public class Collection extends DSpaceObject {
    	}
    	
 
+	@Transient
     public IDSpaceObject getAdminObject(Action action)
     {
         DSpaceObject adminObject = null;
@@ -310,6 +311,7 @@ public class Collection extends DSpaceObject {
     }
     
     @Override
+	@Transient
     public IDSpaceObject getParentObject()
     {
         List<Community> communities = this.getParents();
