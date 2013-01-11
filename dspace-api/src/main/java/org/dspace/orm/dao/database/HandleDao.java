@@ -42,7 +42,7 @@ public class HandleDao extends DSpaceDao<Handle>  implements IHandleDao {
 	@Override
 	public Handle selectByHandle(String handle) {
 		return (Handle) super.getSession().createCriteria(Handle.class)
-				.add(Restrictions.eq("handle", handle))
+				.add(Restrictions.eq("handleString", handle))
 				.uniqueResult();
 	}
 
@@ -50,7 +50,7 @@ public class HandleDao extends DSpaceDao<Handle>  implements IHandleDao {
 	@Override
 	public List<Handle> selectByPrefix(String naHandle) {
 		return (List<Handle>) super.getSession().createCriteria(Handle.class)
-				.add(Restrictions.like("handle", naHandle+"/%"))
+				.add(Restrictions.like("handleString", naHandle+"/%"))
 				.list();
 	}
 

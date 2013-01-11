@@ -106,4 +106,9 @@ public class Handle extends DSpaceObject {
 				return itemDao.selectById(getResourceId());
 		}
 	}
+	
+	@Transient
+	public String toString () {
+		return this.getHandleString();
+	}
 }

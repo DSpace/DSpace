@@ -51,7 +51,7 @@ public class Community extends DSpaceObject implements Serializable {
     private List<Community> childs;
     private List<Collection> collections;
     private List<Item> items;
-    private boolean istop;
+    private Boolean istop;
     private Integer itemCount;
 
     @Id
@@ -204,11 +204,11 @@ public class Community extends DSpaceObject implements Serializable {
     }
 
     @Column(name="istop")
-	public boolean isTop() {
+	public Boolean isTop() {
 		return istop;
 	}
 
-	public void setTop(boolean istop) {
+	public void setTop(Boolean istop) {
 		this.istop = istop;
 	}
 
