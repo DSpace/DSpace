@@ -40,4 +40,22 @@ public class CommunityDao extends DSpaceDao<Community> implements ICommunityDao 
 				.add(Restrictions.eq("top", true))
 				.list();
 	}
+
+
+
+	@Override
+	public Integer save(Community c) {
+		c.setTop(c.getParents() == null || c.getParents().isEmpty());
+		return super.save(c);
+	}
+
+
+
+	@Override
+	public void update(Community c) {
+		c.setTop(c.getParents() == null || c.getParents().isEmpty());
+		super.update(c);
+	}
+	
+	
 }

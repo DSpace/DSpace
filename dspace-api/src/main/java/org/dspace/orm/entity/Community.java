@@ -170,7 +170,6 @@ public class Community extends DSpaceObject implements Serializable {
 
     public void setParents(List<Community> comms) {
         this.parents = comms;
-        this.setTop((comms == null || !comms.isEmpty()));
     }
 
     public void setName(String name) {

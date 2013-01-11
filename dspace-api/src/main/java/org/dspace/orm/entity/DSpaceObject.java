@@ -12,9 +12,9 @@ import java.util.List;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 
+import org.dspace.orm.dao.api.IHandleDao;
+import org.dspace.orm.dao.api.IMetadataValueDao;
 import org.dspace.orm.dao.api.IResourcePolicyDao;
-import org.dspace.orm.dao.database.HandleDao;
-import org.dspace.orm.dao.database.MetadataValueDao;
 import org.dspace.services.auth.Action;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -29,14 +29,12 @@ import org.springframework.beans.factory.annotation.Configurable;
 public abstract class DSpaceObject implements IDSpaceObject {
 	protected int id;
 	
-	@Override
-	public abstract int getID();
 	public void setID (int id) {
 		this.id = id;
 	}
 
-	@Autowired HandleDao handleDao;
-	@Autowired MetadataValueDao metadataDao;
+	@Autowired IHandleDao handleDao;
+	@Autowired IMetadataValueDao metadataDao;
 	@Autowired IResourcePolicyDao resourcePolicyDao;
 	
 	@Transient

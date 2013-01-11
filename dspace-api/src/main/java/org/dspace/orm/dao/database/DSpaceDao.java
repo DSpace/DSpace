@@ -31,7 +31,14 @@ public abstract class DSpaceDao<T extends DSpaceObject> implements IDSpaceDao<T>
 	@Resource(name="sessionFactory") SessionFactory sessionFactory;
 	
 	protected Session getSession() {
-        return sessionFactory.getCurrentSession();
+        Session sess = sessionFactory.getCurrentSession();
+        if (sess == null)
+        	sess = sessionFactory.openSession();
+        
+        if (!sess.getTransaction().isActive())
+        	sess.beginTransaction();
+        
+        return sess;
     }
 	
 	public DSpaceDao (Class<T> clazz) {
