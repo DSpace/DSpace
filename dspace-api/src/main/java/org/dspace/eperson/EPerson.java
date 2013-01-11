@@ -10,6 +10,7 @@ package org.dspace.eperson;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Option;
@@ -1172,6 +1173,10 @@ public class EPerson extends DSpaceObject
 
     }
 
+    /*
+     * Commandline tool for manipulating EPersons.
+     */
+
     private static final Option VERB_ADD = new Option("a", "add", false, "create a new EPerson");
     private static final Option VERB_DELETE = new Option("d", "delete", false, "delete an existing EPerson");
     private static final Option VERB_LIST = new Option("L", "list", false, "list EPersons");
@@ -1195,6 +1200,9 @@ public class EPerson extends DSpaceObject
     private static final Option OPT_EMAIL = new Option("m", "email", true, "the user's email address, empty for none");
     private static final Option OPT_NETID = new Option("n", "netid", true, "network ID associated with the person, empty for none");
 
+    private static final Option OPT_NEW_EMAIL = new Option("i", "newEmail", true, "new email address");
+    private static final Option OPT_NEW_NETID = new Option("I", "newNetid", true, "new network ID");
+
     private static final Options globalOptions = new Options();
     static {
         globalOptions.addOptionGroup(VERBS);
@@ -1203,14 +1211,12 @@ public class EPerson extends DSpaceObject
 
     private static final OptionGroup identityOptions = new OptionGroup();
     static {
-        identityOptions.setRequired(true);
         identityOptions.addOption(OPT_EMAIL);
         identityOptions.addOption(OPT_NETID);
     }
 
     private static final OptionGroup attributeOptions = new OptionGroup();
     static {
-
         attributeOptions.addOption(OPT_GIVENNAME);
         attributeOptions.addOption(OPT_SURNAME);
         attributeOptions.addOption(OPT_PHONE);
@@ -1223,20 +1229,14 @@ public class EPerson extends DSpaceObject
      */
     public static void main(String argv[])
     {
-        final CommandLineParser parser = new PosixParser();
+        final PosixParser parser = new PosixParser();
         CommandLine command = null;
 
         try {
-            command = parser.parse(globalOptions, argv);
+            command = parser.parse(globalOptions, argv, true);
         } catch (ParseException e) {
             System.err.println(e.getMessage());
             System.exit(1);
-        }
-
-        if (command.hasOption('h'))
-        {
-            new HelpFormatter().printHelp("user [options]", globalOptions);
-            System.exit(0);
         }
 
         Context context = null;
@@ -1250,33 +1250,47 @@ public class EPerson extends DSpaceObject
         // Disable authorization since this only runs from the local commandline.
         context.turnOffAuthorisationSystem();
 
-        if (command.hasOption('a'))
+        int status = 0;
+        if (command.hasOption(VERB_ADD.getOpt()))
         {
-            cmdAdd(context, parser, argv);
+            status = cmdAdd(context, parser, argv);
         }
-        else if (command.hasOption('d'))
+        else if (command.hasOption(VERB_DELETE.getOpt()))
         {
-            cmdDelete(context, parser, argv);
+            status = cmdDelete(context, parser, argv);
         }
-        else if (command.hasOption('m'))
+        else if (command.hasOption(VERB_MODIFY.getOpt()))
         {
-            cmdModify(context, parser, argv);
+            status = cmdModify(context, parser, argv);
         }
-        else if (command.hasOption('L'))
+        else if (command.hasOption(VERB_LIST.getOpt()))
         {
-            cmdList(context, parser, argv);
+            status = cmdList(context, parser, argv);
+        }
+        else if (command.hasOption('h'))
+        {
+            new HelpFormatter().printHelp("user [options]", globalOptions);
         }
         else
         {
             System.err.println("Unknown operation.");
+            new HelpFormatter().printHelp("user [options]", globalOptions);
             context.abort();
-            System.exit(1);
+            status = 1;
         }
+
+        try {
+            context.complete();
+        } catch (SQLException ex) {
+            System.err.println(ex.getMessage());
+        }
+
+        System.exit(status);
     }
 
-    private static void cmdAdd(Context context, CommandLineParser parser, String[] argv)
+    /** Command to create an EPerson. */
+    private static int cmdAdd(Context context, CommandLineParser parser, String[] argv)
     {
-        // Create a user.
         Options options = new Options();
 
         options.addOption(VERB_ADD);
@@ -1286,38 +1300,55 @@ public class EPerson extends DSpaceObject
         options.addOptionGroup(attributeOptions);
 
         Option option = new Option("p", "password", true, "password to match the EPerson name");
-        option.setRequired(true);
         options.addOption(option);
 
-        options.addOption("h", "help", false, "explain -add options");
+        options.addOption("h", "help", false, "explain --add options");
 
-        CommandLine command = null;
+        // Rescan the command for more details.
+        CommandLine command;
         try {
             command = parser.parse(options, argv);
         } catch (ParseException e) {
             System.err.println(e.getMessage());
-            System.exit(1);
+            return 1;
         }
 
         if (command.hasOption('h'))
         {
             new HelpFormatter().printHelp("user --add [options]", options);
-            System.exit(0);
+            return 0;
         }
 
+        // Check that we got sufficient credentials to define a user.
+        if ((!command.hasOption(OPT_EMAIL.getOpt())) && (!command.hasOption(OPT_NETID.getOpt())))
+        {
+            System.err.println("You must provide an email address or a netid to identify the new user.");
+            return 1;
+        }
+
+        if (!command.hasOption('p'))
+        {
+            System.err.println("You must provide a password for the new user.");
+            return 1;
+        }
+
+        // Create!
         EPerson eperson = null;
         try {
             eperson = create(context);
         } catch (SQLException ex) {
             context.abort();
             System.err.println(ex.getMessage());
-            System.exit(1);
+            return 1;
         } catch (AuthorizeException ex) { /* XXX SNH */ }
         eperson.setCanLogIn(true);
+        eperson.setSelfRegistered(false);
+
         eperson.setEmail(command.getOptionValue(OPT_EMAIL.getOpt()));
         eperson.setFirstName(command.getOptionValue(OPT_GIVENNAME.getOpt()));
         eperson.setLastName(command.getOptionValue(OPT_SURNAME.getOpt()));
-        eperson.setLanguage(command.getOptionValue(OPT_LANGUAGE.getOpt()));
+        eperson.setLanguage(command.getOptionValue(OPT_LANGUAGE.getOpt(),
+                Locale.getDefault().getLanguage()));
         eperson.setMetadata("phone", command.getOptionValue(OPT_PHONE.getOpt()));
         eperson.setNetid(command.getOptionValue(OPT_NETID.getOpt()));
         eperson.setPassword(command.getOptionValue('p'));
@@ -1326,7 +1357,11 @@ public class EPerson extends DSpaceObject
             eperson.setRequireCertificate(Boolean.valueOf(command.getOptionValue(
                 OPT_REQUIRE_CERTIFICATE.getOpt())));
         }
-        eperson.setSelfRegistered(false);
+        else
+        {
+            eperson.setRequireCertificate(false);
+        }
+
         try {
             eperson.update();
             context.commit();
@@ -1334,72 +1369,84 @@ public class EPerson extends DSpaceObject
         } catch (SQLException ex) {
             context.abort();
             System.err.println(ex.getMessage());
-            System.exit(1);
+            return 1;
         } catch (AuthorizeException ex) { /* XXX SNH */ }
+
+        return 0;
     }
 
-    private static void cmdDelete(Context context, CommandLineParser parser, String[] argv)
+    /** Command to delete an EPerson. */
+    private static int cmdDelete(Context context, CommandLineParser parser, String[] argv)
     {
-        // Delete a user.
         Options options = new Options();
 
         options.addOption(VERB_DELETE);
 
         options.addOptionGroup(identityOptions);
 
-        CommandLine command = null;
+        options.addOption("h", "help", false, "explain --delete options");
+
+        CommandLine command;
         try {
             command = parser.parse(options, argv);
         } catch (ParseException e) {
             System.err.println(e.getMessage());
-            System.exit(1);
+            return 1;
         }
 
         if (command.hasOption('h'))
         {
             new HelpFormatter().printHelp("user --delete [options]", options);
-            System.exit(0);
+            return 0;
         }
 
+        // Delete!
         EPerson eperson = null;
         try {
-            if (command.hasOption('n'))
+            if (command.hasOption(OPT_NETID.getOpt()))
             {
-                eperson = findByNetid(context, command.getOptionValue('n'));
+                eperson = findByNetid(context, command.getOptionValue(OPT_NETID.getOpt()));
+            }
+            else if (command.hasOption(OPT_EMAIL.getOpt()))
+            {
+                eperson = findByEmail(context, command.getOptionValue(OPT_EMAIL.getOpt()));
             }
             else
             {
-                eperson = findByEmail(context, command.getOptionValue('m'));
+                System.err.println("You must specify the user's email address or netid.");
+                return 1;
             }
         } catch (SQLException e) {
             System.err.append(e.getMessage());
-            System.exit(1);
+            return 1;
         } catch (AuthorizeException e) { /* XXX SNH */ }
 
         if (null == eperson)
         {
             System.err.println("No such EPerson");
+            return 1;
         }
-        else
-        {
-            try {
-                eperson.delete();
-                context.commit();
-                System.out.printf("Deleted EPerson %d\n", eperson.getID());
-            } catch (SQLException ex) {
-                System.err.println(ex.getMessage());
-                System.exit(1);
-            } catch (AuthorizeException ex) {
-                System.err.println(ex.getMessage());
-                System.exit(1);
-            } catch (EPersonDeletionException ex) {
-                System.err.println(ex.getMessage());
-                System.exit(1);
-            }
+
+        try {
+            eperson.delete();
+            context.commit();
+            System.out.printf("Deleted EPerson %d\n", eperson.getID());
+        } catch (SQLException ex) {
+            System.err.println(ex.getMessage());
+            return 1;
+        } catch (AuthorizeException ex) {
+            System.err.println(ex.getMessage());
+            return 1;
+        } catch (EPersonDeletionException ex) {
+            System.err.println(ex.getMessage());
+            return 1;
         }
+
+        return 0;
     }
 
-    private static void cmdModify(Context context, CommandLineParser parser, String[] argv)
+    /** Command to modify an EPerson. */
+    private static int cmdModify(Context context, CommandLineParser parser, String[] argv)
     {
         Options options = new Options();
 
@@ -1407,83 +1454,122 @@ public class EPerson extends DSpaceObject
 
         options.addOptionGroup(identityOptions);
 
-        options.addOption(OPT_CAN_LOGIN);
+        options.addOptionGroup(attributeOptions);
 
-        CommandLine command = null;
+        options.addOption(OPT_CAN_LOGIN);
+        options.addOption(OPT_NEW_EMAIL);
+        options.addOption(OPT_NEW_NETID);
+
+        options.addOption("h", "help", false, "explain --modify options");
+
+        CommandLine command;
         try {
             command = parser.parse(options, argv);
         } catch (ParseException e) {
             System.err.println(e.getMessage());
-            System.exit(1);
+            return 1;
         }
 
         if (command.hasOption('h'))
         {
             new HelpFormatter().printHelp("user --modify [options]", options);
-            System.exit(0);
+            return 0;
         }
 
+        // Modify!
         EPerson eperson = null;
         try {
-            if (command.hasOption('n'))
+            if (command.hasOption(OPT_NETID.getOpt()))
             {
-                eperson = findByNetid(context, command.getOptionValue('n'));
+                eperson = findByNetid(context, command.getOptionValue(OPT_NETID.getOpt()));
+            }
+            else if (command.hasOption(OPT_EMAIL.getOpt()))
+            {
+                eperson = findByEmail(context, command.getOptionValue(OPT_EMAIL.getOpt()));
             }
             else
             {
-                eperson = findByEmail(context, command.getOptionValue('m'));
+                System.err.println("No EPerson selected");
+                return 1;
             }
         } catch (SQLException e) {
             System.err.append(e.getMessage());
-            System.exit(1);
+            return 1;
         } catch (AuthorizeException e) { /* XXX SNH */ }
 
+        boolean modified = false;
         if (null == eperson)
         {
             System.err.println("No such EPerson");
+            return 1;
         }
         else
         {
+            if (command.hasOption(OPT_NEW_EMAIL.getOpt()))
+            {
+                eperson.setEmail(command.getOptionValue(OPT_NEW_EMAIL.getOpt()));
+                modified = true;
+            }
+            if (command.hasOption(OPT_NEW_NETID.getOpt()))
+            {
+                eperson.setNetid(command.getOptionValue(OPT_NEW_NETID.getOpt()));
+                modified = true;
+            }
             if (command.hasOption(OPT_GIVENNAME.getOpt()))
             {
                 eperson.setFirstName(command.getOptionValue(OPT_GIVENNAME.getOpt()));
+                modified = true;
             }
             if (command.hasOption(OPT_SURNAME.getOpt()))
             {
                 eperson.setLastName(command.getOptionValue(OPT_SURNAME.getOpt()));
+                modified = true;
             }
             if (command.hasOption(OPT_PHONE.getOpt()))
             {
                 eperson.setMetadata("phone", command.getOptionValue(OPT_PHONE.getOpt()));
+                modified = true;
             }
             if (command.hasOption(OPT_LANGUAGE.getOpt()))
             {
                 eperson.setLanguage(command.getOptionValue(OPT_LANGUAGE.getOpt()));
+                modified = true;
             }
             if (command.hasOption(OPT_REQUIRE_CERTIFICATE.getOpt()))
             {
                 eperson.setRequireCertificate(Boolean.valueOf(command.getOptionValue(
                         OPT_REQUIRE_CERTIFICATE.getOpt())));
+                modified = true;
             }
             if (command.hasOption(OPT_CAN_LOGIN.getOpt()))
             {
                 eperson.setCanLogIn(Boolean.valueOf(command.getOptionValue(OPT_CAN_LOGIN.getOpt())));
+                modified = true;
             }
-            try {
-                eperson.update();
-                context.commit();
-                System.out.printf("Modified EPerson %d\n", eperson.getID());
-            } catch (SQLException ex) {
-                context.abort();
-                System.err.println(ex.getMessage());
-                System.exit(1);
-            } catch (AuthorizeException ex) { /* XXX SNH */ }
+            if (modified)
+            {
+                try {
+                    eperson.update();
+                    context.commit();
+                    System.out.printf("Modified EPerson %d\n", eperson.getID());
+                } catch (SQLException ex) {
+                    context.abort();
+                    System.err.println(ex.getMessage());
+                    return 1;
+                } catch (AuthorizeException ex) { /* XXX SNH */ }
+            }
+            else
+            {
+                System.out.println("No changes.");
+            }
         }
+
+        return 0;
     }
 
-    private static void cmdList(Context context, CommandLineParser parser, String[] argv)
+    /** Command to list known EPersons. */
+    private static int cmdList(Context context, CommandLineParser parser, String[] argv)
     {
-        // List users
         // XXX ideas:
         // specific user/netid
         // wild or regex match user/netid
@@ -1499,7 +1585,9 @@ public class EPerson extends DSpaceObject
             }
         } catch (SQLException ex) {
             System.err.println(ex.getMessage());
-            System.exit(1);
+            return 1;
         }
+
+        return 0;
     }
 }
