@@ -974,7 +974,7 @@ public class Collection extends DSpaceObject
      * @throws IOException
      * @throws AuthorizeException
      */
-    public void update() throws SQLException, IOException, AuthorizeException
+    public void update() throws SQLException, AuthorizeException
     {
         // Check authorisation
         canEdit(true);
@@ -1486,5 +1486,12 @@ public class Collection extends DSpaceObject
         {
             return null;
         }
+    }
+
+    @Override
+    public void updateLastModified()
+    {
+        //Also fire a modified event since the collection HAS been modified
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), null));
     }
 }

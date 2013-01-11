@@ -369,12 +369,11 @@ public class DSpaceSwordAPI
     }
 
     /**
-     * Construct the most appropriate filename for the incoming deposit
+     * Construct the most appropriate filename for the incoming deposit.
      *
      * @param context
      * @param deposit
      * @param original
-     * @return
      * @throws DSpaceSwordException
      */
     public String createFilename(Context context, Deposit deposit, boolean original)

@@ -1,21 +1,30 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace.modules</groupId>
    <artifactId>additions</artifactId>
-   <name>DSpace Kernel :: Additions and Local Customization</name>
+   <name>DSpace Kernel :: Additions and Local Customizations</name>
+   <description>
+       This project allows you to easily create your own "additions.jar"
+       including custom Java classes. This JAR will be automatically included
+       in all DSpace web applications.
+   </description>
    <packaging>jar</packaging>
 
    <!--
    A Parent POM that Maven inherits DSpace Defaults
-   POM atrributes from.
+   POM attributes from.
    -->
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>3.0-SNAPSHOT</version>
+      <version>4.0-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
+
+   <properties>
+       <!-- This is the path to the root [dspace-src] directory. -->
+       <root.basedir>${basedir}/../../..</root.basedir>
+   </properties>
 
    <profiles>
       <profile>
@@ -72,28 +81,9 @@
          <artifactId>dspace-api-lang</artifactId>
       </dependency>
       <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-services-impl</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-services-utils</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-stats</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-discovery-provider</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-discovery-solr</artifactId>
-      </dependency>
-      <dependency>
          <groupId>javax.servlet</groupId>
          <artifactId>servlet-api</artifactId>
+         <scope>provided</scope>
       </dependency>
       <dependency>
          <groupId>ant-contrib</groupId>
@@ -105,11 +95,6 @@
                <artifactId>ant</artifactId>
             </exclusion>
          </exclusions>
-      </dependency>
-
-      <dependency>
-         <groupId>postgresql</groupId>
-         <artifactId>postgresql</artifactId>
       </dependency>
 
    </dependencies>

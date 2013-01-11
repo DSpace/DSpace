@@ -10,11 +10,8 @@ package org.dspace;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.TimeZone;
@@ -38,6 +35,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.search.DSIndexer;
+import org.dspace.servicemanager.DSpaceKernelImpl;
+import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.storage.rdbms.MockDatabaseManager;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -78,6 +77,7 @@ public class AbstractUnitTest
      */
     protected static EPerson eperson;
 
+    protected static DSpaceKernelImpl kernelImpl;
 
     /**
      * This method will be run before the first test as per @BeforeClass. It will
@@ -110,6 +110,13 @@ public class AbstractUnitTest
 
             //load the test configuration file
             ConfigurationManager.loadConfig(null);
+
+            // Initialise the service manager kernel
+            kernelImpl = DSpaceKernelInit.getKernel(null);
+            if (!kernelImpl.isRunning())
+            {
+                kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
+            }
 
             // Load the default registries. This assumes the temporary
             // filesystem is working and the in-memory DB in place.

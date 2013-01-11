@@ -202,7 +202,7 @@ public class PluginManager
             if (val == null)
             {
                 log.warn("No Configuration entry found for Sequence Plugin interface="+iname);
-                return new Object[0];
+                return (Object[]) Array.newInstance(intfc, 0);
             }
             classname = val.trim().split("\\s*,\\s*");
             sequenceConfig.put(iname, classname);

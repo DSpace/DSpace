@@ -686,9 +686,11 @@ public class Bitstream extends DSpaceObject
     }
 
     /**
-     * Get the parent object of a bitstream. It can either be an item if this is a normal 
-     * bitstream, otherwise it could be a collection or a community if it is a logo.     
-     * @return
+     * Get the parent object of a bitstream. The parent can be an item if this
+     * is a normal bitstream, or it could be a collection or a community if the
+     * bitstream is a logo.
+     *
+     * @return this bitstream's parent.
      * @throws SQLException
      */    
     public DSpaceObject getParentObject() throws SQLException
@@ -734,5 +736,12 @@ public class Bitstream extends DSpaceObject
                 }
             }                                   
         }
+    }
+
+    @Override
+    public void updateLastModified()
+    {
+        //Also fire a modified event since the bitstream HAS been modified
+        bContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null));
     }
 }

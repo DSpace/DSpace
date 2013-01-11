@@ -107,6 +107,8 @@ CREATE SEQUENCE group2group_seq;
 CREATE SEQUENCE group2groupcache_seq;
 CREATE SEQUENCE harvested_collection_seq;
 CREATE SEQUENCE harvested_item_seq;
+CREATE SEQUENCE versionitem_seq;
+CREATE SEQUENCE versionhistory_seq;
 
 -------------------------------------------------------
 -- BitstreamFormatRegistry table
@@ -163,7 +165,9 @@ CREATE TABLE EPerson
 (
   eperson_id          INTEGER PRIMARY KEY,
   email               VARCHAR(64) UNIQUE,
-  password            VARCHAR(64),
+  password            VARCHAR(128),
+  salt                VARCHAR(32),
+  digest_algorithm    VARCHAR(16),
   firstname           VARCHAR(64),
   lastname            VARCHAR(64),
   can_log_in          BOOL,
@@ -232,6 +236,7 @@ CREATE TABLE Item
   submitter_id    INTEGER REFERENCES EPerson(eperson_id),
   in_archive      BOOL,
   withdrawn       BOOL,
+  discoverable    BOOL,
   last_modified   TIMESTAMP WITH TIME ZONE,
   owning_collection INTEGER
 );
@@ -435,7 +440,10 @@ CREATE TABLE ResourcePolicy
   eperson_id           INTEGER REFERENCES EPerson(eperson_id),
   epersongroup_id      INTEGER REFERENCES EPersonGroup(eperson_group_id),
   start_date           DATE,
-  end_date             DATE
+  end_date             DATE,
+  rpname               VARCHAR(30),
+  rptype               VARCHAR(30),
+  rpdescription        VARCHAR(100)
 );
 
 -- index by resource_type,resource_id - all queries by
@@ -771,6 +779,24 @@ CREATE TABLE harvested_item
 );
 
 CREATE INDEX harvested_item_fk_idx ON harvested_item(item_id);
+
+
+
+CREATE TABLE versionhistory
+(
+  versionhistory_id INTEGER NOT NULL PRIMARY KEY
+);
+
+CREATE TABLE versionitem
+(
+  versionitem_id INTEGER NOT NULL PRIMARY KEY,
+  item_id INTEGER REFERENCES Item(item_id),
+  version_number INTEGER,
+  eperson_id INTEGER REFERENCES EPerson(eperson_id),
+  version_date TIMESTAMP,
+  version_summary VARCHAR(255),
+  versionhistory_id INTEGER REFERENCES VersionHistory(versionhistory_id)
+);
 
 
 

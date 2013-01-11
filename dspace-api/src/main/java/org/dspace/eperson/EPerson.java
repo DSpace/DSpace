@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.apache.commons.codec.DecoderException;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -604,7 +605,7 @@ public class EPerson extends DSpaceObject
     /**
      * Get the e-person's language
      * 
-     * @return  language
+     * @return language code (or null if the column is an SQL NULL)
      */
      public String getLanguage()
      {
@@ -617,7 +618,7 @@ public class EPerson extends DSpaceObject
      * e.g. "en", "en_US", "pt_BR" (the latter is Brazilian Portugese).
      * 
      * @param language
-     *            language
+     *            language code
      */
      public void setLanguage(String language)
      {
@@ -625,8 +626,11 @@ public class EPerson extends DSpaceObject
      }
   
 
-
-
+    /**
+     * Get the e-person's handle
+     * 
+     * @return current implementation always returns null
+     */
     public String getHandle()
     {
         // No Handles for e-people
@@ -636,7 +640,7 @@ public class EPerson extends DSpaceObject
     /**
      * Get the e-person's email address
      * 
-     * @return their email address
+     * @return their email address (or null if the column is an SQL NULL)
      */
     public String getEmail()
     {
@@ -663,7 +667,7 @@ public class EPerson extends DSpaceObject
     /**
      * Get the e-person's netid
      * 
-     * @return their netid
+     * @return their netid (DB constraints ensure it's never NULL)
      */
     public String getNetid()
     {
@@ -686,7 +690,7 @@ public class EPerson extends DSpaceObject
      * Get the e-person's full name, combining first and last name in a
      * displayable string.
      * 
-     * @return their full name
+     * @return their full name (first + last name; if both are NULL, returns email)
      */
     public String getFullName()
     {
@@ -710,7 +714,7 @@ public class EPerson extends DSpaceObject
     /**
      * Get the eperson's first name.
      * 
-     * @return their first name
+     * @return their first name (or null if the column is an SQL NULL)
      */
     public String getFirstName()
     {
@@ -732,7 +736,7 @@ public class EPerson extends DSpaceObject
     /**
      * Get the eperson's last name.
      * 
-     * @return their last name
+     * @return their last name (or null if the column is an SQL NULL)
      */
     public String getLastName()
     {
@@ -788,7 +792,7 @@ public class EPerson extends DSpaceObject
     /**
      * Get require certificate or not
      * 
-     * @return boolean, yes/no
+     * @return boolean, yes/no (or false if the column is an SQL NULL)
      */
     public boolean getRequireCertificate()
     {
@@ -810,7 +814,7 @@ public class EPerson extends DSpaceObject
     /**
      * Is the user self-registered?
      * 
-     * @return boolean, yes/no
+     * @return boolean, yes/no (or false if the column is an SQL NULL)
      */
     public boolean getSelfRegistered()
     {
@@ -823,7 +827,7 @@ public class EPerson extends DSpaceObject
      * @param field
      *            the name of the metadata field to get
      * 
-     * @return the value of the metadata field
+     * @return the value of the metadata field (or null if the column is an SQL NULL)
      * 
      * @exception IllegalArgumentException
      *                if the requested metadata field doesn't exist
@@ -837,7 +841,7 @@ public class EPerson extends DSpaceObject
      * Set a metadata value
      * 
      * @param field
-     *            the name of the metadata field to get
+     *            the name of the metadata field to set
      * @param value
      *            value to set the field to
      * 
@@ -852,43 +856,64 @@ public class EPerson extends DSpaceObject
     }
 
     /**
-     * Set the EPerson's password
+     * Set the EPerson's password.
      * 
      * @param s
-     *            the new email
+     *            the new password.
      */
     public void setPassword(String s)
     {
-        // FIXME: encoding
-        String encoded = Utils.getMD5(s);
-
-        myRow.setColumn("password", encoded);
+        PasswordHash hash = new PasswordHash(s);
+        myRow.setColumn("password", Utils.toHex(hash.getHash()));
+        myRow.setColumn("salt", Utils.toHex(hash.getSalt()));
+        myRow.setColumn("digest_algorithm", hash.getAlgorithm());
         modified = true;
     }
 
     /**
-     * Set the EPerson's password hash
+     * Set the EPerson's password hash.
      * 
-     * @param s
-     *          hash of the password
+     * @param password
+     *          hashed password, or null to set row data to NULL.
      */
-    public void setPasswordHash(String s)
+    public void setPasswordHash(PasswordHash password)
     {
-        myRow.setColumn("password", s);
+        if (null == password)
+        {
+            myRow.setColumnNull("digest_algorithm");
+            myRow.setColumnNull("salt");
+            myRow.setColumnNull("password");
+        }
+        else
+        {
+            myRow.setColumn("digest_algorithm", password.getAlgorithm());
+            myRow.setColumn("salt", password.getSaltString());
+            myRow.setColumn("password", password.getHashString());
+        }
         modified = true;
     }
 
     /**
-     * Return the EPerson's password hash
+     * Return the EPerson's password hash.
+     *
      * @return hash of the password
      */
-    public String getPasswordHash()
+    public PasswordHash getPasswordHash()
     {
-        return myRow.getStringColumn("password");
+        PasswordHash hash = null;
+        try {
+            hash = new PasswordHash(myRow.getStringColumn("digest_algorithm"),
+                    myRow.getStringColumn("salt"),
+                    myRow.getStringColumn("password"));
+        } catch (DecoderException ex) {
+            log.error("Problem decoding stored salt or hash:  " + ex.getMessage());
+        }
+        return hash;
     }
 
     /**
-     * Check EPerson's password
+     * Check EPerson's password.  Side effect:  original unsalted MD5 hashes are
+     * converted using the current algorithm.
      * 
      * @param attempt
      *            the password attempt
@@ -896,9 +921,38 @@ public class EPerson extends DSpaceObject
      */
     public boolean checkPassword(String attempt)
     {
-        String encoded = Utils.getMD5(attempt);
+        PasswordHash myHash;
+        try
+        {
+            myHash = new PasswordHash(
+                    myRow.getStringColumn("digest_algorithm"),
+                    myRow.getStringColumn("salt"),
+                    myRow.getStringColumn("password"));
+        } catch (DecoderException ex)
+        {
+            log.error(ex.getMessage());
+            return false;
+        }
+        boolean answer = myHash.matches(attempt);
 
-        return (encoded.equals(myRow.getStringColumn("password")));
+        // If using the old unsalted hash, and this password is correct, update to a new hash
+        if (answer && (null == myRow.getStringColumn("digest_algorithm")))
+        {
+            log.info("Upgrading password hash for EPerson " + getID());
+            setPassword(attempt);
+            try {
+                myContext.turnOffAuthorisationSystem();
+                update();
+            } catch (SQLException ex) {
+                log.error("Could not update password hash", ex);
+            } catch (AuthorizeException ex) {
+                log.error("Could not update password hash", ex);
+            } finally {
+                myContext.restoreAuthSystemState();
+            }
+        }
+
+        return answer;
     }
 
     /**
@@ -1122,6 +1176,12 @@ public class EPerson extends DSpaceObject
     public String getName()
     {
         return getEmail();
+    }
+
+    @Override
+    public void updateLastModified()
+    {
+
     }
 
 }

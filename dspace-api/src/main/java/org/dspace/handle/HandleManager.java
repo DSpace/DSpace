@@ -27,13 +27,13 @@ import org.dspace.storage.rdbms.TableRowIterator;
 /**
  * Interface to the <a href="http://www.handle.net" target=_new>CNRI Handle
  * System </a>.
- * 
+ *
  * <p>
  * Currently, this class simply maps handles to local facilities; handles which
  * are owned by other sites (including other DSpaces) are treated as
  * non-existent.
  * </p>
- * 
+ *
  * @author Peter Breton
  * @version $Revision$
  */
@@ -52,10 +52,10 @@ public class HandleManager
 
     /**
      * Return the local URL for handle, or null if handle cannot be found.
-     * 
+     *
      * The returned URL is a (non-handle-based) location where a dissemination
      * of the object referred to by handle can be obtained.
-     * 
+     *
      * @param context
      *            DSpace context
      * @param handle
@@ -87,17 +87,17 @@ public class HandleManager
 
     /**
      * Transforms handle into the canonical form <em>hdl:handle</em>.
-     * 
+     *
      * No attempt is made to verify that handle is in fact valid.
-     * 
+     *
      * @param handle
      *            The handle
      * @return The canonical form
      */
     public static String getCanonicalForm(String handle)
     {
-    	
-    	// Let the admin define a new prefix, if not then we'll use the 
+
+    	// Let the admin define a new prefix, if not then we'll use the
     	// CNRI default. This allows the admin to use "hdl:" if they want to or
     	// use a locally branded prefix handle.myuni.edu.
     	String handlePrefix = ConfigurationManager.getProperty("handle.canonical.prefix");
@@ -105,7 +105,7 @@ public class HandleManager
     	{
     		handlePrefix = "http://hdl.handle.net/";
     	}
-    	
+
     	return handlePrefix + handle;
     }
 
@@ -126,7 +126,7 @@ public class HandleManager
 
     /**
      * Creates a new handle in the database.
-     * 
+     *
      * @param context
      *            DSpace context
      * @param dso
@@ -158,7 +158,7 @@ public class HandleManager
     /**
      * Creates a handle entry, but with a handle supplied by the caller (new
      * Handle not generated)
-     * 
+     *
      * @param context
      *            DSpace context
      * @param dso
@@ -234,21 +234,24 @@ public class HandleManager
     public static void unbindHandle(Context context, DSpaceObject dso)
         throws SQLException
     {
-        TableRow row = getHandleInternal(context, dso.getType(), dso.getID());
-        if (row != null)
+        TableRowIterator rows = getInternalHandles(context, dso.getType(), dso.getID());
+        if (rows != null)
         {
-            //Only set the "resouce_id" column to null when unbinding a handle.
-            // We want to keep around the "resource_type_id" value, so that we
-            // can verify during a restore whether the same *type* of resource
-            // is reusing this handle!
-            row.setColumnNull("resource_id");
-            DatabaseManager.update(context, row);
-
-            if(log.isDebugEnabled())
+            while (rows.hasNext())
             {
-                log.debug("Unbound Handle " + row.getStringColumn("handle") + " from object " + Constants.typeText[dso.getType()] + " id=" + dso.getID());
-            }
+                TableRow row = rows.next();
+                //Only set the "resouce_id" column to null when unbinding a handle.
+                // We want to keep around the "resource_type_id" value, so that we
+                // can verify during a restore whether the same *type* of resource
+                // is reusing this handle!
+                row.setColumnNull("resource_id");
+                DatabaseManager.update(context, row);
 
+                if(log.isDebugEnabled())
+                {
+                    log.debug("Unbound Handle " + row.getStringColumn("handle") + " from object " + Constants.typeText[dso.getType()] + " id=" + dso.getID());
+                }
+            }
         }
         else
         {
@@ -259,7 +262,7 @@ public class HandleManager
     /**
      * Return the object which handle maps to, or null. This is the object
      * itself, not a URL which points to it.
-     * 
+     *
      * @param context
      *            DSpace context
      * @param handle
@@ -288,7 +291,7 @@ public class HandleManager
         }
 
         // check if handle was allocated previously, but is currently not
-        // associated with a DSpaceObject 
+        // associated with a DSpaceObject
         // (this may occur when 'unbindHandle()' is called for an obj that was removed)
         if ((dbhandle.isColumnNull("resource_type_id"))
                 || (dbhandle.isColumnNull("resource_id")))
@@ -344,7 +347,7 @@ public class HandleManager
 
     /**
      * Return the handle for an Object, or null if the Object has no handle.
-     * 
+     *
      * @param context
      *            DSpace context
      * @param dso
@@ -356,8 +359,8 @@ public class HandleManager
     public static String findHandle(Context context, DSpaceObject dso)
             throws SQLException
     {
-        TableRow row = getHandleInternal(context, dso.getType(), dso.getID());
-        if (row == null)
+        TableRowIterator rows = getInternalHandles(context, dso.getType(), dso.getID());
+        if (rows == null || !rows.hasNext())
         {
             if (dso.getType() == Constants.SITE)
             {
@@ -370,13 +373,27 @@ public class HandleManager
         }
         else
         {
-            return row.getStringColumn("handle");
+            //TODO: Move this code away from the HandleManager & into the Identifier provider
+            //Attempt to retrieve a handle that does NOT look like {handle.part}/{handle.part}.{version}
+            String result = rows.next().getStringColumn("handle");
+            while (rows.hasNext())
+            {
+                TableRow row = rows.next();
+                //Ensure that the handle doesn't look like this 12346/213.{version}
+                //If we find a match that indicates that we have a proper handle
+                if(!row.getStringColumn("handle").matches(".*/.*\\.\\d+"))
+                {
+                    result = row.getStringColumn("handle");
+                }
+            }
+
+            return result;
         }
     }
 
     /**
      * Return all the handles which start with prefix.
-     * 
+     *
      * @param context
      *            DSpace context
      * @param prefix
@@ -434,7 +451,7 @@ public class HandleManager
 
     /**
      * Return the handle for an Object, or null if the Object has no handle.
-     * 
+     *
      * @param context
      *            DSpace context
      * @param type
@@ -445,18 +462,18 @@ public class HandleManager
      * @exception SQLException
      *                If a database error occurs
      */
-    private static TableRow getHandleInternal(Context context, int type, int id)
+    private static TableRowIterator getInternalHandles(Context context, int type, int id)
             throws SQLException
-    {   	
+    {
       	String sql = "SELECT * FROM Handle WHERE resource_type_id = ? " +
       				 "AND resource_id = ?";
 
-	return DatabaseManager.querySingleTable(context, "Handle", sql, type, id);
+	return DatabaseManager.queryTable(context, "Handle", sql, type, id);
     }
 
     /**
      * Find the database row corresponding to handle.
-     * 
+     *
      * @param context
      *            DSpace context
      * @param handle

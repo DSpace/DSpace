@@ -509,7 +509,7 @@ public class Community extends DSpaceObject
     /**
      * Update the community metadata (including logo) to the database.
      */
-    public void update() throws SQLException, IOException, AuthorizeException
+    public void update() throws SQLException, AuthorizeException
     {
         // Check authorisation
         canEdit();
@@ -1281,5 +1281,12 @@ public class Community extends DSpaceObject
         {
             return null;
         }       
+    }
+
+    @Override
+    public void updateLastModified()
+    {
+        //Also fire a modified event since the community HAS been modified
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, getID(), null));
     }
 }

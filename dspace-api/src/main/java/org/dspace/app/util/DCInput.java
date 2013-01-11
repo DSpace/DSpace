@@ -7,6 +7,7 @@
  */
 package org.dspace.app.util;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +17,6 @@ import org.dspace.content.MetadataSchema;
  * Class representing a line in an input form.
  * 
  * @author Brian S. Hughes, based on work by Jenny Toves, OCLC
- * @version
  */
 public class DCInput
 {
@@ -64,6 +64,9 @@ public class DCInput
 
     /** is the entry closed to vocabulary terms? */
     private boolean closedVocabulary = false;
+
+    /** allowed document types */
+    private List<String> typeBind = null;
 
     /** 
      * The scope of the input sets, this restricts hidden metadata fields from 
@@ -118,6 +121,17 @@ public class DCInput
         String closedVocabularyStr = fieldMap.get("closedVocabulary");
         closedVocabulary = "true".equalsIgnoreCase(closedVocabularyStr)
                             || "yes".equalsIgnoreCase(closedVocabularyStr);
+        
+        // parsing of the <type-bind> element (using the colon as split separator)
+        typeBind = new ArrayList<String>();
+        String typeBindDef = fieldMap.get("type-bind");
+        if(typeBindDef != null && typeBindDef.trim().length() > 0) {
+        	String[] types = typeBindDef.split(",");
+        	for(String type : types) {
+        		typeBind.add( type.trim() );
+        	}
+        }
+        
     }
 
     /**
@@ -376,4 +390,16 @@ public class DCInput
 		return closedVocabulary;
 	}
 
+	/**
+	 * Decides if this field is valid for the document type
+	 * @param typeName Document type name
+	 * @return true when there is no type restriction or typeName is allowed
+	 */
+	public boolean isAllowedFor(String typeName) {
+		if(typeBind.size() == 0)
+			return true;
+		
+		return typeBind.contains(typeName);
+	}
+	
 }

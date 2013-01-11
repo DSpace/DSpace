@@ -80,6 +80,8 @@ DROP TABLE Group2GroupCache;
 DROP TABLE Group2Group;
 DROP TABLE FileExtension;
 -- Drop main object tables near end as many other tables have dependencies on them
+DROP TABLE versionitem;
+DROP TABLE versionhistory;
 DROP TABLE Community;
 DROP TABLE Collection;
 DROP TABLE Item;
@@ -96,6 +98,7 @@ DROP TABLE EPerson;
 DROP SEQUENCE bitstreamformatregistry_seq;
 DROP SEQUENCE fileextension_seq;
 DROP SEQUENCE bitstream_seq;
+DROP SEQUENCE checksum_history_seq;
 DROP SEQUENCE eperson_seq;
 DROP SEQUENCE epersongroup_seq;
 DROP SEQUENCE item_seq;
@@ -125,6 +128,8 @@ DROP SEQUENCE group2group_seq;
 DROP SEQUENCE group2groupcache_seq;
 DROP SEQUENCE harvested_collection_seq;
 DROP SEQUENCE harvested_item_seq;
+DROP SEQUENCE versionhistory_seq;
+DROP SEQUENCE versionitem_seq;
 
 -- Drop the getnextid() function
 DROP FUNCTION getnextid(VARCHAR(40));
