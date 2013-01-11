@@ -99,7 +99,7 @@ public class ScriptLauncher
         Element command = null;
         for (Element candidate : commands)
         {
-            if (request.equalsIgnoreCase(command.getChild("name").getValue()))
+            if (request.equalsIgnoreCase(candidate.getChild("name").getValue()))
             {
                 command = candidate;
                 break;
