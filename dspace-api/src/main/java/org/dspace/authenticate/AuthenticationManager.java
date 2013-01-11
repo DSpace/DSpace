@@ -11,12 +11,16 @@ import javax.servlet.http.HttpServletRequest;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.eperson.EPerson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Access point for the stackable authentication methods.
@@ -51,6 +55,9 @@ public class AuthenticationManager
     private static AuthenticationMethod methodStack[] =
         (AuthenticationMethod[])PluginManager.getPluginSequence("authentication", AuthenticationMethod.class);
 
+    /** SLF4J logging category */
+    private static final Logger log = (Logger) LoggerFactory.getLogger(AuthenticationManager.class);
+
     /**
      * Test credentials for authenticity.
      * Apply the given credentials to each authenticate() method in
@@ -78,10 +85,10 @@ public class AuthenticationManager
      *   SUCCESS, BAD_CREDENTIALS, CERT_REQUIRED, NO_SUCH_USER, BAD_ARGS
      * <p>Meaning:
      * <br>SUCCESS         - authenticated OK.
-     * <br>BAD_CREDENTIALS - user exists, but credenitals (e.g. passwd) don't match
+     * <br>BAD_CREDENTIALS - user exists, but credentials (e.g. password) don't match
      * <br>CERT_REQUIRED   - not allowed to login this way without X.509 cert.
      * <br>NO_SUCH_USER    - user not found using this method.
-     * <br>BAD_ARGS        - user/pw not appropriate for this method
+     * <br>BAD_ARGS        - user/password not appropriate for this method
      */
     public static int authenticate(Context context,
                             String username,
@@ -119,10 +126,10 @@ public class AuthenticationManager
      *   SUCCESS, BAD_CREDENTIALS, CERT_REQUIRED, NO_SUCH_USER, BAD_ARGS
      * <p>Meaning:
      * <br>SUCCESS         - authenticated OK.
-     * <br>BAD_CREDENTIALS - user exists, but credenitals (e.g. passwd) don't match
+     * <br>BAD_CREDENTIALS - user exists, but credentials (e.g. password) don't match
      * <br>CERT_REQUIRED   - not allowed to login this way without X.509 cert.
      * <br>NO_SUCH_USER    - user not found using this method.
-     * <br>BAD_ARGS        - user/pw not appropriate for this method
+     * <br>BAD_ARGS        - user/password not appropriate for this method
      */
     public static int authenticateImplicit(Context context,
                             String username,
@@ -160,6 +167,18 @@ public class AuthenticationManager
                 }
                 if (ret == AuthenticationMethod.SUCCESS)
                 {
+                    EPerson me = context.getCurrentUser();
+                    me.setLastActive(new Date());
+                    try
+                    {
+                        me.update();
+                    } catch (SQLException ex)
+                    {
+                        log.error("Could not update last-active stamp", ex);
+                    } catch (AuthorizeException ex)
+                    {
+                        log.error("Could not update last-active stamp", ex);
+                    }
                     return ret;
                 }
                 if (ret < bestRet)
