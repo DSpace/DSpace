@@ -22,6 +22,7 @@ import org.dspace.orm.dao.api.ICommunityDao;
 import org.dspace.orm.dao.api.IEpersonDao;
 import org.dspace.orm.dao.api.IEpersonGroupDao;
 import org.dspace.orm.dao.api.IItemDao;
+import org.dspace.orm.entity.content.DSpaceObjectType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 

@@ -24,6 +24,8 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.dspace.orm.entity.content.DSpaceObjectType;
+import org.dspace.orm.entity.content.PredefinedGroup;
 import org.springframework.beans.factory.annotation.Configurable;
 
 @Entity
@@ -305,40 +307,51 @@ public class Eperson extends DSpaceObject {
 	@Transient
 	public boolean memberOf (EpersonGroup g) {
 		// Optimized code
+		if (g.getID() == PredefinedGroup.ANONYMOUS.getId())
+			return true;
 		// First search for in-memory groups (special groups)
-		for (EpersonGroup e : this.getSpecialGroups())
-			if (e.getID() == g.getID())
-				return true;
-		// Next search for the current eperson group
-		for (EpersonGroup e : this.getEpersonGroups())
-			if (e.getID() == g.getID())
-				return true;
-		// At last, search in the hierarchy
-		// If user belongs to Group g then he belongs to all parent groups of it
-		for (EpersonGroup eg : this.getEpersonGroups())
-			for (EpersonGroup e : eg.getAllParents())
+		if (this.getSpecialGroups() != null)
+			for (EpersonGroup e : this.getSpecialGroups())
 				if (e.getID() == g.getID())
 					return true;
+		// Next search for the current eperson group
+		if (this.getEpersonGroups() != null)
+			for (EpersonGroup e : this.getEpersonGroups())
+				if (e.getID() == g.getID())
+					return true;
+		// At last, search in the hierarchy
+		// If user belongs to Group g then he belongs to all parent groups of it
+		if (this.getEpersonGroups() != null)
+			for (EpersonGroup eg : this.getEpersonGroups())
+				for (EpersonGroup e : eg.getAllParents())
+					if (e.getID() == g.getID())
+						return true;
 		
 		return false;
 	}
 
+	@Transient
 	public boolean memberOf(int groupId) {
 		// Optimized code
+		if (groupId == PredefinedGroup.ANONYMOUS.getId())
+			return true;
 		// First search for in-memory groups (special groups)
-		for (EpersonGroup e : this.getSpecialGroups())
-			if (e.getID() == groupId)
-				return true;
-		// Next search for the current eperson group
-		for (EpersonGroup e : this.getEpersonGroups())
-			if (e.getID() == groupId)
-				return true;
-		// At last, search in the hierarchy
-		// If user belongs to Group g then he belongs to all parent groups of it
-		for (EpersonGroup eg : this.getEpersonGroups())
-			for (EpersonGroup e : eg.getAllParents())
+		if (this.getSpecialGroups() != null)
+			for (EpersonGroup e : this.getSpecialGroups())
 				if (e.getID() == groupId)
 					return true;
+		// Next search for the current eperson group
+		if (this.getEpersonGroups() != null)
+			for (EpersonGroup e : this.getEpersonGroups())
+				if (e.getID() == groupId)
+					return true;
+		// At last, search in the hierarchy
+		// If user belongs to Group g then he belongs to all parent groups of it
+		if (this.getEpersonGroups() != null)
+			for (EpersonGroup eg : this.getEpersonGroups())
+				for (EpersonGroup e : eg.getAllParents())
+					if (e.getID() == groupId)
+						return true;
 		
 		return false;
 	}

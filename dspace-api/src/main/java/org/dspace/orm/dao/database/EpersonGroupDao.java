@@ -10,6 +10,7 @@ package org.dspace.orm.dao.database;
 import org.dspace.orm.dao.api.IEpersonGroupDao;
 
 import org.dspace.orm.entity.EpersonGroup;
+import org.dspace.orm.entity.content.PredefinedGroup;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,5 +24,10 @@ public class EpersonGroupDao extends DSpaceDao<EpersonGroup> implements IEperson
     
 	public EpersonGroupDao() {
 		super(EpersonGroup.class);
+	}
+
+	@Override
+	public EpersonGroup selectById(PredefinedGroup anonymous) {
+		return super.selectById(anonymous.getId());
 	}
 }

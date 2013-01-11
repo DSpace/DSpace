@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.services.auth;
+package org.dspace.orm.entity.content;
 
 /**
  * This class is intended to replace the use of constants

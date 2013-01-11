@@ -86,8 +86,8 @@ public class DSpaceStorageService implements StorageService {
 					assetstores.add(obj);
 			}
 
-			incoming = Integer.parseInt(config
-					.getProperty("assetstore.incoming"));
+			// The default value is 0
+			incoming = config.getPropertyAsType("assetstore.incoming", 0);
 		}
 	}
 
@@ -205,9 +205,9 @@ public class DSpaceStorageService implements StorageService {
 		}
 
 		StringBuffer bufFilename = new StringBuffer();
-		if (assetstore instanceof File) {
+		if (assetstore instanceof LocalFile) {
 			try {
-				bufFilename.append(((File) assetstore).getCanonicalPath());
+				bufFilename.append(((LocalFile) assetstore).getCanonicalPath());
 			} catch (IOException e) {
 				throw new StorageException(e);
 			}

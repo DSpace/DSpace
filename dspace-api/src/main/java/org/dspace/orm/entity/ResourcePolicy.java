@@ -21,7 +21,8 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.dspace.services.auth.ResourcePolicyType;
+import org.dspace.orm.entity.content.DSpaceObjectType;
+import org.dspace.orm.entity.content.ResourcePolicyType;
 import org.springframework.beans.factory.annotation.Configurable;
 
 /**
@@ -91,12 +92,12 @@ public class ResourcePolicy extends DSpaceObject{
 	}
 
     @Column(name = "resource_id", nullable = true)
-	public Integer getResource() {
+	public Integer getResourceId() {
 		return resource;
 	}
 	
 
-	public void setResource(Integer resource) {
+	public void setResourceId(Integer resource) {
 		this.resource = resource;
 	}
 
@@ -161,7 +162,7 @@ public class ResourcePolicy extends DSpaceObject{
 	
 	@Transient
 	public DSpaceObjectType getDSpaceObjectType () {
-		return DSpaceObjectType.getById(this.getResource());
+		return DSpaceObjectType.RESOURCE_POLICY;
 	}
 	
 	@Transient

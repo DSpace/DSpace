@@ -25,6 +25,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.dspace.orm.dao.api.ICollectionDao;
+import org.dspace.orm.entity.content.DSpaceObjectType;
 import org.dspace.services.AuthorizationService;
 import org.dspace.services.auth.DSpaceAuthorizeConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;

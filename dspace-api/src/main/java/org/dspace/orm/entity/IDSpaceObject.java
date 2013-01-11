@@ -7,6 +7,7 @@
  */
 package org.dspace.orm.entity;
 
+import org.dspace.orm.entity.content.DSpaceObjectType;
 import org.dspace.services.auth.Action;
 
 /**

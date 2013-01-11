@@ -19,6 +19,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.dspace.orm.entity.content.DSpaceObjectType;
 import org.springframework.beans.factory.annotation.Configurable;
 
 /**

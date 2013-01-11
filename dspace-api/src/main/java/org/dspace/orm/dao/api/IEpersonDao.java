@@ -12,5 +12,6 @@ import org.dspace.orm.entity.Eperson;
 public interface IEpersonDao extends IDSpaceDao<Eperson>{
 
 	Eperson selectByEmail(String eperson);
+	Eperson getAnonymous();
     
 }

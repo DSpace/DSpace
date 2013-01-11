@@ -20,6 +20,8 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.dspace.orm.entity.content.DSpaceObjectType;
+
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
  * @version $Revision$

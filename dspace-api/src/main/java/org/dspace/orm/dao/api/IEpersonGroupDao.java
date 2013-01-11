@@ -8,7 +8,10 @@
 package org.dspace.orm.dao.api;
 
 import org.dspace.orm.entity.EpersonGroup;
+import org.dspace.orm.entity.content.PredefinedGroup;
 
 public interface IEpersonGroupDao extends IDSpaceDao<EpersonGroup>{
+
+	EpersonGroup selectById(PredefinedGroup anonymous);
     
-   }
+}

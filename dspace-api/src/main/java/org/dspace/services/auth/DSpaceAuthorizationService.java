@@ -10,6 +10,7 @@ package org.dspace.services.auth;
 import java.util.List;
 
 import org.dspace.core.DSpaceContext;
+import org.dspace.orm.dao.api.IEpersonDao;
 import org.dspace.orm.dao.api.IResourcePolicyDao;
 import org.dspace.orm.entity.Eperson;
 import org.dspace.orm.entity.IDSpaceObject;
@@ -28,6 +29,7 @@ public class DSpaceAuthorizationService implements AuthorizationService {
 	@Autowired ContextService contextService;
 	@Autowired IResourcePolicyDao resourcePolicyDao;
 	@Autowired ConfigurationService configService;
+	@Autowired IEpersonDao epersonDao;
 	private DSpaceAuthorizeConfiguration config = null;
 	
 	@Override
@@ -92,8 +94,6 @@ public class DSpaceAuthorizationService implements AuthorizationService {
             return true;
         }
 
-        // is eperson set? if not, userid = 0 (anonymous)
-        
         if (e != null)
         {
             // perform isAdmin check to see
@@ -105,7 +105,9 @@ public class DSpaceAuthorizationService implements AuthorizationService {
             	// if is admin or if the user has ADMIN permissions on object
                 return true;
             }
-        }
+        } else // is eperson set? if not, userid = 0 (anonymous)
+        	e = epersonDao.getAnonymous();
+        
 
         return this.hasPermissions(e, o, action);
 	}

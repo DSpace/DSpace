@@ -1,4 +1,4 @@
-package org.dspace.orm.entity;
+package org.dspace.orm.entity.content;
 
 public enum DSpaceObjectType {
 	BITSTREAM(0),
