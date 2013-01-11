@@ -216,7 +216,7 @@
     </command>
 
     <command>
-        <name>run</name>
+        <name>read</name>
         <description>Execute a stream of 'dspace' commands from a file or pipe</description>
         <step>
             <class>org.dspace.app.launcher.CommandRunner</class>
