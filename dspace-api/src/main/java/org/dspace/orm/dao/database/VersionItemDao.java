@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @version $Revision$
  */
 @Transactional
-@Repository("IVersionItemDao")
+@Repository("org.dspace.orm.dao.api.IVersionItemDao")
 public class VersionItemDao extends DSpaceDao<VersionItem> implements IVersionItemDao {
     
 	public VersionItemDao() {

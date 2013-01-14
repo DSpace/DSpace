@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.dspace.orm.dao.api.IHandleDao;
 import org.dspace.orm.entity.Handle;
+import org.dspace.orm.entity.content.DSpaceObjectType;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
@@ -21,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Miguel Pinto <mpinto@lyncode.com>
  */
 @Transactional
-@Repository("IHandleDao")
+@Repository("org.dspace.orm.dao.api.IHandleDao")
 public class HandleDao extends DSpaceDao<Handle>  implements IHandleDao {
 //    private static Logger log = LogManager.getLogger(HandleDao.class);
     
@@ -30,10 +31,10 @@ public class HandleDao extends DSpaceDao<Handle>  implements IHandleDao {
     }
 
 	@Override
-	public Handle selectByResourceId(int resourseType, int id) {
+	public Handle selectByResourceId(DSpaceObjectType resourseType, int id) {
 		return (Handle) super.getSession().createCriteria(Handle.class)
 				.add(Restrictions.and(
-						Restrictions.eq("resourceType", resourseType),
+						Restrictions.eq("resourceType", resourseType.getId()),
 						Restrictions.eq("resourceId", id)
 					))
 				.uniqueResult();

@@ -10,9 +10,10 @@ package org.dspace.orm.dao.api;
 import java.util.List;
 
 import org.dspace.orm.entity.Handle;
+import org.dspace.orm.entity.content.DSpaceObjectType;
 
 public interface IHandleDao extends IDSpaceDao<Handle> {
-    Handle selectByResourceId(int resourseType, int id);
+    Handle selectByResourceId(DSpaceObjectType resourseType, int id);
     Handle selectByHandle(String handle);
 	List<Handle> selectByPrefix(String naHandle);
 	long countByPrefix(String oldH);

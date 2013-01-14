@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 
 @Transactional
-@Repository("ICheckSumResultsDao")
+@Repository("org.dspace.orm.dao.api.ICheckSumResultsDao")
 public class CheckSumResultsDao implements ICheckSumResultsDao {
 	private static Logger log = LogManager.getLogger(CheckSumResults.class);
 	

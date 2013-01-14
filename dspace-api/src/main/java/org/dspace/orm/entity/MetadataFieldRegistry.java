@@ -9,9 +9,12 @@ package org.dspace.orm.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -30,7 +33,7 @@ import org.springframework.beans.factory.annotation.Configurable;
 @SequenceGenerator(name="metadatafieldregistry_gen", sequenceName="metadatafieldregistry_seq")
 @Configurable
 public class MetadataFieldRegistry extends DSpaceObject {
-    private Integer metadataSchema;
+    private MetadataSchemaRegistry metadataSchema;
     private String element;
     private String qualifier;
     
@@ -50,12 +53,13 @@ public class MetadataFieldRegistry extends DSpaceObject {
     }
 
 
-    @Column(name = "metadata_schema_id", nullable = true)
-	public Integer getMetadataSchema() {
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "metadata_schema_id", nullable = true)
+	public MetadataSchemaRegistry getMetadataSchema() {
 		return metadataSchema;
 	}
 
-	public void setMetadataSchema(Integer metadataField) {
+	public void setMetadataSchema(MetadataSchemaRegistry metadataField) {
 		this.metadataSchema = metadataField;
 	}
 
@@ -77,6 +81,4 @@ public class MetadataFieldRegistry extends DSpaceObject {
 	public void setQualifier(String qualifier) {
 		this.qualifier = qualifier;
 	}
-
-  
 }

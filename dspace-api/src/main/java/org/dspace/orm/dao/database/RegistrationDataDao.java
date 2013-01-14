@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 
 @Transactional
-@Repository("IRegistrationDataDao")
+@Repository("org.dspace.orm.dao.api.IRegistrationDataDao")
 public class RegistrationDataDao extends DSpaceDao<RegistrationData> implements IRegistrationDataDao {
     
 	public RegistrationDataDao() {

@@ -15,5 +15,7 @@ import org.dspace.orm.entity.MetadataSchemaRegistry;
  */
 
 public interface IMetadataSchemaRegistryDao extends IDSpaceDao<MetadataSchemaRegistry>{
+
+	MetadataSchemaRegistry selectByName(String schema);
     
    }

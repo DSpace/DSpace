@@ -61,6 +61,7 @@ public class DSpaceSessionFactoryBuilder  {
 	
 			prop.put("hibernate.connection.autocommit", false);
 			prop.put("hibernate.current_session_context_class", "thread");
+			prop.put("hibernate.show_sql", true);
 			
 			local.setHibernateProperties(prop);
 			local.afterPropertiesSet();

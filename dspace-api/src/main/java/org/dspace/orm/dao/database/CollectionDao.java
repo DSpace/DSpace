@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Miguel Pinto <mpinto@lyncode.com>
  */
 @Transactional
-@Repository("ICollectionDao")
+@Repository("org.dspace.orm.dao.api.ICollectionDao")
 public class CollectionDao extends DSpaceDao<Collection> implements ICollectionDao {
 //    private static Logger log = LogManager.getLogger(CollectionDao.class);
 

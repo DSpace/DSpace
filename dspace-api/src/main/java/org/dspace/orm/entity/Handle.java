@@ -92,7 +92,7 @@ public class Handle extends DSpaceObject {
 	 * 
 	 * @return DSpace Object
 	 */
-	public DSpaceObject toObject() {
+	public DSpaceObject toDSpaceObject() {
 		switch (this.getResourceType()) {
 			case Constants.COLLECTION:
 				return collDao.selectById(getResourceId());

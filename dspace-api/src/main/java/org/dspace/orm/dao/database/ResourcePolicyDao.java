@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 
 @Transactional
-@Repository("IResourcePolicyDao")
+@Repository("org.dspace.orm.dao.api.IResourcePolicyDao")
 public class ResourcePolicyDao extends DSpaceDao<ResourcePolicy> implements IResourcePolicyDao {
     
 	public ResourcePolicyDao() {

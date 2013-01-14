@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Miguel Pinto <mpinto@lyncode.com>
  */
 @Transactional
-@Repository("IEpersonGroupDao")
+@Repository("org.dspace.orm.dao.api.IEpersonGroupDao")
 public class EpersonGroupDao extends DSpaceDao<EpersonGroup> implements IEpersonGroupDao {
     
 	public EpersonGroupDao() {

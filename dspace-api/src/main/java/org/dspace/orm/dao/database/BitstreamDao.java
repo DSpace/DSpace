@@ -20,10 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Miguel Pinto <mpinto@lyncode.com>
  */
 @Transactional
-@Repository("IBitstreamDao")
+@Repository("org.dspace.orm.dao.api.IBitstreamDao")
 public class BitstreamDao extends DSpaceDao<Bitstream> implements IBitstreamDao {
     // private static Logger log = LogManager.getLogger(BitstreamDao.class);
-    
     public BitstreamDao () {
     	super(Bitstream.class);
     }

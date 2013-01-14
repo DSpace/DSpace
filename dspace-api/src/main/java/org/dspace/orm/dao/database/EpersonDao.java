@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Miguel Pinto <mpinto@lyncode.com>
  */
 @Transactional
-@Repository("IEpersonDao")
+@Repository("org.dspace.orm.dao.api.IEpersonDao")
 public class EpersonDao extends DSpaceDao<Eperson> implements IEpersonDao {
 	
 	public EpersonDao() {

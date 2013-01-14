@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 
 @Transactional
-@Repository("IWorkSpaceItemDao")
+@Repository("org.dspace.orm.dao.api.IWorkSpaceItemDao")
 public class WorkSpaceItemDao extends DSpaceDao<WorkSpaceItem> implements IWorkSpaceItemDao {
     
 	public WorkSpaceItemDao() {

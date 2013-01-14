@@ -32,7 +32,6 @@ import org.springframework.beans.factory.annotation.Configurable;
 public class MetadataSchemaRegistry extends DSpaceObject {
     private String namespace;
     private String shortID;
-    private Integer resourceType;
     
     
     @Id
@@ -48,17 +47,6 @@ public class MetadataSchemaRegistry extends DSpaceObject {
     {
     	return DSpaceObjectType.METADATA;
     }
-
-
-    @Column(name = "resource_type", nullable = true)
-	public Integer getResourceType() {
-		return resourceType;
-	}
-
-	public void setResourceType(Integer resourceType) {
-		this.resourceType = resourceType;
-	}
-
 
     @Column(name = "short_id", nullable = true)
 	public String getShortID() {

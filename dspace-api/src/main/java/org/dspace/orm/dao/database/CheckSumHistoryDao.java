@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 
 @Transactional
-@Repository("ICheckSumHistoryDao")
+@Repository("org.dspace.orm.dao.api.ICheckSumHistoryDao")
 public class CheckSumHistoryDao implements ICheckSumHistoryDao {
 	private static Logger log = LogManager.getLogger(CheckSumHistory.class);
 	

@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 
 @Transactional
-@Repository("IHarvestedItemDao")
+@Repository("org.dspace.orm.dao.api.IHarvestedItemDao")
 public class HarvestedItemDao extends DSpaceDao<HarvestedItem> implements IHarvestedItemDao {
     
 	public HarvestedItemDao() {

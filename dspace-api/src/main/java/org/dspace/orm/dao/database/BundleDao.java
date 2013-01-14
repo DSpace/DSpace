@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Miguel Pinto <mpinto@lyncode.com>
  */
 @Transactional
-@Repository("IBundleDao")
+@Repository("org.dspace.orm.dao.api.IBundleDao")
 public class BundleDao extends DSpaceDao<Bundle> implements IBundleDao {
 
 //	private static Logger log = LogManager.getLogger(BundleDao.class);

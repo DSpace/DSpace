@@ -8,6 +8,7 @@
 package org.dspace.orm.dao.api;
 
 import org.dspace.orm.entity.MetadataFieldRegistry;
+import org.dspace.orm.entity.MetadataSchemaRegistry;
 
 /**
  * @author Miguel Pinto <mpinto@lyncode.com>
@@ -15,5 +16,7 @@ import org.dspace.orm.entity.MetadataFieldRegistry;
  */
 
 public interface IMetadataFieldRegistryDao extends IDSpaceDao<MetadataFieldRegistry>{
+
+	MetadataFieldRegistry selectByNameAndSchema(MetadataSchemaRegistry schema, String fieldName);
     
-   }
+}

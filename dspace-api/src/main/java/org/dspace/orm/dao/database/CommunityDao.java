@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Miguel Pinto <mpinto@lyncode.com>
  */
 @Transactional
-@Repository("ICommunityDao")
+@Repository("org.dspace.orm.dao.api.ICommunityDao")
 public class CommunityDao extends DSpaceDao<Community> implements ICommunityDao {
 //    private static Logger log = LogManager.getLogger(CommunityDao.class);
 

@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 
 @Transactional
-@Repository("IFileExtensionDao")
+@Repository("org.dspace.orm.dao.api.IFileExtensionDao")
 public class FileExtensionDao extends DSpaceDao<FileExtension> implements IFileExtensionDao {
     
 	public FileExtensionDao() {

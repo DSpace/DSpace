@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Miguel Pinto <mpinto@lyncode.com>
  */
 @Transactional
-@Repository("IItemDao")
+@Repository("org.dspace.orm.dao.api.IItemDao")
 public class ItemDao extends DSpaceDao<Item> implements IItemDao {
     
 	public ItemDao() {
