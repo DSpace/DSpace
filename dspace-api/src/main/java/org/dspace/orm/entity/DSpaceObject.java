@@ -43,6 +43,18 @@ public abstract class DSpaceObject implements IDSpaceObject {
 	}
 	
 	@Transient
+	public List<MetadataValue> getMetadata (String field) { // dc.title
+		return metadataDao.selectByResourceAndField(this.getType(), this.getID(), field);
+	}
+	
+	@Transient
+	public MetadataValue getFirstMetadata (String field) { // dc.title
+		List<MetadataValue> l = metadataDao.selectByResourceAndField(this.getType(), this.getID(), field);
+		if (l.isEmpty()) return null;
+		else return l.get(0);
+	}
+	
+	@Transient
 	public Handle getHandle () {
 		return handleDao.selectByResourceId(getType(), getID());
 	}

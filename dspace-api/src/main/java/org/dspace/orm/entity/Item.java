@@ -274,16 +274,4 @@ public class Item extends DSpaceObject {
 	public void setTemplateItemCollections(List<Collection> templateItemCollections) {
 		this.templateItemCollections = templateItemCollections;
 	}
-	
-	@Transient
-	public List<MetadataValue> getMetadata (String field) { // dc.title
-		return super.metadataDao.selectByResourceAndField(this.getType(), this.getID(), field);
-	}
-	
-	@Transient
-	public MetadataValue getFirstMetadata (String field) { // dc.title
-		List<MetadataValue> l = super.metadataDao.selectByResourceAndField(this.getType(), this.getID(), field);
-		if (l.isEmpty()) return null;
-		else return l.get(0);
-	}
 }
