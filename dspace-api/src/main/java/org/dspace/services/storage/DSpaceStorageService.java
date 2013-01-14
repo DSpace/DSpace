@@ -448,5 +448,4 @@ public class DSpaceStorageService implements StorageService {
 		}
 		return bitstream;
 	}
-
 }
