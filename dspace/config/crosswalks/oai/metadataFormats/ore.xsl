@@ -17,7 +17,7 @@
 	<xsl:output omit-xml-declaration="yes" method="xml" indent="yes" />
 	
 	<xsl:template match="/">
-		<atom:entry xmlns:atom="http://www.w3.org/2005/Atom"
+		<atom:entry xmlns:atom="http://www.w3.org/2005/Atom" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 			xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:oreatom="http://www.openarchives.org/ore/atom/"
 			xmlns:dcterms="http://purl.org/dc/terms/" xsi:schemaLocation="http://www.w3.org/2005/Atom http://www.kbcafe.com/rss/atom.xsd.xml">
 			<atom:id>
