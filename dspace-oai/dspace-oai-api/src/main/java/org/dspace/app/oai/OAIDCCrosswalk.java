@@ -16,13 +16,12 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import org.dspace.app.util.MetadataExposure;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.IConverter;
+import org.dspace.core.*;
 import org.dspace.search.HarvestedItemInfo;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.PluginManager;
-import org.dspace.core.LogManager;
 import org.apache.log4j.Logger;
 
 import ORG.oclc.oai.server.crosswalk.Crosswalk;
@@ -139,10 +138,18 @@ public class OAIDCCrosswalk extends Crosswalk
     public String createMetadata(Object nativeItem)
             throws CannotDisseminateFormatException
     {
+
         Item item = ((HarvestedItemInfo) nativeItem).item;
+        boolean isAuthorized=true;
+        Context context = null;
+        try {
+            context = new Context();
+           isAuthorized = AuthorizeManager.authorizeActionBoolean(context, item, Constants.READ);
+        } catch (SQLException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
 
         StringBuffer metadata = new StringBuffer();
-
         metadata
                 .append(
                         "<oai_dc:dc xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" ")
@@ -151,6 +158,10 @@ public class OAIDCCrosswalk extends Crosswalk
                         "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ")
                 .append(
                         "xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">");
+
+        if(isAuthorized)  {
+
+
 
         for (String element : oaidcElement)
         {
@@ -263,7 +274,12 @@ public class OAIDCCrosswalk extends Crosswalk
                 }
             }
         }
-
+         }
+        else{
+            metadata.append("<dc:status>")
+                    .append("Item is not available")
+                    .append("</dc:status>");
+         }
         metadata.append("</oai_dc:dc>");
 
         return metadata.toString();
