@@ -1370,6 +1370,9 @@ public class DatabaseManager
         try
         {
             String schema = ConfigurationManager.getProperty("db.schema");
+            if(StringUtils.isBlank(schema)){
+                schema = null;
+            }
             String catalog = null;
             
             int dotIndex = table.indexOf('.'); 
