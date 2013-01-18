@@ -21,7 +21,7 @@
 			<head>
 				<title>DSpace OAI-PMH Data Provider</title>
 				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-				<script src="http://code.jquery.com/jquery-1.7.2.min.js"
+				<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"
 					type="text/javascript"></script>
 				<style type="text/css">
 					a {
