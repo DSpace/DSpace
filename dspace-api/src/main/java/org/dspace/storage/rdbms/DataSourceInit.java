@@ -44,8 +44,7 @@ public class DataSourceInit {
             // Note we check to see if property is null; getIntProperty returns
             // '0' if the property is not set OR if it is actually set to zero.
             // But 0 is a valid option...
-            int maxConnections = ConfigurationManager
-                    .getIntProperty("db.maxconnections");
+            int maxConnections = ConfigurationManager.getIntProperty("db.maxconnections");
 
             if (ConfigurationManager.getProperty("db.maxconnections") == null)
             {
@@ -70,15 +69,12 @@ public class DataSourceInit {
 
             // Create object pool
             ObjectPool connectionPool = new GenericObjectPool(null, // PoolableObjectFactory
-                    // - set below
-                    maxConnections, // max connections
-                    GenericObjectPool.WHEN_EXHAUSTED_BLOCK, maxWait, // don't
-                                                                     // block
-                    // more than 5
-                    // seconds
-                    maxIdle, // max idle connections (unlimited)
-                    true, // validate when we borrow connections from pool
-                    false // don't bother validation returned connections
+                    maxConnections,                         // max connections
+                    GenericObjectPool.WHEN_EXHAUSTED_GROW,  // What to do when pool is exhausted
+                    maxWait,                                // don't block more than 5 seconds
+                    maxIdle,                                // max idle connections (unlimited)
+                    true,                                   // validate on connection borrow ?
+                    true                                    // validate on connection return ?
             );
 
             // ConnectionFactory the pool will use to create connections.
@@ -105,6 +101,36 @@ public class DataSourceInit {
             {
                 // The statement Pool is used to pool prepared statements.
                 GenericKeyedObjectPool.Config statementFactoryConfig = new GenericKeyedObjectPool.Config();
+
+                // PeterDietz - While running into timeout waiting for idle connection errors, I'm going to try some fixes.
+                // Information sourced from: http://sacharya.com/grails-dbcp-stale-connections/
+
+                // Likely defaults to Connection Validation
+                //validationQuery=null
+                //testOnBorrow=false
+                //testOnReturn=false
+                //testWhileIdle=false
+
+                //Set your local connection validation hacks here.
+                statementFactoryConfig.testOnBorrow = true;
+                statementFactoryConfig.testOnReturn = true;
+                statementFactoryConfig.testWhileIdle = true;
+
+                statementFactoryConfig.minIdle = 10;
+                statementFactoryConfig.maxIdle = 25;
+
+
+                // Likely defaults to Idle Connection Eviction
+                //timeBetweenEvictionRunsMillis=-1
+                //numTestsPerEvictionRun=3
+                //minEvictableIdleTimeMillis=1000 * 60 * 30
+
+                // Set your local idle connection eviction hacks here.
+                long THIRTY_MINUTES = 1000 * 60 * 30;
+                statementFactoryConfig.timeBetweenEvictionRunsMillis = THIRTY_MINUTES;
+                statementFactoryConfig.numTestsPerEvictionRun = 3;
+                statementFactoryConfig.minEvictableIdleTimeMillis = THIRTY_MINUTES;
+
                 // Just grow the pool size when needed.
                 //
                 // This means we will never block when attempting to
