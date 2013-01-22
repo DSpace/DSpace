@@ -66,6 +66,7 @@ import org.jdom.transform.XSLTransformer;
  *
  * @author Larry Stone
  * @author Scott Phillips
+ * @author Pascal-Nicolas Becker
  * @version $Revision$
  * @see XSLTCrosswalk
  */
@@ -490,10 +491,14 @@ public class XSLTDisseminationCrosswalk
         String xwalkname = argv[0];
         String handle = argv[1];
         OutputStream out = System.out;
-        if (2 < argv.length) {
-            try {
+        if (2 < argv.length)
+        {
+            try
+            {
                 out = new FileOutputStream(argv[2]);
-            } catch (FileNotFoundException e) {
+            }
+            catch (FileNotFoundException e)
+            {
                 System.err.println("Can't write to the specified file: " + e.getMessage());
                 System.err.println("Will write output to stdout.");
             }
@@ -512,28 +517,36 @@ public class XSLTDisseminationCrosswalk
         context.turnOffAuthorisationSystem();
         
         DSpaceObject dso = null;
-        try {
+        try
+        {
             dso = HandleManager.resolveToObject(context, handle);
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             System.err.println("Error: A problem with the database connection occurred, check logs for further information.");
             System.exit(1);
         }
         
-        if (null == dso) {
+        if (null == dso)
+        {
             System.err.println("Can't find a DSpaceObject with the handle \"" + handle + "\"");
             System.exit(1);
         }
         
-        if (!xwalk.canDisseminate(dso)) {
+        if (!xwalk.canDisseminate(dso))
+        {
             System.err.println("Dissemination Crosswalk can't disseminate this DSpaceObject.");
             log.error("Dissemination Crosswalk can't disseminate this DSpaceObject.");
             System.exit(1);
         }
         
         Element root = null;
-        try {
+        try
+        {
             root = xwalk.disseminateElement(dso);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // as this script is for testing dissemination crosswalks, we want
             // verbose information in case of an exception.
             System.err.println("An error occurred while processing the dissemination crosswalk.");
@@ -548,10 +561,13 @@ public class XSLTDisseminationCrosswalk
             System.exit(1);
         }
     
-        try {
+        try
+        {
             XMLOutputter xmlout = new XMLOutputter(Format.getPrettyFormat());
             xmlout.output(new Document(root), out);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // as this script is for testing dissemination crosswalks, we want
             // verbose information in case of an exception.
             System.err.println("An error occurred after processing the dissemination crosswalk.");
@@ -568,7 +584,8 @@ public class XSLTDisseminationCrosswalk
         }
         
         context.complete();
-        if (out instanceof FileOutputStream) {
+        if (out instanceof FileOutputStream)
+        {
             out.close();
         }
     }
