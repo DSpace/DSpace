@@ -7,7 +7,11 @@
  */
 package org.dspace.content.crosswalk;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -482,7 +486,7 @@ public class XSLTDisseminationCrosswalk
             log.error("Started Dissemination Crosswalk Test/Export with more or less than 2 attributes.");
             System.exit(1);
         }
-
+        
         DisseminationCrosswalk xwalk = (DisseminationCrosswalk)PluginManager.getNamedPlugin(
                 DisseminationCrosswalk.class, argv[0]);
         if (xwalk == null)
@@ -499,7 +503,7 @@ public class XSLTDisseminationCrosswalk
         try {
             dso = HandleManager.resolveToObject(context, argv[1]);
         } catch (SQLException e) {
-            System.err.println("Error: A problem with the database connection occured, check logs for further informatin.");
+            System.err.println("Error: A problem with the database connection occurred, check logs for further information.");
             System.exit(1);
         }
         
@@ -519,8 +523,8 @@ public class XSLTDisseminationCrosswalk
             root = xwalk.disseminateElement(dso);
         } catch (Exception e) {
             // as this script is for testing dissemination crosswalks, we want
-            // verbous information in case of an exception.
-            System.err.println("An error occurd while processing the dissemination crosswalk.");
+            // verbose information in case of an exception.
+            System.err.println("An error occurred while processing the dissemination crosswalk.");
             System.err.println("=== Error Message ===");
             System.err.println(e.getMessage());
             System.err.println("===  Stack Trace  ===");
@@ -531,15 +535,15 @@ public class XSLTDisseminationCrosswalk
             log.error(e.getStackTrace());
             System.exit(1);
         }
-        
+    
         try {
             XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
             out.output(new Document(root), System.out);
         } catch (Exception e) {
             // as this script is for testing dissemination crosswalks, we want
-            // verbous information in case of an exception.
-            System.err.println("An error occured after processing the dissemination crosswalk.");
-            System.err.println("The error occured while trying to print the generated XML.");
+            // verbose information in case of an exception.
+            System.err.println("An error occurred after processing the dissemination crosswalk.");
+            System.err.println("The error occurred while trying to print the generated XML.");
             System.err.println("=== Error Message ===");
             System.err.println(e.getMessage());
             System.err.println("===  Stack Trace  ===");
