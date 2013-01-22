@@ -25,10 +25,15 @@ import org.dspace.content.Site;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.PluginManager;
+import org.dspace.handle.HandleManager;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.Verifier;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.jdom.transform.XSLTransformException;
 import org.jdom.transform.XSLTransformer;
 
@@ -66,6 +71,9 @@ public class XSLTDisseminationCrosswalk
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(XSLTDisseminationCrosswalk.class);
+    
+    /** DSpace context, will be created if XSLTDisseminationCrosswalk had been started by command-line. */
+    private static Context context;
 
     private static final String DIRECTION = "dissemination";
 
@@ -459,5 +467,90 @@ public class XSLTDisseminationCrosswalk
             }
             return result.toString();
         }
+    }
+    
+        /**
+     * Simple command-line rig for testing the DIM output of a stylesheet.
+     * Usage:  java XSLTDisseminationCrosswalk  <crosswalk-name> <handle>
+     */
+    public static void main(String[] argv) throws Exception
+    {
+        log.error("started.");
+        if (2 != argv.length)
+        {
+            System.err.println("Usage:  java XSLTDisseminationCrosswalk <crosswalk-name> <handle>");
+            log.error("Started Dissemination Crosswalk Test/Export with more or less than 2 attributes.");
+            System.exit(1);
+        }
+
+        DisseminationCrosswalk xwalk = (DisseminationCrosswalk)PluginManager.getNamedPlugin(
+                DisseminationCrosswalk.class, argv[0]);
+        if (xwalk == null)
+        {
+            System.err.println("Error: Cannot find a DisseminationCrosswalk plugin for: \""+argv[0]+"\"");
+            log.error("Cannot find the Dissemination Crosswalk plugin.");
+            System.exit(1);
+        }
+        
+        context = new Context();
+        context.turnOffAuthorisationSystem();
+        
+        DSpaceObject dso = null;
+        try {
+            dso = HandleManager.resolveToObject(context, argv[1]);
+        } catch (SQLException e) {
+            System.err.println("Error: A problem with the database connection occured, check logs for further informatin.");
+            System.exit(1);
+        }
+        
+        if (null == dso) {
+            System.err.println("Can't find a DSpaceObject with the handle \"" + argv[1] + "\"");
+            System.exit(1);
+        }
+        
+        if (!xwalk.canDisseminate(dso)) {
+            System.err.println("Dissemination Crosswalk can't disseminate this DSpaceObject.");
+            log.error("Dissemination Crosswalk can't disseminate this DSpaceObject.");
+            System.exit(1);
+        }
+        
+        Element root = null;
+        try {
+            root = xwalk.disseminateElement(dso);
+        } catch (Exception e) {
+            // as this script is for testing dissemination crosswalks, we want
+            // verbous information in case of an exception.
+            System.err.println("An error occurd while processing the dissemination crosswalk.");
+            System.err.println("=== Error Message ===");
+            System.err.println(e.getMessage());
+            System.err.println("===  Stack Trace  ===");
+            System.err.println(e.getStackTrace());
+            System.err.println("=====================");
+            log.error("Caught: " + e.toString() + ".");
+            log.error(e.getMessage());
+            log.error(e.getStackTrace());
+            System.exit(1);
+        }
+        
+        try {
+            XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
+            out.output(new Document(root), System.out);
+        } catch (Exception e) {
+            // as this script is for testing dissemination crosswalks, we want
+            // verbous information in case of an exception.
+            System.err.println("An error occured after processing the dissemination crosswalk.");
+            System.err.println("The error occured while trying to print the generated XML.");
+            System.err.println("=== Error Message ===");
+            System.err.println(e.getMessage());
+            System.err.println("===  Stack Trace  ===");
+            System.err.println(e.getStackTrace());
+            System.err.println("=====================");
+            log.error("Caught: " + e.toString() + ".");
+            log.error(e.getMessage());
+            log.error(e.getStackTrace());
+            System.exit(1);
+        }
+        
+        context.complete();
     }
 }
