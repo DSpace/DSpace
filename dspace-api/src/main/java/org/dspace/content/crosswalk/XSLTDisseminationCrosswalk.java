@@ -480,18 +480,30 @@ public class XSLTDisseminationCrosswalk
     public static void main(String[] argv) throws Exception
     {
         log.error("started.");
-        if (2 != argv.length)
+        if (2 > argv.length)
         {
-            System.err.println("Usage:  java XSLTDisseminationCrosswalk <crosswalk-name> <handle>");
+            System.err.println("Usage:  java XSLTDisseminationCrosswalk <crosswalk-name> <handle> [output-file]");
             log.error("Started Dissemination Crosswalk Test/Export with more or less than 2 attributes.");
             System.exit(1);
         }
         
+        String xwalkname = argv[0];
+        String handle = argv[1];
+        OutputStream out = System.out;
+        if (2 < argv.length) {
+            try {
+                out = new FileOutputStream(argv[2]);
+            } catch (FileNotFoundException e) {
+                System.err.println("Can't write to the specified file: " + e.getMessage());
+                System.err.println("Will write output to stdout.");
+            }
+        }
+        
         DisseminationCrosswalk xwalk = (DisseminationCrosswalk)PluginManager.getNamedPlugin(
-                DisseminationCrosswalk.class, argv[0]);
+                DisseminationCrosswalk.class, xwalkname);
         if (xwalk == null)
         {
-            System.err.println("Error: Cannot find a DisseminationCrosswalk plugin for: \""+argv[0]+"\"");
+            System.err.println("Error: Cannot find a DisseminationCrosswalk plugin for: \"" + xwalkname + "\"");
             log.error("Cannot find the Dissemination Crosswalk plugin.");
             System.exit(1);
         }
@@ -501,14 +513,14 @@ public class XSLTDisseminationCrosswalk
         
         DSpaceObject dso = null;
         try {
-            dso = HandleManager.resolveToObject(context, argv[1]);
+            dso = HandleManager.resolveToObject(context, handle);
         } catch (SQLException e) {
             System.err.println("Error: A problem with the database connection occurred, check logs for further information.");
             System.exit(1);
         }
         
         if (null == dso) {
-            System.err.println("Can't find a DSpaceObject with the handle \"" + argv[1] + "\"");
+            System.err.println("Can't find a DSpaceObject with the handle \"" + handle + "\"");
             System.exit(1);
         }
         
@@ -537,8 +549,8 @@ public class XSLTDisseminationCrosswalk
         }
     
         try {
-            XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
-            out.output(new Document(root), System.out);
+            XMLOutputter xmlout = new XMLOutputter(Format.getPrettyFormat());
+            xmlout.output(new Document(root), out);
         } catch (Exception e) {
             // as this script is for testing dissemination crosswalks, we want
             // verbose information in case of an exception.
@@ -556,5 +568,8 @@ public class XSLTDisseminationCrosswalk
         }
         
         context.complete();
+        if (out instanceof FileOutputStream) {
+            out.close();
+        }
     }
 }
