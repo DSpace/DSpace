@@ -58,7 +58,9 @@ public class ObjectInfo extends Element implements Constants {
 	if (myXMLChecksum != null && myChecksumAlgo != null) {
 	    metadataElem.setChecksum(myChecksumAlgo, myXMLChecksum);
 	}
-	bitstreamElem.appendChild((Element)this.getChildElements("checksum").get(0).copy());
+        if(this.getChildElements("checksum").size() > 0) {
+            bitstreamElem.appendChild((Element)this.getChildElements("checksum").get(0).copy());
+        }
 	
 	// modification date
 	Element thisModDate = this.getChildElements("dateSysMetadataModified").get(0);
@@ -67,7 +69,9 @@ public class ObjectInfo extends Element implements Constants {
 	
 	// size
 	metadataElem.addElement("size", "" + myXMLSize);
-	bitstreamElem.appendChild((Element)this.getChildElements("size").get(0).copy());
+        if(this.getChildElements("size").size() > 0) {
+            bitstreamElem.appendChild((Element)this.getChildElements("size").get(0).copy());
+        }
 	
 	
 	// fill out our results array
