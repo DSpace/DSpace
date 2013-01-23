@@ -553,7 +553,7 @@ public class XSLTDisseminationCrosswalk
             System.err.println("=== Error Message ===");
             System.err.println(e.getMessage());
             System.err.println("===  Stack Trace  ===");
-            System.err.println(e.getStackTrace());
+            e.printStackTrace();
             System.err.println("=====================");
             log.error("Caught: " + e.toString() + ".");
             log.error(e.getMessage());
