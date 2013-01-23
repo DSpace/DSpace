@@ -438,7 +438,7 @@ public class DataOneMN extends HttpServlet implements Constants {
             if (myRequestLogger != null){
                 log.info("Request string (from) is " + request.getParameter("fromDate"));
                 log.info("Dates for log records; from= " + from + "; to= " + to);
-                DataOneLogger.LogResults r = myRequestLogger.getLogRecords(from,to,event,pidFilter,start,count);
+                DataOneLogger.LogResults r = myRequestLogger.getLogRecords(from,to,event,pidFilter,start,start + count);
                 response.setContentType(XML_CONTENT_TYPE);
                 pw.write(r.getLogRecords());
             }
