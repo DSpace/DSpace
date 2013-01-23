@@ -60,6 +60,9 @@ public class ObjectInfo extends Element implements Constants {
 	}
         if(this.getChildElements("checksum").size() > 0) {
             bitstreamElem.appendChild((Element)this.getChildElements("checksum").get(0).copy());
+        } else {
+            // checksum is required
+            bitstreamElem.setChecksum(myChecksumAlgo, "");
         }
 	
 	// modification date
@@ -71,6 +74,9 @@ public class ObjectInfo extends Element implements Constants {
 	metadataElem.addElement("size", "" + myXMLSize);
         if(this.getChildElements("size").size() > 0) {
             bitstreamElem.appendChild((Element)this.getChildElements("size").get(0).copy());
+        } else {
+            // size is required
+            bitstreamElem.setSize(0);
         }
 	
 	
