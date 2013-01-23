@@ -60,9 +60,7 @@ public class DataOneLogger {
 
     public DataOneLogger() {
 
-        final String serverString = "http://localhost:9999/solr/dataoneMNlog"; 
-        //TODO: This ought to work
-        //final String serverString = ConfigurationManager.getProperty(SOLR_LOG_SERVER_PROPERTY);
+        final String serverString = ConfigurationManager.getProperty(SOLR_LOG_SERVER_PROPERTY);
         log.info("solr.log.dataonemn.server from configuration :" + serverString);
 
         CommonsHttpSolrServer server = null;
@@ -245,7 +243,8 @@ public class DataOneLogger {
     }
 
     /**
-     * Generate the xml and return bundle of error code, detail Code (?, but it's in the dataone spec), and the xml string
+     * Generate the xml and return bundle of error code, detail Code (?, but 
+     * it's in the dataone spec), and the xml string
      **/
     public static class LogResults{
         private final int htmlErrorCode;
