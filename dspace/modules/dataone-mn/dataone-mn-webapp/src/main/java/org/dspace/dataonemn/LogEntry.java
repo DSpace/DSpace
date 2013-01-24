@@ -117,7 +117,7 @@ public class LogEntry{
         return d;
     }
     
-    public String getXml(int index){
+    public String getXml(){
         StringBuilder sb = new StringBuilder(500);
         sb.append("<logEntry>");
         sb.append("<entryId>");
