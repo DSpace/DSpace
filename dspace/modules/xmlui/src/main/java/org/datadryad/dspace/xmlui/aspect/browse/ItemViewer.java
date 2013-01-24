@@ -489,6 +489,24 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
             if(keyWords.length>0){
 
 
+
+                List<Serializable> parameters = new ArrayList<Serializable>();
+                String metaDataFieldQuery ="select distinct value.item_id from item i,metadatavalue value,metadatafieldregistry id,metadataschemaregistry s where s.short_id= ? and id.metadata_schema_id = s.metadata_schema_id and id.element = ? and id.metadata_field_id = value.metadata_field_id and i.in_archive=true and i.item_id=value.item_id and i.withdrawn=false and (LOWER(value.text_value)= LOWER(?)";
+                parameters.add(schema);
+                parameters.add(element);
+                String queryString=null;
+                for(DCValue keyword : keyWords)
+                {
+                    queryString= keyword.value;
+
+                    metaDataFieldQuery=metaDataFieldQuery+" or LOWER(value.text_value)=LOWER(?)";
+                    parameters.add(queryString);
+                }
+                parameters.add(queryString);
+                metaDataFieldQuery=metaDataFieldQuery+")";
+                Object[] parametersArray = parameters.toArray();
+                TableRowIterator tri = DatabaseManager.query(context, metaDataFieldQuery, parametersArray);
+                if(tri.hasNext()){
                 ReferenceSet relatedSet;
                 if (showFullItem(objectModel)) {
                     relatedSet = division.addReferenceSet("related-viewer", "related-item-detail");
@@ -496,21 +514,6 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
                     relatedSet = division.addReferenceSet("related-viewer", "related-item-summary");
                 }
                 relatedSet.setHead(T_head_related_item);
-                List<Serializable> parameters = new ArrayList<Serializable>();
-                String metaDataFieldQuery ="select distinct value.item_id from item i,metadatavalue value,metadatafieldregistry id,metadataschemaregistry s where s.short_id= ? and id.metadata_schema_id = s.metadata_schema_id and id.element = ? and id.metadata_field_id = value.metadata_field_id and i.in_archive=true and i.item_id=value.item_id and i.withdrawn=false and (value.text_value= ?";
-                parameters.add(schema);
-                parameters.add(element);
-                String queryString=null;
-                for(DCValue keyword : keyWords)
-                {
-                    queryString= keyword.value;
-                    metaDataFieldQuery=metaDataFieldQuery+" or value.text_value= ?";
-                    parameters.add(queryString);
-                }
-                parameters.add(queryString);
-                metaDataFieldQuery=metaDataFieldQuery+")";
-                Object[] parametersArray = parameters.toArray();
-                TableRowIterator tri = DatabaseManager.query(context, metaDataFieldQuery, parametersArray);
                 try
                 {
 
@@ -531,6 +534,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
                     {
                         tri.close();
                     }
+                }
                 }
 
             }
