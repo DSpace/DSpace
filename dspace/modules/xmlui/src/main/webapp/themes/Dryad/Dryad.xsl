@@ -1729,7 +1729,49 @@
 
 
 
+    <xsl:template match="dri:referenceSet[@type = 'related-item-detail']" priority="2">
+        <xsl:apply-templates select="dri:head"/>
+        <table>
+            <xsl:apply-templates select="*[not(name()='head')]" mode="related-item-summary"/>
+        </table>
+    </xsl:template>
 
+    <xsl:template match="dri:referenceSet[@type = 'related-item-summary']" priority="2">
+        <xsl:apply-templates select="dri:head"/>
+        <table>
+            <xsl:apply-templates select="*[not(name()='head')]" mode="related-item-summary"/>
+        </table>
+    </xsl:template>
+    <xsl:template match="//dri:reference" mode="related-item-summary">
+
+        <xsl:variable name="externalMetadataURL">
+            <xsl:text>cocoon:/</xsl:text>
+            <xsl:value-of select="@url"/>
+        </xsl:variable>
+        <tr>
+
+            <xsl:apply-templates select = "document($externalMetadataURL)" mode="related-item-summary"/>
+        </tr>
+    </xsl:template>
+
+    <xsl:template match="mets:METS" mode="related-item-summary">
+        <td>
+            <a>
+                <xsl:attribute name="href">
+                    <xsl:choose>
+                        <xsl:when test=".//dim:field[@element='identifier'][@mdschema='dc'][not(@qualifier)]">
+                            <xsl:text>/resource/</xsl:text>
+                            <xsl:copy-of select=".//dim:field[@element='identifier'][@mdschema='dc'][not(@qualifier)]"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="@OBJID"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:attribute>
+                <xsl:value-of select="//dim:field[@element='title']"/>
+            </a>
+        </td>
+    </xsl:template>
 
 
     <!-- TEST !!!!!!!! -->

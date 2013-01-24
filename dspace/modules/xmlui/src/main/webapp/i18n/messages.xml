@@ -370,6 +370,8 @@
 	<message key="xmlui.ArtifactBrowser.ItemViewer.trail">View Item</message>
 	<message key="xmlui.ArtifactBrowser.ItemViewer.head_parent_collections">This item appears in the
 		following Collection(s)</message>
+    <message key="xmlui.ArtifactBrowser.ItemViewer.head_related_item">Related Data Packages</message>
+
 	<message key="xmlui.ArtifactBrowser.ItemViewer.show_simple">Show simple item record</message>
 	<message key="xmlui.ArtifactBrowser.ItemViewer.show_full">Show full item record</message>
 
