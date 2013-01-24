@@ -197,7 +197,10 @@ public class DataOneMN extends HttpServlet implements Constants {
 	Context ctxt = null;
 	
 	LogEntry le = new LogEntry();
-	final String requestIP = request.getHeader("x-forwarded-for");
+	String requestIP = request.getHeader("x-forwarded-for");
+        if(requestIP == null) {
+            requestIP = request.getRemoteAddr();
+        }
 	//final String requestHost = request.getRemoteHost();
 	final String requestUser = request.getRemoteUser();
 	le.setIPAddress(requestIP);
