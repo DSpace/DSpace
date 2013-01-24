@@ -149,7 +149,7 @@ public class DataOneLogger {
 
     final String logHeaderTemplate = "<d1:log xmlns:d1=\"http://ns.dataone.org/service/types/v1\" count=\"%s\" start=\"%s\" total=\"%s\"> \n";
     
-    public String buildLogHeader(long count, int start, int total){
+    public String buildLogHeader(int count, int start, long total){
         StringBuilder sb = new StringBuilder();
         Formatter formatter = new Formatter(sb);
         formatter.format(logHeaderTemplate,count,start,total);
@@ -191,7 +191,10 @@ public class DataOneLogger {
         }
         StringBuffer xmlResults = new StringBuffer();
         xmlResults.append(xmlHeader);
-        xmlResults.append(buildLogHeader(total,start,matchingEntries.size()));
+        // count should be the count requested?
+        // start should be the start offset requested
+        // total should be what?
+        xmlResults.append(buildLogHeader(count,start,total));
         xmlResults.append(entryResults.toString());
         xmlResults.append(logFooter);
         LogResults results = new LogResults(HttpServletResponse.SC_OK,0,xmlResults.toString());
