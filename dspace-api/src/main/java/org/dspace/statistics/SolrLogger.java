@@ -222,7 +222,7 @@ public class SolrLogger
                 Bitstream bit = (Bitstream) dspaceObject;
                 Bundle[] bundles = bit.getBundles();
                 for (Bundle bundle : bundles) {
-                    //doc1.addField("bundleName", bundle.getName());
+                    doc1.addField("bundleName", bundle.getName());
                 }
             }
 
