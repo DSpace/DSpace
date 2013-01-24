@@ -197,7 +197,10 @@ public class DataOneMN extends HttpServlet implements Constants {
 	Context ctxt = null;
 	
 	LogEntry le = new LogEntry();
-	final String requestIP = request.getHeader("x-forwarded-for");
+	String requestIP = request.getHeader("x-forwarded-for");
+        if(requestIP == null) {
+            requestIP = request.getRemoteAddr();
+        }
 	//final String requestHost = request.getRemoteHost();
 	final String requestUser = request.getRemoteUser();
 	le.setIPAddress(requestIP);
@@ -438,7 +441,7 @@ public class DataOneMN extends HttpServlet implements Constants {
             if (myRequestLogger != null){
                 log.info("Request string (from) is " + request.getParameter("fromDate"));
                 log.info("Dates for log records; from= " + from + "; to= " + to);
-                DataOneLogger.LogResults r = myRequestLogger.getLogRecords(from,to,event,pidFilter,start,count);
+                DataOneLogger.LogResults r = myRequestLogger.getLogRecords(from,to,event,pidFilter,start,start + count);
                 response.setContentType(XML_CONTENT_TYPE);
                 pw.write(r.getLogRecords());
             }
