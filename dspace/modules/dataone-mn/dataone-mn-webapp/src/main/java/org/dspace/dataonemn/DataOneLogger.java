@@ -194,7 +194,7 @@ public class DataOneLogger {
         // count should be the count requested?
         // start should be the start offset requested
         // total should be what?
-        xmlResults.append(buildLogHeader(count,start,total));
+        xmlResults.append(buildLogHeader(matchingEntries.size(),start,total));
         xmlResults.append(entryResults.toString());
         xmlResults.append(logFooter);
         LogResults results = new LogResults(HttpServletResponse.SC_OK,0,xmlResults.toString());
