@@ -1761,7 +1761,7 @@
                     <xsl:choose>
                         <xsl:when test=".//dim:field[@element='identifier'][@mdschema='dc'][not(@qualifier)]">
                             <xsl:text>/resource/</xsl:text>
-                            <xsl:copy-of select=".//dim:field[@element='identifier'][@mdschema='dc'][not(@qualifier)]"/>
+                            <xsl:copy-of select=".//dim:field[@element='identifier'][@mdschema='dc'][not(@qualifier)][1]"/>
                         </xsl:when>
                         <xsl:otherwise>
                             <xsl:value-of select="@OBJID"/>
