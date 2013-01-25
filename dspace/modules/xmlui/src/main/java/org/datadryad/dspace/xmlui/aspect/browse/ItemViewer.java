@@ -48,11 +48,15 @@ import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.handle.HandleManager;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.VersioningService;
 import org.dspace.workflow.ClaimedTask;
+import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 import org.jdom.Element;
@@ -94,7 +98,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
     private static final Message T_version_in_submission = message("xmlui.ItemViewer.versionInSubmission");
     private static final Message T_go_to_submission_page = message("xmlui.ItemViewer.goToSubmissionPage");
     private static final Message T_version_in_workflow = message("xmlui.ItemViewer.versionInWorkflow");
-
+    private static final Message T_head_related_item = message("xmlui.ArtifactBrowser.ItemViewer.head_related_item");
 
     private List<Item> dataFiles = new ArrayList<Item>();
 
@@ -438,6 +442,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
             showfullPara.addXref(link).addContent(T_show_full);
         }
 
+
         ReferenceSet referenceSet;
         if (showFullItem(objectModel)) {
             referenceSet = division.addReferenceSet("collection-viewer", ReferenceSet.TYPE_DETAIL_VIEW);
@@ -467,10 +472,72 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
 
         ReferenceSet appearsInclude = itemRef.addReferenceSet(ReferenceSet.TYPE_DETAIL_LIST, null, "hierarchy");
         appearsInclude.setHead(T_head_parent_collections);
-
         //Reference all collections the item appears in.
         for (Collection collection : item.getCollections()) {
             appearsInclude.addReference(collection);
+        }
+
+        String myDataPkgColl = ConfigurationManager.getProperty("stats.datapkgs.coll");
+
+        //add related Item
+        if (item.getOwningCollection().getHandle().equals(myDataPkgColl)) {
+            String schema = "dryad";
+            String element = "citationTitle";
+            DCValue[] keyWords= item.getMetadata(schema+"."+element);
+
+
+            if(keyWords.length>0){
+
+
+
+                List<Serializable> parameters = new ArrayList<Serializable>();
+                String metaDataFieldQuery ="select distinct value.item_id from item i,metadatavalue value,metadatafieldregistry id,metadataschemaregistry s where s.short_id= ? and id.metadata_schema_id = s.metadata_schema_id and id.element = ? and id.metadata_field_id = value.metadata_field_id and i.in_archive=true and i.item_id=value.item_id and i.withdrawn=false and (LOWER(value.text_value)= LOWER(?)";
+                parameters.add(schema);
+                parameters.add(element);
+                String queryString=null;
+                for(DCValue keyword : keyWords)
+                {
+                    queryString= keyword.value;
+
+                    metaDataFieldQuery=metaDataFieldQuery+" or LOWER(value.text_value)=LOWER(?)";
+                    parameters.add(queryString);
+                }
+                parameters.add(queryString);
+                metaDataFieldQuery=metaDataFieldQuery+")";
+                Object[] parametersArray = parameters.toArray();
+                TableRowIterator tri = DatabaseManager.query(context, metaDataFieldQuery, parametersArray);
+                if(tri.hasNext()){
+                ReferenceSet relatedSet;
+                if (showFullItem(objectModel)) {
+                    relatedSet = division.addReferenceSet("related-viewer", "related-item-detail");
+                } else {
+                    relatedSet = division.addReferenceSet("related-viewer", "related-item-summary");
+                }
+                relatedSet.setHead(T_head_related_item);
+                try
+                {
+
+                    while (tri.hasNext())
+                    {
+                        TableRow row = tri.next();
+                        Integer itemId = row.getIntColumn("item_id");
+                        Item referenceItem = Item.find(context, itemId);
+                        if (item.getOwningCollection().getHandle().equals(myDataPkgColl) && item.getID()!=referenceItem.getID()) {
+                            relatedSet.addReference(referenceItem);
+                        }
+                    }
+                }
+                finally
+                {
+                    // close the TableRowIterator to free up resources
+                    if (tri != null)
+                    {
+                        tri.close();
+                    }
+                }
+                }
+
+            }
         }
     }
 
