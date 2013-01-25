@@ -644,7 +644,7 @@
             <xsl:text>ds-artifact-item even</xsl:text>
         </xsl:attribute>
         <xsl:variable name="doiIdentifier"
-                      select=".//dim:field[@element='identifier'][@mdschema='dc'][not(@qualifier)]"/>
+                      select=".//dim:field[@element='identifier'][@mdschema='dc'][not(@qualifier)][1]"/>
         <xsl:variable name="itemWithdrawn" select="@withdrawn"/>
         <div>
             <xsl:attribute name="class">artifact-description dataset</xsl:attribute>

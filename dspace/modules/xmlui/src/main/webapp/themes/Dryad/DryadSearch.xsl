@@ -256,7 +256,7 @@
 	<!-- Change the fields shown in search results -->
 	<xsl:template match="dim:dim" mode="itemSummaryList-DIM">
 		<xsl:variable name="itemWithdrawn" select="@withdrawn" />
-        <xsl:variable name="doiIdentifier" select=".//dim:field[@element='identifier'][@mdschema='dc'][not(@qualifier)]" />
+        <xsl:variable name="doiIdentifier" select=".//dim:field[@element='identifier'][@mdschema='dc'][not(@qualifier)][1]" />
 
         <xsl:call-template name="itemSummaryTemplate">
             <xsl:with-param name="itemUrl" select="false"/>
@@ -295,7 +295,7 @@
                         </xsl:when>
                         <xsl:when test="$doiIdentifier">
                             <xsl:text>/resource/</xsl:text>
-                            <xsl:copy-of select=".//dim:field[@element='identifier'][@mdschema='dc'][not(@qualifier)]"/>
+                            <xsl:copy-of select=".//dim:field[@element='identifier'][@mdschema='dc'][not(@qualifier)][1]"/>
                         </xsl:when>
                         <xsl:otherwise>
                             <xsl:value-of select="ancestor::mets:METS/@OBJID"/>
@@ -403,7 +403,7 @@
                 </xsl:if>
                 <span>
                     <xsl:variable name="id"
-                                  select="dim:field[@element='identifier'][not(@qualifier)][@mdschema='dc']"/>
+                                  select="dim:field[@element='identifier'][not(@qualifier)][@mdschema='dc'][1]"/>
                     <xsl:if test="$id[starts-with(., 'doi')]">
                         <xsl:value-of select="$id"/>
                     </xsl:if>
