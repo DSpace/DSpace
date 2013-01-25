@@ -336,7 +336,7 @@ on names with last name first (comma delimited). -->
     <xsl:param name="url"/>
     <xsl:template name="checkURL">
         <xsl:param name="doiIdentifier"
-                   select=".//dim:field[@element='identifier'][@mdschema='dc'][not(@qualifier)]"/>
+                   select=".//dim:field[@element='identifier'][@mdschema='dc'][not(@qualifier)][1]"/>
 
         <xsl:choose>
             <xsl:when
