@@ -135,53 +135,55 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                 performSearch(dso);
 
                 // Add the actual collection;
-                if (dso != null)
-                {
+                if (dso != null) {
                     val.add(dso);
                 }
 
-		if(queryResults.getResults() != null) {
-		    val.add("numFound:" + queryResults.getResults().getNumFound());
-		    
-		    for (SolrDocument doc : queryResults.getResults()) {
-			val.add(doc.toString());
-		    }
-		    
-		    for (SolrDocument doc : queryResults.getResults()) {
-			val.add(doc.toString());
-		    }
-		    
-		    for (FacetField field : queryResults.getFacetFields()) {
-			val.add(field.getName());
-			
-			if(field.getValues() != null) {
-			    for (FacetField.Count count : field.getValues()) {
-				val.add(count.getName() + count.getCount());
-			    }
-			}
-		    }
+                if (queryResults.getResults() != null) {
+                    val.add("numFound:" + queryResults.getResults().getNumFound());
+
+                    for (SolrDocument doc : queryResults.getResults()) {
+                        val.add(doc.toString());
+                    }
+
+                    for (SolrDocument doc : queryResults.getResults()) {
+                        val.add(doc.toString());
+                    }
+
+                    if (queryResults.getFacetFields() != null) {
+
+                        for (FacetField field : queryResults.getFacetFields()) {
+                            val.add(field.getName());
+
+                            if (field.getValues() != null) {
+                                for (FacetField.Count count : field.getValues()) {
+                                    val.add(count.getName() + count.getCount());
+                                }
+                            }
+                        }
+                    }
+
                 }
                 SolrDocumentList solrResults = queryResults.getResults();
 
-                if(solrResults.size()==1){
+                if (solrResults.size() == 1 && !this.sitemapURI.equals("workflow-overview")) {
                     HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 
                     String baseURL = ConfigurationManager.getProperty("dspace.baseUrl");
                     for (SolrDocument doc : solrResults) {
                         DSpaceObject resultDSO = SearchUtils.findDSpaceObject(context, doc);
-                        if (resultDSO instanceof Item){
-                            Item item =  (Item) resultDSO;
-                            DCValue[] value = item.getMetadata("dc","identifier",null,Item.ANY) ;
+                        if (resultDSO instanceof Item) {
+                            Item item = (Item) resultDSO;
+                            DCValue[] value = item.getMetadata("dc", "identifier", null, Item.ANY);
                             String buildURL = null;
-                            if(value!=null && value.length > 0){
+                            if (value != null && value.length > 0) {
                                 String doi = value[0].value;
-                                buildURL = baseURL+"/resource/"+doi;
+                                buildURL = baseURL + "/resource/" + doi;
+                            } else {
+                                if (item.getHandle() != null)
+                                    buildURL = baseURL + "/handle/" + item.getHandle();
                             }
-                            else{
-                                if(item.getHandle()!=null)
-                                    buildURL = baseURL+"/handle/"+item.getHandle();
-                            }
-                            if(buildURL!=null) {
+                            if (buildURL != null) {
                                 httpResponse.sendRedirect(buildURL);
                             }
                         }
@@ -189,9 +191,8 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                 }
 
                 this.validity = val.complete();
-            }
-            catch (Exception e) {
-                log.error("unable to generate new DSpaceValidity object",e);
+            } catch (Exception e) {
+                log.error("unable to generate new DSpaceValidity object", e);
             }
 
             //TODO: dependent on tags as well :)
