@@ -1838,6 +1838,7 @@
 	<message key="xmlui.aspect.versioning.VersionItemForm.submit_version">Version</message>
     <message key="xmlui.aspect.versioning.VersionItemForm.submit_update_version">Update Version</message>
     <message key="xmlui.aspect.versioning.VersionItemForm.summary">Reason for creating new version</message>
+    <message key="xmlui.aspect.versioning.VersionItemForm.reason">Reason should have at least 10 characters.</message>
 
     <message key="xmlui.aspect.versioning.VersionUpdateForm.title">Update Version</message>
 	<message key="xmlui.aspect.versioning.VersionUpdateForm.trail">Version</message>

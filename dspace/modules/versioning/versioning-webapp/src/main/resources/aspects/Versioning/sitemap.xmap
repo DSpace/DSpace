@@ -63,6 +63,7 @@
 
             <map:match pattern="item/version/create">
                 <map:transform type="VersionItemForm">
+                    <map:parameter name="errors" value="{flow-attribute:errors}"/>
                     <map:parameter name="itemID" value="{flow-attribute:itemID}"/>
                     <map:parameter name="summary" value="{flow-attribute:summary}"/>
                 </map:transform>
