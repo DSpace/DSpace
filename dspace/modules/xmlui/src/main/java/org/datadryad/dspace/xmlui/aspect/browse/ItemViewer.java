@@ -491,9 +491,10 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
 
 
                 List<Serializable> parameters = new ArrayList<Serializable>();
-                String metaDataFieldQuery ="select distinct value.item_id from item i,metadatavalue value,metadatafieldregistry id,metadataschemaregistry s where s.short_id= ? and id.metadata_schema_id = s.metadata_schema_id and id.element = ? and id.metadata_field_id = value.metadata_field_id and i.in_archive=true and i.item_id=value.item_id and i.withdrawn=false and (LOWER(value.text_value)= LOWER(?)";
+                String metaDataFieldQuery ="select distinct value.item_id from item i,metadatavalue value,metadatafieldregistry id,metadataschemaregistry s where s.short_id= ? and id.metadata_schema_id = s.metadata_schema_id and id.element = ? and id.metadata_field_id = value.metadata_field_id and i.in_archive=true and i.item_id=value.item_id and i.withdrawn=false and i.item_id != ? and (LOWER(value.text_value)= LOWER(?)";
                 parameters.add(schema);
                 parameters.add(element);
+                parameters.add(item.getID());
                 String queryString=null;
                 for(DCValue keyword : keyWords)
                 {
