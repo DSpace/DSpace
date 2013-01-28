@@ -22,6 +22,13 @@ nbactions.xml
 nb-configuration.xml
 META-INF/
 
+<<<<<<< HEAD
 ## Ignore all *.properties file in root folder, EXCEPT build.properties (the default)
 /*.properties
 !/build.properties
+=======
+## Ignore all *.properties file, EXCEPT build.properties (the default)
+*.properties
+!build.properties
+!maven.properties
+>>>>>>> Fix .gitignore to not ignore maven.properties
