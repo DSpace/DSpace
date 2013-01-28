@@ -99,6 +99,9 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
     private static final Message T_go_to_submission_page = message("xmlui.ItemViewer.goToSubmissionPage");
     private static final Message T_version_in_workflow = message("xmlui.ItemViewer.versionInWorkflow");
     private static final Message T_head_related_item = message("xmlui.ArtifactBrowser.ItemViewer.head_related_item");
+    private  static String schema = "dryad";
+    private  static String element = "citationTitle";
+    private  static String myDataPkgColl = ConfigurationManager.getProperty("stats.datapkgs.coll");
 
     private List<Item> dataFiles = new ArrayList<Item>();
 
@@ -153,8 +156,18 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
                     for (Item i : dataFiles) {
                         validity.add(i);
                     }
+                    if(item.getMetadata(schema+"."+element).length>0){
+                    List<Item> relatedItems = queryRelatedItems(item);
+                        if(relatedItems.size()>0){
+                            for (Item i : relatedItems) {
+                                validity.add(i);
+                            }
+                        }
+                    }
                 }
                 validity.add(dso);
+
+
 
                 this.validity = validity.complete();
             } catch (Exception e) {
@@ -477,67 +490,28 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
             appearsInclude.addReference(collection);
         }
 
-        String myDataPkgColl = ConfigurationManager.getProperty("stats.datapkgs.coll");
+
 
         //add related Item
         if (item.getOwningCollection().getHandle().equals(myDataPkgColl)) {
-            String schema = "dryad";
-            String element = "citationTitle";
-            DCValue[] keyWords= item.getMetadata(schema+"."+element);
-
-
-            if(keyWords.length>0){
 
 
 
-                List<Serializable> parameters = new ArrayList<Serializable>();
-                String metaDataFieldQuery ="select distinct value.item_id from item i,metadatavalue value,metadatafieldregistry id,metadataschemaregistry s where s.short_id= ? and id.metadata_schema_id = s.metadata_schema_id and id.element = ? and id.metadata_field_id = value.metadata_field_id and i.in_archive=true and i.item_id=value.item_id and i.withdrawn=false and i.item_id != ? and (LOWER(value.text_value)= LOWER(?)";
-                parameters.add(schema);
-                parameters.add(element);
-                parameters.add(item.getID());
-                String queryString=null;
-                for(DCValue keyword : keyWords)
-                {
-                    queryString= keyword.value;
-
-                    metaDataFieldQuery=metaDataFieldQuery+" or LOWER(value.text_value)=LOWER(?)";
-                    parameters.add(queryString);
-                }
-                parameters.add(queryString);
-                metaDataFieldQuery=metaDataFieldQuery+")";
-                Object[] parametersArray = parameters.toArray();
-                TableRowIterator tri = DatabaseManager.query(context, metaDataFieldQuery, parametersArray);
-                if(tri.hasNext()){
-                ReferenceSet relatedSet;
-                if (showFullItem(objectModel)) {
-                    relatedSet = division.addReferenceSet("related-viewer", "related-item-detail");
-                } else {
-                    relatedSet = division.addReferenceSet("related-viewer", "related-item-summary");
-                }
-                relatedSet.setHead(T_head_related_item);
-                try
-                {
-
-                    while (tri.hasNext())
-                    {
-                        TableRow row = tri.next();
-                        Integer itemId = row.getIntColumn("item_id");
-                        Item referenceItem = Item.find(context, itemId);
-                        if (item.getOwningCollection().getHandle().equals(myDataPkgColl) && item.getID()!=referenceItem.getID()) {
-                            relatedSet.addReference(referenceItem);
-                        }
+            if(item.getMetadata(schema+"."+element).length>0){
+                List<Item> relatedItems = null;
+                relatedItems = queryRelatedItems(item);
+                if(relatedItems.size()>0){
+                    ReferenceSet relatedSet;
+                    if (showFullItem(objectModel)) {
+                        relatedSet = division.addReferenceSet("related-viewer", "related-item-detail");
+                    } else {
+                        relatedSet = division.addReferenceSet("related-viewer", "related-item-summary");
+                    }
+                    relatedSet.setHead(T_head_related_item);
+                    for(Item relatedItem : relatedItems){
+                    relatedSet.addReference(relatedItem);
                     }
                 }
-                finally
-                {
-                    // close the TableRowIterator to free up resources
-                    if (tri != null)
-                    {
-                        tri.close();
-                    }
-                }
-                }
-
             }
         }
     }
@@ -763,6 +737,56 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
         p.addContent(message);
         if (link != null)  //avoid adding worthless links to "/"
         	p.addXref(link, linkMessage);
+
+    }
+
+    private List<Item> queryRelatedItems(Item item) throws SAXException, WingException,
+            UIException, SQLException, IOException, AuthorizeException{
+        DCValue[] keyWords= item.getMetadata(schema+"."+element);
+        List<Serializable> parameters = new ArrayList<Serializable>();
+        String metaDataFieldQuery ="select distinct value.item_id from item i,metadatavalue value,metadatafieldregistry id,metadataschemaregistry s where s.short_id= ? and id.metadata_schema_id = s.metadata_schema_id and id.element = ? and id.metadata_field_id = value.metadata_field_id and i.in_archive=true and i.item_id=value.item_id and i.withdrawn=false and i.item_id != ? and (LOWER(value.text_value)= LOWER(?)";
+        parameters.add(schema);
+        parameters.add(element);
+        parameters.add(item.getID());
+        List<Item> itemList = new ArrayList<Item>();
+        String queryString=null;
+        for(DCValue keyword : keyWords)
+        {
+            queryString= keyword.value;
+
+            metaDataFieldQuery=metaDataFieldQuery+" or LOWER(value.text_value)=LOWER(?)";
+            parameters.add(queryString);
+        }
+        parameters.add(queryString);
+        metaDataFieldQuery=metaDataFieldQuery+")";
+        Object[] parametersArray = parameters.toArray();
+
+        TableRowIterator tri = DatabaseManager.query(context, metaDataFieldQuery, parametersArray);
+        if(tri.hasNext()){
+            try
+            {
+
+                while (tri.hasNext())
+                {
+                    TableRow row = tri.next();
+                    Integer itemId = row.getIntColumn("item_id");
+                    Item referenceItem = Item.find(context, itemId);
+                    if (item.getOwningCollection().getHandle().equals(myDataPkgColl) && item.getID()!=referenceItem.getID()) {
+                                   itemList.add(referenceItem);
+                    }
+                }
+            }
+            finally
+            {
+                // close the TableRowIterator to free up resources
+                if (tri != null)
+                {
+                    tri.close();
+                }
+            }
+        }
+
+        return itemList;
 
     }
 }
