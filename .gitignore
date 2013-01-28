@@ -25,3 +25,4 @@ META-INF/
 ## Ignore all *.properties file, EXCEPT build.properties (the default)
 *.properties
 !build.properties
+!maven.properties
