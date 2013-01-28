@@ -123,12 +123,14 @@
             </bean>
         </property>
         <!--Any default filter queries, these filter queries will be used for all queries done by discovery for this configuration-->
-        <!--<property name="defaultFilterQueries">-->
-            <!--<list>-->
+        <property name="defaultFilterQueries">
+            <list>
+                <value>withdrawn: false</value>
+                <value>discoverable: true</value>
                 <!--Only find items-->
                 <!--<value>search.resourcetype:2</value>-->
-            <!--</list>-->
-        <!--</property>-->
+            </list>
+        </property>
         <!--The configuration for the recent submissions-->
         <property name="recentSubmissionConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoveryRecentSubmissionsConfiguration">
