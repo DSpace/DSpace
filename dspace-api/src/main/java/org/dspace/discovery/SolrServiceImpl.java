@@ -1464,6 +1464,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         if (!includeWithdrawn)
         {
         	solrQuery.addFilterQuery("NOT(withdrawn:true)");
+        	solrQuery.addFilterQuery("NOT(discoverable:false)");
 		}
 
         for (int i = 0; i < discoveryQuery.getFilterQueries().size(); i++)
