@@ -531,7 +531,7 @@
 	<!-- org.dspace.app.xmlui.Submission.submissions -->
 	<message key="xmlui.Submission.Submissions.title">Submissions &amp; Workflow</message>
 	<message key="xmlui.Submission.Submissions.trail">Submissions</message>
-	<message key="xmlui.Submission.Submissions.head">Submissions &amp; workflow tasks</message>
+	<message key="xmlui.Submission.Submissions.head">Submissions &amp; Workflow Tasks</message>
 	<message key="xmlui.Submission.Submissions.untitled"><i>Untitled</i></message>
 	<message key="xmlui.Submission.Submissions.email">email: </message>
 	<!-- Same transformer, workflow section -->
