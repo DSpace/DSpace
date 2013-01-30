@@ -175,7 +175,7 @@
 
 
         <!--Generates thumbnails (if present)-->
-        <xsl:apply-templates select="$metsDoc/mets:METS/mets:fileSec" mode="artifact-preview"/>
+        <xsl:apply-templates select="$metsDoc/mets:METS/mets:fileSec" mode="artifact-preview"><xsl:with-param name="href" select="concat($context-path, '/handle/', $handle)"/></xsl:apply-templates>
 
         <div class="artifact-description">
             <div class="artifact-title">
