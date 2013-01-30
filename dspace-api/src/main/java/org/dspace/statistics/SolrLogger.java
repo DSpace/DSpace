@@ -7,8 +7,9 @@
  */
 package org.dspace.statistics;
 
-import com.Ostermiller.util.CSVParser;
-import com.Ostermiller.util.CSVPrinter;
+import au.com.bytecode.opencsv.CSVParser;
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.CSVWriter;
 import com.maxmind.geoip.Location;
 import com.maxmind.geoip.LookupService;
 
@@ -17,6 +18,7 @@ import java.io.*;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
@@ -1302,7 +1304,8 @@ public class SolrLogger
 
                 InputStream  csvOutput = get.getResponseBodyAsStream();
                 Reader csvReader = new InputStreamReader(csvOutput);
-                String[][] csvParsed = CSVParser.parse(csvReader);
+                List<String[]> rows = new CSVReader(csvReader).readAll();
+                String[][] csvParsed = rows.toArray(new String[rows.size()][]);
                 String[] header = csvParsed[0];
                 //Attempt to find the bitstream id index !
                 int idIndex = 0;
@@ -1314,14 +1317,11 @@ public class SolrLogger
 
                 File tempCsv = new File(tempDirectory.getPath() + File.separatorChar + "temp." + i + ".csv");
                 tempCsvFiles.add(tempCsv);
-                FileOutputStream outputStream = new FileOutputStream(tempCsv);
-                CSVPrinter csvp = new CSVPrinter(outputStream);
-                csvp.setAlwaysQuote(false);
+                CSVWriter csvp = new CSVWriter(new FileWriter(tempCsv));
+                //csvp.setAlwaysQuote(false);
 
                 //Write the header !
-                csvp.write(header);
-                csvp.write("bundleName");
-                csvp.writeln();
+                csvp.writeNext((String[]) ArrayUtils.add(header, "bundleName"));
                 Map<Integer, String> bitBundleCache = new HashMap<Integer, String>();
                 //Loop over each line (skip the headers though)!
                 for (int j = 1; j < csvParsed.length; j++){
@@ -1365,9 +1365,7 @@ public class SolrLogger
                             bundleName = "BITSTREAM_DELETED";
                         }
                     }
-                    csvp.write(csvLine);
-                    csvp.write(bundleName);
-                    csvp.writeln();
+                    csvp.writeNext((String[]) ArrayUtils.add(csvLine, bundleName));
                 }
 
                 //Loop over our parsed csv
