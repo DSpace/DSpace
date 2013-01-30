@@ -545,12 +545,12 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api-lang</artifactId>
-            <version>[3.0.2,4.0.0)</version>
+            <version>[3.0.0,4.0.0)</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-lang</artifactId>
-            <version>[3.0.2,4.0.0)</version>
+            <version>[3.0.0,4.0.0)</version>
             <type>war</type>
          </dependency>
          <!-- DSpace third Party Dependencies -->
