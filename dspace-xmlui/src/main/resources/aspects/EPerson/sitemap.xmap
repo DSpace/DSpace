@@ -41,6 +41,7 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 		<map:actions>
 			<map:action name="AuthenticateAction" src="org.dspace.app.xmlui.aspect.eperson.AuthenticateAction"/>
 			<map:action name="ShibbolethAction" src="org.dspace.app.xmlui.aspect.eperson.ShibbolethAction"/>
+			<map:action name="CASAuthenticateAction" src="org.dspace.app.xmlui.aspect.eperson.CASAuthenticateAction"/>
 			<map:action name="LDAPAuthenticateAction" src="org.dspace.app.xmlui.aspect.eperson.LDAPAuthenticateAction"/>
 			<map:action name="UnAuthenticateAction" src="org.dspace.app.xmlui.aspect.eperson.UnAuthenticateAction"/>
 			<map:action name="LoginRedirect" src="org.dspace.app.xmlui.aspect.eperson.LoginRedirect" />
@@ -183,6 +184,16 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 				<!-- Login failed, try again. --> 
 				<map:transform type="LDAPLogin"/>
 				<map:serialize type="xml"/>
+			</map:match>
+
+			<map:match pattern="cas-login">
+			        <map:act type="CASAuthenticateAction">
+				         <!-- Login succeeded, request will be forwarded. -->
+        	                         <map:serialize type="xml"/>
+			       </map:act>
+			       <!-- Login failed, try again. --> 
+			       <map:transform type="FailedAuthentication"/>
+			       <map:serialize type="xml"/>
 			</map:match>
 			
 			<!--
