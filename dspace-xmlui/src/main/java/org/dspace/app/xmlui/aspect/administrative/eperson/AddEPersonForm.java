@@ -25,6 +25,7 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.ConfigurationManager;
 
 /**
  * Present the user with all the eperson metadata fields so that they
