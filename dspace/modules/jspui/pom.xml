@@ -150,7 +150,7 @@
 	<dependency>
 		<groupId>jdyna-web-api</groupId>
 		<artifactId>jdyna-web-api</artifactId>
-		<version>3.0-alpha</version>
+		<version>3.0-beta</version>
 	</dependency>
 
 	<dependency>
@@ -162,12 +162,12 @@
     <dependency>
 		<groupId>jdyna-webmvc-api</groupId>
 		<artifactId>jdyna-webmvc-api</artifactId>
-		<version>3.0-alpha</version>
+		<version>3.0-beta</version>
 	</dependency>
 	<dependency>
 		<groupId>jdyna-webmvc-webapp</groupId>
 		<artifactId>jdyna-webmvc-webapp</artifactId>
-		<version>3.0-alpha</version>
+		<version>3.0-beta</version>
 		<type>war</type>
 	</dependency>
 

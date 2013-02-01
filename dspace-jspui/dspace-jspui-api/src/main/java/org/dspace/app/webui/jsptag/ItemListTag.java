@@ -66,10 +66,10 @@ public class ItemListTag extends TagSupport
     /** Config browse/search width and height */
     private static int thumbItemListMaxWidth;
 
-    private static int thumbItemListMaxHeight;
-
-    /** Config browse/search thumbnail link behaviour */
-    private static boolean linkToBitstream = false;
+//    private static int thumbItemListMaxHeight;
+//
+//    /** Config browse/search thumbnail link behaviour */
+//    private static boolean linkToBitstream = false;
 
     /** Config to include an edit link */
     private boolean linkToEdit = false;
@@ -104,7 +104,10 @@ public class ItemListTag extends TagSupport
     {
         showThumbs = ConfigurationManager
                 .getBooleanProperty("webui.browse.thumbnail.show");
-
+        
+        thumbItemListMaxWidth = ConfigurationManager
+                .getIntProperty("webui.browse.thumbnail.maxwidth");
+        
         if (showThumbs)
         {
             DEFAULT_LIST_FIELDS = "thumbnail, dc.date.issued(date), dc.title, dc.contributor.*";
@@ -240,7 +243,7 @@ public class ItemListTag extends TagSupport
         // Arrays used to hold the information we will require when outputting each row
         String[] fieldArr  = configLine == null ? new String[0] : configLine.split("\\s*,\\s*");
         String[] widthArr  = widthLine  == null ? new String[0] : widthLine.split("\\s*,\\s*");
-        boolean isDate[]   = new boolean[fieldArr.length];
+//        boolean isDate[]   = new boolean[fieldArr.length];
         boolean emph[]     = new boolean[fieldArr.length];
         String useRender[] = new String[fieldArr.length];
         boolean isAuthor[] = new boolean[fieldArr.length];
