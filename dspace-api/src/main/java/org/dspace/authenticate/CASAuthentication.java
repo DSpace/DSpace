@@ -119,7 +119,7 @@ public class CASAuthentication
             try
             {
                 // Determine CAS validation URL
-                String validate = ConfigurationManager.getProperty("cas.validate.url");
+                String validate = ConfigurationManager.getProperty("authentication-cas", "cas.validate.url");
                 log.info(LogManager.getHeader(context, "login", "CAS validate:  " + validate));
                 if (validate == null)
                 {
@@ -293,7 +293,7 @@ public class CASAuthentication
                             HttpServletResponse response)
     {
        // Determine CAS server URL
-       final String authServer = ConfigurationManager.getProperty("cas.server.url");
+       final String authServer = ConfigurationManager.getProperty("authentication-cas", "cas.server.url");
        StringBuffer url=new StringBuffer(authServer);
        url.append("?service=").append(request.getScheme()).
        append("://").append(request.getServerName());

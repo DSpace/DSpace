@@ -81,7 +81,7 @@ public class UnAuthenticateAction extends AbstractAction
         }
         if(loginType!=null && loginType.equals("CAS")){
            StringBuffer location=new StringBuffer();
-           location.append(ConfigurationManager.getProperty("cas.logout.url")).append
+           location.append(ConfigurationManager.getProperty("authentication-cas","cas.logout.url")).append
                    ("?service=http://").append(httpRequest.getServerName()).append(":").append(
                    httpRequest.getServerPort()).append(httpRequest.getContextPath());
            httpResponse.sendRedirect(location.toString());

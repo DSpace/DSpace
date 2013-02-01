@@ -101,8 +101,8 @@ public class FlowEPersonUtils {
     		result.addError("eperson_email_key");
     	}
 	       //Check if if the netid is already being used.
-        if("true".equals(ConfigurationManager.getProperty("webui.cas.enable"))){
-          EPerson potentialDupicate = EPerson.findByNetid(context, netid);
+        if("true".equals(ConfigurationManager.getProperty("authentication-cas", "webui.cas.enable"))){
+          potentialDupicate = EPerson.findByNetid(context, netid);
           if (potentialDupicate != null)
           {
 		// special error that the front end knows about.
@@ -205,7 +205,7 @@ public class FlowEPersonUtils {
         		}
         	}
                 //dauphine; check if if the netid is alreday being used
-            if("true".equals(ConfigurationManager.getProperty("webui.cas.enable"))){
+            if("true".equals(ConfigurationManager.getProperty("authentication-cas", "webui.cas.enable"))){
                 EPerson potentialDupicate = EPerson.findByNetid(context, netid);
                      if (potentialDupicate == null) 
                      {

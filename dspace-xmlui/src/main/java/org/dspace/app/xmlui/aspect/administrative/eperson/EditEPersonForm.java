@@ -285,7 +285,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
         	identity.addItem(lastValue);
         }
 
-        if ("true".equals(ConfigurationManager.getProperty("webui.cas.enable")))
+        if ("true".equals(ConfigurationManager.getProperty("authentication-cas", "webui.cas.enable")))
         {
            if (admin) {
         	Text netid = identity.addItem().addText("netid");

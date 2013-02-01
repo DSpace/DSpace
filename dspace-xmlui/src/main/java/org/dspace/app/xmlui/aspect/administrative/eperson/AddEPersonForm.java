@@ -180,7 +180,7 @@ public class AddEPersonForm extends AbstractDSpaceTransformer
         	lastName.addError(T_error_lname);
         }
 
-        if("true".equals(ConfigurationManager.getProperty("webui.cas.enable"))){
+        if("true".equals(ConfigurationManager.getProperty("authentication-cas","webui.cas.enable"))){
           Text netid = identity.addItem().addText("netid");
           netid.setLabel(T_netid);
           netid.setValue(netidValue);
