@@ -298,7 +298,7 @@ public class CASAuthentication
        url.append("?service=").append(request.getScheme()).
        append("://").append(request.getServerName());
        //Add the URL callback
-       if(request.getServerPort()!=80)
+       if((request.getServerPort()!=80) && request.getServerPort()!=443)
     	   url.append(":").append(request.getServerPort());
        url.append(request.getContextPath()).append("/cas-login");
        log.info("CAS server and service:  " + authServer);
