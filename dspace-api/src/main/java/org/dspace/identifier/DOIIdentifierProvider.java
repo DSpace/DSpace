@@ -25,6 +25,7 @@ import org.dspace.core.Context;
 import org.dspace.identifier.doi.RegistrationAgency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -66,13 +67,7 @@ public class DOIIdentifierProvider
     extends IdentifierProvider
 {
     private static final Logger log = LoggerFactory.getLogger(DOIIdentifierProvider.class);
-    
-    /**
-     * Configuration property names to look which registration agency should be used.
-     * Set to identifier.doi.registrationagency.
-     */
-    static final String CFG_REGISTRATIONAGENCY = "identifier.doi.registrationagency";
-    
+        
     // Metadata field name elements
     // TODO: move these to MetadataSchema or some such
     public static final String MD_SCHEMA = "dc";
@@ -83,40 +78,10 @@ public class DOIIdentifierProvider
     
     private RegistrationAgency registrationAgency;
     
-    public DOIIdentifierProvider() {
-        super();
-        this.loadRegistrationAgency();
-    }
-    
-    /**
-     * Load the DOI Registration Agency. It should be configured in dspace.cfg
-     * using the key defined in <link>#CFG_REGISTRATIONAGENCY</link>. If it is
-     * not configured
-     * <code>org.dspace.identifier.doi.EZIDRegistrationAgency</code> will be
-     * used as default.
-     * TODO: If we ever will support more than one DOI prefix we should perhaps
-     * support more than one registration agency as well.
-     *
-     * @throws IllegalStateException
-     *             if the configured registration agency can't be loaded
-     */
-    private void loadRegistrationAgency()
-    {
-        String registrationAgencyClassName = this.configurationService.getProperty(CFG_REGISTRATIONAGENCY);
-
-        if (registrationAgencyClassName == null) {
-            // Use default
-            registrationAgencyClassName = "org.dspace.identifier.doi.EZIDRegistrationAgency";
-        }
-
-        try {
-            Class registrationAgencyClass = Class.forName(registrationAgencyClassName);
-            Constructor constructor = registrationAgencyClass.getDeclaredConstructor();
-            this.registrationAgency = (RegistrationAgency) constructor.newInstance();
-        } catch (Exception e) {
-            log.error("Unable to load DOI registration Agency: " + e.getMessage());
-            throw new IllegalStateException(e);
-        }
+    @Required
+    @Autowired
+    public void setRegistrationAgency(RegistrationAgency ra) {
+        this.registrationAgency = ra;
     }
     
     @Override

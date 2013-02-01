@@ -11,15 +11,41 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd" xmlns:aop="http://www.springframework.org/schema/aop">
 
-    <bean id="org.dspace.identifier.DataCiteIdentifierProvider"
-          class="org.dspace.identifier.DataCiteIdentifierProvider"
-          scope='singleton'>
+<!-- To use DOIs as identifier, please remove the following comments, decide
+which registration agency you want to use, remove the comments there and have
+a look on the properties in dspace.cfg. //-->
+<!---->
+    <bean id="org.dspace.identifier.DOIIdentifierProvider"
+        class="org.dspace.identifier.DOIIdentifierProvider"
+        scope="singleton">
+        <property name="registrationAgency"
+                      ref="org.dspace.identifier.doi.RegistrationAgency" />
+    </bean>
+<!--//-->
+    
+    <bean id="org.dspace.identifier.doi.RegistrationAgency"
+        class="org.dspace.identifier.doi.DataCiteRegistrationAgency"
+        scope="singleton">
         <property name="configurationService"
-                      ref="org.dspace.services.ConfigurationService"/>
+                  ref="org.dspace.services.ConfigurationService" />
+        <property name='DATACITE_SCHEME' value='https'/>
+        <property name='DATACITE_HOST' value='test.datacite.org'/>
+        <property name='DATACITE_DOI_PATH' value='mds/doi' />
+        <property name='DATACITE_METADATA_PATH' value='mds/metadata' />
+        <property name='disseminationCrosswalk' value="DataCite" />
+    </bean>
+
+<!--
+    <bean id="org.dspace.identifier.doi.RegistrationAgency"
+        class="org.dspace.identifier.doi.EZIDRegistrationAgency"
+        scope="singleton">
+        <property name="configurationService"
+                      ref="org.dspace.services.ConfigurationService" />
         <property name='requestFactory'>
-            <bean class='org.dspace.identifier.ezid.EZIDRequestFactory'>
+            <bean class='org.dspace.identifier.doi.EZIDRequestFactory'>
                 <property name='EZID_SCHEME' value='https'/>
                 <property name='EZID_HOST' value='n2t.net'/>
             </bean>
@@ -33,5 +59,6 @@
             </map>
         </property>
     </bean>
-
+//-->
+    
 </beans>
