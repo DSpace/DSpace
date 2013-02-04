@@ -387,4 +387,12 @@
         </step>
     </command>
 
+    <command>
+        <name>version</name>
+        <description>Display the version of DSpace and other troubleshooting information</description>
+        <step>
+            <class>org.dspace.app.util.Version</class>
+        </step>
+    </command>
+
 </commands>
