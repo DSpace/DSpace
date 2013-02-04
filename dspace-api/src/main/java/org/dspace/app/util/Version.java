@@ -9,8 +9,11 @@ package org.dspace.app.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
 
 /**
  * Display information about this DSpace, its environment, and how it was built.
@@ -36,7 +39,18 @@ public class Version
 
         // TODO UIs used
 
-        // TODO is Discovery available?
+        // Is Discovery available?
+        ConfigurationService config = new DSpace().getConfigurationService();
+        String consumers = config.getPropertyAsType("event.dispatcher.default.consumers", ""); // Avoid null pointer
+        List<String> consumerList = Arrays.asList(consumers.split("\\s*,\\s*"));
+        if (consumerList.contains("discovery"))
+        {
+            System.out.println("Discovery enabled.");
+        }
+        if (consumerList.contains("search"))
+        {
+            System.out.println("Lucene search enabled.");
+        }
 
         // Java version
         System.out.printf("           JRE:  %s version %s\n",
@@ -67,6 +81,6 @@ public class Version
 
         // DSpace directory path
         System.out.printf("   DSpace home:  %s\n",
-                          ConfigurationManager.getProperty("dspace.dir"));
+                          config.getProperty("dspace.dir"));
     }
 }
