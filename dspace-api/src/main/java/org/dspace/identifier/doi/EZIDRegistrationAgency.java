@@ -49,13 +49,20 @@ import org.springframework.beans.factory.annotation.Required;
  * @author Pascal-Nicolas Becker (p dot becker at tu hyphen berlin dot de)
  */
 public abstract class EZIDRegistrationAgency extends RegistrationAgency {
-    private static final Logger log = LoggerFactory.getLogger(DOIIdentifierProvider.class);
+    private static final Logger log = LoggerFactory.getLogger(EZIDRegistrationAgency.class);
     
     /** Map DataCite metadata into local metadata. */
     protected static Map<String, String> crosswalk = new HashMap<String, String>();
-
     
-    @Required
+    // Configuration property names
+    static final String CFG_SHOULDER = "identifier.doi.ezid.shoulder";
+    static final String CFG_USER = "identifier.doi.ezid.user";
+    static final String CFG_PASSWORD = "identifier.doi.ezid.password";
+
+    /** Factory for EZID requests. */
+    private static EZIDRequestFactory requestFactory;
+
+        @Required
     public void setCrosswalk(Map<String, String> aCrosswalk)
     {
         crosswalk = aCrosswalk;
@@ -86,21 +93,13 @@ public abstract class EZIDRegistrationAgency extends RegistrationAgency {
         return mapped;
     }
     
-    // Configuration property names
-    static final String CFG_SHOULDER = "identifier.doi.ezid.shoulder";
-    static final String CFG_USER = "identifier.doi.ezid.user";
-    static final String CFG_PASSWORD = "identifier.doi.ezid.password";
-
-    /** Factory for EZID requests. */
-    private static EZIDRequestFactory requestFactory;
-    
     @Override
     public boolean create(String identifier, DSpaceObject dso) {
         try {
             // remove doi prefix from id, as it EZIDRequest get's it as constructor attribute
             identifier = DOIToId(identifier);
         } catch (IdentifierException e) {
-            log.error("Unable to load doi prefix: " + e.getMessage());
+            log.error("Unable to load doi prefix: {}", e.getMessage());
             return false;
         }
         
