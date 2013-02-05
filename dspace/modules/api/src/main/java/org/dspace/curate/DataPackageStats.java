@@ -228,6 +228,11 @@ public class DataPackageStats extends AbstractCurationTask {
 		    packageSize = 0;
 		    
 		    // for each data file in the package
+
+		    /* **************************
+		       THIS SECTION COMMENTED OUT -- we need to rework how files are retrieved from the database.
+		       **************************
+
 		    for(int i = 0; i < vals.length; i++) {
 			String fileID = vals[i].value;
 			log.debug(" ======= processing fileID = " + fileID);
@@ -328,6 +333,7 @@ public class DataPackageStats extends AbstractCurationTask {
 			log.debug("max downloads = " + numberOfDownloads);
 			
 		    }
+		    */
 		}
 
 	    } catch (Exception e) {
