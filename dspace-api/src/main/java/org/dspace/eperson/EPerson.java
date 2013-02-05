@@ -1279,10 +1279,13 @@ public class EPerson extends DSpaceObject
             status = 1;
         }
 
-        try {
-            context.complete();
-        } catch (SQLException ex) {
-            System.err.println(ex.getMessage());
+        if (context.isValid())
+        {
+            try {
+                context.complete();
+            } catch (SQLException ex) {
+                System.err.println(ex.getMessage());
+            }
         }
 
         System.exit(status);
