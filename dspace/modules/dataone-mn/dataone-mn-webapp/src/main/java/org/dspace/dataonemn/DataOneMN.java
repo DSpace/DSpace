@@ -201,7 +201,7 @@ public class DataOneMN extends HttpServlet implements Constants {
         if(requestIP == null) {
             requestIP = request.getRemoteAddr();
         }
-	//final String requestHost = request.getRemoteHost();
+
 	final String requestUser = request.getRemoteUser();
 	le.setIPAddress(requestIP);
 	le.setUserAgent(request.getHeader("user-agent"));
@@ -524,7 +524,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	    if (!id.endsWith("/bitstream")) {
 		// return a metadata record (file or package)
 		fileName = simpleDOI + ".xml";
-        response.setContentType(XML_CONTENT_TYPE);
+		response.setContentType(XML_CONTENT_TYPE);
 
 		// throw early, try not to create an output stream
 		Item item = objManager.getDSpaceItem(id);
