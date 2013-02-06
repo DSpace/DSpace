@@ -1228,24 +1228,12 @@ public class EPerson extends DSpaceObject
      * Tool for manipulating user accounts.
      */
     public static void main(String argv[])
+            throws ParseException, SQLException
     {
         final PosixParser parser = new PosixParser();
-        CommandLine command = null;
+        CommandLine command = parser.parse(globalOptions, argv, true);
 
-        try {
-            command = parser.parse(globalOptions, argv, true);
-        } catch (ParseException e) {
-            System.err.println(e.getMessage());
-            System.exit(1);
-        }
-
-        Context context = null;
-        try {
-            context = new Context();
-        } catch (SQLException ex) {
-            System.err.println(ex.getMessage());
-            System.exit(1);
-        }
+        Context context = new Context();
 
         // Disable authorization since this only runs from the local commandline.
         context.turnOffAuthorisationSystem();
@@ -1277,6 +1265,7 @@ public class EPerson extends DSpaceObject
             new HelpFormatter().printHelp("user [options]", globalOptions);
             context.abort();
             status = 1;
+            throw new IllegalArgumentException();
         }
 
         if (context.isValid())
@@ -1287,8 +1276,6 @@ public class EPerson extends DSpaceObject
                 System.err.println(ex.getMessage());
             }
         }
-
-        System.exit(status);
     }
 
     /** Command to create an EPerson. */
