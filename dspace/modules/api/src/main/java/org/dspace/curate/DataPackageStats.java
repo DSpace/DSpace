@@ -43,7 +43,8 @@ import org.apache.log4j.Logger;
  *
  * WARNING: This file is deprecated! Its original purpose was to generate
  * statistics for the 2011 Dryad NSF grant proposal. We are now breaking these stats out into their
- * own curation tasks, which makes it easier to update when we need to make changes.
+ * own curation tasks, which makes it easier to update when we need to make changes. For summary stats,
+ * see PackageSimpleStats. For a brief listing of fields from a particular package, see DataPackageInfo.
  *
  * The task succeeds if it was able to locate all required stats, otherwise it fails.
  * Originally based on the RequiredMetadata task by Richard Rodgers.
@@ -59,6 +60,7 @@ public class DataPackageStats extends AbstractCurationTask {
 
     DocumentBuilderFactory dbf = null;
     DocumentBuilder docb = null;
+    static long total = 0;
     
     @Override 
     public void init(Curator curator, String taskId) throws IOException {
@@ -81,7 +83,7 @@ public class DataPackageStats extends AbstractCurationTask {
      */
     @Override
     public int perform(DSpaceObject dso) throws IOException {
-	log.info("performing DataPackageStats task");
+	log.info("performing DataPackageStats task " + total++ );
 	
 	String handle = "[no handle found]";
 	String doi = "[no DOI found]";
@@ -151,8 +153,7 @@ public class DataPackageStats extends AbstractCurationTask {
 		    dateAccessioned = vals[0].value;
 		}
 		log.debug("dateAccessioned = " + dateAccessioned);
-		
-		
+				
 		// number of keywords
 		int intNumKeywords = item.getMetadata("dc.subject").length +
 		    item.getMetadata("dwc.ScientificName").length +
@@ -163,7 +164,13 @@ public class DataPackageStats extends AbstractCurationTask {
 		log.debug("numKeywords = " + numKeywords);
 
 		// number of keywords in journal email
-		//TODO: fix this for the new style of manuscript numbers -- it fails on anything deposited in 2012 and later
+
+		/* **************************
+		   COMMENTED OUT THIS SECTION -- we don't need the manuscript numbers right now, so removed until the error is fixed
+		   **************************
+		   
+		   //TODO: fix this for the new style of manuscript numbers -- it fails on anything deposited in 2012 and later
+		
 		DCValue[] manuvals = item.getMetadata("dc.identifier.manuscriptNumber");
 		manuscriptNum = null;
 		if(manuvals.length > 0) {
@@ -215,7 +222,7 @@ public class DataPackageStats extends AbstractCurationTask {
 		}
 		log.debug("numKeywordsJournal = " + numKeywordsJournal);
 
-
+		*/
 		
 		// number of files
 		log.debug("getting data file info");
@@ -335,7 +342,7 @@ public class DataPackageStats extends AbstractCurationTask {
 		    }
 		    */
 		}
-
+		log.info(handle + "done.");
 	    } catch (Exception e) {
 		log.fatal("Exception in processing", e);
 		setResult("Object has a fatal error: " + handle + "\n" + e.getMessage());
@@ -357,7 +364,7 @@ public class DataPackageStats extends AbstractCurationTask {
 	// TODO: remove this after the code above is rewritten to not use OAI or METS -- it will be much more
 	// efficient once it is accessing the database directly
 	try {
-	    Thread.sleep(500);
+	    Thread.sleep(200);
 	} catch(InterruptedException e) {
 	    // ignore it
 	}
