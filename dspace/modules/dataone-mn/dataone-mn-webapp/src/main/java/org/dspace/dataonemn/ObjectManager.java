@@ -1,19 +1,12 @@
 package org.dspace.dataonemn;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
+import java.util.*;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
@@ -35,6 +28,7 @@ import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.utils.DSpace;
+import org.dspace.content.DCValue;
 
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -42,6 +36,14 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
 import org.apache.log4j.Logger;
+
+import org.dataone.service.types.v1.Identifier;
+import org.dataone.ore.ResourceMapFactory;
+import org.dspace.foresite.ResourceMap;
+import org.dspace.foresite.OREException;
+import org.dspace.foresite.ORESerialiserException;
+
+import java.net.URISyntaxException;
 
 public class ObjectManager implements Constants {
     
@@ -340,6 +342,11 @@ public class ObjectManager implements Constants {
 		String shortID = aID.substring(0,bitsIndex);
 		aID = shortID;
 	    }
+	    if(aID.endsWith("/d1rem")) {
+		int bitsIndex = aID.indexOf("/d1rem");
+		String shortID = aID.substring(0,bitsIndex);
+		aID = shortID;
+	    }
 	    item = (Item) doiService.resolve(myContext, aID, new String[] {});
 	} catch (IdentifierNotFoundException e) {
 	    log.error(aID + " not found!");
@@ -527,6 +534,83 @@ public class ObjectManager implements Constants {
 	}
 	
     }
+
+    /**
+     * Write an ORE resource map to the output stream.
+     **/
+    public void getResourceMap(String aID, OutputStream aOutputStream)
+	throws IOException, SQLException, NotFoundException {
+	
+	log.debug("Retrieving resource map for " + aID);
+	
+	try {
+	    Item item = getDSpaceItem(aID);
+	    log.debug(" (DSO_ID: " + item.getID() + ") -- " + item.getHandle());
+
+	    // DOI
+	    String doi = "[DOI not found]";
+	    DCValue[] vals = item.getMetadata("dc.identifier");
+	    if (vals.length == 0) {
+		log.error("Object has no dc.identifier available " + aID);
+	    } else {
+		for(int i = 0; i < vals.length; i++) {
+		    if (vals[i].value.startsWith("doi:") || vals[i].value.startsWith("http://doi")) {
+			doi = vals[i].value;
+			break;
+		    }
+		}
+	    }
+
+	    // DataFiles
+	    DCValue[] dataFiles = item.getMetadata("dc.relation.haspart");
+
+	    ////////// generate a resource map
+	    
+	    // the ORE object's id
+	    Identifier resourceMapId = new Identifier();
+	    resourceMapId.setValue(doi + "/rem");
+	    // the science metadata id
+	    Identifier dataPackageId = new Identifier();
+	    dataPackageId.setValue(doi);
+	    // data file identifiers
+	    List<Identifier> dataIds = new ArrayList<Identifier>();
+	    for(int i=0; i < dataFiles.length; i++) {
+		String dataIdString = dataFiles[i].value;
+		Identifier dataFileId = new Identifier();
+		dataFileId.setValue(dataIdString);
+		dataIds.add(dataFileId);
+		Identifier dataFileBitstreamId = new Identifier();
+		dataFileBitstreamId.setValue(dataIdString + "/bitstream");
+		dataIds.add(dataFileBitstreamId);
+	    }
+	    
+	    // associate the metadata and data identifiers
+	    Map<Identifier, List<Identifier>> idMap = new HashMap<Identifier, List<Identifier>>();
+	    idMap.put(dataPackageId, dataIds);
+	    // generate the resource map
+	    ResourceMapFactory rmf = ResourceMapFactory.getInstance();
+	    ResourceMap resourceMap = rmf.createResourceMap(resourceMapId, idMap);
+
+	    // serialize it as RDF/XML
+	    String rdfXml = ResourceMapFactory.getInstance().serializeResourceMap(resourceMap);
+
+	    PrintWriter writer = new PrintWriter(
+						 new BufferedWriter(new OutputStreamWriter(aOutputStream)));
+	    writer.print(rdfXml);
+	    writer.flush();
+	    aOutputStream.close();
+	} catch (OREException e) {
+	    log.error("ORE problem!", e);
+	} catch (ORESerialiserException e) {
+	    log.error("Serilizing problem!", e);
+	} catch (URISyntaxException e) {
+	    log.error("URI problem!", e);
+	} catch (MalformedURLException details) {
+	    log.error("Malformed URL!", details);
+	}
+	
+    }
+
     
     public void writeBitstream(InputStream aInputStream,
 			       OutputStream aOutputStream) throws IOException {
