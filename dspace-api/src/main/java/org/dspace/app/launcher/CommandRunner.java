@@ -60,12 +60,18 @@ public class CommandRunner
         StreamTokenizer tokenizer = new StreamTokenizer(input);
 
         tokenizer.eolIsSignificant(true);
+
         tokenizer.ordinaryChar('-');
         tokenizer.wordChars('-', '-');
+
         tokenizer.ordinaryChars('0', '9');
         tokenizer.wordChars('0', '9');
+
         tokenizer.ordinaryChar('.');
         tokenizer.wordChars('.', '.');
+
+        tokenizer.ordinaryChar('@');
+        tokenizer.wordChars('@', '@');
 
         int status = 0;
         List<String> tokens = new ArrayList<String>();
