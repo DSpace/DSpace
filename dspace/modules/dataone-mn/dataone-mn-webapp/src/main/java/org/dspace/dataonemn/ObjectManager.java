@@ -51,7 +51,7 @@ public class ObjectManager implements Constants {
     private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     public static final int DEFAULT_START = 0;
     public static final int DEFAULT_COUNT = 20;
-
+    
     protected Context myContext;
     protected String myData;
     protected String mySolrServer;
@@ -62,268 +62,267 @@ public class ObjectManager implements Constants {
 	myData = aCollection;
 	mySolrServer = aSolrServer;
     }
-
+    
     public void printList(OutputStream aOutStream) throws SQLException, IOException {
 	printList(DEFAULT_START, DEFAULT_COUNT, aOutStream);
     }
-
+    
     public void printList(Date aFrom, Date aTo, OutputStream aOutStream) throws SQLException, IOException {
 	printList(DEFAULT_START, DEFAULT_COUNT, aFrom, aTo, null, aOutStream);
     }
-
+    
     public void printList(Date aFrom, Date aTo, String aObjFormat, OutputStream aOutStream)
 	throws SQLException, IOException {
 	printList(DEFAULT_START, DEFAULT_COUNT, aFrom, aTo, aObjFormat,
 		  aOutStream);
     }
-
-	public void printList(int aStart, int aCount, OutputStream aOutStream)
-			throws SQLException, IOException {
-		printList(aStart, aCount, null, null, null, aOutStream);
+    
+    public void printList(int aStart, int aCount, OutputStream aOutStream)
+	throws SQLException, IOException {
+	printList(aStart, aCount, null, null, null, aOutStream);
+    }
+    
+    public void printList(int aStart, int aCount, String aObjFormat,
+			  OutputStream aOutStream) throws SQLException, IOException {
+	printList(aStart, aCount, null, null, aObjFormat, aOutStream);
+    }
+    
+    public void printList(int aStart, int aCount, Date aFrom, Date aTo,
+			  String aObjFormat, OutputStream aOutStream) throws SQLException,
+									     IOException {
+	XMLSerializer serializer = new XMLSerializer(aOutStream);
+	boolean countIsEven = aCount % 2 == 0 ? true : false;
+	boolean startIsEven = aStart % 2 == 0 ? true : false;
+	ListObjects list = new ListObjects();
+	int counter = 0;
+	int count;
+	int start;
+	
+	myContext.turnOffAuthorisationSystem();
+	
+	log.debug("Setting start parameter to: " + aStart);
+	log.debug("Setting count parameter to: " + aCount);
+	
+	list.setStart(aStart);
+	list.setCount(aCount);
+	
+	// We split our single records into two records for DataONE MN...
+	if (aObjFormat == null) {
+	    start = startIsEven ? aStart / 2 : (aStart - 1) / 2;
+	    count = countIsEven ? (startIsEven ? aCount / 2 : (aCount + 2) / 2)
+		: (startIsEven ? (aCount + 1) / 2 : (aCount + 3) / 2);
 	}
-
-	public void printList(int aStart, int aCount, String aObjFormat,
-			OutputStream aOutStream) throws SQLException, IOException {
-		printList(aStart, aCount, null, null, aObjFormat, aOutStream);
+	// unless we are filtering by objFormat which spits out one per item
+	else {
+	    start = aStart;
+	    count = aCount * 2;
 	}
-
-	public void printList(int aStart, int aCount, Date aFrom, Date aTo,
-			String aObjFormat, OutputStream aOutStream) throws SQLException,
-			IOException {
-		XMLSerializer serializer = new XMLSerializer(aOutStream);
-		boolean countIsEven = aCount % 2 == 0 ? true : false;
-		boolean startIsEven = aStart % 2 == 0 ? true : false;
-		ListObjects list = new ListObjects();
-		int counter = 0;
-		int count;
-		int start;
-
-		myContext.turnOffAuthorisationSystem();
-
-		log.debug("Setting start parameter to: " + aStart);
-		log.debug("Setting count parameter to: " + aCount);
-
-		list.setStart(aStart);
-		list.setCount(aCount);
-
-		// We split our single records into two records for DataONE MN...
-		if (aObjFormat == null) {
-			start = startIsEven ? aStart / 2 : (aStart - 1) / 2;
-			count = countIsEven ? (startIsEven ? aCount / 2 : (aCount + 2) / 2)
-					: (startIsEven ? (aCount + 1) / 2 : (aCount + 3) / 2);
-		}
-		// unless we are filtering by objFormat which spits out one per item
-		else {
-			start = aStart;
-			count = aCount * 2;
-		}
-
-		try {
-			SolrServer server = new CommonsHttpSolrServer(mySolrServer);
-			SolrQuery query = new SolrQuery();
-
-			query.setQuery(buildQuery(aFrom, aTo, aObjFormat));
-			query.setStart(new Integer(start));
-			query.setRows(new Integer(count));
-
-			QueryResponse solrResponse = server.query(query);
-			SolrDocumentList docs = solrResponse.getResults();
-			Iterator<SolrDocument> iterator = docs.iterator();
-			int total = (int) (aObjFormat == null ? docs.getNumFound() * 2
-					: docs.getNumFound()) - 1;
-
-			if (log.isDebugEnabled()) {
-				log.debug("Setting total parameter to: "
-						+ Integer.toString(total));
-			}
-
-			list.setTotal(total >= 0 ? total : 0);
-			serializer.writeStartTag(list);
-
-			// Iterate through all the data files in the data file collection
-			while (iterator.hasNext()) {
-				SolrDocument doc = iterator.next();
-				String doi = (String) doc.getFieldValue("doi");
-				Integer id = (Integer) doc.getFieldValue("dsid");
-				Date date = (Date) doc.getFieldValue("updated");
-				String format = (String) doc.getFieldValue("format");
-
-				log.debug("Building '" + doi + "' for mn list");
-
-				// convert DOI to http form if necessary
-				if (doi.startsWith("doi:")) {
-				    doi = "http://dx.doi.org/" + doi.substring("doi:".length());
-				    log.debug("converted DOI to http form. It is now " + doi);
-				}
-				
-				ObjectInfo objInfo = new ObjectInfo(doi);
-				Item item = Item.find(myContext, id.intValue());
-				String lastMod = dateFormatter.format(date);
-
-				objInfo.setObjectFormat(format);
-				
-				try {
-				    String[] checksumDetails = getObjectChecksum(doi);
-				    
-				    if (checksumDetails != null && checksumDetails.length == 2) {
-					objInfo.setXMLChecksum(checksumDetails[0],
-							       checksumDetails[1]);
-				    }
-				    
-				    objInfo.setXMLSize(getObjectSize(doi));
-				}
-				catch (NotFoundException e) {
-				    log.error("Unable to calculate checksum for " + doi, e);
-				    
-				}
-				objInfo.setLastModified(lastMod);
-
-				
-				Bundle[] bundles = item.getBundles("ORIGINAL");
-
-				log.debug("Getting bitstreams for " + item.getHandle());
-				
-				if (bundles.length > 0) {
-					for (Bitstream bitstream : bundles[0].getBitstreams()) {
-						String name = bitstream.getName();
-
-						log.debug("Checking '" + name + "' bitstream");
-						
-						if (!name.equalsIgnoreCase("readme.txt")
-								&& !name.equalsIgnoreCase("readme")
-								&& !name.equalsIgnoreCase("readme.txt.txt")) {
-						    log.debug("Getting bitstream information from: "
-										+ name);
-						    
-						    String algorithm = bitstream.getChecksumAlgorithm();
-						    String checksum = bitstream.getChecksum();
-						    
-						    objInfo.setChecksum(algorithm, checksum);
-						    objInfo.setSize(bitstream.getSize());
-						}
-					}
-				}
-
-				log.debug("Writing " + doi + " to XML");
-
-				nu.xom.Element[] parts = objInfo.createInfoElements();
-				
-				if (counter != 0 || startIsEven) {
-					if (aObjFormat == null
-							|| aObjFormat.equals(DRYAD_NAMESPACE)) {
-						serializer.write(parts[0]);
-					}
-				}
-
-				if (startIsEven || (counter + 1 < count)) {
-					if (countIsEven
-							|| ((startIsEven && (counter + 1 < count)) || !startIsEven
-									&& (counter + 2 < count))) {
-						if (aObjFormat == null
-								|| !aObjFormat.equals(DRYAD_NAMESPACE)) {
-							serializer.write(parts[1]);
-						}
-					}
-				}
-
-				serializer.flush();
-				counter += 1;
-			}
-
-			serializer.writeEndTag(list);
-			serializer.flush();
-			aOutStream.close();
-		}
-		catch (SolrServerException details) {
-		    log.warn(details.getMessage(), details);
-		    throw new RuntimeException(details);
-		}
-		catch (MalformedURLException details) {
-		    log.warn(details.getMessage(), details);
-		    throw new RuntimeException(details);
-		}
-
-		myContext.restoreAuthSystemState();
-	}
-
-	public long getObjectSize(String aID)
-	throws NotFoundException, IOException, SQLException {
-	    long size = 0;
-	    Item item = getDSpaceItem(aID);
-
-	    if(!aID.endsWith("/bitstream")) {
-	        DisseminationCrosswalk xWalk = (DisseminationCrosswalk) PluginManager
-	        .getNamedPlugin(DisseminationCrosswalk.class,
-	                DRYAD_CROSSWALK);
-	        try {
-	            Element result = xWalk.disseminateElement(item);
-	            Format ppFormat = Format.getPrettyFormat();
-	            StringWriter writer = new StringWriter();
-	            Namespace dryadNS = result.getNamespace();
-	            Element wrapper = result.getChild("DryadMetadata", dryadNS);
-
-	            if (wrapper != null) {
-	                result = wrapper.getChild("DryadDataFile", dryadNS);
-	            }
-
-	            new XMLOutputter(ppFormat).output(result, writer);
-
-	            size = (long) writer.toString().length();
-	        }
-	        catch (AuthorizeException details) {
-	            log.error("Authorization problem", details);
-	            throw new RuntimeException(details);
-	        }
-	        catch (CrosswalkException details) {
-	            log.error("Unable to crosswalk metadata", details);
-	            throw new RuntimeException(details);
-	        }
-	    } else {
-	        size = getOrigBitstream(item).getSize();
+	
+	try {
+	    SolrServer server = new CommonsHttpSolrServer(mySolrServer);
+	    SolrQuery query = new SolrQuery();
+	    
+	    query.setQuery(buildQuery(aFrom, aTo, aObjFormat));
+	    query.setStart(new Integer(start));
+	    query.setRows(new Integer(count));
+	    
+	    QueryResponse solrResponse = server.query(query);
+	    SolrDocumentList docs = solrResponse.getResults();
+	    Iterator<SolrDocument> iterator = docs.iterator();
+	    int total = (int) (aObjFormat == null ? docs.getNumFound() * 2 : docs.getNumFound()) - 1;
+	    
+	    if (log.isDebugEnabled()) {
+		log.debug("Setting total parameter to: "
+			  + Integer.toString(total));
 	    }
 
-	    return size;
+	    list.setTotal(total >= 0 ? total : 0);
+	    serializer.writeStartTag(list);
+
+	    // Iterate through all the data files in the data file collection
+	    while (iterator.hasNext()) {
+		SolrDocument doc = iterator.next();
+		String doi = (String) doc.getFieldValue("doi");
+		Integer id = (Integer) doc.getFieldValue("dsid");
+		Date date = (Date) doc.getFieldValue("updated");
+		String format = (String) doc.getFieldValue("format");
+
+		log.debug("Building '" + doi + "' for mn list");
+
+		// convert DOI to http form if necessary
+		if (doi.startsWith("doi:")) {
+		    doi = "http://dx.doi.org/" + doi.substring("doi:".length());
+		    log.debug("converted DOI to http form. It is now " + doi);
+		}
+				
+		ObjectInfo objInfo = new ObjectInfo(doi);
+		Item item = Item.find(myContext, id.intValue());
+		String lastMod = dateFormatter.format(date);
+
+		objInfo.setObjectFormat(format);
+				
+		try {
+		    String[] checksumDetails = getObjectChecksum(doi);
+				    
+		    if (checksumDetails != null && checksumDetails.length == 2) {
+			objInfo.setXMLChecksum(checksumDetails[0],
+					       checksumDetails[1]);
+		    }
+				    
+		    objInfo.setXMLSize(getObjectSize(doi));
+		}
+		catch (NotFoundException e) {
+		    log.error("Unable to calculate checksum for " + doi, e);
+				    
+		}
+		objInfo.setLastModified(lastMod);
+
+				
+		Bundle[] bundles = item.getBundles("ORIGINAL");
+
+		log.debug("Getting bitstreams for " + item.getHandle());
+				
+		if (bundles.length > 0) {
+		    for (Bitstream bitstream : bundles[0].getBitstreams()) {
+			String name = bitstream.getName();
+
+			log.debug("Checking '" + name + "' bitstream");
+						
+			if (!name.equalsIgnoreCase("readme.txt")
+			    && !name.equalsIgnoreCase("readme")
+			    && !name.equalsIgnoreCase("readme.txt.txt")) {
+			    log.debug("Getting bitstream information from: "
+				      + name);
+						    
+			    String algorithm = bitstream.getChecksumAlgorithm();
+			    String checksum = bitstream.getChecksum();
+						    
+			    objInfo.setChecksum(algorithm, checksum);
+			    objInfo.setSize(bitstream.getSize());
+			}
+		    }
+		}
+
+		log.debug("Writing " + doi + " to XML");
+
+		nu.xom.Element[] parts = objInfo.createInfoElements();
+				
+		if (counter != 0 || startIsEven) {
+		    if (aObjFormat == null
+			|| aObjFormat.equals(DRYAD_NAMESPACE)) {
+			serializer.write(parts[0]);
+		    }
+		}
+
+		if (startIsEven || (counter + 1 < count)) {
+		    if (countIsEven
+			|| ((startIsEven && (counter + 1 < count)) || !startIsEven
+			    && (counter + 2 < count))) {
+			if (aObjFormat == null
+			    || !aObjFormat.equals(DRYAD_NAMESPACE)) {
+			    serializer.write(parts[1]);
+			}
+		    }
+		}
+
+		serializer.flush();
+		counter += 1;
+	    }
+
+	    serializer.writeEndTag(list);
+	    serializer.flush();
+	    aOutStream.close();
+	}
+	catch (SolrServerException details) {
+	    log.warn(details.getMessage(), details);
+	    throw new RuntimeException(details);
+	}
+	catch (MalformedURLException details) {
+	    log.warn(details.getMessage(), details);
+	    throw new RuntimeException(details);
 	}
 
-	private String buildQuery(Date aFrom, Date aTo, String aObjFormat) {
-		StringBuilder query = new StringBuilder();
-		String qString;
+	myContext.restoreAuthSystemState();
+    }
 
-		if (aObjFormat == null && aFrom == null && aTo == null) {
-			query.append("doi:[* TO *]");
+    public long getObjectSize(String aID)
+	throws NotFoundException, IOException, SQLException {
+	long size = 0;
+	Item item = getDSpaceItem(aID);
+
+	if(!aID.endsWith("/bitstream")) {
+	    DisseminationCrosswalk xWalk = (DisseminationCrosswalk) PluginManager
+	        .getNamedPlugin(DisseminationCrosswalk.class,
+				DRYAD_CROSSWALK);
+	    try {
+		Element result = xWalk.disseminateElement(item);
+		Format ppFormat = Format.getPrettyFormat();
+		StringWriter writer = new StringWriter();
+		Namespace dryadNS = result.getNamespace();
+		Element wrapper = result.getChild("DryadMetadata", dryadNS);
+
+		if (wrapper != null) {
+		    result = wrapper.getChild("DryadDataFile", dryadNS);
+		}
+
+		new XMLOutputter(ppFormat).output(result, writer);
+
+		size = (long) writer.toString().length();
+	    }
+	    catch (AuthorizeException details) {
+		log.error("Authorization problem", details);
+		throw new RuntimeException(details);
+	    }
+	    catch (CrosswalkException details) {
+		log.error("Unable to crosswalk metadata", details);
+		throw new RuntimeException(details);
+	    }
+	} else {
+	    size = getOrigBitstream(item).getSize();
+	}
+
+	return size;
+    }
+
+    private String buildQuery(Date aFrom, Date aTo, String aObjFormat) {
+	StringBuilder query = new StringBuilder();
+	String qString;
+
+	if (aObjFormat == null && aFrom == null && aTo == null) {
+	    query.append("doi:[* TO *]");
+	}
+	else {
+	    SimpleDateFormat date = new SimpleDateFormat(
+							 "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
+	    if (aObjFormat != null) {
+		if (aObjFormat.equals(DRYAD_NAMESPACE)) {
+		    query.append("doi:[* TO *]");
 		}
 		else {
-			SimpleDateFormat date = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-
-			if (aObjFormat != null) {
-				if (aObjFormat.equals(DRYAD_NAMESPACE)) {
-					query.append("doi:[* TO *]");
-				}
-				else {
-					query.append("format:\"").append(aObjFormat).append("\"");
-				}
-			}
-
-			if (aFrom != null && aTo != null) {
-				String from = date.format(aFrom);
-				String to = date.format(aTo);
-				query.append(" updated:[" + from + " TO " + to + "]");
-			}
-			else if (aFrom == null && aTo != null) {
-				query.append(" updated:[* TO " + date.format(aTo));
-			}
-			else if (aFrom != null && aTo == null) {
-				query.append(" updated:[" + date.format(aFrom) + " TO NOW]");
-			}
+		    query.append("format:\"").append(aObjFormat).append("\"");
 		}
+	    }
 
-		qString = query.toString().trim();
-
-		log.debug("Solr query: " + qString);
-	
-		return qString;
+	    if (aFrom != null && aTo != null) {
+		String from = date.format(aFrom);
+		String to = date.format(aTo);
+		query.append(" updated:[" + from + " TO " + to + "]");
+	    }
+	    else if (aFrom == null && aTo != null) {
+		query.append(" updated:[* TO " + date.format(aTo));
+	    }
+	    else if (aFrom != null && aTo == null) {
+		query.append(" updated:[" + date.format(aFrom) + " TO NOW]");
+	    }
 	}
+
+	qString = query.toString().trim();
+
+	log.debug("Solr query: " + qString);
+	
+	return qString;
+    }
 
     /**
        Retrieve a DSpace item by identifier. If the identifier includes the "/bitstream" suffix, returns the Item
