@@ -342,8 +342,8 @@ public class ObjectManager implements Constants {
 		String shortID = aID.substring(0,bitsIndex);
 		aID = shortID;
 	    }
-	    if(aID.endsWith("/rem")) {
-		int bitsIndex = aID.indexOf("/rem");
+	    if(aID.endsWith("/d1rem")) {
+		int bitsIndex = aID.indexOf("/d1rem");
 		String shortID = aID.substring(0,bitsIndex);
 		aID = shortID;
 	    }
