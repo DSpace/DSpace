@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.launcher;
 
 import java.io.FileNotFoundException;
@@ -79,12 +86,15 @@ public class CommandRunner
         {
             if (StreamTokenizer.TT_EOL == tokenizer.ttype)
             {
-                status = ScriptLauncher.runOneCommand(tokens.toArray(new String[tokens.size()]));
-                if (status > 0)
+                if (tokens.size() > 0)
                 {
-                    break;
+                    status = ScriptLauncher.runOneCommand(tokens.toArray(new String[tokens.size()]));
+                    if (status > 0)
+                    {
+                        break;
+                    }
+                    tokens.clear();
                 }
-                tokens.clear();
             }
             else
             {
