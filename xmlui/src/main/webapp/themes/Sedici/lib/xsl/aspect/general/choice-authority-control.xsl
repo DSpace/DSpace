@@ -253,7 +253,14 @@ No redefino todos los templates, solo los que necesito redefinir.
           </xsl:attribute>
         </xsl:if>
         <xsl:attribute name="value">
-            <xsl:value-of select="substring-before($authValue, '#')"/>
+        	<xsl:choose>
+	        	<xsl:when test="contains($authValue,'#')">
+		            <xsl:value-of select="substring-before($authValue, '#')"/>
+	        	</xsl:when>
+	        	<xsl:otherwise>
+	        		<xsl:value-of select="$authValue"/>
+	        	</xsl:otherwise>
+			</xsl:choose>
         </xsl:attribute>
         <!-- this updates confidence after a manual change to authority value -->
         <xsl:attribute name="onChange">
