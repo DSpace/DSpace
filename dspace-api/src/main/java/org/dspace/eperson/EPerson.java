@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Locale;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.codec.DecoderException;
 
@@ -1182,14 +1182,6 @@ public class EPerson extends DSpaceObject
     private static final Option VERB_LIST = new Option("L", "list", false, "list EPersons");
     private static final Option VERB_MODIFY = new Option("M", "modify", false, "modify an EPerson");
 
-    private static final OptionGroup VERBS = new OptionGroup();
-    static {
-        VERBS.addOption(VERB_ADD);
-        VERBS.addOption(VERB_DELETE);
-        VERBS.addOption(VERB_LIST);
-        VERBS.addOption(VERB_MODIFY);
-    }
-
     private static final Option OPT_GIVENNAME = new Option("g", "givenname", true, "the person's actual first or personal name");
     private static final Option OPT_SURNAME = new Option("s", "surname", true, "the person's actual last or family name");
     private static final Option OPT_PHONE = new Option("t", "telephone", true, "telephone number, empty for none");
@@ -1202,27 +1194,6 @@ public class EPerson extends DSpaceObject
 
     private static final Option OPT_NEW_EMAIL = new Option("i", "newEmail", true, "new email address");
     private static final Option OPT_NEW_NETID = new Option("I", "newNetid", true, "new network ID");
-
-    private static final Options globalOptions = new Options();
-    static {
-        globalOptions.addOptionGroup(VERBS);
-        globalOptions.addOption("h", "help", false, "explain options");
-    }
-
-    private static final OptionGroup identityOptions = new OptionGroup();
-    static {
-        identityOptions.addOption(OPT_EMAIL);
-        identityOptions.addOption(OPT_NETID);
-    }
-
-    private static final OptionGroup attributeOptions = new OptionGroup();
-    static {
-        attributeOptions.addOption(OPT_GIVENNAME);
-        attributeOptions.addOption(OPT_SURNAME);
-        attributeOptions.addOption(OPT_PHONE);
-        attributeOptions.addOption(OPT_LANGUAGE);
-        attributeOptions.addOption(OPT_REQUIRE_CERTIFICATE);
-    }
     
     /**
      * Tool for manipulating user accounts.
@@ -1230,7 +1201,17 @@ public class EPerson extends DSpaceObject
     public static void main(String argv[])
             throws ParseException, SQLException
     {
-        final PosixParser parser = new PosixParser();
+        final OptionGroup VERBS = new OptionGroup();
+        VERBS.addOption(VERB_ADD);
+        VERBS.addOption(VERB_DELETE);
+        VERBS.addOption(VERB_LIST);
+        VERBS.addOption(VERB_MODIFY);
+
+        final Options globalOptions = new Options();
+        globalOptions.addOptionGroup(VERBS);
+        globalOptions.addOption("h", "help", false, "explain options");
+
+        GnuParser parser = new GnuParser();
         CommandLine command = parser.parse(globalOptions, argv, true);
 
         Context context = new Context();
@@ -1241,19 +1222,19 @@ public class EPerson extends DSpaceObject
         int status = 0;
         if (command.hasOption(VERB_ADD.getOpt()))
         {
-            status = cmdAdd(context, parser, argv);
+            status = cmdAdd(context, argv);
         }
         else if (command.hasOption(VERB_DELETE.getOpt()))
         {
-            status = cmdDelete(context, parser, argv);
+            status = cmdDelete(context, argv);
         }
         else if (command.hasOption(VERB_MODIFY.getOpt()))
         {
-            status = cmdModify(context, parser, argv);
+            status = cmdModify(context, argv);
         }
         else if (command.hasOption(VERB_LIST.getOpt()))
         {
-            status = cmdList(context, parser, argv);
+            status = cmdList(context, argv);
         }
         else if (command.hasOption('h'))
         {
@@ -1279,15 +1260,23 @@ public class EPerson extends DSpaceObject
     }
 
     /** Command to create an EPerson. */
-    private static int cmdAdd(Context context, CommandLineParser parser, String[] argv)
+    private static int cmdAdd(Context context, String[] argv)
     {
         Options options = new Options();
 
         options.addOption(VERB_ADD);
 
+        final OptionGroup identityOptions = new OptionGroup();
+        identityOptions.addOption(OPT_EMAIL);
+        identityOptions.addOption(OPT_NETID);
+
         options.addOptionGroup(identityOptions);
 
-        options.addOptionGroup(attributeOptions);
+        options.addOption(OPT_GIVENNAME);
+        options.addOption(OPT_SURNAME);
+        options.addOption(OPT_PHONE);
+        options.addOption(OPT_LANGUAGE);
+        options.addOption(OPT_REQUIRE_CERTIFICATE);
 
         Option option = new Option("p", "password", true, "password to match the EPerson name");
         options.addOption(option);
@@ -1295,6 +1284,7 @@ public class EPerson extends DSpaceObject
         options.addOption("h", "help", false, "explain --add options");
 
         // Rescan the command for more details.
+        GnuParser parser = new GnuParser();
         CommandLine command;
         try {
             command = parser.parse(options, argv);
@@ -1366,16 +1356,21 @@ public class EPerson extends DSpaceObject
     }
 
     /** Command to delete an EPerson. */
-    private static int cmdDelete(Context context, CommandLineParser parser, String[] argv)
+    private static int cmdDelete(Context context, String[] argv)
     {
         Options options = new Options();
 
         options.addOption(VERB_DELETE);
 
+        final OptionGroup identityOptions = new OptionGroup();
+        identityOptions.addOption(OPT_EMAIL);
+        identityOptions.addOption(OPT_NETID);
+
         options.addOptionGroup(identityOptions);
 
         options.addOption("h", "help", false, "explain --delete options");
 
+        GnuParser parser = new GnuParser();
         CommandLine command;
         try {
             command = parser.parse(options, argv);
@@ -1436,15 +1431,23 @@ public class EPerson extends DSpaceObject
     }
 
     /** Command to modify an EPerson. */
-    private static int cmdModify(Context context, CommandLineParser parser, String[] argv)
+    private static int cmdModify(Context context, String[] argv)
     {
         Options options = new Options();
 
         options.addOption(VERB_MODIFY);
 
+        final OptionGroup identityOptions = new OptionGroup();
+        identityOptions.addOption(OPT_EMAIL);
+        identityOptions.addOption(OPT_NETID);
+
         options.addOptionGroup(identityOptions);
 
-        options.addOptionGroup(attributeOptions);
+        options.addOption(OPT_GIVENNAME);
+        options.addOption(OPT_SURNAME);
+        options.addOption(OPT_PHONE);
+        options.addOption(OPT_LANGUAGE);
+        options.addOption(OPT_REQUIRE_CERTIFICATE);
 
         options.addOption(OPT_CAN_LOGIN);
         options.addOption(OPT_NEW_EMAIL);
@@ -1452,6 +1455,7 @@ public class EPerson extends DSpaceObject
 
         options.addOption("h", "help", false, "explain --modify options");
 
+        GnuParser parser = new GnuParser();
         CommandLine command;
         try {
             command = parser.parse(options, argv);
@@ -1558,7 +1562,7 @@ public class EPerson extends DSpaceObject
     }
 
     /** Command to list known EPersons. */
-    private static int cmdList(Context context, CommandLineParser parser, String[] argv)
+    private static int cmdList(Context context, String[] argv)
     {
         // XXX ideas:
         // specific user/netid
