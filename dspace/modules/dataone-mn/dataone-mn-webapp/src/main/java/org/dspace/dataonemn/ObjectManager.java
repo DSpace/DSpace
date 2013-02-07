@@ -142,19 +142,13 @@ public class ObjectManager implements Constants {
 	    // Iterate through all the data files in the data file collection
 	    while (iterator.hasNext()) {
 		SolrDocument doc = iterator.next();
-		String doi = (String) doc.getFieldValue("doi");
+		String doi = normalizeDoi((String) doc.getFieldValue("doi"));
 		Integer id = (Integer) doc.getFieldValue("dsid");
 		Date date = (Date) doc.getFieldValue("updated");
 		String format = (String) doc.getFieldValue("format");
 
 		log.debug("Building '" + doi + "' for mn list");
 
-		// convert DOI to http form if necessary
-		if (doi.startsWith("doi:")) {
-		    doi = "http://dx.doi.org/" + doi.substring("doi:".length());
-		    log.debug("converted DOI to http form. It is now " + doi);
-		}
-				
 		ObjectInfo objInfo = new ObjectInfo(doi);
 		Item item = Item.find(myContext, id.intValue());
 		String lastMod = dateFormatter.format(date);
@@ -513,10 +507,8 @@ public class ObjectManager implements Constants {
 	    // adjust the identifier to be a full DOI if it isn't one already
 	    if (idElem != null) {
 		String theID = idElem.getText();
-		if(theID.startsWith("doi:")) {
-		    theID = "http://dx.doi.org/" + theID.substring("doi:".length());
-		    idElem.setText(theID);
-		}
+		theID = normalizeDoi(theID);
+		idElem.setText(theID);
 	    }
 	    
 	    Format ppFormat = Format.getPrettyFormat();
@@ -554,7 +546,7 @@ public class ObjectManager implements Constants {
 	    } else {
 		for(int i = 0; i < vals.length; i++) {
 		    if (vals[i].value.startsWith("doi:") || vals[i].value.startsWith("http://doi")) {
-			doi = vals[i].value;
+			doi = normalizeDoi(vals[i].value);
 			break;
 		    }
 		}
@@ -562,19 +554,20 @@ public class ObjectManager implements Constants {
 
 	    // DataFiles
 	    DCValue[] dataFiles = item.getMetadata("dc.relation.haspart");
+	    
 
 	    ////////// generate a resource map
 	    
 	    // the ORE object's id
 	    Identifier resourceMapId = new Identifier();
-	    resourceMapId.setValue(doi + "/rem");
+	    resourceMapId.setValue(doi + "/d1rem");
 	    // the science metadata id
 	    Identifier dataPackageId = new Identifier();
 	    dataPackageId.setValue(doi);
 	    // data file identifiers
 	    List<Identifier> dataIds = new ArrayList<Identifier>();
 	    for(int i=0; i < dataFiles.length; i++) {
-		String dataIdString = dataFiles[i].value;
+		String dataIdString  = normalizeDoi(dataFiles[i].value);
 		Identifier dataFileId = new Identifier();
 		dataFileId.setValue(dataIdString);
 		dataIds.add(dataFileId);
@@ -610,6 +603,19 @@ public class ObjectManager implements Constants {
 	
     }
 
+    private String normalizeDoi(String doi) {
+	if (doi == null || doi.length() == 0) {
+	    log.error("Attempt to normalize non-existant DOI");
+	    return "";
+	}
+	if(doi.startsWith("doi:")) {
+	    doi = "http://dx.doi.org/" + doi.substring("doi:".length());
+	}
+	if(doi.startsWith("10.")) {
+	    doi = "http://dx.doi.org/" + doi;
+	}
+	return doi;
+    }
     
     public void writeBitstream(InputStream aInputStream,
 			       OutputStream aOutputStream) throws IOException {
