@@ -1084,6 +1084,10 @@
 				<displayed-value>Naturalis</displayed-value>
 				<stored-value>&lt;a href="http://naturalis.fcnym.unlp.edu.ar" target="_blank"&gt;Naturalis&lt;/a&gt;</stored-value>
 			</pair>
+			<pair>
+				<displayed-value>Revistas de la FAHCE</displayed-value>
+				<stored-value>&lt;a href="http://revistas.fahce.unlp.edu.ar" target="_blank"&gt;Revistas de la FAHCE&lt;/a&gt;</stored-value>
+			</pair>
 		</value-pairs>
 
 	</form-value-pairs>
