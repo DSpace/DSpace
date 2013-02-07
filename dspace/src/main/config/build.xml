@@ -142,6 +142,7 @@ Common usage:
         <echo message="load_registries --> Load metadata &amp; file format registries into the " />
         <echo message="                    database" />
         <echo message="" />
+        <echo message="clean_backups  --> Remove .bak directories under install directory" />
         <echo message="clean_database  --> Remove DSpace database tables, destroying data" />
         <echo message="" />
         <echo message="" />
