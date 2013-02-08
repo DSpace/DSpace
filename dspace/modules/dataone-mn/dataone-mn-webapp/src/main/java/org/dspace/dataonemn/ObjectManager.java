@@ -412,14 +412,16 @@ public class ObjectManager implements Constants {
 
             if(fromDate != null) {
                 log.info("Requested fromDate: " + fromDate);
-                queryBuilder.append("  md.text_value::timestamp > ? AND ");
-                bindParameters.add(fromDate);
+                // Postgres-specific, casts text_value to a timestamp
+                queryBuilder.append("  mv.text_value::timestamp > ? AND ");
+                bindParameters.add(new java.sql.Date(fromDate.getTime()));
             }
 
             if(toDate != null) {
                 log.info("Requested toDate: " + toDate);
-                queryBuilder.append("  md.text_value::timestamp < ? AND "); // bind to toDate
-                bindParameters.add(toDate);
+                // Postgres-specific, casts text_value to a timestamp
+                queryBuilder.append("  mv.text_value::timestamp < ? AND "); // bind to toDate
+                bindParameters.add(new java.sql.Date(toDate.getTime()));
             }
             queryBuilder.append("  col.collection_id = ? "); 
             bindParameters.add(c.getID()); 
