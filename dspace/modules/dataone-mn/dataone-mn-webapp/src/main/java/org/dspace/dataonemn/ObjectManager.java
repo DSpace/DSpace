@@ -406,7 +406,7 @@ public class ObjectManager implements Constants {
             if(objFormat != null) {
                 // limit bundle format to the provided objFormat
                 log.info("Requested objFormat: " + objFormat);
-                queryBuilder.append("  bfr.mimetype = ?");
+                queryBuilder.append("  bfr.mimetype = ? AND ");
                 bindParameters.add(objFormat);
             }
 
