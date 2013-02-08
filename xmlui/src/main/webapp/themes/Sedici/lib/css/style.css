@@ -2214,7 +2214,6 @@ background-image:none;
 width:550px;	
 display:block;
 padding:0;
-
 padding-bottom:5px;
 position:relative;
 left:155px;
@@ -2230,7 +2229,7 @@ border:none;
 background-repeat:no-repeat;
 background-position:left;
 padding:18px 0px 20px 45px;
-height:35px;
+min-height:35px;
 display:block;
 color:#E27B2A;
 font-size:20px;
@@ -2538,8 +2537,7 @@ bottom:10px;
 
 .intro-text {
 	float:left;
-	width:390px;
-	border-top:1px solid #dedede;
+	width:550px;
 	padding-top:10px;
 	display:inline-block;
     left: 155px;
@@ -2579,6 +2577,14 @@ bottom:10px;
 .intro-text .texto_libre .label {
     display: none;
 }
+.community .intro-text .texto_libre {
+	background-color: #eee;
+	padding: 15px;
+	margin-top: 12px;
+	color: grey;
+	margin-bottom: 10px;
+}
+
 #aspect_submission_StepTransformer_field_submit_jump_2_1:hover,
 #aspect_submission_StepTransformer_field_submit_jump_2_2:hover,
 #aspect_submission_StepTransformer_field_submit_jump_3_1:hover,
