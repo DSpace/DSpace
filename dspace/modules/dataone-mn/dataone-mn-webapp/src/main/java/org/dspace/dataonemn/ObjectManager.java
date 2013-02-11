@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 
 
 import org.dspace.authorize.AuthorizeException;
@@ -87,32 +88,232 @@ public class ObjectManager implements Constants {
                     String aObjFormat, OutputStream aOutStream) throws SQLException,
                     IOException {
         XMLSerializer serializer = new XMLSerializer(aOutStream);
-        boolean countIsEven = aCount % 2 == 0 ? true : false;
-        boolean startIsEven = aStart % 2 == 0 ? true : false;
         ListObjects list = new ListObjects();
-        long total;
+        
+        long totalDataFileElements;
+        long totalDataPackageElements;
         try {
-            if(aObjFormat != null && aObjFormat.equals(DRYAD_NAMESPACE)) {
+            if(aObjFormat != null && aObjFormat.equals(ORE_NAMESPACE)) {
+                // Relationships requested, not files
+                totalDataFileElements = 0l;
+            } else if(aObjFormat != null && aObjFormat.equals(DRYAD_NAMESPACE)) {
                 // Metadata format requested, do not pass object format to query
-                total = queryTotalDataFilesFromDatabase(aFrom, aTo, null);
+                totalDataFileElements = queryTotalDataFilesFromDatabase(aFrom, aTo, null);
             } else {
-                total = queryTotalDataFilesFromDatabase(aFrom, aTo, aObjFormat);
+                totalDataFileElements = queryTotalDataFilesFromDatabase(aFrom, aTo, aObjFormat);
             }
             // This returns the number of matched objects in the database
             // We will double it
-            if(aObjFormat == null) { total *= 2; }
+            if(aObjFormat == null) { totalDataFileElements *= 2; }
         } catch (NotFoundException ex) {
-            log.error("Unable to query total from database: " + ex);
-            total = 0;
+            log.error("Unable to query total files from database: " + ex);
+            totalDataFileElements = 0l;
+        }
+        
+        try {
+            if(aObjFormat == null) {
+                // no format specified, return two results for each row in the database
+                totalDataPackageElements = queryTotalDataPackagesFromDatabase(aFrom, aTo) * 2;
+            } else if(aObjFormat.equals(ORE_NAMESPACE) || aObjFormat.equals(DRYAD_NAMESPACE)) {
+                // format specified is either the Resource Map or the Metadata format
+                // either way, return one result for each row in the database
+                totalDataPackageElements = queryTotalDataPackagesFromDatabase(aFrom, aTo);
+            } else {
+                // format is specified but not one of the metadata formats
+                // Perhaps a mime type.  Do not return any packages
+                totalDataPackageElements = 0l;
+            }
+        } catch (NotFoundException ex) {
+            log.error("Unable to query total packages from datbase: " + ex);
+            totalDataPackageElements = 0l;
         }
 
         myContext.turnOffAuthorisationSystem();
 
         log.debug("Setting start parameter to: " + aStart);
         list.setStart(aStart);
+        long total = totalDataFileElements + totalDataPackageElements;
         log.debug("Setting total parameter to: " + Long.toString(total));
         list.setTotal(total);
         
+        /*
+         * The result list will contain the list of packages, followed
+         * by the list of data files.  
+         */
+        
+        int packageStart, packageCount, fileStart, fileCount;
+        packageStart = aStart;
+        if(aStart + aCount <= totalDataPackageElements) {
+            // user has requested a range that is entirely packages
+            packageCount = aCount;
+            fileCount = 0;
+            fileStart = 0;
+        } else if(aStart < totalDataPackageElements && 
+                (aStart + aCount) >= totalDataPackageElements) {
+            // user has requested a range that starts in packages and
+            // ends in files
+            packageCount = (int) totalDataPackageElements - packageStart;
+            fileStart = 0;
+            fileCount = aCount - packageCount;
+        } else {
+            // user has requested a range that is entirely files
+            packageStart = 0;
+            packageCount = 0;
+            fileStart = (int) (aStart - totalDataPackageElements);
+            fileCount = aCount;
+        }
+        List<nu.xom.Element> packageElementList = buildDataPackagesList(packageStart, packageCount, aFrom, aTo, aObjFormat);
+        List<nu.xom.Element> fileElementList = buildDataFilesList(fileStart, fileCount, aFrom, aTo, aObjFormat);
+        
+        log.debug("Setting count parameter to: " + Integer.toString(fileElementList.size() + packageElementList.size()));
+        list.setCount(fileElementList.size() + packageElementList.size());
+        
+        serializer.writeStartTag(list);
+        for(nu.xom.Element element : packageElementList) {
+            serializer.write(element);
+        }
+        for(nu.xom.Element element : fileElementList) {
+            serializer.write(element);
+        }
+        serializer.writeEndTag(list);
+        serializer.flush();
+        aOutStream.close();
+
+        myContext.restoreAuthSystemState();
+    }
+
+    private List<nu.xom.Element> buildDataPackagesList(int aStart, int aCount, Date aFrom, Date aTo, String aObjFormat) 
+    throws SQLException, IOException {
+        List<nu.xom.Element> packageElementList = new ArrayList<nu.xom.Element>();
+        if(aCount == 0) {
+            return packageElementList;
+        }
+        
+        /* Now assemble the list of packages */
+        boolean countIsEven = aCount % 2 == 0 ? true : false;
+        boolean startIsEven = aStart % 2 == 0 ? true : false;
+                
+        int offsetForDatabaseQuery = -1;
+        int countForDatabaseQuery = -1;
+            
+        if(aObjFormat == null) {
+            // object format not specified.  We need to retrieve half as much
+            // data from the database and scale the offsets
+            // 0 = metadata
+            // 1 = resource map
+            // 2 = metadata
+            // 3 = resource map
+            // ...
+            
+            if(startIsEven && countIsEven) {
+                // both start and count are even, divide each by two
+                offsetForDatabaseQuery = aStart / 2;
+                countForDatabaseQuery = aCount / 2;
+            } else if(startIsEven && !countIsEven) {
+                // start is even but count is odd
+                // the first item should be metadata but the last item will be metadata
+                offsetForDatabaseQuery = aStart / 2;
+                countForDatabaseQuery = (aCount + 1) / 2;
+            } else if(!startIsEven && countIsEven) {
+                // start is odd and count is even
+                // starting with bitstream but need to subtract 1 before dividing
+                offsetForDatabaseQuery = (aStart - 1) / 2;
+                // also need to fetch an additional row from DB because of the offset
+                countForDatabaseQuery = (aCount + 2) / 2;
+            } else if(!startIsEven && !countIsEven) {
+                // start is odd and count is odd
+                offsetForDatabaseQuery = (aStart - 1) / 2;
+                countForDatabaseQuery = (aCount + 1) / 2;
+            }
+            // after fetching from database, remember to chop first and/or last if needed
+        } else {
+            // objFormat is not null.  
+            countForDatabaseQuery = aCount;
+            offsetForDatabaseQuery = aStart;
+        }
+        
+        TableRowIterator iterator = queryDataPackagesDatabase(offsetForDatabaseQuery, countForDatabaseQuery, aFrom, aTo);
+        while(iterator.hasNext()) {
+            TableRow tr = iterator.next();
+            String doi = tr.getStringColumn("doi");
+            Date dateAvailable = tr.getDateColumn("date_available");
+
+            log.debug("Building '" + doi + "' for mn list");
+            // need one for the bitstream and one for the metadata
+            // convert DOI to http form if necessary
+            if (doi.startsWith("doi:")) {
+                doi = "http://dx.doi.org/" + doi.substring("doi:".length());
+                log.debug("converted DOI to http form. It is now " + doi);
+            }
+
+            String lastModified = dateFormatter.format(dateAvailable);
+            PackageInfo packageInfo = new PackageInfo(doi);
+            packageInfo.setModificationDate(dateFormatter.format(dateAvailable));
+
+            try {
+                String xmlChecksum[] = generateXMLChecksum(doi); // metadata
+                packageInfo.setXmlChecksum(xmlChecksum[0]);
+                packageInfo.setXmlChecksumAlgo(xmlChecksum[1]);
+            } catch (NotFoundException ex) {
+                log.error("Error getting checksum for " + doi, ex);
+            }
+            
+            try {
+                String resourceMapChecksum[] = generateXMLChecksum(doi + "/d1rem");
+                packageInfo.setResourceMapChecksum(resourceMapChecksum[0]);
+                packageInfo.setResourceMapChecksumAlgo(resourceMapChecksum[1]);
+            } catch (NotFoundException ex) {
+                log.error("Error getting checksum for " + doi + "/d1rem", ex);
+            }
+            
+            try {
+                long xmlSize = getObjectSize(doi);
+                packageInfo.setXmlSize(xmlSize);
+            } catch (NotFoundException ex) {
+                log.error("Error getting size for " + doi, ex);
+            }
+            try {
+                long resourceMapSize = getObjectSize(doi + "/d1rem");
+                packageInfo.setResourceMapSize(resourceMapSize);
+            } catch (NotFoundException ex) {
+                log.error("Error getting size for " + doi + "/d1rem", ex);
+            }
+
+            nu.xom.Element[] infoElements = packageInfo.createInfoElements();
+            if(aObjFormat == null) {
+                // object format not specified, add both metadata resource element
+                packageElementList.add(infoElements[0]); // the metadata element
+                packageElementList.add(infoElements[1]); // the resource element
+            } else if(aObjFormat.equals(DRYAD_NAMESPACE)) {
+                packageElementList.add(infoElements[0]); // just the metadata element
+            } else if(aObjFormat.equals(ORE_NAMESPACE)) {
+                packageElementList.add(infoElements[1]); // just the resource map element
+            }
+        }
+        // After assembling the list, check if we need to trim the start/end of 
+        // the list
+        if(aObjFormat == null) {
+            if(!startIsEven) {
+                // start was odd, so remove the first element
+                if(packageElementList.size() > 0){
+                    packageElementList = packageElementList.subList(1, packageElementList.size());
+                    // could also just remove the 0th element
+                }
+            }
+            // now just trim the list to the size of the count if needed
+            if(packageElementList.size() > aCount) {
+                packageElementList = packageElementList.subList(0, aCount);
+            }
+        }
+        return packageElementList;
+    }
+
+    private List<nu.xom.Element> buildDataFilesList(int aStart, int aCount, Date aFrom, Date aTo, String aObjFormat) 
+    throws SQLException, IOException {
+        List<nu.xom.Element> fileElementList = new ArrayList<nu.xom.Element>();
+        if(aCount == 0) {
+            return fileElementList;
+        }
         /*
          * This will list items in the Dryad Data Files collection.
          *
@@ -134,6 +335,9 @@ public class ObjectManager implements Constants {
          * parameter IS passed to the database query, and the XML metadata results
          * are left out of the response.
          */
+        boolean countIsEven = aCount % 2 == 0 ? true : false;
+        boolean startIsEven = aStart % 2 == 0 ? true : false;
+                
         int offsetForDatabaseQuery = -1;
         int countForDatabaseQuery = -1;
             
@@ -172,14 +376,13 @@ public class ObjectManager implements Constants {
             countForDatabaseQuery = aCount;
             offsetForDatabaseQuery = aStart;
         }
-        TableRowIterator iterator = null;
+        TableRowIterator iterator;
         if(aObjFormat != null && aObjFormat.equals(DRYAD_NAMESPACE)) {
             // Metadata format requested, do not pass object format to query
             iterator = queryDataFilesDatabase(offsetForDatabaseQuery, countForDatabaseQuery, aFrom, aTo, null);
         } else {
             iterator = queryDataFilesDatabase(offsetForDatabaseQuery, countForDatabaseQuery, aFrom, aTo, aObjFormat);
         }
-        List<nu.xom.Element> elementList = new ArrayList<nu.xom.Element>();
         while(iterator.hasNext()) {
             TableRow tr = iterator.next();
             String doi = tr.getStringColumn("doi");
@@ -221,12 +424,12 @@ public class ObjectManager implements Constants {
             nu.xom.Element[] infoElements =  bitstreamInfo.createInfoElements();
             if(aObjFormat == null) {
                 // object format not specified, add both  metadata and bitstream
-                elementList.add(infoElements[0]); // the metadata
-                elementList.add(infoElements[1]); // the bitstream
+                fileElementList.add(infoElements[0]); // the metadata
+                fileElementList.add(infoElements[1]); // the bitstream
             } else if(aObjFormat.equals(DRYAD_NAMESPACE)) {
-                elementList.add(infoElements[0]); // just the metadata
+                fileElementList.add(infoElements[0]); // just the metadata
             } else {
-                elementList.add(infoElements[1]); // just the bitstream
+                fileElementList.add(infoElements[1]); // just the bitstream
             }
         };
         
@@ -235,30 +438,20 @@ public class ObjectManager implements Constants {
         if(aObjFormat == null) {
             if(!startIsEven) {
                 // start was odd, so remove the first element
-                if(elementList.size() > 0){
-                    elementList = elementList.subList(1, elementList.size());
+                if(fileElementList.size() > 0){
+                    fileElementList = fileElementList.subList(1, fileElementList.size());
                     // could also just remove the 0th element
                 }
             }
             // now just trim the list to the size of the count if needed
-            if(elementList.size() > aCount) {
-                elementList = elementList.subList(0, aCount);
+            if(fileElementList.size() > aCount) {
+                fileElementList = fileElementList.subList(0, aCount);
             }
         }
-        
-        log.debug("Setting count parameter to: " + Integer.toString(elementList.size()));
-        list.setCount(elementList.size()); 
-        serializer.writeStartTag(list);
-        for(nu.xom.Element element : elementList) {
-            serializer.write(element);
-        }
-        serializer.writeEndTag(list);
-        serializer.flush();
-        aOutStream.close();
-
-        myContext.restoreAuthSystemState();
+        return fileElementList;       
     }
 
+    
 	public long getObjectSize(String aID)
 	throws NotFoundException, IOException, SQLException {
 	    long size = 0;
@@ -475,7 +668,7 @@ public class ObjectManager implements Constants {
 
     private TableRowIterator queryDataPackagesDatabase(boolean countTotal, int start, int count, Date fromDate, Date toDate)
             throws SQLException {
-        Collection c = (Collection) HandleManager.resolveToObject(myContext, myFiles);
+        Collection c = (Collection) HandleManager.resolveToObject(myContext, myPackages);
         int dateAvailableFieldId = getDateAvailableFieldID();
         int dcIdentifierFieldId = getDCIdentifierFieldID();
         StringBuilder queryBuilder = new StringBuilder();
@@ -501,7 +694,6 @@ public class ObjectManager implements Constants {
         queryBuilder.append("  md.metadata_field_id = ? AND ");
         bindParameters.add(dcIdentifierFieldId);
         queryBuilder.append("  md.place = 1 AND ");
-        queryBuilder.append("  col.collection_id = ?  ");
         if(fromDate != null) {
             log.info("Requested fromDate: " + fromDate);
             // Postgres-specific, casts text_value to a timestamp
