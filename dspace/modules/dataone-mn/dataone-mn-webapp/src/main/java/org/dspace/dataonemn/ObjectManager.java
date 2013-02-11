@@ -401,7 +401,7 @@ public class ObjectManager implements Constants {
             bindParameters.add(dcIdentifierFieldId);
             queryBuilder.append("  md.place = 1 AND "); 
             queryBuilder.append("  bun.name = ? AND ");
-            // TODO: exclude readme files based on filename
+            queryBuilder.append("  lower(bit.name) NOT IN ('readme.txt','readme.txt.txt') AND ");
             bindParameters.add(org.dspace.core.Constants.DEFAULT_BUNDLE_NAME);
             if(objFormat != null) {
                 // limit bundle format to the provided objFormat
