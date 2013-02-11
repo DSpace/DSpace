@@ -205,6 +205,19 @@ public class ObjectManager implements Constants {
             bitstreamInfo.setLastModified(lastModified);
             bitstreamInfo.setObjectFormat(format);
 
+            try {
+                String xmlChecksum[] = generateXMLChecksum(doi);
+                bitstreamInfo.setXMLChecksum(xmlChecksum[0], xmlChecksum[1]);
+            } catch (NotFoundException ex) {
+                log.error("Unable to find object to generate XML checksum", ex);
+            }
+            try {
+                long xmlSize = getObjectSize(doi);
+                bitstreamInfo.setXMLSize(xmlSize);
+            } catch (NotFoundException ex) {
+                log.error("Unable to find object to calculate XML size", ex);
+            }
+
             nu.xom.Element[] infoElements =  bitstreamInfo.createInfoElements();
             if(aObjFormat == null) {
                 // object format not specified, add both  metadata and bitstream
