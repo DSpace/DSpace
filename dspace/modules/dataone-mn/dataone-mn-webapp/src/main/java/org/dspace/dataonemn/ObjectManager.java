@@ -383,88 +383,81 @@ public class ObjectManager implements Constants {
     // pass countTotal as true to return the count instead of item data
     private TableRowIterator queryDataFilesDatabase(boolean countTotal, int start, int count, Date fromDate, Date toDate, String objFormat) 
     throws SQLException {
-        try {
-            // need special handling on object format.  If it is passed in as the metadata format
-            // we need to ignore it in the database query
-            
-            Collection c = (Collection) HandleManager.resolveToObject(myContext, myFiles);
-            int dateAvailableFieldId = getDateAvailableFieldID();
-            int dcIdentifierFieldId = getDCIdentifierFieldID();
+        Collection c = (Collection) HandleManager.resolveToObject(myContext, myFiles);
+        int dateAvailableFieldId = getDateAvailableFieldID();
+        int dcIdentifierFieldId = getDCIdentifierFieldID();
 
-            StringBuilder queryBuilder = new StringBuilder();
-            // build up bind paramaters 
-            List<Object> bindParameters = new ArrayList<Object>();
-            queryBuilder.append("SELECT ");
-            if(countTotal) {
-                queryBuilder.append("  count(*) AS total ");
-            } else {
-                queryBuilder.append("  md.text_value AS doi, "); 
-                queryBuilder.append("  bfr.mimetype AS format, "); 
-                queryBuilder.append("  bit.checksum, "); 
-                queryBuilder.append("  bit.checksum_algorithm, "); 
-                queryBuilder.append("  mv.text_value::timestamp AS date_available,  "); 
-                queryBuilder.append("  bit.size_bytes "); 
-            }
-            queryBuilder.append("FROM  "); 
-            queryBuilder.append("  item AS it ");
-            queryBuilder.append("  JOIN collection2item as c2i using (item_id) ");
-            queryBuilder.append("  JOIN collection as col using (collection_id) ");
-            queryBuilder.append("  JOIN metadatavalue AS mv using (item_id) "); 
-            queryBuilder.append("  JOIN metadatavalue AS md using (item_id) "); 
-            queryBuilder.append("  JOIN item2bundle AS i2b using (item_id) "); 
-            queryBuilder.append("  JOIN bundle AS bun using (bundle_id) "); 
-            queryBuilder.append("  JOIN bundle2bitstream as b2b using (bundle_id) "); 
-            queryBuilder.append("  JOIN bitstream as bit using (bitstream_id) "); 
-            queryBuilder.append("  LEFT JOIN bitstreamformatregistry as bfr using (bitstream_format_id) "); 
-            queryBuilder.append("WHERE "); 
-            queryBuilder.append("  mv.metadata_field_id = ? AND "); 
-            bindParameters.add(dateAvailableFieldId);
-            queryBuilder.append("  md.metadata_field_id = ? AND "); 
-            bindParameters.add(dcIdentifierFieldId);
-            queryBuilder.append("  md.place = 1 AND "); 
-            queryBuilder.append("  bun.name = ? AND ");
-            queryBuilder.append("  lower(bit.name) NOT IN ('readme.txt','readme.txt.txt') AND ");
-            bindParameters.add(org.dspace.core.Constants.DEFAULT_BUNDLE_NAME);
-            if(objFormat != null) {
-                // limit bundle format to the provided objFormat
-                log.info("Requested objFormat: " + objFormat);
-                queryBuilder.append("  bfr.mimetype = ? AND ");
-                bindParameters.add(objFormat);
-            }
-
-            if(fromDate != null) {
-                log.info("Requested fromDate: " + fromDate);
-                // Postgres-specific, casts text_value to a timestamp
-                queryBuilder.append("  mv.text_value::timestamp > ? AND ");
-                bindParameters.add(new java.sql.Date(fromDate.getTime()));
-            }
-
-            if(toDate != null) {
-                log.info("Requested toDate: " + toDate);
-                // Postgres-specific, casts text_value to a timestamp
-                queryBuilder.append("  mv.text_value::timestamp < ? AND "); // bind to toDate
-                bindParameters.add(new java.sql.Date(toDate.getTime()));
-            }
-            queryBuilder.append("  col.collection_id = ? "); 
-            bindParameters.add(c.getID()); 
-            
-            if(!countTotal) {
-                queryBuilder.append("ORDER BY date_available ASC, doi ASC ");
-                queryBuilder.append("LIMIT ? "); 
-                bindParameters.add(count);
-                queryBuilder.append("OFFSET ? "); 
-                bindParameters.add(start);
-            }
-            // sample query for casting text_value to timestamp, postgres-specific
-            // select * from metadatavalue where metadata_field_id = 12 
-            // and text_value::timestamp > to_timestamp('2009-06-01','YYYY-MM-DD') 
-            // and text_value::timestamp < to_timestamp('2009-07-01','YYYY-MM-DD')
-            // limit 10;
-            return DatabaseManager.query(myContext, queryBuilder.toString(), bindParameters.toArray());
-        } catch (SQLException ex) {
-            log.error("SQL Exception: " + ex);
-            throw ex;
+        StringBuilder queryBuilder = new StringBuilder();
+        // build up bind paramaters 
+        List<Object> bindParameters = new ArrayList<Object>();
+        queryBuilder.append("SELECT ");
+        if(countTotal) {
+            queryBuilder.append("  count(*) AS total ");
+        } else {
+            queryBuilder.append("  md.text_value AS doi, "); 
+            queryBuilder.append("  bfr.mimetype AS format, "); 
+            queryBuilder.append("  bit.checksum, "); 
+            queryBuilder.append("  bit.checksum_algorithm, "); 
+            queryBuilder.append("  mv.text_value::timestamp AS date_available,  "); 
+            queryBuilder.append("  bit.size_bytes "); 
         }
+        queryBuilder.append("FROM  "); 
+        queryBuilder.append("  item AS it ");
+        queryBuilder.append("  JOIN collection2item as c2i using (item_id) ");
+        queryBuilder.append("  JOIN collection as col using (collection_id) ");
+        queryBuilder.append("  JOIN metadatavalue AS mv using (item_id) "); 
+        queryBuilder.append("  JOIN metadatavalue AS md using (item_id) "); 
+        queryBuilder.append("  JOIN item2bundle AS i2b using (item_id) "); 
+        queryBuilder.append("  JOIN bundle AS bun using (bundle_id) "); 
+        queryBuilder.append("  JOIN bundle2bitstream as b2b using (bundle_id) "); 
+        queryBuilder.append("  JOIN bitstream as bit using (bitstream_id) "); 
+        queryBuilder.append("  LEFT JOIN bitstreamformatregistry as bfr using (bitstream_format_id) "); 
+        queryBuilder.append("WHERE ");
+        queryBuilder.append("  NOT it.withdrawn = 't' AND");
+        queryBuilder.append("  mv.metadata_field_id = ? AND "); 
+        bindParameters.add(dateAvailableFieldId);
+        queryBuilder.append("  md.metadata_field_id = ? AND "); 
+        bindParameters.add(dcIdentifierFieldId);
+        queryBuilder.append("  md.place = 1 AND "); 
+        queryBuilder.append("  bun.name = ? AND ");
+        queryBuilder.append("  lower(bit.name) NOT IN ('readme.txt','readme.txt.txt') AND ");
+        bindParameters.add(org.dspace.core.Constants.DEFAULT_BUNDLE_NAME);
+        if(objFormat != null) {
+            // limit bundle format to the provided objFormat
+            log.info("Requested objFormat: " + objFormat);
+            queryBuilder.append("  bfr.mimetype = ? AND ");
+            bindParameters.add(objFormat);
+        }
+
+        if(fromDate != null) {
+            log.info("Requested fromDate: " + fromDate);
+            // Postgres-specific, casts text_value to a timestamp
+            queryBuilder.append("  mv.text_value::timestamp > ? AND ");
+            bindParameters.add(new java.sql.Date(fromDate.getTime()));
+        }
+
+        if(toDate != null) {
+            log.info("Requested toDate: " + toDate);
+            // Postgres-specific, casts text_value to a timestamp
+            queryBuilder.append("  mv.text_value::timestamp < ? AND "); // bind to toDate
+            bindParameters.add(new java.sql.Date(toDate.getTime()));
+        }
+        queryBuilder.append("  col.collection_id = ? "); 
+        bindParameters.add(c.getID()); 
+
+        if(!countTotal) {
+            queryBuilder.append("ORDER BY date_available ASC, doi ASC ");
+            queryBuilder.append("LIMIT ? "); 
+            bindParameters.add(count);
+            queryBuilder.append("OFFSET ? "); 
+            bindParameters.add(start);
+        }
+        // sample query for casting text_value to timestamp, postgres-specific
+        // select * from metadatavalue where metadata_field_id = 12 
+        // and text_value::timestamp > to_timestamp('2009-06-01','YYYY-MM-DD') 
+        // and text_value::timestamp < to_timestamp('2009-07-01','YYYY-MM-DD')
+        // limit 10;
+        return DatabaseManager.query(myContext, queryBuilder.toString(), bindParameters.toArray());
     }
 
     private TableRowIterator queryDataPackagesDatabase(boolean countTotal, int start, int count, Date fromDate, Date toDate)
