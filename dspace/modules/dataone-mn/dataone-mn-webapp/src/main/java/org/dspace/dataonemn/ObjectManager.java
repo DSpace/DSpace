@@ -93,7 +93,12 @@ public class ObjectManager implements Constants {
         ListObjects list = new ListObjects();
         long total;
         try {
-            total = queryTotalFromDatabase(aFrom, aTo, aObjFormat);
+            if(aObjFormat != null && aObjFormat.equals(DRYAD_NAMESPACE)) {
+                // Metadata format requested, do not pass object format to query
+                total = queryTotalFromDatabase(aFrom, aTo, null);
+            } else {
+                total = queryTotalFromDatabase(aFrom, aTo, aObjFormat);
+            }
             // This returns the number of matched objects in the database
             // We will double it
             if(aObjFormat == null) { total *= 2; }
@@ -162,19 +167,19 @@ public class ObjectManager implements Constants {
                 offsetForDatabaseQuery = (aStart - 1) / 2;
                 countForDatabaseQuery = (aCount + 1) / 2;
             }
-            
             // after fetching from database, remember to chop first and/or last if needed
-            
         } else {
             // objFormat is not null.  
-            // TODO: check if it's the dryad metadata format and do not query the db for the format
-            // If it is the dryad metadata format, need to handle that
-            // if it not, our job is much easier
             countForDatabaseQuery = aCount;
             offsetForDatabaseQuery = aStart;
         }
-           
-        TableRowIterator iterator = queryDatabase(offsetForDatabaseQuery, countForDatabaseQuery, aFrom, aTo, aObjFormat);
+        TableRowIterator iterator = null;
+        if(aObjFormat != null && aObjFormat.equals(DRYAD_NAMESPACE)) {
+            // Metadata format requested, do not pass object format to query
+            iterator = queryDatabase(offsetForDatabaseQuery, countForDatabaseQuery, aFrom, aTo, null);
+        } else {
+            iterator = queryDatabase(offsetForDatabaseQuery, countForDatabaseQuery, aFrom, aTo, aObjFormat);
+        }
         List<nu.xom.Element> elementList = new ArrayList<nu.xom.Element>();
         while(iterator.hasNext()) {
             TableRow tr = iterator.next();
@@ -206,6 +211,8 @@ public class ObjectManager implements Constants {
                 // object format not specified, add both  metadata and bitstream
                 elementList.add(infoElements[0]); // the metadata
                 elementList.add(infoElements[1]); // the bitstream
+            } else if(aObjFormat.equals(DRYAD_NAMESPACE)) {
+                elementList.add(infoElements[0]); // just the metadata
             } else {
                 elementList.add(infoElements[1]); // just the bitstream
             }
