@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 import nu.xom.Document;
 import nu.xom.Serializer;
 
-import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.content.Bitstream;
@@ -59,9 +58,7 @@ public class DataOneMN extends HttpServlet implements Constants {
     
     
     private String myData;
-    
-    private String mySolr;
-    
+
     private DataOneLogger myRequestLogger;
     
 
@@ -121,7 +118,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	Context ctxt = getContext();
 	
 	if (reqPath.startsWith("/object/")) {
-	    ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);
+	    ObjectManager objManager = new ObjectManager(ctxt, myData);
 	    describe(reqPath, response, objManager);
 	} else {
 	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
@@ -216,7 +213,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	
 	try {
 	    ctxt = getContext();
-	    ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);     
+	    ObjectManager objManager = new ObjectManager(ctxt, myData);     
 		    
 	    if (reqPath.startsWith("/monitor/ping")) {
 		ping(response, objManager);
@@ -303,7 +300,6 @@ public class DataOneMN extends HttpServlet implements Constants {
 	}
 	
 	myData = ConfigurationManager.getProperty("stats.datafiles.coll");
-	mySolr = ConfigurationManager.getProperty("solr.dryad.server");
 		
 	myRequestLogger = new DataOneLogger();  //this assumes a configuration has been loaded
 	log.debug("initialization complete");

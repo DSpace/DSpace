@@ -51,13 +51,10 @@ public class ObjectManager implements Constants {
 
     protected Context myContext;
     protected String myData;
-    protected String mySolrServer;
     
-    public ObjectManager(Context aContext, String aCollection,
-			 String aSolrServer) {
+    public ObjectManager(Context aContext, String aCollection) {
 	myContext = aContext;
 	myData = aCollection;
-	mySolrServer = aSolrServer;
     }
 
     public void printList(OutputStream aOutStream) throws SQLException, IOException {
