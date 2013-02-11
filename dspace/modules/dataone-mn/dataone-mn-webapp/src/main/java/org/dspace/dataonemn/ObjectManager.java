@@ -329,10 +329,26 @@ public class ObjectManager implements Constants {
         }
     }
     
+    private long queryTotalDataPackagesFromDatabase(Date fromDate, Date toDate)
+    throws SQLException, NotFoundException {
+        //start and count will be ignored
+        TableRowIterator it = queryDataPackagesDatabase(true, 0, 0, fromDate, toDate);
+        if(it.hasNext()) {
+            return it.next().getLongColumn("total");
+        } else {
+            throw new NotFoundException("Unable to get total from database query");
+        }
+    }
+    
     private TableRowIterator queryDataFilesDatabase(int start, int count, Date fromDate, Date toDate, String objFormat) 
     throws SQLException {
         return queryDataFilesDatabase(false, start, count, fromDate, toDate, objFormat);
         
+    }
+
+    private TableRowIterator queryDataPackagesDatabase(int start, int count, Date fromDate, Date toDate) 
+    throws SQLException {
+        return queryDataPackagesDatabase(false, start, count, fromDate, toDate);
     }
     
     private int getDateAvailableFieldID() 
@@ -451,6 +467,61 @@ public class ObjectManager implements Constants {
         }
     }
 
+    private TableRowIterator queryDataPackagesDatabase(boolean countTotal, int start, int count, Date fromDate, Date toDate)
+            throws SQLException {
+        Collection c = (Collection) HandleManager.resolveToObject(myContext, myFiles);
+        int dateAvailableFieldId = getDateAvailableFieldID();
+        int dcIdentifierFieldId = getDCIdentifierFieldID();
+        StringBuilder queryBuilder = new StringBuilder();
+        // build up bind paramaters 
+        List<Object> bindParameters = new ArrayList<Object>();
+        queryBuilder.append("SELECT ");
+        if(countTotal) {
+            queryBuilder.append("  count(*) AS total ");
+        } else {
+            queryBuilder.append("  md.text_value AS doi, ");
+            queryBuilder.append("  mv.text_value::timestamp AS date_available ");
+        }        
+        queryBuilder.append("FROM ");
+        queryBuilder.append("  item AS it ");
+        queryBuilder.append("  JOIN collection2item as c2i using (item_id) ");
+        queryBuilder.append("  JOIN collection as col using (collection_id) ");
+        queryBuilder.append("  JOIN metadatavalue AS mv using (item_id) ");
+        queryBuilder.append("  JOIN metadatavalue AS md using (item_id) ");
+        queryBuilder.append("WHERE ");
+        queryBuilder.append("  NOT it.withdrawn = 't' AND ");
+        queryBuilder.append("  mv.metadata_field_id = ? AND ");
+        bindParameters.add(dateAvailableFieldId);
+        queryBuilder.append("  md.metadata_field_id = ? AND ");
+        bindParameters.add(dcIdentifierFieldId);
+        queryBuilder.append("  md.place = 1 AND ");
+        queryBuilder.append("  col.collection_id = ?  ");
+        if(fromDate != null) {
+            log.info("Requested fromDate: " + fromDate);
+            // Postgres-specific, casts text_value to a timestamp
+            queryBuilder.append("  mv.text_value::timestamp > ? AND ");
+            bindParameters.add(new java.sql.Date(fromDate.getTime()));
+        }
+
+        if(toDate != null) {
+            log.info("Requested toDate: " + toDate);
+            // Postgres-specific, casts text_value to a timestamp
+            queryBuilder.append("  mv.text_value::timestamp < ? AND "); // bind to toDate
+            bindParameters.add(new java.sql.Date(toDate.getTime()));
+        }
+        queryBuilder.append("  col.collection_id = ? "); 
+        bindParameters.add(c.getID()); 
+
+        if(!countTotal) {
+            queryBuilder.append("ORDER BY date_available ASC, doi ASC ");
+            queryBuilder.append("LIMIT ? "); 
+            bindParameters.add(count);
+            queryBuilder.append("OFFSET ? "); 
+            bindParameters.add(start);
+        }
+        return DatabaseManager.query(myContext, queryBuilder.toString(), bindParameters.toArray());
+        
+    }
     /**
        Retrieve a DSpace item by identifier. If the identifier includes the "/bitstream" suffix, returns the Item
        containing the bistream.
