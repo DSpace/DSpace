@@ -452,47 +452,6 @@ public class ObjectManager implements Constants {
         }
     }
 
-        @Deprecated
-	private String buildQuery(Date aFrom, Date aTo, String aObjFormat) {
-		StringBuilder query = new StringBuilder();
-		String qString;
-                
-		if (aObjFormat == null && aFrom == null && aTo == null) {
-			query.append("doi:[* TO *]");
-		}
-		else {
-			SimpleDateFormat date = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-
-			if (aObjFormat != null) {
-				if (aObjFormat.equals(DRYAD_NAMESPACE)) {
-					query.append("doi:[* TO *]");
-				}
-				else {
-					query.append("format:\"").append(aObjFormat).append("\"");
-				}
-			}
-
-			if (aFrom != null && aTo != null) {
-				String from = date.format(aFrom);
-				String to = date.format(aTo);
-				query.append(" updated:[" + from + " TO " + to + "]");
-			}
-			else if (aFrom == null && aTo != null) {
-				query.append(" updated:[* TO " + date.format(aTo));
-			}
-			else if (aFrom != null && aTo == null) {
-				query.append(" updated:[" + date.format(aFrom) + " TO NOW]");
-			}
-		}
-
-		qString = query.toString().trim();
-
-		log.debug("Solr query: " + qString);
-	
-		return qString;
-	}
-
     /**
        Retrieve a DSpace item by identifier. If the identifier includes the "/bitstream" suffix, returns the Item
        containing the bistream.
