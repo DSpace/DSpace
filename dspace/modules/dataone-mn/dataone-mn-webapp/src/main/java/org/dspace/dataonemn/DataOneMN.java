@@ -57,7 +57,8 @@ public class DataOneMN extends HttpServlet implements Constants {
     private static final int DATA_FILE_COLLECTION = 1;
     
     
-    private String myData;
+    private String myFiles;
+    private String myPackages;
 
     private DataOneLogger myRequestLogger;
     
@@ -118,7 +119,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	Context ctxt = getContext();
 	
 	if (reqPath.startsWith("/object/")) {
-	    ObjectManager objManager = new ObjectManager(ctxt, myData);
+	    ObjectManager objManager = new ObjectManager(ctxt, myFiles, myPackages);
 	    describe(reqPath, response, objManager);
 	} else {
 	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
@@ -213,7 +214,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	
 	try {
 	    ctxt = getContext();
-	    ObjectManager objManager = new ObjectManager(ctxt, myData);     
+	    ObjectManager objManager = new ObjectManager(ctxt, myFiles, myPackages);     
 		    
 	    if (reqPath.startsWith("/monitor/ping")) {
 		ping(response, objManager);
@@ -299,7 +300,8 @@ public class DataOneMN extends HttpServlet implements Constants {
 	    }
 	}
 	
-	myData = ConfigurationManager.getProperty("stats.datafiles.coll");
+	myFiles = ConfigurationManager.getProperty("stats.datafiles.coll");
+        myPackages = ConfigurationManager.getProperty("stats.datapkgs.coll");
 		
 	myRequestLogger = new DataOneLogger();  //this assumes a configuration has been loaded
 	log.debug("initialization complete");

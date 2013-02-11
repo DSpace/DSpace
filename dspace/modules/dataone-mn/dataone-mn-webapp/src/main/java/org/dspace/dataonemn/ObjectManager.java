@@ -50,11 +50,13 @@ public class ObjectManager implements Constants {
     public static final int DEFAULT_COUNT = 20;
 
     protected Context myContext;
-    protected String myData;
+    protected String myFiles;
+    protected String myPackages;
     
-    public ObjectManager(Context aContext, String aCollection) {
+    public ObjectManager(Context aContext, String aFilesCollection, String aPackagesCollection) {
 	myContext = aContext;
-	myData = aCollection;
+	myFiles = aFilesCollection;
+        myPackages = aPackagesCollection;
     }
 
     public void printList(OutputStream aOutStream) throws SQLException, IOException {
@@ -369,7 +371,7 @@ public class ObjectManager implements Constants {
             // need special handling on object format.  If it is passed in as the metadata format
             // we need to ignore it in the database query
             
-            Collection c = (Collection) HandleManager.resolveToObject(myContext, myData);
+            Collection c = (Collection) HandleManager.resolveToObject(myContext, myFiles);
             int dateAvailableFieldId = getDateAvailableFieldID();
             int dcIdentifierFieldId = getDCIdentifierFieldID();
 
