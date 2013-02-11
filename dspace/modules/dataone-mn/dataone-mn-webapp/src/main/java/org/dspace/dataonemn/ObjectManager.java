@@ -95,9 +95,9 @@ public class ObjectManager implements Constants {
         try {
             if(aObjFormat != null && aObjFormat.equals(DRYAD_NAMESPACE)) {
                 // Metadata format requested, do not pass object format to query
-                total = queryTotalFromDatabase(aFrom, aTo, null);
+                total = queryTotalDataFilesFromDatabase(aFrom, aTo, null);
             } else {
-                total = queryTotalFromDatabase(aFrom, aTo, aObjFormat);
+                total = queryTotalDataFilesFromDatabase(aFrom, aTo, aObjFormat);
             }
             // This returns the number of matched objects in the database
             // We will double it
@@ -176,9 +176,9 @@ public class ObjectManager implements Constants {
         TableRowIterator iterator = null;
         if(aObjFormat != null && aObjFormat.equals(DRYAD_NAMESPACE)) {
             // Metadata format requested, do not pass object format to query
-            iterator = queryDatabase(offsetForDatabaseQuery, countForDatabaseQuery, aFrom, aTo, null);
+            iterator = queryDataFilesDatabase(offsetForDatabaseQuery, countForDatabaseQuery, aFrom, aTo, null);
         } else {
-            iterator = queryDatabase(offsetForDatabaseQuery, countForDatabaseQuery, aFrom, aTo, aObjFormat);
+            iterator = queryDataFilesDatabase(offsetForDatabaseQuery, countForDatabaseQuery, aFrom, aTo, aObjFormat);
         }
         List<nu.xom.Element> elementList = new ArrayList<nu.xom.Element>();
         while(iterator.hasNext()) {
@@ -319,10 +319,10 @@ public class ObjectManager implements Constants {
     
 
     
-    private long queryTotalFromDatabase(Date fromDate, Date toDate, String objFormat)
+    private long queryTotalDataFilesFromDatabase(Date fromDate, Date toDate, String objFormat)
     throws SQLException, NotFoundException {
         //start and count will be ignored
-        TableRowIterator it = queryDatabase(true, 0, 0, fromDate, toDate, objFormat);
+        TableRowIterator it = queryDataFilesDatabase(true, 0, 0, fromDate, toDate, objFormat);
         if(it.hasNext()) {
             return it.next().getLongColumn("total");
         } else {
@@ -330,9 +330,9 @@ public class ObjectManager implements Constants {
         }
     }
     
-    private TableRowIterator queryDatabase(int start, int count, Date fromDate, Date toDate, String objFormat) 
+    private TableRowIterator queryDataFilesDatabase(int start, int count, Date fromDate, Date toDate, String objFormat) 
     throws SQLException {
-        return queryDatabase(false, start, count, fromDate, toDate, objFormat);
+        return queryDataFilesDatabase(false, start, count, fromDate, toDate, objFormat);
         
     }
     
@@ -366,7 +366,7 @@ public class ObjectManager implements Constants {
         return dcIdentifierFieldId;
     }    
     // pass countTotal as true to return the count instead of item data
-    private TableRowIterator queryDatabase(boolean countTotal, int start, int count, Date fromDate, Date toDate, String objFormat) 
+    private TableRowIterator queryDataFilesDatabase(boolean countTotal, int start, int count, Date fromDate, Date toDate, String objFormat) 
     throws SQLException {
         try {
             // need special handling on object format.  If it is passed in as the metadata format
