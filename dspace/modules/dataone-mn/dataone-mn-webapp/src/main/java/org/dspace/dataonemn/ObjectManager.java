@@ -457,7 +457,13 @@ public class ObjectManager implements Constants {
 	long size = 0;
 	Item item = getDSpaceItem(aID);
 
-	if(!aID.endsWith("/bitstream")) {
+        if(aID.endsWith("/d1rem")) {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            getResourceMap(aID, outputStream);
+            size = outputStream.size();
+        } else if(aID.endsWith("/bitstream")) {
+	    size = getOrigBitstream(item).getSize();
+        } else {
 	    DisseminationCrosswalk xWalk = (DisseminationCrosswalk) PluginManager
 	        .getNamedPlugin(DisseminationCrosswalk.class,
 				DRYAD_CROSSWALK);
@@ -484,8 +490,6 @@ public class ObjectManager implements Constants {
 		log.error("Unable to crosswalk metadata", details);
 		throw new RuntimeException(details);
 	    }
-	} else {
-	    size = getOrigBitstream(item).getSize();
 	}
         return size;
     }
