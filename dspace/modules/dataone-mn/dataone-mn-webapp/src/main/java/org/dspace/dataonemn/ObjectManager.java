@@ -489,43 +489,7 @@ public class ObjectManager implements Constants {
 	}
         return size;
     }
-        // unused
-        public String[] generateXMLChecksum(String aID)
-	throws NotFoundException, SQLException, IOException {
-	Item item = getDSpaceItem(aID);
-	String checksumAlgo = "";
-	String checksum = "";
-	
-        try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            MessageDigest md = MessageDigest.getInstance(DEFAULT_CHECKSUM_ALGO);
-            StringBuffer hexString = new StringBuffer();
-            byte[] digest;
-            if(aID.endsWith("/d1rem")) {
-                getResourceMap(aID, outputStream);
-            } else {
-                getMetadataObject(aID, outputStream);
-            }
-            md.update(outputStream.toByteArray());
-            checksumAlgo = DEFAULT_CHECKSUM_ALGO;
-            digest = md.digest();
 
-            for (int index = 0; index < digest.length; index++) {
-                hexString.append(Integer.toHexString(0xFF & digest[index]));
-            }
-
-            checksum = hexString.toString();
-
-            log.debug("Calculated XML checksum (" + checksum + ") for " + aID);
-        } catch (NoSuchAlgorithmException details) {
-            log.error("unexpected checksum algorithm", details);
-            throw new RuntimeException(details);
-        }
-    return new String[] { checksum, checksumAlgo };
-    }
-    
-
-    
     private long queryTotalDataFilesFromDatabase(Date fromDate, Date toDate, String objFormat)
     throws SQLException, NotFoundException {
         //start and count will be ignored
