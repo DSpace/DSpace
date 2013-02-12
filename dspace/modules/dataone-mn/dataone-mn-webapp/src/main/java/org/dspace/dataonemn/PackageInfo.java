@@ -33,7 +33,7 @@ public class PackageInfo implements Constants {
     }
 
     /**
-       Split this object into two separate elements -- one for the metadata and one for the primary bitstream.
+       Split this object into two separate elements -- one for the metadata and one for the resource map
     **/
     public Element[] createInfoElements() {    
 	Element[] elements = new Element[2];
