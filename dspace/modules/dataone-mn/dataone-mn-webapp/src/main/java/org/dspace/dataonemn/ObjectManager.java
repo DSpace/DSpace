@@ -6,10 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
+import java.util.*;
 
 
 import org.dspace.authorize.AuthorizeException;
@@ -490,6 +487,8 @@ public class ObjectManager implements Constants {
 	} else {
 	    size = getOrigBitstream(item).getSize();
 	}
+        return size;
+    }
         
         public String[] generateXMLChecksum(String aID)
 	throws NotFoundException, SQLException, IOException {
