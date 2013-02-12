@@ -155,6 +155,10 @@
           <level value="INFO"/>
         </logger>
 
+        <logger name="org.dspace.curate">
+          <level value="INFO"/>
+        </logger>
+
 	<logger name="org.dspace.statistics">
 	  <level value="DEBUG"/>
 	</logger>     

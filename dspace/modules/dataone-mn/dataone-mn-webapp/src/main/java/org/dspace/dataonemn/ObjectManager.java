@@ -1,12 +1,6 @@
 package org.dspace.dataonemn;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -30,6 +24,7 @@ import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.utils.DSpace;
+import org.dspace.content.DCValue;
 
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -43,13 +38,21 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
+import org.dataone.service.types.v1.Identifier;
+import org.dataone.ore.ResourceMapFactory;
+import org.dspace.foresite.ResourceMap;
+import org.dspace.foresite.OREException;
+import org.dspace.foresite.ORESerialiserException;
+
+import java.net.URISyntaxException;
+
 public class ObjectManager implements Constants {
     
     private static final Logger log = Logger.getLogger(ObjectManager.class);
     private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     public static final int DEFAULT_START = 0;
     public static final int DEFAULT_COUNT = 20;
-
+    
     protected Context myContext;
     protected String myFiles;
     protected String myPackages;
@@ -59,15 +62,15 @@ public class ObjectManager implements Constants {
 	myFiles = aFilesCollection;
         myPackages = aPackagesCollection;
     }
-
+    
     public void printList(OutputStream aOutStream) throws SQLException, IOException {
 	printList(DEFAULT_START, DEFAULT_COUNT, aOutStream);
     }
-
+    
     public void printList(Date aFrom, Date aTo, OutputStream aOutStream) throws SQLException, IOException {
 	printList(DEFAULT_START, DEFAULT_COUNT, aFrom, aTo, null, aOutStream);
     }
-
+    
     public void printList(Date aFrom, Date aTo, String aObjFormat, OutputStream aOutStream)
 	throws SQLException, IOException {
 	printList(DEFAULT_START, DEFAULT_COUNT, aFrom, aTo, aObjFormat,
@@ -454,41 +457,38 @@ public class ObjectManager implements Constants {
     
 	public long getObjectSize(String aID)
 	throws NotFoundException, IOException, SQLException {
-	    long size = 0;
-	    Item item = getDSpaceItem(aID);
+	long size = 0;
+	Item item = getDSpaceItem(aID);
 
-	    if(!aID.endsWith("/bitstream")) {
-	        DisseminationCrosswalk xWalk = (DisseminationCrosswalk) PluginManager
+	if(!aID.endsWith("/bitstream")) {
+	    DisseminationCrosswalk xWalk = (DisseminationCrosswalk) PluginManager
 	        .getNamedPlugin(DisseminationCrosswalk.class,
-	                DRYAD_CROSSWALK);
-	        try {
-	            Element result = xWalk.disseminateElement(item);
-	            Format ppFormat = Format.getPrettyFormat();
-	            StringWriter writer = new StringWriter();
-	            Namespace dryadNS = result.getNamespace();
-	            Element wrapper = result.getChild("DryadMetadata", dryadNS);
+				DRYAD_CROSSWALK);
+	    try {
+		Element result = xWalk.disseminateElement(item);
+		Format ppFormat = Format.getPrettyFormat();
+		StringWriter writer = new StringWriter();
+		Namespace dryadNS = result.getNamespace();
+		Element wrapper = result.getChild("DryadMetadata", dryadNS);
 
-	            if (wrapper != null) {
-	                result = wrapper.getChild("DryadDataFile", dryadNS);
-	            }
+		if (wrapper != null) {
+		    result = wrapper.getChild("DryadDataFile", dryadNS);
+		}
 
-	            new XMLOutputter(ppFormat).output(result, writer);
+		new XMLOutputter(ppFormat).output(result, writer);
 
-	            size = (long) writer.toString().length();
-	        }
-	        catch (AuthorizeException details) {
-	            log.error("Authorization problem", details);
-	            throw new RuntimeException(details);
-	        }
-	        catch (CrosswalkException details) {
-	            log.error("Unable to crosswalk metadata", details);
-	            throw new RuntimeException(details);
-	        }
-	    } else {
-	        size = getOrigBitstream(item).getSize();
+		size = (long) writer.toString().length();
 	    }
-
-	    return size;
+	    catch (AuthorizeException details) {
+		log.error("Authorization problem", details);
+		throw new RuntimeException(details);
+	    }
+	    catch (CrosswalkException details) {
+		log.error("Unable to crosswalk metadata", details);
+		throw new RuntimeException(details);
+	    }
+	} else {
+	    size = getOrigBitstream(item).getSize();
 	}
         
         public String[] generateXMLChecksum(String aID)
@@ -701,6 +701,7 @@ public class ObjectManager implements Constants {
             bindParameters.add(new java.sql.Date(fromDate.getTime()));
         }
 
+
         if(toDate != null) {
             log.info("Requested toDate: " + toDate);
             // Postgres-specific, casts text_value to a timestamp
@@ -734,6 +735,11 @@ public class ObjectManager implements Constants {
 
 	    if(aID.endsWith("/bitstream")) {
 		int bitsIndex = aID.indexOf("/bitstream");
+		String shortID = aID.substring(0,bitsIndex);
+		aID = shortID;
+	    }
+	    if(aID.endsWith("/d1rem")) {
+		int bitsIndex = aID.indexOf("/d1rem");
 		String shortID = aID.substring(0,bitsIndex);
 		aID = shortID;
 	    }
@@ -904,10 +910,8 @@ public class ObjectManager implements Constants {
 	    // adjust the identifier to be a full DOI if it isn't one already
 	    if (idElem != null) {
 		String theID = idElem.getText();
-		if(theID.startsWith("doi:")) {
-		    theID = "http://dx.doi.org/" + theID.substring("doi:".length());
-		    idElem.setText(theID);
-		}
+		theID = normalizeDoi(theID);
+		idElem.setText(theID);
 	    }
 	    
 	    Format ppFormat = Format.getPrettyFormat();
@@ -923,6 +927,97 @@ public class ObjectManager implements Constants {
 	    log.error("Malformed URL!", details);
 	}
 	
+    }
+
+    /**
+     * Write an ORE resource map to the output stream.
+     **/
+    public void getResourceMap(String aID, OutputStream aOutputStream)
+	throws IOException, SQLException, NotFoundException {
+	
+	log.debug("Retrieving resource map for " + aID);
+	
+	try {
+	    Item item = getDSpaceItem(aID);
+	    log.debug(" (DSO_ID: " + item.getID() + ") -- " + item.getHandle());
+
+	    // DOI
+	    String doi = "[DOI not found]";
+	    DCValue[] vals = item.getMetadata("dc.identifier");
+	    if (vals.length == 0) {
+		log.error("Object has no dc.identifier available " + aID);
+	    } else {
+		for(int i = 0; i < vals.length; i++) {
+		    if (vals[i].value.startsWith("doi:") || vals[i].value.startsWith("http://doi")) {
+			doi = normalizeDoi(vals[i].value);
+			break;
+		    }
+		}
+	    }
+
+	    // DataFiles
+	    DCValue[] dataFiles = item.getMetadata("dc.relation.haspart");
+	    
+
+	    ////////// generate a resource map
+	    
+	    // the ORE object's id
+	    Identifier resourceMapId = new Identifier();
+	    resourceMapId.setValue(doi + "/d1rem");
+	    // the science metadata id
+	    Identifier dataPackageId = new Identifier();
+	    dataPackageId.setValue(doi);
+	    // data file identifiers
+	    List<Identifier> dataIds = new ArrayList<Identifier>();
+	    for(int i=0; i < dataFiles.length; i++) {
+		String dataIdString  = normalizeDoi(dataFiles[i].value);
+		Identifier dataFileId = new Identifier();
+		dataFileId.setValue(dataIdString);
+		dataIds.add(dataFileId);
+		Identifier dataFileBitstreamId = new Identifier();
+		dataFileBitstreamId.setValue(dataIdString + "/bitstream");
+		dataIds.add(dataFileBitstreamId);
+	    }
+	    
+	    // associate the metadata and data identifiers
+	    Map<Identifier, List<Identifier>> idMap = new HashMap<Identifier, List<Identifier>>();
+	    idMap.put(dataPackageId, dataIds);
+	    // generate the resource map
+	    ResourceMapFactory rmf = ResourceMapFactory.getInstance();
+	    ResourceMap resourceMap = rmf.createResourceMap(resourceMapId, idMap);
+
+	    // serialize it as RDF/XML
+	    String rdfXml = ResourceMapFactory.getInstance().serializeResourceMap(resourceMap);
+
+	    PrintWriter writer = new PrintWriter(
+						 new BufferedWriter(new OutputStreamWriter(aOutputStream)));
+	    writer.print(rdfXml);
+	    writer.flush();
+	    aOutputStream.close();
+	} catch (OREException e) {
+	    log.error("ORE problem!", e);
+	} catch (ORESerialiserException e) {
+	    log.error("Serilizing problem!", e);
+	} catch (URISyntaxException e) {
+	    log.error("URI problem!", e);
+	} catch (MalformedURLException details) {
+	    log.error("Malformed URL!", details);
+	}
+	
+    }
+
+    private String normalizeDoi(String doi) {
+	if (doi == null || doi.length() == 0) {
+	    log.error("Attempt to normalize non-existant DOI");
+	    return "";
+	}
+	if(doi.startsWith("doi:")) {
+	    doi = "http://dx.doi.org/" + doi.substring("doi:".length());
+	}
+	if(doi.startsWith("10.")) {
+	    doi = "http://dx.doi.org/" + doi;
+	}
+	return doi;
     }
     
     public void writeBitstream(InputStream aInputStream,
