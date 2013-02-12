@@ -464,6 +464,7 @@ public class ObjectManager implements Constants {
         } else if(aID.endsWith("/bitstream")) {
 	    size = getOrigBitstream(item).getSize();
         } else {
+	    log.debug("crosswalking with " + DRYAD_CROSSWALK);
 	    DisseminationCrosswalk xWalk = (DisseminationCrosswalk) PluginManager
 	        .getNamedPlugin(DisseminationCrosswalk.class,
 				DRYAD_CROSSWALK);
@@ -861,6 +862,7 @@ public class ObjectManager implements Constants {
 	try {
 	    Item item = getDSpaceItem(aID);
 	    log.debug(" (DSO_ID: " + item.getID() + ") -- " + item.getHandle());
+	    log.debug("crosswalking with " + DRYAD_CROSSWALK);
 	    DisseminationCrosswalk xWalk =
 		(DisseminationCrosswalk) PluginManager.getNamedPlugin(DisseminationCrosswalk.class, DRYAD_CROSSWALK);
 	    
