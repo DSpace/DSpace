@@ -251,7 +251,7 @@ public class ObjectManager implements Constants {
             packageInfo.setModificationDate(dateFormatter.format(dateAvailable));
 
             try {
-                String xmlChecksum[] = generateXMLChecksum(doi); // metadata
+                String xmlChecksum[] = getObjectChecksum(doi); // metadata
                 packageInfo.setXmlChecksum(xmlChecksum[0]);
                 packageInfo.setXmlChecksumAlgo(xmlChecksum[1]);
             } catch (NotFoundException ex) {
@@ -259,7 +259,7 @@ public class ObjectManager implements Constants {
             }
             
             try {
-                String resourceMapChecksum[] = generateXMLChecksum(doi + "/d1rem");
+                String resourceMapChecksum[] = getObjectChecksum(doi + "/d1rem");
                 packageInfo.setResourceMapChecksum(resourceMapChecksum[0]);
                 packageInfo.setResourceMapChecksumAlgo(resourceMapChecksum[1]);
             } catch (NotFoundException ex) {
@@ -409,7 +409,7 @@ public class ObjectManager implements Constants {
             bitstreamInfo.setObjectFormat(format);
 
             try {
-                String xmlChecksum[] = generateXMLChecksum(doi);
+                String xmlChecksum[] = getObjectChecksum(doi);
                 bitstreamInfo.setXMLChecksum(xmlChecksum[0], xmlChecksum[1]);
             } catch (NotFoundException ex) {
                 log.error("Unable to find object to generate XML checksum", ex);
@@ -489,7 +489,7 @@ public class ObjectManager implements Constants {
 	}
         return size;
     }
-        
+        // unused
         public String[] generateXMLChecksum(String aID)
 	throws NotFoundException, SQLException, IOException {
 	Item item = getDSpaceItem(aID);
@@ -501,8 +501,11 @@ public class ObjectManager implements Constants {
             MessageDigest md = MessageDigest.getInstance(DEFAULT_CHECKSUM_ALGO);
             StringBuffer hexString = new StringBuffer();
             byte[] digest;
-
-            getMetadataObject(aID, outputStream);
+            if(aID.endsWith("/d1rem")) {
+                getResourceMap(aID, outputStream);
+            } else {
+                getMetadataObject(aID, outputStream);
+            }
             md.update(outputStream.toByteArray());
             checksumAlgo = DEFAULT_CHECKSUM_ALGO;
             digest = md.digest();
@@ -855,8 +858,11 @@ public class ObjectManager implements Constants {
 		MessageDigest md = MessageDigest.getInstance(DEFAULT_CHECKSUM_ALGO);
 		StringBuffer hexString = new StringBuffer();
 		byte[] digest;
-		
-		getMetadataObject(aID, outputStream);
+		if(aID.endsWith("/d1rem")) {
+                    getResourceMap(aID, outputStream);
+                } else {
+                    getMetadataObject(aID, outputStream);
+                }
 		md.update(outputStream.toByteArray());
 		checksumAlgo = DEFAULT_CHECKSUM_ALGO;
 		digest = md.digest();
