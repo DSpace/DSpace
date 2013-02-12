@@ -99,9 +99,9 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
     private static final Message T_go_to_submission_page = message("xmlui.ItemViewer.goToSubmissionPage");
     private static final Message T_version_in_workflow = message("xmlui.ItemViewer.versionInWorkflow");
     private static final Message T_head_related_item = message("xmlui.ArtifactBrowser.ItemViewer.head_related_item");
-    private  static String schema = "dryad";
-    private  static String element = "citationTitle";
-    private  static String myDataPkgColl = ConfigurationManager.getProperty("stats.datapkgs.coll");
+    private static final String RELATED_ITEMS_SCHEMA = "dryad";
+    private static final String RELATED_ITEMS_ELEMENT = "citationTitle";
+    private static String myDataPkgColl = ConfigurationManager.getProperty("stats.datapkgs.coll");
 
     private List<Item> dataFiles = new ArrayList<Item>();
 
@@ -156,7 +156,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
                     for (Item i : dataFiles) {
                         validity.add(i);
                     }
-                    if(item.getMetadata(schema+"."+element).length>0){
+                    if(item.getMetadata(RELATED_ITEMS_SCHEMA + "." + RELATED_ITEMS_ELEMENT).length>0){
                     List<Item> relatedItems = queryRelatedItems(item);
                         if(relatedItems.size()>0){
                             for (Item i : relatedItems) {
@@ -492,30 +492,25 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
 
 
 
-        //add related Item
-        if (item.getOwningCollection().getHandle().equals(myDataPkgColl)) {
-
-
-
-            if(item.getMetadata(schema+"."+element).length>0){
-                List<Item> relatedItems = null;
-                relatedItems = queryRelatedItems(item);
-                if(relatedItems.size()>0){
-                    ReferenceSet relatedSet;
-                    if (showFullItem(objectModel)) {
-                        relatedSet = division.addReferenceSet("related-viewer", "related-item-detail");
-                    } else {
-                        relatedSet = division.addReferenceSet("related-viewer", "related-item-summary");
-                    }
-                    relatedSet.setHead(T_head_related_item);
-                    for(Item relatedItem : relatedItems){
+        //add list of related Items
+	if(item.getMetadata(RELATED_ITEMS_SCHEMA + "." + RELATED_ITEMS_ELEMENT).length>0){
+	    List<Item> relatedItems = null;
+	    relatedItems = queryRelatedItems(item);
+	    if(relatedItems.size()>0){
+		ReferenceSet relatedSet;
+		if (showFullItem(objectModel)) {
+		    relatedSet = division.addReferenceSet("related-viewer", "related-item-detail");
+		} else {
+		    relatedSet = division.addReferenceSet("related-viewer", "related-item-summary");
+		}
+		relatedSet.setHead(T_head_related_item);
+		for(Item relatedItem : relatedItems){
                     relatedSet.addReference(relatedItem);
-                    }
-                }
+		}
             }
         }
     }
-
+    
 
     private void retrieveDataFiles(Item item) throws SQLException {
         DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
@@ -742,11 +737,11 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
 
     private List<Item> queryRelatedItems(Item item) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException{
-        DCValue[] keyWords= item.getMetadata(schema+"."+element);
+        DCValue[] keyWords= item.getMetadata(RELATED_ITEMS_SCHEMA + "." + RELATED_ITEMS_ELEMENT);
         List<Serializable> parameters = new ArrayList<Serializable>();
         String metaDataFieldQuery ="select distinct value.item_id from item i,metadatavalue value,metadatafieldregistry id,metadataschemaregistry s where s.short_id= ? and id.metadata_schema_id = s.metadata_schema_id and id.element = ? and id.metadata_field_id = value.metadata_field_id and i.in_archive=true and i.item_id=value.item_id and i.withdrawn=false and i.item_id != ? and (LOWER(value.text_value)= LOWER(?)";
-        parameters.add(schema);
-        parameters.add(element);
+        parameters.add(RELATED_ITEMS_SCHEMA);
+        parameters.add(RELATED_ITEMS_ELEMENT);
         parameters.add(item.getID());
         List<Item> itemList = new ArrayList<Item>();
         String queryString=null;
