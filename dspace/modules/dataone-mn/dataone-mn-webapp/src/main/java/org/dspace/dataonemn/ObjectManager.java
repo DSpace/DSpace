@@ -594,8 +594,8 @@ public class ObjectManager implements Constants {
         bindParameters.add(dcIdentifierFieldId);
         queryBuilder.append("  md.place = 1 AND "); 
         queryBuilder.append("  bun.name = ? AND ");
-        queryBuilder.append("  lower(bit.name) NOT IN ('readme.txt','readme.txt.txt') AND ");
         bindParameters.add(org.dspace.core.Constants.DEFAULT_BUNDLE_NAME);
+        queryBuilder.append("  bit.description NOT LIKE 'dc_readme' AND ");
         if(objFormat != null) {
             // limit bundle format to the provided objFormat
             log.info("Requested objFormat: " + objFormat);
