@@ -9,28 +9,33 @@
 package org.dspace.identifier;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Bitstream;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
-import org.dspace.identifier.doi.RegistrationAgency;
+import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.utils.DSpace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -97,6 +102,9 @@ public class DOIDataCiteIdentifierProvider
      * generate DOIs directly after the DOI Prefix. Set in dspace.cfg.
      */
     protected String NAMESPACE_SEPARATOR;
+    
+    protected String USERNAME;
+    protected String PASSWORD;
     
     // TODO: document how exception while initializing the crosswalks will be
     // handeled.
@@ -173,6 +181,8 @@ public class DOIDataCiteIdentifierProvider
         // FIXME
         PREFIX = "10.0123";
         NAMESPACE_SEPARATOR = "DSpace/";
+        USERNAME = "USERNAME";
+        PASSWORD = "SECRET";
     }
     
     /**
@@ -225,15 +235,16 @@ public class DOIDataCiteIdentifierProvider
             throws IdentifierException
     {
         String doi = formatIdentifier(identifier);
-        if (isDOIRegistered(dso, doi))
+
+        if (isDOIRegistered(context, dso, doi))
             return;
 
-        if (isDOIRegistered(doi))
+        if (isDOIRegistered(context, doi))
             throw new IllegalArgumentException("Trying to register a DOI that is registered for another object.");
         
-        if (!isDOIReserved(dso, doi))
+        if (!isDOIReserved(context, dso, doi))
         {
-            if (isDOIReserved(doi))
+            if (isDOIReserved(context, doi))
                 throw new IllegalArgumentException("Trying to register a DOI that is reserved for another object.");
             
             if(!reserveDOI(dso, doi))
@@ -267,9 +278,9 @@ public class DOIDataCiteIdentifierProvider
             throws IdentifierException, IllegalArgumentException
     {
         String doi = formatIdentifier(identifier);
-        if (!isDOIReserved(dso, doi))
+        if (!isDOIReserved(context, dso, doi))
         {
-            if (isDOIReserved(doi))
+            if (isDOIReserved(context, doi))
                 throw new IllegalArgumentException("Trying to register a DOI that is reserved for another object.");
             if(!reserveDOI(dso, doi))
                 throw new IdentifierException("It was impossible to reserve the DOI "
@@ -375,7 +386,7 @@ public class DOIDataCiteIdentifierProvider
         String doi = formatIdentifier(identifier);
         log.debug("formated identifier as {}", doi);
         
-        if (isDOIRegistered(doi))
+        if (isDOIRegistered(context, doi))
             throw new IdentifierException("Unable to delete DOI " + doi +
                     ". It is already registered.");
 
@@ -457,13 +468,21 @@ public class DOIDataCiteIdentifierProvider
         return false;
     }
     
-    protected boolean isDOIReserved(String doi)
+    protected boolean isDOIReserved(Context context, String doi)
+            throws IdentifierException
     {
-        return isDOIReserved(null, doi);
+        return isDOIReserved(context, null, doi);
     }
     
-    protected boolean isDOIReserved(DSpaceObject dso, String doi)
+    protected boolean isDOIReserved(Context context, DSpaceObject dso, String doi)
+            throws IdentifierException
     {
+        if (null == doi)
+            return false;
+        
+        if (!doi.startsWith(DOI_SCHEME + PREFIX + "/"))
+            throw new IdentifierException("Can only check if DOIs out of our prefix are reserved.");
+
         // get mds/metadata/<doi>
         // 410 GONE -> inactive (not clear if ever registered or reserved and deleted)
         // 404 Not Found -> not reserved
@@ -478,19 +497,148 @@ public class DOIDataCiteIdentifierProvider
         return false;
     }
     
-    protected boolean isDOIRegistered(String doi)
+    protected boolean isDOIRegistered(Context context, String doi)
+            throws IdentifierException
     {
-        return isDOIRegistered(null, doi);
+        return isDOIRegistered(context, null, doi);
     }
     
-        protected boolean isDOIRegistered(DSpaceObject dso, String doi)
+    protected boolean isDOIRegistered(Context context, DSpaceObject dso, String doi)
+            throws IdentifierException
     {
+        if (null == doi)
+            return false;
+        
+        if (!doi.startsWith(DOI_SCHEME + PREFIX + "/"))
+            throw new IdentifierException("Working with a DOI that is not part of our namespace (prefixes doesn't match).");
+
         // get mds/doi/<doi>
-        // 404 -> not reservered, not registered
-        // 204 -> reserved, not registered
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        httpclient.getCredentialsProvider().setCredentials(
+                new AuthScope(DATACITE_HOST, 443),
+                new UsernamePasswordCredentials(USERNAME, PASSWORD));
+        
+        URIBuilder uribuilder = new URIBuilder();
+        uribuilder.setScheme("https").setHost(DATACITE_HOST).setPath(DATACITE_DOI_PATH
+                + "/" + doi.substring(DOI_SCHEME.length()));
+        
+        String content = "";
+        int statusCode = -1;
+        HttpEntity entity = null;
+        try
+        {
+            HttpGet httpget = new HttpGet(uribuilder.build());
+            HttpResponse response = httpclient.execute(httpget);
+            StatusLine status = response.getStatusLine();
+            statusCode = status.getStatusCode();
+            entity = response.getEntity();
+            if (null != entity)
+                content = EntityUtils.toString(entity, "UTF-8");
+        }
+        catch (IOException e)
+        {
+            log.warn("Caught an IOException: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        catch (URISyntaxException e)
+        {
+            log.error("The URL we constructed to check a DOI "
+                    + "produced a URISyntaxException. Please check the configuration parameters!");
+            log.error("The URL was {}.", "https://" + DATACITE_HOST +
+                    DATACITE_DOI_PATH + "/" + doi.substring(DOI_SCHEME.length()));
+            throw new IllegalArgumentException("The URL we constructed to check a DOI "
+                    + "produced a URISyntaxException. Please check the configuration parameters!", e);
+        }
+        finally
+        {
+            try
+            {
+                // Release any ressources used by HTTP-Request.
+                if (null != entity)
+                    EntityUtils.consume(entity);
+            }
+            catch (IOException e)
+            {
+                log.warn("Can't release HTTP-Entity: " + e.getMessage());
+            }
+        }
+
         // 200 -> reserved, registered
-        // if dso != null && response-code == 200 -> compare url and response
-        return false;
+        // 204 -> reserved, not registered
+        // 400 -> Bad Request
+        // 401 -> no login
+        // 403 -> wrong credentials or dataset belongs to another party
+        // 404 -> not reservered, not registered
+        // 410 -> deleted/inactive
+        // 500 -> internal server error or unable to find service provider for prefix
+        switch (statusCode)
+        {
+            // status code 200 means the doi is reserved and registered
+            // if we want to know if it is registered for a special dso we should
+            // compare the metadata. But it's easier and should be sufficient to
+            // compare the URLs.
+            case (200) :
+            {
+                if (null == dso)
+                    return true;
+                else
+                {
+                    try
+                    {
+                        return HandleManager.resolveToURL(context, dso.getHandle()).equalsIgnoreCase(content);
+                    }
+                    catch (SQLException e)
+                    {
+                        log.error("Caught an SQL-Exception: " + e.getMessage());
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+            // Status Code 204 "No Content" stands for an known DOI without URL
+            // A DOI is known when it got reserved. It gets an URL when it get
+            // registered. So a unregistered reserved DOI produces a 204.
+            case (204) :
+            {
+                return false;
+            }
+            // we get a 401 if we forgot to send credentials or if the username
+            // and password did not match.
+            case (401) :
+            {
+                log.info("We were unable to authenticate against the DOI ({}) registry agency. It told us: {}", doi, content);
+                throw new IllegalArgumentException("Cannot authenticate at the DOI registry agency. Please check if username and password are correctly set.");
+            }
+            // We get a 403 Forbidden if we are checking a DOI that belongs to
+            // another party or if there is a login problem.
+            case (403) :
+            {
+                log.info("Checking if DOI {} is registered was prohibeted by the registration agency: {}.", doi, content);
+                throw new IdentifierException("Checking if a DOI is registered is only possible for DOIs that belongs to us.");
+            }
+            // 404 "Not Found" means DOI is neither reserved nor registered.
+            case (404) :
+            {
+                return false;
+            }
+            // 410 GONE is produce by DOIs that are marked as inactive.
+            // DOIs get marked as inactive when they are deleted.
+            // It is not clear if a registered DOI can be set inactive.
+            case (410) :
+            {
+                // TODO: check if this is correct.
+                return false;
+            }
+            // For some prefixes the API produces a 400 Bad Request. This behaviour
+            // is topic of a mail to the technical support of Datacite.
+            // A http status code 500 is documented so we should accpect is as well.
+            default :
+            {
+                log.warn("While checking if the DOI {} is registered, we got a "
+                        + "http status code {} and the message \"{}\".", new String[] {doi, Integer.toString(statusCode), content});
+                throw new RuntimeException("It's temporarily impossible to check "
+                        + "if a DOI is registered. Please try again later.");
+            }
+        }
     }
 
     
@@ -510,8 +658,9 @@ public class DOIDataCiteIdentifierProvider
     }
     
     protected boolean deleteDOI(Context context, DSpaceObject dso, String doi)
+            throws IdentifierException
     {
-        if (isDOIRegistered(doi))
+        if (isDOIRegistered(context, doi))
             return false;
 
         // look for doi in DB
@@ -596,12 +745,15 @@ public class DOIDataCiteIdentifierProvider
      * @param context
      * @param dso The DSpaceObject the DOI should be created for.
      * @param doi A DOI or null if DOI should be generated.
-     * @return The generated DOI or @doi if it was saved into the database.
+     * @return The generated DOI or {@code doi} if it was saved into the database.
      * @throws SQLException In case of an error using the database.
      * @throws IllegalArgumentException If the given DOI already exists for an other object.
+     * @throws IdentifierException If {@code doi} is not part of our prefix or
+     *                             the doi registry thinks that the DOI belongs
+     *                             to another party.
      */
     protected String createNewIdentifier(Context context, DSpaceObject dso, String doi)
-            throws SQLException, IllegalArgumentException
+            throws SQLException, IllegalArgumentException, IdentifierException
     {
         TableRow doiRow = null;
         if (null != doi)
@@ -625,7 +777,7 @@ public class DOIDataCiteIdentifierProvider
             {
                 // doi is not null but was not found in db
                 // check if it registered online
-                if (isDOIRegistered(doi) || isDOIReserved(doi))
+                if (isDOIRegistered(context, doi) || isDOIReserved(context, doi))
                     throw new IllegalArgumentException("Trying to save a DOI that is already reserved for another object.");
                 // safe it to db (see below)
             }
