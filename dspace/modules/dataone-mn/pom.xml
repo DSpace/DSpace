@@ -19,4 +19,87 @@
 	<modules>
 		<module>dataone-mn-webapp</module>
 	</modules>
+
+<dependencies>
+	<dependency>
+	  <groupId>org.dataone</groupId>
+	  <artifactId>d1_libclient_java</artifactId>
+	  <version>1.1.0</version>
+	  <type>jar</type>
+	  
+	  <!-- exclude extraneous artifacts (jars) -->
+	  <exclusions>
+	    <exclusion>
+	      <groupId>org.jibx</groupId>
+	      <artifactId>jibx-tools</artifactId>
+	    </exclusion>
+	    <exclusion>
+	      <groupId>org.jibx</groupId>
+	      <artifactId>jibx-schema</artifactId>
+	    </exclusion>
+	    <exclusion>
+	      <groupId>org.jibx</groupId>
+	      <artifactId>jibx-extras</artifactId>
+	    </exclusion>
+	    <exclusion>
+	      <groupId>org.jibx</groupId>
+	      <artifactId>jibx-bind</artifactId>
+	    </exclusion>
+	    <exclusion>
+	      <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-compiler-plugin</artifactId>
+	    </exclusion>
+	    <exclusion>
+	      <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-jar-plugin</artifactId>
+	    </exclusion>
+	    <exclusion>
+	      <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-clean-plugin</artifactId>
+	    </exclusion>
+	    <exclusion>
+	      <groupId>org.jibx</groupId>
+	      <artifactId>maven-jibx-plugin</artifactId>
+	    </exclusion>
+	    <!-- TODO: refine the JCS requirements -->
+	    <exclusion>
+	      <groupId>berkeleydb</groupId>
+	      <artifactId>berkeleydb</artifactId>
+	    </exclusion>
+	    <exclusion>
+	      <groupId>mysql</groupId>
+	      <artifactId>mysql-connector-java</artifactId>
+	    </exclusion>
+	    <exclusion>
+	      <groupId>hsqldb</groupId>
+	      <artifactId>hsqldb</artifactId>
+	    </exclusion>
+	    <exclusion>
+	      <groupId>xerces</groupId>
+	      <artifactId>xercesImpl</artifactId>
+	    </exclusion>
+	    <!-- for ECP we need a newer xalan -->
+	    <exclusion>
+	      <groupId>xalan</groupId>
+	      <artifactId>xalan</artifactId>
+	    </exclusion>
+	  </exclusions>
+	</dependency>
+      </dependencies>
+
+      <repositories>
+        <repository>
+	  <id>dataone.org</id>
+	  <url>http://dev-testing.dataone.org/maven</url>
+	  <releases>
+	    <enabled>true</enabled>
+	  </releases>
+	  <snapshots>
+	    <enabled>true</enabled>
+	  </snapshots>
+	</repository>
+      </repositories>
+
+
+
 </project>

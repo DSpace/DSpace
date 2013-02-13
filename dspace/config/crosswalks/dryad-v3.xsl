@@ -93,9 +93,11 @@
 
 	<!-- package and file -->
 	<xsl:template mode="inner"
-		match="dim:field[@element='identifier'][starts-with(., 'doi:')]">
+		match="dim:field[@element='identifier'][starts-with(., 'doi:') or starts-with(., 'http://dx.doi')]">
 		<dcterms:identifier>
-			<xsl:value-of select="." />
+		  <xsl:call-template name="normalize_doi" >
+		    <xsl:with-param name="node" select="."/>
+		  </xsl:call-template>
 		</dcterms:identifier>
 	</xsl:template>
 
@@ -148,17 +150,21 @@
 
 	<!-- publication -->
 	<xsl:template mode="inner-pub"
-		match="dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'doi')]">
+		match="dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'doi') or starts-with(., 'http://dx.doi')]">
 		<bibo:doi>
-			<xsl:value-of select="." />
+		  <xsl:call-template name="normalize_doi" >
+		    <xsl:with-param name="node" select="."/>
+		  </xsl:call-template>
 		</bibo:doi>
 	</xsl:template>
 
 	<!-- package link to the publication DOI -->
 	<xsl:template mode="inner"
-		match="dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'doi')]">
+ 		match="dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'doi') or starts-with(., 'http://dx.doi')]">
 		<dcterms:references>
-			<xsl:value-of select="." />
+		  <xsl:call-template name="normalize_doi" >
+		    <xsl:with-param name="node" select="."/>
+		  </xsl:call-template>
 		</dcterms:references>
 	</xsl:template>
 
@@ -181,9 +187,11 @@
 
 	<!-- publication -->
 	<xsl:template mode="inner-pub"
-		match="dim:field[@element='identifier'][starts-with(., 'doi:')]">
+		match="dim:field[@element='identifier'][starts-with(., 'doi:') or starts-with(., 'http://dx.doi')]">
 		<dcterms:isReferencedBy>
-			<xsl:value-of select="." />
+		  <xsl:call-template name="normalize_doi" >
+		    <xsl:with-param name="node" select="."/>
+		  </xsl:call-template>
 		</dcterms:isReferencedBy>
 	</xsl:template>
 
@@ -303,6 +311,23 @@
 			<xsl:value-of select="." />
 		</dcterms:isPartOf>
 	</xsl:template>
+
+
+	<!-- DOI normalization -->
+	<!-- Returns the "full form" of a DOI. The input parameter must be a DOI of some form, either full or short. -->
+	<xsl:template name="normalize_doi">
+	  <xsl:param name="node" select="NO DOI" />
+	  <xsl:choose>
+	    <xsl:when test="starts-with($node, 'http://dx.doi')">
+	      <xsl:value-of select="$node" />
+	    </xsl:when>
+	    <xsl:otherwise>
+	      <xsl:text>http://dx.doi.org/</xsl:text>
+	      <xsl:value-of select="substring-after($node, 'doi:')" />
+	    </xsl:otherwise>
+	  </xsl:choose>
+	</xsl:template>
+
 
 	<!-- administrative bits below here -->
 
