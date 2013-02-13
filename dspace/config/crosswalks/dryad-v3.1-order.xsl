@@ -57,6 +57,8 @@
 			<xsl:apply-templates select="dryad:external" mode="copy"/>
 			<xsl:apply-templates select="dcterms:relation" mode="copy"/>
 			<xsl:apply-templates select="dcterms:references" mode="copy"/>
+			<xsl:apply-templates select="bibo:pmid" mode="copy"/>
+			<xsl:apply-templates select="bibo:Journal" mode="copy"/>
 			<xsl:apply-templates select="dcterms:hasPart" mode="copy"/>
 		</xsl:copy>
 	</xsl:template>
