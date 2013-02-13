@@ -48,26 +48,26 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     private static final char DOT = '.';
 
     private static final char SLASH = '/';
-    
+
     // Max number of files attached to a package; completely arbitrary
     private static final int MAX_NUM_OF_FILES = 150;
 
     private String myHdlPrefix;
-    
+
     private String myHostname;
-    
+
     private String myDataPkgColl;
-    
+
     private String myDataFileColl;
-    
+
     private String myLocalPartPrefix;
-    
+
     private String myDoiPrefix;
 
     private int mySuffixVarLength;
 
     private final SecureRandom myRandom = new SecureRandom();
-    
+
     Minter perstMinter = null;
 
     private String[] supportedPrefixes = new String[]{"info:doi/", "doi:" , "http://dx.doi.org/"};
@@ -133,6 +133,19 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         return null;
     }
 
+    public void moveCanonical(Context context, DSpaceObject dso) throws IdentifierException {
+        try{
+            Item item = (Item) dso;
+            String doi = getDoiValue((Item) dso);
+            DOI doi_ = new DOI(doi, item);
+            String collection = getCollection(context, item);
+            moveCanonical(item, true, collection, myDataPkgColl, doi_);
+        }catch (Exception e) {
+            log.error(LogManager.getHeader(context, "Error while attempting to moveCanonical doi", "Item id: " + dso.getID()));
+            throw new IdentifierException("Error while moving doi identifier", e);
+        }
+    }
+
 
     public void delete(Context context, DSpaceObject dso) throws IdentifierException {
         try {
@@ -157,16 +170,19 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                 // If it is the most current version occurs to move the canonical to the previous version
                 VersionHistory history = retrieveVersionHistory(context, item);
                 if(history!=null && history.getLatestVersion().getItem().equals(item) && history.size() > 1){
-                    moveCanonical(context, doi, history);
+                    Item previous = history.getPrevious(history.getLatestVersion()).getItem();
+                    DOI doi_ = new DOI(doi, previous);
+
+                    String collection = getCollection(context, previous);
+                    String myDataPkgColl = configurationService.getProperty("stats.datapkgs.coll");
+                    moveCanonical(previous, true, collection, myDataPkgColl, doi_);
                 }
 
                 //  IF Deleting a 1st version not archived yet:
                 //  The DOI stored in the previous  should revert to the version without ".1".
                 // Canonical DOI already point to the right item: no needs to move it
                 if(history!=null && history.size() == 2 && !item.isArchived()){
-
                     revertDoisFirstItem(context, history);
-
                 }
 
 
@@ -177,44 +193,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         }
     }
 
-    private void revertDoisFirstItem(Context context, VersionHistory history) throws SQLException, IOException, AuthorizeException
-    {
-        Item previous = history.getPrevious(history.getLatestVersion()).getItem();
-        String collection = getCollection(context, previous);
-        // remove doi from DOI service .1
-        String doiPrevious = getDoiValue(previous);
-        DOI removedDOI = new DOI(doiPrevious.toString(), DOI.Type.TOMBSTONE);
-        mint(removedDOI, true, null);
-
-
-        if (collection.equals(myDataPkgColl)) {
-            // replace doi metadata: dryad.2335.1 with  dryad.2335
-            revertIdentierItem(previous);
-        } else {
-            // replace doi metadata: dryad.2335.1/1.1 with  dryad.2335/1
-            revertIdentifierDF(previous);
-
-        }
-    }
-
-    private void moveCanonical(Context context, String doi, VersionHistory history) throws SQLException, IOException
-    {
-        Item previous = history.getPrevious(history.getLatestVersion()).getItem();
-        DOI doi_ = new DOI(doi, previous);
-
-        String collection = getCollection(context, previous);
-        String myDataPkgColl = configurationService.getProperty("stats.datapkgs.coll");
-        DOI canonical=null;
-
-        if (collection.equals(myDataPkgColl)) {
-            canonical = getCanonicalDataPackage(doi_, previous);
-        } else {
-            canonical = getCanonicalDataFile(doi_, previous);
-
-        }
-        mint(canonical, true, null);
-    }
-
 
     private String mintAndRegister(Context context, Item item, boolean register) throws Exception {
         String doi = getDoiValue(item);
@@ -222,12 +200,11 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         String myDataPkgColl = configurationService.getProperty("stats.datapkgs.coll");
         VersionHistory history = retrieveVersionHistory(context, item);
 
-
-        // CASE A:  it is a versioned datafile and the user is modifying its content (adding or removing bitstream) upgrade version number.
+        // CASE A: it is a versioned datafile and the user is modifying its content (adding or removing bitstream) upgrade version number.
         if(item.isArchived()){
             if(!collection.equals(myDataPkgColl)){
                 if(lookup(doi)!=null){
-		            log.debug("case A -- updating DOI info for versioned data file");
+                    log.debug("case A -- updating DOI info for versioned data file");
                     DOI doi_= upgradeDOIDataFile(context, doi, item, history);
                     if(doi_!=null){
                         remove(doi);
@@ -261,17 +238,14 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
             // CASE B1: Versioned DataPackage or DataFiles
             if (history != null) {
-		        log.debug("it's a new version; need to move the canonical identifier");
-                 Version version = history.getVersion(item);
+                log.debug("it's a new version; need to move the canonical identifier");
+                Version version = history.getVersion(item);
                 // if it is the first time that is called "create version": mint identifier ".1"
                 Version previous = history.getPrevious(version);
                 if (history.isFirstVersion(previous)) {
                     DOI firstDOI = calculateDOIFirstVersion(context, previous);
                     mint(firstDOI, register, createListMetadata(previous.getItem()));
                 }
-
-                moveCanonical(item, register, collection, myDataPkgColl, doi_);
-
             }
 
             // CASE B2: new DataFiles for a versioned DataPackage
@@ -282,6 +256,29 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         }
         return doi;
     }
+
+    private void revertDoisFirstItem(Context context, VersionHistory history) throws SQLException, IOException, AuthorizeException{
+        Item previous = history.getPrevious(history.getLatestVersion()).getItem();
+        String collection = getCollection(context, previous);
+        // remove doi from DOI service .1
+        String doiPrevious = getDoiValue(previous);
+        DOI removedDOI = new DOI(doiPrevious.toString(), DOI.Type.TOMBSTONE);
+        mint(removedDOI, true, null);
+
+
+        if (collection.equals(myDataPkgColl)) {
+            // replace doi metadata: dryad.2335.1 with  dryad.2335
+            revertIdentierItem(previous);
+        } else {
+            // replace doi metadata: dryad.2335.1/1.1 with  dryad.2335/1
+            revertIdentifierDF(previous);
+
+        }
+    }
+
+
+
+
 
     private void moveCanonical(Item item, boolean register, String collection, String myDataPkgColl, DOI doi_) throws IOException
     {
@@ -332,21 +329,21 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     }
 
     public DSpaceObject resolve(Context context, String identifier, String... attributes) throws IdentifierNotFoundException, IdentifierNotResolvableException {
-	// convert http DOIs to short form
-	if (identifier.startsWith("http://dx.doi.org/")) {
-	    identifier = "doi:" + identifier.substring("http://dx.doi.org/".length());
-	}
-	// correct http DOIs to short form if a slash was removed by the browser/server
-	if (identifier.startsWith("http:/dx.doi.org/")) {
-	    identifier = "doi:" + identifier.substring("http:/dx.doi.org/".length());
-	}
+        // convert http DOIs to short form
+        if (identifier.startsWith("http://dx.doi.org/")) {
+            identifier = "doi:" + identifier.substring("http://dx.doi.org/".length());
+        }
+        // correct http DOIs to short form if a slash was removed by the browser/server
+        if (identifier.startsWith("http:/dx.doi.org/")) {
+            identifier = "doi:" + identifier.substring("http:/dx.doi.org/".length());
+        }
 
-	
+
         if (identifier != null && identifier.startsWith("doi:")) {
             DOI dbDOI = perstMinter.getKnownDOI(identifier);
             if(dbDOI==null) {
                 throw new IdentifierNotFoundException();
-	    }
+            }
             String value = dbDOI.getInternalIdentifier();
 
             if (value != null) {
@@ -421,7 +418,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         this.perstMinter = perstMinter;
     }
 
-    
+
     // OLDER DryadDOIMinter Methods
 
     /**
@@ -447,7 +444,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             try {
                 context.turnOffAuthorisationSystem();
                 String collection = getCollection(context, item);
-		log.debug("collection is " + collection);
+                log.debug("collection is " + collection);
 
                 // DATAPACKAGE
                 if (collection.equals(myDataPkgColl)) {
@@ -681,7 +678,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         String prefix = id.substring(0, id.lastIndexOf(SLASH));
         String suffix = id.substring(id.lastIndexOf(SLASH));
 
-       id = prefix + DOT + "1" + suffix + DOT + "1";
+        id = prefix + DOT + "1" + suffix + DOT + "1";
 
         item.addMetadata(DOIIdentifierProvider.identifierMetadata.schema, DOIIdentifierProvider.identifierMetadata.element, DOIIdentifierProvider.identifierMetadata.qualifier, null, id);
         item.update();

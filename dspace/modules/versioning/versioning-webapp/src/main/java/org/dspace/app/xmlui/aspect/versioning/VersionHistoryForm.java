@@ -70,6 +70,10 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
 
         VersionHistory versionHistory = retrieveVersionHistory(item);
         if(versionHistory!=null){
+
+            if (isItTheFirstVersionAndIsNotArchivedYet(versionHistory)) return;
+
+
             Division main = createMain(body);
             createTable(main, versionHistory, isItemView, item);
 
@@ -81,6 +85,16 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
             Para note = main.addPara();
             note.addContent("* Selected Version");
         }
+    }
+
+    private boolean isItTheFirstVersionAndIsNotArchivedYet(VersionHistory versionHistory)
+    {
+        if(versionHistory.getVersions().size() == 2){
+            Version version = versionHistory.getVersions().get(0);
+            if(!version.getItem().isArchived())
+                return true;
+        }
+        return false;
     }
 
 
@@ -138,8 +152,8 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
                 Row row = table.addRow(null, Row.ROLE_DATA,"metadata-value");
                 if(!isItemView){
                     CheckBox remove = row.addCell().addCheckBox("remove");
-				    remove.setLabel("remove");
-				    remove.addOption(version.getVersionId());
+                    remove.setLabel("remove");
+                    remove.addOption(version.getVersionId());
                 }
 
                 Cell cell = row.addCell();
@@ -154,6 +168,7 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
                 if(!isItemView)
                     row.addCell().addXref(contextPath + "/item/versionhistory?versioning-continue="+knot.getId()+"&versionID="+version.getVersionId() +"&itemID="+ version.getItem().getID() + "&submit_update", T_submit_update);
             }
+
         }
 
     }

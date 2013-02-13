@@ -1,3 +1,4 @@
+
 # Dryad added IPs of spiders/bots
 
 # localhost
@@ -6,6 +7,11 @@
 
 # NESCent's Nagios server (checks to ensure Dryad is running)
 152.3.104.75
+
+# Various NESCent machines
+152.3.58
+152.3.59
+152.3.68.115
 
 # Elena's RoadRunner IP
 174.109.198.35
@@ -59,3 +65,5 @@
 
 # Other (ambiguous in whois db)
 208.115.111.243
+
+

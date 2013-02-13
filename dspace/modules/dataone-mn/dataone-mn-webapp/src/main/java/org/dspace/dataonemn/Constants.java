@@ -2,7 +2,7 @@ package org.dspace.dataonemn;
 
 public interface Constants {
 
-	public static final String DRYAD_CROSSWALK = "DRYAD-V3";
+	public static final String DRYAD_CROSSWALK = "DRYAD-V3-1";
 
 	public static final String DEFAULT_CHECKSUM_ALGO = "MD5";
 	
