@@ -15,7 +15,7 @@
 	<xsl:template match="dryad:DryadDataFile">
 		<xsl:copy>
 			<xsl:attribute name="xsi:schemaLocation"
-				>http://purl.org/dryad/terms/<xsl:text> </xsl:text>http://datadryad.org/profile/v3/dryad.xsd</xsl:attribute>
+				>http://purl.org/dryad/terms/<xsl:text> </xsl:text>http://datadryad.org/profile/v3.1/dryad.xsd</xsl:attribute>
 			<xsl:apply-templates select="dcterms:type" mode="copy"/>
 			<xsl:apply-templates select="dryad:status" mode="copy"/>
 			<xsl:apply-templates select="dcterms:creator" mode="copy"/>
@@ -41,7 +41,7 @@
 	<xsl:template match="dryad:DryadDataPackage">
 		<xsl:copy>
 			<xsl:attribute name="xsi:schemaLocation"
-				>http://purl.org/dryad/terms/<xsl:text> </xsl:text>http://datadryad.org/profile/v3/dryad.xsd</xsl:attribute>
+				>http://purl.org/dryad/terms/<xsl:text> </xsl:text>http://datadryad.org/profile/v3.1/dryad.xsd</xsl:attribute>
 			<xsl:apply-templates select="dcterms:type" mode="copy"/>
 			<xsl:apply-templates select="dryad:status" mode="copy"/>
 			<xsl:apply-templates select="dcterms:creator" mode="copy"/>
