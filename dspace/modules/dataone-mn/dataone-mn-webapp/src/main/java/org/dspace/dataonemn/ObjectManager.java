@@ -255,6 +255,8 @@ public class ObjectManager implements Constants {
                 packageInfo.setXmlChecksumAlgo(xmlChecksum[1]);
             } catch (NotFoundException ex) {
                 log.error("Error getting checksum for " + doi, ex);
+                packageInfo.setXmlChecksum(DEFAULT_CHECKSUM);
+                packageInfo.setXmlChecksumAlgo(DEFAULT_CHECKSUM_ALGO);
             }
             
             try {
@@ -263,6 +265,8 @@ public class ObjectManager implements Constants {
                 packageInfo.setResourceMapChecksumAlgo(resourceMapChecksum[1]);
             } catch (NotFoundException ex) {
                 log.error("Error getting checksum for " + doi + "/d1rem", ex);
+                packageInfo.setResourceMapChecksum(DEFAULT_CHECKSUM);
+                packageInfo.setResourceMapChecksumAlgo(DEFAULT_CHECKSUM_ALGO);
             }
             
             try {
@@ -410,6 +414,7 @@ public class ObjectManager implements Constants {
                 bitstreamInfo.setXMLChecksum(xmlChecksum[0], xmlChecksum[1]);
             } catch (NotFoundException ex) {
                 log.error("Unable to find object to generate XML checksum", ex);
+                bitstreamInfo.setXMLChecksum(DEFAULT_CHECKSUM, DEFAULT_CHECKSUM_ALGO);
             }
             try {
                 long xmlSize = getObjectSize(doi);
