@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 import nu.xom.Document;
 import nu.xom.Serializer;
 
-import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.content.Bitstream;
@@ -54,14 +53,14 @@ public class DataOneMN extends HttpServlet implements Constants {
     private static final long serialVersionUID = -3545762362447908735L;    
     private static final Logger log = Logger.getLogger(DataOneMN.class);
     private static final String XML_CONTENT_TYPE = "application/xml; charset=UTF-8";
+    private static final String RDF_CONTENT_TYPE = "application/rdf+xml; charset=UTF-8";
     private static final String TEXT_XML_CONTENT_TYPE = "text/xml; charset=UTF-8";
     private static final int DATA_FILE_COLLECTION = 1;
     
     
-    private String myData;
-    
-    private String mySolr;
-    
+    private String myFiles;
+    private String myPackages;
+
     private DataOneLogger myRequestLogger;
     
 
@@ -121,7 +120,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	Context ctxt = getContext();
 	
 	if (reqPath.startsWith("/object/")) {
-	    ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);
+	    ObjectManager objManager = new ObjectManager(ctxt, myFiles, myPackages);
 	    describe(reqPath, response, objManager);
 	} else {
 	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
@@ -201,7 +200,7 @@ public class DataOneMN extends HttpServlet implements Constants {
         if(requestIP == null) {
             requestIP = request.getRemoteAddr();
         }
-	//final String requestHost = request.getRemoteHost();
+
 	final String requestUser = request.getRemoteUser();
 	le.setIPAddress(requestIP);
 	le.setUserAgent(request.getHeader("user-agent"));
@@ -216,7 +215,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	
 	try {
 	    ctxt = getContext();
-	    ObjectManager objManager = new ObjectManager(ctxt, myData, mySolr);     
+	    ObjectManager objManager = new ObjectManager(ctxt, myFiles, myPackages);     
 		    
 	    if (reqPath.startsWith("/monitor/ping")) {
 		ping(response, objManager);
@@ -302,8 +301,8 @@ public class DataOneMN extends HttpServlet implements Constants {
 	    }
 	}
 	
-	myData = ConfigurationManager.getProperty("stats.datafiles.coll");
-	mySolr = ConfigurationManager.getProperty("solr.dryad.server");
+	myFiles = ConfigurationManager.getProperty("stats.datafiles.coll");
+        myPackages = ConfigurationManager.getProperty("stats.datapkgs.coll");
 		
 	myRequestLogger = new DataOneLogger();  //this assumes a configuration has been loaded
 	log.debug("initialization complete");
@@ -521,10 +520,37 @@ public class DataOneMN extends HttpServlet implements Constants {
 	String simpleDOI = id.replace('/','_').replace(':','_');
 
 	try {
-	    if (!id.endsWith("/bitstream")) {
+	    if (id.endsWith("/bitstream")) {
+		// return a bitstream
+		log.debug("bitstream requested");
+		int bitsIndex = id.indexOf("/bitstream");
+		id = id.substring(0,bitsIndex);
+		logent.setIdentifier(id);
+		
+		// locate the bitstream
+		Item item = objManager.getDSpaceItem(id);
+		Bitstream bitstream = objManager.getFirstBitstream(item);
+		
+		// send it to output stream
+		String mimeType = bitstream.getFormat().getMIMEType();
+		response.setContentType(mimeType);
+		log.debug("Setting data file MIME type to: " + mimeType);		
+		fileName = bitstream.getName();
+		response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName);
+		objManager.writeBitstream(bitstream.retrieve(), response.getOutputStream());	
+	    } else if(id.endsWith("/d1rem")) {
+		// return a (dataONE format) resource map
+		response.setContentType(RDF_CONTENT_TYPE);
+
+		// throw early, try not to create an output stream
+		Item item = objManager.getDSpaceItem(id);
+		
+		log.debug("getting resource map for object id=" + id);
+		objManager.getResourceMap(id, response.getOutputStream());
+		logent.setIdentifier(id);
+	    } else {
 		// return a metadata record (file or package)
-		fileName = simpleDOI + ".xml";
-        response.setContentType(XML_CONTENT_TYPE);
+		response.setContentType(XML_CONTENT_TYPE);
 
 		// throw early, try not to create an output stream
 		Item item = objManager.getDSpaceItem(id);
@@ -532,36 +558,16 @@ public class DataOneMN extends HttpServlet implements Constants {
 		log.debug("getting science metadata object id=" + id);
 		objManager.getMetadataObject(id, response.getOutputStream());
 		logent.setIdentifier(id);
-	    } else {
-		// return a bitstream
-		log.debug("bitstream requested");
-		int bitsIndex = id.indexOf("/bitstream");
-		id = id.substring(0,bitsIndex);
-		logent.setIdentifier(id);
-
-		// locate the bitstream
-		Item item = objManager.getDSpaceItem(id);
-		Bitstream bitstream = objManager.getFirstBitstream(item);
-		
-
-		// send it to output stream
-		String mimeType = bitstream.getFormat().getMIMEType();
-		response.setContentType(mimeType);
-		log.debug("Setting data file MIME type to: " + mimeType);		
-		fileName = bitstream.getName();
-		response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName);
-		objManager.writeBitstream(bitstream.retrieve(), response.getOutputStream());
 	    }
 	    
-	}
-	catch (NotFoundException details) {
+	} catch (NotFoundException details) {
 	    log.error("Passed request returned not found", details);
-        response.setStatus(404);
-        String resStr = generateNotFoundResponse(id, "mn.get","1020");
-        OutputStream out = response.getOutputStream();
-        PrintWriter pw = new PrintWriter(out);
-        pw.write(resStr);
-        pw.flush();
+	    response.setStatus(404);
+	    String resStr = generateNotFoundResponse(id, "mn.get","1020");
+	    OutputStream out = response.getOutputStream();
+	    PrintWriter pw = new PrintWriter(out);
+	    pw.write(resStr);
+	    pw.flush();
 	} catch (StringIndexOutOfBoundsException e) {
 	    log.error("Passed request did not find a match", e);
 	    response.sendError(HttpServletResponse.SC_NOT_FOUND);
