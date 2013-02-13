@@ -956,6 +956,7 @@ public class ObjectManager implements Constants {
 	    // generate the resource map
 	    ResourceMapFactory rmf = ResourceMapFactory.getInstance();
 	    ResourceMap resourceMap = rmf.createResourceMap(resourceMapId, idMap);
+            resourceMap.setModified(item.getLastModified());
 
 	    // serialize it as RDF/XML
 	    String rdfXml = ResourceMapFactory.getInstance().serializeResourceMap(resourceMap);
