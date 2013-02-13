@@ -216,7 +216,7 @@ public class ObjectManager implements Constants {
                 countForDatabaseQuery = (aCount + 1) / 2;
             } else if(!startIsEven && countIsEven) {
                 // start is odd and count is even
-                // starting with bitstream but need to subtract 1 before dividing
+                // starting with resource map but need to subtract 1 before dividing
                 offsetForDatabaseQuery = (aStart - 1) / 2;
                 // also need to fetch an additional row from DB because of the offset
                 countForDatabaseQuery = (aCount + 2) / 2;
@@ -239,14 +239,13 @@ public class ObjectManager implements Constants {
             Date dateAvailable = tr.getDateColumn("date_available");
 
             log.debug("Building '" + doi + "' for mn list");
-            // need one for the bitstream and one for the metadata
+            // need one for the metadata and one for the resource map
             // convert DOI to http form if necessary
             if (doi.startsWith("doi:")) {
                 doi = "http://dx.doi.org/" + doi.substring("doi:".length());
                 log.debug("converted DOI to http form. It is now " + doi);
             }
 
-            String lastModified = dateFormatter.format(dateAvailable);
             PackageInfo packageInfo = new PackageInfo(doi);
             packageInfo.setModificationDate(dateFormatter.format(dateAvailable));
 
@@ -283,21 +282,19 @@ public class ObjectManager implements Constants {
             if(aObjFormat == null) {
                 // object format not specified, add both metadata resource element
                 packageElementList.add(infoElements[0]); // the metadata element
-                packageElementList.add(infoElements[1]); // the resource element
+                packageElementList.add(infoElements[1]); // the resource map element
             } else if(aObjFormat.equals(DRYAD_NAMESPACE)) {
                 packageElementList.add(infoElements[0]); // just the metadata element
             } else if(aObjFormat.equals(ORE_NAMESPACE)) {
                 packageElementList.add(infoElements[1]); // just the resource map element
             }
         }
-        // After assembling the list, check if we need to trim the start/end of 
-        // the list
+        // After assembling the list, check if we need to trim the start/end
         if(aObjFormat == null) {
             if(!startIsEven) {
                 // start was odd, so remove the first element
                 if(packageElementList.size() > 0){
                     packageElementList = packageElementList.subList(1, packageElementList.size());
-                    // could also just remove the 0th element
                 }
             }
             // now just trim the list to the size of the count if needed
@@ -431,10 +428,9 @@ public class ObjectManager implements Constants {
             } else {
                 fileElementList.add(infoElements[1]); // just the bitstream
             }
-        };
+        }
         
-        // After assembling the list, check if we need to trim the start/end of 
-        // the list
+        // After assembling the list, check if we need to trim the start/end
         if(aObjFormat == null) {
             if(!startIsEven) {
                 // start was odd, so remove the first element
@@ -590,7 +586,8 @@ public class ObjectManager implements Constants {
         queryBuilder.append("  JOIN bitstream as bit using (bitstream_id) "); 
         queryBuilder.append("  LEFT JOIN bitstreamformatregistry as bfr using (bitstream_format_id) "); 
         queryBuilder.append("WHERE ");
-        queryBuilder.append("  NOT it.withdrawn = 't' AND");
+        queryBuilder.append("  NOT it.withdrawn = true AND");
+        queryBuilder.append("  it.in_archive = true AND ");
         queryBuilder.append("  mv.metadata_field_id = ? AND "); 
         bindParameters.add(dateAvailableFieldId);
         queryBuilder.append("  md.metadata_field_id = ? AND "); 
@@ -659,7 +656,8 @@ public class ObjectManager implements Constants {
         queryBuilder.append("  JOIN metadatavalue AS mv using (item_id) ");
         queryBuilder.append("  JOIN metadatavalue AS md using (item_id) ");
         queryBuilder.append("WHERE ");
-        queryBuilder.append("  NOT it.withdrawn = 't' AND ");
+        queryBuilder.append("  NOT it.withdrawn = true AND ");
+        queryBuilder.append("  it.in_archive = true AND ");
         queryBuilder.append("  mv.metadata_field_id = ? AND ");
         bindParameters.add(dateAvailableFieldId);
         queryBuilder.append("  md.metadata_field_id = ? AND ");
