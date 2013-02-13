@@ -585,7 +585,8 @@ public class ObjectManager implements Constants {
         queryBuilder.append("  JOIN bitstream as bit using (bitstream_id) "); 
         queryBuilder.append("  LEFT JOIN bitstreamformatregistry as bfr using (bitstream_format_id) "); 
         queryBuilder.append("WHERE ");
-        queryBuilder.append("  NOT it.withdrawn = 't' AND");
+        queryBuilder.append("  NOT it.withdrawn = true AND");
+        queryBuilder.append("  it.in_archive = true AND ");
         queryBuilder.append("  mv.metadata_field_id = ? AND "); 
         bindParameters.add(dateAvailableFieldId);
         queryBuilder.append("  md.metadata_field_id = ? AND "); 
@@ -654,7 +655,8 @@ public class ObjectManager implements Constants {
         queryBuilder.append("  JOIN metadatavalue AS mv using (item_id) ");
         queryBuilder.append("  JOIN metadatavalue AS md using (item_id) ");
         queryBuilder.append("WHERE ");
-        queryBuilder.append("  NOT it.withdrawn = 't' AND ");
+        queryBuilder.append("  NOT it.withdrawn = true AND ");
+        queryBuilder.append("  it.in_archive = true AND ");
         queryBuilder.append("  mv.metadata_field_id = ? AND ");
         bindParameters.add(dateAvailableFieldId);
         queryBuilder.append("  md.metadata_field_id = ? AND ");
