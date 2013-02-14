@@ -167,11 +167,12 @@
 		<workflow-editable>false</workflow-editable>
       </step>
       
-      <!--Step sediciAutomaticData cagará datos fijos en el item. No tendrá interface-->
+      <!--Step sediciAutomaticData cagará datos fijos en el item. No tendrá interface.
+      Se quita por ahora
       <step id="sediciAutomaticData">
-        <processing-class>ar.edu.unlp.sedici.aspect.extraSubmission.submit.AutomaticIssuedMetadataStep</processing-class>
+        <processing-class>ar.edu.unlp.sedici.aspect.extraSubmission.submit.AutomaticMetadataStep</processing-class>
 		<workflow-editable>true</workflow-editable>
-      </step> 
+      </step> -->
       
       <!--Step para controlar si el item fue revisado. No tendrá interface-->
       <step id="sediciWorkflowEditedControl">
@@ -269,9 +270,9 @@
       <!--Step 5 will be to select a License-->
       <step id="sediciAdministratorCCLicense"/>
       
-      <!--Step 6 cagará datos fijos en el item. No tendrá interface-->
+      <!--Step 6 cagará datos fijos en el item. No tendrá interface
       <step id="sediciAutomaticData"/>
-
+		-->
       <!--Step 7 Setea el flag indicando que se completo el proceso de edición desde el workflow. No tiene interface-->
       <step id="sediciWorkflowEditedControl"/>
     
@@ -297,9 +298,9 @@
       <!--Step 6 will be to Sign off on the License-->
       <step id="sediciSignOffLicense"/>
       
-      <!--Step 7 cagará datos fijos en el item. No tendrá interface-->
+      <!--Step 7 cagará datos fijos en el item. No tendrá interface
       <step id="sediciAutomaticData"/>
-    
+    -->
       <!--Step 8 Setea el flag indicando que se completo el proceso de edición desde el workflow. No tiene interface-->
       <step id="sediciWorkflowEditedControl"/>
     

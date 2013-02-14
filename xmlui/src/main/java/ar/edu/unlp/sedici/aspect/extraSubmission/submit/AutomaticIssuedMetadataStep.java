@@ -23,7 +23,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.license.CreativeCommons;
 import org.dspace.submit.AbstractProcessingStep;
 
-@Deprecated
+@Deprecated /* No se usa más desde #2183. Se deja como ejemplo de step*/
 public class AutomaticIssuedMetadataStep extends AbstractProcessingStep {
 
 
