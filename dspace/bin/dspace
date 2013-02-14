@@ -58,7 +58,8 @@ FULLPATH=$CLASSPATH:$JARS:$DSPACEDIR/config
 #Allow user to specify java options through JAVA_OPTS variable
 if [ "$JAVA_OPTS" = "" ]; then
   #Default Java to use 512MB of memory (256MB wasn't enough)
-  JAVA_OPTS=-Xmx512m
+  # And use the console logging configuration
+  JAVA_OPTS="-Xmx512m -Dlog4j.configuration=$DSPACEDIR/config/log4j-console.properties -Ddspace.log.init.disable=true"
 fi
 
 # Now invoke Java
