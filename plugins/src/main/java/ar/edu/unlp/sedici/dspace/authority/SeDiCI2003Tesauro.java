@@ -34,7 +34,9 @@ public class SeDiCI2003Tesauro extends SeDiCI2003Hierarchy {
 
 	@Override
 	protected String getLabel(Object entity) {
-		return ((TesaurosTermino) entity).getNombreEs();
+		String separador = "::";
+		String camino = TesaurosTermino.getCamino((TesaurosTermino)entity, separador);
+		return camino + separador + ((TesaurosTermino) entity).getNombreEs();
 	}
 
 	@Override

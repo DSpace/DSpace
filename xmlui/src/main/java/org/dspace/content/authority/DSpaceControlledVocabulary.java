@@ -134,6 +134,11 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
         {
     		return "";
     	}
+    	else if (!"node".equals(node.getLocalName())) 
+    	{
+    		// Solo procesamos los <node>
+    		return buildString(node.getParentNode());
+    	}
         else
         {
     		String parentValue = buildString(node.getParentNode());

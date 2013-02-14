@@ -43,7 +43,7 @@ public abstract class SeDiCI2003Hierarchy extends SeDiCI2003AuthorityProvider {
 		// Generamos los Choices
 		List<Choice> choices = new ArrayList<Choice>(entities.size());
 		for (Object entity : entities) {
-			choices.add( choiceFactory.createChoice(getAuthority(entity), getLabel(entity), getValue(entity)) );
+			choices.add( choiceFactory.createChoice(getAuthority(entity), getValue(entity), getLabel(entity)) );
 		}
 
 		return choices;
