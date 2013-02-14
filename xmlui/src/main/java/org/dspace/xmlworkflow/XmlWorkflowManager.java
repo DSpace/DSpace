@@ -123,8 +123,9 @@ public class XmlWorkflowManager {
         //item.withdraw();
         
         wfi.update();
-        removeUserItemPolicies(context, item, item.getSubmitter());
-        grantSubmitterReadPolicies(context, item);
+        //Se remueve la reasignación de permisos. ver ticket #2182
+        //removeUserItemPolicies(context, item, item.getSubmitter());
+        //grantSubmitterReadPolicies(context, item);
 
         // Shouldn't send the email (the logged user is an admin)
 		noEMail.put(item.getID(), Boolean.TRUE);
