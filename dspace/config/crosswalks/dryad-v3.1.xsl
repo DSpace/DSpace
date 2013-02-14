@@ -73,14 +73,12 @@
 			select="xalan:nodeset($fileNode)/*" />
 	</xsl:template>
 
-	<!-- An old Dryad data package has a dc.relation.haspart value -->
+	<!-- package -->
 	<xsl:template name="package_template">
 		<xsl:param name="node"/>
 		<xsl:variable name="pubPkgNode">
 			<DryadDataPackage>
 				<dcterms:type>package</dcterms:type>
-				<!-- TODO: assign value below dynamically -->
-				<status>deposited</status>
 				<xsl:apply-templates select="$node/dim:field" mode="inner" />
 			</DryadDataPackage>
 		</xsl:variable>
@@ -102,25 +100,9 @@
 	<!-- package and file -->
 	<xsl:template mode="inner"
 		match="dim:field[@element='contributor'][not(@qualifier='correspondingAuthor')]">
-		<dcterms:creator>
-			<xsl:value-of select="." />
-		</dcterms:creator>
-	</xsl:template>
-
-	<!-- publication -->
-	<xsl:template mode="inner-pub"
-		match="dim:field[@element='contributor'][not(@qualifier='correspondingAuthor')]">
-		<dcterms:creator>
-			<xsl:value-of select="." />
-		</dcterms:creator>
-	</xsl:template>
-
-	<!-- publication -->
-	<xsl:template mode="inner-pub"
-		match="dim:field[@element='date'][@qualifier='issued']">
-		<dcterms:issued>
-			<xsl:value-of select="." />
-		</dcterms:issued>
+	  <dcterms:creator>
+	    <xsl:value-of select="." />
+	    </dcterms:creator>
 	</xsl:template>
 
 	<!-- package and file -->
@@ -130,30 +112,11 @@
 		</dcterms:title>
 	</xsl:template>
 
-	<!-- publication -->
-	<xsl:template mode="inner-pub" match="dim:field[@element='title']">
-		<dcterms:title>
-			<!-- Remove 'Data From: ' which == 10 chars + 1 -->
-			<xsl:value-of select="substring(., 11)" />
-		</dcterms:title>
-	</xsl:template>
-
-	<!-- publication -->
-	<xsl:template mode="inner-pub"
-		match="dim:field[@element='publicationName'][@mdschema='prism']">
-		<bibo:Journal>
-			<xsl:value-of select="." />
-		</bibo:Journal>
-	</xsl:template>
-
-	<!-- publication -->
-	<xsl:template mode="inner-pub"
-		match="dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'doi') or starts-with(., 'http://dx.doi')]">
-		<bibo:doi>
-		  <xsl:call-template name="normalize_doi" >
-		    <xsl:with-param name="node" select="."/>
-		  </xsl:call-template>
-		</bibo:doi>
+	<!-- package -->
+	<xsl:template mode="inner" match="dim:field[@element='publicationName']">
+	  <bibo:Journal> 
+	    <xsl:value-of select="." />
+	  </bibo:Journal>
 	</xsl:template>
 
 	<!-- package link to the publication DOI -->
@@ -166,31 +129,12 @@
 		</dcterms:references>
 	</xsl:template>
 
-
-	<!-- publication -->
-	<xsl:template mode="inner-pub"
-		match="dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'pmid')]">
+	<!-- package -->
+	<xsl:template mode="inner"
+		      match="dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'pmid') or starts-with(., 'PMID')]">
 		<bibo:pmid>
-			<xsl:value-of select="." />
+		  <xsl:value-of select="." />
 		</bibo:pmid>
-	</xsl:template>
-
-	<!-- publication -->
-	<xsl:template mode="inner-pub"
-		match="dim:field[@element='description'][@qualifier='abstract']">
-		<dcterms:abstract>
-			<xsl:value-of select="." />
-		</dcterms:abstract>
-	</xsl:template>
-
-	<!-- publication -->
-	<xsl:template mode="inner-pub"
-		match="dim:field[@element='identifier'][starts-with(., 'doi:') or starts-with(., 'http://dx.doi')]">
-		<dcterms:isReferencedBy>
-		  <xsl:call-template name="normalize_doi" >
-		    <xsl:with-param name="node" select="."/>
-		  </xsl:call-template>
-		</dcterms:isReferencedBy>
 	</xsl:template>
 
 	<!-- package and file -->
@@ -379,10 +323,6 @@
 	</xsl:template>
 
 	<xsl:template match="text()" mode="inner">
-		<!-- catch and ignore what we don't explictly crosswalk -->
-	</xsl:template>
-
-	<xsl:template match="text()" mode="inner-pub">
 		<!-- catch and ignore what we don't explictly crosswalk -->
 	</xsl:template>
 
