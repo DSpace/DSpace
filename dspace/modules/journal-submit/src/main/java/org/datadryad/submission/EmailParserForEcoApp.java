@@ -35,6 +35,7 @@ public class EmailParserForEcoApp extends EmailParser {
 	static {
 		ELEMENT_MAP = new HashMap<String, String>();
 		ELEMENT_MAP.put("journal name", "Journal");
+                ELEMENT_MAP.put("journal code", "JournalCode");
 		ELEMENT_MAP.put("journal admin email", "JournalEditorEmail");
 		ELEMENT_MAP.put("journal editor", "JournalEditor");
 		ELEMENT_MAP.put("journal senior editor", "JournalEditor");  //for Paleobiology, senior editor is only editor provided in sample.

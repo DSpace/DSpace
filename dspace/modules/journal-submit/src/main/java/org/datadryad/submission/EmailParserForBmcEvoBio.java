@@ -61,6 +61,7 @@ public class EmailParserForBmcEvoBio extends EmailParser {
     static {
     	
       	fieldToXMLTagTable.put("Journal Name","Journal");
+        fieldToXMLTagTable.put("Journal Code","Journal_Code");
 	fieldToXMLTagTable.put("Print ISSN","ISSN");
 	fieldToXMLTagTable.put("Online ISSN","Online_ISSN");
 	fieldToXMLTagTable.put("Journal Admin Email","Journal_Admin_Email");
