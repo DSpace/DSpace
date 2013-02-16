@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" class="no-js">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+<meta content="width=device-width; initial-scale=1.0; maximum-scale=1.0;" name="viewport" />
+<link rel="shortcut icon" href="/themes/Mirage/images/favicon.ico" />
+<link rel="apple-touch-icon" href="/themes/Mirage/images/apple-touch-icon.png" />
+<meta name="Generator" content="DSpace" />
+<link type="text/css" rel="stylesheet" media="screen" href="files/reset.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/base.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/helper.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/jquery-ui-1.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/style.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/authority-control.css">
+<link type="text/css" rel="stylesheet" media="handheld" href="files/handheld.css">
+<link type="text/css" rel="stylesheet" media="print" href="files/print.css">
+<link type="text/css" rel="stylesheet" media="all" href="files/media.css">
+<link type="application/rss+xml" rel="alternate" href="/feed/rss_1.0/site" />
+<link type="application/rss+xml" rel="alternate" href="/feed/rss_2.0/site" />
+<link type="application/atom+xml" rel="alternate" href="/feed/atom_1.0/site" />
+<script type="text/javascript">
+                                //Clear default text of emty text areas on focus
+                                function tFocus(element)
+                                {
+                                        if (element.value == ' '){element.value='';}
+                                }
+                                //Clear default text of emty text areas on submit
+                                function tSubmit(form)
+                                {
+                                        var defaultedElements = document.getElementsByTagName("textarea");
+                                        for (var i=0; i != defaultedElements.length; i++){
+                                                if (defaultedElements[i].value == ' '){
+                                                        defaultedElements[i].value='';}}
+                                }
+                                //Disable pressing 'enter' key to submit a form (otherwise pressing 'enter' causes a submission to start over)
+                                function disableEnterKey(e)
+                                {
+                                     var key;
+
+                                     if(window.event)
+                                          key = window.event.keyCode;     //Internet Explorer
+                                     else
+                                          key = e.which;     //Firefox and Netscape
+
+                                     if(key == 13)  //if "Enter" pressed, then disable!
+                                          return false;
+                                     else
+                                          return true;
+                                }
+
+                                function FnArray()
+                                {
+                                    this.funcs = new Array;
+                                }
+
+                                FnArray.prototype.add = function(f)
+                                {
+                                    if( typeof f!= "function" )
+                                    {
+                                        f = new Function(f);
+                                    }
+                                    this.funcs[this.funcs.length] = f;
+                                };
+
+                                FnArray.prototype.execute = function()
+                                {
+                                    for( var i=0; i < this.funcs.length; i++ )
+                                    {
+                                        this.funcs[i]();
+                                    }
+                                };
+
+                                var runAfterJSImports = new FnArray();
+            </script>
+<script xmlns:i18n="http://apache.org/cocoon/i18n/2.1" type="text/javascript" src="/themes/Mirage/lib/js/modernizr-1.5.min.js"> </script>
+<title>Dryad Digital Repository</title>
+</head><!--[if lt IE 7 ]> <body class="ie6"> <![endif]-->
+                <!--[if IE 7 ]>    <body class="ie7"> <![endif]-->
+                <!--[if IE 8 ]>    <body class="ie8"> <![endif]-->
+                <!--[if IE 9 ]>    <body class="ie9"> <![endif]-->
+                <!--[if (gt IE 9)|!(IE)]><!--><body><!--<![endif]-->
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="ds-main">
+<div id="ds-header-wrapper">
+<div class="clearfix" id="ds-header">
+<a id="ds-header-logo-link" href="/">
+<span id="ds-header-logo"> </span>
+<span id="ds-header-logo-text">mirage</span>
+</a>
+<h1 class="pagetitle visuallyhidden">Dryad Digital Repository</h1>
+<h2 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="static-pagetitle visuallyhidden">Dryad Repository</h2>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" id="ds-user-box">
+<p>
+<a href="/login">Login</a>
+</p>
+</div>
+</div>
+</div>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" id="ds-trail-wrapper">
+<ul id="ds-trail">
+<li class="ds-trail-link first-link last-link">
+<a href="">Dryad Digital Repository</a>
+</li>
+</ul>
+</div>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="hidden" id="no-js-warning-wrapper">
+<div id="no-js-warning">
+<div class="notice failure">JavaScript is disabled for your browser. Some features of this site may not work without it.</div>
+</div>
+</div>
+<div id="ds-content-wrapper">
+<div class="clearfix" id="ds-content">
+<div id="ds-body">
+<div id="file_news_div_news" class="ds-static-div primary">
+<p class="ds-paragraph">
+      
+		<p xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">Dryad is a nonprofit organization and an international repository of data underlying scientific and medical publications.</p>
+		<p>The scientific, educational, and charitable mission of Dryad is to promote the availability of data underlying findings in 
+			the scientific literature for research and educational reuse. </p>
+		<p>The vision of Dryad is a scholarly communication system in which learned societies, publishers, institutions of research 
+			and education, funding bodies and other stakeholders collaboratively sustain and promote the preservation and reuse of data 
+			underlying the scholarly literature.</p>
+	
+   </p>
+</div>
+<h1 class="ds-div-head">Deposit your data in dryad</h1>
+<div class="ds-static-div primary" id="file_news_div_news">
+<p class="ds-paragraph">
+<a class="submitnowbutton" href="/handle/10255/3/submit">Submit Data Now!</a>
+<a href="http://www.youtube.com/watch?v=RP33cl8tL28">See how to submit</a>
+</p>
+</div>
+<h1 class="ds-div-head">Search DSpace</h1>
+<form xmlns="http://di.tamu.edu/DRI/1.0/" onsubmit="javascript:tSubmit(this);" method="get" action="/discover" class="ds-interactive-div primary" id="aspect_discovery_SiteViewer_div_front-page-search">
+<p class="ds-paragraph">
+<p>
+<label for="aspect_discovery_SiteViewer_field_query" class="ds-form-label">Enter some text in the box below to search DSpace.</label>
+</p>
+<input value="" type="text" name="query" class="ds-text-field" id="aspect_discovery_SiteViewer_field_query" />
+<input value="Go" type="submit" name="submit" class="ds-button-field" id="aspect_discovery_SiteViewer_field_submit" />
+</p>
+</form>
+<div id="ds_connect_with_dryad">
+<h1 class="ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Connect with Dryad</h1>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </div>
+<h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-div-head">Browse for Data</h1>
+<div class="ds-static-div primary" id="aspect_discovery_RecentlyAdded_div_Home">
+<h1 class="ds-div-head">Recently Published
+		Data  <a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" href="/feed/atom_1.0/10255/3" title="Web feed of data packages recently added to Dryad">
+<img src="/themes/Dryad/images/rss.jpg" style="border: 0px;" />
+</a>
+	</h1>
+<div id="aspect_discovery_SiteRecentSubmissions_div_site-recent-submission" class="ds-static-div secondary recent-submission">
+<ul xmlns:oreatom="http://www.openarchives.org/ore/atom/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:atom="http://www.w3.org/2005/Atom" class="ds-artifact-list">
+<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.40767/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+<li class="ds-artifact-item odd">
+<div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+<div class="artifact-title">
+<a href="/handle/10255/dryad.40767">
+<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.ns7v7&amp;rft_id=Reichenbach+F%2C+Baur+H%2C+Neubert+E+%282012%29+Sexual+dimorphism+in+shells+of+Cochlostoma+septemspirale+%28Caenogastropoda%2C+Cyclophoroidea%2C+Diplommatinidae%2C+Cochlostomatinae%29.+ZooKeys+208%3A+1-16.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.40767&amp;rft_id=ZooKeys-2869&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Sexual dimorphism in shells of Cochlostoma septemspirale (Caenogastropoda, Cyclophoroidea, Diplommatinidae, Cochlostomatinae)</span>
+</a>
+</div>
+<div class="artifact-info">
+<span class="author">
+<span>Baur, Hannes</span>; <span>Reichenbach, Fabian</span>; <span>Neubert, Eike</span>
+</span> <span class="publisher-date">(<span class="date">2012-07-17</span>)</span>
+</div>
+</div>
+</li>
+<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.41747/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+<li class="ds-artifact-item even">
+<div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+<div class="artifact-title">
+<a href="/handle/10255/dryad.41747">
+<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.0ct6s&amp;rft_id=Reme%C5%A1+V%2C+Matysiokov%C3%A1+B%2C+Cockburn+A+%282012%29+Long-term+and+large-scale+analyses+of+nest+predation+patterns+in+Australian+songbirds+and+a+global+comparison+of+nest+predation+rates.+Journal+of+Avian+Biology%2C+online+in+advance+of+print.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.41747&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Long-term and large-scale analyses of nest predation patterns in Australian songbirds and a global comparison of nest predation rates</span>
+</a>
+</div>
+<div class="artifact-info">
+<span class="author">
+<span>Remeš, Vladimír</span>; <span>Matysioková, Beata</span>; <span>Cockburn, Andrew</span>
+</span> <span class="publisher-date">(<span class="date">2012-08-06</span>)</span>
+</div>
+</div>
+</li>
+<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.41682/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+<li class="ds-artifact-item odd">
+<div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+<div class="artifact-title">
+<a href="/handle/10255/dryad.41682">
+<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.s022h&amp;rft_id=Maestre+FT%2C+Puche+MD%2C+Guerrero+C%2C+Escudero+A+%282011%29+Shrub+encroachment+does+not+reduce+the+activity+of+some+soil+enzymes+in+Mediterranean+semiarid+grasslands.+Soil+Biology+and+Biochemistry+43%288%29%3A+1746-1749.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.41682&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Shrub encroachment does not reduce the activity of some soil enzymes in Mediterranean semiarid grasslands</span>
+</a>
+</div>
+<div class="artifact-info">
+<span class="author">
+<span>Maestre, Fernando T.</span>; <span>Puche, María D.</span>; <span>Guerrero, César</span>; <span>Escudero, Adrián</span>
+</span> <span class="publisher-date">(<span class="date">2011-05-18</span>)</span>
+</div>
+</div>
+</li>
+<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.40653/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+<li class="ds-artifact-item even">
+<div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+<div class="artifact-title">
+<a href="/handle/10255/dryad.40653">
+<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.k83b8&amp;rft_id=Morlan+JD%2C+Qu+K%2C+Sinicropi+DV+%282012%29+Selective+depletion+of+rRNA+enables+whole+transcriptome+profiling+of+archival+fixed+tissue.+PLoS+ONE+7%288%29%3A+e42882.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.40653&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Selective depletion of rRNA enables whole transcriptome profiling of archival fixed tissue</span>
+</a>
+</div>
+<div class="artifact-info">
+<span class="author">
+<span>Morlan, John D.</span>; <span>Qu, Kunbin</span>; <span>Sinicropi, Dominick V.</span>
+</span> <span class="publisher-date">(<span class="date">2012-08-10</span>)</span>
+</div>
+</div>
+</li>
+<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.38980/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+<li class="ds-artifact-item odd">
+<div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+<div class="artifact-title">
+<a href="/handle/10255/dryad.38980">
+<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.4m0v8474&amp;rft_id=Faircloth+BC%2C+Glenn+TC+%282012%29+Not+all+sequence+tags+are+created+equal%3A+designing+and+validating+sequence+identification+tags+robust+to+indels.+PLoS+ONE+7%288%29%3A+e42543.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.38980&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Not all sequence tags are created equal: designing and validating sequence identification tags robust to indels</span>
+</a>
+</div>
+<div class="artifact-info">
+<span class="author">
+<span>Faircloth, Brant C.</span>; <span>Glenn, Travis C.</span>
+</span> <span class="publisher-date">(<span class="date">2012-08-10</span>)</span>
+</div>
+</div>
+</li>
+<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.35765/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+<li class="ds-artifact-item even">
+<div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+<div class="artifact-title">
+<a href="/handle/10255/dryad.35765">
+<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.8h5p7p00&amp;rft_id=Laetsch+DR%2C+Heitlinger+EG%2C+Taraschewski+H%2C+Nadler+SA%2C+Blaxter+ML+%282012%29+The+phylogenetics+of+Anguillicolidae+%28Nematoda%3A+Anguillicolidea%29%2C+swimbladder+parasites+of+eels.+BMC+Evolutionary+Biology+12%3A+60.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.35765&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: The phylogenetics of Anguillicolidae (Nematoda: Anguillicolidea), swimbladder parasites of eels</span>
+</a>
+</div>
+<div class="artifact-info">
+<span class="author">
+<span>Laetsch, Dominik R.</span>; <span>Heitlinger, Emanuel G.</span>; <span>Taraschewski, Horst</span>; <span>Nadler, Steven A.</span>; <span>Blaxter, Mark L.</span>
+</span> <span class="publisher-date">(<span class="date">2012-08-11</span>)</span>
+</div>
+</div>
+</li>
+<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.41635/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+<li class="ds-artifact-item odd">
+<div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+<div class="artifact-title">
+<a href="/handle/10255/dryad.41635">
+<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.04562&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.41635&amp;rft_id=heredity-HDY-11-OR0417RRR&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Herbicide resistance-endowing ACCase gene mutations in hexaploid wild oat (Avena fatua): Insights into resistance evolution in a hexaploid species</span>
+</a>
+</div>
+<div class="artifact-info">
+<span class="author">
+<span>Powles, Stephen</span>; <span>Yu, Qin</span>; <span>Ahmad-Hamdani, M. S.</span>; <span>Han, Heping</span>; <span>Christoffers, Michael</span>
+</span> <span class="publisher-date">(<span class="date">2012-08-11</span>)</span>
+</div>
+</div>
+</li>
+<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.41155/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+<li class="ds-artifact-item even">
+<div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+<div class="artifact-title">
+<a href="/handle/10255/dryad.41155">
+<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.2k9j0&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.41155&amp;rft_id=SystBiol-USYB-2012-081.R1&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Low-parameter phylogenetic inference under the general Markov model</span>
+</a>
+</div>
+<div class="artifact-info">
+<span class="author">
+<span>Holland, Barbara</span>; <span>Jarvis, Peter</span>; <span>Sumner, Jeremy</span>
+</span> <span class="publisher-date">(<span class="date">2012-08-10</span>)</span>
+</div>
+</div>
+</li>
+<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.39111/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+<li class="ds-artifact-item odd">
+<div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+<div class="artifact-title">
+<a href="/handle/10255/dryad.39111">
+<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.k2502d93&amp;rft_id=Kennington+WJ%2C+Hevroy+TH%2C+Johnson+MS+%282012%29+Long-term+genetic+monitoring+reveals+contrasting+changes+in+the+genetic+composition+of+newly+established+populations+of+the+intertidal+snail+Bembicium+vittatum.+Molecular+Ecology+21%2814%29%3A+3489-3500.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.39111&amp;rft_id=MolEcol-14044988MEC-12-0074.R1&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;rft.workflow=true">Data from: Long-term genetic monitoring reveals contrasting changes in the genetic composition of newly established populations of the intertidal snail Bembicium vittatum</span>
+</a>
+</div>
+<div class="artifact-info">
+<span class="author">
+<span>Kennington, W. Jason</span>
+</span> <span class="publisher-date">(<span class="date">2012-05-22</span>)</span>
+</div>
+</div>
+</li>
+<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.39112/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+<li class="ds-artifact-item even">
+<div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+<div class="artifact-title">
+<a href="/handle/10255/dryad.39112">
+<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.2nd8jg3n&amp;rft_id=Mattersdorfer+K%2C+Koblm%C3%BCller+S%2C+Sefc+KM+%282012%29+AFLP+genome+scans+suggest+divergent+selection+on+colour+patterning+in+allopatric+colour+morphs+of+a+cichlid+fish.+Molecular+Ecology+21%2814%29%3A+3531-3544.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.39112&amp;rft_id=MolEcol-11693890MEC-12-0063.R1&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: AFLP genome scans suggest divergent selection on colour patterning in allopatric colour morphs of a cichlid fish</span>
+</a>
+</div>
+<div class="artifact-info">
+<span class="author">
+<span>Mattersdorfer, Karin</span>; <span>Koblmüller, Stephan</span>; <span>Sefc, Kristina M.</span>
+</span> <span class="publisher-date">(<span class="date">2012-05-24</span>)</span>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<h1 class="ds-div-head">Featured</h1>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-static-div secondary featured-item" id="aspect_discovery_SiteFeaturedItems_div_site-featured-item">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </div>
+<h1 class="ds-div-head">Most Viewed</h1>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-static-div secondary most-viewed" id="aspect_discovery_SiteFeaturedItems_div_site-most-viewed">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </div>
+</div>
+<h1 class="ds-div-head">Dryad Mailing List</h1>
+<div class="ds-static-div primary" id="file_news_div_mailing_list">
+<p class="ds-paragraph">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </p>
+</div>
+<div id="aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home" class="ds-static-div blog-box">
+<h1 class="ds-div-head">Recent Posts from the Dryad Blog</h1>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_dryadinfo_DryadBlogFeed_div_blog-hook" class="ds-static-div">
+<ul id="aspect_dryadinfo_DryadBlogFeed_list_entries" class="ds-simple-list">
+<li>
+<a href="http://blog.datadryad.org/2013/02/11/dryad-membership-meeting-data-publishing-symposium-2/">Dryad Membership Meeting &amp; data publishing symposium</a>
+</li>
+</ul>
+<ul id="aspect_dryadinfo_DryadBlogFeed_list_entries" class="ds-simple-list">
+<li>
+<a href="http://blog.datadryad.org/2013/02/02/how-to-decide-what-data-should-be-archived-at-publication/">How to decide what data should be archived at publication</a>
+</li>
+</ul>
+<ul id="aspect_dryadinfo_DryadBlogFeed_list_entries" class="ds-simple-list">
+<li>
+<a href="http://blog.datadryad.org/2012/10/24/got-data-in-dryad-let-your-website-readers-know/">Got data in Dryad? Let your website readers know.</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="ds-static-div primary repository" id="aspect_statistics_StatisticsTransformer_div_home">
+<h1 class="ds-div-head">Dryad Statistics</h1>
+<div xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-static-div secondary stats" id="aspect_statistics_StatisticsTransformer_div_stats">
+<h2 class="ds-table-head">Total Visits</h2>
+<table class="ds-table tableWithTitle" id="aspect_statistics_StatisticsTransformer_table_list-table">
+<tr class="ds-table-row odd">
+<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_" />
+<td class="ds-table-cell even labelcell" id="aspect_statistics_StatisticsTransformer_cell_">Views</td>
+</tr>
+<tr class="ds-table-row even">
+<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_01">Data from: IDENTIFIER TEST</td>
+<td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_02">23</td>
+</tr>
+<tr class="ds-table-row odd">
+<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_11">Data from: CHECK</td>
+<td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_12">14</td>
+</tr>
+<tr class="ds-table-row even">
+<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_21">Data from: Mini_deletion_revert</td>
+<td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_22">11</td>
+</tr>
+<tr class="ds-table-row odd">
+<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_31">4651</td>
+<td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_32">9</td>
+</tr>
+<tr class="ds-table-row even">
+<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_41">Canada</td>
+<td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_42">9</td>
+</tr>
+<tr class="ds-table-row odd">
+<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_51">South Korea</td>
+<td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_52">9</td>
+</tr>
+<tr class="ds-table-row even">
+<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_61">Data from: Test  duplicate</td>
+<td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_62">9</td>
+</tr>
+<tr class="ds-table-row odd">
+<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_71">Data from: Metadata version</td>
+<td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_72">8</td>
+</tr>
+<tr class="ds-table-row even">
+<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_81">Data from: Test delete version -1</td>
+<td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_82">8</td>
+</tr>
+<tr class="ds-table-row odd">
+<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_91">Data from: 00005</td>
+<td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_92">7</td>
+</tr>
+</table>
+</div>
+</div>
+<h1 class="ds-div-head">Recently Integrated Journal</h1>
+<div class="ds-static-div primary" id="file_news_div_recently_integrated_journal">
+<p class="ds-paragraph">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </p>
+</div>
+</div>
+<div id="ds-options-wrapper">
+<div id="ds-options">
+<h1 class="ds-option-set-head" id="ds-search-option-head">Search Dryad</h1>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-option-set" id="ds-search-option">
+<form method="post" id="ds-search-form" action="/discover">
+<fieldset>
+<input type="text" class="ds-text-field " name="query" />
+<input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" value="Go" type="submit" name="submit" class="ds-button-field " onclick="&#10;                                    var radio = document.getElementById(&quot;ds-search-form-scope-container&quot;);&#10;                                    if (radio != undefined &amp;&amp; radio.checked)&#10;                                    {&#10;                                    var form = document.getElementById(&quot;ds-search-form&quot;);&#10;                                    form.action=&#10;                                &quot;/handle/&quot; + radio.value + &quot;/discover&quot; ; &#10;                                    }&#10;                                " />
+</fieldset>
+</form>
+<a href="/discover">Advanced Search</a>
+</div>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" id="aspect_submission_Navigation_list_submitNow" class="ds-option-set">
+<ul class="ds-simple-list">
+<li>
+<a href="/handle/10255/3/submit" class="submitnowbutton">Submit Data Now!</a>
+<a href="http://www.youtube.com/watch?v=RP33cl8tL28">See how to submit</a>
+</li>
+</ul>
+</div>
+<h1 class="ds-option-set-head">My Account</h1>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_administrative_Navigation_list_account" class="ds-option-set">
+<ul class="ds-simple-list">
+<li>
+<a href="/login">Login or Register</a>
+</li>
+</ul>
+</div>
+<h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-option-set-head">Statistics</h1>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_statistics_Navigation_list_statistics" class="ds-option-set">
+<ul class="ds-simple-list">
+<li>
+<a href="/statistics-home">View Statistics</a>
+</li>
+</ul>
+</div>
+<h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-option-set-head">Browse</h1>
+<div id="org_datadryad_dspace_xmlui_aspect_browse_Navigation_list_DryadBrowse" class="ds-option-set">
+<ul class="ds-simple-list">
+<li>
+<a href="/search-filter?field=dc.contributor.author_filter&amp;fq=location:l2">Authors</a>
+</li>
+<li>
+<a href="/search-filter?field=prism.publicationName_filter&amp;fq=location:l2">Journal Title</a>
+</li>
+</ul>
+</div>
+<h1 class="ds-option-set-head">Information</h1>
+<div id="aspect_dryadinfo_Navigation_list_DryadInfo" class="ds-option-set">
+<ul class="ds-simple-list">
+<li>
+<a href="/pages/depositing">Depositing Data</a>
+</li>
+<li>
+<a href="/pages/using">Using Data</a>
+</li>
+<li>
+<a href="/pages/members">Dryad Members</a>
+</li>
+<li>
+<a href="/pages/jdap">Journal Archiving Policy</a>
+</li>
+<li>
+<a href="/pages/about">About Dryad</a>
+</li>
+<li>
+<a href="http://blog.datadryad.org">Dryad Blog</a>
+</li>
+<li>
+<a href="http://wiki.datadryad.org">Dryad Documentation</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+
+
+
+</div>
+</div>
+<div id="ds-footer-wrapper">
+<div id="ds-footer">
+<div id="ds-footer-left">
+<a target="_blank" href="http://www.dspace.org/">DSpace software</a> copyright © 2002-2010  <a target="_blank" href="http://www.duraspace.org/">Duraspace</a>
+</div>
+<div id="ds-footer-right">
+<span class="theme-by">Theme by </span>
+<a id="ds-footer-logo-link" href="http://atmire.com" target="_blank" title="@mire NV">
+<span id="ds-footer-logo"> </span>
+</a>
+</div>
+<div id="ds-footer-links">
+<a href="/contact">Contact Us</a> | <a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" href="/feedback">xmlui.dri2xhtml.structural.feedback-link</a>
+</div>
+<a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="hidden" href="/htmlmap"> </a>
+</div>
+</div>
+</div>
+<script type="text/javascript">var JsHost = (("https:" == document.location.protocol) ? "https://" : "http://");
+            document.write(unescape("%3Cscript src='" + JsHost + "ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js' type='text/javascript'%3E%3C/script%3E"));</script>
+<script type="text/javascript">!window.jQuery && document.write('<script type="text/javascript" src="/static/js/jquery-1.4.2.min.js"> <\/script>')</script>
+<script type="text/javascript" src="/themes/Mirage/lib/js/jquery-ui-1.8.5.custom.min.js"> </script><!--[if lt IE 7 ]>
+<script type="text/javascript" src="/themes/Mirage/lib/js/DD_belatedPNG_0.0.8a.js?v=1"> </script>
+<script type="text/javascript">DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');$.each($('img[src$=png]'), function() {DD_belatedPNG.fixPng(this);});</script><![endif]-->
+<script type="text/javascript">
+            runAfterJSImports.execute();
+        </script>
+<script type="text/javascript">
+                   var _gaq = _gaq || [];
+                   _gaq.push(['_setAccount', 'UA-16949847-1']);
+                   _gaq.push(['_trackPageview']);
+
+                   (function() {
+                       var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                   })();
+           </script></body></html>
