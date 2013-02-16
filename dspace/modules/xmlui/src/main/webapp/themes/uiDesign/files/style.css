@@ -14,7 +14,7 @@
 /*Font size percentages based on the tables at developer.yahoo.com/yui/fonts/ */
 h1 {
     font-size: 182%;
-    color: #1F3F5E;
+    color: #333;
     text-align: justify;
 }
 
@@ -43,6 +43,10 @@ select {
 
 select.multiple {
     height: auto;
+}
+
+body {
+    background-color: #E4E4E4;
 }
 
 #ds-header-wrapper {
@@ -211,10 +215,10 @@ select.multiple {
 
 h1.ds-option-set-head {
     margin-top: 20px;
-    background-color: #f0f2f5;
-    padding: 3px 10px;
-    border: 1px solid #d8e8eb;
-    border-bottom: none;
+    background-color: transparent;
+    padding: 5px 10px 2px;
+    border: 1px solid #666666;
+    border-bottom: 1px dotted #888;
     font-size: 108%;
 }
 
@@ -223,7 +227,7 @@ h1.ds-option-set-head {
 }
 
 div.ds-option-set {
-    border: 1px solid #d8e8eb;
+    border: 1px solid #666666;
     border-top: none;
 }
 
