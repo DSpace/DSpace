@@ -157,17 +157,19 @@ public class SearchConsumer implements Consumer
                 if (st == Constants.ITEM) {
                     Item item = (Item) event.getSubject(ctx);
 
-                    String id;
-                    DCValue[] values = item.getMetadata("dc.identifier");
-                    if(values!=null && values.length > 0){
-                        id = values[0].value;
-                        String idFirstPart="doi:10.5061/dryad.";
-                        String idLastPart = id.substring(idFirstPart.length());
-                        if(idLastPart.indexOf('.')!=-1){ // this is a versioned item
-                            String canonical = idFirstPart + idLastPart.substring(0, idLastPart.indexOf('.'));
-                            IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
-                            Item previousItem  = (Item) identifierService.resolve(ctx, canonical);
-                            objectsToUpdate.add(previousItem);
+                    if(item!=null){
+                        String id;
+                        DCValue[] values = item.getMetadata("dc.identifier");
+                        if(values!=null && values.length > 0){
+                            id = values[0].value;
+                            String idFirstPart="doi:10.5061/dryad.";
+                            String idLastPart = id.substring(idFirstPart.length());
+                            if(idLastPart.indexOf('.')!=-1){ // this is a versioned item
+                                String canonical = idFirstPart + idLastPart.substring(0, idLastPart.indexOf('.'));
+                                IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
+                                Item previousItem  = (Item) identifierService.resolve(ctx, canonical);
+                                objectsToUpdate.add(previousItem);
+                            }
                         }
                     }
                 }

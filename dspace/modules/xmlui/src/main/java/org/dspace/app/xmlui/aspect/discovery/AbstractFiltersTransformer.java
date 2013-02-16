@@ -134,6 +134,9 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                 // add reciently submitted items, serialize solr query contents.
                 performSearch(dso);
 
+                if (queryResults==null) return this.validity;
+
+
                 // Add the actual collection;
                 if (dso != null) {
                     val.add(dso);
