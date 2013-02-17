@@ -49,10 +49,18 @@ body {
     background-color: #E4E4E4;
 }
 
+a, a:active, a:visited {
+    color: #1F5E1F;
+}
+
 #ds-header-wrapper {
-    background-color: #1F3F5E;
-    color: white;
+    background-color: transparent;
+    color: #444;
     min-width: 950px;
+}
+
+#ds-header {
+    border-bottom: 3px solid #87C033;
 }
 
 #ds-header-logo-link {
@@ -62,18 +70,20 @@ body {
 
 #ds-header-logo {
     float:left;
-    width: 48px;
-    height: 50px;
+    width: 155px;
+    height: 88px;
     margin-top: 10px;
-    background: url('images/dspace-logo-only.png');
+    background: url('images/dryad-logo.png');
+    background-position: left bottom;
     background-repeat: no-repeat;
     background-color: transparent;
     margin-right: 15px;
 }
 
 #ds-header-logo-text {
+    display: none;
     font-size: 400%;
-    color: white;
+    color: #666;
     line-height: 70px;
     font-weight: normal;
     vertical-align: middle;
@@ -84,19 +94,17 @@ body {
     right: 0;
     top: 10px;
     position: absolute;
-    color: white;
+    color: #333;
 }
 
 #ds-user-box a{
-    color: white;
+    color: #333;
 }
 
 #ds-trail-wrapper {
-    background-color: #b6c8d9;
+    background-color: transparent;
     margin: 0;
     padding: 0;
-    border-top: 1px solid #9cacba;
-    border-bottom: 1px solid #9cacba;
     min-width: 950px;
 }
 
@@ -109,12 +117,12 @@ body {
 
 #ds-trail li {
     display: inline;
-    color: #1F3F5E;
+    color: #1F5E1F;
     margin-right: 5px;
 }
 
 #ds-trail a {
-    color: #1F3F5E;
+    color: #1F5E1F;
 }
 
 #no-js-warning,
@@ -149,7 +157,7 @@ body {
 }
 
 #ds-footer {
-    border-top: 1px solid #9CACBA;
+    border-top: 3px solid #87C033;
     padding-top: 10px;
     font-size: 93%;
     line-height: 1.6em;
