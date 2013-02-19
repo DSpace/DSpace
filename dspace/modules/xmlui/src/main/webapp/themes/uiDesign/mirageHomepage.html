@@ -102,7 +102,7 @@
 
     <ul class="sf-menu">
 
-        <li class="current">
+        <li>
             <a href="#TODO">About</a>
             <ul>
                 <li>
@@ -133,7 +133,7 @@
                 <li>
                     <a href="#TODO">Deposit Data Instructions</a>
                 </li>
-                <li>
+                <li class="current">
                     <a href="#TODO">FAQ</a>
                 </li>
                 <li>
@@ -149,16 +149,17 @@
         </li>
 
         <!-- these items would appear only for anonymous visitors (NOT logged in) -->
-        <li>
+        <li id="login-item">
             <a href="#TODO">Login</a>
         </li>
-        <li>
+        <li id="sign-up-item">
             <a href="#TODO">Sign Up</a>
         </li>
 
         <!-- this item would appear only for logged-in users -->
+<!--
         <li>
-            <a href="#TODO">{USER NAME}</a><!-- TODO: Replace with real name -->
+            <a href="#TODO">{USER NAME}</a>
             <ul>
                 <li>
                     <a href="#TODO">My Submissions</a>
@@ -169,22 +170,22 @@
                 <li>
                     <a href="#TODO">Profile</a>
                 </li>
-                <!-- TODO: add a divider here -->
-                <li>
+                <li class="after-divider">
                     <a href="#TODO">Logout</a>
                 </li>
             </ul>
         </li>
+-->
 
         <!-- this item would appear only for logged-in administrators -->
+<!--
         <li>
             <a href="#TODO">Administrative</a>
             <ul>
                 <li>
                     <a href="#TODO">Workflow Overview</a>
                 </li>
-                <!-- TODO: add a divider here -->
-                <li>
+                <li class="after-divider">
                     <a href="#TODO">Access Control</a>
                 </li>
                 <li>
@@ -196,8 +197,7 @@
                 <li>
                     <a href="#TODO">Authorizations</a>
                 </li>
-                <!-- TODO: add a divider here -->
-                <li>
+                <li class="after-divider">
                     <a href="#TODO">Registries</a>
                 </li>
                 <li>
@@ -206,8 +206,7 @@
                 <li>
                     <a href="#TODO">Metadata</a>
                 </li>
-                <!-- TODO: add a divider here -->
-                <li>
+                <li class="after-divider">
                     <a href="#TODO">Items</a>
                 </li>
                 <li>
@@ -224,6 +223,7 @@
                 </li>
             </ul>
         </li>
+-->
 
     </ul>
 </div>

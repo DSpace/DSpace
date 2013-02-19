@@ -1171,3 +1171,36 @@ margin: 2px 2px 0px 2px;
     bottom: -10px;
     right: 0px;
 }
+
+#login-item, #sign-up-item {
+    margin: 0 8px;
+    padding: 0.2em 0;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-bottomright: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+#login-item {
+    background-color: #87C033;
+}
+#login-item:hover, #login-item a:hover {
+    background-color: #fff;
+}
+#sign-up-item {
+    background-color: #ccc;
+}
+#sign-up-item:hover, #sign-up-item a:hover {
+    background-color: #fff;
+}
+#login-item a, #sign-up-item a {
+    margin-top: 0.2em;
+    padding: 0.4em 0.8em;
+}
