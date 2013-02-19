@@ -385,7 +385,7 @@ placeholders for header images -->
 			<div id="ds-footer">
 	            <div class="column" id="footercol1">
 	                <div class="datos_unlp">
-	                    <strong>&#xA9; 2003-2012</strong>
+	                    <strong>&#xA9; 2003-2013</strong>
 	                    <br/>
 	                    <strong>
 		                    <a href="http://prebi.unlp.edu.ar/" target="_blank">PrEBi</a>
