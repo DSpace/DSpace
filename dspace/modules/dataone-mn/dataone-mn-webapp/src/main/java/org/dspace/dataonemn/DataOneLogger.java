@@ -222,7 +222,7 @@ public class DataOneLogger {
                 result.addFilterQuery("dateLogged:[* TO " + zToDate + "]");
             }
         }
-        if (pidFilter != null){
+        if (pidFilter != null && !pidFilter.equalsIgnoreCase("null")){
             //need to escape the colon in the dryad identifier so solr will accept it
             int colonpos = pidFilter.indexOf(':');
             if (colonpos>-1){  //expect it to be there, but to be safe
