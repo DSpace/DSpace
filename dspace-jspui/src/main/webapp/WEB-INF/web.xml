@@ -148,6 +148,11 @@
   <!-- Servlets -->
 
   <servlet>
+    <servlet-name>item-export</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.ExportItemServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>authorize</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.AuthorizeAdminServlet</servlet-class>
   </servlet>
@@ -451,6 +456,11 @@
  
 
   <!-- Servlet Mappings -->
+
+  <servlet-mapping>
+    <servlet-name>item-export</servlet-name>
+    <url-pattern>/item-export/*</url-pattern>
+  </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>authorize</servlet-name>

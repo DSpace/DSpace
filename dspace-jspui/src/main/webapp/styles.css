@@ -702,3 +702,40 @@ input.ds-authority-lock.is-locked
   { background-image: url(image/lock24.png); }
 input.ds-authority-lock.is-unlocked
   { background-image: url(image/unlock24.png); }
+  
+  
+.sharingbar {
+	height:20px;
+	padding:10px 5px 5px;
+	margin-top:20px;
+	width:600px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.sharingbar div.left {
+	margin-left:12px;
+	float:left;
+}
+
+.sharingbar div.left a {
+	margin-right:5px;
+}
+
+.sharingbar div.right {
+	margin-right:12px;
+	float:right;
+}
+
+.sharingbar div.right a {
+	cursor:pointer;
+	margin-right:5px;
+}
+
+.sharingbar div.clear {
+	clear: both;
+}
+
+.sharingbar a {
+        text-decoration: none;
+}

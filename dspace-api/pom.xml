@@ -432,6 +432,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.lyncode</groupId>
+            <artifactId>xoai</artifactId>
+            <version>2.2.9</version>
+        </dependency>
+
+        <dependency>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
