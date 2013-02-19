@@ -223,7 +223,7 @@ a, a:active, a:visited {
 
 h1.ds-option-set-head {
     margin-top: 20px;
-    background-color: transparent;
+    background-color: #fff;
     padding: 5px 10px 2px;
     border: 1px solid #666666;
     border-bottom: 1px dotted #888;
@@ -235,6 +235,7 @@ h1.ds-option-set-head {
 }
 
 div.ds-option-set {
+    background-color: #fff;
     border: 1px solid #666666;
     border-top: none;
 }
@@ -1154,3 +1155,14 @@ background-color: rgb(255, 255, 255);
 margin: 2px 2px 0px 2px;
 /* border: 1px solid rgb(240, 240, 210); */
 }
+
+/* homepage elements */
+
+#ds-dryad-is {
+    padding: 36px 36px 38px;
+    font-size: 23px;
+    font-weight: bold;
+    background-color: #fff;
+    border: 1px solid #333;
+}
+
