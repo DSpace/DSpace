@@ -1166,3 +1166,8 @@ margin: 2px 2px 0px 2px;
     border: 1px solid #333;
 }
 
+#main-menu {
+    position: absolute;
+    bottom: -10px;
+    right: 0px;
+}

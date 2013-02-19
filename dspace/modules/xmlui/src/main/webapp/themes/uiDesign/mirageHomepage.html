@@ -13,6 +13,7 @@
 <link type="text/css" rel="stylesheet" media="screen" href="files/helper.css">
 <link type="text/css" rel="stylesheet" media="screen" href="files/jquery-ui-1.css">
 <link type="text/css" rel="stylesheet" media="screen" href="files/style.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/superfish.css">
 <link type="text/css" rel="stylesheet" media="screen" href="files/authority-control.css">
 <link type="text/css" rel="stylesheet" media="handheld" href="files/handheld.css">
 <link type="text/css" rel="stylesheet" media="print" href="files/print.css">
@@ -90,10 +91,141 @@
 </a>
 <h1 class="pagetitle visuallyhidden">Dryad Digital Repository</h1>
 <h2 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="static-pagetitle visuallyhidden">Dryad Repository</h2>
+<!--
 <div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" id="ds-user-box">
 <p>
 <a href="/login">Login</a>
 </p>
+</div>
+-->
+<div id="main-menu">
+
+    <ul class="sf-menu">
+
+        <li class="current">
+            <a href="#TODO">About</a>
+            <ul>
+                <li>
+                    <a href="#TODO">Purpose &amp; Goals</a>
+                </li>
+                <li>
+                    <a href="#TODO">Who We Are</a>
+                </li>
+                <li>
+                    <a href="#TODO">Journal Archiving Policy</a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a href="#TODO">Membership</a>
+            <ul>
+                <li>
+                    <a href="#TODO">Overview</a>
+                </li>
+                <li>
+                    <a href="#TODO">Apply</a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a href="#TODO">Resources</a>
+            <ul>
+                <li>
+                    <a href="#TODO">Deposit Data Instructions</a>
+                </li>
+                <li>
+                    <a href="#TODO">FAQ</a>
+                </li>
+                <li>
+                    <a href="#TODO">Wiki</a>
+                </li>
+                <li>
+                    <a href="#TODO">Blog</a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a>Contact Us</a>
+        </li>
+
+        <!-- these items would appear only for anonymous visitors (NOT logged in) -->
+        <li>
+            <a href="#TODO">Login</a>
+        </li>
+        <li>
+            <a href="#TODO">Sign Up</a>
+        </li>
+
+        <!-- this item would appear only for logged-in users -->
+        <li>
+            <a href="#TODO">{USER NAME}</a><!-- TODO: Replace with real name -->
+            <ul>
+                <li>
+                    <a href="#TODO">My Submissions</a>
+                </li>
+                <li>
+                    <a href="#TODO">My Tasks</a>
+                </li>
+                <li>
+                    <a href="#TODO">Profile</a>
+                </li>
+                <!-- TODO: add a divider here -->
+                <li>
+                    <a href="#TODO">Logout</a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- this item would appear only for logged-in administrators -->
+        <li>
+            <a href="#TODO">Administrative</a>
+            <ul>
+                <li>
+                    <a href="#TODO">Workflow Overview</a>
+                </li>
+                <!-- TODO: add a divider here -->
+                <li>
+                    <a href="#TODO">Access Control</a>
+                </li>
+                <li>
+                    <a href="#TODO">People</a>
+                </li>
+                <li>
+                    <a href="#TODO">Groups</a>
+                </li>
+                <li>
+                    <a href="#TODO">Authorizations</a>
+                </li>
+                <!-- TODO: add a divider here -->
+                <li>
+                    <a href="#TODO">Registries</a>
+                </li>
+                <li>
+                    <a href="#TODO">Format</a>
+                </li>
+                <li>
+                    <a href="#TODO">Metadata</a>
+                </li>
+                <!-- TODO: add a divider here -->
+                <li>
+                    <a href="#TODO">Items</a>
+                </li>
+                <li>
+                    <a href="#TODO">Withdrawn Items</a>
+                </li>
+                <li>
+                    <a href="#TODO">Control Panel</a>
+                </li>
+                <li>
+                    <a href="#TODO">Statistics</a>
+                </li>
+                <li>
+                    <a href="#TODO">Import Metadata</a>
+                </li>
+            </ul>
+        </li>
+
+    </ul>
 </div>
 </div>
 </div>
@@ -491,11 +623,14 @@
 </div>
 </div>
 <script type="text/javascript">var JsHost = (("https:" == document.location.protocol) ? "https://" : "http://");
-            document.write(unescape("%3Cscript src='" + JsHost + "ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js' type='text/javascript'%3E%3C/script%3E"));</script>
-<script type="text/javascript">!window.jQuery && document.write('<script type="text/javascript" src="/static/js/jquery-1.4.2.min.js"> <\/script>')</script>
+            document.write(unescape("%3Cscript src='" + JsHost + "ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js' type='text/javascript'%3E%3C/script%3E"));</script>
+<script type="text/javascript">!window.jQuery && document.write('<script type="text/javascript" src="/static/js/jquery-1.9.1.min.js"> <\/script>')</script>
 <script type="text/javascript" src="/themes/Mirage/lib/js/jquery-ui-1.8.5.custom.min.js"> </script><!--[if lt IE 7 ]>
 <script type="text/javascript" src="/themes/Mirage/lib/js/DD_belatedPNG_0.0.8a.js?v=1"> </script>
 <script type="text/javascript">DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');$.each($('img[src$=png]'), function() {DD_belatedPNG.fixPng(this);});</script><![endif]-->
+<script type="text/javascript" src="files/jquery.hoverIntent.js"></script>
+<script type="text/javascript" src="files/superfish.js"></script>
+<script type="text/javascript" src="files/supersubs.js"></script>
 <script type="text/javascript">
             runAfterJSImports.execute();
         </script>
@@ -509,4 +644,18 @@
                        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
                        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
                    })();
-           </script></body></html>
+           </script>
+<!-- main menu behavior -->
+<script type="text/javascript">
+        $(document).ready(function() {
+            $('#main-menu ul.sf-menu')
+                .supersubs({
+                    // all numeric properties are in em
+                    minWidth: 22,
+                    maxWidth: 30,   // this isn't doing much...
+                    extraWidth: 1
+                })
+                .superfish();
+        });
+           </script>
+</body></html>
