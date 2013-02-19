@@ -18,9 +18,7 @@
                         <map:generator name="DSpaceFeedGenerator" src="org.dspace.app.xmlui.cocoon.DSpaceFeedGenerator"/>
                         <map:generator name="DSpaceMETSGenerator" src="org.dspace.app.xmlui.cocoon.DSpaceMETSGenerator"/>
                         <map:generator name="DSpaceOREGenerator" src="org.dspace.app.xmlui.cocoon.DSpaceOREGenerator"/>
-                        <map:generator name="DescriptionOpenSearchGenerator" src="org.dspace.app.xmlui.opensearch.DescriptionOpenSearchGenerator"/>
-                        <map:generator name="StandardOpenSearchGenerator" src="org.dspace.app.xmlui.opensearch.StandardOpenSearchGenerator"/>
-                        <map:generator name="DiscoveryOpenSearchGenerator" src="org.dspace.app.xmlui.opensearch.DiscoveryOpenSearchGenerator"/>
+                        <map:generator name="OpenSearchGenerator" src="org.dspace.app.xmlui.cocoon.OpenSearchGenerator"/>
                         <map:generator name="notifying" src="org.apache.cocoon.sitemap.NotifyingGenerator"/>
                         <map:generator name="exception" src="org.apache.cocoon.generation.ExceptionGenerator"/>
                         <map:generator name="AJAXMenuGenerator"
@@ -93,9 +91,9 @@
                         <map:transformer name="stylesheet" src="org.dspace.app.xmlui.cocoon.StylesheetInstructionTransformer"/>
                         <map:transformer name="PasswordLogin" src="org.dspace.app.xmlui.aspect.eperson.PasswordLogin"/>
                         <map:transformer name="LDAPLogin" src="org.dspace.app.xmlui.aspect.eperson.LDAPLogin"/>
+                        <map:transformer name="RemoteUserLogin" src="org.dspace.app.xmlui.aspect.eperson.RemoteUserLogin"/>
                         <map:transformer name="notice" src="org.dspace.app.xmlui.aspect.general.NoticeTransformer"/>
                         <map:transformer name="NamespaceFilter" src="org.dspace.app.xmlui.cocoon.NamespaceFilterTransformer"/>
-                        <map:transformer name="RestrictedItem" src="org.dspace.app.xmlui.aspect.artifactbrowser.RestrictedItem"/>
                 </map:transformers>
                 <map:matchers default="wildcard">
                         <map:matcher logger="sitemap.matcher.wildcard" name="wildcard"
@@ -123,7 +121,6 @@
                                 <map:parameter name="ignore-missing-tables" value="true"/>
                         </map:matcher>
                         <map:matcher name="request" src="org.apache.cocoon.matching.RequestParameterMatcher"/>
-                        <map:matcher name="StatisticsAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.statistics.StatisticsAuthorizedMatcher"/>
                 </map:matchers>
                 <map:selectors>
                         <map:selector name="browser" src="org.apache.cocoon.selection.BrowserSelector"
@@ -176,12 +173,9 @@
                         <map:selector logger="sitemap.selector.exception" name="exception" src="org.apache.cocoon.selection.ExceptionSelector">
                                 <exception name="not-found" class="org.apache.cocoon.ResourceNotFoundException"/>
                                 <exception name="invalid-continuation" class="org.apache.cocoon.components.flow.InvalidContinuationException"/>
-                                <exception name="bad-request" class="org.dspace.app.xmlui.utils.BadRequestException"/>
                                 <!-- The statement below tells the selector to unroll as much exceptions as possible -->
                                 <exception class="java.lang.Throwable" unroll="true"/>
                         </map:selector>
-                        <!-- AuthenticatedSelector for forcing user to login if not authorized - PMD -->
-                        <map:selector name="AuthenticatedSelector" src="org.dspace.app.xmlui.aspect.general.AuthenticatedSelector"/>
                 </map:selectors>
                 <map:readers default="resource">
                     <map:reader name="resource" src="org.apache.cocoon.reading.ResourceReader"
@@ -191,14 +185,10 @@
                     <map:reader name="BitstreamReader" src="org.dspace.app.xmlui.cocoon.BitstreamReader"/>
                     <map:reader name="ExportReader" src="org.dspace.app.xmlui.cocoon.ItemExportDownloadReader"/>
                     <map:reader name="MetadataExportReader" src="org.dspace.app.xmlui.cocoon.MetadataExportReader"/>
-
-                    <map:reader name="CSVOutputter" src="org.dspace.app.xmlui.aspect.statisticsElasticSearch.CSVOutputter"/>
-
                     <map:reader name="OpenURLReader" src="org.dspace.app.xmlui.cocoon.OpenURLReader"/>
                     <map:reader name="SitemapReader" src="org.dspace.app.xmlui.cocoon.SitemapReader"/>
                     <map:reader name="ConcatenationReader" src="org.dspace.app.xmlui.cocoon.ConcatenationReader"/>
                     <map:reader name="JQueryLoaderReader" src="org.dspace.app.xmlui.utils.JQueryLoaderReader"/>
-                    <map:reader name="JSONControlledVocabularyReader" src="org.dspace.app.xmlui.cocoon.JSONControlledVocabularyReader"/>
                 </map:readers>
                 <map:actions>
                         <map:action name="locale" src="org.dspace.app.xmlui.cocoon.DSpaceLocaleAction"/>
@@ -353,7 +343,7 @@
 
 
                         <!--
-                                For URL compatibility with the JSPUI, redirect these old url to their new locations.
+                                For URL compatability with the JSPUI, redirect these old url to their new locations.
 
                                 /bitstream/[handlePrefix]/[handlePostfix]/[sequence]/[name]
                                 /html/[handlePrefix]/[handePostfix]/[name]
@@ -387,57 +377,10 @@
                                 </map:read>
                         </map:match>
 
-                        <map:match pattern="handle/*/*/stats/csv">
-                            <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
-                                <map:read type="CSVOutputter"/>
-                            </map:match>
-
-                            <map:match type="StatisticsAuthorizedMatcher" pattern="!READ">
-                                <map:select type="AuthenticatedSelector">
-                                    <map:when test="eperson">
-                                        <map:transform type="RestrictedItem"/>
-                                        <map:serialize/>
-                                    </map:when>
-                                    <map:otherwise>
-                                        <map:act type="StartAuthentication">
-                                            <map:parameter name="header" value="xmlui.ArtifactBrowser.RestrictedItem.auth_header"/>
-                                            <map:parameter name="message" value="xmlui.ArtifactBrowser.RestrictedItem.auth_message"/>
-                                        </map:act>
-                                        <map:serialize/>
-                                    </map:otherwise>
-                                </map:select>
-                            </map:match>
-                        </map:match>
-
-                        <map:match pattern="handle/*/*/stats/csv/*">
-                            <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
-                                <map:read type="CSVOutputter"/>
-                            </map:match>
-
-                            <map:match type="StatisticsAuthorizedMatcher" pattern="!READ">
-                                <map:select type="AuthenticatedSelector">
-                                    <map:when test="eperson">
-                                        <map:transform type="RestrictedItem"/>
-                                        <map:serialize/>
-                                    </map:when>
-                                    <map:otherwise>
-                                        <map:act type="StartAuthentication">
-                                            <map:parameter name="header" value="xmlui.ArtifactBrowser.RestrictedItem.auth_header"/>
-                                            <map:parameter name="message" value="xmlui.ArtifactBrowser.RestrictedItem.auth_message"/>
-                                        </map:act>
-                                        <map:serialize/>
-                                    </map:otherwise>
-                                </map:select>
-                            </map:match>
-                        </map:match>
-
                         <map:match pattern="JSON/discovery/**">
                             <map:mount check-reload="no" src="aspects/json-solr.xmap" uri-prefix="JSON/discovery/"/>
                         </map:match>
 
-                        <map:match pattern="JSON/controlled-vocabulary">
-                            <map:read type="JSONControlledVocabularyReader"/>
-                        </map:match>
                 </map:pipeline>
 
                 <!-- new AJAX menu (choices) responses for metadata authority control -->
@@ -532,40 +475,36 @@
                         <map:serialize type="xml"/>
                     </map:match>
 
-                    <!-- OpenSearch description document for whole repo or community/collection -->
-                    <map:match pattern="open-search/description.xml">
-                        <map:generate type="DescriptionOpenSearchGenerator"/>
-                        <map:serialize type="opensearch"/>
-                    </map:match>
-
-                    <!-- OpenSearch results document for whole repo or community/collection -->
+                    <!-- OpenSearch results for whole repo or community/collection -->
                     <map:match pattern="open-search/**">
-                        <map:match pattern="open-search/">
-                            <map:generate type="StandardOpenSearchGenerator"/>
+
+                        <map:match pattern="open-search/description.xml">
+                            <map:generate type="OpenSearchGenerator">
+                                <map:parameter name="type" value="description"/>
+                            </map:generate>
+                            <map:serialize type="opensearch"/>
                         </map:match>
 
-                        <map:match pattern="open-search/discover">
-                            <map:generate type="DiscoveryOpenSearchGenerator"/>
+                        <map:match pattern="open-search/**">
+                            <map:generate type="OpenSearchGenerator"/>
+                            <map:act type="locale">
+                                  <map:transform type="i18n">
+                                          <map:parameter name="locale" value="{locale}"/>
+                                  </map:transform>
+                            </map:act>
+                            <map:select type="request-parameter">
+                                <map:parameter name="parameter-name" value="format"/>
+                                <map:when test="rss">
+                                    <map:serialize type="rss"/>
+                                </map:when>
+                                <map:when test="atom">
+                                    <map:serialize type="atom"/>
+                                </map:when>
+                                <map:otherwise>
+                                    <map:serialize type="html"/>
+                                </map:otherwise>
+                            </map:select>
                         </map:match>
-
-                        <map:act type="locale">
-                            <map:transform type="i18n">
-                                <map:parameter name="locale" value="{locale}"/>
-                            </map:transform>
-                        </map:act>
-
-                        <map:select type="request-parameter">
-                            <map:parameter name="parameter-name" value="format"/>
-                            <map:when test="rss">
-                                <map:serialize type="rss"/>
-                            </map:when>
-                            <map:when test="atom">
-                                <map:serialize type="atom"/>
-                            </map:when>
-                            <map:otherwise>
-                                <map:serialize type="xml"/>
-                            </map:otherwise>
-                        </map:select>
                     </map:match>
 
                     <!-- HTML Sitemaps and Sitemaps.org Sitemaps for whole repo -->
@@ -655,20 +594,6 @@
 
                 <map:handle-errors>
                         <map:select type="exception">
-
-                                <map:when test="bad-request">
-                                        <map:generate type="exception"/>
-                                        <map:transform src="exception2html.xslt">
-                                                <map:parameter name="contextPath" value="{request:contextPath}"/>
-                                                <map:parameter name="pageTitle" value="Bad request"/>
-                                        </map:transform>
-                                        <map:act type="locale">
-                                            <map:transform type="i18n">
-                                                    <map:parameter name="locale" value="{locale}"/>
-                                            </map:transform>
-                                        </map:act>
-                                        <map:serialize type="xhtml" status-code="400"/>
-                                </map:when>
 
                                 <map:when test="not-found">
                                         <map:generate type="exception"/>
