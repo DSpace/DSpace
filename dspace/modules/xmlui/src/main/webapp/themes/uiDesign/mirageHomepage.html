@@ -32,7 +32,7 @@
     .home-col-1 {
         float: left;
         width: 625px;
-        margin-left: 0;
+        padding: 0;
         /* margin-right: 25px;*/
     }
     .home-col-2 {
@@ -53,7 +53,6 @@
         font-weight: bold;
         background-color: #fff;
         border: 1px solid #333;
-        width: 625px;
         height: 200px;
         overflow: visible;
     }
@@ -317,7 +316,7 @@
 </div>
 <div class="home-col-2">
     <h1 class="ds-div-head ">Deposit your data in dryad</h1>
-    <div class="ds-static-div primary" id="file_news_div_news">
+    <div class="ds-static-div primary" id="file_news_div_news" style="height: 167px;">
     <p class="ds-paragraph">
     <a class="submitnowbutton" href="/handle/10255/3/submit">Submit Data Now!</a>
     <a href="http://www.youtube.com/watch?v=RP33cl8tL28">See how to submit</a>
@@ -326,9 +325,9 @@
 </div>
 <div class="home-col-1">
     <h1 class="ds-div-head">Search DSpace</h1>
-    <form xmlns="http://di.tamu.edu/DRI/1.0/" onsubmit="javascript:tSubmit(this);" method="get" action="/discover" class="ds-interactive-div primary" id="aspect_discovery_SiteViewer_div_front-page-search">
+    <form xmlns="http://di.tamu.edu/DRI/1.0/" onsubmit="javascript:tSubmit(this);" method="get" action="/discover" class="ds-interactive-div primary" id="aspect_discovery_SiteViewer_div_front-page-search"
+          style="height: 70px;">
     <p class="ds-paragraph">
-    <p>
     <label for="aspect_discovery_SiteViewer_field_query" class="ds-form-label">Enter some text in the box below to search DSpace.</label>
     </p>
     <input value="" type="text" name="query" class="ds-text-field" id="aspect_discovery_SiteViewer_field_query" />
@@ -337,8 +336,8 @@
     </form>
 </div>
 <div class="home-col-2">
-    <div id="ds_connect_with_dryad">
-        <h1 class="ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Connect with Dryad</h1>
+    <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Connect with Dryad</h1>
+    <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 450px;">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit
         amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est
         hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean
@@ -347,254 +346,266 @@
     </div>
 </div>
 
-<br/>
-
-<h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-div-head">Browse for Data</h1>
-<div class="ds-static-div primary" id="aspect_discovery_RecentlyAdded_div_Home">
-<h1 class="ds-div-head">Recently Published
-		Data  <a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" href="/feed/atom_1.0/10255/3" title="Web feed of data packages recently added to Dryad">
-<img src="/themes/Dryad/images/rss.jpg" style="border: 0px;" />
-</a>
+<div class="home-col-1">
+    <h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-div-head">Browse for Data</h1>
+    <div class="ds-static-div primary" id="aspect_discovery_RecentlyAdded_div_Home" style="height: 500px; overflow: hidden;">
+    <h1 class="ds-div-head">Recently Published
+            Data  <a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" href="/feed/atom_1.0/10255/3" title="Web feed of data packages recently added to Dryad">
+    <img src="/themes/Dryad/images/rss.jpg" style="border: 0px;" />
+    </a>
 	</h1>
-<div id="aspect_discovery_SiteRecentSubmissions_div_site-recent-submission" class="ds-static-div secondary recent-submission">
-<ul xmlns:oreatom="http://www.openarchives.org/ore/atom/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:atom="http://www.w3.org/2005/Atom" class="ds-artifact-list">
-<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.40767/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
-<li class="ds-artifact-item odd">
-<div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
-<div class="artifact-title">
-<a href="/handle/10255/dryad.40767">
-<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.ns7v7&amp;rft_id=Reichenbach+F%2C+Baur+H%2C+Neubert+E+%282012%29+Sexual+dimorphism+in+shells+of+Cochlostoma+septemspirale+%28Caenogastropoda%2C+Cyclophoroidea%2C+Diplommatinidae%2C+Cochlostomatinae%29.+ZooKeys+208%3A+1-16.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.40767&amp;rft_id=ZooKeys-2869&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Sexual dimorphism in shells of Cochlostoma septemspirale (Caenogastropoda, Cyclophoroidea, Diplommatinidae, Cochlostomatinae)</span>
-</a>
+    <div id="aspect_discovery_SiteRecentSubmissions_div_site-recent-submission" class="ds-static-div secondary recent-submission">
+    <ul xmlns:oreatom="http://www.openarchives.org/ore/atom/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:atom="http://www.w3.org/2005/Atom" class="ds-artifact-list">
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.40767/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item odd">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.40767">
+    <span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.ns7v7&amp;rft_id=Reichenbach+F%2C+Baur+H%2C+Neubert+E+%282012%29+Sexual+dimorphism+in+shells+of+Cochlostoma+septemspirale+%28Caenogastropoda%2C+Cyclophoroidea%2C+Diplommatinidae%2C+Cochlostomatinae%29.+ZooKeys+208%3A+1-16.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.40767&amp;rft_id=ZooKeys-2869&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Sexual dimorphism in shells of Cochlostoma septemspirale (Caenogastropoda, Cyclophoroidea, Diplommatinidae, Cochlostomatinae)</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Baur, Hannes</span>; <span>Reichenbach, Fabian</span>; <span>Neubert, Eike</span>
+    </span> <span class="publisher-date">(<span class="date">2012-07-17</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.41747/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item even">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.41747">
+    <span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.0ct6s&amp;rft_id=Reme%C5%A1+V%2C+Matysiokov%C3%A1+B%2C+Cockburn+A+%282012%29+Long-term+and+large-scale+analyses+of+nest+predation+patterns+in+Australian+songbirds+and+a+global+comparison+of+nest+predation+rates.+Journal+of+Avian+Biology%2C+online+in+advance+of+print.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.41747&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Long-term and large-scale analyses of nest predation patterns in Australian songbirds and a global comparison of nest predation rates</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Remeš, Vladimír</span>; <span>Matysioková, Beata</span>; <span>Cockburn, Andrew</span>
+    </span> <span class="publisher-date">(<span class="date">2012-08-06</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.41682/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item odd">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.41682">
+    <span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.s022h&amp;rft_id=Maestre+FT%2C+Puche+MD%2C+Guerrero+C%2C+Escudero+A+%282011%29+Shrub+encroachment+does+not+reduce+the+activity+of+some+soil+enzymes+in+Mediterranean+semiarid+grasslands.+Soil+Biology+and+Biochemistry+43%288%29%3A+1746-1749.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.41682&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Shrub encroachment does not reduce the activity of some soil enzymes in Mediterranean semiarid grasslands</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Maestre, Fernando T.</span>; <span>Puche, María D.</span>; <span>Guerrero, César</span>; <span>Escudero, Adrián</span>
+    </span> <span class="publisher-date">(<span class="date">2011-05-18</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.40653/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item even">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.40653">
+    <span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.k83b8&amp;rft_id=Morlan+JD%2C+Qu+K%2C+Sinicropi+DV+%282012%29+Selective+depletion+of+rRNA+enables+whole+transcriptome+profiling+of+archival+fixed+tissue.+PLoS+ONE+7%288%29%3A+e42882.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.40653&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Selective depletion of rRNA enables whole transcriptome profiling of archival fixed tissue</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Morlan, John D.</span>; <span>Qu, Kunbin</span>; <span>Sinicropi, Dominick V.</span>
+    </span> <span class="publisher-date">(<span class="date">2012-08-10</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.38980/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item odd">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.38980">
+    <span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.4m0v8474&amp;rft_id=Faircloth+BC%2C+Glenn+TC+%282012%29+Not+all+sequence+tags+are+created+equal%3A+designing+and+validating+sequence+identification+tags+robust+to+indels.+PLoS+ONE+7%288%29%3A+e42543.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.38980&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Not all sequence tags are created equal: designing and validating sequence identification tags robust to indels</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Faircloth, Brant C.</span>; <span>Glenn, Travis C.</span>
+    </span> <span class="publisher-date">(<span class="date">2012-08-10</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.35765/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item even">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.35765">
+    <span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.8h5p7p00&amp;rft_id=Laetsch+DR%2C+Heitlinger+EG%2C+Taraschewski+H%2C+Nadler+SA%2C+Blaxter+ML+%282012%29+The+phylogenetics+of+Anguillicolidae+%28Nematoda%3A+Anguillicolidea%29%2C+swimbladder+parasites+of+eels.+BMC+Evolutionary+Biology+12%3A+60.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.35765&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: The phylogenetics of Anguillicolidae (Nematoda: Anguillicolidea), swimbladder parasites of eels</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Laetsch, Dominik R.</span>; <span>Heitlinger, Emanuel G.</span>; <span>Taraschewski, Horst</span>; <span>Nadler, Steven A.</span>; <span>Blaxter, Mark L.</span>
+    </span> <span class="publisher-date">(<span class="date">2012-08-11</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.41635/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item odd">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.41635">
+    <span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.04562&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.41635&amp;rft_id=heredity-HDY-11-OR0417RRR&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Herbicide resistance-endowing ACCase gene mutations in hexaploid wild oat (Avena fatua): Insights into resistance evolution in a hexaploid species</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Powles, Stephen</span>; <span>Yu, Qin</span>; <span>Ahmad-Hamdani, M. S.</span>; <span>Han, Heping</span>; <span>Christoffers, Michael</span>
+    </span> <span class="publisher-date">(<span class="date">2012-08-11</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.41155/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item even">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.41155">
+    <span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.2k9j0&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.41155&amp;rft_id=SystBiol-USYB-2012-081.R1&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Low-parameter phylogenetic inference under the general Markov model</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Holland, Barbara</span>; <span>Jarvis, Peter</span>; <span>Sumner, Jeremy</span>
+    </span> <span class="publisher-date">(<span class="date">2012-08-10</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.39111/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item odd">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.39111">
+    <span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.k2502d93&amp;rft_id=Kennington+WJ%2C+Hevroy+TH%2C+Johnson+MS+%282012%29+Long-term+genetic+monitoring+reveals+contrasting+changes+in+the+genetic+composition+of+newly+established+populations+of+the+intertidal+snail+Bembicium+vittatum.+Molecular+Ecology+21%2814%29%3A+3489-3500.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.39111&amp;rft_id=MolEcol-14044988MEC-12-0074.R1&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;rft.workflow=true">Data from: Long-term genetic monitoring reveals contrasting changes in the genetic composition of newly established populations of the intertidal snail Bembicium vittatum</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Kennington, W. Jason</span>
+    </span> <span class="publisher-date">(<span class="date">2012-05-22</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.39112/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item even">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.39112">
+    <span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.2nd8jg3n&amp;rft_id=Mattersdorfer+K%2C+Koblm%C3%BCller+S%2C+Sefc+KM+%282012%29+AFLP+genome+scans+suggest+divergent+selection+on+colour+patterning+in+allopatric+colour+morphs+of+a+cichlid+fish.+Molecular+Ecology+21%2814%29%3A+3531-3544.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.39112&amp;rft_id=MolEcol-11693890MEC-12-0063.R1&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: AFLP genome scans suggest divergent selection on colour patterning in allopatric colour morphs of a cichlid fish</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Mattersdorfer, Karin</span>; <span>Koblmüller, Stephan</span>; <span>Sefc, Kristina M.</span>
+    </span> <span class="publisher-date">(<span class="date">2012-05-24</span>)</span>
+    </div>
+    </div>
+    </li>
+    </ul>
+    </div>
+    <h1 class="ds-div-head">Featured</h1>
+    <div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-static-div secondary featured-item" id="aspect_discovery_SiteFeaturedItems_div_site-featured-item">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </div>
+    <h1 class="ds-div-head">Most Viewed</h1>
+    <div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-static-div secondary most-viewed" id="aspect_discovery_SiteFeaturedItems_div_site-most-viewed">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </div>
+    </div>
 </div>
-<div class="artifact-info">
-<span class="author">
-<span>Baur, Hannes</span>; <span>Reichenbach, Fabian</span>; <span>Neubert, Eike</span>
-</span> <span class="publisher-date">(<span class="date">2012-07-17</span>)</span>
+<div class="home-col-2">
+    <h1 class="ds-div-head">Dryad Mailing List</h1>
+    <div class="ds-static-div primary" id="file_news_div_mailing_list" style="height: 120px;">
+    <p class="ds-paragraph">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat.</p>
+    </div>
 </div>
+
+<div class="home-col-2" style="clear: both; margin-left: 25px;">
+    <h1 class="ds-div-head">Recently Integrated Journals</h1>
+    <div class="ds-static-div primary" id="file_news_div_recently_integrated_journal" style="height: 300px;">
+    <p class="ds-paragraph">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </p>
+    </div>
 </div>
-</li>
-<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.41747/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
-<li class="ds-artifact-item even">
-<div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
-<div class="artifact-title">
-<a href="/handle/10255/dryad.41747">
-<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.0ct6s&amp;rft_id=Reme%C5%A1+V%2C+Matysiokov%C3%A1+B%2C+Cockburn+A+%282012%29+Long-term+and+large-scale+analyses+of+nest+predation+patterns+in+Australian+songbirds+and+a+global+comparison+of+nest+predation+rates.+Journal+of+Avian+Biology%2C+online+in+advance+of+print.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.41747&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Long-term and large-scale analyses of nest predation patterns in Australian songbirds and a global comparison of nest predation rates</span>
-</a>
+
+<div class="home-col-2" style="margin-left: 25px;">
+    <div class="Xds-static-div Xprimary repository" id="aspect_statistics_StatisticsTransformer_div_home">
+        <h1 class="ds-div-head">Dryad Statistics</h1>
+        <div xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-static-div secondary stats" id="aspect_statistics_StatisticsTransformer_div_stats" style="height: 300px;">
+        <h2 class="ds-table-head">Total Visits</h2>
+        <table class="ds-table tableWithTitle" id="aspect_statistics_StatisticsTransformer_table_list-table">
+        <tr class="ds-table-row odd">
+        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_" />
+        <td class="ds-table-cell even labelcell" id="aspect_statistics_StatisticsTransformer_cell_">Views</td>
+        </tr>
+        <tr class="ds-table-row even">
+        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_01">Data from: IDENTIFIER TEST</td>
+        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_02">23</td>
+        </tr>
+        <tr class="ds-table-row odd">
+        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_11">Data from: CHECK</td>
+        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_12">14</td>
+        </tr>
+        <tr class="ds-table-row even">
+        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_21">Data from: Mini_deletion_revert</td>
+        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_22">11</td>
+        </tr>
+        <tr class="ds-table-row odd">
+        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_31">4651</td>
+        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_32">9</td>
+        </tr>
+        <tr class="ds-table-row even">
+        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_41">Canada</td>
+        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_42">9</td>
+        </tr>
+        <tr class="ds-table-row odd">
+        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_51">South Korea</td>
+        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_52">9</td>
+        </tr>
+        <tr class="ds-table-row even">
+        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_61">Data from: Test  duplicate</td>
+        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_62">9</td>
+        </tr>
+        <tr class="ds-table-row odd">
+        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_71">Data from: Metadata version</td>
+        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_72">8</td>
+        </tr>
+        <tr class="ds-table-row even">
+        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_81">Data from: Test delete version -1</td>
+        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_82">8</td>
+        </tr>
+        <tr class="ds-table-row odd">
+        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_91">Data from: 00005</td>
+        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_92">7</td>
+        </tr>
+        </table>
+        </div>
+    </div>
 </div>
-<div class="artifact-info">
-<span class="author">
-<span>Remeš, Vladimír</span>; <span>Matysioková, Beata</span>; <span>Cockburn, Andrew</span>
-</span> <span class="publisher-date">(<span class="date">2012-08-06</span>)</span>
+
+<div class="home-col-2">
+    <div id="aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home" class="Xds-static-div blog-box">
+        <h1 class="ds-div-head">Dryad Blog</h1>
+        <div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_dryadinfo_DryadBlogFeed_div_blog-hook" class="ds-static-div" style="height: 300px;">
+        <ul id="aspect_dryadinfo_DryadBlogFeed_list_entries" class="ds-simple-list">
+        <li>
+        <a href="http://blog.datadryad.org/2013/02/11/dryad-membership-meeting-data-publishing-symposium-2/">Dryad Membership Meeting &amp; data publishing symposium</a>
+        </li>
+        </ul>
+        <ul id="aspect_dryadinfo_DryadBlogFeed_list_entries" class="ds-simple-list">
+        <li>
+        <a href="http://blog.datadryad.org/2013/02/02/how-to-decide-what-data-should-be-archived-at-publication/">How to decide what data should be archived at publication</a>
+        </li>
+        </ul>
+        <ul id="aspect_dryadinfo_DryadBlogFeed_list_entries" class="ds-simple-list">
+        <li>
+        <a href="http://blog.datadryad.org/2012/10/24/got-data-in-dryad-let-your-website-readers-know/">Got data in Dryad? Let your website readers know.</a>
+        </li>
+        </ul>
+        </div>
+    </div>
 </div>
-</div>
-</li>
-<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.41682/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
-<li class="ds-artifact-item odd">
-<div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
-<div class="artifact-title">
-<a href="/handle/10255/dryad.41682">
-<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.s022h&amp;rft_id=Maestre+FT%2C+Puche+MD%2C+Guerrero+C%2C+Escudero+A+%282011%29+Shrub+encroachment+does+not+reduce+the+activity+of+some+soil+enzymes+in+Mediterranean+semiarid+grasslands.+Soil+Biology+and+Biochemistry+43%288%29%3A+1746-1749.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.41682&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Shrub encroachment does not reduce the activity of some soil enzymes in Mediterranean semiarid grasslands</span>
-</a>
-</div>
-<div class="artifact-info">
-<span class="author">
-<span>Maestre, Fernando T.</span>; <span>Puche, María D.</span>; <span>Guerrero, César</span>; <span>Escudero, Adrián</span>
-</span> <span class="publisher-date">(<span class="date">2011-05-18</span>)</span>
-</div>
-</div>
-</li>
-<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.40653/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
-<li class="ds-artifact-item even">
-<div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
-<div class="artifact-title">
-<a href="/handle/10255/dryad.40653">
-<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.k83b8&amp;rft_id=Morlan+JD%2C+Qu+K%2C+Sinicropi+DV+%282012%29+Selective+depletion+of+rRNA+enables+whole+transcriptome+profiling+of+archival+fixed+tissue.+PLoS+ONE+7%288%29%3A+e42882.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.40653&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Selective depletion of rRNA enables whole transcriptome profiling of archival fixed tissue</span>
-</a>
-</div>
-<div class="artifact-info">
-<span class="author">
-<span>Morlan, John D.</span>; <span>Qu, Kunbin</span>; <span>Sinicropi, Dominick V.</span>
-</span> <span class="publisher-date">(<span class="date">2012-08-10</span>)</span>
-</div>
-</div>
-</li>
-<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.38980/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
-<li class="ds-artifact-item odd">
-<div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
-<div class="artifact-title">
-<a href="/handle/10255/dryad.38980">
-<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.4m0v8474&amp;rft_id=Faircloth+BC%2C+Glenn+TC+%282012%29+Not+all+sequence+tags+are+created+equal%3A+designing+and+validating+sequence+identification+tags+robust+to+indels.+PLoS+ONE+7%288%29%3A+e42543.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.38980&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Not all sequence tags are created equal: designing and validating sequence identification tags robust to indels</span>
-</a>
-</div>
-<div class="artifact-info">
-<span class="author">
-<span>Faircloth, Brant C.</span>; <span>Glenn, Travis C.</span>
-</span> <span class="publisher-date">(<span class="date">2012-08-10</span>)</span>
-</div>
-</div>
-</li>
-<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.35765/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
-<li class="ds-artifact-item even">
-<div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
-<div class="artifact-title">
-<a href="/handle/10255/dryad.35765">
-<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.8h5p7p00&amp;rft_id=Laetsch+DR%2C+Heitlinger+EG%2C+Taraschewski+H%2C+Nadler+SA%2C+Blaxter+ML+%282012%29+The+phylogenetics+of+Anguillicolidae+%28Nematoda%3A+Anguillicolidea%29%2C+swimbladder+parasites+of+eels.+BMC+Evolutionary+Biology+12%3A+60.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.35765&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: The phylogenetics of Anguillicolidae (Nematoda: Anguillicolidea), swimbladder parasites of eels</span>
-</a>
-</div>
-<div class="artifact-info">
-<span class="author">
-<span>Laetsch, Dominik R.</span>; <span>Heitlinger, Emanuel G.</span>; <span>Taraschewski, Horst</span>; <span>Nadler, Steven A.</span>; <span>Blaxter, Mark L.</span>
-</span> <span class="publisher-date">(<span class="date">2012-08-11</span>)</span>
-</div>
-</div>
-</li>
-<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.41635/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
-<li class="ds-artifact-item odd">
-<div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
-<div class="artifact-title">
-<a href="/handle/10255/dryad.41635">
-<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.04562&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.41635&amp;rft_id=heredity-HDY-11-OR0417RRR&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Herbicide resistance-endowing ACCase gene mutations in hexaploid wild oat (Avena fatua): Insights into resistance evolution in a hexaploid species</span>
-</a>
-</div>
-<div class="artifact-info">
-<span class="author">
-<span>Powles, Stephen</span>; <span>Yu, Qin</span>; <span>Ahmad-Hamdani, M. S.</span>; <span>Han, Heping</span>; <span>Christoffers, Michael</span>
-</span> <span class="publisher-date">(<span class="date">2012-08-11</span>)</span>
-</div>
-</div>
-</li>
-<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.41155/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
-<li class="ds-artifact-item even">
-<div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
-<div class="artifact-title">
-<a href="/handle/10255/dryad.41155">
-<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.2k9j0&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.41155&amp;rft_id=SystBiol-USYB-2012-081.R1&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: Low-parameter phylogenetic inference under the general Markov model</span>
-</a>
-</div>
-<div class="artifact-info">
-<span class="author">
-<span>Holland, Barbara</span>; <span>Jarvis, Peter</span>; <span>Sumner, Jeremy</span>
-</span> <span class="publisher-date">(<span class="date">2012-08-10</span>)</span>
-</div>
-</div>
-</li>
-<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.39111/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
-<li class="ds-artifact-item odd">
-<div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
-<div class="artifact-title">
-<a href="/handle/10255/dryad.39111">
-<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.k2502d93&amp;rft_id=Kennington+WJ%2C+Hevroy+TH%2C+Johnson+MS+%282012%29+Long-term+genetic+monitoring+reveals+contrasting+changes+in+the+genetic+composition+of+newly+established+populations+of+the+intertidal+snail+Bembicium+vittatum.+Molecular+Ecology+21%2814%29%3A+3489-3500.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.39111&amp;rft_id=MolEcol-14044988MEC-12-0074.R1&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;rft.workflow=true">Data from: Long-term genetic monitoring reveals contrasting changes in the genetic composition of newly established populations of the intertidal snail Bembicium vittatum</span>
-</a>
-</div>
-<div class="artifact-info">
-<span class="author">
-<span>Kennington, W. Jason</span>
-</span> <span class="publisher-date">(<span class="date">2012-05-22</span>)</span>
-</div>
-</div>
-</li>
-<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.39112/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
-<li class="ds-artifact-item even">
-<div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
-<div class="artifact-title">
-<a href="/handle/10255/dryad.39112">
-<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.2nd8jg3n&amp;rft_id=Mattersdorfer+K%2C+Koblm%C3%BCller+S%2C+Sefc+KM+%282012%29+AFLP+genome+scans+suggest+divergent+selection+on+colour+patterning+in+allopatric+colour+morphs+of+a+cichlid+fish.+Molecular+Ecology+21%2814%29%3A+3531-3544.&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.39112&amp;rft_id=MolEcol-11693890MEC-12-0063.R1&amp;rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;">Data from: AFLP genome scans suggest divergent selection on colour patterning in allopatric colour morphs of a cichlid fish</span>
-</a>
-</div>
-<div class="artifact-info">
-<span class="author">
-<span>Mattersdorfer, Karin</span>; <span>Koblmüller, Stephan</span>; <span>Sefc, Kristina M.</span>
-</span> <span class="publisher-date">(<span class="date">2012-05-24</span>)</span>
-</div>
-</div>
-</li>
-</ul>
-</div>
-<h1 class="ds-div-head">Featured</h1>
-<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-static-div secondary featured-item" id="aspect_discovery_SiteFeaturedItems_div_site-featured-item">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </div>
-<h1 class="ds-div-head">Most Viewed</h1>
-<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-static-div secondary most-viewed" id="aspect_discovery_SiteFeaturedItems_div_site-most-viewed">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </div>
-</div>
-<h1 class="ds-div-head">Dryad Mailing List</h1>
-<div class="ds-static-div primary" id="file_news_div_mailing_list">
-<p class="ds-paragraph">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </p>
-</div>
-<div id="aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home" class="ds-static-div blog-box">
-<h1 class="ds-div-head">Recent Posts from the Dryad Blog</h1>
-<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_dryadinfo_DryadBlogFeed_div_blog-hook" class="ds-static-div">
-<ul id="aspect_dryadinfo_DryadBlogFeed_list_entries" class="ds-simple-list">
-<li>
-<a href="http://blog.datadryad.org/2013/02/11/dryad-membership-meeting-data-publishing-symposium-2/">Dryad Membership Meeting &amp; data publishing symposium</a>
-</li>
-</ul>
-<ul id="aspect_dryadinfo_DryadBlogFeed_list_entries" class="ds-simple-list">
-<li>
-<a href="http://blog.datadryad.org/2013/02/02/how-to-decide-what-data-should-be-archived-at-publication/">How to decide what data should be archived at publication</a>
-</li>
-</ul>
-<ul id="aspect_dryadinfo_DryadBlogFeed_list_entries" class="ds-simple-list">
-<li>
-<a href="http://blog.datadryad.org/2012/10/24/got-data-in-dryad-let-your-website-readers-know/">Got data in Dryad? Let your website readers know.</a>
-</li>
-</ul>
-</div>
-</div>
-<div class="ds-static-div primary repository" id="aspect_statistics_StatisticsTransformer_div_home">
-<h1 class="ds-div-head">Dryad Statistics</h1>
-<div xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-static-div secondary stats" id="aspect_statistics_StatisticsTransformer_div_stats">
-<h2 class="ds-table-head">Total Visits</h2>
-<table class="ds-table tableWithTitle" id="aspect_statistics_StatisticsTransformer_table_list-table">
-<tr class="ds-table-row odd">
-<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_" />
-<td class="ds-table-cell even labelcell" id="aspect_statistics_StatisticsTransformer_cell_">Views</td>
-</tr>
-<tr class="ds-table-row even">
-<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_01">Data from: IDENTIFIER TEST</td>
-<td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_02">23</td>
-</tr>
-<tr class="ds-table-row odd">
-<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_11">Data from: CHECK</td>
-<td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_12">14</td>
-</tr>
-<tr class="ds-table-row even">
-<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_21">Data from: Mini_deletion_revert</td>
-<td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_22">11</td>
-</tr>
-<tr class="ds-table-row odd">
-<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_31">4651</td>
-<td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_32">9</td>
-</tr>
-<tr class="ds-table-row even">
-<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_41">Canada</td>
-<td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_42">9</td>
-</tr>
-<tr class="ds-table-row odd">
-<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_51">South Korea</td>
-<td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_52">9</td>
-</tr>
-<tr class="ds-table-row even">
-<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_61">Data from: Test  duplicate</td>
-<td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_62">9</td>
-</tr>
-<tr class="ds-table-row odd">
-<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_71">Data from: Metadata version</td>
-<td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_72">8</td>
-</tr>
-<tr class="ds-table-row even">
-<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_81">Data from: Test delete version -1</td>
-<td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_82">8</td>
-</tr>
-<tr class="ds-table-row odd">
-<td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_91">Data from: 00005</td>
-<td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_92">7</td>
-</tr>
-</table>
-</div>
-</div>
-<h1 class="ds-div-head">Recently Integrated Journal</h1>
-<div class="ds-static-div primary" id="file_news_div_recently_integrated_journal">
-<p class="ds-paragraph">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </p>
-</div>
+
 </div>
 <!-- 
 <div id="ds-options-wrapper">
