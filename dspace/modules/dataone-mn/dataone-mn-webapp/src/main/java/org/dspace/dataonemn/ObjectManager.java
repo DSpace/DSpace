@@ -983,22 +983,25 @@ public class ObjectManager implements Constants {
             } catch (JDOMException ex) {
                 java.util.logging.Logger.getLogger(ObjectManager.class.getName()).log(Level.SEVERE, null, ex);
             }
-            Iterator it = d.getDescendants(new ElementFilter("Description"));
-            Element agentElement = null;
+            Iterator it = d.getRootElement().getChildren().iterator();
+            List<Element> children = new ArrayList<Element>();
             while(it.hasNext()) {
-                Element element = (Element) it.next();
-                if("A0".equals(element.getAttributeValue("nodeID", element.getNamespace()))) {
-                    agentElement = element;
+                Element element = (Element)it.next();
+                children.add(element);
+            }
+            d.getRootElement().removeContent();
+            Collections.sort(children, new Comparator<Element> () {
+                @Override
+                public int compare(Element t, Element t1) {
+                    return t.getText().compareTo(t1.getText());
                 }
+
+            });
+            for(Element el : children) {
+                d.getRootElement().addContent(el);
             }
-            if(agentElement != null) {
-                Element p = agentElement.getParentElement();
-                p.removeContent(agentElement);
-                p.addContent(0, agentElement);
-                XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
-                rdfXml = outputter.outputString(d);
-            }
-            
+            XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+            rdfXml = outputter.outputString(d);
 	    PrintWriter writer = new PrintWriter(
 						 new BufferedWriter(new OutputStreamWriter(aOutputStream)));
 	    writer.print(rdfXml);
