@@ -40,8 +40,16 @@ import org.dataone.ore.ResourceMapFactory;
 import org.dspace.foresite.ResourceMap;
 import org.dspace.foresite.OREException;
 import org.dspace.foresite.ORESerialiserException;
+import org.dspace.foresite.Agent;
 
 import java.net.URISyntaxException;
+import java.util.logging.Level;
+import org.jdom.Content;
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.Parent;
+import org.jdom.filter.ElementFilter;
+import org.jdom.input.SAXBuilder;
 
 public class ObjectManager implements Constants {
     
@@ -967,7 +975,30 @@ public class ObjectManager implements Constants {
 
 	    // serialize it as RDF/XML
 	    String rdfXml = ResourceMapFactory.getInstance().serializeResourceMap(resourceMap);
-
+            // Reorder the RDF/XML to a predictable order
+            SAXBuilder builder = new SAXBuilder();
+            Document d = null;
+            try {
+                d = builder.build(new StringReader(rdfXml));
+            } catch (JDOMException ex) {
+                java.util.logging.Logger.getLogger(ObjectManager.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            Iterator it = d.getDescendants(new ElementFilter("Description"));
+            Element agentElement = null;
+            while(it.hasNext()) {
+                Element element = (Element) it.next();
+                if("A0".equals(element.getAttributeValue("nodeID", element.getNamespace()))) {
+                    agentElement = element;
+                }
+            }
+            if(agentElement != null) {
+                Element p = agentElement.getParentElement();
+                p.removeContent(agentElement);
+                p.addContent(0, agentElement);
+                XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+                rdfXml = outputter.outputString(d);
+            }
+            
 	    PrintWriter writer = new PrintWriter(
 						 new BufferedWriter(new OutputStreamWriter(aOutputStream)));
 	    writer.print(rdfXml);
