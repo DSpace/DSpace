@@ -225,7 +225,10 @@ public class DataOneMN extends HttpServlet implements Constants {
 		getCapabilities(response);
 	    } else if(reqPath.startsWith("/object")) {			
 		if (reqPath.equals("/object")) {
-		    listObjects(request, response, objManager);
+		    listObjects(request, response, objManager, true);
+		}
+		else if (reqPath.equals("/object/simple")) {
+		    listObjects(request, response, objManager, false);
 		}
 		else if (reqPath.startsWith("/object/")) {
 		    getObject(reqPath, response, objManager, le);
@@ -236,7 +239,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 		}
 		else {
 		    response.sendError(HttpServletResponse.SC_NOT_FOUND,
-				       "Did you mean '/object' or '/object/doi:...'");
+				       "Did you mean '/object' or '/object/http://dx.doi.org/...'");
 		}		
 	    } else if (reqPath.startsWith("/meta/")) {
 		getSystemMetadata(reqPath, response, objManager);
@@ -388,7 +391,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	// try to get a single object. If it fails, return an error.
 	try {
 	    OutputStream dummyOutput = new OutputStream() { public void write(int b) throws IOException {}};
-	    objManager.getMetadataObject("doi:10.5061/dryad.20/1", dummyOutput);	    
+	    objManager.getMetadataObject("doi:10.5061/dryad.20/1", "", dummyOutput);	    
 	} catch (Exception e) {
 	    log.error("Unable to retrieve test metadata object doi:10.5061/dryad.20/1", e);
 	    // if there is any problem, respond with an error
@@ -513,13 +516,22 @@ public class DataOneMN extends HttpServlet implements Constants {
     **/
     private void getObject(String reqPath, HttpServletResponse response, ObjectManager objManager, LogEntry logent) throws ServletException, IOException {
 	log.info("getObject()");
-	
+
+	String idTimestamp = "";
 	String format = "";
 	String fileName = "";
 	String id = reqPath.substring("/object/".length());
 	String simpleDOI = id.replace('/','_').replace(':','_');
 
 	try {
+ 	    // perform corrections for timestamped IDs
+	    // If we receive a timestamped ID, we will produce metadata records that contain timestamped IDs.
+	    // Timestamps are always at the end of the identifier
+	    if (id.contains("/mdVer")) {
+		int timeIndex = id.indexOf("/mdVer");
+		idTimestamp = id.substring(timeIndex);
+		id = id.substring(0,timeIndex);
+	    }
 	    if (id.endsWith("/bitstream")) {
 		// return a bitstream
 		log.debug("bitstream requested");
@@ -545,9 +557,9 @@ public class DataOneMN extends HttpServlet implements Constants {
 		// throw early, try not to create an output stream
 		Item item = objManager.getDSpaceItem(id);
 		
-		log.debug("getting resource map for object id=" + id);
-		objManager.getResourceMap(id, response.getOutputStream());
-		logent.setIdentifier(id);
+		log.debug("getting resource map for object id=" + id + idTimestamp);
+		objManager.getResourceMap(id, idTimestamp, response.getOutputStream());
+		logent.setIdentifier(id + idTimestamp);
 	    } else {
 		// return a metadata record (file or package)
 		response.setContentType(XML_CONTENT_TYPE);
@@ -555,15 +567,15 @@ public class DataOneMN extends HttpServlet implements Constants {
 		// throw early, try not to create an output stream
 		Item item = objManager.getDSpaceItem(id);
 		
-		log.debug("getting science metadata object id=" + id);
-		objManager.getMetadataObject(id, response.getOutputStream());
-		logent.setIdentifier(id);
+		log.debug("getting science metadata object id=" + id + idTimestamp);
+		objManager.getMetadataObject(id, idTimestamp, response.getOutputStream());
+		logent.setIdentifier(id + idTimestamp);
 	    }
 	    
 	} catch (NotFoundException details) {
 	    log.error("Passed request returned not found", details);
 	    response.setStatus(404);
-	    String resStr = generateNotFoundResponse(id, "mn.get","1020");
+	    String resStr = generateNotFoundResponse(id + idTimestamp, "mn.get","1020");
 	    OutputStream out = response.getOutputStream();
 	    PrintWriter pw = new PrintWriter(out);
 	    pw.write(resStr);
@@ -603,12 +615,18 @@ public class DataOneMN extends HttpServlet implements Constants {
     private void getSystemMetadata(String reqPath, HttpServletResponse response, ObjectManager objManager) throws ServletException, IOException {
 	log.info("getSystemMetadata()");
 	String id = reqPath.substring("/meta/".length());
-	if (id.startsWith("http:/d")){
-	    log.info("reinserting slash");
-	    id = id.substring(0,5) + '/' + id.substring(5);
-	}
-	log.debug("id = " + id);
+	String idTimestamp = "";
 	
+	// perform corrections for timestamped IDs
+	// If we receive a timestamped ID, we will produce metadata records that contain timestamped IDs.
+	// Timestamps are always at the end of the identifier
+	if (id.contains("/mdVer")) {
+	    int timeIndex = id.indexOf("/mdVer");
+	    idTimestamp = id.substring(timeIndex);
+	    id = id.substring(0,timeIndex);
+	}	
+	log.debug("id = " + id);
+		
 	response.setContentType(TEXT_XML_CONTENT_TYPE); // default for /meta
 	
 	try {
@@ -651,7 +669,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 		// build sysmeta for a science metadata object				
 		sysMeta.setObjectFormat(DRYAD_NAMESPACE);
 
-		long size = objManager.getObjectSize(id); 
+		long size = objManager.getObjectSize(id, idTimestamp); 
         sysMeta.setSize(size);
 		
 		// Add relationship between this science metadata and the bitstream it describes.
@@ -662,7 +680,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 		    sysMeta.setDescribes(id + "/bitstream");
 		}
 
-		String[] checksumDetails = objManager.getObjectChecksum(id);
+		String[] checksumDetails = objManager.getObjectChecksum(id, idTimestamp);
 		sysMeta.setChecksum(checksumDetails[0], checksumDetails[1]);
 	    }
 
@@ -717,9 +735,19 @@ public class DataOneMN extends HttpServlet implements Constants {
 	log.info("describe()");
 
 	String id = reqPath.substring("/object/".length());
-	
+	String idTimestamp = "";
+
+	// perform corrections for timestamped IDs
+	// If we receive a timestamped ID, we will produce metadata records that contain timestamped IDs.
+	// Timestamps are always at the end of the identifier
+	if (id.contains("/mdVer")) {
+	    int timeIndex = id.indexOf("/mdVer");
+	    idTimestamp = id.substring(timeIndex);
+	    id = id.substring(0,timeIndex);
+	}
+
 	try {
-	    long length = objManager.getObjectSize(id);
+	    long length = objManager.getObjectSize(id, idTimestamp);
 	    response.setContentLength((int) length);
 
 	    if (id.endsWith("/bitstream")) {
@@ -739,7 +767,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	    String format = translateMIMEToDataOneFormat(bitstream.getFormat().getMIMEType());
 
 	    response.setHeader("DataONE-formatId", format);
-	    final String[] checksumDetails = objManager.getObjectChecksum(id);
+	    final String[] checksumDetails = objManager.getObjectChecksum(id, idTimestamp);
 	    final String checkSumAlg = checksumDetails[1];
 	    final String checkSum = checksumDetails[0];
 	    final String checkSumStr = checkSumAlg + "," + checkSum; 
@@ -753,7 +781,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	    } else {
             response.setHeader("DataONE-formatId", DRYAD_NAMESPACE);
 	        response.setContentType(XML_CONTENT_TYPE);
-	        final String[] checksumDetails = objManager.getObjectChecksum(id);
+	        final String[] checksumDetails = objManager.getObjectChecksum(id, idTimestamp);
 	        final String checkSumAlg = checksumDetails[1];
 	        final String checkSum = checksumDetails[0];
 	        final String checkSumStr = checkSumAlg + "," + checkSum; 
@@ -803,10 +831,20 @@ public class DataOneMN extends HttpServlet implements Constants {
 	log.info("getChecksum()");
 
 	String id = reqPath.substring("/checksum/".length());
+	String idTimestamp = "";
+	// perform corrections for timestamped IDs
+	// If we receive a timestamped ID, we will produce metadata records that contain timestamped IDs.
+	// Timestamps are always at the end of the identifier
+	if (id.contains("/mdVer")) {
+	    int timeIndex = id.indexOf("/mdVer");
+	    idTimestamp = id.substring(timeIndex);
+	    id = id.substring(0,timeIndex);
+	}
+
        	response.setContentType(TEXT_XML_CONTENT_TYPE);
 	
 	try {
-	    String[] checksum = objManager.getObjectChecksum(id);
+	    String[] checksum = objManager.getObjectChecksum(id, idTimestamp);
 	    PrintWriter writer = response.getWriter();
 	    
 	    writer.print("<checksum xmlns=\"" + D1_TYPES_NAMESPACE
@@ -838,7 +876,8 @@ public class DataOneMN extends HttpServlet implements Constants {
     /**
        List all objects available on this Member Node.
     **/
-    private void listObjects(HttpServletRequest request, HttpServletResponse response, ObjectManager objManager) throws IOException {
+    private void listObjects(HttpServletRequest request, HttpServletResponse response,
+			     ObjectManager objManager, boolean useTimestamps) throws IOException {
 	log.info("listObjects()");
 	String format = request.getParameter("formatId");
 
@@ -855,12 +894,11 @@ public class DataOneMN extends HttpServlet implements Constants {
 	    
 	    if (count <= 0) {
 		OutputStream out = response.getOutputStream();
-		objManager.printList(from, to, format, out);
+		objManager.printList(from, to, format, out, useTimestamps);
 	    }
 	    else {
 		OutputStream out = response.getOutputStream();
-		objManager.printList(start, count, from, to, format,
-				     out);
+		objManager.printList(start, count, from, to, format, out, useTimestamps);
 	    }
 	} catch (ParseException e) {
 	    log.error("unable to parse request info", e);
@@ -896,6 +934,18 @@ public class DataOneMN extends HttpServlet implements Constants {
         String format = "";
         String fileName = "";
         String id = reqPath.substring("/replica/".length());
+	String idTimestamp = "";
+	
+	// perform corrections for timestamped IDs
+	// If we receive a timestamped ID, we will produce metadata records that contain timestamped IDs.
+	// Timestamps are always at the end of the identifier
+	if (id.contains("/mdVer")) {
+	    int timeIndex = id.indexOf("/mdVer");
+	    idTimestamp = id.substring(timeIndex);
+	    id = id.substring(0,timeIndex);
+	}	
+	log.debug("id = " + id);
+	
         String simpleDOI = id.replace('/','_').replace(':','_');
 
         try {
@@ -906,7 +956,7 @@ public class DataOneMN extends HttpServlet implements Constants {
                 response.setContentType(XML_CONTENT_TYPE);
         
                 log.debug("replicating object id=" + id +", format=" + format);
-                objManager.getMetadataObject(id, response.getOutputStream());
+                objManager.getMetadataObject(id, idTimestamp, response.getOutputStream());
                 logent.setIdentifier(id);
             }
             else {

@@ -13,6 +13,7 @@ import nu.xom.Attribute;
  */
 public class PackageInfo implements Constants {
     private String identifier;
+    private String idTimestamp;
     private String modificationDate;
     /* Two halves - first is XML metadata.  
      * Second is the Resource Map */
@@ -24,8 +25,9 @@ public class PackageInfo implements Constants {
     private String resourceMapChecksumAlgo;
     private long resourceMapSize;
     
-    public PackageInfo(String aIdentifier) {
-	identifier = aIdentifier;
+    public PackageInfo(String identifier, String idTimestamp) {
+	this.identifier = identifier;
+	this.idTimestamp = idTimestamp;
     }
     
     public String getNamespace() {
@@ -40,8 +42,8 @@ public class PackageInfo implements Constants {
 	
 	// create objects and set identifiers
 	String baseID = getIdentifier();
-	ObjectInfo metadataElem = new ObjectInfo(baseID);
-	ObjectInfo resourceMapElem = new ObjectInfo(baseID + "/d1rem");
+	ObjectInfo metadataElem = new ObjectInfo(baseID, idTimestamp);
+	ObjectInfo resourceMapElem = new ObjectInfo(baseID + "/d1rem", idTimestamp);
         metadataElem.setObjectFormat(DRYAD_NAMESPACE);
         resourceMapElem.setObjectFormat(ORE_NAMESPACE);
         if(getXmlChecksum() != null && getXmlChecksumAlgo() != null) {

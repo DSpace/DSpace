@@ -63,33 +63,39 @@ public class ObjectManager implements Constants {
         myPackages = aPackagesCollection;
     }
     
-    public void printList(OutputStream aOutStream) throws SQLException, IOException {
-	printList(DEFAULT_START, DEFAULT_COUNT, aOutStream);
+    public void printList(OutputStream aOutStream, boolean useTimestamps) throws SQLException, IOException {
+	printList(DEFAULT_START, DEFAULT_COUNT, aOutStream, useTimestamps);
     }
     
-    public void printList(Date aFrom, Date aTo, OutputStream aOutStream) throws SQLException, IOException {
-	printList(DEFAULT_START, DEFAULT_COUNT, aFrom, aTo, null, aOutStream);
+    public void printList(Date aFrom, Date aTo, OutputStream aOutStream, boolean useTimestamps) throws SQLException, IOException {
+	printList(DEFAULT_START, DEFAULT_COUNT, aFrom, aTo, null, aOutStream, useTimestamps);
     }
     
-    public void printList(Date aFrom, Date aTo, String aObjFormat, OutputStream aOutStream)
+    public void printList(Date aFrom, Date aTo, String aObjFormat, OutputStream aOutStream, boolean useTimestamps)
 	throws SQLException, IOException {
 	printList(DEFAULT_START, DEFAULT_COUNT, aFrom, aTo, aObjFormat,
-		  aOutStream);
+		  aOutStream, useTimestamps);
     }
 
-    public void printList(int aStart, int aCount, OutputStream aOutStream)
+    public void printList(int aStart, int aCount, OutputStream aOutStream, boolean useTimestamps)
                     throws SQLException, IOException {
-        printList(aStart, aCount, null, null, null, aOutStream);
+        printList(aStart, aCount, null, null, null, aOutStream, useTimestamps);
     }
 
     public void printList(int aStart, int aCount, String aObjFormat,
-                    OutputStream aOutStream) throws SQLException, IOException {
-        printList(aStart, aCount, null, null, aObjFormat, aOutStream);
+			  OutputStream aOutStream, boolean useTimestamps) throws SQLException, IOException {
+        printList(aStart, aCount, null, null, aObjFormat, aOutStream, useTimestamps);
     }
 
     public void printList(int aStart, int aCount, Date aFrom, Date aTo,
-                    String aObjFormat, OutputStream aOutStream) throws SQLException,
+			  String aObjFormat, OutputStream aOutStream, boolean useTimestamps) throws SQLException,
                     IOException {
+	log.debug("printing object list with start=" +aStart +
+		  ", count=" + aCount +
+		  ", from=" + aFrom +
+		  ", to=" + aTo +
+		  ", format=" + aObjFormat +
+		  ", timestamps=" + useTimestamps);
         XMLSerializer serializer = new XMLSerializer(aOutStream);
         ListObjects list = new ListObjects();
         
@@ -165,8 +171,8 @@ public class ObjectManager implements Constants {
             fileStart = (int) (aStart - totalDataPackageElements);
             fileCount = aCount;
         }
-        List<nu.xom.Element> packageElementList = buildDataPackagesList(packageStart, packageCount, aFrom, aTo, aObjFormat);
-        List<nu.xom.Element> fileElementList = buildDataFilesList(fileStart, fileCount, aFrom, aTo, aObjFormat);
+        List<nu.xom.Element> packageElementList = buildDataPackagesList(packageStart, packageCount, aFrom, aTo, aObjFormat, useTimestamps);
+        List<nu.xom.Element> fileElementList = buildDataFilesList(fileStart, fileCount, aFrom, aTo, aObjFormat, useTimestamps);
         
         log.debug("Setting count parameter to: " + Integer.toString(fileElementList.size() + packageElementList.size()));
         list.setCount(fileElementList.size() + packageElementList.size());
@@ -185,7 +191,7 @@ public class ObjectManager implements Constants {
         myContext.restoreAuthSystemState();
     }
 
-    private List<nu.xom.Element> buildDataPackagesList(int aStart, int aCount, Date aFrom, Date aTo, String aObjFormat) 
+    private List<nu.xom.Element> buildDataPackagesList(int aStart, int aCount, Date aFrom, Date aTo, String aObjFormat, boolean useTimestamps) 
     throws SQLException, IOException {
         List<nu.xom.Element> packageElementList = new ArrayList<nu.xom.Element>();
         if(aCount == 0) {
@@ -239,50 +245,54 @@ public class ObjectManager implements Constants {
         while(iterator.hasNext()) {
             TableRow tr = iterator.next();
             String doi = tr.getStringColumn("doi");
+	    String idTimestamp = "";
             Date dateAvailable = tr.getDateColumn("date_available");
+	    Date lastModifiedDate = tr.getDateColumn("last_modified");
+            String lastModified = dateFormatter.format(lastModifiedDate);
 
+	    if(useTimestamps) {
+		idTimestamp =  "?ver=" + lastModified;
+	    }
+
+	    log.debug("timestamps=" + useTimestamps + ", idTimestamp=" + idTimestamp);
+	    
             log.debug("Building '" + doi + "' for mn list");
-            // need one for the metadata and one for the resource map
-            // convert DOI to http form if necessary
-            if (doi.startsWith("doi:")) {
-                doi = "http://dx.doi.org/" + doi.substring("doi:".length());
-                log.debug("converted DOI to http form. It is now " + doi);
-            }
+	    doi = normalizeDoi(doi);
 
-            PackageInfo packageInfo = new PackageInfo(doi);
-            packageInfo.setModificationDate(dateFormatter.format(dateAvailable));
+            PackageInfo packageInfo = new PackageInfo(doi, idTimestamp);
+            packageInfo.setModificationDate(lastModified);
 
             try {
-                String xmlChecksum[] = getObjectChecksum(doi); // metadata
+                String xmlChecksum[] = getObjectChecksum(doi, idTimestamp); // metadata
                 packageInfo.setXmlChecksum(xmlChecksum[0]);
                 packageInfo.setXmlChecksumAlgo(xmlChecksum[1]);
             } catch (NotFoundException ex) {
-                log.error("Error getting checksum for " + doi, ex);
+                log.error("Error getting checksum for " + doi + idTimestamp, ex);
                 packageInfo.setXmlChecksum(DEFAULT_CHECKSUM);
                 packageInfo.setXmlChecksumAlgo(DEFAULT_CHECKSUM_ALGO);
             }
             
             try {
-                String resourceMapChecksum[] = getObjectChecksum(doi + "/d1rem");
+                String resourceMapChecksum[] = getObjectChecksum(doi + "/d1rem", idTimestamp);
                 packageInfo.setResourceMapChecksum(resourceMapChecksum[0]);
                 packageInfo.setResourceMapChecksumAlgo(resourceMapChecksum[1]);
             } catch (NotFoundException ex) {
-                log.error("Error getting checksum for " + doi + "/d1rem", ex);
+                log.error("Error getting checksum for " + doi + "/d1rem" + idTimestamp, ex);
                 packageInfo.setResourceMapChecksum(DEFAULT_CHECKSUM);
                 packageInfo.setResourceMapChecksumAlgo(DEFAULT_CHECKSUM_ALGO);
             }
             
             try {
-                long xmlSize = getObjectSize(doi);
+                long xmlSize = getObjectSize(doi, idTimestamp);
                 packageInfo.setXmlSize(xmlSize);
             } catch (NotFoundException ex) {
-                log.error("Error getting size for " + doi, ex);
+                log.error("Error getting size for " + doi + idTimestamp, ex);
             }
             try {
-                long resourceMapSize = getObjectSize(doi + "/d1rem");
+                long resourceMapSize = getObjectSize(doi + "/d1rem", idTimestamp);
                 packageInfo.setResourceMapSize(resourceMapSize);
             } catch (NotFoundException ex) {
-                log.error("Error getting size for " + doi + "/d1rem", ex);
+                log.error("Error getting size for " + doi + "/d1rem" + idTimestamp, ex);
             }
 
             nu.xom.Element[] infoElements = packageInfo.createInfoElements();
@@ -312,7 +322,7 @@ public class ObjectManager implements Constants {
         return packageElementList;
     }
 
-    private List<nu.xom.Element> buildDataFilesList(int aStart, int aCount, Date aFrom, Date aTo, String aObjFormat) 
+    private List<nu.xom.Element> buildDataFilesList(int aStart, int aCount, Date aFrom, Date aTo, String aObjFormat, boolean useTimestamps) 
     throws SQLException, IOException {
         List<nu.xom.Element> fileElementList = new ArrayList<nu.xom.Element>();
         if(aCount == 0) {
@@ -394,33 +404,32 @@ public class ObjectManager implements Constants {
             String checksum = tr.getStringColumn("checksum");
             String checksumAlgorithm = tr.getStringColumn("checksum_algorithm");
             Date dateAvailable = tr.getDateColumn("date_available");
-            long size = tr.getLongColumn("size_bytes");
+	    Date lastModifiedDate = tr.getDateColumn("last_modified");
+            String lastModified = dateFormatter.format(lastModifiedDate);
+	    long size = tr.getLongColumn("size_bytes");
 
             log.debug("Building '" + doi + "' for mn list");
-            // need one for the bitstream and one for the metadata
-            // convert DOI to http form if necessary
-            if (doi.startsWith("doi:")) {
-                doi = "http://dx.doi.org/" + doi.substring("doi:".length());
-                log.debug("converted DOI to http form. It is now " + doi);
-            }
+	    doi = normalizeDoi(doi);
+	    String idTimestamp = "";
+	    if(useTimestamps) {
+		idTimestamp =  "?ver=" + lastModified;
+	    }    
 
-            String lastModified = dateFormatter.format(dateAvailable);
-
-            ObjectInfo bitstreamInfo = new ObjectInfo(doi);
+            ObjectInfo bitstreamInfo = new ObjectInfo(doi, idTimestamp);
             bitstreamInfo.setChecksum(checksumAlgorithm, checksum);
             bitstreamInfo.setSize(size);
             bitstreamInfo.setLastModified(lastModified);
             bitstreamInfo.setObjectFormat(format);
 
             try {
-                String xmlChecksum[] = getObjectChecksum(doi);
+                String xmlChecksum[] = getObjectChecksum(doi, idTimestamp);
                 bitstreamInfo.setXMLChecksum(xmlChecksum[0], xmlChecksum[1]);
             } catch (NotFoundException ex) {
                 log.error("Unable to find object to generate XML checksum", ex);
                 bitstreamInfo.setXMLChecksum(DEFAULT_CHECKSUM, DEFAULT_CHECKSUM_ALGO);
             }
             try {
-                long xmlSize = getObjectSize(doi);
+                long xmlSize = getObjectSize(doi, idTimestamp);
                 bitstreamInfo.setXMLSize(xmlSize);
             } catch (NotFoundException ex) {
                 log.error("Unable to find object to calculate XML size", ex);
@@ -455,15 +464,17 @@ public class ObjectManager implements Constants {
         return fileElementList;       
     }
 
+
+
     
-	public long getObjectSize(String aID)
+    public long getObjectSize(String aID, String idTimestamp)
 	throws NotFoundException, IOException, SQLException {
 	long size = 0;
 	Item item = getDSpaceItem(aID);
 
         if(aID.endsWith("/d1rem")) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            getResourceMap(aID, outputStream);
+            getResourceMap(aID, idTimestamp, outputStream);
             size = outputStream.size();
         } else if(aID.endsWith("/bitstream")) {
 	    size = getOrigBitstream(item).getSize();
@@ -579,7 +590,8 @@ public class ObjectManager implements Constants {
             queryBuilder.append("  bfr.mimetype AS format, "); 
             queryBuilder.append("  bit.checksum, "); 
             queryBuilder.append("  bit.checksum_algorithm, "); 
-            queryBuilder.append("  mv.text_value::timestamp AS date_available,  "); 
+            queryBuilder.append("  mv.text_value::timestamp AS date_available,  ");
+	    queryBuilder.append("  it.last_modified::timestamp AS last_modified, ");
             queryBuilder.append("  bit.size_bytes "); 
         }
         queryBuilder.append("FROM  "); 
@@ -655,7 +667,8 @@ public class ObjectManager implements Constants {
             queryBuilder.append("  count(*) AS total ");
         } else {
             queryBuilder.append("  md.text_value AS doi, ");
-            queryBuilder.append("  mv.text_value::timestamp AS date_available ");
+            queryBuilder.append("  mv.text_value::timestamp AS date_available, ");
+	    queryBuilder.append("  it.last_modified::timestamp AS last_modified ");
         }        
         queryBuilder.append("FROM ");
         queryBuilder.append("  item AS it ");
@@ -677,7 +690,6 @@ public class ObjectManager implements Constants {
             queryBuilder.append("  mv.text_value::timestamp > ? AND ");
             bindParameters.add(new java.sql.Date(fromDate.getTime()));
         }
-
 
         if(toDate != null) {
             log.info("Requested toDate: " + toDate);
@@ -817,7 +829,7 @@ public class ObjectManager implements Constants {
      * @throws SQLException If there was trouble interacting with DSpace
      * @throws IOException If there is trouble reading or writing data
      */
-    public String[] getObjectChecksum(String aID)
+    public String[] getObjectChecksum(String aID, String idTimestamp)
 	throws NotFoundException, SQLException, IOException {
 	Item item = getDSpaceItem(aID);
 	String checksumAlgo = "";
@@ -834,9 +846,9 @@ public class ObjectManager implements Constants {
 		StringBuffer hexString = new StringBuffer();
 		byte[] digest;
 		if(aID.endsWith("/d1rem")) {
-                    getResourceMap(aID, outputStream);
+                    getResourceMap(aID, idTimestamp, outputStream);
                 } else {
-                    getMetadataObject(aID, outputStream);
+                    getMetadataObject(aID, idTimestamp, outputStream);
                 }
 		md.update(outputStream.toByteArray());
 		checksumAlgo = DEFAULT_CHECKSUM_ALGO;
@@ -860,7 +872,7 @@ public class ObjectManager implements Constants {
     /**
      * Write a metadata object to the output stream.
      **/
-    public void getMetadataObject(String aID, OutputStream aOutputStream)
+    public void getMetadataObject(String aID, String idTimestamp, OutputStream aOutputStream)
 	throws IOException, SQLException, NotFoundException {
 	
 	log.debug("Retrieving metadata for " + aID);
@@ -913,10 +925,10 @@ public class ObjectManager implements Constants {
     /**
      * Write an ORE resource map to the output stream.
      **/
-    public void getResourceMap(String aID, OutputStream aOutputStream)
+    public void getResourceMap(String aID, String idTimestamp, OutputStream aOutputStream)
 	throws IOException, SQLException, NotFoundException {
 	
-	log.debug("Retrieving resource map for " + aID);
+	log.debug("Retrieving resource map for " + aID + idTimestamp);
 	
 	try {
 	    Item item = getDSpaceItem(aID);
@@ -944,19 +956,25 @@ public class ObjectManager implements Constants {
 	    
 	    // the ORE object's id
 	    Identifier resourceMapId = new Identifier();
-	    resourceMapId.setValue(doi + "/d1rem");
+	    resourceMapId.setValue(doi + "/d1rem" + idTimestamp);
 	    // the science metadata id
 	    Identifier dataPackageId = new Identifier();
-	    dataPackageId.setValue(doi);
+	    dataPackageId.setValue(doi + idTimestamp);
 	    // data file identifiers
 	    List<Identifier> dataIds = new ArrayList<Identifier>();
 	    for(int i=0; i < dataFiles.length; i++) {
-		String dataIdString  = normalizeDoi(dataFiles[i].value);
+		String dataFileIdString  = normalizeDoi(dataFiles[i].value);
+		String dataFileTimestamp = "";
+		if(idTimestamp.length() > 0) {
+		    // get the timestamp for this file
+		    Item fileItem = getDSpaceItem(aID);
+		    dataFileTimestamp = "/mdVer" + fileItem.getLastModified();
+		}
 		Identifier dataFileId = new Identifier();
-		dataFileId.setValue(dataIdString);
+		dataFileId.setValue(dataFileIdString + dataFileTimestamp);
 		dataIds.add(dataFileId);
 		Identifier dataFileBitstreamId = new Identifier();
-		dataFileBitstreamId.setValue(dataIdString + "/bitstream");
+		dataFileBitstreamId.setValue(dataFileIdString + "/bitstream");
 		dataIds.add(dataFileBitstreamId);
 	    }
 	    
