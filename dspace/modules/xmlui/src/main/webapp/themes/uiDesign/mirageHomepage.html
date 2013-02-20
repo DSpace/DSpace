@@ -54,12 +54,23 @@
         background-color: #fff;
         border: 1px solid #333;
         width: 625px;
-        height: 250px;
-        overflow: auto;
+        height: 200px;
+        overflow: visible;
     }
-    #dryad-home-carousel > div {
-        padding: 36px 36px 38px;
-        border: 1px dashed red;
+    #dryad-home-carousel div.bxslider {
+        overflow: visible;
+    }
+    #dryad-home-carousel div.bxslider div {
+        /* background-color: yellow; */
+        height: 175px;
+        padding: 0;
+        margin: 0;
+    }
+    #dryad-home-carousel div.bxslider div p {
+        /* padding: 36px 36px 38px; */
+        width: 480px;
+        margin: auto;
+        margin-top: 1em;
     }
 
 </style>
@@ -288,18 +299,20 @@
 <div id="ds-body">
 <div class="home-col-1">
     <div id="dryad-home-carousel" class="ds-static-div primary">
+      <div class="bxslider" style="">
         <div>
-            <p Xid="ds-dryad-is" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"><span style="color: #595;">Dryad</span> is a <span style="color: #363;">nonprofit organization</span> and an <span style="color: #242;">international repository</span> of data underlying scientific and medical publications.</p>
+            <p style="margin-top: 44px;" Xid="ds-dryad-is" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"><span style="color: #595;">Dryad</span> is a <span style="color: #363;">nonprofit organization</span> and an <span style="color: #242;">international repository</span> of data underlying scientific and medical publications.</p>
         </div>
         <div>
             <p>The scientific, educational, and charitable mission of Dryad is to promote the availability of data underlying findings in 
                 the scientific literature for research and educational reuse. </p>
         </div>
-        <div>
+        <div style="font-size: 0.85em; margin-top: 12px;">
             <p>The vision of Dryad is a scholarly communication system in which learned societies, publishers, institutions of research 
                 and education, funding bodies and other stakeholders collaboratively sustain and promote the preservation and reuse of data 
                 underlying the scholarly literature.</p>
         </div>
+      </div>
     </div>
 </div>
 <div class="home-col-2">
@@ -732,7 +745,11 @@ in collaboration with several <a href="#TODO">Partner Organizations</a>.
 <!-- carousel behavior (home page only?) -->
 <script type="text/javascript">
         $(document).ready(function() {
-            $('#dryad-home-carousel, .bxslider').bxSlider({
+            $('#dryad-home-carousel .bxslider').bxSlider({
+                auto: true,
+                pause: 5000,        // in ms
+                autoControls: true,
+                autoControlsCombine: true
             });
         });
            </script>
