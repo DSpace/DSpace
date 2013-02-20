@@ -22,7 +22,7 @@ public interface Constants {
 	
 	public static final String MN_NODE_NAME = "http://datadryad.org/mn/";
         
-        public static final String ORE_NAMESPACE = "http://www.openarchives.org/ore/terms/";
+        public static final String ORE_NAMESPACE = "http://www.openarchives.org/ore/terms";
 
 	// and related schemas...
 	public static final String XSD_LOCATION = "http://ns.dataone.org/service/types/v1 http://ns.dataone.org/service/types/v1";
