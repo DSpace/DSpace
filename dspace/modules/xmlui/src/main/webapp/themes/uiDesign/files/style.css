@@ -158,7 +158,7 @@ a, a:active, a:visited {
 
 #ds-footer {
     border-top: 3px solid #87C033;
-    padding-top: 10px;
+    padding: 4px 0;
     font-size: 93%;
     line-height: 1.6em;
 }
@@ -192,11 +192,18 @@ a, a:active, a:visited {
 
 #ds-footer-links {
     clear: left;
+    text-align: center;
 }
-
 .ie6 #ds-footer-links {
     display: inline;
 }
+#ds-footer-links a {
+    color: inherit;
+}
+#ds-footer-links a.discreet {
+    text-decoration: none;
+}
+
 
 /*make transparent PNGs invisible in IE6 until PNG-fix is applied*/
 .ie6 #ds-header-logo,
@@ -1154,16 +1161,6 @@ height: 100%;
 background-color: rgb(255, 255, 255);
 margin: 2px 2px 0px 2px;
 /* border: 1px solid rgb(240, 240, 210); */
-}
-
-/* homepage elements */
-
-#ds-dryad-is {
-    padding: 36px 36px 38px;
-    font-size: 23px;
-    font-weight: bold;
-    background-color: #fff;
-    border: 1px solid #333;
 }
 
 #main-menu {

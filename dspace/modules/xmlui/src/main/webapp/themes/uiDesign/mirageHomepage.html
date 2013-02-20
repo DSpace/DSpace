@@ -14,6 +14,7 @@
 <link type="text/css" rel="stylesheet" media="screen" href="files/jquery-ui-1.css">
 <link type="text/css" rel="stylesheet" media="screen" href="files/style.css">
 <link type="text/css" rel="stylesheet" media="screen" href="files/superfish.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/jquery.bxslider.css">
 <link type="text/css" rel="stylesheet" media="screen" href="files/authority-control.css">
 <link type="text/css" rel="stylesheet" media="handheld" href="files/handheld.css">
 <link type="text/css" rel="stylesheet" media="print" href="files/print.css">
@@ -21,6 +22,47 @@
 <link type="application/rss+xml" rel="alternate" href="/feed/rss_1.0/site" />
 <link type="application/rss+xml" rel="alternate" href="/feed/rss_2.0/site" />
 <link type="application/atom+xml" rel="alternate" href="/feed/atom_1.0/site" />
+<style type="text/css">
+    /* special style for Dryad homepage only */
+    #ds-body {
+        width: 100%;
+    }
+
+    /* implied 3 columns @300px width, 25px gutters */
+    .home-col-1 {
+        float: left;
+        width: 625px;
+        margin-left: 0;
+        /* margin-right: 25px;*/
+    }
+    .home-col-2 {
+        float: right;
+        width: 300px;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .home-top-row {
+        height: 220px;
+    }
+    .home-bottom-row {
+        height: 420px;
+    }
+
+    #dryad-home-carousel {
+        font-size: 23px;
+        font-weight: bold;
+        background-color: #fff;
+        border: 1px solid #333;
+        width: 625px;
+        height: 250px;
+        overflow: auto;
+    }
+    #dryad-home-carousel > div {
+        padding: 36px 36px 38px;
+        border: 1px dashed red;
+    }
+
+</style>
 <script type="text/javascript">
                                 //Clear default text of emty text areas on focus
                                 function tFocus(element)
@@ -244,37 +286,56 @@
 <div id="ds-content-wrapper">
 <div class="clearfix" id="ds-content">
 <div id="ds-body">
-<div id="file_news_div_news" class="ds-static-div primary">
-<p class="ds-paragraph">
-      
-		<p id="ds-dryad-is" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"><span style="color: #595;">Dryad</span> is a <span style="color: #363;">nonprofit organization</span> and an <span style="color: #242;">international repository</span> of data underlying scientific and medical publications.</p>
-<!--
-		<p>The scientific, educational, and charitable mission of Dryad is to promote the availability of data underlying findings in 
-			the scientific literature for research and educational reuse. </p>
-		<p>The vision of Dryad is a scholarly communication system in which learned societies, publishers, institutions of research 
-			and education, funding bodies and other stakeholders collaboratively sustain and promote the preservation and reuse of data 
-			underlying the scholarly literature.</p>
--->	
+<div class="home-col-1">
+    <div id="dryad-home-carousel" class="ds-static-div primary">
+        <div>
+            <p Xid="ds-dryad-is" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"><span style="color: #595;">Dryad</span> is a <span style="color: #363;">nonprofit organization</span> and an <span style="color: #242;">international repository</span> of data underlying scientific and medical publications.</p>
+        </div>
+        <div>
+            <p>The scientific, educational, and charitable mission of Dryad is to promote the availability of data underlying findings in 
+                the scientific literature for research and educational reuse. </p>
+        </div>
+        <div>
+            <p>The vision of Dryad is a scholarly communication system in which learned societies, publishers, institutions of research 
+                and education, funding bodies and other stakeholders collaboratively sustain and promote the preservation and reuse of data 
+                underlying the scholarly literature.</p>
+        </div>
+    </div>
 </div>
-<h1 class="ds-div-head">Deposit your data in dryad</h1>
-<div class="ds-static-div primary" id="file_news_div_news">
-<p class="ds-paragraph">
-<a class="submitnowbutton" href="/handle/10255/3/submit">Submit Data Now!</a>
-<a href="http://www.youtube.com/watch?v=RP33cl8tL28">See how to submit</a>
-</p>
+<div class="home-col-2">
+    <h1 class="ds-div-head ">Deposit your data in dryad</h1>
+    <div class="ds-static-div primary" id="file_news_div_news">
+    <p class="ds-paragraph">
+    <a class="submitnowbutton" href="/handle/10255/3/submit">Submit Data Now!</a>
+    <a href="http://www.youtube.com/watch?v=RP33cl8tL28">See how to submit</a>
+    </p>
+    </div>
 </div>
-<h1 class="ds-div-head">Search DSpace</h1>
-<form xmlns="http://di.tamu.edu/DRI/1.0/" onsubmit="javascript:tSubmit(this);" method="get" action="/discover" class="ds-interactive-div primary" id="aspect_discovery_SiteViewer_div_front-page-search">
-<p class="ds-paragraph">
-<p>
-<label for="aspect_discovery_SiteViewer_field_query" class="ds-form-label">Enter some text in the box below to search DSpace.</label>
-</p>
-<input value="" type="text" name="query" class="ds-text-field" id="aspect_discovery_SiteViewer_field_query" />
-<input value="Go" type="submit" name="submit" class="ds-button-field" id="aspect_discovery_SiteViewer_field_submit" />
-</p>
-</form>
-<div id="ds_connect_with_dryad">
-<h1 class="ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Connect with Dryad</h1>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </div>
+<div class="home-col-1">
+    <h1 class="ds-div-head">Search DSpace</h1>
+    <form xmlns="http://di.tamu.edu/DRI/1.0/" onsubmit="javascript:tSubmit(this);" method="get" action="/discover" class="ds-interactive-div primary" id="aspect_discovery_SiteViewer_div_front-page-search">
+    <p class="ds-paragraph">
+    <p>
+    <label for="aspect_discovery_SiteViewer_field_query" class="ds-form-label">Enter some text in the box below to search DSpace.</label>
+    </p>
+    <input value="" type="text" name="query" class="ds-text-field" id="aspect_discovery_SiteViewer_field_query" />
+    <input value="Go" type="submit" name="submit" class="ds-button-field" id="aspect_discovery_SiteViewer_field_submit" />
+    </p>
+    </form>
+</div>
+<div class="home-col-2">
+    <div id="ds_connect_with_dryad">
+        <h1 class="ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Connect with Dryad</h1>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit
+        amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est
+        hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean
+        vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus.
+        Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. 
+    </div>
+</div>
+
+<br/>
+
 <h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-div-head">Browse for Data</h1>
 <div class="ds-static-div primary" id="aspect_discovery_RecentlyAdded_div_Home">
 <h1 class="ds-div-head">Recently Published
@@ -522,6 +583,7 @@
 <p class="ds-paragraph">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </p>
 </div>
 </div>
+<!-- 
 <div id="ds-options-wrapper">
 <div id="ds-options">
 <h1 class="ds-option-set-head" id="ds-search-option-head">Search Dryad</h1>
@@ -597,6 +659,7 @@
 </div>
 </div>
 </div>
+END of #ds-options-wrapper -->
 
 
 
@@ -606,6 +669,7 @@
 </div>
 <div id="ds-footer-wrapper">
 <div id="ds-footer">
+<!--
 <div id="ds-footer-left">
 <a target="_blank" href="http://www.dspace.org/">DSpace software</a> copyright © 2002-2010  <a target="_blank" href="http://www.duraspace.org/">Duraspace</a>
 </div>
@@ -615,8 +679,12 @@
 <span id="ds-footer-logo"> </span>
 </a>
 </div>
+-->
 <div id="ds-footer-links">
-<a href="/contact">Contact Us</a> | <a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" href="/feedback">xmlui.dri2xhtml.structural.feedback-link</a>
+<a class="discreet" href="#TODO">Dryad Policies</a> &nbsp;|&nbsp; <a class="discreet" href="/contact">Contact Us</a> &nbsp;|&nbsp; <a class="discreet" href="#TODO">Version 1.11.2</a>
+<br/>
+Dryad is developed by the <a href="#TODO">National Evolutionary Synthesis Center</a> and <a href="#TODO">UNC Metadata Research Center</a>
+in collaboration with several <a href="#TODO">Partner Organizations</a>.
 </div>
 <a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="hidden" href="/htmlmap"> </a>
 </div>
@@ -631,6 +699,7 @@
 <script type="text/javascript" src="files/jquery.hoverIntent.js"></script>
 <script type="text/javascript" src="files/superfish.js"></script>
 <script type="text/javascript" src="files/supersubs.js"></script>
+<script type="text/javascript" src="files/jquery.bxslider.min.js"></script>
 <script type="text/javascript">
             runAfterJSImports.execute();
         </script>
@@ -645,6 +714,7 @@
                        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
                    })();
            </script>
+
 <!-- main menu behavior -->
 <script type="text/javascript">
         $(document).ready(function() {
@@ -656,6 +726,14 @@
                     extraWidth: 1
                 })
                 .superfish();
+        });
+           </script>
+
+<!-- carousel behavior (home page only?) -->
+<script type="text/javascript">
+        $(document).ready(function() {
+            $('#dryad-home-carousel, .bxslider').bxSlider({
+            });
         });
            </script>
 </body></html>
