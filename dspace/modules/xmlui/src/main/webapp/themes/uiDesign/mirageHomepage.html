@@ -27,6 +27,18 @@
     #ds-body {
         width: 100%;
     }
+    .labelcell {
+        font-weight: bold;
+    }
+    .datacell {
+        text-align: right;
+    }
+    .ds-div-head a {
+        font-size: 0.7em;
+        font-weight: normal;
+        position: relative;
+        top: -0.1em;
+    }
 
     /* implied 3 columns @300px width, 25px gutters */
     .home-col-1 {
@@ -315,29 +327,25 @@
     </div>
 </div>
 <div class="home-col-2">
-    <h1 class="ds-div-head ">Deposit your data in dryad</h1>
-    <div class="ds-static-div primary" id="file_news_div_news" style="height: 167px;">
-    <p class="ds-paragraph">
+    <h1 class="ds-div-head " style="border-bottom: none; text-align: center; padding: 50px 45px 0; height: 50px;">Deposit your data in dryad</h1></h1>
+    <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
+    <p class="ds-paragraph" style="text-align: center; font-size: 1.2em; margin: 0.5em 0 1.5em;">
     <a class="submitnowbutton" href="/handle/10255/3/submit">Submit Data Now!</a>
-    <a href="http://www.youtube.com/watch?v=RP33cl8tL28">See how to submit</a>
     </p>
+    <a style="float: right; margin-right: 18px;" href="http://www.youtube.com/watch?v=RP33cl8tL28">See how to submit</a>
     </div>
 </div>
 <div class="home-col-1">
-    <h1 class="ds-div-head">Search DSpace</h1>
+    <h1 class="ds-div-head">Search for Data &nbsp; &nbsp; <a href="#">Browse authors</a> &nbsp; &nbsp; <a href="#">Browse journals</a></h1>
     <form xmlns="http://di.tamu.edu/DRI/1.0/" onsubmit="javascript:tSubmit(this);" method="get" action="/discover" class="ds-interactive-div primary" id="aspect_discovery_SiteViewer_div_front-page-search"
-          style="height: 70px;">
-    <p class="ds-paragraph">
-    <label for="aspect_discovery_SiteViewer_field_query" class="ds-form-label">Enter some text in the box below to search DSpace.</label>
-    </p>
-    <input value="" type="text" name="query" class="ds-text-field" id="aspect_discovery_SiteViewer_field_query" />
-    <input value="Go" type="submit" name="submit" class="ds-button-field" id="aspect_discovery_SiteViewer_field_submit" />
-    </p>
+          style="height: 40px; text-align: center;">
+        <input value="Search for data in Dryad" type="text" name="query" class="ds-text-field" style="width: 450px;" id="aspect_discovery_SiteViewer_field_query" />
+        <input value="Go" type="submit" name="submit" class="ds-button-field" id="aspect_discovery_SiteViewer_field_submit" />
     </form>
 </div>
 <div class="home-col-2">
     <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Connect with Dryad</h1>
-    <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 450px;">
+    <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 490px;">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit
         amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est
         hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean
@@ -348,10 +356,11 @@
 
 <div class="home-col-1">
     <h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-div-head">Browse for Data</h1>
-    <div class="ds-static-div primary" id="aspect_discovery_RecentlyAdded_div_Home" style="height: 500px; overflow: hidden;">
+    <div class="ds-static-div primary" id="aspect_discovery_RecentlyAdded_div_Home" style="height: 530px; overflow: hidden;">
+
     <h1 class="ds-div-head">Recently Published
             Data  <a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" href="/feed/atom_1.0/10255/3" title="Web feed of data packages recently added to Dryad">
-    <img src="/themes/Dryad/images/rss.jpg" style="border: 0px;" />
+    <img src="files/images/rss.jpg" style="border: 0px;" />
     </a>
 	</h1>
     <div id="aspect_discovery_SiteRecentSubmissions_div_site-recent-submission" class="ds-static-div secondary recent-submission">
@@ -516,14 +525,17 @@
 </div>
 <div class="home-col-2">
     <h1 class="ds-div-head">Dryad Mailing List</h1>
-    <div class="ds-static-div primary" id="file_news_div_mailing_list" style="height: 120px;">
-    <p class="ds-paragraph">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat.</p>
-    </div>
+    <form xmlns="http://di.tamu.edu/DRI/1.0/" onsubmit="javascript:tSubmit(this);" method="get" action="#TODO" class="ds-interactive-div primary"
+          style="height: 80px; text-align: center;">
+        <p class="ds-paragraph" style="text-align: left;">Join {2,510} other subscribers!</p>
+        <input value="Your e-mail" type="text" name="query" class="ds-text-field" style="width: 180px;" id="" />
+        <input value="Subscribe" type="submit" name="submit" class="ds-button-field" id="" />
+    </form>
 </div>
 
 <div class="home-col-2" style="clear: both; margin-left: 25px;">
     <h1 class="ds-div-head">Recently Integrated Journals</h1>
-    <div class="ds-static-div primary" id="file_news_div_recently_integrated_journal" style="height: 300px;">
+    <div class="ds-static-div" id="file_news_div_recently_integrated_journal" style="height: 300px;">
     <p class="ds-paragraph">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </p>
     </div>
 </div>
@@ -532,51 +544,32 @@
     <div class="Xds-static-div Xprimary repository" id="aspect_statistics_StatisticsTransformer_div_home">
         <h1 class="ds-div-head">Dryad Statistics</h1>
         <div xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-static-div secondary stats" id="aspect_statistics_StatisticsTransformer_div_stats" style="height: 300px;">
-        <h2 class="ds-table-head">Total Visits</h2>
+        <!--<h2 class="ds-table-head">Total Visits</h2>-->
         <table class="ds-table tableWithTitle" id="aspect_statistics_StatisticsTransformer_table_list-table">
         <tr class="ds-table-row odd">
-        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_" />
-        <td class="ds-table-cell even labelcell" id="aspect_statistics_StatisticsTransformer_cell_">Views</td>
+        <td class="ds-table-cell odd labelcell" width="120" id="aspect_statistics_StatisticsTransformer_cell_" />
+        <td class="ds-table-cell even labelcell" width="*" align="right" id="aspect_statistics_StatisticsTransformer_cell_">Total</td>
+        <td class="ds-table-cell odd labelcell" width="100" align="right" id="aspect_statistics_StatisticsTransformer_cell_">Past 30 days</td>
         </tr>
         <tr class="ds-table-row even">
-        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_01">Data from: IDENTIFIER TEST</td>
-        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_02">23</td>
+        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_01">Data packages</td>
+        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_02">987</td>
+        <td class="ds-table-cell odd datacell" id="aspect_statistics_StatisticsTransformer_cell_03">123</td>
         </tr>
         <tr class="ds-table-row odd">
-        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_11">Data from: CHECK</td>
-        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_12">14</td>
+        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_11">Data files</td>
+        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_12">2987</td>
+        <td class="ds-table-cell odd datacell" id="aspect_statistics_StatisticsTransformer_cell_13">2123</td>
         </tr>
         <tr class="ds-table-row even">
-        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_21">Data from: Mini_deletion_revert</td>
-        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_22">11</td>
+        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_21">Journals</td>
+        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_22">102</td>
+        <td class="ds-table-cell odd datacell" id="aspect_statistics_StatisticsTransformer_cell_23">12</td>
         </tr>
         <tr class="ds-table-row odd">
-        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_31">4651</td>
-        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_32">9</td>
-        </tr>
-        <tr class="ds-table-row even">
-        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_41">Canada</td>
-        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_42">9</td>
-        </tr>
-        <tr class="ds-table-row odd">
-        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_51">South Korea</td>
-        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_52">9</td>
-        </tr>
-        <tr class="ds-table-row even">
-        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_61">Data from: Test  duplicate</td>
-        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_62">9</td>
-        </tr>
-        <tr class="ds-table-row odd">
-        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_71">Data from: Metadata version</td>
-        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_72">8</td>
-        </tr>
-        <tr class="ds-table-row even">
-        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_81">Data from: Test delete version -1</td>
-        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_82">8</td>
-        </tr>
-        <tr class="ds-table-row odd">
-        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_91">Data from: 00005</td>
-        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_92">7</td>
+        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_31">Downloads</td>
+        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_32">20123</td>
+        <td class="ds-table-cell odd datacell" id="aspect_statistics_StatisticsTransformer_cell_33">999</td>
         </tr>
         </table>
         </div>
@@ -705,10 +698,17 @@ END of #ds-options-wrapper -->
 </div>
 -->
 <div id="ds-footer-links">
-<a class="discreet" href="#TODO">Dryad Policies</a> &nbsp;|&nbsp; <a class="discreet" href="/contact">Contact Us</a> &nbsp;|&nbsp; <a class="discreet" href="#TODO">Version 1.11.2</a>
-<br/>
-Dryad is developed by the <a href="#TODO">National Evolutionary Synthesis Center</a> and <a href="#TODO">UNC Metadata Research Center</a>
-in collaboration with several <a href="#TODO">Partner Organizations</a>.
+
+    <span style="float: right;">
+        <a href="#TODO">Dryad Policies</a> 
+        &nbsp;<span style="color: #777;">|</span>&nbsp; 
+        <a href="/contact">Contact Us</a> 
+    </span>
+    <span style="float: left;">
+        Dryad is a nonprofit membership organization.
+    </span>
+    <p class="build-info">Dryad built on Tue, 19 Feb 2013 07:48:02 EST served by North Carolina State University</p>
+    <!--Git Commit Hash: 1791a030d671f4e6959e0913857f304fb67b1c9c-->
 </div>
 <a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="hidden" href="/htmlmap"> </a>
 </div>

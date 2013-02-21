@@ -102,6 +102,7 @@ a, a:active, a:visited {
 }
 
 #ds-trail-wrapper {
+    display: none;
     background-color: transparent;
     margin: 0;
     padding: 0;
@@ -153,7 +154,9 @@ a, a:active, a:visited {
 }
 
 #ds-footer-wrapper {
-    margin-top: 40px;
+    margin-top: 25px;
+    margin-bottom: 5px;
+    overflow: hidden;
 }
 
 #ds-footer {
@@ -200,8 +203,14 @@ a, a:active, a:visited {
 #ds-footer-links a {
     color: inherit;
 }
-#ds-footer-links a.discreet {
+a.discreet {
     text-decoration: none;
+}
+#ds-footer .build-info {
+    clear: both; 
+    text-align: right;
+    color: #777; 
+    margin-bottom: 0px;
 }
 
 
@@ -215,13 +224,13 @@ a, a:active, a:visited {
 #ds-body {
     float: left;
     width: 675px;
-    padding-top: 10px;
+    padding-top: 12px;
 }
 
 #ds-options-wrapper {
     float: right;
     width: 249px;
-    padding-top:10px;
+    padding-top:12px;
 }
 
 #ds-options {
@@ -1191,7 +1200,8 @@ margin: 2px 2px 0px 2px;
     right: 0px;
 }
 
-#login-item, #sign-up-item {
+#login-item, #sign-up-item,
+.submitnowbutton {
     margin: 0 8px;
     padding: 0.2em 0;
     -webkit-border-top-left-radius: 5px;
@@ -1222,4 +1232,15 @@ margin: 2px 2px 0px 2px;
 #login-item a, #sign-up-item a {
     margin-top: 0.2em;
     padding: 0.4em 0.8em;
+}
+a.submitnowbutton {
+    background-color: #87C033;
+    color: #333;
+    text-decoration: none;
+    margin-top: 0.2em;
+    padding: 0.4em 0.8em;
+}
+a.submitnowbutton:hover {
+    background-color: #ccc;
+    color: #333;
 }
