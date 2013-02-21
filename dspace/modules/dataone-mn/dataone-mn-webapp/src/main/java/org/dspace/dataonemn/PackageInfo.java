@@ -43,7 +43,11 @@ public class PackageInfo implements Constants {
 	// create objects and set identifiers
 	String baseID = getIdentifier();
 	ObjectInfo metadataElem = new ObjectInfo(baseID, idTimestamp);
-	ObjectInfo resourceMapElem = new ObjectInfo(baseID + "/d1rem", idTimestamp);
+	String idRemTimestamp = "";
+	if(idTimestamp.length() > 0) {
+	    idRemTimestamp = "&" + idTimestamp.substring(1);
+	}
+	ObjectInfo resourceMapElem = new ObjectInfo(baseID + "?format=d1rem", idRemTimestamp);
         metadataElem.setObjectFormat(DRYAD_NAMESPACE);
         resourceMapElem.setObjectFormat(ORE_NAMESPACE);
         if(getXmlChecksum() != null && getXmlChecksumAlgo() != null) {

@@ -246,12 +246,14 @@ public class ObjectManager implements Constants {
             TableRow tr = iterator.next();
             String doi = tr.getStringColumn("doi");
 	    String idTimestamp = "";
+	    String idRemTimestamp = "";
             Date dateAvailable = tr.getDateColumn("date_available");
 	    Date lastModifiedDate = tr.getDateColumn("last_modified");
             String lastModified = dateFormatter.format(lastModifiedDate);
 
 	    if(useTimestamps) {
 		idTimestamp =  "?ver=" + lastModified;
+		idRemTimestamp = "&" + idTimestamp.substring(1);
 	    }
 
 	    log.debug("timestamps=" + useTimestamps + ", idTimestamp=" + idTimestamp);
@@ -273,11 +275,11 @@ public class ObjectManager implements Constants {
             }
             
             try {
-                String resourceMapChecksum[] = getObjectChecksum(doi + "/d1rem", idTimestamp);
+                String resourceMapChecksum[] = getObjectChecksum(doi + "?format=d1rem", idRemTimestamp);
                 packageInfo.setResourceMapChecksum(resourceMapChecksum[0]);
                 packageInfo.setResourceMapChecksumAlgo(resourceMapChecksum[1]);
             } catch (NotFoundException ex) {
-                log.error("Error getting checksum for " + doi + "/d1rem" + idTimestamp, ex);
+                log.error("Error getting checksum for " + doi + "?format=d1rem" + idRemTimestamp, ex);
                 packageInfo.setResourceMapChecksum(DEFAULT_CHECKSUM);
                 packageInfo.setResourceMapChecksumAlgo(DEFAULT_CHECKSUM_ALGO);
             }
@@ -289,10 +291,10 @@ public class ObjectManager implements Constants {
                 log.error("Error getting size for " + doi + idTimestamp, ex);
             }
             try {
-                long resourceMapSize = getObjectSize(doi + "/d1rem", idTimestamp);
+                long resourceMapSize = getObjectSize(doi + "?format=d1rem", idRemTimestamp);
                 packageInfo.setResourceMapSize(resourceMapSize);
             } catch (NotFoundException ex) {
-                log.error("Error getting size for " + doi + "/d1rem" + idTimestamp, ex);
+                log.error("Error getting size for " + doi + "?format=d1rem" + idRemTimestamp, ex);
             }
 
             nu.xom.Element[] infoElements = packageInfo.createInfoElements();
@@ -472,7 +474,7 @@ public class ObjectManager implements Constants {
 	long size = 0;
 	Item item = getDSpaceItem(aID);
 
-        if(aID.endsWith("/d1rem")) {
+        if(aID.contains("format=d1rem")) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             getResourceMap(aID, idTimestamp, outputStream);
             size = outputStream.size();
@@ -727,8 +729,8 @@ public class ObjectManager implements Constants {
 		String shortID = aID.substring(0,bitsIndex);
 		aID = shortID;
 	    }
-	    if(aID.endsWith("/d1rem")) {
-		int bitsIndex = aID.indexOf("/d1rem");
+	    if(aID.contains("?format=d1rem")) {
+		int bitsIndex = aID.indexOf("?format=d1rem");
 		String shortID = aID.substring(0,bitsIndex);
 		aID = shortID;
 	    }
@@ -845,7 +847,7 @@ public class ObjectManager implements Constants {
 		MessageDigest md = MessageDigest.getInstance(DEFAULT_CHECKSUM_ALGO);
 		StringBuffer hexString = new StringBuffer();
 		byte[] digest;
-		if(aID.endsWith("/d1rem")) {
+		if(aID.contains("?format=d1rem")) {
                     getResourceMap(aID, idTimestamp, outputStream);
                 } else {
                     getMetadataObject(aID, idTimestamp, outputStream);
@@ -956,7 +958,7 @@ public class ObjectManager implements Constants {
 	    
 	    // the ORE object's id
 	    Identifier resourceMapId = new Identifier();
-	    resourceMapId.setValue(doi + "/d1rem" + idTimestamp);
+	    resourceMapId.setValue(doi + "?format=d1rem" + idTimestamp);
 	    // the science metadata id
 	    Identifier dataPackageId = new Identifier();
 	    dataPackageId.setValue(doi + idTimestamp);
@@ -968,7 +970,7 @@ public class ObjectManager implements Constants {
 		if(idTimestamp.length() > 0) {
 		    // get the timestamp for this file
 		    Item fileItem = getDSpaceItem(aID);
-		    dataFileTimestamp = "/mdVer" + fileItem.getLastModified();
+		    dataFileTimestamp = "&ver=" + fileItem.getLastModified();
 		}
 		Identifier dataFileId = new Identifier();
 		dataFileId.setValue(dataFileIdString + dataFileTimestamp);

@@ -550,7 +550,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 		fileName = bitstream.getName();
 		response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName);
 		objManager.writeBitstream(bitstream.retrieve(), response.getOutputStream());	
-	    } else if(id.endsWith("/d1rem")) {
+	    } else if(id.contains("format=d1rem")) {
 		// return a (dataONE format) resource map
 		response.setContentType(RDF_CONTENT_TYPE);
 
