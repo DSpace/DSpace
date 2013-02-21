@@ -1225,6 +1225,7 @@ margin: 2px 2px 0px 2px;
 }
 #sign-up-item {
     background-color: #ccc;
+    margin-right: 0px;
 }
 #sign-up-item:hover, #sign-up-item a:hover {
     background-color: #fff;
@@ -1244,3 +1245,13 @@ a.submitnowbutton:hover {
     background-color: #ccc;
     color: #333;
 }
+#sharing-tools {
+    float: right;
+    text-align: right;
+    padding-top: 22px;
+}
+#sharing-tools a {
+    display: inline-block;
+    margin-left: 6px;
+}
+
