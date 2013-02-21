@@ -501,7 +501,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	// other random info
 	pw.write("<ping success=\"true\"/>\n" +
 		 "<subject>CN=urn:node:DRYAD, DC=dataone, DC=org</subject>\n" +
-		 "<contactSubject>CN=Ryan Scherle, DC=datadryad, DC=org</contactSubject>\n");
+		 "<contactSubject>CN=Ryan Scherle A281,O=Duke University,C=US,DC=cilogon,DC=org</contactSubject>\n");
 
 	// close xml
 	pw.write("</d1:node>\n");
