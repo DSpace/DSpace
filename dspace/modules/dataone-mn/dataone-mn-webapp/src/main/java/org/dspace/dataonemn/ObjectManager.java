@@ -49,7 +49,7 @@ import org.jdom.input.SAXBuilder;
 public class ObjectManager implements Constants {
     
     private static final Logger log = Logger.getLogger(ObjectManager.class);
-    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZ");
     public static final int DEFAULT_START = 0;
     public static final int DEFAULT_COUNT = 20;
     
@@ -718,6 +718,11 @@ public class ObjectManager implements Constants {
     **/
     public Item getDSpaceItem(String aID) throws IOException, SQLException, NotFoundException {
 	log.debug("Retrieving DSpace item " + aID);
+
+	// correct for systems that accidentally remove the second slash of the identifier
+	if(aID.startsWith("http:/d")) {
+	    aID = "http://d" + aID.substring("http:/d".length());
+	}
 	
 	DOIIdentifierProvider doiService = new DSpace().getSingletonService(DOIIdentifierProvider.class);
 	Item item = null;
@@ -930,7 +935,7 @@ public class ObjectManager implements Constants {
     public void getResourceMap(String aID, String idTimestamp, OutputStream aOutputStream)
 	throws IOException, SQLException, NotFoundException {
 	
-	log.debug("Retrieving resource map for " + aID + idTimestamp);
+	log.debug("Retrieving resource map for " + aID + " with timestamp " + idTimestamp);
 	
 	try {
 	    Item item = getDSpaceItem(aID);
@@ -953,7 +958,6 @@ public class ObjectManager implements Constants {
 	    // DataFiles
 	    DCValue[] dataFiles = item.getMetadata("dc.relation.haspart");
 	    
-
 	    ////////// generate a resource map
 	    
 	    // the ORE object's id
@@ -970,7 +974,9 @@ public class ObjectManager implements Constants {
 		if(idTimestamp.length() > 0) {
 		    // get the timestamp for this file
 		    Item fileItem = getDSpaceItem(aID);
-		    dataFileTimestamp = "&ver=" + fileItem.getLastModified();
+		    Date fileModDate = fileItem.getLastModified();
+		    String fileModString = dateFormatter.format(fileModDate);
+		    dataFileTimestamp = "?ver=" + fileModString;
 		}
 		Identifier dataFileId = new Identifier();
 		dataFileId.setValue(dataFileIdString + dataFileTimestamp);
@@ -986,7 +992,8 @@ public class ObjectManager implements Constants {
 	    // generate the resource map
 	    ResourceMapFactory rmf = ResourceMapFactory.getInstance();
 	    ResourceMap resourceMap = rmf.createResourceMap(resourceMapId, idMap);
-            resourceMap.setModified(item.getLastModified());
+	    Date itemModDate = item.getLastModified();
+	    resourceMap.setModified(itemModDate);
 
 	    // serialize it as RDF/XML
 	    String rdfXml = ResourceMapFactory.getInstance().serializeResourceMap(resourceMap);

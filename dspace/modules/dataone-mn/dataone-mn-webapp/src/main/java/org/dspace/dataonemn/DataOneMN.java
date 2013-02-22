@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 
@@ -56,7 +57,7 @@ public class DataOneMN extends HttpServlet implements Constants {
     private static final String RDF_CONTENT_TYPE = "application/rdf+xml; charset=UTF-8";
     private static final String TEXT_XML_CONTENT_TYPE = "text/xml; charset=UTF-8";
     private static final int DATA_FILE_COLLECTION = 1;
-    
+    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZ");    
     
     private String myFiles;
     private String myPackages;
@@ -527,8 +528,8 @@ public class DataOneMN extends HttpServlet implements Constants {
  	    // perform corrections for timestamped IDs
 	    // If we receive a timestamped ID, we will produce metadata records that contain timestamped IDs.
 	    // Timestamps are always at the end of the identifier
-	    if (id.contains("/mdVer")) {
-		int timeIndex = id.indexOf("/mdVer");
+	    if (id.contains("ver=")) {
+		int timeIndex = id.indexOf("ver=") - 1;
 		idTimestamp = id.substring(timeIndex);
 		id = id.substring(0,timeIndex);
 	    }
@@ -620,8 +621,8 @@ public class DataOneMN extends HttpServlet implements Constants {
 	// perform corrections for timestamped IDs
 	// If we receive a timestamped ID, we will produce metadata records that contain timestamped IDs.
 	// Timestamps are always at the end of the identifier
-	if (id.contains("/mdVer")) {
-	    int timeIndex = id.indexOf("/mdVer");
+	if (id.contains("ver=")) {
+	    int timeIndex = id.indexOf("ver=") - 1;
 	    idTimestamp = id.substring(timeIndex);
 	    id = id.substring(0,timeIndex);
 	}	
@@ -647,7 +648,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	        accDateString = null;
 	    }
 	    Date date = item.getLastModified();
-	    String lastMod = DataOneLogger.convertDate(date)+'Z'; // The converter in the logger object seems to do it right
+	    String lastMod = dateFormatter.format(date);
 	   
 	    if (id.endsWith("/bitstream")) {
 		//build sysmeta for a bistream
@@ -740,8 +741,8 @@ public class DataOneMN extends HttpServlet implements Constants {
 	// perform corrections for timestamped IDs
 	// If we receive a timestamped ID, we will produce metadata records that contain timestamped IDs.
 	// Timestamps are always at the end of the identifier
-	if (id.contains("/mdVer")) {
-	    int timeIndex = id.indexOf("/mdVer");
+	if (id.contains("ver=")) {
+	    int timeIndex = id.indexOf("ver=") - 1;
 	    idTimestamp = id.substring(timeIndex);
 	    id = id.substring(0,timeIndex);
 	}
@@ -835,8 +836,8 @@ public class DataOneMN extends HttpServlet implements Constants {
 	// perform corrections for timestamped IDs
 	// If we receive a timestamped ID, we will produce metadata records that contain timestamped IDs.
 	// Timestamps are always at the end of the identifier
-	if (id.contains("/mdVer")) {
-	    int timeIndex = id.indexOf("/mdVer");
+	if (id.contains("ver=")) {
+	    int timeIndex = id.indexOf("ver=") - 1;
 	    idTimestamp = id.substring(timeIndex);
 	    id = id.substring(0,timeIndex);
 	}
@@ -939,8 +940,8 @@ public class DataOneMN extends HttpServlet implements Constants {
 	// perform corrections for timestamped IDs
 	// If we receive a timestamped ID, we will produce metadata records that contain timestamped IDs.
 	// Timestamps are always at the end of the identifier
-	if (id.contains("/mdVer")) {
-	    int timeIndex = id.indexOf("/mdVer");
+	if (id.contains("ver=")) {
+	    int timeIndex = id.indexOf("ver=") - 1;
 	    idTimestamp = id.substring(timeIndex);
 	    id = id.substring(0,timeIndex);
 	}	
