@@ -2795,4 +2795,14 @@ public class Item extends DSpaceObject
             return null;
         }
     }
+
+   public static ItemIterator findByLastModifiedGreaterThan(Context context, Date lastGenerateDate) throws SQLException{
+
+       String myQuery = "SELECT * FROM item WHERE in_archive=true and withdrawn=false and  last_Modified >= ?";
+
+       java.sql.Timestamp ts = new java.sql.Timestamp(lastGenerateDate.getTime());
+       TableRowIterator rows = DatabaseManager.queryTable(context, "item", myQuery, ts);
+
+       return new ItemIterator(context, rows);
+   }
 }

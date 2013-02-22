@@ -19,7 +19,9 @@ import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -109,7 +111,11 @@ public class GenerateSitemaps
         // Note the negation (CLI options indicate NOT to generate a sitemap)
         if (!line.hasOption('b') || !line.hasOption('s'))
         {
+            try{
             generateSitemaps(!line.hasOption('b'), !line.hasOption('s'));
+            }catch(Exception e){
+                              System.out.print("\ngenerate site map:"+e.getMessage()+"\n");
+            }
         }
 
         if (line.hasOption('a'))
@@ -149,6 +155,9 @@ public class GenerateSitemaps
     public static void generateSitemaps(boolean makeHTMLMap,
                                         boolean makeSitemapOrg) throws SQLException, IOException
     {
+
+
+        try{
         String sitemapStem = ConfigurationManager.getProperty("dspace.url")
                 + "/sitemap";
         String htmlMapStem = ConfigurationManager.getProperty("dspace.url")
@@ -179,94 +188,69 @@ public class GenerateSitemaps
 
             lastGererateDate= getLastTimeStamp(sitemapsOrg,outputDir);
         }
-
-
-
         Context c = new Context();
 
-        Community[] comms = Community.findAll(c);
+        boolean fileOpen=false;
+        boolean fileOpenSiteMap=false;
 
-//        for (int i = 0; i < comms.length; i++)
-//        {
-//            String url = handleURLStem + comms[i].getHandle();
-//
-//            if (makeHTMLMap)
-//            {
-//                html.addURL(url, null);
-//            }
-//            if (makeSitemapOrg)
-//            {
-//                sitemapsOrg.addURL(url, null);
-//            }
-//        }
-//
-        Collection[] colls = Collection.findAll(c);
-//
-//        for (int i = 0; i < colls.length; i++)
-//        {
-//            String url = handleURLStem + colls[i].getHandle();
-//
-//            if (makeHTMLMap)
-//            {
-//                html.addURL(url, null);
-//            }
-//            if (makeSitemapOrg)
-//            {
-//                sitemapsOrg.addURL(url, null);
-//            }
-//        }
-
-        ItemIterator allItems = Item.findAll(c);
+        ItemIterator allItems = null;
+        if(lastGererateDate==null)
+            allItems=Item.findAll(c);
+        else
+            allItems = Item.findByLastModifiedGreaterThan(c,lastGererateDate);
         try
         {
             int itemCount = 0;
 
+            List<Item> modifiedDP = new ArrayList<Item>();
+            Item i = null;
             while (allItems.hasNext())
             {
-                Item i = allItems.next();
-                String url = handleURLStem + i.getHandle();
-                Date lastMod = i.getLastModified();
-                Boolean modified = false;
                 try{
-                if(i.isArchived()&&i.getOwningCollection().getHandle().equals(myDataPkgColl)) {
-                    modified = checkModification(c,i,lastGererateDate);
-                }
-                }
-                catch (Exception e){
-                                  System.out.print("check:"+e.getMessage()+i.getHandle());
-                }
-                //item modified after the last generate date
-                if(modified){
-                    if (makeHTMLMap)
-                    {
-                        html.addURL(url, lastMod);
-                    }
-                    if (makeSitemapOrg)
-                    {
-                        sitemapsOrg.addURL(url, lastMod);
-                    }
-                    i.decache();
+                    i = allItems.next();
 
-                    itemCount++;
+                    Item dataPackage=i;
+
+                        if(!i.getOwningCollection().getHandle().equals(myDataPkgColl)) {
+                            dataPackage=DryadWorkflowUtils.getDataPackage(c, i);
+                        }
+
+                    String url = handleURLStem + dataPackage.getHandle();
+                    if(!modifiedDP.contains(dataPackage)){
+                        if (makeHTMLMap)
+                        {
+                            html.addURL(url, null);
+                            fileOpen=true;
+                        }
+                        if (makeSitemapOrg)
+                        {
+                            sitemapsOrg.addURL(url, null);
+                            fileOpenSiteMap=true;
+                        }
+                        modifiedDP.add(dataPackage);
+                    }
+                }catch (Exception ex){
+                    // if some items are not consistent just go ahead...
+                    System.out.println("Item : " + i.getID() + " - " + i.getHandle() + ": not processed.");
                 }
             }
 
             if (makeHTMLMap)
             {
-                int files = html.finish();
-                log.info(LogManager.getHeader(c, "write_sitemap",
-                        "type=html,num_files=" + files + ",communities="
-                                + comms.length + ",collections=" + colls.length
-                                + ",items=" + itemCount));
+                if(fileOpen){
+                    int files = html.finish();
+                    log.info(LogManager.getHeader(c, "write_sitemap",
+                            "type=html,num_files=" + files));
+                }
             }
 
             if (makeSitemapOrg)
             {
-                int files = sitemapsOrg.finish();
-                log.info(LogManager.getHeader(c, "write_sitemap",
-                        "type=html,num_files=" + files + ",communities="
-                                + comms.length + ",collections=" + colls.length
-                                + ",items=" + itemCount));
+                if(fileOpenSiteMap){
+                    int files = sitemapsOrg.finish();
+                    log.info(LogManager.getHeader(c, "write_sitemap",
+                            "type=html,num_files=" + files));
+                }
             }
         }
         finally
@@ -278,6 +262,9 @@ public class GenerateSitemaps
         }
 
         c.abort();
+        }catch (Exception ex){
+            ex.printStackTrace(System.out);
+        }
     }
 
     /**
@@ -442,6 +429,10 @@ public class GenerateSitemaps
                     ////check the items files belong to this package item (embargo and modified)
 
                     Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, i);
+                    if(dataFiles.length>0)
+                    {
+                        System.out.print(dataFiles.length+"here\n");
+                    }
                     for(Item dataFile:dataFiles)
                     {
                         if(dataFile.isArchived()){
