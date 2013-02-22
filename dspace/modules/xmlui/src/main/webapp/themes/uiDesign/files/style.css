@@ -240,7 +240,7 @@ a.discreet {
 h1.ds-option-set-head,
 .ds-div-head {
     background-color: #fff;
-    padding: 5px 10px 2px;
+    padding: 7px 12px 2px;
     border: 1px solid #666666;
     border-bottom: 1px solid #ccc;
 }
@@ -270,7 +270,7 @@ h1.ds-option-set-head {
 div.ds-option-set {
     background-color: #fff;
     border: 1px solid #666666;
-    padding: 8px 10px;
+    padding: 8px 12px;
 }
 .ds-div-head + .ds-static-div,
 .ds-div-head + .ds-interactive-div,
@@ -1255,3 +1255,35 @@ a.submitnowbutton:hover {
     margin-left: 6px;
 }
 
+#browse-data-buttons {
+    padding-top: 8px;
+    padding-bottom: 18px;
+}
+#browse-data-buttons a {
+    background-color: #ccc;
+    color: #333;
+    text-decoration: none;
+    margin-right: 90px;
+    padding: 0.4em 0.8em;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-bottomright: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+#browse-data-buttons a:hover {
+    background-color: #999;
+}
+#browse-data-buttons a.selected {
+    background-color: #87C033;
+}
+.browse-data-panel h1.ds-div-head {
+    font-size: 120%;
+}
