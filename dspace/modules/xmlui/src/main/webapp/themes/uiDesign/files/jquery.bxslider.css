@@ -21,7 +21,7 @@
 	*zoom: 1;
 }
 
-.bx-wrapper img {
+.bx-wrapper > img {
 	width: 100%;
 	display: block;
 }
