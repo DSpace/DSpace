@@ -27,5 +27,4 @@ public interface Constants {
 	// and related schemas...
 	public static final String XSD_LOCATION = "http://ns.dataone.org/service/types/v1 http://ns.dataone.org/service/types/v1";
 	
-	public static final String DRYAD_NODE_IDENTIFIER = "urn:node:DRYAD";
 }

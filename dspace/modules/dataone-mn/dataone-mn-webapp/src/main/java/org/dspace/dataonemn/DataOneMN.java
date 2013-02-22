@@ -61,6 +61,8 @@ public class DataOneMN extends HttpServlet implements Constants {
     
     private String myFiles;
     private String myPackages;
+    private String d1NodeID;
+    private String d1contact;
 
     private DataOneLogger myRequestLogger;
     
@@ -211,7 +213,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	}
 	subjectBuff.append("DC=dataone, DC=org");
 	le.setSubject(subjectBuff.toString());
-	le.setNodeIdentifier(DRYAD_NODE_IDENTIFIER);
+	le.setNodeIdentifier(d1NodeID);
 	//code for setting the log time moved to the LogEntry class, since the format needs to work with solr
 	
 	try {
@@ -307,6 +309,8 @@ public class DataOneMN extends HttpServlet implements Constants {
 	
 	myFiles = ConfigurationManager.getProperty("stats.datafiles.coll");
         myPackages = ConfigurationManager.getProperty("stats.datapkgs.coll");
+	d1NodeID = ConfigurationManager.getProperty("dataone.nodeID");
+	d1contact = ConfigurationManager.getProperty("dataone.contact");
 		
 	myRequestLogger = new DataOneLogger();  //this assumes a configuration has been loaded
 	log.debug("initialization complete");
@@ -400,26 +404,8 @@ public class DataOneMN extends HttpServlet implements Constants {
 	    return;
 	}
 	
-	// the basic test passed; return some simple information about this node
-	response.setContentType(XML_CONTENT_TYPE);
-	OutputStream out = response.getOutputStream();
-	PrintWriter pw = new PrintWriter(out);
-	
-	// basic node description
-	pw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n" +
-		 "<d1:node xmlns:d1=\"http://ns.dataone.org/service/types/v1\" replicate=\"true\" synchronize=\"true\" type=\"mn\" state=\"up\"> \n" +
-		 "<identifier>urn:node:DRYAD</identifier>\n" +
-		 "<name>Dryad Digital Repository</name>\n" +
-		 "<description>Dryad is an international repository of data underlying peer-reviewed scientific and medical literature.</description>\n" +
-		 "<baseURL>https://datadryad.org/mn</baseURL>\n");
-
-    	// other random info
-	pw.write("<ping success=\"true\"/>\n" +
-		 "<subject>CN=urn:node:DRYAD, DC=dataone, DC=org</subject>\n" +
-		 "<contactSubject>CN=METACAT1, DC=dataone, DC=org</contactSubject>\n");
-
-	// close xml
-	pw.write("</d1:node>\n");
+	// the basic test passed; return the Node description document
+	getCapabilities(response);
     }
 
     
@@ -479,8 +465,8 @@ public class DataOneMN extends HttpServlet implements Constants {
 	// basic node description
 	pw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n" +
 		 "<?xml-stylesheet type=\"text/xsl\" href=\"/themes/Dryad/dataOne/dataone.types.v1.xsl\"?> \n" +
-		 "<d1:node xmlns:d1=\"http://ns.dataone.org/service/types/v1\" replicate=\"true\" synchronize=\"true\" type=\"mn\" state=\"up\"> \n" +
-		 "<identifier>urn:node:DRYAD</identifier>\n" +
+		 "<d1:node xmlns:d1=\"http://ns.dataone.org/service/types/v1\" replicate=\"false\" synchronize=\"true\" type=\"mn\" state=\"up\"> \n" +
+		 "<identifier>" + d1NodeID + "</identifier>\n" +
 		 "<name>Dryad Digital Repository</name>\n" +
 		 "<description>Dryad is an international repository of data underlying peer-reviewed scientific and medical literature.</description>\n" +
 		 "<baseURL>https://datadryad.org/mn</baseURL>\n");
@@ -501,8 +487,8 @@ public class DataOneMN extends HttpServlet implements Constants {
 
 	// other random info
 	pw.write("<ping success=\"true\"/>\n" +
-		 "<subject>CN=urn:node:DRYAD, DC=dataone, DC=org</subject>\n" +
-		 "<contactSubject>CN=Ryan Scherle A281,O=Duke University,C=US,DC=cilogon,DC=org</contactSubject>\n");
+		 "<subject>CN=" + d1NodeID + ", DC=dataone, DC=org</subject>\n" +
+		 "<contactSubject>" + d1contact + "</contactSubject>\n");
 
 	// close xml
 	pw.write("</d1:node>\n");
@@ -599,7 +585,7 @@ public class DataOneMN extends HttpServlet implements Constants {
             "    errorCode='404'" + "\n" + 
             "    detailCode='" + code + "'\n" + 
             "    pid=" + "\"" + StringEscapeUtils.escapeXml(id) + "\"\n" + 
-            "    nodeId='datadryad'>" + "\n" + 
+            "    nodeId='" + d1NodeID + "'>" + "\n" + 
             "  <description>The specified object does not exist on this node.</description>" + "\n" + 
             "  <traceInformation>" + "\n" + 
             "    method: " + method + "\n" +
@@ -695,8 +681,8 @@ public class DataOneMN extends HttpServlet implements Constants {
 	    sysMeta.setLastModified(lastMod);
 	    sysMeta.setSubmitter(epEmail);
 	    sysMeta.setRightsHolder(DRYAD_ADMIN); 
-	    sysMeta.setAuthoritative(DRYAD_NODE_IDENTIFIER);
-	    sysMeta.setOrigin(DRYAD_NODE_IDENTIFIER);
+	    sysMeta.setAuthoritative(d1NodeID);
+	    sysMeta.setOrigin(d1NodeID);
 
 	    sysMeta.formatOutput();
 	    serializer.write(new Document(sysMeta));
