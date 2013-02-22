@@ -50,7 +50,10 @@ body {
 }
 
 a, a:active, a:visited {
-    color: #1F5E1F;
+    color: #003366;
+}
+a:hover {
+    color: #336699;
 }
 
 #ds-header-wrapper {
@@ -355,7 +358,7 @@ td {
 
 .ds-button-field,
 #aspect_eperson_StartRegistration_list_registration-progress li {
-    background-color: #6d859c;
+    background-color: #789;
     border: 1px solid #1F3F5E;
     padding: 2px 5px;
     color: #FFFFFF;
