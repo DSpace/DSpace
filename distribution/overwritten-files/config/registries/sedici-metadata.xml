@@ -385,4 +385,28 @@
 		<qualifier>expediente</qualifier>
 		<scope_note>Numero de expediente asociado a un documento institucional</scope_note>
 	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>relation</element>
+		<qualifier>isReviewOf</qualifier>
+		<scope_note>Indica el link al documento del cual este recurso es una revisión</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>relation</element>
+		<qualifier>isReviewedBy</qualifier>
+		<scope_note>Contiene el link de un documento que es una revision de este recurso</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>relation</element>
+		<qualifier>isRelatedWith</qualifier>
+		<scope_note>Contiene el link a un documento que está relacionado con este recurso</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>relation</element>
+		<qualifier>bookTitle</qualifier>
+		<scope_note>Título del libro al cual este capítulo corresponde</scope_note>
+	</dc-type>
 </dspace-dc-types>

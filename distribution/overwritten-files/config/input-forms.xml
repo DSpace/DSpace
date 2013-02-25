@@ -215,6 +215,18 @@
 					<i18n>true</i18n>
 				</field>
 
+				<!-- Título del libro (solo para capitulos de libro) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>bookTitle</dc-qualifier>
+					<label>Título del libro</label>
+					<input-type>onebox</input-type>
+					<hint>En el caso de capítulos, indicar aquí el título del libro al que pertenence</hint>
+					<type-bind>Libro</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+
 				<!-- Idioma del recurso -->
 				<field>
 					<dc-schema>dc</dc-schema>
@@ -748,6 +760,43 @@
 					<label>Fuente</label>
 					<input-type value-pairs-name="record_content_sources">dropdown</input-type>
 					<hint>Nombre de la entidad y/o sitio web desde donde se obtuvo la información del registro</hint>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Es revisión de -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>isReviewOf</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Es revisión de</label>
+					<input-type>onebox</input-type>
+					<hint>Link a un documento (puede ser externo a SeDiCI) del cual este documento es una revisión</hint>
+					<type-bind>Articulo</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+				
+				<!-- Tiene una revisión -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>isReviewedBy</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Es revisado por</label>
+					<input-type>onebox</input-type>
+					<hint>Link a un documento (puede ser externo a SeDiCI) que es una revisión del recurso en proceso de carga</hint>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Se relaciona con -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>isRelatedWith</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Se relaciona con</label>
+					<input-type>onebox</input-type>
+					<hint>Link a un documento (puede ser externo a SeDiCI) con el cual este documento está relacionado</hint>
 					<visibility>workflow</visibility>
 				</field>
 

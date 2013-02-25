@@ -98,6 +98,12 @@
 			<xsl:with-param name="name" select="'title-subtitle'"/>
 			<xsl:with-param name="elements" select="dim:field[@element='title' and @qualifier='subtitle'] "/>
 		</xsl:call-template>
+		
+		<!-- book-title row -->
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'relation-book-title'"/>
+			<xsl:with-param name="elements" select="dim:field[@element='relation' and @qualifier='bookTitle'] "/>
+		</xsl:call-template>
 
 		<!-- Author(s) row -->
 		<div class="simple-item-view-authors">
@@ -490,6 +496,37 @@
 					<xsl:with-param name="elements" select="dim:field[@element='subject' and @qualifier='keyword']" />
 					<xsl:with-param name="filter">descriptor</xsl:with-param>
 				</xsl:call-template>
+			</div>
+		</xsl:if>
+
+		<!-- relation-review-of row (es probable que sea uno solo) -->
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'relation-review-of'"/>
+			<xsl:with-param name="elements" select="dim:field[@element='relation' and @qualifier='isReviewOf'] "/>
+			<xsl:with-param name="type">url</xsl:with-param>
+		</xsl:call-template>
+
+		<!-- relation-reviewed-by row (es probable que sea uno solo) -->
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'relation-reviewed-by'"/>
+			<xsl:with-param name="elements" select="dim:field[@element='relation' and @qualifier='isReviewedBy'] "/>
+			<xsl:with-param name="type">url</xsl:with-param>
+		</xsl:call-template>
+
+		<!-- Mostramos los documentos relacionados (es probable que sean muchos) -->
+		<xsl:if test="dim:field[@element='relation' and @qualifier='isRelatedWith']">
+			<div class="metadata simple-item-view-other relation-related-with">
+				<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-relation-related-with</i18n:text></h2>
+				<ul>
+					<xsl:for-each select="dim:field[@element='relation' and @qualifier='isRelatedWith']">
+						<li>
+							<a target="_blank">
+								<xsl:attribute name="href"><xsl:value-of select="."/></xsl:attribute>
+								<xsl:value-of select="."/>
+							</a>
+						</li>
+					</xsl:for-each>
+				</ul>
 			</div>
 		</xsl:if>
 

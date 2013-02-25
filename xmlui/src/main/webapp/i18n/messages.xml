@@ -2130,6 +2130,10 @@
 <message key="xmlui.dri2xhtml.METS-1.0.item-authors">Authors</message>  
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-inscriber">Inscribers</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-identifier-expediente">File Number</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-relation-book-title">Belongs to book</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-relation-review-of">Is review of</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-relation-reviewed-by">Is reviewed by</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-relation-related-with">Related documents</message>
   
 <!-- Choice authority -->
 <message key="sedici.choiceAuthorityControl.messageErrorConfidenceSingular">Check the value</message>

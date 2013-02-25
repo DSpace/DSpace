@@ -2952,6 +2952,11 @@ span.ds-dc_contributor_author-authority {
 	font-style:italic;
 	
 }
+.item-summary-view-metadata .metadata.relation-reviewed-by, 
+.item-summary-view-metadata .metadata.relation-review-of,
+.item-summary-view-metadata .metadata.relation-related-with {
+	text-align: left;
+}
 .item-summary-view-metadata .metadata.record-source {
 	float: right;
 }
