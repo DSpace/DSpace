@@ -9,10 +9,14 @@ public class ObjectInfo extends Element implements Constants {
     private String myXMLChecksum;
     private String myChecksumAlgo;
     private long myXMLSize;
+    private String identifier;
+    private String idTimestamp;
       
-    public ObjectInfo(String aIdentifier) {
+    public ObjectInfo(String identifier, String idTimestamp) {
 	super("objectInfo"); 
-	addElement("identifier", aIdentifier);
+	addElement("identifier", identifier + idTimestamp);
+	this.identifier = identifier;
+	this.idTimestamp = idTimestamp;
     }
     
     public String getNamespace() {
@@ -43,10 +47,9 @@ public class ObjectInfo extends Element implements Constants {
 	Element[] elements = new Element[2];
 	
 	// create objects and set identifiers
-	Element thisID = getChildElements("identifier").get(0);
-	String baseID = thisID.getValue();
-	ObjectInfo metadataElem = new ObjectInfo(baseID);
-	ObjectInfo bitstreamElem = new ObjectInfo(baseID + "/bitstream");
+	// bitstreams never receive timestamps, because they are explicitly versioned
+	ObjectInfo metadataElem = new ObjectInfo(identifier, idTimestamp);
+	ObjectInfo bitstreamElem = new ObjectInfo(identifier + "/bitstream", "");
 	
 	// formats
 	Element thisFormat = getChildElements("formatId").get(0);
