@@ -42,6 +42,7 @@
                     <include>config/modules/curate.cfg</include>
                     <include>config/modules/oai.cfg</include>
                     <include>config/modules/solr-statistics.cfg</include>
+                    <include>config/modules/authentication-ldap.cfg</include>
                 </includes>
             </resource>
             <!-- Declare a mutually exclusive resource set for non-filtered files. -->
@@ -56,6 +57,7 @@
                     <exclude>config/modules/curate.cfg</exclude>
                     <exclude>config/modules/oai.cfg</exclude>
                     <exclude>config/modules/solr-statistics.cfg</exclude>
+                    <exclude>config/modules/authentication-ldap.cfg</exclude>
                 </excludes>
             </resource>
         </resources>
