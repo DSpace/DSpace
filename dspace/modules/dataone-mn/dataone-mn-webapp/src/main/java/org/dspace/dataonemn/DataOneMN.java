@@ -63,6 +63,7 @@ public class DataOneMN extends HttpServlet implements Constants {
     private String myPackages;
     private String d1NodeID;
     private String d1contact;
+    private String d1baseURL;
 
     private DataOneLogger myRequestLogger;
     
@@ -311,6 +312,7 @@ public class DataOneMN extends HttpServlet implements Constants {
         myPackages = ConfigurationManager.getProperty("stats.datapkgs.coll");
 	d1NodeID = ConfigurationManager.getProperty("dataone.nodeID");
 	d1contact = ConfigurationManager.getProperty("dataone.contact");
+	d1baseURL = ConfigurationManager.getProperty("dataone.baseURL");
 		
 	myRequestLogger = new DataOneLogger();  //this assumes a configuration has been loaded
 	log.debug("initialization complete");
@@ -469,7 +471,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 		 "<identifier>" + d1NodeID + "</identifier>\n" +
 		 "<name>Dryad Digital Repository</name>\n" +
 		 "<description>Dryad is an international repository of data underlying peer-reviewed scientific and medical literature.</description>\n" +
-		 "<baseURL>https://datadryad.org/mn</baseURL>\n");
+		 "<baseURL>" + d1baseURL + "</baseURL>\n");
 
 	// supported services 
 	pw.write("<services>\n" +
