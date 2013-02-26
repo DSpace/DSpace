@@ -56,6 +56,9 @@
 			<li class="main">
 				<a href="{$context-path}/feedback"><i18n:text>sedici.menuSuperior.contacto</i18n:text></a>
 			</li>
+			<li class="main">
+				<a href="{$context-path}/submit"><i18n:text>sedici.menuSuperior.subirMaterial</i18n:text></a>
+			</li>
 	     </ul>
      </div>
 

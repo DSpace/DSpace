@@ -2258,6 +2258,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="sedici.menuSuperior.home">Inicio</message>
 <message key="sedici.menuSuperior.buscar">Buscar</message>
 <message key="sedici.menuSuperior.contacto">Contacto</message>
+<message key="sedici.menuSuperior.subirMaterial">Subir Material</message>
 
 <!-- Menu lateral -->
 <message key="sedici.menuLateral.cuenta.usuario"></message>
