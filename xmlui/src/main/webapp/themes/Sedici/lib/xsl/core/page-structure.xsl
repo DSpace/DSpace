@@ -12,7 +12,9 @@
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
                 xmlns:confman="org.dspace.core.ConfigurationManager"
                 xmlns="http://www.w3.org/1999/xhtml"
-                exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman">
+                exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman"
+                xmlns:date="http://exslt.org/dates-and-times" 
+                extension-element-prefixes="date">
 
     <xsl:output indent="yes"/>
 
@@ -385,7 +387,7 @@ placeholders for header images -->
 			<div id="ds-footer">
 	            <div class="column" id="footercol1">
 	                <div class="datos_unlp">
-	                    <strong>&#xA9; 2003-2013</strong>
+	                    <strong>&#xA9; 2003-<xsl:value-of select="date:year()"/></strong>
 	                    <br/>
 	                    <strong>
 		                    <a href="http://prebi.unlp.edu.ar/" target="_blank">PrEBi</a>
