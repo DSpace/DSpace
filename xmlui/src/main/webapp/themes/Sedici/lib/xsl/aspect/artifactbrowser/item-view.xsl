@@ -105,6 +105,12 @@
 			<xsl:with-param name="elements" select="dim:field[@element='relation' and @qualifier='bookTitle'] "/>
 		</xsl:call-template>
 
+		<!-- relation.isPartOfSeries row -->
+		
+        <xsl:call-template name="render-normal-field">
+    		<xsl:with-param name="name" select="'relation-isPartOfSeries'"/>
+    		<xsl:with-param name="elements"    select="dim:field[@element='relation' and @qualifier='isPartOfSeries'] "/>
+		</xsl:call-template>
 		<!-- Author(s) row -->
 		<div class="simple-item-view-authors">
 			<xsl:choose>
@@ -596,7 +602,22 @@
 					<xsl:value-of select="$name"/>
 				</xsl:attribute>
 
-				<span class="metadata-label"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-<xsl:value-of select="$name"/></i18n:text>:</span>
+			<xsl:variable name="externalMetadataURL">
+			            <xsl:text>cocoon:/</xsl:text>
+			            <xsl:value-of select="/dri:document/dri:meta/dri:repositoryMeta/dri:repository/@url"/>
+			           
+		        </xsl:variable>
+				<span class="metadata-label">
+						<i18n:translate>
+   							<i18n:text>xmlui.dri2xhtml.METS-1.0.item-<xsl:value-of select="$name"/></i18n:text>
+   							<i18n:param>
+   								<xsl:apply-templates select="document($externalMetadataURL)" mode="nameRepo"/>
+   								dddd
+   								<xsl:value-of select="$externalMetadataURL"/>
+   								</i18n:param>
+   						</i18n:translate>
+				:</span>
+		
 		
 				<xsl:call-template name="render-field-value">
 					<xsl:with-param name="elements" select="$elements"/>
@@ -610,7 +631,9 @@
 			</div>
 		</xsl:if>
 	</xsl:template>
-
+<xsl:template match="mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim" mode="nameRepo">
+			  		<xsl:value-of select="dim:field[@element='name']"/>
+   	 </xsl:template>
 	<xsl:template match="dri:list[@id='aspect.submission.StepTransformer.list.submit-describe']">
 		<i18n:text>sedici.common.camposObligatorios</i18n:text><br/><br/>
 		<xsl:apply-templates />

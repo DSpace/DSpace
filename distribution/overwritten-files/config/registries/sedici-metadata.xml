@@ -388,6 +388,12 @@
 	<dc-type>
 		<schema>sedici</schema>
 		<element>relation</element>
+		<qualifier>isPartOfSeries</qualifier>
+		<scope_note></scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>relation</element>
 		<qualifier>isReviewOf</qualifier>
 		<scope_note>Indica el link al documento del cual este recurso es una revisión</scope_note>
 	</dc-type>
@@ -409,4 +415,5 @@
 		<qualifier>bookTitle</qualifier>
 		<scope_note>Título del libro al cual este capítulo corresponde</scope_note>
 	</dc-type>
+
 </dspace-dc-types>

@@ -536,7 +536,7 @@
 					<label>Título de la serie</label>
 					<input-type>onebox</input-type>
 					<hint>Título de la serie en la que el documento fué publicado</hint>
-					<type-bind>Articulo,Libro</type-bind>
+					<type-bind>Articulo</type-bind>
 				</field>
 				
 				<!-- Volumen y numero de la revista -->
@@ -547,8 +547,20 @@
 					<label>Volúmen y número de la serie</label>
 					<input-type>onebox</input-type>
 					<hint>Volúmen y número de la serie en la que el documento fué publicado</hint>
-					<type-bind>Articulo,Libro</type-bind>
+					<type-bind>Articulo</type-bind>
 				</field>
+
+				<!-- Serie de Libro -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>isPartOfSeries</dc-qualifier>
+					<label>Titulo y número de la serie</label>
+					<input-type>onebox</input-type>
+					<hint>Titulo y número de la serie en la que el documento fué publicado</hint>
+					<type-bind>Libro</type-bind>
+				</field>
+
 
 				<!-- Dossier -->
 				<field>
@@ -763,7 +775,7 @@
 					<visibility>workflow</visibility>
 				</field>
 
-				<!-- Es revisión de -->
+		<!-- Es revisión de -->
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>relation</dc-element>
@@ -799,6 +811,7 @@
 					<hint>Link a un documento (puede ser externo a SeDiCI) con el cual este documento está relacionado</hint>
 					<visibility>workflow</visibility>
 				</field>
+
 
 				<!-- Notas -->
 				<field>
