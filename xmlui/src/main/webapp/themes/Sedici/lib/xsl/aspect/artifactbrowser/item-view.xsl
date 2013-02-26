@@ -1179,6 +1179,7 @@
 				<xsl:value-of select="dri:item[2]/dri:xref"/>
 			</a>
 		</li>
+		<br/>
 	</xsl:template>
 
 	<xsl:template match="dri:div[@id='aspect.artifactbrowser.RestrictedItem.div.withdrawn']">
