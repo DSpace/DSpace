@@ -1011,7 +1011,7 @@ public class ObjectManager implements Constants {
                 Collections.sort(children, new Comparator<Element> () {
                     @Override
                     public int compare(Element t, Element t1) {
-                        return t.getText().compareTo(t1.getText());
+                        return t.getAttributes().toString().compareTo(t1.getAttributes().toString());
                     }
                 });
                 for(Element el : children) {
