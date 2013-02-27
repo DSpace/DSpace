@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://purl.org/ontology/bibo/" xmlns="http://purl.org/ontology/bibo/"
+	elementFormDefault="qualified" attributeFormDefault="unqualified">
+	
+	<!-- This is not the full bibo, just the elements we're reusing -->
+	<xs:element name="status" type="xs:string"/>
+	<xs:element name="Journal" type="xs:string"/>
+	<xs:element name="issn" type="xs:string"/>
+	<xs:element name="eissn" type="xs:string"/>
+	<xs:element name="volume" type="xs:string"/>
+	<xs:element name="issue" type="xs:string"/>
+	<xs:element name="pageStart" type="xs:string"/>
+	<xs:element name="pageEnd" type="xs:string"/>
+	<xs:element name="pages" type="xs:string"/>
+	<xs:element name="doi" type="xs:string"/>
+	<xs:element name="pmid" type="xs:string"/>
+</xs:schema>

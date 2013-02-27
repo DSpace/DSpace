@@ -6,7 +6,8 @@
 	<xs:import namespace="http://purl.org/dc/terms/" schemaLocation="dcterms.xsd"/>
 	<xs:import namespace="http://rs.tdwg.org/dwc/terms/"
 		schemaLocation="http://rs.tdwg.org/dwc/xsd/tdwg_dwcterms.xsd"/>
-
+	<xs:import namespace="http://purl.org/ontology/bibo/" schemaLocation="bibo.xsd"/> 
+	
 	<!-- For the Dryad data package -->
 	<xs:element name="DryadDataPackage">
 		<xs:complexType>
@@ -25,6 +26,8 @@
 				<xs:element ref="external" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="dcterms:relation" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="dcterms:references"/>
+				<xs:element ref="bibo:pmid" minOccurs="0" />
+				<xs:element ref="bibo:Journal" minOccurs="0" />
 				<xs:element ref="dcterms:hasPart" maxOccurs="unbounded"/>
 			</xs:sequence>
 		</xs:complexType>
@@ -38,7 +41,6 @@
  				<xs:element ref="dcterms:creator" maxOccurs="unbounded"/>
 				<xs:element ref="dcterms:title"/>
 				<xs:element ref="dcterms:identifier" maxOccurs="unbounded"/>
-				<xs:element ref="bitstreamId" maxOccurs="unbounded"/>
 				<xs:element ref="dcterms:rights"/>
 				<xs:element ref="dcterms:description" minOccurs="0"/>
 				<xs:element ref="dcterms:subject" maxOccurs="unbounded"/>
@@ -48,8 +50,7 @@
 				<xs:element ref="dcterms:dateSubmitted"/>
 				<xs:element ref="dcterms:available"/>
 				<xs:element ref="embargoedUntil" minOccurs="0"/>
-				<xs:element ref="dcterms:format"/>
-				<xs:element ref="dcterms:extent"/>
+				<xs:element ref="dcterms:format" minOccurs="0"/>
 				<xs:element ref="dcterms:provenance" maxOccurs="unbounded"/>
 				<xs:element ref="dcterms:isPartOf"/>
 			</xs:sequence>
@@ -58,7 +59,6 @@
 
 	<!-- Dryad defined elements -->
 	<xs:element name="status" type="xs:string"/>
-	<xs:element name="bitstreamId" type="xs:string"/>
 	<xs:element name="external" substitutionGroup="dcterms:identifier"/>
 	<xs:element name="embargoedUntil" substitutionGroup="dcterms:date"/>
 
