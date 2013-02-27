@@ -129,7 +129,7 @@
                     <map:parameter name="stylesheet.screen#5" value="lib/css/style.css"/>
                     <map:parameter name="stylesheet.screen#6" value="lib/css/authority-control.css"/>
 
-                    <map:parameter name="stylesheet.screen#7" value="lib/css/jquery-ui-1.custom.css"/>
+                    <map:parameter name="stylesheet.screen#7" value="lib/css/jquery-ui-1.css"/>
                     <map:parameter name="stylesheet.screen#8" value="lib/css/jquery.bxslider.css"/>
                     <map:parameter name="stylesheet.screen#9" value="lib/css/superfish.css"/>
                 </map:transform>

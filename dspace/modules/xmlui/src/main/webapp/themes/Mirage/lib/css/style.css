@@ -76,7 +76,7 @@ a:hover {
     width: 155px;
     height: 88px;
     margin-top: 10px;
-    background: url('images/dryad-logo.png');
+    background: url('../../images/dryad-logo.png');
     background-position: left bottom;
     background-repeat: no-repeat;
     background-color: transparent;
@@ -190,7 +190,7 @@ a:hover {
 
 #ds-footer-logo {
     display: inline-block;
-    background: url('images/@mirelogo-small.png');
+    background: url('../../images/@mirelogo-small.png');
     background-repeat: no-repeat;
     width: 79px;
     height: 40px;
@@ -1152,13 +1152,13 @@ form.discover-sort-box select{
 }
 
 .icon-button.arrowUp{
-    background-image: url(images/arrow_up_ffffff_16x16.png);
+    background-image: url(../../images/arrow_up_ffffff_16x16.png);
     background-repeat: no-repeat;
     background-position: center center;
 }
 
 .icon-button.arrowDown{
-    background-image: url(images/arrow_down_ffffff_16x16.png);
+    background-image: url(../../images/arrow_down_ffffff_16x16.png);
     background-repeat: no-repeat;
     background-position: center center;
 }

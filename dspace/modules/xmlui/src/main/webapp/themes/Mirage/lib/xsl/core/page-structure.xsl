@@ -421,7 +421,16 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     <i18n:text>xmlui.dri2xhtml.structural.head-subtitle</i18n:text>
                 </h2>
 
-
+                <div id="sharing-tools">
+                    <a href="#TODO"><img src="themes/Mirage/images/dryad_twit_icon.png"/>
+                    </a>
+                    <a href="#TODO"><img src="themes/Mirage/images/dryad_fb_icon2.png"/>
+                    </a>
+                    <a href="#TODO"><img src="themes/Mirage/images/dryad_gplus_icon.png"/>
+                    </a>
+                    <a href="#TODO"><img src="themes/Mirage/images/dryad_rss_icon.png"/>
+                    </a>
+                </div>
                 <xsl:choose>
                     <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
                         <div id="ds-user-box">
@@ -739,8 +748,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
 
                 $(document).ready(function() {
-                    $('#main-menu ul.sf-menu')
-                        .supersubs({
+                    $('#main-menu ul.sf-menu').supersubs({
                             // all numeric properties are in em
                             minWidth: 22,
                             maxWidth: 30,   // this isn't doing much...
