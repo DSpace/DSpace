@@ -1,0 +1,661 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" class="no-js">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+<meta content="width=device-width; initial-scale=1.0; maximum-scale=1.0;" name="viewport" />
+<link rel="shortcut icon" href="/themes/Mirage/images/favicon.ico" />
+<link rel="apple-touch-icon" href="/themes/Mirage/images/apple-touch-icon.png" />
+<meta name="Generator" content="DSpace" />
+<link type="text/css" rel="stylesheet" media="screen" href="files/reset.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/base.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/helper.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/jquery-ui-1.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/style.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/superfish.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/jquery.bxslider.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/authority-control.css">
+<link type="text/css" rel="stylesheet" media="handheld" href="files/handheld.css">
+<link type="text/css" rel="stylesheet" media="print" href="files/print.css">
+<link type="text/css" rel="stylesheet" media="all" href="files/media.css">
+<link type="application/rss+xml" rel="alternate" href="/feed/rss_1.0/site" />
+<link type="application/rss+xml" rel="alternate" href="/feed/rss_2.0/site" />
+<link type="application/atom+xml" rel="alternate" href="/feed/atom_1.0/site" />
+
+<!-- TODO: include CSS in this page only -->
+<style type="text/css">
+    tr.table-shims td {
+        height: 0px;
+    }
+    tr.odd td {
+        background-color: #eee;
+    }
+
+    #journal-policies {
+        width: 100%;
+    }
+
+    #journal-policies th,
+    #journal-policies td {
+        text-align: center;
+    }
+    #journal-policies th:first-child,
+    #journal-policies td:first-child {
+        text-align: left;
+    }
+
+    tr.default-policies td {
+        color: #b22;
+        font-style: italic;
+    }
+</style>
+
+<script type="text/javascript">
+                                //clear default text of emty text areas on focus
+                                function tfocus(element)
+                                {
+                                        if (element.value == ' '){element.value='';}
+                                }
+                                //clear default text of emty text areas on submit
+                                function tsubmit(form)
+                                {
+                                        var defaultedelements = document.getelementsbytagname("textarea");
+                                        for (var i=0; i != defaultedelements.length; i++){
+                                                if (defaultedelements[i].value == ' '){
+                                                        defaultedelements[i].value='';}}
+                                }
+                                //disable pressing 'enter' key to submit a form (otherwise pressing 'enter' causes a submission to start over)
+                                function disableenterkey(e)
+                                {
+                                     var key;
+
+                                     if(window.event)
+                                          key = window.event.keycode;     //internet explorer
+                                     else
+                                          key = e.which;     //firefox and netscape
+
+                                     if(key == 13)  //if "enter" pressed, then disable!
+                                          return false;
+                                     else
+                                          return true;
+                                }
+
+                                function fnarray()
+                                {
+                                    this.funcs = new array;
+                                }
+
+                                fnarray.prototype.add = function(f)
+                                {
+                                    if( typeof f!= "function" )
+                                    {
+                                        f = new function(f);
+                                    }
+                                    this.funcs[this.funcs.length] = f;
+                                };
+
+                                fnarray.prototype.execute = function()
+                                {
+                                    for( var i=0; i < this.funcs.length; i++ )
+                                    {
+                                        this.funcs[i]();
+                                    }
+                                };
+
+                                var runafterjsimports = new fnarray();
+            </script>
+<script xmlns:i18n="http://apache.org/cocoon/i18n/2.1" type="text/javascript" src="/themes/mirage/lib/js/modernizr-1.5.min.js"> </script>
+<title>dryad digital repository</title>
+</head><!--[if lt ie 7 ]> <body class="ie6"> <![endif]-->
+                <!--[if ie 7 ]>    <body class="ie7"> <![endif]-->
+                <!--[if ie 8 ]>    <body class="ie8"> <![endif]-->
+                <!--[if ie 9 ]>    <body class="ie9"> <![endif]-->
+                <!--[if (gt ie 9)|!(ie)]><!--><body><!--<![endif]-->
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/dri/1.0/" id="ds-main">
+<div id="ds-header-wrapper">
+<div class="clearfix" id="ds-header">
+<a id="ds-header-logo-link" href="/">
+<span id="ds-header-logo"> </span>
+<span id="ds-header-logo-text">mirage</span>
+</a>
+<h1 class="pagetitle visuallyhidden">dryad digital repository</h1>
+<h2 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/dri/1.0/" class="static-pagetitle visuallyhidden">dryad repository</h2>
+<!--
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" id="ds-user-box">
+<p>
+<a href="/login">login</a>
+</p>
+</div>
+-->
+<div id="sharing-tools">
+    <a href="#TODO"><img src="files/images/dryad_twit_icon.png" /></a>
+    <a href="#TODO"><img src="files/images/dryad_fb_icon2.png" /></a>
+    <a href="#TODO"><img src="files/images/dryad_gplus_icon.png" /></a>
+    <a href="#TODO"><img src="files/images/dryad_rss_icon.png" /></a>
+</div>
+<div id="main-menu">
+
+    <ul class="sf-menu">
+
+        <li>
+            <a href="#TODO">About</a>
+            <ul>
+                <li>
+                    <a href="#TODO">Purpose &amp; Goals</a>
+                </li>
+                <li>
+                    <a href="#TODO">Who We Are</a>
+                </li>
+                <li>
+                    <a href="#TODO">Journal Archiving Policy</a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a href="#TODO">Membership</a>
+            <ul>
+                <li>
+                    <a href="#TODO">Overview</a>
+                </li>
+                <li>
+                    <a href="#TODO">Apply</a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a href="#TODO">Resources</a>
+            <ul>
+                <li>
+                    <a href="#TODO">Deposit Data Instructions</a>
+                </li>
+                <li class="current">
+                    <a href="#TODO">FAQ</a>
+                </li>
+                <li>
+                    <a href="#TODO">Wiki</a>
+                </li>
+                <li>
+                    <a href="#TODO">Blog</a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a>Contact Us</a>
+        </li>
+
+        <!-- these items would appear only for anonymous visitors (NOT logged in) -->
+        <li id="login-item">
+            <a href="#TODO">Login</a>
+        </li>
+        <li id="sign-up-item">
+            <a href="#TODO">Sign Up</a>
+        </li>
+
+        <!-- this item would appear only for logged-in users -->
+<!--
+        <li>
+            <a href="#TODO">{USER NAME}</a>
+            <ul>
+                <li>
+                    <a href="#TODO">My Submissions</a>
+                </li>
+                <li>
+                    <a href="#TODO">My Tasks</a>
+                </li>
+                <li>
+                    <a href="#TODO">Profile</a>
+                </li>
+                <li class="after-divider">
+                    <a href="#TODO">Logout</a>
+                </li>
+            </ul>
+        </li>
+-->
+
+        <!-- this item would appear only for logged-in administrators -->
+<!--
+        <li>
+            <a href="#TODO">Administrative</a>
+            <ul>
+                <li>
+                    <a href="#TODO">Workflow Overview</a>
+                </li>
+                <li class="after-divider">
+                    <a href="#TODO">Access Control</a>
+                </li>
+                <li>
+                    <a href="#TODO">People</a>
+                </li>
+                <li>
+                    <a href="#TODO">Groups</a>
+                </li>
+                <li>
+                    <a href="#TODO">Authorizations</a>
+                </li>
+                <li class="after-divider">
+                    <a href="#TODO">Registries</a>
+                </li>
+                <li>
+                    <a href="#TODO">Format</a>
+                </li>
+                <li>
+                    <a href="#TODO">Metadata</a>
+                </li>
+                <li class="after-divider">
+                    <a href="#TODO">Items</a>
+                </li>
+                <li>
+                    <a href="#TODO">Withdrawn Items</a>
+                </li>
+                <li>
+                    <a href="#TODO">Control Panel</a>
+                </li>
+                <li>
+                    <a href="#TODO">Statistics</a>
+                </li>
+                <li>
+                    <a href="#TODO">Import Metadata</a>
+                </li>
+            </ul>
+        </li>
+-->
+
+    </ul>
+</div>
+</div>
+</div>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" id="ds-trail-wrapper">
+<ul id="ds-trail">
+<li class="ds-trail-link first-link last-link">
+<a href="">Dryad Digital Repository</a>
+</li>
+</ul>
+</div>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="hidden" id="no-js-warning-wrapper">
+<div id="no-js-warning">
+<div class="notice failure">JavaScript is disabled for your browser. Some features of this site may not work without it.</div>
+</div>
+</div>
+<div id="ds-content-wrapper">
+<div class="clearfix" id="ds-content">
+<div id="ds-body">
+<!-- TODO: This page requires inline STYLE above and contents of #ds-body -->
+
+<h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Journal Submission Policies</h1>
+<div id="" class="ds-static-div primary" style="">
+    <p>
+        Each journal can define its own submission policies with Dryad.
+        Journals not listed will be handled according to the default policies
+        at the top of the chart.
+    </p>
+
+    <!-- TODO: To generate this table dynamically:
+        * Add a row for each journal entry in database (first row is alwys default-policies)
+        * Insert a row of headers (column labels) after every 9 rows of data
+        * Each set of 9 data rows should have classes 'odd', 'even', 'odd', ...
+        * Render stored data values for easy reading (eg, 'A' => 'Upon Acceptance', 'Y' => 'Yes')
+    -->
+    <table id="journal-policies">
+        <tr style="table-shims">
+            <td width="200">&nbsp;</td>
+            <td width="*">&nbsp;</td>
+            <td width="100">&nbsp;</td>
+            <td width="100">&nbsp;</td>
+        </tr>
+        <tr>
+            <th>Journal</th>
+            <th>When to submit</th>
+            <th>Data embargo allowed?</th>
+            <th>Metadata hidden until publication?</th>
+        </tr>
+        <tr class="ds-table-row odd default-policies">
+            <td class="ds-table-cell">If your journal is not listed below...</td>
+            <td class="ds-table-cell">Upon Acceptance</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">Yes</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">American Naturalist, The</td>
+            <td class="ds-table-cell">Upon Acceptance</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">No</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Biological Journal of the Linnean Society</td>
+            <td class="ds-table-cell">Upon Acceptance</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">No</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">Biology Letters</td>
+            <td class="ds-table-cell">Prior to Review</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">Yes</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">BioRisk </td>
+            <td class="ds-table-cell">Prior to Review</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">No</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">BMJ Open</td>
+            <td class="ds-table-cell">Prior to Review</td>
+            <td class="ds-table-cell">No</td>
+            <td class="ds-table-cell">No</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Comparative Cytogenetics </td>
+            <td class="ds-table-cell">Prior to Review</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">No</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">Ecological Monographs </td>
+            <td class="ds-table-cell">Upon Acceptance</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">Yes</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">eLife </td>
+            <td class="ds-table-cell">Prior to Review</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">Yes</td>
+        </tr>
+        <tr>
+            <th>Journal</th>
+            <th>When to submit</th>
+            <th>Data embargo allowed?</th>
+            <th>Metadata hidden until publication?</th>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Evolution</td>
+            <td class="ds-table-cell">Upon Acceptance</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">No</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">Evolutionary Applications</td>
+            <td class="ds-table-cell">Upon Acceptance</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">Yes</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Functional Ecology </td>
+            <td class="ds-table-cell">Prior to Review</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">Yes</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">gms German Medical Science</td>
+            <td class="ds-table-cell">Prior to Review</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">No</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Heredity </td>
+            <td class="ds-table-cell">Prior to Review</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">No</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">International Journal of Myriapodology </td>
+            <td class="ds-table-cell">Prior to Review</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">No</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Journal of Animal Ecology</td>
+            <td class="ds-table-cell">Upon Acceptance</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">Yes</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">Journal of Ecology</td>
+            <td class="ds-table-cell">Upon Acceptance</td>
+            <td class="ds-table-cell">y</td>
+            <td class="ds-table-cell">Yes</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Journal of Evolutionary Biology</td>
+            <td class="ds-table-cell">Upon Acceptance</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">No</td>
+        </tr>
+        <tr>
+            <th>Journal</th>
+            <th>When to submit</th>
+            <th>Data embargo allowed?</th>
+            <th>Metadata hidden until publication?</th>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Journal of Fish and Wildlife Management </td>
+            <td class="ds-table-cell">Upon Acceptance</td>
+            <td class="ds-table-cell">No</td>
+            <td class="ds-table-cell">No</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">Journal of Heredity</td>
+            <td class="ds-table-cell">Upon Acceptance</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">No</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Journal of Paleontology </td>
+            <td class="ds-table-cell">Upon Acceptance</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">No</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">Molecular Ecology</td>
+            <td class="ds-table-cell">Prior to Review</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">No</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Molecular Ecology Resources</td>
+            <td class="ds-table-cell">Prior to Review</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">No</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">MycoKeys </td>
+            <td class="ds-table-cell">Prior to Review</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">Yes</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Nature Conservation </td>
+            <td class="ds-table-cell">Prior to Review</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">No</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">NeoBiota </td>
+            <td class="ds-table-cell">Prior to Review</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">No</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Paleobiology </td>
+            <td class="ds-table-cell">Upon Acceptance</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">No</td>
+        </tr>
+        <tr>
+            <th>Journal</th>
+            <th>When to submit</th>
+            <th>Data embargo allowed?</th>
+            <th>Metadata hidden until publication?</th>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">PhytoKeys </td>
+            <td class="ds-table-cell">Prior to Review</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">Yes</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">PLOS Biology </td>
+            <td class="ds-table-cell">Prior to Review</td>
+            <td class="ds-table-cell">No</td>
+            <td class="ds-table-cell">Yes</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">PLOS Genetics</td>
+            <td class="ds-table-cell">Prior to Review</td>
+            <td class="ds-table-cell">No</td>
+            <td class="ds-table-cell">Yes</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">Systematic Biology </td>
+            <td class="ds-table-cell">Prior to Review</td>
+            <td class="ds-table-cell">No</td>
+            <td class="ds-table-cell">No</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">ZooKeys </td>
+            <td class="ds-table-cell">Prior to Review</td>
+            <td class="ds-table-cell">Yes</td>
+            <td class="ds-table-cell">Yes</td>
+        </tr>
+    </table>
+</div><!-- end of DIV.primary -->
+
+</div><!-- end of DIV#ds-body -->
+
+<div id="ds-options-wrapper">
+<div id="ds-options">
+<h1 class="ds-option-set-head" id="ds-search-option-head">Search Dryad</h1>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-option-set" id="ds-search-option">
+<form method="post" id="ds-search-form" action="/discover">
+<fieldset>
+<input type="text" class="ds-text-field " name="query" />
+<input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" value="Go" type="submit" name="submit" class="ds-button-field " onclick="&#10;                                    var radio = document.getElementById(&quot;ds-search-form-scope-container&quot;);&#10;                                    if (radio != undefined &amp;&amp; radio.checked)&#10;                                    {&#10;                                    var form = document.getElementById(&quot;ds-search-form&quot;);&#10;                                    form.action=&#10;                                &quot;/handle/&quot; + radio.value + &quot;/discover&quot; ; &#10;                                    }&#10;                                " />
+</fieldset>
+</form>
+<a href="/discover">Advanced Search</a>
+</div>
+<h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-option-set-head">Browse</h1>
+<div id="org_datadryad_dspace_xmlui_aspect_browse_Navigation_list_DryadBrowse" class="ds-option-set">
+<ul class="ds-simple-list">
+<li>
+<a href="/search-filter?field=dc.contributor.author_filter&amp;fq=location:l2">Authors</a>
+</li>
+<li>
+<a href="/search-filter?field=prism.publicationName_filter&amp;fq=location:l2">Journal Title</a>
+</li>
+</ul>
+</div>
+<h1 class="ds-option-set-head">Information</h1>
+<div id="aspect_dryadinfo_Navigation_list_DryadInfo" class="ds-option-set">
+<ul class="ds-simple-list">
+<li>
+<a href="/pages/depositing">Depositing Data</a>
+</li>
+<li>
+<a href="/pages/using">Using Data</a>
+</li>
+<li>
+<a href="/pages/members">Dryad Members</a>
+</li>
+<li>
+<a href="/pages/jdap">Journal Archiving Policy</a>
+</li>
+<li>
+<a href="/pages/about">About Dryad</a>
+</li>
+<li>
+<a href="http://blog.datadryad.org">Dryad Blog</a>
+</li>
+<li>
+<a href="http://wiki.datadryad.org">Dryad Documentation</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<!--END of #ds-options-wrapper -->
+
+
+
+
+
+</div>
+</div>
+<div id="ds-footer-wrapper">
+<div id="ds-footer">
+<!--
+<div id="ds-footer-left">
+<a target="_blank" href="http://www.dspace.org/">DSpace software</a> copyright © 2002-2010  <a target="_blank" href="http://www.duraspace.org/">Duraspace</a>
+</div>
+<div id="ds-footer-right">
+<span class="theme-by">Theme by </span>
+<a id="ds-footer-logo-link" href="http://atmire.com" target="_blank" title="@mire NV">
+<span id="ds-footer-logo"> </span>
+</a>
+</div>
+-->
+<div id="ds-footer-links">
+
+    <span style="float: right;">
+        <a href="#TODO">Dryad Policies</a> 
+        &nbsp;<span style="color: #777;">|</span>&nbsp; 
+        <a href="/contact">Contact Us</a> 
+    </span>
+    <span style="float: left;">
+        Dryad is a nonprofit membership organization.
+    </span>
+    <p class="build-info">Dryad updated Tue, 19 Feb 2013 07:48:02 EST and served by North Carolina State University</p>
+    <!--Git Commit Hash: 1791a030d671f4e6959e0913857f304fb67b1c9c-->
+</div>
+<a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="hidden" href="/htmlmap"> </a>
+</div>
+</div>
+</div>
+<script type="text/javascript">var JsHost = (("https:" == document.location.protocol) ? "https://" : "http://");
+            document.write(unescape("%3Cscript src='" + JsHost + "ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js' type='text/javascript'%3E%3C/script%3E"));</script>
+<script type="text/javascript">!window.jQuery && document.write('<script type="text/javascript" src="/static/js/jquery-1.9.1.min.js"> <\/script>')</script>
+<script type="text/javascript" src="/themes/Mirage/lib/js/jquery-ui-1.8.5.custom.min.js"> </script><!--[if lt IE 7 ]>
+<script type="text/javascript" src="/themes/Mirage/lib/js/DD_belatedPNG_0.0.8a.js?v=1"> </script>
+<script type="text/javascript">DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');$.each($('img[src$=png]'), function() {DD_belatedPNG.fixPng(this);});</script><![endif]-->
+<script type="text/javascript" src="files/jquery.hoverIntent.js"></script>
+<script type="text/javascript" src="files/superfish.js"></script>
+<script type="text/javascript" src="files/supersubs.js"></script>
+<script type="text/javascript" src="files/jquery.bxslider.min.js"></script>
+<script type="text/javascript">
+            runAfterJSImports.execute();
+        </script>
+<script type="text/javascript">
+                   var _gaq = _gaq || [];
+                   _gaq.push(['_setAccount', 'UA-16949847-1']);
+                   _gaq.push(['_trackPageview']);
+
+                   (function() {
+                       var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                   })();
+           </script>
+
+<!-- main menu behavior -->
+<script type="text/javascript">
+        $(document).ready(function() {
+            $('#main-menu ul.sf-menu')
+                .supersubs({
+                    // all numeric properties are in em
+                    minWidth: 22,
+                    maxWidth: 30,   // this isn't doing much...
+                    extraWidth: 1
+                })
+                .superfish();
+        });
+           </script>
+
+<!-- behaviors for home page only -->
+<script type="text/javascript">
+        $(document).ready(function() {
+            // TODO
+        });
+           </script>
+</body></html>
