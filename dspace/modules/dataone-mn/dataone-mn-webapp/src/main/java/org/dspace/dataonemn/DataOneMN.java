@@ -663,8 +663,12 @@ public class DataOneMN extends HttpServlet implements Constants {
 
 		sysMeta.setSize(bitstream.getSize());
 	    } else {
-		// build sysmeta for a science metadata object				
-		sysMeta.setObjectFormat(DRYAD_NAMESPACE);
+		// build sysmeta for a science metadata object
+		if(id.contains("format=d1rem")) {
+		    sysMeta.setObjectFormat(ORE_NAMESPACE);
+		} else {
+		    sysMeta.setObjectFormat(DRYAD_NAMESPACE);
+		}
 
 		long size = objManager.getObjectSize(id, idTimestamp); 
 		sysMeta.setSize(size);
