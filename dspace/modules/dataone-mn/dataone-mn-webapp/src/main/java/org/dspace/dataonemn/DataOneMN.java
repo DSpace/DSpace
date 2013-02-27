@@ -247,7 +247,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 				       "Did you mean '/object' or '/object/http://dx.doi.org/...'");
 		}		
 	    } else if (reqPath.startsWith("/meta/")) {
-		getSystemMetadata(reqPath, response, objManager);
+		getSystemMetadata(reqPath, request.getQueryString(), response, objManager);
 	    } else if (reqPath.startsWith("/checksum/")) {
 		getChecksum(reqPath, response, objManager);
 	    } else if (reqPath.startsWith("/isAuthorized/")) {
@@ -606,9 +606,12 @@ public class DataOneMN extends HttpServlet implements Constants {
     /**
        Returns the system metadata associated with an object.       
     **/
-    private void getSystemMetadata(String reqPath, HttpServletResponse response, ObjectManager objManager) throws ServletException, IOException {
+    private void getSystemMetadata(String reqPath, String reqQueryString, HttpServletResponse response, ObjectManager objManager) throws ServletException, IOException {
 	log.info("getSystemMetadata()");
 	String id = reqPath.substring("/meta/".length());
+	if(reqQueryString != null) {
+	    id = id + '?' + reqQueryString;
+	}
 	String idTimestamp = "";
 	
 	// perform corrections for timestamped IDs
@@ -643,7 +646,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	    Date date = item.getLastModified();
 	    String lastMod = dateFormatter.format(date);
 	   
-	    if (id.endsWith("/bitstream")) {
+	    if (reqPath.endsWith("/bitstream")) {
 		//build sysmeta for a bistream
 		Bitstream bitstream = objManager.getFirstBitstream(item);
 		
