@@ -124,23 +124,23 @@
 
                         <div id="connect-illustrated-prose">
                             <p>
-                                <img style="float: right;margin-left: 8px;" src="files/images/connect-1.png"/>
+                                <img style="float: right;margin-left: 8px;" src="themes/Mirage/images/connect-1.png"/>
                                 This text would describe the program in broad, readable terms,
                                 including clickable links for terms that lead us deeper,
-                                <img style="float: left;margin-right: 8px;" src="files/images/connect-2.png"/>
+                                <img style="float: left;margin-right: 8px;" src="themes/Mirage/images/connect-2.png"/>
                                 like <a href="#">membership</a> and <a href="#">journal integration</a>. Lorem ipsum
                                 dolor sit amet, consectetur adipiscing elit.
                             </p>
                             <p>
                                 Nam a nisi sit
                                 amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est
-                                <img style="float: right;margin-left: 8px" src="files/images/connect-3.png"/>
+                                <img style="float: right;margin-left: 8px" src="themes/Mirage/images/connect-3.png"/>
                                 hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa.
                             </p>
                             <p>
                                 Aenean
                                 vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus.
-                                <img style="float: left;margin-right: 10px;" src="files/images/connect-4.png"/>
+                                <img style="float: left;margin-right: 10px;" src="themes/Mirage/images/connect-4.png"/>
                                 Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus.
                             </p>
                             <em>[1. illustrated prose]</em>

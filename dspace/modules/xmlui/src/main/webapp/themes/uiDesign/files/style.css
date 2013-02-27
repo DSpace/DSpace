@@ -190,7 +190,7 @@ a:hover {
 
 #ds-footer-logo {
     display: inline-block;
-    background: url('images/@mirelogo-small.png');
+    background: url('../../images/@mirelogo-small.png');
     background-repeat: no-repeat;
     width: 79px;
     height: 40px;
