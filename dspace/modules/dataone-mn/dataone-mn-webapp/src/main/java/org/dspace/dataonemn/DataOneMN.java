@@ -619,7 +619,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	response.setContentType(TEXT_XML_CONTENT_TYPE); // default for /meta
 	
 	try {
-	    SystemMetadata sysMeta = new SystemMetadata(id);
+	    SystemMetadata sysMeta = new SystemMetadata(id, idTimestamp);
 	    XMLSerializer serializer = new XMLSerializer(response.getOutputStream());
 	    
 	    Item item = objManager.getDSpaceItem(id);
@@ -646,7 +646,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 		sysMeta.setObjectFormat(format);
 		
 		// Add relationship between this bitstream and the science data that describes it
-		sysMeta.setDescribedBy(id);
+		sysMeta.setDescribedBy(id, idTimestamp);
 
 		String checksum = bitstream.getChecksum();
 		String algorithm = bitstream.getChecksumAlgorithm();
@@ -659,14 +659,13 @@ public class DataOneMN extends HttpServlet implements Constants {
 		sysMeta.setObjectFormat(DRYAD_NAMESPACE);
 
 		long size = objManager.getObjectSize(id, idTimestamp); 
-        sysMeta.setSize(size);
+		sysMeta.setSize(size);
 		
 		// Add relationship between this science metadata and the bitstream it describes.
 		// Data packages don't have a bitstream, so they are skipped
 		Collection collect = item.getOwningCollection();
 		if(collect.getID() == DATA_FILE_COLLECTION) {
-		    // how many mns can the current cns handle?
-		    sysMeta.setDescribes(id + "/bitstream");
+		    sysMeta.setDescribes(id + "/bitstream", "");
 		}
 
 		String[] checksumDetails = objManager.getObjectChecksum(id, idTimestamp);
