@@ -880,7 +880,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	    
 	    response.setContentType(XML_CONTENT_TYPE);
 	    
-	    if (count <= 0) {
+	    if (count < 0) {
 		OutputStream out = response.getOutputStream();
 		objManager.printList(from, to, format, out, useTimestamps);
 	    }
