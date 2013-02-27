@@ -81,7 +81,16 @@ public class SendFeedbackAction extends AbstractAction
             // cut off all but the hostname, to cover cases where more than one URL
             // arrives at the installation; e.g. presence or absence of "www"
             int lastDot = host.lastIndexOf('.');
-            basicHost = host.substring(host.substring(0, lastDot).lastIndexOf('.'));
+            int dotBeforeLast = host.substring(0, lastDot).lastIndexOf(".");
+
+            if(dotBeforeLast < 0)
+            {
+                basicHost = host;
+            }
+            else
+            {
+                basicHost = host.substring(dotBeforeLast);
+            }
         }
 
         if ((fromPage == null) || ((fromPage.indexOf(basicHost) == -1) && (!validReferral)))
