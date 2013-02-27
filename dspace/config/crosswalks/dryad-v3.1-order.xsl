@@ -17,11 +17,9 @@
 			<xsl:attribute name="xsi:schemaLocation"
 				>http://purl.org/dryad/terms/<xsl:text> </xsl:text>http://datadryad.org/profile/v3.1/dryad.xsd</xsl:attribute>
 			<xsl:apply-templates select="dcterms:type" mode="copy"/>
-			<xsl:apply-templates select="dryad:status" mode="copy"/>
 			<xsl:apply-templates select="dcterms:creator" mode="copy"/>
 			<xsl:apply-templates select="dcterms:title" mode="copy"/>
 			<xsl:apply-templates select="dcterms:identifier" mode="copy"/>
-			<xsl:apply-templates select="dryad:bitstreamId" mode="copy"/>
 			<xsl:apply-templates select="dcterms:rights" mode="copy"/>
 			<xsl:apply-templates select="dcterms:description" mode="copy"/>
 			<xsl:apply-templates select="dcterms:subject" mode="copy"/>
@@ -43,7 +41,6 @@
 			<xsl:attribute name="xsi:schemaLocation"
 				>http://purl.org/dryad/terms/<xsl:text> </xsl:text>http://datadryad.org/profile/v3.1/dryad.xsd</xsl:attribute>
 			<xsl:apply-templates select="dcterms:type" mode="copy"/>
-			<xsl:apply-templates select="dryad:status" mode="copy"/>
 			<xsl:apply-templates select="dcterms:creator" mode="copy"/>
 			<xsl:apply-templates select="dcterms:dateSubmitted" mode="copy"/>
 			<xsl:apply-templates select="dcterms:available" mode="copy"/>

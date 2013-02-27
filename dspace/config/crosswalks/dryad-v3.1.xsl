@@ -23,7 +23,6 @@
 	</xsl:template>
 
 	<xsl:template name="rootTemplate">
-		<DryadMetadata>
 		<xsl:choose>
 			<xsl:when 	test="count(dim:field[@element='relation'][@qualifier='haspart']) &gt; 0">
 				<xsl:call-template name="package_template" >
@@ -39,7 +38,6 @@
 				<output>The XML output is not what was expected</output>
 			</xsl:otherwise>
 		</xsl:choose>
-		</DryadMetadata>
 	</xsl:template>
 
 	<!-- An old Dryad data file has a dc.relation.ispartof value -->
@@ -48,7 +46,6 @@
 		<xsl:variable name="fileNode">
 			<DryadDataFile>
 				<dcterms:type>file</dcterms:type>
-				<status>deposited</status>
 				<xsl:apply-templates select="$node/dim:field" mode="inner" />
 			
 				<!-- special handling for isPartOf, while the metadata still contains handles in this field -->
@@ -198,14 +195,6 @@
 		<dcterms:spatial>
 			<xsl:value-of select="." />
 		</dcterms:spatial>
-	</xsl:template>
-
-	<!-- file -->
-	<xsl:template mode="inner"
-		match="dim:field[@element='bitstreamId'][@mdschema='dryad']">
-		<bitstreamId>
-			<xsl:value-of select="." />
-		</bitstreamId>
 	</xsl:template>
 
 	<!-- file -->
