@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
 	xmlns:dcterms="http://purl.org/dc/terms/" xmlns="http://purl.org/dryad/terms/"
-	   targetNamespace="http://purl.org/dryad/terms/">
+	   xmlns:bibo="http://purl.org/ontology/bibo/" targetNamespace="http://purl.org/dryad/terms/">
 
 	<xs:import namespace="http://purl.org/dc/terms/" schemaLocation="dcterms.xsd"/>
 	<xs:import namespace="http://rs.tdwg.org/dwc/terms/"
