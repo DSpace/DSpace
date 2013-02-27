@@ -195,6 +195,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	log.debug("starting doGet with request " + request.getPathInfo());  //why is this not printing ?count parameters...
 	
 	String reqPath = buildReqPath(request.getPathInfo());
+        String queryString = request.getQueryString();
        	log.debug("reqPath=" + reqPath);
 	
 	Context ctxt = null;
@@ -235,9 +236,9 @@ public class DataOneMN extends HttpServlet implements Constants {
 		    listObjects(request, response, objManager, false);
 		}
 		else if (reqPath.startsWith("/object/")) {
-		    getObject(reqPath, response, objManager, le);
+		    getObject(reqPath, request.getQueryString(), response, objManager, le);
 		    String objid = reqPath.substring("/object/".length());
-		    log.info("logging request for object id= " + objid);
+		    log.info("logging request for object id= " + objid + " queryString=" + request.getQueryString());
 		    le.setEvent(DataOneLogger.EVENT_READ);
 		    myRequestLogger.log(le);
 		}
@@ -246,7 +247,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 				       "Did you mean '/object' or '/object/http://dx.doi.org/...'");
 		}		
 	    } else if (reqPath.startsWith("/meta/")) {
-		getSystemMetadata(reqPath, response, objManager);
+		getSystemMetadata(reqPath, request.getQueryString(), response, objManager);
 	    } else if (reqPath.startsWith("/checksum/")) {
 		getChecksum(reqPath, response, objManager);
 	    } else if (reqPath.startsWith("/isAuthorized/")) {
@@ -503,13 +504,17 @@ public class DataOneMN extends HttpServlet implements Constants {
     /**
        Retrieve a particular object from this Member Node.
     **/
-    private void getObject(String reqPath, HttpServletResponse response, ObjectManager objManager, LogEntry logent) throws ServletException, IOException {
+    private void getObject(String reqPath, String reqQueryString, HttpServletResponse response, ObjectManager objManager, LogEntry logent) throws ServletException, IOException {
 	log.info("getObject()");
-
 	String idTimestamp = "";
 	String format = "";
 	String fileName = "";
+        // reqPath doesn't include query variables
 	String id = reqPath.substring("/object/".length());
+        if(reqQueryString != null) {
+            id = id + '?' + reqQueryString;
+        }
+
 	String simpleDOI = id.replace('/','_').replace(':','_');
 
 	try {
@@ -521,7 +526,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 		idTimestamp = id.substring(timeIndex);
 		id = id.substring(0,timeIndex);
 	    }
-	    if (id.endsWith("/bitstream")) {
+	    if (reqPath.endsWith("/bitstream")) {
 		// return a bitstream
 		log.debug("bitstream requested");
 		int bitsIndex = id.indexOf("/bitstream");
@@ -601,9 +606,12 @@ public class DataOneMN extends HttpServlet implements Constants {
     /**
        Returns the system metadata associated with an object.       
     **/
-    private void getSystemMetadata(String reqPath, HttpServletResponse response, ObjectManager objManager) throws ServletException, IOException {
+    private void getSystemMetadata(String reqPath, String reqQueryString, HttpServletResponse response, ObjectManager objManager) throws ServletException, IOException {
 	log.info("getSystemMetadata()");
 	String id = reqPath.substring("/meta/".length());
+	if(reqQueryString != null) {
+	    id = id + '?' + reqQueryString;
+	}
 	String idTimestamp = "";
 	
 	// perform corrections for timestamped IDs
@@ -638,7 +646,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	    Date date = item.getLastModified();
 	    String lastMod = dateFormatter.format(date);
 	   
-	    if (id.endsWith("/bitstream")) {
+	    if (reqPath.endsWith("/bitstream")) {
 		//build sysmeta for a bistream
 		Bitstream bitstream = objManager.getFirstBitstream(item);
 		
