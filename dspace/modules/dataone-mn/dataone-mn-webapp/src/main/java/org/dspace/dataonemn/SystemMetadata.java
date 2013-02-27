@@ -17,15 +17,18 @@ public class SystemMetadata extends Element implements Constants {
     private String describedBy = null;
     private String size = null;
     private String identifier = null;
+    private String idTimestamp = null;
     private String myChecksum = null;
     private String myChecksumAlgo = null;
     private String modDate = null;
     private String format =null;
     private String dateUploaded =null;
     
-    public SystemMetadata(String aIdentifier) {
+    public SystemMetadata(String identifier, String idTimestamp) {
 	super("d1:systemMetadata", D1_TYPES_NAMESPACE);
-	identifier = aIdentifier;
+	this.identifier = identifier;
+	this.idTimestamp = idTimestamp;
+	
     }
 
     public String getNamespace() {
@@ -61,12 +64,12 @@ public class SystemMetadata extends Element implements Constants {
 	size = "" + aSize;
     }
 	
-    public void setDescribes(String aDescribesRef) {
-	describes = aDescribesRef;
+    public void setDescribes(String aDescribesRef, String idTimestamp) {
+	describes = aDescribesRef + idTimestamp;
     }
 	
-    public void setDescribedBy(String aDescribedByRef) {
-	describedBy = aDescribedByRef;
+    public void setDescribedBy(String aDescribedByRef, String idTimestamp) {
+	describedBy = aDescribedByRef + idTimestamp;
     }
 
     public void setDateUploaded(String aDateUploaded) {
@@ -100,7 +103,7 @@ public class SystemMetadata extends Element implements Constants {
 	
 	// create the body of the xml in the correct order
 	addElement("serialVersion", "1");
-	addElement("identifier", identifier);
+	addElement("identifier", identifier + idTimestamp);
 	addElement("formatId", format);
 	addElement("size", size);
 	addElement("checksum", myChecksum).addAttribute(
