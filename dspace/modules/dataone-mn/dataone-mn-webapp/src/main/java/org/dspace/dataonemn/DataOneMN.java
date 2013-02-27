@@ -195,6 +195,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	log.debug("starting doGet with request " + request.getPathInfo());  //why is this not printing ?count parameters...
 	
 	String reqPath = buildReqPath(request.getPathInfo());
+        String queryString = request.getQueryString();
        	log.debug("reqPath=" + reqPath);
 	
 	Context ctxt = null;
@@ -235,9 +236,9 @@ public class DataOneMN extends HttpServlet implements Constants {
 		    listObjects(request, response, objManager, false);
 		}
 		else if (reqPath.startsWith("/object/")) {
-		    getObject(reqPath, response, objManager, le);
+		    getObject(reqPath, request.getQueryString(), response, objManager, le);
 		    String objid = reqPath.substring("/object/".length());
-		    log.info("logging request for object id= " + objid);
+		    log.info("logging request for object id= " + objid + " queryString=" + request.getQueryString());
 		    le.setEvent(DataOneLogger.EVENT_READ);
 		    myRequestLogger.log(le);
 		}
@@ -503,13 +504,17 @@ public class DataOneMN extends HttpServlet implements Constants {
     /**
        Retrieve a particular object from this Member Node.
     **/
-    private void getObject(String reqPath, HttpServletResponse response, ObjectManager objManager, LogEntry logent) throws ServletException, IOException {
+    private void getObject(String reqPath, String reqQueryString, HttpServletResponse response, ObjectManager objManager, LogEntry logent) throws ServletException, IOException {
 	log.info("getObject()");
-
 	String idTimestamp = "";
 	String format = "";
 	String fileName = "";
+        // reqPath doesn't include query variables
 	String id = reqPath.substring("/object/".length());
+        if(reqQueryString != null) {
+            id = id + '?' + reqQueryString;
+        }
+
 	String simpleDOI = id.replace('/','_').replace(':','_');
 
 	try {
@@ -521,7 +526,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 		idTimestamp = id.substring(timeIndex);
 		id = id.substring(0,timeIndex);
 	    }
-	    if (id.endsWith("/bitstream")) {
+	    if (reqPath.endsWith("/bitstream")) {
 		// return a bitstream
 		log.debug("bitstream requested");
 		int bitsIndex = id.indexOf("/bitstream");
