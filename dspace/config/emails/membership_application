@@ -1,0 +1,40 @@
+# Dryad Membership Application
+# {0}   Submission Date
+# {1}   Organization Name
+# {2}   Organization Legalname (if different)
+# {3}   Organization Type
+# {4}   Organization's annual revenue
+# {5}   Billing Contact Name
+# {6}   Billing address
+# {7}   Billing Contact Email
+# {8}   Publications
+# {9}   Membership Year
+# {10}   Dryad Representative Name
+# {11}  Dryad Representative Email
+# {12}  Comments
+# {13}  User Agent
+# {14}  Session ID
+#
+Subject: Dryad: Membership Application Submitted
+
+A new Dryad Membership Application has been submitted:
+
+Submission Date:				{0}
+Organization Name:				{1}
+Organization Legal Name:		{2}
+Organization Type:				{3}
+Organization's Annual revenue:	{4}
+Billing Contact Name:			{5}
+Billing address:				{6}
+Billing Contact Email:			{7}
+Publications:					{8}
+Membership Year:				{9}
+Dryad Representative Name:		{10}
+Dryad Representative Email:		{11}
+Comments:						{12}
+User Agent:						{13}
+Session ID:						{14}
+
+Thanks,
+
+The Dryad Team
