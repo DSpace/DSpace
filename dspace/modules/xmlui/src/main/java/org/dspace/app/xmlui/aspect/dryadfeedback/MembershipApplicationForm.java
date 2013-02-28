@@ -121,8 +121,8 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         form.addLabel("org_annual_revenue_label1","ds-form-label").addContent(message(message_prefix + "fields.org_annual_revenue.label1"));
         form.addItem("org_annual_revenue_label2","ds-form-content").addContent(message(message_prefix + "fields.org_annual_revenue.label2"));
         options = form.addList("fields", List.TYPE_GLOSS);
-        options.addItem().addRadio("org_annual_revenue").addOption("less_than_10_million", message(message_prefix + "fields.org_annual_revenue.less_than_10_million"));
-        options.addItem().addRadio("org_annual_revenue").addOption("greater_than_10_million", message(message_prefix + "fields.org_annual_revenue.greater_than_10_million"));
+        options.addItem().addRadio("org_annual_revenue").addOption("under10million", message(message_prefix + "fields.org_annual_revenue.under10million"));
+        options.addItem().addRadio("org_annual_revenue").addOption("over10million", message(message_prefix + "fields.org_annual_revenue.over10million"));
 
         form.addLabel("billing_contact_name_label1","ds-form-label").addContent(message(message_prefix + "fields.billing_contact_name.label1"));
         form.addItem("billing_contact_name_label2","ds-form-content").addContent(message(message_prefix + "fields.billing_contact_name.label2"));
