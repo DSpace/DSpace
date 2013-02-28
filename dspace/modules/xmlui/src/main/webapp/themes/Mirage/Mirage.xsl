@@ -44,7 +44,142 @@
 
 
     <xsl:template match="dri:body[//dri:meta/dri:pageMeta/dri:metadata[@element='request' and @qualifier='URI'] = '' ]">
+        <style type="text/css">
+            /* special style for Dryad homepage only */
+            #ds-body {
+                width: 100%;
+            }
+            .labelcell {
+                font-weight: bold;
+            }
+            .datacell {
+                text-align: right;
+            }
+            .ds-div-head a {
+                font-size: 0.7em;
+                font-weight: normal;
+                position: relative;
+                top: -0.1em;
+            }
+            .ds-artifact-list {
+                /* font-size: 100%; */
+                line-height: 1.4em;
+            }
+            .ds-artifact-item {
+                padding-top: 10px;
+            }
+            .artifact-title {
+                font-size: 100%;
+            }
+            .ds-artifact-list .artifact-info {
+                display: none;
+            }
 
+            /* implied 3 columns @300px width, 25px gutters */
+            .home-col-1 {
+                float: left;
+                width: 625px;
+                padding: 0;
+                /* margin-right: 25px;*/
+            }
+            .home-col-2 {
+                float: right;
+                width: 300px;
+                margin-left: 0;
+                margin-right: 0;
+            }
+            .home-top-row {
+                height: 220px;
+            }
+            .home-bottom-row {
+                height: 420px;
+            }
+
+            #dryad-home-carousel {
+                font-size: 23px;
+                font-weight: bold;
+                background-color: #fff;
+                border: 1px solid #333;
+                height: 216px;
+                padding: 0px;
+                overflow: visible;
+            }
+            #dryad-home-carousel .bx-viewport {
+                height: 190px;
+                width: 623px;
+            }
+            #dryad-home-carousel div.bxslider {
+                overflow: visible;
+            }
+            #dryad-home-carousel div.bxslider div {
+                padding: 0;
+                margin: 0;
+            }
+            #dryad-home-carousel div.bxslider div > a,
+            #dryad-home-carousel div.bxslider div > a > img,
+            #dryad-home-carousel div.bxslider div > img {
+                display: block;
+                height: 190px;
+                width: 623px;
+            }
+            #dryad-home-carousel div.bxslider div p {
+                /* padding: 36px 36px 38px; */
+                width: 480px;
+                margin: auto;
+                margin-top: 12px;
+            }
+            /* tweaks to slider control placement */
+            #dryad-home-carousel .bx-pager {
+                bottom: -32px;
+                left: 8px;
+            }
+            #dryad-home-carousel .bx-controls-auto {
+                bottom: -35px;
+            }
+            .blog-box ul {
+                list-style: none;
+                margin-left: 0;
+            }
+            .blog-box li {
+                margin: 0.5em 0 1.2em;
+            }
+
+
+            /* Connect options */
+            #connect-illustrated-prose {
+                overflow: hidden;
+                font-size: 15px;
+            }
+            #connect-illustrated-prose img {
+                width: auto;
+                margin: 4px;
+            }
+            .wordcloud .cloudword {
+                cursor: default;
+                line-height: 1em;
+                margin: 0;
+                padding: 0.1em 0 0.2em;
+                position: absolute;
+                text-decoration: none;
+                white-space: nowrap;
+                font-family: 'Arial Black','Helvetica','Arial',sans-serif;
+            }
+            .wordcloud a.cloudword[href] {
+                cursor: pointer;
+            }
+            .wordcloud a.cloudword[href]:hover {
+                background-color: #ffc;
+            }
+            #connect-legible-cloud {
+                display: none;
+                padding-top: 8px;
+                font-size: 16px;
+            }
+            #connect-legible-cloud p {
+                margin-top: 0px;
+                margin-bottom: 15px;
+            }
+        </style>
         <div id="ds-body">
 
             <!-- CAROUSEL -->
@@ -80,7 +215,7 @@
 
             <!-- START NEWS -->
             <!--<div class="home-col-2">-->
-                <!--<xsl:apply-templates select="dri:div[@id='file.news.div.news']"/>-->
+            <!--<xsl:apply-templates select="dri:div[@id='file.news.div.news']"/>-->
             <!--</div>-->
 
             <!-- START DEPOSIT -->
@@ -119,69 +254,127 @@
             <!-- START CONNECT  -->
             <div class="home-col-2">
                 <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Connect with Dryad</h1>
+
                 <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 490px;">
                     <div id="TEMP-connect-alternatives">
 
                         <div id="connect-illustrated-prose">
                             <p>
                                 <img style="float: right;margin-left: 8px;" src="themes/Mirage/images/connect-1.png"/>
-                                This text would describe the program in broad, readable terms,
-                                including clickable links for terms that lead us deeper,
+                                Dryad invites <b>publishers</b>, <b>journals</b>, <b>scientific societies</b> and
+                                <b>organizations</b>
+                                interested in data preservation to join us now and shape the course of Dryad’s
+                                future.
+                                <a href="#">Dryad members</a> elect our board of directors, participate in an
+                                active knowledge sharing network and receive discounts on deposit fees.
                                 <img style="float: left;margin-right: 8px;" src="themes/Mirage/images/connect-2.png"/>
-                                like <a href="#">membership</a> and <a href="#">journal integration</a>. Lorem ipsum
-                                dolor sit amet, consectetur adipiscing elit.
                             </p>
+
                             <p>
-                                Nam a nisi sit
-                                amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est
+                                <a href="#">Submission Integration</a> is a free and easy way for <b>journals</b> to
+                                coordinate manuscript submissions with data submissions in Dryad. Integration
+                                makes depositing data and linking it with an article faster and simpler for
+                                both scientists and journals.
                                 <img style="float: right;margin-left: 8px" src="themes/Mirage/images/connect-3.png"/>
-                                hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa.
                             </p>
+
                             <p>
-                                Aenean
-                                vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus.
-                                <img style="float: left;margin-right: 10px;" src="themes/Mirage/images/connect-4.png"/>
-                                Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus.
+                                Charging <a href="#">deposit fees</a> to offset the costs of data archiving
+                                will ensure that the public is never charged to access or reuse the data in
+                                Dryad.
+                                <!--Dryad’s flexible <a href="#">volume payment plans</a> make it attractive
+                                for institutions to sponsor data archiving as a service to their scientists and
+                                authors.-->
                             </p>
-                            <em>[1. illustrated prose]</em>
-                        </div>
-
-                        <div id="connect-keyword-cloud">
-                            <div class="wordcloud resizeable vertical horizontal saved" id="newWordCloud" style="display: none; background-color: rgb(255, 255, 255); width: 274px; height: 450px;"><a class="cloudword Yiggivoo" title="institution" id="cp0" style="font-size: 23px; color: rgb(21, 108, 155); left: 18px; top: 208px; display: inline;">institution</a><a class="cloudword Yiggivoo" title="join" id="cp1" style="font-size: 35px; color: rgb(165, 29, 90); left: 82px; top: 230px; display: inline;">join</a><a class="cloudword Yiggivoo" title="academic" id="cp2" style="font-size: 26px; color: rgb(41, 72, 171); left: 69px; top: 182px; display: inline;">academic</a><a class="cloudword Yiggivoo" title="integrate" id="cp3" style="font-size: 31px; color: rgb(55, 173, 55); left: 66px; top: 265px; display: inline;">integrate</a><a class="cloudword Yiggivoo" title="preserve" id="cp4" style="font-size: 26px; color: rgb(72, 41, 171); left: 91px; top: 156px; display: inline;">preserve</a><a class="cloudword Yiggivoo" title="member" id="cp5" style="font-size: 33px; color: rgb(29, 165, 90); left: 8px; top: 122px; display: inline; text-decoration: underline;" href="#">member</a><a class="cloudword Yiggivoo" title="archive" id="cp6" style="font-size: 30px; color: rgb(29, 165, 90); left: 36px; top: 296px; display: inline;">archive</a><a class="cloudword Yiggivoo" title="publisher" id="cp7" style="font-size: 19px; color: rgb(173, 55, 55); left: 159px; top: 210px; display: inline; text-decoration: underline;" href="#">publisher</a><a class="cloudword Yiggivoo" title="govern" id="cp8" style="font-size: 15px; color: rgb(21, 108, 155); left: 158px; top: 228px; display: inline;">govern</a><a class="cloudword Yiggivoo" title="organization" id="cp9" style="font-size: 31px; color: rgb(21, 108, 155); left: 44px; top: 325px; display: inline;">organization</a><a class="cloudword Yiggivoo" title="partner" id="cp10" style="font-size: 14px; color: rgb(141, 17, 126); left: 157px; top: 244px; display: inline;">partner</a><a class="cloudword Yiggivoo" title="analyze" id="cp11" style="font-size: 26px; color: rgb(173, 55, 55); left: 118px; top: 96px; display: inline;">analyze</a><a class="cloudword Yiggivoo" title="scientist" id="cp12" style="font-size: 20px; color: rgb(165, 29, 90); left: 173px; top: 136px; display: inline;">scientist</a><a class="cloudword Yiggivoo" title="data" id="cp13" style="font-size: 28px; color: rgb(17, 141, 126); left: 185px; top: 296px; display: inline;">data</a><a class="cloudword Yiggivoo" title="educate" id="cp14" style="font-size: 35px; color: rgb(165, 29, 90); left: 60px; top: 60px; display: inline;">educate</a><a class="cloudword Yiggivoo" title="journal" id="cp15" style="font-size: 38px; color: rgb(21, 108, 155); left: 1px; top: 356px; display: inline; text-decoration: underline;" href="#">journal</a><a class="cloudword Yiggivoo" title="help" id="cp16" style="font-size: 32px; color: rgb(108, 21, 155); left: 180px; top: 356px; display: inline;">help</a><a class="cloudword Yiggivoo" title="share" id="cp17" style="font-size: 13px; color: rgb(41, 72, 171); left: 30px; top: 230px; display: inline;">share</a><a class="cloudword Yiggivoo" title="society" id="cp18" style="font-size: 39px; color: rgb(41, 72, 171); left: 0px; top: 20px; display: inline; text-decoration: underline;" href="#">society</a><a class="cloudword Yiggivoo" title="collaborate" id="cp19" style="font-size: 26px; color: rgb(21, 108, 155); left: 102px; top: 394px; display: inline;">collaborate</a><a class="cloudword Yiggivoo" title="connect" id="cp20" style="font-size: 27px; color: rgb(141, 17, 126); left: 110px; top: 419px; display: inline;">connect</a><a class="cloudword Yiggivoo" title="study" id="cp21" style="font-size: 21px; color: rgb(21, 108, 155); left: 2px; top: 242px; display: inline;">study</a><a class="cloudword Yiggivoo" title="sustain" id="cp22" style="font-size: 21px; color: rgb(141, 17, 126); left: 18px; top: 100px; display: inline;">sustain</a><a class="cloudword Yiggivoo" title="synthesize" id="cp23" style="font-size: 20px; color: rgb(72, 41, 171); left: 75px; top: 0px; display: inline;">synthesize</a></div>
-
-                            <em>[2. keyword cloud]</em>
                         </div>
 
                         <div id="connect-legible-cloud">
+                            <p>
+                                <span style="font-size: 110%; color: #494; font-weight: bold;">Dryad</span>
+                                invites
+                                <span style="font-size: 130%; color: #c99;">publishers</span>,
+                                <span style="font-size: 120%; color: #aa5;">journals</span>,
+                                <span style="font-size: 130%; color: #99c;">scientific societies</span>
+                                and
+                                <span style="font-size: 120%; color: #6a9;">organizations</span>
+                                interested in
+                                <span style="color: #999; font-weight: bold;">data preservation</span>
+                                to join us now and shape the course of Dryad’s
+                                <span style="font-size: 110%; color: #c99; font-weight: bold;">future</span>.
+                                <a href="#" style="font-weight: bold;">Dryad members</a>
+                                elect our
+                                <span style="color: #aa5;">board of directors</span>,
+                                participate in an active
+                                <span style="font-weight: bold; color: #99c;">knowledge sharing</span>
+                                network and receive
+                                <span style="color: #c99;">discounts</span>
+                                on deposit fees.
+                            </p>
+
+                            <p>
+                                <a href="#" style="font-weight: bold;">Submission Integration</a>
+                                is a free and easy way for
+                                <span style="font-size: 120%; color: #99c;">journals</span>
+                                to
+                                <span style="color: #6a9;">coordinate manuscript submissions</span>
+                                with data submissions in
+                                <span style="color: #494; font-weight: bold;">Dryad</span>
+                                . Integration
+                                makes depositing data and
+                                <span style="font-weight: bold; color: #99c;">linking it</span>
+                                with an article
+                                <span style="color: #aa5;">faster and simpler</span>
+                                for both
+                                <span style="color: #c99;">scientists</span>
+                                and journals.
+                            </p>
+
+                            <p>
+                                Charging
+                                <a href="#" style="font-weight: bold;">deposit fees</a>
+                                to offset the
+                                <span style="color: #6a9;">costs of data archiving</span>
+                                will ensure that the
+                                <span style="color: #aa5;">public is never charged</span>
+                                to
+                                <span style="font-weight: bold; color: #999;">access or reuse</span>
+                                the data in
+                                <span style="color: #494; font-weight: bold;">Dryad</span>.
+                            </p>
+
+                            <!--Dryad’s flexible <a href="#">volume payment plans</a> make it attractive
+                            for institutions to sponsor data archiving as a service to their scientists and
+                            authors.
+                            -->
+
+                            <!--
                             The
                             <span style="font-size: 25px; color: #c99;">
-                                <a href="#">vision</a> of
-                                <span style="font-weight: 36px; color: #494; font-weight: bold;">Dryad</span></span> is a
+                            <a href="#">vision</a> of
+                            <span style="font-weight: 36px; color: #494; font-weight: bold;">Dryad</span></span> is a
                             <span style="font-size: 22px; color: #99b;">scholarly
-                                <a href="#">communication</a> system</span> in which
+                            <a href="#">communication</a> system</span> in which
                             <span style="font-size: 22px;">learned
-                                <a style="font-size: 24px; color: #494;" href="#TODO">societies</a>,
-                                <a style="font-size: 27px; color: #9c9; font-weight: bold;" href="#TODO">publishers</a>,
-                                <a style="font-size: 30px; color: #494;" href="#TODO">institutions</a>
-                                of research and education</span>, funding bodies and other
+                            <a style="font-size: 24px; color: #494;" href="#TODO">societies</a>,
+                            <a style="font-size: 27px; color: #9c9; font-weight: bold;" href="#TODO">publishers</a>,
+                            <a style="font-size: 30px; color: #494;" href="#TODO">institutions</a>
+                             of research and education</span>, funding bodies and other
                             <span style="font-size: 22px;">
-                                <a style="font-size: 28px; color: #449;" href="#TODO">stakeholders</a>
+                            <a style="font-size: 28px; color: #449;" href="#TODO">stakeholders</a>
                             </span>
-                            collaboratively
+                             collaboratively
                             <a style="font-size: 24px; color: #c99; font-weight: bold;" href="#TODO">sustain</a>
                             and promote the
                             <span style="font-size: 24px; color: #bb6;">
-                                <a href="#" style="color: #bb6;">preservation</a>
-                                and reuse
+                            <a href="#" style="color: #bb6;">preservation</a>
+                            and reuse
                             </span>
-                            of data.
-
-                            <br/>
-                            <br/>
-                            <em style="font-size: 13px;">[3. readable word cloud]</em>
+                             of data.
+                            -->
                         </div>
 
-                    </div><!-- END of #TEMP-connect-alternatives -->
+                    </div>
+                    <!-- END of #TEMP-connect-alternatives -->
                 </div>
             </div>
 
@@ -236,10 +429,6 @@
                 </div>
             </div>
 
-            <!-- START BLOG -->
-            <div class="home-col-2">
-                <xsl:apply-templates select="dri:div[@id='aspect.dryadinfo.DryadBlogFeed.div.dryad-info-home']"/>
-            </div>
 
 
             <!-- START STATISTICS -->
@@ -344,8 +533,22 @@
                     </div>
                 </div>
             </div>
+            <!-- START BLOG -->
+            <div class="home-col-2">
+                <xsl:apply-templates select="dri:div[@id='aspect.dryadinfo.DryadBlogFeed.div.dryad-info-home']"/>
+            </div>
+
         </div>
 
     </xsl:template>
+    <xsl:template match="dri:options"/>
 
+    <xsl:variable name="meta" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata"/>
+    <xsl:variable name="pageName" select="$meta[@element='request'][@qualifier='URI']"/>
+    <!--xsl:variable name="doc" select="document(concat('pages/', $pageName, '.xhtml'))"/-->
+
+    <xsl:template match="dri:xref[@rend='embed']">
+               <xsl:variable name="url" select="concat('pages/',@target)" />
+               <xsl:copy-of select="document(string($url))/html/*"/>
+           </xsl:template>
 </xsl:stylesheet>
