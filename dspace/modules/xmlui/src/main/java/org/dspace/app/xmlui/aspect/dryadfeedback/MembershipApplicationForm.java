@@ -158,10 +158,10 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         Text rep_email = form.addItem().addText("rep_email");
         rep_email.setValue(parameters.getParameter("rep_email", ""));
 
+        form.addLabel("comments_label1","ds-form-label").addContent(message(message_prefix + "fields.comments.label1"));
+        form.addItem("comments_label2","ds-form-content").addContent(message(message_prefix + "fields.comments.label2"));
         TextArea comments = form.addItem().addTextArea("comments");
-        comments.setLabel(message(message_prefix + "fields.comments.label1"));
-        form.addItem(message(message_prefix + "fields.comments.label2"));
-        comments.setValue(parameters.getParameter("comments",""));
+        comments.setValue(parameters.getParameter("comments", ""));
         
         form.addItem().addButton("submit").setValue(message(message_prefix + "submit"));
     }
