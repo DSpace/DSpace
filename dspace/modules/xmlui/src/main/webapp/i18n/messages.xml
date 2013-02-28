@@ -3298,7 +3298,7 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.label2">Membership years run Jan.-Dec.; what year would you like membership to begin?</message>
     
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_name.label1">9. Representative to Dryad <span class="required-mark">*</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_name.label2">Membership years run Jan.-Dec.; what year would you like membership to begin?</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_name.label2">Dryad members appoint a representative to Dryad’s annual meeting in May. This representative can vote for the Board of Directors and on Dryad issues. Please list the name of the representative for your organization.</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_email.label1">10. Representative's email address <span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_email.label2">Please provide the email address for the representative to Dryad.</message>
