@@ -93,7 +93,10 @@
         padding: 0;
         margin: 0;
     }
-    #dryad-home-carousel div.bxslider div img {
+    #dryad-home-carousel div.bxslider div > a,
+    #dryad-home-carousel div.bxslider div > a > img,
+    #dryad-home-carousel div.bxslider div > img {
+        display: block;
         height: 190px;
         width: 623px;
     }
@@ -105,11 +108,11 @@
     }
     /* tweaks to slider control placement */
     #dryad-home-carousel .bx-pager {
-        bottom: -24px;
+        bottom: -32px;
         left: 8px;
     }
     #dryad-home-carousel .bx-controls-auto {
-        bottom: -27px;
+        bottom: -35px;
     }
     .blog-box ul {
         list-style: none;
@@ -388,16 +391,24 @@
     <div id="dryad-home-carousel" class="ds-static-div primary">
       <div class="bxslider" style="">
         <div>
-            <img src="files/images/homepage-slides/ammonoids.jpg" />
+            <a href="http://datadryad.org/resource/doi:10.5061/dryad.k9b14/4">
+                <img src="files/images/homepage-slides/ammonoids.jpg" />
+            </a>
         </div>
         <div>
-            <img src="files/images/homepage-slides/Nectocaris.jpg" />
+            <a href="http://datadryad.org/resource/doi:10.5061/dryad.7m6kg">
+                <img src="files/images/homepage-slides/Nectocaris.jpg" />
+            </a>
         </div>
         <div>
-            <img src="files/images/homepage-slides/ginseng.jpg" />
+            <a href="http://datadryad.org/resource/doi:10.5061/dryad.q1cb1">
+                <img src="files/images/homepage-slides/ginseng.jpg" />
+            </a>
         </div>
         <div>
-            <img src="files/images/homepage-slides/oxford-meeting.jpg" />
+            <a href="http://blog.datadryad.org/2013/02/11/dryad-membership-meeting-data-publishing-symposium-2/" target="_blank">
+                <img src="files/images/homepage-slides/oxford-meeting.jpg" />
+            </a>
         </div>
         <div>
             <p style="margin-top: 54px;" Xid="ds-dryad-is" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"><span style="color: #595;">Dryad</span> is a <span style="color: #363;">nonprofit organization</span> and an <span style="color: #242;">international repository</span> of data underlying scientific and medical publications.</p>
