@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" class="no-js">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+<meta content="width=device-width; initial-scale=1.0; maximum-scale=1.0;" name="viewport" />
+<link rel="shortcut icon" href="/themes/Mirage/images/favicon.ico" />
+<link rel="apple-touch-icon" href="/themes/Mirage/images/apple-touch-icon.png" />
+<meta name="Generator" content="DSpace" />
+<link type="text/css" rel="stylesheet" media="screen" href="files/reset.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/base.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/helper.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/jquery-ui-1.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/style.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/superfish.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/jquery.bxslider.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/authority-control.css">
+<link type="text/css" rel="stylesheet" media="handheld" href="files/handheld.css">
+<link type="text/css" rel="stylesheet" media="print" href="files/print.css">
+<link type="text/css" rel="stylesheet" media="all" href="files/media.css">
+<link type="application/rss+xml" rel="alternate" href="/feed/rss_1.0/site" />
+<link type="application/rss+xml" rel="alternate" href="/feed/rss_2.0/site" />
+<link type="application/atom+xml" rel="alternate" href="/feed/atom_1.0/site" />
+
+<!-- TODO: include CSS in this page only -->
+<style type="text/css">
+     #dryad-member-application {
+        padding-left: 70px;
+        width: 515px;
+        padding-top: 8px;
+        padding-bottom: 12px;
+     }
+     label.q-title
+     {
+        display: block;
+        margin: 20px 0 0;
+        color: #555;
+        font-weight: bold;
+        font-size: 1.3em;
+     }
+     label.q-help
+     {
+        display: block;
+        margin: 4px 0 6px;
+     }
+     .required-mark {
+        color: #393;
+     }
+     #dryad-member-application ul {
+        list-style: none;
+     }
+     #dryad-member-application ul li {
+        color: inherit;
+        margin-bottom: 4px;
+     }
+     #dryad-member-application input[type='text'] {
+        width: 300px;
+     }
+</style>
+
+<script type="text/javascript">
+                                //clear default text of emty text areas on focus
+                                function tfocus(element)
+                                {
+                                        if (element.value == ' '){element.value='';}
+                                }
+                                //clear default text of emty text areas on submit
+                                function tsubmit(form)
+                                {
+                                        var defaultedelements = document.getelementsbytagname("textarea");
+                                        for (var i=0; i != defaultedelements.length; i++){
+                                                if (defaultedelements[i].value == ' '){
+                                                        defaultedelements[i].value='';}}
+                                }
+                                //disable pressing 'enter' key to submit a form (otherwise pressing 'enter' causes a submission to start over)
+                                function disableenterkey(e)
+                                {
+                                     var key;
+
+                                     if(window.event)
+                                          key = window.event.keycode;     //internet explorer
+                                     else
+                                          key = e.which;     //firefox and netscape
+
+                                     if(key == 13)  //if "enter" pressed, then disable!
+                                          return false;
+                                     else
+                                          return true;
+                                }
+
+                                function fnarray()
+                                {
+                                    this.funcs = new array;
+                                }
+
+                                fnarray.prototype.add = function(f)
+                                {
+                                    if( typeof f!= "function" )
+                                    {
+                                        f = new function(f);
+                                    }
+                                    this.funcs[this.funcs.length] = f;
+                                };
+
+                                fnarray.prototype.execute = function()
+                                {
+                                    for( var i=0; i < this.funcs.length; i++ )
+                                    {
+                                        this.funcs[i]();
+                                    }
+                                };
+
+                                var runafterjsimports = new fnarray();
+            </script>
+<script xmlns:i18n="http://apache.org/cocoon/i18n/2.1" type="text/javascript" src="/themes/mirage/lib/js/modernizr-1.5.min.js"> </script>
+<title>dryad digital repository</title>
+</head><!--[if lt ie 7 ]> <body class="ie6"> <![endif]-->
+                <!--[if ie 7 ]>    <body class="ie7"> <![endif]-->
+                <!--[if ie 8 ]>    <body class="ie8"> <![endif]-->
+                <!--[if ie 9 ]>    <body class="ie9"> <![endif]-->
+                <!--[if (gt ie 9)|!(ie)]><!--><body><!--<![endif]-->
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/dri/1.0/" id="ds-main">
+<div id="ds-header-wrapper">
+<div class="clearfix" id="ds-header">
+<a id="ds-header-logo-link" href="/">
+<span id="ds-header-logo"> </span>
+<span id="ds-header-logo-text">mirage</span>
+</a>
+<h1 class="pagetitle visuallyhidden">dryad digital repository</h1>
+<h2 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/dri/1.0/" class="static-pagetitle visuallyhidden">dryad repository</h2>
+<!--
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" id="ds-user-box">
+<p>
+<a href="/login">login</a>
+</p>
+</div>
+-->
+<div id="sharing-tools">
+    <a href="#TODO"><img src="files/images/dryad_twit_icon.png" /></a>
+    <a href="#TODO"><img src="files/images/dryad_fb_icon2.png" /></a>
+    <a href="#TODO"><img src="files/images/dryad_gplus_icon.png" /></a>
+    <a href="#TODO"><img src="files/images/dryad_rss_icon.png" /></a>
+</div>
+<div id="main-menu">
+
+    <ul class="sf-menu">
+
+        <li>
+            <a href="#TODO">About</a>
+            <ul>
+                <li>
+                    <a href="#TODO">Purpose &amp; Goals</a>
+                </li>
+                <li>
+                    <a href="#TODO">Who We Are</a>
+                </li>
+                <li>
+                    <a href="#TODO">Journal Archiving Policy</a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a href="#TODO">Membership</a>
+            <ul>
+                <li>
+                    <a href="#TODO">Overview</a>
+                </li>
+                <li>
+                    <a href="#TODO">Apply</a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a href="#TODO">Resources</a>
+            <ul>
+                <li>
+                    <a href="#TODO">Deposit Data Instructions</a>
+                </li>
+                <li class="current">
+                    <a href="#TODO">FAQ</a>
+                </li>
+                <li>
+                    <a href="#TODO">Wiki</a>
+                </li>
+                <li>
+                    <a href="#TODO">Blog</a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a>Contact Us</a>
+        </li>
+
+        <!-- these items would appear only for anonymous visitors (NOT logged in) -->
+        <li id="login-item">
+            <a href="#TODO">Login</a>
+        </li>
+        <li id="sign-up-item">
+            <a href="#TODO">Sign Up</a>
+        </li>
+
+        <!-- this item would appear only for logged-in users -->
+<!--
+        <li>
+            <a href="#TODO">{USER NAME}</a>
+            <ul>
+                <li>
+                    <a href="#TODO">My Submissions</a>
+                </li>
+                <li>
+                    <a href="#TODO">My Tasks</a>
+                </li>
+                <li>
+                    <a href="#TODO">Profile</a>
+                </li>
+                <li class="after-divider">
+                    <a href="#TODO">Logout</a>
+                </li>
+            </ul>
+        </li>
+-->
+
+        <!-- this item would appear only for logged-in administrators -->
+<!--
+        <li>
+            <a href="#TODO">Administrative</a>
+            <ul>
+                <li>
+                    <a href="#TODO">Workflow Overview</a>
+                </li>
+                <li class="after-divider">
+                    <a href="#TODO">Access Control</a>
+                </li>
+                <li>
+                    <a href="#TODO">People</a>
+                </li>
+                <li>
+                    <a href="#TODO">Groups</a>
+                </li>
+                <li>
+                    <a href="#TODO">Authorizations</a>
+                </li>
+                <li class="after-divider">
+                    <a href="#TODO">Registries</a>
+                </li>
+                <li>
+                    <a href="#TODO">Format</a>
+                </li>
+                <li>
+                    <a href="#TODO">Metadata</a>
+                </li>
+                <li class="after-divider">
+                    <a href="#TODO">Items</a>
+                </li>
+                <li>
+                    <a href="#TODO">Withdrawn Items</a>
+                </li>
+                <li>
+                    <a href="#TODO">Control Panel</a>
+                </li>
+                <li>
+                    <a href="#TODO">Statistics</a>
+                </li>
+                <li>
+                    <a href="#TODO">Import Metadata</a>
+                </li>
+            </ul>
+        </li>
+-->
+
+    </ul>
+</div>
+</div>
+</div>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" id="ds-trail-wrapper">
+<ul id="ds-trail">
+<li class="ds-trail-link first-link last-link">
+<a href="">Dryad Digital Repository</a>
+</li>
+</ul>
+</div>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="hidden" id="no-js-warning-wrapper">
+<div id="no-js-warning">
+<div class="notice failure">JavaScript is disabled for your browser. Some features of this site may not work without it.</div>
+</div>
+</div>
+<div id="ds-content-wrapper">
+<div class="clearfix" id="ds-content">
+<div id="ds-body">
+<!-- TODO: This page requires inline STYLE above and contents of #ds-body -->
+
+<h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Dryad 2013 Member Application</h1>
+<div id="" class="ds-static-div primary" style="">
+   <p>
+    Any organization that supports and advances the educational, scientific, and charitable mission of Dryad can apply to become a member. Dryad members guide the direction of the Dryad data repository through electing the Board of Directors and approving policy changes.  Members also participate in an annual meeting that provides a forum for sharing knowledge and coordinating action around data policies. Journals who are members of Dryad (or who are produced by publishers who are members) receive a discount on deposit fees.
+   </p>   
+   <p>
+    Once an organization submits this application, it will be reviewed by the Dryad Board of Directors.  Upon acceptance, the Board will send the organization a membership agreement and a request for membership dues.  Memberships become active when Dryad receives the signed agreement and dues.
+   </p>   
+   <p>
+    For more information about Dryad, contact <a href="mailto:director@datadryad.org">director@datadryad.org</a> or visit <a target="_blank" href="http://datadryad.org/pages/members">http://datadryad.org/pages/members</a>.
+   </p>   
+
+<form id="dryad-member-application">
+   <div class="required-mark" style="float: right;">
+      <b style="font-size: 1.3em;">*</b> Marked fields are required
+   </div>
+
+   <div class="errorbox-good" style="clear: right;">
+      <div class="form-item"><label class="q-title" for="entry_0">1a. Name of member organization <span class="required-mark">*</span></label>
+      <label class="q-help" for="entry_0">Please provide the preferred name for the membership list. </label>
+      <input name="entry.0.single" value="" class="ss-q-short" id="entry_0" type="text"></div>
+   </div>
+
+   <div class="errorbox-good">
+      <div class="form-item"><label class="q-title" for="entry_1">1b. Legal name of organization</label>
+      <label class="q-help" for="entry_1">Please provide the institution's legal name, if different. </label>
+      <input name="entry.1.single" value="" class="ss-q-short" id="entry_1" type="text"></div>
+   </div>
+
+   <div class="errorbox-good">
+      <div class="form-item"><label class="q-title" for="entry_2">2. Type of organization <span class="required-mark">*</span></label>
+      <label class="q-help" for="entry_2">Membership in Dryad is open to the full spectrum of stakeholder organizations, including but not limited to journals, learned societies, publishers, research institutions, libraries, and funding bodies.</label>
+      <ul class="ss-choices"><li class="ss-choice-item"><label class="ss-choice-label"><input name="entry.2.group" value="Data center or repository" class="ss-q-radio" id="group_2_1" type="radio">
+      Data center or repository</label></li> <li class="ss-choice-item"><label class="ss-choice-label"><input name="entry.2.group" value="Funding organization" class="ss-q-radio" id="group_2_2" type="radio">
+      Funding organization</label></li> <li class="ss-choice-item"><label class="ss-choice-label"><input name="entry.2.group" value="Journal" class="ss-q-radio" id="group_2_3" type="radio">
+      Journal</label></li> <li class="ss-choice-item"><label class="ss-choice-label"><input name="entry.2.group" value="Publisher" class="ss-q-radio" id="group_2_4" type="radio">
+      Publisher</label></li> <li class="ss-choice-item"><label class="ss-choice-label"><input name="entry.2.group" value="Scholarly society" class="ss-q-radio" id="group_2_5" type="radio">
+      Scholarly society</label></li> <li class="ss-choice-item"><label class="ss-choice-label"><input name="entry.2.group" value="University, research, or educational institute" class="ss-q-radio" id="group_2_6" type="radio">
+      University, research, or educational institute</label></li>
+      <li class="ss-choice-item"><input name="entry.2.group" value="__option__" class="ss-q-radio" id="other_option:2" type="radio">
+      <label for="other_option:2">Other: </label>
+      <input name="entry.2.group.other_option_" value="" class="ss-q-other" type="text"></li></ul></div>
+   </div>
+
+   <div class="errorbox-good">
+      <div class="form-item"><label class="q-title" for="entry_20">3. Gross annual revenue <span class="required-mark">*</span></label>
+      <label class="q-help" for="entry_20">Dryad membership fees are based on members' annual revenue.</label>
+      <ul class="ss-choices"><li class="ss-choice-item"><label class="ss-choice-label"><input name="entry.20.group" value="Less than $10 million per year (annual membership fee US$1000)" class="ss-q-checkbox" id="group_20_1" type="checkbox">
+      Less than $10 million per year (annual membership fee US$1000)</label></li> <li class="ss-choice-item"><label class="ss-choice-label"><input name="entry.20.group" value="Greater than $10 million per year (annual membership fee US$5000)" class="ss-q-checkbox" id="group_20_2" type="checkbox">
+      Greater than $10 million per year (annual membership fee US$5000)</label></li>
+      </ul></div>
+   </div>
+
+   <div class="errorbox-good">
+      <div class="form-item"><label class="q-title" for="entry_21">4. Billing contact <span class="required-mark">*</span></label>
+      <label class="q-help" for="entry_21">Pleae provide the name of the billing contact person. </label>
+      <input name="entry.21.single" value="" class="ss-q-short" id="entry_21" type="text"></div>
+   </div>
+
+   <div class="errorbox-good">
+      <div class="form-item"><label class="q-title" for="entry_10">4. Billing address <span class="required-mark">*</span></label>
+      <label class="q-help" for="entry_10">Dryad will invoice members for 2013 membership dues. Please provide the address for billing purposes. </label>
+      <textarea name="entry.10.single" rows="8" cols="75" class="ss-q-long" id="entry_10"></textarea></div>
+   </div>
+
+   <div class="errorbox-good">
+      <div class="form-item"><label class="q-title" for="entry_25">6. Billing email address <span class="required-mark">*</span></label>
+      <label class="q-help" for="entry_25"></label>
+      <input name="entry.25.single" value="" class="ss-q-short" id="entry_25" type="text"></div>
+   </div>
+
+   <div class="errorbox-good">
+      <div class="form-item"><label class="q-title" for="entry_4">7. Publications
+      </label>
+      <label class="q-help" for="entry_4">Membership in Dryad allows a discount on certain journal user fees. Please list journals that your organization publishes. If too many to list here, please send this info to <a href="mailto:director@datadryad.org">director@datadryad.org</a>.</label>
+      <textarea name="entry.4.single" rows="8" cols="75" class="ss-q-long" id="entry_4"></textarea></div>
+   </div>
+
+   <div class="errorbox-good">
+      <div class="form-item"><label class="q-title" for="entry_22">8. Membership year <span class="required-mark">*</span></label>
+      <label class="q-help" for="entry_22">Membership years run Jan.-Dec.; what year would you like membership to begin?</label>
+      <input name="entry.22.single" value="" class="ss-q-short" id="entry_22" type="text"></div>
+   </div>
+   
+   <div class="errorbox-good">
+      <div class="form-item"><label class="q-title" for="entry_5">9. Representative to Dryad <span class="required-mark">*</span></label>
+      <label class="q-help" for="entry_5">Dryad members appoint a representative to Dryad’s annual meeting in May. This representative can vote for the Board of Directors and on Dryad issues. Please list the name of the representative for your organization.</label>
+      <input name="entry.5.single" value="" class="ss-q-short" id="entry_5" type="text"></div>
+   </div>
+   
+   <div class="errorbox-good">
+      <div class="form-item"><label class="q-title" for="entry_6">10. Representative's email address <span class="required-mark">*</span></label>
+      <label class="q-help" for="entry_6">Please provide the email address for the representative to Dryad. </label>
+      <input name="entry.6.single" value="" class="ss-q-short" id="entry_6" type="text"></div>
+   </div>
+   
+   <div class="errorbox-good">
+      <div class="form-item"><label class="q-title" for="entry_9">11. Comments </label>
+      <label class="q-help" for="entry_9">Please tell us anything else you think we should know about the member organization. </label>
+      <textarea name="entry.9.single" rows="8" cols="75" class="ss-q-long" id="entry_9"></textarea></div>
+   </div>
+
+   <br>
+   <input name="pageNumber" value="0" type="hidden">
+   <input name="backupCache" value="" type="hidden">
+
+   <div class="form-item" style="text-align: right;">
+    <input type="submit" class="ds-button-field " name="submit" value="Submit">
+   </div>
+
+</form>
+</div><!-- end of DIV.primary -->
+
+</div><!-- end of DIV#ds-body -->
+
+<div id="ds-options-wrapper">
+<div id="ds-options">
+<h1 class="ds-option-set-head" id="ds-search-option-head">Search Dryad</h1>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-option-set" id="ds-search-option">
+<form method="post" id="ds-search-form" action="/discover">
+<fieldset>
+<input type="text" class="ds-text-field " name="query" />
+<input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" value="Go" type="submit" name="submit" class="ds-button-field " onclick="&#10;                                    var radio = document.getElementById(&quot;ds-search-form-scope-container&quot;);&#10;                                    if (radio != undefined &amp;&amp; radio.checked)&#10;                                    {&#10;                                    var form = document.getElementById(&quot;ds-search-form&quot;);&#10;                                    form.action=&#10;                                &quot;/handle/&quot; + radio.value + &quot;/discover&quot; ; &#10;                                    }&#10;                                " />
+</fieldset>
+</form>
+<a href="/discover">Advanced Search</a>
+</div>
+<h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-option-set-head">Browse</h1>
+<div id="org_datadryad_dspace_xmlui_aspect_browse_Navigation_list_DryadBrowse" class="ds-option-set">
+<ul class="ds-simple-list">
+<li>
+<a href="/search-filter?field=dc.contributor.author_filter&amp;fq=location:l2">Authors</a>
+</li>
+<li>
+<a href="/search-filter?field=prism.publicationName_filter&amp;fq=location:l2">Journal Title</a>
+</li>
+</ul>
+</div>
+<h1 class="ds-option-set-head">Information</h1>
+<div id="aspect_dryadinfo_Navigation_list_DryadInfo" class="ds-option-set">
+<ul class="ds-simple-list">
+<li>
+<a href="/pages/depositing">Depositing Data</a>
+</li>
+<li>
+<a href="/pages/using">Using Data</a>
+</li>
+<li>
+<a href="/pages/members">Dryad Members</a>
+</li>
+<li>
+<a href="/pages/jdap">Journal Archiving Policy</a>
+</li>
+<li>
+<a href="/pages/about">About Dryad</a>
+</li>
+<li>
+<a href="http://blog.datadryad.org">Dryad Blog</a>
+</li>
+<li>
+<a href="http://wiki.datadryad.org">Dryad Documentation</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<!--END of #ds-options-wrapper -->
+
+
+
+
+
+</div>
+</div>
+<div id="ds-footer-wrapper">
+<div id="ds-footer">
+<!--
+<div id="ds-footer-left">
+<a target="_blank" href="http://www.dspace.org/">DSpace software</a> copyright © 2002-2010  <a target="_blank" href="http://www.duraspace.org/">Duraspace</a>
+</div>
+<div id="ds-footer-right">
+<span class="theme-by">Theme by </span>
+<a id="ds-footer-logo-link" href="http://atmire.com" target="_blank" title="@mire NV">
+<span id="ds-footer-logo"> </span>
+</a>
+</div>
+-->
+<div id="ds-footer-links">
+
+    <span style="float: right;">
+        <a href="#TODO">Dryad Policies</a> 
+        &nbsp;<span style="color: #777;">|</span>&nbsp; 
+        <a href="/contact">Contact Us</a> 
+    </span>
+    <span style="float: left;">
+        Dryad is a nonprofit membership organization.
+    </span>
+    <p class="build-info">Dryad updated Tue, 19 Feb 2013 07:48:02 EST and served by North Carolina State University</p>
+    <!--Git Commit Hash: 1791a030d671f4e6959e0913857f304fb67b1c9c-->
+</div>
+<a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="hidden" href="/htmlmap"> </a>
+</div>
+</div>
+</div>
+<script type="text/javascript">var JsHost = (("https:" == document.location.protocol) ? "https://" : "http://");
+            document.write(unescape("%3Cscript src='" + JsHost + "ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js' type='text/javascript'%3E%3C/script%3E"));</script>
+<script type="text/javascript">!window.jQuery && document.write('<script type="text/javascript" src="/static/js/jquery-1.9.1.min.js"> <\/script>')</script>
+<script type="text/javascript" src="/themes/Mirage/lib/js/jquery-ui-1.8.5.custom.min.js"> </script><!--[if lt IE 7 ]>
+<script type="text/javascript" src="/themes/Mirage/lib/js/DD_belatedPNG_0.0.8a.js?v=1"> </script>
+<script type="text/javascript">DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');$.each($('img[src$=png]'), function() {DD_belatedPNG.fixPng(this);});</script><![endif]-->
+<script type="text/javascript" src="files/jquery.hoverIntent.js"></script>
+<script type="text/javascript" src="files/superfish.js"></script>
+<script type="text/javascript" src="files/supersubs.js"></script>
+<script type="text/javascript" src="files/jquery.bxslider.min.js"></script>
+<script type="text/javascript">
+            runAfterJSImports.execute();
+        </script>
+<script type="text/javascript">
+                   var _gaq = _gaq || [];
+                   _gaq.push(['_setAccount', 'UA-16949847-1']);
+                   _gaq.push(['_trackPageview']);
+
+                   (function() {
+                       var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                   })();
+           </script>
+
+<!-- main menu behavior -->
+<script type="text/javascript">
+        $(document).ready(function() {
+            $('#main-menu ul.sf-menu')
+                .supersubs({
+                    // all numeric properties are in em
+                    minWidth: 22,
+                    maxWidth: 30,   // this isn't doing much...
+                    extraWidth: 1
+                })
+                .superfish();
+        });
+           </script>
+
+<!-- behaviors for home page only -->
+<script type="text/javascript">
+        $(document).ready(function() {
+            // TODO
+        });
+           </script>
+</body></html>
