@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- We have to comment out the DTD to run, but use it to validate when editing -->
+<!--
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+-->
+<html>
+    <head>
+        <title>Restricted Access</title>
+        <script type="text/javascript">jQuery.noConflict();</script> 
+        <script src="http://platform.twitter.com/widgets.js" language="javascript" type="text/javascript"> </script> 
+        <script src="/themes/Dryad/lib/editor.js" language="javascript" type="text/javascript"> </script> 
+        <script type="text/javascript" src="/themes/Dryad/lib/jquery-1.3.1.min.js"> </script> 
+        <script type="text/javascript" src="/themes/Dryad/lib/utils.js"> </script> 
+        <script type="text/javascript" src="/themes/Dryad/lib/jquery.tooltip.js"> </script> 
+        <script type="text/javascript">var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));</script> 
+        <script type="text/javascript">try {var pageTracker = _gat._getTracker("UA-16949847-1");pageTracker._trackPageview();} catch(err) {}</script> 
+        
+	<style type="text/css">
+          div#ds-body { margin: 0px 0px 0px 130px;padding-right: 10px; top: 165px;}
+	</style>
+
+    </head>
+    <body>
+        <div id="ds-body">
+            <h1>Content restricted ahead of article publication</h1>
+            
+            <form xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_artifactbrowser_FeedbackForm_div_feedback-form" class="ds-interactive-div primary" action="/feedback" method="post" onsubmit="javascript:tSubmit(this);"> 
+                <p class="ds-paragraph">As far as we know, the article
+                associated with this Dryad data package has not yet
+                been published, and the journal requires us to
+                suppress the data until article publication.  If you
+                know that the article has in fact been published,
+                please let us know by filling out the form below and
+                we will make the data available promptly. Thanks!</p> 
+                <fieldset xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_artifactbrowser_FeedbackForm_list_form" class="ds-form-list"> 
+                    <ol> 
+                        <li class="ds-form-item"> 
+                            <label class="ds-form-label" for="aspect_artifactbrowser_FeedbackForm_field_email">Your Email:</label> 
+                            <div xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-form-content"> 
+                                <input id="aspect_artifactbrowser_FeedbackForm_field_email" class="ds-text-field" name="email" type="text" value="" title="This address will be used to follow&#10;&#9;&#9;up on your feedback." /> 
+                                <span class="field-help">This address will be used to follow
+                                    up with you.</span> 
+                            </div> 
+                        </li> 
+                        <li xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-form-item"> 
+                            <label class="ds-form-label"
+                                for="aspect_artifactbrowser_FeedbackForm_field_comments">Please
+                                provide a link to the article if it is published online, or provide a
+                                description of where the article has been published:</label> 
+                            <div xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-form-content"> 
+                                <textarea id="aspect_artifactbrowser_FeedbackForm_field_comments" class="ds-textarea-field" name="comments" onfocus="javascript:tFocus(this);" cols="60" rows="5"> </textarea> 
+                            </div> 
+                        </li> 
+                        <li class="ds-form-item last"> 
+                            <div class="ds-form-content"> 
+                                <input id="aspect_artifactbrowser_FeedbackForm_field_submit" class="ds-button-field" name="submit" type="submit" value="Submit" /> 
+                            </div> 
+                        </li> 
+                    </ol> 
+                </fieldset> 
+                <p id="aspect_artifactbrowser_FeedbackForm_p_hidden-fields" class="ds-paragraph hidden"> 
+                    <input id="aspect_artifactbrowser_FeedbackForm_field_page" class="ds-hidden-field" name="page" type="hidden" value="http://datadryad.org/publicationBlackout" /> 
+                </p> 
+            </form> 
+            <div class="page-license">
+                <p>
+                    All text on this page is 
+                    available under a <a href="http://creativecommons.org/licenses/by/3.0" target="_blank">CC-BY 3.0</a> license.
+                    <a href="http://creativecommons.org/licenses/by/3.0" target="_blank">
+                        <img src="/themes/Dryad/images/cc-by.png" alt="cc-by-3.0 icon"/>
+                    </a>             
+                </p>
+            </div>              
+        </div>
+    </body>
+</html>

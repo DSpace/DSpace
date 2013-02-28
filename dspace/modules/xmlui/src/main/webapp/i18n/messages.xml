@@ -363,7 +363,7 @@
 	<message key="xmlui.Site.stats">As of {0}, Dryad contains <span class="bold">{1} data
 			packages</span> and <span class="bold">{2} data files</span>, associated with articles in <span class="bold"
 			>{3} journals</span>.</message>
-	<message key="xmlui.Site.blogfeed.title">Recent Posts from the Dryad Blog</message>
+	<message key="xmlui.Site.blogfeed.title">Dryad Blog</message>
 
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.ItemViewer.java -->
@@ -3249,5 +3249,6 @@
 
     <message key="xmlui.submit.publication.journal.help_in_review">If your journal is not listed, you must wait until your manuscript has been accepted before submitting data to Dryad.</message>
 
+    <message key="xmlui.dri2xhtml.structural.feedback-link">Feed Back</message>
 
 </catalogue>

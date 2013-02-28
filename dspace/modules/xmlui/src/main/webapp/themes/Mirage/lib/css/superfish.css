@@ -110,7 +110,7 @@ ul.sf-menu li li li.sfHover ul {
     height:			10px;
     text-indent: 	-999em;
     overflow:		hidden;
-    background:		url('./arrows-333333.png') no-repeat -10px -100px; /* 8-bit indexed alpha png. IE6 gets solid image only */
+    background:		url('../../images/arrows-333333.png') no-repeat -10px -100px; /* 8-bit indexed alpha png. IE6 gets solid image only */
 }
 a > .sf-sub-indicator {  /* give all except IE6 the correct values */
     top:			.8em;

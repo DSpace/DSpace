@@ -431,47 +431,179 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     <a href="#TODO"><img src="themes/Mirage/images/dryad_rss_icon.png"/>
                     </a>
                 </div>
-                <xsl:choose>
-                    <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
-                        <div id="ds-user-box">
-                            <p>
-                                <a>
-                                    <xsl:attribute name="href">
-                                        <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
-                                        dri:metadata[@element='identifier' and @qualifier='url']"/>
+                <div id="main-menu">
+
+                    <ul class="sf-menu">
+
+                        <li>
+                            <a href="#TODO">About</a>
+                            <ul>
+                                <li>
+                                    <a href="#TODO">Purpose &amp; Goals</a>
+                                </li>
+                                <li>
+                                    <a><xsl:attribute name="href">
+                                        <xsl:value-of
+                                                select="//dri:document/dri:options/dri:list[@n='DryadInfo']/dri:item/dri:xref[contains(@target,'about')]/@target"/>
                                     </xsl:attribute>
-                                    <i18n:text>xmlui.dri2xhtml.structural.profile</i18n:text>
-                                    <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
-                                    dri:metadata[@element='identifier' and @qualifier='firstName']"/>
-                                    <xsl:text> </xsl:text>
-                                    <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
-                                    dri:metadata[@element='identifier' and @qualifier='lastName']"/>
-                                </a>
-                                <xsl:text> | </xsl:text>
-                                <a>
-                                    <xsl:attribute name="href">
-                                        <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
-                                        dri:metadata[@element='identifier' and @qualifier='logoutURL']"/>
+                                        Who We Are</a>
+                                </li>
+                                <li>
+                                    <a><xsl:attribute name="href">
+                                        <xsl:value-of
+                                                select="//dri:document/dri:options/dri:list[@n='DryadInfo']/dri:item/dri:xref[contains(@target,'jdap')]/@target"/>
                                     </xsl:attribute>
-                                    <i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
-                                </a>
-                            </p>
-                        </div>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <div id="ds-user-box">
-                            <p>
-                                <a>
-                                    <xsl:attribute name="href">
-                                        <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
+                                        Journal Archiving Policy</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#TODO">Membership</a>
+                            <ul>
+                                <li>
+                                    <a><xsl:attribute name="href">
+                                        <xsl:value-of
+                                                select="//dri:document/dri:options/dri:list[@n='DryadInfo']/dri:item/dri:xref[contains(@target,'members')]/@target"/>
+                                    </xsl:attribute>
+                                        Overview</a>
+                                </li>
+                                <li>
+                                    <a href="#TODO">Apply</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#TODO">Resources</a>
+                            <ul>
+                                <li>
+                                    <a><xsl:attribute name="href">
+                                        <xsl:value-of
+                                                select="//dri:document/dri:options/dri:list[@n='DryadInfo']/dri:item/dri:xref[contains(@target,'deposit')]/@target"/>
+                                    </xsl:attribute>
+                                        Deposit Data Instructions</a>
+                                </li>
+                                <li class="current">
+                                    <a href="#TODO">FAQ</a>
+                                </li>
+                                <li>
+                                    <a><xsl:attribute name="href">
+                                        <xsl:value-of
+                                                select="//dri:document/dri:options/dri:list[@n='DryadInfo']/dri:item/dri:xref[contains(@target,'wiki')]/@target"/>
+                                    </xsl:attribute>
+                                        Wiki</a>
+                                </li>
+                                <li>
+                                    <a>
+                                        <xsl:attribute name="href">
+                                            <xsl:value-of
+                                                    select="//dri:document/dri:options/dri:list[@n='DryadInfo']/dri:item/dri:xref[contains(@target,'blog')]/@target"/>
+                                        </xsl:attribute>
+                                        Blog</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a>
+                                <xsl:attribute name="href">
+                                    <xsl:value-of
+                                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                                    <xsl:text>/contact</xsl:text>
+                                </xsl:attribute>
+                                <i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
+                            </a>
+                        </li>
+
+                        <!-- these items would appear only for anonymous visitors (NOT logged in) -->
+                        <li id="login-item">
+                            <a>
+                                <xsl:attribute name="href">
+                                    <xsl:value-of select="//dri:document/dri:meta/dri:userMeta/
                                         dri:metadata[@element='identifier' and @qualifier='loginURL']"/>
-                                    </xsl:attribute>
-                                    <i18n:text>xmlui.dri2xhtml.structural.login</i18n:text>
-                                </a>
-                            </p>
-                        </div>
-                    </xsl:otherwise>
-                </xsl:choose>
+                                </xsl:attribute>
+                                <i18n:text>xmlui.dri2xhtml.structural.login</i18n:text>
+                            </a>
+                        </li>
+                        <li id="sign-up-item">
+                            <a>
+                                <xsl:attribute name="href">
+                                    <xsl:value-of select="//dri:document/dri:meta/dri:userMeta/
+                                        dri:metadata[@element='identifier' and @qualifier='loginURL']"/>
+                                </xsl:attribute>
+                                Sign Up
+                            </a>
+                        </li>
+
+                        <!-- this item would appear only for logged-in users -->
+                        <!--
+                                <li>
+                                    <a href="#TODO">{USER NAME}</a>
+                                    <ul>
+                                        <li>
+                                            <a href="#TODO">My Submissions</a>
+                                        </li>
+                                        <li>
+                                            <a href="#TODO">My Tasks</a>
+                                        </li>
+                                        <li>
+                                            <a href="#TODO">Profile</a>
+                                        </li>
+                                        <li class="after-divider">
+                                            <a href="#TODO">Logout</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                        -->
+
+                        <!-- this item would appear only for logged-in administrators -->
+                        <!--
+                                <li>
+                                    <a href="#TODO">Administrative</a>
+                                    <ul>
+                                        <li>
+                                            <a href="#TODO">Workflow Overview</a>
+                                        </li>
+                                        <li class="after-divider">
+                                            <a href="#TODO">Access Control</a>
+                                        </li>
+                                        <li>
+                                            <a href="#TODO">People</a>
+                                        </li>
+                                        <li>
+                                            <a href="#TODO">Groups</a>
+                                        </li>
+                                        <li>
+                                            <a href="#TODO">Authorizations</a>
+                                        </li>
+                                        <li class="after-divider">
+                                            <a href="#TODO">Registries</a>
+                                        </li>
+                                        <li>
+                                            <a href="#TODO">Format</a>
+                                        </li>
+                                        <li>
+                                            <a href="#TODO">Metadata</a>
+                                        </li>
+                                        <li class="after-divider">
+                                            <a href="#TODO">Items</a>
+                                        </li>
+                                        <li>
+                                            <a href="#TODO">Withdrawn Items</a>
+                                        </li>
+                                        <li>
+                                            <a href="#TODO">Control Panel</a>
+                                        </li>
+                                        <li>
+                                            <a href="#TODO">Statistics</a>
+                                        </li>
+                                        <li>
+                                            <a href="#TODO">Import Metadata</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                        -->
+
+                    </ul>
+                </div>
 
             </div>
         </div>
@@ -767,6 +899,17 @@ references to stylesheets pulled directly from the pageMeta element. -->
                         autoControlsCombine: true
                     });
 
+
+                   // TEMPORARY slider to show Connect alternatives
+            // some objects start hidden, as they make highly visible
+            // "glitches" during page load
+            $('.wordcloud').show();
+            $('#connect-legible-cloud').show();
+            $('#TEMP-connect-alternatives').bxSlider({
+                controls: false,
+                mode: 'vertical'
+                //pagerType: 'short'
+            });
                     // "tabs" in Browse Data
                     var $tabButtons = $('#browse-data-buttons a');
                     $tabButtons.unbind('click').click(function() {
