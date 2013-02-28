@@ -3,7 +3,7 @@
 # {1}   Organization Name
 # {2}   Organization Legalname (if different)
 # {3}   Organization Type
-# {4}   Organization's annual revenue
+# {4}   Organization annual revenue
 # {5}   Billing Contact Name
 # {6}   Billing address
 # {7}   Billing Contact Email
@@ -23,7 +23,7 @@ Submission Date:				{0}
 Organization Name:				{1}
 Organization Legal Name:		{2}
 Organization Type:				{3}
-Organization's Annual revenue:	{4}
+Organization Annual revenue:	{4}
 Billing Contact Name:			{5}
 Billing address:				{6}
 Billing Contact Email:			{7}
