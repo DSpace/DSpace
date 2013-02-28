@@ -49,7 +49,7 @@ public class DataSourceInit {
 
             if (ConfigurationManager.getProperty("db.maxconnections") == null)
             {
-                maxConnections = 30;
+                maxConnections = 150;
             }
 
             int maxWait = ConfigurationManager.getIntProperty("db.maxwait");
