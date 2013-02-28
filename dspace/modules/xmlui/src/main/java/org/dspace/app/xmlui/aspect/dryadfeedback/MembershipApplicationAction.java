@@ -34,6 +34,7 @@ public class MembershipApplicationAction extends AbstractAction
         String org_name = request.getParameter("org_name"); // required
         String org_legalname = request.getParameter("org_legalname");
         String org_type = request.getParameter("org_type");
+        String org_type_other = request.getParameter("org_type_other");
         String org_annual_revenue = request.getParameter("org_annual_revenue"); // required
         String billing_contact_name = request.getParameter("billing_contact_name"); // required
         String billing_address = request.getParameter("billing_address"); // required
@@ -74,6 +75,7 @@ public class MembershipApplicationAction extends AbstractAction
             map.put("org_annual_revenue", org_annual_revenue);
             map.put("org_legalname", org_legalname);
             map.put("org_type", org_type);
+            map.put("org_type_other", org_type_other);
 
             map.put("billing_contact_name", billing_contact_name);
             map.put("billing_address", billing_address);
@@ -88,7 +90,6 @@ public class MembershipApplicationAction extends AbstractAction
             map.put("comments", comments);
 
             return map;
-
         }
 
         String fromPage = request.getHeader("Referer");
@@ -148,7 +149,11 @@ public class MembershipApplicationAction extends AbstractAction
         email.addArgument(new Date());
         email.addArgument(org_name);
         email.addArgument(org_legalname);
-        email.addArgument(org_type);
+        if(org_type != null && org_type.equals("other")) {
+            email.addArgument("Other: " + org_type_other);
+        } else {
+            email.addArgument(org_type);
+        }
         email.addArgument(org_annual_revenue);
         email.addArgument(billing_contact_name);
         email.addArgument(billing_address);

@@ -34,6 +34,7 @@
                         <map:parameter name="org_name" value="{org_name}" />
                         <map:parameter name="org_legalname" value="{org_legalname}" />
                         <map:parameter name="org_type" value="{org_type}" />
+                        <map:parameter name="org_type_other" value="{org_type_other}" />
                         <map:parameter name="org_annual_revenue" value="{org_annual_revenue}" />
                         <map:parameter name="billing_contact_name" value="{billing_contact_name}" />
                         <map:parameter name="billing_address" value="{billing_address}" />
