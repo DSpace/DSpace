@@ -1,0 +1,1108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" class="no-js">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+<meta content="width=device-width; initial-scale=1.0; maximum-scale=1.0;" name="viewport" />
+<link rel="shortcut icon" href="/themes/Mirage/images/favicon.ico" />
+<link rel="apple-touch-icon" href="/themes/Mirage/images/apple-touch-icon.png" />
+<meta name="Generator" content="DSpace" />
+<link type="text/css" rel="stylesheet" media="screen" href="files/reset.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/base.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/helper.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/jquery-ui-1.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/style.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/superfish.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/jquery.bxslider.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/authority-control.css">
+<link type="text/css" rel="stylesheet" media="handheld" href="files/handheld.css">
+<link type="text/css" rel="stylesheet" media="print" href="files/print.css">
+<link type="text/css" rel="stylesheet" media="all" href="files/media.css">
+<link type="application/rss+xml" rel="alternate" href="/feed/rss_1.0/site" />
+<link type="application/rss+xml" rel="alternate" href="/feed/rss_2.0/site" />
+<link type="application/atom+xml" rel="alternate" href="/feed/atom_1.0/site" />
+<style type="text/css">
+    /* special style for Dryad homepage only */
+    #ds-body {
+        width: 100%;
+    }
+    .labelcell {
+        font-weight: bold;
+    }
+    .datacell {
+        text-align: right;
+    }
+    .ds-div-head a {
+        font-size: 0.7em;
+        font-weight: normal;
+        position: relative;
+        top: -0.1em;
+    }
+    .ds-artifact-list {
+        /* font-size: 100%; */
+        line-height: 1.4em;
+    }
+    .ds-artifact-item {
+        padding-top: 10px;
+    }
+    .artifact-title {
+        font-size: 100%;
+    }
+    .ds-artifact-list .artifact-info {
+        display: none;
+    }
+
+    /* implied 3 columns @300px width, 25px gutters */
+    .home-col-1 {
+        float: left;
+        width: 625px;
+        padding: 0;
+        /* margin-right: 25px;*/
+    }
+    .home-col-2 {
+        float: right;
+        width: 300px;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .home-top-row {
+        height: 220px;
+    }
+    .home-bottom-row {
+        height: 420px;
+    }
+
+    #dryad-home-carousel {
+        font-size: 23px;
+        font-weight: bold;
+        background-color: #fff;
+        border: 1px solid #333;
+        height: 216px;
+        padding: 0px;
+        overflow: visible;
+    }
+    #dryad-home-carousel .bx-viewport {
+        height: 190px;
+        width: 623px;
+    }
+    #dryad-home-carousel div.bxslider {
+        overflow: visible;
+    }
+    #dryad-home-carousel div.bxslider div {
+        padding: 0;
+        margin: 0;
+    }
+    #dryad-home-carousel div.bxslider div > a,
+    #dryad-home-carousel div.bxslider div > a > img,
+    #dryad-home-carousel div.bxslider div > img {
+        display: block;
+        height: 190px;
+        width: 623px;
+    }
+    #dryad-home-carousel div.bxslider div p {
+        /* padding: 36px 36px 38px; */
+        width: 480px;
+        margin: auto;
+        margin-top: 12px;
+    }
+    /* tweaks to slider control placement */
+    #dryad-home-carousel .bx-pager {
+        bottom: -32px;
+        left: 8px;
+    }
+    #dryad-home-carousel .bx-controls-auto {
+        bottom: -35px;
+    }
+    .blog-box ul {
+        list-style: none;
+        margin-left: 0;
+    }
+    .blog-box li {
+        margin: 0.5em 0 1.2em;
+    }
+
+
+    /* Connect options */
+    #connect-illustrated-prose {
+        overflow: hidden;
+        font-size: 15px;
+    }
+    #connect-illustrated-prose img {
+        width: auto;
+        margin: 4px;
+    }
+    .wordcloud .cloudword {
+        cursor: default;
+        line-height: 1em;
+        margin: 0;
+        padding: 0.1em 0 0.2em;
+        position: absolute;
+        text-decoration: none;
+        white-space: nowrap;
+        font-family: 'Arial Black','Helvetica','Arial',sans-serif;
+    }
+    .wordcloud a.cloudword[href] {
+        cursor: pointer;
+    }
+    .wordcloud a.cloudword[href]:hover {
+        background-color: #ffc;
+    }
+    #connect-legible-cloud {
+        display: none;
+        padding-top: 8px;
+        font-size: 16px;
+    }
+    #connect-legible-cloud p {
+        margin-top: 0px;
+        margin-bottom: 15px;
+    }
+</style>
+<script type="text/javascript">
+                                //Clear default text of emty text areas on focus
+                                function tFocus(element)
+                                {
+                                        if (element.value == ' '){element.value='';}
+                                }
+                                //Clear default text of emty text areas on submit
+                                function tSubmit(form)
+                                {
+                                        var defaultedElements = document.getElementsByTagName("textarea");
+                                        for (var i=0; i != defaultedElements.length; i++){
+                                                if (defaultedElements[i].value == ' '){
+                                                        defaultedElements[i].value='';}}
+                                }
+                                //Disable pressing 'enter' key to submit a form (otherwise pressing 'enter' causes a submission to start over)
+                                function disableEnterKey(e)
+                                {
+                                     var key;
+
+                                     if(window.event)
+                                          key = window.event.keyCode;     //Internet Explorer
+                                     else
+                                          key = e.which;     //Firefox and Netscape
+
+                                     if(key == 13)  //if "Enter" pressed, then disable!
+                                          return false;
+                                     else
+                                          return true;
+                                }
+
+                                function FnArray()
+                                {
+                                    this.funcs = new Array;
+                                }
+
+                                FnArray.prototype.add = function(f)
+                                {
+                                    if( typeof f!= "function" )
+                                    {
+                                        f = new Function(f);
+                                    }
+                                    this.funcs[this.funcs.length] = f;
+                                };
+
+                                FnArray.prototype.execute = function()
+                                {
+                                    for( var i=0; i < this.funcs.length; i++ )
+                                    {
+                                        this.funcs[i]();
+                                    }
+                                };
+
+                                var runAfterJSImports = new FnArray();
+            </script>
+<script xmlns:i18n="http://apache.org/cocoon/i18n/2.1" type="text/javascript" src="/themes/Mirage/lib/js/modernizr-1.5.min.js"> </script>
+<title>Dryad Digital Repository</title>
+</head><!--[if lt IE 7 ]> <body class="ie6"> <![endif]-->
+                <!--[if IE 7 ]>    <body class="ie7"> <![endif]-->
+                <!--[if IE 8 ]>    <body class="ie8"> <![endif]-->
+                <!--[if IE 9 ]>    <body class="ie9"> <![endif]-->
+                <!--[if (gt IE 9)|!(IE)]><!--><body><!--<![endif]-->
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="ds-main">
+<div id="ds-header-wrapper">
+<div class="clearfix" id="ds-header">
+<a id="ds-header-logo-link" href="/">
+<span id="ds-header-logo"> </span>
+<span id="ds-header-logo-text">mirage</span>
+</a>
+<h1 class="pagetitle visuallyhidden">Dryad Digital Repository</h1>
+<h2 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="static-pagetitle visuallyhidden">Dryad Repository</h2>
+<!--
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" id="ds-user-box">
+<p>
+<a href="/login">Login</a>
+</p>
+</div>
+-->
+<div id="sharing-tools">
+    <a href="#TODO"><img src="files/images/dryad_twit_icon.png" /></a>
+    <a href="#TODO"><img src="files/images/dryad_fb_icon2.png" /></a>
+    <a href="#TODO"><img src="files/images/dryad_gplus_icon.png" /></a>
+    <a href="#TODO"><img src="files/images/dryad_rss_icon.png" /></a>
+</div>
+<div id="main-menu">
+
+    <ul class="sf-menu">
+
+        <li>
+            <a href="#TODO">About</a>
+            <ul>
+                <li>
+                    <a href="#TODO">Purpose &amp; Goals</a>
+                </li>
+                <li>
+                    <a href="#TODO">Who We Are</a>
+                </li>
+                <li>
+                    <a href="#TODO">Journal Archiving Policy</a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a href="#TODO">Membership</a>
+            <ul>
+                <li>
+                    <a href="#TODO">Overview</a>
+                </li>
+                <li>
+                    <a href="#TODO">Apply</a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a href="#TODO">Resources</a>
+            <ul>
+                <li>
+                    <a href="#TODO">Deposit Data Instructions</a>
+                </li>
+                <li class="current">
+                    <a href="#TODO">FAQ</a>
+                </li>
+                <li>
+                    <a href="#TODO">Wiki</a>
+                </li>
+                <li>
+                    <a href="#TODO">Blog</a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a>Contact Us</a>
+        </li>
+
+        <!-- these items would appear only for anonymous visitors (NOT logged in) -->
+        <li id="login-item">
+            <a href="#TODO">Login</a>
+        </li>
+        <li id="sign-up-item">
+            <a href="#TODO">Sign Up</a>
+        </li>
+
+        <!-- this item would appear only for logged-in users -->
+<!--
+        <li>
+            <a href="#TODO">{USER NAME}</a>
+            <ul>
+                <li>
+                    <a href="#TODO">My Submissions</a>
+                </li>
+                <li>
+                    <a href="#TODO">My Tasks</a>
+                </li>
+                <li>
+                    <a href="#TODO">Profile</a>
+                </li>
+                <li class="after-divider">
+                    <a href="#TODO">Logout</a>
+                </li>
+            </ul>
+        </li>
+-->
+
+        <!-- this item would appear only for logged-in administrators -->
+<!--
+        <li>
+            <a href="#TODO">Administrative</a>
+            <ul>
+                <li>
+                    <a href="#TODO">Workflow Overview</a>
+                </li>
+                <li class="after-divider">
+                    <a href="#TODO">Access Control</a>
+                </li>
+                <li>
+                    <a href="#TODO">People</a>
+                </li>
+                <li>
+                    <a href="#TODO">Groups</a>
+                </li>
+                <li>
+                    <a href="#TODO">Authorizations</a>
+                </li>
+                <li class="after-divider">
+                    <a href="#TODO">Registries</a>
+                </li>
+                <li>
+                    <a href="#TODO">Format</a>
+                </li>
+                <li>
+                    <a href="#TODO">Metadata</a>
+                </li>
+                <li class="after-divider">
+                    <a href="#TODO">Items</a>
+                </li>
+                <li>
+                    <a href="#TODO">Withdrawn Items</a>
+                </li>
+                <li>
+                    <a href="#TODO">Control Panel</a>
+                </li>
+                <li>
+                    <a href="#TODO">Statistics</a>
+                </li>
+                <li>
+                    <a href="#TODO">Import Metadata</a>
+                </li>
+            </ul>
+        </li>
+-->
+
+    </ul>
+</div>
+</div>
+</div>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" id="ds-trail-wrapper">
+<ul id="ds-trail">
+<li class="ds-trail-link first-link last-link">
+<a href="">Dryad Digital Repository</a>
+</li>
+</ul>
+</div>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="hidden" id="no-js-warning-wrapper">
+<div id="no-js-warning">
+<div class="notice failure">JavaScript is disabled for your browser. Some features of this site may not work without it.</div>
+</div>
+</div>
+<div id="ds-content-wrapper">
+<div class="clearfix" id="ds-content">
+<div id="ds-body">
+<div class="home-col-1">
+    <div id="dryad-home-carousel" class="ds-static-div primary">
+      <div class="bxslider" style="">
+        <div>
+            <a href="http://datadryad.org/resource/doi:10.5061/dryad.k9b14/4">
+                <img src="files/images/homepage-slides/ammonoids.jpg" />
+            </a>
+        </div>
+        <div>
+            <a href="http://datadryad.org/resource/doi:10.5061/dryad.7m6kg">
+                <img src="files/images/homepage-slides/Nectocaris.jpg" />
+            </a>
+        </div>
+        <div>
+            <a href="http://datadryad.org/resource/doi:10.5061/dryad.q1cb1">
+                <img src="files/images/homepage-slides/ginseng.jpg" />
+            </a>
+        </div>
+        <div>
+            <a href="http://blog.datadryad.org/2013/02/11/dryad-membership-meeting-data-publishing-symposium-2/" target="_blank">
+                <img src="files/images/homepage-slides/oxford-meeting.jpg" />
+            </a>
+        </div>
+        <div>
+            <p style="margin-top: 54px;" Xid="ds-dryad-is" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"><span style="color: #595;">Dryad</span> is a <span style="color: #363;">nonprofit organization</span> and an <span style="color: #242;">international repository</span> of data underlying scientific and medical publications.</p>
+        </div>
+        <div style="margin-top: 18px;">
+            <p>The scientific, educational, and charitable mission of Dryad is to promote the availability of data underlying findings in 
+                the scientific literature for research and educational reuse. </p>
+        </div>
+        <div style="font-size: 0.85em; margin-top: 18px;">
+            <p>The vision of Dryad is a scholarly communication system in which learned societies, publishers, institutions of research 
+                and education, funding bodies and other stakeholders collaboratively sustain and promote the preservation and reuse of data 
+                underlying the scholarly literature.</p>
+        </div>
+      </div>
+    </div>
+</div>
+<div class="home-col-2">
+    <h1 class="ds-div-head " style="border-bottom: none; text-align: center; padding: 50px 45px 0; height: 50px;">Deposit your data in dryad</h1></h1>
+    <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
+    <p class="ds-paragraph" style="text-align: center; font-size: 1.2em; margin: 0.5em 0 1.5em;">
+    <a class="submitnowbutton" href="/handle/10255/3/submit">Submit Data Now!</a>
+    </p>
+    <a style="float: right; margin-right: 18px;" href="http://www.youtube.com/watch?v=RP33cl8tL28">See how to submit</a>
+    </div>
+</div>
+<div class="home-col-1">
+    <h1 class="ds-div-head">Search for Data &nbsp; &nbsp; <a href="#">Browse authors</a> &nbsp; &nbsp; <a href="#">Browse journals</a></h1>
+    <form xmlns="http://di.tamu.edu/DRI/1.0/" onsubmit="javascript:tSubmit(this);" method="get" action="/discover" class="ds-interactive-div primary" id="aspect_discovery_SiteViewer_div_front-page-search"
+          style="height: 40px; text-align: center;">
+        <input value="Search for data in Dryad" type="text" name="query" class="ds-text-field" style="width: 450px;" id="aspect_discovery_SiteViewer_field_query" />
+        <input value="Go" type="submit" name="submit" class="ds-button-field" id="aspect_discovery_SiteViewer_field_submit" />
+    </form>
+</div>
+<div class="home-col-2">
+    <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Connect with Dryad</h1>
+    <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 490px;">
+      <div id="TEMP-connect-alternatives">
+
+        <div id="connect-illustrated-prose">
+
+
+          <p>
+            <img style="float: right;" src="files/images/connect-1.png" 
+                style="margin-left: 8px;" />
+Dryad invites <b>publishers</b>, <b>journals</b>, <b>scientific societies</b> and <b>organizations</b>
+interested in data preservation to join us now and shape the course of Dryad’s
+future.
+<a href="#">Dryad members</a> elect our board of directors, participate in an
+active knowledge sharing network and receive discounts on deposit fees.  
+            <img style="float: left;" src="files/images/connect-2.png"
+                style="margin-right: 8px;" />
+          </p>
+          <p>
+<a href="#">Submission Integration</a> is a free and easy way for <b>journals</b> to
+coordinate manuscript submissions with data submissions in Dryad. Integration
+makes depositing data and linking it with an article faster and simpler for
+both scientists and journals. 
+            <img style="float: right;" src="files/images/connect-3.png"
+                style="margin-left: 8px;" />
+          </p>
+          <p>
+Charging <a href="#">deposit fees</a> to offset the costs of data archiving
+will ensure that the public is never charged to access or reuse the data in
+Dryad. 
+<!--Dryad’s flexible <a href="#">volume payment plans</a> make it attractive
+for institutions to sponsor data archiving as a service to their scientists and
+authors.-->
+          </p>
+        </div>
+
+<!--
+        <div id="connect-keyword-cloud">
+<div class="wordcloud resizeable vertical horizontal saved" id="newWordCloud" style="display: none; background-color: rgb(255, 255, 255); width: 274px; height: 450px;"><a class="cloudword Yiggivoo" title="institution" id="cp0" style="font-size: 23px; color: rgb(21, 108, 155); left: 18px; top: 208px; display: inline;">institution</a><a class="cloudword Yiggivoo" title="join" id="cp1" style="font-size: 35px; color: rgb(165, 29, 90); left: 82px; top: 230px; display: inline;">join</a><a class="cloudword Yiggivoo" title="academic" id="cp2" style="font-size: 26px; color: rgb(41, 72, 171); left: 69px; top: 182px; display: inline;">academic</a><a class="cloudword Yiggivoo" title="integrate" id="cp3" style="font-size: 31px; color: rgb(55, 173, 55); left: 66px; top: 265px; display: inline;">integrate</a><a class="cloudword Yiggivoo" title="preserve" id="cp4" style="font-size: 26px; color: rgb(72, 41, 171); left: 91px; top: 156px; display: inline;">preserve</a><a class="cloudword Yiggivoo" title="member" id="cp5" style="font-size: 33px; color: rgb(29, 165, 90); left: 8px; top: 122px; display: inline; text-decoration: underline;" href="#">member</a><a class="cloudword Yiggivoo" title="archive" id="cp6" style="font-size: 30px; color: rgb(29, 165, 90); left: 36px; top: 296px; display: inline;">archive</a><a class="cloudword Yiggivoo" title="publisher" id="cp7" style="font-size: 19px; color: rgb(173, 55, 55); left: 159px; top: 210px; display: inline; text-decoration: underline;" href="#">publisher</a><a class="cloudword Yiggivoo" title="govern" id="cp8" style="font-size: 15px; color: rgb(21, 108, 155); left: 158px; top: 228px; display: inline;">govern</a><a class="cloudword Yiggivoo" title="organization" id="cp9" style="font-size: 31px; color: rgb(21, 108, 155); left: 44px; top: 325px; display: inline;">organization</a><a class="cloudword Yiggivoo" title="partner" id="cp10" style="font-size: 14px; color: rgb(141, 17, 126); left: 157px; top: 244px; display: inline;">partner</a><a class="cloudword Yiggivoo" title="analyze" id="cp11" style="font-size: 26px; color: rgb(173, 55, 55); left: 118px; top: 96px; display: inline;">analyze</a><a class="cloudword Yiggivoo" title="scientist" id="cp12" style="font-size: 20px; color: rgb(165, 29, 90); left: 173px; top: 136px; display: inline;">scientist</a><a class="cloudword Yiggivoo" title="data" id="cp13" style="font-size: 28px; color: rgb(17, 141, 126); left: 185px; top: 296px; display: inline;">data</a><a class="cloudword Yiggivoo" title="educate" id="cp14" style="font-size: 35px; color: rgb(165, 29, 90); left: 60px; top: 60px; display: inline;">educate</a><a class="cloudword Yiggivoo" title="journal" id="cp15" style="font-size: 38px; color: rgb(21, 108, 155); left: 1px; top: 356px; display: inline; text-decoration: underline;" href="#">journal</a><a class="cloudword Yiggivoo" title="help" id="cp16" style="font-size: 32px; color: rgb(108, 21, 155); left: 180px; top: 356px; display: inline;">help</a><a class="cloudword Yiggivoo" title="share" id="cp17" style="font-size: 13px; color: rgb(41, 72, 171); left: 30px; top: 230px; display: inline;">share</a><a class="cloudword Yiggivoo" title="society" id="cp18" style="font-size: 39px; color: rgb(41, 72, 171); left: 0px; top: 20px; display: inline; text-decoration: underline;" href="#">society</a><a class="cloudword Yiggivoo" title="collaborate" id="cp19" style="font-size: 26px; color: rgb(21, 108, 155); left: 102px; top: 394px; display: inline;">collaborate</a><a class="cloudword Yiggivoo" title="connect" id="cp20" style="font-size: 27px; color: rgb(141, 17, 126); left: 110px; top: 419px; display: inline;">connect</a><a class="cloudword Yiggivoo" title="study" id="cp21" style="font-size: 21px; color: rgb(21, 108, 155); left: 2px; top: 242px; display: inline;">study</a><a class="cloudword Yiggivoo" title="sustain" id="cp22" style="font-size: 21px; color: rgb(141, 17, 126); left: 18px; top: 100px; display: inline;">sustain</a><a class="cloudword Yiggivoo" title="synthesize" id="cp23" style="font-size: 20px; color: rgb(72, 41, 171); left: 75px; top: 0px; display: inline;">synthesize</a></div>
+
+            <em>[2. keyword cloud]</em>
+        </div>
+-->
+
+        <div id="connect-legible-cloud">
+<p>
+ <span style="font-size: 110%; color: #494; font-weight: bold;">Dryad</span>
+invites 
+ <span style="font-size: 130%; color: #c99;">publishers</span>, 
+ <span style="font-size: 120%; color: #aa5;">journals</span>, 
+ <span style="font-size: 130%; color: #99c;">scientific societies</span>
+and 
+ <span style="font-size: 120%; color: #6a9;">organizations</span>
+interested in 
+ <span style="color: #999; font-weight: bold;">data preservation</span>
+to join us now and shape the course of Dryad’s
+ <span style="font-size: 110%; color: #c99; font-weight: bold;">future</span>. 
+ <a href="#" style="font-weight: bold;">Dryad members</a> 
+elect our 
+ <span style="color: #aa5;">board of directors</span>, 
+participate in an active 
+ <span style="font-weight: bold; color: #99c;">knowledge sharing</span>
+network and receive 
+ <span style="color: #c99;">discounts</span>
+on deposit fees. 
+</p>
+
+<p>
+ <a href="#" style="font-weight: bold;">Submission Integration</a> 
+is a free and easy way for 
+ <span style="font-size: 120%; color: #99c;">journals</span>
+to
+ <span style="color: #6a9;">coordinate manuscript submissions</span>
+with data submissions in  
+ <span style="color: #494; font-weight: bold;">Dryad</span>
+. Integration
+makes depositing data and 
+ <span style="font-weight: bold; color: #99c;">linking it</span> 
+with an article 
+ <span style="color: #aa5;">faster and simpler</span>
+for both 
+ <span style="color: #c99;">scientists</span>
+and journals. 
+</p>
+
+<p>
+Charging 
+ <a href="#" style="font-weight: bold;">deposit fees</a> 
+to offset the 
+ <span style="color: #6a9;">costs of data archiving</span>
+will ensure that the 
+ <span style="color: #aa5;">public is never charged</span>
+to 
+ <span style="font-weight: bold; color: #999;">access or reuse</span>
+the data in
+ <span style="color: #494; font-weight: bold;">Dryad</span>.
+</p>
+
+<!--Dryad’s flexible <a href="#">volume payment plans</a> make it attractive
+for institutions to sponsor data archiving as a service to their scientists and
+authors.
+-->
+
+<!--
+The 
+<span style="font-size: 25px; color: #c99;">
+<a href="#">vision</a> of 
+<span style="font-weight: 36px; color: #494; font-weight: bold;">Dryad</span></span> is a 
+<span style="font-size: 22px; color: #99b;">scholarly 
+<a href="#">communication</a> system</span> in which 
+<span style="font-size: 22px;">learned 
+<a style="font-size: 24px; color: #494;" href="#TODO">societies</a>, 
+<a style="font-size: 27px; color: #9c9; font-weight: bold;" href="#TODO">publishers</a>, 
+<a style="font-size: 30px; color: #494;" href="#TODO">institutions</a>
+ of research and education</span>, funding bodies and other 
+<span style="font-size: 22px;">
+<a style="font-size: 28px; color: #449;" href="#TODO">stakeholders</a>
+</span>
+ collaboratively 
+<a style="font-size: 24px; color: #c99; font-weight: bold;" href="#TODO">sustain</a> 
+and promote the 
+<span style="font-size: 24px; color: #bb6;">
+<a href="#" style="color: #bb6;">preservation</a> 
+and reuse
+</span>
+ of data.
+-->
+        </div>
+
+      </div><!-- END of #TEMP-connect-alternatives -->
+    </div>
+</div>
+
+<div class="home-col-1">
+ <h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-div-head">Browse for Data</h1>
+ <div class="ds-static-div primary" id="aspect_discovery_BrowseData_div_Home" style="height: 530px; overflow: hidden;">
+    <div id="browse-data-buttons">
+        <a href="#recently-published-data"><span>Recently Published</span></a>
+        <a href="#most-viewed-data"><span>Most Viewed</span></a>
+    </div>
+
+   <div id="recently-published-data" class="browse-data-panel">
+    <h1 class="ds-div-head">
+        Recently Published Data
+        <a href="#TODO"><img style="width: 15px; height: 15px; vertical-align: middle;" src="files/images/dryad_rss_icon.png" /></a>
+	</h1>
+    <div id="aspect_discovery_SiteRecentSubmissions_div_site-recent-submission" class="ds-static-div secondary recent-submission">
+
+    <ul xmlns:oreatom="http://www.openarchives.org/ore/atom/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:atom="http://www.w3.org/2005/Atom" class="ds-artifact-list">
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.40767/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item odd">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.40767">
+    <span class="Z3988" title="">Vanholme R, Storme V, Vanholme B, Sundin L, Holst Christensen J, Goeminne G, Halpin C, Rohde A, Morreel K, Boerjan W (2012) Data from: A systems biology view of responses to lignin biosynthesis perturbations in Arabidopsis. The Plant Cell doi:10.5061/dryad.jn16g</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Baur, Hannes</span>; <span>Reichenbach, Fabian</span>; <span>Neubert, Eike</span>
+    </span> <span class="publisher-date">(<span class="date">2012-07-17</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.41747/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item even">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.41747">
+    <span class="Z3988" title="">Ward DJ, Martino OI, Simpson S, Stevens AJ (2013) Data from: Decline in new drug launches: myth or reality? Retrospective observational study using 30 years of data from the UK. BMJ Open doi:10.5061/dryad.2263n</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Remeš, Vladimír</span>; <span>Matysioková, Beata</span>; <span>Cockburn, Andrew</span>
+    </span> <span class="publisher-date">(<span class="date">2012-08-06</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.41682/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item odd">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.41682">
+    <span class="Z3988" title="">Zöttl M, Frommen J, Taborsky M (2013) Data from: Group size adjustment to ecological demand in a cooperative breeder. Proceedings of the Royal Society B doi:10.5061/dryad.3280v</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Maestre, Fernando T.</span>; <span>Puche, María D.</span>; <span>Guerrero, César</span>; <span>Escudero, Adrián</span>
+    </span> <span class="publisher-date">(<span class="date">2011-05-18</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.40653/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item even">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.40653">
+    <span class="Z3988" title="">Zöttl M, Chapuis L, Freiburghaus M, Taborsky M (2013) Data from: Strategic reduction of help before dispersal in a cooperative breeder. Biology Letters doi:10.5061/dryad.8fg95</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Morlan, John D.</span>; <span>Qu, Kunbin</span>; <span>Sinicropi, Dominick V.</span>
+    </span> <span class="publisher-date">(<span class="date">2012-08-10</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.38980/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item odd">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.38980">
+    <span class="Z3988" title="">Forister ML, Scholl CF, Jahner JP, Wilson JS, Fordyce JA, Gompert Z, Narala DR, Buerkle CA, Nice CC (2012) Data from: Specificity, rank preference and the colonization of a non-native host plant by the Melissa blue butterfly. Oecologia doi:10.5061/dryad.ps639</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Faircloth, Brant C.</span>; <span>Glenn, Travis C.</span>
+    </span> <span class="publisher-date">(<span class="date">2012-08-10</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.35765/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item even">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.35765">
+    <span class="Z3988" title="">Shrestha M, Dyer AG, Boyd-Gerny S, Wong BBM, Burd M (2013) Data from: Shades of red: bird-pollinated flowers target the specific colour discrimination abilities of avian vision. New Phytologist doi:10.5061/dryad.pj860</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Laetsch, Dominik R.</span>; <span>Heitlinger, Emanuel G.</span>; <span>Taraschewski, Horst</span>; <span>Nadler, Steven A.</span>; <span>Blaxter, Mark L.</span>
+    </span> <span class="publisher-date">(<span class="date">2012-08-11</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.41635/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item odd">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.41635">
+    <span class="Z3988" title="">Trindade S, Sousa A, Xavier KB, Dionisio F, Ferreira MG, Gordo I (2009) Data from: Positive epistasis drives the acquisition of multidrug resistance.  PLoS Genetics doi:10.5061/dryad.20k7j</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Powles, Stephen</span>; <span>Yu, Qin</span>; <span>Ahmad-Hamdani, M. S.</span>; <span>Han, Heping</span>; <span>Christoffers, Michael</span>
+    </span> <span class="publisher-date">(<span class="date">2012-08-11</span>)</span>
+    </div>
+    </div>
+    </li>
+    </ul>
+
+    </div>
+   </div>
+
+   <div id="most-viewed-data" class="browse-data-panel">
+    <h1 class="ds-div-head">
+        Most Viewed Data
+        <a href="#TODO"><img style="width: 15px; height: 15px; vertical-align: middle;" src="files/images/dryad_rss_icon.png" /></a>
+    </h1>
+    <div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-static-div secondary most-viewed" id="aspect_discovery_SiteFeaturedItems_div_site-most-viewed">
+
+    <ul xmlns:oreatom="http://www.openarchives.org/ore/atom/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:atom="http://www.w3.org/2005/Atom" class="ds-artifact-list">
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.38980/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item odd">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.38980">
+    <span class="Z3988" title="">Forister ML, Scholl CF, Jahner JP, Wilson JS, Fordyce JA, Gompert Z, Narala DR, Buerkle CA, Nice CC (2012) Data from: Specificity, rank preference and the colonization of a non-native host plant by the Melissa blue butterfly. Oecologia doi:10.5061/dryad.ps639</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Faircloth, Brant C.</span>; <span>Glenn, Travis C.</span>
+    </span> <span class="publisher-date">(<span class="date">2012-08-10</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.35765/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item even">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.35765">
+    <span class="Z3988" title="">Shrestha M, Dyer AG, Boyd-Gerny S, Wong BBM, Burd M (2013) Data from: Shades of red: bird-pollinated flowers target the specific colour discrimination abilities of avian vision. New Phytologist doi:10.5061/dryad.pj860</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Laetsch, Dominik R.</span>; <span>Heitlinger, Emanuel G.</span>; <span>Taraschewski, Horst</span>; <span>Nadler, Steven A.</span>; <span>Blaxter, Mark L.</span>
+    </span> <span class="publisher-date">(<span class="date">2012-08-11</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.41635/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item odd">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.41635">
+    <span class="Z3988" title="">Trindade S, Sousa A, Xavier KB, Dionisio F, Ferreira MG, Gordo I (2009) Data from: Positive epistasis drives the acquisition of multidrug resistance.  PLoS Genetics doi:10.5061/dryad.20k7j</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Powles, Stephen</span>; <span>Yu, Qin</span>; <span>Ahmad-Hamdani, M. S.</span>; <span>Han, Heping</span>; <span>Christoffers, Michael</span>
+    </span> <span class="publisher-date">(<span class="date">2012-08-11</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.40767/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item odd">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.40767">
+    <span class="Z3988" title="">Vanholme R, Storme V, Vanholme B, Sundin L, Holst Christensen J, Goeminne G, Halpin C, Rohde A, Morreel K, Boerjan W (2012) Data from: A systems biology view of responses to lignin biosynthesis perturbations in Arabidopsis. The Plant Cell doi:10.5061/dryad.jn16g</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Baur, Hannes</span>; <span>Reichenbach, Fabian</span>; <span>Neubert, Eike</span>
+    </span> <span class="publisher-date">(<span class="date">2012-07-17</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.41747/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item even">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.41747">
+    <span class="Z3988" title="">Ward DJ, Martino OI, Simpson S, Stevens AJ (2013) Data from: Decline in new drug launches: myth or reality? Retrospective observational study using 30 years of data from the UK. BMJ Open doi:10.5061/dryad.2263n</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Remeš, Vladimír</span>; <span>Matysioková, Beata</span>; <span>Cockburn, Andrew</span>
+    </span> <span class="publisher-date">(<span class="date">2012-08-06</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.41682/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item odd">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.41682">
+    <span class="Z3988" title="">Zöttl M, Frommen J, Taborsky M (2013) Data from: Group size adjustment to ecological demand in a cooperative breeder. Proceedings of the Royal Society B doi:10.5061/dryad.3280v</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Maestre, Fernando T.</span>; <span>Puche, María D.</span>; <span>Guerrero, César</span>; <span>Escudero, Adrián</span>
+    </span> <span class="publisher-date">(<span class="date">2011-05-18</span>)</span>
+    </div>
+    </div>
+    </li>
+    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.40653/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
+    <li class="ds-artifact-item even">
+    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
+    <div class="artifact-title">
+    <a href="/handle/10255/dryad.40653">
+    <span class="Z3988" title="">Zöttl M, Chapuis L, Freiburghaus M, Taborsky M (2013) Data from: Strategic reduction of help before dispersal in a cooperative breeder. Biology Letters doi:10.5061/dryad.8fg95</span>
+    </a>
+    </div>
+    <div class="artifact-info">
+    <span class="author">
+    <span>Morlan, John D.</span>; <span>Qu, Kunbin</span>; <span>Sinicropi, Dominick V.</span>
+    </span> <span class="publisher-date">(<span class="date">2012-08-10</span>)</span>
+    </div>
+    </div>
+    </li>
+    </ul>
+
+    </div>
+   </div>
+  </div>
+</div>
+<div class="home-col-2">
+    <h1 class="ds-div-head">Dryad Mailing List</h1>
+    <form xmlns="http://di.tamu.edu/DRI/1.0/" onsubmit="javascript:tSubmit(this);" method="get" action="#TODO" class="ds-interactive-div primary"
+          style="height: 80px; text-align: center;">
+        <p class="ds-paragraph" style="text-align: left;">Join {2,510} other subscribers!</p>
+        <input value="Your e-mail" type="text" name="query" class="ds-text-field" style="width: 180px;" id="" />
+        <input value="Subscribe" type="submit" name="submit" class="ds-button-field" id="" />
+    </form>
+</div>
+
+<div class="home-col-2" style="clear: both; margin-left: 25px;">
+    <h1 class="ds-div-head">Recently Integrated Journals</h1>
+    <div class="ds-static-div" id="file_news_div_recently_integrated_journal" style="height: 300px;">
+    <p class="ds-paragraph">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </p>
+    </div>
+</div>
+
+<div class="home-col-2" style="margin-left: 25px;">
+    <div class="Xds-static-div Xprimary repository" id="aspect_statistics_StatisticsTransformer_div_home">
+        <h1 class="ds-div-head">Dryad Statistics</h1>
+        <div xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-static-div secondary stats" id="aspect_statistics_StatisticsTransformer_div_stats" style="height: 300px;">
+        <!--<h2 class="ds-table-head">Total Visits</h2>-->
+        <table class="ds-table tableWithTitle" id="aspect_statistics_StatisticsTransformer_table_list-table">
+        <tr class="ds-table-row odd">
+        <td class="ds-table-cell odd labelcell" width="120" id="aspect_statistics_StatisticsTransformer_cell_" />
+        <td class="ds-table-cell even labelcell" width="*" align="right" id="aspect_statistics_StatisticsTransformer_cell_">Total</td>
+        <td class="ds-table-cell odd labelcell" width="100" align="right" id="aspect_statistics_StatisticsTransformer_cell_">Past 30 days</td>
+        </tr>
+        <tr class="ds-table-row even">
+        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_01">Data packages</td>
+        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_02">987</td>
+        <td class="ds-table-cell odd datacell" id="aspect_statistics_StatisticsTransformer_cell_03">123</td>
+        </tr>
+        <tr class="ds-table-row odd">
+        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_11">Data files</td>
+        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_12">2987</td>
+        <td class="ds-table-cell odd datacell" id="aspect_statistics_StatisticsTransformer_cell_13">2123</td>
+        </tr>
+        <tr class="ds-table-row even">
+        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_21">Journals</td>
+        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_22">102</td>
+        <td class="ds-table-cell odd datacell" id="aspect_statistics_StatisticsTransformer_cell_23">12</td>
+        </tr>
+        <tr class="ds-table-row odd">
+        <td class="ds-table-cell odd labelcell" id="aspect_statistics_StatisticsTransformer_cell_31">Downloads</td>
+        <td class="ds-table-cell even datacell" id="aspect_statistics_StatisticsTransformer_cell_32">20123</td>
+        <td class="ds-table-cell odd datacell" id="aspect_statistics_StatisticsTransformer_cell_33">999</td>
+        </tr>
+        </table>
+        </div>
+    </div>
+</div>
+
+<div class="home-col-2">
+    <div id="aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home" class="Xds-static-div blog-box">
+        <h1 class="ds-div-head">
+            Dryad Blog
+            <a href="#TODO"><img style="width: 15px; height: 15px; vertical-align: middle;" src="files/images/dryad_rss_icon.png" /></a>
+        </h1>
+        <div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_dryadinfo_DryadBlogFeed_div_blog-hook" class="ds-static-div" style="height: 300px;">
+        <ul id="aspect_dryadinfo_DryadBlogFeed_list_entries" class="ds-simple-list">
+        <li>
+        <a href="http://blog.datadryad.org/2013/02/11/dryad-membership-meeting-data-publishing-symposium-2/">Dryad Membership Meeting &amp; data publishing symposium</a>
+        </li>
+        </ul>
+        <ul id="aspect_dryadinfo_DryadBlogFeed_list_entries" class="ds-simple-list">
+        <li>
+        <a href="http://blog.datadryad.org/2013/02/02/how-to-decide-what-data-should-be-archived-at-publication/">How to decide what data should be archived at publication</a>
+        </li>
+        </ul>
+        <ul id="aspect_dryadinfo_DryadBlogFeed_list_entries" class="ds-simple-list">
+        <li>
+        <a href="http://blog.datadryad.org/2012/10/24/got-data-in-dryad-let-your-website-readers-know/">Got data in Dryad? Let your website readers know.</a>
+        </li>
+        </ul>
+        <ul id="aspect_dryadinfo_DryadBlogFeed_list_entries" class="ds-simple-list">
+        <li>
+        <a href="http://blog.datadryad.org/2013/02/11/dryad-membership-meeting-data-publishing-symposium-2/">Dryad Membership Meeting &amp; data publishing symposium</a>
+        </li>
+        </ul>
+        <ul id="aspect_dryadinfo_DryadBlogFeed_list_entries" class="ds-simple-list">
+        <li>
+        <a href="http://blog.datadryad.org/2013/02/02/how-to-decide-what-data-should-be-archived-at-publication/">How to decide what data should be archived at publication</a>
+        </li>
+        </ul>
+        </div>
+    </div>
+</div>
+
+</div>
+<!-- 
+<div id="ds-options-wrapper">
+<div id="ds-options">
+<h1 class="ds-option-set-head" id="ds-search-option-head">Search Dryad</h1>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-option-set" id="ds-search-option">
+<form method="post" id="ds-search-form" action="/discover">
+<fieldset>
+<input type="text" class="ds-text-field " name="query" />
+<input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" value="Go" type="submit" name="submit" class="ds-button-field " onclick="&#10;                                    var radio = document.getElementById(&quot;ds-search-form-scope-container&quot;);&#10;                                    if (radio != undefined &amp;&amp; radio.checked)&#10;                                    {&#10;                                    var form = document.getElementById(&quot;ds-search-form&quot;);&#10;                                    form.action=&#10;                                &quot;/handle/&quot; + radio.value + &quot;/discover&quot; ; &#10;                                    }&#10;                                " />
+</fieldset>
+</form>
+<a href="/discover">Advanced Search</a>
+</div>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" id="aspect_submission_Navigation_list_submitNow" class="ds-option-set">
+<ul class="ds-simple-list">
+<li>
+<a href="/handle/10255/3/submit" class="submitnowbutton">Submit Data Now!</a>
+<a href="http://www.youtube.com/watch?v=RP33cl8tL28">See how to submit</a>
+</li>
+</ul>
+</div>
+<h1 class="ds-option-set-head">My Account</h1>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_administrative_Navigation_list_account" class="ds-option-set">
+<ul class="ds-simple-list">
+<li>
+<a href="/login">Login or Register</a>
+</li>
+</ul>
+</div>
+<h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-option-set-head">Statistics</h1>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_statistics_Navigation_list_statistics" class="ds-option-set">
+<ul class="ds-simple-list">
+<li>
+<a href="/statistics-home">View Statistics</a>
+</li>
+</ul>
+</div>
+<h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-option-set-head">Browse</h1>
+<div id="org_datadryad_dspace_xmlui_aspect_browse_Navigation_list_DryadBrowse" class="ds-option-set">
+<ul class="ds-simple-list">
+<li>
+<a href="/search-filter?field=dc.contributor.author_filter&amp;fq=location:l2">Authors</a>
+</li>
+<li>
+<a href="/search-filter?field=prism.publicationName_filter&amp;fq=location:l2">Journal Title</a>
+</li>
+</ul>
+</div>
+<h1 class="ds-option-set-head">Information</h1>
+<div id="aspect_dryadinfo_Navigation_list_DryadInfo" class="ds-option-set">
+<ul class="ds-simple-list">
+<li>
+<a href="/pages/depositing">Depositing Data</a>
+</li>
+<li>
+<a href="/pages/using">Using Data</a>
+</li>
+<li>
+<a href="/pages/members">Dryad Members</a>
+</li>
+<li>
+<a href="/pages/jdap">Journal Archiving Policy</a>
+</li>
+<li>
+<a href="/pages/about">About Dryad</a>
+</li>
+<li>
+<a href="http://blog.datadryad.org">Dryad Blog</a>
+</li>
+<li>
+<a href="http://wiki.datadryad.org">Dryad Documentation</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+END of #ds-options-wrapper -->
+
+
+
+
+
+</div>
+</div>
+<div id="ds-footer-wrapper">
+<div id="ds-footer">
+<!--
+<div id="ds-footer-left">
+<a target="_blank" href="http://www.dspace.org/">DSpace software</a> copyright © 2002-2010  <a target="_blank" href="http://www.duraspace.org/">Duraspace</a>
+</div>
+<div id="ds-footer-right">
+<span class="theme-by">Theme by </span>
+<a id="ds-footer-logo-link" href="http://atmire.com" target="_blank" title="@mire NV">
+<span id="ds-footer-logo"> </span>
+</a>
+</div>
+-->
+<div id="ds-footer-links">
+
+    <span style="float: right;">
+        <a href="#TODO">Dryad Policies</a> 
+        &nbsp;<span style="color: #777;">|</span>&nbsp; 
+        <a href="/contact">Contact Us</a> 
+    </span>
+    <span style="float: left;">
+        Dryad is a nonprofit membership organization.
+    </span>
+    <p class="build-info">Dryad updated Tue, 19 Feb 2013 07:48:02 EST and served by North Carolina State University</p>
+    <!--Git Commit Hash: 1791a030d671f4e6959e0913857f304fb67b1c9c-->
+</div>
+<a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="hidden" href="/htmlmap"> </a>
+</div>
+</div>
+</div>
+<script type="text/javascript">var JsHost = (("https:" == document.location.protocol) ? "https://" : "http://");
+            document.write(unescape("%3Cscript src='" + JsHost + "ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js' type='text/javascript'%3E%3C/script%3E"));</script>
+<script type="text/javascript">!window.jQuery && document.write('<script type="text/javascript" src="/static/js/jquery-1.9.1.min.js"> <\/script>')</script>
+<script type="text/javascript" src="/themes/Mirage/lib/js/jquery-ui-1.8.5.custom.min.js"> </script><!--[if lt IE 7 ]>
+<script type="text/javascript" src="/themes/Mirage/lib/js/DD_belatedPNG_0.0.8a.js?v=1"> </script>
+<script type="text/javascript">DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');$.each($('img[src$=png]'), function() {DD_belatedPNG.fixPng(this);});</script><![endif]-->
+<script type="text/javascript" src="files/jquery.hoverIntent.js"></script>
+<script type="text/javascript" src="files/superfish.js"></script>
+<script type="text/javascript" src="files/supersubs.js"></script>
+<script type="text/javascript" src="files/jquery.bxslider.min.js"></script>
+<script type="text/javascript">
+            runAfterJSImports.execute();
+        </script>
+<script type="text/javascript">
+                   var _gaq = _gaq || [];
+                   _gaq.push(['_setAccount', 'UA-16949847-1']);
+                   _gaq.push(['_trackPageview']);
+
+                   (function() {
+                       var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                   })();
+           </script>
+
+<!-- main menu behavior -->
+<script type="text/javascript">
+        $(document).ready(function() {
+            $('#main-menu ul.sf-menu')
+                .supersubs({
+                    // all numeric properties are in em
+                    minWidth: 22,
+                    maxWidth: 30,   // this isn't doing much...
+                    extraWidth: 1
+                })
+                .superfish();
+        });
+           </script>
+
+<!-- behaviors for home page only -->
+<script type="text/javascript">
+        $(document).ready(function() {
+
+            // main carousel at top
+            $('#dryad-home-carousel .bxslider').bxSlider({
+                auto: true,
+                pause: 5000,        // in ms
+                autoControls: true,
+                autoControlsCombine: true
+            });
+
+            // TEMPORARY slider to show Connect alternatives
+            // some objects start hidden, as they make highly visible 
+            // "glitches" during page load
+            $('.wordcloud').show();
+            $('#connect-legible-cloud').show();
+            $('#TEMP-connect-alternatives').bxSlider({
+                controls: false,
+                mode: 'vertical'
+                //pagerType: 'short'
+            });
+
+            // "tabs" in Browse Data
+            var $tabButtons = $('#browse-data-buttons a'); 
+            $tabButtons.unbind('click').click(function() {
+                // highlight this button and show its panel
+                $(this).addClass('selected');
+                var $panel = $($(this).attr('href'));
+                $panel.show();
+                // dim others and hide their panels
+                $(this).siblings().each(function() {
+                    $(this).removeClass('selected');
+                    var $panel = $($(this).attr('href'));
+                    $panel.hide();
+                });
+                return false;
+            });
+            $tabButtons.eq(0).click();
+        });
+           </script>
+</body></html>

@@ -12,6 +12,7 @@
 <link type="text/css" rel="stylesheet" media="screen" href="files/helper.css">
 <link type="text/css" rel="stylesheet" media="screen" href="files/jquery-ui-1.8.15.custom.css">
 <link type="text/css" rel="stylesheet" media="screen" href="files/style.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/superfish.css">
 <link type="text/css" rel="stylesheet" media="screen" href="files/authority-control.css">
 <link type="text/css" rel="stylesheet" media="handheld" href="files/handheld.css">
 <link type="text/css" rel="stylesheet" media="print" href="files/print.css">
@@ -87,10 +88,141 @@
 </a>
 <h1 class="pagetitle visuallyhidden">Browsing  by Issue Date </h1>
 <h2 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="static-pagetitle visuallyhidden">DSpace/Manakin Repository</h2>
+<!--
 <div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" id="ds-user-box">
 <p>
 <a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/login">Login</a>
 </p>
+</div>
+-->
+<div id="main-menu">
+
+    <ul class="sf-menu">
+
+        <li>
+            <a href="#TODO">About</a>
+            <ul>
+                <li>
+                    <a href="#TODO">Purpose &amp; Goals</a>
+                </li>
+                <li>
+                    <a href="#TODO">Who We Are</a>
+                </li>
+                <li>
+                    <a href="#TODO">Journal Archiving Policy</a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a href="#TODO">Membership</a>
+            <ul>
+                <li>
+                    <a href="#TODO">Overview</a>
+                </li>
+                <li>
+                    <a href="#TODO">Apply</a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a href="#TODO">Resources</a>
+            <ul>
+                <li>
+                    <a href="#TODO">Deposit Data Instructions</a>
+                </li>
+                <li class="current">
+                    <a href="#TODO">FAQ</a>
+                </li>
+                <li>
+                    <a href="#TODO">Wiki</a>
+                </li>
+                <li>
+                    <a href="#TODO">Blog</a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a>Contact Us</a>
+        </li>
+
+        <!-- these items would appear only for anonymous visitors (NOT logged in) -->
+<!--
+        <li id="login-item">
+            <a href="#TODO">Login</a>
+        </li>
+        <li id="sign-up-item">
+            <a href="#TODO">Sign Up</a>
+        </li>
+-->
+
+        <!-- this item would appear only for logged-in users -->
+        <li>
+            <a href="#TODO">{USER NAME}</a>
+            <ul>
+                <li>
+                    <a href="#TODO">My Submissions</a>
+                </li>
+                <li>
+                    <a href="#TODO">My Tasks</a>
+                </li>
+                <li>
+                    <a href="#TODO">Profile</a>
+                </li>
+                <li class="after-divider">
+                    <a href="#TODO">Logout</a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- this item would appear only for logged-in administrators -->
+<!--
+        <li>
+            <a href="#TODO">Administrative</a>
+            <ul>
+                <li>
+                    <a href="#TODO">Workflow Overview</a>
+                </li>
+                <li class="after-divider">
+                    <a href="#TODO">Access Control</a>
+                </li>
+                <li>
+                    <a href="#TODO">People</a>
+                </li>
+                <li>
+                    <a href="#TODO">Groups</a>
+                </li>
+                <li>
+                    <a href="#TODO">Authorizations</a>
+                </li>
+                <li class="after-divider">
+                    <a href="#TODO">Registries</a>
+                </li>
+                <li>
+                    <a href="#TODO">Format</a>
+                </li>
+                <li>
+                    <a href="#TODO">Metadata</a>
+                </li>
+                <li class="after-divider">
+                    <a href="#TODO">Items</a>
+                </li>
+                <li>
+                    <a href="#TODO">Withdrawn Items</a>
+                </li>
+                <li>
+                    <a href="#TODO">Control Panel</a>
+                </li>
+                <li>
+                    <a href="#TODO">Statistics</a>
+                </li>
+                <li>
+                    <a href="#TODO">Import Metadata</a>
+                </li>
+            </ul>
+        </li>
+-->
+
+    </ul>
 </div>
 </div>
 </div>
@@ -308,7 +440,23 @@
 <script type="text/javascript" src="files/jquery-ui-1.8.15.custom.min.js"> </script><!--[if lt IE 7 ]>
 <script type="text/javascript" src="/themes/Mirage/lib/js/DD_belatedPNG_0.0.8a.js?v=1"> </script>
 <script type="text/javascript">DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');$.each($('img[src$=png]'), function() {DD_belatedPNG.fixPng(this);});</script><![endif]-->
+<script type="text/javascript" src="files/jquery.hoverIntent.js"></script>
+<script type="text/javascript" src="files/superfish.js"></script>
+<script type="text/javascript" src="files/supersubs.js"></script>
 <script type="text/javascript">
             runAfterJSImports.execute();
         </script>
+<!-- main menu behavior -->
+<script type="text/javascript">
+        $(document).ready(function() {
+            $('#main-menu ul.sf-menu')
+                .supersubs({
+                    // all numeric properties are in em
+                    minWidth: 22,
+                    maxWidth: 30,   // this isn't doing much...
+                    extraWidth: 1
+                })
+                .superfish();
+        });
+           </script>
 <div style="display: none;" id="hiddenlpsubmitdiv"></div><script>try{for(var lastpass_iter=0; lastpass_iter < document.forms.length; lastpass_iter++){ var lastpass_f = document.forms[lastpass_iter]; if(typeof(lastpass_f.lpsubmitorig2)=="undefined"){ lastpass_f.lpsubmitorig2 = lastpass_f.submit; lastpass_f.submit = function(){ var form=this; var customEvent = document.createEvent("Event"); customEvent.initEvent("lpCustomEvent", true, true); var d = document.getElementById("hiddenlpsubmitdiv"); for(var i = 0; i < document.forms.length; i++){ if(document.forms[i]==form){ d.innerText=i; } } d.dispatchEvent(customEvent); form.lpsubmitorig2(); } } }}catch(e){}</script></body></html>

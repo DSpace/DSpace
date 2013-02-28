@@ -290,6 +290,7 @@ public class DryadEmailSubmission extends HttpServlet {
                 // Load in DSpace config
                 ConfigurationManager.loadConfig(config);                
             }
+
             String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
             File propFile = new File(journalPropFile);
 

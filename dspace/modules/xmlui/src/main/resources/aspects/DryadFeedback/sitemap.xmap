@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+    <map:components>
+        <map:transformers>
+            <map:transformer name="SubscribeMailingListForm" src="org.dspace.app.xmlui.aspect.dryadfeedback.SubscribeMailingListForm"/>
+            <map:transformer name="SubscribeMailingListConfirmed" src="org.dspace.app.xmlui.aspect.dryadfeedback.SubscribeMailingListConfirmed"/>
+        </map:transformers>
+        <map:matchers default="wildcard"/>
+        <map:actions>
+            <map:action name="SubscribeMailingListAction" src="org.dspace.app.xmlui.aspect.dryadfeedback.SubscribeMailingListAction"/>
+        </map:actions>
+        <map:selectors/>
+    </map:components>
+
+    <map:pipelines>
+        <map:pipeline>
+            <map:generate/>
+            <map:match pattern="subscribe">
+                <map:act type="SubscribeMailingListAction">
+                    <map:transform type="SubscribeMailingListForm">
+                        <map:parameter name="email" value="{email}"/>
+                    </map:transform>
+                    <map:serialize type="xml"/>
+                </map:act>
+                <map:transform type="SubscribeMailingListConfirmed"/>
+                <map:serialize type="xml"/>
+            </map:match>
+            <!-- Not a URL we care about, so just pass it on. -->
+            <map:serialize type="xml"/>
+        </map:pipeline>
+    </map:pipelines>
+</map:sitemap>
