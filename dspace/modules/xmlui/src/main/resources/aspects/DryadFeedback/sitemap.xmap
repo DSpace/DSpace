@@ -4,10 +4,13 @@
         <map:transformers>
             <map:transformer name="SubscribeMailingListForm" src="org.dspace.app.xmlui.aspect.dryadfeedback.SubscribeMailingListForm"/>
             <map:transformer name="SubscribeMailingListConfirmed" src="org.dspace.app.xmlui.aspect.dryadfeedback.SubscribeMailingListConfirmed"/>
+            <map:transformer name="MembershipApplicationForm" src="org.dspace.app.xmlui.aspect.dryadfeedback.MembershipApplicationForm"/>
+            <map:transformer name="MembershipApplicationSubmitted" src="org.dspace.app.xmlui.aspect.dryadfeedback.MembershipApplicationSubmitted"/>
         </map:transformers>
         <map:matchers default="wildcard"/>
         <map:actions>
             <map:action name="SubscribeMailingListAction" src="org.dspace.app.xmlui.aspect.dryadfeedback.SubscribeMailingListAction"/>
+            <map:action name="MembershipApplicationAction" src="org.dspace.app.xmlui.aspect.dryadfeedback.MembershipApplicationAction"/>
         </map:actions>
         <map:selectors/>
     </map:components>
@@ -23,6 +26,27 @@
                     <map:serialize type="xml"/>
                 </map:act>
                 <map:transform type="SubscribeMailingListConfirmed"/>
+                <map:serialize type="xml"/>
+            </map:match>
+            <map:match pattern="membership">
+                <map:act type="MembershipApplicationAction">
+                    <map:transform type="MembershipApplicationForm">
+                        <map:parameter name="org_name" value="{org_name}" />
+                        <map:parameter name="org_legalname" value="{org_legalname}" />
+                        <map:parameter name="org_type" value="{org_type}" />
+                        <map:parameter name="org_annual_revenue" value="{org_annual_revenue}" />
+                        <map:parameter name="billing_contact_name" value="{billing_contact_name}" />
+                        <map:parameter name="billing_address" value="{billing_address}" />
+                        <map:parameter name="billing_email" value="{billing_email}" />
+                        <map:parameter name="publications" value="{publications}" />
+                        <map:parameter name="membership_year" value="{membership_year}" />
+                        <map:parameter name="rep_name" value="{rep_name}" />
+                        <map:parameter name="rep_email" value="{rep_email}" />
+                        <map:parameter name="comments" value="{comments}" />
+                    </map:transform>
+                    <map:serialize type="xml"/>
+                </map:act>
+                <map:transform type="MembershipApplicationSubmitted"/>
                 <map:serialize type="xml"/>
             </map:match>
             <!-- Not a URL we care about, so just pass it on. -->
