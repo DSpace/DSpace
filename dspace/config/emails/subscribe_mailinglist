@@ -1,0 +1,7 @@
+# E-mail sent to mailman when users request to subscribe to the
+# Dryad-announcement mailing list
+#
+# Parameters: {0} is the email address that should be subscribed to the list
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: subscribe address={0}
