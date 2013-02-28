@@ -65,6 +65,6 @@ public class SubscribeMailingListConfirmed extends AbstractDSpaceTransformer imp
     {
         Division feedback = body.addDivision("feedback-sent","primary");
         feedback.setHead("Subscribed");
-        feedback.addPara("Thank you for subscribing to the dryad mailing list");
+        feedback.addPara("Thank you for subscribing to the Dryad mailing list");
     }
 }
