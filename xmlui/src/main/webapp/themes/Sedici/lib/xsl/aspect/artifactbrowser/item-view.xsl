@@ -249,11 +249,11 @@
 			</div>
 		</xsl:if>
 		<!-- note row -->
-		<xsl:if test="(dim:field[@element='note'])">
+		<xsl:if test="(dim:field[@element='description' and @qualifier='note'])">
 			<div class="simple-item-view-description">
 				<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-note</i18n:text></h2>
 				<p>
-					<xsl:value-of select="dim:field[@element='note']" disable-output-escaping="yes"/>
+					<xsl:value-of select="dim:field[@element='description' and @qualifier='note']" disable-output-escaping="yes"/>
 				</p>
 			</div>
 		</xsl:if>
@@ -545,21 +545,23 @@
 
 		<xsl:apply-templates select="/mets:METS" mode="generate-bitstream"/>
 
-		<!-- status row -->
-		<xsl:if test="dim:field[@element='status'] or dim:field[@element='fulltext']">
+		<!-- peer_review row -->
+		<!-- fulltext row -->
+		
+		<xsl:if test="dim:field[@qualifier='peerReview'] or dim:field[@qualifier='fulltext']">
 	        <div id="other_attributes">
 				<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.other-attributes</i18n:text></h2>
 				<ul>
-					<xsl:if test="dim:field[@element='status']">
+					<xsl:if test="dim:field[@qualifier='peerReview']">
 						<li class="metadata peer-review">
-							<i18n:text>xmlui.dri2xhtml.METS-1.0.item-is-<xsl:value-of select="dim:field[@element='status']"/></i18n:text>
+							<i18n:text>xmlui.dri2xhtml.METS-1.0.item-is-<xsl:value-of select="dim:field[@qualifier='peerReview']"/></i18n:text>
 						</li>
 					</xsl:if>
 			
 					<!-- fulltext row -->
-					<xsl:if test="dim:field[@element='fulltext']">
+					<xsl:if test="dim:field[@qualifier='fulltext']">
 						<li class="metadata fulltext">
-							<i18n:text>xmlui.dri2xhtml.METS-1.0.item-<xsl:value-of select="dim:field[@element='fulltext']"/>-fulltext</i18n:text>
+							<i18n:text>xmlui.dri2xhtml.METS-1.0.item-<xsl:value-of select="dim:field[@qualifier='fulltext']"/>-fulltext</i18n:text>
 						</li>
 					</xsl:if>
 				</ul>

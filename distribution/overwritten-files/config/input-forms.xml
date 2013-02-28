@@ -312,7 +312,8 @@
 				<!-- Fulltext -->
 				<field>
 					<dc-schema>sedici</dc-schema>
-					<dc-element>fulltext</dc-element>
+					<dc-element>description</dc-element>
+					<dc-qualifier>fulltext</dc-qualifier>
 					<label>Texto completo</label>
 					<input-type value-pairs-name="boolean_values">dropdown</input-type>
 					<hint>Indica si se cuenta con el texto completo de la obra</hint>
@@ -576,8 +577,9 @@
 
 				<!-- Evaluación -->
 				<field>
-					<dc-schema>eprints</dc-schema>
-					<dc-element>status</dc-element>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>description</dc-element>
+					<dc-qualifier>peerReview</dc-qualifier>
 					<label>Evaluación</label>
 					<input-type value-pairs-name="common_evaluations">dropdown</input-type>
 					<hint>Tipo de evaluación a la que el recurso fue sometido</hint>
@@ -816,7 +818,8 @@
 				<!-- Notas -->
 				<field>
 					<dc-schema>sedici</dc-schema>
-					<dc-element>note</dc-element>
+					<dc-element>description</dc-element>
+					<dc-qualifier>note</dc-qualifier>
 					<label>Notas</label>
 					<input-type>textarea</input-type>
 					<hint>Si usted desea que su obra sea embargada debe indicarlo aquí. El período de embargo se contabiliza a partir de la fecha de presentación de la tesis o trabajo y puede abarcar desde tres (3) meses hasta un máximo de veinticuatro (24) meses. Indique por favor un período dentro de ese rango. Luego, deberá adjuntar una nota escrita en la que se justifique debidamente la solicitud de embargo para su obra.</hint>

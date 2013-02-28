@@ -135,7 +135,8 @@
 	</dc-type>
 	<dc-type>
 		<schema>sedici</schema>
-		<element>note</element>
+		<element>description</element>
+		<qualifier>note</qualifier>
 		<!-- sin calificar -->
 		<scope_note>Anotaciones del usuario o administrador, aclarando algún aspecto sobre el documento y su catalogación</scope_note>
 	</dc-type>	
@@ -213,7 +214,8 @@
 	</dc-type>
 	<dc-type>
 		<schema>sedici</schema>
-		<element>fulltext</element>
+		<element>description</element>
+		<qualifier>fulltext</qualifier>
 		<!-- sin calificar -->
 		<scope_note>Indica si se posee el registro a texto completo</scope_note>
 	</dc-type>
@@ -338,8 +340,9 @@
 		<scope_note>Nombre del evento al que un objeto fue presentado</scope_note>
 	</dc-type>
 	<dc-type>
-		<schema>eprints</schema>
-		<element>status</element>
+		<schema>sedici</schema>
+		<element>description</element>
+		<qualifier>peerReview</qualifier>
 		<!-- sin calificar -->
 		<scope_note>Indica si el documento cuenta con revisión por pares o no</scope_note>
 	</dc-type>
