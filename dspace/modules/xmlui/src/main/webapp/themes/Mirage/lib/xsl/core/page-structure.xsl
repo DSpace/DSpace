@@ -459,16 +459,18 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 </h2>
 
                 <div id="sharing-tools">
-                    <a href="#TODO">
+                    <a href="http://twitter.com/datadryad">
                         <img src="themes/Mirage/images/dryad_twit_icon.png"/>
                     </a>
-                    <a href="#TODO">
+                    <a href="http://www.facebook.com/DataDryad">
                         <img src="themes/Mirage/images/dryad_fb_icon2.png"/>
                     </a>
-                    <a href="#TODO">
+		    <!-- We don't currently have a Google Plus page...
+                    <a href="">
                         <img src="themes/Mirage/images/dryad_gplus_icon.png"/>
                     </a>
-                    <a href="#TODO">
+		    -->
+                    <a href="http://blog.datadryad.org/feed/">
                         <img src="themes/Mirage/images/dryad_rss_icon.png"/>
                     </a>
                 </div>
@@ -476,7 +478,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 <div id="main-menu">
                     <ul class="sf-menu">
                         <li>
-                            <a href="#TODO">About</a>
+                            <a href="/pages/about">About</a>
                             <ul>
                                 <li>
                                     <a href="#TODO">Purpose &amp; Goals</a>
@@ -494,7 +496,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             </ul>
                         </li>
                         <li>
-                            <a href="#TODO">Membership</a>
+                            <a href="#TODO">Get Started</a>
                             <ul>
                                 <li>
                                     <a href="/pages/members">
@@ -507,7 +509,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             </ul>
                         </li>
                         <li>
-                            <a href="#TODO">Resources</a>
+                            <a href="#TODO">Learn More</a>
                             <ul>
                                 <li>
                                     <a href="/pages/depositing">
@@ -530,7 +532,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             </ul>
                         </li>
                         <li>
-                            <a href="/contact">Contact Us</a>
+                            <a href="/feedback">Contact Us</a>
                         </li>
 
 

@@ -9,9 +9,8 @@
 
 -->
 <!--
-    TODO: Describe this XSL file
-    Author: Alexey Maslov
-
+    Original author: Alexey Maslov
+    Extensively modified by many others....
 -->
 
 <xsl:stylesheet xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
@@ -258,7 +257,7 @@
             <div class="home-col-2">
                 <h1 class="ds-div-head "
                     style="border-bottom: none; text-align: center; padding: 50px 45px 0; height: 50px;">Deposit your
-                    data in dryad
+                    data in Dryad
                 </h1>
                 <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
                     <p class="ds-paragraph" style="text-align: center; font-size: 1.2em; margin: 0.5em 0 1.5em;">
@@ -392,35 +391,6 @@
                                 <span style="color: #494; font-weight: bold;">Dryad</span>.
                             </p>
 
-                            <!--Dryad’s flexible <a href="#">volume payment plans</a> make it attractive
-                            for institutions to sponsor data archiving as a service to their scientists and
-                            authors.
-                            -->
-
-                            <!--
-                            The
-                            <span style="font-size: 25px; color: #c99;">
-                            <a href="#">vision</a> of
-                            <span style="font-weight: 36px; color: #494; font-weight: bold;">Dryad</span></span> is a
-                            <span style="font-size: 22px; color: #99b;">scholarly
-                            <a href="#">communication</a> system</span> in which
-                            <span style="font-size: 22px;">learned
-                            <a style="font-size: 24px; color: #494;" href="#TODO">societies</a>,
-                            <a style="font-size: 27px; color: #9c9; font-weight: bold;" href="#TODO">publishers</a>,
-                            <a style="font-size: 30px; color: #494;" href="#TODO">institutions</a>
-                             of research and education</span>, funding bodies and other
-                            <span style="font-size: 22px;">
-                            <a style="font-size: 28px; color: #449;" href="#TODO">stakeholders</a>
-                            </span>
-                             collaboratively
-                            <a style="font-size: 24px; color: #c99; font-weight: bold;" href="#TODO">sustain</a>
-                            and promote the
-                            <span style="font-size: 24px; color: #bb6;">
-                            <a href="#" style="color: #bb6;">preservation</a>
-                            and reuse
-                            </span>
-                             of data.
-                            -->
                         </div>
 
                     </div>
@@ -629,7 +599,7 @@
     <xsl:template match="dri:list" mode="menu">
 
         <li>
-            <a href="#TODO">
+            <a href="#TODO-MenuList">
                 <i18n:text>
                     <xsl:value-of select="dri:head"/>
                 </i18n:text>
@@ -645,7 +615,7 @@
     <xsl:template match="dri:item" mode="menu">
 
         <li>
-            <a href="#TODO">
+            <a href="#TODO-MenuItem">
                 <xsl:attribute name="href">
                     <xsl:value-of select="dri:xref/@target"/>
                 </xsl:attribute>
