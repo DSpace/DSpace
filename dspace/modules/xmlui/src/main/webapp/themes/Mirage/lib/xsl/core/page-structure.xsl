@@ -478,7 +478,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 <div id="main-menu">
                     <ul class="sf-menu">
                         <li>
-                            <a href="#TODO">About</a>
+                            <a href="/pages/about">About</a>
                             <ul>
                                 <li>
                                     <a href="#TODO">Purpose &amp; Goals</a>
@@ -496,7 +496,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             </ul>
                         </li>
                         <li>
-                            <a href="#TODO">Membership</a>
+                            <a href="#TODO">Get Started</a>
                             <ul>
                                 <li>
                                     <a href="/pages/members">
@@ -509,7 +509,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             </ul>
                         </li>
                         <li>
-                            <a href="#TODO">Resources</a>
+                            <a href="#TODO">Learn More</a>
                             <ul>
                                 <li>
                                     <a href="/pages/depositing">
@@ -532,7 +532,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             </ul>
                         </li>
                         <li>
-                            <a href="/contact">Contact Us</a>
+                            <a href="/feedback">Contact Us</a>
                         </li>
 
 
