@@ -1272,7 +1272,7 @@ p.ds-paragraph {
 
 #aspect_artifactbrowser_CollectionViewer_div_collection-view .ds-paragraph a {
 position: relative;
-left:95px;
+left:155px;
 background-image:url(../../images/flecha_enviar2.png);
 background-position:left;
 background-repeat:no-repeat;
@@ -2537,7 +2537,7 @@ bottom:10px;
 
 .intro-text {
 	float:left;
-	width:550px;
+	width:400px;
 	padding-top:10px;
 	display:inline-block;
     left: 155px;

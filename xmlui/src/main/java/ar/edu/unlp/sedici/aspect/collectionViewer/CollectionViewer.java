@@ -126,29 +126,21 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
            return;
        }
 
-       // Set up the major variables
-       Collection collection = (Collection) dso;
+       Community[] superCommunities=((Collection) dso).getCommunities();
        
-       Community[] communities=collection.getCommunities();
-       int root=communities.length-1;
-
-       Community community=communities[root];
-
-       // Agrego la referencia a la comunidad root
-   	   Division viewer =  body.addDivision("community-view-root","secondary");
-       ReferenceSet mainInclude = viewer.addReferenceSet("community-view-root",
-               ReferenceSet.TYPE_DETAIL_LIST);
-       mainInclude.addReference(community);
-       
-       // si tiene mas de un nivel de comunidades padres agrego la referencia a la comunidad padre
-       if (root>0){
-           community=communities[0];
-       	   viewer =  body.addDivision("community-view-top","secondary");
-           mainInclude = viewer.addReferenceSet("community-view-top",
-                   ReferenceSet.TYPE_DETAIL_LIST);
-           mainInclude.addReference(community);
-       };
-
+       int i = 0;
+       while(i < superCommunities.length)
+       {
+    	   if(superCommunities[i].getLogo() != null) 
+    	   {
+    	       // Agrego la referencia a la comunidad root
+    	   	   Division viewer =  body.addDivision("community-view-root","secondary");
+    	       ReferenceSet mainInclude = viewer.addReferenceSet("community-view-root", ReferenceSet.TYPE_DETAIL_LIST);
+    	       mainInclude.addReference(superCommunities[i]);
+    	       break;
+    	   }
+    	   i++;
+       }
    }
    
    /**

@@ -119,22 +119,20 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
            return;
        }
 
-       // Set up the major variables
-       Community community = (Community) dso;
-       
-       Community[] superCommunities=community.getAllParents();
-
-       int root=superCommunities.length;
-       
-       if (root>0){
-    	   community=superCommunities[root-1];	       
-	       // Agrego la referencia a la comunidad root
-	   	   Division viewer =  body.addDivision("community-view-root","secondary");
-	       ReferenceSet mainInclude = viewer.addReferenceSet("community-view-root",
-	               ReferenceSet.TYPE_DETAIL_LIST);
-	       mainInclude.addReference(community);
+       Community[] superCommunities = ((Community) dso).getAllParents();
+       int i = 0;
+       while(i < superCommunities.length) 
+       {
+    	   if(superCommunities[i].getLogo() != null) 
+    	   {
+    	       // Agrego la referencia a la comunidad root
+    	   	   Division viewer =  body.addDivision("community-view-root","secondary");
+    	       ReferenceSet mainInclude = viewer.addReferenceSet("community-view-root", ReferenceSet.TYPE_DETAIL_LIST);
+    	       mainInclude.addReference(superCommunities[i]);
+    	       break;
+    	   }
+    	   i++;
        }
-
    }
    
    /**
