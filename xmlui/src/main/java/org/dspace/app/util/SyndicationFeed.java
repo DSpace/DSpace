@@ -581,10 +581,18 @@ public class SyndicationFeed
         	DCValue values[] = item.getMetadata(metadataField);
             for (DCValue v : values)
             {
+            	if (v.value.isEmpty())
+            		continue;
+            	
             	if (first)
+            	{
               		first = false;
-              	else if (!v.value.isEmpty())
+              		sb.append(v.value);
+            	}
+              	else 
+              	{
               		sb.append(separator).append(v.value);
+              	}
             }
         }
 		return sb.toString();
