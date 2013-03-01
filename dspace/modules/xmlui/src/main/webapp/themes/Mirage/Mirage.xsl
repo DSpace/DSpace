@@ -599,7 +599,7 @@
     <xsl:template match="dri:list" mode="menu">
 
         <li>
-            <a href="#TODO">
+            <a href="#TODO-MenuList">
                 <i18n:text>
                     <xsl:value-of select="dri:head"/>
                 </i18n:text>
@@ -615,7 +615,7 @@
     <xsl:template match="dri:item" mode="menu">
 
         <li>
-            <a href="#TODO">
+            <a href="#TODO-MenuItem">
                 <xsl:attribute name="href">
                     <xsl:value-of select="dri:xref/@target"/>
                 </xsl:attribute>
