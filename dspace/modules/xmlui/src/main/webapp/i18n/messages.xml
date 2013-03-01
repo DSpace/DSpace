@@ -3260,13 +3260,14 @@
     
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_name.label1">1a. Name of member organization <span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_name.label2">Please provide the preferred name for the membership list.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_name">Organization name is required</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_legalname.label1">1b. Legal name of organization</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_legalname.label2">Please provide the institution's legal name, if different.</message>
     
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_type.label1">2. Type of organization <span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_type.label2">Membership in Dryad is open to the full spectrum of stakeholder organizations, including but not limited to journals, learned societies, publishers, research institutions, libraries, and funding bodies.</message>
-    
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_type">Organization type is required</message>
     <!-- Radio Option Choices for org_type -->
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_type.data_center_or_repository">Data center or repository</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_type.funding_organization">Funding organization</message>
@@ -3282,27 +3283,34 @@
     <!-- Checkbox options for org_annual_revenue -->
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.less_than_10_million">Less than $10 million per year (annual membership fee US$1000)</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.greater_than_10_million">Greater than $10 million per year (annual membership fee US$5000)</message>
-    
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue">Annual revenue is required</message>
+
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.billing_contact_name.label1">4. Billing contact <span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.billing_contact_name.label2">Please provide the name of the billing contact person.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.billing_contact_name">Billing contact name is required</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.billing_address.label1">5. Billing address <span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.billing_address.label2">Dryad will invoice members for 2013 membership dues. Please provide the address for billing purposes.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.billing_address">Billing address is required</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.billing_email.label1">6. Billing email address <span class="required-mark">*</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.billing_email">Billing email address is required</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.publications.label1">7. Publications</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.publications.label2">Membership in Dryad allows a discount on certain journal user fees. Please list journals that your organization publishes. If too many to list here, please send this info to <a href="mailto:director@datadryad.org">director@datadryad.org</a>.</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.label1">8. Membership year <span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.label2">Membership years run Jan.-Dec.; what year would you like membership to begin?</message>
-    
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.membership_year">Membership year is required</message>
+
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_name.label1">9. Representative to Dryad <span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_name.label2">Dryad members appoint a representative to Dryad’s annual meeting in May. This representative can vote for the Board of Directors and on Dryad issues. Please list the name of the representative for your organization.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.rep_name">Representative name is required</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_email.label1">10. Representative's email address <span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_email.label2">Please provide the email address for the representative to Dryad.</message>
-    
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.rep_email">Representative's email address is required</message>
+
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.comments.label1">11. Comments</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.comments.label2">Please tell us anything else you think we should know about the member organization.</message>
     

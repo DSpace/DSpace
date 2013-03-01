@@ -3,9 +3,11 @@ package org.dspace.app.xmlui.aspect.dryadfeedback;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.util.HashUtil;
+import org.apache.commons.lang.StringUtils;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -94,6 +96,13 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         membership.addPara(message(message_prefix + "overview.p3"));
         membership.addPara(message(message_prefix + "markedfields"));
 
+        // Check for errors
+        String errorFields = parameters.getParameter("error_fields","");
+        final String errorFieldsArray[] = StringUtils.split(errorFields, ',');
+        java.util.List<String> errorFieldList = new java.util.ArrayList<String>() {{
+            for(String errorField : errorFieldsArray) { add(errorField); }
+        }};
+
         List form = membership.addList("form", List.TYPE_FORM);
         // Org Name
         Item orgName = form.addItem("org_name","");
@@ -102,6 +111,10 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         orgNameText.setHelp(message(message_prefix + "fields.org_name.label2"));
         orgNameText.setValue(parameters.getParameter("org_name", ""));
         orgNameText.setRequired();
+        if(errorFieldList.contains("org_name")) {
+            orgNameText.addError(message(message_prefix + "errors.org_name"));
+        }
+
 
         // Org Legal Name
         Item orgLegalName = form.addItem("org_legalname","");
@@ -124,6 +137,9 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         orgTypeRadios.addOption("university_research_or_edu_institute", message(message_prefix + "fields.org_type.university_research_or_edu_institute"));
         orgTypeRadios.addOption("other", message(message_prefix + "fields.org_type.other"));
         orgTypeRadios.setRequired();
+        if(errorFieldList.contains("org_type")) {
+            orgTypeRadios.addError(message(message_prefix + "errors.org_type"));
+        }
 
         Text org_type_other = orgType.addText("org_type_other");
         org_type_other.setValue(parameters.getParameter("org_type_other", ""));
@@ -137,6 +153,9 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         orgAnnualRevenueRadios.addOption("less_than_10_million", message(message_prefix + "fields.org_annual_revenue.less_than_10_million"));
         orgAnnualRevenueRadios.addOption("greater_than_10_million", message(message_prefix + "fields.org_annual_revenue.greater_than_10_million"));
         orgAnnualRevenueRadios.setRequired();
+        if(errorFieldList.contains("org_annual_revenue")) {
+            orgAnnualRevenueRadios.addError(message(message_prefix + "errors.org_annual_revenue"));
+        }
 
         // Billing Contact Name
         Item billingContactName = form.addItem("billing_contact_name","");
@@ -146,6 +165,9 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         billingContactNameText.setHelp(message(message_prefix + "fields.billing_contact_name.label2"));
         billingContactNameText.setValue(parameters.getParameter("billing_contact_name", ""));
         billingContactNameText.setRequired();
+        if(errorFieldList.contains("billing_contact_name")) {
+            billingContactNameText.addError(message(message_prefix + "errors.billing_contact_name"));
+        }
 
         // Billing Address
         Item billingAddress = form.addItem("billing_address","");
@@ -155,6 +177,9 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         billingAddressText.setHelp(message(message_prefix + "fields.billing_address.label2"));
         billingAddressText.setValue(parameters.getParameter("billing_address", ""));
         billingAddressText.setRequired();
+        if(errorFieldList.contains("billing_address")) {
+            billingAddressText.addError(message(message_prefix + "errors.billing_address"));
+        }
 
         // Billing Email
         Item billingEmail = form.addItem("billing_email","");
@@ -163,6 +188,9 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         billingEmailText.setLabel(message(message_prefix + "fields.billing_email.label1"));
         billingEmailText.setValue(parameters.getParameter("billing_email", ""));
         billingEmailText.setRequired();
+        if(errorFieldList.contains("billing_email")) {
+            billingEmailText.addError(message(message_prefix + "errors.billing_email"));
+        }
 
         // Publications
         Item publications = form.addItem("publications","");
@@ -180,6 +208,9 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         membershipYearText.setHelp(message(message_prefix + "fields.membership_year.label2"));
         membershipYearText.setValue(parameters.getParameter("membership_year", ""));
         membershipYearText.setRequired();
+        if(errorFieldList.contains("membership_year")) {
+            membershipYearText.addError(message(message_prefix + "errors.membership_year"));
+        }
 
         // Representatitve Name
         Item repName = form.addItem("rep_name","");
@@ -189,6 +220,9 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         repNameText.setHelp(message(message_prefix + "fields.rep_name.label2"));
         repNameText.setValue(parameters.getParameter("rep_name", ""));
         repNameText.setRequired();
+        if(errorFieldList.contains("rep_name")) {
+            repNameText.addError(message(message_prefix + "errors.rep_name"));
+        }
 
         // Representative email address
         Item repEmail = form.addItem("rep_email","");
@@ -198,6 +232,9 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         repEmailText.setHelp(message(message_prefix + "fields.rep_email.label2"));
         repEmailText.setValue(parameters.getParameter("rep_email", ""));
         repEmailText.setRequired();
+        if(errorFieldList.contains("rep_email")) {
+            repEmailText.addError(message(message_prefix + "errors.rep_email"));
+        }
 
         // Comments
         Item comments = form.addItem("comments","");

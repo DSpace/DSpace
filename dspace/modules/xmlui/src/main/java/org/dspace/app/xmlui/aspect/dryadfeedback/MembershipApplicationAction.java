@@ -1,9 +1,10 @@
 package org.dspace.app.xmlui.aspect.dryadfeedback;
 
-import org.dspace.app.xmlui.aspect.artifactbrowser.*;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.avalon.framework.parameters.Parameters;
@@ -12,6 +13,7 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
@@ -47,29 +49,22 @@ public class MembershipApplicationAction extends AbstractAction
         String agent = request.getHeader("User-Agent");
         String session = request.getSession().getId();
 
-        // If first time requesting the form or otherwise incomplete, do not submit
-        // instead, return the map of values
-
         // User email from context
         Context context = ContextUtil.obtainContext(objectModel);
-        EPerson loggedin = context.getCurrentUser();
-        String eperson = null;
-        if (loggedin != null) {
-            eperson = loggedin.getEmail();
-        }
 
-
-        // Check all required data is present
-        if(     (org_name == null) || org_name.equals("") ||
-                (org_annual_revenue == null) || org_annual_revenue.equals("") ||
-                (billing_contact_name == null) || billing_contact_name.equals("") ||
-                (billing_address == null) || billing_address.equals("") ||
-                (billing_email == null) || billing_email.equals("") ||
-                (membership_year == null) || membership_year.equals("") ||
-                (rep_name == null) || rep_name.equals("") ||
-                (rep_email == null) || rep_email.equals("")
+        if(     (org_name == null) ||
+                (org_annual_revenue == null) ||
+                (billing_contact_name == null) ||
+                (billing_address == null) ||
+                (billing_email == null) ||
+                (membership_year == null) ||
+                (rep_name == null) ||
+                (rep_email == null)
                 ) {
-            // missing required fields
+            // Either this is the first request for the form, or it has been submitted
+            // If the first request for the form, the parameters will not exist
+
+            // at least one required parameter not set
             Map<String, String> map = new HashMap<String, String>();
             map.put("org_name", org_name);
             map.put("org_annual_revenue", org_annual_revenue);
@@ -89,6 +84,41 @@ public class MembershipApplicationAction extends AbstractAction
 
             map.put("comments", comments);
 
+            // Handle error fields on submission
+            List<String> errorFieldNames = new ArrayList<String>();
+
+            if((org_name != null) && org_name.equals("")) {
+                errorFieldNames.add("org_name");
+            }
+            if((org_type != null) && org_type.equals("")) {
+                errorFieldNames.add("org_type");
+            }
+            if((org_annual_revenue != null) && org_annual_revenue.equals("")) {
+                errorFieldNames.add("org_annual_revenue");
+            }
+            if((billing_contact_name != null) && billing_contact_name.equals("")) {
+                errorFieldNames.add("billing_contact_name");
+            }
+            if((billing_address != null) && billing_address.equals("")) {
+                errorFieldNames.add("billing_address");
+            }
+            if((billing_email != null) && billing_email.equals("")) {
+                errorFieldNames.add("billing_email");
+            }
+            if((membership_year != null) && membership_year.equals("")) {
+                errorFieldNames.add("membership_year");
+            }
+            if((rep_name != null) && rep_name.equals("")) {
+                errorFieldNames.add("rep_name");
+            }
+            if((rep_email != null) && rep_email.equals("")) {
+                errorFieldNames.add("rep_email");
+            }
+
+            if(errorFieldNames.size() > 0) {
+                // missing required fields
+                map.put("error_fields",StringUtils.join(errorFieldNames.toArray(), ','));
+            }
             return map;
         }
 
