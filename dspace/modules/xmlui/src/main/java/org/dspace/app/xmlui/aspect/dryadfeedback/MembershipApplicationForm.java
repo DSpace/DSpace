@@ -95,74 +95,119 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         membership.addPara(message(message_prefix + "markedfields"));
 
         List form = membership.addList("form", List.TYPE_FORM);
-        form.addLabel("org_name_label1","ds-form-label").addContent(message(message_prefix + "fields.org_name.label1"));
-        form.addItem("org_name_label2","ds-form-content").addContent(message(message_prefix + "fields.org_name.label2"));
-        Text org_name = form.addItem().addText("org_name");
-        org_name.setValue(parameters.getParameter("org_name", ""));
+        // Org Name
+        Item orgName = form.addItem("org_name","");
+        Text orgNameText = orgName.addText("org_name");
+        orgNameText.setLabel(message(message_prefix + "fields.org_name.label1"));
+        orgNameText.setHelp(message(message_prefix + "fields.org_name.label2"));
+        orgNameText.setValue(parameters.getParameter("org_name", ""));
+        orgNameText.setRequired();
 
-        form.addLabel("org_legalname_label1","ds-form-label").addContent(message(message_prefix + "fields.org_legalname.label1"));
-        form.addItem("org_legalname_label2","ds-form-content").addContent(message(message_prefix + "fields.org_legalname.label2"));
-        Text org_legalname = form.addItem().addText("org_legalname");
-        org_legalname.setValue(parameters.getParameter("org_legalname", ""));
+        // Org Legal Name
+        Item orgLegalName = form.addItem("org_legalname","");
+        Text orgLegalNameText = orgLegalName.addText("org_legalname");
+        orgLegalNameText.setLabel(message(message_prefix + "fields.org_legalname.label1"));
+        orgLegalNameText.setHelp(message(message_prefix + "fields.org_legalname.label2"));
+        orgLegalNameText.setValue(parameters.getParameter("org_legalname", ""));
 
-        form.addLabel("org_type_label11","ds-form-label").addContent(message(message_prefix + "fields.org_type.label1"));
-        form.addItem("org_type_label2","ds-form-content").addContent(message(message_prefix + "fields.org_type.label2"));
-        List options = form.addList("options", List.TYPE_GLOSS);
-        options.addItem().addRadio("org_type").addOption("data_center_or_repository", message(message_prefix + "fields.org_type.data_center_or_repository"));
-        options.addItem().addRadio("org_type").addOption("funding_organization", message(message_prefix + "fields.org_type.funding_organization"));
-        options.addItem().addRadio("org_type").addOption("journal", message(message_prefix + "fields.org_type.journal"));
-        options.addItem().addRadio("org_type").addOption("publisher", message(message_prefix + "fields.org_type.publisher"));
-        options.addItem().addRadio("org_type").addOption("scholarly_society", message(message_prefix + "fields.org_type.scholarly_society"));
-        options.addItem().addRadio("org_type").addOption("university_research_or_edu_institute", message(message_prefix + "fields.org_type.university_research_or_edu_institute"));
-        options.addItem().addRadio("org_type").addOption("other", message(message_prefix + "fields.org_type.other"));
-        Text org_type_other = options.addItem().addText("org_type_other");
+        // Org Type
+        Item orgType = form.addItem("org_type", "");
+        Radio orgTypeRadios = orgType.addRadio("org_type");
+        orgTypeRadios.setLabel(message(message_prefix + "fields.org_type.label1"));
+        orgTypeRadios.setHelp(message(message_prefix + "fields.org_type.label2"));
+
+        orgTypeRadios.addOption("data_center_or_repository", message(message_prefix + "fields.org_type.data_center_or_repository"));
+        orgTypeRadios.addOption("funding_organization", message(message_prefix + "fields.org_type.funding_organization"));
+        orgTypeRadios.addOption("journal", message(message_prefix + "fields.org_type.journal"));
+        orgTypeRadios.addOption("publisher", message(message_prefix + "fields.org_type.publisher"));
+        orgTypeRadios.addOption("scholarly_society", message(message_prefix + "fields.org_type.scholarly_society"));
+        orgTypeRadios.addOption("university_research_or_edu_institute", message(message_prefix + "fields.org_type.university_research_or_edu_institute"));
+        orgTypeRadios.addOption("other", message(message_prefix + "fields.org_type.other"));
+        orgTypeRadios.setRequired();
+
+        Text org_type_other = orgType.addText("org_type_other");
         org_type_other.setValue(parameters.getParameter("org_type_other", ""));
 
-        form.addLabel("org_annual_revenue_label1","ds-form-label").addContent(message(message_prefix + "fields.org_annual_revenue.label1"));
-        form.addItem("org_annual_revenue_label2","ds-form-content").addContent(message(message_prefix + "fields.org_annual_revenue.label2"));
-        options = form.addList("fields", List.TYPE_GLOSS);
-        options.addItem().addRadio("org_annual_revenue").addOption("less_than_10_million", message(message_prefix + "fields.org_annual_revenue.less_than_10_million"));
-        options.addItem().addRadio("org_annual_revenue").addOption("greater_than_10_million", message(message_prefix + "fields.org_annual_revenue.greater_than_10_million"));
+        // Annual Revenue
+        Item orgAnnualRevenue = form.addItem("org_annual_revenue", "");
+        Radio orgAnnualRevenueRadios = orgAnnualRevenue.addRadio("org_annual_revenue");
+        orgAnnualRevenueRadios.setLabel(message(message_prefix + "fields.org_annual_revenue.label1"));
+        orgAnnualRevenueRadios.setHelp(message(message_prefix + "fields.org_annual_revenue.label2"));
 
-        form.addLabel("billing_contact_name_label1","ds-form-label").addContent(message(message_prefix + "fields.billing_contact_name.label1"));
-        form.addItem("billing_contact_name_label2","ds-form-content").addContent(message(message_prefix + "fields.billing_contact_name.label2"));
-        Text billing_contact_name = form.addItem().addText("billing_contact_name");
-        billing_contact_name.setValue(parameters.getParameter("billing_contact_name", ""));
+        orgAnnualRevenueRadios.addOption("less_than_10_million", message(message_prefix + "fields.org_annual_revenue.less_than_10_million"));
+        orgAnnualRevenueRadios.addOption("greater_than_10_million", message(message_prefix + "fields.org_annual_revenue.greater_than_10_million"));
+        orgAnnualRevenueRadios.setRequired();
 
-        form.addLabel("billing_address_label1","ds-form-label").addContent(message(message_prefix + "fields.billing_address.label1"));
-        form.addItem("billing_address_label2","ds-form-content").addContent(message(message_prefix + "fields.billing_address.label2"));
-        TextArea billing_address = form.addItem().addTextArea("billing_address");
-        billing_address.setValue(parameters.getParameter("billing_address", ""));
+        // Billing Contact Name
+        Item billingContactName = form.addItem("billing_contact_name","");
+        Text billingContactNameText = billingContactName.addText("billing_contact_name");
 
-        form.addLabel("billing_email_label1","ds-form-label").addContent(message(message_prefix + "fields.billing_email.label1"));
-        Text billing_email = form.addItem().addText("billing_email");
-        billing_email.setValue(parameters.getParameter("billing_email", ""));
+        billingContactNameText.setLabel(message(message_prefix + "fields.billing_contact_name.label1"));
+        billingContactNameText.setHelp(message(message_prefix + "fields.billing_contact_name.label2"));
+        billingContactNameText.setValue(parameters.getParameter("billing_contact_name", ""));
+        billingContactNameText.setRequired();
 
-        form.addLabel("publications_label1","ds-form-label").addContent(message(message_prefix + "fields.publications.label1"));
-        form.addItem("publications_label2","ds-form-content").addContent(message(message_prefix + "fields.publications.label2"));
-        TextArea publications = form.addItem().addTextArea("publications");
-        publications.setValue(parameters.getParameter("publications", ""));
+        // Billing Address
+        Item billingAddress = form.addItem("billing_address","");
+        Text billingAddressText = billingAddress.addText("billing_address");
 
-        form.addLabel("membership_year_label1","ds-form-label").addContent(message(message_prefix + "fields.membership_year.label1"));
-        form.addItem("membership_year_label2","ds-form-content").addContent(message(message_prefix + "fields.membership_year.label2"));
-        Text membership_year = form.addItem().addText("membership_year");
-        membership_year.setValue(parameters.getParameter("membership_year", ""));
+        billingAddressText.setLabel(message(message_prefix + "fields.billing_address.label1"));
+        billingAddressText.setHelp(message(message_prefix + "fields.billing_address.label2"));
+        billingAddressText.setValue(parameters.getParameter("billing_address", ""));
+        billingAddressText.setRequired();
 
-        form.addLabel("rep_name_label1","ds-form-label").addContent(message(message_prefix + "fields.rep_name.label1"));
-        form.addItem("rep_name_label2","ds-form-content").addContent(message(message_prefix + "fields.rep_name.label2"));
-        Text rep_name = form.addItem().addText("rep_name");
-        rep_name.setValue(parameters.getParameter("rep_name", ""));
+        // Billing Email
+        Item billingEmail = form.addItem("billing_email","");
+        Text billingEmailText = billingEmail.addText("billing_email");
 
-        form.addLabel("rep_email_label1","ds-form-label").addContent(message(message_prefix + "fields.rep_email.label1"));
-        form.addItem("rep_email_label2","ds-form-content").addContent(message(message_prefix + "fields.rep_email.label2"));
-        Text rep_email = form.addItem().addText("rep_email");
-        rep_email.setValue(parameters.getParameter("rep_email", ""));
+        billingEmailText.setLabel(message(message_prefix + "fields.billing_email.label1"));
+        billingEmailText.setValue(parameters.getParameter("billing_email", ""));
+        billingEmailText.setRequired();
 
-        form.addLabel("comments_label1","ds-form-label").addContent(message(message_prefix + "fields.comments.label1"));
-        form.addItem("comments_label2","ds-form-content").addContent(message(message_prefix + "fields.comments.label2"));
-        TextArea comments = form.addItem().addTextArea("comments");
-        comments.setValue(parameters.getParameter("comments", ""));
-        
+        // Publications
+        Item publications = form.addItem("publications","");
+        TextArea publicationsTextArea = publications.addTextArea("publications");
+
+        publicationsTextArea.setLabel(message(message_prefix + "fields.publications.label1"));
+        publicationsTextArea.setHelp(message(message_prefix + "fields.publications.label2"));
+        publicationsTextArea.setValue(parameters.getParameter("publications", ""));
+
+        // Membership Year
+        Item membershipYear = form.addItem("membership_year","");
+        Text membershipYearText = membershipYear.addText("membership_year");
+
+        membershipYearText.setLabel(message(message_prefix + "fields.membership_year.label1"));
+        membershipYearText.setHelp(message(message_prefix + "fields.membership_year.label2"));
+        membershipYearText.setValue(parameters.getParameter("membership_year", ""));
+        membershipYearText.setRequired();
+
+        // Representatitve Name
+        Item repName = form.addItem("rep_name","");
+        Text repNameText = repName.addText("rep_name");
+
+        repNameText.setLabel(message(message_prefix + "fields.rep_name.label1"));
+        repNameText.setHelp(message(message_prefix + "fields.rep_name.label2"));
+        repNameText.setValue(parameters.getParameter("rep_name", ""));
+        repNameText.setRequired();
+
+        // Representative email address
+        Item repEmail = form.addItem("rep_email","");
+        Text repEmailText = repEmail.addText("rep_email");
+
+        repEmailText.setLabel(message(message_prefix + "fields.rep_email.label1"));
+        repEmailText.setHelp(message(message_prefix + "fields.rep_email.label2"));
+        repEmailText.setValue(parameters.getParameter("rep_email", ""));
+        repEmailText.setRequired();
+
+        // Comments
+        Item comments = form.addItem("comments","");
+        TextArea commentsTextArea = comments.addTextArea("comments");
+
+        commentsTextArea.setLabel(message(message_prefix + "fields.comments.label1"));
+        commentsTextArea.setHelp(message(message_prefix + "fields.comments.label2"));
+        commentsTextArea.setValue(parameters.getParameter("comments", ""));
+
+        // Submit button
         form.addItem().addButton("submit").setValue(message(message_prefix + "submit"));
     }
 }
