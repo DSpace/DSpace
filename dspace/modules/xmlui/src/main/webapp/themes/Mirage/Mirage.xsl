@@ -49,28 +49,35 @@
             #ds-body {
                 width: 100%;
             }
+
             .labelcell {
                 font-weight: bold;
             }
+
             .datacell {
                 text-align: right;
             }
+
             .ds-div-head a {
                 font-size: 0.7em;
                 font-weight: normal;
                 position: relative;
                 top: -0.1em;
             }
+
             .ds-artifact-list {
                 /* font-size: 100%; */
                 line-height: 1.4em;
             }
+
             .ds-artifact-item {
                 padding-top: 10px;
             }
+
             .artifact-title {
                 font-size: 100%;
             }
+
             .ds-artifact-list .artifact-info {
                 display: none;
             }
@@ -82,15 +89,18 @@
                 padding: 0;
                 /* margin-right: 25px;*/
             }
+
             .home-col-2 {
                 float: right;
                 width: 300px;
                 margin-left: 0;
                 margin-right: 0;
             }
+
             .home-top-row {
                 height: 220px;
             }
+
             .home-bottom-row {
                 height: 420px;
             }
@@ -104,17 +114,21 @@
                 padding: 0px;
                 overflow: visible;
             }
+
             #dryad-home-carousel .bx-viewport {
                 height: 190px;
                 width: 623px;
             }
+
             #dryad-home-carousel div.bxslider {
                 overflow: visible;
             }
+
             #dryad-home-carousel div.bxslider div {
                 padding: 0;
                 margin: 0;
             }
+
             #dryad-home-carousel div.bxslider div > a,
             #dryad-home-carousel div.bxslider div > a > img,
             #dryad-home-carousel div.bxslider div > img {
@@ -122,38 +136,44 @@
                 height: 190px;
                 width: 623px;
             }
+
             #dryad-home-carousel div.bxslider div p {
                 /* padding: 36px 36px 38px; */
                 width: 480px;
                 margin: auto;
                 margin-top: 12px;
             }
+
             /* tweaks to slider control placement */
             #dryad-home-carousel .bx-pager {
                 bottom: -32px;
                 left: 8px;
             }
+
             #dryad-home-carousel .bx-controls-auto {
                 bottom: -35px;
             }
+
             .blog-box ul {
                 list-style: none;
                 margin-left: 0;
             }
+
             .blog-box li {
                 margin: 0.5em 0 1.2em;
             }
-
 
             /* Connect options */
             #connect-illustrated-prose {
                 overflow: hidden;
                 font-size: 15px;
             }
+
             #connect-illustrated-prose img {
                 width: auto;
                 margin: 4px;
             }
+
             .wordcloud .cloudword {
                 cursor: default;
                 line-height: 1em;
@@ -162,19 +182,23 @@
                 position: absolute;
                 text-decoration: none;
                 white-space: nowrap;
-                font-family: 'Arial Black','Helvetica','Arial',sans-serif;
+                font-family: 'Arial Black', 'Helvetica', 'Arial', sans-serif;
             }
+
             .wordcloud a.cloudword[href] {
                 cursor: pointer;
             }
+
             .wordcloud a.cloudword[href]:hover {
                 background-color: #ffc;
             }
+
             #connect-legible-cloud {
                 display: none;
                 padding-top: 8px;
                 font-size: 16px;
             }
+
             #connect-legible-cloud p {
                 margin-top: 0px;
                 margin-bottom: 15px;
@@ -187,17 +211,29 @@
                 <div id="dryad-home-carousel" class="ds-static-div primary">
                     <div class="bxslider" style="">
                         <div>
-                            <p style="margin-top: 44px;" Xid="ds-dryad-is" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
-                                <span style="color: #595;">Dryad</span> is a <span style="color: #363;">nonprofit organization</span> and an <span style="color: #242;">international repository</span> of data underlying scientific and medical publications.</p>
+                            <p style="margin-top: 44px;" Xid="ds-dryad-is"
+                               xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
+                                <span style="color: #595;">Dryad</span>
+                                is a
+                                <span style="color: #363;">nonprofit organization</span>
+                                and an
+                                <span style="color: #242;">international repository</span>
+                                of data underlying scientific and medical publications.
+                            </p>
                         </div>
                         <div>
-                            <p>The scientific, educational, and charitable mission of Dryad is to promote the availability of data underlying findings in
-                                the scientific literature for research and educational reuse. </p>
+                            <p>The scientific, educational, and charitable mission of Dryad is to promote the
+                                availability of data underlying findings in
+                                the scientific literature for research and educational reuse.
+                            </p>
                         </div>
                         <div style="font-size: 0.85em; margin-top: 12px;">
-                            <p>The vision of Dryad is a scholarly communication system in which learned societies, publishers, institutions of research
-                                and education, funding bodies and other stakeholders collaboratively sustain and promote the preservation and reuse of data
-                                underlying the scholarly literature.</p>
+                            <p>The vision of Dryad is a scholarly communication system in which learned societies,
+                                publishers, institutions of research
+                                and education, funding bodies and other stakeholders collaboratively sustain and promote
+                                the preservation and reuse of data
+                                underlying the scholarly literature.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -220,12 +256,17 @@
 
             <!-- START DEPOSIT -->
             <div class="home-col-2">
-                <h1 class="ds-div-head " style="border-bottom: none; text-align: center; padding: 50px 45px 0; height: 50px;">Deposit your data in dryad</h1>
+                <h1 class="ds-div-head "
+                    style="border-bottom: none; text-align: center; padding: 50px 45px 0; height: 50px;">Deposit your
+                    data in dryad
+                </h1>
                 <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
                     <p class="ds-paragraph" style="text-align: center; font-size: 1.2em; margin: 0.5em 0 1.5em;">
                         <a class="submitnowbutton" href="/handle/10255/3/submit">Submit Data Now!</a>
                     </p>
-                    <a style="float: right; margin-right: 18px;" href="http://www.youtube.com/watch?v=RP33cl8tL28">See how to submit</a>
+                    <a style="float: right; margin-right: 18px;" href="http://www.youtube.com/watch?v=RP33cl8tL28">See
+                        how to submit
+                    </a>
                 </div>
             </div>
 
@@ -253,7 +294,8 @@
 
             <!-- START CONNECT  -->
             <div class="home-col-2">
-                <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Connect with Dryad</h1>
+                <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Connect with Dryad
+                </h1>
 
                 <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 490px;">
                     <div id="TEMP-connect-alternatives">
@@ -261,17 +303,23 @@
                         <div id="connect-illustrated-prose">
                             <p>
                                 <img style="float: right;margin-left: 8px;" src="themes/Mirage/images/connect-1.png"/>
-                                Dryad invites <b>publishers</b>, <b>journals</b>, <b>scientific societies</b> and
+                                Dryad invites<b>publishers</b>,<b>journals</b>,
+                                <b>scientific societies</b>
+                                and
                                 <b>organizations</b>
                                 interested in data preservation to join us now and shape the course of Dryad’s
                                 future.
-                                <a href="#">Dryad members</a> elect our board of directors, participate in an
+                                <a href="#">Dryad members</a>
+                                elect our board of directors, participate in an
                                 active knowledge sharing network and receive discounts on deposit fees.
                                 <img style="float: left;margin-right: 8px;" src="themes/Mirage/images/connect-2.png"/>
                             </p>
 
                             <p>
-                                <a href="#">Submission Integration</a> is a free and easy way for <b>journals</b> to
+                                <a href="#">Submission Integration</a>
+                                is a free and easy way for
+                                <b>journals</b>
+                                to
                                 coordinate manuscript submissions with data submissions in Dryad. Integration
                                 makes depositing data and linking it with an article faster and simpler for
                                 both scientists and journals.
@@ -279,7 +327,9 @@
                             </p>
 
                             <p>
-                                Charging <a href="#">deposit fees</a> to offset the costs of data archiving
+                                Charging
+                                <a href="#">deposit fees</a>
+                                to offset the costs of data archiving
                                 will ensure that the public is never charged to access or reuse the data in
                                 Dryad.
                                 <!--Dryad’s flexible <a href="#">volume payment plans</a> make it attractive
@@ -430,7 +480,6 @@
             </div>
 
 
-
             <!-- START STATISTICS -->
             <div class="home-col-2" style="margin-left: 25px;">
                 <div id="aspect_statistics_StatisticsTransformer_div_home" class="ds-static-div primary repository">
@@ -541,14 +590,102 @@
         </div>
 
     </xsl:template>
-    <xsl:template match="dri:options"/>
+
+
+    <!--
+        The template to handle dri:options. Since it contains only dri:list tags (which carry the actual
+        information), the only things than need to be done is creating the ds-options div and applying
+        the templates inside it.
+
+        In fact, the only bit of real work this template does is add the search box, which has to be
+        handled specially in that it is not actually included in the options div, and is instead built
+        from metadata available under pageMeta.
+
+
+-->
+
+    <xsl:template match="dri:options[dri:list/@n='administrative']"/>
+    <xsl:template match="dri:options[dri:list/@n='browse']"/>
+    <xsl:template match="dri:options[dri:list/@n='context']"/>
+    <xsl:template match="dri:options[dri:list/@n='search']"/>
+    <xsl:template match="dri:options[dri:list/@n='account']"/>
+    <xsl:template match="dri:options[dri:list/@n='DryadBrowse']"/>
+
+    <!--
+    <xsl:template match="dri:options/dri:list[@n='DryadInfo']" priority="3">
+        <div id="main-menu">
+            <ul class="sf-menu">
+
+                <xsl:apply-templates select="dri:list" mode="nested"/>
+
+
+                <xsl:apply-templates select="dri:item" mode="nested"/>
+            </ul>
+
+        </div>
+    </xsl:template>
+    -->
+
+    <xsl:template match="dri:list" mode="menu">
+
+        <li>
+            <a href="#TODO">
+                <i18n:text>
+                    <xsl:value-of select="dri:head"/>
+                </i18n:text>
+            </a>
+            <ul>
+                <xsl:apply-templates select="dri:list|dri:item" mode="menu"/>
+            </ul>
+        </li>
+
+    </xsl:template>
+
+
+    <xsl:template match="dri:item" mode="menu">
+
+        <li>
+            <a href="#TODO">
+                <xsl:attribute name="href">
+                    <xsl:value-of select="dri:xref/@target"/>
+                </xsl:attribute>
+                <i18n:text>
+                    <xsl:value-of select="dri:xref"/>
+                </i18n:text>
+            </a>
+
+        </li>
+
+    </xsl:template>
+
+
+    <xsl:template match="dri:options/dri:list[@n='DryadConnect']" priority="3">
+        <div id="ds-options-dryaddata">3
+            <xsl:apply-templates select="dri:item" mode="nested"/>
+        </div>
+    </xsl:template>
+
+    <xsl:template match="dri:options/dri:list[@n='DyradSubmitData']" priority="3">
+        <div id="ds-options-dryadconnect">1
+            <xsl:apply-templates select="dri:item" mode="nested"/>
+        </div>
+    </xsl:template>
+
+    <xsl:template match="dri:options/dri:list[@n='DyradMail']" priority="3">
+        <div id="ds-options-dryadmail">2
+            <xsl:apply-templates select="dri:item" mode="nested"/>
+        </div>
+    </xsl:template>
 
     <xsl:variable name="meta" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata"/>
     <xsl:variable name="pageName" select="$meta[@element='request'][@qualifier='URI']"/>
     <!--xsl:variable name="doc" select="document(concat('pages/', $pageName, '.xhtml'))"/-->
 
     <xsl:template match="dri:xref[@rend='embed']">
-               <xsl:variable name="url" select="concat('pages/',@target)" />
-               <xsl:copy-of select="document(string($url))/html/*"/>
-           </xsl:template>
+               
+        <xsl:variable name="url" select="concat('pages/',@target)"/>
+               
+        <xsl:copy-of select="document(string($url))/html/*"/>
+           
+    </xsl:template>
 </xsl:stylesheet>
