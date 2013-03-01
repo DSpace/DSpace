@@ -9,9 +9,8 @@
 
 -->
 <!--
-    TODO: Describe this XSL file
-    Author: Alexey Maslov
-
+    Original author: Alexey Maslov
+    Extensively modified by many others....
 -->
 
 <xsl:stylesheet xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
@@ -258,7 +257,7 @@
             <div class="home-col-2">
                 <h1 class="ds-div-head "
                     style="border-bottom: none; text-align: center; padding: 50px 45px 0; height: 50px;">Deposit your
-                    data in dryad
+                    data in Dryad
                 </h1>
                 <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
                     <p class="ds-paragraph" style="text-align: center; font-size: 1.2em; margin: 0.5em 0 1.5em;">
