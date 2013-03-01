@@ -59,8 +59,9 @@
                               <map:transform type="Navigation"/>
                            </map:match>
 
-                           <map:match type="HandleTypeMatcher" pattern="community,collection,item">
-                              <map:transform type="Navigation"/>
+
+                           <map:match  type="wildcard" pattern="handle/**/**">
+                                             <map:transform type="Navigation"/>
                            </map:match>
 
 
