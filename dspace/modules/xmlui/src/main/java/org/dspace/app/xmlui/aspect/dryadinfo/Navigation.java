@@ -90,21 +90,18 @@ public class Navigation extends AbstractDSpaceTransformer
 
 
         {
-            List list = options.addList("DyradSubmitData");
-            list.setHead("Submit Now");
-            list.addItemXref("test_option","simple");
+            List list = options.addList("DryadSubmitData");
+
         }
 
         {
             List list = options.addList("DryadConnect");
-            list.setHead("Submit Now");
-            list.addItemXref("test_option","simple");
+
         }
 
         {
-            List list = options.addList("DyradMail");
-            list.setHead("Submit Now");
-            list.addItemXref("test_option","simple");
+            List list = options.addList("DryadMail");
+
         }
 
     }

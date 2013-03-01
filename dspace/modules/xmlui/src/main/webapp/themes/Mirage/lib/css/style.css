@@ -1290,3 +1290,20 @@ a.submitnowbutton:hover {
 .browse-data-panel h1.ds-div-head {
     font-size: 120%;
 }
+div.citation-view {
+    background-color: #FEFECD;
+    border: 1px solid #DDDDDD;
+    float: left;
+    min-height: 198px;
+    width: 80%;
+}
+div.journal-cover-view {
+    float: right;
+    margin-left: -25px;
+    margin-right: 25px;
+    margin-top: 0;
+    width: 15%;
+}
+blockquote {
+    margin: 10px 70px 10px 50px;
+}

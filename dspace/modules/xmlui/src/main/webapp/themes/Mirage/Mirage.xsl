@@ -39,6 +39,9 @@
     <xsl:import href="lib/xsl/aspect/artifactbrowser/item-view.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/community-list.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/collection-list.xsl"/>
+    <xsl:import href="integrated-view.xsl"/>
+    <xsl:import href="DryadItemSummary.xsl"/>
+    <xsl:import href="DryadUtils.xsl"/>
     <xsl:output indent="yes"/>
 
 
@@ -271,7 +274,18 @@
 
             <!-- START SEARCH -->
             <div class="home-col-1">
-                <h1 class="ds-div-head">Search DSpace</h1>
+                <h1 class="ds-div-head">Search DSpace <a>
+                    <xsl:attribute name="href">
+                        <![CDATA[/search-filter?query=&field=dc.contributor.author_filter]]>
+                    </xsl:attribute>
+                    Browse authors</a>
+                    <a>
+                        <xsl:attribute name="href">
+                            <![CDATA[/search-filter?query=&field=prism.publicationName_filter]]>
+                        </xsl:attribute>
+                        Browse journals</a>
+                </h1>
+
                 <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                       id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary"
                       action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
@@ -402,27 +416,23 @@
             <div class="home-col-1">
                 <h1 class="ds-div-head">Browse for Data</h1>
                 <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary">
-
-                    <xsl:for-each select="dri:div[@n='site-home']">
-                        <xsl:apply-templates/>
-                    </xsl:for-each>
-
-                    <h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-div-head">
-                        <i18n:text>Featured</i18n:text>
-                    </h1>
-
-                    <div id="aspect_discovery_SiteFeaturedItems_div_site-featured-item"
-                         class="ds-static-div secondary featured-item">
-                        <xsl:text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </xsl:text>
-
+                    <div id="browse-data-buttons">
+                        <a href="#recently-published-data"><span>Recently Published</span></a>
+                        <a href="#most-viewed-data"><span>Most Viewed</span></a>
                     </div>
-
-                    <h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-div-head">
-                        <i18n:text>Most Viewed</i18n:text>
-                    </h1>
-                    <div id="aspect_discovery_SiteFeaturedItems_div_site-most-viewed"
-                         class="ds-static-div secondary most-viewed">
-                        <xsl:text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </xsl:text>
+                    <div id="recently-published-data" class="browse-data-panel">
+                        <xsl:for-each select="dri:div[@n='site-home']">
+                            <xsl:apply-templates/>
+                        </xsl:for-each>
+                    </div>
+                    <div id="most-viewed-data" class="browse-data-panel">
+                        <h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-div-head">
+                            <i18n:text>Most Viewed</i18n:text>
+                        </h1>
+                        <div id="aspect_discovery_SiteFeaturedItems_div_site-most-viewed"
+                             class="ds-static-div secondary most-viewed">
+                            <xsl:text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </xsl:text>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -574,13 +584,22 @@
 
 -->
 
-    <xsl:template match="dri:options[dri:list/@n='administrative']"/>
-    <xsl:template match="dri:options[dri:list/@n='browse']"/>
-    <xsl:template match="dri:options[dri:list/@n='context']"/>
-    <xsl:template match="dri:options[dri:list/@n='search']"/>
-    <xsl:template match="dri:options[dri:list/@n='account']"/>
-    <xsl:template match="dri:options[dri:list/@n='DryadBrowse']"/>
-
+    <xsl:template match="dri:options/dri:list[@n='administrative']"/>
+    <xsl:template match="dri:options/dri:list[@n='browse']"/>
+    <xsl:template match="dri:options/dri:list[@n='context']"/>
+    <xsl:template match="dri:options/dri:list[@n='search']"/>
+    <xsl:template match="dri:options/dri:list[@n='account']"/>
+    <xsl:template match="dri:options/dri:list[@n='DryadBrowse']"/>
+    <!--- Static Navigation Override -->
+    <!-- TODO: figure out why i18n tags break the go button -->
+    <xsl:template match="dri:options">
+        <div id="ds-options-wrapper">
+            <div id="ds-options">
+                <!-- Once the search box is built, the other parts of the options are added -->
+                <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSubmitData']|dri:list[@n='DryadConnect']|dri:list[@n='DryadMail']"/>
+            </div>
+        </div>
+    </xsl:template>
     <!--
     <xsl:template match="dri:options/dri:list[@n='DryadInfo']" priority="3">
         <div id="main-menu">
@@ -630,20 +649,172 @@
 
 
     <xsl:template match="dri:options/dri:list[@n='DryadConnect']" priority="3">
-        <div id="ds-options-dryaddata">3
-            <xsl:apply-templates select="dri:item" mode="nested"/>
+
+        <!-- START CONNECT  -->
+        <div class="home-col-2">
+            <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Connect with Dryad
+            </h1>
+
+            <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 390px;">
+                <div id="TEMP-connect-alternatives">
+
+                    <div id="connect-illustrated-prose">
+                        <p>
+                            <img style="float: right;margin-left: 8px;" src="themes/Mirage/images/connect-1.png"/>
+                            Dryad invites<b>publishers</b>,<b>journals</b>,
+                            <b>scientific societies</b>
+                            and
+                            <b>organizations</b>
+                            interested in data preservation to join us now and shape the course of Dryad’s
+                            future.
+                            <a href="#">Dryad members</a>
+                            elect our board of directors, participate in an
+                            active knowledge sharing network and receive discounts on deposit fees.
+                            <img style="float: left;margin-right: 8px;" src="themes/Mirage/images/connect-2.png"/>
+                        </p>
+
+                        <p>
+                            <a href="#">Submission Integration</a>
+                            is a free and easy way for
+                            <b>journals</b>
+                            to
+                            coordinate manuscript submissions with data submissions in Dryad. Integration
+                            makes depositing data and linking it with an article faster and simpler for
+                            both scientists and journals.
+                            <img style="float: right;margin-left: 8px" src="themes/Mirage/images/connect-3.png"/>
+                        </p>
+
+                        <p>
+                            Charging
+                            <a href="#">deposit fees</a>
+                            to offset the costs of data archiving
+                            will ensure that the public is never charged to access or reuse the data in
+                            Dryad.
+                            <!--Dryad’s flexible <a href="#">volume payment plans</a> make it attractive
+                            for institutions to sponsor data archiving as a service to their scientists and
+                            authors.-->
+                        </p>
+                    </div>
+
+                    <div id="connect-legible-cloud">
+                        <p>
+                            <span style="font-size: 110%; color: #494; font-weight: bold;">Dryad</span>
+                            invites
+                            <span style="font-size: 130%; color: #c99;">publishers</span>,
+                            <span style="font-size: 120%; color: #aa5;">journals</span>,
+                            <span style="font-size: 130%; color: #99c;">scientific societies</span>
+                            and
+                            <span style="font-size: 120%; color: #6a9;">organizations</span>
+                            interested in
+                            <span style="color: #999; font-weight: bold;">data preservation</span>
+                            to join us now and shape the course of Dryad’s
+                            <span style="font-size: 110%; color: #c99; font-weight: bold;">future</span>.
+                            <a href="#" style="font-weight: bold;">Dryad members</a>
+                            elect our
+                            <span style="color: #aa5;">board of directors</span>,
+                            participate in an active
+                            <span style="font-weight: bold; color: #99c;">knowledge sharing</span>
+                            network and receive
+                            <span style="color: #c99;">discounts</span>
+                            on deposit fees.
+                        </p>
+
+                        <p>
+                            <a href="#" style="font-weight: bold;">Submission Integration</a>
+                            is a free and easy way for
+                            <span style="font-size: 120%; color: #99c;">journals</span>
+                            to
+                            <span style="color: #6a9;">coordinate manuscript submissions</span>
+                            with data submissions in
+                            <span style="color: #494; font-weight: bold;">Dryad</span>
+                            . Integration
+                            makes depositing data and
+                            <span style="font-weight: bold; color: #99c;">linking it</span>
+                            with an article
+                            <span style="color: #aa5;">faster and simpler</span>
+                            for both
+                            <span style="color: #c99;">scientists</span>
+                            and journals.
+                        </p>
+
+                        <p>
+                            Charging
+                            <a href="#" style="font-weight: bold;">deposit fees</a>
+                            to offset the
+                            <span style="color: #6a9;">costs of data archiving</span>
+                            will ensure that the
+                            <span style="color: #aa5;">public is never charged</span>
+                            to
+                            <span style="font-weight: bold; color: #999;">access or reuse</span>
+                            the data in
+                            <span style="color: #494; font-weight: bold;">Dryad</span>.
+                        </p>
+
+                        <!--Dryad’s flexible <a href="#">volume payment plans</a> make it attractive
+                        for institutions to sponsor data archiving as a service to their scientists and
+                        authors.
+                        -->
+
+                        <!--
+                        The
+                        <span style="font-size: 25px; color: #c99;">
+                        <a href="#">vision</a> of
+                        <span style="font-weight: 36px; color: #494; font-weight: bold;">Dryad</span></span> is a
+                        <span style="font-size: 22px; color: #99b;">scholarly
+                        <a href="#">communication</a> system</span> in which
+                        <span style="font-size: 22px;">learned
+                        <a style="font-size: 24px; color: #494;" href="#TODO">societies</a>,
+                        <a style="font-size: 27px; color: #9c9; font-weight: bold;" href="#TODO">publishers</a>,
+                        <a style="font-size: 30px; color: #494;" href="#TODO">institutions</a>
+                         of research and education</span>, funding bodies and other
+                        <span style="font-size: 22px;">
+                        <a style="font-size: 28px; color: #449;" href="#TODO">stakeholders</a>
+                        </span>
+                         collaboratively
+                        <a style="font-size: 24px; color: #c99; font-weight: bold;" href="#TODO">sustain</a>
+                        and promote the
+                        <span style="font-size: 24px; color: #bb6;">
+                        <a href="#" style="color: #bb6;">preservation</a>
+                        and reuse
+                        </span>
+                         of data.
+                        -->
+                    </div>
+
+                </div>
+                <!-- END of #TEMP-connect-alternatives -->
+            </div>
         </div>
     </xsl:template>
 
-    <xsl:template match="dri:options/dri:list[@n='DyradSubmitData']" priority="3">
-        <div id="ds-options-dryadconnect">1
-            <xsl:apply-templates select="dri:item" mode="nested"/>
+    <xsl:template match="dri:options/dri:list[@n='DryadSubmitData']" priority="3">
+        <!-- START DEPOSIT -->
+        <div class="home-col-2">
+            <h1 class="ds-div-head "
+                style="border-bottom: none; text-align: center; padding: 50px 45px 0; height: 50px;">Deposit your
+                data in dryad
+            </h1>
+            <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
+                <p class="ds-paragraph" style="text-align: center; font-size: 1.2em; margin: 0.5em 0 1.5em;">
+                    <a class="submitnowbutton" href="/handle/10255/3/submit">Submit Data Now!</a>
+                </p>
+                <a style="float: right; margin-right: 18px;" href="http://www.youtube.com/watch?v=RP33cl8tL28">See
+                    how to submit
+                </a>
+            </div>
         </div>
     </xsl:template>
 
-    <xsl:template match="dri:options/dri:list[@n='DyradMail']" priority="3">
-        <div id="ds-options-dryadmail">2
-            <xsl:apply-templates select="dri:item" mode="nested"/>
+    <xsl:template match="dri:options/dri:list[@n='DryadMail']" priority="3">
+        <!-- START MAILING LIST-->
+        <div class="home-col-2">
+            <h1 class="ds-div-head">Dryad Mailing List</h1>
+            <div id="file_news_div_mailing_list" class="ds-static-div primary">
+                <p class="ds-paragraph">
+                    <xsl:text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </xsl:text>
+
+                </p>
+            </div>
         </div>
     </xsl:template>
 
