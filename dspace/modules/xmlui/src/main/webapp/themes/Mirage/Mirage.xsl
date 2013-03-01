@@ -391,35 +391,6 @@
                                 <span style="color: #494; font-weight: bold;">Dryad</span>.
                             </p>
 
-                            <!--Dryad’s flexible <a href="#">volume payment plans</a> make it attractive
-                            for institutions to sponsor data archiving as a service to their scientists and
-                            authors.
-                            -->
-
-                            <!--
-                            The
-                            <span style="font-size: 25px; color: #c99;">
-                            <a href="#">vision</a> of
-                            <span style="font-weight: 36px; color: #494; font-weight: bold;">Dryad</span></span> is a
-                            <span style="font-size: 22px; color: #99b;">scholarly
-                            <a href="#">communication</a> system</span> in which
-                            <span style="font-size: 22px;">learned
-                            <a style="font-size: 24px; color: #494;" href="#TODO">societies</a>,
-                            <a style="font-size: 27px; color: #9c9; font-weight: bold;" href="#TODO">publishers</a>,
-                            <a style="font-size: 30px; color: #494;" href="#TODO">institutions</a>
-                             of research and education</span>, funding bodies and other
-                            <span style="font-size: 22px;">
-                            <a style="font-size: 28px; color: #449;" href="#TODO">stakeholders</a>
-                            </span>
-                             collaboratively
-                            <a style="font-size: 24px; color: #c99; font-weight: bold;" href="#TODO">sustain</a>
-                            and promote the
-                            <span style="font-size: 24px; color: #bb6;">
-                            <a href="#" style="color: #bb6;">preservation</a>
-                            and reuse
-                            </span>
-                             of data.
-                            -->
                         </div>
 
                     </div>
