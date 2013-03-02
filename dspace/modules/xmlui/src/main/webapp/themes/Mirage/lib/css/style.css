@@ -1307,3 +1307,76 @@ div.journal-cover-view {
 blockquote {
     margin: 10px 70px 10px 50px;
 }
+
+
+#aspect_submission_StepTransformer_list_submit-create-publication{
+    width:620px;
+}
+
+#aspect_submission_StepTransformer_item_article_status{
+    margin-top: 100px;
+}
+#N100E7{
+    margin-top: 50px;
+
+}
+#aspect_submission_StepTransformer_field_article_doi,#aspect_submission_StepTransformer_field_manu,#aspect_submission_StepTransformer_field_prism_publicationName {
+    width:150px;
+}
+
+/*Autocomplete*/
+.ui-autocomplete{
+    position:absolute;
+    width:250px;
+    background-color:white;
+    border:1px solid #888;
+    margin:0;
+    padding:0;
+
+}
+
+#aspect_submission_StepTransformer_field_prism_publicationName_container{
+    display:none;
+}
+
+.ui-menu-item{
+    list-style-type:none;
+    display:block;
+    margin:0;
+    padding:2px;
+    cursor:pointer;
+}
+
+img.ds-authority-confidence
+{ width: 16px; height: 16px; margin: 0px 2px; padding: 0px; vertical-align: bottom;}
+
+
+/* ********************* Modifications to default settings for devices/browsers with smaller widths **************** */
+
+@media screen and (max-width : 600px) {
+    div#dryad_blog {
+        display: none;
+    }
+
+    /* ensure the width of the screen is the width of the device */
+    ds-main {
+        width:94%;
+    }
+
+    /* make the body the full width of the device */
+    ds-body {
+        width:94%;
+    }
+
+    /* make the menus hidden */
+    ds-options {
+        display:none;
+    }
+}
+
+#aspect_discovery_DiscoverySubmissions_cell_workspaceitemcell_checkbox{
+    width:10px;
+}
+#journalIDStatusInReview span.field-help, #prism_publicationName span.field-help{
+    width:450px;
+}

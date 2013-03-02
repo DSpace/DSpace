@@ -312,7 +312,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                         <xsl:text>:</xsl:text>
                         <xsl:value-of
                                 select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='serverPort']"/>
-                        <xsl:value-of select="$context-path"/>
+                        <xsl:value-of select="jQuerycontext-path"/>
                         <xsl:text>/</xsl:text>
                         <xsl:value-of
                                 select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='context']"/>
@@ -341,8 +341,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 if (defaultedElements[i].value == '<i18n:text>xmlui.dri2xhtml.default.textarea.value</i18n:text>'){
                 defaultedElements[i].value='';}}
                 }
-                //Disable pressing 'enter' key to submit a form (otherwise pressing 'enter' causes a submission to start
-                over)
+                //Disable pressing 'enter' key to submit a form (otherwise pressing 'enter' causes a submission to start over)
                 function disableEnterKey(e)
                 {
                 var key;
@@ -402,11 +401,11 @@ references to stylesheets pulled directly from the pageMeta element. -->
                           select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']"/>
             <title>
                 <xsl:choose>
-                    <xsl:when test="not($page_title)">
+                    <xsl:when test="not(jQuerypage_title)">
                         <xsl:text>  </xsl:text>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:copy-of select="$page_title/node()"/>
+                        <xsl:copy-of select="jQuerypage_title/node()"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </title>
@@ -749,7 +748,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
         <script type="text/javascript">
             <xsl:text disable-output-escaping="yes">!window.jQuery &amp;&amp; document.write('&lt;script type="text/javascript" src="</xsl:text><xsl:value-of
-                select="$localJQuerySrc"/><xsl:text
+                select="jQuerylocalJQuerySrc"/><xsl:text
                 disable-output-escaping="yes">"&gt;&#160;&lt;\/script&gt;')</xsl:text>
         </script>
 
@@ -872,7 +871,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
             &#160;
         </script>
         <script type="text/javascript">
-            <xsl:text>DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');$.each($('img[src$=png]'), function() {DD_belatedPNG.fixPng(this);});</xsl:text>
+            <xsl:text>DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');jQuery.each(jQuery('img[srcjQuery=png]'), function() {DD_belatedPNG.fixPng(this);});</xsl:text>
         </script>
         <xsl:text disable-output-escaping="yes">&lt;![endif]--&gt;</xsl:text>
 
@@ -896,8 +895,8 @@ references to stylesheets pulled directly from the pageMeta element. -->
                    })();
 
 
-                $(document).ready(function() {
-                    $('#main-menu ul.sf-menu').supersubs({
+                jQuery(document).ready(function() {
+                    jQuery('#main-menu ul.sf-menu').supersubs({
                             // all numeric properties are in em
                             minWidth: 22,
                             maxWidth: 30,   // this isn't doing much...
@@ -907,9 +906,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 });
 
 
-                $(document).ready(function() {
+                jQuery(document).ready(function() {
                     // main carousel at top
-                    $('#dryad-home-carousel .bxslider').bxSlider({
+                    jQuery('#dryad-home-carousel .bxslider').bxSlider({
                         auto: true,
                         pause: 5000,        // in ms
                         autoControls: true,
@@ -920,29 +919,29 @@ references to stylesheets pulled directly from the pageMeta element. -->
                    // TEMPORARY slider to show Connect alternatives
             // some objects start hidden, as they make highly visible
             // "glitches" during page load
-            $('.wordcloud').show();
-            $('#connect-legible-cloud').show();
-            $('#TEMP-connect-alternatives').bxSlider({
+            jQuery('.wordcloud').show();
+            jQuery('#connect-legible-cloud').show();
+            jQuery('#TEMP-connect-alternatives').bxSlider({
                 controls: false,
                 mode: 'vertical'
                 //pagerType: 'short'
             });
                     // "tabs" in Browse Data
-                    var $tabButtons = $('#browse-data-buttons a');
-                    $tabButtons.unbind('click').click(function() {
+                    var jQuerytabButtons = jQuery('#browse-data-buttons a');
+                    jQuerytabButtons.unbind('click').click(function() {
                         // highlight this button and show its panel
-                        $(this).addClass('selected');
-                        var $panel = $($(this).attr('href'));
-                        $panel.show();
+                        jQuery(this).addClass('selected');
+                        var jQuerypanel = jQuery(jQuery(this).attr('href'));
+                        jQuerypanel.show();
                         // dim others and hide their panels
-                        $(this).siblings().each(function() {
-                            $(this).removeClass('selected');
-                            var $panel = $($(this).attr('href'));
-                            $panel.hide();
+                        jQuery(this).siblings().each(function() {
+                            jQuery(this).removeClass('selected');
+                            var jQuerypanel = jQuery(jQuery(this).attr('href'));
+                            jQuerypanel.hide();
                         });
                         return false;
                     });
-                    $tabButtons.eq(0).click();
+                    jQuerytabButtons.eq(0).click();
                 });
 
 
