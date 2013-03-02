@@ -477,56 +477,89 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 <div id="main-menu">
                     <ul class="sf-menu">
                         <li>
-                            <a href="/pages/about">About</a>
+                            <a href="">About</a>
                             <ul>
                                 <li>
-                                    <a href="#TODO">Purpose &amp; Goals</a>
+                                    <a href="pages/missionAndValues">Mission &amp; Values</a>
                                 </li>
                                 <li>
-                                    <a href="/pages/about">
-                                        Who We Are
-                                    </a>
+                                    <a href="/pages/about">Who We Are</a>
                                 </li>
                                 <li>
-                                    <a href="/pages/jdap">
-                                        Journal Archiving Policy
-                                    </a>
+                                    <a href="/pages/ourCommunity">Our Community</a>
+                                </li>
+                                <li>
+                                    <a href="/feedback">Contact Us</a>
+                                </li>
+                                <li>
+                                    <a href="http://blog.datadryad.org">Blog</a>
                                 </li>
                             </ul>
                         </li>
                         <li>
-                            <a href="#TODO">Get Started</a>
+                            <a href="">Get Started</a>
                             <ul>
                                 <li>
-                                    <a href="/pages/members">
-                                        Overview
-                                    </a>
+                                    <a href="/pages/depositing">Depositing Data</a>
                                 </li>
                                 <li>
-                                    <a href="#TODO">Apply</a>
+                                    <a href="/pages/using">Using Data</a>
+                                </li>
+                                <li>
+				  <a href="">Become a Member</a>
+				  <ul>
+				    <li>
+				      <a href="/pages/membershipOverview">Membership Overview</a>
+				    </li>
+				    <li>
+				      <a href="/pages/members">Current Members</a>
+				    </li>
+				    <li>
+				      <a href="/membership">Membership Application</a>
+				    </li>
+				  </ul>
+                                </li>
+                                <li>
+                                    <a href="">Integrate Your Journal</a>
+				    <ul>
+				      <li>
+					<a href="/pages/integratedJournals">Currently Integrated Journals</a>
+				      </li>
+				      <li>
+					<a href="/pages/journalIntegration">How to Integrate</a>
+				      </li>
+				    </ul>
+                                </li>
+                                <li>
+                                    <a href="/pages/pricing">Pricing Plans</a>
                                 </li>
                             </ul>
                         </li>
                         <li>
-                            <a href="#TODO">Learn More</a>
+                            <a href="">Learn More</a>
                             <ul>
                                 <li>
-                                    <a href="/pages/depositing">
-                                        Deposit Data Instructions
-                                    </a>
+                                    <a href="/pages/jdap">Journal Archiving Policy</a>
                                 </li>
-                                <li class="current">
-                                    <a href="#TODO">FAQ</a>
+				<li>
+				  <a href="">Frequently Asked Questions</a>
+				  <ul>
+				    <li>
+				      <a href="/pages/depositing">Depositing Data</a>
+				    </li>
+				    <li>
+				      <a href="/pages/using">Using Data</a>
+				    </li>
+				    <li>
+				      <a href="/pages/jdap">Journal Archiving Policy</a>
+				    </li>
+				  </ul>
                                 </li>
                                 <li>
-                                    <a href="http://wiki.datadryad.org">
-                                        Wiki
-                                    </a>
+                                    <a href="http://wiki.datadryad.org">Documentation</a>
                                 </li>
                                 <li>
-                                    <a href="http://blog.datadryad.org">
-                                        Blog
-                                    </a>
+                                    <a href="/pages/partners">Partner Repositories</a>
                                 </li>
                             </ul>
                         </li>
