@@ -58,7 +58,7 @@ public class HTMLSitemapGenerator extends AbstractGenerator
     public String getLeadingBoilerPlate()
     {
         return "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">\n"
-                + "<html><head><title>URL List</title></head><body><ul>";
+                + "<html><head><title>URL List</title></head><body><h1>CLOCKSS system has permission to ingest, preserve, and serve this Archival Unit.</h1><ul>";
     }
 
     public int getMaxSize()

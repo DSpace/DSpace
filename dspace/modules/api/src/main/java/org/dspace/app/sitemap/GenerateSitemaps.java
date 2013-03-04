@@ -158,6 +158,8 @@ public class GenerateSitemaps
 
 
         try{
+        String resourceURL =  ConfigurationManager.getProperty("dspace.url")+"/resource/";
+
         String sitemapStem = ConfigurationManager.getProperty("dspace.url")
                 + "/sitemap";
         String htmlMapStem = ConfigurationManager.getProperty("dspace.url")
@@ -214,8 +216,20 @@ public class GenerateSitemaps
                         if(!i.getOwningCollection().getHandle().equals(myDataPkgColl)) {
                             dataPackage=DryadWorkflowUtils.getDataPackage(c, i);
                         }
+                    String url = "";
+                    DCValue[] identifier = dataPackage.getMetadata("dc.identifier");
+                    if(identifier.length>0){
 
-                    String url = handleURLStem + dataPackage.getHandle();
+                    url = resourceURL + identifier[0].value;
+                    }
+                    else if(dataPackage.getHandle()!=null)
+                    {
+                        url = handleURLStem + dataPackage.getHandle();
+                    }
+                    else
+                    {
+                        url = handleURLStem + "item/"+dataPackage.getID();
+                    }
                     if(!modifiedDP.contains(dataPackage)){
                         if (makeHTMLMap)
                         {
