@@ -940,11 +940,13 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
 		
                 jQuery(document).ready(function() {
-                    // main carousel at top
+                    // main carousel at top of homepage
                     jQuery('#dryad-home-carousel .bxslider').bxSlider({
                         auto: true,
 			autoHover: true,
-                        pause: 10000,        // in ms
+                        pause: 10000,  // in ms
+			speed: 1000,   // ms for slide transition
+			mode: 'fade',  // can be 'horizontal', 'vertical', 'fade'
                         autoControls: true,
                         autoControlsCombine: true
                     });
