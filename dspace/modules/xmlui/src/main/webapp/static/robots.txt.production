@@ -70,3 +70,6 @@ Disallow: /doi/citation
 # it to appear in an index.
 Disallow: /repo
 
+# Disallow a "bad" robot
+user-agent: AhrefsBot
+disallow: /
