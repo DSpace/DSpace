@@ -228,6 +228,7 @@
                         <div>
 			  <a href="/pages/depositing">
 			    <img src="themes/Mirage/images/bookmarkSubmissionProcess.jpg"/>
+			    <p>Placeholder text --- to be replaced by bookmark images.
 			  </a>
                         </div>
                         <div>
