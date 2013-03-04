@@ -129,7 +129,7 @@
 	      }
 	      
 	      #dryad-home-carousel div.bxslider div p {
-	      width: 480px;
+	      width: 550px;
 	      margin: auto;
 	      margin-top: 1em;
 	      }
