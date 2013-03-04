@@ -107,13 +107,14 @@
 	      .home-bottom-row {
 	      height: 420px;
 	      }
-	      
+
 	      #dryad-home-carousel {
 	      font-size: 23px;
 	      font-weight: bold;
-	      background-color: #fff;
-	      border: 1px solid #333;
-	      height: 200px;
+	      background-color: rgb(255, 255, 255);
+	      border: 1px solid rgb(51, 51, 51);
+	      height: 216px;
+	      padding: 0px;
 	      overflow: visible;
 	      }
 	      
@@ -122,7 +123,7 @@
 	      }
 	      
 	      #dryad-home-carousel div.bxslider div {
-	      height: 175px;
+	      height: 190px;
 	      padding: 0;
 	      margin: 0;
 	      }
@@ -133,6 +134,15 @@
 	      margin-top: 1em;
 	      }
 	      
+	      #dryad-home-carousel .bx-pager {
+	      bottom: -32px;
+	      left: 8px;
+	      }
+
+	      #dryad-home-carousel .bx-controls-auto-item {
+	      padding-top: 10px;
+	      }
+
 	      .blog-box ul {
 	      list-style: none;
 	      margin-left: 0;
@@ -140,6 +150,11 @@
 	      
 	      .blog-box li {
 	      margin: 0.5em 0 1.2em;
+	      }
+
+	      #connect-illustrated-prose img {
+	      width: auto;
+	      margin: 4px;
 	      }
 	    </style>
 	    
@@ -151,7 +166,7 @@
                 <div id="dryad-home-carousel" class="ds-static-div primary">
                     <div class="bxslider" style="">
                         <div>
-                            <p style="margin-top: 44px;" Xid="ds-dryad-is"
+                            <p Xid="ds-dryad-is" style="font-size: 88%"
                                xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
                                 <span style="color: #595;">DataDryad.org</span>
                                 is a

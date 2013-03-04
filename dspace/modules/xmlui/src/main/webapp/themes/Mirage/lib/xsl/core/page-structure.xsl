@@ -843,9 +843,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
                         auto: true,
 			autoHover: true,
                         pause: 10000,  // in ms
-			speed: 1000,   // ms for slide transition
+			speed: 500,   // ms for slide transition
 			mode: 'fade',  // can be 'horizontal', 'vertical', 'fade'
-                        autoControls: true,
+                        autoControls: false,
                         autoControlsCombine: true
                     });
 
