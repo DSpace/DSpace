@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <document xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1" xmlns:xi="http://www.w3.org/2003/XInclude">
     <body>
-      <xref rend="embed" target="publicationBlackout.xhtml"/>
+        <xref rend="embed" target="whoWeAre.xhtml"/>
     </body>
-
-    <meta>
+     <meta>
         <userMeta/>
         <pageMeta>
-            <metadata element="title">Restricted Access</metadata>
+            <metadata element="title">Who We Are</metadata>
             <trail target="/">Dryad Digital Repository</trail>
         </pageMeta>
         <repositoryMeta/>
