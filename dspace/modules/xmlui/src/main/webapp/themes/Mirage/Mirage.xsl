@@ -215,28 +215,32 @@
                         <div>
                             <p style="margin-top: 44px;" Xid="ds-dryad-is"
                                xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
-                                <span style="color: #595;">Dryad</span>
+                                <span style="color: #595;">DataDryad.org</span>
                                 is a
-                                <span style="color: #363;">nonprofit organization</span>
-                                and an
-                                <span style="color: #242;">international repository</span>
-                                of data underlying scientific and medical publications.
+                                <span style="color: #363;">curated general-purpose repository</span>
+                                that makes the 
+                                <span style="color: #242;">data underlying scientific publications</span>
+                                discoverable, freely reusable, and citable. Dryad has 
+				<span style="color: #595;">integrated data submission</span> 
+				for a growing list of journals; submission of data from other publications is also welcome.
                             </p>
                         </div>
                         <div>
-                            <p>The scientific, educational, and charitable mission of Dryad is to promote the
-                                availability of data underlying findings in
-                                the scientific literature for research and educational reuse.
-                            </p>
+			  <a href="/pages/depositing">
+			    <img src="themes/Mirage/images/bookmarkSubmissionProcess.jpg"/>
+			  </a>
                         </div>
-                        <div style="font-size: 0.85em; margin-top: 12px;">
-                            <p>The vision of Dryad is a scholarly communication system in which learned societies,
-                                publishers, institutions of research
-                                and education, funding bodies and other stakeholders collaboratively sustain and promote
-                                the preservation and reuse of data
-                                underlying the scholarly literature.
-                            </p>
+                        <div>
+			  <a href="http://blog.datadryad.org/2013/02/11/dryad-membership-meeting-data-publishing-symposium-2/">
+			    <img src="themes/Mirage/images/2013membershipMeeting.jpg"/>
+			  </a>
                         </div>
+                        <div>
+			  <a href="http://datadryad.org/resource/doi:10.5061/dryad.gs45f">
+			    <img src="themes/Mirage/images/dryad.gs45f.jpg"/>
+			  </a>
+                        </div>
+
                     </div>
                 </div>
             </div>
