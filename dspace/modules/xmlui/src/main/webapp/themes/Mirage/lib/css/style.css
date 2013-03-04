@@ -1251,11 +1251,17 @@ a.submitnowbutton:hover {
 #sharing-tools {
     float: right;
     text-align: right;
-    padding-top: 22px;
+    padding-top: 30px;
 }
 #sharing-tools a {
     display: inline-block;
     margin-left: 6px;
+}
+
+#sharing-tools img {
+    
+    height: 22px;
+    width: 22px;
 }
 
 #browse-data-buttons {
