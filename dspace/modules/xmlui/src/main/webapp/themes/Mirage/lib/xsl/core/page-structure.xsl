@@ -476,10 +476,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='context']" mode="menu"/>
                         </xsl:if>
 
-                        <xsl:if test="/dri:document/dri:options/dri:list[@n='administrative']/*">
-                            <xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='administrative']"
-                                                 mode="menu"/>
-                        </xsl:if>
+
 
                         <xsl:choose>
                             <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
@@ -522,7 +519,10 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                 </li>
                             </xsl:otherwise>
                         </xsl:choose>
-
+                        <xsl:if test="/dri:document/dri:options/dri:list[@n='administrative']/*">
+                            <xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='administrative']"
+                                                 mode="menu"/>
+                        </xsl:if>
 
                     </ul>
 

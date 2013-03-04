@@ -596,9 +596,7 @@
                 <xsl:attribute name="href">
                     <xsl:value-of select="dri:xref/@target"/>
                 </xsl:attribute>
-                <i18n:text>
-                    <xsl:value-of select="dri:xref"/>
-                </i18n:text>
+                <xsl:apply-templates select="dri:xref/*|dri:xref/text()"/>
             </a>
 
         </li>
