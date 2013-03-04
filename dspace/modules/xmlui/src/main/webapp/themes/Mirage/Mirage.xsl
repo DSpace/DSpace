@@ -46,166 +46,104 @@
 
 
     <xsl:template match="dri:body[//dri:meta/dri:pageMeta/dri:metadata[@element='request' and @qualifier='URI'] = '' ]">
-        <style type="text/css">
-            /* special style for Dryad homepage only */
-            #ds-body {
-                width: 100%;
-            }
+            <!-- add special style just for the homepage -->
+	    <style type="text/css">
+	      /* special style for Dryad homepage only */
+	      #ds-body {
+	      width: 100%;
+	      }
+	      
+	      .labelcell {
+	      font-weight: bold;
+	      }
+	      
+	      .datacell {
+	      text-align: right;
+	      }
+	      
+	      .ds-div-head a {
+	      font-size: 0.7em;
+	      font-weight: normal;
+	      position: relative;
+	      top: -0.1em;
+	      }
+	      
+	      .ds-artifact-list {
+	      /* font-size: 100%; */
+	      line-height: 1.4em;
+	      }
+	      
+	      .ds-artifact-item {
+	      padding-top: 10px;
+	      }
+	      
+	      .artifact-title {
+	      font-size: 100%;
+	      }
+	      
+	      .ds-artifact-list .artifact-info {
+	      display: none;
+	      }
+	      
+	      /* implied 3 columns @300px width, 25px gutters */
+	      .home-col-1 {
+	      float: left;
+	      width: 625px;
+	      padding: 0;
+	      /* margin-right: 25px;*/
+	      }
+	      
+	      .home-col-2 {
+	      float: right;
+	      width: 300px;
+	      margin-left: 0;
+	      margin-right: 0;
+	      }
+	      
+	      .home-top-row {
+	      height: 220px;
+	      }
+	      
+	      .home-bottom-row {
+	      height: 420px;
+	      }
+	      
+	      #dryad-home-carousel {
+	      font-size: 23px;
+	      font-weight: bold;
+	      background-color: #fff;
+	      border: 1px solid #333;
+	      height: 200px;
+	      overflow: visible;
+	      }
+	      
+	      #dryad-home-carousel div.bxslider {
+	      overflow: visible;
+	      }
+	      
+	      #dryad-home-carousel div.bxslider div {
+	      height: 175px;
+	      padding: 0;
+	      margin: 0;
+	      }
+	      
+	      #dryad-home-carousel div.bxslider div p {
+	      width: 480px;
+	      margin: auto;
+	      margin-top: 1em;
+	      }
+	      
+	      .blog-box ul {
+	      list-style: none;
+	      margin-left: 0;
+	      }
+	      
+	      .blog-box li {
+	      margin: 0.5em 0 1.2em;
+	      }
+	    </style>
+	    
 
-            .labelcell {
-                font-weight: bold;
-            }
-
-            .datacell {
-                text-align: right;
-            }
-
-            .ds-div-head a {
-                font-size: 0.7em;
-                font-weight: normal;
-                position: relative;
-                top: -0.1em;
-            }
-
-            .ds-artifact-list {
-                /* font-size: 100%; */
-                line-height: 1.4em;
-            }
-
-            .ds-artifact-item {
-                padding-top: 10px;
-            }
-
-            .artifact-title {
-                font-size: 100%;
-            }
-
-            .ds-artifact-list .artifact-info {
-                display: none;
-            }
-
-            /* implied 3 columns @300px width, 25px gutters */
-            .home-col-1 {
-                float: left;
-                width: 625px;
-                padding: 0;
-                /* margin-right: 25px;*/
-            }
-
-            .home-col-2 {
-                float: right;
-                width: 300px;
-                margin-left: 0;
-                margin-right: 0;
-            }
-
-            .home-top-row {
-                height: 220px;
-            }
-
-            .home-bottom-row {
-                height: 420px;
-            }
-
-            #dryad-home-carousel {
-                font-size: 23px;
-                font-weight: bold;
-                background-color: #fff;
-                border: 1px solid #333;
-                height: 216px;
-                padding: 0px;
-                overflow: visible;
-            }
-
-            #dryad-home-carousel .bx-viewport {
-                height: 190px;
-                width: 623px;
-            }
-
-            #dryad-home-carousel div.bxslider {
-                overflow: visible;
-            }
-
-            #dryad-home-carousel div.bxslider div {
-                padding: 0;
-                margin: 0;
-            }
-
-            #dryad-home-carousel div.bxslider div > a,
-            #dryad-home-carousel div.bxslider div > a > img,
-            #dryad-home-carousel div.bxslider div > img {
-                display: block;
-                height: 190px;
-                width: 623px;
-            }
-
-            #dryad-home-carousel div.bxslider div p {
-                /* padding: 36px 36px 38px; */
-                width: 480px;
-                margin: auto;
-                margin-top: 12px;
-            }
-
-            /* tweaks to slider control placement */
-            #dryad-home-carousel .bx-pager {
-                bottom: -32px;
-                left: 8px;
-            }
-
-            #dryad-home-carousel .bx-controls-auto {
-                bottom: -35px;
-            }
-
-            .blog-box ul {
-                list-style: none;
-                margin-left: 0;
-            }
-
-            .blog-box li {
-                margin: 0.5em 0 1.2em;
-            }
-
-            /* Connect options */
-            #connect-illustrated-prose {
-                overflow: hidden;
-                font-size: 15px;
-            }
-
-            #connect-illustrated-prose img {
-                width: auto;
-                margin: 4px;
-            }
-
-            .wordcloud .cloudword {
-                cursor: default;
-                line-height: 1em;
-                margin: 0;
-                padding: 0.1em 0 0.2em;
-                position: absolute;
-                text-decoration: none;
-                white-space: nowrap;
-                font-family: 'Arial Black', 'Helvetica', 'Arial', sans-serif;
-            }
-
-            .wordcloud a.cloudword[href] {
-                cursor: pointer;
-            }
-
-            .wordcloud a.cloudword[href]:hover {
-                background-color: #ffc;
-            }
-
-            #connect-legible-cloud {
-                display: none;
-                padding-top: 8px;
-                font-size: 16px;
-            }
-
-            #connect-legible-cloud p {
-                margin-top: 0px;
-                margin-bottom: 15px;
-            }
-        </style>
         <div id="ds-body">
 
             <!-- CAROUSEL -->
@@ -228,7 +166,7 @@
                         <div>
 			  <a href="/pages/depositing">
 			    <img src="themes/Mirage/images/bookmarkSubmissionProcess.jpg"/>
-			    <p>Placeholder text --- to be replaced by bookmark images.
+			    <p>Placeholder text --- to be replaced by bookmark images </p>
 			  </a>
                         </div>
                         <div>
