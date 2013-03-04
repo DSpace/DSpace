@@ -22,9 +22,9 @@
     </head>
     <body>
         <div id="ds-body">
-            <h1>Content restricted ahead of article publication</h1>
-            
-            <form xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_artifactbrowser_FeedbackForm_div_feedback-form" class="ds-interactive-div primary" action="/feedback" method="post" onsubmit="javascript:tSubmit(this);"> 
+            <h1 class="ds-div-head">Content restricted ahead of article publication<a id="contentRestricted">&#160;</a></h1>
+            <div class="ds-static-div primary">
+                <form xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_artifactbrowser_FeedbackForm_div_feedback-form" class="ds-interactive-div primary" action="/feedback" method="post" onsubmit="javascript:tSubmit(this);"> 
                 <p class="ds-paragraph">As far as we know, the article
                 associated with this Dryad data package has not yet
                 been published, and the journal requires us to
@@ -62,15 +62,18 @@
                     <input id="aspect_artifactbrowser_FeedbackForm_field_page" class="ds-hidden-field" name="page" type="hidden" value="http://datadryad.org/publicationBlackout" /> 
                 </p> 
             </form> 
+            </div>
             <div class="page-license">
                 <p>
-                    All text on this page is 
-                    available under a <a href="http://creativecommons.org/licenses/by/3.0" target="_blank">CC-BY 3.0</a> license.
+                    <span>All text on this page is available under a 
+                    <a href="http://creativecommons.org/licenses/by/3.0" target="_blank">CC-BY 3.0</a> license.
                     <a href="http://creativecommons.org/licenses/by/3.0" target="_blank">
                         <img src="/themes/Mirage/images/cc-by.png" alt="cc-by-3.0 icon"/>
-                    </a>             
+                    </a>
+                    </span>
+                    <span>Last revised: 2013-03-01</span>
                 </p>
-            </div>              
-        </div>
+            </div>
+          </div>
     </body>
 </html>
