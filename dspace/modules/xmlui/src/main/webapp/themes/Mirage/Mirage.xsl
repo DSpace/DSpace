@@ -180,7 +180,7 @@
                         </div>
                         <div>
 			  <a href="/pages/depositing">
-			    <img src="themes/Mirage/images/bookmarkSubmissionProcess.jpg"/>
+			    <img src="themes/Mirage/images/bookmarkSubmissionProcess.png"/>
 			    <p>Placeholder text --- to be replaced by bookmark images </p>
 			  </a>
                         </div>
