@@ -938,12 +938,13 @@ references to stylesheets pulled directly from the pageMeta element. -->
                         .superfish();
                 });
 
-
+		
                 jQuery(document).ready(function() {
                     // main carousel at top
                     jQuery('#dryad-home-carousel .bxslider').bxSlider({
                         auto: true,
-                        pause: 5000,        // in ms
+			autoHover: true,
+                        pause: 10000,        // in ms
                         autoControls: true,
                         autoControlsCombine: true
                     });
