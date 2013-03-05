@@ -33,6 +33,9 @@
 
     <xsl:output indent="yes"/>
 
+    <!-- Initialize info on build date for use in the footer -->
+    <xsl:variable name="dryadrelease" select="document('meta/version.xml')"/>
+
     <!--
         The starting point of any XSL processing is matching the root element. In DRI the root element is document,
         which contains a version attribute and three top level elements: body, options, meta (in that order).
@@ -614,7 +617,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     </span>
                     <span style="float: left;">
                         <xsl:text>Dryad is a nonprofit membership organization.</xsl:text>
-                    </span>
+                    </span>		    
                     <p class="build-info">
                         <i18n:text>xmlui.dri2xhtml.structural.footer-promotional2</i18n:text>
                         <xsl:value-of select="$dryadrelease/release/date"/> 
