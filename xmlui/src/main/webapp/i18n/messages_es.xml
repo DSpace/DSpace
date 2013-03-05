@@ -696,13 +696,13 @@
 
 	<!-- org.dspace.app.xmlui.Submission.submit.UploadStep -->
 	<message key="xmlui.Submission.submit.UploadStep.head">Adjuntar archivo(s)</message>
-<message key="xmlui.Submission.submit.UploadStep.file">Fichero (*)</message>
-<message key="xmlui.Submission.submit.UploadStep.file_help">Por favor, presione el botón "Examinar...", se abrirá una ventana que le permitirá seleccionar un archivo de su computadora que corresponda con el ítem. </message>
+<message key="xmlui.Submission.submit.UploadStep.file">Adjuntar Nuevo Archivo</message>
+<message key="xmlui.Submission.submit.UploadStep.file_help">Presione el botón "Examinar...", para seleccionar un archivo de su computadora. Recuerde que puede subir archivos en formatos editables ( Word, OpenOffice, etc), nosotros lo convertiremos en archivos bloqueados aptos para publicación (pdf)</message>
 <message key="xmlui.Submission.submit.UploadStep.file_error">El ítem debe contener al menos un archivo.</message>
 <message key="xmlui.Submission.submit.UploadStep.upload_error">Hubo un problema adjuntando su archivo.  Bien el nombre del archivo era incorrecto, o hubo un problema de red  que impidió que el archivo nos llegase correctamente, o ha adjuntado un archivo cuyo formato solo se permite para usos internos del sistema. Por favor, inténtelo de nuevo.</message>
 <message key="xmlui.Submission.submit.UploadStep.description">Descripción del archivo</message>
-<message key="xmlui.Submission.submit.UploadStep.description_help">Si lo desea, puede describir brevemente el archivo; por ejemplo,"</message>
-<message key="xmlui.Submission.submit.UploadStep.submit_upload">Adjuntar otro archivo</message>
+<message key="xmlui.Submission.submit.UploadStep.description_help">Si lo desea, puede describir brevemente el archivo. Por ejemplo: "Versión original en word", "Tapa", "Documento completo", etc. </message>
+<message key="xmlui.Submission.submit.UploadStep.submit_upload">Subir Archivo</message>
 <message key="xmlui.Submission.submit.UploadStep.head2">Archivos cargados</message>
 <message key="xmlui.Submission.submit.UploadStep.column0">Primario</message>
 <message key="xmlui.Submission.submit.UploadStep.column1"></message>

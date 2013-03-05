@@ -21,7 +21,23 @@
 				<a href="{$context-path}/"><i18n:text>sedici.menuSuperior.home</i18n:text></a>
 			</li>
 			<li class="main">
-				<a href="{$context-path}/submit"><i18n:text>sedici.menuSuperior.subirMaterial</i18n:text></a>
+				<xsl:choose>
+					<xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='autoArchive' and @qualifier='submit']='true'">
+					<a>
+						<xsl:attribute name="href">
+							<xsl:value-of select="$context-path"/>
+							<xsl:text>/handle/</xsl:text>
+							<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='autoArchive'][@qualifier='handle']"/>
+							<xsl:text>/submit</xsl:text>
+						</xsl:attribute>
+						<i18n:text>sedici.menuSuperior.subirMaterial</i18n:text>
+					</a>	
+				</xsl:when>
+				<xsl:otherwise>
+  					<a href="{$context-path}/submit"><i18n:text>sedici.menuSuperior.subirMaterial</i18n:text></a>
+  				</xsl:otherwise>
+			  </xsl:choose> 
+				
 			</li>
 			<li class="main">
 				<a href="{$context-path}/discover"><i18n:text>sedici.menuSuperior.buscar</i18n:text></a>
