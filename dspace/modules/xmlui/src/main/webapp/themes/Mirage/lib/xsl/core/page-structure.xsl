@@ -600,7 +600,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             </xsl:attribute>
                             <xsl:text>Dryad Policies</xsl:text>
                         </a>
-                        <xsl:text>&#160;<span style="color: #777;">|</span>&#160;</xsl:text>
+			<xsl:text>&#160;</xsl:text>
+                        <span style="color: #777;"><xsl:text>|</xsl:text></span>
+                        <xsl:text>&#160;</xsl:text>
                         <a>
                             <xsl:attribute name="href">
                                 <xsl:value-of
