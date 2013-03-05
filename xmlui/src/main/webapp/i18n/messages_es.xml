@@ -426,15 +426,15 @@
 
 	<!-- org.dspace.app.xmlui.eperson.PasswordLogin.java -->
 <message key="xmlui.EPerson.PasswordLogin.trail">Registrarse</message>
-<message key="xmlui.EPerson.PasswordLogin.head1">Registrarse en SeDiCI</message>
-<message key="xmlui.EPerson.PasswordLogin.title">Registrarse</message>
+<message key="xmlui.EPerson.PasswordLogin.head1">Iniciar sesión en SeDiCI</message>
+<message key="xmlui.EPerson.PasswordLogin.title">Iniciar sesión en SeDiCI</message>
 <message key="xmlui.EPerson.PasswordLogin.email_address">Correo electrónico</message>
 <message key="xmlui.EPerson.PasswordLogin.error_bad_login">La clave o la dirección de correo electrónico introducida no es válida.</message>
 <message key="xmlui.EPerson.PasswordLogin.password">Clave</message>
 <message key="xmlui.EPerson.PasswordLogin.forgot_link">¿Olvidó su contraseña?</message>
 <message key="xmlui.EPerson.PasswordLogin.submit">Iniciar sesión</message>
-<message key="xmlui.EPerson.PasswordLogin.head2">Registro de nuevo usuario</message>
-<message key="xmlui.EPerson.PasswordLogin.para1">Regístrese y suscríbase a las colecciones de su interés, además de recibir periódicamente información acerca de las modificaciones y los nuevos ítems en SeDiCI.</message>
+<message key="xmlui.EPerson.PasswordLogin.head2">¿No tiene una cuenta en SeDiCI?</message>
+<message key="xmlui.EPerson.PasswordLogin.para1">Sólo los usuarios registrados pueden publicar material en el repositorio.</message>
 <message key="xmlui.EPerson.PasswordLogin.register_link">Haga click aquí para registrarse</message>
 
 

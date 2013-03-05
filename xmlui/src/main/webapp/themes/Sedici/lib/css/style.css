@@ -1228,17 +1228,18 @@ ul.alphabet li {
 #aspect_eperson_PasswordLogin_list_password-login .ds-form-item {
     float: left;
     margin: 0;
-    margin-right: 25px;
 }
 
 #aspect_eperson_PasswordLogin_list_password-login .ds-form-item a {
-    margin-left: 20px;
+	position: relative;
+	float: right;
+    font-size: 11px;
 }
 
 #aspect_eperson_PasswordLogin_list_password-login .ds-form-item.last {
     clear: left;
+    margin-top: -15px;
 }
-
 
 #aspect_eperson_PasswordLogin_list_password-login .ds-form-item.last .ds-form-label{
     display: none;
@@ -1944,19 +1945,34 @@ top:25px;
 font-size:11px;
 }
 #aspect_eperson_PasswordLogin_list_password-login {
-background-color:white;
-padding:25px 10px 10px 10px;
-/*border:1px dashed #dedede;*/
+padding:15px;
 margin-bottom:20px;
-background-image:url(../../images/fondoregistro.png);
 background-repeat:no-repeat;
-width:637px;
+width:300px;
 height:153px;;
 margin-top:10px;
+display: inline;
 }
 
-#aspect_eperson_PasswordLogin_div_register {
 
+#aspect_eperson_PasswordLogin_div_login h2 {
+	float: right;
+	width: 300px;
+	color: #E27B2A;
+}
+#aspect_eperson_PasswordLogin_div_register {
+	width: 300px;
+	float: right;
+	margin-top: -160px;
+}
+
+#aspect_eperson_PasswordLogin_div_register a {
+	color: #9C4F0A;
+	font-weight: bold;
+	font-size: 13px;
+}
+#aspect_eperson_PasswordLogin_div_register a:hover {
+	color: #F59321;
 }
 
 #aspect_submission_Submissions_field_submit_submissions_remove,
