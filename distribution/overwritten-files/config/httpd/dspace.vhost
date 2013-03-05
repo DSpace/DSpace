@@ -25,6 +25,18 @@ NameVirtualHost *:80
     Order allow,deny
     Allow from all
   </Directory>
+
+  #Se comprime todos los contenidos textuales
+  <IfModule mod_deflate.c>
+     AddType text/javascript .js
+
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+    AddOutputFilterByType DEFLATE text/javascript application/x-javascript application/javascript application/ecmascript
+    AddOutputFilterByType DEFLATE application/xml application/xhtml+xml application/json
+    AddOutputFilterByType DEFLATE application/rss+xml application/atom+xml  
+    #AddOutputFilterByType DEFLATE application/vnd.ms-fontobject application/x-font-ttf font/opentype image/svg+xml
+  </IfModule>
+
   
   ####################################################
   ########## PROXY A DSPACE ##########################
