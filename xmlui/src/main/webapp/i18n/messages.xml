@@ -652,14 +652,14 @@
 
 	<!-- org.dspace.app.xmlui.Submission.submit.UploadStep -->
 	<message key="xmlui.Submission.submit.UploadStep.head">Upload File(s)</message>
-	<message key="xmlui.Submission.submit.UploadStep.file">Adjuntar Nuevo Archivo</message>
-	<message key="xmlui.Submission.submit.UploadStep.file_help">Presione el botón "Examinar...", para seleccionar un archivo de su computadora. Recuerde que puede subir archivos en formatos editables ( Word, OpenOffice, etc), nosotros lo convertiremos en archivos bloqueados aptos para publicación (pdf)</message>
+	<message key="xmlui.Submission.submit.UploadStep.file">Attatch a new file</message>
+	<message key="xmlui.Submission.submit.UploadStep.file_help">Press the "Browse..." button in order to select a file from your computer. Remember you can upload files in an editable format (MS Word, OpenOffice, etc), and we will export them to non-editable formats suitable for publication (pdf)</message>
 	<message key="xmlui.Submission.submit.UploadStep.file_error">The item must contain at least one file.</message>
 	<message key="xmlui.Submission.submit.UploadStep.upload_error">There was a problem uploading your file.  Either the filename you entered was incorrect, there was a network problem which prevented the file from reaching us correctly, or you have attempted to upload a file format marked for internal system use only.  Please try again.</message>
 	<message key="xmlui.Submission.submit.UploadStep.virus_error">The file has not been uploaded as it appears to contain a virus. Please contact the system administrator.</message>
     <message key="xmlui.Submission.submit.UploadStep.virus_checker_error">A technical problem was encountered whilst attempting to scan the file for viruses. Please contact the system administrator.</message>
     <message key="xmlui.Submission.submit.UploadStep.description">File Description</message>
-	<message key="xmlui.Submission.submit.UploadStep.description_help">Si lo desea, puede describir brevemente el archivo. Por ejemplo: "Versión original en word", "Tapa", "Documento completo", etc. </message>
+	<message key="xmlui.Submission.submit.UploadStep.description_help">You can provide a briefly description for your file, e.g. "MS Word Original Version", "Cover", etc. </message>
 	<message key="xmlui.Submission.submit.UploadStep.submit_upload">Upload file</message>
 	<message key="xmlui.Submission.submit.UploadStep.head2">Files Uploaded</message>
 	<message key="xmlui.Submission.submit.UploadStep.column0">Primary</message>
@@ -2094,6 +2094,7 @@
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-director">Advisor</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-codirector">Co-advisor</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-editor">Editor</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-contributor-editors">Editors</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-translator">Translator</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-compiler">Compiler</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-compilers">Compilers</message>

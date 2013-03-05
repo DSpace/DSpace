@@ -170,6 +170,34 @@
 						</span>
 					</xsl:for-each>
 				</xsl:when>
+				<xsl:when test="dim:field[@element='contributor' and @qualifier='editor']">
+					<span class="metadata-label">
+						<xsl:choose>
+							<xsl:when test="count(dim:field[@element='contributor' and @qualifier='editor']) &gt; 1">
+								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-contributor-editors</i18n:text>:
+							</xsl:when>
+							<xsl:otherwise>
+								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-contributor-editor</i18n:text>:
+							</xsl:otherwise>
+						</xsl:choose>
+					</span>
+					<xsl:for-each select="dim:field[@element='contributor' and @qualifier='editor']">
+						<span class="metadata-value">
+							<xsl:if test="@authority">
+								<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
+							</xsl:if>
+	
+							<a>
+								<xsl:attribute name="href"><xsl:value-of select="$linkFilter"/>?filtertype=persona&amp;filter="<xsl:copy-of select="translate(node(),'áéíóú','aeiou')"/>"</xsl:attribute>
+								<xsl:copy-of select="node()" />
+							</a>							
+	
+							<xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='editor']) != 0">
+								<xsl:text> | </xsl:text>
+							</xsl:if>
+						</span>
+					</xsl:for-each>
+				</xsl:when>
 				<xsl:otherwise>
 					<i18n:text>xmlui.dri2xhtml.METS-1.0.no-author</i18n:text>
 				</xsl:otherwise>
