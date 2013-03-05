@@ -33,6 +33,8 @@
 
     <xsl:output indent="yes"/>
 
+    <xsl:variable name="dryadrelease" select="document('meta/version.xml')"/>
+
     <!--
         The starting point of any XSL processing is matching the root element. In DRI the root element is document,
         which contains a version attribute and three top level elements: body, options, meta (in that order).
