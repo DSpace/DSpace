@@ -203,10 +203,9 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
         	}
         	else 
         	{
+        		label = node.getAttributes().getNamedItem("label").getNodeValue();
         		if (this.suggestHierarchy)
-	        		label = hierarchyLabel;
-	        	else
-	            	label = node.getAttributes().getNamedItem("label").getNodeValue();
+	        		label += " - " + hierarchyLabel;
 	        	
 	        	if (this.storeHierarchy)
 	            	value = hierarchyLabel;
