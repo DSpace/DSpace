@@ -404,14 +404,12 @@ public class ConfigurationManager
     {
     // Load in default license
 
-        InputStream is = null;
-        InputStreamReader ir = null;
+        FileReader fr = null;
         BufferedReader br = null;
         try
         {
-            is = new FileInputStream(licenseFile);
-            ir = new InputStreamReader(is, "UTF-8");
-            br = new BufferedReader(ir);
+            fr = new FileReader(licenseFile);
+            br = new BufferedReader(fr);
             String lineIn;
             license = "";
             while ((lineIn = br.readLine()) != null)
@@ -440,22 +438,11 @@ public class ConfigurationManager
                 }
             }
 
-            if (ir != null)
+            if (fr != null)
             {
                 try
                 { 
-                    ir.close();
-                }
-                catch (IOException ioe)
-                {
-                    
-                }
-            }
-            if (is != null)
-            {
-                try
-                { 
-                    is.close();
+                    fr.close();
                 }
                 catch (IOException ioe)
                 {
@@ -607,20 +594,16 @@ public class ConfigurationManager
         StringBuffer contentBuffer = new StringBuffer();
 
         // Read in template
-        InputStream is = null;
-        InputStreamReader ir = null;
-        BufferedReader br = null;
+        BufferedReader reader = null;
         try
         {
-            is = new FileInputStream(emailFile);
-            ir = new InputStreamReader(is, "UTF-8");
-            br = new BufferedReader(ir);
+            reader = new BufferedReader(new FileReader(emailFile));
 
             boolean more = true;
 
             while (more)
             {
-                String line = br.readLine();
+                String line = reader.readLine();
 
                 if (line == null)
                 {
@@ -647,29 +630,9 @@ public class ConfigurationManager
         }
         finally
         {
-            if (br != null)
+            if (reader != null)
             {
-                try {
-                    br.close();
-                } catch (IOException ioe)
-                {
-                }
-            }
-            if (ir != null)
-            {
-                try {
-                    ir.close();
-                } catch (IOException ioe)
-                {
-                }
-            }
-            if (is != null)
-            {
-                try {
-                    is.close();
-                } catch (IOException ioe)
-                {
-                }
+                reader.close();
             }
         }
         // Create an email
@@ -741,8 +704,6 @@ public class ConfigurationManager
             }
 
             br.close();
-            ir.close();
-            fir.close();
         }
         catch (IOException e)
         {
@@ -844,20 +805,13 @@ public class ConfigurationManager
             {
                 Properties modProps = new Properties();
                 InputStream modIS = null;
-                InputStreamReader modIR = null;
                 try
                 {
                     modIS = new FileInputStream(modFile);
-                    modIR = new InputStreamReader(modIS, "UTF-8");
-                    modProps.load(modIR);
+                    modProps.load(modIS);
                 }
                 finally
                 {
-                    if (modIR != null)
-                    {
-                        modIR.close();
-                    }
-                    
                     if (modIS != null)
                     {
                         modIS.close();
@@ -908,7 +862,6 @@ public class ConfigurationManager
         URL url = null;
         
         InputStream is = null;
-        InputStreamReader reader = null;
         try
         {
             String configProperty = null;
@@ -968,8 +921,7 @@ public class ConfigurationManager
             {
                 properties = new Properties();
                 is = url.openStream();
-                reader = new InputStreamReader(is, "UTF-8");
-                properties.load(reader);
+                properties.load(is);
 
                 // walk values, interpolating any embedded references.
                 for (Enumeration<?> pe = properties.propertyNames(); pe.hasMoreElements(); )
@@ -994,15 +946,6 @@ public class ConfigurationManager
         }
         finally
         {
-            if (reader != null)
-            {
-                try {
-                    reader.close();
-                }
-                catch (IOException ioe)
-                {
-                }
-            }
             if (is != null)
             {
                 try
