@@ -597,7 +597,7 @@ public class ConfigurationManager
         BufferedReader reader = null;
         try
         {
-            reader = new BufferedReader(new FileReader(emailFile));
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(emailFile), "UTF-8"));
 
             boolean more = true;
 
@@ -921,7 +921,7 @@ public class ConfigurationManager
             {
                 properties = new Properties();
                 is = url.openStream();
-                properties.load(is);
+                properties.load(new InputStreamReader(is, "UTF-8"));
 
                 // walk values, interpolating any embedded references.
                 for (Enumeration<?> pe = properties.propertyNames(); pe.hasMoreElements(); )
