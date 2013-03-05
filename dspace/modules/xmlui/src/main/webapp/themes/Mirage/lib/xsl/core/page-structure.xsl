@@ -590,35 +590,40 @@ references to stylesheets pulled directly from the pageMeta element. -->
     <xsl:template name="buildFooter">
         <div id="ds-footer-wrapper">
             <div id="ds-footer">
-                <div id="ds-footer-left">
-                    <a href="http://www.dspace.org/" target="_blank">DSpace software</a>
-                    copyright&#160;&#169;&#160;2002-2010&#160;
-                    <a href="http://www.duraspace.org/" target="_blank">Duraspace</a>
-                </div>
-                <div id="ds-footer-right">
-                    <span class="theme-by">Theme by&#160;</span>
-                    <a title="@mire NV" target="_blank" href="http://atmire.com" id="ds-footer-logo-link">
-                        <span id="ds-footer-logo">&#160;</span>
-                    </a>
-                </div>
                 <div id="ds-footer-links">
-                    <a>
-                        <xsl:attribute name="href">
+                    <span style="float: right;">
+                        <a>
+                            <xsl:attribute name="href">
+                                <xsl:value-of
+                                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                                <xsl:text>#TODO</xsl:text>
+                            </xsl:attribute>
+                            <xsl:text>Dryad Policies</xsl:text>
+                        </a>
+                        <xsl:text>&#160;<span style="color: #777;">|</span>&#160;</xsl:text>
+                        <a>
+                            <xsl:attribute name="href">
+                                <xsl:value-of
+                                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                                <xsl:text>/contact</xsl:text>
+                            </xsl:attribute>
+                            <i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
+                        </a>
+                    </span>
+                    <span style="float: left;">
+                        <xsl:text>Dryad is a nonprofit membership organization.</xsl:text>
+                    </span>
+                    <p class="build-info">
+                        <i18n:text>xmlui.dri2xhtml.structural.footer-promotional2</i18n:text>
+                        <xsl:value-of select="$dryadrelease/release/date"/> 
+                        <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dryad'][@qualifier='node']">
+                            <i18n:text>xmlui.dri2xhtml.structureal.footer-node</i18n:text>
                             <xsl:value-of
-                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                            <xsl:text>/contact</xsl:text>
-                        </xsl:attribute>
-                        <i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
-                    </a>
-                    <xsl:text> | </xsl:text>
-                    <a>
-                        <xsl:attribute name="href">
-                            <xsl:value-of
-                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                            <xsl:text>/feedback</xsl:text>
-                        </xsl:attribute>
-                        <i18n:text>xmlui.dri2xhtml.structural.feedback-link</i18n:text>
-                    </a>
+                                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dryad'][@qualifier='node']"/>
+                        </xsl:if>
+                    </p>
+                    <!--Git Commit hash rendered in HTML comment-->
+                    <xsl:comment>Git Commit Hash: <xsl:value-of select="$dryadrelease/release/version"/></xsl:comment>
                 </div>
                 <!--Invisible link to HTML sitemap (for search engines) -->
                 <a class="hidden">
@@ -632,7 +637,6 @@ references to stylesheets pulled directly from the pageMeta element. -->
             </div>
         </div>
     </xsl:template>
-
 
     <!--
             The meta, body, options elements; the three top-level elements in the schema
