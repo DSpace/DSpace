@@ -381,25 +381,38 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <a href="">About</a>
                             <ul>
                                 <li>
-                                    <a href="/pages/missionAndVision">Mission &amp; Vision</a>
+                                    <a href="/pages/organization">The Organization</a>
+                                    <ul>
+                                      <li>
+                                        <a href="/pages/organization#overview">Overview</a>
+                                      </li>
+                                      <li>
+                                        <a href="/pages/organization#community">Our Community</a>
+                                      </li>
+                                      <li>
+                                        <a href="/pages/organization#funding">Funding</a>
+                                      </li>
+                                    </ul>
                                 </li>
                                 <li>
                                     <a href="/pages/whoWeAre">Who We Are</a>
                                 </li>
                                 <li>
-                                    <a href="/pages/ourCommunity">Our Community</a>
+                                    <a href="/pages/repository">The Repository</a>
+                                    <ul>
+                                      <li>
+                                        <a href="/pages/repository#keyFeatures">Key Features</a>
+                                      </li>
+                                      <li>
+                                        <a href="/pages/repository#technology">The Technology</a>
+                                      </li>
+                                    </ul>
                                 </li>
                                 <li>
-                                    <a href="/pages/funding">Funding</a>
+                                    <a href="http://blog.datadryad.org">News</a>
                                 </li>
                                 <li>
-                                    <a href="/pages/technology">Technology</a>
-                                </li>
-                                <li>
-                                    <a href="/feedback">Contact Us</a>
-                                </li>
-                                <li>
-                                    <a href="http://blog.datadryad.org">Blog</a>
+                                    <a href="">Ideas Forum</a>
                                 </li>
                             </ul>
                         </li>
@@ -407,25 +420,43 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <a href="">Get Started</a>
                             <ul>
                                 <li>
-                                    <a href="/pages/faq#depositing">Depositing Data</a>
+                                    <a href="/pages/depositing">Depositing Data</a>
                                 </li>
                                 <li>
                                     <a href="/pages/using">Using Data</a>
                                 </li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="">Learn More</a>
+                            <ul>
                                 <li>
-                                    <a href="">Membership</a>
+                                  <a href="/pages/faq">FAQ</a>
+                                  <ul>
+                                      <li>
+                                          <a href="/pages/jdap">Journal Archiving Policy</a>
+                                      </li>
+
+                                      <li>
+                                          <a href="/pages/partners">Related Projects</a>
+                                      </li>
+                                  </ul>
+                                </li>                                
+                                <li>
+                                    <a href="/pages/membershipOverview">Become A Member</a>
                                     <ul>
                                       <li>
                                         <a href="/pages/membershipOverview#becomeAMember">Become A Member</a>
                                       </li>
                                       <li>
-                                        <a href="/pages/membershipOverview#members">Members</a>
-                                      </li>
-                                      <li>
-                                        <a href="/pages/membershipMeeting">Membership Meeting</a>
+                                        <a href="/pages/membershipOverview#members">Member List</a>
                                       </li>
                                       <li>
                                         <a href="/membership">Membership Application</a>
+                                      </li>
+                                      <li>
+                                        <a href="/pages/membershipMeeting">Membership Meeting</a>
                                       </li>
                                     </ul>
                                 </li>
@@ -442,33 +473,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                 </li>
                                 <li>
                                     <a href="/pages/pricing">Pricing Plans</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="">Learn More</a>
-                            <ul>
-                                <li>
-                                    <a href="/pages/jdap">Journal Archiving Policy</a>
-                                </li>
-                                <li>
-                                  <a href="">Frequently Asked Questions</a>
-                                  <ul>
-                                    <li>
-                                      <a href="/pages/faq#depositing">Depositing Data</a>
-                                    </li>
-                                    <li>
-                                      <a href="/pages/faq#using">Using Data</a>
-                                    </li>
-                                    <li>
-                                      <a href="/pages/jdap">Journal Archiving Policy</a>
-                                    </li>
-                                  </ul>
-                                </li>
-                                <li>
-                                    <a href="/pages/partners">Related Projects</a>
-                                </li>
-                            </ul>
+                                </li>                            </ul>
                         </li>
                         <li>
                             <a href="/feedback">Contact Us</a>
