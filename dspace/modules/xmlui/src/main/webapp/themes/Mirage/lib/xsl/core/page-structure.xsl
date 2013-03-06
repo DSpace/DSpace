@@ -853,7 +853,16 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             maxWidth: 30,   // this isn't doing much...
                             extraWidth: 1
                         })
-                        .superfish();
+                        .superfish({
+                            // make the menu snappy (fast+simple animation)
+                            delay: 0,
+                            animation: {
+                                //height: 'show',
+                                opacity: 'show'
+                            },
+                            speed: 0, 
+                            disableHI: true     // remove menu delay (from hoverIntent)
+                        });
                 });
 
 		
