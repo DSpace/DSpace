@@ -1060,7 +1060,16 @@ END of #ds-options-wrapper -->
                     maxWidth: 30,   // this isn't doing much...
                     extraWidth: 1
                 })
-                .superfish();
+                .superfish({
+                    // make the menu snappy (fast+simple animation)
+                    delay: 0,
+                    animation: {
+                        // opacity: 'show', 
+                        height: 'show'
+                    },
+                    speed: 'fast', 
+                    disableHI: true     // remove menu delay (from hoverIntent)
+                });
         });
            </script>
 
