@@ -107,7 +107,14 @@
 	      .home-bottom-row {
 	      height: 420px;
 	      }
-
+	      
+	      #file_news_div_recently_integrated_journal,
+	      #aspect_statistics_StatisticsTransformer_div_stats,
+	      #aspect_dryadinfo_DryadBlogFeed_div_blog-hook {
+	      height: 300px;
+	      overflow: visible;
+	      }
+	      
 	      #dryad-home-carousel {
 	      font-size: 23px;
 	      font-weight: bold;
