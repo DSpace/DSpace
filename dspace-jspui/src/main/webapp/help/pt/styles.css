@@ -1,0 +1,615 @@
+
+
+
+
+
+
+
+A { color: #336699; text-decoration:none; }
+A:HOVER { color: #0066CC; text-decoration:underline; }
+
+BODY { font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
+       font-size: 8pt;
+       font-style: normal;
+       color: #444;
+       background: #fff;
+       margin: 0;
+       padding: 0;
+       margin-left:0px;
+       margin-right:0px; 
+       margin-top:0px; 
+       margin-bottom:10px }
+       
+input, select, textarea{
+       font-family:Tahoma, Verdana, Arial, Helvetica, sans-serif;
+       font-weight: normal;
+       font-size:100%;
+       color:#555;
+       border: 1px solid #999;
+       background-color:#FFFFFF; }
+
+
+H1 { margin-left: 10px;
+     margin-right: 10px;
+     font-size: 140%;
+     font-weight: bold;
+     font-style: normal;
+     font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+     color: #336699 }
+
+H2 { margin-left: 10px;
+     margin-right: 10px;
+     font-size: 120%;
+     font-style: normal;
+     font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+     color: #336699 }
+
+H3 { margin-left: 10px;
+     margin-right: 10px;
+     font-size: 110%;
+     font-weight: bold;
+     font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+     color: #444 }
+
+H4 { margin-left: 10px;
+     margin-right: 10px;
+     font-size: 110%;
+     font-weight: normal;
+     font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+     line-height: 14pt;
+     color: #336699 }
+
+H5 { margin-left: 20px;
+     margin-right: 10px;
+     font-size: 110%;
+     font-weight: normal;
+     font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+     line-height: 9pt;
+     color: #336699 }
+
+p {  margin-left: 10px;
+     margin-right: 10px;
+     font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+     font-size: 100% }
+     
+
+
+
+DIV { margin-left: 10px;
+      margin-right: 10px;
+      margin-bottom: 15px; 
+      font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+      font-size: 100%;}      
+
+UL { font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+     font-size: 100% }
+
+
+
+.standard { margin-left: 10px;
+            margin-right: 10px;
+            font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+            font-size: 100% }                       
+
+.pageBanner { width: 960px;
+              border: 0;
+              margin: 0 auto;
+              background: #ffffff;
+              color: #444;
+              padding: 0;
+              vertical-align: middle }
+
+.tagLine { vertical-align: bottom;
+           padding: 10px;
+           border: 0;
+           margin: 0;
+           background: #ffffff;
+           color: #ff6600 }
+
+.tagLineText { background: #ffffff;
+               color: #ff6600;
+               font-size: 100%;
+               font-weight: bold;
+               border: 0;
+               margin: 0 }
+
+.topUCright { background: #336699 url(/dspace/image/uc/topright_uc_bg.png) repeat-x; }
+
+.banner{  padding:10px 0 0 0;
+				}
+        
+.bottomUC-l, .bottomUC-r{ border-top: 4px solid #E5E5E5; margin: 15px 0 0 0; padding: 5px 0 0 0; }
+.bottomUC-rcprt{ border-top: 4px solid #E5E5E5; margin: 15px 0 0 0; padding: 5px 0 0 0; color: #999999 }
+
+.stripe { background: #336699 url(/dspace/image/stripe.gif) repeat-x;
+          vertical-align: top;
+          border: 0;
+          padding: 0;
+          margin: 0;
+          color: #ffffff }
+
+.locationBar { font-size: 100%;
+               font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+               text-align: left }
+
+.centralPane { margin: 0 auto;
+               vertical-align: top;
+               padding: 0;
+               border: 0;
+               width: 960px; }
+
+
+
+
+
+
+
+.pageContents { FONT-FAMILY: Tahoma, Verdana, Arial, Helvetica, sans-serif;
+                background: white;
+                color: #444;
+                vertical-align: top;
+                width: 100% }
+
+.navigationBarTable{ width: 170px;
+                     padding: 2px;
+                     margin: 2px;
+                     border: 0;
+                     background-color: #F5F5F5; }
+
+.navigationBar { font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                 font-size: 100%;
+                 font-style: normal;
+                 font-weight: bold;
+                 padding:10px;
+                 color: #252645;
+                 text-decoration: none;
+                 background-color: #F5F5F5; }
+
+.navigationBarSublabel{  font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                         font-size: 100%;
+                         font-style: normal;
+                         font-weight: bold;
+                         color: #444;
+                         text-decoration: none;
+                         background-color: #F5F5F5;
+                         white-space: nowrap }
+
+
+
+
+
+.navigationBarItem { font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                     font-size: 100%;
+                     font-style: normal;
+                     font-weight: normal;
+                     color: #252645;
+                     background-color: #F5F5F5;
+                     text-decoration: none;
+                     vertical-align: middle;
+                     white-space: nowrap }
+                     
+.navigationBarItemA { font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                     font-size: 110%;
+                     font-style: normal;
+                     font-weight: normal;
+                     color: #252645;
+                     background-color: #FFFFFF;
+                     text-decoration: none;
+                     margin-left: 20px;
+                     vertical-align: middle;
+                     white-space:nowrap }
+
+.navigationBarItem td { padding:2px; }
+.navigationBarItemA td { padding:2px; }
+
+.loggedIn { font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+            font-size: 100%;
+            font-style: normal;
+            font-weight: normal;
+            color: #882222;
+            background: #ffffff }
+
+.pageFooterBar { width: 100%;
+                 border: 0;
+                 margin: 0;
+                 padding: 0;
+                 background: #ffffff;
+                 color: #444;
+                 vertical-align: middle }
+
+.pageFootnote { font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                font-size: 100%;
+                font-style: normal;
+                font-weight: normal;
+                background: #ffffff;
+                color: #252645;
+                text-decoration: none;
+                text-align: left;
+                vertical-align: middle;
+                margin-left: 10px;
+                margin-right: 10px }
+
+.sidebar { background: #ffffff;
+           color: #444; }
+
+.communityLink { font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                 font-size: 100%;
+                 font-weight: bold }
+
+.communityDescription { margin-left: 20px;
+                        margin-right: 10px;
+                        font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                        font-size: 100%;
+                        font-weight: normal;
+                        list-style-type: none }
+
+.collectionListItem { font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                      font-size: 100%;
+                      font-weight: normal }
+
+.collectionDescription { margin-left: 20px;
+                     margin-right: 10px;
+                     font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                     font-size: 100%;
+                     font-weight: normal;
+                     list-style-type: none }
+
+.miscListItem { margin-left: 20px;
+                margin-right: 10px;
+                font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                font-size: 100%;
+                list-style-type: none }
+
+.copyrightText { margin-left: 20px;
+                 margin-right: 20px;
+                 text-align: center;
+                 font-style: italic;
+                 font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                 font-size: 100%;
+                 list-style-type: none }
+
+.browseBarLabel { font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                  font-size: 100%;
+                  font-style: normal;
+                  font-weight: bold;
+                  color: #444;
+                  background: #ffffff;
+                  vertical-align: middle;
+                  text-decoration: none }
+
+.browseBar { font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+             font-size: 100%;
+             font-style: normal;
+             font-weight: bold;
+             background: #ffffff;
+             color: #252645;
+             vertical-align: middle;
+             text-decoration: none }
+
+.itemListCellOdd { font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                   font-size: 100%;
+                   font-style: normal;
+                   font-weight: normal;
+                   color: #444;
+                   vertical-align: middle;
+                   text-decoration: none;
+                   background: #ffffff }
+
+
+.itemListCellEven { font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                    font-size: 100%;
+                    font-style: normal;
+                    font-weight: normal;
+                    color: #444;
+                    vertical-align: middle;
+                    text-decoration: none;
+                    /*background: #eeeeee*/ }
+
+.itemListCellHilight { font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                       font-size: 100%;
+                       font-style: normal;
+                       font-weight: normal;
+                       color: #444;
+                       vertical-align: middle;
+                       text-decoration: none;
+                       /*background: #eee*/ }
+
+.topNavLink { margin-left: 10px;
+          margin-right: 10px;
+          font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+          font-size: 100%;
+          text-align: center }
+
+.submitFormLabel { margin-left: 10px;
+           margin-right: 10px;
+           font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                   font-weight: bold;
+           font-size: 100%;
+           text-align: right }
+
+.submitFormHelp {  margin-left: 10px;
+           margin-right: 10px;
+           font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+           font-size: 100%;
+           text-align: center }
+           
+
+.submitFormWarn {  margin-left: 10px;
+           margin-right: 10px;
+           font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+           font-weight: bold;
+           font-size: 12pt;
+           color: #ff6600;
+           text-align: center }
+
+.uploadHelp { margin-left: 20px;
+              margin-right: 20px;
+              font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+              font-size: 100%;
+              text-align: left }
+
+.submitFormDateLabel {  margin-left: 10px;
+                        margin-right: 10px;
+                        font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                        font-size: 100%;
+                        font-style: italic;
+                        text-align: center }
+
+.submitProgressTable{ margin: 0;
+                      padding: 0;
+                      border: 0;
+                      vertical-align: top;
+                      text-align: center;
+                      white-space: nowrap }
+
+.submitProgressButton{ border: 0 }
+
+.submitProgressButtonDone{ border: 0;
+                           background-image: url(/dspace/image//submit/done.gif);
+                           background-position: center;
+                           height: 30px;
+                           width: 90px;
+                           font-size: 100%;
+                           color: #444;
+                           background-repeat: no-repeat; }
+
+.submitProgressButtonCurrent{ border: 0;
+                           background-image: url(/dspace/image//submit/current.gif);
+                           background-position: center;
+                           height: 30px;
+                           width: 90px;
+                           font-size: 100%;
+                           color: white;
+                           background-repeat: no-repeat; }
+
+.submitProgressButtonNotDone{ border: 0;
+                           background-image: url(/dspace/image//submit/notdone.gif);
+                           background-position: center;
+                           height: 30px;
+                           width: 90px;
+                           font-size: 100%;
+                           color: #444;
+                           background-repeat: no-repeat; }
+
+.miscTable { font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+             font-size: 100%;
+             font-style: normal;
+             font-weight: normal;
+             color: #444;
+             vertical-align: middle;
+             text-decoration: none;
+             /*background: #eee*/ }
+
+.miscTableNoColor { font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+             font-size: 12pt;
+             font-style: normal;
+             font-weight: normal;
+             color: #444;
+             vertical-align: middle;
+             text-decoration: none;
+             background: #ffffff }
+
+
+
+
+
+.oddRowOddCol{ font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+               font-size: 100%;
+               font-style: normal;
+               font-weight: normal;
+               color: #444;
+               vertical-align: middle;
+               text-decoration: none;
+               background: #ffffff;
+               padding: 3px }
+
+.evenRowOddCol{ font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                font-size: 100%;
+                font-style: normal;
+                font-weight: normal;
+                color: #444;
+                vertical-align: middle;
+                text-decoration: none;
+                background: #fff;
+                padding: 3px  }
+
+.oddRowEvenCol{ font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                font-size: 100%;
+                font-style: normal;
+                font-weight: normal;
+                color: #444;
+                vertical-align: middle;
+                text-decoration: none;
+                /*background: #eeeeee;*/
+                padding: 3px  }
+
+.evenRowEvenCol{ font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                 font-size: 100%;
+                 font-style: normal;
+                 font-weight: normal;
+                 color: #444;
+                 vertical-align: middle;
+                 text-decoration: none;
+                 /*background: #eee;*/
+                 padding: 3px  }
+
+.highlightRowOddCol{ font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                     font-size: 100%;
+                     font-style: normal;
+                     font-weight: normal;
+                     color: #444;
+                     vertical-align: middle;
+                     text-decoration: none;
+                     background: #ccccee;
+                     padding: 3px }
+
+.highlightRowEvenCol{ font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                      font-size: 100%;
+                      font-style: normal;
+                      font-weight: normal;
+                      color: #444;
+                      vertical-align: middle;
+                      text-decoration: none;
+                      background: #bbbbcc;
+                      padding: 3px }
+
+.itemDisplayTable{ text-align: center;
+                   border: 0;
+                   color: #444 }
+
+.metadataFieldLabel{ font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                     font-size: 100%;
+                     font-style: normal;
+                     font-weight: bold;
+                     color: #444;
+                     vertical-align: top;
+                     text-align: right;
+                     text-decoration: none;
+                     white-space: nowrap;
+                     padding: 3px }
+
+.metadataFieldValue{ font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                     font-size: 100%;
+                     font-style: normal;
+                     font-weight: normal;
+                     color: #444;
+                     vertical-align: top;
+                     text-align: left;
+                     text-decoration: none;
+                     padding: 3px }  
+
+.recentItem { margin-left: 10px;
+              margin-right: 10px;
+              font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+              font-size: 100% }
+
+.searchBox { font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+             font-size: 100%;
+             font-style: normal;
+             font-weight: bold;
+             color: #444;
+             vertical-align: middle;
+             text-decoration: none;
+             background: #e5e5e5;
+             padding: 0;
+             border: 0;
+             margin: 0 }
+
+.searchBoxLabel { font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                  font-size: 100%;
+                  font-style: normal;
+                  font-weight: bold;
+                  color: #444;
+                  background: #e5e5e5;
+                  text-decoration: none;
+                  vertical-align: middle }
+
+.searchBoxLabelSmall { font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+                  font-size: 100%;
+                  font-style: normal;
+                  font-weight: bold;
+                  color: #444;
+                  background: #e5e5e5;
+                  text-decoration: none;
+                  vertical-align: middle }
+
+.attentionTable 
+{
+    font-style: normal;
+    font-weight: normal;
+    color: #444;
+    vertical-align: middle;
+    text-decoration: none;
+    background: #cc9966;
+}
+
+.attentionCell 
+{
+    background: #ffffcc;
+    text-align: center;
+}
+
+.help {font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+        background: #ffffff;
+        margin-left:10px;}
+
+.help h2{text-align:center;
+                font-size:1100%;
+                color:#444;}
+
+.help h3{font-weight:bold;
+         margin-left:0px;}
+
+.help h4{font-weight:bold;
+         font-size: 100%;
+         margin-left:5px;}
+
+.help h5{font-weight:bold;
+         margin-left:10px;
+         line-height:.5;}
+
+.help p {font-size:100%;}
+
+.help table{margin-left:8px;
+            width:90%;}
+
+.help table.formats{font-size:100%;}
+
+.help ul {font-size:100%;}
+
+.help p.bottomLinks {font-size:100%;
+                    font-weight:bold;}
+
+.help td.leftAlign{font-size:100%;}
+.help td.rightAlign{text-align:right;
+                    font-size:100%;}
+                    
+
+
+
+ul.controlledvocabulary  {
+		list-style-type:none; }
+
+	
+.controlledvocabulary ul  li ul {
+	     list-style-type:none;
+		display:none; }
+
+input.controlledvocabulary  {
+		border:0px; }
+
+img.controlledvocabulary {
+		margin-right:8px ! important;
+		margin-left:11px ! important;
+		cursor:hand; }                    
+
+.submitFormHelpControlledVocabularies {  
+		   margin-left: 10px;
+           margin-right: 10px;
+           font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+           font-size: 100%;
+           text-align: left; }           
+
+.controlledVocabularyLink {  
+           font-family: Tahoma, Verdana, "Arial", "Helvetica", sans-serif;
+           font-size: 100%; }   

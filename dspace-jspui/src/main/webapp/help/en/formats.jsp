@@ -72,7 +72,7 @@
 <title>
 	<fmt:message key="jsp.help.formats.title"/></title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<link rel="stylesheet" href="../styles.css" type="text/css"/>
+<link rel="stylesheet" href="../../styles.css" type="text/css"/>
 </head>
 <body class="help">
 
@@ -173,9 +173,9 @@
     </tr>
 </table>
 <p>
-<%-- Please contact your <a href="#" onClick="javascript:window.open('../components/contact-info.jsp', 'contact', 'location=no,menubar=no,height=300,width=550,resizable')">DSpace Administrator</a>
+<%-- Please contact your <a href="#" onClick="javascript:window.open('../../components/contact-info.jsp', 'contact', 'location=no,menubar=no,height=300,width=550,resizable')">DSpace Administrator</a>
 if you have questions about a particular format. --%>
-<fmt:message key="jsp.help.formats.contact1"/> <a href="#" onclick="javascript:window.open('../components/contact-info.jsp', 'contact', 'location=no,menubar=no,height=300,width=550,resizable')"><fmt:message key="jsp.help.formats.contact2"/></a>
+<fmt:message key="jsp.help.formats.contact1"/> <a href="#" onclick="javascript:window.open('../../components/contact-info.jsp', 'contact', 'location=no,menubar=no,height=300,width=550,resizable')"><fmt:message key="jsp.help.formats.contact2"/></a>
 <fmt:message key="jsp.help.formats.contact3"/>
 </p>
 <p>&nbsp;</p>
