@@ -81,11 +81,13 @@ ul.sf-menu li li li.sfHover ul {
 }
 .sf-menu li li {
 	background:		#E4E4E4; /* #fff; */
+    overflow: visible;
 }
 .sf-menu li ul {
 	border-left: 1px solid #ccc;
     border-bottom: 1px solid #555;
     border-right: 1px solid #555;
+    overflow: hidden;
 }
 .sf-menu li li li {
 	background:		#fff;
