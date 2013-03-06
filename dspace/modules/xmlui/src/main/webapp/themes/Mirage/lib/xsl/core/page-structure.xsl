@@ -34,7 +34,7 @@
     <xsl:output indent="yes"/>
 
     <!-- Initialize info on build date for use in the footer -->
-    <xsl:variable name="dryadrelease" select="document('meta/version.xml')"/>
+    <xsl:variable name="dryadrelease" select="document('../../../meta/version.xml')"/>
 
     <!--
         The starting point of any XSL processing is matching the root element. In DRI the root element is document,
