@@ -156,7 +156,7 @@ public abstract class DSpaceItemRepository extends AbstractItemRepository
     public ListItemsResults getItemsUntil(List<Filter> filters, int offset,
             int length, String setSpec, Date from)
     {
-        filters.add(new Filter(new DateFromFilter(from), FilterScope.Query));
+        filters.add(new Filter(new DateUntilFilter(from), FilterScope.Query));
         filters.add(new Filter(new DspaceSetSpecFilter(setSpec),
                 FilterScope.Query));
         return this.getItems(filters, offset, length);
