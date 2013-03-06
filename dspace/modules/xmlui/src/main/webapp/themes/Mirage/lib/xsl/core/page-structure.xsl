@@ -604,9 +604,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <xsl:attribute name="href">
                                 <xsl:value-of
                                         select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                                <xsl:text>#TODO</xsl:text>
+                                <xsl:text>/pages/policies</xsl:text>
                             </xsl:attribute>
-                            <xsl:text>Dryad Policies</xsl:text>
+                            <xsl:text>Dryad Terms of Use</xsl:text>
                         </a>
 			<xsl:text>&#160;</xsl:text>
                         <span style="color: #777;"><xsl:text>|</xsl:text></span>
@@ -615,7 +615,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <xsl:attribute name="href">
                                 <xsl:value-of
                                         select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                                <xsl:text>/contact</xsl:text>
+                                <xsl:text>/feedback</xsl:text>
                             </xsl:attribute>
                             <i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
                         </a>
