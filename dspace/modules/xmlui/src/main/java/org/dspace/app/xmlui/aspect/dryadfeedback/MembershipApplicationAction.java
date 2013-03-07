@@ -36,13 +36,13 @@ public class MembershipApplicationAction extends AbstractAction
         String org_name = request.getParameter("org_name"); // required
         String org_legalname = request.getParameter("org_legalname");
         String org_type = request.getParameter("org_type");
-        String org_type_other = request.getParameter("org_type_other");
         String org_annual_revenue = request.getParameter("org_annual_revenue"); // required
         String billing_contact_name = request.getParameter("billing_contact_name"); // required
-        String billing_address = request.getParameter("billing_address"); // required
         String billing_email = request.getParameter("billing_email"); // required
+        String billing_address = request.getParameter("billing_address"); // required
         String publications = request.getParameter("publications");
-        String membership_year = request.getParameter("membership_year"); // required
+        String membership_year_start = request.getParameter("membership_year_start"); // required
+        String membership_year_end = request.getParameter("membership_year_end"); // required
         String rep_name = request.getParameter("rep_name"); // required
         String rep_email = request.getParameter("rep_email"); // required
         String comments = request.getParameter("comments");
@@ -57,7 +57,8 @@ public class MembershipApplicationAction extends AbstractAction
                 (billing_contact_name == null) ||
                 (billing_address == null) ||
                 (billing_email == null) ||
-                (membership_year == null) ||
+                (membership_year_start == null) ||
+                (membership_year_end == null) ||
                 (rep_name == null) ||
                 (rep_email == null)
                 ) {
@@ -70,14 +71,14 @@ public class MembershipApplicationAction extends AbstractAction
             map.put("org_annual_revenue", org_annual_revenue);
             map.put("org_legalname", org_legalname);
             map.put("org_type", org_type);
-            map.put("org_type_other", org_type_other);
 
             map.put("billing_contact_name", billing_contact_name);
-            map.put("billing_address", billing_address);
             map.put("billing_email", billing_email);
-
+            map.put("billing_address", billing_address);
+            
             map.put("publications", publications);
-            map.put("membership_year", membership_year);
+            map.put("membership_year_start", membership_year_start);
+            map.put("membership_year_end", membership_year_end);
 
             map.put("rep_name", rep_name);
             map.put("rep_email", rep_email);
@@ -99,14 +100,17 @@ public class MembershipApplicationAction extends AbstractAction
             if((billing_contact_name != null) && billing_contact_name.equals("")) {
                 errorFieldNames.add("billing_contact_name");
             }
-            if((billing_address != null) && billing_address.equals("")) {
-                errorFieldNames.add("billing_address");
-            }
             if((billing_email != null) && billing_email.equals("")) {
                 errorFieldNames.add("billing_email");
             }
-            if((membership_year != null) && membership_year.equals("")) {
-                errorFieldNames.add("membership_year");
+            if((billing_address != null) && billing_address.equals("")) {
+                errorFieldNames.add("billing_address");
+            }
+            if((membership_year_start != null) && membership_year_start.equals("")) {
+                errorFieldNames.add("membership_year_start");
+            }
+            if((membership_year_end != null) && membership_year_end.equals("")) {
+                errorFieldNames.add("membership_year_end");
             }
             if((rep_name != null) && rep_name.equals("")) {
                 errorFieldNames.add("rep_name");
@@ -179,24 +183,19 @@ public class MembershipApplicationAction extends AbstractAction
         email.addArgument(new Date());
         email.addArgument(org_name);
         email.addArgument(org_legalname);
-        if(org_type != null && org_type.equals("other")) {
-            email.addArgument("Other: " + org_type_other);
-        } else {
-            email.addArgument(org_type);
-        }
+        email.addArgument(org_type);
         email.addArgument(org_annual_revenue);
         email.addArgument(billing_contact_name);
-        email.addArgument(billing_address);
         email.addArgument(billing_email);
+        email.addArgument(billing_address);
         email.addArgument(publications);
-        email.addArgument(membership_year);
+        email.addArgument(membership_year_start);
+        email.addArgument(membership_year_end);
         email.addArgument(rep_name);
         email.addArgument(rep_email);
         email.addArgument(comments);
         email.addArgument(agent);
         email.addArgument(session);
-        // Replying to feedback will reply to email on form
-        email.setReplyTo(rep_email);
 
         // May generate MessageExceptions.
         email.send();

@@ -16,6 +16,7 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.CheckBox;
+import org.dspace.app.xmlui.wing.element.Composite;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.Label;
@@ -50,19 +51,20 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         String org_type = parameters.getParameter("org_type","");
         String org_annual_revenue = parameters.getParameter("org_annual_revenue",""); // required
         String billing_contact_name = parameters.getParameter("billing_contact_name",""); // required
-        String billing_address = parameters.getParameter("billing_address",""); // required
         String billing_email = parameters.getParameter("billing_email",""); // required
+        String billing_address = parameters.getParameter("billing_address",""); // required
         String publications = parameters.getParameter("publications","");
-        String membership_year = parameters.getParameter("membership_year",""); // required
+        String membership_year_start = parameters.getParameter("membership_year_start",""); // required
+        String membership_year_end = parameters.getParameter("membership_year_end",""); // required
         String rep_name = parameters.getParameter("rep_name",""); // required
         String rep_email = parameters.getParameter("rep_email",""); // required
         String comments = parameters.getParameter("comments","");
 
        return HashUtil.hash(org_name + "-" + org_name + "-" + org_legalname + "-" + 
                org_type + "-" + org_annual_revenue + "-" + billing_contact_name + "-" + 
-               billing_address + "-" + billing_email + "-" + publications + "-" + 
-               membership_year + "-" + rep_name + "-" + rep_email + "-" +
-               comments);
+               billing_email + "-" + billing_address + "-" + publications + "-" +
+               membership_year_start + "-" + membership_year_end + "-"+ rep_name + 
+               "-" + rep_email + "-" + comments);
     }
 
     /**
@@ -93,7 +95,6 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
 
         membership.addPara(message(message_prefix + "overview.p1"));
         membership.addPara(message(message_prefix + "overview.p2"));
-        membership.addPara(message(message_prefix + "overview.p3"));
         membership.addPara(message(message_prefix + "markedfields"));
 
         // Check for errors
@@ -125,24 +126,14 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
 
         // Org Type
         Item orgType = form.addItem("org_type", "");
-        Radio orgTypeRadios = orgType.addRadio("org_type");
-        orgTypeRadios.setLabel(message(message_prefix + "fields.org_type.label1"));
-        orgTypeRadios.setHelp(message(message_prefix + "fields.org_type.label2"));
-
-        orgTypeRadios.addOption("data_center_or_repository", message(message_prefix + "fields.org_type.data_center_or_repository"));
-        orgTypeRadios.addOption("funding_organization", message(message_prefix + "fields.org_type.funding_organization"));
-        orgTypeRadios.addOption("journal", message(message_prefix + "fields.org_type.journal"));
-        orgTypeRadios.addOption("publisher", message(message_prefix + "fields.org_type.publisher"));
-        orgTypeRadios.addOption("scholarly_society", message(message_prefix + "fields.org_type.scholarly_society"));
-        orgTypeRadios.addOption("university_research_or_edu_institute", message(message_prefix + "fields.org_type.university_research_or_edu_institute"));
-        orgTypeRadios.addOption("other", message(message_prefix + "fields.org_type.other"));
-        orgTypeRadios.setRequired();
+        TextArea orgTypeTextArea = orgType.addTextArea("org_type");
+        orgTypeTextArea.setLabel(message(message_prefix + "fields.org_type.label1"));
+        orgTypeTextArea.setHelp(message(message_prefix + "fields.org_type.label2"));
+        orgTypeTextArea.setValue(parameters.getParameter("org_type", ""));
+        orgTypeTextArea.setRequired();
         if(errorFieldList.contains("org_type")) {
-            orgTypeRadios.addError(message(message_prefix + "errors.org_type"));
+            orgTypeTextArea.addError(message(message_prefix + "errors.org_type"));
         }
-
-        Text org_type_other = orgType.addText("org_type_other");
-        org_type_other.setValue(parameters.getParameter("org_type_other", ""));
 
         // Annual Revenue
         Item orgAnnualRevenue = form.addItem("org_annual_revenue", "");
@@ -162,23 +153,10 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         Text billingContactNameText = billingContactName.addText("billing_contact_name");
 
         billingContactNameText.setLabel(message(message_prefix + "fields.billing_contact_name.label1"));
-        billingContactNameText.setHelp(message(message_prefix + "fields.billing_contact_name.label2"));
         billingContactNameText.setValue(parameters.getParameter("billing_contact_name", ""));
         billingContactNameText.setRequired();
         if(errorFieldList.contains("billing_contact_name")) {
             billingContactNameText.addError(message(message_prefix + "errors.billing_contact_name"));
-        }
-
-        // Billing Address
-        Item billingAddress = form.addItem("billing_address","");
-        Text billingAddressText = billingAddress.addText("billing_address");
-
-        billingAddressText.setLabel(message(message_prefix + "fields.billing_address.label1"));
-        billingAddressText.setHelp(message(message_prefix + "fields.billing_address.label2"));
-        billingAddressText.setValue(parameters.getParameter("billing_address", ""));
-        billingAddressText.setRequired();
-        if(errorFieldList.contains("billing_address")) {
-            billingAddressText.addError(message(message_prefix + "errors.billing_address"));
         }
 
         // Billing Email
@@ -192,6 +170,17 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
             billingEmailText.addError(message(message_prefix + "errors.billing_email"));
         }
 
+        // Billing Address
+        Item billingAddress = form.addItem("billing_address","");
+        Text billingAddressText = billingAddress.addText("billing_address");
+
+        billingAddressText.setLabel(message(message_prefix + "fields.billing_address.label1"));
+        billingAddressText.setValue(parameters.getParameter("billing_address", ""));
+        billingAddressText.setRequired();
+        if(errorFieldList.contains("billing_address")) {
+            billingAddressText.addError(message(message_prefix + "errors.billing_address"));
+        }
+
         // Publications
         Item publications = form.addItem("publications","");
         TextArea publicationsTextArea = publications.addTextArea("publications");
@@ -200,16 +189,33 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         publicationsTextArea.setHelp(message(message_prefix + "fields.publications.label2"));
         publicationsTextArea.setValue(parameters.getParameter("publications", ""));
 
-        // Membership Year
+        // Membership Term, start and end
         Item membershipYear = form.addItem("membership_year","");
-        Text membershipYearText = membershipYear.addText("membership_year");
+        Composite membershipYearComposite = membershipYear.addComposite("membership_year_group");
+        membershipYearComposite.setLabel(message(message_prefix + "fields.membership_year.label1"));
+        membershipYearComposite.setHelp(message(message_prefix + "fields.membership_year.label2"));
 
-        membershipYearText.setLabel(message(message_prefix + "fields.membership_year.label1"));
-        membershipYearText.setHelp(message(message_prefix + "fields.membership_year.label2"));
-        membershipYearText.setValue(parameters.getParameter("membership_year", ""));
-        membershipYearText.setRequired();
-        if(errorFieldList.contains("membership_year")) {
-            membershipYearText.addError(message(message_prefix + "errors.membership_year"));
+        Radio membershipYearStartRadio = membershipYearComposite.addRadio("membership_year_start");
+        membershipYearStartRadio.setLabel(message(message_prefix + "fields.membership_year.starting_year.label"));
+        membershipYearStartRadio.addOption("2013", message(message_prefix + "fields.membership_year.starting_year.2013"));
+        membershipYearStartRadio.addOption("2014", message(message_prefix + "fields.membership_year.starting_year.2014"));
+        membershipYearStartRadio.setOptionSelected(parameters.getParameter("membership_year_start", "2013"));
+        membershipYearStartRadio.setRequired();
+        if(errorFieldList.contains("membership_year_start")) {
+            membershipYearStartRadio.addError(message(message_prefix + "errors.membership_year_start"));
+        }
+
+        Radio membershipYearEndRadio = membershipYearComposite.addRadio("membership_year_end");
+        membershipYearEndRadio.setLabel(message(message_prefix + "fields.membership_year.ending_year.label"));
+        membershipYearEndRadio.addOption("2013", message(message_prefix + "fields.membership_year.ending_year.2013"));
+        membershipYearEndRadio.addOption("2014", message(message_prefix + "fields.membership_year.ending_year.2014"));
+        membershipYearEndRadio.addOption("2015", message(message_prefix + "fields.membership_year.ending_year.2015"));
+        membershipYearEndRadio.addOption("2016", message(message_prefix + "fields.membership_year.ending_year.2016"));
+        membershipYearEndRadio.addOption("2017", message(message_prefix + "fields.membership_year.ending_year.2017"));
+        membershipYearEndRadio.setOptionSelected(parameters.getParameter("membership_year_end", "2014"));
+        membershipYearEndRadio.setRequired();
+        if(errorFieldList.contains("membership_year_end")) {
+            membershipYearEndRadio.addError(message(message_prefix + "errors.membership_year_end"));
         }
 
         // Representatitve Name
@@ -229,7 +235,6 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         Text repEmailText = repEmail.addText("rep_email");
 
         repEmailText.setLabel(message(message_prefix + "fields.rep_email.label1"));
-        repEmailText.setHelp(message(message_prefix + "fields.rep_email.label2"));
         repEmailText.setValue(parameters.getParameter("rep_email", ""));
         repEmailText.setRequired();
         if(errorFieldList.contains("rep_email")) {
