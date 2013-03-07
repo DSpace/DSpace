@@ -5,15 +5,16 @@
 # {3}   Organization Type
 # {4}   Organization annual revenue
 # {5}   Billing Contact Name
-# {6}   Billing address
-# {7}   Billing Contact Email
+# {6}   Billing Contact Email
+# {7}   Billing address
 # {8}   Publications
-# {9}   Membership Year
-# {10}   Dryad Representative Name
-# {11}  Dryad Representative Email
-# {12}  Comments
-# {13}  User Agent
-# {14}  Session ID
+# {9}   Membership Year Start
+# {10}   Membership Year End
+# {11}   Dryad Representative Name
+# {12}  Dryad Representative Email
+# {13}  Comments
+# {14}  User Agent
+# {15}  Session ID
 #
 Subject: Dryad: Membership Application Submitted
 
@@ -25,15 +26,15 @@ Organization Legal Name:		{2}
 Organization Type:				{3}
 Organization Annual revenue:	{4}
 Billing Contact Name:			{5}
-Billing address:				{6}
-Billing Contact Email:			{7}
+Billing Contact Email:			{6}
+Billing address:				{7}
 Publications:					{8}
-Membership Year:				{9}
-Dryad Representative Name:		{10}
-Dryad Representative Email:		{11}
-Comments:						{12}
-User Agent:						{13}
-Session ID:						{14}
+Membership Term:				{9}-{10}
+Dryad Representative Name:		{11}
+Dryad Representative Email:		{12}
+Comments:						{13}
+User Agent:						{14}
+Session ID:						{15}
 
 Thanks,
 
