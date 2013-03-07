@@ -172,13 +172,13 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
 
         // Billing Address
         Item billingAddress = form.addItem("billing_address","");
-        Text billingAddressText = billingAddress.addText("billing_address");
+        TextArea billingAddressTextArea = billingAddress.addTextArea("billing_address");
 
-        billingAddressText.setLabel(message(message_prefix + "fields.billing_address.label1"));
-        billingAddressText.setValue(parameters.getParameter("billing_address", ""));
-        billingAddressText.setRequired();
+        billingAddressTextArea.setLabel(message(message_prefix + "fields.billing_address.label1"));
+        billingAddressTextArea.setValue(parameters.getParameter("billing_address", ""));
+        billingAddressTextArea.setRequired();
         if(errorFieldList.contains("billing_address")) {
-            billingAddressText.addError(message(message_prefix + "errors.billing_address"));
+            billingAddressTextArea.addError(message(message_prefix + "errors.billing_address"));
         }
 
         // Publications
