@@ -33,7 +33,8 @@
 
     <xsl:output indent="yes"/>
 
-    <xsl:variable name="dryadrelease" select="document('meta/version.xml')"/>
+    <!-- Initialize info on build date for use in the footer -->
+    <xsl:variable name="dryadrelease" select="document('../../../meta/version.xml')"/>
 
     <!--
         The starting point of any XSL processing is matching the root element. In DRI the root element is document,
@@ -381,25 +382,38 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <a href="">About</a>
                             <ul>
                                 <li>
-                                    <a href="/pages/missionAndVision">Mission &amp; Vision</a>
+                                    <a href="/pages/organization">The Organization</a>
+                                    <ul>
+                                      <li>
+                                        <a href="/pages/organization#overview">Overview</a>
+                                      </li>
+                                      <li>
+                                        <a href="/pages/organization#community">Our Community</a>
+                                      </li>
+                                      <li>
+                                        <a href="/pages/organization#funding">Funding</a>
+                                      </li>
+                                    </ul>
                                 </li>
                                 <li>
                                     <a href="/pages/whoWeAre">Who We Are</a>
                                 </li>
                                 <li>
-                                    <a href="/pages/ourCommunity">Our Community</a>
+                                    <a href="/pages/repository">The Repository</a>
+                                    <ul>
+                                      <li>
+                                        <a href="/pages/repository#keyFeatures">Key Features</a>
+                                      </li>
+                                      <li>
+                                        <a href="/pages/repository#technology">The Technology</a>
+                                      </li>
+                                    </ul>
                                 </li>
                                 <li>
-                                    <a href="/pages/funding">Funding</a>
+                                    <a href="http://blog.datadryad.org">News</a>
                                 </li>
                                 <li>
-                                    <a href="/pages/technology">Technology</a>
-                                </li>
-                                <li>
-                                    <a href="/feedback">Contact Us</a>
-                                </li>
-                                <li>
-                                    <a href="http://blog.datadryad.org">Blog</a>
+                                    <a href="">Ideas Forum</a>
                                 </li>
                             </ul>
                         </li>
@@ -407,25 +421,43 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <a href="">Get Started</a>
                             <ul>
                                 <li>
-                                    <a href="/pages/faq#depositing">Depositing Data</a>
+                                    <a href="/pages/depositing">Depositing Data</a>
                                 </li>
                                 <li>
                                     <a href="/pages/using">Using Data</a>
                                 </li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="">Learn More</a>
+                            <ul>
                                 <li>
-                                    <a href="">Membership</a>
+                                  <a href="/pages/faq">FAQ</a>
+                                  <ul>
+                                      <li>
+                                          <a href="/pages/jdap">Journal Archiving Policy</a>
+                                      </li>
+
+                                      <li>
+                                          <a href="/pages/partners">Related Projects</a>
+                                      </li>
+                                  </ul>
+                                </li>                                
+                                <li>
+                                    <a href="/pages/membershipOverview">Become A Member</a>
                                     <ul>
                                       <li>
                                         <a href="/pages/membershipOverview#becomeAMember">Become A Member</a>
                                       </li>
                                       <li>
-                                        <a href="/pages/membershipOverview#members">Members</a>
-                                      </li>
-                                      <li>
-                                        <a href="/pages/membershipMeeting">Membership Meeting</a>
+                                        <a href="/pages/membershipOverview#members">Member List</a>
                                       </li>
                                       <li>
                                         <a href="/membership">Membership Application</a>
+                                      </li>
+                                      <li>
+                                        <a href="/pages/membershipMeeting">Membership Meeting</a>
                                       </li>
                                     </ul>
                                 </li>
@@ -442,33 +474,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                 </li>
                                 <li>
                                     <a href="/pages/pricing">Pricing Plans</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="">Learn More</a>
-                            <ul>
-                                <li>
-                                    <a href="/pages/jdap">Journal Archiving Policy</a>
-                                </li>
-                                <li>
-                                  <a href="">Frequently Asked Questions</a>
-                                  <ul>
-                                    <li>
-                                      <a href="/pages/faq#depositing">Depositing Data</a>
-                                    </li>
-                                    <li>
-                                      <a href="/pages/faq#using">Using Data</a>
-                                    </li>
-                                    <li>
-                                      <a href="/pages/jdap">Journal Archiving Policy</a>
-                                    </li>
-                                  </ul>
-                                </li>
-                                <li>
-                                    <a href="/pages/partners">Related Projects</a>
-                                </li>
-                            </ul>
+                                </li>                            </ul>
                         </li>
                         <li>
                             <a href="/feedback">Contact Us</a>
@@ -599,23 +605,25 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <xsl:attribute name="href">
                                 <xsl:value-of
                                         select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                                <xsl:text>#TODO</xsl:text>
+                                <xsl:text>/pages/policies</xsl:text>
                             </xsl:attribute>
-                            <xsl:text>Dryad Policies</xsl:text>
+                            <xsl:text>Dryad Terms of Use</xsl:text>
                         </a>
-                        <xsl:text>&#160;<span style="color: #777;">|</span>&#160;</xsl:text>
+			<xsl:text>&#160;</xsl:text>
+                        <span style="color: #777;"><xsl:text>|</xsl:text></span>
+                        <xsl:text>&#160;</xsl:text>
                         <a>
                             <xsl:attribute name="href">
                                 <xsl:value-of
                                         select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                                <xsl:text>/contact</xsl:text>
+                                <xsl:text>/feedback</xsl:text>
                             </xsl:attribute>
                             <i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
                         </a>
                     </span>
                     <span style="float: left;">
                         <xsl:text>Dryad is a nonprofit membership organization.</xsl:text>
-                    </span>
+                    </span>		    
                     <p class="build-info">
                         <i18n:text>xmlui.dri2xhtml.structural.footer-promotional2</i18n:text>
                         <xsl:value-of select="$dryadrelease/release/date"/> 
@@ -846,7 +854,16 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             maxWidth: 30,   // this isn't doing much...
                             extraWidth: 1
                         })
-                        .superfish();
+                        .superfish({
+                            // make the menu snappy (fast+simple animation)
+                            delay: 0,
+                            animation: {
+                                //height: 'show',
+                                opacity: 'show'
+                            },
+                            speed: 0, 
+                            disableHI: true     // remove menu delay (from hoverIntent)
+                        });
                 });
 
 		
