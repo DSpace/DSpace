@@ -46,6 +46,7 @@ public class MembershipApplicationAction extends AbstractAction
         String rep_name = request.getParameter("rep_name"); // required
         String rep_email = request.getParameter("rep_email"); // required
         String comments = request.getParameter("comments");
+        String submittedOnce = request.getParameter("submitted_once");
         String agent = request.getHeader("User-Agent");
         String session = request.getSession().getId();
 
@@ -94,7 +95,7 @@ public class MembershipApplicationAction extends AbstractAction
             if((org_type != null) && org_type.equals("")) {
                 errorFieldNames.add("org_type");
             }
-            if((org_annual_revenue != null) && org_annual_revenue.equals("")) {
+            if((submittedOnce != null) && ((org_annual_revenue == null) || org_annual_revenue.equals(""))) {
                 errorFieldNames.add("org_annual_revenue");
             }
             if((billing_contact_name != null) && billing_contact_name.equals("")) {
@@ -106,10 +107,10 @@ public class MembershipApplicationAction extends AbstractAction
             if((billing_address != null) && billing_address.equals("")) {
                 errorFieldNames.add("billing_address");
             }
-            if((membership_year_start != null) && membership_year_start.equals("")) {
+            if((submittedOnce != null) && ((membership_year_start == null) || membership_year_start.equals(""))) {
                 errorFieldNames.add("membership_year_start");
             }
-            if((membership_year_end != null) && membership_year_end.equals("")) {
+            if((submittedOnce != null) && ((membership_year_end == null) || membership_year_end.equals(""))) {
                 errorFieldNames.add("membership_year_end");
             }
             if((rep_name != null) && rep_name.equals("")) {

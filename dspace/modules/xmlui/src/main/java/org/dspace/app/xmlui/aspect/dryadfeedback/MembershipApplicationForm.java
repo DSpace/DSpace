@@ -18,6 +18,7 @@ import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.CheckBox;
 import org.dspace.app.xmlui.wing.element.Composite;
 import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.Hidden;
 import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.Label;
 import org.dspace.app.xmlui.wing.element.List;
@@ -199,7 +200,7 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         membershipYearStartRadio.setLabel(message(message_prefix + "fields.membership_year.starting_year.label"));
         membershipYearStartRadio.addOption("2013", message(message_prefix + "fields.membership_year.starting_year.2013"));
         membershipYearStartRadio.addOption("2014", message(message_prefix + "fields.membership_year.starting_year.2014"));
-        membershipYearStartRadio.setOptionSelected(parameters.getParameter("membership_year_start", "2013"));
+        membershipYearStartRadio.setOptionSelected(parameters.getParameter("membership_year_start", ""));
         membershipYearStartRadio.setRequired();
         if(errorFieldList.contains("membership_year_start")) {
             membershipYearStartRadio.addError(message(message_prefix + "errors.membership_year_start"));
@@ -212,7 +213,7 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         membershipYearEndRadio.addOption("2015", message(message_prefix + "fields.membership_year.ending_year.2015"));
         membershipYearEndRadio.addOption("2016", message(message_prefix + "fields.membership_year.ending_year.2016"));
         membershipYearEndRadio.addOption("2017", message(message_prefix + "fields.membership_year.ending_year.2017"));
-        membershipYearEndRadio.setOptionSelected(parameters.getParameter("membership_year_end", "2014"));
+        membershipYearEndRadio.setOptionSelected(parameters.getParameter("membership_year_end", ""));
         membershipYearEndRadio.setRequired();
         if(errorFieldList.contains("membership_year_end")) {
             membershipYearEndRadio.addError(message(message_prefix + "errors.membership_year_end"));
@@ -248,6 +249,11 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         commentsTextArea.setLabel(message(message_prefix + "fields.comments.label1"));
         commentsTextArea.setHelp(message(message_prefix + "fields.comments.label2"));
         commentsTextArea.setValue(parameters.getParameter("comments", ""));
+
+        // Hidden field for submitted once, lets the action know to check radios
+        Item submittedOnce = form.addItem("submitted_once", "");
+        Hidden submittedOnceHidden = submittedOnce.addHidden("submitted_once");
+        submittedOnceHidden.setValue("1");
 
         // Submit button
         form.addItem().addButton("submit").setValue(message(message_prefix + "submit"));

@@ -44,6 +44,7 @@
                         <map:parameter name="rep_name" value="{rep_name}" />
                         <map:parameter name="rep_email" value="{rep_email}" />
                         <map:parameter name="comments" value="{comments}" />
+                        <map:parameter name="submitted_once" value="{submitted_once}" />
                         <map:parameter name="error_fields" value="{error_fields}" />
                     </map:transform>
                     <map:serialize type="xml"/>
