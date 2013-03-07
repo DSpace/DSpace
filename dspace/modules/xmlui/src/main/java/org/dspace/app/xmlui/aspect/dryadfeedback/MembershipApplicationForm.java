@@ -145,6 +145,7 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         orgAnnualRevenueRadios.addOption("less_than_10_million", message(message_prefix + "fields.org_annual_revenue.less_than_10_million"));
         orgAnnualRevenueRadios.addOption("greater_than_10_million", message(message_prefix + "fields.org_annual_revenue.greater_than_10_million"));
         orgAnnualRevenueRadios.setRequired();
+        orgAnnualRevenueRadios.setOptionSelected(parameters.getParameter("org_annual_revenue", ""));
         if(errorFieldList.contains("org_annual_revenue")) {
             orgAnnualRevenueRadios.addError(message(message_prefix + "errors.org_annual_revenue"));
         }
