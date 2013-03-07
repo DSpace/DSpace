@@ -119,10 +119,14 @@
 	      font-size: 23px;
 	      font-weight: bold;
 	      background-color: rgb(255, 255, 255);
-	      border: 1px solid rgb(51, 51, 51);
 	      height: 216px;
 	      padding: 0px;
-	      overflow: visible;
+	      overflow: hidden;
+	      }
+	      
+	      #dryad-home-carousel .bx-viewport {
+	      height: 190px;
+	      width: 623px;
 	      }
 	      
 	      #dryad-home-carousel div.bxslider {
@@ -142,14 +146,21 @@
 	      }
 	      
 	      #dryad-home-carousel .bx-pager {
-	      bottom: -32px;
+	      bottom: -19px;
 	      left: 8px;
 	      }
-
-	      #dryad-home-carousel .bx-controls-auto-item {
-	      padding-top: 10px;
+	      #dryad-home-carousel .bx-pager-item {
+	      float: left;
 	      }
-
+	      
+	      #dryad-home-carousel .bx-controls-auto {
+	      bottom: -18px;
+	      }
+	      #dryad-home-carousel .bx-controls-auto-item {
+	      float: right;
+	      padding-right: 8px;
+	      }
+	      
 	      .blog-box ul {
 	      list-style: none;
 	      margin-left: 0;
@@ -222,18 +233,21 @@
             <!--</div>-->
 
             <!-- START DEPOSIT -->
-            <div class="home-col-2">
+            <div id="submit-data-feature-box" class="home-col-2">
                 <h1 class="ds-div-head "
-                    style="border-bottom: none; text-align: center; padding: 50px 45px 0; height: 50px;">Deposit your
-                    data in Dryad
+                    style="font-size: 1.8em; border-bottom: none; text-align: center; padding: 25px 35px 19px; height: 56px;">Have data 
+                    for your publication?
                 </h1>
                 <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
-                    <p class="ds-paragraph" style="text-align: center; font-size: 1.2em; margin: 0.5em 0 1.5em;">
+                    <p class="ds-paragraph">
                         <a class="submitnowbutton" href="/handle/10255/3/submit">Submit Data Now!</a>
                     </p>
-                    <a style="float: right; margin-right: 18px;" href="http://www.youtube.com/watch?v=RP33cl8tL28">See
-                        how to submit
-                    </a>
+                    <p style="font-size: 0.9em; padding-top: 4px;">
+                        <xsl:text>OR</xsl:text>
+                    </p>
+                    <p>
+                        <a class="learn-to-submit-button" href="http://www.youtube.com/watch?v=RP33cl8tL28">Learn how to submit data</a>
+                    </p>
                 </div>
             </div>
 
@@ -262,8 +276,8 @@
                         </p>
                         <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                                id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
-                               type="text" value=""/>
-                        <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
+                               type="text" value=""/><!-- no whitespace between these!
+                     --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
                                id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
                                type="submit" value="Go"/>
                     </p>
@@ -300,6 +314,8 @@
                     <div id="browse-data-buttons">
                         <a href="#recently-published-data"><span>Recently Published</span></a>
                         <a href="#most-viewed-data"><span>Most Viewed</span></a>
+                        <a href="#data-by-author"><span>By Author</span></a>
+                        <a href="#data-by-journal"><span>By Journal</span></a>
                     </div>
                     <div id="recently-published-data" class="browse-data-panel">
                         <xsl:for-each select="dri:div[@n='site-home']">
@@ -315,6 +331,9 @@
                             <xsl:text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </xsl:text>
                         </div>
                     </div>
+                    <div style="text-align: center;">
+                        <input value="View more" type="submit" name="submit" class="ds-button-field" id="" />
+                    </div>
                 </div>
             </div>
 
@@ -322,10 +341,11 @@
             <div class="home-col-2">
                 <h1 class="ds-div-head">Dryad Mailing List</h1>
                 <div id="file_news_div_mailing_list" class="ds-static-div primary">
-                    <p class="ds-paragraph">
-                        <xsl:text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </xsl:text>
-
+                    <p class="ds-paragraph" style="text-align: left; margin-bottom: 2px;">
+                        <xsl:text>Join {2,510} other subscribers!</xsl:text>
+                        <input value="Your e-mail" type="text" name="query" class="ds-text-field" style="width: 240px; margin-top: 8px;" id="" />
                     </p>
+                    <input value="Subscribe" type="submit" name="submit" class="ds-button-field" id="" />
                 </div>
             </div>
 

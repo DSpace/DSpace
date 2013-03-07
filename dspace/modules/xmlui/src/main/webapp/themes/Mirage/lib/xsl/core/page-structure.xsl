@@ -331,6 +331,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
     <xsl:template name="buildHeader">
         <div id="ds-header-wrapper">
             <div id="ds-header" class="clearfix">
+                <a id="skip-nav" href="#ds-body">Skip navigation</a>
                 <a id="ds-header-logo-link">
                     <xsl:attribute name="href">
                         <xsl:value-of
