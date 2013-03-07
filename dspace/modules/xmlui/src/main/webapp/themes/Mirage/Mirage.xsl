@@ -107,7 +107,14 @@
 	      .home-bottom-row {
 	      height: 420px;
 	      }
-
+	      
+	      #file_news_div_recently_integrated_journal,
+	      #aspect_statistics_StatisticsTransformer_div_stats,
+	      #aspect_dryadinfo_DryadBlogFeed_div_blog-hook {
+	      height: 300px;
+	      overflow: visible;
+	      }
+	      
 	      #dryad-home-carousel {
 	      font-size: 23px;
 	      font-weight: bold;
@@ -265,108 +272,24 @@
 
             <!-- START CONNECT  -->
             <div class="home-col-2">
-                <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Connect with Dryad
+                <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be a part of Dryad
                 </h1>
 
                 <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 490px;">
-                    <div id="TEMP-connect-alternatives">
-
-                        <div id="connect-illustrated-prose">
-                            <p>
-                                <img style="float: right;margin-left: 8px;" src="themes/Mirage/images/connect-1.png"/>
-                                Dryad invites<b>publishers</b>,<b>journals</b>,
-                                <b>scientific societies</b>
-                                and
-                                <b>organizations</b>
-                                interested in data preservation to join us now and shape the course of Dryad’s
-                                future.
-                                <a href="#">Dryad members</a>
-                                elect our board of directors, participate in an
-                                active knowledge sharing network and receive discounts on deposit fees.
-                                <img style="float: left;margin-right: 8px;" src="themes/Mirage/images/connect-2.png"/>
-                            </p>
-
-                            <p>
-                                <a href="#">Submission Integration</a>
-                                is a free and easy way for
-                                <b>journals</b>
-                                to
-                                coordinate manuscript submissions with data submissions in Dryad. Integration
-                                makes depositing data and linking it with an article faster and simpler for
-                                both scientists and journals.
-                                <img style="float: right;margin-left: 8px" src="themes/Mirage/images/connect-3.png"/>
-                            </p>
-
-                            <p>
-                                Charging
-                                <a href="#">deposit fees</a>
-                                to offset the costs of data archiving
-                                will ensure that the public is never charged to access or reuse the data in
-                                Dryad.
-                                <!--Dryad’s flexible <a href="#">volume payment plans</a> make it attractive
-                                for institutions to sponsor data archiving as a service to their scientists and
-                                authors.-->
-                            </p>
-                        </div>
-
-                        <div id="connect-legible-cloud">
-                            <p>
-                                <span style="font-size: 110%; color: #494; font-weight: bold;">Dryad</span>
-                                invites
-                                <span style="font-size: 130%; color: #c99;">publishers</span>,
-                                <span style="font-size: 120%; color: #aa5;">journals</span>,
-                                <span style="font-size: 130%; color: #99c;">scientific societies</span>
-                                and
-                                <span style="font-size: 120%; color: #6a9;">organizations</span>
-                                interested in
-                                <span style="color: #999; font-weight: bold;">data preservation</span>
-                                to join us now and shape the course of Dryad’s
-                                <span style="font-size: 110%; color: #c99; font-weight: bold;">future</span>.
-                                <a href="#" style="font-weight: bold;">Dryad members</a>
-                                elect our
-                                <span style="color: #aa5;">board of directors</span>,
-                                participate in an active
-                                <span style="font-weight: bold; color: #99c;">knowledge sharing</span>
-                                network and receive
-                                <span style="color: #c99;">discounts</span>
-                                on deposit fees.
-                            </p>
-
-                            <p>
-                                <a href="#" style="font-weight: bold;">Submission Integration</a>
-                                is a free and easy way for
-                                <span style="font-size: 120%; color: #99c;">journals</span>
-                                to
-                                <span style="color: #6a9;">coordinate manuscript submissions</span>
-                                with data submissions in
-                                <span style="color: #494; font-weight: bold;">Dryad</span>
-                                . Integration
-                                makes depositing data and
-                                <span style="font-weight: bold; color: #99c;">linking it</span>
-                                with an article
-                                <span style="color: #aa5;">faster and simpler</span>
-                                for both
-                                <span style="color: #c99;">scientists</span>
-                                and journals.
-                            </p>
-
-                            <p>
-                                Charging
-                                <a href="#" style="font-weight: bold;">deposit fees</a>
-                                to offset the
-                                <span style="color: #6a9;">costs of data archiving</span>
-                                will ensure that the
-                                <span style="color: #aa5;">public is never charged</span>
-                                to
-                                <span style="font-weight: bold; color: #999;">access or reuse</span>
-                                the data in
-                                <span style="color: #494; font-weight: bold;">Dryad</span>.
-                            </p>
-
-                        </div>
-
+                    <div id="connect-illustrated-prose">
+                      <p>
+                        <img src="themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" />
+                        Publishers, societies, universities, libraries, funders, and other stakeholder organizations are invited to become <a href="#TODO">Members</a>. Tap into an active knowledge-sharing network, receive discounts on deposit fees, and help shape Dryad’s future.
+                        <img src="themes/Mirage/images/seed-3.png" style="float: right; margin-right: -8px;" />
+                      </p>
+                      <p>
+                        <a href="#TODO">Submission Integration</a> is a service provided to journals free-of-charge to coordinate manuscript submission with data submission to Dryad.  It makes data deposition easy for researchers; makes linking articles and data easy for journals; and enables confidential review of data prior to publication.
+                      </p>
+                      <p>
+                        <img src="themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" />
+                        Deposit fees enable Dryad’s content to be made available free of charge for research and educational reuse.  Flexible <a href="#TODO">pricing plans</a> provide volume discounts on deposit fees.
+                      </p>
                     </div>
-                    <!-- END of #TEMP-connect-alternatives -->
                 </div>
             </div>
 
