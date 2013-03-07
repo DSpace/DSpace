@@ -77,10 +77,9 @@
         font-size: 23px;
         font-weight: bold;
         background-color: #fff;
-        border: 1px solid #333;
         height: 216px;
         padding: 0px;
-        overflow: visible;
+        overflow: hidden;
     }
     #dryad-home-carousel .bx-viewport {
         height: 190px;
@@ -108,11 +107,18 @@
     }
     /* tweaks to slider control placement */
     #dryad-home-carousel .bx-pager {
-        bottom: -32px;
+        bottom: -19px;
         left: 8px;
     }
+    #dryad-home-carousel .bx-pager-item {
+        float: left;
+    }
     #dryad-home-carousel .bx-controls-auto {
-        bottom: -35px;
+        bottom: -18px;
+    }
+    #dryad-home-carousel .bx-controls-auto-item {
+        float: right;
+        padding-right: 8px;
     }
     .blog-box ul {
         list-style: none;
@@ -200,6 +206,7 @@
 <div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="ds-main">
 <div id="ds-header-wrapper">
 <div class="clearfix" id="ds-header">
+<a id="skip-nav" href="#ds-body">Skip navigation</a>
 <a id="ds-header-logo-link" href="/">
 <span id="ds-header-logo"> </span>
 <span id="ds-header-logo-text">mirage</span>
@@ -217,7 +224,9 @@
     <a href="#TODO"><img src="files/images/dryad_twit_icon.png" /></a>
     <a href="#TODO"><img src="files/images/dryad_fb_icon2.png" /></a>
     <a href="#TODO"><img src="files/images/dryad_gplus_icon.png" /></a>
+    <!--
     <a href="#TODO"><img src="files/images/dryad_rss_icon.png" /></a>
+    -->
 </div>
 <div id="main-menu">
 
@@ -403,21 +412,26 @@
       </div>
     </div>
 </div>
-<div class="home-col-2">
-    <h1 class="ds-div-head " style="border-bottom: none; text-align: center; padding: 50px 45px 0; height: 50px;">Deposit your data in dryad</h1></h1>
+<div id="submit-data-feature-box" class="home-col-2">
+    <h1 class="ds-div-head " style="font-size: 1.8em; border-bottom: none; text-align: center; padding: 25px 35px 19px; height: 56px;">Have data for your publication?</h1></h1>
     <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
-    <p class="ds-paragraph" style="text-align: center; font-size: 1.2em; margin: 0.5em 0 1.5em;">
+    <p class="ds-paragraph">
     <a class="submitnowbutton" href="/handle/10255/3/submit">Submit Data Now!</a>
     </p>
-    <a style="float: right; margin-right: 18px;" href="http://www.youtube.com/watch?v=RP33cl8tL28">See how to submit</a>
+    <p style="font-size: 0.9em; padding-top: 4px;">
+    OR
+    </p>
+    <p>
+    <a class="learn-to-submit-button" href="http://www.youtube.com/watch?v=RP33cl8tL28">Learn how to submit data</a>
+    </p>
     </div>
 </div>
 <div class="home-col-1">
     <h1 class="ds-div-head">Search for Data &nbsp; &nbsp; <a href="#">Browse authors</a> &nbsp; &nbsp; <a href="#">Browse journals</a></h1>
     <form xmlns="http://di.tamu.edu/DRI/1.0/" onsubmit="javascript:tSubmit(this);" method="get" action="/discover" class="ds-interactive-div primary" id="aspect_discovery_SiteViewer_div_front-page-search"
           style="height: 40px; text-align: center;">
-        <input value="Search for data in Dryad" type="text" name="query" class="ds-text-field" style="width: 450px;" id="aspect_discovery_SiteViewer_field_query" />
-        <input value="Go" type="submit" name="submit" class="ds-button-field" id="aspect_discovery_SiteViewer_field_submit" />
+        <input value="Search for data in Dryad" type="text" name="query" class="ds-text-field" style="width: 450px;" id="aspect_discovery_SiteViewer_field_query" /><!-- no whitespace between these elements!
+        --><input value="Go" type="submit" name="submit" class="ds-button-field" id="aspect_discovery_SiteViewer_field_submit" />
     </form>
 </div>
 <div class="home-col-2">
@@ -447,6 +461,8 @@
     <div id="browse-data-buttons">
         <a href="#recently-published-data"><span>Recently Published</span></a>
         <a href="#most-viewed-data"><span>Most Viewed</span></a>
+        <a href="#data-by-author"><span>By Author</span></a>
+        <a href="#data-by-journal"><span>By Journal</span></a>
     </div>
 
    <div id="recently-published-data" class="browse-data-panel">
@@ -529,21 +545,6 @@
     <span class="author">
     <span>Faircloth, Brant C.</span>; <span>Glenn, Travis C.</span>
     </span> <span class="publisher-date">(<span class="date">2012-08-10</span>)</span>
-    </div>
-    </div>
-    </li>
-    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.35765/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
-    <li class="ds-artifact-item even">
-    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
-    <div class="artifact-title">
-    <a href="/handle/10255/dryad.35765">
-    <span class="Z3988" title="">Shrestha M, Dyer AG, Boyd-Gerny S, Wong BBM, Burd M (2013) Data from: Shades of red: bird-pollinated flowers target the specific colour discrimination abilities of avian vision. New Phytologist doi:10.5061/dryad.pj860</span>
-    </a>
-    </div>
-    <div class="artifact-info">
-    <span class="author">
-    <span>Laetsch, Dominik R.</span>; <span>Heitlinger, Emanuel G.</span>; <span>Taraschewski, Horst</span>; <span>Nadler, Steven A.</span>; <span>Blaxter, Mark L.</span>
-    </span> <span class="publisher-date">(<span class="date">2012-08-11</span>)</span>
     </div>
     </div>
     </li>
@@ -650,21 +651,6 @@
     </div>
     </div>
     </li>
-    <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.41682/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
-    <li class="ds-artifact-item odd">
-    <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
-    <div class="artifact-title">
-    <a href="/handle/10255/dryad.41682">
-    <span class="Z3988" title="">Zöttl M, Frommen J, Taborsky M (2013) Data from: Group size adjustment to ecological demand in a cooperative breeder. Proceedings of the Royal Society B doi:10.5061/dryad.3280v</span>
-    </a>
-    </div>
-    <div class="artifact-info">
-    <span class="author">
-    <span>Maestre, Fernando T.</span>; <span>Puche, María D.</span>; <span>Guerrero, César</span>; <span>Escudero, Adrián</span>
-    </span> <span class="publisher-date">(<span class="date">2011-05-18</span>)</span>
-    </div>
-    </div>
-    </li>
     <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.40653/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
     <li class="ds-artifact-item even">
     <div xmlns:confman="org.dspace.core.ConfigurationManager" xmlns:util="org.dspace.app.xmlui.utils.XSLUtils" class="artifact-description">
@@ -684,14 +670,20 @@
 
     </div>
    </div>
+
+   <div style="text-align: center;">
+        <input value="View more" type="submit" name="submit" class="ds-button-field" id="" />
+   </div>
   </div>
 </div>
 <div class="home-col-2">
     <h1 class="ds-div-head">Dryad Mailing List</h1>
     <form xmlns="http://di.tamu.edu/DRI/1.0/" onsubmit="javascript:tSubmit(this);" method="get" action="#TODO" class="ds-interactive-div primary"
           style="height: 80px; text-align: center;">
-        <p class="ds-paragraph" style="text-align: left;">Join {2,510} other subscribers!</p>
-        <input value="Your e-mail" type="text" name="query" class="ds-text-field" style="width: 180px;" id="" />
+        <p class="ds-paragraph" style="text-align: left; margin-bottom: 2px;">
+            Join {2,510} other subscribers!
+            <input value="Your e-mail" type="text" name="query" class="ds-text-field" style="width: 240px; margin-top: 8px;" id="" />
+        </p>
         <input value="Subscribe" type="submit" name="submit" class="ds-button-field" id="" />
     </form>
 </div>
