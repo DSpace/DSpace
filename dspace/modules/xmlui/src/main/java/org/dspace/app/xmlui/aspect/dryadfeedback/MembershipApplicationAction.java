@@ -53,20 +53,18 @@ public class MembershipApplicationAction extends AbstractAction
         // User email from context
         Context context = ContextUtil.obtainContext(objectModel);
 
-        if(     (org_name == null) ||
-                (org_annual_revenue == null) ||
-                (billing_contact_name == null) ||
-                (billing_address == null) ||
-                (billing_email == null) ||
+        if(     (org_name == null) || (org_name.equals("")) ||
+                (org_annual_revenue == null) || (org_annual_revenue.equals("")) ||
+                (billing_contact_name == null) || (billing_contact_name.equals("")) ||
+                (billing_address == null) || (billing_address.equals("")) ||
+                (billing_email == null) || (billing_email.equals("")) ||
                 (membership_year_start == null) ||
                 (membership_year_end == null) ||
-                (rep_name == null) ||
-                (rep_email == null)
+                (rep_name == null) || (rep_name.equals("")) ||
+                (rep_email == null) || (rep_email.equals(""))
                 ) {
-            // Either this is the first request for the form, or it has been submitted
-            // If the first request for the form, the parameters will not exist
-
-            // at least one required parameter not set
+            // Either this is the first request for the form, or it has been 
+            // submitted without required parameters
             Map<String, String> map = new HashMap<String, String>();
             map.put("org_name", org_name);
             map.put("org_annual_revenue", org_annual_revenue);
