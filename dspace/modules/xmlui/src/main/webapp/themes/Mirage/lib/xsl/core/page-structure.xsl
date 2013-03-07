@@ -33,6 +33,9 @@
 
     <xsl:output indent="yes"/>
 
+    <!-- Initialize info on build date for use in the footer -->
+    <xsl:variable name="dryadrelease" select="document('../../../meta/version.xml')"/>
+
     <!--
         The starting point of any XSL processing is matching the root element. In DRI the root element is document,
         which contains a version attribute and three top level elements: body, options, meta (in that order).
@@ -64,7 +67,8 @@
                 &lt;!--[if (gt IE 9)|!(IE)]&gt;&lt;!--&gt;&lt;body&gt;&lt;!--&lt;![endif]--&gt;</xsl:text>
 
             <xsl:choose>
-                <xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='framing'][@qualifier='popup']">
+                <xsl:when
+                        test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='framing'][@qualifier='popup']">
                     <xsl:apply-templates select="dri:body/*"/>
                 </xsl:when>
                 <xsl:otherwise>
@@ -96,6 +100,7 @@
                                user. The meta element is ignored since its contents are not processed directly, but
                                instead referenced from the different points in the document. -->
                                 <xsl:apply-templates/>
+
                             </div>
                         </div>
 
@@ -136,17 +141,21 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
             <link rel="shortcut icon">
                 <xsl:attribute name="href">
-                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                    <xsl:value-of
+                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                     <xsl:text>/themes/</xsl:text>
-                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                    <xsl:value-of
+                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
                     <xsl:text>/images/favicon.ico</xsl:text>
                 </xsl:attribute>
             </link>
             <link rel="apple-touch-icon">
                 <xsl:attribute name="href">
-                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                    <xsl:value-of
+                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                     <xsl:text>/themes/</xsl:text>
-                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                    <xsl:value-of
+                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
                     <xsl:text>/images/apple-touch-icon.png</xsl:text>
                 </xsl:attribute>
             </link>
@@ -156,7 +165,8 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     <xsl:text>DSpace</xsl:text>
                     <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dspace'][@qualifier='version']">
                         <xsl:text> </xsl:text>
-                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dspace'][@qualifier='version']"/>
+                        <xsl:value-of
+                                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dspace'][@qualifier='version']"/>
                     </xsl:if>
                 </xsl:attribute>
             </meta>
@@ -167,101 +177,16 @@ references to stylesheets pulled directly from the pageMeta element. -->
                         <xsl:value-of select="@qualifier"/>
                     </xsl:attribute>
                     <xsl:attribute name="href">
-                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                        <xsl:value-of
+                                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                         <xsl:text>/themes/</xsl:text>
-                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                        <xsl:value-of
+                                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
                         <xsl:text>/</xsl:text>
                         <xsl:value-of select="."/>
                     </xsl:attribute>
                 </link>
             </xsl:for-each>
-
-            <!-- add special style just for the homepage -->
-            <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:trail) = 1">
-                <style type="text/css">
-                    /* special style for Dryad homepage only */
-                    #ds-body {
-                        width: 100%;
-                    }
-                    .labelcell {
-                        font-weight: bold;
-                    }
-                    .datacell {
-                        text-align: right;
-                    }
-                    .ds-div-head a {
-                        font-size: 0.7em;
-                        font-weight: normal;
-                        position: relative;
-                        top: -0.1em;
-                    }
-                    .ds-artifact-list {
-                        /* font-size: 100%; */
-                        line-height: 1.4em;
-                    }
-                    .ds-artifact-item {
-                        padding-top: 10px;
-                    }
-                    .artifact-title {
-                        font-size: 100%;
-                    }
-                    .ds-artifact-list .artifact-info {
-                        display: none;
-                    }
-
-                    /* implied 3 columns @300px width, 25px gutters */
-                    .home-col-1 {
-                        float: left;
-                        width: 625px;
-                        padding: 0;
-                        /* margin-right: 25px;*/
-                    }
-                    .home-col-2 {
-                        float: right;
-                        width: 300px;
-                        margin-left: 0;
-                        margin-right: 0;
-                    }
-                    .home-top-row {
-                        height: 220px;
-                    }
-                    .home-bottom-row {
-                        height: 420px;
-                    }
-
-                    #dryad-home-carousel {
-                        font-size: 23px;
-                        font-weight: bold;
-                        background-color: #fff;
-                        border: 1px solid #333;
-                        height: 200px;
-                        overflow: visible;
-                    }
-                    #dryad-home-carousel div.bxslider {
-                        overflow: visible;
-                    }
-                    #dryad-home-carousel div.bxslider div {
-                        /* background-color: yellow; */
-                        height: 175px;
-                        padding: 0;
-                        margin: 0;
-                    }
-                    #dryad-home-carousel div.bxslider div p {
-                        /* padding: 36px 36px 38px; */
-                        width: 480px;
-                        margin: auto;
-                        margin-top: 1em;
-                    }
-                    .blog-box ul {
-                        list-style: none;
-                        margin-left: 0;
-                    }
-                    .blog-box li {
-                        margin: 0.5em 0 1.2em;
-                    }
-                </style>
-            </xsl:if>
-
 
             <!-- Add syndication feeds -->
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='feed']">
@@ -280,18 +205,23 @@ references to stylesheets pulled directly from the pageMeta element. -->
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='shortName']">
                 <link rel="search" type="application/opensearchdescription+xml">
                     <xsl:attribute name="href">
-                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='scheme']"/>
+                        <xsl:value-of
+                                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='scheme']"/>
                         <xsl:text>://</xsl:text>
-                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='serverName']"/>
+                        <xsl:value-of
+                                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='serverName']"/>
                         <xsl:text>:</xsl:text>
-                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='serverPort']"/>
-                        <xsl:value-of select="$context-path"/>
+                        <xsl:value-of
+                                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='serverPort']"/>
+                        <xsl:value-of select="jQuerycontext-path"/>
                         <xsl:text>/</xsl:text>
-                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='context']"/>
+                        <xsl:value-of
+                                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='context']"/>
                         <xsl:text>description.xml</xsl:text>
                     </xsl:attribute>
-                    <xsl:attribute name="title" >
-                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='shortName']"/>
+                    <xsl:attribute name="title">
+                        <xsl:value-of
+                                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='shortName']"/>
                     </xsl:attribute>
                 </link>
             </xsl:if>
@@ -318,11 +248,11 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 var key;
 
                 if(window.event)
-                key = window.event.keyCode;     //Internet Explorer
+                key = window.event.keyCode; //Internet Explorer
                 else
-                key = e.which;     //Firefox and Netscape
+                key = e.which; //Firefox and Netscape
 
-                if(key == 13)  //if "Enter" pressed, then disable!
+                if(key == 13) //if "Enter" pressed, then disable!
                 return false;
                 else
                 return true;
@@ -344,7 +274,8 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
                 FnArray.prototype.execute = function()
                 {
-                for( var i=0; i <xsl:text disable-output-escaping="yes">&lt;</xsl:text> this.funcs.length; i++ )
+                for( var i=0; i
+                <xsl:text disable-output-escaping="yes">&lt;</xsl:text> this.funcs.length; i++ )
                 {
                 this.funcs[i]();
                 }
@@ -356,21 +287,26 @@ references to stylesheets pulled directly from the pageMeta element. -->
             <!-- Modernizr enables HTML5 elements & feature detects -->
             <script type="text/javascript">
                 <xsl:attribute name="src">
-                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                    <xsl:value-of
+                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                     <xsl:text>/themes/</xsl:text>
-                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                    <xsl:value-of
+                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
                     <xsl:text>/lib/js/modernizr-1.5.min.js</xsl:text>
-                </xsl:attribute>&#160;</script>
+                </xsl:attribute>
+                &#160;
+            </script>
 
             <!-- Add the title in -->
-            <xsl:variable name="page_title" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']" />
+            <xsl:variable name="page_title"
+                          select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']"/>
             <title>
                 <xsl:choose>
-                    <xsl:when test="not($page_title)">
+                    <xsl:when test="not(jQuerypage_title)">
                         <xsl:text>  </xsl:text>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:copy-of select="$page_title/node()" />
+                        <xsl:copy-of select="jQuerypage_title/node()"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </title>
@@ -382,7 +318,8 @@ references to stylesheets pulled directly from the pageMeta element. -->
             </xsl:if>
 
             <!-- Add all Google Scholar Metadata values -->
-            <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[substring(@element, 1, 9) = 'citation_']">
+            <xsl:for-each
+                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[substring(@element, 1, 9) = 'citation_']">
                 <meta name="{@element}" content="{.}"></meta>
             </xsl:for-each>
 
@@ -422,56 +359,183 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 </h2>
 
                 <div id="sharing-tools">
-                    <a href="#TODO"><img src="themes/Mirage/images/dryad_twit_icon.png"/>
+                    <a href="http://twitter.com/datadryad">
+                        <img src="/themes/Mirage/images/dryad_twit_icon.png"/>
                     </a>
-                    <a href="#TODO"><img src="themes/Mirage/images/dryad_fb_icon2.png"/>
+                    <a href="http://www.facebook.com/DataDryad">
+                        <img src="/themes/Mirage/images/dryad_fb_icon2.png"/>
                     </a>
-                    <a href="#TODO"><img src="themes/Mirage/images/dryad_gplus_icon.png"/>
+		    <!-- We don't currently have a Google Plus page...
+                    <a href="">
+                        <img src="/themes/Mirage/images/dryad_gplus_icon.png"/>
                     </a>
-                    <a href="#TODO"><img src="themes/Mirage/images/dryad_rss_icon.png"/>
+		    -->
+                    <a href="http://blog.datadryad.org/feed/">
+                        <img src="/themes/Mirage/images/dryad_rss_icon.png"/>
                     </a>
                 </div>
-                <xsl:choose>
-                    <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
-                        <div id="ds-user-box">
-                            <p>
-                                <a>
-                                    <xsl:attribute name="href">
-                                        <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
+
+                <div id="main-menu">
+                    <ul class="sf-menu">
+                        <li>
+                            <a href="">About</a>
+                            <ul>
+                                <li>
+                                    <a href="/pages/organization">The Organization</a>
+                                    <ul>
+                                      <li>
+                                        <a href="/pages/organization#overview">Overview</a>
+                                      </li>
+                                      <li>
+                                        <a href="/pages/organization#community">Our Community</a>
+                                      </li>
+                                      <li>
+                                        <a href="/pages/organization#funding">Funding</a>
+                                      </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="/pages/whoWeAre">Who We Are</a>
+                                </li>
+                                <li>
+                                    <a href="/pages/repository">The Repository</a>
+                                    <ul>
+                                      <li>
+                                        <a href="/pages/repository#keyFeatures">Key Features</a>
+                                      </li>
+                                      <li>
+                                        <a href="/pages/repository#technology">The Technology</a>
+                                      </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="http://blog.datadryad.org">News</a>
+                                </li>
+                                <li>
+                                    <a href="">Ideas Forum</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="">Get Started</a>
+                            <ul>
+                                <li>
+                                    <a href="/pages/depositing">Depositing Data</a>
+                                </li>
+                                <li>
+                                    <a href="/pages/using">Using Data</a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="">Learn More</a>
+                            <ul>
+                                <li>
+                                  <a href="/pages/faq">FAQ</a>
+                                  <ul>
+                                      <li>
+                                          <a href="/pages/jdap">Journal Archiving Policy</a>
+                                      </li>
+
+                                      <li>
+                                          <a href="/pages/partners">Related Projects</a>
+                                      </li>
+                                  </ul>
+                                </li>                                
+                                <li>
+                                    <a href="/pages/membershipOverview">Become A Member</a>
+                                    <ul>
+                                      <li>
+                                        <a href="/pages/membershipOverview#becomeAMember">Become A Member</a>
+                                      </li>
+                                      <li>
+                                        <a href="/pages/membershipOverview#members">Member List</a>
+                                      </li>
+                                      <li>
+                                        <a href="/membership">Membership Application</a>
+                                      </li>
+                                      <li>
+                                        <a href="/pages/membershipMeeting">Membership Meeting</a>
+                                      </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="">Integrate Your Journal</a>
+                                    <ul>
+                                      <li>
+                                  <a href="/pages/integratedJournals">Currently Integrated Journals</a>
+                                      </li>
+                                      <li>
+                                  <a href="/pages/journalIntegration">How to Integrate</a>
+                                      </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="/pages/pricing">Pricing Plans</a>
+                                </li>                            </ul>
+                        </li>
+                        <li>
+                            <a href="/feedback">Contact Us</a>
+                        </li>
+
+
+                        <xsl:if test="/dri:document/dri:options/dri:list[@n='context']/*">
+                            <xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='context']" mode="menu"/>
+                        </xsl:if>
+
+
+
+                        <xsl:choose>
+                            <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
+                                <li>
+                                    <a>
+                                        <xsl:attribute name="href">
+                                            <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
                                         dri:metadata[@element='identifier' and @qualifier='url']"/>
-                                    </xsl:attribute>
-                                    <i18n:text>xmlui.dri2xhtml.structural.profile</i18n:text>
-                                    <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
+                                        </xsl:attribute>
+                                        <i18n:text>xmlui.dri2xhtml.structural.profile</i18n:text>
+                                        <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
                                     dri:metadata[@element='identifier' and @qualifier='firstName']"/>
-                                    <xsl:text> </xsl:text>
-                                    <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
+                                        <xsl:text> </xsl:text>
+                                        <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
                                     dri:metadata[@element='identifier' and @qualifier='lastName']"/>
-                                </a>
-                                <xsl:text> | </xsl:text>
-                                <a>
-                                    <xsl:attribute name="href">
-                                        <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
+                                    </a>
+
+                                    <ul>
+                                        <li>
+                                            <a>
+                                                <xsl:attribute name="href">
+                                                    <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
                                         dri:metadata[@element='identifier' and @qualifier='logoutURL']"/>
-                                    </xsl:attribute>
-                                    <i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
-                                </a>
-                            </p>
-                        </div>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <div id="ds-user-box">
-                            <p>
-                                <a>
-                                    <xsl:attribute name="href">
-                                        <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
-                                        dri:metadata[@element='identifier' and @qualifier='loginURL']"/>
-                                    </xsl:attribute>
-                                    <i18n:text>xmlui.dri2xhtml.structural.login</i18n:text>
-                                </a>
-                            </p>
-                        </div>
-                    </xsl:otherwise>
-                </xsl:choose>
+                                                </xsl:attribute>
+                                                <i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
+                                            </a>
+                                        </li>
+                                    </ul>
+
+                                </li>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <li id="login-item">
+                                    <a href="/login">Login</a>
+                                </li>
+                                <li id="sign-up-item">
+                                    <a href="/login">
+                                        Sign Up
+                                    </a>
+                                </li>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:if test="/dri:document/dri:options/dri:list[@n='administrative']/*">
+                            <xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='administrative']"
+                                                 mode="menu"/>
+                        </xsl:if>
+
+                    </ul>
+
+                </div>
+
 
             </div>
         </div>
@@ -519,49 +583,57 @@ references to stylesheets pulled directly from the pageMeta element. -->
                         <xsl:attribute name="href">
                             <xsl:value-of select="./@target"/>
                         </xsl:attribute>
-                        <xsl:apply-templates />
+                        <xsl:apply-templates/>
                     </a>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:apply-templates />
+                    <xsl:apply-templates/>
                 </xsl:otherwise>
             </xsl:choose>
         </li>
     </xsl:template>
 
 
-
     <!-- Like the header, the footer contains various miscellanious text, links, and image placeholders -->
     <xsl:template name="buildFooter">
         <div id="ds-footer-wrapper">
             <div id="ds-footer">
-                <div id="ds-footer-left">
-                    <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2010&#160; <a href="http://www.duraspace.org/" target="_blank">Duraspace</a>
-                </div>
-                <div id="ds-footer-right">
-                    <span class="theme-by">Theme by&#160;</span>
-                    <a title="@mire NV" target="_blank" href="http://atmire.com" id="ds-footer-logo-link">
-                        <span id="ds-footer-logo">&#160;</span>
-                    </a>
-                </div>
                 <div id="ds-footer-links">
-                    <a>
-                        <xsl:attribute name="href">
+                    <span style="float: right;">
+                        <a>
+                            <xsl:attribute name="href">
+                                <xsl:value-of
+                                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                                <xsl:text>/pages/policies</xsl:text>
+                            </xsl:attribute>
+                            <xsl:text>Dryad Terms of Use</xsl:text>
+                        </a>
+			<xsl:text>&#160;</xsl:text>
+                        <span style="color: #777;"><xsl:text>|</xsl:text></span>
+                        <xsl:text>&#160;</xsl:text>
+                        <a>
+                            <xsl:attribute name="href">
+                                <xsl:value-of
+                                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                                <xsl:text>/feedback</xsl:text>
+                            </xsl:attribute>
+                            <i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
+                        </a>
+                    </span>
+                    <span style="float: left;">
+                        <xsl:text>Dryad is a nonprofit membership organization.</xsl:text>
+                    </span>		    
+                    <p class="build-info">
+                        <i18n:text>xmlui.dri2xhtml.structural.footer-promotional2</i18n:text>
+                        <xsl:value-of select="$dryadrelease/release/date"/> 
+                        <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dryad'][@qualifier='node']">
+                            <i18n:text>xmlui.dri2xhtml.structureal.footer-node</i18n:text>
                             <xsl:value-of
-                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                            <xsl:text>/contact</xsl:text>
-                        </xsl:attribute>
-                        <i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
-                    </a>
-                    <xsl:text> | </xsl:text>
-                    <a>
-                        <xsl:attribute name="href">
-                            <xsl:value-of
-                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                            <xsl:text>/feedback</xsl:text>
-                        </xsl:attribute>
-                        <i18n:text>xmlui.dri2xhtml.structural.feedback-link</i18n:text>
-                    </a>
+                                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dryad'][@qualifier='node']"/>
+                        </xsl:if>
+                    </p>
+                    <!--Git Commit hash rendered in HTML comment-->
+                    <xsl:comment>Git Commit Hash: <xsl:value-of select="$dryadrelease/release/version"/></xsl:comment>
                 </div>
                 <!--Invisible link to HTML sitemap (for search engines) -->
                 <a class="hidden">
@@ -576,12 +648,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
         </div>
     </xsl:template>
 
-
     <!--
             The meta, body, options elements; the three top-level elements in the schema
     -->
-
-
 
 
     <!--
@@ -593,11 +662,12 @@ references to stylesheets pulled directly from the pageMeta element. -->
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']">
                 <div id="ds-system-wide-alert">
                     <p>
-                        <xsl:copy-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']/node()"/>
+                        <xsl:copy-of
+                                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']/node()"/>
                     </p>
                 </div>
             </xsl:if>
-            <xsl:apply-templates />
+            <xsl:apply-templates/>
         </div>
     </xsl:template>
 
@@ -622,67 +692,85 @@ references to stylesheets pulled directly from the pageMeta element. -->
         </script>
 
         <xsl:variable name="localJQuerySrc">
-            <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+            <xsl:value-of
+                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
             <xsl:text>/static/js/jquery-1.9.1.min.js</xsl:text>
         </xsl:variable>
 
         <script type="text/javascript">
             <xsl:text disable-output-escaping="yes">!window.jQuery &amp;&amp; document.write('&lt;script type="text/javascript" src="</xsl:text><xsl:value-of
-                select="$localJQuerySrc"/><xsl:text disable-output-escaping="yes">"&gt;&#160;&lt;\/script&gt;')</xsl:text>
+                select="jQuerylocalJQuerySrc"/><xsl:text
+                disable-output-escaping="yes">"&gt;&#160;&lt;\/script&gt;')</xsl:text>
         </script>
 
         <script type="text/javascript">
             <xsl:attribute name="src">
-                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                 <xsl:text>/themes/</xsl:text>
-                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
                 <xsl:text>/lib/js/jquery.bxslider.min.js</xsl:text>
-            </xsl:attribute>&#160;
+            </xsl:attribute>
+            &#160;
         </script>
 
         <script type="text/javascript">
             <xsl:attribute name="src">
-                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                 <xsl:text>/themes/</xsl:text>
-                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
                 <xsl:text>/lib/js/jquery.hoverIntent.js</xsl:text>
-            </xsl:attribute>&#160;
+            </xsl:attribute>
+            &#160;
         </script>
 
         <script type="text/javascript">
             <xsl:attribute name="src">
-                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                 <xsl:text>/themes/</xsl:text>
-                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
                 <xsl:text>/lib/js/superfish.js</xsl:text>
-            </xsl:attribute>&#160;
+            </xsl:attribute>
+            &#160;
         </script>
 
         <script type="text/javascript">
             <xsl:attribute name="src">
-                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                 <xsl:text>/themes/</xsl:text>
-                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
                 <xsl:text>/lib/js/supersubs.js</xsl:text>
-            </xsl:attribute>&#160;
+            </xsl:attribute>
+            &#160;
         </script>
-
 
 
         <!-- Add theme javascipt  -->
         <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)]">
             <script type="text/javascript">
                 <xsl:attribute name="src">
-                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                    <xsl:value-of
+                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                     <xsl:text>/themes/</xsl:text>
-                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                    <xsl:value-of
+                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
                     <xsl:text>/</xsl:text>
                     <xsl:value-of select="."/>
-                </xsl:attribute>&#160;</script>
+                </xsl:attribute>
+                &#160;
+            </script>
         </xsl:for-each>
 
         <!-- add "shared" javascript from static, path is relative to webapp root-->
-        <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][@qualifier='static']">
+        <xsl:for-each
+                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][@qualifier='static']">
             <!--This is a dirty way of keeping the scriptaculous stuff from choice-support
             out of our theme without modifying the administrative and submission sitemaps.
             This is obviously not ideal, but adding those scripts in those sitemaps is far
@@ -691,11 +779,15 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 <xsl:when test="text() = 'static/js/choice-support.js'">
                     <script type="text/javascript">
                         <xsl:attribute name="src">
-                            <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                            <xsl:value-of
+                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                             <xsl:text>/themes/</xsl:text>
-                            <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                            <xsl:value-of
+                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
                             <xsl:text>/lib/js/choice-support.js</xsl:text>
-                        </xsl:attribute>&#160;</script>
+                        </xsl:attribute>
+                        &#160;
+                    </script>
                 </xsl:when>
                 <xsl:when test="not(starts-with(text(), 'static/js/scriptaculous'))">
                     <script type="text/javascript">
@@ -704,7 +796,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                             <xsl:text>/</xsl:text>
                             <xsl:value-of select="."/>
-                        </xsl:attribute>&#160;</script>
+                        </xsl:attribute>
+                        &#160;
+                    </script>
                 </xsl:when>
             </xsl:choose>
         </xsl:for-each>
@@ -718,15 +812,19 @@ references to stylesheets pulled directly from the pageMeta element. -->
         <xsl:text disable-output-escaping="yes">&lt;!--[if lt IE 7 ]&gt;</xsl:text>
         <script type="text/javascript">
             <xsl:attribute name="src">
-                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                 <xsl:text>/themes/</xsl:text>
-                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
                 <xsl:text>/lib/js/DD_belatedPNG_0.0.8a.js?v=1</xsl:text>
-            </xsl:attribute>&#160;</script>
-        <script type="text/javascript">
-            <xsl:text>DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');$.each($('img[src$=png]'), function() {DD_belatedPNG.fixPng(this);});</xsl:text>
+            </xsl:attribute>
+            &#160;
         </script>
-        <xsl:text disable-output-escaping="yes" >&lt;![endif]--&gt;</xsl:text>
+        <script type="text/javascript">
+            <xsl:text>DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');jQuery.each(jQuery('img[srcjQuery=png]'), function() {DD_belatedPNG.fixPng(this);});</xsl:text>
+        </script>
+        <xsl:text disable-output-escaping="yes">&lt;![endif]--&gt;</xsl:text>
 
 
         <script type="text/javascript">
@@ -737,7 +835,8 @@ references to stylesheets pulled directly from the pageMeta element. -->
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']">
             <script type="text/javascript"><xsl:text>
                    var _gaq = _gaq || [];
-                   _gaq.push(['_setAccount', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>']);
+                   _gaq.push(['_setAccount', '</xsl:text><xsl:value-of
+                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>']);
                    _gaq.push(['_trackPageview']);
 
                    (function() {
@@ -747,46 +846,71 @@ references to stylesheets pulled directly from the pageMeta element. -->
                    })();
 
 
-                $(document).ready(function() {
-                    $('#main-menu ul.sf-menu').supersubs({
+                jQuery(document).ready(function() {
+                    jQuery('#main-menu ul.sf-menu').supersubs({
                             // all numeric properties are in em
                             minWidth: 22,
                             maxWidth: 30,   // this isn't doing much...
                             extraWidth: 1
                         })
-                        .superfish();
+                        .superfish({
+                            // make the menu snappy (fast+simple animation)
+                            delay: 0,
+                            animation: {
+                                //height: 'show',
+                                opacity: 'show'
+                            },
+                            speed: 0, 
+                            disableHI: true     // remove menu delay (from hoverIntent)
+                        });
                 });
 
-
-                $(document).ready(function() {
-                    // main carousel at top
-                    $('#dryad-home-carousel .bxslider').bxSlider({
+		
+                jQuery(document).ready(function() {
+                    // main carousel at top of homepage
+                    jQuery('#dryad-home-carousel .bxslider').bxSlider({
                         auto: true,
-                        pause: 5000,        // in ms
-                        autoControls: true,
+			autoHover: true,
+                        pause: 10000,  // in ms
+			speed: 500,   // ms for slide transition
+			mode: 'fade',  // can be 'horizontal', 'vertical', 'fade'
+			controls: false,
+                        autoControls: false,
                         autoControlsCombine: true
                     });
 
+
+                   // TEMPORARY slider to show Connect alternatives
+            // some objects start hidden, as they make highly visible
+            // "glitches" during page load
+            jQuery('.wordcloud').show();
+            jQuery('#connect-legible-cloud').show();
+            jQuery('#TEMP-connect-alternatives').bxSlider({
+                controls: false,
+                mode: 'vertical'
+                //pagerType: 'short'
+            });
                     // "tabs" in Browse Data
-                    var $tabButtons = $('#browse-data-buttons a');
-                    $tabButtons.unbind('click').click(function() {
+                    var jQuerytabButtons = jQuery('#browse-data-buttons a');
+                    jQuerytabButtons.unbind('click').click(function() {
                         // highlight this button and show its panel
-                        $(this).addClass('selected');
-                        var $panel = $($(this).attr('href'));
-                        $panel.show();
+                        jQuery(this).addClass('selected');
+                        var jQuerypanel = jQuery(jQuery(this).attr('href'));
+                        jQuerypanel.show();
                         // dim others and hide their panels
-                        $(this).siblings().each(function() {
-                            $(this).removeClass('selected');
-                            var $panel = $($(this).attr('href'));
-                            $panel.hide();
+                        jQuery(this).siblings().each(function() {
+                            jQuery(this).removeClass('selected');
+                            var jQuerypanel = jQuery(jQuery(this).attr('href'));
+                            jQuerypanel.hide();
                         });
                         return false;
                     });
-                    $tabButtons.eq(0).click();
+                    jQuerytabButtons.eq(0).click();
                 });
 
 
-           </xsl:text></script>
+           </xsl:text>
+            </script>
         </xsl:if>
     </xsl:template>
 

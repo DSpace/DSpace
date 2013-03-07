@@ -35,7 +35,7 @@
 .sf-menu li.sfHover ul {
     left:			0;
     top:			2.5em; /* match top ul list item height */
-    z-index:		99;
+    z-index:		10000; /* float above slider controls (.bx-next, etc) */
 }
 ul.sf-menu li:hover li ul,
 ul.sf-menu li.sfHover li ul {
@@ -81,11 +81,13 @@ ul.sf-menu li li li.sfHover ul {
 }
 .sf-menu li li {
     background:		#E4E4E4; /* #fff; */
+    overflow:		visible;
 }
 .sf-menu li ul {
     border-left: 1px solid #ccc;
     border-bottom: 1px solid #555;
     border-right: 1px solid #555;
+    overflow: hidden;
 }
 .sf-menu li li li {
     background:		#fff;
@@ -110,7 +112,7 @@ ul.sf-menu li li li.sfHover ul {
     height:			10px;
     text-indent: 	-999em;
     overflow:		hidden;
-    background:		url('./arrows-333333.png') no-repeat -10px -100px; /* 8-bit indexed alpha png. IE6 gets solid image only */
+    background:		url('../../images/arrows-333333.png') no-repeat -10px -100px; /* 8-bit indexed alpha png. IE6 gets solid image only */
 }
 a > .sf-sub-indicator {  /* give all except IE6 the correct values */
     top:			.8em;

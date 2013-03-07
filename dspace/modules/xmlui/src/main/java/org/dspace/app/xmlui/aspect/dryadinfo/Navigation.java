@@ -87,15 +87,22 @@ public class Navigation extends AbstractDSpaceTransformer
     public void addOptions(Options options) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
-        List info = options.addList("DryadInfo");
 
-        info.setHead("Information");
-        info.addItemXref(contextPath + "/pages/depositing", "Depositing Data");
-        info.addItemXref(contextPath + "/pages/using", "Using Data");
-        info.addItemXref(contextPath + "/pages/members", "Dryad Members");
-        info.addItemXref(contextPath + "/pages/jdap", "Journal Archiving Policy");
-        info.addItemXref(contextPath + "/pages/about", "About Dryad");
-        info.addItemXref("http://blog.datadryad.org", "Dryad Blog");
-        info.addItemXref("http://wiki.datadryad.org", "Dryad Documentation");
+
+        {
+            List list = options.addList("DryadSubmitData");
+
+        }
+
+        {
+            List list = options.addList("DryadConnect");
+
+        }
+
+        {
+            List list = options.addList("DryadMail");
+
+        }
+
     }
 }

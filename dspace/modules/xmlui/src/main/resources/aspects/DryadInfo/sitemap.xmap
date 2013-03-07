@@ -55,7 +55,16 @@
         <map:pipeline>
             <map:generate/>
 
-            <map:transform type="Navigation"/>
+                          <map:match  type="wildcard" pattern="pages/**">
+                              <map:transform type="Navigation"/>
+                           </map:match>
+
+
+                           <map:match  type="wildcard" pattern="handle/**/**">
+                                             <map:transform type="Navigation"/>
+                           </map:match>
+
+
 
             <map:serialize/>
 
