@@ -413,7 +413,11 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <a href="http://blog.datadryad.org">News</a>
                                 </li>
                                 <li>
-                                    <a href="http://datadryad.uservoice.com">Ideas Forum</a>
+                                    <!-- UserVoice JavaScript SDK (only needed once on a page) -->
+                                    <script>(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/oW4J4by2WMgw3H4qYuJsDQ.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</script>
+
+                                    <!-- A link to launch the Classic Widget -->
+                                    <a href="javascript:void(0)" data-uv-lightbox="classic_widget" data-uv-mode="feedback" data-uv-primary-color="#88c033" data-uv-link-color="#333333" data-uv-forum-id="197408" data-uv-feedback-tab_name="Ideas Forum">Ideas Forum</a>
                                 </li>
                             </ul>
                         </li>
