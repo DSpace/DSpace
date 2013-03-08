@@ -137,7 +137,10 @@ public class SimpleSearch extends AbstractSearch implements
 					query.addHidden("fq").setValue(name);
 					continue;
 				}
-
+                if (name.startsWith("location.coll:")) {
+                    query.addHidden("fq").setValue(name);
+                    continue;
+                }
 				if (name.contains(":")) {
 					field = name.split(":")[0];
 					value = name.split(":")[1];
@@ -283,15 +286,18 @@ public class SimpleSearch extends AbstractSearch implements
 					&& request
 							.getParameter("submit_search-filter-controls_add") != null) {
 				String exactFq = (type.equals("*") ? "" : type + ":") + value;
+                if(!exactFq.contains("location.coll")){
 				fqs.add(exactFq + " OR " + exactFq + "*");
 			}
+            }
 
 			for (String fq : fqs) {
 				// Do not put a wildcard after a range query
-				if (fq.matches(".*\\:\\[.* TO .*\\](?![a-z 0-9]).*")) {
+                if (fq.matches(".*\\:\\[.* TO .*\\](?![a-z 0-9]).*") || fq.contains("location.coll")) {
 					allFilterQueries.add(fq);
 				}
 				else {
+
 					allFilterQueries.add(fq.endsWith("*") ? fq : fq + " OR "
 							+ fq + "*");
 				}

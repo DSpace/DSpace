@@ -913,6 +913,87 @@
         </li>
     </xsl:template>
     <!-- END First submission form: added and rewrote some templates to manage the form using jquery, to lead the user through the submission -->
+    <!-- Here we construct Dryad's search results tabs; externally harvested
+collections are each given a tab. Collection values of these collections
+(l3 for instance... this is just a code assigned by DSpace) are hard-coded
+so we need to make sure a collection has the same code across different
+Dryad installs (dev, demo, staging, production, etc.) -->
+    <xsl:template match="dri:referenceSet[@type = 'summaryList']"
+                  priority="2">
+        <xsl:apply-templates select="dri:head" />
+        <!-- Here we decide whether we have a hierarchical list or a flat one -->
+        <xsl:choose>
+            <xsl:when
+                    test="descendant-or-self::dri:referenceSet/@rend='hierarchy' or ancestor::dri:referenceSet/@rend='hierarchy'">
+                <ul>
+                    <xsl:apply-templates select="*[not(name()='head')]"
+                                         mode="summaryList" />
+                </ul>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:if test="$meta[@element='request'][@qualifier='URI'][.='discover']">
+
+
+                    <!-- The tabs display a selected tab based on the location
+parameter that is being used (see variable defined above) -->
+                    <div id="searchTabs">
+                        <ul>
+                            <xsl:call-template name="buildTabs"/>
+
+
+                        </ul>
+                    </div>
+                </xsl:if>
+                <ul class="ds-artifact-list">
+                    <xsl:choose>
+                        <xsl:when test="$meta[@element='request'][@qualifier='URI'][.='submissions']">
+                            <xsl:apply-templates select="*[not(name()='head')]"
+                                                 mode="summaryNonArchivedList" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:apply-templates select="*[not(name()='head')]"
+                                                 mode="summaryList" />
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </ul>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <xsl:template name="buildTabs">
+
+        <xsl:for-each select="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='tabs']/dri:item">
+
+            <xsl:element name="li">
+
+                <xsl:if test="dri:field[@n='selected']">
+                    <xsl:attribute name="id">selected</xsl:attribute>
+
+                </xsl:if>
+                <xsl:element name="a">
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="dri:xref/@target"/>
+                    </xsl:attribute>
+
+
+                    <xsl:value-of select="dri:xref/text()"/>
+
+                </xsl:element>
+            </xsl:element>
+
+        </xsl:for-each>
+
+    </xsl:template>
+
+
+
+
+    <!--
+<xsl:template match="/dri:document/dri:body/dri:div/dri:div[@id='aspect.discovery.SimpleSearch.div.search-results']/dri:list">
+
+</xsl:template>
+-->
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='tabs']"/>
+
 
 
 </xsl:stylesheet>
