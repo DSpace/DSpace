@@ -1487,3 +1487,6 @@ img.ds-authority-confidence
 #journalIDStatusInReview span.field-help, #prism_publicationName span.field-help{
     width:450px;
 }
+#aspect_submission_StepTransformer_item_license_accepted{
+    margin-top:100px;
+}
