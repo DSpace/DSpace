@@ -373,6 +373,23 @@ p {
     margin-bottom: 10px;
 }
 
+#aspect_eperson_PasswordLogin_div_register, #aspect_eperson_PasswordLogin_div_login {
+    padding: 10px;
+    width: auto;
+    float: left;
+} 
+
+#aspect_eperson_PasswordLogin_div_register h1, #aspect_eperson_PasswordLogin_div_login h1 {
+    font-size: 150%;
+}
+
+#aspect_eperson_PasswordLogin_div_login {
+    margin: 20px 0px 40px 18px; /* top right bottom left */
+}
+#aspect_eperson_PasswordLogin_div_register {
+    margin: 20px 18px 20px 0px;
+}
+
 #aspect_eperson_EditProfile_list_form,
 .submission fieldset.ds-form-list,
 .administrative fieldset.ds-form-list {
