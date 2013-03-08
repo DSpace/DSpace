@@ -179,6 +179,16 @@
 
         <div id="ds-body">
 
+            <!-- SYSTEM-WIDE ALERT BOX -->
+            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']">
+                <div id="ds-system-wide-alert">
+                    <p>
+                        <xsl:copy-of
+                                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']/node()"/>
+                    </p>
+                </div>
+            </xsl:if>
+
             <!-- CAROUSEL -->
             <div class="home-col-1">
                 <div id="dryad-home-carousel" class="ds-static-div primary">
@@ -217,15 +227,6 @@
                 </div>
             </div>
 
-
-            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']">
-                <div id="ds-system-wide-alert">
-                    <p>
-                        <xsl:copy-of
-                                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']/node()"/>
-                    </p>
-                </div>
-            </xsl:if>
 
             <!-- START NEWS -->
             <!--<div class="home-col-2">-->

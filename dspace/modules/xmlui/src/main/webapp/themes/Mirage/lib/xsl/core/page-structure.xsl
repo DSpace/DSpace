@@ -378,6 +378,8 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
                 <div id="main-menu">
                     <ul class="sf-menu">
+                        <!-- hide "newby" menus from admin user (to avoid crowding) -->
+                        <xsl:if test="not(/dri:document/dri:options/dri:list[@n='administrative']/*)">
                         <li>
                             <a href="">About</a>
                             <ul>
@@ -479,7 +481,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                         <li>
                             <a href="/feedback">Contact Us</a>
                         </li>
-
+                        </xsl:if>
 
                         <xsl:if test="/dri:document/dri:options/dri:list[@n='context']/*">
                             <xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='context']" mode="menu"/>

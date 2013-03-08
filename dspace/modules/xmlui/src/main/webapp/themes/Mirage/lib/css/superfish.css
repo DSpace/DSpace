@@ -35,7 +35,7 @@
 .sf-menu li:hover ul,
 .sf-menu li.sfHover ul {
     left:			0;
-    top:			2.5em; /* match top ul list item height */
+    top:			2.0em; /* match top ul list item height */
     z-index:		10000; /* float above slider controls (.bx-next, etc) */
 }
 ul.sf-menu li:hover li ul,
