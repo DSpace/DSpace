@@ -413,7 +413,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <a href="http://blog.datadryad.org">News</a>
                                 </li>
                                 <li>
-                                    <a href="">Ideas Forum</a>
+                                    <a href="http://datadryad.uservoice.com">Ideas Forum</a>
                                 </li>
                             </ul>
                         </li>
