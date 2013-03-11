@@ -1093,6 +1093,14 @@
 								</xsl:if>
 							</xsl:for-each>
 						</xsl:when>
+						<xsl:when test="dim:field[@element='contributor' and @qualifier='editor']">
+							<xsl:for-each select="dim:field[@element='contributor' and @qualifier='editor']">
+								<xsl:copy-of select="node()"/>
+								<xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='editor']) != 0">
+									<xsl:text>; </xsl:text>
+								</xsl:if>
+							</xsl:for-each>
+						</xsl:when>
 						<xsl:otherwise>
 							<i18n:text>xmlui.dri2xhtml.METS-1.0.no-author</i18n:text>
 						</xsl:otherwise>

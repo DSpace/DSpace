@@ -65,7 +65,7 @@
             <xsl:apply-templates />
         </li>
     </xsl:template>
-<xsl:template match="/dri:document/dri:body/dri:div[@id='aspect.submission.StepTransformer.div.submit-upload']" priority="3">
+<xsl:template match="/dri:document/dri:body/dri:div[@id='aspect.submission.StepTransformer.div.submit-upload1']" priority="3">
 		<xsl:apply-templates select="." mode="ordered">
 			<xsl:with-param name="elements">
 	     		<xsl:copy-of select="dri:list[@id='aspect.submission.StepTransformer.list.submit-progress']"/>
