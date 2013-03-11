@@ -263,6 +263,9 @@ public class GenerateSitemaps
                     log.info(LogManager.getHeader(c, "write_sitemap",
                             "type=html,num_files=" + files));
                 }
+                else{
+                    System.out.println("Nothing to do. Since last creation no items were created or updated.");
+                }
             }
 
             if (makeSitemapOrg)
@@ -271,6 +274,8 @@ public class GenerateSitemaps
                     int files = sitemapsOrg.finish();
                     log.info(LogManager.getHeader(c, "write_sitemap",
                             "type=html,num_files=" + files));
+                }else{
+                    System.out.println("Anything to do. SInce last creation no items were created or updated.");
                 }
             }
         }
@@ -281,7 +286,7 @@ public class GenerateSitemaps
                 allItems.close();
             }
         }
-
+        System.out.println("Process terminated. Sitemaps have been generated.");
         c.abort();
         }catch (Exception ex){
             ex.printStackTrace(System.out);
