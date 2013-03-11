@@ -26,6 +26,7 @@
 	xmlns:xhtml="http://www.w3.org/1999/xhtml"
 	xmlns:mods="http://www.loc.gov/mods/v3"
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:exslt="http://exslt.org/common"
 	xmlns="http://www.w3.org/1999/xhtml"
 	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
 
@@ -43,7 +44,7 @@
                 <xsl:text>&amp;dmdTypes=DC</xsl:text>
             </xsl:if>-->
         </xsl:variable>
-        <xsl:comment> External Metadata URL: <xsl:value-of select="$externalMetadataURL"/> </xsl:comment>
+       
         <li>
             <xsl:attribute name="class">
                 <xsl:text>ds-artifact-item </xsl:text>
@@ -64,6 +65,86 @@
             <xsl:apply-templates />
         </li>
     </xsl:template>
+<xsl:template match="/dri:document/dri:body/dri:div[@id='aspect.submission.StepTransformer.div.submit-upload']" priority="3">
+		<xsl:apply-templates select="." mode="ordered">
+			<xsl:with-param name="elements">
+	     		<xsl:copy-of select="dri:list[@id='aspect.submission.StepTransformer.list.submit-progress']"/>
+	     		<xsl:copy-of select="dri:table[@id='aspect.submission.StepTransformer.table.submit-upload-summary']"/>
+	     		<xsl:copy-of select="dri:list[@id='aspect.submission.StepTransformer.list.submit-upload-new']"/>
+	     		<xsl:copy-of select="dri:list[@id='aspect.submission.StepTransformer.list.submit-upload-new-part2']"/>
+	     		
+	     		
+			</xsl:with-param>
+		</xsl:apply-templates>
+	</xsl:template>
 
+
+    <!-- Interactive divs get turned into forms. The priority attribute on the template itself
+        signifies that this template should be executed if both it and the one above match the
+        same element (namely, the div element).
+
+        Strictly speaking, XSL should be smart enough to realize that since one template is general
+        and other more specific (matching for a tag and an attribute), it should apply the more
+        specific once is it encounters a div with the matching attribute. However, the way this
+        decision is made depends on the implementation of the XSL parser is not always consistent.
+        For that reason explicit priorities are a safer, if perhaps redundant, alternative. -->
+    <xsl:template match="dri:div[@interactive='yes']" mode="ordered">
+    	<xsl:param name="elements"/>
+    
+        <xsl:apply-templates select="dri:head"/>
+        <xsl:apply-templates select="@pagination">
+            <xsl:with-param name="position">top</xsl:with-param>
+        </xsl:apply-templates>
+        <form>
+            <xsl:call-template name="standardAttributes">
+                <xsl:with-param name="class">ds-interactive-div</xsl:with-param>
+            </xsl:call-template>
+            <xsl:attribute name="action"><xsl:value-of select="@action"/></xsl:attribute>
+            <xsl:attribute name="method"><xsl:value-of select="@method"/></xsl:attribute>
+            <xsl:if test="@method='multipart'">
+                <xsl:attribute name="method">post</xsl:attribute>
+                <xsl:attribute name="enctype">multipart/form-data</xsl:attribute>
+            </xsl:if>
+            <xsl:attribute name="onsubmit">javascript:tSubmit(this);</xsl:attribute>
+                        <!--For Item Submission process, disable ability to submit a form by pressing 'Enter'-->
+                        <xsl:if test="starts-with(@n,'submit')">
+                                <xsl:attribute name="onkeydown">javascript:return disableEnterKey(event);</xsl:attribute>
+            </xsl:if>
+
+            <xsl:choose>
+            	<xsl:when test="$elements">
+            		<xsl:apply-templates select="exslt:node-set($elements)"/>
+            	</xsl:when>
+            	<xsl:otherwise>
+            		<xsl:apply-templates select="*[not(name()='head')]"/>
+            	</xsl:otherwise>
+            </xsl:choose>
+				
+        </form>
+        <!-- JS to scroll form to DIV parent of "Add" button if jump-to -->
+        <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='jumpTo']">
+          <script type="text/javascript">
+            <xsl:text>var button = document.getElementById('</xsl:text>
+            <xsl:value-of select="translate(@id,'.','_')"/>
+            <xsl:text>').elements['</xsl:text>
+            <xsl:value-of select="concat('submit_',/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='jumpTo'],'_add')"/>
+            <xsl:text>'];</xsl:text>
+            <xsl:text>
+                      if (button != null) {
+                        var n = button.parentNode;
+                        for (; n != null; n = n.parentNode) {
+                            if (n.tagName == 'DIV') {
+                              n.scrollIntoView(false);
+                              break;
+                           }
+                        }
+                      }
+            </xsl:text>
+          </script>
+        </xsl:if>
+        <xsl:apply-templates select="@pagination">
+            <xsl:with-param name="position">bottom</xsl:with-param>
+        </xsl:apply-templates>
+    </xsl:template>
 
 </xsl:stylesheet>
