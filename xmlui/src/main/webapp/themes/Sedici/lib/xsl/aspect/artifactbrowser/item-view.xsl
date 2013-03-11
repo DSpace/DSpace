@@ -586,12 +586,15 @@
 						</li>
 					</xsl:if>
 			
-					<!-- fulltext row -->
-					<xsl:if test="dim:field[@qualifier='fulltext']">
-						<li class="metadata fulltext">
-							<i18n:text>xmlui.dri2xhtml.METS-1.0.item-<xsl:value-of select="dim:field[@qualifier='fulltext']"/>-fulltext</i18n:text>
-						</li>
-					</xsl:if>
+					<!-- Si el tipo es audio o video no se muestra que tiene a documento completo -->
+					<xsl:if test="dim:field[@element='type'] = 'Audio'">
+						<!-- fulltext row -->
+						<xsl:if test="dim:field[@qualifier='fulltext']">
+							<li class="metadata fulltext">
+								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-<xsl:value-of select="dim:field[@qualifier='fulltext']"/>-fulltext</i18n:text>
+							</li>
+						</xsl:if>
+					</xsl:if>	
 				</ul>
 			</div>
 		</xsl:if>
@@ -1048,11 +1051,12 @@
 	<xsl:template match="dim:dim" mode="itemSummaryList-DIM-metadata">
 		<xsl:param name="href"/>
 			<div  class="artifact-title">
-				<span class="title">
 				<xsl:element name="a">
+				   
 					<xsl:attribute name="href">
                         <xsl:value-of select="$href"/>
                     </xsl:attribute>
+                    <span class="title">
 					<xsl:choose>
 						<xsl:when test="dim:field[@element='title']">
 							<xsl:value-of select="dim:field[@element='title'][1]/node()" disable-output-escaping="yes"/>
@@ -1062,11 +1066,11 @@
 							<i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
 						</xsl:otherwise>
 					</xsl:choose>
+					</span>
 					<xsl:if test="dim:field[@element='title' and @qualifier='subtitle']">
-							<span class="subtitle">- <xsl:value-of select="dim:field[@element='title' and @qualifier='subtitle'][1]/node()" disable-output-escaping="yes"/></span>
-					</xsl:if> 
-				</xsl:element>
-				</span>				
+							<span class="subtitle"> : <xsl:value-of select="dim:field[@element='title' and @qualifier='subtitle'][1]/node()" disable-output-escaping="yes"/></span>
+					</xsl:if> 		
+				</xsl:element>	
 				<span class="publisher-date">
 					<!-- date.issued : extraemos el año solamente -->
 					<xsl:if test="dim:field[@element='date' and @qualifier='issued'] ">
