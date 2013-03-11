@@ -515,6 +515,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                                 <i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
                                             </a>
                                         </li>
+                                        <xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='account']/dri:item" mode="menu"/>
                                     </ul>
 
                                 </li>
