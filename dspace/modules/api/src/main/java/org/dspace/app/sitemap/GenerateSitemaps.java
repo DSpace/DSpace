@@ -213,12 +213,13 @@ public class GenerateSitemaps
 
                     Item dataPackage=i;
 
-                        if(!i.getOwningCollection().getHandle().equals(myDataPkgColl)) {
+                    if(!i.getOwningCollection().getHandle().equals(myDataPkgColl)) {
                             dataPackage=DryadWorkflowUtils.getDataPackage(c, i);
                         }
                     String url = "";
+                    if(dataPackage!=null){
                     DCValue[] identifier = dataPackage.getMetadata("dc.identifier");
-                    if(identifier.length>0){
+                    if(identifier!=null&&identifier.length>0){
 
                     url = resourceURL + identifier[0].value;
                     }
@@ -243,9 +244,15 @@ public class GenerateSitemaps
                         }
                         modifiedDP.add(dataPackage);
                     }
+                    }
+                    else
+                    {
+                        System.out.println("Item : " + i.getID() + " - " + i.getHandle() + ": can't find the datapackage information.");
+                    }
                 }catch (Exception ex){
                     // if some items are not consistent just go ahead...
                     System.out.println("Item : " + i.getID() + " - " + i.getHandle() + ": not processed.");
+                    log.info("Item : " + i.getID() + " - " + i.getHandle() + ": not processed.");
                 }
             }
 
@@ -399,18 +406,26 @@ public class GenerateSitemaps
         }
         if(handle instanceof SitemapsOrgGenerator)
         {
-            key = ".xml";
+            key = ".xml.gz";
         }
         if(files!=null&&files.length>0){
             for(File file : files){
 
-                if(file.getName().contains(key)&&file.getName().contains("sitemap")&&!file.getName().equals("sitemap_index.html"))
+                if(file.getName().contains(key)&&file.getName().startsWith("sitemap")&&!file.getName().contains("_index"))
                 {
                     int startPos =   "sitemap".length();
                     int endPos =file.getName().indexOf(key);
                     String name = file.getName();
                     String index = name.substring(startPos,endPos);
-                    int newNumber =Integer.parseInt(index);
+                    int newNumber=0;
+                    try{
+                    newNumber =Integer.parseInt(index);
+                    }
+                    catch (Exception e)
+                    {
+                        log.warn("Found some files may contain sitemap infomations:" + file.getName(), e);
+                        System.out.println("Found some files may contain sitemap infomations:" + file.getName()+". If this is the first time to generate the sitemap, please clean the old files in the sitemap folder");
+                    }
                     if(newNumber>number)
                     {
                         number=newNumber;
