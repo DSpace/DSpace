@@ -247,7 +247,7 @@
                         <xsl:text>OR</xsl:text>
                     </p>
                     <p>
-                        <a class="learn-to-submit-button" href="http://www.youtube.com/watch?v=RP33cl8tL28">Learn how to submit data</a>
+                        <a class="learn-to-submit-button" href="/pages/faq#deposit">Learn how to submit data</a>
                     </p>
                 </div>
             </div>
