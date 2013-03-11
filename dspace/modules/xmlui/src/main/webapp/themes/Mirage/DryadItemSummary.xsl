@@ -2229,7 +2229,10 @@
                 </a>
             </xsl:when>
             <xsl:otherwise>
-                <p></p>
+                <a>
+                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/nonintegratedjournal.jpg"
+                         alt="This journal is not integrated with Dryad"/>
+                </a>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
