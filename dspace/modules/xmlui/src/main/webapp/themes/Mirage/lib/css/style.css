@@ -373,6 +373,23 @@ p {
     margin-bottom: 10px;
 }
 
+#aspect_eperson_PasswordLogin_div_register, #aspect_eperson_PasswordLogin_div_login {
+    padding: 10px;
+    width: auto;
+    float: left;
+} 
+
+#aspect_eperson_PasswordLogin_div_register h1, #aspect_eperson_PasswordLogin_div_login h1 {
+    font-size: 150%;
+}
+
+#aspect_eperson_PasswordLogin_div_login {
+    margin: 20px 0px 40px 18px; /* top right bottom left */
+}
+#aspect_eperson_PasswordLogin_div_register {
+    margin: 20px 18px 20px 0px;
+}
+
 #aspect_eperson_EditProfile_list_form,
 .submission fieldset.ds-form-list,
 .administrative fieldset.ds-form-list {
@@ -1486,4 +1503,47 @@ img.ds-authority-confidence
 }
 #journalIDStatusInReview span.field-help, #prism_publicationName span.field-help{
     width:450px;
+}
+
+/*
+  ***************************
+  SEARCH TABS
+  ***************************
+ */
+#searchTabs ul {
+    list-style: none;
+    padding: 0px;
+    /*margin: 0px 0px -7px 0px;*/
+    margin: 0px 0px 0px 0px;
+}
+
+#searchTabs li {
+    display: inline;
+    border: solid gray;
+    border-width: 1px;
+    margin: 0 2px 0 0;
+    background-color: rgb(238, 238, 238);
+    /* padding: 3px;*/
+    padding: .25em;
+}
+
+#searchTabs li a {
+    padding: 0 1em;
+}
+
+#searchTabs #selected {
+    background: white;
+    border-width: 1px 1px 0px 1px;
+    /*padding-bottom: 4px;*/
+    padding-bottom: .5em;
+}
+
+#aspect_discovery_SimpleSearch_div_search-results ul.ds-artifact-list {
+    border: 1px solid gray;
+    list-style-type: none;
+    margin-top:3px;
+}
+
+#aspect_submission_StepTransformer_item_license_accepted{
+    margin-top:100px;
 }

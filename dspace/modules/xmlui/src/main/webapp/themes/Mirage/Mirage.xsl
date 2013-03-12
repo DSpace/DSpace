@@ -247,14 +247,14 @@
                         <xsl:text>OR</xsl:text>
                     </p>
                     <p>
-                        <a class="learn-to-submit-button" href="http://www.youtube.com/watch?v=RP33cl8tL28">Learn how to submit data</a>
+                        <a class="learn-to-submit-button" href="/pages/faq#deposit">Learn how to submit data</a>
                     </p>
                 </div>
             </div>
 
             <!-- START SEARCH -->
             <div class="home-col-1">
-                <h1 class="ds-div-head">Search DSpace <a>
+                <h1 class="ds-div-head">Search for Data <a>
                     <xsl:attribute name="href">
                         <![CDATA[/search-filter?query=&field=dc.contributor.author_filter]]>
                     </xsl:attribute>
@@ -271,8 +271,7 @@
                       action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
                     <p class="ds-paragraph">
                         <p>
-                            <label class="ds-form-label" for="aspect_discovery_SiteViewer_field_query">Enter some text
-                                in the box below to search DSpace.
+                            <label class="ds-form-label" for="aspect_discovery_SiteViewer_field_query">Search for data in Dryad:
                             </label>
                         </p>
                         <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
@@ -777,7 +776,7 @@
     <!-- First submission form: STATUS: PUBLISHED - journalID Select + Manuscript Number Edit Box -->
     <xsl:template match="dri:list[@n='doi']">
         <li id="aspect_submission_StepTransformer_list_doi">
-            <table style="border: 2px solid gray; float:right; display:inline-block; margin-top:-100px; padding:10px; width:500px">
+            <table style="border: 2px solid gray; float:right; display:inline-block; margin-top:-100px; padding:10px; width:500px; position: relative;">
                 <tr>
                     <xsl:for-each select="dri:item/dri:field">
                         <xsl:variable name="currentId"><xsl:value-of select="@id"/></xsl:variable>
@@ -822,7 +821,7 @@
     <!-- First submission form: STATUS: ACCEPTED/IN REVIEW/NOT_YET_SUBMITTED -->
     <xsl:template match="dri:list/dri:item[@n='select_publication_new' or @n='select_publication_exist']">
         <li>
-            <table id="status_other_than_published" style="border: 2px solid gray; float:right; display:inline-block; margin-top:-100px; padding:10px; width:500px;">
+            <table id="status_other_than_published" style="border: 2px solid gray; float:right; display:inline-block; margin-top:-100px; padding:10px; width:500px; position: relative;">
                 <tr><td>
                     <!--xsl:call-template name="standardAttributes">
                     <xsl:with-param name="class">
@@ -914,6 +913,87 @@
         </li>
     </xsl:template>
     <!-- END First submission form: added and rewrote some templates to manage the form using jquery, to lead the user through the submission -->
+    <!-- Here we construct Dryad's search results tabs; externally harvested
+collections are each given a tab. Collection values of these collections
+(l3 for instance... this is just a code assigned by DSpace) are hard-coded
+so we need to make sure a collection has the same code across different
+Dryad installs (dev, demo, staging, production, etc.) -->
+    <xsl:template match="dri:referenceSet[@type = 'summaryList']"
+                  priority="2">
+        <xsl:apply-templates select="dri:head" />
+        <!-- Here we decide whether we have a hierarchical list or a flat one -->
+        <xsl:choose>
+            <xsl:when
+                    test="descendant-or-self::dri:referenceSet/@rend='hierarchy' or ancestor::dri:referenceSet/@rend='hierarchy'">
+                <ul>
+                    <xsl:apply-templates select="*[not(name()='head')]"
+                                         mode="summaryList" />
+                </ul>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:if test="$meta[@element='request'][@qualifier='URI'][.='discover']">
+
+
+                    <!-- The tabs display a selected tab based on the location
+parameter that is being used (see variable defined above) -->
+                    <div id="searchTabs">
+                        <ul>
+                            <xsl:call-template name="buildTabs"/>
+
+
+                        </ul>
+                    </div>
+                </xsl:if>
+                <ul class="ds-artifact-list">
+                    <xsl:choose>
+                        <xsl:when test="$meta[@element='request'][@qualifier='URI'][.='submissions']">
+                            <xsl:apply-templates select="*[not(name()='head')]"
+                                                 mode="summaryNonArchivedList" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:apply-templates select="*[not(name()='head')]"
+                                                 mode="summaryList" />
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </ul>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <xsl:template name="buildTabs">
+
+        <xsl:for-each select="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='tabs']/dri:item">
+
+            <xsl:element name="li">
+
+                <xsl:if test="dri:field[@n='selected']">
+                    <xsl:attribute name="id">selected</xsl:attribute>
+
+                </xsl:if>
+                <xsl:element name="a">
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="dri:xref/@target"/>
+                    </xsl:attribute>
+
+
+                    <xsl:value-of select="dri:xref/text()"/>
+
+                </xsl:element>
+            </xsl:element>
+
+        </xsl:for-each>
+
+    </xsl:template>
+
+
+
+
+    <!--
+<xsl:template match="/dri:document/dri:body/dri:div/dri:div[@id='aspect.discovery.SimpleSearch.div.search-results']/dri:list">
+
+</xsl:template>
+-->
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='tabs']"/>
+
 
 
 </xsl:stylesheet>

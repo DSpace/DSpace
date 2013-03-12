@@ -435,7 +435,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
 
     private void addLicence(List form) throws WingException {
-        CheckBox licensebox = form.addItem().addCheckBox("license_accept");
+        CheckBox licensebox = form.addItem("license_accepted","license_accepted").addCheckBox("license_accept");
         licensebox.addOption(String.valueOf(Boolean.TRUE), T_PUB_LICENSE);
         if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.STATUS_LICENSE_NOT_ACCEPTED)
             licensebox.addError(T_PUB_LICENSE_ERROR);

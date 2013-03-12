@@ -14,8 +14,10 @@ import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -152,6 +154,8 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
     protected void buildSearchResultsDivision(Division search)
             throws IOException, SQLException, WingException, SearchServiceException, AuthorizeException {
 
+        Request request = ObjectModelHelper.getRequest(objectModel);
+
         try {
             if (queryResults == null || queryResults.getResults() == null) {
 
@@ -187,6 +191,60 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
             results.setHead(T_head1_collection.parameterize(collectionName));
         } else {
             results.setHead(T_head1_none);
+        }
+
+
+        FacetField facet = queryResults.getFacetField("location.coll");
+        if(facet != null){
+            java.util.List<FacetField.Count> facetVals = facet.getValues();
+            if(facetVals != null)
+            {
+                org.dspace.app.xmlui.wing.element.List list = results.addList("tabs");
+
+                for (FacetField.Count count : facetVals) {
+                    if(!count.getName().equals("3")){
+                        String filterQuery = count.getAsFilterQuery();
+                        String paramsQuery=request.getQueryString();
+                        Collection coll = Collection.find(context,Integer.parseInt(count.getName()));
+                        org.dspace.app.xmlui.wing.element.Item collectionLink = list.addItem();
+                        if(paramsQuery.contains("fq=location.coll"))  {
+                            if(paramsQuery.contains("fq=location.coll:"+count.getName())||paramsQuery.contains("fq=location.coll%3A"+count.getName()))
+
+                            {
+                                collectionLink.addHidden("selected");
+                            }
+                        }
+                        else{
+                            if(count.getName().equals("2"))
+                            {
+                                collectionLink.addHidden("selected");
+                            }
+                        }
+
+
+
+
+                        if(request.getQueryString().contains("&fq=location.coll:")){
+                            paramsQuery = parameterReplace("&fq=location.coll:",paramsQuery,count.getName());
+                        }
+                        else if(request.getQueryString().contains("&fq=location.coll%3A")){
+                            paramsQuery = parameterReplace("&fq=location.coll%3A",paramsQuery,count.getName());
+                        }
+                        else{
+                            paramsQuery=paramsQuery+"&fq=location.coll:" + count.getName();
+                        }
+
+                        if(request.getQueryString().contains("&page=")){
+                            paramsQuery = parameterReplace("&page=",paramsQuery,"1");
+                        }
+
+
+                        collectionLink.addXref(contextPath + "/" + getDiscoverUrl() + "?" +paramsQuery,coll.getName() + " (" + count.getCount() + ")" );
+
+                    }
+                }
+            }
+
         }
 
         if (queryResults != null &&
@@ -362,19 +420,36 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
         int page = getParameterPage();
 
         List<String> filterQueries = new ArrayList<String>();
+        //remove the old collection and community filter so we can use solr to collect all the collection information
+        String[] location = ObjectModelHelper.getRequest(objectModel).getParameterValues("fq");
 
-        if (scope instanceof Community) {
-            filterQueries.add("location:m" + scope.getID());
+        boolean found = false;
+        if(location!=null){
+            for(String loc : location)
+            {
+                if(loc.startsWith("location.coll:"))
+                {
+                    found = true;
+                }
+            }
+        }
+        if(!found)
+        {
+            filterQueries.add("{!tag=dt}location.coll:2");
+        }
 
-        } else if (scope instanceof Collection) {
-            filterQueries.add("location:l" + scope.getID());
-        }
-        String location = ObjectModelHelper.getRequest(objectModel).getParameter("location");
-        if(location != null){
-            filterQueries.add("location:" + location);
-        }
+
+
 
         String[] fqs = getSolrFilterQueries();
+        for(int i=0;i<fqs.length;i++){
+            if(fqs[i].contains("location.coll:")){
+
+                String tmp= fqs[i].replaceAll("location.coll","{!tag=dt}location.coll");
+                fqs[i] = tmp;
+            }
+
+        }
 
         if (fqs != null)
         {
@@ -453,6 +528,8 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
         }
 
 
+        queryArgs.addFacetField("{!ex=dt}location.coll");
+        queryArgs.add("f.location.coll.facet.mincount","0");
 
 
 
@@ -640,7 +717,6 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
     protected void buildSearchControls(Division div)
             throws WingException {
 
-        
 
 
 
@@ -664,7 +740,7 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
             Select groupSelect = groupCell.addSelect("group_by");
             groupSelect.addOption(false, "none", T_group_by_none);
 
-            
+
             String[] groups = {"publication_grp"};
             for (String group : groups) {
                 groupSelect.addOption(group.equals(getParameterGroup()), group,
@@ -676,7 +752,7 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
             throw new WingException("Unable to get group options", se);
         }
         */
-        
+
         Cell sortCell = controlsRow.addCell();
         // Create a drop down of the different sort columns available
         sortCell.addContent(T_sort_by);
@@ -756,5 +832,24 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
         log.info(LogManager.getHeader(context, "search", logInfo + "query=\""
                 + queryArgs.getQuery() + "\",results=(" + countCommunities + ","
                 + countCollections + "," + countItems + ")"));
+    }
+
+    public static String parameterReplace(String prefix,String s,String newNumber){
+        String query=s;
+        String part = s.substring(s.indexOf(prefix) + prefix.length());
+        String collectionNumber="";
+        boolean isNumber=true;
+        while(isNumber){
+            try{
+                String number = part.substring(0, 1);
+                Integer.parseInt(number);
+                collectionNumber+=number;
+                part=part.substring(1);
+            }catch (Exception nfe){
+                isNumber=false;
+            }
+        }
+        query = s.replace(prefix+collectionNumber, prefix+newNumber);
+        return query;
     }
 }
