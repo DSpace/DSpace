@@ -415,7 +415,11 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <a href="http://blog.datadryad.org">News</a>
                                 </li>
                                 <li>
-                                    <a href="">Ideas Forum</a>
+                                    <!-- UserVoice JavaScript SDK (only needed once on a page) -->
+                                    <script>(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/oW4J4by2WMgw3H4qYuJsDQ.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</script>
+
+                                    <!-- A link to launch the Classic Widget -->
+                                    <a href="javascript:void(0)" data-uv-lightbox="classic_widget" data-uv-mode="feedback" data-uv-primary-color="#88c033" data-uv-link-color="#333333" data-uv-forum-id="197408" data-uv-feedback-tab_name="Ideas Forum">Ideas Forum</a>
                                 </li>
                             </ul>
                         </li>
@@ -423,10 +427,10 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <a href="">Get Started</a>
                             <ul>
                                 <li>
-                                    <a href="/pages/depositing">Depositing Data</a>
+                                    <a href="/pages/faq#deposit">Deposit Data</a>
                                 </li>
                                 <li>
-                                    <a href="/pages/using">Using Data</a>
+                                    <a href="/pages/faq#using">Use Data</a>
                                 </li>
                             </ul>
                         </li>
@@ -434,18 +438,6 @@ references to stylesheets pulled directly from the pageMeta element. -->
                         <li>
                             <a href="">Learn More</a>
                             <ul>
-                                <li>
-                                  <a href="/pages/faq">FAQ</a>
-                                  <ul>
-                                      <li>
-                                          <a href="/pages/jdap">Journal Archiving Policy</a>
-                                      </li>
-
-                                      <li>
-                                          <a href="/pages/partners">Related Projects</a>
-                                      </li>
-                                  </ul>
-                                </li>                                
                                 <li>
                                     <a href="/pages/membershipOverview">Become A Member</a>
                                     <ul>
@@ -475,8 +467,21 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     </ul>
                                 </li>
                                 <li>
+                                  <a href="/pages/faq">FAQ</a>
+                                  <ul>
+                                      <li>
+                                          <a href="/pages/jdap">Journal Archiving Policy</a>
+                                      </li>
+
+                                      <li>
+                                          <a href="/pages/partners">Related Projects</a>
+                                      </li>
+                                  </ul>
+                                </li>                                
+                                <li>
                                     <a href="/pages/pricing">Pricing Plans</a>
-                                </li>                            </ul>
+                                </li>                            
+                            </ul>
                         </li>
                         <li>
                             <a href="/feedback">Contact Us</a>
