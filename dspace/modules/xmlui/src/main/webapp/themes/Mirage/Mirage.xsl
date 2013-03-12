@@ -254,7 +254,7 @@
 
             <!-- START SEARCH -->
             <div class="home-col-1">
-                <h1 class="ds-div-head">Search DSpace <a>
+                <h1 class="ds-div-head">Search for Data <a>
                     <xsl:attribute name="href">
                         <![CDATA[/search-filter?query=&field=dc.contributor.author_filter]]>
                     </xsl:attribute>
@@ -271,8 +271,7 @@
                       action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
                     <p class="ds-paragraph">
                         <p>
-                            <label class="ds-form-label" for="aspect_discovery_SiteViewer_field_query">Enter some text
-                                in the box below to search DSpace.
+                            <label class="ds-form-label" for="aspect_discovery_SiteViewer_field_query">Search for data in Dryad:
                             </label>
                         </p>
                         <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
