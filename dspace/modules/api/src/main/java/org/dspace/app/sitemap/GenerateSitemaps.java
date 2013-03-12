@@ -196,7 +196,7 @@ public class GenerateSitemaps {
                                 dataPackage = DryadWorkflowUtils.getDataPackage(c, i);
                             }
                             String url = "";
-                            if (dataPackage != null) {
+                            if (dataPackage != null && !dataPackage.isWithdrawn()) {
                                 DCValue[] identifier = dataPackage.getMetadata("dc.identifier");
                                 if (identifier != null && identifier.length > 0) {
 
@@ -218,11 +218,18 @@ public class GenerateSitemaps {
                                     modifiedDP.add(dataPackage);
                                 }
                             } else {
+                                if(dataPackage.isWithdrawn())
+                                {
+                                    System.out.println("Item : " + i.getID() + " - " + i.getHandle() + ": withdrawn.");
+                                }
+                                else{
                                 System.out.println("Item : " + i.getID() + " - " + i.getHandle() + ": can't find the datapackage information.");
+                                }
                             }
-                        } else {
-                            System.out.println("Item : " + i.getID() + " - " + i.getHandle() + ":  withdran.");
-                            log.info("Item : " + i.getID() + " - " + i.getHandle() + ": withdran.");
+                        }
+                        else
+                        {
+                            System.out.println("Item : " + i.getID() + " - " + i.getHandle() + ": withdrawn.");
                         }
                     } catch (Exception ex) {
                         // if some items are not consistent just go ahead...
