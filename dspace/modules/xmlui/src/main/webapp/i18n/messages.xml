@@ -363,7 +363,7 @@
 	<message key="xmlui.Site.stats">As of {0}, Dryad contains <span class="bold">{1} data
 			packages</span> and <span class="bold">{2} data files</span>, associated with articles in <span class="bold"
 			>{3} journals</span>.</message>
-	<message key="xmlui.Site.blogfeed.title">Dryad Blog</message>
+	<message key="xmlui.Site.blogfeed.title">News</message>
 
 
 

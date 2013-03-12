@@ -310,7 +310,7 @@
             <!-- START BROWSE -->
             <div class="home-col-1">
                 <h1 class="ds-div-head">Browse for Data</h1>
-                <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary">
+                <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 496px; TODO-height: 530px; overflow: auto;">
                     <div id="browse-data-buttons">
                         <a href="#recently-published-data"><span>Recently Published</span></a>
                         <a href="#most-viewed-data"><span>Most Viewed</span></a>
@@ -342,7 +342,7 @@
                 <h1 class="ds-div-head">Dryad Mailing List</h1>
                 <div id="file_news_div_mailing_list" class="ds-static-div primary">
                     <p class="ds-paragraph" style="text-align: left; margin-bottom: 2px;">
-                        <xsl:text>Join {2,510} other subscribers!</xsl:text>
+                        <xsl:text>Sign up for announcements.</xsl:text>
                         <input value="Your e-mail" type="text" name="query" class="ds-text-field" style="width: 240px; margin-top: 8px;" id="" />
                     </p>
                     <input value="Subscribe" type="submit" name="submit" class="ds-button-field" id="" />
@@ -364,7 +364,7 @@
             <!-- START STATISTICS -->
             <div class="home-col-2" style="margin-left: 25px;">
                 <div id="aspect_statistics_StatisticsTransformer_div_home" class="repository">
-                    <h1 class="ds-div-head">Dryad Statistics</h1>
+                    <h1 class="ds-div-head">Stats</h1>
                     <div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                          id="aspect_statistics_StatisticsTransformer_div_stats" class="ds-static-div secondary stats">
                         <h2 class="ds-table-head">Total Visits</h2>
