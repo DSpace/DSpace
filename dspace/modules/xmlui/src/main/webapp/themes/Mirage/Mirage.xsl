@@ -363,7 +363,7 @@
 
             <!-- START STATISTICS -->
             <div class="home-col-2" style="margin-left: 25px;">
-                <div id="aspect_statistics_StatisticsTransformer_div_home" class="ds-static-div primary repository">
+                <div id="aspect_statistics_StatisticsTransformer_div_home" class="repository">
                     <h1 class="ds-div-head">Dryad Statistics</h1>
                     <div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                          id="aspect_statistics_StatisticsTransformer_div_stats" class="ds-static-div secondary stats">
@@ -465,7 +465,9 @@
             </div>
             <!-- START BLOG -->
             <div class="home-col-2">
-                <xsl:apply-templates select="dri:div[@id='aspect.dryadinfo.DryadBlogFeed.div.dryad-info-home']"/>
+                <div id="aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home" class="blog-box">
+                    <xsl:apply-templates select="dri:div[@id='aspect.dryadinfo.DryadBlogFeed.div.dryad-info-home']"/>
+                </div>
             </div>
 
         </div>
