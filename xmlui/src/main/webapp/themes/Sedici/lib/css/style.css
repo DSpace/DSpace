@@ -3314,5 +3314,19 @@ a.link-community-view-all {
 	margin-left: 10px;
 }
 
+
+#aspect_submission_StepTransformer_div_submit-upload h1.ds-head {
+display:none;
+}
+
+#aspect_submission_StepTransformer_div_submit-upload h1.ds-table-head {
+font-size: 100%;
+margin-top: 20px;
+border-bottom: 1px solid #D8E8EB;
+margin-bottom: 3px;
+}
+
+
+
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
 body{ background-color:white;}
