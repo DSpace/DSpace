@@ -47,7 +47,7 @@
 				<field>
 					<dc-schema>dc</dc-schema>
 					<dc-element>type</dc-element>
-					<label>Tipo de documento</label>
+					<label>Tipo de documento (*)</label>
 					<input-type value-pairs-name="common_types">dropdown</input-type>
 					<hint>Seleccione el Tipo de Documento que desea cargar</hint>
 					<required>Debe seleccionar un tipo de documento, ya que el proceso de carga dependerá de su elección</required>
@@ -67,7 +67,7 @@
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>subtype</dc-element>
-					<label>Especifique el tipo de Artículo</label>
+					<label>Especifique el tipo de Artículo (*)</label>
 					<input-type value-pairs-name="common_subtypes_articulo">dropdown</input-type>
 					<hint>Seleccione el tipo de artículo que desea cargar</hint>
 					<required>Debe seleccionar un subtipo de documento</required>
@@ -78,7 +78,7 @@
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>subtype</dc-element>
-					<label>Especifique el tipo de Tesis</label>
+					<label>Especifique el tipo de Tesis (*)</label>
 					<input-type value-pairs-name="common_subtypes_tesis">dropdown</input-type>
 					<hint>Seleccione el tipo de tesis que desea cargar</hint>
 					<required>Debe seleccionar un subtipo de documento</required>
@@ -89,7 +89,7 @@
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>subtype</dc-element>
-					<label>Especifique el tipo de Libro</label>
+					<label>Especifique el tipo de Libro (*)</label>
 					<input-type value-pairs-name="common_subtypes_libro">dropdown</input-type>
 					<hint>Seleccione el tipo de libro que desea cargar</hint>
 					<required>Debe seleccionar un subtipo de documento</required>
@@ -100,7 +100,7 @@
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>subtype</dc-element>
-					<label>Especifique el tipo de Objeto de Conferencia</label>
+					<label>Especifique el tipo de Objeto de Conferencia (*)</label>
 					<input-type value-pairs-name="common_subtypes_objeto_conferencia">dropdown</input-type>
 					<hint>Seleccione el tipo de objeto de conferencia que desea cargar</hint>
 					<required>Debe seleccionar un subtipo de documento</required>
@@ -111,7 +111,7 @@
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>subtype</dc-element>
-					<label>Especifique el tipo de Documento Institucional</label>
+					<label>Especifique el tipo de Documento Institucional (*)</label>
 					<input-type value-pairs-name="common_subtypes_documento_institucional">dropdown</input-type>
 					<hint>Seleccione el tipo de documento institucional que desea cargar</hint>
 					<required>Debe seleccionar un subtipo de documento</required>
@@ -122,7 +122,7 @@
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>subtype</dc-element>
-					<label>Especifique el tipo de Imagen Fija</label>
+					<label>Especifique el tipo de Imagen Fija (*)</label>
 					<input-type value-pairs-name="common_subtypes_imagen_fija">dropdown</input-type>
 					<hint>Seleccione el tipo de imagen fija que desea cargar</hint>
 					<required>Debe seleccionar un subtipo de documento</required>
@@ -133,7 +133,7 @@
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>subtype</dc-element>
-					<label>Especifique el tipo de Imagen en Movimiento</label>
+					<label>Especifique el tipo de Imagen en Movimiento (*)</label>
 					<input-type value-pairs-name="common_subtypes_imagen_movimiento">dropdown</input-type>
 					<hint>Seleccione el tipo de imagen en movimiento que desea cargar</hint>
 					<required>Debe seleccionar un subtipo de documento</required>
@@ -144,7 +144,7 @@
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>subtype</dc-element>
-					<label>Especifique el tipo de Audio</label>
+					<label>Especifique el tipo de Audio (*)</label>
 					<input-type value-pairs-name="common_subtypes_audio">dropdown</input-type>
 					<hint>Seleccione el tipo de audio que desea cargar</hint>
 					<required>Debe seleccionar un subtipo de documento</required>
@@ -231,7 +231,7 @@
 				<field>
 					<dc-schema>dc</dc-schema>
 					<dc-element>language</dc-element>
-					<label>Idioma</label>
+					<label>Idioma (*)</label>
 					<input-type value-pairs-name="common_iso_languages">dropdown</input-type>
 					<hint>Idioma principal de la obra</hint>
 					<required>Debe indicar el idioma principal de la obra</required>
@@ -314,7 +314,7 @@
 					<dc-schema>sedici</dc-schema>
 					<dc-element>description</dc-element>
 					<dc-qualifier>fulltext</dc-qualifier>
-					<label>Texto completo</label>
+					<label>Texto completo (*)</label>
 					<input-type value-pairs-name="boolean_values">dropdown</input-type>
 					<hint>Indica si se cuenta con el texto completo de la obra</hint>
 					<required>Debe indicar si se cuenta con el documento completo</required>
@@ -326,7 +326,7 @@
 					<dc-schema>mods</dc-schema>
 					<dc-element>originInfo</dc-element>
 					<dc-qualifier>place</dc-qualifier>
-					<label>Entidad de origen</label>
+					<label>Entidad de origen (*)</label>
 					<input-type>onebox</input-type>
 					<hint>Institución donde el documento fue creado</hint>
 					<required>Debe seleccionar la institución de origen del documento</required>
@@ -390,7 +390,7 @@
 					<dc-element>subject</dc-element>
 					<dc-qualifier>materias</dc-qualifier>
 					<repeatable>true</repeatable>
-					<label>Materia SeDiCI</label>
+					<label>Materia SeDiCI (*)</label>
 					<input-type>onebox</input-type>
 					<hint>Area temática del recurso extraída del tesauro de materias de SeDiCI</hint>
 					<required>Debe ingresar al menos una materia para el documento</required>
@@ -674,7 +674,7 @@
 					<dc-schema>thesis</dc-schema>
 					<dc-element>degree</dc-element>
 					<dc-qualifier>name</dc-qualifier>
-					<label>Grado alcanzado</label>
+					<label>Grado alcanzado (*)</label>
 					<input-type>onebox</input-type>
 					<hint>Grado al que el tesista accede</hint>
 					<required>Debe seleccionar el Grado Alcanzado</required>
@@ -686,7 +686,7 @@
 					<dc-schema>thesis</dc-schema>
 					<dc-element>degree</dc-element>
 					<dc-qualifier>grantor</dc-qualifier>
-					<label>Institución garante</label>
+					<label>Institución garante (*)</label>
 					<input-type>onebox</input-type>
 					<hint>Institución que otorga el título</hint>
 					<required>Debe seleccionar la Institución Garante</required>
