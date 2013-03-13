@@ -3327,6 +3327,23 @@ margin-bottom: 3px;
 }
 
 
+#aspect_xmlworkflow_WorkflowTransformer_div_perform-task h1.ds-table-head{
+font-size: 100%;
+margin-top: 20px;
+border-bottom: 1px solid #D8E8EB;
+margin-bottom: 3px;
+	
+	
+}
+#aspect_xmlworkflow_WorkflowTransformer_div_perform-task h1.ds-list-head{
+font-size: 100%;
+margin-top: 20px;
+border-bottom: 1px solid #D8E8EB;
+margin-bottom: 3px;
+	
+	
+}
+
 
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
 body{ background-color:white;}

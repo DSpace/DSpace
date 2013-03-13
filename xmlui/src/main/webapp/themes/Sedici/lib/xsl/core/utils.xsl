@@ -65,7 +65,7 @@
             <xsl:apply-templates />
         </li>
     </xsl:template>
-<xsl:template match="/dri:document/dri:body/dri:div[@id='aspect.submission.StepTransformer.div.submit-upload' and (dri:list[@id='aspect.submission.StepTransformer.list.submit-upload-new']) ]" priority="3">
+	<xsl:template match="/dri:document/dri:body/dri:div[@id='aspect.submission.StepTransformer.div.submit-upload' and (dri:list[@id='aspect.submission.StepTransformer.list.submit-upload-new']) ]" priority="3">
 		<xsl:apply-templates select="." mode="ordered">
 			<xsl:with-param name="elements">
 	     		<xsl:copy-of select="dri:list[@id='aspect.submission.StepTransformer.list.submit-progress']"/>
@@ -77,7 +77,17 @@
 			</xsl:with-param>
 		</xsl:apply-templates>
 	</xsl:template>
-
+	<xsl:template match="/dri:document/dri:body/dri:div[@id='aspect.xmlworkflow.WorkflowTransformer.div.perform-task']" priority="3">
+		<xsl:apply-templates select="." mode="ordered">
+			<xsl:with-param name="elements">
+		  		<xsl:copy-of select="dri:table[@id='aspect.xmlworkflow.WorkflowTransformer.table.workflow-actions']"/>
+	     		<xsl:copy-of select="dri:referenceSet[@id='aspect.xmlworkflow.WorkflowTransformer.referenceSet.narf']"/>
+	     		<xsl:copy-of select="dri:p[@id='aspect.xmlworkflow.WorkflowTransformer.p.hidden-fields']"/>
+	     		<xsl:copy-of select="dri:p/dri:field[@id='aspect.xmlworkflow.WorkflowTransformer.field.submit_full_item_info']"/>
+	    		<xsl:copy-of select="dri:referenceSet[@id='ar.edu.unlp.sedici.aspect.collectionViewer.CollectionViewer.referenceSet.community-view-root']"/>
+	  		</xsl:with-param>
+		</xsl:apply-templates>
+	</xsl:template>
 
 
     <!-- Interactive divs get turned into forms. The priority attribute on the template itself
