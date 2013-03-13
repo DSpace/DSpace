@@ -169,7 +169,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 DCInput[] inputs;
                 try
                 {
-                        inputSet = getInputsReader().getInputs(submission.getCollection().getHandle());
+                        inputSet = getInputsReader().getInputs(submission.getCollection());
                         inputs = inputSet.getPageRows(getPage()-1, submission.hasMultipleTitles(), submission.isPublishedBefore());
                 }
                 catch (DCInputsReaderException se)
@@ -322,7 +322,7 @@ public class DescribeStep extends AbstractSubmissionStep
         DCInputSet inputSet = null;
         try
         {
-            inputSet = getInputsReader().getInputs(submission.getCollection().getHandle());
+            inputSet = getInputsReader().getInputs(submission.getCollection());
         }
         catch (DCInputsReaderException se)
         {
@@ -1354,4 +1354,3 @@ public class DescribeStep extends AbstractSubmissionStep
                 return clean;
         }
 }
-
