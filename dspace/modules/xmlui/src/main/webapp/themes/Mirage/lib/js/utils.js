@@ -427,7 +427,31 @@ function enableNextButton() {
     jQuery("#aspect_submission_StepTransformer_field_submit_next").attr("disabled", "disabled");
 }
 
-
+// Mailing list subscription form on homepage, submits to /subscribe via ajax
+function subscribeMailingList(form) {
+    var subscribeButton = jQuery('#file_news_div_mailing_list_input_subscribe');
+    subscribeButton.attr("disabled", "disabled").attr("value","Subscribing...");
+    var subscribeURL = '/subscribe';
+    jQuery.ajax({
+      url: subscribeURL,
+      data: jQuery(form).serialize()
+    }).done(function(data) {
+        // Remove the email input and replace with thank you text
+        var emailField = jQuery('#file_news_div_mailing_list_input_email');
+        emailField.parent().text("Thank you for signing up!")
+        emailField.remove();
+        var subscribeButton = jQuery('#file_news_div_mailing_list_input_subscribe');
+        subscribeButton.attr("disabled", "disabled").attr("value","Subscribed!");    
+    }).fail(function(data) {
+        // Remove the email input and replace with thank you text
+        var emailField = jQuery('#file_news_div_mailing_list_input_email');
+        emailField.parent().text("Error")
+        emailField.remove();
+        var subscribeButton = jQuery('#file_news_div_mailing_list_input_subscribe');
+        subscribeButton.attr("value","Subscribe");    
+    });
+    return false;
+}
 
 
 /////// TESTING PROGRESS BAR /////////////////

@@ -341,11 +341,16 @@
             <div class="home-col-2">
                 <h1 class="ds-div-head">Dryad Mailing List</h1>
                 <div id="file_news_div_mailing_list" class="ds-static-div primary">
+                    <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
+                      id="aspect_discovery_SiteViewer_div_front-page-file_news_div_mailing_list" 
+                      class="ds-interactive-div primary" action="/subscribe"
+                      onsubmit="return subscribeMailingList(this);">
                     <p class="ds-paragraph" style="text-align: left; margin-bottom: 2px;">
-                        <xsl:text>Join {2,510} other subscribers!</xsl:text>
-                        <input value="Your e-mail" type="text" name="query" class="ds-text-field" style="width: 240px; margin-top: 8px;" id="" />
+                        <xsl:text>Sign up for announcements.</xsl:text>
+                        <input placeholder="Your e-mail" type="text" name="email" class="ds-text-field" style="width: 240px; margin-top: 8px;" id="file_news_div_mailing_list_input_email" />
                     </p>
-                    <input value="Subscribe" type="submit" name="submit" class="ds-button-field" id="" />
+                    <input value="Subscribe" type="submit" name="submit" class="ds-button-field" id="file_news_div_mailing_list_input_subscribe" />
+                    </form>
                 </div>
             </div>
 
