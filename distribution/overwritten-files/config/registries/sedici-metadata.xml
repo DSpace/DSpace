@@ -392,7 +392,7 @@
 		<schema>sedici</schema>
 		<element>relation</element>
 		<qualifier>isPartOfSeries</qualifier>
-		<scope_note></scope_note>
+		<scope_note>Titulo y número de la serie en la que el libro fué publicado</scope_note>
 	</dc-type>
 	<dc-type>
 		<schema>sedici</schema>

@@ -558,7 +558,7 @@
 					<dc-qualifier>isPartOfSeries</dc-qualifier>
 					<label>Titulo y número de la serie</label>
 					<input-type>onebox</input-type>
-					<hint>Titulo y número de la serie en la que el documento fué publicado</hint>
+					<hint>Titulo y número de la serie en la que el libro fué publicado</hint>
 					<type-bind>Libro</type-bind>
 				</field>
 
