@@ -82,7 +82,8 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
             AuthorizeException
     {       
         pageMeta.addMetadata("title").addContent(message(message_prefix + "title"));
-         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
+        pageMeta.addMetadata("stylesheet", "screen").addContent("lib/css/membership-form.css");
+        pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         pageMeta.addTrail().addContent(message(message_prefix + "title"));
     }
 
@@ -90,7 +91,7 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
             UIException, SQLException, IOException, AuthorizeException
     {
         Division membership = body.addInteractiveDivision("membership-form",
-                contextPath+"/membership",Division.METHOD_POST,"primary");
+                contextPath+"/membership",Division.METHOD_POST,"primary membership-form");
 
         membership.setHead(message(message_prefix + "heading"));
 

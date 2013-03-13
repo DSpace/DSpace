@@ -3256,7 +3256,7 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p1">Any organization that supports the educational, scientific, and charitable mission of Dryad is eligible to become a Member. Applications will be reviewed by the Board of Directors. Upon acceptance, a Membership Agreement and request for dues will be sent to the address given. Membership is active once Dryad has received the signed agreement and dues.</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p2">For more information on Membership, please see the <a href="/pages/members">Membership page</a> or contact <a href="mailto:director@datadryad.org">director@datadryad.org</a>.</message>
 
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.markedfields"><span class="required-mark">* Marked fields are required</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.markedfields"><span id="required-fields-note" class="required-mark">* Marked fields are required</span></message>
     
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_name.label1">1a. Name of member organization <span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_name.label2">The preferred name to be used on official Membership lists.</message>
