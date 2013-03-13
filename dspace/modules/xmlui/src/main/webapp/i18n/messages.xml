@@ -2834,7 +2834,6 @@
 	<message key="xmlui.submit.select.pub.help">
 	</message>
 	<message key="xmlui.submit.select.pub.help_new">
-<object align="right" width="240" height="193"><param name="movie" value="http://www.youtube.com/v/RP33cl8tL28?fs=1&amp;hl=en_US&amp;rel=0"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/RP33cl8tL28?fs=1&amp;hl=en_US&amp;rel=0" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="240" height="193"></embed></object>
 	  Submitting data to Dryad consists of three simple steps:
 	<br/>
 	<ul>
