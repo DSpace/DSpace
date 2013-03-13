@@ -16,12 +16,14 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
@@ -385,24 +387,11 @@ public class Util {
         DCInput myInputs = null;
         boolean myInputsFound = false;
         String formFileName = I18nUtil.getInputFormsFileName(locale);
-        String col_handle = "";
-
-        Collection collection = item.getOwningCollection();
-
-        if (collection == null)
-        {
-            // set an empty handle so to get the default input set
-            col_handle = "";
-        }
-        else
-        {
-            col_handle = collection.getHandle();
-        }
 
         // Read the input form file for the specific collection
         DCInputsReader inputsReader = new DCInputsReader(formFileName);
 
-        DCInputSet inputSet = inputsReader.getInputs(col_handle);
+        DCInputSet inputSet = inputsReader.getInputs( item.getOwningCollection() );
 
         // Replace the values of DCValue[] with the correct ones in case of
         // controlled vocabularies
@@ -466,4 +455,47 @@ public class Util {
 
         return toReturn;
     }
+    
+    /**
+     * Tries to find a config definition according to a matching handle based on a collection's handle
+     * or its parent communities's handle.
+     * 
+     * @param collection Collection to start the searching from
+     * @return The config map's content associated to the matched handle 
+     * @throws Exception when an SQLException occurs getting parent communities (couldn't find any more specific exception)
+     */
+    public static <T> T findDefinitionInMap(Collection collection, Map<String,T> configMap) throws Exception
+    {
+    	if(collection == null)
+    		return null;
+    	
+    	// Tries the collection first
+    	if(configMap.containsKey(collection.getHandle()))
+    	{
+    		return configMap.get(collection.getHandle());
+    	}
+    	else
+    	{
+			// Search through the community hierarchy in ascending order
+    		Community[] communities;
+    		try 
+    		{
+    			communities = collection.getCommunities();
+			}
+			catch (SQLException e)
+			{
+				throw new Exception("Error getting communities from collection "+collection.getID(), e);
+			}
+
+    		for(int i = 0 ; i < communities.length ; i++)
+    		{
+    	    	if(configMap.containsKey(communities[i].getHandle()))
+    	    		return configMap.get(communities[i].getHandle());
+    		}
+    		
+    		// Couldn't find any match
+    		return null;
+    	}
+    }
+
 }

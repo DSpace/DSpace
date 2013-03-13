@@ -131,8 +131,7 @@ public class JSPUploadStep extends JSPStep
             try
             {
                 DCInputsReader inputsReader = new DCInputsReader();
-                request.setAttribute("submission.inputs", inputsReader.getInputs(c
-                        .getHandle()));
+                request.setAttribute("submission.inputs", inputsReader.getInputs(c));
             }
             catch (DCInputsReaderException e)
             {
@@ -247,8 +246,7 @@ public class JSPUploadStep extends JSPStep
                         {
                             Collection c = subInfo.getSubmissionItem().getCollection();
                             DCInputsReader inputsReader = new DCInputsReader();
-                            request.setAttribute("submission.inputs", inputsReader
-                                    .getInputs(c.getHandle()));
+                            request.setAttribute("submission.inputs", inputsReader.getInputs(c));
                         }
                         catch (DCInputsReaderException e)
                         {
@@ -268,8 +266,7 @@ public class JSPUploadStep extends JSPStep
                     {
                         Collection c = subInfo.getSubmissionItem().getCollection();
                         DCInputsReader inputsReader = new DCInputsReader();
-                        request.setAttribute("submission.inputs", inputsReader
-                                .getInputs(c.getHandle()));
+                        request.setAttribute("submission.inputs", inputsReader.getInputs(c));
                     }
                     catch (DCInputsReaderException e)
                     {
@@ -288,8 +285,7 @@ public class JSPUploadStep extends JSPStep
                     {
                         Collection c = subInfo.getSubmissionItem().getCollection();
                         DCInputsReader inputsReader = new DCInputsReader();
-                        request.setAttribute("submission.inputs", inputsReader
-                                .getInputs(c.getHandle()));
+                        request.setAttribute("submission.inputs", inputsReader.getInputs(c));
                     }
                     catch (DCInputsReaderException e)
                     {
