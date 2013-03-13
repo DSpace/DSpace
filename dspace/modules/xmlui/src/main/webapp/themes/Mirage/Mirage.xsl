@@ -310,7 +310,7 @@
             <!-- START BROWSE -->
             <div class="home-col-1">
                 <h1 class="ds-div-head">Browse for Data</h1>
-                <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary">
+                <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 496px; TODO-height: 530px; overflow: auto;">
                     <div id="browse-data-buttons">
                         <a href="#recently-published-data"><span>Recently Published</span></a>
                         <a href="#most-viewed-data"><span>Most Viewed</span></a>
@@ -368,8 +368,8 @@
 
             <!-- START STATISTICS -->
             <div class="home-col-2" style="margin-left: 25px;">
-                <div id="aspect_statistics_StatisticsTransformer_div_home" class="ds-static-div primary repository">
-                    <h1 class="ds-div-head">Dryad Statistics</h1>
+                <div id="aspect_statistics_StatisticsTransformer_div_home" class="repository">
+                    <h1 class="ds-div-head">Stats</h1>
                     <div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                          id="aspect_statistics_StatisticsTransformer_div_stats" class="ds-static-div secondary stats">
                         <h2 class="ds-table-head">Total Visits</h2>
@@ -470,7 +470,9 @@
             </div>
             <!-- START BLOG -->
             <div class="home-col-2">
-                <xsl:apply-templates select="dri:div[@id='aspect.dryadinfo.DryadBlogFeed.div.dryad-info-home']"/>
+                <div id="aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home" class="blog-box">
+                    <xsl:apply-templates select="dri:div[@id='aspect.dryadinfo.DryadBlogFeed.div.dryad-info-home']"/>
+                </div>
             </div>
 
         </div>
