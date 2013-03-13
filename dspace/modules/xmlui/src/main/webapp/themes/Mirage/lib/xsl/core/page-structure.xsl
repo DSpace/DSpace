@@ -520,6 +520,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                                 <i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
                                             </a>
                                         </li>
+                                        <xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='account']/dri:item" mode="menu"/>
                                     </ul>
 
                                 </li>
@@ -855,6 +856,15 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
 
                 jQuery(document).ready(function() {
+                if(jQuery("input[type='checkbox']").length == 0){
+                    jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").css("display","none");
+                }
+                  jQuery("#advanced-search").click(function(){
+
+                  jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").toggle();
+
+                    });
+
                     jQuery('#main-menu ul.sf-menu').supersubs({
                             // all numeric properties are in em
                             minWidth: 22,

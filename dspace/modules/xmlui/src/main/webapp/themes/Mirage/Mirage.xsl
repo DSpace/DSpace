@@ -1001,6 +1001,12 @@ parameter that is being used (see variable defined above) -->
 -->
     <xsl:template match="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='tabs']"/>
 
-
-
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='search-query']/dri:item[position()=1]">
+        <li class="ds-form-item">
+            <label class="ds-form-label" for="aspect_discovery_SimpleSearch_field_query"><i18n:text><xsl:value-of select="."/></i18n:text></label>
+            <div class="ds-form-content">
+                <xsl:apply-templates/><a id="advanced-search" href="#">Advanced Search</a>
+            </div>
+        </li>
+    </xsl:template>
 </xsl:stylesheet>

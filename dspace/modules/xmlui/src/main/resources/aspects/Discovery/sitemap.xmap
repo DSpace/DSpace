@@ -173,7 +173,12 @@ and searching the repository.
                 <map:transform type="IncludePageMeta">
                     <map:parameter name="stylesheet.screen.discovery#1" value="../../static/css/discovery/style.css"/>
 
-                    <map:parameter name="javascript.static#1" value="static/js/jquery/jquery-1.4.2.min.js"/>
+
+                    <!-- removed import of JQuery 1.4.2 because breaks the page, removed search.js as well for the same reason
+                    (it seems not be used in the current version)-->
+                    <!--map:parameter name="javascript.static#1" value="static/js/jquery/jquery-1.4.2.min.js"/-->
+                    <!--map:parameter name="javascript.static#11" value="static/js/discovery/search/search.js"/-->
+
                     <map:parameter name="javascript.static#2" value="static/js/discovery/core/Core.js"/>
                     <map:parameter name="javascript.static#3" value="static/js/discovery/core/AbstractManager.js"/>
                     <map:parameter name="javascript.static#4" value="static/js/discovery/core/Parameter.js"/>
@@ -183,7 +188,7 @@ and searching the repository.
                     <map:parameter name="javascript.static#8" value="static/js/discovery/managers/Manager.jquery.js"/>
                     <map:parameter name="javascript.static#9" value="static/js/jquery/jquery.autocomplete.js"/>
                     <map:parameter name="javascript.static#10" value="static/js/discovery/widgets/AutocompleteWidget.js"/>
-                    <map:parameter name="javascript.static#11" value="static/js/discovery/search/search.js"/>
+
                 </map:transform>
 				<map:serialize type="xml"/>
 			</map:match>
@@ -330,7 +335,12 @@ and searching the repository.
                             <map:transform type="IncludePageMeta">
                                 <map:parameter name="stylesheet.screen.discovery#1" value="../../static/css/discovery/style.css"/>
 
-                                <map:parameter name="javascript.static#1" value="static/js/jquery/jquery-1.4.2.min.js"/>
+
+                                <!-- removed import of JQuery 1.4.2 because breaks the page, removed search.js as well for the same reason
+                                    (it seems not be used in the current version)-->
+                                <!--map:parameter name="javascript.static#1" value="static/js/jquery/jquery-1.4.2.min.js"/-->
+                                <!--map:parameter name="javascript.static#11" value="static/js/discovery/search/search.js"/-->
+
                                 <map:parameter name="javascript.static#2" value="static/js/discovery/core/Core.js"/>
                                 <map:parameter name="javascript.static#3" value="static/js/discovery/core/AbstractManager.js"/>
                                 <map:parameter name="javascript.static#4" value="static/js/discovery/core/Parameter.js"/>
@@ -340,8 +350,8 @@ and searching the repository.
                                 <map:parameter name="javascript.static#8" value="static/js/discovery/managers/Manager.jquery.js"/>
                                 <map:parameter name="javascript.static#9" value="static/js/jquery/jquery.autocomplete.js"/>
                                 <map:parameter name="javascript.static#10" value="static/js/discovery/widgets/AutocompleteWidget.js"/>
-                                <map:parameter name="javascript.static#11" value="static/js/discovery/search/search.js"/>
-                            </map:transform>
+
+                               </map:transform>
 							<map:serialize type="xml"/>
 						</map:match>
 
