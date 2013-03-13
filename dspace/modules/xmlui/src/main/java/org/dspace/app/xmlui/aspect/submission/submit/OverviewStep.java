@@ -61,7 +61,7 @@ public class OverviewStep extends AbstractStep {
         Collection collection = submission.getCollection();
         String actionURL = contextPath + "/handle/" + collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 
-        Division mainDiv = body.addDivision("submit-completed-dataset", actionURL, Division.METHOD_POST, "primary submission");
+        Division mainDiv = body.addInteractiveDivision("submit-completed-dataset", actionURL, Division.METHOD_POST, "primary submission");
 
         Division helpDivision = mainDiv.addDivision("submit-help");
         helpDivision.setHead(T_MAIN_HEAD);
