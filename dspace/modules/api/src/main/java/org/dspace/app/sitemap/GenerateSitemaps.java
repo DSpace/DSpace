@@ -208,48 +208,47 @@ public class GenerateSitemaps
             Item i = null;
             while (allItems.hasNext())
             {
-                try{
+                try {
                     i = allItems.next();
+                    if (!i.isWithdrawn()) {
+                        Item dataPackage = i;
 
-                    Item dataPackage=i;
+                        if (!i.getOwningCollection().getHandle().equals(myDataPkgColl)) {
+                            dataPackage = DryadWorkflowUtils.getDataPackage(c, i);
+                        }
+                        String url = "";
+                        if (dataPackage != null && !dataPackage.isWithdrawn()) {
+                            DCValue[] identifier = dataPackage.getMetadata("dc.identifier");
+                            if (identifier != null && identifier.length > 0) {
 
-                    if(!i.getOwningCollection().getHandle().equals(myDataPkgColl)) {
-                            dataPackage=DryadWorkflowUtils.getDataPackage(c, i);
+                                url = resourceURL + identifier[0].value;
+                            } else if (dataPackage.getHandle() != null) {
+                                url = handleURLStem + dataPackage.getHandle();
+                            } else {
+                                url = handleURLStem + "item/" + dataPackage.getID();
+                            }
+                            if (!modifiedDP.contains(dataPackage)) {
+                                if (makeHTMLMap) {
+                                    html.addURL(url, null);
+                                    fileOpen = true;
+                                }
+                                if (makeSitemapOrg) {
+                                    sitemapsOrg.addURL(url, null);
+                                    fileOpenSiteMap = true;
+                                }
+                                modifiedDP.add(dataPackage);
+                            }
+                        } else {
+                            if (dataPackage.isWithdrawn()) {
+                                System.out.println("Item : " + i.getID() + " - " + i.getHandle() + ": withdrawn.");
+                            } else {
+                                System.out.println("Item : " + i.getID() + " - " + i.getHandle() + ": can't find the datapackage information.");
+                            }
                         }
-                    String url = "";
-                    if(dataPackage!=null){
-                    DCValue[] identifier = dataPackage.getMetadata("dc.identifier");
-                    if(identifier!=null&&identifier.length>0){
-
-                    url = resourceURL + identifier[0].value;
-                    }
-                    else if(dataPackage.getHandle()!=null)
-                    {
-                        url = handleURLStem + dataPackage.getHandle();
-                    }
-                    else
-                    {
-                        url = handleURLStem + "item/"+dataPackage.getID();
-                    }
-                    if(!modifiedDP.contains(dataPackage)){
-                        if (makeHTMLMap)
-                        {
-                            html.addURL(url, null);
-                            fileOpen=true;
-                        }
-                        if (makeSitemapOrg)
-                        {
-                            sitemapsOrg.addURL(url, null);
-                            fileOpenSiteMap=true;
-                        }
-                        modifiedDP.add(dataPackage);
-                    }
-                    }
-                    else
-                    {
+                    } else {
                         System.out.println("Item : " + i.getID() + " - " + i.getHandle() + ": can't find the datapackage information.");
                     }
-                }catch (Exception ex){
+                } catch (Exception ex) {
                     // if some items are not consistent just go ahead...
                     System.out.println("Item : " + i.getID() + " - " + i.getHandle() + ": not processed.");
                     log.info("Item : " + i.getID() + " - " + i.getHandle() + ": not processed.");
