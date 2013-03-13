@@ -43,14 +43,14 @@ import org.dspace.workflow.DryadWorkflowUtils;
  * @author Robert Tansley
  * @author Stuart Lewis
  */
-public class GenerateSitemaps {
-    /**
-     * Logger
-     */
+public class GenerateSitemaps
+{
+    /** Logger */
     private static Logger log = Logger.getLogger(GenerateSitemaps.class);
     private static String myDataPkgColl = ConfigurationManager.getProperty("stats.datapkgs.coll");
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception
+    {
         final String usage = GenerateSitemaps.class.getCanonicalName();
 
         CommandLineParser parser = new PosixParser();
@@ -71,19 +71,24 @@ public class GenerateSitemaps {
 
         CommandLine line = null;
 
-        try {
+        try
+        {
             line = parser.parse(options, args);
-        } catch (ParseException pe) {
+        }
+        catch (ParseException pe)
+        {
             hf.printHelp(usage, options);
             System.exit(1);
         }
 
-        if (line.hasOption('h')) {
+        if (line.hasOption('h'))
+        {
             hf.printHelp(usage, options);
             System.exit(0);
         }
 
-        if (line.getArgs().length != 0) {
+        if (line.getArgs().length != 0)
+        {
             hf.printHelp(usage, options);
             System.exit(1);
         }
@@ -95,7 +100,8 @@ public class GenerateSitemaps {
         if (line.getArgs().length != 0 || line.hasOption('b')
                 && line.hasOption('s') && !line.hasOption('g')
                 && !line.hasOption('m') && !line.hasOption('y')
-                && !line.hasOption('p')) {
+                && !line.hasOption('p'))
+        {
             System.err
                     .println("Nothing to do (no sitemap to generate, no search engines to ping)");
             hf.printHelp(usage, options);
@@ -103,22 +109,28 @@ public class GenerateSitemaps {
         }
 
         // Note the negation (CLI options indicate NOT to generate a sitemap)
-        if (!line.hasOption('b') || !line.hasOption('s')) {
-            try {
-                generateSitemaps(!line.hasOption('b'), !line.hasOption('s'));
-            } catch (Exception e) {
-                System.out.print("\ngenerate site map:" + e.getMessage() + "\n");
+        if (!line.hasOption('b') || !line.hasOption('s'))
+        {
+            try{
+            generateSitemaps(!line.hasOption('b'), !line.hasOption('s'));
+            }catch(Exception e){
+                              System.out.print("\ngenerate site map:"+e.getMessage()+"\n");
             }
         }
 
-        if (line.hasOption('a')) {
+        if (line.hasOption('a'))
+        {
             pingConfiguredSearchEngines();
         }
 
-        if (line.hasOption('p')) {
-            try {
+        if (line.hasOption('p'))
+        {
+            try
+            {
                 pingSearchEngine(line.getOptionValue('p'));
-            } catch (MalformedURLException me) {
+            }
+            catch (MalformedURLException me)
+            {
                 System.err
                         .println("Bad search engine URL (include all except sitemap URL)");
                 System.exit(1);
@@ -131,140 +143,152 @@ public class GenerateSitemaps {
     /**
      * Generate sitemap.org protocol and/or basic HTML sitemaps.
      *
-     * @param makeHTMLMap    if {@code true}, generate an HTML sitemap.
-     * @param makeSitemapOrg if {@code true}, generate an sitemap.org sitemap.
-     * @throws SQLException if a database error occurs.
-     * @throws IOException  if IO error occurs.
+     * @param makeHTMLMap
+     *            if {@code true}, generate an HTML sitemap.
+     * @param makeSitemapOrg
+     *            if {@code true}, generate an sitemap.org sitemap.
+     * @throws SQLException
+     *             if a database error occurs.
+     * @throws IOException
+     *             if IO error occurs.
      */
     public static void generateSitemaps(boolean makeHTMLMap,
-                                        boolean makeSitemapOrg) throws SQLException, IOException {
+                                        boolean makeSitemapOrg) throws SQLException, IOException
+    {
 
 
-        try {
-            String resourceURL = ConfigurationManager.getProperty("dspace.url") + "/resource/";
+        try{
+        String resourceURL =  ConfigurationManager.getProperty("dspace.url")+"/resource/";
 
-            String sitemapStem = ConfigurationManager.getProperty("dspace.url")
-                    + "/sitemap";
-            String htmlMapStem = ConfigurationManager.getProperty("dspace.url")
-                    + "/htmlmap";
-            String handleURLStem = ConfigurationManager.getProperty("dspace.url")
-                    + "/handle/";
+        String sitemapStem = ConfigurationManager.getProperty("dspace.url")
+                + "/sitemap";
+        String htmlMapStem = ConfigurationManager.getProperty("dspace.url")
+                + "/htmlmap";
+        String handleURLStem = ConfigurationManager.getProperty("dspace.url")
+                + "/handle/";
 
-            File outputDir = new File(ConfigurationManager.getProperty("sitemap.dir"));
-            if (!outputDir.exists() && !outputDir.mkdir()) {
-                log.error("Unable to create output directory");
-            }
-            AbstractGenerator html = null;
-            AbstractGenerator sitemapsOrg = null;
-            Date lastGererateDate = null;
-            if (makeHTMLMap) {
-                html = new HTMLSitemapGenerator(outputDir, htmlMapStem + "?map=",
-                        null);
+        File outputDir = new File(ConfigurationManager.getProperty("sitemap.dir"));
+        if (!outputDir.exists() && !outputDir.mkdir())
+        {
+            log.error("Unable to create output directory");
+        }
+        AbstractGenerator html = null;
+        AbstractGenerator sitemapsOrg = null;
+        Date lastGererateDate = null;
+        if (makeHTMLMap)
+        {
+            html = new HTMLSitemapGenerator(outputDir, htmlMapStem + "?map=",
+                    null);
 
-                lastGererateDate = getLastTimeStamp(html, outputDir);
-            }
+            lastGererateDate=getLastTimeStamp(html,outputDir);
+        }
 
-            if (makeSitemapOrg) {
-                sitemapsOrg = new SitemapsOrgGenerator(outputDir, sitemapStem
-                        + "?map=", null);
+        if (makeSitemapOrg)
+        {
+            sitemapsOrg = new SitemapsOrgGenerator(outputDir, sitemapStem
+                    + "?map=", null);
 
-                lastGererateDate = getLastTimeStamp(sitemapsOrg, outputDir);
-            }
-            Context c = new Context();
+            lastGererateDate= getLastTimeStamp(sitemapsOrg,outputDir);
+        }
+        Context c = new Context();
 
-            boolean fileOpen = false;
-            boolean fileOpenSiteMap = false;
+        boolean fileOpen=false;
+        boolean fileOpenSiteMap=false;
 
-            ItemIterator allItems = null;
-            if (lastGererateDate == null)
-                allItems = Item.findAll(c);
-            else
-                allItems = Item.findByLastModifiedGreaterThan(c, lastGererateDate);
-            try {
-                int itemCount = 0;
+        ItemIterator allItems = null;
+        if(lastGererateDate==null)
+            allItems=Item.findAll(c);
+        else
+            allItems = Item.findByLastModifiedGreaterThan(c,lastGererateDate);
+        try
+        {
+            int itemCount = 0;
 
-                List<Item> modifiedDP = new ArrayList<Item>();
-                Item i = null;
-                while (allItems.hasNext()) {
-                    try {
-                        i = allItems.next();
+            List<Item> modifiedDP = new ArrayList<Item>();
+            Item i = null;
+            while (allItems.hasNext())
+            {
+                try{
+                    i = allItems.next();
 
-                        if (!i.isWithdrawn()) {
-                            Item dataPackage = i;
+                    Item dataPackage=i;
 
-                            if (!i.getOwningCollection().getHandle().equals(myDataPkgColl)) {
-                                dataPackage = DryadWorkflowUtils.getDataPackage(c, i);
-                            }
-                            String url = "";
-                            if (dataPackage != null && !dataPackage.isWithdrawn()) {
-                                DCValue[] identifier = dataPackage.getMetadata("dc.identifier");
-                                if (identifier != null && identifier.length > 0) {
-
-                                    url = resourceURL + identifier[0].value;
-                                } else if (dataPackage.getHandle() != null) {
-                                    url = handleURLStem + dataPackage.getHandle();
-                                } else {
-                                    url = handleURLStem + "item/" + dataPackage.getID();
-                                }
-                                if (!modifiedDP.contains(dataPackage)) {
-                                    if (makeHTMLMap) {
-                                        html.addURL(url, null);
-                                        fileOpen = true;
-                                    }
-                                    if (makeSitemapOrg) {
-                                        sitemapsOrg.addURL(url, null);
-                                        fileOpenSiteMap = true;
-                                    }
-                                    modifiedDP.add(dataPackage);
-                                }
-                            } else {
-                                if(dataPackage.isWithdrawn())
-                                {
-                                    System.out.println("Item : " + i.getID() + " - " + i.getHandle() + ": withdrawn.");
-                                }
-                                else{
-                                System.out.println("Item : " + i.getID() + " - " + i.getHandle() + ": can't find the datapackage information.");
-                                }
-                            }
+                    if(!i.getOwningCollection().getHandle().equals(myDataPkgColl)) {
+                            dataPackage=DryadWorkflowUtils.getDataPackage(c, i);
                         }
-                        else
+                    String url = "";
+                    if(dataPackage!=null){
+                    DCValue[] identifier = dataPackage.getMetadata("dc.identifier");
+                    if(identifier!=null&&identifier.length>0){
+
+                    url = resourceURL + identifier[0].value;
+                    }
+                    else if(dataPackage.getHandle()!=null)
+                    {
+                        url = handleURLStem + dataPackage.getHandle();
+                    }
+                    else
+                    {
+                        url = handleURLStem + "item/"+dataPackage.getID();
+                    }
+                    if(!modifiedDP.contains(dataPackage)){
+                        if (makeHTMLMap)
                         {
-                            System.out.println("Item : " + i.getID() + " - " + i.getHandle() + ": withdrawn.");
+                            html.addURL(url, null);
+                            fileOpen=true;
                         }
-                    } catch (Exception ex) {
-                        // if some items are not consistent just go ahead...
-                        System.out.println("Item : " + i.getID() + " - " + i.getHandle() + ": not processed.");
-                        log.info("Item : " + i.getID() + " - " + i.getHandle() + ": not processed.");
+                        if (makeSitemapOrg)
+                        {
+                            sitemapsOrg.addURL(url, null);
+                            fileOpenSiteMap=true;
+                        }
+                        modifiedDP.add(dataPackage);
                     }
-                }
-
-                if (makeHTMLMap) {
-                    if (fileOpen) {
-                        int files = html.finish();
-                        log.info(LogManager.getHeader(c, "write_sitemap",
-                                "type=html,num_files=" + files));
-                    } else {
-                        System.out.println("Nothing to do. Since last creation no items were created or updated.");
                     }
-                }
-
-                if (makeSitemapOrg) {
-                    if (fileOpenSiteMap) {
-                        int files = sitemapsOrg.finish();
-                        log.info(LogManager.getHeader(c, "write_sitemap",
-                                "type=html,num_files=" + files));
-                    } else {
-                        System.out.println("Anything to do. SInce last creation no items were created or updated.");
+                    else
+                    {
+                        System.out.println("Item : " + i.getID() + " - " + i.getHandle() + ": can't find the datapackage information.");
                     }
-                }
-            } finally {
-                if (allItems != null) {
-                    allItems.close();
+                }catch (Exception ex){
+                    // if some items are not consistent just go ahead...
+                    System.out.println("Item : " + i.getID() + " - " + i.getHandle() + ": not processed.");
+                    log.info("Item : " + i.getID() + " - " + i.getHandle() + ": not processed.");
                 }
             }
-            System.out.println("Process terminated. Sitemaps have been generated.");
-            c.abort();
-        } catch (Exception ex) {
+
+            if (makeHTMLMap)
+            {
+                if(fileOpen){
+                    int files = html.finish();
+                    log.info(LogManager.getHeader(c, "write_sitemap",
+                            "type=html,num_files=" + files));
+                }
+                else{
+                    System.out.println("Nothing to do. Since last creation no items were created or updated.");
+                }
+            }
+
+            if (makeSitemapOrg)
+            {
+                if(fileOpenSiteMap){
+                    int files = sitemapsOrg.finish();
+                    log.info(LogManager.getHeader(c, "write_sitemap",
+                            "type=html,num_files=" + files));
+                }else{
+                    System.out.println("Anything to do. SInce last creation no items were created or updated.");
+                }
+            }
+        }
+        finally
+        {
+            if (allItems != null)
+            {
+                allItems.close();
+            }
+        }
+        System.out.println("Process terminated. Sitemaps have been generated.");
+        c.abort();
+        }catch (Exception ex){
             ex.printStackTrace(System.out);
         }
     }
@@ -272,28 +296,36 @@ public class GenerateSitemaps {
     /**
      * Ping all search engines configured in {@code dspace.cfg}.
      *
-     * @throws UnsupportedEncodingException theoretically should never happen
+     * @throws UnsupportedEncodingException
+     *             theoretically should never happen
      */
     public static void pingConfiguredSearchEngines()
-            throws UnsupportedEncodingException {
+            throws UnsupportedEncodingException
+    {
         String engineURLProp = ConfigurationManager
                 .getProperty("sitemap.engineurls");
         String engineURLs[] = null;
 
-        if (engineURLProp != null) {
+        if (engineURLProp != null)
+        {
             engineURLs = engineURLProp.trim().split("\\s*,\\s*");
         }
 
         if (engineURLProp == null || engineURLs == null
-                || engineURLs.length == 0 || engineURLs[0].trim().equals("")) {
+                || engineURLs.length == 0 || engineURLs[0].trim().equals(""))
+        {
             log.warn("No search engine URLs configured to ping");
             return;
         }
 
-        for (int i = 0; i < engineURLs.length; i++) {
-            try {
+        for (int i = 0; i < engineURLs.length; i++)
+        {
+            try
+            {
                 pingSearchEngine(engineURLs[i]);
-            } catch (MalformedURLException me) {
+            }
+            catch (MalformedURLException me)
+            {
                 log.warn("Bad search engine URL in configuration: "
                         + engineURLs[i]);
             }
@@ -303,16 +335,21 @@ public class GenerateSitemaps {
     /**
      * Ping the given search engine.
      *
-     * @param engineURL Search engine URL minus protocol etc, e.g.
-     *                  {@code www.google.com}
-     * @throws MalformedURLException        if the passed in URL is malformed
-     * @throws UnsupportedEncodingException theoretically should never happen
+     * @param engineURL
+     *            Search engine URL minus protocol etc, e.g.
+     *            {@code www.google.com}
+     * @throws MalformedURLException
+     *             if the passed in URL is malformed
+     * @throws UnsupportedEncodingException
+     *             theoretically should never happen
      */
     public static void pingSearchEngine(String engineURL)
-            throws MalformedURLException, UnsupportedEncodingException {
+            throws MalformedURLException, UnsupportedEncodingException
+    {
         // Set up HTTP proxy
         if ((ConfigurationManager.getProperty("http.proxy.host") != null)
-                && (ConfigurationManager.getProperty("http.proxy.port") != null)) {
+                && (ConfigurationManager.getProperty("http.proxy.port") != null))
+        {
             System.setProperty("proxySet", "true");
             System.setProperty("proxyHost", ConfigurationManager
                     .getProperty("http.proxy.host"));
@@ -325,7 +362,8 @@ public class GenerateSitemaps {
 
         URL url = new URL(engineURL + URLEncoder.encode(sitemapURL, "UTF-8"));
 
-        try {
+        try
+        {
             HttpURLConnection connection = (HttpURLConnection) url
                     .openConnection();
 
@@ -334,56 +372,68 @@ public class GenerateSitemaps {
 
             String inputLine;
             StringBuffer resp = new StringBuffer();
-            while ((inputLine = in.readLine()) != null) {
+            while ((inputLine = in.readLine()) != null)
+            {
                 resp.append(inputLine).append("\n");
             }
             in.close();
 
-            if (connection.getResponseCode() == 200) {
+            if (connection.getResponseCode() == 200)
+            {
                 log.info("Pinged " + url.toString() + " successfully");
-            } else {
+            }
+            else
+            {
                 log.warn("Error response pinging " + url.toString() + ":\n"
                         + resp);
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             log.warn("Error pinging " + url.toString(), e);
         }
     }
 
 
-    public static void setFileCount(AbstractGenerator handle, int number) {
-        handle.fileCount = number;
+    public static void setFileCount(AbstractGenerator handle,int number){
+        handle.fileCount =number;
     }
 
-    public static Date getLastTimeStamp(AbstractGenerator handle, File outputDir) {
+    public static Date getLastTimeStamp(AbstractGenerator handle,File outputDir){
         int number = 0;
-        File[] files = outputDir.listFiles();
+        File[] files= outputDir.listFiles();
         String key = ".html";
         Date lastGenerateDate = null;
         // DCDate now = DCDate.getCurrent();
-        if (handle instanceof HTMLSitemapGenerator) {
+        if(handle instanceof HTMLSitemapGenerator)
+        {
             key = ".html";
         }
-        if (handle instanceof SitemapsOrgGenerator) {
+        if(handle instanceof SitemapsOrgGenerator)
+        {
             key = ".xml.gz";
         }
-        if (files != null && files.length > 0) {
-            for (File file : files) {
+        if(files!=null&&files.length>0){
+            for(File file : files){
 
-                if (file.getName().contains(key) && file.getName().startsWith("sitemap") && !file.getName().contains("_index")) {
-                    int startPos = "sitemap".length();
-                    int endPos = file.getName().indexOf(key);
+                if(file.getName().contains(key)&&file.getName().startsWith("sitemap")&&!file.getName().contains("_index"))
+                {
+                    int startPos =   "sitemap".length();
+                    int endPos =file.getName().indexOf(key);
                     String name = file.getName();
-                    String index = name.substring(startPos, endPos);
-                    int newNumber = 0;
-                    try {
-                        newNumber = Integer.parseInt(index);
-                    } catch (Exception e) {
-                        log.warn("Found some files may contain sitemap infomations:" + file.getName(), e);
-                        System.out.println("Found some files may contain sitemap infomations:" + file.getName() + ". If this is the first time to generate the sitemap, please clean the old files in the sitemap folder");
+                    String index = name.substring(startPos,endPos);
+                    int newNumber=0;
+                    try{
+                    newNumber =Integer.parseInt(index);
                     }
-                    if (newNumber > number) {
-                        number = newNumber;
+                    catch (Exception e)
+                    {
+                        log.warn("Found some files may contain sitemap infomations:" + file.getName(), e);
+                        System.out.println("Found some files may contain sitemap infomations:" + file.getName()+". If this is the first time to generate the sitemap, please clean the old files in the sitemap folder");
+                    }
+                    if(newNumber>number)
+                    {
+                        number=newNumber;
                         lastGenerateDate = new Date(file.lastModified());
 
                     }
@@ -391,42 +441,48 @@ public class GenerateSitemaps {
             }
 
         }
-        setFileCount(handle, number + 1);
+        setFileCount(handle,number+1);
         return lastGenerateDate;
     }
 
-    public static boolean checkModification(Context context, Item i, Date lastGenerateDate) {
-        Boolean modified = false;
+    public static boolean checkModification(Context context,Item i, Date lastGenerateDate){
+        Boolean modified =false;
         Date lastMod = i.getLastModified();
         DCDate now = DCDate.getCurrent();
 
         DateFormat parser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        try {
-            if (i.isArchived()) {
+        try{
+            if(i.isArchived()){
 
-                if (lastGenerateDate == null || lastMod.after(lastGenerateDate)) {   //item hase been modified
-                    modified = true;
-                } else {
+                if(lastGenerateDate==null||lastMod.after(lastGenerateDate))
+                {   //item hase been modified
+                    modified=true;
+                }
+                else
+                {
                     ////check the items files belong to this package item (embargo and modified)
 
                     Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, i);
-                    if (dataFiles.length > 0) {
-                        System.out.print(dataFiles.length + "here\n");
+                    if(dataFiles.length>0)
+                    {
+                        System.out.print(dataFiles.length+"here\n");
                     }
-                    for (Item dataFile : dataFiles) {
-                        if (dataFile.isArchived()) {
+                    for(Item dataFile:dataFiles)
+                    {
+                        if(dataFile.isArchived()){
                             //check modified
                             Date lastModified = dataFile.getLastModified();
-                            if (lastModified.after(lastGenerateDate)) {
-                                modified = true;
+                            if(lastModified.after(lastGenerateDate)){
+                                 modified=true;
                             }
                             //check embargo
-                            DCValue[] embargos = dataFile.getMetadata("dc.date.embargoedUntil");
-                            for (DCValue embargo : embargos) {
-                                Date embargoDate = parser.parse(embargo.toString());
-                                if (embargoDate.after(lastGenerateDate) && embargoDate.before(now.toDate())) {
-                                    modified = true;
-                                }
+                            DCValue[] embargos  = dataFile.getMetadata("dc.date.embargoedUntil");
+                            for(DCValue embargo:embargos){
+                                 Date embargoDate = parser.parse(embargo.toString());
+                                 if(embargoDate.after(lastGenerateDate)&&embargoDate.before(now.toDate()))
+                                 {
+                                     modified=true;
+                                 }
                             }
 
 
@@ -434,9 +490,10 @@ public class GenerateSitemaps {
                     }
 
 
+
                 }
             }
-        } catch (Exception e) {
+        }catch (Exception e){
             log.info("error when checking whether an item is a data package or not!");
         }
         return modified;
