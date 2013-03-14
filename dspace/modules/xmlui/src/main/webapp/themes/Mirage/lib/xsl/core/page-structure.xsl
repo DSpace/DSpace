@@ -468,6 +468,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                 </li>
                                 <li>
                                   <a href="/pages/faq">FAQ</a>
+                                  <!--
                                   <ul>
                                       <li>
                                           <a href="/pages/jdap">Journal Archiving Policy</a>
@@ -477,6 +478,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                           <a href="/pages/partners">Related Projects</a>
                                       </li>
                                   </ul>
+                                  -->
                                 </li>                                
                                 <li>
                                     <a href="/pages/pricing">Pricing Plans</a>
