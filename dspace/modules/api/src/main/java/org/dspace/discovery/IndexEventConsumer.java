@@ -159,32 +159,24 @@ public class IndexEventConsumer implements Consumer {
             case Event.DELETE:
 
                 if (st == Constants.ITEM) {
-                    Item item = (Item) event.getSubject(ctx);
-
-                    String id;
-                    DCValue[] values = item.getMetadata("dc.identifier");
-                    if(values!=null && values.length > 0){
-                        id = values[0].value;
-                        String idFirstPart="doi:10.5061/dryad.";
-                        String idLastPart = id.substring(idFirstPart.length());
-                        if(idLastPart.indexOf('.')!=-1){ // this is a versioned item
-                            String canonical = idFirstPart + idLastPart.substring(0, idLastPart.indexOf('.'));
-                            IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
-                            Item previousItem  = (Item) identifierService.resolve(ctx, canonical);
-                            objectsToUpdate.add(previousItem);
-                        }
+                    // get item ID previous version, id present.
+                    int itemIDPreviousVersion = event.getObjectID();
+                    if(itemIDPreviousVersion!=-1){
+                        Item previousItem  = Item.find(ctx, itemIDPreviousVersion);
+                        objectsToUpdate.add(previousItem);
+                    }
+                    String detail = event.getDetail();
+                    if (detail == null)
+                    {
+                        log.warn("got null detail on DELETE event, skipping it.");
+                    }
+                    else {
+                        log.debug("consume() adding event to delete queue: " + event.toString());
+                        handlesToDelete.add(detail);
                     }
                 }
-                String detail = event.getDetail();
-                if (detail == null)
-                {
-                    log.warn("got null detail on DELETE event, skipping it.");
-                }
-                else {
-                    log.debug("consume() adding event to delete queue: " + event.toString());
-                    handlesToDelete.add(detail);
-                }
                 break;
+
             default:
                 log
                         .warn("IndexConsumer should not have been given a event of type="
