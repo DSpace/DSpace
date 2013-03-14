@@ -94,7 +94,7 @@ ul.sf-menu li li li.sfHover ul {
 	border-left: 3px solid #87c033;
     border-bottom: 3px solid #87c033;
     border-right: 3px solid #87c033;
-    overflow: hidden;
+    overflow: visible;
     -webkit-border-bottom-left-radius: 8px;
     -webkit-border-bottom-right-radius: 8px;
     -moz-border-radius-bottomleft: 8px;
