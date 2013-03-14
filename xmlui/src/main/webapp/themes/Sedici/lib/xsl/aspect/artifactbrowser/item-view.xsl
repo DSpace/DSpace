@@ -287,7 +287,7 @@
 		</xsl:if>
 
 		<!-- Solo para el tipo tesis -->
-		<xsl:if test="dim:field[@element='type'] = 'Tesis'">
+		<xsl:if test="dim:field[@element='type'] = '$tesis'">
 			<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.tesis-info</i18n:text></h2>
 			<!-- contributor.director row -->
 			<xsl:call-template name="render-normal-field">
@@ -575,30 +575,30 @@
 
 		<!-- peer_review row -->
 		<!-- fulltext row -->
-		
-		<xsl:if test="dim:field[@qualifier='peerReview'] or dim:field[@qualifier='fulltext']">
-	        <div id="other_attributes">
-				<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.other-attributes</i18n:text></h2>
-				<ul>
-					<xsl:if test="dim:field[@qualifier='peerReview']">
-						<li class="metadata peer-review">
-							<i18n:text>xmlui.dri2xhtml.METS-1.0.item-is-<xsl:value-of select="dim:field[@qualifier='peerReview']"/></i18n:text>
-						</li>
-					</xsl:if>
+		<!-- Si el tipo es audio o video no se muestra que tiene a documento completo -->
+		<xsl:if test="dim:field[@element='type'] = '$audio' and dim:field[@element='type'] = '$imagen_en_movimiento'">
+					
+			<xsl:if test="dim:field[@qualifier='peerReview'] or dim:field[@qualifier='fulltext']">
+	        	<div id="other_attributes">
+					<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.other-attributes</i18n:text></h2>
+					<ul>
+						<xsl:if test="dim:field[@qualifier='peerReview']">
+							<li class="metadata peer-review">
+								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-is-<xsl:value-of select="dim:field[@qualifier='peerReview']"/></i18n:text>
+							</li>
+						</xsl:if>
 			
-					<!-- Si el tipo es audio o video no se muestra que tiene a documento completo -->
-					<xsl:if test="dim:field[@element='type'] = 'Audio'">
 						<!-- fulltext row -->
 						<xsl:if test="dim:field[@qualifier='fulltext']">
 							<li class="metadata fulltext">
 								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-<xsl:value-of select="dim:field[@qualifier='fulltext']"/>-fulltext</i18n:text>
 							</li>
 						</xsl:if>
-					</xsl:if>	
-				</ul>
-			</div>
-		</xsl:if>
-		
+					</ul>
+				</div>
+			</xsl:if>
+		</xsl:if>	
+				
 		<!-- mods.recordInfo.recordContentSource row -->
 		<xsl:if test="dim:field[@element='recordInfo' and @qualifier='recordContentSource']">
 			<div class="metadata simple-item-view-other record-source">
@@ -1115,14 +1115,14 @@
 					<xsl:choose>
 						
 						<!-- Solo para el tipo tesis: grado alanzado e institución otorgante -->
-						<xsl:when test="dim:field[@element='type'] = 'Tesis'">
+						<xsl:when test="dim:field[@element='type'] = '$tesis'">
 							<xsl:value-of select="dim:field[@element='degree' and @qualifier='name']"/>
 							<xsl:text>; </xsl:text>
 							<xsl:value-of select="dim:field[@element='degree' and @qualifier='grantor']"/>
 						</xsl:when>
 
 						<!-- Solo para el tipo Objeto de coferencia: evento -->
-						<xsl:when test="dim:field[@element='type'] = 'Objeto de conferencia'">
+						<xsl:when test="dim:field[@element='type'] = '$objeto_de_conferencia'">
 							<xsl:value-of select="dim:field[@element='relation' and @qualifier='event']"/>
 						</xsl:when>
 						
