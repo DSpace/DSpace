@@ -54,14 +54,14 @@
 			};
 		
 		return this.each(function() {
-			var o = $.superfish.o[this.serial]; /* get this menu's options */
+			var o = $.fn.superfish.o[this.serial]; /* get this menu's options */
 			
 			/* if callbacks already set, store them */
 			var _onInit = o.onInit,
 				_onBeforeShow = o.onBeforeShow,
 				_onHide = o.onHide;
 				
-			$.extend($.superfish.o[this.serial],{
+			$.extend($.fn.superfish.o[this.serial],{
 				onInit		: function() {
 					onInit.call(this); /* fire our Supposition callback */
 					_onInit.call(this); /* fire stored callbacks */
