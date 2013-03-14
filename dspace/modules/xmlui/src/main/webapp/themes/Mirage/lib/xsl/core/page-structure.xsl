@@ -759,6 +759,18 @@ references to stylesheets pulled directly from the pageMeta element. -->
             &#160;
         </script>
 
+        <script type="text/javascript">
+            <xsl:attribute name="src">
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                <xsl:text>/themes/</xsl:text>
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                <xsl:text>/lib/js/supposition-BLACK-BOX-MODS.js</xsl:text>
+            </xsl:attribute>
+            &#160;
+        </script>
+
 
         <!-- Add theme javascipt  -->
         <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)]">
@@ -855,10 +867,11 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
 
                 jQuery(document).ready(function() {
-                    jQuery('#main-menu ul.sf-menu').supersubs({
+                    jQuery('#main-menu ul.sf-menu')
+                        .supersubs({
                             // all numeric properties are in em
-                            minWidth: 22,
-                            maxWidth: 30,   // this isn't doing much...
+                            minWidth: 10,
+                            maxWidth: 20,
                             extraWidth: 1
                         })
                         .superfish({
@@ -870,7 +883,8 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             },
                             speed: 0, 
                             disableHI: true     // remove menu delay (from hoverIntent)
-                        });
+                        })
+                        .supposition();
                 });
 
 		
