@@ -42,6 +42,7 @@
     <xsl:import href="integrated-view.xsl"/>
     <xsl:import href="DryadItemSummary.xsl"/>
     <xsl:import href="DryadUtils.xsl"/>
+    <xsl:import href="DryadSearch.xsl"/>
     <xsl:output indent="yes"/>
 
 
@@ -943,13 +944,6 @@ Dryad installs (dev, demo, staging, production, etc.) -->
 
                     <!-- The tabs display a selected tab based on the location
 parameter that is being used (see variable defined above) -->
-                    <div id="searchTabs">
-                        <ul>
-                            <xsl:call-template name="buildTabs"/>
-
-
-                        </ul>
-                    </div>
                 </xsl:if>
                 <ul class="ds-artifact-list">
                     <xsl:choose>
@@ -999,11 +993,20 @@ parameter that is being used (see variable defined above) -->
 
 </xsl:template>
 -->
-    <xsl:template match="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='tabs']"/>
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='tabs']">
+        <div id="searchTabs">
+            <ul>
+                <xsl:call-template name="buildTabs"/>
+
+
+            </ul>
+        </div>
+    </xsl:template>
+
 
     <xsl:template match="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='search-query']/dri:item[position()=1]">
         <li class="ds-form-item">
-            <label class="ds-form-label" for="aspect_discovery_SimpleSearch_field_query"><i18n:text><xsl:value-of select="."/></i18n:text></label>
+            <label class="ds-form-label" for="aspect_discovery_SimpleSearch_field_query"><i18n:text><xsl:value-of select="dri:field/dri:label"/></i18n:text></label>
             <div class="ds-form-content">
                 <xsl:apply-templates/><a id="advanced-search" href="#">Advanced Search</a>
             </div>

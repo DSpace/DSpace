@@ -1547,3 +1547,7 @@ img.ds-authority-confidence
 #aspect_submission_StepTransformer_item_license_accepted{
     margin-top:100px;
 }
+
+#aspect_discovery_SimpleSearch_div_search-results p{
+    margin-top:10px;
+}

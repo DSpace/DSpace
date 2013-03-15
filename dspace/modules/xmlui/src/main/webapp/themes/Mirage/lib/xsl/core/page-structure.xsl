@@ -513,15 +513,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     </a>
 
                                     <ul>
-                                        <li>
-                                            <a>
-                                                <xsl:attribute name="href">
-                                                    <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
-                                        dri:metadata[@element='identifier' and @qualifier='logoutURL']"/>
-                                                </xsl:attribute>
-                                                <i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
-                                            </a>
-                                        </li>
+                                        <!--remove the extra login link-->
                                         <xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='account']/dri:item" mode="menu"/>
                                     </ul>
 
@@ -870,9 +862,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
 
                 jQuery(document).ready(function() {
-                if(jQuery("input[type='checkbox']").length == 0){
-                    jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").css("display","none");
-                }
+
+                  jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").css("display","none");
+
                   jQuery("#advanced-search").click(function(){
 
                   jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").toggle();

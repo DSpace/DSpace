@@ -137,18 +137,7 @@
 		query</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.head3">Items matching your query</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.no_results">
-		<div id="aspect_discovery_SimpleSearch_div_search-results" class="ds-static-div primary"> 
-			<div id="searchTabs"> 
-				<ul> 
-					<li id="selected" style="color: rgb(49, 102, 22);"> Dryad (0)</li> 
-					<li style="color: rgb(49, 102, 22);">TreeBASE (0)</li>
-					<li style="color: rgb(49, 102, 22);">KNB (0)</li>
-				</ul> 
-			</div>
-			<ul class="ds-artifact-list"> 
-				<li class="ds-artifact-item odd"/>
-			</ul>
-		</div>
+		No result found
 	</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.all_of_dspace">All of Dryad</message>
 
