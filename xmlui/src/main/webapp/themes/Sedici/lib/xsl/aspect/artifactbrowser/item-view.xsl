@@ -304,11 +304,26 @@
 			</xsl:call-template>
 
 			<!-- date.exposure row -->
-			<xsl:call-template name="render-normal-field">
-				<xsl:with-param name="name" select="'date-exposure'"/>
-				<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='exposure'] "/>
-				<xsl:with-param name="type" select="'date'"/>
-			</xsl:call-template>
+			<xsl:choose>
+				<xsl:when test="dim:field[@element='date' and @qualifier='exposure']">
+					<!-- date.exposure row -->
+					<xsl:call-template name="render-normal-field">
+						<xsl:with-param name="name" select="'date-exposure'"/>
+						<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='exposure'] "/>
+						<xsl:with-param name="type" select="'date'"/>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:when test="(dim:field[@element='date' and @qualifier='exposure']!=dim:field[@element='date' and @qualifier='available'])">
+					<!-- date.exposure row -->
+					<xsl:call-template name="render-normal-field">
+						<xsl:with-param name="name" select="'date-issued'"/>
+						<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='issued'] "/>
+						<xsl:with-param name="type" select="'date'"/>
+						
+					</xsl:call-template>
+				</xsl:when>
+					
+			</xsl:choose>	
 
 			<!-- affiliatedInstitution row -->
 			<xsl:call-template name="render-normal-field">
@@ -332,14 +347,29 @@
 
 
 		<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.general-info</i18n:text></h2>
-		<xsl:if test="not(dim:field[@element='contributor' and @qualifier='director'])">
+		<xsl:if test="not(dim:field[@element='type'] = '$tesis')">
 			<!-- date.exposure row -->
-			<xsl:call-template name="render-normal-field">
-				<xsl:with-param name="name" select="'date-exposure'"/>
-				<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='exposure'] "/>
-				<xsl:with-param name="type" select="'date'"/>
-				<xsl:with-param name="filter">persona</xsl:with-param>
-			</xsl:call-template>
+			<xsl:choose>
+				<xsl:when test="dim:field[@element='date' and @qualifier='exposure']">
+					<!-- date.exposure row -->
+					<xsl:call-template name="render-normal-field">
+						<xsl:with-param name="name" select="'date-exposure'"/>
+						<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='exposure'] "/>
+						<xsl:with-param name="type" select="'date'"/>
+						<xsl:with-param name="filter">persona</xsl:with-param>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:when test="(dim:field[@element='date' and @qualifier='exposure']!=dim:field[@element='date' and @qualifier='available'])">
+					<!-- date.exposure row -->
+					<xsl:call-template name="render-normal-field">
+						<xsl:with-param name="name" select="'date-issued'"/>
+						<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='issued'] "/>
+						<xsl:with-param name="type" select="'date'"/>
+						
+					</xsl:call-template>
+				</xsl:when>
+					
+			</xsl:choose>	
 		</xsl:if>
 
 		<!-- identifier.expediente row -->
@@ -566,10 +596,17 @@
 
 		<!-- date.available row -->
 		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'date-accessioned'" />
+			<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='accessioned']" />
+			<xsl:with-param name="type" select="'date'"/>
+		</xsl:call-template>
+		<!-- date.available row -->
+		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'date-available'" />
 			<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='available']" />
 			<xsl:with-param name="type" select="'date'"/>
 		</xsl:call-template>
+
 
 		<xsl:apply-templates select="/mets:METS" mode="generate-bitstream"/>
 
