@@ -3273,7 +3273,10 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_type">Organization type is required</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label1">3. Gross annual revenue <span class="required-mark">*</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label2">Dryad membership fees are based on members' annual revenue.  Please specify currency if not USD.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label2">Dryad membership fees are based on members' annual revenue.</message>
+
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue_currency.label">Please specify currency.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue_currency">Currency selection is required</message>
     
     <!-- Checkbox options for org_annual_revenue -->
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.less_than_10_million">Less than $10 million per year (annual membership fee US$1000)</message>
