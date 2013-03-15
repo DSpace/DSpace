@@ -769,7 +769,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 <xsl:text>/themes/</xsl:text>
                 <xsl:value-of
                         select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-                <xsl:text>/lib/js/supposition-BLACK-BOX-MODS.js</xsl:text>
+                <xsl:text>/lib/js/supposition-BLACK-BLOG-MODS.js</xsl:text>
             </xsl:attribute>
             &#160;
         </script>
