@@ -36,14 +36,14 @@ public class DryadBlogFeed extends AbstractDSpaceTransformer implements
 
 	private static final Logger LOGGER = Logger.getLogger(DryadBlogFeed.class);
 
-	private static final Message HEADER = message("xmlui.Site.blogfeed.title");
+	private static final Message HEADER = message("xmlui.Site.blogfeed.title"); 
+    // TODO: add RSS icon to this header
 
 	private SourceValidity myValidity;
 
 	public void addBody(Body body) throws SAXException, WingException,
 			UIException, SQLException, IOException, AuthorizeException {
-		Division home = body.addDivision("dryad-info-home", "blog-box");
-		Division dryadFeed = home.addDivision("blog-hook");
+		Division dryadFeed = body.addDivision("blog-hook");
 		
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

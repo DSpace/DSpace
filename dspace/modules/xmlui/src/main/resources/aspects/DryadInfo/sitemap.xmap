@@ -60,10 +60,9 @@
                            </map:match>
 
 
-                           <map:match  type="wildcard" pattern="handle/**/**">
+                           <map:match  type="wildcard" pattern="handle/*/*">
                                              <map:transform type="Navigation"/>
                            </map:match>
-
 
 
             <map:serialize/>

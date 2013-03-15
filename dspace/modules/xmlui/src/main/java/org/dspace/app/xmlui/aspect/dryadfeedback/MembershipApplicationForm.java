@@ -82,7 +82,16 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
             AuthorizeException
     {       
         pageMeta.addMetadata("title").addContent(message(message_prefix + "title"));
-        pageMeta.addMetadata("stylesheet", "screen").addContent("lib/css/membership-form.css");
+        pageMeta.addMetadata("stylesheet", "screen").addContent("lib/css/reset.css");
+	pageMeta.addMetadata("stylesheet", "screen").addContent("lib/css/base.css");
+	pageMeta.addMetadata("stylesheet", "screen").addContent("lib/css/helper.css");
+	pageMeta.addMetadata("stylesheet", "screen").addContent("lib/css/jquery-ui-1.9.1.custom.css");
+	pageMeta.addMetadata("stylesheet", "screen").addContent("lib/css/style.css");
+	pageMeta.addMetadata("stylesheet", "screen").addContent("lib/css/authority-control.css");
+	pageMeta.addMetadata("stylesheet", "screen").addContent("lib/css/jquery-ui-1.css");
+	pageMeta.addMetadata("stylesheet", "screen").addContent("lib/css/jquery.bxslider.css");
+	pageMeta.addMetadata("stylesheet", "screen").addContent("lib/css/superfish.css");
+	pageMeta.addMetadata("stylesheet", "screen").addContent("lib/css/membership-form.css");
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         pageMeta.addTrail().addContent(message(message_prefix + "title"));
     }

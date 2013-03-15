@@ -327,11 +327,15 @@
 	<message key="xmlui.ArtifactBrowser.Contact.email">Email</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.FeedbackForm.java -->
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.title">Give feedback</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.title">Contact Us</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.trail">Give feedback</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.head">Give feedback</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.para1">Thanks for sharing your feedback about the
-		Dryad repository. Your comments are appreciated!</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.head">Contact Us</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.para1">Journals, publishers or societies seeking more information about membership, submission integration, payment plans or other ways to be part of Dryad please email: <a href="mailto:director@datadryad.org">director@datadryad.org</a>. </message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.para2">To submit a help ticket, send us feedback on the web site or for general technical questions please email: <a href="mailto:help@datadryad.org">help@datadryad.org</a>.</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.para3">For Dryad staff and project personnel, please see <a href="/pages/whoWeAre#staff">Who We Are</a>.</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.para4">Postal Address:</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.para5">Dryad<br/>PO Box 585<br/>Durham, NC 27702-0585 USA</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.para6">You may also submit your inquiry or help ticket using the form below.  Your submission will be tracked and routed to the correct person.</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.email">Your Email</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.email_help">This address will be used to follow
 		up on your feedback.</message>
@@ -363,7 +367,7 @@
 	<message key="xmlui.Site.stats">As of {0}, Dryad contains <span class="bold">{1} data
 			packages</span> and <span class="bold">{2} data files</span>, associated with articles in <span class="bold"
 			>{3} journals</span>.</message>
-	<message key="xmlui.Site.blogfeed.title">Dryad Blog</message>
+	<message key="xmlui.Site.blogfeed.title">News</message>
 
 
 
