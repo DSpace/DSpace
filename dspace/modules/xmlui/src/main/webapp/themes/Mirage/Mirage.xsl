@@ -470,9 +470,7 @@
             </div>
             <!-- START BLOG -->
             <div class="home-col-2">
-                <div id="aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home" class="blog-box">
-                    <xsl:apply-templates select="dri:div[@id='aspect.dryadinfo.DryadBlogFeed.div.dryad-info-home']"/>
-                </div>
+                <xsl:apply-templates select="dri:div[@id='aspect.dryadinfo.DryadBlogFeed.div.dryad-info-home']"/> 
             </div>
 
         </div>

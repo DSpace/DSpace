@@ -259,7 +259,10 @@ h1.ds-option-set-head {
 /* remove some style for nested boxes */
 .ds-static-div .ds-div-head,
 .ds-static-div .ds-static-div,
-.ds-static-div .ds-interactive-div {
+.ds-static-div .ds-interactive-div,
+/* special-case rules for the occasional top-level div.ds-static-div */
+#org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div,
+#aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div {
     border: none;
     padding: 0;
     -moz-box-shadow: none;
@@ -273,6 +276,13 @@ h1.ds-option-set-head {
 
 .ds-static-div,
 .ds-interactive-div,
+/* special-case rules for the occasional top-level div.ds-static-div */
+#org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div .ds-div-head,
+#org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div .ds-static-div,
+#org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div .ds-interactive-div,
+#aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-div-head,
+#aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-static-div,
+#aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-interactive-div,
 #submit-data-feature-box h1,
 div.ds-option-set {
     margin-top: 8px;

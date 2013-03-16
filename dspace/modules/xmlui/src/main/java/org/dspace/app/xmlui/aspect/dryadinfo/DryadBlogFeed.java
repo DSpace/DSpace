@@ -43,7 +43,8 @@ public class DryadBlogFeed extends AbstractDSpaceTransformer implements
 
 	public void addBody(Body body) throws SAXException, WingException,
 			UIException, SQLException, IOException, AuthorizeException {
-		Division dryadFeed = body.addDivision("blog-hook");
+        Division home = body.addDivision("dryad-info-home", "blog-box");
+        Division dryadFeed = home.addDivision("blog-hook"); 
 		
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
