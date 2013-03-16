@@ -695,16 +695,19 @@
 
     <xsl:template match="dri:options/dri:list[@n='DryadSubmitData']" priority="3">
         <!-- START DEPOSIT -->
-        <div class="home-col-2">
+        <div id="submit-data-feature-box" class="home-col-2">
             <h1 class="ds-div-head "
-                style="border-bottom: none; text-align: center; padding: 50px 45px 0; height: 50px;">Deposit your
+                style="border-bottom: none; text-align: center; padding: 30px 45px 0; height: 50px;">Deposit your
                 data in dryad
             </h1>
             <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
                 <p class="ds-paragraph" style="text-align: center; font-size: 1.2em; margin: 0.5em 0 1.5em;">
                     <a class="submitnowbutton" href="/handle/10255/3/submit">Submit Data Now!</a>
                 </p>
-                <a style="float: right; margin-right: 18px;" href="http://www.youtube.com/watch?v=RP33cl8tL28">See
+                <p style="font-size: 0.9em; padding-top: 4px;">
+                    OR
+                </p>
+                <a class="learn-to-submit-button" href="http://www.youtube.com/watch?v=RP33cl8tL28">See
                     how to submit
                 </a>
             </div>
