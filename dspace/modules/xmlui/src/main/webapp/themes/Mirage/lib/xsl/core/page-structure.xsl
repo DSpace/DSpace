@@ -456,13 +456,13 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     </ul>
                                 </li>
                                 <li>
-                                    <a href="">Integrate Your Journal</a>
+                                    <a href="">Journal Integration</a>
                                     <ul>
                                       <li>
-                                  <a href="/pages/integratedJournals">Currently Integrated Journals</a>
+                                  <a href="/pages/journalIntegration">How to Integrate</a>
                                       </li>
                                       <li>
-                                  <a href="/pages/journalIntegration">How to Integrate</a>
+                                  <a href="/pages/integratedJournals">Currently Integrated Journals</a>
                                       </li>
                                     </ul>
                                 </li>
