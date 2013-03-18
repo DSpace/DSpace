@@ -1935,7 +1935,21 @@ public class Item extends DSpaceObject
         // leaving the database in an inconsistent state
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
-        ourContext.addEvent(new Event(Event.DELETE, Constants.ITEM, getID(), getHandle()));
+
+        VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
+        VersionHistory history = versioningService.findVersionHistory(ourContext, this.getID());
+
+        Version version=null;
+        Version previous=null;
+        int objectId=-1;
+        if(history!=null){
+            version  = versioningService.getVersion(ourContext, this);
+            previous = history.getPrevious(version);
+            if(previous!=null)
+                objectId=previous.getItem().getID();
+        }
+
+        ourContext.addEvent(new Event(Event.DELETE, Constants.ITEM, getID(), Constants.ITEM, objectId, getHandle()));
 
         log.info(LogManager.getHeader(ourContext, "delete_item", "item_id="
                 + getID()));
@@ -1959,19 +1973,13 @@ public class Item extends DSpaceObject
 //               FIXME: there is an exception handling problem here
         try
         {
-//               Remove from indices
+//          Remove from indices
             IndexBrowse ib = new IndexBrowse(ourContext);
             ib.itemRemoved(this);
 
             // Reinstate previous version if present
-            VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
-            VersionHistory history = versioningService.findVersionHistory(ourContext, this.getID());
-            if(history!=null){
-                Version version  = versioningService.getVersion(ourContext, this);
-                Version previousVersion = history.getPrevious(version);
-                if(previousVersion!=null){
-                    ib.indexItem(previousVersion.getItem());
-                }
+            if(previous!=null){
+                ib.indexItem(previous.getItem());
             }
         }
         catch (BrowseException e)
@@ -2017,7 +2025,6 @@ public class Item extends DSpaceObject
 
 
         // Remove version attached to the item
-        VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
         if(versioningService.getVersion(ourContext, this)!=null)
             versioningService.removeVersion(ourContext, this);
         else{
