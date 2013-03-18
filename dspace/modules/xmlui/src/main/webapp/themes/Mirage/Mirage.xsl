@@ -1012,4 +1012,112 @@ parameter that is being used (see variable defined above) -->
             </div>
         </li>
     </xsl:template>
+
+
+    <xsl:template match="//dri:list[@id='aspect.submission.StepTransformer.list.submit-select-publication']/dri:head">
+        <legend>
+            <i18n:text><xsl:value-of select="."/></i18n:text>
+        </legend>
+    </xsl:template>
+    <xsl:template match="//dri:list[@id='aspect.submission.StepTransformer.list.submit-upload-file']/dri:head">
+        <legend>
+            <i18n:text><xsl:value-of select="."/></i18n:text>
+        </legend>
+    </xsl:template>
+
+    <xsl:template match="//dri:list[@id='aspect.submission.StepTransformer.list.submit-describe-dataset']/dri:head">
+        <legend>
+            <i18n:text><xsl:value-of select="."/></i18n:text>
+        </legend>
+    </xsl:template>
+
+    <xsl:template match="dri:list[@id='aspect.submission.StepTransformer.list.submit-upload-file']">
+        <fieldset>
+            <xsl:call-template name="standardAttributes">
+                <xsl:with-param name="class">
+                    <!-- Provision for the sub list -->
+                    <xsl:text>ds-form-</xsl:text>
+                    <xsl:if test="ancestor::dri:list[@type='form']">
+                        <xsl:text>sub</xsl:text>
+                    </xsl:if>
+                    <xsl:text>list </xsl:text>
+                    <xsl:if test="count(dri:item) > 3">
+                        <xsl:text>thick </xsl:text>
+                    </xsl:if>
+                </xsl:with-param>
+            </xsl:call-template>
+            <xsl:apply-templates select="dri:head"/>
+
+            <xsl:apply-templates select="dri:item[@id='aspect.submission.StepTransformer.item.data-upload-details']"/>
+
+            <table class="datafiletable">
+                <tr>
+                    <td>
+                        <xsl:apply-templates
+                                select="dri:item[@id='aspect.submission.StepTransformer.item.dataset-item']/dri:field[@type='radio']"
+                                />
+                    </td>
+                    <td>
+                        <xsl:apply-templates
+                                select="dri:item[@id='aspect.submission.StepTransformer.item.dataset-item']/*[not(@type='radio')]"
+                                />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <xsl:apply-templates
+                                select="dri:item[@id='aspect.submission.StepTransformer.item.dataset-identifier']/dri:field[@type='radio']"
+                                />
+                    </td>
+                    <td>
+                        <xsl:apply-templates
+                                select="dri:item[@id='aspect.submission.StepTransformer.item.dataset-identifier']/*[not(@type='radio')]"
+                                />
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+    </xsl:template>
+    <xsl:template match="dri:item[@id='aspect.submission.StepTransformer.item.data-upload-details']">
+        <div class="ds-form-content">
+            <i18n:text>
+                <xsl:value-of select="."/>
+            </i18n:text>
+        </div>
+    </xsl:template>
+    <xsl:template match="dri:help" mode="compositeComponent">
+        <xsl:if
+                test="not(ancestor::dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-publication' or @id= 'aspect.submission.StepTransformer.div.submit-describe-dataset'])">
+            <span class="composite-help">
+                <xsl:if
+                        test="ancestor::dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-publication' or @id= 'aspect.submission.StepTransformer.div.submit-describe-dataset']">
+                    <xsl:variable name="translatedParentId">
+                        <xsl:value-of select="translate(../@id, '.', '_')"/>
+                    </xsl:variable>
+                    <xsl:attribute name="connectId">
+                        <xsl:value-of select="$translatedParentId"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="id"><xsl:value-of select="$translatedParentId"
+                            />_tooltip
+                    </xsl:attribute>
+                </xsl:if>
+
+                <xsl:apply-templates/>
+            </span>
+        </xsl:if>
+    </xsl:template>
+    <xsl:template match="dri:help" mode="help">
+        <xsl:if
+                test="not(ancestor::dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-publication' or @id= 'aspect.submission.StepTransformer.div.submit-describe-dataset'])">
+            <!--Only create the <span> if there is content in the <dri:help> node-->
+            <xsl:if test="./text() or ./node()">
+                <span>
+                    <xsl:attribute name="class">
+                        <xsl:text>field-help</xsl:text>
+                    </xsl:attribute>
+                    <xsl:apply-templates/>
+                </span>
+            </xsl:if>
+        </xsl:if>
+    </xsl:template>
 </xsl:stylesheet>

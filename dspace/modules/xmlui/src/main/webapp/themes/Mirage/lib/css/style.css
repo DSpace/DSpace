@@ -1551,3 +1551,155 @@ img.ds-authority-confidence
 #aspect_discovery_SimpleSearch_div_search-results p{
     margin-top:10px;
 }
+
+/*
+  ******************************
+  ***********  forms  **********
+  ******************************
+ */
+form.ds-interactive-div {
+    width: 95%;
+}
+form.ds-interactive-div li.ds-form-item {
+    /* display: block; */
+    padding: 2px 0;
+    width: 100%;
+}
+form.ds-interactive-div li {
+    margin: 0;
+}
+form.ds-interactive-div li.odd {
+    background-color: rgb(255, 255, 255);
+}
+form.ds-interactive-div li.even {
+    background-color: rgb(255, 255, 255);
+}
+form.ds-interactive-div li.last {
+
+}
+li.ds-form-item {
+    float: left;
+    clear: both;
+    width: 100%;
+}
+div.ds-form-content {
+    float: left;
+    clear: right;
+    display: block;
+    padding: 7px;
+    width: 600px;
+}
+span.ds-form-label,label.ds-form-label {
+    display: block;
+    float: left;
+    clear: left;
+    padding: 5px 20px 5px 10px;
+    /*width: 200px;*/
+    font-weight: bold;
+    vertical-align: middle;
+    overflow: hidden;
+}
+/* Help, error, & in-line labels */
+label.ds-composite-component {
+    display: block;
+    float: left;
+    padding: 0px 5px 0 0px;
+    font-size: 80%;
+    color: black;
+    background-color: inherit;
+    text-align: left;
+}
+span.error {
+    display: block;
+    font-size: 100%;
+    color: red;
+    background-color: inherit;
+    margin: 0;
+}
+span.field-help {
+    display: block;
+    margin-left: 5px;
+    font-size: 90%;
+    color: gray;
+    background-color: inherit;
+}
+input.error,textarea.error,select.error {
+    color: inherit;
+    background-color: rgb(255, 245, 245);
+    border-color: red;
+}
+span.composite-help {
+    display: block;
+    font-size: 90%;
+    color: gray;
+    background-color: inherit;
+    text-align: left;
+}
+span.composite-help {
+    display: block;
+    font-size: 80%;
+    color: black;
+    background-color: inherit;
+    text-align: left;
+}
+div.spacer {
+    margin: 0;
+    padding: 0;
+    line-height: 0px;
+    clear: both;
+}
+/* The composite field */
+span.ds-composite-field {
+    display: table-row;
+    padding: 2px;
+}
+*.ds-composite-field.ds-composite-component {
+    display: table-cell;
+    text-align: left;
+    width: auto;
+    padding-right: 10px;
+}
+*.ds-composite-field input,*.ds-composite-field textarea,*.ds-composite-field select {
+    margin-right: 5px;
+    margin-bottom: -2px;
+}
+/* Checkboxes and Radio buttons */
+fieldset.ds-checkbox-field,fieldset.ds-radio-field {
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+fieldset.ds-checkbox-field legend,fieldset.ds-radio-field legend {
+    display: none;
+}
+fieldset.ds-checkbox-field label,fieldset.ds-radio-field label {
+    display: block;
+}
+/* Sub sections within a form */
+fieldset.ds-form-list {
+    border: 2px solid gray;
+    padding: 0;
+    margin-left: 0;
+    margin-right: 0;
+}
+fieldset.ds-form-list ol {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    list-style-type: none;
+}
+fieldset.ds-form-list legend {
+    color: #336699;
+    background-color: inherit;
+    font-size: 115%;
+    font-weight: bolder;
+    margin-left: 10px;
+}
+fieldset.ds-form-sublist {
+    border: 1px solid rgb(238, 238, 238);
+    padding: 0;
+    margin: 5px;
+}
+#aspect_submission_StepTransformer_field_datafile_identifier{
+    width:300px
+}
