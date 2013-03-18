@@ -91,14 +91,14 @@
 
                                 function fnarray()
                                 {
-                                    this.funcs = new array;
+                                    this.funcs = new Array;
                                 }
 
                                 fnarray.prototype.add = function(f)
                                 {
                                     if( typeof f!= "function" )
                                     {
-                                        f = new function(f);
+                                        f = new Function(f);
                                     }
                                     this.funcs[this.funcs.length] = f;
                                 };
@@ -111,7 +111,7 @@
                                     }
                                 };
 
-                                var runafterjsimports = new fnarray();
+                                var runAfterJSImports = new fnarray();
             </script>
 <script xmlns:i18n="http://apache.org/cocoon/i18n/2.1" type="text/javascript" src="/themes/mirage/lib/js/modernizr-1.5.min.js"> </script>
 <title>dryad digital repository</title>
