@@ -10,40 +10,81 @@
     if(self.length == 0)
     	return;
 
+    // Lista de Handlers para tipos especiales
+    var typeHandlers = {
+    	link: {
+    		encode: function(key, value) {
+    			//
+    			// Creamos un tag A con el value como link y el texo definido en el metadato
+    			//
+    			var linkLabel = value;
+    			if(metadataList[key].linkLabel)
+    				linkLabel = metadataList[key].linkLabel;
+    			
+    			// Agregamos el "HTTP://"
+    			if(!/^http:\/\//i.test(value))
+    				value = "http://"+value;
+    			
+    			// Arma el html a retornar
+	            return "<a target='_blank' href='"+value+"'>"+linkLabel+"</a>";
+    		},
+    		decode: function(key, value) {
+    			// 
+    			// Espera recibir un tag A para extraerle el link
+    			//
+
+    			// Extrae el link
+    	        var result = /<a.*href=\"(.*)\".*>.*<\/a>/i.exec(value);
+    	        
+    			return value;
+    		}
+    	}
+    }
+    
     // Lista de metadatos para ofrecer
     // TODO Sería genial si esto pudiese levantarse de la base de datos o de la configuracion
     var metadataList = {
-        comite_de_referato: "Comité de referato",
-        comite_editorial: 'Comité editorial',
-        comite_organizador: "Comité organizador",
-        consejo_asesor: "Consejo asesor",
-        descriptores: 'Descriptores',
-        director: 'Director',
-        dossier: "Dossier",
-        editor: 'Editor',
-        editorial: "Editorial",
-        entidad_de_origen: 'Entidad de Origen',
-        fecha_de_publicacion: 'Fecha de publicación',
-        fecha: "Fecha",
-        frecuencia: 'Frecuencia',
-        isbnl: "ISSN-L",
-        isbn: "ISBN",
-        issn: 'ISSN',
-        localizacion_electronica: 'Localización electrónica',
-        localizacion_fisica: 'Localización física',
-        lugar: "Lugar",
-        materias: 'Materias',
-        nombre_del_evento: "Nombre del evento",
-        notas: 'Notas',
-        revista_indizada_en: 'Revista indizada en',
-        secretaria_de_redaccion: 'Secretaría de redacción',
-        subdirector: 'Subdirector',
-        subtitulo_de_la_serie: 'Subtítulo de la serie',
-        titulo_de_la_serie: 'Título de la serie',
-        texto_libre: 'Texto libre'
+	    titulo_de_la_serie: {label: "Título de la serie"},
+	    subtitulo_de_la_serie: {label: "Subtítulo de la serie"},
+	    texto_libre: {label: "Texto libre"},
+	    dossier: {label: "Dossier"},
+	    decano: {label: "Decano"},
+	    vicedecano: {label: "Vicedecano"},
+	    direccion: {label: "Dirección"},
+	    entidad_de_origen: {label: "Entidad de Origen"},
+	    fecha_de_publicacion: {label: "Fecha de publicación"},
+	    director: {label: "Director"},
+	    subdirector: {label: "Subdirector"},
+	    editor: {label: "Editor"},
+	    editorial: {label: "Editorial"},
+		comite_editorial: {label: "Comité editorial"},
+	    comite_de_referato: {label: "Comité de referato"},
+	    consejo_asesor: {label: "Consejo asesor"},
+	    secretaria_de_redaccion: {label: "Secretaría de redacción"},
+	    issn: {label: "ISSN"},
+	    isbnl: {label: "ISSN-L"},
+	    frecuencia: {label: "Frecuencia"},
+        nombre_del_evento: {label: "Nombre del evento"},
+        fecha: {label: "Fecha"},
+        lugar: {label: "Lugar"},
+        comite_organizador: {label: "Comité organizador"},
+        isbn: {label: "ISBN"},
+        materias: {label: "Materias"},
+        descriptores: {label: "Descriptores"},
+        notas: {label: "Notas"},
+        revista_indizada_en: {label: "Revista indizada en"},
+        localizacion_fisica: {label: "Localización física"},
+        localizacion_electronica: {label: "Localización electrónica", type: "link", linkLabel: "---Acceder al sitio web"},
     };
 
+    // Array con los codigos de los metadatos (para determinar la posicion de inserción)
+    var metadataKeys = $.map(metadataList, function(value, key) { return key; });
 
+    // Array con los codigos de los metadatos ordenados alfabeticamente (para la combo)
+    var sortedMetadataKeys = $.map(metadataList, function(value, key) { return key; });
+    sortedMetadataKeys.sort();
+    
+    
     //////////////////////////////////////////////////////////////////
     // Creación de los elementos DOM necesarios
     //////////////////////////////////////////////////////////////////
@@ -52,9 +93,11 @@
 
     // Combo con los metadatos
     var combo_text = "<select name='metadata'>";
-    for(m in metadataList) {
-        combo_text += "<option value='"+m+"'>"+metadataList[m]+"</option>";
-    }
+    
+    $(sortedMetadataKeys).each(function(key, value){
+    	combo_text += "<option value='"+value+"'>"+metadataList[value].label+"</option>";
+    });
+    
     combo_text += "</select>";
 
     var combo = $(combo_text);
@@ -67,10 +110,6 @@
     // Boton de agregar
     var agregar = $("<input type='button' class='add_metadata' value='Agregar'></input>");
     selectContainer.append(agregar);
-
-    // Boton de agregar como link
-    var agregar_link = $("<input type='button' class='add_metadata_link' value='Agregar como Link'></input>");
-    selectContainer.append(agregar_link);
 
 
     //////////////////////////////////////////////////////////////////
@@ -122,23 +161,6 @@
         combo.focus();
     });
 
-    // Boton para agregar metadatos como links a un sitio web
-    agregar_link.click(function() {
-        if(textarea.val().trim() == "")
-            return false;
-
-        // Intentamos identificar si no se trata de un tag A previamente cargado
-        var anchor_regexp = /<a.*href=.*>/;
-
-        var link_text = textarea.val();
-        if(!anchor_regexp.test(link_text))
-            link_text = "<a target='_blank' href='"+link_text+"'>Acceder al sitio web</a>";
-
-        addMetadata(combo.val(), link_text);
-        textarea.val("");
-        combo.focus();
-    });
-
     $(".metadataGenerator .generator_list span.value").click( function(event, ui) {
         event.preventDefault();
         removeEditMetadata( event, ui, $(this) );
@@ -148,21 +170,58 @@
     // Funciones auxiliares
     //////////////////////////////////////////////////////////////////
 
+    var getInsertPosition = function(key) {
+    	return $.inArray(key, metadataKeys);    	
+    }
+    
     var addMetadata = function(key, value) {
+    	
         var metadataElement = resultsContainer.find("."+key);
+        
         if(metadataElement.length == 0) {
-            metadataElement = createMetadataElement(key, value);
-            resultsContainer.append(metadataElement);
+            metadataElement = createMetadataElement(key);
+            
+        	// Buscamos la posicion donde insertar el nuevo elemento 
+            // (si el container está vacío el bucle no modifica nada)
+        	var currentInsertPosition = getInsertPosition(key);
+        	var inserted = false;
+        	resultsContainer.find("div").each(function() {
+        		var metadataInsertPosition = getInsertPosition( $(this).attr('class') );
+        		if(metadataInsertPosition > currentInsertPosition) {
+        			// Insertamos el elemento como predecesor
+        			metadataElement.insertBefore(this);
+        			inserted = true;
+        			return false;
+        		}
+        	});
+
+        	// Si el container estaba vacío, o no había ningún elemento con indice mayor, 
+        	// insertamos como último elemento
+            if(!inserted) {
+	        	resultsContainer.append(metadataElement);
+            }
         }
-        metadataElement.append( createValueElement(metadataElement, value) );
+        
+        // Si tiene un tipo especial definido, hacemos el procesamiento adicional
+        if(metadataList[key].type && metadataList[key].type != "text") {
+        	value = typeHandlers[ metadataList[key].type ].encode(key, value);
+        }
+        
+        metadataElement.append( createValueElement(metadataElement, key, value) );
         updateTarget();
     };
 
     // Boton para editar/eliminar metadatos
     var removeEditMetadata = function(event, ui, target) {
         var key = target.parent().attr('class');
+        var value = target.html().replace(/&amp;/g, '&');
 
-        textarea.val(target.html());
+        // Si tiene un tipo especial definido, hacemos el procesamiento de decodificacion
+        if(metadataList[key].type && metadataList[key].type != "text") {
+        	value = typeHandlers[ metadataList[key].type ].decode(key, value);
+        }
+
+        textarea.val(value);
         combo.val(key);
 
         // Elimino el elemento y el posible ";" a su lado
@@ -186,7 +245,7 @@
         self.val( resultsContainer.html() );
     }
 
-    var createValueElement = function(parent, value) {
+    var createValueElement = function(parent, key, value) {
         if(parent.find(".value").length > 0)
             parent.append("; ");
 
@@ -212,8 +271,8 @@
         return element;
     }
 
-    var createMetadataElement = function(key, value) {
-        return $("<div class='"+key+"'><span class='label'>"+metadataList[key]+": </span></div>");
+    var createMetadataElement = function(key) {
+        return $("<div class='"+key+"'><span class='label'>"+metadataList[key].label+": </span></div>");
     }
 
   }
