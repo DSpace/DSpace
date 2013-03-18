@@ -95,6 +95,11 @@ public class Navigation extends AbstractDSpaceTransformer
         }
 
         {
+            List list = options.addList("DryadSearch");
+
+        }
+
+        {
             List list = options.addList("DryadConnect");
 
         }

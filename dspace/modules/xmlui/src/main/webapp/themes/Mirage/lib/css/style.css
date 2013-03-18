@@ -1557,9 +1557,6 @@ img.ds-authority-confidence
   ***********  forms  **********
   ******************************
  */
-form.ds-interactive-div {
-    width: 95%;
-}
 form.ds-interactive-div li.ds-form-item {
     /* display: block; */
     padding: 2px 0;
@@ -1702,4 +1699,32 @@ fieldset.ds-form-sublist {
 }
 #aspect_submission_StepTransformer_field_datafile_identifier{
     width:300px
+}
+a.learn-to-submit-button-option:hover {
+    background-color: #ccc;
+    color: #333;
+}
+a.learn-to-submit-button-option {
+    background-color: #87c033;
+    border: 1px solid #555;
+    color: #472D2E;
+    text-decoration: none;
+    margin-top: 0.2em;
+    padding: 0.4em 0.8em;
+}
+a.learn-to-submit-button-option {
+    margin: 0 8px;
+    padding: 0.2em 0;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-bottomright: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
