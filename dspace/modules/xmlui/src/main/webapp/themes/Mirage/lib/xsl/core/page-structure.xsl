@@ -899,31 +899,20 @@ references to stylesheets pulled directly from the pageMeta element. -->
                         .supposition();
                 });
 
-		
+                /* Home page only */
                 jQuery(document).ready(function() {
                     // main carousel at top of homepage
                     jQuery('#dryad-home-carousel .bxslider').bxSlider({
                         auto: true,
-			autoHover: true,
+                        autoHover: true,
                         pause: 10000,  // in ms
-			speed: 500,   // ms for slide transition
-			mode: 'fade',  // can be 'horizontal', 'vertical', 'fade'
-			controls: false,
+                        speed: 500,   // ms for slide transition
+                        mode: 'fade',  // can be 'horizontal', 'vertical', 'fade'
+                        controls: false,
                         autoControls: false,
                         autoControlsCombine: true
                     });
 
-
-                   // TEMPORARY slider to show Connect alternatives
-            // some objects start hidden, as they make highly visible
-            // "glitches" during page load
-            jQuery('.wordcloud').show();
-            jQuery('#connect-legible-cloud').show();
-            jQuery('#TEMP-connect-alternatives').bxSlider({
-                controls: false,
-                mode: 'vertical'
-                //pagerType: 'short'
-            });
                     // "tabs" in Browse Data
                     var jQuerytabButtons = jQuery('#browse-data-buttons a');
                     jQuerytabButtons.unbind('click').click(function() {
@@ -942,6 +931,38 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     jQuerytabButtons.eq(0).click();
                 });
 
+                /* Membership Form page only */
+                var revenueThresholdInUSD = '10,000,000';
+                var smallOrgFeeInUSD = '1,000';
+                var largeOrgFeeInUSD = '10,000';
+                function showPreferredCurrency(currencyCode, currencyPrefix, revenueThreshold, smallFee, largeFee) {
+                    // EXAMPLE: showPreferredCurrency('GBP', '£', '6,600,000', '6,600.00', '66,000.00');
+
+
+                }
+                jQuery(document).ready(function() {
+                    // choosing a currency should modify the displayed org-revenue threshold and fees
+                    $('select[name=org_annual_revenue_currency]').unbind('change').change(function() {
+                        var currency = $(this).val();
+                        if (currency === 'USD') {
+                            // easy, just show the original values... OR note that Google will gladly "convert" USD to USD
+                            showPreferredCurrency('USD', '$', revenueThresholdInUSD, smallOrgFeeInUSD, largeOrgFeeInUSD);
+                        } else {
+                            // convert the USD amounts to the desired currency, using today's market value
+                            var fetchURL = 'http://www.google.com/ig/calculator?hl=en&q=1USD=?'+ currency;
+                            $.get(
+                                fetchURL,
+                                {}, // no more data
+                                function( data, textStatus, jqXHR ) { // success callback
+                                    console.log("data:\n"+ data);
+                                    console.log("textStatus:\n"+ textStatus);
+                                    console.log("jqXHR:\n"+ jqXHR);
+                                }
+                                /// , 'script'   // to force data type
+                            );
+                        }
+                    });
+                });
 
            </xsl:text>
             </script>
