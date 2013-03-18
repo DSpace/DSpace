@@ -378,29 +378,6 @@
                                         </td>
                                         <td>
                                             <xsl:element name="a">
-                                                <xsl:attribute name="href">
-                                                    <!-- Doesn't like DOI, can't resolve against CrossRef -->
-                                                    <xsl:variable name="pkgURL">
-                                                        <xsl:choose>
-                                                            <xsl:when
-                                                                    test=".//dim:field[@element='relation'][@qualifier='ispartof']">
-                                                                <xsl:value-of
-                                                                        select="encoder:encode(.//dim:field[@element='relation'][@qualifier='ispartof'])"/>
-                                                            </xsl:when>
-                                                            <xsl:otherwise>
-                                                                <xsl:value-of select="$thispage"/>
-                                                            </xsl:otherwise>
-                                                        </xsl:choose>
-                                                    </xsl:variable>
-                                                    <xsl:value-of
-                                                            select="concat('http://www.connotea.org/add?uri=', $pkgURL)"/>
-                                                </xsl:attribute>
-                                                <img border="0px;" src="/themes/Dryad/images/connotea.png"
-                                                     height="21" width="21" alt="Connotea" title="Connotea"/>
-                                            </xsl:element>
-                                        </td>
-                                        <td>
-                                            <xsl:element name="a">
                                                 <xsl:attribute name="class">DiggThisButton DiggCompact</xsl:attribute>
                                                 <xsl:attribute name="href">
                                                     <xsl:value-of
@@ -799,17 +776,6 @@
                                             <script type="text/javascript" src="/themes/Dryad/lib/delicious.js">
                                                 <xsl:text> </xsl:text>
                                             </script>
-                                        </td>
-                                        <td>
-                                            <xsl:element name="a">
-                                                <xsl:attribute name="href">
-                                                    <!-- Doesn't like DOI, can't resolve against CrossRef -->
-                                                    <xsl:value-of
-                                                            select="concat('http://www.connotea.org/add?uri=', $thispage)"/>
-                                                </xsl:attribute>
-                                                <img border="0px;" src="/themes/Dryad/images/connotea.png"
-                                                     height="21" width="21" alt="Connotea" title="Connotea"/>
-                                            </xsl:element>
                                         </td>
                                         <td>
                                             <xsl:element name="a">
