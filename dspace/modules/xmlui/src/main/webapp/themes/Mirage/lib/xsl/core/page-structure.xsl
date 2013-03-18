@@ -468,6 +468,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                 </li>
                                 <li>
                                   <a href="/pages/faq">FAQ</a>
+                                  <!--
                                   <ul>
                                       <li>
                                           <a href="/pages/jdap">Journal Archiving Policy</a>
@@ -477,6 +478,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                           <a href="/pages/partners">Related Projects</a>
                                       </li>
                                   </ul>
+                                  -->
                                 </li>                                
                                 <li>
                                     <a href="/pages/pricing">Pricing Plans</a>
@@ -520,6 +522,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                                 <i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
                                             </a>
                                         </li>
+                                        <xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='account']/dri:item" mode="menu"/>
                                     </ul>
 
                                 </li>
@@ -759,6 +762,18 @@ references to stylesheets pulled directly from the pageMeta element. -->
             &#160;
         </script>
 
+        <script type="text/javascript">
+            <xsl:attribute name="src">
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                <xsl:text>/themes/</xsl:text>
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                <xsl:text>/lib/js/supposition-BLACK-BOX-MODS.js</xsl:text>
+            </xsl:attribute>
+            &#160;
+        </script>
+
 
         <!-- Add theme javascipt  -->
         <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)]">
@@ -855,10 +870,20 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
 
                 jQuery(document).ready(function() {
-                    jQuery('#main-menu ul.sf-menu').supersubs({
+                if(jQuery("input[type='checkbox']").length == 0){
+                    jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").css("display","none");
+                }
+                  jQuery("#advanced-search").click(function(){
+
+                  jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").toggle();
+
+                    });
+
+                    jQuery('#main-menu ul.sf-menu')
+                        .supersubs({
                             // all numeric properties are in em
-                            minWidth: 22,
-                            maxWidth: 30,   // this isn't doing much...
+                            minWidth: 10,
+                            maxWidth: 20,
                             extraWidth: 1
                         })
                         .superfish({
@@ -870,7 +895,8 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             },
                             speed: 0, 
                             disableHI: true     // remove menu delay (from hoverIntent)
-                        });
+                        })
+                        .supposition();
                 });
 
 		
