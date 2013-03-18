@@ -98,7 +98,7 @@ public class SiteRecentSubmissions extends AbstractFiltersTransformer {
             }
         }
         String searchUrl="discover?sort_by=dc.date.issued_dt_sort&order=DESC&submit=Go";
-        lastSubmittedDiv.addList("most_recent").addItemXref(searchUrl,"Most Recent");
+        lastSubmittedDiv.addList("most_recent").addItemXref(searchUrl,"View more");
     }
 
     public String getView()
