@@ -332,7 +332,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
     <xsl:template name="buildHeader">
         <div id="ds-header-wrapper">
             <div id="ds-header" class="clearfix">
-                <a id="skip-nav" href="#ds-body">Skip navigation</a>
+                <a id="skip-nav" href="#ds-body"><img src="/themes/Mirage/images/nada.gif" alt="Skip navigation" name="skipnav" width="1" height="1" border="0" id="skipnav"></a>
                 <a id="ds-header-logo-link">
                     <xsl:attribute name="href">
                         <xsl:value-of
@@ -456,13 +456,13 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     </ul>
                                 </li>
                                 <li>
-                                    <a href="">Integrate Your Journal</a>
+                                    <a href="">Journal Integration</a>
                                     <ul>
                                       <li>
-                                  <a href="/pages/integratedJournals">Currently Integrated Journals</a>
+                                  <a href="/pages/journalIntegration">How to Integrate</a>
                                       </li>
                                       <li>
-                                  <a href="/pages/journalIntegration">How to Integrate</a>
+                                  <a href="/pages/integratedJournals">Currently Integrated Journals</a>
                                       </li>
                                     </ul>
                                 </li>
@@ -769,7 +769,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 <xsl:text>/themes/</xsl:text>
                 <xsl:value-of
                         select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-                <xsl:text>/lib/js/supposition-BLACK-BOX-MODS.js</xsl:text>
+                <xsl:text>/lib/js/supposition-BLACK-BLOG-MODS.js</xsl:text>
             </xsl:attribute>
             &#160;
         </script>

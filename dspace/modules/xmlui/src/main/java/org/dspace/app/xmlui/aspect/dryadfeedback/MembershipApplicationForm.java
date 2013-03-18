@@ -148,10 +148,33 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
 
         // Annual Revenue
         Item orgAnnualRevenue = form.addItem("org_annual_revenue", "");
+
+        Select orgAnnualRevenueCurrencySelect = orgAnnualRevenue.addSelect("org_annual_revenue_currency");
+        orgAnnualRevenueCurrencySelect.setLabel(message(message_prefix + "fields.org_annual_revenue_currency.label"));
+        orgAnnualRevenueCurrencySelect.addOption("USD", "$ USD");
+        orgAnnualRevenueCurrencySelect.addOption("GBP", "£ GBP");
+        orgAnnualRevenueCurrencySelect.addOption("CAD", "C$ CAD");
+        orgAnnualRevenueCurrencySelect.addOption("SEK", "kr SEK");
+        orgAnnualRevenueCurrencySelect.addOption("NOK", "kr NOK");
+        orgAnnualRevenueCurrencySelect.addOption("DKK", "kr DKK");
+        orgAnnualRevenueCurrencySelect.addOption("CHF", "₣ CHF");
+        orgAnnualRevenueCurrencySelect.addOption("EUR", "€ EUR");
+        orgAnnualRevenueCurrencySelect.addOption("AUD", "$ AUD");
+        orgAnnualRevenueCurrencySelect.addOption("RMB", "¥ RMB");
+        orgAnnualRevenueCurrencySelect.addOption("HKD", "$ HKD");
+        orgAnnualRevenueCurrencySelect.addOption("NZD", "$ NZD");
+        orgAnnualRevenueCurrencySelect.addOption("SGD", "$ SGD");
+        orgAnnualRevenueCurrencySelect.addOption("TWD", "NT$ TWD");
+        orgAnnualRevenueCurrencySelect.addOption("RUB", "p. RUB");
+        orgAnnualRevenueCurrencySelect.setOptionSelected(parameters.getParameter("org_annual_revenue_currency", "USD"));
+        orgAnnualRevenueCurrencySelect.setRequired();
+        if(errorFieldList.contains("org_annual_revenue_currency")) {
+            orgAnnualRevenueCurrencySelect.addError(message(message_prefix + "errors.org_annual_revenue_currency"));
+        }
+
         Radio orgAnnualRevenueRadios = orgAnnualRevenue.addRadio("org_annual_revenue");
         orgAnnualRevenueRadios.setLabel(message(message_prefix + "fields.org_annual_revenue.label1"));
         orgAnnualRevenueRadios.setHelp(message(message_prefix + "fields.org_annual_revenue.label2"));
-
         orgAnnualRevenueRadios.addOption("less_than_10_million", message(message_prefix + "fields.org_annual_revenue.less_than_10_million"));
         orgAnnualRevenueRadios.addOption("greater_than_10_million", message(message_prefix + "fields.org_annual_revenue.greater_than_10_million"));
         orgAnnualRevenueRadios.setRequired();
@@ -207,27 +230,27 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         membershipYearComposite.setLabel(message(message_prefix + "fields.membership_year.label1"));
         membershipYearComposite.setHelp(message(message_prefix + "fields.membership_year.label2"));
 
-        Radio membershipYearStartRadio = membershipYearComposite.addRadio("membership_year_start");
-        membershipYearStartRadio.setLabel(message(message_prefix + "fields.membership_year.starting_year.label"));
-        membershipYearStartRadio.addOption("2013", message(message_prefix + "fields.membership_year.starting_year.2013"));
-        membershipYearStartRadio.addOption("2014", message(message_prefix + "fields.membership_year.starting_year.2014"));
-        membershipYearStartRadio.setOptionSelected(parameters.getParameter("membership_year_start", ""));
-        membershipYearStartRadio.setRequired();
+        Select membershipYearStartSelect = membershipYearComposite.addSelect("membership_year_start");
+        membershipYearStartSelect.setLabel(message(message_prefix + "fields.membership_year.starting_year.label"));
+        membershipYearStartSelect.addOption("2013", message(message_prefix + "fields.membership_year.starting_year.2013"));
+        membershipYearStartSelect.addOption("2014", message(message_prefix + "fields.membership_year.starting_year.2014"));
+        membershipYearStartSelect.setOptionSelected(parameters.getParameter("membership_year_start", ""));
+        membershipYearStartSelect.setRequired();
         if(errorFieldList.contains("membership_year_start")) {
-            membershipYearStartRadio.addError(message(message_prefix + "errors.membership_year_start"));
+            membershipYearStartSelect.addError(message(message_prefix + "errors.membership_year_start"));
         }
 
-        Radio membershipYearEndRadio = membershipYearComposite.addRadio("membership_year_end");
-        membershipYearEndRadio.setLabel(message(message_prefix + "fields.membership_year.ending_year.label"));
-        membershipYearEndRadio.addOption("2013", message(message_prefix + "fields.membership_year.ending_year.2013"));
-        membershipYearEndRadio.addOption("2014", message(message_prefix + "fields.membership_year.ending_year.2014"));
-        membershipYearEndRadio.addOption("2015", message(message_prefix + "fields.membership_year.ending_year.2015"));
-        membershipYearEndRadio.addOption("2016", message(message_prefix + "fields.membership_year.ending_year.2016"));
-        membershipYearEndRadio.addOption("2017", message(message_prefix + "fields.membership_year.ending_year.2017"));
-        membershipYearEndRadio.setOptionSelected(parameters.getParameter("membership_year_end", ""));
-        membershipYearEndRadio.setRequired();
+        Select membershipYearEndSelect = membershipYearComposite.addSelect("membership_year_end");
+        membershipYearEndSelect.setLabel(message(message_prefix + "fields.membership_year.ending_year.label"));
+        membershipYearEndSelect.addOption("2013", message(message_prefix + "fields.membership_year.ending_year.2013"));
+        membershipYearEndSelect.addOption("2014", message(message_prefix + "fields.membership_year.ending_year.2014"));
+        membershipYearEndSelect.addOption("2015", message(message_prefix + "fields.membership_year.ending_year.2015"));
+        membershipYearEndSelect.addOption("2016", message(message_prefix + "fields.membership_year.ending_year.2016"));
+        membershipYearEndSelect.addOption("2017", message(message_prefix + "fields.membership_year.ending_year.2017"));
+        membershipYearEndSelect.setOptionSelected(parameters.getParameter("membership_year_end", ""));
+        membershipYearEndSelect.setRequired();
         if(errorFieldList.contains("membership_year_end")) {
-            membershipYearEndRadio.addError(message(message_prefix + "errors.membership_year_end"));
+            membershipYearEndSelect.addError(message(message_prefix + "errors.membership_year_end"));
         }
 
         // Representatitve Name
