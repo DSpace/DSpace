@@ -1035,4 +1035,10 @@ parameter that is being used (see variable defined above) -->
             </xsl:if>
         </xsl:if>
     </xsl:template>
+
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='most_recent']">
+        <div class="link-to-button">
+            <xsl:apply-templates select="dri:item"/>
+        </div>
+    </xsl:template>
 </xsl:stylesheet>

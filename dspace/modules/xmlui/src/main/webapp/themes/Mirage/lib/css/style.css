@@ -1728,3 +1728,17 @@ a.learn-to-submit-button-option {
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
 }
+
+.link-to-button{
+    text-align: center;
+
+}
+.link-to-button a{
+    text-decoration: none;
+    font-weight:bold;
+    border:1px solid black;
+    background: green;
+    color: white;
+    padding: 2px 5px;
+
+}
