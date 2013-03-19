@@ -138,6 +138,7 @@ a:hover {
     width: 950px;
     margin: auto;
     position: relative;
+    text-align: center;
 }
 
 /*ie6 uses quirks mode for strict xhtml pages, and in quirks mode margin: auto; doesn't center things*/
@@ -170,6 +171,10 @@ a:hover {
     line-height: 1.6em;
 }
 
+#ds-footer img.powered-by {
+    vertical-align: middle;
+}
+
 #ds-footer-left {
     float: left;
 }
@@ -197,24 +202,11 @@ a:hover {
     height: 40px;
 }
 
-#ds-footer-links {
-    clear: left;
-
-}
-.ie6 #ds-footer-links {
-    display: inline;
-}
-#ds-footer-links a {
+#ds-footer a {
     color: inherit;
 }
 a.discreet {
     text-decoration: none;
-}
-#ds-footer .build-info {
-    clear: both;
-    text-align: right;
-    color: #777;
-    margin-bottom: 0px;
 }
 
 
