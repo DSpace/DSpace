@@ -89,7 +89,10 @@ public class EmailParserForManuscriptCentral extends EmailParser {
 	fieldToXMLTagTable.put("Article Type", "Article_Type");
 	fieldToXMLTagTable.put("MS Citation Title", "Citation_Title");
 	fieldToXMLTagTable.put("MS Citation Authors", "Citation_Authors");
-        	
+
+        // Accept 'Article type' for PLoS Biology
+	fieldToXMLTagTable.put("Article type", "Article_Type");
+
         xmlTagNameAuthorSubList= Arrays.asList(
             "Corresponding_Author",
             "Email",
