@@ -488,12 +488,41 @@
                 </div>
             </div>
         </xsl:if>
+        <!-- Redesigned 2013-03-19 -->
+        <!-- probably needs to be conditional as just for data package -->
+        <xsl:variable name="article_doi"
+              select=".//dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'doi:')]"/>
+        <xsl:variable name="title"
+                      select=".//dim:field[@element='title']/node()"/>
 
+        <!-- publication header -->
+        <div class="publication-header">
+            <xsl:call-template name="journal-lookup">
+                <xsl:with-param name="journal-name" select=".//dim:field[@element='publicationName']"/>
+                <xsl:with-param name="article-doi"
+                                select=".//dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'doi:')]"/>
+            </xsl:call-template>
+            <p>
+              <a class="pub-title">
+                  <xsl:attribute name="href">
+                      <xsl:value-of
+                              select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                  </xsl:attribute>
+                  <xsl:value-of select="$title"/>
+              </a>
+            </p>
+        </div>
+        <!-- Files in package -->
+        <div class="ds-static-div primary">
+          <p></p>
+        </div>
+        <!-- citing -->
         <!-- CITATION FOR DATA PACKAGE -->
         <xsl:if
                 test="not($meta[@element='xhtml_head_item'][contains(., 'DCTERMS.isPartOf')]) and .//dim:field[@element='relation'][@qualifier='haspart']">
-            <div>
-                <div class="citation-view">
+            <div class="ds-static-div primary">
+                <h2 class="ds-list-head">Citing this article and package</h2><!-- i18n this -->
+                    <div class="secondary">
                     <xsl:variable name="citation"
                                   select=".//dim:field[@element='identifier'][@qualifier='citation'][position() = 1]"/>
                     <xsl:variable name="article_doi"
@@ -505,7 +534,7 @@
                     <p class="ds-paragraph">
                         <i18n:text>xmlui.DryadItemSummary.whenUsing</i18n:text>
                     </p>
-                    <blockquote>
+                    <div class="citation-sample">
                         <xsl:choose>
                             <xsl:when test="$citation!=''">
                                 <xsl:choose>
@@ -574,7 +603,7 @@
                                 </xsl:choose>
                             </xsl:otherwise>
                         </xsl:choose>
-                    </blockquote>
+                    </div>
                     <table>
                         <tr>
                             <td rowspace="2">
@@ -585,7 +614,7 @@
                         <p class="ds-paragraph">
                             <i18n:text>xmlui.DryadItemSummary.pleaseCite</i18n:text>
                         </p>
-                        <blockquote>
+                        <div class="citation-sample">
                             <xsl:choose>
                                 <xsl:when
                                         test=".//dim:field[@element='contributor'][@qualifier='author']">
@@ -712,7 +741,7 @@
                                     </a>
                                 </xsl:otherwise>
                             </xsl:choose>
-                        </blockquote>
+                        </div>
                     </xsl:if>
                     <!-- only show citation/share if viewing from public (not admin) page -->
                     <xsl:if
@@ -891,46 +920,32 @@
                         </div>
                     </xsl:if>
                 </div>
-                <div class="journal-cover-view">
-                    <xsl:call-template name="journal-lookup">
-                        <xsl:with-param name="journal-name" select=".//dim:field[@element='publicationName']"/>
-                        <xsl:with-param name="article-doi"
-                                        select=".//dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'doi:')]"/>
-                    </xsl:call-template>
-                </div>
             </div>
         </xsl:if>
-
-        <!-- General, non-citation, metadata display -->
-
-
-        <table class="ds-includeSet-table">
-            <tr class="ds-table-row">
-                <td width="15%">
+        <!-- package metadata -->
+        <div class="ds-static-div primary">
+          <h2 class="ds-list-head">Package metadata</h2>
+          <div class="item-summary-view-metadata">
+            <table class="package-metadata">
+            <tbody>
+            <tr>
+                <th>
                     <xsl:choose>
                         <xsl:when test="$treebase_url != ''">
-                            <span class="bold">
-                                <i18n:text>xmlui.DryadItemSummary.viewContentTB</i18n:text>
-                            </span>
+                            <i18n:text>xmlui.DryadItemSummary.viewContentTB</i18n:text>
                         </xsl:when>
                         <xsl:when test="$knb_url!=''">
-                            <span class="bold">
-                                <i18n:text>xmlui.DryadItemSummary.viewContentKNB</i18n:text>
-                            </span>
+                            <i18n:text>xmlui.DryadItemSummary.viewContentKNB</i18n:text>
                         </xsl:when>
                         <xsl:when test="$datafiles!=''">
-                            <span class="bold">
-                                <i18n:text>xmlui.DryadItemSummary.dryadPkgID</i18n:text>
-                            </span>
+                            <i18n:text>xmlui.DryadItemSummary.dryadPkgID</i18n:text>
                         </xsl:when>
                         <xsl:otherwise>
-                            <span class="bold">
-                                <i18n:text>xmlui.DryadItemSummary.dryadFileID</i18n:text>
-                            </span>
+                            <i18n:text>xmlui.DryadItemSummary.dryadFileID</i18n:text>
                         </xsl:otherwise>
                     </xsl:choose>
-                </td>
-                <td width="55%">
+                </th>
+                <td>
                     <xsl:choose>
                         <xsl:when test="$treebase_url!=''">
                             <a>
@@ -1038,39 +1053,8 @@
 
                 </td>
             </tr>
-
-            <xsl:variable name="description">
-                <xsl:for-each
-                        select=".//dim:field[@element='description'][not(@qualifier='provenance')]">
-                    <xsl:copy-of select="node()"/>
-                    <br/>
-                </xsl:for-each>
-            </xsl:variable>
-
-
-            <xsl:if test="$description!=''">
-                <tr class="ds-table-row">
-                    <td>
-                        <!-- Display "Description" for data files and "Abstract" for data packages. -->
-                        <xsl:choose>
-                            <xsl:when
-                                    test=".//dim:field[@element='relation'][@qualifier='ispartof']">
-                                <span class="bold">
-                                    <i18n:text>xmlui.DryadItemSummary.description</i18n:text>
-                                </span>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <span class="bold">
-                                    <i18n:text>xmlui.DryadItemSummary.abstract</i18n:text>
-                                </span>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </td>
-                    <td width="70%" colspan="2">
-                        <xsl:copy-of select="$description"/>
-                    </td>
-                </tr>
-            </xsl:if>
+            
+            <!-- End of identifier -->
 
             <!-- Need to add spatial, temporal, taxonomic keywords from file metadata -->
             <xsl:variable name="keywords">
@@ -1083,13 +1067,11 @@
                 </xsl:for-each>
             </xsl:variable>
             <xsl:if test="$keywords!=''">
-                <tr class="ds-table-row">
+                <tr>
+                    <th>
+                        <i18n:text>xmlui.DryadItemSummary.keywords</i18n:text>
+                    </th>
                     <td>
-                        <span class="bold">
-                            <i18n:text>xmlui.DryadItemSummary.keywords</i18n:text>
-                        </span>
-                    </td>
-                    <td colspan="2">
                         <xsl:copy-of select="$keywords"/>
                     </td>
                     <td>
@@ -1099,12 +1081,10 @@
 
             <xsl:if
                     test=".//dim:field[@element='identifier'][not(@qualifier)][contains(., 'dryad.')]">
-                <tr class="ds-table-row">
-                    <td>
-                        <span class="bold">
-                            <i18n:text>xmlui.DryadItemSummary.depDate</i18n:text>
-                        </span>
-                    </td>
+                <tr>
+                    <th>
+                        <i18n:text>xmlui.DryadItemSummary.depDate</i18n:text>
+                    </th>
                     <td>
                         <xsl:copy-of
                                 select=".//dim:field[@element='date' and @qualifier='accessioned']"/>
@@ -1123,16 +1103,12 @@
                 </xsl:for-each>
             </xsl:variable>
             <xsl:if test="$sciNames!=''">
-                <tr class="ds-table-row">
+                <tr>
+                    <th>
+                        <i18n:text>xmlui.DryadItemSummary.sciNames</i18n:text>
+                    </th>
                     <td>
-                        <span class="bold">
-                            <i18n:text>xmlui.DryadItemSummary.sciNames</i18n:text>
-                        </span>
-                    </td>
-                    <td colspan="2">
                         <xsl:copy-of select="$sciNames"/>
-                    </td>
-                    <td>
                     </td>
                 </tr>
             </xsl:if>
@@ -1147,16 +1123,12 @@
                 </xsl:for-each>
             </xsl:variable>
             <xsl:if test="$spatialCoverage!=''">
-                <tr class="ds-table-row">
+                <tr>
+                    <th>
+                        <i18n:text>xmlui.DryadItemSummary.spatialCov</i18n:text>
+                    </th>
                     <td>
-                        <span class="bold">
-                            <i18n:text>xmlui.DryadItemSummary.spatialCov</i18n:text>
-                        </span>
-                    </td>
-                    <td colspan="2">
                         <xsl:copy-of select="$spatialCoverage"/>
-                    </td>
-                    <td>
                     </td>
                 </tr>
             </xsl:if>
@@ -1171,16 +1143,12 @@
                 </xsl:for-each>
             </xsl:variable>
             <xsl:if test="$temporalCoverage!=''">
-                <tr class="ds-table-row">
+                <tr>
+                    <th>
+                        <i18n:text>xmlui.DryadItemSummary.temporalCov</i18n:text>
+                    </th>
                     <td>
-                        <span class="bold">
-                            <i18n:text>xmlui.DryadItemSummary.temporalCov</i18n:text>
-                        </span>
-                    </td>
-                    <td colspan="2">
                         <xsl:copy-of select="$temporalCoverage"/>
-                    </td>
-                    <td>
                     </td>
                 </tr>
             </xsl:if>
@@ -1192,21 +1160,17 @@
                               select=".//dim:field[@element='creator'][@mdschema='dc']"/>
 
                 <xsl:if test="$dc-creators != ''">
-                    <tr class="ds-table-row">
-                        <td>
+                    <tr>
+                        <th>
                             <xsl:choose>
                                 <xsl:when test="count($dc-creators) &gt; 1">
-                                    <span class="bold">
-                                        <i18n:text>xmlui.DryadItemSummary.authors</i18n:text>
-                                    </span>
+                                    <i18n:text>xmlui.DryadItemSummary.authors</i18n:text>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <span class="bold">
-                                        <i18n:text>xmlui.DryadItemSummary.author</i18n:text>
-                                    </span>
+                                    <i18n:text>xmlui.DryadItemSummary.author</i18n:text>
                                 </xsl:otherwise>
                             </xsl:choose>
-                        </td>
+                        </th>
                         <td>
                             <xsl:for-each select="$dc-creators">
                                 <xsl:value-of select="."/>
@@ -1220,21 +1184,17 @@
                               select=".//dim:field[@element='publisher'][@mdschema='dc']"/>
 
                 <xsl:if test="$dc-publishers != ''">
-                    <tr class="ds-table-row">
-                        <td>
+                    <tr>
+                        <th>
                             <xsl:choose>
                                 <xsl:when test="count($dc-publishers) &gt; 1">
-                                    <span class="bold">
-                                        <i18n:text>xmlui.DryadItemSummary.publishers</i18n:text>
-                                    </span>
+                                    <i18n:text>xmlui.DryadItemSummary.publishers</i18n:text>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <span class="bold">
-                                        <i18n:text>xmlui.DryadItemSummary.publisher</i18n:text>
-                                    </span>
+                                    <i18n:text>xmlui.DryadItemSummary.publisher</i18n:text>
                                 </xsl:otherwise>
                             </xsl:choose>
-                        </td>
+                        </th>
                         <td>
                             <xsl:for-each select="$dc-publishers">
                                 <xsl:value-of select="."/>
@@ -1248,12 +1208,10 @@
                               select=".//dim:field[@element='date'][not(@qualifier)][@mdschema='dc']"/>
 
                 <xsl:if test="$dc-date != ''">
-                    <tr class="ds-table-row">
-                        <td>
-                            <span class="bold">
-                                <i18n:text>xmlui.DryadItemSummary.published</i18n:text>
-                            </span>
-                        </td>
+                    <tr>
+                        <th>
+                            <i18n:text>xmlui.DryadItemSummary.published</i18n:text>
+                        </th>
                         <td>
                             <xsl:value-of select="$dc-date[1]"/>
                         </td>
@@ -1277,12 +1235,10 @@
                 </xsl:for-each>
             </xsl:variable>
             <xsl:if test="$externalDataSets!=''">
-                <tr class="ds-table-row">
-                    <td>
-                        <span class="bold">
-                            <i18n:text>xmlui.DryadItemSummary.otherRepos</i18n:text>
-                        </span>
-                    </td>
+                <tr>
+                    <th>
+                        <i18n:text>xmlui.DryadItemSummary.otherRepos</i18n:text>
+                    </th>
                     <td>
                         <xsl:copy-of select="$externalDataSets"/>
                     </td>
@@ -1313,13 +1269,11 @@
                 </xsl:for-each>
             </xsl:variable>
             <xsl:if test="$describedBy!=''">
-                <tr class="ds-table-row">
+                <tr>
+                    <th>
+                        <i18n:text>xmlui.DryadItemSummary.containedInPackage</i18n:text>
+                    </th>
                     <td>
-                        <span class="bold">
-                            <i18n:text>xmlui.DryadItemSummary.containedInPackage</i18n:text>
-                        </span>
-                    </td>
-                    <td colspan="2">
                         <xsl:copy-of select="$describedBy"/>
                     </td>
                 </tr>
@@ -1342,8 +1296,43 @@
                        </td>
                    </tr>
                </xsl:if>  -->
+        <!-- abstract goes here -->
+            <xsl:variable name="description">
+                <xsl:for-each
+                        select=".//dim:field[@element='description'][not(@qualifier='provenance')]">
+                    <xsl:copy-of select="node()"/>
+                    <br/>
+                </xsl:for-each>
+            </xsl:variable>
 
+
+            <xsl:if test="$description!=''">
+                <tr>
+                    <td colspan="2">
+                        <!-- Display "Description" for data files and "Abstract" for data packages. -->
+                        <xsl:choose>
+                            <xsl:when
+                                    test=".//dim:field[@element='relation'][@qualifier='ispartof']">
+                                <div class="article-abstract"><b><i18n:text>xmlui.DryadItemSummary.description</i18n:text></b><br/>
+                                  <xsl:copy-of select="$description"/>
+                                </div>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <div class="article-abstract"><b><i18n:text>xmlui.DryadItemSummary.abstract</i18n:text></b><br/>
+                                  <xsl:copy-of select="$description"/>
+                                </div>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </td>
+                </tr>
+            </xsl:if>        
+        </tbody>
         </table>
+        
+          </div>
+        </div>
+      
+        <!-- end redesign -->       
 
         <!-- we only want this view from item view - not the administrative pages -->
         <xsl:if test="$meta[@qualifier='URI' and contains(.., 'handle') and not(contains(..,'workflow'))]">
@@ -1576,7 +1565,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/amNat.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/amNat.png"
                          alt="The American Naturalist cover"/>
                 </a>
             </xsl:when>
@@ -1593,7 +1582,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/BJLS.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/BJLS.png"
                          alt="Biological Journal of the Linnean Society cover"/>
                 </a>
             </xsl:when>
@@ -1610,7 +1599,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/BiolLett.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/BiolLett.png"
                          alt="Biology Letters cover"/>
                 </a>
             </xsl:when>
@@ -1627,7 +1616,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/biorisk.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/biorisk.png"
                          alt="BioRisk cover"/>
                 </a>
             </xsl:when>
@@ -1644,7 +1633,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/bmjOpen.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/bmjOpen.png"
                          alt="BMJ Open logo"/>
                 </a>
             </xsl:when>
@@ -1661,7 +1650,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/compcytogen.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/compcytogen.png"
                          alt="Comparative Cytogenetics cover"/>
                 </a>
             </xsl:when>
@@ -1679,7 +1668,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/ecoMono.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/ecoMono.png"
                          alt="Ecological Monographs cover"/>
                 </a>
             </xsl:when>
@@ -1697,7 +1686,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/elife-full-color-vertical.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/elife-full-color-vertical.png"
                          alt="eLife logo"/>
                 </a>
             </xsl:when>
@@ -1714,7 +1703,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/evolution.png" alt="Evolution cover"/>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/evolution.png" alt="Evolution cover"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Evolutionary Applications"'>
@@ -1731,7 +1720,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/EvolApp.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/EvolApp.png"
                          alt="Evolutionary Applications cover"/>
                 </a>
             </xsl:when>
@@ -1749,7 +1738,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/FEcover.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/FEcover.png"
                          alt="Functional Ecology cover"/>
                 </a>
             </xsl:when>
@@ -1767,7 +1756,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/gms_ejournal.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/gms_ejournal.png"
                          alt="German Medical Science cover"/>
                 </a>
             </xsl:when>
@@ -1784,7 +1773,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/heredity.png" alt="Heredity cover"/>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/heredity.png" alt="Heredity cover"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "International Journal of Myriapodology"'>
@@ -1800,7 +1789,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/ijm.png" alt="International Journal of Myriapodology cover"/>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/ijm.png" alt="International Journal of Myriapodology cover"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Journal of Animal Ecology"'>
@@ -1816,7 +1805,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/JAnimalEcol.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/JAnimalEcol.png"
                          alt="Journal of Animal Ecology cover"/>
                 </a>
             </xsl:when>
@@ -1833,7 +1822,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/EvolBiol.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/EvolBiol.png"
                          alt="Journal of Evolutionary Biology cover"/>
                 </a>
             </xsl:when>
@@ -1850,7 +1839,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/JFWM.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/JFWM.png"
                          alt="Journal of Fish and Wildlife Management cover"/>
                 </a>
             </xsl:when>
@@ -1867,7 +1856,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/jhered.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/jhered.png"
                          alt="Journal of Heredity cover"/>
                 </a>
             </xsl:when>
@@ -1884,7 +1873,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/JPALEO.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/JPALEO.png"
                          alt="Journal of Paleontology cover"/>
                 </a>
             </xsl:when>
@@ -1901,7 +1890,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/mbe.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/mbe.png"
                          alt="Molecular Biology and Evolution cover"/>
                 </a>
             </xsl:when>
@@ -1919,7 +1908,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/MolEcol.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/MolEcol.png"
                          alt="Molecular Ecology cover"/>
                 </a>
             </xsl:when>
@@ -1937,7 +1926,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/MolEcolRes.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/MolEcolRes.png"
                          alt="Molecular Ecology Resources cover"/>
                 </a>
             </xsl:when>
@@ -1955,7 +1944,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/mpe.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/mpe.png"
                          alt="Molecular Phylogenetics and Evolution cover"/>
                 </a>
             </xsl:when>
@@ -1973,7 +1962,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/mycokeys.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/mycokeys.png"
                          alt="MycoKeys cover"/>
                 </a>
             </xsl:when>
@@ -1991,7 +1980,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/natureconservation.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/natureconservation.png"
                          alt="Nature Conservation cover"/>
                 </a>
             </xsl:when>
@@ -2009,7 +1998,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/neobiota.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/neobiota.png"
                          alt="NeoBiota cover"/>
                 </a>
             </xsl:when>
@@ -2027,7 +2016,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/paleobiology.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/paleobiology.png"
                          alt="Paleobiology cover"/>
                 </a>
             </xsl:when>
@@ -2045,7 +2034,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/phytokeys.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/phytokeys.png"
                          alt="PhytoKeys cover"/>
                 </a>
             </xsl:when>
@@ -2063,7 +2052,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/PLOS-Biology.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/PLOS-Biology.png"
                          alt="PLOS Biology logo"/>
                 </a>
             </xsl:when>
@@ -2081,7 +2070,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/PLOS-CompBiology.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/PLOS-CompBiology.png"
                          alt="PLOS Computational Biology logo"/>
                 </a>
             </xsl:when>
@@ -2099,7 +2088,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/PLOS-Currents_TreeOfLife.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/PLOS-Currents_TreeOfLife.png"
                          alt="PLOS Currents logo"/>
                 </a>
             </xsl:when>
@@ -2117,7 +2106,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/PLOS-Genetics.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/PLOS-Genetics.png"
                          alt="PLOS Genetics logo"/>
                 </a>
             </xsl:when>
@@ -2135,7 +2124,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/pmedicine.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/pmedicine.png"
                          alt="PLOS Medicine logo"/>
                 </a>
             </xsl:when>
@@ -2153,7 +2142,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/pntd.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/pntd.png"
                          alt="PLOS Neglected Tropical Diseases logo"/>
                 </a>
             </xsl:when>
@@ -2171,7 +2160,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/PLOS-ONE.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/PLOS-ONE.png"
                          alt="PLOS ONE logo"/>
                 </a>
             </xsl:when>
@@ -2189,7 +2178,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/PLOS-Pathogens.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/PLOS-Pathogens.png"
                          alt="PLOS Pathogens logo"/>
                 </a>
             </xsl:when>
@@ -2206,7 +2195,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/SystBiol.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/SystBiol.png"
                          alt="Systematic Biology cover"/>
                 </a>
             </xsl:when>
@@ -2224,13 +2213,13 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/zookeys.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/zookeys.png"
                          alt="ZooKeys cover"/>
                 </a>
             </xsl:when>
             <xsl:otherwise>
                 <a>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/nonintegratedjournal.jpg"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/nonintegratedjournal.jpg"
                          alt="This journal is not integrated with Dryad"/>
                 </a>
             </xsl:otherwise>
