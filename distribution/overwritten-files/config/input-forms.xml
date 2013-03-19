@@ -662,6 +662,7 @@
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>institucionDesarrollo</dc-element>
+					<repeatable>true</repeatable>
 					<label>Lugar de desarrollo</label>
 					<input-type>onebox</input-type>
 					<hint>Institución en donde se desarrollo el trabajo de tesis</hint>
