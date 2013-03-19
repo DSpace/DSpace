@@ -2096,6 +2096,7 @@
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-editor">Editor</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-editors">Editors</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-translator">Translator</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-contributor-translators">Translator</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-compiler">Compiler</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-compilers">Compilers</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-juror">Jury</message>

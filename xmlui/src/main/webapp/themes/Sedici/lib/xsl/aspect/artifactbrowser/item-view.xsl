@@ -198,6 +198,34 @@
 						</span>
 					</xsl:for-each>
 				</xsl:when>
+				<xsl:when test="dim:field[@element='contributor' and @qualifier='translator']">
+					<span class="metadata-label">
+						<xsl:choose>
+							<xsl:when test="count(dim:field[@element='contributor' and @qualifier='translator']) &gt; 1">
+								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-contributor-translators</i18n:text>:
+							</xsl:when>
+							<xsl:otherwise>
+								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-contributor-translator</i18n:text>:
+							</xsl:otherwise>
+						</xsl:choose>
+					</span>
+					<xsl:for-each select="dim:field[@element='contributor' and @qualifier='translator']">
+						<span class="metadata-value">
+							<xsl:if test="@authority">
+								<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
+							</xsl:if>
+	
+							<a>
+								<xsl:attribute name="href"><xsl:value-of select="$linkFilter"/>?filtertype=persona&amp;filter="<xsl:copy-of select="translate(node(),'áéíóú','aeiou')"/>"</xsl:attribute>
+								<xsl:copy-of select="node()" />
+							</a>							
+	
+							<xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='translator']) != 0">
+								<xsl:text> | </xsl:text>
+							</xsl:if>
+						</span>
+					</xsl:for-each>
+				</xsl:when>
 				<xsl:otherwise>
 					<i18n:text>xmlui.dri2xhtml.METS-1.0.no-author</i18n:text>
 				</xsl:otherwise>
@@ -1121,6 +1149,14 @@
 							<xsl:for-each select="dim:field[@element='contributor' and @qualifier='editor']">
 								<xsl:copy-of select="node()"/>
 								<xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='editor']) != 0">
+									<xsl:text>; </xsl:text>
+								</xsl:if>
+							</xsl:for-each>
+						</xsl:when>
+						<xsl:when test="dim:field[@element='contributor' and @qualifier='translator']">
+							<xsl:for-each select="dim:field[@element='contributor' and @qualifier='translator']">
+								<xsl:copy-of select="node()"/>
+								<xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='translator']) != 0">
 									<xsl:text>; </xsl:text>
 								</xsl:if>
 							</xsl:for-each>
