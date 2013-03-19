@@ -142,7 +142,9 @@ public class ErrorHandlerHelper extends AbstractLogEnabled
                                                                       InvokeContext context)
     throws Exception {
         Throwable rootException = ExceptionUtils.getRootCause(ex);
-        if (rootException instanceof ResourceNotFoundException) {
+        if(ex instanceof ResourceNotFoundException) {
+        	this.handledErrorsLogger.error(ex.getMessage());
+        } else if (rootException instanceof ResourceNotFoundException) {
             this.handledErrorsLogger.error(rootException.getMessage());
         } else {
             this.handledErrorsLogger.error(ex.getMessage(), ex);
