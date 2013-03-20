@@ -330,9 +330,7 @@
                             <xsl:text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </xsl:text>
                         </div>
                     </div>
-                    <div style="text-align: center;">
-                        <input value="View more" type="submit" name="submit" class="ds-button-field" id="" />
-                    </div>
+
                 </div>
             </div>
 
