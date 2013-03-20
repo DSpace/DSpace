@@ -855,8 +855,15 @@ span.field-help {
 
 .file-wrapper,
 .ds-artifact-item {
-    padding-top: 15px;
-    padding-bottom: 15px;
+    padding-top: 5px !important;
+    padding-bottom: 10px !important;
+}
+
+.ds-artifact-item.doi-item a {
+      text-decoration: none;
+}
+.ds-artifact-item.doi-item a span.doi {
+      text-decoration: underline;
 }
 
 .ds-artifact-item.collection,

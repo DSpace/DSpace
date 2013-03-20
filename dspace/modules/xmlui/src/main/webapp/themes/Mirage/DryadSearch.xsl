@@ -166,7 +166,7 @@
                     </span>
                     <xsl:text> </xsl:text>
                 </xsl:if>
-                <span>
+                <span class="doi">
                     <xsl:variable name="id"
                                   select="dim:field[@element='identifier'][not(@qualifier)][@mdschema='dc'][1]"/>
                     <xsl:if test="$id[starts-with(., 'doi')]">
@@ -193,10 +193,13 @@
                 <xsl:text>&amp;dmdTypes=DC</xsl:text>
             </xsl:if>-->
         </xsl:variable>
+        <xsl:variable name="inner_id"
+                      select="dim:field[@element='identifier'][not(@qualifier)][@mdschema='dc'][1]"/>
         <xsl:comment> External Metadata URL: <xsl:value-of select="$externalMetadataURL"/> </xsl:comment>
         <li>
             <xsl:attribute name="class">
                 <xsl:text>ds-artifact-item </xsl:text>
+                <xsl:if test="$inner_id[starts-with(., 'doi')]">doi-item </xsl:if>
                 <xsl:choose>
                     <xsl:when test="position() mod 2 = 0">even</xsl:when>
                     <xsl:otherwise>odd</xsl:otherwise>
