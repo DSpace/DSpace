@@ -859,6 +859,13 @@ span.field-help {
     padding-bottom: 15px;
 }
 
+.ds-artifact-item.doi-item a {
+      text-decoration: none;
+}
+.ds-artifact-item.doi-item a span.doi {
+      text-decoration: underline;
+}
+
 .ds-artifact-item.collection,
 .ds-artifact-item.community {
     padding-top: 1px;
