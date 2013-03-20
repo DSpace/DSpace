@@ -21,7 +21,24 @@
           autowire="byType"
           scope="singleton"/>
 
-
+    <bean id="org.dspace.identifier.doi.DOIConnector"
+        class="org.dspace.identifier.doi.DataCiteConnector"
+        scope="singleton">
+        <property name='DATACITE_SCHEME' value='https'/>
+        <property name='DATACITE_HOST' value='test.datacite.org'/>
+        <property name='DATACITE_DOI_PATH' value='/mds/doi/' />
+        <property name='DATACITE_METADATA_PATH' value='/mds/metadata/' />
+        <property name='disseminationCrosswalkName' value="DataCite" />
+    </bean>
+    
+    <bean id="org.dspace.identifier.DOIIdentifierProvider"
+        class="org.dspace.identifier.DOIIdentifierProvider"
+        scope="singleton">
+        <property name="configurationService"
+            ref="org.dspace.services.ConfigurationService" />
+        <property name="DOIConnector"
+            ref="org.dspace.identifier.doi.DOIConnector" />
+    </bean>
    <!-- provider for using the versioned handle identifier instead of the default one. -->
     <!--<bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider"-->
           <!--scope="singleton">-->
