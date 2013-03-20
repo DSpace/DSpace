@@ -116,6 +116,10 @@
                 overflow: visible;
             }
 
+            #aspect_statistics_StatisticsTransformer_div_stats .ds-table-row {
+	        height:60px;
+	    }
+
             #recently_integrated_journals img {
 	        padding: 10px;
 	    }
