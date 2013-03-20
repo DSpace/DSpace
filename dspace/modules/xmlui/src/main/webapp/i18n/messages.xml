@@ -324,6 +324,7 @@
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.para3">For Dryad staff and project personnel, please see <a href="/pages/whoWeAre#staff">Who We Are</a>.</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.para4">Postal Address:</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.para5">Dryad<br/>PO Box 585<br/>Durham, NC 27702-0585 USA</message>
+    <message key="xmlui.ArtifactBrowser.FeedbackForm.forumLink"><a href="#" onclick="$('#forum-link').click(); return false;">Share your ideas for features and vote for ideas already submitted</a></message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.para6">You may also submit your inquiry or help ticket using the form below.  Your submission will be tracked and routed to the correct person.</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.email">Your Email</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.email_help">This address will be used to follow
@@ -3267,8 +3268,8 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue_currency">Currency selection is required</message>
     
     <!-- Checkbox options for org_annual_revenue -->
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.less_than_10_million">Less than $10 million per year (annual membership fee US$1000)</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.greater_than_10_million">Greater than $10 million per year (annual membership fee US$5000)</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.less_than_10_million">Less than USD$10 million per year (annual membership fee USD$1000)</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.greater_than_10_million">Greater than USD$10 million per year (annual membership fee USD$5000)</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue">Annual revenue is required</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.billing_contact_name.label1">4. Billing contact name<span class="required-mark">*</span></message>
