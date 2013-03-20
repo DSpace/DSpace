@@ -173,8 +173,13 @@
 
             #connect-illustrated-prose img {
                 width: auto;
-                margin: 4px;
+                margin: 4px;		
             }
+
+	    #aspect_discovery_SiteViewer_field_query {
+	        width:75%;
+	    }
+
         </style>
 
 
@@ -253,32 +258,21 @@
 
             <!-- START SEARCH -->
             <div class="home-col-1">
-                <h1 class="ds-div-head">Search for Data <a>
-                    <xsl:attribute name="href">
-                        <![CDATA[/search-filter?query=&field=dc.contributor.author_filter]]>
-                    </xsl:attribute>
-                    Browse authors</a>
-                    <a>
-                        <xsl:attribute name="href">
-                            <![CDATA[/search-filter?query=&field=prism.publicationName_filter]]>
-                        </xsl:attribute>
-                        Browse journals</a>
-                </h1>
+                <h1 class="ds-div-head">Search for Data</h1>
 
                 <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                       id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary"
                       action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
                     <p class="ds-paragraph">
                         <p>
-                            <label class="ds-form-label" for="aspect_discovery_SiteViewer_field_query">Search for data in Dryad:
-                            </label>
+                            <label class="ds-form-label" for="aspect_discovery_SiteViewer_field_query"></label>
                         </p>
                         <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                                id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
                                type="text" value=""/><!-- no whitespace between these!
                      --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
                                id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
-                               type="submit" value="Go"/>
+                               type="submit" value="Search"/>
                     </p>
                 </form>
             </div>
@@ -313,8 +307,16 @@
                     <div id="browse-data-buttons">
                         <a href="#recently-published-data"><span>Recently Published</span></a>
                         <a href="#most-viewed-data"><span>Most Viewed</span></a>
-                        <a href="#data-by-author"><span>By Author</span></a>
-                        <a href="#data-by-journal"><span>By Journal</span></a>
+			<a>
+			  <xsl:attribute name="href">
+			    <![CDATA[/search-filter?query=&field=dc.contributor.author_filter]]>
+			  </xsl:attribute>
+			By author</a>
+			<a>
+			  <xsl:attribute name="href">
+                            <![CDATA[/search-filter?query=&field=prism.publicationName_filter]]>
+			  </xsl:attribute>
+                        By journal</a>
                     </div>
                     <div id="recently-published-data" class="browse-data-panel">
                         <xsl:for-each select="dri:div[@n='site-home']">
