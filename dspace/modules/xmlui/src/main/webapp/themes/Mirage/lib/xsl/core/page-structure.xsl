@@ -625,12 +625,8 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 <!-- Powered by... -->
                 <p style="margin-top: 0.5em;">
                     <i18n:text>xmlui.dri2xhtml.structural.footer-powered-by</i18n:text>
-                    <a href="http://creativecommons.org/" target="_blank">
-                        <img class="powered-by" src="/themes/Mirage/images/powered-by-cc.png" alt="Creative Commons" />
-                    </a>
-                    <a href="http://www.dspace.org/" target="_blank">
-                        <img class="powered-by" src="/themes/Mirage/images/powered-by-dspace.png" alt="DSpace" />
-                    </a>
+                    <a href="http://creativecommons.org/" target="_blank"><img class="powered-by" src="/themes/Mirage/images/powered-by-cc.png" alt="Creative Commons" /></a>
+                    <a href="http://www.dspace.org/" target="_blank"><img class="powered-by" src="/themes/Mirage/images/powered-by-dspace.png" alt="DSpace" /></a>
                 </p>
 
                 <p>
