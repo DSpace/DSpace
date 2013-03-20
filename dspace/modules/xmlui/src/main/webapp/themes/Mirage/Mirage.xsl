@@ -195,6 +195,21 @@
                 <div id="dryad-home-carousel" class="ds-static-div primary">
                     <div class="bxslider" style="">
                         <div>
+                            <a href="/pages/membershipMeeting">
+                                <img src="themes/Mirage/images/2013membershipMeeting.jpg" alt="Dryad Membership Meeting, May 24, Oxford, UK" />
+                            </a>
+                        </div>
+                        <div>
+                            <a href="/pages/depositing">
+                                <img src="themes/Mirage/images/bookmarkSubmissionProcess.png" alt="Desosit data. Get permanent identifier. Watch your citations grow! Relax, your data are discoverable and secure." />
+                            </a>
+                        </div>
+                       <div>
+                            <a href="http://datadryad.org/resource/doi:10.5061/dryad.gs45f">
+                                <img src="themes/Mirage/images/dryad.gs45f.jpg" alt="Featured data: Herbivory-induced volatiles function as defenses..."/>
+                            </a>
+                        </div>
+                        <div>
                             <p Xid="ds-dryad-is" style="font-size: 88%"
                                xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
                                 <span style="color: #595;">DataDryad.org</span>
@@ -207,23 +222,6 @@
                                 for a growing list of journals; submission of data from other publications is also welcome.
                             </p>
                         </div>
-                        <div>
-                            <a href="/pages/depositing">
-                                <img src="themes/Mirage/images/bookmarkSubmissionProcess.png"/>
-                                <p>Placeholder text --- to be replaced by bookmark images </p>
-                            </a>
-                        </div>
-                        <div>
-                            <a href="http://blog.datadryad.org/2013/02/11/dryad-membership-meeting-data-publishing-symposium-2/">
-                                <img src="themes/Mirage/images/2013membershipMeeting.jpg"/>
-                            </a>
-                        </div>
-                        <div>
-                            <a href="http://datadryad.org/resource/doi:10.5061/dryad.gs45f">
-                                <img src="themes/Mirage/images/dryad.gs45f.jpg"/>
-                            </a>
-                        </div>
-
                     </div>
                 </div>
             </div>
