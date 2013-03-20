@@ -109,12 +109,20 @@
                 height: 420px;
             }
 
-            #file_news_div_recently_integrated_journal,
+            #recently_integrated_journals,
             #aspect_statistics_StatisticsTransformer_div_stats,
             #aspect_dryadinfo_DryadBlogFeed_div_blog-hook {
                 height: 300px;
                 overflow: visible;
             }
+
+            #recently_integrated_journals img {
+	        padding: 10px;
+	    }
+
+	    #recently_integrated_journals .container {
+	        text-align: center;
+	    }
 
             #dryad-home-carousel {
                 font-size: 23px;
@@ -356,11 +364,13 @@
             <!-- START INTEGRATED JOURNAL-->
             <div class="home-col-2" style="clear: both; margin-left: 25px;">
                 <h1 class="ds-div-head">Recently Integrated Journals</h1>
-                <div id="file_news_div_recently_integrated_journal" class="ds-static-div primary">
-                    <p class="ds-paragraph">
-                        <xsl:text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </xsl:text>
-
-                    </p>
+                <div id="recently_integrated_journals" class="ds-static-div primary">
+		  <div class="container">
+		    <img src="/themes/Mirage/images/recentlyIntegrated-pbio.png" alt="PLOS Biology" />
+		    <img src="/themes/Mirage/images/recentlyIntegrated-jpaleo.gif" alt="Journal of Paleontology" />
+		    <img src="/themes/Mirage/images/recentlyIntegrated-functecol.png" alt="Functional Ecology" />
+		    <img src="/themes/Mirage/images/recentlyIntegrated-elife.png" alt="eLife" />
+		  </div>
                 </div>
             </div>
 
