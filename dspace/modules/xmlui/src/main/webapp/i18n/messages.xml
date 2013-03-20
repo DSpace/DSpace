@@ -2564,9 +2564,9 @@
     <message key="xmlui.dri2xhtml.structural.footer-promotional1">
         Dryad is a nonprofit repository for data underlying the international scientific and medical literature.</message>
 	<message key="xmlui.dri2xhtml.structural.footer-promotional2">Latest software build </message>
-	<message key="xmlui.dri2xhtml.structureal.footer-node">. Served by </message>
-	<message key="xmlui.dri2xhtml.structureal.footer-powered-by">Powered by </message>
-	<message key="xmlui.dri2xhtml.structureal.footer-terms-of-service">Terms of Service</message>
+	<message key="xmlui.dri2xhtml.structural.footer-node">. Served by </message>
+	<message key="xmlui.dri2xhtml.structural.footer-powered-by">Powered by </message>
+	<message key="xmlui.dri2xhtml.structural.footer-terms-of-service">Terms of Service</message>
 
 	<message key="xmlui.dri2xhtml.structural.contact-link">Contact Us</message>
 	<message key="xmlui.dri2xhtml.structural.feedback-text">Have questions, problems, or suggestions

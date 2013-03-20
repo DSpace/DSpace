@@ -161,6 +161,7 @@ a:hover {
     margin-top: 25px;
     margin-bottom: 5px;
     overflow: hidden;
+    clear: both;
 }
 
 #ds-footer {
@@ -168,6 +169,7 @@ a:hover {
     padding: 4px 0;
     font-size: 93%;
     line-height: 1.6em;
+    text-align: center;
 }
 
 #ds-footer img.powered-by {
