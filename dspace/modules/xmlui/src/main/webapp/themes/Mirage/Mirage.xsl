@@ -209,18 +209,18 @@
                         </div>
                         <div>
                             <a href="/pages/depositing">
-                                <img src="themes/Mirage/images/bookmarkSubmissionProcess.png"/>
+                                <img src="/themes/Mirage/images/bookmarkSubmissionProcess.png"/>
                                 <p>Placeholder text --- to be replaced by bookmark images </p>
                             </a>
                         </div>
                         <div>
                             <a href="http://blog.datadryad.org/2013/02/11/dryad-membership-meeting-data-publishing-symposium-2/">
-                                <img src="themes/Mirage/images/2013membershipMeeting.jpg"/>
+                                <img src="/themes/Mirage/images/2013membershipMeeting.jpg"/>
                             </a>
                         </div>
                         <div>
                             <a href="http://datadryad.org/resource/doi:10.5061/dryad.gs45f">
-                                <img src="themes/Mirage/images/dryad.gs45f.jpg"/>
+                                <img src="/themes/Mirage/images/dryad.gs45f.jpg"/>
                             </a>
                         </div>
 
@@ -293,16 +293,16 @@
                 <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 490px;">
                     <div id="connect-illustrated-prose">
                         <p>
-                            <img src="themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" />
-                            Publishers, societies, universities, libraries, funders, and other stakeholder organizations are invited to become <a href="#TODO">Members</a>. Tap into an active knowledge-sharing network, receive discounts on deposit fees, and help shape Dryad’s future.
-                            <img src="themes/Mirage/images/seed-3.png" style="float: right; margin-right: -8px;" />
+                            <img src="/themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" />
+                            Publishers, societies, universities, libraries, funders, and other stakeholder organizations are invited to become <a href="/pages/membershipOverview">Members</a>. Tap into an active knowledge-sharing network, receive discounts on deposit fees, and help shape Dryad’s future.
+                            <img src="/themes/Mirage/images/seed-3.png" style="float: right; margin-right: -8px;" />
                         </p>
                         <p>
-                            <a href="#TODO">Submission Integration</a> is a service provided to journals free-of-charge to coordinate manuscript submission with data submission to Dryad.  It makes data deposition easy for researchers; makes linking articles and data easy for journals; and enables confidential review of data prior to publication.
+                            <a href="/pages/journalIntegration">Submission Integration</a> is a service provided to journals free-of-charge to coordinate manuscript submission with data submission to Dryad.  It makes data deposition easy for researchers; makes linking articles and data easy for journals; and enables confidential review of data prior to publication.
                         </p>
                         <p>
-                            <img src="themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" />
-                            Deposit fees enable Dryad’s content to be made available free of charge for research and educational reuse.  Flexible <a href="#TODO">pricing plans</a> provide volume discounts on deposit fees.
+                            <img src="/themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" />
+                            Deposit fees enable Dryad’s content to be made available free of charge for research and educational reuse.  Flexible <a href="/pages/pricing">pricing plans</a> provide volume discounts on deposit fees.
                         </p>
                     </div>
                 </div>
@@ -590,16 +590,16 @@
             <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 490px;">
                 <div id="connect-illustrated-prose">
                     <p>
-                        <img src="themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" />
-                        Publishers, societies, universities, libraries, funders, and other stakeholder organizations are invited to become <a href="#TODO">Members</a>. Tap into an active knowledge-sharing network, receive discounts on deposit fees, and help shape Dryad’s future.
-                        <img src="themes/Mirage/images/seed-3.png" style="float: right; margin-right: -8px;" />
+                        <img src="/themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" />
+                        Publishers, societies, universities, libraries, funders, and other stakeholder organizations are invited to become <a href="/pages/membershipOverview">Members</a>. Tap into an active knowledge-sharing network, receive discounts on deposit fees, and help shape Dryad’s future.
+                        <img src="/themes/Mirage/images/seed-3.png" style="float: right; margin-right: -8px;" />
                     </p>
                     <p>
-                        <a href="#TODO">Submission Integration</a> is a service provided to journals free-of-charge to coordinate manuscript submission with data submission to Dryad.  It makes data deposition easy for researchers; makes linking articles and data easy for journals; and enables confidential review of data prior to publication.
+                        <a href="/pages/journalIntegration">Submission Integration</a> is a service provided to journals free-of-charge to coordinate manuscript submission with data submission to Dryad.  It makes data deposition easy for researchers; makes linking articles and data easy for journals; and enables confidential review of data prior to publication.
                     </p>
                     <p>
-                        <img src="themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" />
-                        Deposit fees enable Dryad’s content to be made available free of charge for research and educational reuse.  Flexible <a href="#TODO">pricing plans</a> provide volume discounts on deposit fees.
+                        <img src="/themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" />
+                        Deposit fees enable Dryad’s content to be made available free of charge for research and educational reuse.  Flexible <a href="/pages/pricing">pricing plans</a> provide volume discounts on deposit fees.
                     </p>
                 </div>
             </div>
