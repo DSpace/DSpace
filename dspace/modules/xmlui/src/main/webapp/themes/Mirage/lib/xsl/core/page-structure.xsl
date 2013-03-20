@@ -456,7 +456,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     </ul>
                                 </li>
                                 <li>
-                                    <a href="">Journal Integration</a>
+                                    <a href="/pages/journalIntegration">Journal Integration</a>
                                     <ul>
                                       <li>
                                   <a href="/pages/journalIntegration">How to Integrate</a>
