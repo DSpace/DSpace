@@ -381,96 +381,48 @@
                     <h1 class="ds-div-head">Stats</h1>
                     <div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                          id="aspect_statistics_StatisticsTransformer_div_stats" class="ds-static-div secondary stats">
-                        <h2 class="ds-table-head">Total Visits</h2>
                         <table xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                                id="aspect_statistics_StatisticsTransformer_table_list-table"
                                class="ds-table tableWithTitle">
-                            <tr class="ds-table-row odd">
-                                <td id="aspect_statistics_StatisticsTransformer_cell_"
-                                    class="ds-table-cell odd labelcell"/>
-                                <td id="aspect_statistics_StatisticsTransformer_cell_"
-                                    class="ds-table-cell even labelcell">Views
-                                </td>
-                            </tr>
                             <tr xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                                 class="ds-table-row even">
                                 <td id="aspect_statistics_StatisticsTransformer_cell_01"
-                                    class="ds-table-cell odd labelcell">Data from: IDENTIFIER TEST
+                                    class="ds-table-cell odd labelcell">Total Data Packages
                                 </td>
                                 <td id="aspect_statistics_StatisticsTransformer_cell_02"
-                                    class="ds-table-cell even datacell">23
+                                    class="ds-table-cell even datacell">2886
                                 </td>
                             </tr>
                             <tr class="ds-table-row odd">
                                 <td id="aspect_statistics_StatisticsTransformer_cell_11"
-                                    class="ds-table-cell odd labelcell">Data from: CHECK
+                                    class="ds-table-cell odd labelcell">Total Data Files
                                 </td>
                                 <td id="aspect_statistics_StatisticsTransformer_cell_12"
-                                    class="ds-table-cell even datacell">14
+                                    class="ds-table-cell even datacell">8197
                                 </td>
                             </tr>
                             <tr class="ds-table-row even">
                                 <td id="aspect_statistics_StatisticsTransformer_cell_21"
-                                    class="ds-table-cell odd labelcell">Data from: Mini_deletion_revert
+                                    class="ds-table-cell odd labelcell">Journals Represented
                                 </td>
                                 <td id="aspect_statistics_StatisticsTransformer_cell_22"
-                                    class="ds-table-cell even datacell">11
+                                    class="ds-table-cell even datacell">202
                                 </td>
                             </tr>
                             <tr class="ds-table-row odd">
                                 <td id="aspect_statistics_StatisticsTransformer_cell_31"
-                                    class="ds-table-cell odd labelcell">4651
+                                    class="ds-table-cell odd labelcell">Total Unique Authors
                                 </td>
                                 <td id="aspect_statistics_StatisticsTransformer_cell_32"
-                                    class="ds-table-cell even datacell">9
+                                    class="ds-table-cell even datacell">11,125
                                 </td>
                             </tr>
                             <tr class="ds-table-row even">
                                 <td id="aspect_statistics_StatisticsTransformer_cell_41"
-                                    class="ds-table-cell odd labelcell">Canada
+                                    class="ds-table-cell odd labelcell">Total File Downloads
                                 </td>
                                 <td id="aspect_statistics_StatisticsTransformer_cell_42"
-                                    class="ds-table-cell even datacell">9
-                                </td>
-                            </tr>
-                            <tr class="ds-table-row odd">
-                                <td id="aspect_statistics_StatisticsTransformer_cell_51"
-                                    class="ds-table-cell odd labelcell">South Korea
-                                </td>
-                                <td id="aspect_statistics_StatisticsTransformer_cell_52"
-                                    class="ds-table-cell even datacell">9
-                                </td>
-                            </tr>
-                            <tr class="ds-table-row even">
-                                <td id="aspect_statistics_StatisticsTransformer_cell_61"
-                                    class="ds-table-cell odd labelcell">Data from: Test duplicate
-                                </td>
-                                <td id="aspect_statistics_StatisticsTransformer_cell_62"
-                                    class="ds-table-cell even datacell">9
-                                </td>
-                            </tr>
-                            <tr class="ds-table-row odd">
-                                <td id="aspect_statistics_StatisticsTransformer_cell_71"
-                                    class="ds-table-cell odd labelcell">Data from: Metadata version
-                                </td>
-                                <td id="aspect_statistics_StatisticsTransformer_cell_72"
-                                    class="ds-table-cell even datacell">8
-                                </td>
-                            </tr>
-                            <tr class="ds-table-row even">
-                                <td id="aspect_statistics_StatisticsTransformer_cell_81"
-                                    class="ds-table-cell odd labelcell">Data from: Test delete version -1
-                                </td>
-                                <td id="aspect_statistics_StatisticsTransformer_cell_82"
-                                    class="ds-table-cell even datacell">8
-                                </td>
-                            </tr>
-                            <tr class="ds-table-row odd">
-                                <td id="aspect_statistics_StatisticsTransformer_cell_91"
-                                    class="ds-table-cell odd labelcell">Data from: 00005
-                                </td>
-                                <td id="aspect_statistics_StatisticsTransformer_cell_92"
-                                    class="ds-table-cell even datacell">7
+                                    class="ds-table-cell even datacell">74,567
                                 </td>
                             </tr>
                         </table>
