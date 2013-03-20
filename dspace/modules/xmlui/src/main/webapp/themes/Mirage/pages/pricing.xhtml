@@ -8,14 +8,29 @@
   <title>Membership Overview</title>
      <style type="text/css">
          div#ds-body { margin: 0px 0px 0px 0px;padding-right: 10px; top: 165px;}
-         p.deposit-fees { color: #ff0000; text-decoration: underline; }
+        .pricing-table {
+            margin-bottom: 1em;
+            border-top: 2px solid #ccc;
+            border-bottom: 2px solid #ccc;
+        }
+        .pricing-table th {
+            text-align: left;
+        }
+        .pricing-table tr.odd {
+            border-top: 1px dotted #ccc;
+            border-bottom: 1px dotted #ccc;
+        }
+        .pricing-table td.plan-name {
+            font-weight: bold;
+            color: #40841c; 
+        }
      </style>
  </head>
  <body>
   <div id="ds-body">
   <h1 class="ds-div-head">Pricing plans and deposit fees<a id="pricing">&#160;</a></h1>
    <div class="ds-static-div primary">
-     <p class="deposit-fees">Dryad will begin charging deposit fees on the 1st of September 2013.</p>
+     <h2 style="margin-bottom: 8px;">Dryad will begin charging deposit fees on the <span style="color: #40841c;">1st of September 2013</span>.</h2>
      <p>Dryad is a <strong>nonprofit</strong> organization that provides <strong>long-term
       access</strong> to its contents at <strong>no cost</strong> to researchers, educators or students,
       irrespective of nationality or institutional affiliation. Dryad is able to provide free access to
@@ -59,15 +74,15 @@
       upon request for deposits originating from researchers based in <a
       href="http://data.worldbank.org/about/country-classifications/country-and-lending-groups">countries
       classified by the World Bank as Low-income or Lower-middle-income economies</a>.</p>
-      <table>
+      <table class="pricing-table">
           <thead>
               <tr><th>Payment Plan</th><th>Member</th><th>Non-member</th><th>Minimum purchase</th></tr>
           </thead>
           <tbody>
-              <tr><td>1. Subscription Plan</td><td>annual fee based on $25 per published research article</td><td>annual fee based on $30 per published research article</td><td>2 yr contract</td></tr>
-              <tr><td>2. Deferred Payment Plan</td><td>$70 per data package</td><td>$75 per data package</td><td>1 yr contract</td></tr>
-              <tr><td>3. Voucher Plan</td><td>$65 per data package</td><td>$70 per data package</td><td>25 vouchers</td></tr>
-              <tr><td>For individuals: Pay on Deposit</td><td>NA</td><td>$80 per data package, payable by depositor at the time of deposit</td><td>1 data package</td></tr>
+              <tr class="odd"><td class="plan-name">1. Subscription Plan</td><td>annual fee based on $25 per published research article</td><td>annual fee based on $30 per published research article</td><td>2 yr contract</td></tr>
+              <tr><td class="plan-name">2. Deferred Payment Plan</td><td>$70 per data package</td><td>$75 per data package</td><td>1 yr contract</td></tr>
+              <tr class="odd"><td class="plan-name">3. Voucher Plan</td><td>$65 per data package</td><td>$70 per data package</td><td>25 vouchers</td></tr>
+              <tr><td class="plan-name">For individuals:<br/>Pay on Deposit</td><td>NA</td><td>$80 per data package, payable by depositor at the time of deposit</td><td>1 data package</td></tr>
           </tbody>
       </table>
       <p>While base deposit fees cover the entire cost of most submissions, two additional fees may apply:</p>
