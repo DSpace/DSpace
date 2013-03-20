@@ -338,7 +338,7 @@
 
             <!-- START MAILING LIST-->
             <div class="home-col-2">
-                <h1 class="ds-div-head">Dryad Mailing List</h1>
+                <h1 class="ds-div-head">Mailing List</h1>
                 <div id="file_news_div_mailing_list" class="ds-static-div primary">
                     <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                           id="aspect_discovery_SiteViewer_div_front-page-file_news_div_mailing_list"
@@ -355,7 +355,7 @@
 
             <!-- START INTEGRATED JOURNAL-->
             <div class="home-col-2" style="clear: both; margin-left: 25px;">
-                <h1 class="ds-div-head">Recently Integrated Journal</h1>
+                <h1 class="ds-div-head">Recently Integrated Journals</h1>
                 <div id="file_news_div_recently_integrated_journal" class="ds-static-div primary">
                     <p class="ds-paragraph">
                         <xsl:text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </xsl:text>
