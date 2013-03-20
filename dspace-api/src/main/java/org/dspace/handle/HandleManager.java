@@ -84,6 +84,36 @@ public class HandleManager
 
         return url;
     }
+    
+    /**
+     * Return the handle for a local URL, if it was associated with a handle
+     * before.
+     * @param context DSpace context
+     * @param url The URL
+     * @return The handle or null if the handle couldn't be extracted of a URL
+     * or if the extracted handle couldn't be found.
+     * @throws SQLException  If a database error occurs
+     */
+    public static String resolveUrlToHandle(Context context, String url)
+            throws SQLException
+    {
+        String dspaceUrl = ConfigurationManager.getProperty("dspace.url")
+                + "/handle/";
+        
+        if (!url.startsWith(dspaceUrl))
+            return null;
+        
+        String handle = url.substring(dspaceUrl.length());
+        
+        if (!handle.startsWith(getPrefix()))
+            return null;
+        
+        TableRow dbhandle = findHandleInternal(context, handle);
+        if (null == dbhandle)
+            return null;
+        
+        return handle;
+    }
 
     /**
      * Transforms handle into the canonical form <em>hdl:handle</em>.
