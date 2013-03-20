@@ -74,7 +74,7 @@ There are three custom edits:
  * make the line-height relative and unit-less
  * remove the pre, code styles
 */
-body { font:13px sans-serif; *font-size:small; *font:x-small; line-height:1.22; }
+body { font:15px sans-serif; *font-size:small; *font:x-small; line-height:1.22; }
 
 table { font-size:inherit; font:100%; }
 
