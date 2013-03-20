@@ -18,7 +18,10 @@ import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.dspace.content.DSpaceObject;
@@ -462,15 +465,90 @@ implements DOIConnector
         this.reserved.clear();
     }
     
+    private DataCiteResponse sendDOIPostRequest(String doi, String url) {
+        // post mds/doi/
+        // body should contaion "doi=<doi>\nurl=<url>}n"
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        httpclient.getCredentialsProvider().setCredentials(
+                new AuthScope(HOST, 443),
+                new UsernamePasswordCredentials(this.getUsername(), this.getPassword()));
+                
+        URIBuilder uribuilder = new URIBuilder();
+        uribuilder.setScheme("https").setHost(HOST).setPath(DOI_PATH
+                + doi.substring(DOI.SCHEME.length()));
+        
+        HttpEntity respEntity = null;
+        try
+        {
+            // assemble request content:
+            String req = "doi=" + doi + "\n" + "url=" + url + "\n";
+            ContentType contentType = ContentType.create("text/plain", "UTF-8");
+            HttpEntity reqEntity = new StringEntity(req, contentType);
+            HttpPost httppost = new HttpPost(uribuilder.build());
+            httppost.setEntity(reqEntity);
+
+            HttpResponse response = httpclient.execute(httppost);
+            StatusLine status = response.getStatusLine();
+            int statusCode = status.getStatusCode();
+            respEntity = response.getEntity();
+            if (null == respEntity)
+            {
+                return new DataCiteResponse(statusCode, null);
+            }
+            
+            return new DataCiteResponse(statusCode, EntityUtils.toString(respEntity, "UTF-8"));
+        }
+        catch (IOException e)
+        {
+            log.warn("Caught an IOException: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        catch (URISyntaxException e)
+        {
+            log.error("The URL we constructed to check a DOI "
+                    + "produced a URISyntaxException. Please check the configuration parameters!");
+            log.error("The URL was {}.", "https://" + HOST +
+                    DOI_PATH + "/" + doi.substring(DOI.SCHEME.length()));
+            throw new IllegalArgumentException("The URL we constructed to check a DOI "
+                    + "produced a URISyntaxException. Please check the configuration parameters!", e);
+        }
+        finally
+        {
+            try
+            {
+                // Release any ressources used by HTTP-Request.
+                if (null != respEntity)
+                    EntityUtils.consume(respEntity);
+            }
+            catch (IOException e)
+            {
+                log.warn("Can't release HTTP-Entity: " + e.getMessage());
+            }
+        }
+    }
+    
+    // TODO
+    private void sendMetadataDeleteRequest() {
+        
+    }
+    
     private DataCiteResponse sendDOIGetRequest(String doi) {
-        // get mds/doi/<doi>
+        return sendGetRequest(doi, DOI_PATH);
+    }
+    
+    private DataCiteResponse sendMetadataGetRequest(String doi) {
+        return sendGetRequest(doi, METADATA_PATH);
+    }
+    
+    private DataCiteResponse sendGetRequest(String doi, String path) {
+        // get mds/metadata/<doi>
         DefaultHttpClient httpclient = new DefaultHttpClient();
         httpclient.getCredentialsProvider().setCredentials(
                 new AuthScope(HOST, 443),
                 new UsernamePasswordCredentials(this.getUsername(), this.getPassword()));
         
         URIBuilder uribuilder = new URIBuilder();
-        uribuilder.setScheme("https").setHost(HOST).setPath(DOI_PATH
+        uribuilder.setScheme("https").setHost(HOST).setPath(path
                 + doi.substring(DOI.SCHEME.length()));
         
         HttpEntity entity = null;
@@ -515,21 +593,6 @@ implements DOIConnector
                 log.warn("Can't release HTTP-Entity: " + e.getMessage());
             }
         }
-    }
-    
-    // TODO
-    private void sendDOIPostRequest() {
-        
-    }
-    
-    // TODO
-    private void sendMetadataDeleteRequest() {
-        
-    }
-    
-    // TODO
-    private DataCiteResponse sendMetadataGetRequest(String doi) {
-        return null;
     }
     
     // TODO
