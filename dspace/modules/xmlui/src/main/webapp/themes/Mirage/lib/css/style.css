@@ -138,7 +138,6 @@ a:hover {
     width: 950px;
     margin: auto;
     position: relative;
-    text-align: center;
 }
 
 /*ie6 uses quirks mode for strict xhtml pages, and in quirks mode margin: auto; doesn't center things*/
