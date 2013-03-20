@@ -138,7 +138,6 @@ a:hover {
     width: 950px;
     margin: auto;
     position: relative;
-    text-align: center;
 }
 
 /*ie6 uses quirks mode for strict xhtml pages, and in quirks mode margin: auto; doesn't center things*/
@@ -169,6 +168,7 @@ a:hover {
     padding: 4px 0;
     font-size: 93%;
     line-height: 1.6em;
+    text-align: center;
 }
 
 #ds-footer img.powered-by {
