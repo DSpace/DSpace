@@ -161,6 +161,7 @@ a:hover {
     margin-top: 25px;
     margin-bottom: 5px;
     overflow: hidden;
+    clear: both;
 }
 
 #ds-footer {
