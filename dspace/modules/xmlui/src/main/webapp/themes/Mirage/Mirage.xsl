@@ -257,7 +257,7 @@
                 </h1>
                 <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
                     <p class="ds-paragraph">
-                        <a class="submitnowbutton" href="/handle/10255/3/submit">Submit Data Now!</a>
+                        <a class="submitnowbutton" href="/handle/10255/3/submit">Submit data now!</a>
                     </p>
                     <p style="font-size: 0.9em; padding-top: 4px;">
                         <xsl:text>OR</xsl:text>
@@ -270,7 +270,7 @@
 
             <!-- START SEARCH -->
             <div class="home-col-1">
-                <h1 class="ds-div-head">Search for Data</h1>
+                <h1 class="ds-div-head">Search for data</h1>
 
                 <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                       id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary"
@@ -314,11 +314,11 @@
 
             <!-- START BROWSE -->
             <div class="home-col-1">
-                <h1 class="ds-div-head">Browse for Data</h1>
+                <h1 class="ds-div-head">Browse for data</h1>
                 <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 496px; TODO-height: 530px; overflow: auto;">
                     <div id="browse-data-buttons">
-                        <a href="#recently-published-data"><span>Recently Published</span></a>
-                        <a href="#most-viewed-data"><span>Most Viewed</span></a>
+                        <a href="#recently-published-data"><span>Recently published</span></a>
+                        <a href="#most-viewed-data"><span>Most viewed</span></a>
 			<a>
 			  <xsl:attribute name="href">
 			    <![CDATA[/search-filter?query=&field=dc.contributor.author_filter]]>
@@ -337,7 +337,7 @@
                     </div>
                     <div id="most-viewed-data" class="browse-data-panel">
                         <h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-div-head">
-                            <i18n:text>Most Viewed</i18n:text>
+                            <i18n:text>Most viewed</i18n:text>
                         </h1>
                         <div id="aspect_discovery_SiteFeaturedItems_div_site-most-viewed"
                              class="ds-static-div secondary most-viewed">
@@ -350,7 +350,7 @@
 
             <!-- START MAILING LIST-->
             <div class="home-col-2">
-                <h1 class="ds-div-head">Mailing List</h1>
+                <h1 class="ds-div-head">Mailing list</h1>
                 <div id="file_news_div_mailing_list" class="ds-static-div primary">
                     <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                           id="aspect_discovery_SiteViewer_div_front-page-file_news_div_mailing_list"
@@ -367,7 +367,7 @@
 
             <!-- START INTEGRATED JOURNAL-->
             <div class="home-col-2" style="clear: both; margin-left: 25px;">
-                <h1 class="ds-div-head">Recently Integrated Journals</h1>
+                <h1 class="ds-div-head">Recently integrated journals</h1>
                 <div id="recently_integrated_journals" class="ds-static-div primary">
 		  <div class="container">
 		    <img src="/themes/Mirage/images/recentlyIntegrated-pbio.png" alt="PLOS Biology" />
@@ -391,7 +391,7 @@
                             <tr xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                                 class="ds-table-row even">
                                 <td id="aspect_statistics_StatisticsTransformer_cell_01"
-                                    class="ds-table-cell odd labelcell">Total Data Packages
+                                    class="ds-table-cell odd labelcell">Total data packages
                                 </td>
                                 <td id="aspect_statistics_StatisticsTransformer_cell_02"
                                     class="ds-table-cell even datacell">2886
@@ -399,7 +399,7 @@
                             </tr>
                             <tr class="ds-table-row odd">
                                 <td id="aspect_statistics_StatisticsTransformer_cell_11"
-                                    class="ds-table-cell odd labelcell">Total Data Files
+                                    class="ds-table-cell odd labelcell">Total data files
                                 </td>
                                 <td id="aspect_statistics_StatisticsTransformer_cell_12"
                                     class="ds-table-cell even datacell">8197
@@ -407,7 +407,7 @@
                             </tr>
                             <tr class="ds-table-row even">
                                 <td id="aspect_statistics_StatisticsTransformer_cell_21"
-                                    class="ds-table-cell odd labelcell">Journals Represented
+                                    class="ds-table-cell odd labelcell">Journals represented
                                 </td>
                                 <td id="aspect_statistics_StatisticsTransformer_cell_22"
                                     class="ds-table-cell even datacell">202
@@ -415,7 +415,7 @@
                             </tr>
                             <tr class="ds-table-row odd">
                                 <td id="aspect_statistics_StatisticsTransformer_cell_31"
-                                    class="ds-table-cell odd labelcell">Total Unique Authors
+                                    class="ds-table-cell odd labelcell">Total unique authors
                                 </td>
                                 <td id="aspect_statistics_StatisticsTransformer_cell_32"
                                     class="ds-table-cell even datacell">11,125
@@ -423,7 +423,7 @@
                             </tr>
                             <tr class="ds-table-row even">
                                 <td id="aspect_statistics_StatisticsTransformer_cell_41"
-                                    class="ds-table-cell odd labelcell">Total File Downloads
+                                    class="ds-table-cell odd labelcell">Total file downloads
                                 </td>
                                 <td id="aspect_statistics_StatisticsTransformer_cell_42"
                                     class="ds-table-cell even datacell">74,567
