@@ -245,7 +245,7 @@ h1.ds-option-set-head {
     font-size: 108%;
 }
 .ds-div-head {
-    font-size: 150%;
+    font-size: 20px;
     height: 25px;
     overflow: visible;
 }
@@ -1375,12 +1375,13 @@ a.learn-to-submit-button:hover {
     padding-bottom: 18px;
 }
 #browse-data-buttons a {
+    font-size: 14px;
     font-weight: bold;
     background-color: #707070;
     color: #fff;
     text-decoration: none;
     margin-right: 25px;
-    padding: 0.4em 0.8em;
+    padding: 7px 11px 4px;
     border: 1px solid #707070;
     -webkit-border-top-left-radius: 5px;
     -webkit-border-top-right-radius: 5px;
