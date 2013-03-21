@@ -562,8 +562,7 @@
                         Deposit fees enable Dryad’s content to be made available free of charge for research and educational reuse.  Flexible <a href="/pages/pricing">pricing plans</a> provide volume discounts on deposit fees.
                     </p>
                 </div>
-            </div>
-        </div>
+	</div>
     </xsl:template>
 
     <xsl:template match="dri:options/dri:list[@n='DryadSubmitData']" priority="3">
