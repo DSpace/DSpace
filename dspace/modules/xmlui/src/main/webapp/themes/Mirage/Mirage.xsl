@@ -252,7 +252,7 @@
             <!-- START DEPOSIT -->
             <div id="submit-data-feature-box" class="home-col-2">
                 <h1 class="ds-div-head "
-                    style="font-size: 1.8em; border-bottom: none; text-align: center; padding: 25px 35px 19px; height: 56px;">Have data
+                    style="font-size: 22px; border-bottom: none; text-align: center; padding: 25px 25px 19px; height: 56px;">Have data
                     for your publication?
                 </h1>
                 <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
@@ -569,7 +569,7 @@
         <!-- START DEPOSIT -->
         <div id="submit-data-feature-box" class="home-col-2">
             <h1 class="ds-div-head "
-                style="font-size: 1.8em; border-bottom: none; text-align: center; padding: 25px 35px 19px; height: 76px;">Have data
+                style="font-size: 24px; border-bottom: none; text-align: center; padding: 25px 35px 19px; height: 76px;">Have data
                 for your publication?
             </h1>
             <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">

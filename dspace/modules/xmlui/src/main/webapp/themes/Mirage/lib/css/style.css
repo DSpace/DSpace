@@ -235,7 +235,11 @@ a.discreet {
 }
 
 h1.ds-option-set-head,
-.ds-div-head {
+.ds-div-head,
+/* special-case rules for the occasional top-level div.ds-static-div */
+#org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div .ds-div-head,
+#aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-div-head
+{
     color: #333;
     padding: 0px 0px;
     border-bottom: 3px solid #87C033;
@@ -245,7 +249,7 @@ h1.ds-option-set-head {
     font-size: 108%;
 }
 .ds-div-head {
-    font-size: 150%;
+    font-size: 20px;
     height: 25px;
     overflow: visible;
 }
@@ -271,10 +275,8 @@ h1.ds-option-set-head {
 .ds-static-div,
 .ds-interactive-div,
 /* special-case rules for the occasional top-level div.ds-static-div */
-#org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div .ds-div-head,
 #org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div .ds-static-div,
 #org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div .ds-interactive-div,
-#aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-div-head,
 #aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-static-div,
 #aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-interactive-div,
 #submit-data-feature-box h1,
@@ -1381,12 +1383,13 @@ a.learn-to-submit-button:hover {
     padding-bottom: 18px;
 }
 #browse-data-buttons a {
+    font-size: 14px;
     font-weight: bold;
     background-color: #707070;
     color: #fff;
     text-decoration: none;
     margin-right: 25px;
-    padding: 0.4em 0.8em;
+    padding: 7px 11px 4px;
     border: 1px solid #707070;
     -webkit-border-top-left-radius: 5px;
     -webkit-border-top-right-radius: 5px;
