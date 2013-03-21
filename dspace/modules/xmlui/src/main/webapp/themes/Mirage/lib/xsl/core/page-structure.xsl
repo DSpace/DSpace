@@ -933,36 +933,72 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 });
 
                 /* Membership Form page only */
-                var revenueThresholdInUSD = '10,000,000';
-                var smallOrgFeeInUSD = '1,000';
-                var largeOrgFeeInUSD = '10,000';
-                function showPreferredCurrency(currencyCode, currencyPrefix, revenueThreshold, smallFee, largeFee) {
-                    // EXAMPLE: showPreferredCurrency('GBP', '£', '6,600,000', '6,600.00', '66,000.00');
-
-
-                }
                 jQuery(document).ready(function() {
-                    // choosing a currency should modify the displayed org-revenue threshold and fees
-                    $('select[name=org_annual_revenue_currency]').unbind('change').change(function() {
-                        var currency = $(this).val();
-                        if (currency === 'USD') {
-                            // easy, just show the original values... OR note that Google will gladly "convert" USD to USD
-                            showPreferredCurrency('USD', '$', revenueThresholdInUSD, smallOrgFeeInUSD, largeOrgFeeInUSD);
-                        } else {
-                            // convert the USD amounts to the desired currency, using today's market value
-                            var fetchURL = 'http://www.google.com/ig/calculator?hl=en&q=1USD=?'+ currency;
-                            $.get(
-                                fetchURL,
-                                {}, // no more data
-                                function( data, textStatus, jqXHR ) { // success callback
-                                    console.log("data:\n"+ data);
-                                    console.log("textStatus:\n"+ textStatus);
-                                    console.log("jqXHR:\n"+ jqXHR);
-                                }
-                                /// , 'script'   // to force data type
-                            );
+                    var $currencySelector = $('select[name=org_annual_revenue_currency]');
+                    if ($currencySelector.length === 1) {
+                        var revenueThresholdInUSD = 10000000;
+                        var smallOrgFeeInUSD = 1000;
+                        var largeOrgFeeInUSD = 5000;
+                        var openExchange_APP_ID = 'efc17b0a3b5443e3a41b0b50769efc36';
+
+                        // convert the USD amounts to the desired currency, using today's market value
+                        // disable the selector until we have supporting data
+                        $currencySelector.attr('disabled', 'disabled');
+                        var exchangeRates = null;
+                        $.ajax({
+                            url: 'http://openexchangerates.org/api/latest.json?app_id='+ openExchange_APP_ID,
+                            dataType: 'jsonp',
+                            success: function(json) {
+                                exchangeRates = json.rates;
+                                console.log(exchangeRates);
+                                // enable the currency selector
+                                $currencySelector.removeAttr('disabled');
+                                // show initial values in USD (don't rely on i18n-message text!)
+                                showPreferredCurrency('USD');
+                            }
+                        });
+
+                        function showPreferredCurrency(currencyCode) {
+                            // EXAMPLE: showPreferredCurrency('GBP');
+                            var sign = getCurrencySign(currencyCode);
+                            var rate = exchangeRates[ currencyCode ];
+                            // apply exchange rate to all key amounts
+                            var revenueThreshold = rate * revenueThresholdInUSD;
+                            var smallOrgFee = rate * smallOrgFeeInUSD;
+                            var largeOrgFee = rate * largeOrgFeeInUSD;
+                            // build and show display strings in the new currency
+                            var msgLessThan = 'Less than {SIGN}{THRESHOLD} per year (annual membership fee {SIGN}{SMALL_ORG_FEE})'
+                                .replace('{SIGN}', sign, 'g')
+                                .replace('{THRESHOLD}', revenueThreshold)
+                                .replace('{SMALL_ORG_FEE}', smallOrgFee);
+                            $('#msg-less_than_10_million').html( msgLessThan );
+                            var msgGreaterThan = 'Greater than {SIGN}{THRESHOLD} per year (annual membership fee {SIGN}{LARGE_ORG_FEE})'
+                                .replace('{SIGN}', sign, 'g')
+                                .replace('{THRESHOLD}', revenueThreshold)
+                                .replace('{LARGE_ORG_FEE}', smallOrgFee);
+                            $('#msg-greater_than_10_million').html( msgGreaterThan );
                         }
-                    });
+
+                        function getCurrencySign(currencyCode) {
+                            // find appropriate currency sign ($, etc)
+                            switch(currencyCode) {
+                                case 'USD': return 'USD$';
+                                case 'GBP': return '£';
+                                case 'CAD': return 'CAD$';
+                                case 'EUR': return '€';
+                                case 'AUD': return 'AUD$';
+                                case 'JPY': return '¥';
+                                default: return '?';    
+                            }
+                        }
+
+                        jQuery(document).ready(function() {
+                            // choosing a currency should modify the displayed org-revenue threshold and fees
+                            $currencySelector.unbind('change').change(function() {
+                                showPreferredCurrency( $(this).val() );
+                            });
+                        });
+                    }
                 });
 
            </xsl:text>
