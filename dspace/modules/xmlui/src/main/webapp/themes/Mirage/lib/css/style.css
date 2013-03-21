@@ -855,10 +855,16 @@ li.ds-form-item label.ds-composite-component.last{
     line-height: 153.9%;
 }
 
-.file-wrapper,
+.file-wrapper {
+    padding-top: 15px !important;
+    padding-bottom: 15px !important;
+}
+
 .ds-artifact-item {
     padding-top: 5px !important;
     padding-bottom: 10px !important;
+    padding-left: 20px;
+    text-indent: -20px;
 }
 
 .ds-artifact-item.doi-item a {
