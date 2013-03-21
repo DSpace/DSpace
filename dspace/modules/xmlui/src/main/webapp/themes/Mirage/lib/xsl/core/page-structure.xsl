@@ -938,32 +938,32 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     if ($currencySelector.length === 1) {
                         var amountsByCurrency = {
                             'USD': {
-                                revenueThresold: '10 million US Dollars',
+                                revenueThreshold: '10 million US Dollars',
                                 smallOrgFee: 'USD$1,000',
                                 largeOrgFee: 'USD$5,000'
                             },
                             'EUR': {
-                                revenueThresold: '7.8 million Euros',
+                                revenueThreshold: '7.8 million Euros',
                                 smallOrgFee: '€780',
                                 largeOrgFee: '€3900'
                             },
                             'GBP': {
-                                revenueThresold: '6.6 million GB Pounds',
+                                revenueThreshold: '6.6 million GB Pounds',
                                 smallOrgFee: '£660',
                                 largeOrgFee: '£3300'
                             },
                             'CAD': {
-                                revenueThresold: '10 million Canadian Dollars',
+                                revenueThreshold: '10 million Canadian Dollars',
                                 smallOrgFee: 'CAD$1,000',
                                 largeOrgFee: 'CAD$5,000'
                             },
                             'JPY': {
-                                revenueThresold: '950 billion Japanese Yen',
+                                revenueThreshold: '950 billion Japanese Yen',
                                 smallOrgFee: '¥95,000',
                                 largeOrgFee: '¥475,000'
                             },
                             'AUD': {
-                                revenueThresold: '9.6 million Australian Dollars',
+                                revenueThreshold: '9.6 million Australian Dollars',
                                 smallOrgFee: 'AUD$960',
                                 largeOrgFee: 'AUD$4,800'
                             }
