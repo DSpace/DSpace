@@ -1790,6 +1790,7 @@ a.learn-to-submit-button-option:hover {
     background-color: #ccc;
     color: #333;
 }
+a.learn-to-submit-button,
 a.learn-to-submit-button-option {
     background-color: #87c033;
     border: 1px solid #555;
