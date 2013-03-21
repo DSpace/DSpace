@@ -610,7 +610,7 @@ implements DOIConnector
     private DataCiteResponse sendDOIPostRequest(String doi, String url)
     {
         // post mds/doi/
-        // body should contaion "doi=<doi>\nurl=<url>}n"
+        // body must contaion "doi=<doi>\nurl=<url>}n"
         URIBuilder uribuilder = new URIBuilder();
         uribuilder.setScheme("https").setHost(HOST).setPath(DOI_PATH
                 + doi.substring(DOI.SCHEME.length()));
@@ -714,10 +714,51 @@ implements DOIConnector
         return sendHttpRequest(httpget);
     }
     
-    // TODO
-    private void sendMetadataPostRequest()
+    private DataCiteResponse sendMetadataPostRequest(String doi, String metadata)
     {
+        // post mds/metadata/
+        // body must contain metadata in DataCite-XML.
+        URIBuilder uribuilder = new URIBuilder();
+        uribuilder.setScheme("https").setHost(HOST).setPath(METADATA_PATH);
         
+        HttpPost httppost = null;
+        try
+        {
+            httppost = new HttpPost(uribuilder.build());
+        }
+        catch (URISyntaxException e)
+        {
+            log.error("The URL we constructed to check a DOI "
+                    + "produced a URISyntaxException. Please check the configuration parameters!");
+            log.error("The URL was {}.", "https://" + HOST +
+                    DOI_PATH + "/" + doi.substring(DOI.SCHEME.length()));
+            throw new IllegalArgumentException("The URL we constructed to check a DOI "
+                    + "produced a URISyntaxException. Please check the configuration parameters!", e);
+        }
+        
+        // assemble request content:
+        HttpEntity reqEntity = null;
+        try
+        {
+            ContentType contentType = ContentType.create("application/xml", "UTF-8");
+            reqEntity = new StringEntity(metadata, contentType);
+            httppost.setEntity(reqEntity);
+            
+            return sendHttpRequest(httppost);
+        }
+        finally
+        {
+            // release ressources
+            try
+            {
+                EntityUtils.consume(reqEntity);
+            }
+            catch (IOException ioe)
+            {
+               log.info("Caught an IOException while releasing a HTTPEntity:"
+                       + ioe.getMessage());
+            }
+        }
     }
     
     private DataCiteResponse sendHttpRequest(HttpUriRequest req)
