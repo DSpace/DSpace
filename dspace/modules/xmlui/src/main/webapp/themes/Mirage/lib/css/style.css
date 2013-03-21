@@ -235,7 +235,11 @@ a.discreet {
 }
 
 h1.ds-option-set-head,
-.ds-div-head {
+.ds-div-head,
+/* special-case rules for the occasional top-level div.ds-static-div */
+#org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div .ds-div-head,
+#aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-div-head
+{
     color: #333;
     padding: 0px 0px;
     border-bottom: 3px solid #87C033;
@@ -271,10 +275,8 @@ h1.ds-option-set-head {
 .ds-static-div,
 .ds-interactive-div,
 /* special-case rules for the occasional top-level div.ds-static-div */
-#org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div .ds-div-head,
 #org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div .ds-static-div,
 #org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div .ds-interactive-div,
-#aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-div-head,
 #aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-static-div,
 #aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-interactive-div,
 #submit-data-feature-box h1,
