@@ -3285,17 +3285,17 @@
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.label1">8. Membership term <span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.label2">Membership years run January-December.  Membership may start in 2013 or 2014 and may be selected for multiple years.<br/></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.label">Starting January</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.ending_year.label">Ending December</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.how_many_years.label">Membership for </message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.label"> starting January </message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.2013">2013</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.2014">2014</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.ending_year.2013">2013</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.ending_year.2014">2014</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.ending_year.2015">2015</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.ending_year.2016">2016</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.ending_year.2017">2017</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.how_many_years.1">1 year</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.how_many_years.2">2 years</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.how_many_years.3">3 years</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.how_many_years.4">4 years</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.how_many_years.5">5 years</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.how_many_years">Number of years of membership is required</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.membership_year_start">Membership term starting year is required</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.membership_year_end">Membership term ending year is required</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_name.label1">9. Organizational representative <span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_name.label2">The organizational representative will receive all regular communications on behalf of the Member organization, excepting those concerning dues. The representative may serve as the delegate at the Annual Meeting or appoint another delegate in his/her place. </message>
