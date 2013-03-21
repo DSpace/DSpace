@@ -7,10 +7,12 @@
  */
 package org.dspace.identifier.doi;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -34,6 +36,11 @@ import org.dspace.handle.HandleManager;
 import org.dspace.identifier.DOI;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.services.ConfigurationService;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.filter.ElementFilter;
+import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -259,17 +266,150 @@ implements DOIConnector
             throws IdentifierException
     {
         // get mds/metadata/<doi>
-        // 410 GONE -> inactive (not clear if ever registered or reserved and deleted)
-        // 404 Not Found -> not reserved
-        // 401 -> no login
-        // 403 -> wrong credential or doi belongs to another party.
-        // 400 -> Bad Content -> f.e. non existing prefix
-        // 500 -> try again later or doi belongs to another registry agency
-        // 200 -> registered and reserved
-        // 204 no content -> reserved but not registered
-        // if (204 && dso != null) -> get mds/doi/<doi> and compare xml->alternative identifier
-        // if (200 && dso != null) -> compare url (out of response-content) with dso
-        return false;
+        
+        // do we have cached information?
+        if (this.reserved.containsKey(doi))
+        {
+            // do we know that the doi is not reserved?
+            if (null == this.reserved.get(doi))
+            {
+                return false;
+            }
+            // we know that the doi is reserved.
+            // Have we bin asked if it is reserved for a specific dso?
+            if (null == dso)
+            {
+                return true;
+            }
+            else
+            {
+                int[] ids = this.reserved.get(doi);
+                return (dso.getType() == ids[0] && dso.getID() == ids[1]);
+            }
+        }
+        
+        DataCiteResponse resp = this.sendMetadataGetRequest(doi);
+    
+        switch (resp.getStatusCode())
+        {
+            // 200 -> reserved
+            // if (200 && dso != null) -> compare url (out of response-content) with dso
+            case (200) :
+            {
+                String handle = null;
+                try
+                {
+                    handle = extractAlternateIdentifier(context, resp.getContent());
+                }
+                catch (SQLException e)
+                {
+                    if (null == dso)
+                    {
+                        return true;
+                    }
+                    throw new RuntimeException(e);
+                }
+                
+                if (null == handle)
+                {
+                    // we were unable to find a handle belonging to our repository
+                    // were we looking if a doi is reservered for a specific dso?
+                    if (null != dso)
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+                
+                // add information to our cache
+                int[] ids = new int[2];
+                try
+                {
+                    DSpaceObject handleHolder = HandleManager.resolveToObject(context, handle);
+                    ids[0] = handleHolder.getType();
+                    ids[1] = handleHolder.getID();
+                }
+                catch (SQLException e)
+                {
+                    log.error("Error in database connection: " + e.getMessage());
+                    throw new RuntimeException(e);
+                }
+                this.reserved.put(doi, ids);
+                
+                if (null == dso)
+                {
+                    return true;
+                }
+                
+                return (dso.getType() == ids[0] && dso.getID() == ids[1]);
+            }
+                
+            // we get a 401 if we forgot to send credentials or if the username
+            // and password did not match.
+            case (401) :
+            {
+                log.info("We were unable to authenticate against the DOI ({}) registry agency. It told us: {}", doi, resp.getContent());
+                throw new IllegalArgumentException("Cannot authenticate at the DOI registry agency. Please check if username and password are correctly set.");
+            }
+                
+            // We get a 403 Forbidden if we are checking a DOI that belongs to
+            // another party or if there is a login problem.
+            case (403) :
+            {
+                log.info("Checking if DOI {} is registered was prohibeted by the registration agency: {}.", doi, resp.getContent());
+                throw new IdentifierException("Checking if a DOI is registered is only possible for DOIs that belongs to us.");
+            }
+                
+            // 404 "Not Found" means DOI is neither reserved nor registered.
+            case (404) :
+            {
+                this.registered.put(doi, null);
+                this.reserved.put(doi, null);
+                return false;
+            }
+                
+            // 410 GONE -> DOI is set inactive
+            // that means metadata have bin delted
+            // it is unclear if the doi has bin registered before or only reserved.
+            // it is unclear for which item it has bin reservered
+            // we will handle this as if it reserverd for an unknown object.
+            case (410) :
+            {
+                if (null == dso)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+                
+            // 500 is documented and signals an internal server error
+            case (500) :
+            {
+                log.warn("Caught an http status code while checking if a DOI is "
+                        +"registered. Message was: " + resp.getContent());
+                throw new RuntimeException("DataCite API has an internal error. "
+                        + "It is temporaribly impossible to check if a DOI is "
+                        + "reservered. Further information can be found in "
+                        + "DSpace log file.");
+            }
+                
+            // Catch all other http status code in case we forgot one.
+            default :
+            {
+                log.warn("While checking if the DOI {} is registered, we got a "
+                        + "http status code {} and the message \"{}\".",
+                        new String[]
+                        {
+                            doi, Integer.toString(resp.statusCode),
+                            resp.getContent()
+                        });
+                throw new IllegalStateException("Unable to parse an anwser from "
+                        + "DataCite API. Please have a look into DSpace logs.");
+            }
+        }
     }
     
     public boolean isDOIRegistered(Context context, String doi)
@@ -370,7 +510,7 @@ implements DOIConnector
             }
             // Status Code 204 "No Content" stands for an known DOI without URL.
             // A DOI that is known but does not have an associated URL is
-            // resevered but not registered.
+            // resevered but not registered yet.
             case (204) :
             {
                 return false;
@@ -396,25 +536,24 @@ implements DOIConnector
                 this.reserved.put(doi, null);
                 return false;
             }
-            // DataCite API documentation lets expect that 410 GONE is returned
-            // for DOIs marked as inactive. But the API returns 200 or 204.
-            // I think the API is right doing so and the documentation is wrong.
-            // => Ignoring 410
-            //case (410) :
-            //{
-            //    return false;
-            //}
-            
-            // For some prefixes the API produces a 400 Bad Request. This behaviour
-            // is topic of a mail to the technical support of Datacite.
-            // A http status code 500 is documented so we should accpect is as well.
+            // 500 is documented and signals an internal server error
+            case (500) :
+            {
+                log.warn("Caught an http status code while checking if a DOI is "
+                        +"registered. Message was: " + response.getContent());
+                throw new RuntimeException("DataCite API has an internal error. "
+                        + "It is temporaribly impossible to check if a DOI is "
+                        + "registered. Further information can be found in "
+                        + "DSpace log file.");
+            }
+            // Catch all other http status code in case we forgot one.
             default :
             {
                 log.warn("While checking if the DOI {} is registered, we got a "
                         + "http status code {} and the message \"{}\".",
                         new String[] {doi, Integer.toString(response.statusCode), response.getContent()});
-                throw new RuntimeException("It's temporarily impossible to check "
-                        + "if a DOI is registered. Please try again later.");
+                throw new IllegalStateException("Unable to parse an anwser from "
+                        + "DataCite API. Please have a look into DSpace logs.");
             }
         }
     }
@@ -622,6 +761,52 @@ implements DOIConnector
                 log.warn("Can't release HTTP-Entity: " + e.getMessage());
             }
         }
+    }
+
+    // TODO: JAVADOC
+    // returns null or handle
+    private String extractAlternateIdentifier(Context context, String content)
+    throws SQLException
+    {
+        if (content == null)
+        {
+            return null;
+        }
+        
+        // parse the XML
+        SAXBuilder saxBuilder = new SAXBuilder();
+        Document doc = null;
+        try
+        {
+            doc = saxBuilder.build(new ByteArrayInputStream(content.getBytes("UTF-8")));
+        }
+        catch (IOException ioe)
+        {
+            throw new RuntimeException("Got a IOException while reading from a string?!", ioe);
+        }
+        catch (JDOMException jde)
+        {
+            throw new IllegalArgumentException("Got an JDOMException while parsing a response from the DataCite API.", jde);
+        }
+        
+        String handle = null;
+        // TODO: add Namespace
+        Iterator<Element> it = doc.getDescendants(new ElementFilter("alternativeIdentifier"));
+        while (handle == null && it.hasNext())
+        {
+            Element alternateIdentifier = it.next();
+            try
+            {
+                handle = HandleManager.resolveUrlToHandle(context,
+                        alternateIdentifier.getText());
+            }
+            catch (SQLException e)
+            {
+                throw e;
+            }
+        }
+
+        return handle;
     }
     
     private class DataCiteResponse
