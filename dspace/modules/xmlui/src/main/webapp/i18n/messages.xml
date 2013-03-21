@@ -3244,7 +3244,7 @@
     
     <!-- Messages for Dryad Membership Application -->
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.title">Dryad Membership</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.heading">Dryad Member Application</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.heading">Membership Application</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p1">Any organization that supports the educational, scientific, and charitable mission of Dryad is eligible to become a Member. Applications will be reviewed by the Board of Directors. Upon acceptance, a Membership Agreement and request for dues will be sent to the address given. Membership is active once Dryad has received the signed agreement and dues.</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p2">For more information on Membership, please see the <a href="/pages/members">Membership page</a> or contact <a href="mailto:director@datadryad.org">director@datadryad.org</a>.</message>
 
@@ -3262,9 +3262,7 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_type">Organization type is required</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label1">3. Gross annual revenue <span class="required-mark">*</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label2">Dryad membership fees are based on members' annual revenue.</message>
-
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue_currency.label">Please specify currency.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label2">Dryad membership fees are based on members' annual revenue. Please specify currency and annual revenue.</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue_currency">Currency selection is required</message>
     
     <!-- Checkbox options for org_annual_revenue -->
