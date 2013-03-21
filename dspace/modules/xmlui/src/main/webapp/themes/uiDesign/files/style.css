@@ -291,7 +291,7 @@ div.ds-option-set {
     -moz-border-radius-bottomright: 8px;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
-    border: 3px solid #515151;
+    border: 1px solid #ccc;
     -moz-box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
     -webkit-box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
     box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
@@ -395,7 +395,7 @@ p {
     -moz-border-radius-bottomright: 8px;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
-    border: 3px solid #515151;
+    border: 1px solid #ccc;
     -moz-box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
     -webkit-box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
     box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
@@ -1265,6 +1265,24 @@ margin: 2px 2px 0px 2px;
 a.learn-to-submit-button {
     margin: 0 8px;
     padding: 0.2em 0;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-bottomright: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+/* general button radius */
+
+.ds-button-field,
+#login-item, #sign-up-item {
     -webkit-border-top-left-radius: 5px;
     -webkit-border-top-right-radius: 5px;
     -moz-border-radius-topleft: 5px;
