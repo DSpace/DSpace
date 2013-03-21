@@ -290,7 +290,7 @@
                 <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be a part of Dryad
                 </h1>
 
-                <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 490px;">
+                <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 490px; font-size: 14px;">
                     <div id="connect-illustrated-prose">
                         <p>
                             <img src="themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" />
@@ -583,25 +583,23 @@
     <xsl:template match="dri:options/dri:list[@n='DryadConnect']" priority="3">
 
         <!-- START CONNECT  -->
-        <div class="home-col-2">
-            <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be a part of Dryad
-            </h1>
+        <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be a part of Dryad
+        </h1>
 
-            <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 490px;">
-                <div id="connect-illustrated-prose">
-                    <p>
-                        <img src="themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" />
-                        Publishers, societies, universities, libraries, funders, and other stakeholder organizations are invited to become <a href="#TODO">Members</a>. Tap into an active knowledge-sharing network, receive discounts on deposit fees, and help shape Dryad’s future.
-                        <img src="themes/Mirage/images/seed-3.png" style="float: right; margin-right: -8px;" />
-                    </p>
-                    <p>
-                        <a href="#TODO">Submission Integration</a> is a service provided to journals free-of-charge to coordinate manuscript submission with data submission to Dryad.  It makes data deposition easy for researchers; makes linking articles and data easy for journals; and enables confidential review of data prior to publication.
-                    </p>
-                    <p>
-                        <img src="themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" />
-                        Deposit fees enable Dryad’s content to be made available free of charge for research and educational reuse.  Flexible <a href="#TODO">pricing plans</a> provide volume discounts on deposit fees.
-                    </p>
-                </div>
+        <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 600px; font-size: 14px;">
+            <div id="connect-illustrated-prose">
+                <p>
+                    <img src="themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" />
+                    Publishers, societies, universities, libraries, funders, and other stakeholder organizations are invited to become <a href="#TODO">Members</a>. Tap into an active knowledge-sharing network, receive discounts on deposit fees, and help shape Dryad’s future.
+                    <img src="themes/Mirage/images/seed-3.png" style="float: right; margin-right: -8px;" />
+                </p>
+                <p>
+                    <a href="#TODO">Submission Integration</a> is a service provided to journals free-of-charge to coordinate manuscript submission with data submission to Dryad.  It makes data deposition easy for researchers; makes linking articles and data easy for journals; and enables confidential review of data prior to publication.
+                </p>
+                <p>
+                    <img src="themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" />
+                    Deposit fees enable Dryad’s content to be made available free of charge for research and educational reuse.  Flexible <a href="#TODO">pricing plans</a> provide volume discounts on deposit fees.
+                </p>
             </div>
         </div>
     </xsl:template>
