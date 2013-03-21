@@ -120,8 +120,8 @@
 	        height:60px;
 	    }
 
-            #recently_integrated_journals img {
-	        padding: 10px;
+        #recently_integrated_journals img.pub-cover {
+	        margin: 7px 10px;
 	    }
 
 	    #recently_integrated_journals .container {
@@ -370,10 +370,10 @@
                 <h1 class="ds-div-head">Recently integrated journals</h1>
                 <div id="recently_integrated_journals" class="ds-static-div primary">
 		  <div class="container">
-		    <img src="/themes/Mirage/images/recentlyIntegrated-pbio.png" alt="PLOS Biology" />
-		    <img src="/themes/Mirage/images/recentlyIntegrated-jpaleo.gif" alt="Journal of Paleontology" />
-		    <img src="/themes/Mirage/images/recentlyIntegrated-functecol.png" alt="Functional Ecology" />
-		    <img src="/themes/Mirage/images/recentlyIntegrated-elife.png" alt="eLife" />
+		    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-pbio.png" alt="PLOS Biology" />
+		    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-jpaleo.gif" alt="Journal of Paleontology" />
+		    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-functecol.png" alt="Functional Ecology" />
+		    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-elife.png" alt="eLife" />
 		  </div>
                 </div>
             </div>

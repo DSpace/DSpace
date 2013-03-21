@@ -1577,14 +1577,16 @@ img.ds-authority-confidence
     padding-bottom: 30px;
     margin: 0 15px -20px !important;
 }
+img.pub-cover {
+    -moz-box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
+    -webkit-box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
+}
 .publication-header img.pub-cover {
     float: left;
     height: 120px; 
     width: 90px; 
     margin-right: 20px;
-    -moz-box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
-    -webkit-box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
-    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
 }
 .publication-header .pub-title {
     font-size: 1.2em;
