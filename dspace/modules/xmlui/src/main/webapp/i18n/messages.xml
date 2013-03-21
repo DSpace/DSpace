@@ -3283,7 +3283,7 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.publications.label2">One Member benefit is a discount on Payment Plans for qualifying journals published by the Member. Please list journals that your organization publishes. If too many to list here, please send to <a href="mailto:director@datadryad.org">director@datadryad.org</a>.</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.label1">8. Membership term <span class="required-mark">*</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.label2">Membership years run January-December.  Membership may start in 2013 or 2014 and may be selected for multiple years.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.label2">Membership years run January-December.  Membership may start in 2013 or 2014 and may be selected for multiple years.<br/></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.label">Starting January</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.ending_year.label">Ending December</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.2013">2013</message>
