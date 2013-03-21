@@ -35,7 +35,7 @@
                     <i18n:text>xmlui.dri2xhtml.structural.footer-promotional2</i18n:text>
                     <xsl:value-of select="$dryadrelease/release/date"/> 
                     <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dryad'][@qualifier='node']">
-                    	<i18n:text>xmlui.dri2xhtml.structureal.footer-node</i18n:text>
+                    	<i18n:text>xmlui.dri2xhtml.structural.footer-node</i18n:text>
                     	<xsl:value-of
                                 select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dryad'][@qualifier='node']"/>
                     </xsl:if>

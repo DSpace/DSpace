@@ -137,18 +137,7 @@
 		query</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.head3">Items matching your query</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.no_results">
-		<div id="aspect_discovery_SimpleSearch_div_search-results" class="ds-static-div primary"> 
-			<div id="searchTabs"> 
-				<ul> 
-					<li id="selected" style="color: rgb(49, 102, 22);"> Dryad (0)</li> 
-					<li style="color: rgb(49, 102, 22);">TreeBASE (0)</li>
-					<li style="color: rgb(49, 102, 22);">KNB (0)</li>
-				</ul> 
-			</div>
-			<ul class="ds-artifact-list"> 
-				<li class="ds-artifact-item odd"/>
-			</ul>
-		</div>
+		No result found
 	</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.all_of_dspace">All of Dryad</message>
 
@@ -335,6 +324,7 @@
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.para3">For Dryad staff and project personnel, please see <a href="/pages/whoWeAre#staff">Who We Are</a>.</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.para4">Postal Address:</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.para5">Dryad<br/>PO Box 585<br/>Durham, NC 27702-0585 USA</message>
+    <message key="xmlui.ArtifactBrowser.FeedbackForm.forumLink"><a href="#" onclick="$('#forum-link').click(); return false;">Share your ideas for features and vote for ideas already submitted</a></message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.para6">You may also submit your inquiry or help ticket using the form below.  Your submission will be tracked and routed to the correct person.</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.email">Your Email</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.email_help">This address will be used to follow
@@ -2572,13 +2562,12 @@
 
 
 	<!-- structural.xsl -->
-	<message key="xmlui.dri2xhtml.structural.footer-promotional1">Dryad is developed by the <a
-			class="footerLink" href="http://www.nescent.org">National Evolutionary Synthesis Center</a>
-		and UNC <a class="footerLink" href="http://ils.unc.edu/mrc/">Metadata Research Center</a> in
-		collaboration with several <a class="footerLink" href="/partners">Partner
-		Organizations</a>.</message>
-	<message key="xmlui.dri2xhtml.structural.footer-promotional2">Dryad updated </message>
-	<message key="xmlui.dri2xhtml.structureal.footer-node"> and served by </message>
+    <message key="xmlui.dri2xhtml.structural.footer-promotional1">
+        Dryad is a nonprofit repository for data underlying the international scientific and medical literature.</message>
+	<message key="xmlui.dri2xhtml.structural.footer-promotional2">Latest software build </message>
+	<message key="xmlui.dri2xhtml.structural.footer-node">. Served by </message>
+	<message key="xmlui.dri2xhtml.structural.footer-powered-by">Powered by </message>
+	<message key="xmlui.dri2xhtml.structural.footer-terms-of-service">Terms of Service</message>
 
 	<message key="xmlui.dri2xhtml.structural.contact-link">Contact Us</message>
 	<message key="xmlui.dri2xhtml.structural.feedback-text">Have questions, problems, or suggestions
@@ -3255,7 +3244,7 @@
     
     <!-- Messages for Dryad Membership Application -->
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.title">Dryad Membership</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.heading">Dryad Member Application</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.heading">Membership Application</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p1">Any organization that supports the educational, scientific, and charitable mission of Dryad is eligible to become a Member. Applications will be reviewed by the Board of Directors. Upon acceptance, a Membership Agreement and request for dues will be sent to the address given. Membership is active once Dryad has received the signed agreement and dues.</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p2">For more information on Membership, please see the <a href="/pages/members">Membership page</a> or contact <a href="mailto:director@datadryad.org">director@datadryad.org</a>.</message>
 
@@ -3273,11 +3262,12 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_type">Organization type is required</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label1">3. Gross annual revenue <span class="required-mark">*</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label2">Dryad membership fees are based on members' annual revenue.  Please specify currency if not USD.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label2">Dryad membership fees are based on members' annual revenue. Please specify currency and annual revenue.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue_currency">Currency selection is required</message>
     
     <!-- Checkbox options for org_annual_revenue -->
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.less_than_10_million">Less than $10 million per year (annual membership fee US$1000)</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.greater_than_10_million">Greater than $10 million per year (annual membership fee US$5000)</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.less_than_10_million">Less than USD$10 million per year (annual membership fee USD$1000)</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.greater_than_10_million">Greater than USD$10 million per year (annual membership fee USD$5000)</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue">Annual revenue is required</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.billing_contact_name.label1">4. Billing contact name<span class="required-mark">*</span></message>

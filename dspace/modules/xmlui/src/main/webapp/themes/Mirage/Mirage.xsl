@@ -42,140 +42,158 @@
     <xsl:import href="integrated-view.xsl"/>
     <xsl:import href="DryadItemSummary.xsl"/>
     <xsl:import href="DryadUtils.xsl"/>
+    <xsl:import href="DryadSearch.xsl"/>
     <xsl:output indent="yes"/>
 
 
     <xsl:template match="dri:body[//dri:meta/dri:pageMeta/dri:metadata[@element='request' and @qualifier='URI'] = '' ]">
-            <!-- add special style just for the homepage -->
-	    <style type="text/css">
-	      /* special style for Dryad homepage only */
-	      #ds-body {
-	      width: 100%;
-	      }
-	      
-	      .labelcell {
-	      font-weight: bold;
-	      }
-	      
-	      .datacell {
-	      text-align: right;
-	      }
-	      
-	      .ds-div-head a {
-	      font-size: 0.7em;
-	      font-weight: normal;
-	      position: relative;
-	      top: -0.1em;
-	      }
-	      
-	      .ds-artifact-list {
-	      /* font-size: 100%; */
-	      line-height: 1.4em;
-	      }
-	      
-	      .ds-artifact-item {
-	      padding-top: 10px;
-	      }
-	      
-	      .artifact-title {
-	      font-size: 100%;
-	      }
-	      
-	      .ds-artifact-list .artifact-info {
-	      display: none;
-	      }
-	      
-	      /* implied 3 columns @300px width, 25px gutters */
-	      .home-col-1 {
-	      float: left;
-	      width: 625px;
-	      padding: 0;
-	      /* margin-right: 25px;*/
-	      }
-	      
-	      .home-col-2 {
-	      float: right;
-	      width: 300px;
-	      margin-left: 0;
-	      margin-right: 0;
-	      }
-	      
-	      .home-top-row {
-	      height: 220px;
-	      }
-	      
-	      .home-bottom-row {
-	      height: 420px;
-	      }
-	      
-	      #file_news_div_recently_integrated_journal,
-	      #aspect_statistics_StatisticsTransformer_div_stats,
-	      #aspect_dryadinfo_DryadBlogFeed_div_blog-hook {
-	      height: 300px;
-	      overflow: visible;
-	      }
-	      
-	      #dryad-home-carousel {
-	      font-size: 23px;
-	      font-weight: bold;
-	      background-color: rgb(255, 255, 255);
-	      height: 216px;
-	      padding: 0px;
-	      overflow: hidden;
-	      }
-	      
-	      #dryad-home-carousel .bx-viewport {
-	      height: 190px;
-	      width: 623px;
-	      }
-	      
-	      #dryad-home-carousel div.bxslider {
-	      overflow: visible;
-	      }
-	      
-	      #dryad-home-carousel div.bxslider div {
-	      height: 190px;
-	      padding: 0;
-	      margin: 0;
-	      }
-	      
-	      #dryad-home-carousel div.bxslider div p {
-	      width: 550px;
-	      margin: auto;
-	      margin-top: 1em;
-	      }
-	      
-	      #dryad-home-carousel .bx-pager {
-	      bottom: -19px;
-	      left: 8px;
-	      }
-	      #dryad-home-carousel .bx-pager-item {
-	      float: left;
-	      }
-	      
-	      #dryad-home-carousel .bx-controls-auto {
-	      bottom: -18px;
-	      }
-	      #dryad-home-carousel .bx-controls-auto-item {
-	      float: right;
-	      padding-right: 8px;
-	      }
-	      
-	      .blog-box ul {
-	      list-style: none;
-	      margin-left: 0;
-	      }
-	      
-	      .blog-box li {
-	      margin: 0.5em 0 1.2em;
-	      }
+        <!-- add special style just for the homepage -->
+        <style type="text/css">
+            /* special style for Dryad homepage only */
+            #ds-body {
+                width: 100%;
+            }
 
-	      #connect-illustrated-prose img {
-	      width: auto;
-	      margin: 4px;
-	      }
-	    </style>
-	    
+            .labelcell {
+                font-weight: bold;
+            }
+
+            .datacell {
+                text-align: right;
+            }
+
+            .ds-div-head a {
+                font-size: 0.7em;
+                font-weight: normal;
+                position: relative;
+                top: -0.1em;
+            }
+
+            .ds-artifact-list {
+                /* font-size: 100%; */
+                line-height: 1.4em;
+            }
+
+            .ds-artifact-item {
+                padding-top: 10px;
+            }
+
+            .artifact-title {
+                font-size: 100%;
+            }
+
+            .ds-artifact-list .artifact-info {
+                display: none;
+            }
+
+            /* implied 3 columns @300px width, 25px gutters */
+            .home-col-1 {
+                float: left;
+                width: 625px;
+                padding: 0;
+                /* margin-right: 25px;*/
+            }
+
+            .home-col-2 {
+                float: right;
+                width: 300px;
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            .home-top-row {
+                height: 220px;
+            }
+
+            .home-bottom-row {
+                height: 420px;
+            }
+
+            #recently_integrated_journals,
+            #aspect_statistics_StatisticsTransformer_div_stats,
+            #aspect_dryadinfo_DryadBlogFeed_div_blog-hook {
+                height: 300px;
+                overflow: visible;
+            }
+
+            #aspect_statistics_StatisticsTransformer_div_stats .ds-table-row {
+	        height:60px;
+	    }
+
+            #recently_integrated_journals img {
+	        padding: 10px;
+	    }
+
+	    #recently_integrated_journals .container {
+	        text-align: center;
+	    }
+
+            #dryad-home-carousel {
+                font-size: 23px;
+                font-weight: bold;
+                background-color: rgb(255, 255, 255);
+                height: 216px;
+                padding: 0px;
+                overflow: hidden;
+            }
+
+            #dryad-home-carousel .bx-viewport {
+                height: 190px;
+                width: 623px;
+            }
+
+            #dryad-home-carousel div.bxslider {
+                overflow: visible;
+            }
+
+            #dryad-home-carousel div.bxslider div {
+                height: 190px;
+                padding: 0;
+                margin: 0;
+            }
+
+            #dryad-home-carousel div.bxslider div p {
+                width: 550px;
+                margin: auto;
+                margin-top: 1em;
+            }
+
+            #dryad-home-carousel .bx-pager {
+                bottom: -19px;
+                left: 8px;
+            }
+            #dryad-home-carousel .bx-pager-item {
+                float: left;
+            }
+
+            #dryad-home-carousel .bx-controls-auto {
+                bottom: -18px;
+            }
+            #dryad-home-carousel .bx-controls-auto-item {
+                float: right;
+                padding-right: 8px;
+            }
+
+            .blog-box ul {
+                list-style: none;
+                margin-left: 0;
+            }
+
+            .blog-box li {
+                margin: 0.5em 0 1.2em;
+            }
+
+            #connect-illustrated-prose img {
+                width: auto;
+                margin: 4px;		
+            }
+
+	    #aspect_discovery_SiteViewer_field_query {
+	        width:75%;
+	    }
+
+        </style>
+
 
         <div id="ds-body">
 
@@ -194,35 +212,33 @@
                 <div id="dryad-home-carousel" class="ds-static-div primary">
                     <div class="bxslider" style="">
                         <div>
+                            <a href="/pages/membershipMeeting">
+                                <img src="/themes/Mirage/images/2013membershipMeeting.jpg" alt="Dryad Membership Meeting, May 24, Oxford, UK" />
+                            </a>
+                        </div>
+                        <div>
+                            <a href="/pages/depositing">
+                                <img src="/themes/Mirage/images/bookmarkSubmissionProcess.png" alt="Desosit data. Get permanent identifier. Watch your citations grow! Relax, your data are discoverable and secure." />
+                            </a>
+                        </div>
+                       <div>
+                            <a href="http://datadryad.org/resource/doi:10.5061/dryad.gs45f">
+                                <img src="/themes/Mirage/images/dryad.gs45f.jpg" alt="Featured data: Herbivory-induced volatiles function as defenses..."/>
+                            </a>
+                        </div>
+                        <div>
                             <p Xid="ds-dryad-is" style="font-size: 88%"
                                xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
                                 <span style="color: #595;">DataDryad.org</span>
                                 is a
                                 <span style="color: #363;">curated general-purpose repository</span>
-                                that makes the 
+                                that makes the
                                 <span style="color: #242;">data underlying scientific publications</span>
-                                discoverable, freely reusable, and citable. Dryad has 
-				<span style="color: #595;">integrated data submission</span> 
-				for a growing list of journals; submission of data from other publications is also welcome.
+                                discoverable, freely reusable, and citable. Dryad has
+                                <span style="color: #595;">integrated data submission</span>
+                                for a growing list of journals; submission of data from other publications is also welcome.
                             </p>
                         </div>
-                        <div>
-			  <a href="/pages/depositing">
-			    <img src="themes/Mirage/images/bookmarkSubmissionProcess.png"/>
-			    <p>Placeholder text --- to be replaced by bookmark images </p>
-			  </a>
-                        </div>
-                        <div>
-			  <a href="http://blog.datadryad.org/2013/02/11/dryad-membership-meeting-data-publishing-symposium-2/">
-			    <img src="themes/Mirage/images/2013membershipMeeting.jpg"/>
-			  </a>
-                        </div>
-                        <div>
-			  <a href="http://datadryad.org/resource/doi:10.5061/dryad.gs45f">
-			    <img src="themes/Mirage/images/dryad.gs45f.jpg"/>
-			  </a>
-                        </div>
-
                     </div>
                 </div>
             </div>
@@ -236,7 +252,7 @@
             <!-- START DEPOSIT -->
             <div id="submit-data-feature-box" class="home-col-2">
                 <h1 class="ds-div-head "
-                    style="font-size: 1.8em; border-bottom: none; text-align: center; padding: 25px 35px 19px; height: 56px;">Have data 
+                    style="font-size: 1.8em; border-bottom: none; text-align: center; padding: 25px 35px 19px; height: 56px;">Have data
                     for your publication?
                 </h1>
                 <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
@@ -254,32 +270,21 @@
 
             <!-- START SEARCH -->
             <div class="home-col-1">
-                <h1 class="ds-div-head">Search for Data <a>
-                    <xsl:attribute name="href">
-                        <![CDATA[/search-filter?query=&field=dc.contributor.author_filter]]>
-                    </xsl:attribute>
-                    Browse authors</a>
-                    <a>
-                        <xsl:attribute name="href">
-                            <![CDATA[/search-filter?query=&field=prism.publicationName_filter]]>
-                        </xsl:attribute>
-                        Browse journals</a>
-                </h1>
+                <h1 class="ds-div-head">Search for Data</h1>
 
                 <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                       id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary"
                       action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
                     <p class="ds-paragraph">
                         <p>
-                            <label class="ds-form-label" for="aspect_discovery_SiteViewer_field_query">Search for data in Dryad:
-                            </label>
+                            <label class="ds-form-label" for="aspect_discovery_SiteViewer_field_query"></label>
                         </p>
                         <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                                id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
                                type="text" value=""/><!-- no whitespace between these!
                      --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
                                id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
-                               type="submit" value="Go"/>
+                               type="submit" value="Search"/>
                     </p>
                 </form>
             </div>
@@ -291,18 +296,18 @@
 
                 <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 490px;">
                     <div id="connect-illustrated-prose">
-                      <p>
-                        <img src="themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" />
-                        Publishers, societies, universities, libraries, funders, and other stakeholder organizations are invited to become <a href="#TODO">Members</a>. Tap into an active knowledge-sharing network, receive discounts on deposit fees, and help shape Dryad’s future.
-                        <img src="themes/Mirage/images/seed-3.png" style="float: right; margin-right: -8px;" />
-                      </p>
-                      <p>
-                        <a href="#TODO">Submission Integration</a> is a service provided to journals free-of-charge to coordinate manuscript submission with data submission to Dryad.  It makes data deposition easy for researchers; makes linking articles and data easy for journals; and enables confidential review of data prior to publication.
-                      </p>
-                      <p>
-                        <img src="themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" />
-                        Deposit fees enable Dryad’s content to be made available free of charge for research and educational reuse.  Flexible <a href="#TODO">pricing plans</a> provide volume discounts on deposit fees.
-                      </p>
+                        <p>
+                            <img src="/themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" />
+                            Publishers, societies, universities, libraries, funders, and other stakeholder organizations are invited to become <a href="/pages/membershipOverview">Members</a>. Tap into an active knowledge-sharing network, receive discounts on deposit fees, and help shape Dryad’s future.
+                            <img src="/themes/Mirage/images/seed-3.png" style="float: right; margin-right: -8px;" />
+                        </p>
+                        <p>
+                            <a href="/pages/journalIntegration">Submission Integration</a> is a service provided to journals free-of-charge to coordinate manuscript submission with data submission to Dryad.  It makes data deposition easy for researchers; makes linking articles and data easy for journals; and enables confidential review of data prior to publication.
+                        </p>
+                        <p>
+                            <img src="/themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" />
+                            Deposit fees enable Dryad’s content to be made available free of charge for research and educational reuse.  Flexible <a href="/pages/pricing">pricing plans</a> provide volume discounts on deposit fees.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -314,8 +319,16 @@
                     <div id="browse-data-buttons">
                         <a href="#recently-published-data"><span>Recently Published</span></a>
                         <a href="#most-viewed-data"><span>Most Viewed</span></a>
-                        <a href="#data-by-author"><span>By Author</span></a>
-                        <a href="#data-by-journal"><span>By Journal</span></a>
+			<a>
+			  <xsl:attribute name="href">
+			    <![CDATA[/search-filter?query=&field=dc.contributor.author_filter]]>
+			  </xsl:attribute>
+			By author</a>
+			<a>
+			  <xsl:attribute name="href">
+                            <![CDATA[/search-filter?query=&field=prism.publicationName_filter]]>
+			  </xsl:attribute>
+                        By journal</a>
                     </div>
                     <div id="recently-published-data" class="browse-data-panel">
                         <xsl:for-each select="dri:div[@n='site-home']">
@@ -331,37 +344,37 @@
                             <xsl:text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </xsl:text>
                         </div>
                     </div>
-                    <div style="text-align: center;">
-                        <input value="View more" type="submit" name="submit" class="ds-button-field" id="" />
-                    </div>
+
                 </div>
             </div>
 
             <!-- START MAILING LIST-->
             <div class="home-col-2">
-                <h1 class="ds-div-head">Dryad Mailing List</h1>
+                <h1 class="ds-div-head">Mailing List</h1>
                 <div id="file_news_div_mailing_list" class="ds-static-div primary">
                     <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
-                      id="aspect_discovery_SiteViewer_div_front-page-file_news_div_mailing_list" 
-                      class="ds-interactive-div primary" action="/subscribe"
-                      onsubmit="return subscribeMailingList(this);">
-                    <p class="ds-paragraph" style="text-align: left; margin-bottom: 2px;">
-                        <xsl:text>Sign up for announcements.</xsl:text>
-                        <input placeholder="Your e-mail" type="text" name="email" class="ds-text-field" style="width: 240px; margin-top: 8px;" id="file_news_div_mailing_list_input_email" />
-                    </p>
-                    <input value="Subscribe" type="submit" name="submit" class="ds-button-field" id="file_news_div_mailing_list_input_subscribe" />
+                          id="aspect_discovery_SiteViewer_div_front-page-file_news_div_mailing_list"
+                          class="ds-interactive-div primary" action="/subscribe"
+                          onsubmit="return subscribeMailingList(this);">
+                        <p class="ds-paragraph" style="text-align: left; margin-bottom: 2px;">
+                            <xsl:text>Sign up for announcements.</xsl:text>
+                            <input placeholder="Your e-mail" type="text" name="email" class="ds-text-field" style="width: 240px; margin-top: 8px;" id="file_news_div_mailing_list_input_email" />
+                        </p>
+                        <input value="Subscribe" type="submit" name="submit" class="ds-button-field" id="file_news_div_mailing_list_input_subscribe" />
                     </form>
                 </div>
             </div>
 
             <!-- START INTEGRATED JOURNAL-->
             <div class="home-col-2" style="clear: both; margin-left: 25px;">
-                <h1 class="ds-div-head">Recently Integrated Journal</h1>
-                <div id="file_news_div_recently_integrated_journal" class="ds-static-div primary">
-                    <p class="ds-paragraph">
-                        <xsl:text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </xsl:text>
-
-                    </p>
+                <h1 class="ds-div-head">Recently Integrated Journals</h1>
+                <div id="recently_integrated_journals" class="ds-static-div primary">
+		  <div class="container">
+		    <img src="/themes/Mirage/images/recentlyIntegrated-pbio.png" alt="PLOS Biology" />
+		    <img src="/themes/Mirage/images/recentlyIntegrated-jpaleo.gif" alt="Journal of Paleontology" />
+		    <img src="/themes/Mirage/images/recentlyIntegrated-functecol.png" alt="Functional Ecology" />
+		    <img src="/themes/Mirage/images/recentlyIntegrated-elife.png" alt="eLife" />
+		  </div>
                 </div>
             </div>
 
@@ -372,96 +385,48 @@
                     <h1 class="ds-div-head">Stats</h1>
                     <div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                          id="aspect_statistics_StatisticsTransformer_div_stats" class="ds-static-div secondary stats">
-                        <h2 class="ds-table-head">Total Visits</h2>
                         <table xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                                id="aspect_statistics_StatisticsTransformer_table_list-table"
                                class="ds-table tableWithTitle">
-                            <tr class="ds-table-row odd">
-                                <td id="aspect_statistics_StatisticsTransformer_cell_"
-                                    class="ds-table-cell odd labelcell"/>
-                                <td id="aspect_statistics_StatisticsTransformer_cell_"
-                                    class="ds-table-cell even labelcell">Views
-                                </td>
-                            </tr>
                             <tr xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                                 class="ds-table-row even">
                                 <td id="aspect_statistics_StatisticsTransformer_cell_01"
-                                    class="ds-table-cell odd labelcell">Data from: IDENTIFIER TEST
+                                    class="ds-table-cell odd labelcell">Total Data Packages
                                 </td>
                                 <td id="aspect_statistics_StatisticsTransformer_cell_02"
-                                    class="ds-table-cell even datacell">23
+                                    class="ds-table-cell even datacell">2886
                                 </td>
                             </tr>
                             <tr class="ds-table-row odd">
                                 <td id="aspect_statistics_StatisticsTransformer_cell_11"
-                                    class="ds-table-cell odd labelcell">Data from: CHECK
+                                    class="ds-table-cell odd labelcell">Total Data Files
                                 </td>
                                 <td id="aspect_statistics_StatisticsTransformer_cell_12"
-                                    class="ds-table-cell even datacell">14
+                                    class="ds-table-cell even datacell">8197
                                 </td>
                             </tr>
                             <tr class="ds-table-row even">
                                 <td id="aspect_statistics_StatisticsTransformer_cell_21"
-                                    class="ds-table-cell odd labelcell">Data from: Mini_deletion_revert
+                                    class="ds-table-cell odd labelcell">Journals Represented
                                 </td>
                                 <td id="aspect_statistics_StatisticsTransformer_cell_22"
-                                    class="ds-table-cell even datacell">11
+                                    class="ds-table-cell even datacell">202
                                 </td>
                             </tr>
                             <tr class="ds-table-row odd">
                                 <td id="aspect_statistics_StatisticsTransformer_cell_31"
-                                    class="ds-table-cell odd labelcell">4651
+                                    class="ds-table-cell odd labelcell">Total Unique Authors
                                 </td>
                                 <td id="aspect_statistics_StatisticsTransformer_cell_32"
-                                    class="ds-table-cell even datacell">9
+                                    class="ds-table-cell even datacell">11,125
                                 </td>
                             </tr>
                             <tr class="ds-table-row even">
                                 <td id="aspect_statistics_StatisticsTransformer_cell_41"
-                                    class="ds-table-cell odd labelcell">Canada
+                                    class="ds-table-cell odd labelcell">Total File Downloads
                                 </td>
                                 <td id="aspect_statistics_StatisticsTransformer_cell_42"
-                                    class="ds-table-cell even datacell">9
-                                </td>
-                            </tr>
-                            <tr class="ds-table-row odd">
-                                <td id="aspect_statistics_StatisticsTransformer_cell_51"
-                                    class="ds-table-cell odd labelcell">South Korea
-                                </td>
-                                <td id="aspect_statistics_StatisticsTransformer_cell_52"
-                                    class="ds-table-cell even datacell">9
-                                </td>
-                            </tr>
-                            <tr class="ds-table-row even">
-                                <td id="aspect_statistics_StatisticsTransformer_cell_61"
-                                    class="ds-table-cell odd labelcell">Data from: Test duplicate
-                                </td>
-                                <td id="aspect_statistics_StatisticsTransformer_cell_62"
-                                    class="ds-table-cell even datacell">9
-                                </td>
-                            </tr>
-                            <tr class="ds-table-row odd">
-                                <td id="aspect_statistics_StatisticsTransformer_cell_71"
-                                    class="ds-table-cell odd labelcell">Data from: Metadata version
-                                </td>
-                                <td id="aspect_statistics_StatisticsTransformer_cell_72"
-                                    class="ds-table-cell even datacell">8
-                                </td>
-                            </tr>
-                            <tr class="ds-table-row even">
-                                <td id="aspect_statistics_StatisticsTransformer_cell_81"
-                                    class="ds-table-cell odd labelcell">Data from: Test delete version -1
-                                </td>
-                                <td id="aspect_statistics_StatisticsTransformer_cell_82"
-                                    class="ds-table-cell even datacell">8
-                                </td>
-                            </tr>
-                            <tr class="ds-table-row odd">
-                                <td id="aspect_statistics_StatisticsTransformer_cell_91"
-                                    class="ds-table-cell odd labelcell">Data from: 00005
-                                </td>
-                                <td id="aspect_statistics_StatisticsTransformer_cell_92"
-                                    class="ds-table-cell even datacell">7
+                                    class="ds-table-cell even datacell">74,567
                                 </td>
                             </tr>
                         </table>
@@ -502,7 +467,7 @@
         <div id="ds-options-wrapper">
             <div id="ds-options">
                 <!-- Once the search box is built, the other parts of the options are added -->
-                <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSubmitData']|dri:list[@n='DryadConnect']|dri:list[@n='DryadMail']"/>
+                <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSubmitData']|dri:list[@n='DryadSearch']|dri:list[@n='DryadConnect']"/>
             </div>
         </div>
     </xsl:template>
@@ -551,142 +516,54 @@
 
     </xsl:template>
 
+    <xsl:template match="dri:options/dri:list[@n='DryadSearch']" priority="3">
+        <!-- START SEARCH -->
+        <div class="home-col-1">
+            <h1 class="ds-div-head">Search for Data
+            </h1>
+
+            <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
+                  id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary"
+                  action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
+                <p class="ds-paragraph">
+                    <p>
+                        <label class="ds-form-label" for="aspect_discovery_SiteViewer_field_query">Search for data in Dryad:
+                        </label>
+                    </p>
+                    <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
+                           id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
+                           type="text" value=""/><!-- no whitespace between these!
+                     --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
+                               id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
+                               type="submit" value="Go"/>
+                </p>
+            </form>
+        </div>
+
+    </xsl:template>
 
     <xsl:template match="dri:options/dri:list[@n='DryadConnect']" priority="3">
 
         <!-- START CONNECT  -->
         <div class="home-col-2">
-            <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Connect with Dryad
+            <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be a part of Dryad
             </h1>
 
-            <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 390px;">
-                <div id="TEMP-connect-alternatives">
-
-                    <div id="connect-illustrated-prose">
-                        <p>
-                            <img style="float: right;margin-left: 8px;" src="themes/Mirage/images/connect-1.png"/>
-                            Dryad invites<b>publishers</b>,<b>journals</b>,
-                            <b>scientific societies</b>
-                            and
-                            <b>organizations</b>
-                            interested in data preservation to join us now and shape the course of Dryad’s
-                            future.
-                            <a href="#">Dryad members</a>
-                            elect our board of directors, participate in an
-                            active knowledge sharing network and receive discounts on deposit fees.
-                            <img style="float: left;margin-right: 8px;" src="themes/Mirage/images/connect-2.png"/>
-                        </p>
-
-                        <p>
-                            <a href="#">Submission Integration</a>
-                            is a free and easy way for
-                            <b>journals</b>
-                            to
-                            coordinate manuscript submissions with data submissions in Dryad. Integration
-                            makes depositing data and linking it with an article faster and simpler for
-                            both scientists and journals.
-                            <img style="float: right;margin-left: 8px" src="themes/Mirage/images/connect-3.png"/>
-                        </p>
-
-                        <p>
-                            Charging
-                            <a href="#">deposit fees</a>
-                            to offset the costs of data archiving
-                            will ensure that the public is never charged to access or reuse the data in
-                            Dryad.
-                            <!--Dryad’s flexible <a href="#">volume payment plans</a> make it attractive
-                            for institutions to sponsor data archiving as a service to their scientists and
-                            authors.-->
-                        </p>
-                    </div>
-
-                    <div id="connect-legible-cloud">
-                        <p>
-                            <span style="font-size: 110%; color: #494; font-weight: bold;">Dryad</span>
-                            invites
-                            <span style="font-size: 130%; color: #c99;">publishers</span>,
-                            <span style="font-size: 120%; color: #aa5;">journals</span>,
-                            <span style="font-size: 130%; color: #99c;">scientific societies</span>
-                            and
-                            <span style="font-size: 120%; color: #6a9;">organizations</span>
-                            interested in
-                            <span style="color: #999; font-weight: bold;">data preservation</span>
-                            to join us now and shape the course of Dryad’s
-                            <span style="font-size: 110%; color: #c99; font-weight: bold;">future</span>.
-                            <a href="#" style="font-weight: bold;">Dryad members</a>
-                            elect our
-                            <span style="color: #aa5;">board of directors</span>,
-                            participate in an active
-                            <span style="font-weight: bold; color: #99c;">knowledge sharing</span>
-                            network and receive
-                            <span style="color: #c99;">discounts</span>
-                            on deposit fees.
-                        </p>
-
-                        <p>
-                            <a href="#" style="font-weight: bold;">Submission Integration</a>
-                            is a free and easy way for
-                            <span style="font-size: 120%; color: #99c;">journals</span>
-                            to
-                            <span style="color: #6a9;">coordinate manuscript submissions</span>
-                            with data submissions in
-                            <span style="color: #494; font-weight: bold;">Dryad</span>
-                            . Integration
-                            makes depositing data and
-                            <span style="font-weight: bold; color: #99c;">linking it</span>
-                            with an article
-                            <span style="color: #aa5;">faster and simpler</span>
-                            for both
-                            <span style="color: #c99;">scientists</span>
-                            and journals.
-                        </p>
-
-                        <p>
-                            Charging
-                            <a href="#" style="font-weight: bold;">deposit fees</a>
-                            to offset the
-                            <span style="color: #6a9;">costs of data archiving</span>
-                            will ensure that the
-                            <span style="color: #aa5;">public is never charged</span>
-                            to
-                            <span style="font-weight: bold; color: #999;">access or reuse</span>
-                            the data in
-                            <span style="color: #494; font-weight: bold;">Dryad</span>.
-                        </p>
-
-                        <!--Dryad’s flexible <a href="#">volume payment plans</a> make it attractive
-                        for institutions to sponsor data archiving as a service to their scientists and
-                        authors.
-                        -->
-
-                        <!--
-                        The
-                        <span style="font-size: 25px; color: #c99;">
-                        <a href="#">vision</a> of
-                        <span style="font-weight: 36px; color: #494; font-weight: bold;">Dryad</span></span> is a
-                        <span style="font-size: 22px; color: #99b;">scholarly
-                        <a href="#">communication</a> system</span> in which
-                        <span style="font-size: 22px;">learned
-                        <a style="font-size: 24px; color: #494;" href="#TODO">societies</a>,
-                        <a style="font-size: 27px; color: #9c9; font-weight: bold;" href="#TODO">publishers</a>,
-                        <a style="font-size: 30px; color: #494;" href="#TODO">institutions</a>
-                         of research and education</span>, funding bodies and other
-                        <span style="font-size: 22px;">
-                        <a style="font-size: 28px; color: #449;" href="#TODO">stakeholders</a>
-                        </span>
-                         collaboratively
-                        <a style="font-size: 24px; color: #c99; font-weight: bold;" href="#TODO">sustain</a>
-                        and promote the
-                        <span style="font-size: 24px; color: #bb6;">
-                        <a href="#" style="color: #bb6;">preservation</a>
-                        and reuse
-                        </span>
-                         of data.
-                        -->
-                    </div>
-
+            <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 490px;">
+                <div id="connect-illustrated-prose">
+                    <p>
+                        <img src="/themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" />
+                        Publishers, societies, universities, libraries, funders, and other stakeholder organizations are invited to become <a href="/pages/membershipOverview">Members</a>. Tap into an active knowledge-sharing network, receive discounts on deposit fees, and help shape Dryad’s future.
+                        <img src="/themes/Mirage/images/seed-3.png" style="float: right; margin-right: -8px;" />
+                    </p>
+                    <p>
+                        <a href="/pages/journalIntegration">Submission Integration</a> is a service provided to journals free-of-charge to coordinate manuscript submission with data submission to Dryad.  It makes data deposition easy for researchers; makes linking articles and data easy for journals; and enables confidential review of data prior to publication.
+                    </p>
+                    <p>
+                        <img src="/themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" />
+                        Deposit fees enable Dryad’s content to be made available free of charge for research and educational reuse.  Flexible <a href="/pages/pricing">pricing plans</a> provide volume discounts on deposit fees.
+                    </p>
                 </div>
-                <!-- END of #TEMP-connect-alternatives -->
             </div>
         </div>
     </xsl:template>
@@ -695,19 +572,19 @@
         <!-- START DEPOSIT -->
         <div id="submit-data-feature-box" class="home-col-2">
             <h1 class="ds-div-head "
-                style="border-bottom: none; text-align: center; padding: 30px 45px 0; height: 50px;">Deposit your
-                data in dryad
+                style="font-size: 1.8em; border-bottom: none; text-align: center; padding: 25px 35px 19px; height: 76px;">Have data
+                for your publication?
             </h1>
             <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
-                <p class="ds-paragraph" style="text-align: center; font-size: 1.2em; margin: 0.5em 0 1.5em;">
+                <p class="ds-paragraph">
                     <a class="submitnowbutton" href="/handle/10255/3/submit">Submit Data Now!</a>
                 </p>
                 <p style="font-size: 0.9em; padding-top: 4px;">
-                    OR
+                    <xsl:text>OR</xsl:text>
                 </p>
-                <a class="learn-to-submit-button" href="http://www.youtube.com/watch?v=RP33cl8tL28">See
-                    how to submit
-                </a>
+                <p>
+                    <a class="learn-to-submit-button-option" href="/pages/faq#deposit">Learn how to submit data</a>
+                </p>
             </div>
         </div>
     </xsl:template>
@@ -944,13 +821,6 @@ Dryad installs (dev, demo, staging, production, etc.) -->
 
                     <!-- The tabs display a selected tab based on the location
 parameter that is being used (see variable defined above) -->
-                    <div id="searchTabs">
-                        <ul>
-                            <xsl:call-template name="buildTabs"/>
-
-
-                        </ul>
-                    </div>
                 </xsl:if>
                 <ul class="ds-artifact-list">
                     <xsl:choose>
@@ -1000,14 +870,137 @@ parameter that is being used (see variable defined above) -->
 
 </xsl:template>
 -->
-    <xsl:template match="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='tabs']"/>
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='tabs']">
+        <div id="searchTabs">
+            <ul>
+                <xsl:call-template name="buildTabs"/>
+
+
+            </ul>
+        </div>
+    </xsl:template>
+
 
     <xsl:template match="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='search-query']/dri:item[position()=1]">
         <li class="ds-form-item">
-            <label class="ds-form-label" for="aspect_discovery_SimpleSearch_field_query"><i18n:text><xsl:value-of select="."/></i18n:text></label>
+            <label class="ds-form-label" for="aspect_discovery_SimpleSearch_field_query"><i18n:text><xsl:value-of select="dri:field/dri:label"/></i18n:text></label>
             <div class="ds-form-content">
                 <xsl:apply-templates/><a id="advanced-search" href="#">Advanced Search</a>
             </div>
         </li>
+    </xsl:template>
+
+
+    <xsl:template match="//dri:list[@id='aspect.submission.StepTransformer.list.submit-select-publication']/dri:head">
+        <legend>
+            <i18n:text><xsl:value-of select="."/></i18n:text>
+        </legend>
+    </xsl:template>
+    <xsl:template match="//dri:list[@id='aspect.submission.StepTransformer.list.submit-upload-file']/dri:head">
+        <legend>
+            <i18n:text><xsl:value-of select="."/></i18n:text>
+        </legend>
+    </xsl:template>
+
+    <xsl:template match="//dri:list[@id='aspect.submission.StepTransformer.list.submit-describe-dataset']/dri:head">
+        <legend>
+            <i18n:text><xsl:value-of select="."/></i18n:text>
+        </legend>
+    </xsl:template>
+
+    <xsl:template match="dri:list[@id='aspect.submission.StepTransformer.list.submit-upload-file']">
+        <fieldset>
+            <xsl:call-template name="standardAttributes">
+                <xsl:with-param name="class">
+                    <!-- Provision for the sub list -->
+                    <xsl:text>ds-form-</xsl:text>
+                    <xsl:if test="ancestor::dri:list[@type='form']">
+                        <xsl:text>sub</xsl:text>
+                    </xsl:if>
+                    <xsl:text>list </xsl:text>
+                    <xsl:if test="count(dri:item) > 3">
+                        <xsl:text>thick </xsl:text>
+                    </xsl:if>
+                </xsl:with-param>
+            </xsl:call-template>
+            <xsl:apply-templates select="dri:head"/>
+
+            <xsl:apply-templates select="dri:item[@id='aspect.submission.StepTransformer.item.data-upload-details']"/>
+
+            <table class="datafiletable">
+                <tr>
+                    <td>
+                        <xsl:apply-templates
+                                select="dri:item[@id='aspect.submission.StepTransformer.item.dataset-item']/dri:field[@type='radio']"
+                                />
+                    </td>
+                    <td>
+                        <xsl:apply-templates
+                                select="dri:item[@id='aspect.submission.StepTransformer.item.dataset-item']/*[not(@type='radio')]"
+                                />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <xsl:apply-templates
+                                select="dri:item[@id='aspect.submission.StepTransformer.item.dataset-identifier']/dri:field[@type='radio']"
+                                />
+                    </td>
+                    <td>
+                        <xsl:apply-templates
+                                select="dri:item[@id='aspect.submission.StepTransformer.item.dataset-identifier']/*[not(@type='radio')]"
+                                />
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+    </xsl:template>
+    <xsl:template match="dri:item[@id='aspect.submission.StepTransformer.item.data-upload-details']">
+        <div class="ds-form-content">
+            <i18n:text>
+                <xsl:value-of select="."/>
+            </i18n:text>
+        </div>
+    </xsl:template>
+    <xsl:template match="dri:help" mode="compositeComponent">
+        <xsl:if
+                test="not(ancestor::dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-publication' or @id= 'aspect.submission.StepTransformer.div.submit-describe-dataset'])">
+            <span class="composite-help">
+                <xsl:if
+                        test="ancestor::dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-publication' or @id= 'aspect.submission.StepTransformer.div.submit-describe-dataset']">
+                    <xsl:variable name="translatedParentId">
+                        <xsl:value-of select="translate(../@id, '.', '_')"/>
+                    </xsl:variable>
+                    <xsl:attribute name="connectId">
+                        <xsl:value-of select="$translatedParentId"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="id"><xsl:value-of select="$translatedParentId"
+                            />_tooltip
+                    </xsl:attribute>
+                </xsl:if>
+
+                <xsl:apply-templates/>
+            </span>
+        </xsl:if>
+    </xsl:template>
+    <xsl:template match="dri:help" mode="help">
+        <xsl:if
+                test="not(ancestor::dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-publication' or @id= 'aspect.submission.StepTransformer.div.submit-describe-dataset'])">
+            <!--Only create the <span> if there is content in the <dri:help> node-->
+            <xsl:if test="./text() or ./node()">
+                <span>
+                    <xsl:attribute name="class">
+                        <xsl:text>field-help</xsl:text>
+                    </xsl:attribute>
+                    <xsl:apply-templates/>
+                </span>
+            </xsl:if>
+        </xsl:if>
+    </xsl:template>
+
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='most_recent']">
+        <div class="link-to-button">
+            <xsl:apply-templates select="dri:item"/>
+        </div>
     </xsl:template>
 </xsl:stylesheet>

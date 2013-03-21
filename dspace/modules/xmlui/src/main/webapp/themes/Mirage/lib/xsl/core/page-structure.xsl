@@ -332,7 +332,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
     <xsl:template name="buildHeader">
         <div id="ds-header-wrapper">
             <div id="ds-header" class="clearfix">
-                <a id="skip-nav" href="#ds-body">Skip navigation</a>
+                <a id="skip-nav" href="#ds-body"><img src="/themes/Mirage/images/nada.gif" alt="Skip navigation" name="skipnav" width="1" height="1" border="0" id="skipnav" /></a>
                 <a id="ds-header-logo-link">
                     <xsl:attribute name="href">
                         <xsl:value-of
@@ -419,7 +419,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <script>(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/oW4J4by2WMgw3H4qYuJsDQ.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</script>
 
                                     <!-- A link to launch the Classic Widget -->
-                                    <a href="javascript:void(0)" data-uv-lightbox="classic_widget" data-uv-mode="feedback" data-uv-primary-color="#88c033" data-uv-link-color="#333333" data-uv-forum-id="197408" data-uv-feedback-tab_name="Ideas Forum">Ideas Forum</a>
+                                    <a id="forum-link" href="javascript:void(0)" data-uv-lightbox="classic_widget" data-uv-mode="feedback" data-uv-primary-color="#88c033" data-uv-link-color="#333333" data-uv-forum-id="197408" data-uv-feedback-tab_name="Ideas Forum">Ideas Forum</a>
                                 </li>
                             </ul>
                         </li>
@@ -427,7 +427,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <a href="">Get Started</a>
                             <ul>
                                 <li>
-                                    <a href="/pages/faq#deposit">Deposit Data</a>
+                                    <a href="/pages/faq#depositing">Deposit Data</a>
                                 </li>
                                 <li>
                                     <a href="/pages/faq#using">Use Data</a>
@@ -456,13 +456,13 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     </ul>
                                 </li>
                                 <li>
-                                    <a href="">Integrate Your Journal</a>
+                                    <a href="/pages/journalIntegration">Journal Integration</a>
                                     <ul>
                                       <li>
-                                  <a href="/pages/integratedJournals">Currently Integrated Journals</a>
+                                  <a href="/pages/journalIntegration">How to Integrate</a>
                                       </li>
                                       <li>
-                                  <a href="/pages/journalIntegration">How to Integrate</a>
+                                  <a href="/pages/integratedJournals">Currently Integrated Journals</a>
                                       </li>
                                     </ul>
                                 </li>
@@ -513,15 +513,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     </a>
 
                                     <ul>
-                                        <li>
-                                            <a>
-                                                <xsl:attribute name="href">
-                                                    <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
-                                        dri:metadata[@element='identifier' and @qualifier='logoutURL']"/>
-                                                </xsl:attribute>
-                                                <i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
-                                            </a>
-                                        </li>
+                                        <!--remove the extra login link-->
                                         <xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='account']/dri:item" mode="menu"/>
                                     </ul>
 
@@ -609,43 +601,52 @@ references to stylesheets pulled directly from the pageMeta element. -->
     <xsl:template name="buildFooter">
         <div id="ds-footer-wrapper">
             <div id="ds-footer">
-                <div id="ds-footer-links">
-                    <span style="float: right;">
-                        <a>
-                            <xsl:attribute name="href">
-                                <xsl:value-of
-                                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                                <xsl:text>/pages/policies</xsl:text>
-                            </xsl:attribute>
-                            <xsl:text>Dryad Terms of Use</xsl:text>
-                        </a>
-			<xsl:text>&#160;</xsl:text>
-                        <span style="color: #777;"><xsl:text>|</xsl:text></span>
-                        <xsl:text>&#160;</xsl:text>
-                        <a>
-                            <xsl:attribute name="href">
-                                <xsl:value-of
-                                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                                <xsl:text>/feedback</xsl:text>
-                            </xsl:attribute>
-                            <i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
-                        </a>
-                    </span>
-                    <span style="float: left;">
-                        <xsl:text>Dryad is a nonprofit membership organization.</xsl:text>
-                    </span>		    
-                    <p class="build-info">
-                        <i18n:text>xmlui.dri2xhtml.structural.footer-promotional2</i18n:text>
-                        <xsl:value-of select="$dryadrelease/release/date"/> 
-                        <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dryad'][@qualifier='node']">
-                            <i18n:text>xmlui.dri2xhtml.structureal.footer-node</i18n:text>
-                            <xsl:value-of
-                                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dryad'][@qualifier='node']"/>
-                        </xsl:if>
-                    </p>
-                    <!--Git Commit hash rendered in HTML comment-->
-                    <xsl:comment>Git Commit Hash: <xsl:value-of select="$dryadrelease/release/version"/></xsl:comment>
+                <p style="text-align: center; margin: 0;">
+                    <!-- 'Dryad is...' -->
+                    <i18n:text>xmlui.dri2xhtml.structural.footer-promotional1</i18n:text>
+                    <xsl:text> </xsl:text>
+                    <!-- latest Dryad build info (and node/site name, if available) -->
+                    <i18n:text>xmlui.dri2xhtml.structural.footer-promotional2</i18n:text>
+                    <xsl:value-of select="$dryadrelease/release/date"/> 
+                    <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dryad'][@qualifier='node']">
+                        <i18n:text>xmlui.dri2xhtml.structural.footer-node</i18n:text>
+                        <xsl:text> </xsl:text>
+                        <xsl:value-of
+                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dryad'][@qualifier='node']"/>
+                    </xsl:if>
+                </p>
+                <!--Git Commit hash rendered in HTML comment-->
+                <xsl:comment>Git Commit Hash: <xsl:value-of select="$dryadrelease/release/version"/></xsl:comment>
+
+                <!-- Powered by... -->
+                <div id="footer-left">
+                    <i18n:text>xmlui.dri2xhtml.structural.footer-powered-by</i18n:text>
+                    <xsl:text> </xsl:text>
+                    <a href="http://creativecommons.org/" target="_blank"><img class="powered-by" src="/themes/Mirage/images/powered-by-cc.png" alt="Creative Commons" /></a>
+                    <xsl:text> &#160;</xsl:text>
+                    <a href="http://www.dspace.org/" target="_blank"><img class="powered-by" src="/themes/Mirage/images/powered-by-dspace.png" alt="DSpace" /></a>
                 </div>
+
+                <div id="footer-right" style="margin-top: 11px;">
+                    <a>
+                        <xsl:attribute name="href">
+                            <xsl:value-of
+                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                            <xsl:text>/pages/policies</xsl:text>
+                        </xsl:attribute>
+                        <i18n:text>xmlui.dri2xhtml.structural.footer-terms-of-service</i18n:text>
+                    </a>
+                    <span style="color: #777;"><xsl:text>&#160; | &#160;</xsl:text></span>
+                    <a>
+                        <xsl:attribute name="href">
+                            <xsl:value-of
+                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                            <xsl:text>/feedback</xsl:text>
+                        </xsl:attribute>
+                        <i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
+                    </a>
+                </div>
+
                 <!--Invisible link to HTML sitemap (for search engines) -->
                 <a class="hidden">
                     <xsl:attribute name="href">
@@ -769,7 +770,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 <xsl:text>/themes/</xsl:text>
                 <xsl:value-of
                         select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-                <xsl:text>/lib/js/supposition-BLACK-BOX-MODS.js</xsl:text>
+                <xsl:text>/lib/js/supposition-BLACK-BLOG-MODS.js</xsl:text>
             </xsl:attribute>
             &#160;
         </script>
@@ -870,9 +871,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
 
                 jQuery(document).ready(function() {
-                if(jQuery("input[type='checkbox']").length == 0){
-                    jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").css("display","none");
-                }
+
+                  jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").css("display","none");
+
                   jQuery("#advanced-search").click(function(){
 
                   jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").toggle();

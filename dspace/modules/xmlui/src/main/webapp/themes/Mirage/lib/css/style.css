@@ -161,6 +161,7 @@ a:hover {
     margin-top: 25px;
     margin-bottom: 5px;
     overflow: hidden;
+    clear: both;
 }
 
 #ds-footer {
@@ -168,6 +169,11 @@ a:hover {
     padding: 4px 0;
     font-size: 93%;
     line-height: 1.6em;
+    text-align: center;
+}
+
+#ds-footer img.powered-by {
+    vertical-align: middle;
 }
 
 #ds-footer-left {
@@ -197,24 +203,11 @@ a:hover {
     height: 40px;
 }
 
-#ds-footer-links {
-    clear: left;
-
-}
-.ie6 #ds-footer-links {
-    display: inline;
-}
-#ds-footer-links a {
+#ds-footer a {
     color: inherit;
 }
 a.discreet {
     text-decoration: none;
-}
-#ds-footer .build-info {
-    clear: both;
-    text-align: right;
-    color: #777;
-    margin-bottom: 0px;
 }
 
 
@@ -721,15 +714,6 @@ li.ds-form-item label.ds-composite-component.last{
     margin-bottom: 0;
 }
 
-span.composite-help,
-span.field-help {
-    display: block;
-    font-size: 93%;
-    margin-top: 3px;
-    width: 506px;
-    text-align: justify;
-}
-
 .ds-checkbox-field input,
 .ds-radio-field input {
     margin-left: 0;
@@ -873,8 +857,15 @@ span.field-help {
 
 .file-wrapper,
 .ds-artifact-item {
-    padding-top: 15px;
-    padding-bottom: 15px;
+    padding-top: 5px !important;
+    padding-bottom: 10px !important;
+}
+
+.ds-artifact-item.doi-item a {
+      text-decoration: none;
+}
+.ds-artifact-item.doi-item a span.doi {
+      text-decoration: underline;
 }
 
 .ds-artifact-item.collection,
@@ -1118,9 +1109,6 @@ div.simple-item-view-description h3{
     margin-top: 5px;
 }
 
-div.spacer{
-    height: 15px;
-}
 
 .thumbnail-wrapper,
 .file-metadata,
@@ -1358,14 +1346,6 @@ a.submitnowbutton:hover {
     background-color: #ccc;
     color: #333;
 }
-a.learn-to-submit-button {
-    background-color: #87c033;
-    border: 1px solid #555;
-    color: #472D2E;
-    text-decoration: none;
-    margin-top: 0.2em;
-    padding: 0.4em 0.8em;
-}
 a.learn-to-submit-button:hover {
     background-color: #ccc;
     color: #333;
@@ -1374,9 +1354,6 @@ a.learn-to-submit-button:hover {
 #skip-nav {
     float: right;
     padding-top: 4px;
-    height: 18px;
-    color: #333;
-    font-weight: bold;
 }
 #sharing-tools {
     float: right;
@@ -1563,6 +1540,7 @@ img.ds-authority-confidence
     margin-top:100px;
 }
 
+
 /* 
   ***************************
   DATA PACKAGE PAGES
@@ -1663,4 +1641,176 @@ table.package-file-description td {
     -moz-border-radius-bottomright: 8px;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
+
+#aspect_discovery_SimpleSearch_div_search-results p{
+    margin-top:10px;
+}
+
+/*
+  ******************************
+  ***********  forms  **********
+  ******************************
+ */
+form.ds-interactive-div li.ds-form-item {
+    /* display: block; */
+    padding: 2px 0;
+    width: 100%;
+}
+form.ds-interactive-div li {
+    margin: 0;
+}
+form.ds-interactive-div li.odd {
+    background-color: rgb(255, 255, 255);
+}
+form.ds-interactive-div li.even {
+    background-color: rgb(255, 255, 255);
+}
+form.ds-interactive-div li.last {
+
+}
+li.ds-form-item {
+    float: left;
+    clear: both;
+    width: 100%;
+}
+div.ds-form-content {
+    float: left;
+    clear: right;
+    display: block;
+    padding: 7px;
+    width: 600px;
+}
+span.ds-form-label,label.ds-form-label {
+    display: block;
+    float: left;
+    clear: left;
+    padding: 5px 20px 5px 10px;
+    /*width: 200px;*/
+    font-weight: bold;
+    vertical-align: middle;
+    overflow: hidden;
+}
+/* Help, error, & in-line labels */
+label.ds-composite-component {
+    display: block;
+    float: left;
+    padding: 0px 5px 0 0px;
+    font-size: 80%;
+    color: black;
+    background-color: inherit;
+    text-align: left;
+}
+input.error,textarea.error,select.error {
+    color: inherit;
+    background-color: rgb(255, 245, 245);
+    border-color: red;
+}
+
+span.field-help,
+span.composite-help {
+    display: block;
+    font-size: 90%;
+    color: gray;
+    background-color: inherit;
+    text-align: left;
+}
+
+div.spacer {
+    height: 15px;
+    margin: 0;
+    padding: 0;
+    line-height: 0px;
+    clear: both;
+}
+/* The composite field */
+span.ds-composite-field {
+    display: table-row;
+    padding: 2px;
+}
+*.ds-composite-field.ds-composite-component {
+    display: table-cell;
+    text-align: left;
+    width: auto;
+    padding-right: 10px;
+}
+*.ds-composite-field input,*.ds-composite-field textarea,*.ds-composite-field select {
+    margin-right: 5px;
+    margin-bottom: -2px;
+}
+/* Checkboxes and Radio buttons */
+fieldset.ds-checkbox-field,fieldset.ds-radio-field {
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+fieldset.ds-checkbox-field legend,fieldset.ds-radio-field legend {
+    display: none;
+}
+fieldset.ds-checkbox-field label,fieldset.ds-radio-field label {
+    display: block;
+}
+/* Sub sections within a form */
+fieldset.ds-form-list {
+    border: 2px solid gray;
+    padding: 0;
+    margin-left: 0;
+    margin-right: 0;
+}
+fieldset.ds-form-list ol {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    list-style-type: none;
+}
+fieldset.ds-form-list legend {
+    color: #336699;
+    background-color: inherit;
+    font-size: 115%;
+    font-weight: bolder;
+    margin-left: 10px;
+}
+fieldset.ds-form-sublist {
+    border: 1px solid rgb(238, 238, 238);
+    padding: 0;
+    margin: 5px;
+}
+#aspect_submission_StepTransformer_field_datafile_identifier{
+    width:300px
+}
+a.learn-to-submit-button-option:hover {
+    background-color: #ccc;
+    color: #333;
+}
+a.learn-to-submit-button-option {
+    background-color: #87c033;
+    border: 1px solid #555;
+    color: #472D2E;
+    text-decoration: none;
+    margin-top: 0.2em;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-bottomright: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.link-to-button{
+    text-align: center;
+
+}
+.link-to-button a{
+    text-decoration: none;
+    font-weight:bold;
+    border:1px solid black;
+    background: green;
+    color: white;
+    padding: 2px 5px;
+
 }
