@@ -138,8 +138,8 @@
             }
 
             #dryad-home-carousel .bx-viewport {
-                height: 190px;
-                width: 623px;
+                height: 194px;
+                width: 627px;
             }
 
             #dryad-home-carousel div.bxslider {
@@ -152,6 +152,13 @@
                 margin: 0;
             }
 
+            #dryad-home-carousel div.bxslider div > a > img,
+            #dryad-home-carousel div.bxslider div > img {
+                display: block;
+                height: 194px;
+                width: 627px;
+            }
+
             #dryad-home-carousel div.bxslider div p {
                 width: 550px;
                 margin: auto;
@@ -159,7 +166,7 @@
             }
 
             #dryad-home-carousel .bx-pager {
-                bottom: -19px;
+                bottom: -16px;
                 left: 8px;
             }
             #dryad-home-carousel .bx-pager-item {
@@ -167,7 +174,7 @@
             }
 
             #dryad-home-carousel .bx-controls-auto {
-                bottom: -18px;
+                bottom: -16px;
             }
             #dryad-home-carousel .bx-controls-auto-item {
                 float: right;
