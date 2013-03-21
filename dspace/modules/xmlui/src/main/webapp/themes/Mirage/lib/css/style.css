@@ -668,7 +668,7 @@ li.ds-form-item label.ds-composite-component{
     display: block;
     float: left;
     font-size: 93%;
-    padding:0 8px 0 0;
+    padding:0 15px 0 0;
 }
 
 li.ds-form-item label.ds-composite-component input.ds-text-field{
