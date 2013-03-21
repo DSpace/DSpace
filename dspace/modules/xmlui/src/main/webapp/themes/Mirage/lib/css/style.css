@@ -857,6 +857,8 @@ span.field-help {
 .ds-artifact-item {
     padding-top: 5px !important;
     padding-bottom: 10px !important;
+    padding-left: 20px;
+    text-indent: -20px;
 }
 
 .ds-artifact-item.doi-item a {
