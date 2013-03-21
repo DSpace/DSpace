@@ -67,6 +67,10 @@ a:hover {
     border-bottom: 3px solid #87C033;
 }
 
+.ds-div-head img.feed-icon {
+    width: 16px; height: 16px; vertical-align: middle;
+}
+
 #ds-header-logo-link {
     text-decoration: none;
     cursor: pointer;
@@ -169,7 +173,6 @@ a:hover {
     padding: 4px 0;
     font-size: 93%;
     line-height: 1.6em;
-    text-align: center;
 }
 
 #ds-footer img.powered-by {
@@ -227,7 +230,7 @@ a.discreet {
 #ds-options-wrapper {
     float: right;
     width: 249px;
-    padding-top: 20px;
+    padding-top: 12px;
 }
 
 #ds-options {
@@ -245,7 +248,7 @@ h1.ds-option-set-head,
     border-bottom: 3px solid #87C033;
 }
 h1.ds-option-set-head {
-    margin-top: 20px;
+    margin-top: 5px;
     font-size: 108%;
 }
 .ds-div-head {
@@ -263,6 +266,8 @@ h1.ds-option-set-head {
 .publication-header.ds-static-div {
     border: none;
     padding: 0;
+    margin-top: 0px;
+    background-color: transparent;
     -moz-box-shadow: none;
     -webkit-box-shadow: none;
     box-shadow: none;
@@ -1578,14 +1583,16 @@ img.ds-authority-confidence
     padding-bottom: 30px;
     margin: 0 15px -20px !important;
 }
+img.pub-cover {
+    -moz-box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
+    -webkit-box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
+}
 .publication-header img.pub-cover {
     float: left;
     height: 120px; 
     width: 90px; 
     margin-right: 20px;
-    -moz-box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
-    -webkit-box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
-    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
 }
 .publication-header .pub-title {
     font-size: 1.2em;
@@ -1790,6 +1797,7 @@ a.learn-to-submit-button-option:hover {
     background-color: #ccc;
     color: #333;
 }
+a.learn-to-submit-button,
 a.learn-to-submit-button-option {
     background-color: #87c033;
     border: 1px solid #555;
