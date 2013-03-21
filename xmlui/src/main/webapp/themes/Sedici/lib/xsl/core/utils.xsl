@@ -65,7 +65,7 @@
             <xsl:apply-templates />
         </li>
     </xsl:template>
-	<xsl:template match="/dri:document/dri:body/dri:div[@id='aspect.submission.StepTransformer.div.submit-upload' and (dri:list[@id='aspect.submission.StepTransformer.list.submit-upload-new']) ]" priority="3">
+	<xsl:template match="/dri:document/dri:body/dri:div[@id='aspect.submission.StepTransformer.div.submit-upload' and (dri:list[@id='aspect.submission.StepTransformer.list.submit-upload-new']) ]" >
 		<xsl:apply-templates select="." mode="ordered">
 			<xsl:with-param name="elements">
 	     		<xsl:copy-of select="dri:list[@id='aspect.submission.StepTransformer.list.submit-progress']"/>
@@ -77,7 +77,7 @@
 			</xsl:with-param>
 		</xsl:apply-templates>
 	</xsl:template>
-	<xsl:template match="/dri:document/dri:body/dri:div[@id='aspect.xmlworkflow.WorkflowTransformer.div.perform-task']" priority="3">
+	<xsl:template match="/dri:document/dri:body/dri:div[@id='aspect.xmlworkflow.WorkflowTransformer.div.perform-task']" >
 		<xsl:apply-templates select="." mode="ordered">
 			<xsl:with-param name="elements">
 		  		<xsl:copy-of select="dri:table[@id='aspect.xmlworkflow.WorkflowTransformer.table.workflow-actions']"/>
