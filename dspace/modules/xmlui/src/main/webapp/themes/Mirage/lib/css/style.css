@@ -67,6 +67,10 @@ a:hover {
     border-bottom: 3px solid #87C033;
 }
 
+.ds-div-head img.feed-icon {
+    width: 16px; height: 16px; vertical-align: middle;
+}
+
 #ds-header-logo-link {
     text-decoration: none;
     cursor: pointer;
@@ -226,7 +230,7 @@ a.discreet {
 #ds-options-wrapper {
     float: right;
     width: 249px;
-    padding-top: 20px;
+    padding-top: 12px;
 }
 
 #ds-options {
@@ -244,7 +248,7 @@ h1.ds-option-set-head,
     border-bottom: 3px solid #87C033;
 }
 h1.ds-option-set-head {
-    margin-top: 20px;
+    margin-top: 5px;
     font-size: 108%;
 }
 .ds-div-head {
@@ -262,6 +266,8 @@ h1.ds-option-set-head {
 .publication-header.ds-static-div {
     border: none;
     padding: 0;
+    margin-top: 0px;
+    background-color: transparent;
     -moz-box-shadow: none;
     -webkit-box-shadow: none;
     box-shadow: none;
