@@ -3266,8 +3266,9 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue_currency">Currency selection is required</message>
     
     <!-- Checkbox options for org_annual_revenue -->
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.less_than_10_million">Less than USD$10 million per year (annual membership fee USD$1000)</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.greater_than_10_million">Greater than USD$10 million per year (annual membership fee USD$5000)</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.less_than_10_million"><span id="msg-less_than_10_million">Less than $10 million per year (annual membership fee US$1000)</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.greater_than_10_million"><span id="msg-greater_than_10_million">Greater than $10 million per year (annual membership fee US$5000)</span></message>
+
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue">Annual revenue is required</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.billing_contact_name.label1">4. Billing contact name<span class="required-mark">*</span></message>
@@ -3283,7 +3284,7 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.publications.label2">One Member benefit is a discount on Payment Plans for qualifying journals published by the Member. Please list journals that your organization publishes. If too many to list here, please send to <a href="mailto:director@datadryad.org">director@datadryad.org</a>.</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.label1">8. Membership term <span class="required-mark">*</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.label2">Membership years run January-December.  Membership may start in 2013 or 2014 and may be selected for multiple years.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.label2">Membership years run January-December.  Membership may start in 2013 or 2014 and may be selected for multiple years.<br/></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.label">Starting January</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.ending_year.label">Ending December</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.2013">2013</message>

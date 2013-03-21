@@ -900,31 +900,20 @@ references to stylesheets pulled directly from the pageMeta element. -->
                         .supposition();
                 });
 
-		
+                /* Home page only */
                 jQuery(document).ready(function() {
                     // main carousel at top of homepage
                     jQuery('#dryad-home-carousel .bxslider').bxSlider({
                         auto: true,
-			autoHover: true,
+                        autoHover: true,
                         pause: 10000,  // in ms
-			speed: 500,   // ms for slide transition
-			mode: 'fade',  // can be 'horizontal', 'vertical', 'fade'
-			controls: false,
+                        speed: 500,   // ms for slide transition
+                        mode: 'fade',  // can be 'horizontal', 'vertical', 'fade'
+                        controls: false,
                         autoControls: false,
                         autoControlsCombine: true
                     });
 
-
-                   // TEMPORARY slider to show Connect alternatives
-            // some objects start hidden, as they make highly visible
-            // "glitches" during page load
-            jQuery('.wordcloud').show();
-            jQuery('#connect-legible-cloud').show();
-            jQuery('#TEMP-connect-alternatives').bxSlider({
-                controls: false,
-                mode: 'vertical'
-                //pagerType: 'short'
-            });
                     // "tabs" in Browse Data
                     var jQuerytabButtons = jQuery('#browse-data-buttons a');
                     jQuerytabButtons.unbind('click').click(function() {
@@ -943,6 +932,74 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     jQuerytabButtons.eq(0).click();
                 });
 
+                /* Membership Form page only */
+                jQuery(document).ready(function() {
+                    var $currencySelector = $('select[name=org_annual_revenue_currency]');
+                    if ($currencySelector.length === 1) {
+                        var revenueThresholdInUSD = 10000000;
+                        var smallOrgFeeInUSD = 1000;
+                        var largeOrgFeeInUSD = 5000;
+                        var openExchange_APP_ID = 'efc17b0a3b5443e3a41b0b50769efc36';
+
+                        // convert the USD amounts to the desired currency, using today's market value
+                        // disable the selector until we have supporting data
+                        $currencySelector.attr('disabled', 'disabled');
+                        var exchangeRates = null;
+                        $.ajax({
+                            url: 'http://openexchangerates.org/api/latest.json?app_id='+ openExchange_APP_ID,
+                            dataType: 'jsonp',
+                            success: function(json) {
+                                exchangeRates = json.rates;
+                                console.log(exchangeRates);
+                                // enable the currency selector
+                                $currencySelector.removeAttr('disabled');
+                                // show initial values in USD (don't rely on i18n-message text!)
+                                showPreferredCurrency('USD');
+                            }
+                        });
+
+                        function showPreferredCurrency(currencyCode) {
+                            // EXAMPLE: showPreferredCurrency('GBP');
+                            var sign = getCurrencySign(currencyCode);
+                            var rate = exchangeRates[ currencyCode ];
+                            // apply exchange rate to all key amounts
+                            var revenueThreshold = rate * revenueThresholdInUSD;
+                            var smallOrgFee = rate * smallOrgFeeInUSD;
+                            var largeOrgFee = rate * largeOrgFeeInUSD;
+                            // build and show display strings in the new currency
+                            var msgLessThan = 'Less than {SIGN}{THRESHOLD} per year (annual membership fee {SIGN}{SMALL_ORG_FEE})'
+                                .replace('{SIGN}', sign, 'g')
+                                .replace('{THRESHOLD}', revenueThreshold)
+                                .replace('{SMALL_ORG_FEE}', smallOrgFee);
+                            $('#msg-less_than_10_million').html( msgLessThan );
+                            var msgGreaterThan = 'Greater than {SIGN}{THRESHOLD} per year (annual membership fee {SIGN}{LARGE_ORG_FEE})'
+                                .replace('{SIGN}', sign, 'g')
+                                .replace('{THRESHOLD}', revenueThreshold)
+                                .replace('{LARGE_ORG_FEE}', smallOrgFee);
+                            $('#msg-greater_than_10_million').html( msgGreaterThan );
+                        }
+
+                        function getCurrencySign(currencyCode) {
+                            // find appropriate currency sign ($, etc)
+                            switch(currencyCode) {
+                                case 'USD': return 'USD$';
+                                case 'GBP': return '£';
+                                case 'CAD': return 'CAD$';
+                                case 'EUR': return '€';
+                                case 'AUD': return 'AUD$';
+                                case 'JPY': return '¥';
+                                default: return '?';    
+                            }
+                        }
+
+                        jQuery(document).ready(function() {
+                            // choosing a currency should modify the displayed org-revenue threshold and fees
+                            $currencySelector.unbind('change').change(function() {
+                                showPreferredCurrency( $(this).val() );
+                            });
+                        });
+                    }
+                });
 
            </xsl:text>
             </script>
