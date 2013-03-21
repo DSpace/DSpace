@@ -294,7 +294,7 @@
                 <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be a part of Dryad
                 </h1>
 
-                <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 490px;">
+                <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 490px; font-size: 14px;">
                     <div id="connect-illustrated-prose">
                         <p>
                             <img src="/themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" />
@@ -545,11 +545,9 @@
     <xsl:template match="dri:options/dri:list[@n='DryadConnect']" priority="3">
 
         <!-- START CONNECT  -->
-        <div class="home-col-2">
-            <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be a part of Dryad
-            </h1>
-
-            <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 490px;">
+        <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be a part of Dryad
+        </h1>
+        <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 600px; font-size: 14px;">
                 <div id="connect-illustrated-prose">
                     <p>
                         <img src="/themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" />
