@@ -166,6 +166,7 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         }
 
         Radio orgAnnualRevenueRadios = orgAnnualRevenue.addRadio("org_annual_revenue");
+	orgAnnualRevenueRadios.setHelp("Note: the values below do not yet reflect the currency chosen -- this is coming soon!");
         orgAnnualRevenueRadios.addOption("less_than_10_million", message(message_prefix + "fields.org_annual_revenue.less_than_10_million"));
         orgAnnualRevenueRadios.addOption("greater_than_10_million", message(message_prefix + "fields.org_annual_revenue.greater_than_10_million"));
         orgAnnualRevenueRadios.setRequired();
