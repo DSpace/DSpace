@@ -378,7 +378,6 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
                 <div id="main-menu">
                     <ul class="sf-menu">
-                        <!-- hide "newby" menus from admin user (to avoid crowding) -->
                         <li>
                             <a href="">About</a>
                             <ul>
