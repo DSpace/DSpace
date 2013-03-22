@@ -52,7 +52,7 @@ public class DOIIdentifierProvider
     private static final Logger log = LoggerFactory.getLogger(DOIIdentifierProvider.class);
     
     static final String CFG_PREFIX = "identifier.doi.prefix";
-    static final String CFG_NAMESPACESEPARATOR = "identifier.doi.namespaceseparator";
+    static final String CFG_NAMESPACE_SEPARATOR = "identifier.doi.namespaceseparator";
         
     // Metadata field name elements
     // TODO: move these to MetadataSchema or some such?
@@ -63,7 +63,7 @@ public class DOIIdentifierProvider
     /**
      * Prefix of DOI namespace. Set in dspace.cfg.
      */
-    protected String PREFIX;
+    private String PREFIX;
     
     /**
      * Part of DOI to separate several applications that generate DOIs. F.e. it
@@ -71,7 +71,36 @@ public class DOIIdentifierProvider
      * prefix/dspace/uniqueString. Set it to the empty String if DSpace should
      * generate DOIs directly after the DOI Prefix. Set in dspace.cfg.
      */
-    protected String NAMESPACE_SEPARATOR;
+    private String NAMESPACE_SEPARATOR;
+    
+    protected String getPrefix()
+    {
+        if (null == this.PREFIX)
+        {
+            this.PREFIX = this.configurationService.getProperty(CFG_PREFIX);
+            if (null == this.PREFIX)
+            {
+                throw new RuntimeException("Unable to load DOI prefix from "
+                        + "configuration. Cannot find property " +
+                        CFG_PREFIX + ".");
+            }
+        }
+        return this.PREFIX;
+    }
+    
+    protected String getNamespaceSeparator()
+    {
+        if (null == this.NAMESPACE_SEPARATOR)
+        {
+            this.NAMESPACE_SEPARATOR = this.configurationService.getProperty(CFG_NAMESPACE_SEPARATOR);
+            if (null == this.NAMESPACE_SEPARATOR)
+            {
+                this.NAMESPACE_SEPARATOR = "";
+            }
+        }
+        return this.NAMESPACE_SEPARATOR;
+    }
+
     
     private DOIConnector connector;
     
@@ -596,12 +625,13 @@ public class DOIIdentifierProvider
         if (null != doi)
         {
             doi = doi.substring(DOI.SCHEME.length());
-            if (!doi.startsWith(PREFIX + "/"))
+            if (!doi.startsWith(this.getPrefix() + "/"))
                 throw new IdentifierException("Trying to create a DOI " +
                         "that's not part of our Namespace!");
         }
         else
-            doi = PREFIX + "/" + NAMESPACE_SEPARATOR + doiRow.getIntColumn("doi_id");
+            doi = this.getPrefix() + "/" + this.getNamespaceSeparator() + 
+                    doiRow.getIntColumn("doi_id");
         
         doiRow.setColumn("doi", doi);
         doiRow.setColumn("resource_type_id", dso.getType());
