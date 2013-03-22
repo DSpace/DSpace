@@ -386,19 +386,21 @@ p {
 
 #aspect_eperson_PasswordLogin_div_register, #aspect_eperson_PasswordLogin_div_login {
     padding: 10px;
-    width: auto;
-    float: left;
+    width: 300px;
 } 
 
 #aspect_eperson_PasswordLogin_div_register h1, #aspect_eperson_PasswordLogin_div_login h1 {
-    font-size: 150%;
+    font-size: 130%;
+    text-align: center;
 }
 
 #aspect_eperson_PasswordLogin_div_login {
     margin: 20px 0px 40px 18px; /* top right bottom left */
+    float: right;
 }
 #aspect_eperson_PasswordLogin_div_register {
     margin: 20px 18px 20px 0px;
+    float: left;
 }
 
 #aspect_eperson_EditProfile_list_form,
