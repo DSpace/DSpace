@@ -531,7 +531,6 @@ ul.ds-progress-list li.disabled input.ds-button-field
     cursor: auto;
 }
 
-
 ul.ds-progress-list li.arrow {
     border: none;
     background: none;
@@ -1675,7 +1674,7 @@ table.package-file-description td {
     -moz-border-radius-bottomright: 8px;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
-
+}
 #aspect_discovery_SimpleSearch_div_search-results p{
     margin-top:10px;
 }
