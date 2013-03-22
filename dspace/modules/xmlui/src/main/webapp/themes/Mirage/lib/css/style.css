@@ -1334,6 +1334,7 @@ a.learn-to-submit-button {
 #login-item, #sign-up-item {
     margin-top: 0.35em;
     margin-left: 8px;
+    overflow: hidden;
 }
 #login-item {
     background-color: #40841c;
@@ -1352,6 +1353,20 @@ a.learn-to-submit-button {
 #login-item a, #sign-up-item a {
     font-size: 0.6em;
     padding: 0.6em 0.8em;
+}
+#login-item a:hover, #sign-up-item a:hover {
+    -webkit-border-top-left-radius: 0px;
+    -webkit-border-top-right-radius: 0px;
+    -moz-border-radius-topleft: 0px;
+    -moz-border-radius-topright: 0px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    -webkit-border-bottom-left-radius: 0px;
+    -webkit-border-bottom-right-radius: 0px;
+    -moz-border-radius-bottomleft: 0px;
+    -moz-border-radius-bottomright: 0px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
 }
 a.submitnowbutton {
     background-color: #424242;
