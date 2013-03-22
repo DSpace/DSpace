@@ -819,8 +819,9 @@ li.ds-form-item label.ds-composite-component.last{
 .pagination,
 .pagination-masked {
     padding: 7px;
-    background-color: #fafafa;
-    border: 1px solid #ccc;
+    padding-bottom: 15px;
+    background-color: #fff;
+    border: none;
     line-height: 1em;
     vertical-align:middle;
 }
@@ -908,7 +909,11 @@ li.ds-form-item label.ds-composite-component.last{
 }
 
 .artifact-title {
-    font-size: 123.1%;
+    font-size: 100%;
+}
+
+.italics {
+    font-style: italic;
 }
 
 .result-query,
@@ -1536,6 +1541,13 @@ img.ds-authority-confidence
     background-color: rgb(238, 238, 238);
     /* padding: 3px;*/
     padding: .25em;
+    padding-top: .5em;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 
 #searchTabs li a {
@@ -1549,10 +1561,23 @@ img.ds-authority-confidence
     padding-bottom: .5em;
 }
 
+#aspect_discovery_SimpleSearch_div_search label.ds-form-label {
+    padding: 0px;
+}
+#aspect_discovery_SimpleSearch_div_search fieldset.ds-form-list {
+    border: none;
+    /* border-bottom: 1px dotted #ccc; */
+}
+
+#aspect_discovery_SimpleSearch_div_search-results {
+    margin-bottom: 4px;
+}
+
 #aspect_discovery_SimpleSearch_div_search-results ul.ds-artifact-list {
     border: 1px solid gray;
     list-style-type: none;
     margin-top:3px;
+    margin-top: 0;
 }
 
 #aspect_submission_StepTransformer_item_license_accepted{
