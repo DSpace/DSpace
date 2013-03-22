@@ -1339,18 +1339,6 @@ a.learn-to-submit-button {
 #sign-up-item:hover, #sign-up-item a:hover,
 #login-item:hover, #login-item a:hover {
     background-color: #424242;
-    -webkit-border-top-left-radius: 0;
-    -webkit-border-top-right-radius: 0;
-    -moz-border-radius-topleft: 0;
-    -moz-border-radius-topright: 0;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    -webkit-border-bottom-left-radius: 0;
-    -webkit-border-bottom-right-radius: 0;
-    -moz-border-radius-bottomleft: 0;
-    -moz-border-radius-bottomright: 0;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
 }
 #sign-up-item {
     background-color: #ccc;
