@@ -28,7 +28,9 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
@@ -39,8 +41,11 @@ import org.dspace.services.ConfigurationService;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.Namespace;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -209,7 +214,7 @@ implements DOIConnector
         
         this.xwalk = (DisseminationCrosswalk) PluginManager.getNamedPlugin(
                 DisseminationCrosswalk.class, this.CROSSWALK_NAME);
-        // FIXME handle the case if the crosswalk can't be found
+        
         if (this.xwalk == null)
         {
             throw new IllegalStateException("Can't find crosswalk '"
@@ -575,16 +580,121 @@ implements DOIConnector
         return false;
     }
 
-    // TODO
     public boolean reserveDOI(Context context, DSpaceObject dso, String doi)
+            throws IdentifierException
     {
+        this.perpareXwalk();
+        
+        if (!this.xwalk.canDisseminate(dso))
+        {
+            log.error("Crosswalk " + this.CROSSWALK_NAME 
+                    + " cannot disseminate DSO wiht type " + dso.getType() 
+                    + " and ID " + dso.getID() + ". Giving up to reserve DOI "
+                    + doi + ".");
+            log.warn("Please fix the crosswalk " + this.CROSSWALK_NAME + ".");
+            return false;
+        }
+        
+        Element root = null;
+        try
+        {
+            root = xwalk.disseminateElement(dso);
+        }
+        catch (AuthorizeException ae)
+        {
+            log.error("Caught an Authorize Exception while disseminating DSO "
+                    + "with type " + dso.getType() + " and ID " + dso.getID()
+                    + ". Giving up to reserve DOI " + doi + ".");
+            log.warn("AuthorizeExceptionMessage: " + ae.getMessage());
+            return false;
+        }
+        catch (CrosswalkException ce)
+        {
+            log.error("Caught an CrosswalkException while reserving a DOI ("
+                    + doi + ") for DSO with type " + dso.getType() + " and ID " 
+                    + dso.getID() + ". Won't reserve the doi.");
+            log.warn("Please fix the Crosswalk " + this.CROSSWALK_NAME + "!");
+            return false;
+        }
+        catch (IOException ioe)
+        {
+            throw new RuntimeException(ioe);
+        }
+        catch (SQLException se)
+        {
+            throw new RuntimeException(se);
+        }
+        
+        String metadataDOI = extractDOI(root);
+        if (null == metadataDOI)
+        {
+            root = addDOI(doi, root);
+        }
+        else if (metadataDOI != doi)
+        {
+            throw new IdentifierException("DSO with type " + dso.getTypeText()
+                    + " and id " + dso.getID() + " already has DOI "
+                    + metadataDOI + ". Won't reserver DOI " + doi + " for it.");
+        }
+        
         // send metadata as post to mds/metadata
-        // 400 -> invalid XML
-        // 401 -> no login
-        // 403 -> wrong credentials or datasets belong to another party
-        // 201 -> created / ok
-        // 500 -> try again later / internal server error
-        return false;
+        DataCiteResponse resp = this.sendMetadataPostRequest(doi, root);
+        
+        switch (resp.getStatusCode())
+        {
+            // 201 -> created / ok
+            case (201) :
+            {
+                return true;
+            }
+            // 400 -> invalid XML
+            case (400) :
+            {
+                log.warn("Either we send invalid xml metadata, tried to reserve "
+                        + " a DOI for a wrong domain or prefix.");
+                log.warn("DataCite Metadata API returned a http status code "
+                        +"400: " + resp.getContent());
+                Format format = Format.getCompactFormat();
+                format.setEncoding("UTF-8");
+                XMLOutputter xout = new XMLOutputter(format);
+                log.info("We send the following XML:\n" + xout.outputString(root));
+                throw new IdentifierException("Unable to reserve DOI " + doi 
+                        + ". Please inform your administrator or take a look "
+                        +" into the log files.");
+            }
+            // we get a 401 if we forgot to send credentials or if the username
+            // and password did not match.
+            case (401) :
+            {
+                log.info("We were unable to authenticate against the DOI ({}) registry agency. It told us: {}", doi, resp.getContent());
+                throw new IllegalArgumentException("Cannot authenticate at the DOI registry agency. Please check if username and password are correctly set.");
+            }
+            // We get a 403 Forbidden if we are checking a DOI that belongs to
+            // another party or if there is a login problem.
+            case (403) :
+            {
+                log.info("Checking if DOI {} is registered was prohibeted by the registration agency: {}.", doi, resp.getContent());
+                throw new IdentifierException("Checking if a DOI is registered is only possible for DOIs that belongs to us.");
+            }
+            // 500 is documented and signals an internal server error
+            case (500) :
+            {
+                log.warn("Caught an http status code while reserving DOI " + doi
+                        +". Message was: " + resp.getContent());
+                throw new RuntimeException("DataCite API has an internal error. "
+                        + "It is temporaribly impossible to reserve DOIs. "
+                        + "Further information can be found in DSpace log file.");
+            }
+            // Catch all other http status code in case we forgot one.
+            default :
+            {
+                log.warn("While reserving the DOI {}, we got a http status code "
+                        + "{} and the message \"{}\".", new String[]
+                        {doi, Integer.toString(resp.statusCode), resp.getContent()});
+                throw new IllegalStateException("Unable to parse an anwser from "
+                        + "DataCite API. Please have a look into DSpace logs.");
+            }
+        }
     }
     
     // TODO
@@ -714,6 +824,20 @@ implements DOIConnector
         return sendHttpRequest(httpget);
     }
     
+    private DataCiteResponse sendMetadataPostRequest(String doi, Element metadataRoot) {
+        Format format = Format.getCompactFormat();
+        format.setEncoding("UTF-8");
+        XMLOutputter xout = new XMLOutputter(format);
+        return sendMetadataPostRequest(doi, xout.outputString(new Document(metadataRoot)));
+    }
+    
+    private DataCiteResponse sendMetadataPostRequest(String doi, Document metadata) {
+        Format format = Format.getCompactFormat();
+        format.setEncoding("UTF-8");
+        XMLOutputter xout = new XMLOutputter(format);
+        return sendMetadataPostRequest(doi, xout.outputString(metadata));
+    }
+    
     private DataCiteResponse sendMetadataPostRequest(String doi, String metadata)
     {
         // post mds/metadata/
@@ -831,7 +955,7 @@ implements DOIConnector
         }
         
         String handle = null;
-        // TODO: add Namespace
+        // TODO: add Namespace?
         Iterator<Element> it = doc.getDescendants(new ElementFilter("alternativeIdentifier"));
         while (handle == null && it.hasNext())
         {
@@ -850,6 +974,22 @@ implements DOIConnector
         return handle;
     }
     
+    private String extractDOI(Element root) {
+        Element doi = root.getChild("identifier");
+        return (null == doi) ? null : doi.getTextTrim();
+    }
+
+    private Element addDOI(String doi, Element root) {
+        if (null != extractDOI(root))
+        {
+            return root;
+        }
+        Element identifier = new Element("identifier", "http://datacite.org/schema/kernel-2.2");
+        identifier.setAttribute("identifierType", "DOI");
+        identifier.addContent(doi.substring(DOI.SCHEME.length()));
+        return root.addContent(0, identifier);
+    }
+
     private class DataCiteResponse
     {
         private final int statusCode;
