@@ -1819,6 +1819,7 @@ a.learn-to-submit-button,
 a.learn-to-submit-button-option {
     background-color: #87c033;
     border: 1px solid #555;
+    padding: 0.3em 0.5em 0.2em;
     color: #472D2E;
     text-decoration: none;
     margin-top: 0.2em;
