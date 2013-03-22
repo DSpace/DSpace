@@ -559,10 +559,6 @@
                   id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary"
                   action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
                 <p class="ds-paragraph">
-                    <p>
-                        <label class="ds-form-label" for="aspect_discovery_SiteViewer_field_query">Search for data in Dryad:
-                        </label>
-                    </p>
                     <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                            id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
                            type="text" value=""/><!-- no whitespace between these!
