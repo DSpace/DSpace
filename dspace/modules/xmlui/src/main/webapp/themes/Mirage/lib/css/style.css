@@ -301,7 +301,7 @@ div.ds-option-set {
     -moz-border-radius-bottomright: 8px;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
-    border: 1px solid #ccc;
+    border: 1px solid #aaa;
     -moz-box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
     -webkit-box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
     box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
@@ -422,7 +422,7 @@ p {
     -moz-border-radius-bottomright: 8px;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
-    border: 1px solid #ccc;
+    border: 1px solid #aaa;
     -moz-box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
     -webkit-box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
     box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
@@ -530,7 +530,6 @@ ul.ds-progress-list li.disabled input.ds-button-field
     zoom: 1;
     cursor: auto;
 }
-
 
 ul.ds-progress-list li.arrow {
     border: none;
@@ -1675,7 +1674,7 @@ table.package-file-description td {
     -moz-border-radius-bottomright: 8px;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
-
+}
 #aspect_discovery_SimpleSearch_div_search-results p{
     margin-top:10px;
 }
@@ -1819,6 +1818,7 @@ a.learn-to-submit-button,
 a.learn-to-submit-button-option {
     background-color: #87c033;
     border: 1px solid #555;
+    padding: 0.3em 0.5em 0.2em;
     color: #472D2E;
     text-decoration: none;
     margin-top: 0.2em;
