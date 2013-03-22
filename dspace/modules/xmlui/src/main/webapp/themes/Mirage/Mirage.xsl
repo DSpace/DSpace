@@ -418,51 +418,8 @@
                     <h1 class="ds-div-head">Stats</h1>
                     <div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                          id="aspect_statistics_StatisticsTransformer_div_stats" class="ds-static-div secondary stats">
-                        <table xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
-                               id="aspect_statistics_StatisticsTransformer_table_list-table"
-                               class="ds-table tableWithTitle">
-                            <tr xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
-                                class="ds-table-row even">
-                                <td id="aspect_statistics_StatisticsTransformer_cell_01"
-                                    class="ds-table-cell odd labelcell">Total data packages
-                                </td>
-                                <td id="aspect_statistics_StatisticsTransformer_cell_02"
-                                    class="ds-table-cell even datacell">2886
-                                </td>
-                            </tr>
-                            <tr class="ds-table-row odd">
-                                <td id="aspect_statistics_StatisticsTransformer_cell_11"
-                                    class="ds-table-cell odd labelcell">Total data files
-                                </td>
-                                <td id="aspect_statistics_StatisticsTransformer_cell_12"
-                                    class="ds-table-cell even datacell">8197
-                                </td>
-                            </tr>
-                            <tr class="ds-table-row even">
-                                <td id="aspect_statistics_StatisticsTransformer_cell_21"
-                                    class="ds-table-cell odd labelcell">Journals represented
-                                </td>
-                                <td id="aspect_statistics_StatisticsTransformer_cell_22"
-                                    class="ds-table-cell even datacell">202
-                                </td>
-                            </tr>
-                            <tr class="ds-table-row odd">
-                                <td id="aspect_statistics_StatisticsTransformer_cell_31"
-                                    class="ds-table-cell odd labelcell">Total unique authors
-                                </td>
-                                <td id="aspect_statistics_StatisticsTransformer_cell_32"
-                                    class="ds-table-cell even datacell">11,125
-                                </td>
-                            </tr>
-                            <tr class="ds-table-row even">
-                                <td id="aspect_statistics_StatisticsTransformer_cell_41"
-                                    class="ds-table-cell odd labelcell">Total file downloads
-                                </td>
-                                <td id="aspect_statistics_StatisticsTransformer_cell_42"
-                                    class="ds-table-cell even datacell">74,567
-                                </td>
-                            </tr>
-                        </table>
+                        <!--remove old static information and add real data-->
+                        <xsl:apply-templates select="/dri:document/dri:body/dri:div[@n='front-page-stats']"/>
                     </div>
                 </div>
             </div>

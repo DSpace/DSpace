@@ -31,16 +31,25 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchUtils;
 import org.dspace.handle.HandleManager;
+import org.dspace.statistics.content.DatasetDSpaceObjectGenerator;
+import org.dspace.statistics.content.StatisticsDataVisits;
+import org.dspace.statistics.content.StatisticsListing;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -54,12 +63,21 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
 
 
     private static final String PUB_SEARCH = "/select/?q=DSpaceStatus:Archived&facet=on&rows=0&facet.field=prism.publicationName_filter&fq=location:l2&facet.limit=-1";
-
+    private static final String AUTH_SEARCH = "/select/?q=DSpaceStatus:Archived&facet=on&rows=0&facet.field=dc.contributor.author_filter&fq=location:l2&facet.limit=-1";
+    private static final String DOWN_SEARCH = "/select/?q=*%3A*&facet=on&rows=0&facet.limit=-1&facet.field=type";
 
     private static final String PUB_COUNTER = "count(//lst[@name='prism.publicationName_filter']/int[.!='0'])";
-
+    private static final String AUTH_COUNTER = "count(//lst[@name='dc.contributor.author_filter']/int[.!='0'])";
+    private static final String DOWN_COUNTER = "//lst[@name='type']/int[@name='"+Constants.BITSTREAM+"']";
 
     private SourceValidity validity;
+
+    protected QueryResponse queryResults;
+
+    /**
+     * Cached query arguments
+     */
+    protected SolrQuery queryArgs;
 
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException {
@@ -68,6 +86,9 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
         long dataPackageCount = 0;
         long dataFileCount = 0;
         int journalCount = 0;
+
+        long uniqAuthors=0;
+        long totalFileDownload=0;
 
         try {
             dataFileCount = ((Collection) HandleManager.resolveToObject(
@@ -123,14 +144,136 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
             LOGGER.error(details.getMessage(), details);
         }
 
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            GetMethod get = new GetMethod(solr + AUTH_SEARCH);
 
 
-        Object[] params = new String[] {
-                SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM)
-                        .format(new Date()),
-                Long.toString(dataPackageCount),
-                Long.toString(dataFileCount), Integer.toString(journalCount) };
-        overviewStats.addPara(STATS_TEXT.parameterize(params));
+            switch (new HttpClient().executeMethod(get)) {
+                case 200:
+                case 201:
+                case 202:
+                    Document doc = db.parse(get.getResponseBodyAsStream());
+                    doc.getDocumentElement().normalize();
+
+                    // xmlToString(doc);
+
+
+                    XPathFactory xpf = XPathFactory.newInstance();
+                    XPath xpath = xpf.newXPath();
+                    String xpathResult = xpath.evaluate(AUTH_COUNTER, doc);
+
+                    uniqAuthors = Integer.parseInt(xpathResult);
+                    break;
+                default:
+                    LOGGER.error("Solr search failed to respond as expected");
+            }
+
+            get.releaseConnection();
+        }
+        catch (ParserConfigurationException details) {
+            LOGGER.error(details.getMessage(), details);
+        }
+        catch (XPathExpressionException details) {
+            LOGGER.error(details.getMessage(), details);
+        }
+
+
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            GetMethod get = new GetMethod(solr + PUB_SEARCH);
+
+
+            switch (new HttpClient().executeMethod(get)) {
+                case 200:
+                case 201:
+                case 202:
+                    Document doc = db.parse(get.getResponseBodyAsStream());
+                    doc.getDocumentElement().normalize();
+
+                    // xmlToString(doc);
+
+
+                    XPathFactory xpf = XPathFactory.newInstance();
+                    XPath xpath = xpf.newXPath();
+                    String xpathResult = xpath.evaluate(PUB_COUNTER, doc);
+
+                    journalCount = Integer.parseInt(xpathResult);
+                    break;
+                default:
+                    LOGGER.error("Solr search failed to respond as expected");
+            }
+
+            get.releaseConnection();
+        }
+        catch (ParserConfigurationException details) {
+            LOGGER.error(details.getMessage(), details);
+        }
+        catch (XPathExpressionException details) {
+            LOGGER.error(details.getMessage(), details);
+        }
+
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            GetMethod get = new GetMethod(solr.replace("search","statistics") + DOWN_SEARCH);
+
+
+            switch (new HttpClient().executeMethod(get)) {
+                case 200:
+                case 201:
+                case 202:
+                    Document doc = db.parse(get.getResponseBodyAsStream());
+                    doc.getDocumentElement().normalize();
+
+                    // xmlToString(doc);
+
+
+                    XPathFactory xpf = XPathFactory.newInstance();
+                    XPath xpath = xpf.newXPath();
+                    String xpathResult = xpath.evaluate(DOWN_COUNTER, doc);
+
+                    totalFileDownload = Integer.parseInt(xpathResult);
+                    break;
+                default:
+                    LOGGER.error("Solr search failed to respond as expected");
+            }
+
+            get.releaseConnection();
+        }
+        catch (ParserConfigurationException details) {
+            LOGGER.error(details.getMessage(), details);
+        }
+        catch (XPathExpressionException details) {
+            LOGGER.error(details.getMessage(), details);
+        }
+
+        org.dspace.app.xmlui.wing.element.Table infoTable= overviewStats.addTable("list-table",5,2);
+
+        String value = Long.toString(dataPackageCount) ;
+
+        Row row = infoTable.addRow();
+        row.addCell("data").addContent("Total data packages");
+        row.addCell("data").addContent(Long.toString(dataPackageCount));
+
+        row = infoTable.addRow();
+        row.addCell("data").addContent("Total data files");
+        row.addCell("data").addContent(Long.toString(dataFileCount));
+
+        row = infoTable.addRow();
+        row.addCell("data").addContent("Journals represented");
+        row.addCell("data").addContent(Integer.toString(journalCount) );
+
+        row = infoTable.addRow();
+        row.addCell("data").addContent("Total unique authors");
+        row.addCell("data").addContent(Long.toString(uniqAuthors));
+
+        row = infoTable.addRow();
+        row.addCell("data").addContent("Total file downloads");
+        row.addCell("data").addContent(Long.toString(totalFileDownload));
+
     }
 
     //	@Override
