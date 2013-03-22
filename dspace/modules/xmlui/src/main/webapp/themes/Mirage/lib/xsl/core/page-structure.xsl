@@ -619,9 +619,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 <div id="ds-footer-left">
                     <i18n:text>xmlui.dri2xhtml.structural.footer-powered-by</i18n:text>
                     <xsl:text> </xsl:text>
-                    <a href="http://creativecommons.org/" target="_blank"><img class="powered-by" src="/themes/Mirage/images/powered-by-cc.png" alt="Creative Commons" /></a>
+                    <a class="single-image-link" href="http://creativecommons.org/" target="_blank"><img class="powered-by" src="/themes/Mirage/images/powered-by-cc.png" alt="Creative Commons" /></a>
                     <xsl:text> &#160;</xsl:text>
-                    <a href="http://www.dspace.org/" target="_blank"><img class="powered-by" src="/themes/Mirage/images/powered-by-dspace.png" alt="DSpace" /></a>
+                    <a class="single-image-link" href="http://www.dspace.org/" target="_blank"><img class="powered-by" src="/themes/Mirage/images/powered-by-dspace.png" alt="DSpace" /></a>
                 </div>
 
                 <div id="ds-footer-right" style="margin-top: 11px;">

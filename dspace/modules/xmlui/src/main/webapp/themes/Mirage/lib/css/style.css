@@ -408,6 +408,31 @@ p {
 .administrative fieldset.ds-form-list {
     margin-bottom: 25px;
 }
+.submission fieldset.ds-form-list {
+    border: none;
+}
+#status_other_than_published,
+#aspect_submission_StepTransformer_list_doi > table {
+    border: 1px solid #ccc;
+    float: right;
+    display: inline-block;
+    margin-top: -72px;
+    padding: 10px;
+    width: 500px;
+    position: relative;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-bottomright: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
 
 .primary {
     margin-top: 8px;
@@ -1881,4 +1906,9 @@ a.learn-to-submit-button-option {
     color: white;
     padding: 2px 5px;
 
+}
+
+/* eliminate whitespace (visible underlining) when a link wraps a single image */
+a.single-image-link {
+    display: inline-block;
 }
