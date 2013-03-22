@@ -874,10 +874,13 @@ li.ds-form-item label.ds-composite-component.last{
     text-indent: -20px;
 }
 
-.ds-artifact-item.doi-item a {
+.ds-artifact-item a {
       text-decoration: none;
 }
-.ds-artifact-item.doi-item a span.doi {
+.ds-artifact-item a span.doi {
+      text-decoration: underline;
+}
+.ds-artifact-item a:hover {
       text-decoration: underline;
 }
 
