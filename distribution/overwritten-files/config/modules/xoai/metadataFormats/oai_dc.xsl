@@ -52,9 +52,9 @@
 				<dc:title>
 					<xsl:value-of select="." />
 					<xsl:if test="position() = 1">
-						<xsl:if test="../../../../doc:element[@name='sedici']/doc:element[@name='title']/doc:element[@name='subtitle']/doc:field[@name='value']">
+						<xsl:if test="../../../../doc:element[@name='sedici']/doc:element[@name='title']/doc:element[@name='subtitle']/doc:element/doc:field[@name='value']">
 							<xsl:text> : </xsl:text>
-							<xsl:value-of select="../../../../doc:element[@name='sedici']/doc:element[@name='title']/doc:element[@name='subtitle']/doc:field[@name='value']" />
+							<xsl:value-of select="../../../../doc:element[@name='sedici']/doc:element[@name='title']/doc:element[@name='subtitle']/doc:element/doc:field[@name='value']" />
 						</xsl:if>
 					</xsl:if>
 				</dc:title>
