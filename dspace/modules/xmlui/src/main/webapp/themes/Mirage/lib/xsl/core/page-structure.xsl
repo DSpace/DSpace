@@ -881,8 +881,8 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     jQuery('#main-menu ul.sf-menu')
                         .supersubs({
                             // all numeric properties are in em
-                            minWidth: 10,
-                            maxWidth: 20,
+                            minWidth: 12,
+                            maxWidth: 24,
                             extraWidth: 1
                         })
                         .superfish({
