@@ -301,7 +301,7 @@ div.ds-option-set {
     -moz-border-radius-bottomright: 8px;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
-    border: 1px solid #ccc;
+    border: 1px solid #aaa;
     -moz-box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
     -webkit-box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
     box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
@@ -422,7 +422,7 @@ p {
     -moz-border-radius-bottomright: 8px;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
-    border: 1px solid #ccc;
+    border: 1px solid #aaa;
     -moz-box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
     -webkit-box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
     box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
