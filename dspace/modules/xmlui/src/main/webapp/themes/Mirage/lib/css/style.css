@@ -1842,7 +1842,7 @@ fieldset.ds-checkbox-field label,fieldset.ds-radio-field label {
 }
 /* Sub sections within a form */
 fieldset.ds-form-list {
-    border: 2px solid gray;
+    border: none;
     padding: 0;
     margin-left: 0;
     margin-right: 0;
