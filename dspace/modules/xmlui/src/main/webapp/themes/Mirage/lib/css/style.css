@@ -395,11 +395,11 @@ p {
 }
 
 #aspect_eperson_PasswordLogin_div_login {
-    margin: 20px 0px 40px 18px; /* top right bottom left */
+    margin: 20px 0px 40px; /* top right bottom left */
     float: right;
 }
 #aspect_eperson_PasswordLogin_div_register {
-    margin: 20px 18px 20px 0px;
+    margin: 20px 0px;
     float: left;
 }
 
