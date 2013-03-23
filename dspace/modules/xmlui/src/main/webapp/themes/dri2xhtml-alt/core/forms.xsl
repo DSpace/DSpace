@@ -778,17 +778,31 @@
                         <xsl:apply-templates select="dri:label" mode="compositeComponent"/>
                     </xsl:if>
                 </xsl:when>
+		<xsl:when test="@rend='label-at-left'">
+		  <!-- render the label text before the component -->
+		  <label class="ds-composite-component">
+		    <xsl:if test="position()=last()">
+		      <xsl:attribute name="class">ds-composite-component last</xsl:attribute>
+		    </xsl:if>
+		    <xsl:if test="dri:label">
+		      <br/>
+		      <xsl:apply-templates select="dri:label" mode="compositeComponent"/>
+		    </xsl:if>
+		    <xsl:apply-templates select="." mode="normalField"/>
+		  </label>
+		</xsl:when>
                 <xsl:otherwise>
-                        <label class="ds-composite-component">
-                            <xsl:if test="position()=last()">
-                                <xsl:attribute name="class">ds-composite-component last</xsl:attribute>
-                            </xsl:if>
-                            <xsl:apply-templates select="." mode="normalField"/>
-                            <xsl:if test="dri:label">
-                                <br/>
-                                <xsl:apply-templates select="dri:label" mode="compositeComponent"/>
-                            </xsl:if>
-                        </label>
+		  <!-- render the label text after/below the component -->
+		  <label class="ds-composite-component">
+		    <xsl:if test="position()=last()">
+		      <xsl:attribute name="class">ds-composite-component last</xsl:attribute>
+		    </xsl:if>
+		    <xsl:apply-templates select="." mode="normalField"/>
+		    <xsl:if test="dri:label">
+		      <br/>
+		      <xsl:apply-templates select="dri:label" mode="compositeComponent"/>
+		    </xsl:if>
+		  </label>
                 </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
