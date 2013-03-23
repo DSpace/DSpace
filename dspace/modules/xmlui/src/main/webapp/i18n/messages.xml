@@ -580,14 +580,14 @@
 	<!-- org.dspace.app.xmlui.eperson.PasswordLogin.java -->
 	<message key="xmlui.EPerson.PasswordLogin.title">Sign in to Dryad</message>
 	<message key="xmlui.EPerson.PasswordLogin.trail">Sign in to Dryad</message>
-	<message key="xmlui.EPerson.PasswordLogin.head1">I do not have a Dryad account<br/>&#160;&#160;and would like to create one</message>
+	<message key="xmlui.EPerson.PasswordLogin.head1">I do not have a Dryad account<br/>and would like to create one</message>
 	<message key="xmlui.EPerson.PasswordLogin.email_address"><nobr>E-Mail Address: </nobr></message>
 	<message key="xmlui.EPerson.PasswordLogin.error_bad_login">The email address and/or password
 		supplied were not valid.</message>
 	<message key="xmlui.EPerson.PasswordLogin.password">Password: </message>
 	<message key="xmlui.EPerson.PasswordLogin.forgot_link"> Forgot your password?</message>
 	<message key="xmlui.EPerson.PasswordLogin.submit">Sign in</message>
-	<message key="xmlui.EPerson.PasswordLogin.head2">I have a Dryad account<br/>&#160;&#160;and would like to login</message>
+	<message key="xmlui.EPerson.PasswordLogin.head2">I have a Dryad account<br/>and would like to login</message>
 	<message key="xmlui.EPerson.PasswordLogin.para1">Create an account to deposit data and/or
 	subscribe to email updates.</message>
 	<message key="xmlui.EPerson.PasswordLogin.submitReg">Register</message>
@@ -2844,10 +2844,10 @@
 	<message key="xmlui.submit.select.pub.form.error">Please fill in a valid data package
 		identifier</message>
 	<message key="xmlui.submit.select.pub.form.license">&#160;I understand that by submitting data to Dryad,
-		I am agreeing to release it under the terms of the <div id="cc-label"><a
+		I am agreeing to release it under the terms of the <div id="cc-label" style="display: inline;"><a
 			href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank">Creative Commons Zero
 			(CC0)</a> waiver. All authors of the data have agreed to the terms of this waiver. <a href="/depositing#whycc0" target="_blank">Why does Dryad require CC0?</a>
-			&#160;&#160;&#160;&#160;<a href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank"><img src="/themes/Dryad/images/cc-zero.png" alt="CC0 logo"></img></a></div></message>
+			&#160;&#160;&#160;&#160;<a class="single-image-link" href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank"><img src="/themes/Dryad/images/cc-zero.png" alt="CC0 logo"></img></a></div></message>
 	<message key="xmlui.submit.select.pub.form.license_error">You must accept the CC0 waiver to continue the submission.</message>
 
 	<message key="xmlui.submit.publication.journal.preview.head">Metadata preview of selected journal</message>
