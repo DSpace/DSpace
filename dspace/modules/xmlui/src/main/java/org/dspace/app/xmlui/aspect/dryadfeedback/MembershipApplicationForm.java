@@ -216,12 +216,13 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         publicationsTextArea.setValue(parameters.getParameter("publications", ""));
 
 	// Membership Term, start and end
-	Item membershipYear = form.addItem("membership_year","");
-	Composite membershipYearComposite = membershipYear.addComposite("membership_year_group");
-	membershipYearComposite.setLabel(message(message_prefix + "fields.membership_year.label1"));
-	membershipYearComposite.setHelp(message(message_prefix + "fields.membership_year.label2"));
+	Item membershipTerm = form.addItem("membership_term","");
 
-	Select membershipYearStartSelect = membershipYearComposite.addSelect("membership_year_start");
+	Composite membershipTermComposite = membershipTerm.addComposite("membership_term_group");
+	membershipTermComposite.setLabel(message(message_prefix + "fields.membership_term.label1"));
+	membershipTermComposite.setHelp(message(message_prefix + "fields.membership_term.label2"));
+
+	Select membershipYearStartSelect = membershipTermComposite.addSelect("membership_year_start","label-at-left");
 	membershipYearStartSelect.setLabel(message(message_prefix + "fields.membership_year.starting_year.label"));
 	membershipYearStartSelect.addOption("2013", message(message_prefix + "fields.membership_year.starting_year.2013"));
 	membershipYearStartSelect.addOption("2014", message(message_prefix + "fields.membership_year.starting_year.2014"));
@@ -231,19 +232,19 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
 	    membershipYearStartSelect.addError(message(message_prefix + "errors.membership_year_start"));
 	}
 
-	Select membershipYearEndSelect = membershipYearComposite.addSelect("membership_year_end");
-	membershipYearEndSelect.setLabel(message(message_prefix + "fields.membership_year.ending_year.label"));
-	membershipYearEndSelect.addOption("2013", message(message_prefix + "fields.membership_year.ending_year.2013"));
-	membershipYearEndSelect.addOption("2014", message(message_prefix + "fields.membership_year.ending_year.2014"));
-	membershipYearEndSelect.addOption("2015", message(message_prefix + "fields.membership_year.ending_year.2015"));
-	membershipYearEndSelect.addOption("2016", message(message_prefix + "fields.membership_year.ending_year.2016"));
-	membershipYearEndSelect.addOption("2017", message(message_prefix + "fields.membership_year.ending_year.2017"));
-	membershipYearEndSelect.setOptionSelected(parameters.getParameter("membership_year_end", ""));
-	membershipYearEndSelect.setRequired();
-	if(errorFieldList.contains("membership_year_end")) {
-	    membershipYearEndSelect.addError(message(message_prefix + "errors.membership_year_end"));
+	Select membershipLengthSelect = membershipTermComposite.addSelect("membership_length", "label-at-left");
+	membershipLengthSelect.setLabel(message(message_prefix + "fields.membership_length.label"));
+	membershipLengthSelect.addOption("1yr", message(message_prefix + "fields.membership_length.1"));
+	membershipLengthSelect.addOption("2yr", message(message_prefix + "fields.membership_length.2"));
+	membershipLengthSelect.addOption("3yr", message(message_prefix + "fields.membership_length.3"));
+	membershipLengthSelect.addOption("4yr", message(message_prefix + "fields.membership_length.4"));
+	membershipLengthSelect.addOption("5yr", message(message_prefix + "fields.membership_length.5"));
+	membershipLengthSelect.setOptionSelected(parameters.getParameter("membership_length", ""));
+	membershipLengthSelect.setRequired();
+	if(errorFieldList.contains("membership_length")) {
+	    membershipLengthSelect.addError(message(message_prefix + "errors.membership_length"));
 	}
-		
+
         // Representatitve Name
         Item repName = form.addItem("rep_name","");
         Text repNameText = repName.addText("rep_name");
