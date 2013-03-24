@@ -605,12 +605,14 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     <!-- latest Dryad build info (and node/site name, if available) -->
                     <i18n:text>xmlui.dri2xhtml.structural.footer-promotional2</i18n:text>
                     <xsl:value-of select="$dryadrelease/release/date"/> 
+                    <!-- 'Served by...' is moot, there's just one Dryad server now.
                     <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dryad'][@qualifier='node']">
                         <i18n:text>xmlui.dri2xhtml.structural.footer-node</i18n:text>
                         <xsl:text> </xsl:text>
                         <xsl:value-of
                             select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dryad'][@qualifier='node']"/>
                     </xsl:if>
+                    -->
                 </p>
                 <!--Git Commit hash rendered in HTML comment-->
                 <xsl:comment>Git Commit Hash: <xsl:value-of select="$dryadrelease/release/version"/></xsl:comment>
