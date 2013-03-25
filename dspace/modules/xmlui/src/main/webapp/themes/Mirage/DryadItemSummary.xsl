@@ -2184,10 +2184,7 @@
                 </a>
             </xsl:when>
             <xsl:otherwise>
-                <a>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/nonintegratedjournal.jpg"
-                         alt="This journal is not integrated with Dryad"/>
-                </a>
+	      <!-- If we didn't match an integrated journal, don't use an image. -->
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
