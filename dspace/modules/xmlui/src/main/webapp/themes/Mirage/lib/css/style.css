@@ -1849,3 +1849,7 @@ a.learn-to-submit-button-option {
     padding: 2px 5px;
 
 }
+
+#aspect_discovery_MostViewedItem_table_most-viewed td:first-child{
+    width:400px;
+}
