@@ -1643,6 +1643,7 @@ img.ds-authority-confidence
  */
 .publication-header {
     margin: 0 15px 18px;
+    margin-top: 6px !important;
     padding: 12px 18px;
     background-color: #ddd;
     border: 1px solid #d5d5d5;
