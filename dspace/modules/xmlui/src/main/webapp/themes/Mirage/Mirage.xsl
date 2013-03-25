@@ -598,7 +598,7 @@
         <!-- START DEPOSIT -->
         <div id="submit-data-feature-box" class="home-col-2">
             <h1 class="ds-div-head "
-                style="font-size: 24px; border-bottom: none; text-align: center; padding: 25px 35px 19px; height: 76px;">Have data
+                style="margin-top: 6px; font-size: 24px; border-bottom: none; text-align: center; padding: 25px 35px 19px; height: 76px;">Have data
                 for your publication?
             </h1>
             <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
