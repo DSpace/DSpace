@@ -1095,39 +1095,33 @@
 		</div>
 	</xsl:template>
 
-	<!-- Listado de los items recientemente subidos -->
-	<xsl:template match="dim:dim" mode="itemSummaryList-DIM-metadata">
-		<xsl:param name="href"/>
-			<div  class="artifact-title">
-				<xsl:element name="a">
-				   
-					<xsl:attribute name="href">
+    <!-- Listado de los items recientemente subidos -->
+    <xsl:template match="dim:dim" mode="itemSummaryList-DIM-metadata">
+        <xsl:param name="href"/>
+        <div class="artifact-description">
+            <div class="artifact-title">
+                <xsl:element name="a">
+                    <xsl:attribute name="href">
                         <xsl:value-of select="$href"/>
                     </xsl:attribute>
-                    <span class="title">
-					<xsl:choose>
-						<xsl:when test="dim:field[@element='title']">
-							<xsl:value-of select="dim:field[@element='title'][1]/node()" disable-output-escaping="yes"/>
-							
-						</xsl:when>
-						<xsl:otherwise>
-							<i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
-						</xsl:otherwise>
-					</xsl:choose>
-					</span>
-					<xsl:if test="dim:field[@element='title' and @qualifier='subtitle']">
-							<span class="subtitle"> : <xsl:value-of select="dim:field[@element='title' and @qualifier='subtitle'][1]/node()" disable-output-escaping="yes"/></span>
-					</xsl:if> 		
-				</xsl:element>	
-				<span class="publisher-date">
-					<!-- date.issued : extraemos el año solamente -->
-					<xsl:if test="dim:field[@element='date' and @qualifier='issued'] ">
-						<xsl:value-of select="substring(dim:field[@element='date' and @qualifier='issued'],1,4)"></xsl:value-of>
-					</xsl:if>
-				</span>
-			</div>
-		<div class="artifact-description">			
-				<div class="author">
+                    <xsl:choose>
+                        <xsl:when test="dim:field[@element='title']">
+                            <xsl:value-of select="dim:field[@element='title'][1]/node()" disable-output-escaping="yes"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:element>
+                <span class="Z3988">
+                    <xsl:attribute name="title">
+                        <xsl:call-template name="renderCOinS"/>
+                    </xsl:attribute>
+                    &#xFEFF; <!-- non-breaking space to force separating the end tag -->
+                </span>
+            </div>
+            <div class="artifact-info">
+                <span class="author">
 					<xsl:choose>
 						<xsl:when test="dim:field[@element='creator']">
 							<xsl:for-each select="dim:field[@element='creator']">
@@ -1165,77 +1159,32 @@
 							<i18n:text>xmlui.dri2xhtml.METS-1.0.no-author</i18n:text>
 						</xsl:otherwise>
 					</xsl:choose>
-				</div>
-
-				<xsl:variable name="originInfoContent">
-					<xsl:choose>
-						
-						<!-- Solo para el tipo tesis: grado alanzado e institución otorgante -->
-						<xsl:when test="dim:field[@element='type'] = '$tesis'">
-							<xsl:value-of select="dim:field[@element='degree' and @qualifier='name']"/>
-							<xsl:text>; </xsl:text>
-							<xsl:value-of select="dim:field[@element='degree' and @qualifier='grantor']"/>
-						</xsl:when>
-
-						<!-- Solo para el tipo Objeto de coferencia: evento -->
-						<xsl:when test="dim:field[@element='type'] = '$objeto_de_conferencia'">
-							<xsl:value-of select="dim:field[@element='relation' and @qualifier='event']"/>
-						</xsl:when>
-						
-						<!-- Si tiene journalTitle -->
-						<xsl:when test="dim:field[@element = 'relation' and @qualifier='journalTitle']">
-							<xsl:value-of select="dim:field[@element='relation' and @qualifier='journalTitle']"/>
-							<xsl:if test="dim:field[@element='relation' and @qualifier='journalVolumeAndIssue']">
-								<xsl:text>; </xsl:text>
-								<xsl:value-of select="dim:field[@element='relation' and @qualifier='journalVolumeAndIssue']"/>
-							</xsl:if>
-
-							<!-- Si además tiene evento, lo muestro -->
-							<xsl:if test="dim:field[@element = 'relation' and @qualifier='event']">
-								<xsl:text> | </xsl:text>
-								<xsl:value-of select="dim:field[@element='relation' and @qualifier='event']"/>
-							</xsl:if>
-						</xsl:when>
-					</xsl:choose>			
-				</xsl:variable>
-				
-				<div class="originInfo">
-					<xsl:choose>					
-						<xsl:when test="$originInfoContent != ''">
-							<xsl:value-of select="$originInfoContent"/>
-						</xsl:when>
-						<xsl:otherwise>
-							<!-- si nada aplica, mostramos el originInfo -->
-							<xsl:value-of select="dim:field[@element='originInfo' and @qualifier='place']"/>
-						</xsl:otherwise>
-					</xsl:choose>			
-				</div>
-				<div class="type">
-					<xsl:choose>
-						<xsl:when test="dim:field[@element='subtype']"> 
-								<xsl:copy-of select="dim:field[@element='subtype']/node()"/> 
-						</xsl:when>
-						<xsl:when test="dim:field[@element='type']"> 
-								<xsl:copy-of select="dim:field[@element='type']/node()"/> 
-						</xsl:when>
-						<!-- No hay otherwise -->
-					</xsl:choose>
-				</div>	
-				<div i18n:attr="title">
-					<xsl:choose>
-						 	<xsl:when test="../../../../mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']"> 
-								    <xsl:attribute name="class">availability local</xsl:attribute>
-								    <xsl:attribute name="title">xmlui.dri2xhtml.METS-1.0.item-availability-local-help</xsl:attribute>
-								    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-availability-local</i18n:text>
-					            </xsl:when>					
-							<!-- Localizacion Electronica -->
-							<xsl:when test="dim:field[@element='identifier'  and @qualifier='uri' and @mdschema='sedici']"> 
-								    <xsl:attribute name="class">availability linked</xsl:attribute>
-								    <xsl:attribute name="title">xmlui.dri2xhtml.METS-1.0.item-availability-linked-help</xsl:attribute>
-					                <i18n:text>xmlui.dri2xhtml.METS-1.0.item-availability-linked</i18n:text>
-							</xsl:when>
-					</xsl:choose>  
-				</div>
+                </span>
+                <xsl:text> </xsl:text>
+                <xsl:if test="dim:field[@element='date' and @qualifier='issued'] or dim:field[@element='publisher']">
+                        <span class="publisher-date">
+                            <xsl:text>(</xsl:text>
+                            <xsl:if test="dim:field[@element='publisher']">
+                                <span class="publisher">
+                                    <xsl:copy-of select="dim:field[@element='publisher']/node()"/>
+                                </span>
+                                <xsl:text>, </xsl:text>
+                            </xsl:if>
+                            <span class="date">
+                                                        <xsl:call-template name="render-date">
+                                                                <xsl:with-param name="dateString" select="dim:field[@element='date' and @qualifier='issued']"/>
+                                                        </xsl:call-template>
+                            </span>
+                            <xsl:text>)</xsl:text>
+                        </span>
+                </xsl:if>
+            </div>
+            <xsl:if test="dim:field[@element = 'description' and @qualifier='abstract']">
+                <xsl:variable name="abstract" select="dim:field[@element = 'description' and @qualifier='abstract']/node()"/>
+                <div class="artifact-abstract">
+                    <xsl:value-of select="util:shortenString($abstract, 220, 10)" disable-output-escaping="yes"/>
+                </div>
+            </xsl:if>
         </div>
 	</xsl:template>
 
