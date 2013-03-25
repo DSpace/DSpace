@@ -85,10 +85,10 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
         Division overviewStats = body.addDivision("front-page-stats");
         long dataPackageCount = 0;
         long dataFileCount = 0;
-        int journalCount = 0;
+        String journalCount = "0";
 
-        long uniqAuthors=0;
-        long totalFileDownload=0;
+        String uniqAuthors="0";
+        String totalFileDownload="0";
 
         try {
             dataFileCount = ((Collection) HandleManager.resolveToObject(
@@ -129,7 +129,7 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
                     XPath xpath = xpf.newXPath();
                     String xpathResult = xpath.evaluate(PUB_COUNTER, doc);
 
-                    journalCount = Integer.parseInt(xpathResult);
+                    journalCount =xpathResult;
                     break;
                 default:
                     LOGGER.error("Solr search failed to respond as expected");
@@ -164,7 +164,7 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
                     XPath xpath = xpf.newXPath();
                     String xpathResult = xpath.evaluate(AUTH_COUNTER, doc);
 
-                    uniqAuthors = Integer.parseInt(xpathResult);
+                    uniqAuthors = xpathResult;
                     break;
                 default:
                     LOGGER.error("Solr search failed to respond as expected");
@@ -180,40 +180,7 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
         }
 
 
-        try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            GetMethod get = new GetMethod(solr + PUB_SEARCH);
-
-
-            switch (new HttpClient().executeMethod(get)) {
-                case 200:
-                case 201:
-                case 202:
-                    Document doc = db.parse(get.getResponseBodyAsStream());
-                    doc.getDocumentElement().normalize();
-
-                    // xmlToString(doc);
-
-
-                    XPathFactory xpf = XPathFactory.newInstance();
-                    XPath xpath = xpf.newXPath();
-                    String xpathResult = xpath.evaluate(PUB_COUNTER, doc);
-
-                    journalCount = Integer.parseInt(xpathResult);
-                    break;
-                default:
-                    LOGGER.error("Solr search failed to respond as expected");
-            }
-
-            get.releaseConnection();
-        }
-        catch (ParserConfigurationException details) {
-            LOGGER.error(details.getMessage(), details);
-        }
-        catch (XPathExpressionException details) {
-            LOGGER.error(details.getMessage(), details);
-        }
+       //remove duplicate code
 
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -235,7 +202,7 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
                     XPath xpath = xpf.newXPath();
                     String xpathResult = xpath.evaluate(DOWN_COUNTER, doc);
 
-                    totalFileDownload = Integer.parseInt(xpathResult);
+                    totalFileDownload = xpathResult;
                     break;
                 default:
                     LOGGER.error("Solr search failed to respond as expected");
@@ -264,15 +231,15 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
 
         row = infoTable.addRow();
         row.addCell("data").addContent("Journals represented");
-        row.addCell("data").addContent(Integer.toString(journalCount) );
+        row.addCell("data").addContent(journalCount);
 
         row = infoTable.addRow();
         row.addCell("data").addContent("Total unique authors");
-        row.addCell("data").addContent(Long.toString(uniqAuthors));
+        row.addCell("data").addContent(uniqAuthors);
 
         row = infoTable.addRow();
         row.addCell("data").addContent("Total file downloads");
-        row.addCell("data").addContent(Long.toString(totalFileDownload));
+        row.addCell("data").addContent(totalFileDownload);
 
     }
 
