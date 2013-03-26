@@ -315,7 +315,7 @@
 		</xsl:if>
 
 		<!-- Solo para el tipo tesis -->
-		<xsl:if test="dim:field[@element='type'] = '$tesis'">
+		<xsl:if test="dim:field[@element='type'] = $tesis">
 			<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.tesis-info</i18n:text></h2>
 			<!-- contributor.director row -->
 			<xsl:call-template name="render-normal-field">
@@ -375,7 +375,7 @@
 
 
 		<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.general-info</i18n:text></h2>
-		<xsl:if test="not(dim:field[@element='type'] = '$tesis')">
+		<xsl:if test="not(dim:field[@element='type'] = $tesis)">
 			<!-- date.exposure row -->
 			<xsl:choose>
 				<xsl:when test="dim:field[@element='date' and @qualifier='exposure']">
@@ -641,7 +641,7 @@
 		<!-- peer_review row -->
 		<!-- fulltext row -->
 		<!-- Si el tipo es audio o video no se muestra que tiene a documento completo -->
-		<xsl:if test="dim:field[@element='type'] = '$audio' and dim:field[@element='type'] = '$imagen_en_movimiento'">
+		<xsl:if test="dim:field[@element='type'] = $audio and dim:field[@element='type'] = $imagen_en_movimiento">
 					
 			<xsl:if test="dim:field[@qualifier='peerReview'] or dim:field[@qualifier='fulltext']">
 	        	<div id="other_attributes">
