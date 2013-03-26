@@ -1109,9 +1109,9 @@ background-repeat:repeat-x;
 .ds-artifact-list .publisher-date {
 	float: right;
 }
-.ds-artifact-list .title {
-	width: 600px; 
-	display: inline-block;
+.ds-artifact-list .subtitle {
+	 font-weight: normal;
+	 font-style: italic;
 }
 .ds-artifact-list .type {
 	display: inline;
