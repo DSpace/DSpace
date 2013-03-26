@@ -144,15 +144,15 @@
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='description']/doc:element[@name='abstract']/doc:element/doc:field[@name='value']">
 				<dc:description><xsl:value-of select="." /></dc:description>
 			</xsl:for-each>
-			<!--sedici.note = description -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='note']/doc:element/doc:field[@name='value']">
+			<!--sedici.description.note = description -->
+			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='description']/doc:element[@name='note']/doc:element/doc:field[@name='value']">
 				<dc:description><xsl:value-of select="." /></dc:description>
 			</xsl:for-each>
 			
-			<!--sedici.fulltext -->
+			<!--sedici.description.fulltext -->
 			<!--No lo pongo -->
 			
-			<!--eprints.status -->
+			<!--sedici.description.peer_review -->
 			<!--No lo pongo -->
 			
 			<!--dc.description.provenance = description -->

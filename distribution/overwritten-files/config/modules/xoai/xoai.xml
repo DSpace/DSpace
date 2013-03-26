@@ -319,7 +319,7 @@
 		<Filter id="fulltextOnlyFilter">
 			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
 			<Parameter key="field">
-				<Value>sedici.fulltext</Value>
+				<Value>sedici.description.fulltext</Value>
 			</Parameter>
 			<Parameter key="operator">
 				<Value>equal</Value>
