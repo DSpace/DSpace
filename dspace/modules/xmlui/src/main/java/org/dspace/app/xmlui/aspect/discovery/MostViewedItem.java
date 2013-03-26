@@ -57,8 +57,8 @@ public class MostViewedItem extends AbstractFiltersTransformer {
 
     private static final Message T_head_recent_submissions =
             message("xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions");
-    private static final String T_head_downloads_count = "xmlui.statistics.downloads.count";
-    private static final String T_head_downloads_title = "xmlui.statistics.downloads.title";
+    private static final String T_head_view_count = "xmlui.statistics.view.count";
+    private static final String T_head_view_title = "xmlui.statistics.view.title";
     private static final String T_head_viewed_item = "xmlui.statistics.most.viewed.items";
     /**
      * Display a single community (and refrence any sub communites or
@@ -92,7 +92,7 @@ public class MostViewedItem extends AbstractFiltersTransformer {
     {
         return "site";
     }
-    String solr= "http://localhost:8080/solr/statistics/select/?q=type%3A2&facet=on&rows=0&facet.limit=-1&facet.field=id" ;
+    String solr=  ConfigurationManager.getBooleanProperty("solr.log.server")+"/select/?q=type%3A2&facet=on&rows=0&facet.limit=-1&facet.field=id" ;
 
     /**
      * facet.limit=11&wt=javabin&rows=5&sort=dateaccessioned+asc&facet=true&facet.mincount=1&q=search.resourcetype:2&version=1
@@ -166,9 +166,9 @@ public class MostViewedItem extends AbstractFiltersTransformer {
             }
             Row headerRow = table.addRow();
 
-            headerRow.addCell("", Cell.ROLE_HEADER, "labelcell").addContent(message(T_head_downloads_title));
+            headerRow.addCell("", Cell.ROLE_HEADER, "labelcell").addContent(message(T_head_view_title));
 
-            headerRow.addCell("", Cell.ROLE_HEADER, "labelcell").addContent(message(T_head_downloads_count));
+            headerRow.addCell("", Cell.ROLE_HEADER, "labelcell").addContent(message(T_head_view_count));
 
 
             int col=0;
@@ -178,7 +178,7 @@ public class MostViewedItem extends AbstractFiltersTransformer {
 
                 Cell catCell = valListRow.addCell(col + "1", Cell.ROLE_DATA,"labelcell");
 
-                catCell.addXref("handle/".concat(temp[2]),temp[0]);
+                catCell.addXref(temp[2],temp[0]);
 
                 Cell valCell = valListRow.addCell(col + "2", Cell.ROLE_DATA, "datacell");
                 valCell.addContent(temp[1]);
@@ -263,7 +263,7 @@ public class MostViewedItem extends AbstractFiltersTransformer {
                             String[] temp = new String[3];
                             temp[0]=itemTitle;
                             temp[1]= strings[j];
-                            temp[2] =  prefix+"/resource/"+identifier[0];
+                            temp[2] =  prefix+"/resource/"+identifier[0].value;
                             values.add(temp);
                             i++;
                         }
