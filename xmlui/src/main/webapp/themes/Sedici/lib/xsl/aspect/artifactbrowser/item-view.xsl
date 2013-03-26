@@ -1104,14 +1104,22 @@
                     <xsl:attribute name="href">
                         <xsl:value-of select="$href"/>
                     </xsl:attribute>
-                    <xsl:choose>
-                        <xsl:when test="dim:field[@element='title']">
-                            <xsl:value-of select="dim:field[@element='title'][1]/node()" disable-output-escaping="yes"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
-                        </xsl:otherwise>
-                    </xsl:choose>
+                    <span class="title">
+	                    <xsl:choose>
+	                        <xsl:when test="dim:field[@element='title']">
+	                            <xsl:value-of select="dim:field[@element='title'][1]/node()" disable-output-escaping="yes"/>
+	                        </xsl:when>
+	                        <xsl:otherwise>
+	                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+	                        </xsl:otherwise>
+	                    </xsl:choose>
+                    </span>
+					<xsl:if test="dim:field[@element='title' and @qualifier='subtitle']">
+						<span class="subtitle">
+							<xsl:text> : </xsl:text>
+							<xsl:value-of select="dim:field[@element='title' and @qualifier='subtitle'][1]/node()" disable-output-escaping="yes"/>
+						</span>
+					</xsl:if>
                 </xsl:element>
                 <span class="Z3988">
                     <xsl:attribute name="title">
