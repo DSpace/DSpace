@@ -7,6 +7,7 @@
  */
 package org.dspace.app.xmlui.aspect.discovery;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrDocument;
@@ -256,12 +257,30 @@ public class MostViewedItem extends AbstractFiltersTransformer {
                     if(dso!=null){
 
                         DCValue[] vals = ((Item)dso).getMetadata("dc", "title", null, Item.ANY);
+                        DCValue[] authors = ((Item)dso).getMetadata("dc", "contributor", "author", Item.ANY);
+                        DCValue[] year = ((Item)dso).getMetadata("dc", "date", "issued", Item.ANY);
                         DCValue[] identifier =  ((Item)dso).getMetadata("dc", "identifier", null, Item.ANY);
+                        String[] authorNames=new String[authors.length];
+                        int n=0;
+                        for(DCValue author : authors)
+                        {
+                            String[] names = author.value.split(",");
+                            String[] lastNames = names[names.length-1].trim().split(" ");
+                            String lastName="";
+                            for(String tem:lastNames){
+                                lastName=lastName+tem.trim().substring(0,1);
+                            }
+
+                            String tmpName = names[0]+" "+lastName;
+                            authorNames[n]=tmpName;
+                            n=n+1;
+                        }
+                        String authorName= StringUtils.join(authorNames, ",");
                         if(vals != null && 0 < vals.length)
                         {
                             String itemTitle = vals[0].value;
                             String[] temp = new String[3];
-                            temp[0]=itemTitle;
+                            temp[0]=authorName+" ("+year[0].value.substring(0,4)+") "+itemTitle+". "+identifier[0].value;
                             temp[1]= strings[j];
                             temp[2] =  prefix+"/resource/"+identifier[0].value;
                             values.add(temp);
