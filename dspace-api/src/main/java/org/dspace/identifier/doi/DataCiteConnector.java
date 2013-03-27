@@ -11,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -118,6 +119,8 @@ implements DOIConnector
      */
     private Map<String, int[]> reserved;
     private Map<String, int[]> registered;
+    private long cacheCreationTime;
+    private long cacheTimeout;
     
     public DataCiteConnector()
     {
@@ -126,9 +129,12 @@ implements DOIConnector
         this.PASSWORD = null;
         this.registered = new HashMap<String, int[]>();
         this.reserved = new HashMap<String, int[]>();
+        this.cacheCreationTime = -1l;
+        // default value
+        this.cacheTimeout = 120l;
     }
     
-        /**
+    /**
      * Used to set the scheme to connect the DataCite server. Used by spring
      * dependency injection.
      * @param DATACITE_SCHEME Probably https or http.
@@ -146,6 +152,17 @@ implements DOIConnector
     @Required
     public void setDATACITE_HOST(String DATACITE_HOST) {
         this.HOST = DATACITE_HOST;
+    }
+    
+    /**
+     * To be able to set the cache timeout by spring dependency ingestion.
+     * Default value set in {@link #DataCiteConnector()}.
+     * 
+     * @param CACHE_TIMEOUT time to hold cached information about reserved and 
+     *                      registered DOIs in seconds.
+     */
+    public void setCACHE_TIMEOUT(long CACHE_TIMEOUT) {
+        this.cacheTimeout = CACHE_TIMEOUT;
     }
     
     /**
@@ -207,7 +224,7 @@ implements DOIConnector
 
     }
     
-    private void perpareXwalk()
+    private void prepareXwalk()
     {
         if (null != this.xwalk)
             return;
@@ -256,40 +273,45 @@ implements DOIConnector
     public boolean isDOIReserved(Context context, String doi)
             throws IdentifierException
     {
-        // do we have information about the doi in our cache?
-        if (this.reserved.containsKey(doi))
+        if (!this.checkCache())
         {
-            // is it reserved (value in map is not null) or isn't it?
-            return (null != this.reserved.get(doi));
+            // do we have information about the doi in our cache?
+            if (this.reserved.containsKey(doi))
+            {
+                // is it reserved (value in map is not null) or isn't it?
+                return (null != this.reserved.get(doi));
+            }
         }
         
         return isDOIReserved(context, null, doi);
     }
     
-    // TODO
     public boolean isDOIReserved(Context context, DSpaceObject dso, String doi)
             throws IdentifierException
     {
         // get mds/metadata/<doi>
         
         // do we have cached information?
-        if (this.reserved.containsKey(doi))
+        if (!this.checkCache())
         {
-            // do we know that the doi is not reserved?
-            if (null == this.reserved.get(doi))
+            if (this.reserved.containsKey(doi))
             {
-                return false;
-            }
-            // we know that the doi is reserved.
-            // Have we bin asked if it is reserved for a specific dso?
-            if (null == dso)
-            {
-                return true;
-            }
-            else
-            {
-                int[] ids = this.reserved.get(doi);
-                return (dso.getType() == ids[0] && dso.getID() == ids[1]);
+                // do we know that the doi is not reserved?
+                if (null == this.reserved.get(doi))
+                {
+                    return false;
+                }
+                // we know that the doi is reserved.
+                // Have we bin asked if it is reserved for a specific dso?
+                if (null == dso)
+                {
+                    return true;
+                }
+                else
+                {
+                    int[] ids = this.reserved.get(doi);
+                    return (dso.getType() == ids[0] && dso.getID() == ids[1]);
+                }
             }
         }
         
@@ -339,7 +361,7 @@ implements DOIConnector
                     log.error("Error in database connection: " + e.getMessage());
                     throw new RuntimeException(e);
                 }
-                this.reserved.put(doi, ids);
+                this.addToCache(doi, true, false, ids);
                 
                 if (null == dso)
                 {
@@ -368,8 +390,7 @@ implements DOIConnector
             // 404 "Not Found" means DOI is neither reserved nor registered.
             case (404) :
             {
-                this.registered.put(doi, null);
-                this.reserved.put(doi, null);
+                this.addToCache(doi, true, true, null);
                 return false;
             }
                 
@@ -421,10 +442,13 @@ implements DOIConnector
             throws IdentifierException
     {
         // Do we have information about the DOI in our cache?
-        if (this.registered.containsKey(doi))
+        if (!this.checkCache())
         {
-            // if the doi is reserved the value is not null.
-            return (null != this.registered.get(doi));
+            if (this.registered.containsKey(doi))
+            {
+                // if the doi is reserved the value is not null.
+                return (null != this.registered.get(doi));
+            }
         }
         
         return isDOIRegistered(context, null, doi);
@@ -434,21 +458,24 @@ implements DOIConnector
             throws IdentifierException
     {
         // do we have information about the DOI in our cache?
-        if (this.registered.containsKey(doi))
+        if (!this.checkCache())
         {
-            int[] ids = this.registered.get(doi);
-            if (null == ids)
+            if (this.registered.containsKey(doi))
             {
-                // doi is not reserved
-                return false;
+                int[] ids = this.registered.get(doi);
+                if (null == ids)
+                {
+                    // doi is not reserved
+                    return false;
+                }
+                if (null == dso)
+                {
+                    // don't check if it is registered for a specific dso, just
+                    // wether it is registered or not
+                    return true;
+                }
+                return (ids[0] == dso.getType() && ids[1] == dso.getID());
             }
-            if (null == dso)
-            {
-                // don't check if it is registered for a specific dso, just
-                // wether it is registered or not
-                return true;
-            }
-            return (ids[0] == dso.getType() && ids[1] == dso.getID());
         }
         
         DataCiteResponse response = sendDOIGetRequest(doi);
@@ -507,9 +534,8 @@ implements DOIConnector
                 }
                 
                 // safe this information in our cache
-                this.registered.put(doi, ids);
                 // if it is registered, it must be reserverd too.
-                this.reserved.put(doi, ids);
+                this.addToCache(doi, true, true, ids);
                 
                 return (dso.getType() == ids[0] && dso.getID() == ids[1]);
             }
@@ -518,6 +544,8 @@ implements DOIConnector
             // resevered but not registered yet.
             case (204) :
             {
+                // we know it is reserved, but we do not know for which object
+                // won't add this to the cache.
                 return false;
             }
             // we get a 401 if we forgot to send credentials or if the username
@@ -537,8 +565,7 @@ implements DOIConnector
             // 404 "Not Found" means DOI is neither reserved nor registered.
             case (404) :
             {
-                this.registered.put(doi, null);
-                this.reserved.put(doi, null);
+                this.addToCache(doi, true, true, null);
                 return false;
             }
             // 500 is documented and signals an internal server error
@@ -627,7 +654,7 @@ implements DOIConnector
     public boolean reserveDOI(Context context, DSpaceObject dso, String doi)
             throws IdentifierException
     {
-        this.perpareXwalk();
+        this.prepareXwalk();
         
         if (!this.xwalk.canDisseminate(dso))
         {
@@ -695,7 +722,7 @@ implements DOIConnector
             case (400) :
             {
                 log.warn("Either we send invalid xml metadata, tried to reserve "
-                        + " a DOI for a wrong domain or prefix.");
+                        + " a DOI for a wrong prefix.");
                 log.warn("DataCite Metadata API returned a http status code "
                         +"400: " + resp.getContent());
                 Format format = Format.getCompactFormat();
@@ -741,9 +768,9 @@ implements DOIConnector
         }
     }
     
-    // TODO
     public boolean registerDOI(Context context, DSpaceObject dso, String doi)
     {
+        
         // send doi=<doi>\nurl=<url> to mds/doi
         // 412 -> prediction failed -> not reserved
         // 403 -> wrong credential, quota exceeded
@@ -754,11 +781,48 @@ implements DOIConnector
         return false;
     }
     
-    @Override
-    public void relax()
+    /**
+     * Purges cached information reserved and registered DOIs.
+     * The DataCiteConnector caches information about reserved and registered 
+     * DOIs. It caches these information as the DOIIdentifierProvider calls the
+     * isDOIResereved and isDOIRegistered methods several times when it
+     * reserves or registers new DOIs. This methods purges the cached
+     * information. The cache will be purged automatically {@link #cacheTimeout}
+     * seconds after first information was added to the cache.
+     */
+    public void purgeCache()
     {
         this.registered.clear();
         this.reserved.clear();
+        this.cacheCreationTime = -1l;
+    }
+    
+    private void addToCache(String doi, boolean reserved, boolean registered, int ids[])
+    {
+        Date date = new Date();
+        if (this.cacheCreationTime < 0)
+        {
+            this.cacheCreationTime = date.getTime();
+        }
+        if (reserved)
+        {
+            this.reserved.put(doi, ids);
+        }
+        if (registered)
+        {
+            this.registered.put(doi, ids);
+        }
+    }
+    
+    private boolean checkCache()
+    {
+        Date date = new Date();
+        if (date.getTime() > this.cacheTimeout + this.cacheCreationTime)
+        {
+            this.purgeCache();
+            return true;
+        }
+        return false;
     }
     
     private DataCiteResponse sendDOIPostRequest(String doi, String url)

@@ -159,14 +159,7 @@ public class DOIIdentifierProvider
     public void register(Context context, DSpaceObject dso, String identifier)
             throws IdentifierException
     {
-        try
-        {
-            this.registerDOI(context, dso, identifier);
-        }
-        finally
-        {
-            connector.relax();
-        }
+        this.registerDOI(context, dso, identifier);
     }
     
     private void registerDOI(Context context, DSpaceObject dso, String identifier)
@@ -247,12 +240,7 @@ public class DOIIdentifierProvider
     public void reserve(Context context, DSpaceObject dso, String identifier)
             throws IdentifierException, IllegalArgumentException
     {
-        try {
-            this.reserveDOI(context, dso, identifier);
-        }
-        finally {
-            connector.relax();
-        }
+        this.reserveDOI(context, dso, identifier);
     }
     
     private void reserveDOI(Context context, DSpaceObject dso, String identifier)
@@ -263,7 +251,7 @@ public class DOIIdentifierProvider
         // ensure that the DOI is in our DOI table and is not reserved online
         // for another object than dso
         try {
-            createNewIdentifier(context, dso, doi, false);
+            createNewIdentifier(context, dso, doi);
         }
         catch (IllegalArgumentException ex)
         {
@@ -313,7 +301,7 @@ public class DOIIdentifierProvider
         {
             try
             {
-                doi = createNewIdentifier(context, dso, null, true);
+                doi = createNewIdentifier(context, dso, null);
             }
             catch (SQLException e)
             {
@@ -397,14 +385,7 @@ public class DOIIdentifierProvider
     public void delete(Context context, DSpaceObject dso, String identifier)
             throws IdentifierException
     {
-        try
-        {
             deleteDOI(context, dso, identifier);
-        }
-        finally
-        {
-            connector.relax();
-        }
     }
 
     private void deleteDOI(Context context, DSpaceObject dso, String identifier)
@@ -576,7 +557,7 @@ public class DOIIdentifierProvider
      *                             the doi registry thinks that the DOI belongs
      *                             to another party.
      */
-    protected String createNewIdentifier(Context context, DSpaceObject dso, String doi, boolean relaxConnector)
+    protected String createNewIdentifier(Context context, DSpaceObject dso, String doi)
             throws SQLException, IllegalArgumentException, IdentifierException
     {
         TableRow doiRow = null;
@@ -592,14 +573,10 @@ public class DOIIdentifierProvider
                 if (doiRow.getIntColumn("resource_id") == dso.getID() &&
                         doiRow.getIntColumn("resource_type_id") == dso.getType())
                 {
-                    if (relaxConnector)
-                        connector.relax();
                     return doi;
                 }
                 else
                 {
-                    if (relaxConnector)
-                        connector.relax();
                     throw new IllegalArgumentException("Trying to save a DOI " +
                             "that is already reserved for another object.");
                 }
@@ -611,8 +588,6 @@ public class DOIIdentifierProvider
                 if (!connector.isDOIReserved(context, dso, doi) &&
                         connector.isDOIReserved(context, doi))
                 {
-                    if (relaxConnector)
-                        connector.relax();
                     throw new IllegalArgumentException("Trying to save a DOI " +
                             "that is already reserved for another object.");
                 // safe it to db (see below)
