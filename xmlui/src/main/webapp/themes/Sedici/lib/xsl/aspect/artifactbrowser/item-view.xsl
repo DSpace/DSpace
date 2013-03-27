@@ -1095,11 +1095,83 @@
 		</div>
 	</xsl:template>
 
-    <!-- Listado de los items recientemente subidos -->
-    <xsl:template match="dim:dim" mode="itemSummaryList-DIM-metadata">
-        <xsl:param name="href"/>
-        <div class="artifact-description">
-            <div class="artifact-title">
+	<!-- Listado de los items recientemente subidos -->
+	<xsl:template match="dim:dim" mode="itemSummaryList-DIM-metadata">
+		<xsl:param name="href"/>
+
+		<div class="artifact-type">
+			<div class="type">
+				<xsl:choose>
+					<xsl:when test="dim:field[@element='subtype']"> 
+							<xsl:copy-of select="dim:field[@element='subtype']/node()"/> 
+					</xsl:when>
+					<xsl:when test="dim:field[@element='type']"> 
+							<xsl:copy-of select="dim:field[@element='type']/node()"/> 
+					</xsl:when>
+					<!-- No hay otherwise -->
+				</xsl:choose>
+			</div>	
+
+			<xsl:variable name="originInfoContent">
+				<xsl:choose>
+					
+					<!-- Solo para el tipo tesis: grado alanzado e institución otorgante -->
+					<xsl:when test="dim:field[@element='type'] = 'Tesis'">
+						<xsl:value-of select="dim:field[@element='degree' and @qualifier='name']"/>
+						<xsl:text>; </xsl:text>
+						<xsl:value-of select="dim:field[@element='degree' and @qualifier='grantor']"/>
+					</xsl:when>
+
+					<!-- Solo para el tipo Objeto de coferencia: evento -->
+					<xsl:when test="dim:field[@element='type'] = 'Objeto de conferencia'">
+						<xsl:value-of select="dim:field[@element='relation' and @qualifier='event']"/>
+					</xsl:when>
+					
+					<!-- Si tiene journalTitle -->
+					<xsl:when test="dim:field[@element = 'relation' and @qualifier='journalTitle']">
+						<xsl:value-of select="dim:field[@element='relation' and @qualifier='journalTitle']"/>
+						<xsl:if test="dim:field[@element='relation' and @qualifier='journalVolumeAndIssue']">
+							<xsl:text>; </xsl:text>
+							<xsl:value-of select="dim:field[@element='relation' and @qualifier='journalVolumeAndIssue']"/>
+						</xsl:if>
+
+						<!-- Si además tiene evento, lo muestro -->
+						<xsl:if test="dim:field[@element = 'relation' and @qualifier='event']">
+							<xsl:text> | </xsl:text>
+							<xsl:value-of select="dim:field[@element='relation' and @qualifier='event']"/>
+						</xsl:if>
+					</xsl:when>
+					
+					<!-- En cualquier otro caso, va la Institucion de Origen -->
+					<xsl:otherwise>
+						<xsl:value-of select="dim:field[@element='originInfo' and @qualifier='place']"/>
+					</xsl:otherwise>
+					
+				</xsl:choose>
+			</xsl:variable>
+
+			<div class="originInfo">
+				<xsl:attribute name="title"><xsl:value-of select="$originInfoContent"/></xsl:attribute>
+				<xsl:choose>
+					<xsl:when test="string-length(concat(dim:field[@element='subtype'],$originInfoContent)) > 95">
+						<xsl:value-of select="substring($originInfoContent,0,(95 - string-length(dim:field[@element='subtype'])))"/><xsl:text>...</xsl:text>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="$originInfoContent"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</div>
+			
+			<div class="publisher-date">
+				<!-- date.issued : extraemos el año solamente -->
+				<xsl:if test="dim:field[@element='date' and @qualifier='issued'] ">
+					<xsl:value-of select="substring(dim:field[@element='date' and @qualifier='issued'],1,4)"></xsl:value-of>
+				</xsl:if>
+			</div>
+		</div>
+		
+		<div class="artifact-description">
+			<div  class="artifact-title">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
                         <xsl:value-of select="$href"/>
@@ -1121,79 +1193,68 @@
 						</span>
 					</xsl:if>
                 </xsl:element>
-                <span class="Z3988">
-                    <xsl:attribute name="title">
-                        <xsl:call-template name="renderCOinS"/>
-                    </xsl:attribute>
-                    &#xFEFF; <!-- non-breaking space to force separating the end tag -->
-                </span>
-            </div>
-            <div class="artifact-info">
-                <span class="author">
-					<xsl:choose>
-						<xsl:when test="dim:field[@element='creator']">
-							<xsl:for-each select="dim:field[@element='creator']">
-								<xsl:copy-of select="node()"/>
-								<xsl:if test="count(following-sibling::dim:field[@element='creator']) != 0">
-									<xsl:text>; </xsl:text>
-								</xsl:if>
-							</xsl:for-each>
-						</xsl:when>
-						<xsl:when test="dim:field[@element='contributor' and @qualifier='compiler']">
-							<xsl:for-each select="dim:field[@element='contributor' and @qualifier='compiler']">
-								<xsl:copy-of select="node()"/>
-								<xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='compiler']) != 0">
-									<xsl:text>; </xsl:text>
-								</xsl:if>
-							</xsl:for-each>
-						</xsl:when>
-						<xsl:when test="dim:field[@element='contributor' and @qualifier='editor']">
-							<xsl:for-each select="dim:field[@element='contributor' and @qualifier='editor']">
-								<xsl:copy-of select="node()"/>
-								<xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='editor']) != 0">
-									<xsl:text>; </xsl:text>
-								</xsl:if>
-							</xsl:for-each>
-						</xsl:when>
-						<xsl:when test="dim:field[@element='contributor' and @qualifier='translator']">
-							<xsl:for-each select="dim:field[@element='contributor' and @qualifier='translator']">
-								<xsl:copy-of select="node()"/>
-								<xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='translator']) != 0">
-									<xsl:text>; </xsl:text>
-								</xsl:if>
-							</xsl:for-each>
-						</xsl:when>
-						<xsl:otherwise>
-							<i18n:text>xmlui.dri2xhtml.METS-1.0.no-author</i18n:text>
-						</xsl:otherwise>
-					</xsl:choose>
-                </span>
-                <xsl:text> </xsl:text>
-                <xsl:if test="dim:field[@element='date' and @qualifier='issued'] or dim:field[@element='publisher']">
-                        <span class="publisher-date">
-                            <xsl:text>(</xsl:text>
-                            <xsl:if test="dim:field[@element='publisher']">
-                                <span class="publisher">
-                                    <xsl:copy-of select="dim:field[@element='publisher']/node()"/>
-                                </span>
-                                <xsl:text>, </xsl:text>
-                            </xsl:if>
-                            <span class="date">
-                                                        <xsl:call-template name="render-date">
-                                                                <xsl:with-param name="dateString" select="dim:field[@element='date' and @qualifier='issued']"/>
-                                                        </xsl:call-template>
-                            </span>
-                            <xsl:text>)</xsl:text>
-                        </span>
-                </xsl:if>
-            </div>
-            <xsl:if test="dim:field[@element = 'description' and @qualifier='abstract']">
-                <xsl:variable name="abstract" select="dim:field[@element = 'description' and @qualifier='abstract']/node()"/>
-                <div class="artifact-abstract">
-                    <xsl:value-of select="util:shortenString($abstract, 220, 10)" disable-output-escaping="yes"/>
-                </div>
-            </xsl:if>
-        </div>
+			</div>
+
+			<div class="author">
+				<xsl:choose>
+					<xsl:when test="dim:field[@element='creator']">
+						<xsl:for-each select="dim:field[@element='creator']">
+							<xsl:copy-of select="node()"/>
+							<xsl:if test="count(following-sibling::dim:field[@element='creator']) != 0">
+								<xsl:text>; </xsl:text>
+							</xsl:if>
+						</xsl:for-each>
+					</xsl:when>
+					<xsl:when test="dim:field[@element='contributor' and @qualifier='compiler']">
+						<xsl:for-each select="dim:field[@element='contributor' and @qualifier='compiler']">
+							<xsl:copy-of select="node()"/>
+							<xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='compiler']) != 0">
+								<xsl:text>; </xsl:text>
+							</xsl:if>
+						</xsl:for-each>
+					</xsl:when>
+					<xsl:when test="dim:field[@element='contributor' and @qualifier='editor']">
+						<xsl:for-each select="dim:field[@element='contributor' and @qualifier='editor']">
+							<xsl:copy-of select="node()"/>
+							<xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='editor']) != 0">
+								<xsl:text>; </xsl:text>
+							</xsl:if>
+						</xsl:for-each>
+					</xsl:when>
+					<xsl:when test="dim:field[@element='contributor' and @qualifier='translator']">
+						<xsl:for-each select="dim:field[@element='contributor' and @qualifier='translator']">
+							<xsl:copy-of select="node()"/>
+							<xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='translator']) != 0">
+								<xsl:text>; </xsl:text>
+							</xsl:if>
+						</xsl:for-each>
+					</xsl:when>
+					<xsl:otherwise>
+						<i18n:text>xmlui.dri2xhtml.METS-1.0.no-author</i18n:text>
+					</xsl:otherwise>
+				</xsl:choose>
+			</div>
+			
+			<xsl:choose>
+				<!-- Tiene archivos cargados -->
+			 	<xsl:when test="../../../../mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']"> 
+					<span i18n:attr="title">
+					    <xsl:attribute name="class">availability local</xsl:attribute>
+					    <xsl:attribute name="title">xmlui.dri2xhtml.METS-1.0.item-availability-local-help</xsl:attribute>
+						<xsl:text> </xsl:text>
+					</span>
+	            </xsl:when>					
+				<!-- Tiene Localizacion Electronica -->
+				<xsl:when test="dim:field[@element='identifier'  and @qualifier='uri' and @mdschema='sedici']"> 
+					<span i18n:attr="title">
+					    <xsl:attribute name="class">availability linked</xsl:attribute>
+					    <xsl:attribute name="title">xmlui.dri2xhtml.METS-1.0.item-availability-linked-help</xsl:attribute>
+						<xsl:text> </xsl:text>
+					</span>
+				</xsl:when>
+			</xsl:choose>
+			
+       	</div>
 	</xsl:template>
 
 	<!-- An item rendered in the detailView pattern, the "full item record"  view of a DSpace item in Manakin. -->
