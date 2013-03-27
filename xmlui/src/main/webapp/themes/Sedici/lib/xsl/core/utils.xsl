@@ -85,6 +85,8 @@
 	     		<xsl:copy-of select="dri:p[@id='aspect.xmlworkflow.WorkflowTransformer.p.hidden-fields']"/>
 	     		<xsl:copy-of select="dri:p/dri:field[@id='aspect.xmlworkflow.WorkflowTransformer.field.submit_full_item_info']"/>
 	    		<xsl:copy-of select="dri:referenceSet[@id='ar.edu.unlp.sedici.aspect.collectionViewer.CollectionViewer.referenceSet.community-view-root']"/>
+	  		    <xsl:copy-of select="dri:div[@id='aspect.xmlworkflow.WorkflowTransformer.div.general-message']"/>
+	    		<xsl:copy-of select="dri:list[@id='aspect.xmlworkflow.WorkflowTransformer.list.delete-workflow']"/>
 	  		</xsl:with-param>
 		</xsl:apply-templates>
 	</xsl:template>
