@@ -393,8 +393,8 @@ implements DOIConnector
             // 500 is documented and signals an internal server error
             case (500) :
             {
-                log.warn("Caught an http status code while checking if a DOI is "
-                        +"registered. Message was: " + resp.getContent());
+                log.warn("Caught an http status code 500 while checking if a "
+                        +"DOI is registered. Message was: " + resp.getContent());
                 throw new RuntimeException("DataCite API has an internal error. "
                         + "It is temporaribly impossible to check if a DOI is "
                         + "reservered. Further information can be found in "
@@ -544,8 +544,8 @@ implements DOIConnector
             // 500 is documented and signals an internal server error
             case (500) :
             {
-                log.warn("Caught an http status code while checking if a DOI is "
-                        +"registered. Message was: " + response.getContent());
+                log.warn("Caught an http status code 500 while checking if a "
+                        + "DOI is registered. Message was: " + response.getContent());
                 throw new RuntimeException("DataCite API has an internal error. "
                         + "It is temporaribly impossible to check if a DOI is "
                         + "registered. Further information can be found in "
@@ -569,15 +569,59 @@ implements DOIConnector
     {
         if (isDOIRegistered(context, doi))
             return false;
-
-        // delete mds/metadata/<doi>
-        // 200 -> ok
-        // 401 -> no login
-        // 403 -> wrong credential or doi belongs another party
-        // 404 -> doi neither reserved nor registered
-        // 500 -> internal server error
         
-        return false;
+        if (!isDOIReserved(context, doi))
+            return false;
+        
+        // delete mds/metadata/<doi>
+        DataCiteResponse resp = this.sendMetadataDeleteRequest(doi);
+        switch(resp.getStatusCode())
+        {
+            //ok
+            case (200) :
+            {
+                return true;
+            }
+            // we get a 401 if we forgot to send credentials or if the username
+            // and password did not match.
+            case (401) :
+            {
+                log.info("We were unable to authenticate against the DOI ({}) registry agency. It told us: {}", doi, resp.getContent());
+                throw new IllegalArgumentException("Cannot authenticate at the DOI registry agency. Please check if username and password are correctly set.");
+            }
+            // We get a 403 Forbidden if we are checking a DOI that belongs to
+            // another party or if there is a login problem.
+            case (403) :
+            {
+                log.info("Checking if DOI {} is registered was prohibeted by the registration agency: {}.", doi, resp.getContent());
+                throw new IdentifierException("Checking if a DOI is registered is only possible for DOIs that belongs to us.");
+            }
+            // 404 "Not Found" means DOI is neither reserved nor registered.
+            case (404) :
+            {
+                return false;
+            }
+            // 500 is documented and signals an internal server error
+            case (500) :
+            {
+                log.warn("Caught an http status code 500 while deleting "
+                        + " metadata of DOI " + doi + ". Message was: " 
+                        + resp.getContent());
+                throw new RuntimeException("DataCite API has an internal error. "
+                        + "It is temporaribly impossible to delete metadata of "
+                        + "DOIs. Further information can be found in DSpace log "
+                        + "file.");
+            }
+            // Catch all other http status code in case we forgot one.
+            default :
+            {
+                log.warn("While deleting metadata of DOI {}, we got a "
+                        + "http status code {} and the message \"{}\".",
+                        new String[] {doi, Integer.toString(resp.statusCode), resp.getContent()});
+                throw new IllegalStateException("Unable to parse an anwser from "
+                        + "DataCite API. Please have a look into DSpace logs.");
+            }
+        }
     }
 
     public boolean reserveDOI(Context context, DSpaceObject dso, String doi)
@@ -679,8 +723,8 @@ implements DOIConnector
             // 500 is documented and signals an internal server error
             case (500) :
             {
-                log.warn("Caught an http status code while reserving DOI " + doi
-                        +". Message was: " + resp.getContent());
+                log.warn("Caught an http status code 500 while reserving DOI " 
+                        + doi +". Message was: " + resp.getContent());
                 throw new RuntimeException("DataCite API has an internal error. "
                         + "It is temporaribly impossible to reserve DOIs. "
                         + "Further information can be found in DSpace log file.");
@@ -766,7 +810,7 @@ implements DOIConnector
         }
     }
     
-    // TODO
+    
     private DataCiteResponse sendMetadataDeleteRequest(String doi)
     {
         // delete mds/metadata/<doi>
