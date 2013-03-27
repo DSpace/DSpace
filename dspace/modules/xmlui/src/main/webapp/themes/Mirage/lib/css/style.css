@@ -1853,3 +1853,9 @@ a.learn-to-submit-button-option {
 #aspect_discovery_MostViewedItem_table_most-viewed td:first-child{
     width:400px;
 }
+#aspect_discovery_MostViewedItem_table_most-viewed h2{
+    font-size:15px;
+}
+td li{
+    list-style: none;
+}

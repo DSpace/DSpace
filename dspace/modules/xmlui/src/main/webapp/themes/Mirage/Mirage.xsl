@@ -1004,4 +1004,27 @@ parameter that is being used (see variable defined above) -->
             <xsl:apply-templates select="dri:item"/>
         </div>
     </xsl:template>
+
+    <xsl:template match="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostViewedItem.div.home']">
+
+        <div id="aspect_discovery_MostViewedItem_table_most-viewed">
+            <xsl:apply-templates select="./dri:div/dri:head"/>
+            <table>
+                <tr>
+                    <th><xsl:apply-templates select="./dri:div/dri:div[@n='items']/dri:head"/></th>
+                    <th><xsl:apply-templates select="./dri:div/dri:div[@n='count']/dri:head"/></th>
+                </tr>
+                <xsl:for-each select="./dri:div/dri:div[@n='items']/dri:referenceSet/dri:reference">
+                    <xsl:variable name="position">
+                        <xsl:value-of select="position()"/>
+                    </xsl:variable>
+                    <tr>
+                        <td><xsl:apply-templates select="." mode="summaryList"/></td>
+                        <td><xsl:apply-templates select="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostViewedItem.div.home']/dri:div/dri:div[@n='count']/dri:list/dri:item[position()=$position]"/></td>
+                    </tr>
+                </xsl:for-each>
+
+            </table>
+        </div>
+    </xsl:template>
 </xsl:stylesheet>

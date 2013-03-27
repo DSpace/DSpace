@@ -158,33 +158,29 @@ public class MostViewedItem extends AbstractFiltersTransformer {
             String[][] matrix = dataset.getMatrixFormatted();
 
             java.util.List<String[]> values = retrieveResultList(title, dataset, matrix[0]);
-
-            Table table = mainDiv.addTable("most-viewed", matrix.length, 2,
-                    title == null ? "" : "tableWithTitle");
             if (title != null)
             {
-                table.setHead(message(title));
+                mainDiv.setHead(message(title));
             }
-            Row headerRow = table.addRow();
+            Division items = mainDiv.addDivision("items");
+            Division count = mainDiv.addDivision("count");
 
-            headerRow.addCell("", Cell.ROLE_HEADER, "labelcell").addContent(message(T_head_view_title));
+            ReferenceSet referenceSet = items.addReferenceSet(
+                    "most-viewed-items", ReferenceSet.TYPE_SUMMARY_LIST,
+                    null, "most-viewed");
+            org.dspace.app.xmlui.wing.element.List list = count.addList(
+                    "most-viewed-count",
+                    org.dspace.app.xmlui.wing.element.List.TYPE_SIMPLE, "most-viewed-count");
 
-            headerRow.addCell("", Cell.ROLE_HEADER, "labelcell").addContent(message(T_head_view_count));
+            items.setHead(message(T_head_view_title));
 
+            count.setHead(message(T_head_view_count));
 
-            int col=0;
             for (String[] temp : values){
+                 DSpaceObject dso = HandleManager.resolveToObject(context,temp[0]);
+                 referenceSet.addReference(dso);
+                 list.addItem().addContent(temp[1]);
 
-                Row valListRow = table.addRow();
-
-                Cell catCell = valListRow.addCell(col + "1", Cell.ROLE_DATA,"labelcell");
-
-                catCell.addXref(temp[2],temp[0]);
-
-                Cell valCell = valListRow.addCell(col + "2", Cell.ROLE_DATA, "datacell");
-                valCell.addContent(temp[1]);
-
-                col++;
             }
             if(!this.sitemapURI.contains("most_viewed_items")){
                 mainDiv.addList("link-to-button").addItemXref("/most_viewed_items","View More");
@@ -214,7 +210,7 @@ public class MostViewedItem extends AbstractFiltersTransformer {
             }
             else
             {
-                dsoAxis.addDsoChild(Constants.ITEM, 10, false, -1);
+                dsoAxis.addDsoChild(Constants.ITEM, 5, false, -1);
             }
             statListing.addDatasetGenerator(dsoAxis);
 
@@ -257,32 +253,12 @@ public class MostViewedItem extends AbstractFiltersTransformer {
                     if(dso!=null){
 
                         DCValue[] vals = ((Item)dso).getMetadata("dc", "title", null, Item.ANY);
-                        DCValue[] authors = ((Item)dso).getMetadata("dc", "contributor", "author", Item.ANY);
-                        DCValue[] year = ((Item)dso).getMetadata("dc", "date", "issued", Item.ANY);
-                        DCValue[] identifier =  ((Item)dso).getMetadata("dc", "identifier", null, Item.ANY);
-                        String[] authorNames=new String[authors.length];
-                        int n=0;
-                        for(DCValue author : authors)
-                        {
-                            String[] names = author.value.split(",");
-                            String[] lastNames = names[names.length-1].trim().split(" ");
-                            String lastName="";
-                            for(String tem:lastNames){
-                                lastName=lastName+tem.trim().substring(0,1);
-                            }
 
-                            String tmpName = names[0]+" "+lastName;
-                            authorNames[n]=tmpName;
-                            n=n+1;
-                        }
-                        String authorName= StringUtils.join(authorNames, ",");
                         if(vals != null && 0 < vals.length)
                         {
-                            String itemTitle = vals[0].value;
                             String[] temp = new String[3];
-                            temp[0]=authorName+" ("+year[0].value.substring(0,4)+") "+itemTitle+". "+identifier[0].value;
+                            temp[0] = suffix;
                             temp[1]= strings[j];
-                            temp[2] =  prefix+"/resource/"+identifier[0].value;
                             values.add(temp);
                             i++;
                         }
