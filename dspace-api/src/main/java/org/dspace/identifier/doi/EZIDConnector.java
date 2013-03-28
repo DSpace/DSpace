@@ -48,10 +48,5 @@ public class EZIDConnector implements DOIConnector {
     public boolean registerDOI(Context context, DSpaceObject dso, String doi) throws IdentifierException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-
-    @Override
-    public void relax() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
     
 }
