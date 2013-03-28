@@ -7,20 +7,24 @@
  */
 package org.dspace.identifier.doi;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Level;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -699,6 +703,10 @@ implements DOIConnector
         String metadataDOI = extractDOI(root);
         if (null == metadataDOI)
         {
+            // The DOI will be saved as metadata of dso after successful
+            // registration. To register a doi it has to be part of the metadata
+            // send to DataCite. So we'll add it to the XML we send DataCite
+            // and will add it to the DSO after successful registration.
             root = addDOI(doi, root);
         }
         else if (metadataDOI != doi)
@@ -716,6 +724,7 @@ implements DOIConnector
             // 201 -> created / ok
             case (201) :
             {
+                log.debug("Reserved DOI {}.", doi);
                 return true;
             }
             // 400 -> invalid XML
@@ -737,7 +746,7 @@ implements DOIConnector
             // and password did not match.
             case (401) :
             {
-                log.info("We were unable to authenticate against the DOI ({}) registry agency. It told us: {}", doi, resp.getContent());
+                log.info("We were unable to authenticate against the DOI registry agency. It told us: {}", resp.getContent());
                 throw new IllegalArgumentException("Cannot authenticate at the DOI registry agency. Please check if username and password are correctly set.");
             }
             // We get a 403 Forbidden if we are checking a DOI that belongs to
@@ -769,16 +778,89 @@ implements DOIConnector
     }
     
     public boolean registerDOI(Context context, DSpaceObject dso, String doi)
+            throws IdentifierException
     {
-        
+        log.debug("Want to register DOI {}!", doi);
+
         // send doi=<doi>\nurl=<url> to mds/doi
-        // 412 -> prediction failed -> not reserved
-        // 403 -> wrong credential, quota exceeded
-        // 401 -> no login
-        // 400 -> wrong domain, wrong prefix, wrong request body
-        // 201 -> created/updated
-        // 500 -> try again later / internal server error
-        return false;
+        DataCiteResponse resp = null;
+        try
+        {
+            resp = this.sendDOIPostRequest(doi, 
+                    HandleManager.resolveToURL(context, dso.getHandle()));
+        }
+        catch (SQLException e)
+        {
+            log.error("Caught SQL-Exception while resolving handle to URL: "
+                    + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        
+        switch(resp.statusCode)
+        {
+            // 201 -> created/updated -> okay
+            case (201) :
+            {
+                return true;
+            }
+            // 400 -> wrong domain, wrong prefix, wrong request body
+            case (400) :
+            {
+                log.warn("We send an irregular request to DataCite. While "
+                        + "registering a DOI they told us: " + resp.getContent());
+                throw new IllegalStateException("Currently we cannot register "
+                        + "DOIs. Please inform the administrator or take a look "
+                        + " in the DSpace log file.");
+            }
+            // we get a 401 if we forgot to send credentials.
+            case (401) :
+            {
+                log.info("We were unable to authenticate against the DOI "
+                        + "registry agency. It told us: {}", resp.getContent());
+                throw new IllegalArgumentException("Cannot authenticate at the "
+                        + "DOI registry agency. Please check if username and "
+                        + "password are correctly set.");
+            }
+            // We get a 403 Forbidden if we are registering a DOI that belongs to
+            // another party or if there is a login problem.
+            case (403) :
+            {
+                log.info("Registration of DOI {} was prohibeted by the "
+                        + "registration agency: {}.", doi, resp.getContent());
+                throw new IdentifierException("There was a problem registering "
+                        + "a DOI. Either the login credentials are wrong or our "
+                        + "quota is exceeded.");
+            }
+            // 412 Precondition failed: DOI was not reserved before registration!
+            case (412) :
+            {
+                log.error("We tried to register a DOI {} that was not reserved "
+                        + "before! The registration agency told us: {}.", doi,
+                        resp.getContent());
+                throw new IdentifierException("There was an error in handling "
+                        + "of DOIs. The DOI we wanted to register had not been "
+                        + "reserved in advance. Please contact the administrator "
+                        + "or take a look in DSpace log file.");
+            }
+            // 500 is documented and signals an internal server error
+            case (500) :
+            {
+                log.warn("Caught an http status code 500 while reserving DOI " 
+                        + doi +". Message was: " + resp.getContent());
+                throw new RuntimeException("DataCite API has an internal error. "
+                        + "It is temporaribly impossible to reserve DOIs. "
+                        + "Further information can be found in DSpace log file.");
+            }
+            // Catch all other http status code in case we forgot one.
+            default :
+            {
+                log.warn("While registration of DOI {}, we got a http status code "
+                        + "{} and the message \"{}\".", new String[]
+                        {doi, Integer.toString(resp.statusCode), resp.getContent()});
+                throw new IllegalStateException("Unable to parse an anwser from "
+                        + "DataCite API. Please have a look into DSpace logs.");
+            }
+        }
     }
     
     /**
@@ -830,8 +912,7 @@ implements DOIConnector
         // post mds/doi/
         // body must contaion "doi=<doi>\nurl=<url>}n"
         URIBuilder uribuilder = new URIBuilder();
-        uribuilder.setScheme("https").setHost(HOST).setPath(DOI_PATH
-                + doi.substring(DOI.SCHEME.length()));
+        uribuilder.setScheme("https").setHost(HOST).setPath(DOI_PATH);
         
         HttpPost httppost = null;
         try
@@ -852,7 +933,7 @@ implements DOIConnector
         HttpEntity reqEntity = null;
         try
         {
-            String req = "doi=" + doi + "\n" + "url=" + url + "\n";
+            String req = "doi=" + doi.substring(DOI.SCHEME.length()) + "\n" + "url=" + url + "\n";
             ContentType contentType = ContentType.create("text/plain", "UTF-8");
             reqEntity = new StringEntity(req, contentType);
             httppost.setEntity(reqEntity);
@@ -1004,15 +1085,54 @@ implements DOIConnector
         try
         {
             HttpResponse response = httpclient.execute(req);
+            
             StatusLine status = response.getStatusLine();
             int statusCode = status.getStatusCode();
-            entity = response.getEntity();
-            if (null == entity)
-            {
-                return new DataCiteResponse(statusCode, null);
-            }
             
-            return new DataCiteResponse(statusCode, EntityUtils.toString(entity, "UTF-8"));
+            String content = null;
+            entity = response.getEntity();
+            if (null != entity)
+            {
+                content = EntityUtils.toString(entity, "UTF-8");
+            }
+
+            /* While debugging it can be useful to see whitch requests are send:
+             *
+             * log.debug("Going to send HTTP request of type " + req.getMethod() + ".");
+             * log.debug("Will be send to " + req.getURI().toString() + ".");
+             * if (req instanceof HttpEntityEnclosingRequestBase)
+             * {
+             *     log.debug("Request contains entity!");
+             *     HttpEntityEnclosingRequestBase reqee = (HttpEntityEnclosingRequestBase) req;
+             *     if (reqee.getEntity() instanceof StringEntity)
+             *     {
+             *         StringEntity se = (StringEntity) reqee.getEntity();
+             *         try {
+             *             BufferedReader br = new BufferedReader(new InputStreamReader(se.getContent()));
+             *             String line = null;
+             *             while ((line = br.readLine()) != null)
+             *             {
+             *                 log.debug(line);
+             *             }
+             *             log.info("----");
+             *         } catch (IOException ex) {
+             *             
+             *         }
+             *     }
+             * } else {
+             *     log.debug("Request contains no entity!");
+             * }
+             * log.debug("The request got http status code {}.", Integer.toString(statusCode));
+             * if (null == content)
+             * {
+             *     log.debug("The response did not contain any answer.");
+             * } else {
+             *     log.debug("DataCite says: {}", content);
+             * }
+             * 
+             */
+
+            return new DataCiteResponse(statusCode, content);
         }
         catch (IOException e)
         {
