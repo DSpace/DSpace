@@ -41,14 +41,6 @@ import org.springframework.beans.factory.annotation.Required;
 public class DOIIdentifierProvider
     extends IdentifierProvider
 {
-    /*
-     * TODOs:
-     *  - better exception handling
-     *  - search this file for TODOs an FIXMEs
-     *  - set DataCiteConnector.reseverDOI(...) and comparable methods to return void
-     *  - make an interface for DataCiteConnector
-     */
-    
     private static final Logger log = LoggerFactory.getLogger(DOIIdentifierProvider.class);
     
     static final String CFG_PREFIX = "identifier.doi.prefix";
@@ -200,29 +192,23 @@ public class DOIIdentifierProvider
             }
         }
         
-        try
+        if (!connector.registerDOI(context, dso, doi))
         {
-            if (!connector.registerDOI(context, dso, doi))
-            {
-                throw new IdentifierException("It was impossible to register the DOI "
-                    + doi + ". Take a look into the logs for further details.");
-            }
-        }
-        //FIXME add better exception handling
-        catch (Exception e)
-        {
-            throw new IdentifierException(e);
+            throw new IdentifierException("It was impossible to register the DOI "
+                + doi + ". Take a look into the logs for further details.");
         }
 
         try {
             saveDOIToObject(context, dso, doi);
         }
-        //FIXME add better exception handling
-        catch (Exception e)
+        catch (AuthorizeException ae)
         {
-            throw new IdentifierException(e);
+            throw new IdentifierException("Not authorized to save a DOI as metadata of an dso!", ae);
         }
-
+        catch (SQLException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -594,10 +580,10 @@ public class DOIIdentifierProvider
                 if (!connector.isDOIReserved(context, dso, doi) &&
                         connector.isDOIReserved(context, doi))
                 {
-                    throw new IllegalArgumentException("Trying to save a DOI " +
+                    throw new IdentifierException("Trying to save a DOI " +
                             "that is already reserved for another object.");
-                // safe it to db (see below)
                 }
+                // safe it to db (see below after end of if-else-statement)
             }
         }
         

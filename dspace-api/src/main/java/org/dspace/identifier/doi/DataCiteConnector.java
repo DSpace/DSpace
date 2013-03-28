@@ -206,8 +206,6 @@ implements DOIConnector
         this.configurationService = configurationService;
     }
     
-    // TODO: document how exception while initializing the crosswalks will be
-    // handeled.
     /**
      * Set the name of the dissemination crosswalk used to convert the metadata
      * into DataCite Metadata Schema. This method tries to initialize the named
@@ -586,15 +584,12 @@ implements DOIConnector
         }
     }
 
-    // TODO
+    
     public boolean deleteDOI(Context context, String doi)
             throws IdentifierException
     {
-        if (isDOIRegistered(context, doi))
-            return false;
-        
         if (!isDOIReserved(context, doi))
-            return false;
+            return true;
         
         // delete mds/metadata/<doi>
         DataCiteResponse resp = this.sendMetadataDeleteRequest(doi);
@@ -1148,7 +1143,6 @@ implements DOIConnector
         }
     }
 
-    // TODO: JAVADOC
     // returns null or handle
     private String extractAlternateIdentifier(Context context, String content)
     throws SQLException, IdentifierException
@@ -1175,7 +1169,7 @@ implements DOIConnector
         }
         
         String handle = null;
-        // TODO: add Namespace?
+        
         Iterator<Element> it = doc.getDescendants(new ElementFilter("alternativeIdentifier"));
         while (handle == null && it.hasNext())
         {
