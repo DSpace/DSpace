@@ -218,14 +218,6 @@ implements DOIConnector
     @Required
     public void setDisseminationCrosswalkName(String CROSSWALK_NAME) {
         this.CROSSWALK_NAME = CROSSWALK_NAME;
-        // FIXME: this fails while deployment: "Property 'disseminationCrosswalkName' threw exception; nested exception is java.lang.IllegalStateException: Cannot find dspace.cfg"
-        //this.xwalk = (DisseminationCrosswalk) PluginManager.getNamedPlugin(
-        //        DisseminationCrosswalk.class, CROSSWALK_NAME);
-        // FIXME handle the case if the crosswalk can't be found
-        //if (this.xwalk == null) {
-        //    throw new IllegalArgumentException("Can't find crosswalk '" + CROSSWALK_NAME + "'!");
-        //}
-
     }
     
     private void prepareXwalk()
@@ -238,7 +230,7 @@ implements DOIConnector
         
         if (this.xwalk == null)
         {
-            throw new IllegalStateException("Can't find crosswalk '"
+            throw new RuntimeException("Can't find crosswalk '"
                     + CROSSWALK_NAME + "'!");
         }
     }
@@ -380,7 +372,7 @@ implements DOIConnector
             case (401) :
             {
                 log.info("We were unable to authenticate against the DOI ({}) registry agency. It told us: {}", doi, resp.getContent());
-                throw new IllegalArgumentException("Cannot authenticate at the DOI registry agency. Please check if username and password are correctly set.");
+                throw new IdentifierException("Cannot authenticate at the DOI registry agency. Please check if username and password are correctly set.");
             }
                 
             // We get a 403 Forbidden if we are checking a DOI that belongs to
@@ -420,7 +412,7 @@ implements DOIConnector
             {
                 log.warn("Caught an http status code 500 while checking if a "
                         +"DOI is registered. Message was: " + resp.getContent());
-                throw new RuntimeException("DataCite API has an internal error. "
+                throw new IdentifierException("DataCite API has an internal error. "
                         + "It is temporaribly impossible to check if a DOI is "
                         + "reservered. Further information can be found in "
                         + "DSpace log file.");
@@ -436,7 +428,7 @@ implements DOIConnector
                             doi, Integer.toString(resp.statusCode),
                             resp.getContent()
                         });
-                throw new IllegalStateException("Unable to parse an anwser from "
+                throw new IdentifierException("Unable to parse an anwser from "
                         + "DataCite API. Please have a look into DSpace logs.");
             }
         }
@@ -496,7 +488,7 @@ implements DOIConnector
                 if (null == url)
                 {
                     log.error("Received a status code 200 without a response content. DOI: {}.", doi);
-                    throw new IllegalStateException("Received a http status code 200 without a response content.");
+                    throw new IdentifierException("Received a http status code 200 without a response content.");
                 }
                 
                 String handle = null;
@@ -557,7 +549,7 @@ implements DOIConnector
             case (401) :
             {
                 log.info("We were unable to authenticate against the DOI ({}) registry agency. It told us: {}", doi, response.getContent());
-                throw new IllegalArgumentException("Cannot authenticate at the DOI registry agency. Please check if username and password are correctly set.");
+                throw new IdentifierException("Cannot authenticate at the DOI registry agency. Please check if username and password are correctly set.");
             }
             // We get a 403 Forbidden if we are checking a DOI that belongs to
             // another party or if there is a login problem.
@@ -577,7 +569,7 @@ implements DOIConnector
             {
                 log.warn("Caught an http status code 500 while checking if a "
                         + "DOI is registered. Message was: " + response.getContent());
-                throw new RuntimeException("DataCite API has an internal error. "
+                throw new IdentifierException("DataCite API has an internal error. "
                         + "It is temporaribly impossible to check if a DOI is "
                         + "registered. Further information can be found in "
                         + "DSpace log file.");
@@ -588,7 +580,7 @@ implements DOIConnector
                 log.warn("While checking if the DOI {} is registered, we got a "
                         + "http status code {} and the message \"{}\".",
                         new String[] {doi, Integer.toString(response.statusCode), response.getContent()});
-                throw new IllegalStateException("Unable to parse an anwser from "
+                throw new IdentifierException("Unable to parse an anwser from "
                         + "DataCite API. Please have a look into DSpace logs.");
             }
         }
@@ -618,7 +610,7 @@ implements DOIConnector
             case (401) :
             {
                 log.info("We were unable to authenticate against the DOI ({}) registry agency. It told us: {}", doi, resp.getContent());
-                throw new IllegalArgumentException("Cannot authenticate at the DOI registry agency. Please check if username and password are correctly set.");
+                throw new IdentifierException("Cannot authenticate at the DOI registry agency. Please check if username and password are correctly set.");
             }
             // We get a 403 Forbidden if we are checking a DOI that belongs to
             // another party or if there is a login problem.
@@ -638,7 +630,7 @@ implements DOIConnector
                 log.warn("Caught an http status code 500 while deleting "
                         + " metadata of DOI " + doi + ". Message was: " 
                         + resp.getContent());
-                throw new RuntimeException("DataCite API has an internal error. "
+                throw new IdentifierException("DataCite API has an internal error. "
                         + "It is temporaribly impossible to delete metadata of "
                         + "DOIs. Further information can be found in DSpace log "
                         + "file.");
@@ -649,7 +641,7 @@ implements DOIConnector
                 log.warn("While deleting metadata of DOI {}, we got a "
                         + "http status code {} and the message \"{}\".",
                         new String[] {doi, Integer.toString(resp.statusCode), resp.getContent()});
-                throw new IllegalStateException("Unable to parse an anwser from "
+                throw new IdentifierException("Unable to parse an anwser from "
                         + "DataCite API. Please have a look into DSpace logs.");
             }
         }
@@ -747,7 +739,7 @@ implements DOIConnector
             case (401) :
             {
                 log.info("We were unable to authenticate against the DOI registry agency. It told us: {}", resp.getContent());
-                throw new IllegalArgumentException("Cannot authenticate at the DOI registry agency. Please check if username and password are correctly set.");
+                throw new IdentifierException("Cannot authenticate at the DOI registry agency. Please check if username and password are correctly set.");
             }
             // We get a 403 Forbidden if we are checking a DOI that belongs to
             // another party or if there is a login problem.
@@ -761,7 +753,7 @@ implements DOIConnector
             {
                 log.warn("Caught an http status code 500 while reserving DOI " 
                         + doi +". Message was: " + resp.getContent());
-                throw new RuntimeException("DataCite API has an internal error. "
+                throw new IdentifierException("DataCite API has an internal error. "
                         + "It is temporaribly impossible to reserve DOIs. "
                         + "Further information can be found in DSpace log file.");
             }
@@ -771,7 +763,7 @@ implements DOIConnector
                 log.warn("While reserving the DOI {}, we got a http status code "
                         + "{} and the message \"{}\".", new String[]
                         {doi, Integer.toString(resp.statusCode), resp.getContent()});
-                throw new IllegalStateException("Unable to parse an anwser from "
+                throw new IdentifierException("Unable to parse an anwser from "
                         + "DataCite API. Please have a look into DSpace logs.");
             }
         }
@@ -808,7 +800,7 @@ implements DOIConnector
             {
                 log.warn("We send an irregular request to DataCite. While "
                         + "registering a DOI they told us: " + resp.getContent());
-                throw new IllegalStateException("Currently we cannot register "
+                throw new IdentifierException("Currently we cannot register "
                         + "DOIs. Please inform the administrator or take a look "
                         + " in the DSpace log file.");
             }
@@ -817,7 +809,7 @@ implements DOIConnector
             {
                 log.info("We were unable to authenticate against the DOI "
                         + "registry agency. It told us: {}", resp.getContent());
-                throw new IllegalArgumentException("Cannot authenticate at the "
+                throw new IdentifierException("Cannot authenticate at the "
                         + "DOI registry agency. Please check if username and "
                         + "password are correctly set.");
             }
@@ -847,7 +839,7 @@ implements DOIConnector
             {
                 log.warn("Caught an http status code 500 while reserving DOI " 
                         + doi +". Message was: " + resp.getContent());
-                throw new RuntimeException("DataCite API has an internal error. "
+                throw new IdentifierException("DataCite API has an internal error. "
                         + "It is temporaribly impossible to reserve DOIs. "
                         + "Further information can be found in DSpace log file.");
             }
@@ -857,7 +849,7 @@ implements DOIConnector
                 log.warn("While registration of DOI {}, we got a http status code "
                         + "{} and the message \"{}\".", new String[]
                         {doi, Integer.toString(resp.statusCode), resp.getContent()});
-                throw new IllegalStateException("Unable to parse an anwser from "
+                throw new IdentifierException("Unable to parse an anwser from "
                         + "DataCite API. Please have a look into DSpace logs.");
             }
         }
@@ -925,7 +917,7 @@ implements DOIConnector
                     + "produced a URISyntaxException. Please check the configuration parameters!");
             log.error("The URL was {}.", "https://" + HOST +
                     DOI_PATH + "/" + doi.substring(DOI.SCHEME.length()));
-            throw new IllegalArgumentException("The URL we constructed to check a DOI "
+            throw new RuntimeException("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!", e);
         }
         
@@ -974,7 +966,7 @@ implements DOIConnector
                     + "produced a URISyntaxException. Please check the configuration parameters!");
             log.error("The URL was {}.", "https://" + HOST +
                     DOI_PATH + "/" + doi.substring(DOI.SCHEME.length()));
-            throw new IllegalArgumentException("The URL we constructed to check a DOI "
+            throw new RuntimeException("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!", e);
         }
         return sendHttpRequest(httpdelete);
@@ -1007,7 +999,7 @@ implements DOIConnector
                     + "produced a URISyntaxException. Please check the configuration parameters!");
             log.error("The URL was {}.", "https://" + HOST +
                     DOI_PATH + "/" + doi.substring(DOI.SCHEME.length()));
-            throw new IllegalArgumentException("The URL we constructed to check a DOI "
+            throw new RuntimeException("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!", e);
         }
         return sendHttpRequest(httpget);
@@ -1045,7 +1037,7 @@ implements DOIConnector
                     + "produced a URISyntaxException. Please check the configuration parameters!");
             log.error("The URL was {}.", "https://" + HOST +
                     DOI_PATH + "/" + doi.substring(DOI.SCHEME.length()));
-            throw new IllegalArgumentException("The URL we constructed to check a DOI "
+            throw new RuntimeException("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!", e);
         }
         
@@ -1159,7 +1151,7 @@ implements DOIConnector
     // TODO: JAVADOC
     // returns null or handle
     private String extractAlternateIdentifier(Context context, String content)
-    throws SQLException
+    throws SQLException, IdentifierException
     {
         if (content == null)
         {
@@ -1179,7 +1171,7 @@ implements DOIConnector
         }
         catch (JDOMException jde)
         {
-            throw new IllegalArgumentException("Got an JDOMException while parsing a response from the DataCite API.", jde);
+            throw new IdentifierException("Got an JDOMException while parsing a response from the DataCite API.", jde);
         }
         
         String handle = null;

@@ -80,6 +80,7 @@ public class DOIIdentifierProvider
             this.PREFIX = this.configurationService.getProperty(CFG_PREFIX);
             if (null == this.PREFIX)
             {
+                log.warn("Cannot find DOI prefix in configuration!");
                 throw new RuntimeException("Unable to load DOI prefix from "
                         + "configuration. Cannot find property " +
                         CFG_PREFIX + ".");
@@ -174,7 +175,8 @@ public class DOIIdentifierProvider
         // check if DOI is registered for another object
         if (connector.isDOIRegistered(context, doi))
         {
-            throw new IllegalArgumentException("Trying to register a DOI that is "
+            log.warn("Trying to register DOI {}, that is already registered.", doi);
+            throw new IdentifierException("Trying to register a DOI that is "
                     + "registered for another object.");
         }
         
@@ -184,7 +186,9 @@ public class DOIIdentifierProvider
             // check if doi is already reserved for another dso
             if (connector.isDOIReserved(context, doi))
             {
-                throw new IllegalArgumentException("Trying to register a DOI " +
+                log.warn("Trying to register DOI {}, that is reserved for "
+                        + "another dso.", doi);
+                throw new IdentifierException("Trying to register a DOI " +
                         "that is reserved for another object.");
             }
             
@@ -268,7 +272,9 @@ public class DOIIdentifierProvider
             // check if doi is already reserved for another object
             if (connector.isDOIReserved(context, doi))
             {
-                throw new IllegalArgumentException("Trying to register a DOI " +
+                log.warn("Trying to reserve a DOI {} that is reserved for "
+                        + "another object.", doi);
+                throw new IdentifierException("Trying to reserve a DOI " +
                         "that is reserved for another object.");
             }
             // try to reserve the doi
