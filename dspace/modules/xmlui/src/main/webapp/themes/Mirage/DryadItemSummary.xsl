@@ -489,10 +489,6 @@
               </a>
             </p>
         </div>
-        <!-- Files in package -->
-        <div class="ds-static-div primary">
-          <p></p>
-        </div>
         <!-- citing -->
         <!-- CITATION FOR DATA PACKAGE -->
         <xsl:if
