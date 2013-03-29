@@ -52,21 +52,22 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         String org_legalname = parameters.getParameter("org_legalname","");
         String org_type = parameters.getParameter("org_type","");
         String org_annual_revenue = parameters.getParameter("org_annual_revenue",""); // required
+        String org_annual_revenue_currency = parameters.getParameter("org_annual_revenue_currency",""); // required
         String billing_contact_name = parameters.getParameter("billing_contact_name",""); // required
         String billing_email = parameters.getParameter("billing_email",""); // required
         String billing_address = parameters.getParameter("billing_address",""); // required
         String publications = parameters.getParameter("publications","");
         String membership_year_start = parameters.getParameter("membership_year_start",""); // required
-        String membership_how_many_years = parameters.getParameter("membership_how_many_years",""); // required
+        String membership_length = parameters.getParameter("membership_length",""); // required
         String rep_name = parameters.getParameter("rep_name",""); // required
         String rep_email = parameters.getParameter("rep_email",""); // required
         String comments = parameters.getParameter("comments","");
 
        return HashUtil.hash(org_name + "-" + org_name + "-" + org_legalname + "-" + 
-               org_type + "-" + org_annual_revenue + "-" + billing_contact_name + "-" + 
-               billing_email + "-" + billing_address + "-" + publications + "-" +
-               membership_year_start + "-" + membership_how_many_years + "-"+ rep_name + 
-               "-" + rep_email + "-" + comments);
+               org_type + "-" + org_annual_revenue + "-" + org_annual_revenue_currency + "-" +
+               billing_contact_name + "-" + billing_email + "-" + billing_address + "-" +
+               publications + "-" + membership_year_start + "-" + membership_length + "-"+
+               rep_name + "-" + rep_email + "-" + comments);
     }
 
     /**
