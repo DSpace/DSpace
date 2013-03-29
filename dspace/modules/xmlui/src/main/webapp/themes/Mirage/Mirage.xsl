@@ -166,11 +166,10 @@
             }
 
             #dryad-home-carousel .bx-pager {
-                bottom: -16px;
-                left: 8px;
             }
             #dryad-home-carousel .bx-pager-item {
-                float: left;
+                position: relative;
+                top: 2px;
             }
 
             #dryad-home-carousel .bx-controls-auto {
