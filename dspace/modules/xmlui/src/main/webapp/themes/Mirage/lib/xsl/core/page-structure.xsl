@@ -377,6 +377,11 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 </div>
 
                 <div id="main-menu">
+                    <xsl:if test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
+                        <xsl:attribute name="class">
+                            <xsl:text>authenticated-menu</xsl:text>
+                        </xsl:attribute>
+                    </xsl:if>
                     <ul class="sf-menu">
                         <li>
                             <a href="">About</a>

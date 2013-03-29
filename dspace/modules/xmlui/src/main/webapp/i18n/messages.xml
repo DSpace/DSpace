@@ -118,7 +118,7 @@
 
 
 	<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Recently Published
-		Data&#160;&#160;<a href="/feed/atom_1.0/10255/3"
+		Data&#160;&#160;<a href="/feed/atom_1.0/10255/3" class="single-image-link"
 			title="Web feed of data packages recently added to Dryad"><img
 				src="/themes/Dryad/images/rss.jpg" style="border: 0px;"/></a>
 	</message>

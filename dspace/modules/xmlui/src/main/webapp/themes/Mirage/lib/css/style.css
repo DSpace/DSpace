@@ -1387,8 +1387,8 @@ a.learn-to-submit-button {
     margin-right: 0px;
 }
 #login-item a, #sign-up-item a {
-    font-size: 0.6em;
-    padding: 0.6em 0.8em;
+    font-size: 0.75em;
+    padding: 0.4em 0.6em;
 }
 #login-item a:hover, #sign-up-item a:hover {
     -webkit-border-top-left-radius: 0px;

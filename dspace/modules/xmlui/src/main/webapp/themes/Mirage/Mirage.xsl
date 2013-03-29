@@ -188,6 +188,9 @@
             .blog-box li {
                 margin: 0.5em 0 1.2em;
             }
+            .home-col-2 #connect-illustrated-prose {
+                line-height: 1.3em;
+            }
 
             #connect-illustrated-prose img {
                 width: auto;
