@@ -388,6 +388,15 @@ div#ds-feed-option a
 
 p {
     margin-bottom: 10px;
+    line-height: 1.5em;
+}
+li, 
+div.bioText {
+    line-height: 1.5em;
+}
+.ds-div-head p,
+#submit-data-feature-box p {
+    line-height: 1.2em;
 }
 
 #aspect_eperson_PasswordLogin_div_register, #aspect_eperson_PasswordLogin_div_login {
