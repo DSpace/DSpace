@@ -912,6 +912,25 @@ references to stylesheets pulled directly from the pageMeta element. -->
                         })
                         .supposition();
 
+                    // General support for simple tabs (styled as buttons) in all pages
+                    // NOTE: This logic supports multiple sets of tabs on a page.
+                    var jQuerytabButtons = jQuery('.tab-buttons a');
+                    jQuerytabButtons.unbind('click').click(function() {
+                        // highlight this button and show its panel
+                        jQuery(this).addClass('selected');
+                        var jQuerypanel = jQuery(jQuery(this).attr('href'));
+                        jQuerypanel.show();
+                        // dim others and hide their panels
+                        jQuery(this).siblings().each(function() {
+                            jQuery(this).removeClass('selected');
+                            var jQuerypanel = jQuery(jQuery(this).attr('href'));
+                            jQuerypanel.hide();
+                        });
+                        return false;
+                    });
+                    // CLick the first (default) tab in each set
+                    jQuery('.tab-buttons a:first-child').click();
+
                 });
 
                 /* JS behaviors for Home page only */
@@ -928,22 +947,6 @@ references to stylesheets pulled directly from the pageMeta element. -->
                         autoControlsCombine: true
                     });
 
-                    // "tabs" in Browse Data
-                    var jQuerytabButtons = jQuery('#browse-data-buttons a');
-                    jQuerytabButtons.unbind('click').click(function() {
-                        // highlight this button and show its panel
-                        jQuery(this).addClass('selected');
-                        var jQuerypanel = jQuery(jQuery(this).attr('href'));
-                        jQuerypanel.show();
-                        // dim others and hide their panels
-                        jQuery(this).siblings().each(function() {
-                            jQuery(this).removeClass('selected');
-                            var jQuerypanel = jQuery(jQuery(this).attr('href'));
-                            jQuerypanel.hide();
-                        });
-                        return false;
-                    });
-                    jQuerytabButtons.eq(0).click();
                 });
 
                 /* Membership Form page only */

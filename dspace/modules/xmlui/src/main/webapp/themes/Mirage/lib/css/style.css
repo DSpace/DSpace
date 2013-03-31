@@ -1453,11 +1453,11 @@ a.learn-to-submit-button:hover {
     width: 22px;
 }
 
-#browse-data-buttons {
+.tab-buttons {
     padding-top: 8px;
     padding-bottom: 18px;
 }
-#browse-data-buttons a {
+.tab-buttons a {
     font-size: 14px;
     font-weight: bold;
     background-color: #707070;
@@ -1479,10 +1479,10 @@ a.learn-to-submit-button:hover {
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
 }
-#browse-data-buttons a:hover {
+.tab-buttons a:hover {
     background-color: #555;
 }
-#browse-data-buttons a.selected {
+.tab-buttons a.selected {
     background-color: #87C033;
     color: #333;
     border: 1px solid #555;
