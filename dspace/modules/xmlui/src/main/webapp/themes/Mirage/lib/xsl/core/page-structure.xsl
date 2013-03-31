@@ -884,37 +884,37 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
                 })();
 
+                /* JS behaviors for all Dryad pages */
                 jQuery(document).ready(function() {
 
                     jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").css("display","none");
 
                     jQuery("#advanced-search").click(function(){
+                        jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").toggle();
+                    });
 
-                    jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").toggle();
+                    jQuery('#main-menu ul.sf-menu')
+                        .supersubs({
+                            // all numeric properties are in em
+                            minWidth: 12,
+                            maxWidth: 24,
+                            extraWidth: 1
+                        })
+                        .superfish({
+                            // make the menu snappy (fast+simple animation)
+                            delay: 0,
+                            animation: {
+                                //height: 'show',
+                                opacity: 'show'
+                            },
+                            speed: 0, 
+                            disableHI: true     // remove menu delay (from hoverIntent)
+                        })
+                        .supposition();
 
                 });
 
-                jQuery('#main-menu ul.sf-menu')
-                    .supersubs({
-                        // all numeric properties are in em
-                        minWidth: 12,
-                        maxWidth: 24,
-                        extraWidth: 1
-                    })
-                    .superfish({
-                        // make the menu snappy (fast+simple animation)
-                        delay: 0,
-                        animation: {
-                            //height: 'show',
-                            opacity: 'show'
-                        },
-                        speed: 0, 
-                        disableHI: true     // remove menu delay (from hoverIntent)
-                    })
-                    .supposition();
-                });
-
-                /* Home page only */
+                /* JS behaviors for Home page only */
                 jQuery(document).ready(function() {
                     // main carousel at top of homepage
                     jQuery('#dryad-home-carousel .bxslider').bxSlider({
