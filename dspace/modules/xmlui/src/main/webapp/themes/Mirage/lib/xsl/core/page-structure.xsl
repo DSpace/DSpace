@@ -874,46 +874,44 @@ references to stylesheets pulled directly from the pageMeta element. -->
         <!-- Add a google analytics script if the key is present -->
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']">
             <script type="text/javascript"><xsl:text>
-                   var _gaq = _gaq || [];
-                   _gaq.push(['_setAccount', '</xsl:text><xsl:value-of
-                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>']);
-                   _gaq.push(['_trackPageview']);
+                var _gaq = _gaq || [];
+                _gaq.push(['_setAccount', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>']);
+                _gaq.push(['_trackPageview']);
 
-                   (function() {
-                       var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-                   })();
-
+                (function() {
+                    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                })();
 
                 jQuery(document).ready(function() {
 
-                  jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").css("display","none");
+                    jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").css("display","none");
 
-                  jQuery("#advanced-search").click(function(){
+                    jQuery("#advanced-search").click(function(){
 
-                  jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").toggle();
+                    jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").toggle();
 
-                    });
+                });
 
-                    jQuery('#main-menu ul.sf-menu')
-                        .supersubs({
-                            // all numeric properties are in em
-                            minWidth: 12,
-                            maxWidth: 24,
-                            extraWidth: 1
-                        })
-                        .superfish({
-                            // make the menu snappy (fast+simple animation)
-                            delay: 0,
-                            animation: {
-                                //height: 'show',
-                                opacity: 'show'
-                            },
-                            speed: 0, 
-                            disableHI: true     // remove menu delay (from hoverIntent)
-                        })
-                        .supposition();
+                jQuery('#main-menu ul.sf-menu')
+                    .supersubs({
+                        // all numeric properties are in em
+                        minWidth: 12,
+                        maxWidth: 24,
+                        extraWidth: 1
+                    })
+                    .superfish({
+                        // make the menu snappy (fast+simple animation)
+                        delay: 0,
+                        animation: {
+                            //height: 'show',
+                            opacity: 'show'
+                        },
+                        speed: 0, 
+                        disableHI: true     // remove menu delay (from hoverIntent)
+                    })
+                    .supposition();
                 });
 
                 /* Home page only */
