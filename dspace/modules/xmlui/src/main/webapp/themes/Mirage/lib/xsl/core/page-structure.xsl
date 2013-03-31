@@ -779,6 +779,18 @@ references to stylesheets pulled directly from the pageMeta element. -->
             &#160;
         </script>
 
+        <!-- Emulate HTML5 placeholder behavior (prompting text in input fields) with assigned CSS class. -->
+        <script type="text/javascript">
+            <xsl:attribute name="src">
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                <xsl:text>/themes/</xsl:text>
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                <xsl:text>/lib/js/jquery.complete-placeholder.min.js</xsl:text>
+            </xsl:attribute>
+            &#160;
+        </script>
 
         <!-- Add theme javascipt  -->
         <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)]">
