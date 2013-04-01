@@ -243,6 +243,10 @@ a.discreet {
     padding: 0;
 }
 
+#ds-options .simple-box {
+    margin-bottom: 18px;
+}
+
 h1.ds-option-set-head,
 .ds-div-head,
 /* special-case rules for the occasional top-level div.ds-static-div */
@@ -1516,6 +1520,7 @@ a.learn-to-submit-button:hover {
 }
 .simple-box h1 {
   color: #333;
+  font-size: 18px;
 }
 .simple-box .primary,
 .tab-panel .primary {
