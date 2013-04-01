@@ -932,6 +932,10 @@ li.ds-form-item label.ds-composite-component.last{
     padding-bottom: 1px;
 }
 
+.doi {
+    white-space: nowrap;
+}
+
 .community .artifact-title a {
     font-weight: bold;
 }
