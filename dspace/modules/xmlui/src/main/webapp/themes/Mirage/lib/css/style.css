@@ -1507,6 +1507,10 @@ a.learn-to-submit-button:hover {
     font-size: 120%;
 }
 
+.simple-box {
+    margin-bottom: 18px;
+}
+
 .simple-box h1,
 .tab-panel h1 {
   color: #40841C;
@@ -1516,6 +1520,7 @@ a.learn-to-submit-button:hover {
 }
 .simple-box h1 {
   color: #333;
+  font-size: 18px;
 }
 .simple-box .primary,
 .tab-panel .primary {
