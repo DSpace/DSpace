@@ -510,70 +510,58 @@
     </xsl:template>
 
     <xsl:template match="dri:options/dri:list[@n='DryadSearch']" priority="3">
+      <div class="simple-box">
         <!-- START SEARCH -->
-        <div class="home-col-1">
-            <h1 class="ds-div-head">Search for Data
-            </h1>
-
-            <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
-                  id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary"
-                  action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
-                <p class="ds-paragraph">
-                    <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
-                           id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
-                           placeholder="Search for data in Dryad"
-                           type="text" value=""/><!-- no whitespace between these!
-                     --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
-                               id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
-                               type="submit" value="Go"/>
-                </p>
-            </form>
-        </div>
-
+        <h1 class="ds-div-head">Search for data
+        </h1>
+        <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
+              id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary"
+              action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
+            <p class="ds-paragraph">
+                <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
+                       id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
+                       placeholder="Search for data in Dryad"
+                       type="text" value=""/><!-- no whitespace between these!
+                 --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
+                           id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
+                           type="submit" value="Go"/>
+            </p>
+        </form>
+      </div>
     </xsl:template>
 
     <xsl:template match="dri:options/dri:list[@n='DryadConnect']" priority="3">
-
+      <div class="simple-box">
         <!-- START CONNECT  -->
-        <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be a part of Dryad
+        <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Become a part of Dryad
         </h1>
         <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 600px; font-size: 14px;">
-                <div id="connect-illustrated-prose">
-                    <p>
-                        <img src="/themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" />
-                        Publishers, societies, universities, libraries, funders, and other stakeholder organizations are invited to become <a href="/pages/membershipOverview">Members</a>. Tap into an active knowledge-sharing network, receive discounts on deposit fees, and help shape Dryad’s future.
-                        <img src="/themes/Mirage/images/seed-3.png" style="float: right; margin-right: -8px;" />
-                    </p>
-                    <p>
-                        <a href="/pages/journalIntegration">Submission Integration</a> is a service provided to journals free-of-charge to coordinate manuscript submission with data submission to Dryad.  It makes data deposition easy for researchers; makes linking articles and data easy for journals; and enables confidential review of data prior to publication.
-                    </p>
-                    <p>
-                        <img src="/themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" />
-                        Deposit fees enable Dryad’s content to be made available free of charge for research and educational reuse.  Flexible <a href="/pages/pricing">pricing plans</a> provide volume discounts on deposit fees.
-                    </p>
-                </div>
-	</div>
+            <p>
+                Learn more about
+                <a href="/pages/membershipOverview">membership</a>,
+                <a href="/pages/journalIntegration">submission integration</a>,
+                and
+                <a href="/pages/pricing">pricing plans</a>.
+            </p>
+	    </div>
+	  </div>
     </xsl:template>
 
     <xsl:template match="dri:options/dri:list[@n='DryadSubmitData']" priority="3">
+      <div id="submit-data-sidebar-box" class="simple-box">
         <!-- START DEPOSIT -->
-        <div id="submit-data-feature-box" class="home-col-2">
-            <h1 class="ds-div-head "
-                style="margin-top: 6px; font-size: 24px; border-bottom: none; text-align: center; padding: 25px 35px 19px; height: 76px;">Have data
-                for your publication?
-            </h1>
-            <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
-                <p class="ds-paragraph">
-                    <a class="submitnowbutton" href="/handle/10255/3/submit">Submit Data Now!</a>
-                </p>
-                <p style="font-size: 0.9em; padding-top: 4px;">
-                    <xsl:text>OR</xsl:text>
-                </p>
-                <p>
-                    <a class="learn-to-submit-button-option" href="/pages/faq#deposit">Learn how to submit data</a>
-                </p>
-            </div>
+        <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
+            <p class="ds-paragraph">
+                <a class="submitnowbutton" href="/handle/10255/3/submit">Deposit data from<br/>your publication</a>
+            </p>
+            <p style="font-size: 0.9em; margin: 4px; padding-top: 0px;">
+                <xsl:text>OR</xsl:text>
+            </p>
+            <p style="margin: 4px;">
+                <a class="learn-to-submit-button-option" href="/pages/faq#deposit">Learn how to deposit data</a>
+            </p>
         </div>
+      </div>
     </xsl:template>
 
     <xsl:template match="dri:options/dri:list[@n='DryadMail']" priority="3">

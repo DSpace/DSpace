@@ -719,6 +719,19 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 disable-output-escaping="yes">"&gt;&#160;&lt;\/script&gt;')</xsl:text>
         </script>
 
+        <!-- include the jQuery Migrate plugin to support deprecated APIs like jQuery.browser (used in some of plugins) -->
+        <script type="text/javascript">
+            <xsl:attribute name="src">
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                <xsl:text>/themes/</xsl:text>
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                <xsl:text>/lib/js/jquery-migrate-1.1.1.min.js</xsl:text>
+            </xsl:attribute>
+            &#160;
+        </script>
+
         <script type="text/javascript">
             <xsl:attribute name="src">
                 <xsl:value-of
