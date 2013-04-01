@@ -342,38 +342,9 @@
                         </xsl:for-each>
                     </div>
                     <div id="most-viewed-data" class="browse-data-panel">
-                        <h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-div-head">
-                            <i18n:text>Most viewed</i18n:text>
-                        </h1>
-                        <div id="aspect_discovery_SiteFeaturedItems_div_site-most-viewed"
-                             class="ds-static-div secondary most-viewed">
 
-			  <!-- placeholder content for Most Viewed until the real system is working -->
-			  <ul class="ds-artifact-list">
-			    <li class="ds-artifact-item odd">
-			      <div style="padding: 6px;" class="artifact-description">
-				<a href="/resource/doi:10.5061/dryad.154">Sulloway FJ (1982) Data from: The Beagle collections of Darwin's finches (Geospizinae). Dryad Digital Repository. http://dx.doi.org/10.5061/dryad.154</a>
-			      </div>
-			    </li>
-			    <li class="ds-artifact-item odd">
-			      <div style="padding: 6px;" class="artifact-description">
-				<a href="/resource/doi:10.5061/dryad.234">Zanne AE, Lopez-Gonzalez G, Coomes DA, Ilic J, Jansen S, Lewis SL, Miller RB, Swenson NG, Wiemann MC, Chave J (2009) Data from: Towards a worldwide wood economics spectrum. Dryad Digital Repository. http://dx.doi.org/10.5061/dryad.234</a>
-			      </div>
-			    </li>
-			    <li class="ds-artifact-item odd">
-			      <div style="padding: 6px;" class="artifact-description">
-				<a href="/resource/doi:10.5061/dryad.20617h5g">Belinky F, Szitenberg A, Goldfarb I, Feldstein T, Gert W, Ilan M, Huchon D (2012) Data from: ALG11 – a new variable DNA marker for sponge phylogeny: comparison of phylogenetic performances with the 18S rDNA and the COI gene. Dryad Digital Repository. http://dx.doi.org/10.5061/dryad.20617h5g</a>
-			      </div>
-			    </li>
-			    <li class="ds-artifact-item odd">
-			      <div style="padding: 6px;" class="artifact-description">
-				<a href="/resource/doi:10.5061/dryad.8384">Wu D, Wu M, Halpern A, Rusch DB, Yooseph S, Frazier M, Venter JC, Eisen JA (2011) Data from: Stalking the fourth domain in metagenomic data: searching for, discovering, and interpreting novel, deep branches in phylogenetic trees of phylogenetic marker genes. Dryad Digital Repository. http://dx.doi.org/10.5061/dryad.8384</a>
-			      </div>
-			    </li>
-			  </ul>
-			  <!-- end placeholder content -->
+                        <xsl:apply-templates select="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostViewedItem.div.home']"/>
 
-                        </div>
                     </div>
                     <div id="by-author" class="browse-data-panel">
                         <!--xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-dc.contributor.author_filter']"/-->
@@ -982,15 +953,31 @@ parameter that is being used (see variable defined above) -->
         </xsl:if>
     </xsl:template>
 
-    <xsl:template match="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='most_recent']">
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='most_recent' or @n='link-to-button']">
         <div class="link-to-button">
             <xsl:apply-templates select="dri:item"/>
         </div>
     </xsl:template>
 
-    <xsl:template match="/dri:document/dri:body/dri:div/dri:list[@n='link-to-button']">
-        <div class="link-to-button">
-            <xsl:apply-templates select="dri:item"/>
+    <xsl:template match="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostViewedItem.div.home']">
+        <div id="aspect_discovery_MostViewedItem_table_most-viewed">
+            <xsl:apply-templates select="./dri:div/dri:head"/>
+            <table>
+                <tr>
+                    <th><xsl:apply-templates select="./dri:div/dri:div[@n='items']/dri:head"/></th>
+                    <th><xsl:apply-templates select="./dri:div/dri:div[@n='count']/dri:head"/></th>
+                </tr>
+                <xsl:for-each select="./dri:div/dri:div[@n='items']/dri:referenceSet/dri:reference">
+                    <xsl:variable name="position">
+                        <xsl:value-of select="position()"/>
+                    </xsl:variable>
+                    <tr>
+                        <td><xsl:apply-templates select="." mode="summaryList"/></td>
+                        <td><xsl:apply-templates select="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostViewedItem.div.home']/dri:div/dri:div[@n='count']/dri:list/dri:item[position()=$position]"/></td>
+                    </tr>
+                </xsl:for-each>
+
+            </table>
         </div>
     </xsl:template>
 </xsl:stylesheet>

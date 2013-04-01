@@ -3310,4 +3310,8 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.submit">Submit</message>
     <message key="xmlui.dri2xhtml.structural.feedback-link">Feed Back</message>
 
+    <!--Most Viewed Items-->
+    <message key="xmlui.statistics.view.title">Most Viewed Items</message>
+    <message key="xmlui.statistics.view.count">Number of View</message>
+    <message key="xmlui.statistics.most.viewed.items">Most Viewed Items</message>
 </catalogue>
