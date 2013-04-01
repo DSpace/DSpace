@@ -535,6 +535,7 @@
                 </p>
             </form>
         </div>
+      </div>
     </xsl:template>
 
     <xsl:template match="dri:options/dri:list[@n='DryadConnect']" priority="3">
