@@ -326,16 +326,8 @@
                     <div id="browse-data-buttons">
                         <a href="#recently-published-data"><span>Recently published</span></a>
                         <a href="#most-viewed-data"><span>Most viewed</span></a>
-			<a>
-			  <xsl:attribute name="href">
-			    <![CDATA[/search-filter?query=&field=dc.contributor.author_filter]]>
-			  </xsl:attribute>
-			By author</a>
-			<a>
-			  <xsl:attribute name="href">
-                            <![CDATA[/search-filter?query=&field=prism.publicationName_filter]]>
-			  </xsl:attribute>
-                        By journal</a>
+                        <a href="#by-author"><span>By Author</span></a>
+                        <a href="#by-journal"><span>By Journal</span></a>
                     </div>
                     <div id="recently-published-data" class="browse-data-panel">
                         <xsl:for-each select="dri:div[@n='site-home']">
@@ -376,7 +368,16 @@
 
                         </div>
                     </div>
+                    <div id="by-author" class="browse-data-panel">
+                        <!--xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-dc.contributor.author_filter']"/-->
+                        <xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-dc.contributor.author_filter-results']"/>
 
+                    </div>
+                    <div id="by-journal" class="browse-data-panel">
+                        <!--xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-prism.publicationName_filter']"/-->
+                        <xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-prism.publicationName_filter-results']"/>
+
+                    </div>
                 </div>
             </div>
 
@@ -982,6 +983,12 @@ parameter that is being used (see variable defined above) -->
     </xsl:template>
 
     <xsl:template match="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='most_recent']">
+        <div class="link-to-button">
+            <xsl:apply-templates select="dri:item"/>
+        </div>
+    </xsl:template>
+
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:list[@n='link-to-button']">
         <div class="link-to-button">
             <xsl:apply-templates select="dri:item"/>
         </div>
