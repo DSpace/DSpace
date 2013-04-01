@@ -887,6 +887,21 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 /* JS behaviors for all Dryad pages */
                 jQuery(document).ready(function() {
 
+                    // If the page has separate sidebar boxes, try to align the topmost
+                    // box with the first "primary" box on the page.
+// allow suppression with the browser's query-string (TODO: remove this!)
+if (window.location.search.indexOf('noalign') == -1) {
+                    var topMainBox = $('#ds-body .primary:eq(0)');
+                    var topSidebarBox = $('#ds-options .simple-box:eq(0)');
+                    if (topMainBox.length && topSidebarBox.length) {
+                        var mainPageBoxTop = topMainBox.offset().top;
+                        var sidebarBoxTop = topSidebarBox.offset().top;
+                        var boxNudge = mainPageBoxTop - sidebarBoxTop;
+                        // ASSUMES that #ds-option has no padding-top!
+                        $('#ds-options').css('padding-top', boxNudge+"px");
+                    }
+}
+
                     jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").css("display","none");
 
                     jQuery("#advanced-search").click(function(){
@@ -914,6 +929,8 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
                     // General support for simple tabs (styled as buttons) in all pages
                     // NOTE: This logic supports multiple sets of tabs on a page.
+// allow suppression with the browser's query-string (TODO: remove this!)
+if (window.location.search.indexOf('notabs') == -1) {  
                     var jQuerytabButtons = jQuery('.tab-buttons a');
                     jQuerytabButtons.unbind('click').click(function() {
                         // highlight this button and show its panel
@@ -930,6 +947,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     });
                     // CLick the first (default) tab in each set
                     jQuery('.tab-buttons a:first-child').click();
+}
 
                 });
 
