@@ -292,6 +292,7 @@ h1.ds-option-set-head {
 #aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-interactive-div,
 #submit-data-feature-box h1,
 .tab-panel,
+.simple-box,
 div.ds-option-set {
     margin-top: 8px;
     padding: 8px 12px;
@@ -337,6 +338,20 @@ div.ds-option-set {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
+
+#submit-data-sidebar-box {
+  text-align: center;
+}
+#submit-data-sidebar-box .primary {
+  padding: 0;
+  margin: 0;
+}
+#submit-data-sidebar-box a.submitnowbutton {
+  display: block;
+  line-height: 1.1em;
+  padding: 9px 12px;
+}
+
 
 div.ds-option-set ul {
     list-style: none;
@@ -1492,12 +1507,17 @@ a.learn-to-submit-button:hover {
     font-size: 120%;
 }
 
+.simple-box h1,
 .tab-panel h1 {
   color: #40841C;
   border-bottom: none;
   padding: 0;
   margin: 0 0 0.5em;
 }
+.simple-box h1 {
+  color: #333;
+}
+.simple-box .primary,
 .tab-panel .primary {
   padding: 0;
   margin: 0;
