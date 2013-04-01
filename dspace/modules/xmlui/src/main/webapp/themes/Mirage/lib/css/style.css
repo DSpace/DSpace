@@ -243,10 +243,6 @@ a.discreet {
     padding: 0;
 }
 
-#ds-options .simple-box {
-    margin-bottom: 18px;
-}
-
 h1.ds-option-set-head,
 .ds-div-head,
 /* special-case rules for the occasional top-level div.ds-static-div */
@@ -1509,6 +1505,10 @@ a.learn-to-submit-button:hover {
 }
 .browse-data-panel h1.ds-div-head {
     font-size: 120%;
+}
+
+.simple-box {
+    margin-bottom: 18px;
 }
 
 .simple-box h1,
