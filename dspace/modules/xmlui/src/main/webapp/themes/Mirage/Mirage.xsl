@@ -535,7 +535,7 @@
         <!-- START CONNECT  -->
         <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Become a part of Dryad
         </h1>
-        <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 600px; font-size: 14px;">
+        <div id="ds_connect_with_dryad" class="ds-static-div primary" style="font-size: 14px;">
             <p>
                 Learn more about
                 <a href="/pages/membershipOverview">membership</a>,
@@ -550,7 +550,7 @@
     <xsl:template match="dri:options/dri:list[@n='DryadSubmitData']" priority="3">
       <div id="submit-data-sidebar-box" class="simple-box">
         <!-- START DEPOSIT -->
-        <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
+        <div class="ds-static-div primary" id="file_news_div_news">
             <p class="ds-paragraph">
                 <a class="submitnowbutton" href="/handle/10255/3/submit">Deposit data from<br/>your publication</a>
             </p>
@@ -558,7 +558,7 @@
                 <xsl:text>OR</xsl:text>
             </p>
             <p style="margin: 4px;">
-                <a class="learn-to-submit-button-option" href="/pages/faq#deposit">Learn how to deposit data</a>
+                <a href="/pages/faq#deposit">Learn how to deposit data</a>
             </p>
         </div>
       </div>
