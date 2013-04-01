@@ -213,7 +213,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                         <xsl:text>:</xsl:text>
                         <xsl:value-of
                                 select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='serverPort']"/>
-                        <xsl:value-of select="jQuerycontext-path"/>
+                        <xsl:value-of select="$context-path"/>
                         <xsl:text>/</xsl:text>
                         <xsl:value-of
                                 select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='context']"/>
@@ -302,11 +302,11 @@ references to stylesheets pulled directly from the pageMeta element. -->
                           select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']"/>
             <title>
                 <xsl:choose>
-                    <xsl:when test="not(jQuerypage_title)">
+                    <xsl:when test="not($page_title)">
                         <xsl:text>  </xsl:text>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:copy-of select="jQuerypage_title/node()"/>
+                        <xsl:copy-of select="$page_title/node()"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </title>
@@ -715,7 +715,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
         <script type="text/javascript">
             <xsl:text disable-output-escaping="yes">!window.jQuery &amp;&amp; document.write('&lt;script type="text/javascript" src="</xsl:text><xsl:value-of
-                select="jQuerylocalJQuerySrc"/><xsl:text
+                select="$localJQuerySrc"/><xsl:text
                 disable-output-escaping="yes">"&gt;&#160;&lt;\/script&gt;')</xsl:text>
         </script>
 
@@ -862,7 +862,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
             &#160;
         </script>
         <script type="text/javascript">
-            <xsl:text>DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');jQuery.each(jQuery('img[srcjQuery=png]'), function() {DD_belatedPNG.fixPng(this);});</xsl:text>
+            <xsl:text>DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');jQuery.each(jQuery('img[src$=png]'), function() {DD_belatedPNG.fixPng(this);});</xsl:text>
         </script>
         <xsl:text disable-output-escaping="yes">&lt;![endif]--&gt;</xsl:text>
 
