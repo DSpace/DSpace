@@ -285,12 +285,10 @@
                       id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary"
                       action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
                     <p class="ds-paragraph">
-                        <p>
-                            <label class="ds-form-label" for="aspect_discovery_SiteViewer_field_query"></label>
-                        </p>
                         <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                                id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
                                placeholder="Search for data in Dryad"
+                               title="Search for data in Dryad"
                                type="text" value=""/><!-- no whitespace between these!
                      --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
                                id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
@@ -307,15 +305,21 @@
                 <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 490px; font-size: 14px;">
                     <div id="connect-illustrated-prose">
                         <p>
-                            <img src="/themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" />
+                            <img src="/themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" 
+                                 alt="Dryad's data packages are like seeds."
+                                 title="Dryad's data packages are like seeds." />
                             Publishers, societies, universities, libraries, funders, and other stakeholder organizations are invited to become <a href="/pages/membershipOverview">Members</a>. Tap into an active knowledge-sharing network, receive discounts on deposit fees, and help shape Dryad’s future.
-                            <img src="/themes/Mirage/images/seed-3.png" style="float: right; margin-right: -8px;" />
+                            <img src="/themes/Mirage/images/seed-3.png" style="float: right; margin-right: -8px;" 
+                                 alt="Researchers use Dryad data in their new work."
+                                 title="Researchers use Dryad data in their new work."/>
                         </p>
                         <p>
                             <a href="/pages/journalIntegration">Submission Integration</a> is a service provided to journals free-of-charge to coordinate manuscript submission with data submission to Dryad.  It makes data deposition easy for researchers; makes linking articles and data easy for journals; and enables confidential review of data prior to publication.
                         </p>
                         <p>
-                            <img src="/themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" />
+                            <img src="/themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" 
+                                 alt="New data is added to Dryad, and the cycle continues."
+                                 title="New data is added to Dryad, and the cycle continues."/>
                             Deposit fees enable Dryad’s content to be made available free of charge for research and educational reuse.  Flexible <a href="/pages/pricing">pricing plans</a> provide volume discounts on deposit fees.
                         </p>
                     </div>
@@ -394,7 +398,7 @@
                           onsubmit="return subscribeMailingList(this);">
                         <p class="ds-paragraph" style="text-align: left; margin-bottom: 2px;">
                             <xsl:text>Sign up for announcements.</xsl:text>
-                            <input placeholder="Your e-mail" type="text" name="email" class="ds-text-field" style="width: 240px; margin-top: 8px;" id="file_news_div_mailing_list_input_email" />
+                            <input placeholder="Your e-mail" title="Your e-mail" type="text" name="email" class="ds-text-field" style="width: 240px; margin-top: 8px;" id="file_news_div_mailing_list_input_email" />
                         </p>
                         <input value="Subscribe" type="submit" name="submit" class="ds-button-field" id="file_news_div_mailing_list_input_subscribe" />
                     </form>
@@ -512,21 +516,25 @@
     <xsl:template match="dri:options/dri:list[@n='DryadSearch']" priority="3">
       <div class="simple-box">
         <!-- START SEARCH -->
-        <h1 class="ds-div-head">Search for data
-        </h1>
-        <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
-              id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary"
-              action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
-            <p class="ds-paragraph">
-                <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
-                       id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
-                       placeholder="Search for data in Dryad"
-                       type="text" value=""/><!-- no whitespace between these!
-                 --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
-                           id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
-                           type="submit" value="Go"/>
-            </p>
-        </form>
+        <div class="home-col-1">
+            <h1 class="ds-div-head">Search for Data
+            </h1>
+
+            <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
+                  id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary"
+                  action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
+                <p class="ds-paragraph">
+                    <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
+                           id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
+                           placeholder="Search for data in Dryad"
+                           title="Search for data in Dryad"
+                           type="text" value=""/><!-- no whitespace between these!
+                     --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
+                               id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
+                               type="submit" value="Go"/>
+                </p>
+            </form>
+        </div>
       </div>
     </xsl:template>
 
