@@ -88,7 +88,15 @@
                     </xsl:for-each>
                 </subjects>
             </xsl:if>
-	    
+
+	    <!-- ************ Resource Type ************** -->
+	    <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
+  	    <resourceType resourceTypeGeneral="Dataset">DataFile</resourceType>
+  	  </xsl:if>
+	    <xsl:if test="dspace:field[@element='relation' and @qualifier='haspart']">
+  	    <resourceType resourceTypeGeneral="Dataset">DataPackage</resourceType>
+  	  </xsl:if>
+
 	    <!-- *********** Related Identifiers ********* -->
             <xsl:if test="dspace:field[@element='relation']">
 	      <relatedIdentifiers>

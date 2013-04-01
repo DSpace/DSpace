@@ -28,7 +28,10 @@ import org.dspace.core.*;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.identifier.IdentifierService;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
 import org.dspace.utils.DSpace;
+import org.dspace.workflow.WorkflowItem;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -59,6 +62,8 @@ public class CDLDataCiteService {
     public static final String DATACITE_TITLE = "datacite.title";
     public static final String DATACITE_PUBLISHER = "datacite.publisher";
     public static final String DATACITE_PUBBLICATIONYEAR = "datacite.publicationyear";
+
+    public static final String DRYAD_PENDING_PUBLICATION_STEP = "pendingPublicationStep";
 
     public String publisher = null;
 
@@ -406,7 +411,25 @@ public class CDLDataCiteService {
     public static Map<String, String> createMetadataListXML(Item item) {
         Map<String, String> metadata = new HashMap<String, String>();
         try {
-            DisseminationCrosswalk dc = (DisseminationCrosswalk) PluginManager.getNamedPlugin(DisseminationCrosswalk.class, "DIM2DATACITE");
+            org.dspace.core.Context context = null;
+            try {
+                context = new org.dspace.core.Context();
+            } catch (SQLException e) {
+                System.exit(1);
+            }
+            context.turnOffAuthorisationSystem();
+            String crosswalk = "DIM2DATACITE";
+
+            // If item is in publication blackout, get the appropriate crosswalk
+            // Publication Blackout is determined by the taskowner table,
+            // which is not a part of dspace, so it must be queried directly.
+            String query = "select taskowner.step_id from taskowner, workflowitem where taskowner.workflow_item_id = workflowitem.workflow_id and workflowitem.item_id = ?";
+            TableRow row = DatabaseManager.querySingleTable(context, "taskowner", query, item.getID());
+            if(row != null && DRYAD_PENDING_PUBLICATION_STEP.equals(row.getStringColumn("step_id"))) {
+                log.info("Item is in publication blackout, using blackout crosswalk");
+                crosswalk = "DIM2DATACITE-BLACKOUT";
+            }
+            DisseminationCrosswalk dc = (DisseminationCrosswalk) PluginManager.getNamedPlugin(DisseminationCrosswalk.class, crosswalk);
             Element element = dc.disseminateElement(item);
             XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
             String xmlout = outputter.outputString(element);
