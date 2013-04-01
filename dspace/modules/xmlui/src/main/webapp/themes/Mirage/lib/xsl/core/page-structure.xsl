@@ -54,7 +54,7 @@
         overriding the dri:document template.
     -->
     <xsl:template match="dri:document">
-        <html class="no-js">
+         <html class="no-js" lang="en">
             <!-- First of all, build the HTML head element -->
             <xsl:call-template name="buildHead"/>
             <!-- Then proceed to the body -->
