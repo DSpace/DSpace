@@ -291,6 +291,7 @@ h1.ds-option-set-head {
 #aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-static-div,
 #aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-interactive-div,
 #submit-data-feature-box h1,
+.tab-panel
 div.ds-option-set {
     margin-top: 8px;
     padding: 8px 12px;
@@ -1489,6 +1490,26 @@ a.learn-to-submit-button:hover {
 }
 .browse-data-panel h1.ds-div-head {
     font-size: 120%;
+}
+
+.tab-panel h1 {
+  color: #40841C;
+  border-bottom: none;
+  padding: 0;
+  margin: 0 0 0.5em;
+}
+.tab-panel .primary {
+  padding: 0;
+  margin: 0;
+  border: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;  
+}
+
+h1.main-page-title {
+    font-size: 150%; 
+    margin-bottom: 8px;
 }
 div.citation-view {
     background-color: #FEFECD;
