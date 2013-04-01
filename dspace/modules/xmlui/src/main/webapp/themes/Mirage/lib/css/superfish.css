@@ -4,9 +4,14 @@
     margin:			0;
     padding:		0;
     list-style:		none;
+    font-size:		20px;
+}
+/* more compact font for admin users */
+.authenticated-menu .sf-menu, .authenticated-menu .sf-menu * {
     font-size:		17px;
 }
-.sf-menu {
+.sf-menu,
+.sf-menu li {
     line-height:	1.0;
 }
 .sf-menu ul {

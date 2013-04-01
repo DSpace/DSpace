@@ -35,12 +35,13 @@
                         <map:parameter name="org_legalname" value="{org_legalname}" />
                         <map:parameter name="org_type" value="{org_type}" />
                         <map:parameter name="org_annual_revenue" value="{org_annual_revenue}" />
+                        <map:parameter name="org_annual_revenue_currency" value="{org_annual_revenue_currency}" />
                         <map:parameter name="billing_contact_name" value="{billing_contact_name}" />
                         <map:parameter name="billing_email" value="{billing_email}" />
                         <map:parameter name="billing_address" value="{billing_address}" />
                         <map:parameter name="publications" value="{publications}" />
                         <map:parameter name="membership_year_start" value="{membership_year_start}" />
-                        <map:parameter name="membership_year_end" value="{membership_year_end}" />
+                        <map:parameter name="membership_length" value="{membership_length}" />
                         <map:parameter name="rep_name" value="{rep_name}" />
                         <map:parameter name="rep_email" value="{rep_email}" />
                         <map:parameter name="comments" value="{comments}" />

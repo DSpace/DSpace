@@ -430,7 +430,7 @@
     <h1 class="ds-div-head">Search for Data &nbsp; &nbsp; <a href="#">Browse authors</a> &nbsp; &nbsp; <a href="#">Browse journals</a></h1>
     <form xmlns="http://di.tamu.edu/DRI/1.0/" onsubmit="javascript:tSubmit(this);" method="get" action="/discover" class="ds-interactive-div primary" id="aspect_discovery_SiteViewer_div_front-page-search"
           style="height: 40px; text-align: center;">
-        <input value="Search for data in Dryad" type="text" name="query" class="ds-text-field" style="width: 450px;" id="aspect_discovery_SiteViewer_field_query" /><!-- no whitespace between these elements!
+        <input value="" placeholder="Search for data..." type="text" name="query" class="ds-text-field" style="width: 450px;" id="aspect_discovery_SiteViewer_field_query" /><!-- no whitespace between these elements!
         --><input value="Go" type="submit" name="submit" class="ds-button-field" id="aspect_discovery_SiteViewer_field_submit" />
     </form>
 </div>
@@ -892,6 +892,7 @@ END of #ds-options-wrapper -->
 <script type="text/javascript" src="files/superfish.js"></script>
 <script type="text/javascript" src="files/supersubs.js"></script>
 <script type="text/javascript" src="files/jquery.bxslider.min.js"></script>
+<script type="text/javascript" src="../Mirage/lib/js/jquery.complete-placeholder.min.js"></script>
 <script type="text/javascript">
             runAfterJSImports.execute();
         </script>

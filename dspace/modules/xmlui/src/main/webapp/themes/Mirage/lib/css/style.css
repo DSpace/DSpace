@@ -291,6 +291,8 @@ h1.ds-option-set-head {
 #aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-static-div,
 #aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-interactive-div,
 #submit-data-feature-box h1,
+.tab-panel,
+.simple-box,
 div.ds-option-set {
     margin-top: 8px;
     padding: 8px 12px;
@@ -336,6 +338,20 @@ div.ds-option-set {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
+
+#submit-data-sidebar-box {
+  text-align: center;
+}
+#submit-data-sidebar-box .primary {
+  padding: 0;
+  margin: 0;
+}
+#submit-data-sidebar-box a.submitnowbutton {
+  display: block;
+  line-height: 1.1em;
+  padding: 9px 12px;
+}
+
 
 div.ds-option-set ul {
     list-style: none;
@@ -388,6 +404,15 @@ div#ds-feed-option a
 
 p {
     margin-bottom: 10px;
+    line-height: 1.5em;
+}
+li, 
+div.bioText {
+    line-height: 1.5em;
+}
+.ds-div-head p,
+#submit-data-feature-box p {
+    line-height: 1.2em;
 }
 
 #aspect_eperson_PasswordLogin_div_register, #aspect_eperson_PasswordLogin_div_login {
@@ -1387,8 +1412,8 @@ a.learn-to-submit-button {
     margin-right: 0px;
 }
 #login-item a, #sign-up-item a {
-    font-size: 0.6em;
-    padding: 0.6em 0.8em;
+    font-size: 0.75em;
+    padding: 0.4em 0.6em;
 }
 #login-item a:hover, #sign-up-item a:hover {
     -webkit-border-top-left-radius: 0px;
@@ -1444,11 +1469,11 @@ a.learn-to-submit-button:hover {
     width: 22px;
 }
 
-#browse-data-buttons {
+.tab-buttons {
     padding-top: 8px;
     padding-bottom: 18px;
 }
-#browse-data-buttons a {
+.tab-buttons a {
     font-size: 14px;
     font-weight: bold;
     background-color: #707070;
@@ -1470,16 +1495,46 @@ a.learn-to-submit-button:hover {
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
 }
-#browse-data-buttons a:hover {
+.tab-buttons a:hover {
     background-color: #555;
 }
-#browse-data-buttons a.selected {
+.tab-buttons a.selected {
     background-color: #87C033;
     color: #333;
     border: 1px solid #555;
 }
 .browse-data-panel h1.ds-div-head {
     font-size: 120%;
+}
+
+.simple-box {
+    margin-bottom: 18px;
+}
+
+.simple-box h1,
+.tab-panel h1 {
+  color: #40841C;
+  border-bottom: none;
+  padding: 0;
+  margin: 0 0 0.5em;
+}
+.simple-box h1 {
+  color: #333;
+  font-size: 18px;
+}
+.simple-box .primary,
+.tab-panel .primary {
+  padding: 0;
+  margin: 0;
+  border: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;  
+}
+
+h1.main-page-title {
+    font-size: 150%; 
+    margin-bottom: 8px;
 }
 div.citation-view {
     background-color: #FEFECD;
@@ -1918,4 +1973,8 @@ a.learn-to-submit-button-option {
 /* eliminate whitespace (visible underlining) when a link wraps a single image */
 a.single-image-link {
     display: inline-block;
+}
+/* emulate HTML5 placeholder style for older browsers (triggered by complete-placeholder JS plugin) */
+.placeholder {
+    color: #999;
 }

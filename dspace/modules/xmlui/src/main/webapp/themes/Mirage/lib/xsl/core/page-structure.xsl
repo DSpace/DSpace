@@ -377,6 +377,11 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 </div>
 
                 <div id="main-menu">
+                    <xsl:if test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
+                        <xsl:attribute name="class">
+                            <xsl:text>authenticated-menu</xsl:text>
+                        </xsl:attribute>
+                    </xsl:if>
                     <ul class="sf-menu">
                         <li>
                             <a href="">About</a>
@@ -714,6 +719,19 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 disable-output-escaping="yes">"&gt;&#160;&lt;\/script&gt;')</xsl:text>
         </script>
 
+        <!-- include the jQuery Migrate plugin to support deprecated APIs like jQuery.browser (used in some of plugins) -->
+        <script type="text/javascript">
+            <xsl:attribute name="src">
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                <xsl:text>/themes/</xsl:text>
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                <xsl:text>/lib/js/jquery-migrate-1.1.1.min.js</xsl:text>
+            </xsl:attribute>
+            &#160;
+        </script>
+
         <script type="text/javascript">
             <xsl:attribute name="src">
                 <xsl:value-of
@@ -774,6 +792,18 @@ references to stylesheets pulled directly from the pageMeta element. -->
             &#160;
         </script>
 
+        <!-- Emulate HTML5 placeholder behavior (prompting text in input fields) with assigned CSS class. -->
+        <script type="text/javascript">
+            <xsl:attribute name="src">
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                <xsl:text>/themes/</xsl:text>
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                <xsl:text>/lib/js/jquery.complete-placeholder.min.js</xsl:text>
+            </xsl:attribute>
+            &#160;
+        </script>
 
         <!-- Add theme javascipt  -->
         <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)]">
@@ -857,26 +887,23 @@ references to stylesheets pulled directly from the pageMeta element. -->
         <!-- Add a google analytics script if the key is present -->
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']">
             <script type="text/javascript"><xsl:text>
-                   var _gaq = _gaq || [];
-                   _gaq.push(['_setAccount', '</xsl:text><xsl:value-of
-                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>']);
-                   _gaq.push(['_trackPageview']);
+                var _gaq = _gaq || [];
+                _gaq.push(['_setAccount', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>']);
+                _gaq.push(['_trackPageview']);
 
-                   (function() {
-                       var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-                   })();
+                (function() {
+                    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                })();
 
-
+                /* JS behaviors for all Dryad pages */
                 jQuery(document).ready(function() {
 
-                  jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").css("display","none");
+                    jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").css("display","none");
 
-                  jQuery("#advanced-search").click(function(){
-
-                  jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").toggle();
-
+                    jQuery("#advanced-search").click(function(){
+                        jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").toggle();
                     });
 
                     jQuery('#main-menu ul.sf-menu')
@@ -897,24 +924,10 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             disableHI: true     // remove menu delay (from hoverIntent)
                         })
                         .supposition();
-                });
 
-                /* Home page only */
-                jQuery(document).ready(function() {
-                    // main carousel at top of homepage
-                    jQuery('#dryad-home-carousel .bxslider').bxSlider({
-                        auto: true,
-                        autoHover: true,
-                        pause: 10000,  // in ms
-                        speed: 500,   // ms for slide transition
-                        mode: 'fade',  // can be 'horizontal', 'vertical', 'fade'
-                        controls: false,
-                        autoControls: false,
-                        autoControlsCombine: true
-                    });
-
-                    // "tabs" in Browse Data
-                    var jQuerytabButtons = jQuery('#browse-data-buttons a');
+                    // General support for simple tabs (styled as buttons) in all pages
+                    // NOTE: This logic supports multiple sets of tabs on a page.
+                    var jQuerytabButtons = jQuery('.tab-buttons a');
                     jQuerytabButtons.unbind('click').click(function() {
                         // highlight this button and show its panel
                         jQuery(this).addClass('selected');
@@ -928,7 +941,25 @@ references to stylesheets pulled directly from the pageMeta element. -->
                         });
                         return false;
                     });
-                    jQuerytabButtons.eq(0).click();
+                    // CLick the first (default) tab in each set
+                    jQuery('.tab-buttons a:first-child').click();
+
+                });
+
+                /* JS behaviors for Home page only */
+                jQuery(document).ready(function() {
+                    // main carousel at top of homepage
+                    jQuery('#dryad-home-carousel .bxslider').bxSlider({
+                        auto: true,
+                        autoHover: true,
+                        pause: 10000,  // in ms
+                        speed: 500,   // ms for slide transition
+                        mode: 'fade',  // can be 'horizontal', 'vertical', 'fade'
+                        controls: false,
+                        autoControls: false,
+                        autoControlsCombine: true
+                    });
+
                 });
 
                 /* Membership Form page only */
