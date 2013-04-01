@@ -66,7 +66,7 @@ and searching the repository.
             <map:transformer name="SearchFacetFilter" src="org.dspace.app.xmlui.aspect.discovery.SearchFacetFilter"/>
             <map:transformer name="FrontPageSearch" src="org.dspace.app.xmlui.aspect.discovery.SiteViewer"/>
             <map:transformer name="SiteRecentSubmissions" src="org.dspace.app.xmlui.aspect.discovery.SiteRecentSubmissions"/>
-
+            <map:transformer name="SearchFilterTransformer" src="org.dspace.app.xmlui.aspect.discovery.SearchFilterTransformer"/>
 
             <map:transformer name="CommunitySearch" src="org.dspace.app.xmlui.aspect.discovery.CommunitySearch"/>
             <map:transformer name="CommunityViewer" src="org.dspace.app.xmlui.aspect.discovery.CommunityViewer"/>
@@ -150,6 +150,12 @@ and searching the repository.
                 <map:transform type="SiteStatsOverview"/>
                 <map:transform type="FrontPageSearch"/>
                 <map:transform type="SiteRecentSubmissions"/>
+                <map:transform type="SearchFilterTransformer">
+                         <map:parameter name="field" value="dc.contributor.author_filter" />
+                </map:transform>
+                <map:transform type="SearchFilterTransformer">
+                         <map:parameter name="field" value="prism.publicationName_filter" />
+                </map:transform>
                 <map:serialize type="xml"/>
             </map:match>
 
