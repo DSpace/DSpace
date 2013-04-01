@@ -658,7 +658,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                 select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                         <xsl:text>/htmlmap</xsl:text>
                     </xsl:attribute>
-                    <xsl:text>&#160;</xsl:text>
+                    <xsl:text>sitemap</xsl:text>
                 </a>
             </div>
         </div>
