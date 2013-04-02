@@ -617,7 +617,9 @@ implements DOIConnector
             // 404 "Not Found" means DOI is neither reserved nor registered.
             case (404) :
             {
-                return false;
+                log.error("DOI {} is at least reserverd, but a delete reqeuest "
+                        + "told us that it is unknown!", doi);
+                return true;
             }
             // 500 is documented and signals an internal server error
             case (500) :

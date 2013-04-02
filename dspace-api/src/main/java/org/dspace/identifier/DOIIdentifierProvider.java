@@ -370,7 +370,15 @@ public class DOIIdentifierProvider
                     "information about a DOI for " + dso.getTypeText() + 
                     " with ID " + dso.getID() + ".", e);
         }
-        this.delete(context, dso, doi);
+        if (doi == null)
+        {
+            // doi is not in DB. Is it in dso metadata?
+            doi = this.getDOIOutOfObject(dso);
+        }
+        if (doi != null)
+        {
+            this.delete(context, dso, doi);
+        }
     }
 
     @Override
@@ -387,15 +395,11 @@ public class DOIIdentifierProvider
         String doi = formatIdentifier(identifier);
         log.debug("formated identifier as {}", doi);
         
-        if (connector.isDOIRegistered(context, doi))
-            throw new IdentifierException("Unable to delete DOI " + doi +
-                    ". It is already registered.");
-        
         // look for doi in DB
         // if it exists compare resource type and id
         // if not okay throw exception
-
-        try {
+        try
+        {
             removeDOIFromObject(context, dso, doi);
         }
         catch (AuthorizeException ex)
@@ -411,12 +415,11 @@ public class DOIIdentifierProvider
                     "metadata of an Item " + dso.getID(), ex);
         }
         
-        
-        // DataCiteConnector.deleteDOI(String doi)
-        // delete doi from database
-        
-        //if (!deleteDOI(context, dso, doi))
-        if (false)
+        // As a DOI is a persistent identifier it should not be deleted at all.
+        // DataCite for example can mark a DOI as inactive and uses http delete
+        // method to do so.
+        // DOIConnector returns boolean, try to delete DOI:
+        if(!connector.deleteDOI(context, doi))
         {
             // It was not possible to delete a DOI at the registry agency. We
             // already removed the DOI out of the metadata of the object,
@@ -445,6 +448,29 @@ public class DOIIdentifierProvider
             }
             throw new IdentifierException("Unable to delete DOI " + doi +
                     ". Take a look into the logs for further details.");
+        }
+        
+        // last thing to do is to delete the relation beteween DOI and item
+        try{
+            TableRow doiRow = DatabaseManager.findByUnique(context, "Doi", "doi", doi);
+            if (doiRow != null)
+            {
+                // Set ressource_id and type_id to null. In opposition to
+                // HandleIdentifierProvider we don't want to reuse DOIs at all!
+                doiRow.setColumnNull("resource_id");
+                doiRow.setColumnNull("resource_type_id");
+                DatabaseManager.update(context, doiRow);
+            }
+            else
+            {
+                log.warn("Cannot find entry for DOI " + doi +". Wanted to "
+                        + "the doi for object " + dso.getTypeText() + " id="
+                        + dso.getID());
+            }
+        }
+        catch(SQLException sqe)
+        {
+                throw new IdentifierException(sqe.getMessage(),sqe);
         }
         log.info("Deleted {}", doi);
     }
