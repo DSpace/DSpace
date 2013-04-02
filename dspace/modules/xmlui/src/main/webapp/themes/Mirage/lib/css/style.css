@@ -1958,7 +1958,7 @@ a.learn-to-submit-button-option {
 
 .link-to-button{
     text-align: center;
-
+    padding-bottom: 12px;
 }
 .link-to-button a{
     text-decoration: none;
@@ -1967,7 +1967,6 @@ a.learn-to-submit-button-option {
     background: green;
     color: white;
     padding: 2px 5px;
-
 }
 
 
