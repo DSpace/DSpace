@@ -1936,3 +1936,19 @@ a.single-image-link {
 .placeholder {
     color: #999;
 }
+
+/* FAQ style */
+.question-closer {
+    float: right;
+    margin: 4px 7px 0 8px;
+}
+.answer-panel {
+    border-top: 2px dotted #ccc;
+    border-bottom: 2px dotted #ccc;
+    padding: 6px 8px;
+    background-color: #eee;
+    margin-bottom: 6px;
+}
+.answer-panel h2 {
+    font-size: 116%;
+}

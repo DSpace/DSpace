@@ -1030,6 +1030,83 @@ if (window.location.search.indexOf('notabs') == -1) {
                     }
                 });
 
+                /* JS behaviors for FAQ page only */
+                // Enable expanding FAQ via JS (else jump to answers) TODO-FAQ
+                jQuery(document).ready(function() {
+                        if (jQuery('.faq-answers').length === 0) {
+                            // no FAQ on this page, never mind
+                            return;
+                        }
+
+                        var qLinkCloseText = 'Close';
+
+                        // hide all answers (we'll bring them up as needed)
+                        jQuery('.faq-answers').hide();
+                        var questionBlock = jQuery('.faq-questions');
+
+                        // strip links from section headings
+                        questionBlock.find('h2 a').each(function() {
+                            jQuery(this).replaceWith(jQuery(this).html());
+                        });
+
+                        // wire remaining links to toggle w/ answer panel
+                        questionBlock.find('a').unbind('click').click(function() {
+                            var qLink = jQuery(this);
+                            var qListItem = qLink.closest('li');
+                            // strip off preceding '#' and complete URL, if found
+                            var aHref = qLink.attr('href');
+                            if (typeof(aHref) === 'string') {
+                                aHref = aHref.split('#')[1];
+                            } else {
+                                console.log('No HREF found for this link:\n'+ qLink.text());
+                                return false;
+                            }
+                            if (qLink.text() === qLinkCloseText) {
+                                // hide answer and restore link question
+                                qLink.html( unescape(qLink.attr('full-question')) );
+                                qLink.removeClass('question-closer');
+                                qListItem.find('.answer-panel').remove();
+
+                            } else {
+                                // hide link question and show the matching answer
+                                qLink.attr('full-question', escape(qLink.html()) );
+                                qLink.text( qLinkCloseText );
+                                qLink.addClass('question-closer');
+                                qListItem.find('.answer-panel').remove(); // just in case
+                                qListItem.append('<div class="answer-panel"></div>');
+                                // find and copy the named answer below
+                                /// IF well-organized in DIVs: qAnswer = jQuery('#'+ aHref).clone(false);
+                                qAnswer = jQuery('#'+ aHref).nextUntil('h2[id]').andSelf().clone(false);
+                                qListItem.find('.answer-panel').append( qAnswer );
+                            }
+                            return false;
+                        });
+                        
+                        // add 'Open/Close All Answers' trigger
+                        questionBlock.prepend('<a id="all-faq-toggle" href="#" style="float: right;">Open All Answers</a>');
+                        jQuery('#all-faq-toggle').unbind('click').click(function() {
+                            var toggle = jQuery(this);
+                            if (toggle.text().indexOf('Open') > -1) {
+                                // open all answers and update label
+                                questionBlock.find('li > a').each(function() {
+                                    if (jQuery(this).text() !== qLinkCloseText) {
+                                        jQuery(this).click();
+                                    }
+                                });
+                                toggle.text('Close All Answers');
+                            } else {
+                                // close all answers and update label
+                                questionBlock.find('li > a').each(function() {
+                                    if (jQuery(this).text() === qLinkCloseText) {
+                                        jQuery(this).click();
+                                    }
+                                });
+                                toggle.text('Open All Answers');
+                            }
+                        });
+
+                });
+
            </xsl:text>
             </script>
         </xsl:if>
