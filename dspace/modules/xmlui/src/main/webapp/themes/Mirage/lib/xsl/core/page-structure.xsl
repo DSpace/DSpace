@@ -675,6 +675,11 @@ references to stylesheets pulled directly from the pageMeta element. -->
     -->
     <xsl:template match="dri:body">
         <div id="ds-body">
+            <xsl:if test="not(/dri:document/dri:options/dri:list[@n='discovery'] or /dri:document/dri:options/dri:list[@n='DryadSubmitData'] or /dri:document/dri:options/dri:list[@n='DryadSearch'] or /dri:document/dri:options/dri:list[@n='DryadConnect'])">
+                <xsl:attribute name="style">
+                    <xsl:text>width:100%</xsl:text>
+                </xsl:attribute>
+            </xsl:if>
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']">
                 <div id="ds-system-wide-alert">
                     <p>
@@ -899,7 +904,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
                 /* JS behaviors for all Dryad pages */
                 jQuery(document).ready(function() {
-
+                    jQuery('span.field-help').each(function(entry){
+                        jQuery(jQuery('span.field-help')[entry]).html(jQuery(jQuery('span.field-help')[entry]).text());
+                    });
                     jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").css("display","none");
 
                     jQuery("#advanced-search").click(function(){
