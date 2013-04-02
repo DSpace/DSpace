@@ -362,10 +362,10 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
                 <div id="sharing-tools">
                     <a href="http://twitter.com/datadryad">
-                        <img src="/themes/Mirage/images/dryad_twit_icon.png"/>
+                        <img src="/themes/Mirage/images/dryad_twit_icon.png" alt="Follow us on Twitter"/>
                     </a>
                     <a href="http://www.facebook.com/DataDryad">
-                        <img src="/themes/Mirage/images/dryad_fb_icon2.png"/>
+                        <img src="/themes/Mirage/images/dryad_fb_icon2.png" alt="Find us on Facebook"/>
                     </a>
 		    <!-- We don't currently have a Google Plus page...
                     <a href="">
@@ -373,7 +373,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     </a>
 		    -->
                     <a href="http://blog.datadryad.org/feed/">
-                        <img src="/themes/Mirage/images/dryad_rss_icon.png"/>
+                        <img src="/themes/Mirage/images/dryad_rss_icon.png" alt="RSS feed"/>
                     </a>
                 </div>
 
