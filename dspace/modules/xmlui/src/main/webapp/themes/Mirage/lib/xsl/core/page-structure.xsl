@@ -1086,7 +1086,7 @@ if (window.location.search.indexOf('notabs') == -1) {
                                 qLink.text( qLinkCloseText );
                                 qLink.addClass('question-closer');
                                 qListItem.find('.answer-panel').remove(); // just in case
-                                qListItem.append('<div class="answer-panel"></div>');
+                                qListItem.append('&lt;div class="answer-panel"&gt;&lt;/div&gt;');
                                 // find and copy the named answer below
                                 /// IF well-organized in DIVs: qAnswer = jQuery('#'+ aHref).clone(false);
                                 qAnswer = jQuery('#'+ aHref).nextUntil('h2[id]').andSelf().clone(false);
@@ -1096,7 +1096,7 @@ if (window.location.search.indexOf('notabs') == -1) {
                         });
                         
                         // add 'Open/Close All Answers' trigger
-                        questionBlock.prepend('<a id="all-faq-toggle" href="#" style="float: right;">Open All Answers</a>');
+                        questionBlock.prepend('&lt;a id="all-faq-toggle" href="#" style="float: right;"&gt;Open All Answers&lt;/a&gt;');
                         jQuery('#all-faq-toggle').unbind('click').click(function() {
                             var toggle = jQuery(this);
                             if (toggle.text().indexOf('Open') > -1) {
