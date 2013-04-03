@@ -894,7 +894,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
 if (window.location.search.indexOf('noalign') == -1) {
                     var topMainBox = $('#ds-body .primary:eq(0)');
                     var topSidebarBox = $('#ds-options .simple-box:eq(0)');
-                    if (topMainBox.length && topSidebarBox.length) {
+                    if (topMainBox.length &#38;&#38; topSidebarBox.length) {
                         var mainPageBoxTop = topMainBox.offset().top;
                         var sidebarBoxTop = topSidebarBox.offset().top;
                         var boxNudge = mainPageBoxTop - sidebarBoxTop;
