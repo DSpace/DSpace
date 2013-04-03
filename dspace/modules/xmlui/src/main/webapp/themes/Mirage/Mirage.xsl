@@ -329,7 +329,7 @@
             <!-- START BROWSE -->
             <div class="home-col-1">
                 <h1 class="ds-div-head">Browse for data</h1>
-                <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 537px; overflow: auto;">
+                <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 547px; overflow: auto;">
                     <div id="browse-data-buttons" class="tab-buttons">
                         <a href="#recently-published-data"><span>Recently published</span></a>
                         <a href="#most-viewed-data"><span>Most viewed</span></a>

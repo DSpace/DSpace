@@ -162,7 +162,7 @@ a:hover {
 }
 
 #ds-footer-wrapper {
-    margin-top: 25px;
+    margin-top: 10px;
     margin-bottom: 5px;
     overflow: hidden;
     clear: both;
@@ -946,6 +946,10 @@ li.ds-form-item label.ds-composite-component.last{
 .ds-artifact-item.community {
     padding-top: 1px;
     padding-bottom: 1px;
+}
+
+.doi {
+    white-space: nowrap;
 }
 
 .community .artifact-title a {
@@ -1988,5 +1992,24 @@ a.single-image-link {
 }
 td li{
     list-style: none;
+
+/* FAQ style */
+.question-closer {
+    float: right;
+    margin: 4px 7px 0 8px;
+}
+.answer-panel {
+    border-top: 2px dotted #ccc;
+    border-bottom: 2px dotted #ccc;
+    padding: 6px 8px;
+    background-color: #eee;
+    margin-bottom: 6px;
+}
+.answer-panel h2 {
+    font-size: 116%;
+}
+
+div.page-license {
+    margin-top: 1em;
 }
 
