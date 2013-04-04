@@ -14,6 +14,10 @@ jQuery(document).ready(function() {
         $('#ds-options').css('padding-top', boxNudge+"px");
     }
 
+    jQuery('span.field-help').each(function(entry){
+        jQuery(jQuery('span.field-help')[entry]).html(jQuery(jQuery('span.field-help')[entry]).text());
+    });
+
     jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").css("display","none");
 
     jQuery("#advanced-search").click(function(){

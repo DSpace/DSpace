@@ -917,7 +917,8 @@ parameter that is being used (see variable defined above) -->
             </i18n:text>
         </div>
     </xsl:template>
-    <xsl:template match="dri:help" mode="compositeComponent">
+    <!-- remove old dryad tooltip style help text-->
+    <!--xsl:template match="dri:help" mode="compositeComponent">
         <xsl:if
                 test="not(ancestor::dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-publication' or @id= 'aspect.submission.StepTransformer.div.submit-describe-dataset'])">
             <span class="composite-help">
@@ -937,16 +938,32 @@ parameter that is being used (see variable defined above) -->
                 <xsl:apply-templates/>
             </span>
         </xsl:if>
+    </xsl:template-->
+    <!--add hidden class to help text-->
+    <xsl:template match="dri:help" mode="compositeComponent">
+        <span class="composite-help">
+            <xsl:if test="ancestor::dri:field[@rend='hidden']">
+                <xsl:attribute name="class">
+                    <xsl:text>hidden</xsl:text>
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:apply-templates />
+        </span>
     </xsl:template>
-    <xsl:template match="dri:help" mode="help">
+    <xsl:template match="dri:help">
         <xsl:if
-                test="not(ancestor::dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-publication' or @id= 'aspect.submission.StepTransformer.div.submit-describe-dataset'])">
+                test="not(ancestor::dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-publication' or @id= 'aspect.submission.StepTransformer.div.submit-describe-dataset' or @id= 'aspect.submission.StepTransformer.div.submit-select-publication'])">
             <!--Only create the <span> if there is content in the <dri:help> node-->
             <xsl:if test="./text() or ./node()">
                 <span>
                     <xsl:attribute name="class">
                         <xsl:text>field-help</xsl:text>
                     </xsl:attribute>
+                    <xsl:if test="ancestor::dri:field[@rend='hidden']">
+                        <xsl:attribute name="class">
+                            <xsl:text>hidden</xsl:text>
+                        </xsl:attribute>
+                    </xsl:if>
                     <xsl:apply-templates/>
                 </span>
             </xsl:if>

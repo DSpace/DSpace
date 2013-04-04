@@ -228,9 +228,9 @@ a.discreet {
 }
 /* alignment fix for "nested" bodies */
 #ds-body #ds-body {
-  padding: 0;
-  margin: 0;
-  margin-top: -1em;
+    padding: 0;
+    margin: 0;
+    margin-top: -1em;
 }
 
 #ds-options-wrapper {
@@ -245,7 +245,7 @@ a.discreet {
 
 h1.ds-option-set-head,
 .ds-div-head,
-/* special-case rules for the occasional top-level div.ds-static-div */
+    /* special-case rules for the occasional top-level div.ds-static-div */
 #org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div .ds-div-head,
 #aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-div-head
 {
@@ -266,7 +266,7 @@ h1.ds-option-set-head {
 .ds-static-div .ds-div-head,
 .ds-static-div .ds-static-div,
 .ds-static-div .ds-interactive-div,
-/* special-case rules for the occasional top-level div.ds-static-div */
+    /* special-case rules for the occasional top-level div.ds-static-div */
 #org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div,
 #aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div,
 .publication-header.ds-static-div {
@@ -285,7 +285,7 @@ h1.ds-option-set-head {
 
 .ds-static-div,
 .ds-interactive-div,
-/* special-case rules for the occasional top-level div.ds-static-div */
+    /* special-case rules for the occasional top-level div.ds-static-div */
 #org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div .ds-static-div,
 #org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div .ds-interactive-div,
 #aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-static-div,
@@ -340,16 +340,16 @@ div.ds-option-set {
 }
 
 #submit-data-sidebar-box {
-  text-align: center;
+    text-align: center;
 }
 #submit-data-sidebar-box .primary {
-  padding: 0;
-  margin: 0;
+    padding: 0;
+    margin: 0;
 }
 #submit-data-sidebar-box a.submitnowbutton {
-  display: block;
-  line-height: 1.1em;
-  padding: 9px 12px;
+    display: block;
+    line-height: 1.1em;
+    padding: 9px 12px;
 }
 
 
@@ -406,7 +406,7 @@ p {
     margin-bottom: 10px;
     line-height: 1.5em;
 }
-li, 
+li,
 div.bioText {
     line-height: 1.5em;
 }
@@ -418,7 +418,7 @@ div.bioText {
 #aspect_eperson_PasswordLogin_div_register, #aspect_eperson_PasswordLogin_div_login {
     padding: 10px;
     width: 300px;
-} 
+}
 
 #aspect_eperson_PasswordLogin_div_register h1, #aspect_eperson_PasswordLogin_div_login h1 {
     font-size: 130%;
@@ -933,13 +933,13 @@ li.ds-form-item label.ds-composite-component.last{
 }
 
 .ds-artifact-item a {
-      text-decoration: none;
+    text-decoration: none;
 }
 .ds-artifact-item a span.doi {
-      text-decoration: underline;
+    text-decoration: underline;
 }
 .ds-artifact-item a:hover {
-      text-decoration: underline;
+    text-decoration: underline;
 }
 
 .ds-artifact-item.collection,
@@ -1440,7 +1440,7 @@ a.submitnowbutton {
     text-decoration: none;
     margin-top: 0.2em;
     padding: 0.4em 0.8em;
-/*  box-shadow: 0px 0px 6px rgba(33, 33, 33, 1.0); */
+    /*  box-shadow: 0px 0px 6px rgba(33, 33, 33, 1.0); */
     -moz-box-shadow: 2px 2px 12px rgba(33, 33, 33, 1.0);
     -webkit-box-shadow: 2px 2px 12px rgba(33, 33, 33, 1.0);
     box-shadow: 2px 2px 12px rgba(33, 33, 33, 1.0);
@@ -1517,27 +1517,27 @@ a.learn-to-submit-button:hover {
 
 .simple-box h1,
 .tab-panel h1 {
-  color: #40841C;
-  border-bottom: none;
-  padding: 0;
-  margin: 0 0 0.5em;
+    color: #40841C;
+    border-bottom: none;
+    padding: 0;
+    margin: 0 0 0.5em;
 }
 .simple-box h1 {
-  color: #333;
-  font-size: 18px;
+    color: #333;
+    font-size: 18px;
 }
 .simple-box .primary,
 .tab-panel .primary {
-  padding: 0;
-  margin: 0;
-  border: none;
-  -moz-box-shadow: none;
-  -webkit-box-shadow: none;
-  box-shadow: none;  
+    padding: 0;
+    margin: 0;
+    border: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
 }
 
 h1.main-page-title {
-    font-size: 150%; 
+    font-size: 150%;
     margin-bottom: 8px;
 }
 div.citation-view {
@@ -1559,9 +1559,6 @@ blockquote {
 }
 
 
-#aspect_submission_StepTransformer_list_submit-create-publication{
-    width:620px;
-}
 
 #aspect_submission_StepTransformer_item_article_status{
     margin-top: 100px;
@@ -1695,7 +1692,7 @@ img.ds-authority-confidence
 }
 
 
-/* 
+/*
   ***************************
   DATA PACKAGE PAGES
   ***************************
@@ -1731,8 +1728,8 @@ img.pub-cover {
 }
 .publication-header img.pub-cover {
     float: left;
-    height: 120px; 
-    width: 90px; 
+    height: 120px;
+    width: 90px;
     margin-right: 20px;
 }
 .publication-header .pub-title {
@@ -1745,11 +1742,11 @@ img.pub-cover {
     padding: 5px 7px;
     margin: 8px 20px;
     font-size: 0.9em;
-/*
-    -moz-box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25);
-    -webkit-box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25);
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25);
-*/
+    /*
+        -moz-box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25);
+        -webkit-box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25);
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25);
+    */
 }
 div.file-list {
     margin-top: 0;
@@ -1835,7 +1832,7 @@ div.ds-form-content {
     clear: right;
     display: block;
     padding: 7px;
-    width: 600px;
+    width:100%;
 }
 span.ds-form-label,label.ds-form-label {
     display: block;
@@ -2027,3 +2024,36 @@ div.page-license {
 #aspect_discovery_MostViewedItem_table_most-viewed td:last-child {
     text-align: right;
 }
+
+#aspect_submission_StepTransformer_list_submit-select-publication span.field-help,
+#aspect_submission_StepTransformer_div_submit-describe-dataset span.field-help,
+#aspect_submission_StepTransformer_list_submit-select-publication span.composite-help,
+#aspect_submission_StepTransformer_div_submit-describe-dataset span.composite-help{
+    width:350px;
+    float:right;
+    margin-right: 20px;
+    background-color: #FEFECD;
+    border:2px solid grey;
+    padding:5px;
+    font-weight: 900;
+
+}
+span.field-help li{
+    list-style: none;
+}
+#aspect_submission_StepTransformer_list_submit-upload-file span.field-help{
+    width:150px;
+    margin-left:2px;
+}
+
+#aspect_submission_StepTransformer_field_datafile_identifier{
+    width:150px;
+}
+
+table.datafiletable{
+    width:100%;
+}
+table.datafiletable span.ds-composite-field{
+    display: inline-block;
+}
+
