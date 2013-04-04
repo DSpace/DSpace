@@ -23,7 +23,10 @@
 
 
     <xsl:template match="dri:referenceSet[@type = 'embeddedView']" priority="2">
-        <xsl:apply-templates select="*[not(name()='head')]" mode="embeddedView"/>
+      <h2 class="ds-list-head">Files in this package</h2>
+        <div class="file-list">
+          <xsl:apply-templates select="*[not(name()='head')]" mode="embeddedView"/>
+        </div>
     </xsl:template>
 
 
@@ -46,33 +49,74 @@
 
         <xsl:variable name="my_doi"
                       select=".//dim:field[@element='identifier'][not(@qualifier)][starts-with(., 'doi:')]"/>
-        <hr class="item-separator"/>
-        <div style="padding-left:2px; padding-top:0px;">
-            <!-- Title && Views && Downloads -->
-            <span class="filename">
-                <xsl:copy-of select=".//dim:field[@element='title']"/>
-            </span>
+        <table class="package-file-description">
+          <tbody>
+          <tr>
+            <th>Title</th>
+            <th><xsl:copy-of select=".//dim:field[@element='title']"/></th>
+            <tr>
+              <th>Description</th>
+              <td>
+                <xsl:copy-of select=".//dim:field[@element='description'][@mdschema='dc'][not(@qualifier)]"/>
+              </td>
+            </tr>
+          </tr>
+          <xsl:for-each select="/mets:METS/mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file">
+            <tr>
+            <th>Download</th>
+            <td>
+              <a>
+                <!-- Download Link -->
+                <xsl:attribute name="href">
+                    <xsl:value-of select="mets:FLocat/@xlink:href"/>
+                </xsl:attribute>
 
-            <xsl:variable name="downloads" select=".//dim:field[@element='dryad'][@qualifier='downloads']"/>
-                <xsl:if test="$downloads">
-                    <span style="font-size: smaller; font-weight: bold;">
-                        <xsl:text>   </xsl:text>
-                        <xsl:value-of select="$downloads"/>
-                        <xsl:choose>
-                            <xsl:when test="string($downloads) = '1'">
-                                <xsl:text>&#160;</xsl:text>
-                                <i18n:text>xmlui.DryadItemSummary.download</i18n:text>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:text>&#160;</xsl:text>
-                                <i18n:text>xmlui.DryadItemSummary.downloads</i18n:text>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                </span>
-            </xsl:if>
-
-            <!-- View File Details -->
-            <xsl:if test="$token!=''">
+                <xsl:value-of select="mets:FLocat/@xlink:title"/>
+                <!-- File Size -->
+                <span class="bitstream-filesize">(
+                    <xsl:choose>
+                        <xsl:when test="@SIZE &lt; 1000">
+                            <xsl:value-of select="@SIZE"/>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
+                        </xsl:when>
+                        <xsl:when test="@SIZE &lt; 1000000">
+                            <xsl:value-of select="substring(string(@SIZE div 1000),1,5)"/>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
+                        </xsl:when>
+                        <xsl:when test="@SIZE &lt; 1000000000">
+                            <xsl:value-of select="substring(string(@SIZE div 1000000),1,5)"/>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="substring(string(@SIZE div 1000000000),1,5)"/>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    )</span>
+              </a>
+              <!-- Download count -->
+              <xsl:variable name="downloads" select=".//dim:field[@element='dryad'][@qualifier='downloads']"/>
+              <xsl:if test="$downloads">
+                  <span style="font-size: 0.8em;">
+                      <xsl:text>   </xsl:text>
+                      <xsl:value-of select="$downloads"/>
+                      <xsl:choose>
+                          <xsl:when test="string($downloads) = '1'">
+                              <xsl:text>&#160;</xsl:text>
+                              <i18n:text>xmlui.DryadItemSummary.download</i18n:text>
+                          </xsl:when>
+                          <xsl:otherwise>
+                              <xsl:text>&#160;</xsl:text>
+                              <i18n:text>xmlui.DryadItemSummary.downloads</i18n:text>
+                          </xsl:otherwise>
+                      </xsl:choose>
+                  </span>
+              </xsl:if>
+              <xsl:if test="not($downloads)">
+                <span>&#160;&#160;</span>
+              </xsl:if>
+              <!-- View File Details -->
+              <xsl:if test="$token!=''">
                 <a>
                     <xsl:attribute name="href">
                         <xsl:text>/review?doi=</xsl:text>
@@ -86,9 +130,9 @@
 
             <xsl:if test="not($token!='')">
                 <xsl:variable name="my_doi"
-                              select=".//dim:field[@element='identifier'][not(@qualifier)][starts-with(., 'doi:')]"/>
+                              select="//dim:field[@element='identifier'][not(@qualifier)][starts-with(., 'doi:')]"/>
                 <xsl:variable name="my_uri"
-                              select=".//dim:field[@element='identifier'][@qualifier='uri'][not(starts-with(., 'doi'))]"/>
+                              select="//dim:field[@element='identifier'][@qualifier='uri'][not(starts-with(., 'doi'))]"/>
                 <a>
 
                     <!-- link -->
@@ -107,15 +151,22 @@
 
                     <xsl:text>View&#160;File&#160;Details</xsl:text>
                 </a>
-            </xsl:if>
-        </div>
+                <xsl:choose>
+                  <xsl:when test="//dim:field[@element='rights'][.='http://creativecommons.org/publicdomain/zero/1.0/']">
+                    <!-- For items with the normal CC0 license, display cc-zero.png && opendata.png -->
+                    <div class="license-badges">
+                      <a href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank"><img src="/themes/Dryad/images/cc-zero.png"/></a>
+                      <a href="http://opendefinition.org/"><img src="/themes/Dryad/images/opendata.png"/></a>
+                    </div>
+                    </xsl:when>
+                  </xsl:choose>
+              </xsl:if>
+            </td>
+          </tr>
 
-        <div style="padding-left:1px; padding-top:2px;">
-            <span>
-                <xsl:copy-of select=".//dim:field[@element='description'][@mdschema='dc'][not(@qualifier)]"/>
-            </span>
-        </div>
-
+          </xsl:for-each>
+          </tbody>
+        </table>
 
         <!-- Embargo Notice -->
         <xsl:variable name="embargoedDate"
@@ -174,69 +225,12 @@
             </xsl:when>
         </xsl:choose>
 
-
-        <!-- Bitstream List -->
-        <div style="padding-left:2px; padding-top:2px;">
-            <xsl:for-each select="/mets:METS/mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file">
-                <!-- TITLE -->
-                <div>
-                    <span style="font-weight: bolder">
-                        Download:
-                        <a>
-                            <xsl:attribute name="href">
-                                <xsl:value-of select="mets:FLocat/@xlink:href"/>
-                            </xsl:attribute>
-                            <xsl:value-of select="mets:FLocat/@xlink:title"/>
-                        </a>
-                    </span>
-                    <!-- SIZE -->
-                    <span class="bitstream-filesize">(
-                        <xsl:choose>
-                            <xsl:when test="@SIZE &lt; 1000">
-                                <xsl:value-of select="@SIZE"/>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
-                            </xsl:when>
-                            <xsl:when test="@SIZE &lt; 1000000">
-                                <xsl:value-of select="substring(string(@SIZE div 1000),1,5)"/>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
-                            </xsl:when>
-                            <xsl:when test="@SIZE &lt; 1000000000">
-                                <xsl:value-of select="substring(string(@SIZE div 1000000),1,5)"/>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="substring(string(@SIZE div 1000000000),1,5)"/>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                        )
-                    </span>
-                </div>
-            </xsl:for-each>
-            <span></span>
-        </div>
-
         <xsl:choose>
             <xsl:when test=".//dim:field[@element='rights'][.='http://creativecommons.org/publicdomain/zero/1.0/']">
-              <!-- For items with the normal CC0 license, display cc-zero.png && opendata.png -->
-                <table class="license-line">
-                <tr>
-                    <td style="padding-left:2px">
-                        <i18n:text>xmlui.dri2xhtml.METS-1.0.license-cc0</i18n:text>
-                        <xsl:text> </xsl:text>
-                    </td>
-                    <td style="padding-left:0px">
-                        <a href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank">
-                            <img src="/themes/Dryad/images/cc-zero.png"/>
-                        </a>
-                    </td>
-                    <td style="padding-left:0px">
-                        <a href="http://opendefinition.org/">
-                            <img src="/themes/Dryad/images/opendata.png"/>
-                        </a>
-                    </td>
-                </tr>
-            </table>
+              <p style="font-size: 0.9em;">
+                  <i18n:text>xmlui.dri2xhtml.METS-1.0.license-cc0</i18n:text>
+                  <xsl:text> </xsl:text>
+              </p>
             <xsl:text> &#160; </xsl:text>
             </xsl:when>
             <xsl:when test=".//dim:field[@element='rights'][.='http://opensource.org/licenses/gpl-3.0']">
@@ -264,9 +258,6 @@
 	      <!-- If there isn't a license, do nothing. -->
             </xsl:otherwise>
         </xsl:choose>
-
-        <br/>
-        <br/>
     </xsl:template>
 
 
