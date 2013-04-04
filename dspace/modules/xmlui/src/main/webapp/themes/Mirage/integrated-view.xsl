@@ -23,12 +23,10 @@
 
 
     <xsl:template match="dri:referenceSet[@type = 'embeddedView']" priority="2">
-      <div class="ds-static-div primary">
       <h2 class="ds-list-head">Files in this package</h2>
         <div class="file-list">
           <xsl:apply-templates select="*[not(name()='head')]" mode="embeddedView"/>
         </div>
-      </div>
     </xsl:template>
 
 
