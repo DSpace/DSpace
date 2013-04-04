@@ -1751,6 +1751,7 @@ div.file-list {
     margin-top: 0;
 }
 table.package-file-description {
+    width: 100%;
     margin: 20px 0;
     background-color: #eee;
     border: 4px solid #eee;
