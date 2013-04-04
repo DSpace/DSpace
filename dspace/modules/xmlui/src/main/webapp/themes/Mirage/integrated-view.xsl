@@ -54,10 +54,16 @@
           <tr>
             <th>Title</th>
             <th><xsl:copy-of select=".//dim:field[@element='title']"/></th>
+            <tr>
+              <th>Description</th>
+              <td>
+                <xsl:copy-of select=".//dim:field[@element='description'][@mdschema='dc'][not(@qualifier)]"/>
+              </td>
+            </tr>
           </tr>
           <xsl:for-each select="/mets:METS/mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file">
             <tr>
-            <th>Download:</th>
+            <th>Download</th>
             <td>
               <a>
                 <!-- Download Link -->
@@ -161,13 +167,6 @@
           </xsl:for-each>
           </tbody>
         </table>
-
-        <div style="padding-left:1px; padding-top:2px;">
-            <span>
-                <xsl:copy-of select=".//dim:field[@element='description'][@mdschema='dc'][not(@qualifier)]"/>
-            </span>
-        </div>
-
 
         <!-- Embargo Notice -->
         <xsl:variable name="embargoedDate"
