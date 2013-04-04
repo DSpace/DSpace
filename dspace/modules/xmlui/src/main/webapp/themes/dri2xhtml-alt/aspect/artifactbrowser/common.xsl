@@ -194,7 +194,6 @@
         </xsl:variable>
         <xsl:comment> External Metadata URL: <xsl:value-of select="$externalMetadataURL"/> </xsl:comment>
         <xsl:apply-templates select="document($externalMetadataURL)" mode="summaryView"/>
-        <xsl:apply-templates />
     </xsl:template>
 
     <xsl:template match="dri:reference" mode="detailView">
