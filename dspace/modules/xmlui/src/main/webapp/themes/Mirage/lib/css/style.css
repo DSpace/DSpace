@@ -2057,3 +2057,16 @@ table.datafiletable span.ds-composite-field{
     display: inline-block;
 }
 
+dl.formatted,
+ol.formatted {
+  line-height: 1.5em;
+  margin: 0.25em 0;
+}
+dl.formatted dt {
+  padding-left: 1em;
+}
+dl.formatted dd,
+ol.formatted li {
+  padding-left: 2em;
+  margin-bottom: 0.75em;
+}
