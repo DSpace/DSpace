@@ -130,9 +130,9 @@
 
             <xsl:if test="not($token!='')">
                 <xsl:variable name="my_doi"
-                              select=".//dim:field[@element='identifier'][not(@qualifier)][starts-with(., 'doi:')]"/>
+                              select="//dim:field[@element='identifier'][not(@qualifier)][starts-with(., 'doi:')]"/>
                 <xsl:variable name="my_uri"
-                              select=".//dim:field[@element='identifier'][@qualifier='uri'][not(starts-with(., 'doi'))]"/>
+                              select="//dim:field[@element='identifier'][@qualifier='uri'][not(starts-with(., 'doi'))]"/>
                 <a>
 
                     <!-- link -->
