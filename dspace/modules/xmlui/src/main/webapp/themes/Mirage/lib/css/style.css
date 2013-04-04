@@ -1962,7 +1962,7 @@ a.learn-to-submit-button-option {
 
 .link-to-button{
     text-align: center;
-
+    padding-bottom: 12px;
 }
 .link-to-button a{
     text-decoration: none;
@@ -1971,7 +1971,6 @@ a.learn-to-submit-button-option {
     background: green;
     color: white;
     padding: 2px 5px;
-
 }
 
 
@@ -2013,3 +2012,18 @@ div.page-license {
     margin-top: 1em;
 }
 
+#aspect_discovery_MostViewedItem_table_most-viewed > h1 {
+    width: 360px; 
+    margin-bottom: -27px; 
+    background-color: #fff; 
+    position: relative;
+}
+#aspect_discovery_MostViewedItem_table_most-viewed li.ds-artifact-item
+#aspect_discovery_MostViewedItem_table_most-viewed div.artifact-description {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+#aspect_discovery_MostViewedItem_table_most-viewed th:last-child,
+#aspect_discovery_MostViewedItem_table_most-viewed td:last-child {
+    text-align: right;
+}
