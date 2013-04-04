@@ -4,8 +4,6 @@ jQuery(document).ready(function() {
 
     // If the page has separate sidebar boxes, try to align the topmost
     // box with the first "primary" box on the page.
-// allow suppression with the browser's query-string (TODO: remove this!)
-if (window.location.search.indexOf('noalign') == -1) {
     var topMainBox = $('#ds-body .primary:eq(0)');
     var topSidebarBox = $('#ds-options .simple-box:eq(0)');
     if (topMainBox.length && topSidebarBox.length) {
@@ -15,7 +13,6 @@ if (window.location.search.indexOf('noalign') == -1) {
         // ASSUMES that #ds-option has no padding-top!
         $('#ds-options').css('padding-top', boxNudge+"px");
     }
-}
 
     jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").css("display","none");
 
@@ -44,8 +41,6 @@ if (window.location.search.indexOf('noalign') == -1) {
 
     // General support for simple tabs (styled as buttons) in all pages
     // NOTE: This logic supports multiple sets of tabs on a page.
-// allow suppression with the browser's query-string (TODO: remove this!)
-if (window.location.search.indexOf('notabs') == -1) {  
     var jQuerytabButtons = jQuery('.tab-buttons a');
     jQuerytabButtons.unbind('click').click(function() {
         // highlight this button and show its panel
@@ -62,7 +57,6 @@ if (window.location.search.indexOf('notabs') == -1) {
     });
     // CLick the first (default) tab in each set
     jQuery('.tab-buttons a:first-child').click();
-}
 
 });
 
