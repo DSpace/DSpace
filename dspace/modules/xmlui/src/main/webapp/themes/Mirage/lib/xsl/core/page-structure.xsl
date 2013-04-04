@@ -54,7 +54,7 @@
         overriding the dri:document template.
     -->
     <xsl:template match="dri:document">
-        <html class="no-js">
+         <html class="no-js" lang="en">
             <!-- First of all, build the HTML head element -->
             <xsl:call-template name="buildHead"/>
             <!-- Then proceed to the body -->
@@ -213,7 +213,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                         <xsl:text>:</xsl:text>
                         <xsl:value-of
                                 select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='serverPort']"/>
-                        <xsl:value-of select="jQuerycontext-path"/>
+                        <xsl:value-of select="$context-path"/>
                         <xsl:text>/</xsl:text>
                         <xsl:value-of
                                 select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='context']"/>
@@ -302,11 +302,12 @@ references to stylesheets pulled directly from the pageMeta element. -->
                           select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']"/>
             <title>
                 <xsl:choose>
-                    <xsl:when test="not(jQuerypage_title)">
-                        <xsl:text>  </xsl:text>
+                    <xsl:when test="not($page_title)">
+                        <xsl:text>Dryad</xsl:text>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:copy-of select="jQuerypage_title/node()"/>
+                        <xsl:copy-of select="$page_title/node()"/>
+                        <xsl:text> -- Dryad</xsl:text>
                     </xsl:otherwise>
                 </xsl:choose>
             </title>
@@ -361,10 +362,10 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
                 <div id="sharing-tools">
                     <a href="http://twitter.com/datadryad">
-                        <img src="/themes/Mirage/images/dryad_twit_icon.png"/>
+                        <img src="/themes/Mirage/images/dryad_twit_icon.png" alt="Follow us on Twitter"/>
                     </a>
                     <a href="http://www.facebook.com/DataDryad">
-                        <img src="/themes/Mirage/images/dryad_fb_icon2.png"/>
+                        <img src="/themes/Mirage/images/dryad_fb_icon2.png" alt="Find us on Facebook"/>
                     </a>
 		    <!-- We don't currently have a Google Plus page...
                     <a href="">
@@ -372,7 +373,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     </a>
 		    -->
                     <a href="http://blog.datadryad.org/feed/">
-                        <img src="/themes/Mirage/images/dryad_rss_icon.png"/>
+                        <img src="/themes/Mirage/images/dryad_rss_icon.png" alt="RSS feed"/>
                     </a>
                 </div>
 
@@ -658,7 +659,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                 select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                         <xsl:text>/htmlmap</xsl:text>
                     </xsl:attribute>
-                    <xsl:text>&#160;</xsl:text>
+                    <xsl:text>sitemap</xsl:text>
                 </a>
             </div>
         </div>
@@ -715,7 +716,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
         <script type="text/javascript">
             <xsl:text disable-output-escaping="yes">!window.jQuery &amp;&amp; document.write('&lt;script type="text/javascript" src="</xsl:text><xsl:value-of
-                select="jQuerylocalJQuerySrc"/><xsl:text
+                select="$localJQuerySrc"/><xsl:text
                 disable-output-escaping="yes">"&gt;&#160;&lt;\/script&gt;')</xsl:text>
         </script>
 
@@ -875,7 +876,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
             &#160;
         </script>
         <script type="text/javascript">
-            <xsl:text>DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');jQuery.each(jQuery('img[srcjQuery=png]'), function() {DD_belatedPNG.fixPng(this);});</xsl:text>
+            <xsl:text>DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');jQuery.each(jQuery('img[src$=png]'), function() {DD_belatedPNG.fixPng(this);});</xsl:text>
         </script>
         <xsl:text disable-output-escaping="yes">&lt;![endif]--&gt;</xsl:text>
 
@@ -899,6 +900,21 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
                 /* JS behaviors for all Dryad pages */
                 jQuery(document).ready(function() {
+
+                    // If the page has separate sidebar boxes, try to align the topmost
+                    // box with the first "primary" box on the page.
+// allow suppression with the browser's query-string (TODO: remove this!)
+if (window.location.search.indexOf('noalign') == -1) {
+                    var topMainBox = $('#ds-body .primary:eq(0)');
+                    var topSidebarBox = $('#ds-options .simple-box:eq(0)');
+                    if (topMainBox.length &#38;&#38; topSidebarBox.length) {
+                        var mainPageBoxTop = topMainBox.offset().top;
+                        var sidebarBoxTop = topSidebarBox.offset().top;
+                        var boxNudge = mainPageBoxTop - sidebarBoxTop;
+                        // ASSUMES that #ds-option has no padding-top!
+                        $('#ds-options').css('padding-top', boxNudge+"px");
+                    }
+}
 
                     jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").css("display","none");
 
@@ -927,6 +943,8 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
                     // General support for simple tabs (styled as buttons) in all pages
                     // NOTE: This logic supports multiple sets of tabs on a page.
+// allow suppression with the browser's query-string (TODO: remove this!)
+if (window.location.search.indexOf('notabs') == -1) {  
                     var jQuerytabButtons = jQuery('.tab-buttons a');
                     jQuerytabButtons.unbind('click').click(function() {
                         // highlight this button and show its panel
@@ -943,6 +961,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     });
                     // CLick the first (default) tab in each set
                     jQuery('.tab-buttons a:first-child').click();
+}
 
                 });
 
@@ -1022,6 +1041,83 @@ references to stylesheets pulled directly from the pageMeta element. -->
                         // show initial values in USD (don't rely on i18n-message text!)
                         showPreferredCurrency('USD');
                     }
+                });
+
+                /* JS behaviors for FAQ page only */
+                // Enable expanding FAQ via JS (else jump to answers) TODO-FAQ
+                jQuery(document).ready(function() {
+                        if (jQuery('.faq-answers').length === 0) {
+                            // no FAQ on this page, never mind
+                            return;
+                        }
+
+                        var qLinkCloseText = 'Close';
+
+                        // hide all answers (we'll bring them up as needed)
+                        jQuery('.faq-answers').hide();
+                        var questionBlock = jQuery('.faq-questions');
+
+                        // strip links from section headings
+                        questionBlock.find('h2 a').each(function() {
+                            jQuery(this).replaceWith(jQuery(this).html());
+                        });
+
+                        // wire remaining links to toggle w/ answer panel
+                        questionBlock.find('a').unbind('click').click(function() {
+                            var qLink = jQuery(this);
+                            var qListItem = qLink.closest('li');
+                            // strip off preceding '#' and complete URL, if found
+                            var aHref = qLink.attr('href');
+                            if (typeof(aHref) === 'string') {
+                                aHref = aHref.split('#')[1];
+                            } else {
+                                console.log('No HREF found for this link:\n'+ qLink.text());
+                                return false;
+                            }
+                            if (qLink.text() === qLinkCloseText) {
+                                // hide answer and restore link question
+                                qLink.html( unescape(qLink.attr('full-question')) );
+                                qLink.removeClass('question-closer');
+                                qListItem.find('.answer-panel').remove();
+
+                            } else {
+                                // hide link question and show the matching answer
+                                qLink.attr('full-question', escape(qLink.html()) );
+                                qLink.text( qLinkCloseText );
+                                qLink.addClass('question-closer');
+                                qListItem.find('.answer-panel').remove(); // just in case
+                                qListItem.append('&lt;div class="answer-panel"&gt;&lt;/div&gt;');
+                                // find and copy the named answer below
+                                /// IF well-organized in DIVs: qAnswer = jQuery('#'+ aHref).clone(false);
+                                qAnswer = jQuery('#'+ aHref).nextUntil('h2[id]').andSelf().clone(false);
+                                qListItem.find('.answer-panel').append( qAnswer );
+                            }
+                            return false;
+                        });
+                        
+                        // add 'Open/Close All Answers' trigger
+                        questionBlock.prepend('&lt;a id="all-faq-toggle" href="#" style="float: right;"&gt;Open All Answers&lt;/a&gt;');
+                        jQuery('#all-faq-toggle').unbind('click').click(function() {
+                            var toggle = jQuery(this);
+                            if (toggle.text().indexOf('Open') > -1) {
+                                // open all answers and update label
+                                questionBlock.find('li > a').each(function() {
+                                    if (jQuery(this).text() !== qLinkCloseText) {
+                                        jQuery(this).click();
+                                    }
+                                });
+                                toggle.text('Close All Answers');
+                            } else {
+                                // close all answers and update label
+                                questionBlock.find('li > a').each(function() {
+                                    if (jQuery(this).text() === qLinkCloseText) {
+                                        jQuery(this).click();
+                                    }
+                                });
+                                toggle.text('Open All Answers');
+                            }
+                        });
+
                 });
 
            </xsl:text>

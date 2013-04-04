@@ -285,12 +285,10 @@
                       id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary"
                       action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
                     <p class="ds-paragraph">
-                        <p>
-                            <label class="ds-form-label" for="aspect_discovery_SiteViewer_field_query"></label>
-                        </p>
                         <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                                id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
                                placeholder="Search for data in Dryad"
+                               title="Search for data in Dryad"
                                type="text" value=""/><!-- no whitespace between these!
                      --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
                                id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
@@ -307,15 +305,21 @@
                 <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 490px; font-size: 14px;">
                     <div id="connect-illustrated-prose">
                         <p>
-                            <img src="/themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" />
+                            <img src="/themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" 
+                                 alt="Dryad's data packages are like seeds."
+                                 title="Dryad's data packages are like seeds." />
                             Publishers, societies, universities, libraries, funders, and other stakeholder organizations are invited to become <a href="/pages/membershipOverview">Members</a>. Tap into an active knowledge-sharing network, receive discounts on deposit fees, and help shape Dryad’s future.
-                            <img src="/themes/Mirage/images/seed-3.png" style="float: right; margin-right: -8px;" />
+                            <img src="/themes/Mirage/images/seed-3.png" style="float: right; margin-right: -8px;" 
+                                 alt="Researchers use Dryad data in their new work."
+                                 title="Researchers use Dryad data in their new work."/>
                         </p>
                         <p>
                             <a href="/pages/journalIntegration">Submission Integration</a> is a service provided to journals free-of-charge to coordinate manuscript submission with data submission to Dryad.  It makes data deposition easy for researchers; makes linking articles and data easy for journals; and enables confidential review of data prior to publication.
                         </p>
                         <p>
-                            <img src="/themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" />
+                            <img src="/themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" 
+                                 alt="New data is added to Dryad, and the cycle continues."
+                                 title="New data is added to Dryad, and the cycle continues."/>
                             Deposit fees enable Dryad’s content to be made available free of charge for research and educational reuse.  Flexible <a href="/pages/pricing">pricing plans</a> provide volume discounts on deposit fees.
                         </p>
                     </div>
@@ -325,20 +329,12 @@
             <!-- START BROWSE -->
             <div class="home-col-1">
                 <h1 class="ds-div-head">Browse for data</h1>
-                <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 537px; overflow: auto;">
+                <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 547px; overflow: auto;">
                     <div id="browse-data-buttons" class="tab-buttons">
                         <a href="#recently-published-data"><span>Recently published</span></a>
                         <a href="#most-viewed-data"><span>Most viewed</span></a>
-			<a>
-			  <xsl:attribute name="href">
-			    <![CDATA[/search-filter?query=&field=dc.contributor.author_filter]]>
-			  </xsl:attribute>
-			By author</a>
-			<a>
-			  <xsl:attribute name="href">
-                            <![CDATA[/search-filter?query=&field=prism.publicationName_filter]]>
-			  </xsl:attribute>
-                        By journal</a>
+                        <a href="#by-author"><span>By Author</span></a>
+                        <a href="#by-journal"><span>By Journal</span></a>
                     </div>
                     <div id="recently-published-data" class="browse-data-panel">
                         <xsl:for-each select="dri:div[@n='site-home']">
@@ -346,40 +342,20 @@
                         </xsl:for-each>
                     </div>
                     <div id="most-viewed-data" class="browse-data-panel">
-                        <h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-div-head">
-                            <i18n:text>Most viewed</i18n:text>
-                        </h1>
-                        <div id="aspect_discovery_SiteFeaturedItems_div_site-most-viewed"
-                             class="ds-static-div secondary most-viewed">
 
-			  <!-- placeholder content for Most Viewed until the real system is working -->
-			  <ul class="ds-artifact-list">
-			    <li class="ds-artifact-item odd">
-			      <div style="padding: 6px;" class="artifact-description">
-				<a href="/resource/doi:10.5061/dryad.154">Sulloway FJ (1982) Data from: The Beagle collections of Darwin's finches (Geospizinae). Dryad Digital Repository. http://dx.doi.org/10.5061/dryad.154</a>
-			      </div>
-			    </li>
-			    <li class="ds-artifact-item odd">
-			      <div style="padding: 6px;" class="artifact-description">
-				<a href="/resource/doi:10.5061/dryad.234">Zanne AE, Lopez-Gonzalez G, Coomes DA, Ilic J, Jansen S, Lewis SL, Miller RB, Swenson NG, Wiemann MC, Chave J (2009) Data from: Towards a worldwide wood economics spectrum. Dryad Digital Repository. http://dx.doi.org/10.5061/dryad.234</a>
-			      </div>
-			    </li>
-			    <li class="ds-artifact-item odd">
-			      <div style="padding: 6px;" class="artifact-description">
-				<a href="/resource/doi:10.5061/dryad.20617h5g">Belinky F, Szitenberg A, Goldfarb I, Feldstein T, Gert W, Ilan M, Huchon D (2012) Data from: ALG11 – a new variable DNA marker for sponge phylogeny: comparison of phylogenetic performances with the 18S rDNA and the COI gene. Dryad Digital Repository. http://dx.doi.org/10.5061/dryad.20617h5g</a>
-			      </div>
-			    </li>
-			    <li class="ds-artifact-item odd">
-			      <div style="padding: 6px;" class="artifact-description">
-				<a href="/resource/doi:10.5061/dryad.8384">Wu D, Wu M, Halpern A, Rusch DB, Yooseph S, Frazier M, Venter JC, Eisen JA (2011) Data from: Stalking the fourth domain in metagenomic data: searching for, discovering, and interpreting novel, deep branches in phylogenetic trees of phylogenetic marker genes. Dryad Digital Repository. http://dx.doi.org/10.5061/dryad.8384</a>
-			      </div>
-			    </li>
-			  </ul>
-			  <!-- end placeholder content -->
+                        <xsl:apply-templates select="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostViewedItem.div.home']"/>
 
-                        </div>
                     </div>
+                    <div id="by-author" class="browse-data-panel">
+                        <!--xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-dc.contributor.author_filter']"/-->
+                        <xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-dc.contributor.author_filter-results']"/>
 
+                    </div>
+                    <div id="by-journal" class="browse-data-panel">
+                        <!--xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-prism.publicationName_filter']"/-->
+                        <xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-prism.publicationName_filter-results']"/>
+
+                    </div>
                 </div>
             </div>
 
@@ -394,7 +370,7 @@
                           onsubmit="return subscribeMailingList(this);">
                         <p class="ds-paragraph" style="text-align: left; margin-bottom: 2px;">
                             <xsl:text>Sign up for announcements.</xsl:text>
-                            <input placeholder="Your e-mail" type="text" name="email" class="ds-text-field" style="width: 240px; margin-top: 8px;" id="file_news_div_mailing_list_input_email" />
+                            <input placeholder="Your e-mail" title="Your e-mail" type="text" name="email" class="ds-text-field" style="width: 240px; margin-top: 8px;" id="file_news_div_mailing_list_input_email" />
                         </p>
                         <input value="Subscribe" type="submit" name="submit" class="ds-button-field" id="file_news_div_mailing_list_input_subscribe" />
                     </form>
@@ -512,21 +488,25 @@
     <xsl:template match="dri:options/dri:list[@n='DryadSearch']" priority="3">
       <div class="simple-box">
         <!-- START SEARCH -->
-        <h1 class="ds-div-head">Search for data
-        </h1>
-        <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
-              id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary"
-              action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
-            <p class="ds-paragraph">
-                <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
-                       id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
-                       placeholder="Search for data in Dryad"
-                       type="text" value=""/><!-- no whitespace between these!
-                 --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
-                           id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
-                           type="submit" value="Go"/>
-            </p>
-        </form>
+        <div class="home-col-1">
+            <h1 class="ds-div-head">Search for Data
+            </h1>
+
+            <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
+                  id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary"
+                  action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
+                <p class="ds-paragraph">
+                    <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
+                           id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
+                           placeholder="Search for data in Dryad"
+                           title="Search for data in Dryad"
+                           type="text" value=""/><!-- no whitespace between these!
+                     --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
+                               id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
+                               type="submit" value="Go"/>
+                </p>
+            </form>
+        </div>
       </div>
     </xsl:template>
 
@@ -973,9 +953,31 @@ parameter that is being used (see variable defined above) -->
         </xsl:if>
     </xsl:template>
 
-    <xsl:template match="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='most_recent']">
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='most_recent' or @n='link-to-button']">
         <div class="link-to-button">
             <xsl:apply-templates select="dri:item"/>
+        </div>
+    </xsl:template>
+
+    <xsl:template match="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostViewedItem.div.home']">
+        <div id="aspect_discovery_MostViewedItem_table_most-viewed">
+            <xsl:apply-templates select="./dri:div/dri:head"/>
+            <table>
+                <tr>
+                    <th><xsl:apply-templates select="./dri:div/dri:div[@n='items']/dri:head"/></th>
+                    <th><xsl:apply-templates select="./dri:div/dri:div[@n='count']/dri:head"/></th>
+                </tr>
+                <xsl:for-each select="./dri:div/dri:div[@n='items']/dri:referenceSet/dri:reference">
+                    <xsl:variable name="position">
+                        <xsl:value-of select="position()"/>
+                    </xsl:variable>
+                    <tr>
+                        <td><xsl:apply-templates select="." mode="summaryList"/></td>
+                        <td><xsl:apply-templates select="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostViewedItem.div.home']/dri:div/dri:div[@n='count']/dri:list/dri:item[position()=$position]"/></td>
+                    </tr>
+                </xsl:for-each>
+
+            </table>
         </div>
     </xsl:template>
 </xsl:stylesheet>

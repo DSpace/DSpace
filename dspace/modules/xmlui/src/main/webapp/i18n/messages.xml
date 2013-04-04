@@ -120,7 +120,7 @@
 	<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Recently Published
 		Data&#160;&#160;<a href="/feed/atom_1.0/10255/3" class="single-image-link"
 			title="Web feed of data packages recently added to Dryad"><img
-				src="/themes/Dryad/images/rss.jpg" style="border: 0px;"/></a>
+				src="/themes/Dryad/images/rss.jpg" style="border: 0px;" alt="RSS feed"/></a>
 	</message>
 
 
@@ -357,7 +357,7 @@
 	<message key="xmlui.Site.stats">As of {0}, Dryad contains <span class="bold">{1} data
 			packages</span> and <span class="bold">{2} data files</span>, associated with articles in <span class="bold"
 			>{3} journals</span>.</message>
-	<message key="xmlui.Site.blogfeed.title">News <a href="http://blog.datadryad.org/feed/"><img class="feed-icon" src="/themes/Mirage/images/dryad_rss_icon.png" /></a></message>
+	<message key="xmlui.Site.blogfeed.title">News <a href="http://blog.datadryad.org/feed/"><img class="feed-icon" src="/themes/Mirage/images/dryad_rss_icon.png" alt="RSS feed" /></a></message>
 
 
 
@@ -3310,4 +3310,8 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.submit">Submit</message>
     <message key="xmlui.dri2xhtml.structural.feedback-link">Feed Back</message>
 
+    <!--Most Viewed Items-->
+    <message key="xmlui.statistics.view.title">Most Viewed Items</message>
+    <message key="xmlui.statistics.view.count">Number of View</message>
+    <message key="xmlui.statistics.most.viewed.items">Most Viewed Items</message>
 </catalogue>
