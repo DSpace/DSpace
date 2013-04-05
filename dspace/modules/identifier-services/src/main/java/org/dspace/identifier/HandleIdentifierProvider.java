@@ -94,6 +94,10 @@ public class HandleIdentifierProvider extends IdentifierProvider {
     public DSpaceObject resolve(Context context, String identifier, String... attributes) {
         // We can do nothing with this, return null
         try{
+            if(identifier.startsWith("hdl:"))
+            {
+                identifier=identifier.replace("hdl:","");
+            }
             TableRow dbhandle = findHandleInternal(context, identifier);
 
             if (dbhandle == null) {
