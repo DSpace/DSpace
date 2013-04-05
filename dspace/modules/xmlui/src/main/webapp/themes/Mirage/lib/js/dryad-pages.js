@@ -4,14 +4,14 @@ jQuery(document).ready(function() {
 
     // If the page has separate sidebar boxes, try to align the topmost
     // box with the first "primary" box on the page.
-    var topMainBox = $('#ds-body .primary:eq(0)');
-    var topSidebarBox = $('#ds-options .simple-box:eq(0)');
+    var topMainBox = jQuery('#ds-body .primary:eq(0)');
+    var topSidebarBox = jQuery('#ds-options .simple-box:eq(0)');
     if (topMainBox.length && topSidebarBox.length) {
         var mainPageBoxTop = topMainBox.offset().top;
         var sidebarBoxTop = topSidebarBox.offset().top;
         var boxNudge = mainPageBoxTop - sidebarBoxTop;
         // ASSUMES that #ds-option has no padding-top!
-        $('#ds-options').css('padding-top', boxNudge+"px");
+        jQuery('#ds-options').css('padding-top', boxNudge+"px");
     }
 
     jQuery('span.field-help').each(function(entry){
@@ -38,7 +38,7 @@ jQuery(document).ready(function() {
                 //height: 'show',
                 opacity: 'show'
             },
-            speed: 0, 
+            speed: 0,
             disableHI: true     // remove menu delay (from hoverIntent)
         })
         .supposition();
@@ -82,7 +82,7 @@ jQuery(document).ready(function() {
 
 /* Membership Form page only */
 jQuery(document).ready(function() {
-    var $currencySelector = $('select[name=org_annual_revenue_currency]');
+    var $currencySelector = jQuery('select[name=org_annual_revenue_currency]');
     if ($currencySelector.length === 1) {
         var amountsByCurrency = {
             'USD': {
@@ -126,11 +126,11 @@ jQuery(document).ready(function() {
             var msgLessThan = 'Less than {THRESHOLD} per year (annual membership fee {SMALL_ORG_FEE})'
                 .replace('{THRESHOLD}', revenueThreshold)
                 .replace('{SMALL_ORG_FEE}', smallOrgFee);
-            $('#msg-less_than_10_million').html( msgLessThan );
+            jQuery('#msg-less_than_10_million').html( msgLessThan );
             var msgGreaterThan = 'Greater than {THRESHOLD} per year (annual membership fee {LARGE_ORG_FEE})'
                 .replace('{THRESHOLD}', revenueThreshold)
                 .replace('{LARGE_ORG_FEE}', largeOrgFee);
-            $('#msg-greater_than_10_million').html( msgGreaterThan );
+           jQuery('#msg-greater_than_10_million').html( msgGreaterThan );
         }
 
         // choosing a currency should modify the displayed org-revenue threshold and fees
@@ -193,7 +193,7 @@ jQuery(document).ready(function() {
             }
             return false;
         });
-        
+
         // add 'Open/Close All Answers' trigger
         questionBlock.prepend('<a id="all-faq-toggle" href="#" style="float: right;">Open All Answers</a>');
         jQuery('#all-faq-toggle').unbind('click').click(function() {
