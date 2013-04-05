@@ -56,14 +56,22 @@
                             <xsl:value-of select="$itemUrl"/>
                         </xsl:when>
                         <xsl:when test="$itemWithdrawn">
-                            <xsl:value-of select="ancestor::mets:METS/@OBJEDIT"/>
+                            <xsl:value-of select="/mets:METS/@OBJEDIT"/>
                         </xsl:when>
                         <xsl:when test="$doiIdentifier">
-                            <xsl:text>/resource/</xsl:text>
-                            <xsl:copy-of select=".//dim:field[@element='identifier'][@mdschema='dc'][not(@qualifier)][1]"/>
+                            <xsl:choose>
+                                <xsl:when test=".//dim:field[@element='identifier'][not(@qualifier)][starts-with(., 'doi:')]">
+                                    <xsl:text>/resource/</xsl:text>
+                                    <xsl:copy-of select=".//dim:field[@element='identifier'][@mdschema='dc'][not(@qualifier)][1]"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:text>/resource/</xsl:text>
+                                    <xsl:value-of select="/mets:METS/@ID"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:value-of select="ancestor::mets:METS/@OBJID"/>
+                            <xsl:value-of select="/mets:METS/@OBJID"/>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:attribute>
