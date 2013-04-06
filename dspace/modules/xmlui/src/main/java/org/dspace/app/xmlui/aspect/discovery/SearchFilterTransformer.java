@@ -219,15 +219,8 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
         }
 
 
-        if (scope != null) /* top level search / community */ {
-            if (scope instanceof Community) {
-                queryArgs.setFilterQueries("location:m" + scope.getID());
-            } else if (scope instanceof Collection) {
-                queryArgs.setFilterQueries("location:l" + scope.getID());
-            }
-        }
 
-
+        queryArgs.setFilterQueries("location:l2");
         boolean isDate = false;
         if(facetField.endsWith("_dt")){
             facetField = facetField.split("_")[0];
@@ -458,7 +451,7 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
                             renderFacetField(browseParams, dso, facetField, singleTable, filterQueries, value);
                         }
                     }
-                    String url = ConfigurationManager.getProperty("dspace.url")+"/search-filter?query=&field="+field;
+                    String url = ConfigurationManager.getProperty("dspace.url")+"/search-filter?query=&field="+field+"&fq=location:l2";
 		    results.addList("link-to-button").addItemXref(url,"View More");
                 }else{
                     results.addPara(message("xmlui.discovery.SearchFacetFilter.no-results"));
