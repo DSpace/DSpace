@@ -266,13 +266,10 @@
                 </h1>
                 <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
                     <p class="ds-paragraph">
-                        <a class="submitnowbutton" href="/handle/10255/3/submit">Submit data now!</a>
+                        <a class="submitnowbutton" href="/handle/10255/3/submit">Deposit your data</a>
                     </p>
-                    <p style="font-size: 0.9em; padding-top: 4px;">
-                        <xsl:text>OR</xsl:text>
-                    </p>
-                    <p>
-                        <a class="learn-to-submit-button" href="/pages/faq#deposit">Learn how to submit data</a>
+                    <p style="margin-top: 2.5em; font-size: 95%;">
+                        <a href="/pages/faq#deposit">How and why?</a>
                     </p>
                 </div>
             </div>
@@ -532,13 +529,10 @@
         <!-- START DEPOSIT -->
         <div class="ds-static-div primary" id="file_news_div_news">
             <p class="ds-paragraph">
-                <a class="submitnowbutton" href="/handle/10255/3/submit">Deposit data from<br/>your publication</a>
+                <a class="submitnowbutton" href="/handle/10255/3/submit">Deposit your data</a>
             </p>
-            <p style="font-size: 0.9em; margin: 4px; padding-top: 0px;">
-                <xsl:text>OR</xsl:text>
-            </p>
-            <p style="margin: 4px;">
-                <a href="/pages/faq#deposit">Learn how to deposit data</a>
+            <p style="margin: 1em 0 4px;">
+                <a href="/pages/faq#deposit">How and why?</a>
             </p>
         </div>
       </div>
