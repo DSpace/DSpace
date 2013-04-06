@@ -112,9 +112,22 @@
                 overflow: visible;
             }
 
-            #aspect_statistics_StatisticsTransformer_div_stats .ds-table-row {
-	        height:60px;
+        #aspect_statistics_StatisticsTransformer_div_stats table {
+            width: 100%;
+            margin-top: 10px;
+        }
+        #aspect_statistics_StatisticsTransformer_div_stats .ds-table-row {
+	        height: 40px;
 	    }
+        #aspect_statistics_StatisticsTransformer_div_stats tr.odd td {
+	        background-color: #eee;
+	    }
+        #aspect_statistics_StatisticsTransformer_div_stats td {
+            padding: 0 8px;
+        }
+        #aspect_statistics_StatisticsTransformer_div_stats td:last-child {
+            text-align: right;
+        }
 
         #recently_integrated_journals img.pub-cover {
 	        margin: 7px 10px;
@@ -193,9 +206,9 @@
                 margin: 4px;		
             }
 
-	    #aspect_discovery_SiteViewer_field_query {
-	        width:75%;
-	    }
+            #aspect_discovery_SiteViewer_field_query {
+                width: 85%;
+            }
 
         </style>
 
@@ -262,7 +275,7 @@
                 </h1>
                 <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
                     <p class="ds-paragraph">
-                        <a class="submitnowbutton" href="/handle/10255/3/submit">Deposit your data</a>
+                        <a class="submitnowbutton" href="/handle/10255/3/submit">Submit your data</a>
                     </p>
                     <p style="margin-top: 2.5em; font-size: 95%;">
                         <a href="/pages/faq#deposit">How and why?</a>
@@ -277,7 +290,7 @@
                 <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                       id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary"
                       action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
-                    <p class="ds-paragraph">
+                    <p class="ds-paragraph" style="overflow; hidden; margin-bottom: 0px;">
                         <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                                id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
                                placeholder="Enter keyword, author, title, DOI, etc. Example: herbivory"
@@ -286,6 +299,7 @@
                      --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
                                id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
                                type="submit" value="Search"/>
+                        <a style="float:left; font-size: 95%;" href="/discover?query=&submit=Search">Advanced search</a>
                     </p>
                 </form>
             </div>
@@ -301,19 +315,19 @@
                             <img src="/themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" 
                                  alt="Dryad's data packages are like seeds."
                                  title="Dryad's data packages are like seeds." />
-                            Publishers, societies, universities, libraries, funders, and other stakeholder organizations are invited to become <a href="/pages/membershipOverview">Members</a>. Tap into an active knowledge-sharing network, receive discounts on deposit fees, and help shape Dryad’s future.
+                            Publishers, societies, universities, libraries, funders, and other stakeholder organizations are invited to become <a href="/pages/membershipOverview">Members</a>. Tap into an active knowledge-sharing network, receive discounts on submission fees, and help shape Dryad’s future.
                             <img src="/themes/Mirage/images/seed-3.png" style="float: right; margin-right: -8px;" 
                                  alt="Researchers use Dryad data in their new work."
                                  title="Researchers use Dryad data in their new work."/>
                         </p>
                         <p>
-                            <a href="/pages/journalIntegration">Submission Integration</a> is a service provided to journals free-of-charge to coordinate manuscript submission with data submission to Dryad.  It makes data deposition easy for researchers; makes linking articles and data easy for journals; and enables confidential review of data prior to publication.
+                            <a href="/pages/journalIntegration">Submission Integration</a> is a service provided to journals free-of-charge to coordinate manuscript submission with data submission to Dryad.  It makes data submission easy for researchers; makes linking articles and data easy for journals; and enables confidential review of data prior to publication.
                         </p>
                         <p>
                             <img src="/themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" 
                                  alt="New data is added to Dryad, and the cycle continues."
                                  title="New data is added to Dryad, and the cycle continues."/>
-                            Deposit fees enable Dryad’s content to be made available free of charge for research and educational reuse.  Flexible <a href="/pages/pricing">pricing plans</a> provide volume discounts on deposit fees.
+                            Submission fees enable Dryad’s content to be made available free of charge for research and educational reuse.  Flexible <a href="/pages/pricing">pricing plans</a> provide volume discounts on submission fees.
                         </p>
                     </div>
                 </div>
@@ -322,7 +336,7 @@
             <!-- START BROWSE -->
             <div class="home-col-1">
                 <h1 class="ds-div-head">Browse for data</h1>
-                <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 547px; overflow: auto;">
+                <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 535px; overflow: auto;">
                     <div id="browse-data-buttons" class="tab-buttons">
                         <a href="#recently-published-data"><span>Recently published</span></a>
                         <a href="#most-viewed-data"><span>Most viewed</span></a>
@@ -525,7 +539,7 @@
         <!-- START DEPOSIT -->
         <div class="ds-static-div primary" id="file_news_div_news">
             <p class="ds-paragraph">
-                <a class="submitnowbutton" href="/handle/10255/3/submit">Deposit your data</a>
+                <a class="submitnowbutton" href="/handle/10255/3/submit">Submit your data</a>
             </p>
             <p style="margin: 1em 0 4px;">
                 <a href="/pages/faq#deposit">How and why?</a>

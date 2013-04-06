@@ -43,24 +43,27 @@ jQuery(document).ready(function() {
         })
         .supposition();
 
-    // General support for simple tabs (styled as buttons) in all pages
+    // General support for simple tabs (styled as buttons)
     // NOTE: This logic supports multiple sets of tabs on a page.
-    var jQuerytabButtons = jQuery('.tab-buttons a');
-    jQuerytabButtons.unbind('click').click(function() {
-        // highlight this button and show its panel
-        jQuery(this).addClass('selected');
-        var jQuerypanel = jQuery(jQuery(this).attr('href'));
-        jQuerypanel.show();
-        // dim others and hide their panels
-        jQuery(this).siblings().each(function() {
-            jQuery(this).removeClass('selected');
+    // NOTE: For now, we're only using this on the Home page!
+    if (jQuery('#aspect_discovery_RecentlyAdded_div_Home').length === 1) {
+        var jQuerytabButtons = jQuery('.tab-buttons a');
+        jQuerytabButtons.unbind('click').click(function() {
+            // highlight this button and show its panel
+            jQuery(this).addClass('selected');
             var jQuerypanel = jQuery(jQuery(this).attr('href'));
-            jQuerypanel.hide();
+            jQuerypanel.show();
+            // dim others and hide their panels
+            jQuery(this).siblings().each(function() {
+                jQuery(this).removeClass('selected');
+                var jQuerypanel = jQuery(jQuery(this).attr('href'));
+                jQuerypanel.hide();
+            });
+            return false;
         });
-        return false;
-    });
-    // CLick the first (default) tab in each set
-    jQuery('.tab-buttons a:first-child').click();
+        // CLick the first (default) tab in each set
+        jQuery('.tab-buttons a:first-child').click();
+    }
 
 });
 
@@ -158,6 +161,12 @@ jQuery(document).ready(function() {
 
         // strip links from section headings
         questionBlock.find('h2 a').each(function() {
+            // transfer its href to the heading, to support inbound links
+            var targetID = jQuery(this).attr('href').split('#')[1];
+            jQuery('#'+targetID).remove();
+            var heading = jQuery(this).parent();
+            heading.attr('id', targetID);
+            // strip the hyperlink, to leave a simple header
             jQuery(this).replaceWith(jQuery(this).html());
         });
 
