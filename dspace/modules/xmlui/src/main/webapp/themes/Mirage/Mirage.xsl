@@ -231,7 +231,7 @@
                             </a>
                         </div>
                         <div>
-                            <p Xid="ds-dryad-is" style="font-size: 88%"
+                            <p Xid="ds-dryad-is" style="font-size: 88%; line-height: 1.35em;"
                                xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
                                 <span style="color: #595;">DataDryad.org</span>
                                 is a
