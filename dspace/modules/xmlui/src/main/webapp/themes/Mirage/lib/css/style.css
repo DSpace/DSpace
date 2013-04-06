@@ -341,10 +341,12 @@ div.ds-option-set {
 
 #submit-data-sidebar-box {
     text-align: center;
+    background-color: #87C033;
 }
 #submit-data-sidebar-box .primary {
     padding: 0;
     margin: 0;
+    background-color: #87C033;
 }
 #submit-data-sidebar-box a.submitnowbutton {
     display: block;
