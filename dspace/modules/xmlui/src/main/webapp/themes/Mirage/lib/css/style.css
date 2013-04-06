@@ -929,7 +929,7 @@ li.ds-form-item label.ds-composite-component.last{
 
 .ds-artifact-item {
     padding-top: 5px !important;
-    padding-bottom: 10px !important;
+    padding-bottom: 0px !important;
     padding-left: 20px;
     text-indent: -20px;
 }
@@ -1983,15 +1983,16 @@ a.single-image-link {
     color: #999;
 }
 
-#aspect_discovery_MostViewedItem_table_most-viewed td:first-child{
-    width:400px;
+#aspect_discovery_MostViewedItem_table_most-viewed td:first-child {
+    width: 400px;
 }
-#aspect_discovery_MostViewedItem_table_most-viewed h2{
+#aspect_discovery_MostViewedItem_table_most-viewed h2 {
     font-size:15px;
 }
 td li{
     list-style: none;
 }
+
 /* FAQ style */
 .question-closer {
     float: right;
@@ -2072,4 +2073,12 @@ dl.formatted dd,
 ol.formatted li {
   padding-left: 2em;
   margin-bottom: 0.75em;
+}
+
+#membershipMeetingImage small {
+    color: #fff; 
+    display: block; 
+    margin-top: -2em; 
+    padding-left: 5px; 
+    padding-bottom: 1em;
 }
