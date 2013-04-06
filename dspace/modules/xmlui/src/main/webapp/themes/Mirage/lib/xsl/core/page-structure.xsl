@@ -303,10 +303,11 @@ references to stylesheets pulled directly from the pageMeta element. -->
             <title>
                 <xsl:choose>
                     <xsl:when test="not($page_title)">
-                        <xsl:text>  </xsl:text>
+                        <xsl:text>Dryad</xsl:text>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:copy-of select="$page_title/node()"/>
+                        <xsl:text> -- Dryad</xsl:text>
                     </xsl:otherwise>
                 </xsl:choose>
             </title>
@@ -361,10 +362,10 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
                 <div id="sharing-tools">
                     <a href="http://twitter.com/datadryad">
-                        <img src="/themes/Mirage/images/dryad_twit_icon.png"/>
+                        <img src="/themes/Mirage/images/dryad_twit_icon.png" alt="Follow us on Twitter"/>
                     </a>
                     <a href="http://www.facebook.com/DataDryad">
-                        <img src="/themes/Mirage/images/dryad_fb_icon2.png"/>
+                        <img src="/themes/Mirage/images/dryad_fb_icon2.png" alt="Find us on Facebook"/>
                     </a>
 		    <!-- We don't currently have a Google Plus page...
                     <a href="">
@@ -372,7 +373,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     </a>
 		    -->
                     <a href="http://blog.datadryad.org/feed/">
-                        <img src="/themes/Mirage/images/dryad_rss_icon.png"/>
+                        <img src="/themes/Mirage/images/dryad_rss_icon.png" alt="RSS feed"/>
                     </a>
                 </div>
 
@@ -675,6 +676,11 @@ references to stylesheets pulled directly from the pageMeta element. -->
     -->
     <xsl:template match="dri:body">
         <div id="ds-body">
+            <xsl:if test="not(/dri:document/dri:options/dri:list[@n='discovery'] or /dri:document/dri:options/dri:list[@n='DryadSubmitData'] or /dri:document/dri:options/dri:list[@n='DryadSearch'] or /dri:document/dri:options/dri:list[@n='DryadConnect'])">
+                <xsl:attribute name="style">
+                    <xsl:text>width:100%</xsl:text>
+                </xsl:attribute>
+            </xsl:if>
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']">
                 <div id="ds-system-wide-alert">
                     <p>
@@ -879,6 +885,18 @@ references to stylesheets pulled directly from the pageMeta element. -->
         </script>
         <xsl:text disable-output-escaping="yes">&lt;![endif]--&gt;</xsl:text>
 
+        <!-- Include all on-document-ready JS, incl. some for specific pages -->
+        <script type="text/javascript">
+            <xsl:attribute name="src">
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                <xsl:text>/themes/</xsl:text>
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                <xsl:text>/lib/js/dryad-pages.js</xsl:text>
+            </xsl:attribute>
+            &#160;
+        </script>
 
         <script type="text/javascript">
             runAfterJSImports.execute();
@@ -896,134 +914,6 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
                 })();
-
-                /* JS behaviors for all Dryad pages */
-                jQuery(document).ready(function() {
-
-                    jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").css("display","none");
-
-                    jQuery("#advanced-search").click(function(){
-                        jQuery("#aspect_discovery_SimpleSearch_item_search-filter-list").toggle();
-                    });
-
-                    jQuery('#main-menu ul.sf-menu')
-                        .supersubs({
-                            // all numeric properties are in em
-                            minWidth: 12,
-                            maxWidth: 24,
-                            extraWidth: 1
-                        })
-                        .superfish({
-                            // make the menu snappy (fast+simple animation)
-                            delay: 0,
-                            animation: {
-                                //height: 'show',
-                                opacity: 'show'
-                            },
-                            speed: 0, 
-                            disableHI: true     // remove menu delay (from hoverIntent)
-                        })
-                        .supposition();
-
-                    // General support for simple tabs (styled as buttons) in all pages
-                    // NOTE: This logic supports multiple sets of tabs on a page.
-                    var jQuerytabButtons = jQuery('.tab-buttons a');
-                    jQuerytabButtons.unbind('click').click(function() {
-                        // highlight this button and show its panel
-                        jQuery(this).addClass('selected');
-                        var jQuerypanel = jQuery(jQuery(this).attr('href'));
-                        jQuerypanel.show();
-                        // dim others and hide their panels
-                        jQuery(this).siblings().each(function() {
-                            jQuery(this).removeClass('selected');
-                            var jQuerypanel = jQuery(jQuery(this).attr('href'));
-                            jQuerypanel.hide();
-                        });
-                        return false;
-                    });
-                    // CLick the first (default) tab in each set
-                    jQuery('.tab-buttons a:first-child').click();
-
-                });
-
-                /* JS behaviors for Home page only */
-                jQuery(document).ready(function() {
-                    // main carousel at top of homepage
-                    jQuery('#dryad-home-carousel .bxslider').bxSlider({
-                        auto: true,
-                        autoHover: true,
-                        pause: 10000,  // in ms
-                        speed: 500,   // ms for slide transition
-                        mode: 'fade',  // can be 'horizontal', 'vertical', 'fade'
-                        controls: false,
-                        autoControls: false,
-                        autoControlsCombine: true
-                    });
-
-                });
-
-                /* Membership Form page only */
-                jQuery(document).ready(function() {
-                    var $currencySelector = $('select[name=org_annual_revenue_currency]');
-                    if ($currencySelector.length === 1) {
-                        var amountsByCurrency = {
-                            'USD': {
-                                revenueThreshold: '10 million US Dollars',
-                                smallOrgFee: 'USD$1,000',
-                                largeOrgFee: 'USD$5,000'
-                            },
-                            'EUR': {
-                                revenueThreshold: '7.8 million Euros',
-                                smallOrgFee: '€780',
-                                largeOrgFee: '€3900'
-                            },
-                            'GBP': {
-                                revenueThreshold: '6.6 million GB Pounds',
-                                smallOrgFee: '£660',
-                                largeOrgFee: '£3300'
-                            },
-                            'CAD': {
-                                revenueThreshold: '10 million Canadian Dollars',
-                                smallOrgFee: 'CAD$1,000',
-                                largeOrgFee: 'CAD$5,000'
-                            },
-                            'JPY': {
-                                revenueThreshold: '950 billion Japanese Yen',
-                                smallOrgFee: '¥95,000',
-                                largeOrgFee: '¥475,000'
-                            },
-                            'AUD': {
-                                revenueThreshold: '9.6 million Australian Dollars',
-                                smallOrgFee: 'AUD$960',
-                                largeOrgFee: 'AUD$4,800'
-                            }
-                        };
-
-                        function showPreferredCurrency(currencyCode) {
-                            // EXAMPLE: showPreferredCurrency('GBP');
-                            revenueThreshold = amountsByCurrency[currencyCode].revenueThreshold;
-                            smallOrgFee = amountsByCurrency[currencyCode].smallOrgFee;
-                            largeOrgFee = amountsByCurrency[currencyCode].largeOrgFee;
-                            // build and show display strings in the new currency
-                            var msgLessThan = 'Less than {THRESHOLD} per year (annual membership fee {SMALL_ORG_FEE})'
-                                .replace('{THRESHOLD}', revenueThreshold)
-                                .replace('{SMALL_ORG_FEE}', smallOrgFee);
-                            $('#msg-less_than_10_million').html( msgLessThan );
-                            var msgGreaterThan = 'Greater than {THRESHOLD} per year (annual membership fee {LARGE_ORG_FEE})'
-                                .replace('{THRESHOLD}', revenueThreshold)
-                                .replace('{LARGE_ORG_FEE}', largeOrgFee);
-                            $('#msg-greater_than_10_million').html( msgGreaterThan );
-                        }
-
-                        // choosing a currency should modify the displayed org-revenue threshold and fees
-                        $currencySelector.unbind('change').change(function() {
-                            showPreferredCurrency( $(this).val() );
-                        });
-                        // show initial values in USD (don't rely on i18n-message text!)
-                        showPreferredCurrency('USD');
-                    }
-                });
-
            </xsl:text>
             </script>
         </xsl:if>

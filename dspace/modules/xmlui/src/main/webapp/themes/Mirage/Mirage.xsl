@@ -329,7 +329,7 @@
             <!-- START BROWSE -->
             <div class="home-col-1">
                 <h1 class="ds-div-head">Browse for data</h1>
-                <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 537px; overflow: auto;">
+                <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 547px; overflow: auto;">
                     <div id="browse-data-buttons" class="tab-buttons">
                         <a href="#recently-published-data"><span>Recently published</span></a>
                         <a href="#most-viewed-data"><span>Most viewed</span></a>
@@ -917,7 +917,8 @@ parameter that is being used (see variable defined above) -->
             </i18n:text>
         </div>
     </xsl:template>
-    <xsl:template match="dri:help" mode="compositeComponent">
+    <!-- remove old dryad tooltip style help text-->
+    <!--xsl:template match="dri:help" mode="compositeComponent">
         <xsl:if
                 test="not(ancestor::dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-publication' or @id= 'aspect.submission.StepTransformer.div.submit-describe-dataset'])">
             <span class="composite-help">
@@ -937,16 +938,32 @@ parameter that is being used (see variable defined above) -->
                 <xsl:apply-templates/>
             </span>
         </xsl:if>
+    </xsl:template-->
+    <!--add hidden class to help text-->
+    <xsl:template match="dri:help" mode="compositeComponent">
+        <span class="composite-help">
+            <xsl:if test="ancestor::dri:field[@rend='hidden']">
+                <xsl:attribute name="class">
+                    <xsl:text>hidden</xsl:text>
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:apply-templates />
+        </span>
     </xsl:template>
-    <xsl:template match="dri:help" mode="help">
+    <xsl:template match="dri:help">
         <xsl:if
-                test="not(ancestor::dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-publication' or @id= 'aspect.submission.StepTransformer.div.submit-describe-dataset'])">
+                test="not(ancestor::dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-publication' or @id= 'aspect.submission.StepTransformer.div.submit-describe-dataset' or @id= 'aspect.submission.StepTransformer.div.submit-select-publication'])">
             <!--Only create the <span> if there is content in the <dri:help> node-->
             <xsl:if test="./text() or ./node()">
                 <span>
                     <xsl:attribute name="class">
                         <xsl:text>field-help</xsl:text>
                     </xsl:attribute>
+                    <xsl:if test="ancestor::dri:field[@rend='hidden']">
+                        <xsl:attribute name="class">
+                            <xsl:text>hidden</xsl:text>
+                        </xsl:attribute>
+                    </xsl:if>
                     <xsl:apply-templates/>
                 </span>
             </xsl:if>

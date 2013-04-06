@@ -489,9 +489,16 @@
               </a>
             </p>
         </div>
-        <!-- Files in package -->
+        <!-- Data Files in package -->
         <div class="ds-static-div primary">
-          <p></p>
+          <xsl:variable name="dryad_dri_url">
+              <xsl:value-of select="confman:getProperty('dspace.url')"/>
+              <xsl:text>:</xsl:text>
+              <xsl:value-of select="confman:getIntProperty('dspace.port')"/>
+              <xsl:text>/DRI</xsl:text>
+              <xsl:value-of select="@OBJID"/>
+          </xsl:variable>
+          <xsl:apply-templates select="document($dryad_dri_url)//dri:referenceSet[@type='embeddedView']"/>
         </div>
         <!-- citing -->
         <!-- CITATION FOR DATA PACKAGE -->

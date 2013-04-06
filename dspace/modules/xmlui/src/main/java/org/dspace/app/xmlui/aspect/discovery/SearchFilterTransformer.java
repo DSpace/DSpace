@@ -459,8 +459,7 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
                         }
                     }
                     String url = ConfigurationManager.getProperty("dspace.url")+"/search-filter?query=&field="+field;
-                    results.addList("link-to-button").addItemXref(url,"View More");
-
+		    results.addList("link-to-button").addItemXref(url,"View More");
                 }else{
                     results.addPara(message("xmlui.discovery.SearchFacetFilter.no-results"));
                 }
