@@ -487,6 +487,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                 <li>
                                     <a href="/pages/pricing">Pricing Plans</a>
                                 </li>                            
+                                <li>
+                                    <a href="/pages/policies">Terms of Service</a>
+                                </li>                            
                             </ul>
                         </li>
                         <li>
@@ -627,21 +630,10 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 <div id="ds-footer-left">
                     <i18n:text>xmlui.dri2xhtml.structural.footer-powered-by</i18n:text>
                     <xsl:text> </xsl:text>
-                    <a class="single-image-link" href="http://creativecommons.org/" target="_blank"><img class="powered-by" src="/themes/Mirage/images/powered-by-cc.png" alt="Creative Commons" /></a>
-                    <xsl:text> &#160;</xsl:text>
                     <a class="single-image-link" href="http://www.dspace.org/" target="_blank"><img class="powered-by" src="/themes/Mirage/images/powered-by-dspace.png" alt="DSpace" /></a>
                 </div>
 
                 <div id="ds-footer-right" style="margin-top: 11px;">
-                    <a>
-                        <xsl:attribute name="href">
-                            <xsl:value-of
-                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                            <xsl:text>/pages/policies</xsl:text>
-                        </xsl:attribute>
-                        <i18n:text>xmlui.dri2xhtml.structural.footer-terms-of-service</i18n:text>
-                    </a>
-                    <span style="color: #777;"><xsl:text>&#160; | &#160;</xsl:text></span>
                     <a>
                         <xsl:attribute name="href">
                             <xsl:value-of
