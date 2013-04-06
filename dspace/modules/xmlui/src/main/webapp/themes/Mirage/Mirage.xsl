@@ -225,11 +225,6 @@
                                 <img src="/themes/Mirage/images/2013membershipMeeting.jpg" alt="Dryad Membership Meeting, May 24, Oxford, UK" />
                             </a>
                         </div>
-                        <div>
-                            <a href="/pages/depositing">
-                                <img src="/themes/Mirage/images/bookmarkSubmissionProcess.png" alt="Desosit data. Get permanent identifier. Watch your citations grow! Relax, your data are discoverable and secure." />
-                            </a>
-                        </div>
                        <div>
                             <a href="http://datadryad.org/resource/doi:10.5061/dryad.gs45f">
                                 <img src="/themes/Mirage/images/dryad.gs45f.jpg" alt="Featured data: Herbivory-induced volatiles function as defenses..."/>
