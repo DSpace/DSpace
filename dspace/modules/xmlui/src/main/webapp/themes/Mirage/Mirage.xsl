@@ -225,11 +225,6 @@
                                 <img src="/themes/Mirage/images/2013membershipMeeting.jpg" alt="Dryad Membership Meeting, May 24, Oxford, UK" />
                             </a>
                         </div>
-                       <div>
-                            <a href="http://datadryad.org/resource/doi:10.5061/dryad.gs45f">
-                                <img src="/themes/Mirage/images/dryad.gs45f.jpg" alt="Featured data: Herbivory-induced volatiles function as defenses..."/>
-                            </a>
-                        </div>
                         <div>
                             <p Xid="ds-dryad-is" style="font-size: 88%; line-height: 1.35em;"
                                xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
@@ -242,6 +237,16 @@
                                 <span style="color: #595;">integrated data submission</span>
                                 for a growing list of journals; submission of data from other publications is also welcome.
                             </p>
+                        </div>
+                        <div>
+                            <a href="/pages/repository#keyFeatures">
+                                <img src="/themes/Mirage/images/bookmarkSubmissionProcess.png" alt="Desosit data. Get permanent identifier. Watch your citations grow! Relax, your data are discoverable and secure." />
+                           </a>
+                       </div>
+                       <div>
+                            <a href="http://datadryad.org/resource/doi:10.5061/dryad.gs45f">
+                                <img src="/themes/Mirage/images/dryad.gs45f.jpg" alt="Featured data: Herbivory-induced volatiles function as defenses..."/>
+                            </a>
                         </div>
                     </div>
                 </div>
