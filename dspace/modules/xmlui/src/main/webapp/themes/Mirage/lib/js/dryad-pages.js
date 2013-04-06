@@ -70,7 +70,7 @@ jQuery(document).ready(function() {
     jQuery('#dryad-home-carousel .bxslider').bxSlider({
         auto: true,
         autoHover: true,
-        pause: 10000,  // in ms
+        pause: 6000,  // in ms
         speed: 500,   // ms for slide transition
         mode: 'fade',  // can be 'horizontal', 'vertical', 'fade'
         controls: false,

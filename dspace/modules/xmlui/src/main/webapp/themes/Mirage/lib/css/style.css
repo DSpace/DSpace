@@ -341,10 +341,12 @@ div.ds-option-set {
 
 #submit-data-sidebar-box {
     text-align: center;
+    background-color: #87C033;
 }
 #submit-data-sidebar-box .primary {
     padding: 0;
     margin: 0;
+    background-color: #87C033;
 }
 #submit-data-sidebar-box a.submitnowbutton {
     display: block;
@@ -417,8 +419,8 @@ div.bioText {
 
 #aspect_eperson_PasswordLogin_div_register, #aspect_eperson_PasswordLogin_div_login {
     padding: 10px;
-    width: 300px;
-}
+    width: 350px;
+} 
 
 #aspect_eperson_PasswordLogin_div_register h1, #aspect_eperson_PasswordLogin_div_login h1 {
     font-size: 130%;
