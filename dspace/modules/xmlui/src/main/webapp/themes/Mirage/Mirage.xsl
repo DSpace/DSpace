@@ -282,8 +282,8 @@
                     <p class="ds-paragraph">
                         <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                                id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
-                               placeholder="Search for data in Dryad"
-                               title="Search for data in Dryad"
+                               placeholder="Enter keyword, author, title, DOI, etc. Example: herbivory"
+                               title="Enter keyword, author, title, DOI, etc. Example: herbivory"
                                type="text" value=""/><!-- no whitespace between these!
                      --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
                                id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
@@ -493,8 +493,8 @@
                 <p class="ds-paragraph">
                     <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                            id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
-                           placeholder="Search for data in Dryad"
-                           title="Search for data in Dryad"
+                           placeholder="Enter keyword, DOI, etc."
+                           title="Enter keyword, author, title, DOI, etc. Example: herbivory"
                            type="text" value=""/><!-- no whitespace between these!
                      --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
                                id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
