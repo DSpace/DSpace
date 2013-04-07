@@ -929,7 +929,7 @@ li.ds-form-item label.ds-composite-component.last{
 
 .ds-artifact-item {
     padding-top: 5px !important;
-    padding-bottom: 10px !important;
+    padding-bottom: 0px !important;
     padding-left: 20px;
     text-indent: -20px;
 }

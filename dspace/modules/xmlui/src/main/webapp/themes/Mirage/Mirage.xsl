@@ -74,10 +74,6 @@
                 line-height: 1.4em;
             }
 
-            .ds-artifact-item {
-                padding-top: 10px;
-            }
-
             .artifact-title {
                 font-size: 100%;
             }
