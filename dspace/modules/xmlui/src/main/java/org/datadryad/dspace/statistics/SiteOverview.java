@@ -222,23 +222,23 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
         String value = Long.toString(dataPackageCount) ;
 
         Row row = infoTable.addRow();
-        row.addCell("data").addContent("Total data packages");
+        row.addCell("data").addContent("Data packages");
         row.addCell("data").addContent(Long.toString(dataPackageCount));
 
         row = infoTable.addRow();
-        row.addCell("data").addContent("Total data files");
+        row.addCell("data").addContent("Data files");
         row.addCell("data").addContent(Long.toString(dataFileCount));
 
         row = infoTable.addRow();
-        row.addCell("data").addContent("Journals represented");
+        row.addCell("data").addContent("Journals");
         row.addCell("data").addContent(journalCount);
 
         row = infoTable.addRow();
-        row.addCell("data").addContent("Total unique authors");
+        row.addCell("data").addContent("Authors");
         row.addCell("data").addContent(uniqAuthors);
 
         row = infoTable.addRow();
-        row.addCell("data").addContent("Total file downloads");
+        row.addCell("data").addContent("Downloads");
         row.addCell("data").addContent(totalFileDownload);
 
     }

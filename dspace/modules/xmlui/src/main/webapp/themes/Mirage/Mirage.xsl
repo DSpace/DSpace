@@ -112,9 +112,22 @@
                 overflow: visible;
             }
 
-            #aspect_statistics_StatisticsTransformer_div_stats .ds-table-row {
-	        height:60px;
+        #aspect_statistics_StatisticsTransformer_div_stats table {
+            width: 100%;
+            margin-top: 10px;
+        }
+        #aspect_statistics_StatisticsTransformer_div_stats .ds-table-row {
+	        height: 40px;
 	    }
+        #aspect_statistics_StatisticsTransformer_div_stats tr.odd td {
+	        background-color: #eee;
+	    }
+        #aspect_statistics_StatisticsTransformer_div_stats td {
+            padding: 0 8px;
+        }
+        #aspect_statistics_StatisticsTransformer_div_stats td:last-child {
+            text-align: right;
+        }
 
         #recently_integrated_journals img.pub-cover {
 	        margin: 7px 10px;
