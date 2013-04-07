@@ -428,7 +428,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             </ul>
                         </li>
                         <li>
-                            <a href="">Get Started</a>
+                            <a href="/pages/faq#depositing">Get Started</a>
                             <ul>
                                 <li>
                                     <a href="/pages/faq#depositing">Submit Data</a>
