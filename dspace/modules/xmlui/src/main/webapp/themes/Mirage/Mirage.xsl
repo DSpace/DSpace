@@ -193,9 +193,9 @@
                 margin: 4px;		
             }
 
-	    #aspect_discovery_SiteViewer_field_query {
-	        width:75%;
-	    }
+            #aspect_discovery_SiteViewer_field_query {
+                width: 85%;
+            }
 
         </style>
 
@@ -277,7 +277,7 @@
                 <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                       id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary"
                       action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
-                    <p class="ds-paragraph">
+                    <p class="ds-paragraph" style="overflow; hidden; margin-bottom: 0px;">
                         <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                                id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
                                placeholder="Enter keyword, author, title, DOI, etc. Example: herbivory"
@@ -286,6 +286,7 @@
                      --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
                                id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
                                type="submit" value="Search"/>
+                        <a style="float:left; font-size: 95%;" href="/discover?query=&submit=Search">Advanced search</a>
                     </p>
                 </form>
             </div>
@@ -322,7 +323,7 @@
             <!-- START BROWSE -->
             <div class="home-col-1">
                 <h1 class="ds-div-head">Browse for data</h1>
-                <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 547px; overflow: auto;">
+                <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 535px; overflow: auto;">
                     <div id="browse-data-buttons" class="tab-buttons">
                         <a href="#recently-published-data"><span>Recently published</span></a>
                         <a href="#most-viewed-data"><span>Most viewed</span></a>
