@@ -2074,3 +2074,11 @@ ol.formatted li {
   padding-left: 2em;
   margin-bottom: 0.75em;
 }
+
+#membershipMeetingImage small {
+    color: #fff; 
+    display: block; 
+    margin-top: -2em; 
+    padding-left: 5px; 
+    padding-bottom: 1em;
+}
