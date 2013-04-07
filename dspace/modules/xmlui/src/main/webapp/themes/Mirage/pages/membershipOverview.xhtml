@@ -9,17 +9,22 @@
      <style type="text/css">
          div#ds-body { margin: 0px 0px 0px 0px;padding-right: 10px; top: 165px;}
         .currency-table {
-            width: 95%;
-            margin: 1em auto;
-            border-top: 2px solid #ccc;
-            border-bottom: 2px solid #ccc;
+            width: 90%;
+            margin: 1.5em auto 0.5em;
         }
-        .currency-table th {
+        .currency-table td {
+             text-align: center;
+        }
+        .currency-table th:first-child,
+        .currency-table td:first-child {
             text-align: left;
+            padding-left: 8px;
+        }
+        .currency-table tr {
+            background-color: #eee;
         }
         .currency-table tr.odd {
-            border-top: 2px solid #ddd;
-            border-bottom: 1px dotted #ccc;
+            background-color: #fff;
         }
      </style>
  </head>
@@ -79,7 +84,7 @@
               <td>1,000</td>
               <td>5,000</td>
           </tr>
-          <tr class="odd">
+          <tr>
               <td>7.8 million Euros</td>
               <td>780</td>
               <td>3900</td>
@@ -89,7 +94,7 @@
               <td>660</td>
               <td>3300</td>
           </tr>
-          <tr class="odd">
+          <tr>
               <td>10 million Canadian Dollars</td>
               <td>1,000</td>
               <td>5,000</td>
@@ -99,7 +104,7 @@
               <td>95,000</td>
               <td>475,000</td>
           </tr>
-          <tr class="odd">
+          <tr>
               <td>9.6 million Australian Dollars</td>
               <td>960</td>
               <td>4,800</td>
