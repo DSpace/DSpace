@@ -161,6 +161,12 @@ jQuery(document).ready(function() {
 
         // strip links from section headings
         questionBlock.find('h2 a').each(function() {
+            // transfer its href to the heading, to support inbound links
+            var targetID = jQuery(this).attr('href').split('#')[1];
+            jQuery('#'+targetID).remove();
+            var heading = jQuery(this).parent();
+            heading.attr('id', targetID);
+            // strip the hyperlink, to leave a simple header
             jQuery(this).replaceWith(jQuery(this).html());
         });
 
