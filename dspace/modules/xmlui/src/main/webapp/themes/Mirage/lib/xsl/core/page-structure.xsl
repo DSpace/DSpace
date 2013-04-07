@@ -416,7 +416,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     </ul>
                                 </li>
                                 <li>
-                                    <a href="http://blog.datadryad.org">News</a>
+                                    <a href="http://blog.datadryad.org">News and Views</a>
                                 </li>
                                 <li>
                                     <!-- UserVoice JavaScript SDK (only needed once on a page) -->
