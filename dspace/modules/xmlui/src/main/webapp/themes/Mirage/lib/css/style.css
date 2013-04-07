@@ -2082,3 +2082,7 @@ ol.formatted li {
     padding-left: 5px; 
     padding-bottom: 1em;
 }
+
+a.top-link {
+    float: right;
+}
