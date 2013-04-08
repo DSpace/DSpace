@@ -493,8 +493,6 @@
         <div class="ds-static-div primary">
           <xsl:variable name="dryad_dri_url">
               <xsl:value-of select="confman:getProperty('dspace.url')"/>
-              <xsl:text>:</xsl:text>
-              <xsl:value-of select="confman:getIntProperty('dspace.port')"/>
               <xsl:text>/DRI</xsl:text>
               <xsl:value-of select="@OBJID"/>
           </xsl:variable>
