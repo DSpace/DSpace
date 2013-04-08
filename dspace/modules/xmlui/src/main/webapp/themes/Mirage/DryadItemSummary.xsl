@@ -1409,17 +1409,19 @@
     </xsl:template>
 
     <xsl:template name="checkedAndNoEmbargo">
-        <table class="ds-table file-list">
-            <tr class="ds-table-header-row">
-            </tr>
-            <tr>
-                <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CONTENT']">
-                    <xsl:with-param name="context" select="."/>
-                    <xsl:with-param name="primaryBitstream"
-                                    select="./mets:structMap[@TYPE='LOGICAL']/mets:div[@TYPE='DSpace Item']/mets:fptr/@FILEID"/>
-                </xsl:apply-templates>
-            </tr>
-        </table>
+        <div class="ds-static-div primary">
+            <table class="ds-table file-list">
+                <tr class="ds-table-header-row">
+                </tr>
+                <tr>
+                    <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CONTENT']">
+                        <xsl:with-param name="context" select="."/>
+                        <xsl:with-param name="primaryBitstream"
+                                        select="./mets:structMap[@TYPE='LOGICAL']/mets:div[@TYPE='DSpace Item']/mets:fptr/@FILEID"/>
+                    </xsl:apply-templates>
+                </tr>
+            </table>
+        </div>
     </xsl:template>
 
 
