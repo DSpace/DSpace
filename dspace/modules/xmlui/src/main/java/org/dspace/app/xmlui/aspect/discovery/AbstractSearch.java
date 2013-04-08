@@ -200,47 +200,16 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
             if(facetVals != null)
             {
                 org.dspace.app.xmlui.wing.element.List list = results.addList("tabs");
-
+                //ADD COLLECTION 2 (Dryad) first
                 for (FacetField.Count count : facetVals) {
-                    if(!count.getName().equals("3")){
-                        String filterQuery = count.getAsFilterQuery();
-                        String paramsQuery=request.getQueryString();
-                        Collection coll = Collection.find(context,Integer.parseInt(count.getName()));
-                        org.dspace.app.xmlui.wing.element.Item collectionLink = list.addItem();
-                        if(paramsQuery.contains("fq=location.coll"))  {
-                            if(paramsQuery.contains("fq=location.coll:"+count.getName())||paramsQuery.contains("fq=location.coll%3A"+count.getName()))
-
-                            {
-                                collectionLink.addHidden("selected");
-                            }
-                        }
-                        else{
-                            if(count.getName().equals("2"))
-                            {
-                                collectionLink.addHidden("selected");
-                            }
-                        }
-
-
-
-
-                        if(request.getQueryString().contains("&fq=location.coll:")){
-                            paramsQuery = parameterReplace("&fq=location.coll:",paramsQuery,count.getName());
-                        }
-                        else if(request.getQueryString().contains("&fq=location.coll%3A")){
-                            paramsQuery = parameterReplace("&fq=location.coll%3A",paramsQuery,count.getName());
-                        }
-                        else{
-                            paramsQuery=paramsQuery+"&fq=location.coll:" + count.getName();
-                        }
-
-                        if(request.getQueryString().contains("&page=")){
-                            paramsQuery = parameterReplace("&page=",paramsQuery,"1");
-                        }
-
-
-                        collectionLink.addXref(contextPath + "/" + getDiscoverUrl() + "?" +paramsQuery,coll.getName() + " (" + count.getCount() + ")" );
-
+                    if(count.getName().equals("2")){
+                        buildTabs(count,request,list);
+                    }
+                }
+                //remove collection 7 (dryadlab)
+                for (FacetField.Count count : facetVals) {
+                    if(!count.getName().equals("3")&&!count.getName().equals("2")&&!count.getName().equals("7")){
+                        buildTabs(count,request,list);
                     }
                 }
             }
@@ -851,5 +820,47 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
         }
         query = s.replace(prefix+collectionNumber, prefix+newNumber);
         return query;
+    }
+
+    private void buildTabs(FacetField.Count count,Request request,org.dspace.app.xmlui.wing.element.List list)
+            throws SQLException,WingException
+    {
+        String filterQuery = count.getAsFilterQuery();
+        String paramsQuery=request.getQueryString();
+        Collection coll = Collection.find(context,Integer.parseInt(count.getName()));
+        org.dspace.app.xmlui.wing.element.Item collectionLink = list.addItem();
+        if(paramsQuery.contains("fq=location.coll"))  {
+            if(paramsQuery.contains("fq=location.coll:"+count.getName())||paramsQuery.contains("fq=location.coll%3A"+count.getName()))
+
+            {
+                collectionLink.addHidden("selected");
+            }
+        }
+        else{
+            if(count.getName().equals("2"))
+            {
+                collectionLink.addHidden("selected");
+            }
+        }
+
+
+
+
+        if(request.getQueryString().contains("&fq=location.coll:")){
+            paramsQuery = parameterReplace("&fq=location.coll:",paramsQuery,count.getName());
+        }
+        else if(request.getQueryString().contains("&fq=location.coll%3A")){
+            paramsQuery = parameterReplace("&fq=location.coll%3A",paramsQuery,count.getName());
+        }
+        else{
+            paramsQuery=paramsQuery+"&fq=location.coll:" + count.getName();
+        }
+
+        if(request.getQueryString().contains("&page=")){
+            paramsQuery = parameterReplace("&page=",paramsQuery,"1");
+        }
+
+
+        collectionLink.addXref(contextPath + "/" + getDiscoverUrl() + "?" +paramsQuery,coll.getName() + " (" + count.getCount() + ")" );
     }
 }
