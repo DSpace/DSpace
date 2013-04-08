@@ -35,16 +35,16 @@ public interface DOIConnector {
     /**
      * Sends the DELETE-Request to the DOI registry.
      * 
-     * <p>This methods sends a request to "delete" a DOI. As DOIs are persistant
-     * identifiers they should never be deleted. If you send f.e. a HTTP DELETE
+     * <p>This method sends a request to "delete" a DOI. As DOIs are persistant
+     * identifiers they should never be deleted. For example, if you send a HTTP DELETE
      * request to the DataCite Metadata API directly, it will set the DOI to
      * inactive.</p>
      * 
-     * <p>A DOIConnector does not have to check weather the DOI is reserved,
+     * <p>A DOIConnector does not have to check whether the DOI is reserved,
      * registered or not. It will only send the request and return the answer
      * in form of a boolean weather the deletion was successful or not. It may
-     * even throw an IdentiferException in case you are not allowed to delete
-     * a DOI, the DOI does not exist, ... So please be ensure that the deletion
+     * even throw an IdentifierException in case you are not allowed to delete
+     * a DOI, the DOI does not exist, ... So please be sure that the deletion
      * of a DOI is conform with the rules of the registry and that the DOI is in
      * the appropriate state (f.e. reserved but not registered).</p>
      * 
