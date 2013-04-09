@@ -1,6 +1,6 @@
 jQuery(document).ready(function() {
     initdatasetsubmissionfile();
-    initjQueryTooltips();
+    //initjQueryTooltips();
     initCiteMe();
     initFirstSubmissionForm();
 
