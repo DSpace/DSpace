@@ -315,19 +315,33 @@
                             <img src="/themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" 
                                  alt="Dryad's data packages are like seeds."
                                  title="Dryad's data packages are like seeds." />
-                            Publishers, societies, universities, libraries, funders, and other stakeholder organizations are invited to become <a href="/pages/membershipOverview">Members</a>. Tap into an active knowledge-sharing network, receive discounts on submission fees, and help shape Dryad’s future.
+                            Publishers, societies, universities, libraries,
+                            funders, and other stakeholder organizations are
+                            invited to become <a href="/pages/membershipOverview">Members</a>.
+                            Tap into an active knowledge-sharing network,
+                            receive discounts on submission fees, and help
+                            shape Dryad's future.
                             <img src="/themes/Mirage/images/seed-3.png" style="float: right; margin-right: -8px;" 
                                  alt="Researchers use Dryad data in their new work."
                                  title="Researchers use Dryad data in their new work."/>
                         </p>
                         <p>
-                            <a href="/pages/journalIntegration">Submission Integration</a> is a service provided to journals free-of-charge to coordinate manuscript submission with data submission to Dryad.  It makes data submission easy for researchers; makes linking articles and data easy for journals; and enables confidential review of data prior to publication.
+                            <a href="/pages/journalIntegration">Submission Integration</a> 
+                            is a free service that allows
+                            journal publishers to coordinate manuscript
+                            submission with data submission in Dryad. It makes
+                            submitting data easy for researchers; makes linking
+                            articles and data easy for journals; and enables
+                            confidential review of data prior to publication.
                         </p>
                         <p>
                             <img src="/themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" 
                                  alt="New data is added to Dryad, and the cycle continues."
                                  title="New data is added to Dryad, and the cycle continues."/>
-                            Submission fees enable Dryad’s content to be made available free of charge for research and educational reuse.  Flexible <a href="/pages/pricing">pricing plans</a> provide volume discounts on submission fees.
+                            Submission fees enable Dryad's content to be made
+                            available free of charge for research and
+                            educational reuse. Flexible <a href="/pages/pricing">pricing plans</a> 
+                            provide volume discounts.
                         </p>
                     </div>
                 </div>
