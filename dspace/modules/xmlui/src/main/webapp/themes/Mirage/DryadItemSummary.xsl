@@ -501,7 +501,6 @@
         <xsl:if
                 test="not($meta[@element='xhtml_head_item'][contains(., 'DCTERMS.isPartOf')]) and .//dim:field[@element='relation'][@qualifier='haspart']">
             <div class="ds-static-div primary">
-                <h2 class="ds-list-head">Citing this article and package</h2><!-- i18n this -->
                     <div class="secondary">
                     <xsl:variable name="citation"
                                   select=".//dim:field[@element='identifier'][@qualifier='citation'][position() = 1]"/>
@@ -893,7 +892,6 @@
         </xsl:if>
         <!-- package metadata -->
         <div class="ds-static-div primary">
-          <h2 class="ds-list-head">Package metadata</h2>
           <div class="item-summary-view-metadata">
             <table class="package-metadata">
             <tbody>
