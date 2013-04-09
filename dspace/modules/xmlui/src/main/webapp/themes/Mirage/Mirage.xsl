@@ -301,7 +301,7 @@
 
             <!-- START CONNECT  -->
             <div class="home-col-2">
-                <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be a part of Dryad
+                <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be part of Dryad
                 </h1>
 
                 <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 490px; font-size: 14px;">
@@ -312,7 +312,7 @@
                                  title="Dryad's data packages are like seeds." />
                             Publishers, societies, universities, libraries,
                             funders, and other stakeholder organizations are
-                            invited to become <a href="/pages/membershipOverview">Members</a>.
+                            invited to become <a href="/pages/membershipOverview">members</a>.
                             Tap into an active knowledge-sharing network,
                             receive discounts on submission fees, and help
                             shape Dryad's future.
@@ -321,11 +321,10 @@
                                  title="Researchers use Dryad data in their new work."/>
                         </p>
                         <p>
-                            <a href="/pages/journalIntegration">Submission Integration</a> 
-                            is a free service that allows
-                            journal publishers to coordinate manuscript
-                            submission with data submission in Dryad. It makes
-                            submitting data easy for researchers; makes linking
+                            <a href="/pages/journalIntegration">Submission integration</a> 
+                            is a free service that allow publishers to
+                            coordinate manuscript and data submissions.
+                            It makes submitting data easy for researchers; makes linking
                             articles and data easy for journals; and enables
                             confidential review of data prior to publication.
                         </p>
@@ -333,9 +332,8 @@
                             <img src="/themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" 
                                  alt="New data is added to Dryad, and the cycle continues."
                                  title="New data is added to Dryad, and the cycle continues."/>
-                            Submission fees enable Dryad's content to be made
-                            available free of charge for research and
-                            educational reuse. Flexible <a href="/pages/pricing">pricing plans</a> 
+                            Submission fees keep Dryad's content free for research and educational reuse.
+                            Flexible <a href="/pages/pricing">pricing plans</a> 
                             provide volume discounts.
                         </p>
                     </div>
@@ -529,7 +527,7 @@
     <xsl:template match="dri:options/dri:list[@n='DryadConnect']" priority="3">
       <div class="simple-box">
         <!-- START CONNECT  -->
-        <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Become a part of Dryad
+        <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be part of Dryad
         </h1>
         <div id="ds_connect_with_dryad" class="ds-static-div primary" style="font-size: 14px;">
             <p>
