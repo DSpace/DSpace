@@ -496,9 +496,6 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <a href="/feedback">Contact Us</a>
                         </li>
 
-                        <xsl:if test="/dri:document/dri:options/dri:list[@n='context']/*">
-                            <xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='context']" mode="menu"/>
-                        </xsl:if>
 
 
 
@@ -521,6 +518,14 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <ul>
                                         <!--remove the extra login link-->
                                         <xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='account']/dri:item" mode="menu"/>
+
+                                        <xsl:if test="/dri:document/dri:options/dri:list[@n='context']/*">
+                                            <xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='context']" mode="menu"/>
+                                        </xsl:if>
+                                        <xsl:if test="/dri:document/dri:options/dri:list[@n='administrative']/*">
+                                            <xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='administrative']"
+                                                                 mode="menu"/>
+                                        </xsl:if>
                                     </ul>
 
                                 </li>
@@ -536,10 +541,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                 </li>
                             </xsl:otherwise>
                         </xsl:choose>
-                        <xsl:if test="/dri:document/dri:options/dri:list[@n='administrative']/*">
-                            <xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='administrative']"
-                                                 mode="menu"/>
-                        </xsl:if>
+
 
                     </ul>
 
