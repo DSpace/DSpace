@@ -155,8 +155,8 @@
                   <xsl:when test="//dim:field[@element='rights'][.='http://creativecommons.org/publicdomain/zero/1.0/']">
                     <!-- For items with the normal CC0 license, display cc-zero.png && opendata.png -->
                     <div class="license-badges">
-                      <a href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank"><img src="/themes/Dryad/images/cc-zero.png"/></a>
-                      <a href="http://opendefinition.org/"><img src="/themes/Dryad/images/opendata.png"/></a>
+                      <a href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank" class="single-image-link"><img src="/themes/Dryad/images/cc-zero.png"/></a>
+                      <a href="http://opendefinition.org/" target="_blank" class="single-image-link"><img src="/themes/Dryad/images/opendata.png"/></a>
                     </div>
                     </xsl:when>
                   </xsl:choose>
@@ -231,7 +231,6 @@
                   <i18n:text>xmlui.dri2xhtml.METS-1.0.license-cc0</i18n:text>
                   <xsl:text> </xsl:text>
               </p>
-            <xsl:text> &#160; </xsl:text>
             </xsl:when>
             <xsl:when test=".//dim:field[@element='rights'][.='http://opensource.org/licenses/gpl-3.0']">
 	      <!-- It has a GPL license -->

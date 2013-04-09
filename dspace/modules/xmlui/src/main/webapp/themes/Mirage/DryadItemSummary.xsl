@@ -1363,10 +1363,10 @@
                             <i18n:text>xmlui.dri2xhtml.METS-1.0.license-cc0</i18n:text>
                             <xsl:text> &#160; </xsl:text>
                             <a href="http://creativecommons.org/publicdomain/zero/1.0/"
-                               target="_blank">
+                               target="_blank" class="single-image-link">
                                 <img src="/themes/Dryad/images/cc-zero.png" alt="CC0"/>
                             </a>
-                            <a href="http://opendefinition.org/">
+                            <a href="http://opendefinition.org/" class="single-image-link">
                                 <img src="/themes/Dryad/images/opendata.png" alt="open data"/>
                             </a>
                         </div>
@@ -1377,10 +1377,10 @@
                         <i18n:text>xmlui.dri2xhtml.METS-1.0.license-cc0</i18n:text>
                         <xsl:text> &#160; </xsl:text>
                         <a href="http://creativecommons.org/publicdomain/zero/1.0/"
-                           target="_blank">
+                           target="_blank" class="single-image-link">
                             <img src="/themes/Dryad/images/cc-zero.png" alt="CC0"/>
                         </a>
-                        <a href="http://opendefinition.org/">
+                        <a href="http://opendefinition.org/" class="single-image-link">
                             <img src="/themes/Dryad/images/opendata.png" alt="open data"/>
                         </a>
                     </div>
