@@ -500,7 +500,7 @@
     </xsl:template>
 
     <xsl:template match="dri:options/dri:list[@n='DryadSearch']" priority="3">
-      <div class="simple-box">
+      <div class="NOT-simple-box">
         <!-- START SEARCH -->
         <div class="home-col-1">
             <h1 class="ds-div-head">Search for Data
@@ -525,7 +525,7 @@
     </xsl:template>
 
     <xsl:template match="dri:options/dri:list[@n='DryadConnect']" priority="3">
-      <div class="simple-box">
+      <div class="NOT-simple-box">
         <!-- START CONNECT  -->
         <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be part of Dryad
         </h1>
