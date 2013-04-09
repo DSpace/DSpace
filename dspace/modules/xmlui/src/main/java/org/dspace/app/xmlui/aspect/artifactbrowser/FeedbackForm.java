@@ -127,11 +127,10 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
         feedback.addPara(T_overview_para1);
         feedback.addPara(T_overview_para2);
         feedback.addPara(T_overview_para3);
-        feedback.addPara(T_address_head);
-        
-        feedback.addPara(T_address_para1);
-
         feedback.addPara(T_ideasforum_forumlink);
+
+        feedback.addPara(T_address_head);
+        feedback.addPara(T_address_para1);
 
         feedback.addPara(T_contactform_head);
         feedback.addPara(T_contactform_para1);
