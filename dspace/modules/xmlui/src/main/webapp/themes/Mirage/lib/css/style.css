@@ -1729,10 +1729,10 @@ img.pub-cover {
     box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
 }
 .publication-header img.pub-cover {
-    float: left;
+    float: right;
     height: 120px;
     width: 90px;
-    margin-right: 20px;
+    margin-left: 20px;
 }
 .publication-header .pub-title {
     font-size: 1.2em;

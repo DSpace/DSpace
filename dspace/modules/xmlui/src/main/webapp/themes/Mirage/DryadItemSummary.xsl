@@ -480,13 +480,9 @@
                                 select=".//dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'doi:')]"/>
             </xsl:call-template>
             <p>
-              <a class="pub-title">
-                  <xsl:attribute name="href">
-                      <xsl:value-of
-                              select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
-                  </xsl:attribute>
+              <span class="pub-title">
                   <xsl:value-of select="$title"/>
-              </a>
+              </span>
             </p>
         </div>
         <!-- Data Files in package -->
@@ -1526,7 +1522,7 @@
         <xsl:param name="article-doi"/>
         <xsl:choose>
             <xsl:when test='$journal-name = "The American Naturalist"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1543,7 +1539,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Biological Journal of the Linnean Society"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1560,7 +1556,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Biology Letters"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1577,7 +1573,8 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "BioRisk"'>
-                <a>
+                <a target="_blank">
+                    <xsl:attribute name="href">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1594,7 +1591,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "BMJ Open"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1611,7 +1608,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Comparative Cytogenetics"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1628,7 +1625,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Ecological Monographs"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1646,7 +1643,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "eLife"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1664,7 +1661,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Evolution"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1680,7 +1677,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Evolutionary Applications"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1698,7 +1695,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Functional Ecology"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1716,7 +1713,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "German Medical Science"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1734,7 +1731,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Heredity"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1750,7 +1747,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "International Journal of Myriapodology"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1766,7 +1763,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Journal of Animal Ecology"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1783,7 +1780,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Journal of Evolutionary Biology"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1800,7 +1797,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Journal of Fish and Wildlife Management"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1817,7 +1814,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Journal of Heredity"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1834,7 +1831,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Journal of Open Public Health Data"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1851,7 +1848,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Journal of Paleontology"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1868,7 +1865,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Methods in Ecology and Evolution"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1885,7 +1882,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Molecular Biology and Evolution"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1902,7 +1899,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Molecular Ecology"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1920,7 +1917,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Molecular Ecology Resources"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1938,7 +1935,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Molecular Phylogenetics and Evolution"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1956,7 +1953,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "MycoKeys"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1974,7 +1971,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Nature Conservation"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -1992,7 +1989,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "NeoBiota"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -2010,7 +2007,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Paleobiology"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -2028,7 +2025,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "PhytoKeys"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -2046,7 +2043,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "PLoS Biology" or $journal-name = "PLOS Biology"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -2064,7 +2061,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "PLoS Computational Biology" or $journal-name = "PLOS Computational Biology"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -2082,7 +2079,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='starts-with($journal-name,"PLoS Currents") or starts-with($journal-name,"PLOS Currents")'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -2100,7 +2097,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "PLoS Genetics" or $journal-name = "PLOS Genetics"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -2118,7 +2115,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "PLoS Medicine" or $journal-name = "PLOS Medicine"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -2136,7 +2133,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "PLoS Neglected Tropical Diseases" or $journal-name = "PLOS Neglected Tropical Diseases"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -2154,7 +2151,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "PLoS ONE" or $journal-name = "PLOS ONE"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -2172,7 +2169,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "PLoS Pathogens" or $journal-name = "PLOS Pathogens"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -2190,7 +2187,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Systematic Biology"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
@@ -2207,7 +2204,7 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "ZooKeys"'>
-                <a>
+                <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
