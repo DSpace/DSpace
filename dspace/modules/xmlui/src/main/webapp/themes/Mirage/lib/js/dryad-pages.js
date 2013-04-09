@@ -2,14 +2,19 @@
 /* JS behaviors for all Dryad pages */
 jQuery(document).ready(function() {
 
-    // If the page has separate sidebar boxes, try to align the topmost
-    // box with the first "primary" box on the page.
-    var topMainBox = jQuery('#ds-body .primary:eq(0)');
+    /* If the page has separate sidebar boxes, try to align the topmost
+     * box with the first topmost element on the page, preferably:
+     *  > a button-bar for intra-page navigation
+     *  > a main page title
+     *  > a publication-header box
+     *  > or any .primary box
+     */
+    var topMainPageElement = jQuery('#ds-body .tab-buttons, #ds-body h1, #ds-body .publication-header, #ds-body .primary').eq(0);
     var topSidebarBox = jQuery('#ds-options .simple-box:eq(0)');
-    if (topMainBox.length && topSidebarBox.length) {
-        var mainPageBoxTop = topMainBox.offset().top;
+    if (topMainPageElement.length && topSidebarBox.length) {
+        var mainPageTop = topMainPageElement.offset().top;
         var sidebarBoxTop = topSidebarBox.offset().top;
-        var boxNudge = mainPageBoxTop - sidebarBoxTop;
+        var boxNudge = mainPageTop - sidebarBoxTop;
         // ASSUMES that #ds-option has no padding-top!
         jQuery('#ds-options').css('padding-top', boxNudge+"px");
     }
