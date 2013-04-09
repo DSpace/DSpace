@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.unlp.sedici.sedici2003.model.JerarquiasTermino;
+import ar.edu.unlp.sedici.sedici2003.model.TesaurosTermino;
 
 public class SeDiCI2003Jerarquia extends SeDiCI2003Hierarchy {
 
@@ -31,7 +32,9 @@ public class SeDiCI2003Jerarquia extends SeDiCI2003Hierarchy {
 
 	@Override
 	protected String getLabel(Object entity) {
-		return ((JerarquiasTermino) entity).getNombreEs();
+		String separador = "::";
+		String camino = JerarquiasTermino.getCamino((JerarquiasTermino)entity, separador);
+		return ((JerarquiasTermino) entity).getNombreEs() + " - " + camino + separador + ((JerarquiasTermino) entity).getNombreEs();
 	}
 
 	@Override

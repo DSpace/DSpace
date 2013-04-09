@@ -32,6 +32,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.roo.addon.dbre.RooDbManaged;
 import org.springframework.roo.addon.entity.RooEntity;
 import org.springframework.roo.addon.javabean.RooJavaBean;
@@ -94,5 +95,42 @@ public class JerarquiasTermino {
 		
 		return q.getResultList();    
 	}
+	
+	/**
+	 * Genera el camino de terminos hasta llegar al antecesor del termino actual
+	 * @param separador
+	 * @return
+	 */
+	public static String getCamino(JerarquiasTermino entity, String separador) {
+		String listaIDs = "'";
+		String idTermino = entity.getId();
+		
+		// Armamos los IDs de los antecesores a partir del id del termino actual
+		while(idTermino.contains(".")) {
+			idTermino = idTermino.substring(0, idTermino.lastIndexOf("."));
+			listaIDs += idTermino;
+			if(idTermino.contains("."))
+				listaIDs += "','";
+		}
+		listaIDs += "'";
+		
+		// Armamos la query
+		String sqlAntecesores = "SELECT terminos FROM JerarquiasTermino AS terminos " +
+				"WHERE terminos.id IN ("+listaIDs+") " +
+				"ORDER BY terminos.id ASC";
+		
+		// Ejecutamos la query
+		EntityManager em = JerarquiasTermino.entityManager();
+		TypedQuery<JerarquiasTermino> q = em.createQuery(sqlAntecesores, JerarquiasTermino.class);
+		List<JerarquiasTermino> antecesores = q.getResultList();    
+		
+		// Procesamos los resultados y armamos el camino final
+		String[] terminos = new String[antecesores.size()];
+		for(int i = 0; i < antecesores.size(); i++) {
+			terminos[i] = antecesores.get(i).getNombreEs();
+		}
+		return StringUtils.join(terminos, separador);
+	}
+	
 
 }
