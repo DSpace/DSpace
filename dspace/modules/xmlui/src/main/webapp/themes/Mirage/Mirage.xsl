@@ -288,7 +288,7 @@
                 <h1 class="ds-div-head">Search for data</h1>
 
                 <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
-                      id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary"
+                      id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary" style="overflow: hidden;"
                       action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
                     <p class="ds-paragraph" style="overflow; hidden; margin-bottom: 0px;">
                         <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"

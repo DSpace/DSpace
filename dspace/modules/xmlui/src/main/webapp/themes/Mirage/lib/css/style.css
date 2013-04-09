@@ -1596,6 +1596,10 @@ blockquote {
     cursor:pointer;
 }
 
+.ui-tooltip {
+    max-width: 400px;
+}
+
 img.ds-authority-confidence
 { width: 16px; height: 16px; margin: 0px 2px; padding: 0px; vertical-align: bottom;}
 
@@ -2086,3 +2090,15 @@ ol.formatted li {
 a.top-link {
     float: right;
 }
+
+/* ********************* Tweaks for webkit browsers (Chrome + Safari) only **************** */
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    /* misplaced pager controls */
+    #dryad-home-carousel .bx-pager-item {
+        top: -7px;
+    }
+}
+
+
+
