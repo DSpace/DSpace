@@ -291,7 +291,6 @@ h1.ds-option-set-head {
 #aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-static-div,
 #aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-interactive-div,
 #submit-data-feature-box h1,
-.tab-panel,
 .simple-box,
 div.ds-option-set {
     margin-top: 8px;
@@ -1517,8 +1516,7 @@ a.learn-to-submit-button:hover {
     margin-bottom: 18px;
 }
 
-.simple-box h1,
-.tab-panel h1 {
+.simple-box h1 {
     color: #40841C;
     border-bottom: none;
     padding: 0;
@@ -1528,8 +1526,7 @@ a.learn-to-submit-button:hover {
     color: #333;
     font-size: 18px;
 }
-.simple-box .primary,
-.tab-panel .primary {
+.simple-box .primary {
     padding: 0;
     margin: 0;
     border: none;
