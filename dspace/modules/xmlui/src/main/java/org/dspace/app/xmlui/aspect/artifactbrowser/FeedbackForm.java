@@ -64,11 +64,8 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
     private static final Message T_address_para1 =
         message("xmlui.ArtifactBrowser.FeedbackForm.address.para1");
 
-    private static final Message T_ideasforum_head =
-        message("xmlui.ArtifactBrowser.FeedbackForm.ideasforum.head");
-
     private static final Message T_ideasforum_forumlink =
-        message("xmlui.ArtifactBrowser.FeedbackForm.ideasforum.forumLink");
+        message("xmlui.ArtifactBrowser.FeedbackForm.forumLink");
 
     private static final Message T_contactform_head =
         message("xmlui.ArtifactBrowser.FeedbackForm.contactform.head");
@@ -124,24 +121,19 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
             UIException, SQLException, IOException, AuthorizeException
     {
 
-        Division overview = body.addDivision("feedback-overview", "primary");
-        overview.setHead(T_overview_head);
-        overview.addPara(T_overview_para1);
-        overview.addPara(T_overview_para2);
-        overview.addPara(T_overview_para3);
-
-        Division address = body.addDivision("feedback-address", "primary");
-        address.setHead(T_address_head);
-        address.addPara(T_address_para1);
-
-        Division ideasforum = body.addDivision("feedback-ideasforum", "primary");
-        ideasforum.setHead(T_ideasforum_head);
-        ideasforum.addPara(T_ideasforum_forumlink);
-
         Division feedback = body.addInteractiveDivision("feedback-form",
                 contextPath+"/feedback",Division.METHOD_POST,"primary");
+        feedback.setHead(T_overview_head);
+        feedback.addPara(T_overview_para1);
+        feedback.addPara(T_overview_para2);
+        feedback.addPara(T_overview_para3);
+        feedback.addPara(T_address_head);
         
-        feedback.setHead(T_contactform_head);
+        feedback.addPara(T_address_para1);
+
+        feedback.addPara(T_ideasforum_forumlink);
+
+        feedback.addPara(T_contactform_head);
         feedback.addPara(T_contactform_para1);
         
         List form = feedback.addList("form",List.TYPE_FORM);
