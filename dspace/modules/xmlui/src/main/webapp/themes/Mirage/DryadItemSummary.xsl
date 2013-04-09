@@ -142,7 +142,6 @@
             <xsl:variable name="journal"
                           select="$meta[@element='publicationName']"/>
             <div class="ds-static-div primary">
-                <h2 class="ds-list-head">Citing this article and package</h2><!-- i18n this -->
                     <div class="secondary">
                     <p class="ds-paragraph">
                         <i18n:text>xmlui.DryadItemSummary.whenUsing</i18n:text>
@@ -479,7 +478,6 @@
         <xsl:if
                 test="not($meta[@element='xhtml_head_item'][contains(., 'DCTERMS.isPartOf')]) and .//dim:field[@element='relation'][@qualifier='haspart']">
             <div class="ds-static-div primary">
-                <h2 class="ds-list-head">Citing this article and package</h2><!-- i18n this -->
                     <div class="secondary">
                     <xsl:variable name="citation"
                                   select=".//dim:field[@element='identifier'][@qualifier='citation'][position() = 1]"/>
@@ -865,17 +863,6 @@
         </xsl:if>
         <!-- metadata -->
           <div class="ds-static-div primary" id="dryad_metadata">
-          <h2 class="ds-list-head">
-            <xsl:choose>
-                <xsl:when
-                        test=".//dim:field[@element='relation'][@qualifier='ispartof']">
-                    <xsl:text>File metadata</xsl:text>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:text>Package metadata</xsl:text>
-                </xsl:otherwise>
-            </xsl:choose>
-          </h2>
           <div class="item-summary-view-metadata">
             <table class="package-metadata">
             <tbody>
