@@ -318,19 +318,20 @@
 	<!-- org.dspace.app.xmlui.artifactbrowser.FeedbackForm.java -->
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.title">Contact Us</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.trail">Give feedback</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.head">Contact Us</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.para1">Journals, publishers or societies seeking more information about membership, submission integration, payment plans or other ways to be part of Dryad please email: <a href="mailto:director@datadryad.org">director@datadryad.org</a>. </message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.para2">To submit a help ticket, send us feedback on the web site or for general technical questions please email: <a href="mailto:help@datadryad.org">help@datadryad.org</a>.</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.para3">For Dryad staff and project personnel, please see <a href="/pages/whoWeAre#staff">Who We Are</a>.</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.para4">Postal Address:</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.para5">Dryad<br/>PO Box 585<br/>Durham, NC 27702-0585 USA</message>
-    <message key="xmlui.ArtifactBrowser.FeedbackForm.forumLink"><a href="#" onclick="$('#forum-link').click(); return false;">Share your ideas for features and vote for ideas already submitted</a></message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.para6">You may also submit your inquiry or help ticket using the form below.  Your submission will be tracked and routed to the correct person.</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.email">Your Email</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.email_help">This address will be used to follow
-		up on your feedback.</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.comments">Comments</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.submit">Send Feedback</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.head">Contact Us</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para1">Journals, publishers or societies seeking more information about membership, submission integration, payment plans or other ways to be part of Dryad please email: <a href="mailto:director@datadryad.org">director@datadryad.org</a>. </message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para2">To submit a help ticket, send us feedback on the web site or for general technical questions please email: <a href="mailto:help@datadryad.org">help@datadryad.org</a>.</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para3">For information about Dryad staff and project personnel, please see <a href="/pages/whoWeAre#staff">Who We Are</a>.</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.address.head">Postal Address</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.address.para1">Dryad<br/>PO Box 585<br/>Durham, NC 27702-0585 USA</message>
+  <message key="xmlui.ArtifactBrowser.FeedbackForm.ideasforum.head">Ideas Forum</message>
+  <message key="xmlui.ArtifactBrowser.FeedbackForm.ideasforum.forumLink"><a href="#" onclick="$('#forum-link').click(); return false;">Share your ideas for features and vote for ideas already submitted</a></message>
+  <message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.head">Contact Form</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.para1">You may also submit your inquiry or help ticket using the form below.  Your submission will be tracked and routed to the correct person.</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.email">Your Email</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.email_help">This address will ONLY be used to follow up on your feedback.</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.comments">Comments</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.submit">Send Feedback</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.FeedbackSent.java -->
 	<message key="xmlui.ArtifactBrowser.FeedbackSent.title">Give feedback</message>
