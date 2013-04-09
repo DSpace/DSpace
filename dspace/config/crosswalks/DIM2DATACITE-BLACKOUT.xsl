@@ -56,10 +56,12 @@
 
 	    <!-- ********* Title *************** -->
             <xsl:if test="dspace:field[@element ='title']">
+                <xsl:variable name="title-doi" select="dspace:field[@element='identifier' and not(@qualifier)]" />
                 <titles>
                     <xsl:for-each select="dspace:field[@element ='title']">
                         <title>
-                            <xsl:text>:tba</xsl:text>
+                            <xsl:text>Dryad Item </xsl:text>
+                            <xsl:value-of select="translate(substring-after($title-doi,'doi:'), $smallcase, $uppercase)" />
                         </title>
                     </xsl:for-each>
                 </titles>
