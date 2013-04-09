@@ -2090,3 +2090,15 @@ ol.formatted li {
 a.top-link {
     float: right;
 }
+
+/* ********************* Tweaks for webkit browsers (Chrome + Safari) only **************** */
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    /* misplaced pager controls */
+    #dryad-home-carousel .bx-pager-item {
+        top: -7px;
+    }
+}
+
+
+
