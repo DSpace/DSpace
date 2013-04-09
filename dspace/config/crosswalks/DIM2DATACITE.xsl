@@ -194,6 +194,9 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="dspace:field[@element='rights']"/>
+                </xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
           <!-- ************ Rights *************** -->
