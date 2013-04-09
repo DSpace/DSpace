@@ -1544,7 +1544,6 @@
             <xsl:when test='$journal-name = "BioRisk"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
-                    <xsl:attribute name="href">
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
