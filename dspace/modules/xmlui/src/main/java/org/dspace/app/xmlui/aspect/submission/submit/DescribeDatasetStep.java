@@ -156,7 +156,10 @@ public class DescribeDatasetStep extends AbstractSubmissionStep {
             Composite dataComp = fileUrlItem.addComposite("data_file_repo");
             Text dataIdenTxt = dataComp.addText("datafile_identifier");
             dataIdenTxt.setValue(request.getParameter("datafile_identifier") == null ? "" : request.getParameter("datafile_identifier"));
-            dataIdenTxt.setHelp(T_FORM_DATA_FILE_REPO_HELP);
+            /* TODO: Find allowed method to set these two attributes
+             * dataIdenTxt.setAttribute('placeholder', T_FORM_DATA_FILE_REPO_HELP);
+             * dataIdenTxt.setAttribute('title', T_FORM_DATA_FILE_REPO_HELP);
+             */
             Select datafileRepo = dataComp.addSelect("datafile_repo");
             datafileRepo.addOption("select-repo", "(please select a repository)");
 

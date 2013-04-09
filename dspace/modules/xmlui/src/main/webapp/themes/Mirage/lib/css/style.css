@@ -1596,6 +1596,10 @@ blockquote {
     cursor:pointer;
 }
 
+.ui-tooltip {
+    max-width: 400px;
+}
+
 img.ds-authority-confidence
 { width: 16px; height: 16px; margin: 0px 2px; padding: 0px; vertical-align: bottom;}
 
@@ -1729,10 +1733,10 @@ img.pub-cover {
     box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
 }
 .publication-header img.pub-cover {
-    float: left;
+    float: right;
     height: 120px;
     width: 90px;
-    margin-right: 20px;
+    margin-left: 20px;
 }
 .publication-header .pub-title {
     font-size: 1.2em;
@@ -1761,6 +1765,9 @@ table.package-file-description {
     -moz-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
     -webkit-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+}
+table.package-file-description th:first-child {
+    width: 120px;
 }
 table.package-metadata th,
 table.package-file-description th {
@@ -2100,4 +2107,13 @@ a.feedbackform-user-voice-link {
     color: #1b8ebc;
     background-color: #f2f2f2;
     border: 1px solid #d7d7d7;
+}
+
+/* ********************* Tweaks for webkit browsers (Chrome + Safari) only **************** */
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    /* misplaced pager controls */
+    #dryad-home-carousel .bx-pager-item {
+        top: -7px;
+    }
 }
