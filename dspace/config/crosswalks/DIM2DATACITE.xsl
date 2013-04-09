@@ -115,7 +115,7 @@
       <!-- *********** Description - Only for data files********* -->
 	    <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
 	        <description descriptionType="">
-
+              <xsl:value-of select="dspace:field[@element='description']"/>
 	        </description>
       </xsl:if>
 
