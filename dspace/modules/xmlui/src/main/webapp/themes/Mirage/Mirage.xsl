@@ -1029,7 +1029,7 @@ parameter that is being used (see variable defined above) -->
     </xsl:template>
 
      <!--add attribute placeholder and title-->
-    <xsl:template match="//dri:field[@id='aspect.submission.StepTransformer.field.datafile_identifier']" mode="normalField">
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:list/dri:item/dri:field/dri:field[@id='aspect.submission.StepTransformer.field.datafile_identifier']" mode="normalField">
         <input>
             <xsl:call-template name="fieldAttributes"/>
             <xsl:attribute name="placeholder">
