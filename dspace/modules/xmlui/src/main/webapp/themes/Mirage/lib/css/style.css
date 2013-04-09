@@ -1762,6 +1762,9 @@ table.package-file-description {
     -webkit-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
 }
+table.package-file-description th:first-child {
+    width: 120px;
+}
 table.package-metadata th,
 table.package-file-description th {
     font-weight: bold;
