@@ -107,15 +107,9 @@
                 <xsl:with-param name="article-doi"
                                 select=".//dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'doi:')]"/>
             </xsl:call-template>
-            <p>
-              <a class="pub-title">
-                  <xsl:attribute name="href">
-                      <xsl:value-of
-                              select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
-                  </xsl:attribute>
+              <p class="pub-title">
                   <xsl:value-of select="$title"/>
-              </a>
-            </p>
+              </p>
         </div>
         <!-- Data Files in package -->
         <xsl:if test="$datafiles">
