@@ -607,10 +607,24 @@ references to stylesheets pulled directly from the pageMeta element. -->
     <xsl:template name="buildFooter">
         <div id="ds-footer-wrapper">
             <div id="ds-footer">
+
+                <div id="ds-footer-right">
+                    <a>
+                        <xsl:attribute name="href">
+                            <xsl:value-of
+                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                            <xsl:text>/feedback</xsl:text>
+                        </xsl:attribute>
+                        <i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
+                    </a>
+                </div>
+
                 <p style="margin: 0;">
                     <!-- 'Dryad is...' -->
                     <i18n:text>xmlui.dri2xhtml.structural.footer-promotional1</i18n:text>
-                    <xsl:text> </xsl:text>
+                </p>
+
+                <p style="clear: both; float: right; margin-top: 11px; color: #999;">
                     <!-- latest Dryad build info (and node/site name, if available) -->
                     <i18n:text>xmlui.dri2xhtml.structural.footer-promotional2</i18n:text>
                     <xsl:value-of select="$dryadrelease/release/date"/> 
@@ -625,21 +639,10 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 <xsl:comment>Git Commit Hash: <xsl:value-of select="$dryadrelease/release/version"/></xsl:comment>
 
                 <!-- Powered by... -->
-                <div id="ds-footer-left">
+                <div id="ds-footer-left" style="color: #999;">
                     <i18n:text>xmlui.dri2xhtml.structural.footer-powered-by</i18n:text>
                     <xsl:text> </xsl:text>
                     <a class="single-image-link" href="http://www.dspace.org/" target="_blank"><img class="powered-by" src="/themes/Mirage/images/powered-by-dspace.png" alt="DSpace" /></a>
-                </div>
-
-                <div id="ds-footer-right" style="margin-top: 11px;">
-                    <a>
-                        <xsl:attribute name="href">
-                            <xsl:value-of
-                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                            <xsl:text>/feedback</xsl:text>
-                        </xsl:attribute>
-                        <i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
-                    </a>
                 </div>
 
                 <!--Invisible link to HTML sitemap (for search engines) -->
