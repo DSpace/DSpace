@@ -635,7 +635,7 @@
                         <xsl:attribute name="id"><xsl:value-of select="$currentName"/></xsl:attribute>
 
                         <xsl:if test="$currentName!='unknown_doi'">
-                            <td style='width:35%'>
+                            <td style='padding: 0px 8px; width:35%'>
                                 <label class="ds-form-label-select-publication">
                                     <xsl:attribute name="for">
                                         <xsl:value-of select="translate($currentId,'.','_')"/>
@@ -652,12 +652,8 @@
                         </xsl:if>
 
                         <xsl:if test="$currentName='unknown_doi'">
-                            <td style='font-weight:bold; border-left: 1px solid gray; padding:0px;width:5%'>&#160;&#160;&#160;&#160;&#160;&#160;OR</td>
-
-                            <td style='font-weight:bold; border-right: 1px solid gray;'>
-                                <span style=''></span>
-                            </td>
-                            <td>
+                            <td style="font-weight:bold; border-left: 2px dotted #ccc; border-right: 2px dotted #ccc; padding: 0px 8px; width:5%">OR</td>
+                            <td style="padding: 0px 8px;">
                                 <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
                                 <xsl:apply-templates select="../dri:field[@id=$currentId]/dri:error"/>
                             </td>
