@@ -798,6 +798,10 @@ li.ds-form-item label.ds-composite-component.last{
     margin-top: 10px;
     clear: both;
 }
+.submission .ds-form-list .ds-previous-values {
+    clear: left;
+    width: 500px;
+}
 
 #aspect_submission_Submissions_div_submissions .ds-static-div,
 .submission .ds-form-sublist ol {
@@ -2064,6 +2068,13 @@ span.field-help li{
 table.datafiletable{
     width:100%;
 }
+table.datafiletable td {
+    padding: 0;
+}
+table.datafiletable td:first-child{
+    text-align: right;
+}
+
 table.datafiletable span.ds-composite-field{
     display: inline-block;
 }
