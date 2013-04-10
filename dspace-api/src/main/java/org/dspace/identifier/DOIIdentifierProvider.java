@@ -151,12 +151,6 @@ public class DOIIdentifierProvider
     public void register(Context context, DSpaceObject dso, String identifier)
             throws IdentifierException
     {
-        this.registerDOI(context, dso, identifier);
-    }
-    
-    private void registerDOI(Context context, DSpaceObject dso, String identifier)
-            throws IdentifierException
-    {
         String doi = formatIdentifier(identifier);
 
         // check if the DOI is already registered for this dso

@@ -17,7 +17,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Level;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -46,7 +45,6 @@ import org.dspace.services.ConfigurationService;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.jdom.Namespace;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
@@ -280,6 +278,7 @@ implements DOIConnector
         return isDOIReserved(context, null, doi);
     }
     
+    @Override
     public boolean isDOIReserved(Context context, DSpaceObject dso, String doi)
             throws IdentifierException
     {
@@ -365,22 +364,6 @@ implements DOIConnector
                 return (dso.getType() == ids[0] && dso.getID() == ids[1]);
             }
                 
-            // we get a 401 if we forgot to send credentials or if the username
-            // and password did not match.
-            case (401) :
-            {
-                log.info("We were unable to authenticate against the DOI ({}) registry agency. The response was: {}", doi, resp.getContent());
-                throw new IdentifierException("Cannot authenticate at the DOI registry agency. Please check if username and password are set correctly.");
-            }
-                
-            // We get a 403 Forbidden if we are checking a DOI that belongs to
-            // another party or if there is a login problem.
-            case (403) :
-            {
-                log.info("Checking if DOI {} is registered was prohibeted by the registration agency: {}.", doi, resp.getContent());
-                throw new IdentifierException("Checking if a DOI is registered is only possible for DOIs that belong to us.");
-            }
-                
             // 404 "Not Found" means DOI is neither reserved nor registered.
             case (404) :
             {
@@ -405,17 +388,6 @@ implements DOIConnector
                 }
             }
                 
-            // 500 is documented and signals an internal server error
-            case (500) :
-            {
-                log.warn("Caught an http status code 500 while checking if a "
-                        +"DOI is registered. Message was: " + resp.getContent());
-                throw new IdentifierException("DataCite API has an internal error. "
-                        + "It is temporarily impossible to check if a DOI is "
-                        + "reserved. Further information can be found in "
-                        + "DSpace log file.");
-            }
-                
             // Catch all other http status code in case we forgot one.
             default :
             {
@@ -432,6 +404,7 @@ implements DOIConnector
         }
     }
     
+    @Override
     public boolean isDOIRegistered(Context context, String doi)
             throws IdentifierException
     {
@@ -448,6 +421,7 @@ implements DOIConnector
         return isDOIRegistered(context, null, doi);
     }
     
+    @Override
     public boolean isDOIRegistered(Context context, DSpaceObject dso, String doi)
             throws IdentifierException
     {
@@ -509,7 +483,6 @@ implements DOIConnector
                 if (null == handle && null == dso)
                     return true;
                 // it is registered, but we cannot say for which object.
-                // TODO: throw exception?
                 if (null == handle)
                     return false;
                 
@@ -542,35 +515,11 @@ implements DOIConnector
                 // won't add this to the cache.
                 return false;
             }
-            // we get a 401 if we forgot to send credentials or if the username
-            // and password did not match.
-            case (401) :
-            {
-                log.info("We were unable to authenticate against the DOI ({}) registry agency. The reponse was: {}", doi, response.getContent());
-                throw new IdentifierException("Cannot authenticate at the DOI registry agency. Please check if username and password are set correctly.");
-            }
-            // We get a 403 Forbidden if we are checking a DOI that belongs to
-            // another party or if there is a login problem.
-            case (403) :
-            {
-                log.info("Checking if DOI {} is registered was prohibited by the registration agency: {}.", doi, response.getContent());
-                throw new IdentifierException("Checking if a DOI is registered is only possible for DOIs that belong to us.");
-            }
             // 404 "Not Found" means DOI is neither reserved nor registered.
             case (404) :
             {
                 this.addToCache(doi, true, true, null);
                 return false;
-            }
-            // 500 is documented and signals an internal server error
-            case (500) :
-            {
-                log.warn("Caught an http status code 500 while checking if a "
-                        + "DOI is registered. Message was: " + response.getContent());
-                throw new IdentifierException("DataCite API has an internal error. "
-                        + "It is temporarily impossible to check if a DOI is "
-                        + "registered. Further information can be found in "
-                        + "DSpace log file.");
             }
             // Catch all other http status code in case we forgot one.
             default :
@@ -585,6 +534,7 @@ implements DOIConnector
     }
 
     
+    @Override
     public boolean deleteDOI(Context context, String doi)
             throws IdentifierException
     {
@@ -600,37 +550,12 @@ implements DOIConnector
             {
                 return true;
             }
-            // we get a 401 if we forgot to send credentials or if the username
-            // and password did not match.
-            case (401) :
-            {
-                log.info("We were unable to authenticate against the DOI ({}) registry agency. The reponse was: {}", doi, resp.getContent());
-                throw new IdentifierException("Cannot authenticate at the DOI registry agency. Please check if username and password are set correctly.");
-            }
-            // We get a 403 Forbidden if we are checking a DOI that belongs to
-            // another party or if there is a login problem.
-            case (403) :
-            {
-                log.info("Checking if DOI {} is registered was prohibited by the registration agency: {}.", doi, resp.getContent());
-                throw new IdentifierException("Checking if a DOI is registered is only possible for DOIs that belong to us.");
-            }
             // 404 "Not Found" means DOI is neither reserved nor registered.
             case (404) :
             {
                 log.error("DOI {} is at least reserved, but a delete request "
                         + "told us that it is unknown!", doi);
                 return true;
-            }
-            // 500 is documented and signals an internal server error
-            case (500) :
-            {
-                log.warn("Caught an http status code 500 while deleting "
-                        + " metadata of DOI " + doi + ". Message was: " 
-                        + resp.getContent());
-                throw new IdentifierException("DataCite API has an internal error. "
-                        + "It is temporarily impossible to delete metadata of "
-                        + "DOIs. Further information can be found in DSpace log "
-                        + "file.");
             }
             // Catch all other http status code in case we forgot one.
             default :
@@ -644,6 +569,7 @@ implements DOIConnector
         }
     }
 
+    @Override
     public boolean reserveDOI(Context context, DSpaceObject dso, String doi)
             throws IdentifierException
     {
@@ -713,6 +639,7 @@ implements DOIConnector
             // 201 -> created / ok
             case (201) :
             {
+                addToCache(doi, true, false, new int[] {dso.getType(), dso.getID()});
                 log.debug("Reserved DOI {}.", doi);
                 return true;
             }
@@ -730,29 +657,6 @@ implements DOIConnector
                         + ". Please inform your administrator or take a look "
                         +" into the log files.");
             }
-            // we get a 401 if we forgot to send credentials or if the username
-            // and password did not match.
-            case (401) :
-            {
-                log.info("We were unable to authenticate against the DOI registry agency. The response was: {}", resp.getContent());
-                throw new IdentifierException("Cannot authenticate at the DOI registry agency. Please check if username and password are set correctly.");
-            }
-            // We get a 403 Forbidden if we are checking a DOI that belongs to
-            // another party or if there is a login problem.
-            case (403) :
-            {
-                log.info("Checking if DOI {} is registered was prohibited by the registration agency: {}.", doi, resp.getContent());
-                throw new IdentifierException("Checking if a DOI is registered is only possible for DOIs that belong to us.");
-            }
-            // 500 is documented and signals an internal server error
-            case (500) :
-            {
-                log.warn("Caught an http status code 500 while reserving DOI " 
-                        + doi +". Message was: " + resp.getContent());
-                throw new IdentifierException("DataCite API has an internal error. "
-                        + "It is temporarily impossible to reserve DOIs. "
-                        + "Further information can be found in DSpace log file.");
-            }
             // Catch all other http status code in case we forgot one.
             default :
             {
@@ -765,6 +669,7 @@ implements DOIConnector
         }
     }
     
+    @Override
     public boolean registerDOI(Context context, DSpaceObject dso, String doi)
             throws IdentifierException
     {
@@ -789,6 +694,7 @@ implements DOIConnector
             // 201 -> created/updated -> okay
             case (201) :
             {
+                addToCache(doi, true, true, new int[] {dso.getType(), dso.getID()});
                 return true;
             }
             // 400 -> wrong domain, wrong prefix, wrong request body
@@ -800,25 +706,6 @@ implements DOIConnector
                         + "DOIs. Please inform the administrator or take a look "
                         + " in the DSpace log file.");
             }
-            // we get a 401 if we forgot to send credentials.
-            case (401) :
-            {
-                log.info("We were unable to authenticate against the DOI "
-                        + "registry agency. The response was: {}", resp.getContent());
-                throw new IdentifierException("Cannot authenticate at the "
-                        + "DOI registry agency. Please check if username and "
-                        + "password are set correctly.");
-            }
-            // We get a 403 Forbidden if we are registering a DOI that belongs to
-            // another party or if there is a login problem.
-            case (403) :
-            {
-                log.info("Registration of DOI {} was prohibited by the "
-                        + "registration agency: {}.", doi, resp.getContent());
-                throw new IdentifierException("There was a problem registering "
-                        + "a DOI. Either the login credentials are wrong or our "
-                        + "quota is exceeded.");
-            }
             // 412 Precondition failed: DOI was not reserved before registration!
             case (412) :
             {
@@ -829,15 +716,6 @@ implements DOIConnector
                         + "of DOIs. The DOI we wanted to register had not been "
                         + "reserved in advance. Please contact the administrator "
                         + "or take a look in DSpace log file.");
-            }
-            // 500 is documented and signals an internal server error
-            case (500) :
-            {
-                log.warn("Caught an http status code 500 while reserving DOI " 
-                        + doi +". Message was: " + resp.getContent());
-                throw new IdentifierException("DataCite API has an internal error. "
-                        + "It is temporaribly impossible to reserve DOIs. "
-                        + "Further information can be found in DSpace log file.");
             }
             // Catch all other http status code in case we forgot one.
             default :
@@ -896,6 +774,7 @@ implements DOIConnector
     }
     
     private DataCiteResponse sendDOIPostRequest(String doi, String url)
+            throws IdentifierException
     {
         // post mds/doi/
         // body must contaion "doi=<doi>\nurl=<url>}n"
@@ -926,7 +805,7 @@ implements DOIConnector
             reqEntity = new StringEntity(req, contentType);
             httppost.setEntity(reqEntity);
             
-            return sendHttpRequest(httppost);
+            return sendHttpRequest(httppost, doi);
         }
         finally
         {
@@ -945,6 +824,7 @@ implements DOIConnector
     
     
     private DataCiteResponse sendMetadataDeleteRequest(String doi)
+            throws IdentifierException
     {
         // delete mds/metadata/<doi>
         URIBuilder uribuilder = new URIBuilder();
@@ -965,20 +845,23 @@ implements DOIConnector
             throw new RuntimeException("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!", e);
         }
-        return sendHttpRequest(httpdelete);
+        return sendHttpRequest(httpdelete, doi);
     }
     
     private DataCiteResponse sendDOIGetRequest(String doi)
+            throws IdentifierException
     {
         return sendGetRequest(doi, DOI_PATH);
     }
     
     private DataCiteResponse sendMetadataGetRequest(String doi)
+            throws IdentifierException
     {
         return sendGetRequest(doi, METADATA_PATH);
     }
     
     private DataCiteResponse sendGetRequest(String doi, String path)
+            throws IdentifierException
     {
         URIBuilder uribuilder = new URIBuilder();
         uribuilder.setScheme("https").setHost(HOST).setPath(path
@@ -998,17 +881,21 @@ implements DOIConnector
             throw new RuntimeException("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!", e);
         }
-        return sendHttpRequest(httpget);
+        return sendHttpRequest(httpget, doi);
     }
     
-    private DataCiteResponse sendMetadataPostRequest(String doi, Element metadataRoot) {
+    private DataCiteResponse sendMetadataPostRequest(String doi, Element metadataRoot)
+            throws IdentifierException
+    {
         Format format = Format.getCompactFormat();
         format.setEncoding("UTF-8");
         XMLOutputter xout = new XMLOutputter(format);
         return sendMetadataPostRequest(doi, xout.outputString(new Document(metadataRoot)));
     }
     
-    private DataCiteResponse sendMetadataPostRequest(String doi, Document metadata) {
+    private DataCiteResponse sendMetadataPostRequest(String doi, Document metadata)
+            throws IdentifierException
+    {
         Format format = Format.getCompactFormat();
         format.setEncoding("UTF-8");
         XMLOutputter xout = new XMLOutputter(format);
@@ -1016,6 +903,7 @@ implements DOIConnector
     }
     
     private DataCiteResponse sendMetadataPostRequest(String doi, String metadata)
+            throws IdentifierException
     {
         // post mds/metadata/
         // body must contain metadata in DataCite-XML.
@@ -1045,7 +933,7 @@ implements DOIConnector
             reqEntity = new StringEntity(metadata, contentType);
             httppost.setEntity(reqEntity);
             
-            return sendHttpRequest(httppost);
+            return sendHttpRequest(httppost, doi);
         }
         finally
         {
@@ -1062,7 +950,15 @@ implements DOIConnector
         }
     }
     
-    private DataCiteResponse sendHttpRequest(HttpUriRequest req)
+    /**
+     * 
+     * @param req
+     * @param doi
+     * @return
+     * @throws IdentifierException 
+     */
+    private DataCiteResponse sendHttpRequest(HttpUriRequest req, String doi)
+            throws IdentifierException
     {
         DefaultHttpClient httpclient = new DefaultHttpClient();
         httpclient.getCredentialsProvider().setCredentials(
@@ -1119,6 +1015,42 @@ implements DOIConnector
              * }
              * 
              */
+
+            switch (statusCode)
+            {
+                // we get a 401 if we forgot to send credentials or if the username
+                // and password did not match.
+                case (401) :
+                {
+                    log.info("We were unable to authenticate against the DOI registry agency.");
+                    log.info("The response was: {}", content);
+                    throw new IdentifierException("Cannot authenticate at the "
+                            + "DOI registry agency. Please check if username "
+                            + "and password are set correctly.");
+                }
+
+                // We get a 403 Forbidden if we are managing a DOI that belongs to
+                // another party or if there is a login problem.
+                case (403) :
+                {
+                    log.info("Managing a DOI ({}) was prohibited by the DOI "
+                            + "registration agency: {}", doi, content);
+                    throw new IdentifierException("We can check, register or "
+                            + "reserve DOIs that belong to us only.");
+                }
+
+
+                // 500 is documented and signals an internal server error
+                case (500) :
+                {
+                    log.warn("Caught an http status code 500 while managing DOI "
+                            +"{}. Message was: " + content);
+                    throw new IdentifierException("DataCite API has an internal error. "
+                            + "It is temporarily impossible to manage DOIs. "
+                            + "Further information can be found in DSpace log file.");
+                }
+            }
+            
 
             return new DataCiteResponse(statusCode, content);
         }
