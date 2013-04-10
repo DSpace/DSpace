@@ -499,6 +499,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
 
 
 
+
                         <xsl:choose>
                             <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
                                 <li>
@@ -520,11 +521,54 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                         <xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='account']/dri:item" mode="menu"/>
 
                                         <xsl:if test="/dri:document/dri:options/dri:list[@n='context']/*">
-                                            <xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='context']" mode="menu"/>
+                                            <xsl:for-each select="/dri:document/dri:options/dri:list[@n='context']/dri:item">
+                                                <xsl:choose>
+                                                    <xsl:when test="position()=1">
+                                                        <li class="menu-border">
+                                                            <xsl:apply-templates select="." mode="menu"/>
+                                                        </li>
+                                                    </xsl:when>
+                                                    <xsl:otherwise>
+                                                        <li>
+                                                            <xsl:apply-templates select="." mode="menu"/>
+                                                        </li>
+                                                    </xsl:otherwise>
+                                                </xsl:choose>
+
+                                            </xsl:for-each>
                                         </xsl:if>
+
                                         <xsl:if test="/dri:document/dri:options/dri:list[@n='administrative']/*">
-                                            <xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='administrative']"
-                                                                 mode="menu"/>
+                                            <xsl:for-each select="/dri:document/dri:options/dri:list[@n='administrative']/dri:item">
+                                                <xsl:choose>
+                                                    <xsl:when test="position()=1">
+                                                        <li class="menu-border">
+                                                            <xsl:apply-templates select ="*"/>
+                                                        </li>
+                                                    </xsl:when>
+                                                    <xsl:otherwise>
+                                                        <li>
+                                                            <xsl:apply-templates select ="*"/>
+                                                        </li>
+                                                    </xsl:otherwise>
+                                                </xsl:choose>
+
+                                            </xsl:for-each>
+
+                                            <xsl:for-each select="/dri:document/dri:options/dri:list[@n='administrative']/dri:list">
+                                                <li>
+                                                    <a href="#">
+                                                        <i18n:text><xsl:value-of select="dri:head"/></i18n:text>
+                                                    </a>
+                                                    <ul>
+                                                        <xsl:for-each select="dri:item">
+                                                            <li>
+                                                                <xsl:apply-templates select="*"/>
+                                                            </li>
+                                                        </xsl:for-each>
+                                                    </ul>
+                                                </li>
+                                            </xsl:for-each>
                                         </xsl:if>
                                     </ul>
 
