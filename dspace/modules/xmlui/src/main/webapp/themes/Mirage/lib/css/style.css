@@ -969,6 +969,17 @@ li.ds-form-item label.ds-composite-component.last{
     display: none;
 }
 
+#aspect_discovery_SimpleSearch_list_search-query label {
+    display: none;
+}
+#aspect_discovery_SimpleSearch_list_search-query .search-filter-list label {
+    display: block;
+}
+#aspect_discovery_SimpleSearch_field_query {
+    width: 475px;
+    margin-right: 8px;
+}
+
 #aspect_artifactbrowser_SimpleSearch_div_search-results li, #aspect_discovery_SimpleSearch_div_search-results li, #aspect_artifactbrowser_AdvancedSearch_div_search-results li {
     padding-top: 15px;
     padding-bottom: 15px;
