@@ -2120,6 +2120,11 @@ a.top-link {
     float: right;
 }
 
+#aspect_submission_StepTransformer_list_submit-overview-file table {
+    clear: left;
+    margin-left: 20px;
+}
+
 /* Contact Us (Feedback Form) style */
 
 h2.feedbackform-heading {
