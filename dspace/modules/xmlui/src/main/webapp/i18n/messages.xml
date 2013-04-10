@@ -593,7 +593,7 @@
 	<message key="xmlui.EPerson.PasswordLogin.submitReg">Register</message>
 	<message key="xmlui.EPerson.PasswordLogin.submitLogin">Login</message>
 	<message key="xmlui.EPerson.PasswordLogin.register_link">Create a Dryad account.</message>
-	<message key="xmlui.EPerson.RegLogin.head">Welcome to Dryad. You must login before submitting your data.</message>
+	<message key="xmlui.EPerson.RegLogin.head">Welcome to Dryad. Login is required for data submission, but not for data use.</message>
 
 	<!-- org.dspace.app.xmlui.eperson.LDAPLogin.java -->
 	<message key="xmlui.EPerson.LDAPLogin.title">Sign in</message>
@@ -3222,7 +3222,7 @@
     <message key="xmlui_submit_publication_article_status_accepted">&#160; Accepted</message>
     <message key="xmlui_submit_publication_article_status_in_review">&#160; In review</message>
     <message key="xmlui_submit_publication_article_status_not_yet_submitted">&#160; Not yet submitted</message>
-    <message key="xmlui.submit.publication.unknown_doi">&#160; This Article has been published in the Journal I will name, but I don't know or don't have a DOI or PubMedID for it.</message>
+    <message key="xmlui.submit.publication.unknown_doi">&#160; This article has been published in the journal I will name, but I do not know the DOI or PubMedID for it.</message>
     <message key="xmlui.submit.publication.article_status">Select Your Article Status</message>
     <message key="xmlui.submit.publication.article_status_help">All data in Dryad must be associated with an article or other publication. Please select the status of your article.</message>
     <message key="xmlui.submit.publication.journal.manu.acc.label">&#160; This manuscript has been accepted for publication in the above named journal.</message>
