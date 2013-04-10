@@ -2125,6 +2125,6 @@ a.feedbackform-user-voice-link {
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
     /* misplaced pager controls */
     #dryad-home-carousel .bx-pager-item {
-        top: -7px;
+        top: -7px !important;
     }
 }
