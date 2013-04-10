@@ -273,7 +273,7 @@ implements DOIConnector
             if (this.reserved.containsKey(doi))
             {
                 // is it reserved (value in map is not null) or not?
-                return (null != this.reserved.  get(doi));
+                return (null != this.reserved.get(doi));
             }
         }
         
@@ -334,7 +334,7 @@ implements DOIConnector
                 if (null == handle)
                 {
                     // we were unable to find a handle belonging to our repository
-                    // were we looking if a doi is reservered for a specific dso? (?)
+                    // were we looking if a doi is reserved for a specific dso?
                     if (null != dso)
                     {
                         return false;
@@ -694,7 +694,7 @@ implements DOIConnector
         {
             // The DOI will be saved as metadata of dso after successful
             // registration. To register a doi it has to be part of the metadata
-            // sent to DataCite. So we'll add it to the XML designated to DataCite
+            // sent to DataCite. So we add it to the XML we'll send to DataCite
             // and we'll add it to the DSO after successful registration.
             root = addDOI(doi, root);
         }
@@ -719,8 +719,7 @@ implements DOIConnector
             // 400 -> invalid XML
             case (400) :
             {
-                log.warn("Either we send invalid xml metadata, tried to reserve "
-                        + " a DOI for a wrong prefix (or?).");
+                log.warn("DataCite was unable to understand the XML we send.");
                 log.warn("DataCite Metadata API returned a http status code "
                         +"400: " + resp.getContent());
                 Format format = Format.getCompactFormat();
