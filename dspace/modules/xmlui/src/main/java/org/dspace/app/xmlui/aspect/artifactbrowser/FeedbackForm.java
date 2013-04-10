@@ -46,41 +46,44 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
     private static final Message T_trail =
         message("xmlui.ArtifactBrowser.FeedbackForm.trail");
     
-    private static final Message T_head = 
-        message("xmlui.ArtifactBrowser.FeedbackForm.head");
+    private static final Message T_overview_head =
+        message("xmlui.ArtifactBrowser.FeedbackForm.overview.head");
     
-    private static final Message T_para1 =
-        message("xmlui.ArtifactBrowser.FeedbackForm.para1");
+    private static final Message T_overview_para1 =
+        message("xmlui.ArtifactBrowser.FeedbackForm.overview.para1");
 
-    private static final Message T_para2 =
-        message("xmlui.ArtifactBrowser.FeedbackForm.para2");
+    private static final Message T_overview_para2 =
+        message("xmlui.ArtifactBrowser.FeedbackForm.overview.para2");
 
-    private static final Message T_para3 =
-        message("xmlui.ArtifactBrowser.FeedbackForm.para3");
+    private static final Message T_overview_para3 =
+        message("xmlui.ArtifactBrowser.FeedbackForm.overview.para3");
 
-    private static final Message T_para4 =
-        message("xmlui.ArtifactBrowser.FeedbackForm.para4");
+    private static final Message T_address_head =
+        message("xmlui.ArtifactBrowser.FeedbackForm.address.head");
 
-    private static final Message T_para5 =
-        message("xmlui.ArtifactBrowser.FeedbackForm.para5");
+    private static final Message T_address_para1 =
+        message("xmlui.ArtifactBrowser.FeedbackForm.address.para1");
 
-    private static final Message T_forumLink =
+    private static final Message T_ideasforum_forumlink =
         message("xmlui.ArtifactBrowser.FeedbackForm.forumLink");
 
-    private static final Message T_para6 =
-        message("xmlui.ArtifactBrowser.FeedbackForm.para6");
-    
-    private static final Message T_email =
-        message("xmlui.ArtifactBrowser.FeedbackForm.email");
+    private static final Message T_contactform_head =
+        message("xmlui.ArtifactBrowser.FeedbackForm.contactform.head");
 
-    private static final Message T_email_help =
-        message("xmlui.ArtifactBrowser.FeedbackForm.email_help");
+    private static final Message T_contactform_para1 =
+        message("xmlui.ArtifactBrowser.FeedbackForm.contactform.para1");
     
-    private static final Message T_comments = 
-        message("xmlui.ArtifactBrowser.FeedbackForm.comments");
+    private static final Message T_contactform_email =
+        message("xmlui.ArtifactBrowser.FeedbackForm.contactform.email");
+
+    private static final Message T_contactform_email_help =
+        message("xmlui.ArtifactBrowser.FeedbackForm.contactform.email_help");
     
-    private static final Message T_submit =
-        message("xmlui.ArtifactBrowser.FeedbackForm.submit");
+    private static final Message T_contactform_comments =
+        message("xmlui.ArtifactBrowser.FeedbackForm.contactform.comments");
+    
+    private static final Message T_contactform_submit =
+        message("xmlui.ArtifactBrowser.FeedbackForm.contactform.submit");
     
     /**
      * Generate the unique caching key.
@@ -91,8 +94,8 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
         String email = parameters.getParameter("email","");
         String comments = parameters.getParameter("comments","");
         String page = parameters.getParameter("page","unknown");
-        
-       return HashUtil.hash(email + "-" + comments + "-" + page);
+        // Changing caching key since page layout has changed in code
+       return HashUtil.hash(email + "-" + comments + "-" + page + "-feedback");
     }
 
     /**
@@ -118,32 +121,32 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
             UIException, SQLException, IOException, AuthorizeException
     {
 
-        // Build the item viewer division.
         Division feedback = body.addInteractiveDivision("feedback-form",
                 contextPath+"/feedback",Division.METHOD_POST,"primary");
-        
-        feedback.setHead(T_head);
-        
-        feedback.addPara(T_para1);
-        feedback.addPara(T_para2);
-        feedback.addPara(T_para3);
-        feedback.addPara(T_para4);
-        feedback.addPara(T_para5);
-        feedback.addPara(T_forumLink);
-        feedback.addPara(T_para6);
+        feedback.setHead(T_overview_head);
+        feedback.addPara(T_overview_para1);
+        feedback.addPara(T_overview_para2);
+        feedback.addPara(T_overview_para3);
+        feedback.addPara(T_ideasforum_forumlink);
+
+        feedback.addPara(T_address_head);
+        feedback.addPara(T_address_para1);
+
+        feedback.addPara(T_contactform_head);
+        feedback.addPara(T_contactform_para1);
         
         List form = feedback.addList("form",List.TYPE_FORM);
         
         Text email = form.addItem().addText("email");
-        email.setLabel(T_email);
-        email.setHelp(T_email_help);
+        email.setLabel(T_contactform_email);
+        email.setHelp(T_contactform_email_help);
         email.setValue(parameters.getParameter("email",""));
         
         TextArea comments = form.addItem().addTextArea("comments");
-        comments.setLabel(T_comments);
+        comments.setLabel(T_contactform_comments);
         comments.setValue(parameters.getParameter("comments",""));
         
-        form.addItem().addButton("submit").setValue(T_submit);
+        form.addItem().addButton("submit").setValue(T_contactform_submit);
         
         feedback.addHidden("page").setValue(parameters.getParameter("page","unknown"));
     }

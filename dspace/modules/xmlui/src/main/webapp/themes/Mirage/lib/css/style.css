@@ -2094,6 +2094,21 @@ a.top-link {
     float: right;
 }
 
+/* Contact Us (Feedback Form) style */
+
+h2.feedbackform-heading {
+    color: #40841c;
+    font-size: 18px;
+}
+
+a.feedbackform-user-voice-link {
+    padding: 5px;
+    text-decoration: none;
+    color: #1b8ebc;
+    background-color: #f2f2f2;
+    border: 1px solid #d7d7d7;
+}
+
 /* ********************* Tweaks for webkit browsers (Chrome + Safari) only **************** */
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
@@ -2102,6 +2117,3 @@ a.top-link {
         top: -7px;
     }
 }
-
-
-
