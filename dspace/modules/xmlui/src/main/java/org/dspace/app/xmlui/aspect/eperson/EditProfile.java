@@ -353,6 +353,7 @@ public class EditProfile extends AbstractDSpaceTransformer
            lang.setDisabled();
        }
 
+       /* Subscriptions aren't currently used in Dryad
        // Subscriptions
        if (!registering)
        {
@@ -386,7 +387,7 @@ public class EditProfile extends AbstractDSpaceTransformer
                subscriptions.addInstance().setOptionSelected(collection.getID());
            }
        }
-       
+       */
        
        if (allowSetPassword)
        {
@@ -439,7 +440,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        profile.addHidden("eperson-continue").setValue(knot.getId());
        
        
-       
+       /* The list of groups is not displayed for Dryad users.
        if (!registering)
        {
                 // Add a list of groups that this user is apart of.
@@ -459,6 +460,7 @@ public class EditProfile extends AbstractDSpaceTransformer
                                 list.addItem(group.getName());
                         }
        }
+       */
    }
    
    /**
