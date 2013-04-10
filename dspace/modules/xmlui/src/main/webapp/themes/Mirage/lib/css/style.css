@@ -441,7 +441,7 @@ div.bioText {
     margin-bottom: 25px;
 }
 .submission fieldset.ds-form-list {
-    border: none;
+    border: 1px solid black;
 }
 #status_other_than_published,
 #aspect_submission_StepTransformer_list_doi > table {

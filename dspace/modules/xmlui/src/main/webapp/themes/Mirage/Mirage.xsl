@@ -857,18 +857,24 @@ parameter that is being used (see variable defined above) -->
     </xsl:template>
 
 
-    <xsl:template match="//dri:list[@id='aspect.submission.StepTransformer.list.submit-select-publication']/dri:head">
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:list[@id='aspect.submission.StepTransformer.list.submit-select-publication']/dri:head">
         <legend>
             <i18n:text><xsl:value-of select="."/></i18n:text>
         </legend>
     </xsl:template>
-    <xsl:template match="//dri:list[@id='aspect.submission.StepTransformer.list.submit-upload-file']/dri:head">
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:list[@id='aspect.submission.StepTransformer.list.submit-upload-file']/dri:head">
         <legend>
             <i18n:text><xsl:value-of select="."/></i18n:text>
         </legend>
     </xsl:template>
 
-    <xsl:template match="//dri:list[@id='aspect.submission.StepTransformer.list.submit-describe-dataset']/dri:head">
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:list[@id='aspect.submission.StepTransformer.list.submit-describe-dataset']/dri:head">
+        <legend>
+            <i18n:text><xsl:value-of select="."/></i18n:text>
+        </legend>
+    </xsl:template>
+
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:list[@id='aspect.submission.StepTransformer.list.submit-overview-file']/dri:head">
         <legend>
             <i18n:text><xsl:value-of select="."/></i18n:text>
         </legend>
@@ -1007,5 +1013,52 @@ parameter that is being used (see variable defined above) -->
 
             </table>
         </div>
+    </xsl:template>
+
+    <!--add table for updated file information-->
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:list/dri:item[@id='aspect.submission.StepTransformer.item.bitstream-item']">
+        <table><tr>
+            <xsl:for-each select="./dri:hi[@rend='head']">
+                <th>
+                    <xsl:apply-templates/>
+                </th>
+            </xsl:for-each>
+        </tr>
+            <tr>
+                <xsl:for-each select="./dri:hi[@rend='content']">
+                    <td>
+                        <xsl:apply-templates/>
+                    </td>
+                </xsl:for-each>
+            </tr>
+        </table>
+        <xsl:apply-templates select="./dri:field"/>
+    </xsl:template>
+
+     <!--add attribute placeholder and title-->
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:list/dri:item/dri:field/dri:field[@id='aspect.submission.StepTransformer.field.datafile_identifier']" mode="normalField">
+        <input>
+            <xsl:call-template name="fieldAttributes"/>
+            <xsl:attribute name="placeholder">
+                <xsl:text>External file identifier</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="title">
+                <xsl:text>External file identifier</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="value">
+                <xsl:choose>
+                    <xsl:when test="./dri:value[@type='raw']">
+                        <xsl:value-of select="./dri:value[@type='raw']"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="./dri:value[@type='default']"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:attribute>
+            <xsl:if test="dri:value/i18n:text">
+                <xsl:attribute name="i18n:attr">value</xsl:attribute>
+            </xsl:if>
+            <xsl:apply-templates />
+        </input>
     </xsl:template>
 </xsl:stylesheet>
