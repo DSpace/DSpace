@@ -122,11 +122,13 @@
         #aspect_statistics_StatisticsTransformer_div_stats tr.odd td {
 	        background-color: #eee;
 	    }
+        #aspect_statistics_StatisticsTransformer_div_stats th,
         #aspect_statistics_StatisticsTransformer_div_stats td {
             padding: 0 8px;
+            text-align: right
         }
-        #aspect_statistics_StatisticsTransformer_div_stats td:last-child {
-            text-align: right;
+        #aspect_statistics_StatisticsTransformer_div_stats td:first-child {
+            text-align: left;
         }
 
         #recently_integrated_journals img.pub-cover {
