@@ -151,7 +151,7 @@ jQuery(document).ready(function() {
 });
 
 /* JS behaviors for FAQ page only */
-// Enable expanding FAQ via JS (else jump to answers) TODO-FAQ
+// Enable expanding FAQ via JS (else jump to answers)
 jQuery(document).ready(function() {
         if (jQuery('.faq-answers').length === 0) {
             // no FAQ on this page, never mind
@@ -230,6 +230,19 @@ jQuery(document).ready(function() {
                 toggle.text('Open All Answers');
             }
         });
+
+        // IF we've just entered the page with a #fragment specified, try to go to it
+        var inboundAnswerID = window.location.hash;
+        if (inboundAnswerID !== '') {
+            var targetAnswer = jQuery( inboundAnswerID ); // eg, '#payment-plans'
+            // IF it's a valid target, toggle this answer open and jump to it
+            if (targetAnswer.length === 1) {
+                questionBlock.find('li a[href$='+ inboundAnswerID +']').click();
+                // NOTE: there are now *two* elements with this ID, but the visible clone 
+                // will always respond to a simple ID selector because it's first in DOM.
+                jQuery(document).scrollTop( jQuery( inboundAnswerID ).offset().top );
+            }
+        }
 
 });
 
