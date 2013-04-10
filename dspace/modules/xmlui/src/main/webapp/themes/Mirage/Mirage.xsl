@@ -969,7 +969,7 @@ parameter that is being used (see variable defined above) -->
     </xsl:template>
     <xsl:template match="dri:help">
         <xsl:if
-                test="not(ancestor::dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-publication' or @id= 'aspect.submission.StepTransformer.div.submit-describe-dataset' or @id= 'aspect.submission.StepTransformer.div.submit-select-publication'])">
+                test="not(ancestor::dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-publication' or @id= 'aspect.submission.StepTransformer.div.submit-describe-dataset' or @id= 'aspect.submission.StepTransformer.div.submit-select-publication' or @id= 'aspect.dryadfeedback.MembershipApplicationForm.div.membership-form' or @id= 'aspect.artifactbrowser.FeedbackForm.div.feedback-form'])">
             <!--Only create the <span> if there is content in the <dri:help> node-->
             <xsl:if test="./text() or ./node()">
                 <span>
