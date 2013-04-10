@@ -322,7 +322,7 @@
                         </p>
                         <p>
                             <a href="/pages/journalIntegration">Submission integration</a> 
-                            is a free service that allow publishers to
+                            is a free service that allows publishers to
                             coordinate manuscript and data submissions.
                             It makes submitting data easy for researchers; makes linking
                             articles and data easy for journals; and enables
@@ -332,7 +332,7 @@
                             <img src="/themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" 
                                  alt="New data is added to Dryad, and the cycle continues."
                                  title="New data is added to Dryad, and the cycle continues."/>
-                            Submission fees keep Dryad's content free for research and educational reuse.
+                            Submission fees support the cost of keeping Dryad's content free to use.
                             Flexible <a href="/pages/pricing">pricing plans</a> 
                             provide volume discounts.
                         </p>
