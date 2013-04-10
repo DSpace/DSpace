@@ -989,6 +989,10 @@ li.ds-form-item label.ds-composite-component.last{
     margin-bottom: 25px;
 }
 
+#aspect_discovery_SimpleSearch_div_search h2 {
+    display: none;
+}
+
 .artifact-title {
     font-size: 100%;
 }
