@@ -428,18 +428,6 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             </ul>
                         </li>
                         <li>
-                            <a href="/pages/faq#depositing">Get Started</a>
-                            <ul>
-                                <li>
-                                    <a href="/pages/faq#depositing">Submit Data</a>
-                                </li>
-                                <li>
-                                    <a href="/pages/faq#using">Use Data</a>
-                                </li>
-                            </ul>
-                        </li>
-
-                        <li>
                             <a href="">Learn More</a>
                             <ul>
                                 <li>
@@ -472,17 +460,14 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                 </li>
                                 <li>
                                   <a href="/pages/faq">FAQ</a>
-                                  <!--
                                   <ul>
-                                      <li>
-                                          <a href="/pages/jdap">Journal Archiving Policy</a>
-                                      </li>
-
-                                      <li>
-                                          <a href="/pages/partners">Related Projects</a>
-                                      </li>
-                                  </ul>
-                                  -->
+				    <li>
+				      <a href="/pages/faq#depositing">Submit Data</a>
+				    </li>
+				    <li>
+				      <a href="/pages/faq#using">Use Data</a>
+				    </li>
+				  </ul>
                                 </li>                                
                                 <li>
                                     <a href="/pages/pricing">Pricing Plans</a>
