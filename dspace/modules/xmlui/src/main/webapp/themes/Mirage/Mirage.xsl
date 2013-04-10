@@ -631,13 +631,14 @@
         <li id="aspect_submission_StepTransformer_list_doi">
             <table>
                 <tr>
+                    <td>
                     <xsl:for-each select="dri:item/dri:field">
                         <xsl:variable name="currentId"><xsl:value-of select="@id"/></xsl:variable>
                         <xsl:variable name="currentName"><xsl:value-of select="@n"/></xsl:variable>
                         <xsl:attribute name="id"><xsl:value-of select="$currentName"/></xsl:attribute>
 
                         <xsl:if test="$currentName!='unknown_doi'">
-                            <td style='padding: 0px 8px; width:35%'>
+                            <div style='padding: 0 8px 8px;'>
                                 <label class="ds-form-label-select-publication">
                                     <xsl:attribute name="for">
                                         <xsl:value-of select="translate($currentId,'.','_')"/>
@@ -650,18 +651,21 @@
 
                                 <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
                                 <xsl:apply-templates select="../dri:field[@id=$currentId]/dri:error"/>
-                            </td>
+                            </div>
                         </xsl:if>
 
                         <xsl:if test="$currentName='unknown_doi'">
-                            <td style="font-weight:bold; border-left: 2px dotted #ccc; border-right: 2px dotted #ccc; padding: 0px 8px; width:5%">OR</td>
-                            <td style="padding: 0px 8px;">
+                            <div style="font-weight:bold; border-top: 2px dotted #ccc; border-bottom: 2px dotted #ccc; padding: 3px 0 1px; text-align: center;">
+                                OR
+                            </div>
+                            <div style="padding: 8px;" id="unknown-doi-panel">
                                 <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
                                 <xsl:apply-templates select="../dri:field[@id=$currentId]/dri:error"/>
-                            </td>
+                            </div>
                         </xsl:if>
 
                     </xsl:for-each>
+                    </td>
                 </tr>
             </table>
         </li>

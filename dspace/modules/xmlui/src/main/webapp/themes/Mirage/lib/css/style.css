@@ -1589,8 +1589,17 @@ blockquote {
     margin-top: 50px;
 
 }
-#aspect_submission_StepTransformer_field_article_doi,#aspect_submission_StepTransformer_field_manu,#aspect_submission_StepTransformer_field_prism_publicationName {
+#aspect_submission_StepTransformer_field_manu,#aspect_submission_StepTransformer_field_prism_publicationName {
     width:150px;
+}
+#aspect_submission_StepTransformer_field_article_doi {
+    width:440px;
+}
+
+#unknown-doi-panel label {
+    text-indent: -25px;
+    margin-left: 20px;
+    line-height: 1.2em;
 }
 
 /*Autocomplete*/
