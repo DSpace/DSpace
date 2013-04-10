@@ -864,8 +864,7 @@
 	<message key="xmlui.Submission.submit.DescribeStep.head">Describe Item</message>
 	<message key="xmlui.Submission.submit.DescribeStep.unknown_field">Error: Unknown field
 		type</message>
-	<message key="xmlui.Submission.submit.DescribeStep.required_field">This field is
-		required</message>
+	<message key="xmlui.Submission.submit.DescribeStep.required_field">This field is required</message>
 	<message key="xmlui.Submission.submit.DescribeStep.last_name_help">Last name, <i>e.g.
 		Smith</i></message>
 	<message key="xmlui.Submission.submit.DescribeStep.first_name_help">First name + initial, <i>e.g.
@@ -1544,15 +1543,12 @@
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.namespace">Namespace</message>
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.namespace_help">Namespace
 		should be an established URI location for the new schema.</message>
-	<message key="xmlui.administrative.registries.MetadataRegistryMain.namespace_error">This field is
-		required.</message>
+	<message key="xmlui.administrative.registries.MetadataRegistryMain.namespace_error">This field is required.</message>
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.name">Name</message>
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.name_help">Shorthand notation
 		for the schema. This will be used to prefix a field's name (e.g. dc.element.qualifier). The name
 		must be less than 32 characters and cannot include spaces, periods or underscores.</message>
-	<message key="xmlui.administrative.registries.MetadataRegistryMain.name_error">This field is
-		required and must be less than 32 characters and cannot contain any spaces, periods, or
-		underscores.</message>
+	<message key="xmlui.administrative.registries.MetadataRegistryMain.name_error">This field is required and must be less than 32 characters and cannot contain any spaces, periods, or underscores.</message>
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.submit_add">Add new schema</message>
 
 	<!-- org.dspace.app.xmlui.administrative.registries.MoveMetadataField.java -->

@@ -671,7 +671,6 @@
     <xsl:template match="dri:list/dri:item[@n='select_publication_new' or @n='select_publication_exist']">
         <li>
             <table id="status_other_than_published">
-                <tr><td>
                     <!--xsl:call-template name="standardAttributes">
                     <xsl:with-param name="class">
                         <xsl:text>ds-form-item </xsl:text>
@@ -755,9 +754,6 @@
 
 
                     </xsl:for-each>
-
-                    <!--/div-->
-                </td></tr>
             </table>
         </li>
     </xsl:template>
