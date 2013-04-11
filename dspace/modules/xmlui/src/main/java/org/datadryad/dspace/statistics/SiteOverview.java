@@ -362,33 +362,33 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
 
         org.dspace.app.xmlui.wing.element.Table infoTable= overviewStats.addTable("list-table",5,3);
 
-        Row headerRow = resultTable.addRow(Row.ROLE_HEADER);
-        headerRow.addCell().addContent("&nbsp;");
+        Row headerRow = infoTable.addRow(Row.ROLE_HEADER);
+        headerRow.addCell().addContent("");
         headerRow.addCell().addContent("Total");
-        headerRow.addCell().addContent("30&nbsp;days");  // header text should not wrap
+        headerRow.addCell().addContent("30 days"); 
 
         Row row = infoTable.addRow();
-        row.addCell("data").addContent("Total data packages");
+        row.addCell("data").addContent("Data packages");
         row.addCell("data").addContent(Long.toString(dataPackageCount));
         row.addCell("data").addContent(Long.toString(dataPackageCount_30day));
 
         row = infoTable.addRow();
-        row.addCell("data").addContent("Total data files");
+        row.addCell("data").addContent("Data files");
         row.addCell("data").addContent(Long.toString(dataFileCount));
         row.addCell("data").addContent(Long.toString(dataFileCount_30day));
 
         row = infoTable.addRow();
-        row.addCell("data").addContent("Journals represented");
+        row.addCell("data").addContent("Journals");
         row.addCell("data").addContent(journalCount);
         row.addCell("data").addContent(journalCount_30day);
 
         row = infoTable.addRow();
-        row.addCell("data").addContent("Total unique authors");
+        row.addCell("data").addContent("Authors");
         row.addCell("data").addContent(uniqAuthors);
         row.addCell("data").addContent(uniqAuthors_30day);
 
         row = infoTable.addRow();
-        row.addCell("data").addContent("Total file downloads");
+        row.addCell("data").addContent("Downloads");
         row.addCell("data").addContent(totalFileDownload);
         row.addCell("data").addContent(totalFileDownload_30day);
     }

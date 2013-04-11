@@ -59,7 +59,13 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
 
     private static final Logger log = Logger.getLogger(AbstractSearch.class);
 
-
+    /**
+     * Collection definitions
+     */
+    private static final String DATA_PACKAGE_COLLECTION = "2";
+    private static final String DATA_FILE_COLLECTION = "3";
+    private static final String DRYAD_LAB_COLLECTION = "7";
+    
     /**
      * Language strings
      */
@@ -200,15 +206,15 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
             if(facetVals != null)
             {
                 org.dspace.app.xmlui.wing.element.List list = results.addList("tabs");
-                //ADD COLLECTION 2 (Dryad) first
+                //Add primary collection (data packages) first
                 for (FacetField.Count count : facetVals) {
-                    if(count.getName().equals("2")){
+                    if(count.getName().equals(DATA_PACKAGE_COLLECTION)){
                         buildTabs(count,request,list);
                     }
                 }
-                //remove collection 7 (dryadlab)
+                //remove dryadlab collection 
                 for (FacetField.Count count : facetVals) {
-                    if(!count.getName().equals("3")&&!count.getName().equals("2")&&!count.getName().equals("7")){
+                    if(!count.getName().equals(DATA_FILE_COLLECTION)&&!count.getName().equals(DATA_PACKAGE_COLLECTION)&&!count.getName().equals(DRYAD_LAB_COLLECTION)){
                         buildTabs(count,request,list);
                     }
                 }
@@ -837,7 +843,7 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
             }
         }
         else{
-            if(count.getName().equals("2"))
+            if(count.getName().equals(DATA_PACKAGE_COLLECTION))
             {
                 collectionLink.addHidden("selected");
             }

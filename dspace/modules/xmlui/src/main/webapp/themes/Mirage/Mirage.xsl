@@ -265,23 +265,19 @@
             <!--</div>-->
 
             <!-- START DEPOSIT -->
-            <div id="submit-data-feature-box" class="home-col-2">
-                <h1 class="ds-div-head "
-                    style="font-size: 22px; border-bottom: none; text-align: center; padding: 25px 25px 19px; height: 56px;">Have data
-                    for your publication?
-                </h1>
-                <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
+            <div id="submit-data-sidebar-box" class="home-col-2 simple-box" style="padding: 8px 34px; width: 230px; margin: 8px 0 12px;">
+                <div class="ds-static-div primary" id="file_news_div_news" style="height: 75px;">
                     <p class="ds-paragraph">
                         <a class="submitnowbutton" href="/handle/10255/3/submit">Submit your data</a>
                     </p>
-                    <p style="margin-top: 2.5em; font-size: 95%;">
+                    <p style="margin: 14px 0 4px;">
                         <a href="/pages/faq#deposit">How and why?</a>
                     </p>
                 </div>
             </div>
 
             <!-- START SEARCH -->
-            <div class="home-col-1">
+            <div class="home-col-2">
                 <h1 class="ds-div-head">Search for data</h1>
 
                 <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
@@ -292,11 +288,11 @@
                                id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
                                placeholder="Enter keyword, author, title, DOI, etc. Example: herbivory"
                                title="Enter keyword, author, title, DOI, etc. Example: herbivory"
-                               type="text" value=""/><!-- no whitespace between these!
+                               type="text" value="" style="width: 224px;"/><!-- no whitespace between these!
                      --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
                                id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
-                               type="submit" value="Search"/>
-                        <a style="float:left; font-size: 95%;" href="/discover?query=&amp;submit=Search">Advanced search</a>
+                               type="submit" value="Go" style="margin-right: -4px;"/>
+                        <a style="float:left; font-size: 95%;" href="/discover?query=&amp;submit=Search#advanced">Advanced search</a>
                     </p>
                 </form>
             </div>
@@ -306,7 +302,7 @@
                 <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be part of Dryad
                 </h1>
 
-                <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 490px; font-size: 14px;">
+                <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 475px; font-size: 14px;">
                     <div id="connect-illustrated-prose">
                         <p>
                             <img src="/themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" 
@@ -345,7 +341,7 @@
             <!-- START BROWSE -->
             <div class="home-col-1">
                 <h1 class="ds-div-head">Browse for data</h1>
-                <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 535px; overflow: auto;">
+                <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 649px; overflow: auto;">
                     <div id="browse-data-buttons" class="tab-buttons">
                         <a href="#recently-published-data"><span>Recently published</span></a>
                         <a href="#most-viewed-data"><span>Most viewed</span></a>
@@ -969,7 +965,7 @@ parameter that is being used (see variable defined above) -->
     </xsl:template>
     <xsl:template match="dri:help">
         <xsl:if
-                test="not(ancestor::dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-publication' or @id= 'aspect.submission.StepTransformer.div.submit-describe-dataset' or @id= 'aspect.submission.StepTransformer.div.submit-select-publication'])">
+                test="not(ancestor::dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-publication' or @id= 'aspect.submission.StepTransformer.div.submit-describe-dataset' or @id= 'aspect.submission.StepTransformer.div.submit-select-publication' or @id= 'aspect.dryadfeedback.MembershipApplicationForm.div.membership-form' or @id= 'aspect.artifactbrowser.FeedbackForm.div.feedback-form'])">
             <!--Only create the <span> if there is content in the <dri:help> node-->
             <xsl:if test="./text() or ./node()">
                 <span>
