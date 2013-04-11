@@ -1502,11 +1502,11 @@ a.learn-to-submit-button:hover {
 
 .tab-buttons {
     padding-top: 8px;
-    padding-bottom: 18px;
+    padding-bottom: 0px;
 }
 #browse-data-buttons {
-    padding-top: 13px;
-    padding-bottom: 2px;
+    padding-top: 8px;
+    padding-bottom: 0px;
 } 
 .tab-buttons a {
     font-size: 14px;
