@@ -341,13 +341,13 @@
             <!-- START BROWSE -->
             <div class="home-col-1">
                 <h1 class="ds-div-head">Browse for data</h1>
+                <div id="browse-data-buttons" class="tab-buttons">
+                    <a href="#recently-published-data"><span>Recently published</span></a>
+                    <a href="#most-viewed-data"><span>Most viewed</span></a>
+                    <a href="#by-author"><span>By Author</span></a>
+                    <a href="#by-journal"><span>By Journal</span></a>
+                </div>
                 <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 649px; overflow: auto;">
-                    <div id="browse-data-buttons" class="tab-buttons">
-                        <a href="#recently-published-data"><span>Recently published</span></a>
-                        <a href="#most-viewed-data"><span>Most viewed</span></a>
-                        <a href="#by-author"><span>By Author</span></a>
-                        <a href="#by-journal"><span>By Journal</span></a>
-                    </div>
                     <div id="recently-published-data" class="browse-data-panel">
                         <xsl:for-each select="dri:div[@n='site-home']">
                             <xsl:apply-templates/>
