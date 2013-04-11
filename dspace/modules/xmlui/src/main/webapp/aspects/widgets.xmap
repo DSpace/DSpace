@@ -5,31 +5,24 @@
         <map:selectors>
             <map:selector name="WidgetBannerSelector" src="org.dspace.app.xmlui.aspect.dryadwidgets.WidgetBannerSelector"/>
         </map:selectors>
-        <map:pipes default="caching">
-            <map:pipe name="noncaching" src="org.apache.cocoon.components.pipeline.impl.NonCachingProcessingPipeline"/>
-            <map:pipe name="caching" src="org.apache.cocoon.components.pipeline.impl.CachingProcessingPipeline"/>
-        </map:pipes>
     </map:components>
-
     <map:pipelines>
-        <map:pipeline type="noncaching">
+        <map:pipeline>
             <map:match pattern="banner">
                 <map:select type="WidgetBannerSelector">
                     <map:parameter name="publisher" value="{request-param:publisher}"/>
                     <map:parameter name="identifier" value="{request-param:identifier}"/>
                     <map:when test="resolvable">
-                        <!-- return the banner image -->
+                        <!-- Return the Dryad banner image -->
                         <map:read type="image" src="../static/Dryad_web_banner_small_v4e.jpg" mime-type="image/jpeg"/>
                     </map:when>
                     <map:otherwise>
-                        <!-- return 1px transparent gif -->
+                        <!-- Return 1px transparent gif -->
                         <map:read type="image" src="../static/Transparent.gif" mime-type="image/gif"/>
                     </map:otherwise>
                 </map:select>
             </map:match>
             <map:match pattern="resource">
-                <map:parameter name="publisher" value="{request-param:publisher}"/>
-                <map:parameter name="identifier" value="{request-param:identifier}"/>
                 <!-- this should redirect the user to the resource specified by the identifier -->
                 <map:redirect-to uri="/resource/{request-param:identifier}"/>
             </map:match>
