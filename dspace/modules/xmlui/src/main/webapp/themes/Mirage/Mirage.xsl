@@ -265,7 +265,7 @@
             <!--</div>-->
 
             <!-- START DEPOSIT -->
-            <div id="submit-data-sidebar-box" class="home-col-2 simple-box" style="padding: 8px 34px; width: 230px; margin: 8px 0;">
+            <div id="submit-data-sidebar-box" class="home-col-2 simple-box" style="padding: 8px 34px; width: 230px; margin: 8px 0 12px;">
                 <div class="ds-static-div primary" id="file_news_div_news" style="height: 75px;">
                     <p class="ds-paragraph">
                         <a class="submitnowbutton" href="/handle/10255/3/submit">Submit your data</a>
@@ -277,7 +277,7 @@
             </div>
 
             <!-- START SEARCH -->
-            <div class="home-col-1">
+            <div class="home-col-2">
                 <h1 class="ds-div-head">Search for data</h1>
 
                 <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
@@ -288,10 +288,10 @@
                                id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
                                placeholder="Enter keyword, author, title, DOI, etc. Example: herbivory"
                                title="Enter keyword, author, title, DOI, etc. Example: herbivory"
-                               type="text" value=""/><!-- no whitespace between these!
+                               type="text" value="" style="width: 224px;"/><!-- no whitespace between these!
                      --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
                                id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
-                               type="submit" value="Search"/>
+                               type="submit" value="Go" style="margin-right: -4px;"/>
                         <a style="float:left; font-size: 95%;" href="/discover?query=&amp;submit=Search#advanced">Advanced search</a>
                     </p>
                 </form>
@@ -302,7 +302,7 @@
                 <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be part of Dryad
                 </h1>
 
-                <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 490px; font-size: 14px;">
+                <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 475px; font-size: 14px;">
                     <div id="connect-illustrated-prose">
                         <p>
                             <img src="/themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" 
@@ -341,7 +341,7 @@
             <!-- START BROWSE -->
             <div class="home-col-1">
                 <h1 class="ds-div-head">Browse for data</h1>
-                <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 535px; overflow: auto;">
+                <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 649px; overflow: auto;">
                     <div id="browse-data-buttons" class="tab-buttons">
                         <a href="#recently-published-data"><span>Recently published</span></a>
                         <a href="#most-viewed-data"><span>Most viewed</span></a>
