@@ -307,7 +307,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:copy-of select="$page_title/node()"/>
-                        <xsl:text> -- Dryad</xsl:text>
+                        <xsl:text> - Dryad</xsl:text>
                     </xsl:otherwise>
                 </xsl:choose>
             </title>
