@@ -2157,4 +2157,18 @@ a.feedbackform-user-voice-link {
     #dryad-home-carousel .bx-pager-item {
         top: -7px !important;
     }
+
+    /* force rounded corners in the slideshow (known Chrome bug) */
+    .bx-viewport, 
+    .bx-wrapper img {
+        -webkit-border-top-left-radius: 8px;
+        -webkit-border-top-right-radius: 8px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        -webkit-border-bottom-left-radius: 8px;
+        -webkit-border-bottom-right-radius: 8px;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
 }
