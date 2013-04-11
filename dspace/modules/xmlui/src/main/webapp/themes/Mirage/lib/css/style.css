@@ -1509,6 +1509,7 @@ a.learn-to-submit-button:hover {
     padding-bottom: 0px;
 } 
 .tab-buttons a {
+    display: inline-block;
     font-size: 14px;
     font-weight: bold;
     background-color: #707070;
