@@ -177,6 +177,7 @@ a:hover {
 
 #ds-footer img.powered-by {
     vertical-align: middle;
+    margin-top: -3px;
 }
 
 #ds-footer-left {
