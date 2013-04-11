@@ -298,7 +298,7 @@
             </div>
 
             <!-- START CONNECT  -->
-            <div class="home-col-2">
+            <div class="home-col-2" style="clear: right;">
                 <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be part of Dryad
                 </h1>
 
