@@ -388,97 +388,55 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <a href="">About</a>
                             <ul>
                                 <li>
-                                    <a href="/pages/organization">The Organization</a>
-                                    <ul>
-                                      <li>
-                                        <a href="/pages/organization#overview">Overview</a>
-                                      </li>
-                                      <li>
-                                        <a href="/pages/organization#community">Our Community</a>
-                                      </li>
-                                      <li>
-                                        <a href="/pages/organization#funding">Funding</a>
-                                      </li>
-                                    </ul>
+                                    <a href="/pages/repository">Repository features and technology</a>
                                 </li>
                                 <li>
-                                    <a href="/pages/whoWeAre">Who We Are</a>
+                                    <a href="/pages/organization">The organization</a>
                                 </li>
                                 <li>
-                                    <a href="/pages/repository">The Repository</a>
-                                    <ul>
-                                      <li>
-                                        <a href="/pages/repository#keyFeatures">Key Features</a>
-                                      </li>
-                                      <li>
-                                        <a href="/pages/repository#technology">The Technology</a>
-                                      </li>
-                                    </ul>
+                                    <a href="http://blog.datadryad.org">News and views</a>
                                 </li>
                                 <li>
-                                    <a href="http://blog.datadryad.org">News and Views</a>
+                                    <a href="/pages/whoWeAre">Who we are</a>
                                 </li>
                                 <li>
-                                    <!-- UserVoice JavaScript SDK (only needed once on a page) -->
-                                    <script>(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/oW4J4by2WMgw3H4qYuJsDQ.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</script>
-
-                                    <!-- A link to launch the Classic Widget -->
-                                    <a id="forum-link" href="javascript:void(0)" data-uv-lightbox="classic_widget" data-uv-mode="feedback" data-uv-primary-color="#88c033" data-uv-link-color="#333333" data-uv-forum-id="197408" data-uv-feedback-tab_name="Ideas Forum">Ideas Forum</a>
+                                  <a href="/pages/faq">Frequently asked questions</a>
                                 </li>
                             </ul>
                         </li>
                         <li>
-                            <a href="">Learn More</a>
+                            <a href="">For researchers</a>
                             <ul>
                                 <li>
-                                    <a href="/pages/membershipOverview">Become A Member</a>
-                                    <ul>
-                                      <li>
-                                        <a href="/pages/membershipOverview#becomeAMember">Become A Member</a>
-                                      </li>
-                                      <li>
-                                        <a href="/pages/membershipOverview#members">Member List</a>
-                                      </li>
-                                      <li>
-                                        <a href="/membership">Membership Application</a>
-                                      </li>
-                                      <li>
-                                        <a href="/pages/membershipMeeting">Membership Meeting</a>
-                                      </li>
-                                    </ul>
+                                  <a href="/pages/faq#depositing">Submit data</a>
                                 </li>
                                 <li>
-                                    <a href="/pages/journalIntegration">Journal Integration</a>
-                                    <ul>
-                                      <li>
-                                  <a href="/pages/journalIntegration">How to Integrate</a>
-                                      </li>
-                                      <li>
-                                  <a href="/pages/integratedJournals">Currently Integrated Journals</a>
-                                      </li>
-                                    </ul>
+                                  <a href="/pages/faq#using">Use data</a>
                                 </li>
                                 <li>
-                                  <a href="/pages/faq">FAQ</a>
-                                  <ul>
-				    <li>
-				      <a href="/pages/faq#depositing">Submit Data</a>
-				    </li>
-				    <li>
-				      <a href="/pages/faq#using">Use Data</a>
-				    </li>
-				  </ul>
-                                </li>                                
+                                  <a href="/pages/integratedJournals">Currently integrated journals</a>
+                                </li>
                                 <li>
-                                    <a href="/pages/pricing">Pricing Plans</a>
-                                </li>                            
-                                <li>
-                                    <a href="/pages/policies">Terms of Service</a>
+                                    <a href="/pages/policies">Terms of service</a>
                                 </li>                            
                             </ul>
                         </li>
                         <li>
-                            <a href="/feedback">Contact Us</a>
+                            <a href="">For organizations</a>
+                            <ul>
+                                <li>
+                                    <a href="/pages/journalIntegration">Journal integration</a>
+                                </li>                            
+                                <li>
+                                    <a href="/pages/membershipOverview">Membership</a>
+                                </li>                            
+                                <li>
+                                    <a href="/pages/pricing">Pricing plans</a>
+                                </li>                            
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="/feedback">Contact us</a>
                         </li>
 
 
