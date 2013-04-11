@@ -17,7 +17,7 @@
 
 /* smaller text in drop-down menus */
 .sf-menu ul li a {
-    font-size: 15px;
+    font-size: 15px !important;
 }
 
 .sf-menu ul {
