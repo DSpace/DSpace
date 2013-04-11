@@ -177,6 +177,7 @@ a:hover {
 
 #ds-footer img.powered-by {
     vertical-align: middle;
+    margin-top: -3px;
 }
 
 #ds-footer-left {
@@ -447,6 +448,7 @@ div.bioText {
 #aspect_submission_StepTransformer_list_doi > table {
     border: 1px solid #ccc;
     float: right;
+    margin-right: 180px;
     display: inline-block;
     margin-top: -72px;
     padding: 10px;
@@ -969,6 +971,17 @@ li.ds-form-item label.ds-composite-component.last{
     display: none;
 }
 
+#aspect_discovery_SimpleSearch_list_search-query label {
+    display: none;
+}
+#aspect_discovery_SimpleSearch_list_search-query .search-filter-list label {
+    display: block;
+}
+#aspect_discovery_SimpleSearch_field_query {
+    width: 475px;
+    margin-right: 8px;
+}
+
 #aspect_artifactbrowser_SimpleSearch_div_search-results li, #aspect_discovery_SimpleSearch_div_search-results li, #aspect_artifactbrowser_AdvancedSearch_div_search-results li {
     padding-top: 15px;
     padding-bottom: 15px;
@@ -976,6 +989,10 @@ li.ds-form-item label.ds-composite-component.last{
 
 #aspect_artifactbrowser_SimpleSearch_div_search-results ul, #aspect_discovery_SimpleSearch_div_search-results ul, #aspect_artifactbrowser_AdvancedSearch_div_search-results ul {
     margin-bottom: 25px;
+}
+
+#aspect_discovery_SimpleSearch_div_search h2 {
+    display: none;
 }
 
 .artifact-title {
@@ -1573,8 +1590,17 @@ blockquote {
     margin-top: 50px;
 
 }
-#aspect_submission_StepTransformer_field_article_doi,#aspect_submission_StepTransformer_field_manu,#aspect_submission_StepTransformer_field_prism_publicationName {
+#aspect_submission_StepTransformer_field_manu,#aspect_submission_StepTransformer_field_prism_publicationName {
     width:150px;
+}
+#aspect_submission_StepTransformer_field_article_doi {
+    width:440px;
+}
+
+#unknown-doi-panel label {
+    text-indent: -25px;
+    margin-left: 20px;
+    line-height: 1.2em;
 }
 
 /*Autocomplete*/
@@ -2105,6 +2131,11 @@ a.top-link {
     float: right;
 }
 
+#aspect_submission_StepTransformer_list_submit-overview-file table {
+    clear: left;
+    margin-left: 20px;
+}
+
 /* Contact Us (Feedback Form) style */
 
 h2.feedbackform-heading {
@@ -2125,6 +2156,20 @@ a.feedbackform-user-voice-link {
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
     /* misplaced pager controls */
     #dryad-home-carousel .bx-pager-item {
-        top: -7px;
+        top: -7px !important;
     }
+
+    /* force rounded corners in the slideshow (known Chrome bug) */
+    .bx-viewport, 
+    .bx-wrapper img {
+        -webkit-border-top-left-radius: 8px;
+        -webkit-border-top-right-radius: 8px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        -webkit-border-bottom-left-radius: 8px;
+        -webkit-border-bottom-right-radius: 8px;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
 }

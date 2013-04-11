@@ -388,9 +388,9 @@
 	<message key="xmlui.ArtifactBrowser.Navigation.head_this_community">This Community</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.SimpleSearch.java -->
-	<message key="xmlui.ArtifactBrowser.SimpleSearch.title">Dryad Search Results</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.title">Search Results</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.trail">Search</message>
-	<message key="xmlui.ArtifactBrowser.SimpleSearch.head">Dryad Search</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.head">Search for data</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.search_scope">Search Scope</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.full_text_search">Search terms</message><!-- All fields search -->
 

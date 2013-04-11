@@ -505,21 +505,22 @@
       <div class="NOT-simple-box">
         <!-- START SEARCH -->
         <div class="home-col-1">
-            <h1 class="ds-div-head">Search for Data
+            <h1 class="ds-div-head">Search for data
             </h1>
 
             <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                   id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary"
-                  action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
+                  action="/discover" method="get" onsubmit="javascript:tSubmit(this);" style="overflow: hidden;">
                 <p class="ds-paragraph">
                     <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                            id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
                            placeholder="Enter keyword, DOI, etc."
                            title="Enter keyword, author, title, DOI, etc. Example: herbivory"
-                           type="text" value=""/><!-- no whitespace between these!
+                           type="text" value="" style="width: 145px;"/><!-- no whitespace between these!
                      --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
                                id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
-                               type="submit" value="Go"/>
+                               type="submit" value="Search" style="margin-right: -4px;"/>
+                        <a style="float:left; font-size: 95%;" href="/discover?query=&amp;submit=Search">Advanced search</a>
                 </p>
             </form>
         </div>
@@ -539,7 +540,7 @@
                 and
                 <a href="/pages/pricing">pricing plans</a>.
             </p>
-	    </div>
+        </div>      
 	  </div>
     </xsl:template>
 
@@ -631,13 +632,14 @@
         <li id="aspect_submission_StepTransformer_list_doi">
             <table>
                 <tr>
+                    <td>
                     <xsl:for-each select="dri:item/dri:field">
                         <xsl:variable name="currentId"><xsl:value-of select="@id"/></xsl:variable>
                         <xsl:variable name="currentName"><xsl:value-of select="@n"/></xsl:variable>
                         <xsl:attribute name="id"><xsl:value-of select="$currentName"/></xsl:attribute>
 
                         <xsl:if test="$currentName!='unknown_doi'">
-                            <td style='padding: 0px 8px; width:35%'>
+                            <div style='padding: 0 8px 8px;'>
                                 <label class="ds-form-label-select-publication">
                                     <xsl:attribute name="for">
                                         <xsl:value-of select="translate($currentId,'.','_')"/>
@@ -650,18 +652,21 @@
 
                                 <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
                                 <xsl:apply-templates select="../dri:field[@id=$currentId]/dri:error"/>
-                            </td>
+                            </div>
                         </xsl:if>
 
                         <xsl:if test="$currentName='unknown_doi'">
-                            <td style="font-weight:bold; border-left: 2px dotted #ccc; border-right: 2px dotted #ccc; padding: 0px 8px; width:5%">OR</td>
-                            <td style="padding: 0px 8px;">
+                            <div style="font-weight:bold; border-top: 2px dotted #ccc; border-bottom: 2px dotted #ccc; padding: 3px 0 1px; text-align: center;">
+                                OR
+                            </div>
+                            <div style="padding: 8px;" id="unknown-doi-panel">
                                 <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
                                 <xsl:apply-templates select="../dri:field[@id=$currentId]/dri:error"/>
-                            </td>
+                            </div>
                         </xsl:if>
 
                     </xsl:for-each>
+                    </td>
                 </tr>
             </table>
         </li>
