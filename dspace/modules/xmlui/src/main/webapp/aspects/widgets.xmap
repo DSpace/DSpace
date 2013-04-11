@@ -11,8 +11,7 @@
             <map:match pattern="banner">
                 <map:select type="WidgetBannerSelector">
                     <map:parameter name="publisher" value="{request-param:publisher}"/>
-                    <map:parameter name="identifier" value="{request-param:identifier}"/>
-                    <map:when test="resolvable">
+                    <map:when test="{request-param:identifier}">
                         <!-- Return the Dryad banner image -->
                         <map:read type="image" src="../static/Dryad_web_banner_small_v4e.jpg" mime-type="image/jpeg"/>
                     </map:when>

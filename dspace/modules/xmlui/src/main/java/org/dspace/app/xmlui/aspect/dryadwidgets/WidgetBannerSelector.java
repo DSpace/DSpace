@@ -23,11 +23,11 @@ import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.utils.DSpace;
 
 /**
- * This simple selector operates on a DOI as 'identifier'.  It returns true if
- * the identifier is found, false if not.  Can be used to determine which banner
- * to render.
+ * This simple selector attempts to resolve a DOI passed in as the pattern.  It
+ * returns true if the identifier is found, false if not.
+ * Can be used to determine which widget banner to render.
  *
- * The test expression is not used, but 'identifier' is a required parameter
+ * The publisher parameter must be provided, but is not recorded.
  * 
  * @author Dan Leehr
  */
@@ -45,15 +45,18 @@ public class WidgetBannerSelector extends AbstractLogEnabled implements
             Parameters parameters) {
         try
         {
+
             Context context = ContextUtil.obtainContext(objectModel);
-            String publisher = parameters.getParameter("publisher","unknown");
-            String identifier = parameters.getParameter("identifier","unknown");
+            String publisher = parameters.getParameter("publisher","");
+            if(publisher.length() == 0 || expression.length() == 0) {
+                return false;
+            }
 
             // incoming identifier should be a DOI, try to resolve with DOIIdentifierPRovider
             DSpaceObject dso = null;
             DOIIdentifierProvider doiService = new DSpace().getSingletonService(DOIIdentifierProvider.class);
             try {
-                dso = doiService.resolve(context, identifier,  new String[]{});
+                dso = doiService.resolve(context, expression,  new String[]{});
             } catch (IdentifierNotFoundException ex) {
                 // ignoring the exception, leaving dso as null
             } catch (IdentifierNotResolvableException ex) {
@@ -69,9 +72,8 @@ public class WidgetBannerSelector extends AbstractLogEnabled implements
         catch (Exception e)
         {
             // Log it and returned no match.
-            log.error("Error selecting based on provided identifier and publisher: "
-                    + e.getMessage());
-
+            log.error("Error selecting based on provided identifier " +
+                    expression + " : " + e.getMessage());
             return false;
         }
     }
