@@ -789,6 +789,10 @@ references to stylesheets pulled directly from the pageMeta element. -->
             &#160;
         </script>
 
+        <script type="text/javascript" language="javascript" src="http://platform.twitter.com/widgets.js">
+            <xsl:text>&#160;</xsl:text>
+        </script>
+
         <!-- Add theme javascipt  -->
         <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)]">
             <script type="text/javascript">
