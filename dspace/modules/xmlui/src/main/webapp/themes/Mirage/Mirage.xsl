@@ -532,14 +532,13 @@
         <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be part of Dryad
         </h1>
         <div id="ds_connect_with_dryad" class="ds-static-div primary" style="font-size: 14px;">
-            <p style="margin-bottom: 0;">
-                Learn more about:
+            <p>
+                Learn more about
+                <a href="/pages/membershipOverview">membership</a>,
+                <a href="/pages/journalIntegration">submission integration</a>,
+                and
+                <a href="/pages/pricing">pricing plans</a>.
             </p>
-            <ul style="list-style: none; margin-left: 1em;">
-                <li><a href="/pages/membershipOverview">Membership</a></li>
-                <li><a href="/pages/journalIntegration">Submission integration</a></li>
-                <li><a href="/pages/pricing">Pricing plans</a></li>
-            </ul>
         </div>      
 	  </div>
     </xsl:template>
