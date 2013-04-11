@@ -265,16 +265,12 @@
             <!--</div>-->
 
             <!-- START DEPOSIT -->
-            <div id="submit-data-feature-box" class="home-col-2">
-                <h1 class="ds-div-head "
-                    style="font-size: 22px; border-bottom: none; text-align: center; padding: 25px 25px 19px; height: 56px;">Have data
-                    for your publication?
-                </h1>
-                <div class="ds-static-div primary" id="file_news_div_news" style="height: 100px;">
+            <div id="submit-data-sidebar-box" class="home-col-2 simple-box" style="padding: 8px 34px; width: 230px; margin: 8px 0;">
+                <div class="ds-static-div primary" id="file_news_div_news" style="height: 75px;">
                     <p class="ds-paragraph">
                         <a class="submitnowbutton" href="/handle/10255/3/submit">Submit your data</a>
                     </p>
-                    <p style="margin-top: 2.5em; font-size: 95%;">
+                    <p style="margin: 14px 0 4px;">
                         <a href="/pages/faq#deposit">How and why?</a>
                     </p>
                 </div>
