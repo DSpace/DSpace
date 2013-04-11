@@ -14,6 +14,12 @@
 .sf-menu li {
     line-height:	1.0;
 }
+
+/* smaller text in drop-down menus */
+.sf-menu ul li a {
+    font-size: 15px;
+}
+
 .sf-menu ul {
     position:		absolute;
     top:			-999em;
