@@ -999,6 +999,11 @@ li.ds-form-item label.ds-composite-component.last{
     font-size: 100%;
 }
 
+#recently-published-data .odd
+{
+    background-color: #EEEEEE;
+}
+
 .italics {
     font-style: italic;
 }
