@@ -7,9 +7,10 @@ jQuery(document).ready(function() {
      *  > a button-bar for intra-page navigation
      *  > a main page title
      *  > a publication-header box
+     *  > a featured image
      *  > or any .primary box
      */
-    var topMainPageElement = jQuery('#ds-body .tab-buttons, #ds-body h1, #ds-body .publication-header, #ds-body .primary').eq(0);
+    var topMainPageElement = jQuery('#ds-body .tab-buttons, #ds-body h1, #ds-body .publication-header, #ds-body .featured-image, #ds-body .primary').eq(0);
     var topSidebarBox = jQuery('#ds-options .simple-box:eq(0)');
     if (topMainPageElement.length && topSidebarBox.length) {
         var mainPageTop = topMainPageElement.offset().top;
