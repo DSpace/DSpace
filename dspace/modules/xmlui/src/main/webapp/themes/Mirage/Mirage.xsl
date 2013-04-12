@@ -343,7 +343,7 @@
                 <h1 class="ds-div-head">Browse for data</h1>
                 <div id="browse-data-buttons" class="tab-buttons">
                     <a href="#recently-published-data"><span>Recently published</span></a>
-                    <a href="#most-viewed-data"><span>Most viewed</span></a>
+                    <a href="#most-viewed-data"><span>Popular</span></a>
                     <a href="/search-filter?query=&amp;field=dc.contributor.author_filter&amp;fq=location:l2"><span>By Author</span></a>
                     <a href="/search-filter?query=&amp;field=prism.publicationName_filter&amp;fq=location:l2"><span>By Journal</span></a>
                 </div>
@@ -512,10 +512,10 @@
                            id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
                            placeholder="Enter keyword, DOI, etc."
                            title="Enter keyword, author, title, DOI, etc. Example: herbivory"
-                           type="text" value="" style="width: 145px;"/><!-- no whitespace between these!
+                           type="text" value="" style="width: 175px;"/><!-- no whitespace between these!
                      --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
                                id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
-                               type="submit" value="Search" style="margin-right: -4px;"/>
+                               type="submit" value="Go" style="margin-right: -4px;"/>
                         <a style="float:left; font-size: 95%;" href="/discover?query=&amp;submit=Search">Advanced search</a>
                 </p>
             </form>

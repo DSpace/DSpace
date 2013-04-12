@@ -394,7 +394,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <a href="/pages/organization">The organization</a>
                                 </li>
                                 <li>
-                                    <a href="http://blog.datadryad.org">News and views</a>
+                                    <a href="http://blog.datadryad.org" target="_blank">News and views</a>
                                 </li>
                                 <li>
                                     <a href="/pages/whoWeAre">Who we are</a>
@@ -891,6 +891,10 @@ references to stylesheets pulled directly from the pageMeta element. -->
         <script type="text/javascript">
             runAfterJSImports.execute();
         </script>
+
+        <!-- Add hidden trigger for Ideas Forum launcher (formerly in a menu item) -->
+        <script type="text/javascript"><xsl:text>(function(){var uv=document.createElement('script'); uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/oW4J4by2WMgw3H4qYuJsDQ.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</xsl:text></script>
+        <a style="display: none;" data-uv-feedback-tab_name="Ideas Forum" data-uv-forum-id="197408" data-uv-link-color="#333333" data-uv-primary-color="#88c033" data-uv-mode="feedback" data-uv-lightbox="classic_widget" href="javascript:void(0)" id="forum-link">Ideas Forum</a>
 
         <!-- Add a google analytics script if the key is present -->
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']">
