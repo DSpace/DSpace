@@ -358,16 +358,14 @@
                         <xsl:apply-templates select="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostViewedItem.div.home']"/>
 
                     </div>
-                    <div id="by-author" class="browse-data-panel">
+
                         <!--xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-dc.contributor.author_filter']"/-->
                         <!--xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-dc.contributor.author_filter-results']"/-->
 
-                    </div>
-                    <div id="by-journal" class="browse-data-panel">
                         <!--xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-prism.publicationName_filter']"/-->
                         <!--xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-prism.publicationName_filter-results']"/-->
 
-                    </div>
+
                 </div>
             </div>
 
