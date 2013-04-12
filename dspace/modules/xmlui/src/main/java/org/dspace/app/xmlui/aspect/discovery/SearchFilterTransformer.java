@@ -546,6 +546,9 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
                 jumpList.addItemXref(linkUrl, Character
                         .toString(c));
             }
+
+
+
             Para hiddenFrom=jump.addPara("hidden_form_"+field,"hidden_form_by");
 
             hiddenFrom.addText("field",field+"_hidden_"+field).setValue(field);
@@ -572,6 +575,11 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
             jumpForm.addText("starts_with","starts_with_"+field).setHelp(T_starts_with_help);
 
             jumpForm.addButton("submit","submit_"+field).setValue(T_go);
+
+            if(field.equals(request.getParameter(SearchFilterParam.FACET_FIELD)))
+            {
+                jump.addPara("choose_browse_by_"+field,"choose_browse_by").addContent(field);
+            }
         }
     }
 

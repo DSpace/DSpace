@@ -2228,3 +2228,6 @@ a.feedbackform-user-voice-link {
 .hidden_form_by{
     display: none;
 }
+.choose_browse_by{
+    display: none;
+}
