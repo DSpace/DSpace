@@ -319,14 +319,14 @@
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.title">Contact Us</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.trail">Give feedback</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.head">Contact Us</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para1">Journals, publishers or societies seeking more information about membership, submission integration, payment plans or other ways to be part of Dryad please email: <a href="mailto:director@datadryad.org">director@datadryad.org</a>. </message>
+    <message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para1">Journals, publishers or societies seeking more information about <a href="/pages/membershipOverview" target="_blank">membership</a>, <a href="/pages/journalIntegration" target="_blank">submission integration</a>, <a href="/pages/pricing" target="_blank">payment plans</a> or other ways to be part of Dryad please email: <a href="mailto:director@datadryad.org">director@datadryad.org</a>. </message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para2">To submit a help ticket, send us feedback on the web site or for general technical questions please email: <a href="mailto:help@datadryad.org">help@datadryad.org</a>.</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para3">For information about Dryad staff and project personnel, please see <a href="/pages/whoWeAre#staff">Who We Are</a>.</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.address.head"><h2 class="feedbackform-heading">Postal Address</h2></message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.address.para1">Dryad<br/>PO Box 585<br/>Durham, NC 27702-0585 USA</message>
-  <message key="xmlui.ArtifactBrowser.FeedbackForm.forumLink"><a class="feedbackform-user-voice-link" href="#" onclick="$('#forum-link').click(); return false;"><img width="16" height="16" src="/themes/Mirage/images/icon.idea.16px.png" alt="Give your Feedback"></img>&#160;Give your Feedback&#160;</a></message>
+  <message key="xmlui.ArtifactBrowser.FeedbackForm.forumLink"><a class="feedbackform-user-voice-link" href="#" onclick="jQuery('#forum-link').click(); return false;"><img width="16" height="16" src="/themes/Mirage/images/icon.idea.16px.png" alt="Give your Feedback"></img>&#160;Give your Feedback&#160;</a></message>
   <message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.head"><h2 class="feedbackform-heading">Contact Form</h2></message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.para1">You may also submit your inquiry or help ticket using the form below.  Your submission will be tracked and routed to the correct person.</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.para1">You may also submit your inquiry or help ticket using the form below.</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.email">Your Email</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.email_help">This address will ONLY be used to follow up on your feedback.</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.comments">Comments</message>
@@ -336,8 +336,7 @@
 	<message key="xmlui.ArtifactBrowser.FeedbackSent.title">Give feedback</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackSent.trail">Give feedback</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackSent.head">Feedback sent</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackSent.para1">Your comments have been
-		received.</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackSent.para1">Thank you for your comments. Confirmation has been sent to the email you provided.</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.FrontPageSearch.java -->
 	<message key="xmlui.ArtifactBrowser.FrontPageSearch.head">&#160;</message>
@@ -593,7 +592,7 @@
 	<message key="xmlui.EPerson.PasswordLogin.submitReg">Register</message>
 	<message key="xmlui.EPerson.PasswordLogin.submitLogin">Login</message>
 	<message key="xmlui.EPerson.PasswordLogin.register_link">Create a Dryad account.</message>
-	<message key="xmlui.EPerson.RegLogin.head">Welcome to Dryad. Login is required for data submission, but not for data use.</message>
+	<message key="xmlui.EPerson.RegLogin.head">Login is required for data submission, but not for data use.</message>
 
 	<!-- org.dspace.app.xmlui.eperson.LDAPLogin.java -->
 	<message key="xmlui.EPerson.LDAPLogin.title">Sign in</message>
@@ -3241,13 +3240,13 @@
     <!-- Messages for Dryad Membership Application -->
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.title">Dryad Membership</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.heading">Membership Application</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p1">Any organization that supports the educational, scientific, and charitable mission of Dryad is eligible to become a Member. Applications will be reviewed by the Board of Directors. Upon acceptance, a Membership Agreement and request for dues will be sent to the address given. Membership is active once Dryad has received the signed agreement and dues.</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p2">For more information on Membership, please see the <a href="/pages/membershipOverview">Membership page</a> or contact <a href="mailto:director@datadryad.org">director@datadryad.org</a>.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p1">Any organization that supports the educational, scientific, and charitable mission of Dryad is eligible to become a member. Applications will be reviewed by the Board of Directors. Upon acceptance, a <a href="/themes/Mirage/docs/Membership_Agreement.pdf">Membership Agreement</a> and request for dues will be sent to the address given. Membership is active once Dryad has received the signed agreement and dues.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p2">For more information on membership, please see the <a href="/pages/membershipOverview">membership page</a> or contact <a href="mailto:director@datadryad.org">director@datadryad.org</a>.</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.markedfields"><span id="required-fields-note" class="required-mark">* Marked fields are required</span></message>
     
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_name.label1">1a. Name of member organization <span class="required-mark">*</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_name.label2">The preferred name to be used on official Membership lists.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_name.label2">The preferred name to be used on official membership lists.</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_name">Organization name is required</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_legalname.label1">1b. Legal name of organization</message>
@@ -3277,7 +3276,7 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.billing_address">Billing address is required</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.publications.label1">7. Publications</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.publications.label2">One Member benefit is a discount on Payment Plans for qualifying journals published by the Member. Please list journals that your organization publishes. If too many to list here, please send to <a href="mailto:director@datadryad.org">director@datadryad.org</a>.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.publications.label2">One member benefit is a discount on payment plans for qualifying journals published by the member. Please list journals that your organization publishes. If too many to list here, please send to <a href="mailto:director@datadryad.org">director@datadryad.org</a>.</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_term.label1">8. Membership term <span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_term.label2">Membership years run January-December.  Membership may start in 2013 or 2014 and may be selected for multiple years.<br/></message>
@@ -3294,7 +3293,7 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.membership_year_start">Membership term starting year is required.</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_name.label1">9. Organizational representative <span class="required-mark">*</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_name.label2">The organizational representative will receive all regular communications on behalf of the Member organization, excepting those concerning dues. The representative may serve as the delegate at the Annual Meeting or appoint another delegate in his/her place. </message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_name.label2">The organizational representative will receive all regular communications on behalf of the member organization, excepting those concerning dues. The representative may serve as the delegate at the Annual Meeting or appoint another delegate in his/her place. </message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.rep_name">Representative name is required</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_email.label1">10. Organizational representative's email address <span class="required-mark">*</span></message>
