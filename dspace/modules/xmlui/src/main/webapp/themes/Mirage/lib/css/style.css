@@ -1516,13 +1516,14 @@ a.learn-to-submit-button:hover {
 
 .tab-buttons {
     padding-top: 8px;
-    padding-bottom: 18px;
+    padding-bottom: 0px;
 }
 #browse-data-buttons {
-    padding-top: 13px;
-    padding-bottom: 2px;
+    padding-top: 8px;
+    padding-bottom: 0px;
 } 
 .tab-buttons a {
+    display: inline-block;
     font-size: 14px;
     font-weight: bold;
     background-color: #707070;
@@ -2174,6 +2175,13 @@ a.feedbackform-user-voice-link {
     border: 1px solid #d7d7d7;
 }
 
+.menu-border{
+    border-top: 1px solid black;
+    margin: 5px 0;
+}
+
+
+
 /* ********************* Tweaks for webkit browsers (Chrome + Safari) only **************** */
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
@@ -2181,6 +2189,7 @@ a.feedbackform-user-voice-link {
     #dryad-home-carousel .bx-pager-item {
         top: -7px !important;
     }
+
 
     /* force rounded corners in the slideshow (known Chrome bug) */
     .bx-viewport, 
@@ -2194,5 +2203,5 @@ a.feedbackform-user-voice-link {
         border-bottom-left-radius: 8px;
         border-bottom-right-radius: 8px;
     }
-
+    
 }
