@@ -780,6 +780,10 @@ references to stylesheets pulled directly from the pageMeta element. -->
             &#160;
         </script>
 
+        <script type="text/javascript">
+            $('input#aspect_discovery_SimpleSearch_field_query').attr('placeholder','Enter keyword, author, title, DOI, etc. Example: herbivory');
+        </script>
+
         <!-- Emulate HTML5 placeholder behavior (prompting text in input fields) with assigned CSS class. -->
         <script type="text/javascript">
             <xsl:attribute name="src">
