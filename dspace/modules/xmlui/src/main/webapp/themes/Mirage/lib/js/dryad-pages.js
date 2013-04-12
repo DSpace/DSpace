@@ -57,6 +57,14 @@ jQuery(document).ready(function() {
     if (jQuery('#aspect_discovery_RecentlyAdded_div_Home').length === 1) {
         var jQuerytabButtons = jQuery('.tab-buttons a');
         jQuerytabButtons.unbind('click').click(function() {
+
+            //if click on browse by author or journal redirect
+            if(jQuery(this).attr('href').indexOf("#by_")>=0)
+            {
+                var url = jQuery(this).attr('link');
+                $(location).attr('href',url);
+            }
+
             // highlight this button and show its panel
             jQuery(this).addClass('selected');
             var jQuerypanel = jQuery(jQuery(this).attr('href'));
