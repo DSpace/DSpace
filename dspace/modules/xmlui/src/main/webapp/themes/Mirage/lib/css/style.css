@@ -419,7 +419,8 @@ div.bioText {
 
 #aspect_eperson_PasswordLogin_div_register, #aspect_eperson_PasswordLogin_div_login {
     padding: 10px;
-    width: 350px;
+    width: 435px;
+    height: 215px;
 } 
 
 #aspect_eperson_PasswordLogin_div_register h1, #aspect_eperson_PasswordLogin_div_login h1 {
@@ -431,9 +432,22 @@ div.bioText {
     margin: 20px 0px 40px; /* top right bottom left */
     float: right;
 }
+#aspect_eperson_PasswordLogin_div_login table,
+#aspect_eperson_PasswordLogin_div_login p
+{
+    width: 320px;
+    margin: auto;
+}
+#aspect_eperson_PasswordLogin_div_login table td:first-child {
+    text-align: right;
+}
 #aspect_eperson_PasswordLogin_div_register {
     margin: 20px 0px;
     float: left;
+}
+#aspect_eperson_PasswordLogin_div_register p {
+    text-align: center;
+    margin: 6px 0 0;
 }
 
 #aspect_eperson_EditProfile_list_form,
