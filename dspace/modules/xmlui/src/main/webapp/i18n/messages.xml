@@ -2842,7 +2842,7 @@
 	<message key="xmlui.submit.select.pub.form.license">&#160;I understand that by submitting data to Dryad,
 		I am agreeing to release it under the terms of the <div id="cc-label" style="display: inline;"><a
 			href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank">Creative Commons Zero
-			(CC0)</a> waiver. All authors of the data have agreed to the terms of this waiver. <a href="/depositing#whycc0" target="_blank">Why does Dryad require CC0?</a>
+			(CC0)</a> waiver. All authors of the data have agreed to the terms of this waiver. <a href="/pages/faq#info-cc0" target="_blank">Why does Dryad require CC0?</a>
 			&#160;&#160;&#160;&#160;<a class="single-image-link" href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank"><img src="/themes/Dryad/images/cc-zero.png" alt="CC0 logo"></img></a></div></message>
 	<message key="xmlui.submit.select.pub.form.license_error">You must accept the CC0 waiver to continue the submission.</message>
 
