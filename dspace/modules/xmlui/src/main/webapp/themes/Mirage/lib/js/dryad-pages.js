@@ -103,13 +103,13 @@ jQuery(document).ready(function() {
             },
             'EUR': {
                 revenueThreshold: '7.8 million Euros',
-                smallOrgFee: '€780',
-                largeOrgFee: '€3900'
+                smallOrgFee: '&#128;780',  // €
+                largeOrgFee: '&#128;3900'
             },
             'GBP': {
                 revenueThreshold: '6.6 million GB Pounds',
-                smallOrgFee: '£660',
-                largeOrgFee: '£3300'
+                smallOrgFee: '&#163;660',  // £
+                largeOrgFee: '&#163;3300'
             },
             'CAD': {
                 revenueThreshold: '10 million Canadian Dollars',
@@ -118,8 +118,8 @@ jQuery(document).ready(function() {
             },
             'JPY': {
                 revenueThreshold: '950 billion Japanese Yen',
-                smallOrgFee: '¥95,000',
-                largeOrgFee: '¥475,000'
+                smallOrgFee: '&#165;95,000', // ¥
+                largeOrgFee: '&#165;475,000'
             },
             'AUD': {
                 revenueThreshold: '9.6 million Australian Dollars',
