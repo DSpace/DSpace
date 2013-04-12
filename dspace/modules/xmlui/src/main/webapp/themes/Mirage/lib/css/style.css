@@ -988,9 +988,7 @@ li.ds-form-item label.ds-composite-component.last{
     display: none;
 }
 
-#aspect_discovery_SimpleSearch_list_search-query label {
-    display: none;
-}
+
 #aspect_discovery_SimpleSearch_list_search-query .search-filter-list label {
     display: block;
 }
