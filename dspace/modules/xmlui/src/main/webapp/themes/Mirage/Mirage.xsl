@@ -1051,6 +1051,16 @@ parameter that is being used (see variable defined above) -->
         </li>
     </xsl:template>
 
+    <!-- Add Empty select option if no authors listed.  Prevents Subject Keywords from breaking -->
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:list/dri:item/dri:field[@id='aspect.submission.StepTransformer.field.dc_contributor_correspondingAuthor' and @type='select']">
+        <select>
+            <xsl:apply-templates/>
+            <xsl:if test="not(dri:option)">
+                <option value=""/>
+            </xsl:if>
+        </select>
+    </xsl:template>
+
      <!--add attribute placeholder and title-->
     <xsl:template match="/dri:document/dri:body/dri:div/dri:list/dri:item/dri:field/dri:field[@id='aspect.submission.StepTransformer.field.datafile_identifier']" mode="normalField">
         <input>
