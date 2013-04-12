@@ -109,7 +109,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         div.setHead(T_HEAD);
 
         List form = div.addList("submit-create-publication", List.TYPE_FORM);
-        form.setHead(T_FORM_HEAD);
+        //form.setHead(T_FORM_HEAD);
         Item content = form.addItem();
         boolean submitExisting = ConfigurationManager.getBooleanProperty("submit.dataset.existing-datasets", true);
         if(submitExisting)

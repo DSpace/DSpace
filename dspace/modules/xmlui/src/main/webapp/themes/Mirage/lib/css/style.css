@@ -456,7 +456,7 @@ div.bioText {
     margin-bottom: 25px;
 }
 .submission fieldset.ds-form-list {
-    border: 1px solid black;
+    border: none;
 }
 #status_other_than_published,
 #aspect_submission_StepTransformer_list_doi > table {
@@ -713,6 +713,9 @@ input.ds-password-field.error {
 
 .ds-form-list {
     margin-top: 15px;
+}
+#aspect_submission_StepTransformer_list_submit-create-publication {
+    margin-top: 0;
 }
 
 .submission h2,
@@ -1606,9 +1609,8 @@ blockquote {
 }
 
 
-
 #aspect_submission_StepTransformer_item_article_status{
-    margin-top: 100px;
+    margin-top: 10px;
 }
 #N100E7{
     margin-top: 50px;
@@ -1748,7 +1750,7 @@ img.ds-authority-confidence
 }
 
 #aspect_submission_StepTransformer_item_license_accepted{
-    margin-top:100px;
+    margin-top: 10px;
 }
 
 
@@ -2102,6 +2104,12 @@ div.page-license {
     padding:5px;
     font-weight: 900;
 
+}
+#aspect_submission_StepTransformer_list_submit-select-publication li.ds-form-item .ds-form-label {
+    padding: 8px 20px 0 10px;
+}
+#aspect_submission_StepTransformer_list_submit-select-publication div.ds-form-content {
+    padding: 0 7px 7px;
 }
 span.field-help li{
     list-style: none;
