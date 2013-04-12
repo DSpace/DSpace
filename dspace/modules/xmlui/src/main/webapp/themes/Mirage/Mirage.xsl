@@ -344,8 +344,8 @@
                 <div id="browse-data-buttons" class="tab-buttons">
                     <a href="#recently-published-data"><span>Recently published</span></a>
                     <a href="#most-viewed-data"><span>Popular</span></a>
-                    <a href="/search-filter?query=&amp;field=dc.contributor.author_filter&amp;fq=location:l2"><span>By Author</span></a>
-                    <a href="/search-filter?query=&amp;field=prism.publicationName_filter&amp;fq=location:l2"><span>By Journal</span></a>
+                    <a href="#by_author" link="/search-filter?query=&amp;field=dc.contributor.author_filter&amp;fq=location:l2"><span>By Author</span></a>
+                    <a href="#by_journal" link="/search-filter?query=&amp;field=prism.publicationName_filter&amp;fq=location:l2"><span>By Journal</span></a>
                 </div>
                 <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 649px; overflow: auto;">
                     <div id="recently-published-data" class="browse-data-panel">
