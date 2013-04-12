@@ -123,7 +123,7 @@
                 <a>
                     <xsl:attribute name="href">
                         <xsl:text>/review?doi=</xsl:text>
-                        <xsl:copy-of select=".//dim:field[@element='identifier'][@mdschema='dc'][not(@qualifier)]"/>
+                        <xsl:copy-of select="$my_doi"/>
                         <xsl:text>&amp;token=</xsl:text>
                         <xsl:copy-of select="$token"/>
                     </xsl:attribute>
