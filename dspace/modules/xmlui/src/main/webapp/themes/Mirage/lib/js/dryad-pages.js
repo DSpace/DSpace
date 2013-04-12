@@ -61,7 +61,14 @@ jQuery(document).ready(function() {
             //if click on browse by author or journal redirect
             if(jQuery(this).attr('href').indexOf("#by_")>=0)
             {
-                var url = jQuery(this).attr('link');
+                var url ="/search-filter?query=&field=dc.contributor.author_filter&fq=location:l2";
+                $(location).attr('href',url);
+            }
+
+            //if click on browse by author or journal redirect
+            if(jQuery(this).attr('href').indexOf("#by_journal")>=0)
+            {
+                var url ="/search-filter?query=&field=prism.publicationName_filter&fq=location:l2";
                 $(location).attr('href',url);
             }
 
