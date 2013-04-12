@@ -54,12 +54,15 @@
           <tr>
             <th>Title</th>
             <th><xsl:copy-of select=".//dim:field[@element='title']"/></th>
-            <tr>
-              <th>Description</th>
-              <td>
-                <xsl:copy-of select=".//dim:field[@element='description'][@mdschema='dc'][not(@qualifier)]"/>
-              </td>
-            </tr>
+	    <xsl:variable name="my_description" select=".//dim:field[@element='description'][@mdschema='dc'][not(@qualifier)]" />
+	    <xsl:if test="$my_description!=''">
+	      <tr>
+		<th>Description</th>
+		<td>
+		  <xsl:copy-of select="$my_description" />
+		</td>
+	      </tr>
+	    </xsl:if>
           </tr>
           <xsl:for-each select="/mets:METS/mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file">
             <tr>
