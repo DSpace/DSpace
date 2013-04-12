@@ -344,8 +344,8 @@
                 <div id="browse-data-buttons" class="tab-buttons">
                     <a href="#recently-published-data"><span>Recently published</span></a>
                     <a href="#most-viewed-data"><span>Most viewed</span></a>
-                    <a href="#by-author"><span>By Author</span></a>
-                    <a href="#by-journal"><span>By Journal</span></a>
+                    <a href="/search-filter?query=&amp;field=dc.contributor.author_filter&amp;fq=location:l2"><span>By Author</span></a>
+                    <a href="/search-filter?query=&amp;field=prism.publicationName_filter&amp;fq=location:l2"><span>By Journal</span></a>
                 </div>
                 <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 649px; overflow: auto;">
                     <div id="recently-published-data" class="browse-data-panel">
@@ -360,12 +360,12 @@
                     </div>
                     <div id="by-author" class="browse-data-panel">
                         <!--xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-dc.contributor.author_filter']"/-->
-                        <xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-dc.contributor.author_filter-results']"/>
+                        <!--xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-dc.contributor.author_filter-results']"/-->
 
                     </div>
                     <div id="by-journal" class="browse-data-panel">
                         <!--xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-prism.publicationName_filter']"/-->
-                        <xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-prism.publicationName_filter-results']"/>
+                        <!--xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-prism.publicationName_filter-results']"/-->
 
                     </div>
                 </div>
