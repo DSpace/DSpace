@@ -268,7 +268,7 @@
             <div id="submit-data-sidebar-box" class="home-col-2 simple-box" style="padding: 8px 34px; width: 230px; margin: 8px 0 12px;">
                 <div class="ds-static-div primary" id="file_news_div_news" style="height: 75px;">
                     <p class="ds-paragraph">
-                        <a class="submitnowbutton" href="/handle/10255/3/submit">Submit your data</a>
+                        <a class="submitnowbutton" href="/handle/10255/3/submit">Submit data now</a>
                     </p>
                     <p style="margin: 14px 0 4px;">
                         <a href="/pages/faq#deposit">How and why?</a>
@@ -546,7 +546,7 @@
         <!-- START DEPOSIT -->
         <div class="ds-static-div primary" id="file_news_div_news">
             <p class="ds-paragraph">
-                <a class="submitnowbutton" href="/handle/10255/3/submit">Submit your data</a>
+                <a class="submitnowbutton" href="/handle/10255/3/submit">Submit data now</a>
             </p>
             <p style="margin: 1em 0 4px;">
                 <a href="/pages/faq#deposit">How and why?</a>
