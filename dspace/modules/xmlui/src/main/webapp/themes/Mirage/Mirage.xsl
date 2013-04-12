@@ -512,10 +512,10 @@
                            id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
                            placeholder="Enter keyword, DOI, etc."
                            title="Enter keyword, author, title, DOI, etc. Example: herbivory"
-                           type="text" value="" style="width: 145px;"/><!-- no whitespace between these!
+                           type="text" value="" style="width: 175px;"/><!-- no whitespace between these!
                      --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
                                id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
-                               type="submit" value="Search" style="margin-right: -4px;"/>
+                               type="submit" value="Go" style="margin-right: -4px;"/>
                         <a style="float:left; font-size: 95%;" href="/discover?query=&amp;submit=Search">Advanced search</a>
                 </p>
             </form>
