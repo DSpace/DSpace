@@ -1518,8 +1518,8 @@ a.learn-to-submit-button:hover {
 }
 
 .tab-buttons {
-    padding-top: 8px;
-    padding-bottom: 0px;
+    padding-top: 0px;
+    padding-bottom: 8px;
 }
 #browse-data-buttons {
     padding-top: 8px;
