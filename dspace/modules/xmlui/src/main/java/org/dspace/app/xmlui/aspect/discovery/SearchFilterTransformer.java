@@ -75,6 +75,9 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
     private int DEFAULT_PAGE_SIZE = 10;
     private String DEFAULT_FIELD = "dc.contributor.author_filter";
     private String field =DEFAULT_FIELD;
+    //indicate if the query facet is the facet field we are rendering now
+    //default to be false so the new facet search always starts with page 0
+    private boolean isQueryFacet=false;
     private ConfigurationService config = null;
 
     private SearchService searchService = null;
@@ -186,6 +189,10 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
 
         //get the current rendering facet
         field = parameters.getParameter("field", DEFAULT_FIELD);
+        if(field.equals(RequestUtils.getIntParameter(request, SearchFilterParam.FACET_FIELD)))
+        {
+            isQueryFacet=true;
+        }
 
         queryArgs.setQuery("search.resourcetype: " + Constants.ITEM + ((request.getParameter("query") != null && !"".equals(request.getParameter("query"))) ? " AND (" + request.getParameter("query") + ")" : ""));
 //        queryArgs.setQuery("search.resourcetype:" + Constants.ITEM);
@@ -204,16 +211,14 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
 
         queryArgs.setFacet(true);
         String facetField = field;
-
+        int offset=0;
         //only set the offeset when the search query equals current rendering facet
-        int offset = RequestUtils.getIntParameter(request, SearchFilterParam.OFFSET);
-        if (offset == -1)
-        {
-            offset = 0;
-        }
-        if(!field.equals(request.getParameter(SearchFilterParam.FACET_FIELD)))
-        {
-            offset=0;
+        if(isQueryFacet){
+        offset= RequestUtils.getIntParameter(request, SearchFilterParam.OFFSET);
+            if (offset == -1)
+            {
+                offset = 0;
+            }
         }
 
 
@@ -282,11 +287,11 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
 
         } else {
             //only set the start_with when the search query equals current rendering facet
-            if(!field.equals(request.getParameter(SearchFilterParam.FACET_FIELD))){
-            if(request.getParameter(SearchFilterParam.STARTS_WITH) != null)
-            {
-                queryArgs.setFacetPrefix(facetField, request.getParameter(SearchFilterParam.STARTS_WITH).toLowerCase());
-            }
+            if(isQueryFacet){
+                if(request.getParameter(SearchFilterParam.STARTS_WITH) != null)
+                {
+                    queryArgs.setFacetPrefix(facetField, request.getParameter(SearchFilterParam.STARTS_WITH).toLowerCase());
+                }
             }
             queryArgs.addFacetField(facetField);
         }
@@ -335,6 +340,7 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
         Request request = ObjectModelHelper.getRequest(objectModel);
         String facetField = field;
 
+        if(isQueryFacet){
         pageMeta.addMetadata("title").addContent(message("xmlui.Discovery.AbstractSearch.type_" + facetField));
 
 
@@ -346,6 +352,7 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
         }
 
         pageMeta.addTrail().addContent(message("xmlui.Discovery.AbstractSearch.type_" + facetField));
+        }
     }
 
 
@@ -353,8 +360,14 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
         Request request = ObjectModelHelper.getRequest(objectModel);
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-
-        SearchFilterParam browseParams = new SearchFilterParam(request);
+        SearchFilterParam browseParams=null;
+        if(isQueryFacet){
+           browseParams= new SearchFilterParam(request);
+        }
+        else
+        {
+            browseParams=new SearchFilterParam(null);
+        }
         // Build the DRI Body
         Division div = body.addDivision("browse-by-" + field, "form_"+field);
 
@@ -404,12 +417,15 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
 
                     // Find our faceting offset
                     int offSet = 0;
+                    //only get the query when the query facet equals the
+                    if(isQueryFacet)
+                    {
                     try {
                         offSet = Integer.parseInt(queryArgs.get(FacetParams.FACET_OFFSET));
                     } catch (NumberFormatException e) {
                         //Ignore
                     }
-
+                    }
                     String nextPageUrl = null;
                     if(facetField.getName().endsWith(".year")){
                         offSet = Util.getIntParameter(request, SearchFilterParam.OFFSET);
@@ -454,9 +470,11 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
                     Table singleTable = results.addTable("browse-by-" + field + "-results", (int) (queryResults.getResults().getNumFound() + 1), 1);
 
                     List<String> filterQueries = new ArrayList<String>();
+                    if(isQueryFacet){
                     if(request.getParameterValues("fq") != null)
                     {
                         filterQueries = Arrays.asList(request.getParameterValues("fq"));
+                    }
                     }
 
                     if(facetField.getName().endsWith(".year")){
@@ -507,8 +525,9 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
                 Division.METHOD_POST, "secondary navigation");
 
         Map<String, String> params = new HashMap<String, String>();
-        params.putAll(browseParams.getCommonBrowseParams());
-
+        if(isQueryFacet){
+            params.putAll(browseParams.getCommonBrowseParams());
+        }
 
         //We cannot create a filter for dates
         if(!field.endsWith(".year")){
@@ -582,7 +601,9 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
         } else {
             //Add the basics
             Map<String, String> urlParams = new HashMap<String, String>();
+            if(isQueryFacet){
             urlParams.putAll(browseParams.getCommonBrowseParams());
+            }
             String url = generateURL(contextPath + (dso == null ? "" : "/handle/" + dso.getHandle()) + "/" + getDiscoverUrl(), urlParams);
             //Add already existing filter queries
             url = addFilterQueriesToUrl(url);
@@ -598,15 +619,17 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
     }
 
     private String getNextPageURL(SearchFilterParam browseParams, Request request) throws SQLException {
-        int offSet = Util.getIntParameter(request, SearchFilterParam.OFFSET);
-        if (offSet == -1)
-        {
-            offSet = 0;
-        }
-
+        int offSet=0;
         Map<String, String> parameters = new HashMap<String, String>();
+        if(isQueryFacet){
+            offSet= Util.getIntParameter(request, SearchFilterParam.OFFSET);
+            if (offSet == -1)
+            {
+                offSet = 0;
+            }
         parameters.putAll(browseParams.getCommonBrowseParams());
         parameters.putAll(browseParams.getControlParameters());
+        }
         parameters.put(SearchFilterParam.OFFSET, String.valueOf(offSet + DEFAULT_PAGE_SIZE));
         parameters.put(SearchFilterParam.FACET_FIELD, field);
 
@@ -619,21 +642,24 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
     }
 
     private String getPreviousPageURL(SearchFilterParam browseParams, Request request) throws SQLException {
-        //If our offset should be 0 then we shouldn't be able to view a previous page url
-        if ("0".equals(queryArgs.get(FacetParams.FACET_OFFSET)) && Util.getIntParameter(request, "offset") == -1)
-        {
-            return null;
-        }
-
-        int offset = Util.getIntParameter(request, SearchFilterParam.OFFSET);
-        if(offset == -1 || offset == 0)
-        {
-            return null;
-        }
-
+        int offset=0;
         Map<String, String> parameters = new HashMap<String, String>();
-        parameters.putAll(browseParams.getCommonBrowseParams());
-        parameters.putAll(browseParams.getControlParameters());
+        if(isQueryFacet){
+            //If our offset should be 0 then we shouldn't be able to view a previous page url
+            if ("0".equals(queryArgs.get(FacetParams.FACET_OFFSET)) && Util.getIntParameter(request, "offset") == -1)
+            {
+                return null;
+            }
+
+            offset = Util.getIntParameter(request, SearchFilterParam.OFFSET);
+            if(offset == -1 || offset == 0)
+            {
+                return null;
+            }
+
+            parameters.putAll(browseParams.getCommonBrowseParams());
+            parameters.putAll(browseParams.getControlParameters());
+        }
         parameters.put(SearchFilterParam.OFFSET, String.valueOf(offset - DEFAULT_PAGE_SIZE));
 
         //TODO: correct  comm/collection url
@@ -672,6 +698,7 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
     public String[] getParameterFilterQueries() throws SQLException{
         Request request = ObjectModelHelper.getRequest(objectModel);
         java.util.List<String> fqs = new ArrayList<String>();
+        if(isQueryFacet){
         if(request.getParameterValues("fq") != null)
         {
             fqs.addAll(Arrays.asList(request.getParameterValues("fq")));
@@ -681,6 +708,7 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
         if(request.getParameter("filter") != null && !"".equals(request.getParameter("filter")))
         {
             fqs.add((request.getParameter("filtertype").equals("*") ? "" : request.getParameter("filtertype") + ":") + request.getParameter("filter"));
+        }
         }
         return fqs.toArray(new String[fqs.size()]);
     }
@@ -695,15 +723,18 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
             java.util.List<String> allFilterQueries = new ArrayList<String>();
             Request request = ObjectModelHelper.getRequest(objectModel);
             java.util.List<String> fqs = new ArrayList<String>();
-
+            String type=null;
+            String value=null;
+            if(isQueryFacet){
             if(request.getParameterValues("fq") != null)
             {
                 fqs.addAll(Arrays.asList(request.getParameterValues("fq")));
             }
 
-            String type = request.getParameter("filtertype");
-            String value = request.getParameter("filter");
 
+            type= request.getParameter("filtertype");
+            value = request.getParameter("filter");
+            }
             if(value != null && !value.equals("")){
                 String exactFq = (type.equals("*") ? "" : type + ":") + value;
                 fqs.add(exactFq + " OR " + exactFq + "*");
