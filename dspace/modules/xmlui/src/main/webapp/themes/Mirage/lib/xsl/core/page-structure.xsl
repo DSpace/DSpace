@@ -237,6 +237,29 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 //Clear default text of emty text areas on submit
                 function tSubmit(form)
                 {
+
+                //add "" to search text so the seach with doi and hdl will return item
+                var defaultedElements = document.getElementsByTagName("textarea");
+                   for (var i = 0; i != defaultedElements.length; i++) {
+                       if (defaultedElements[i].value == ' ') {
+                           defaultedElements[i].value = '';
+                       }
+                   }
+                   var queryTexts = document.getElementsByName("query");
+                   for (var i = 0; i != queryTexts.length; i++) {
+                       var value = queryTexts[i].value;
+                       if (value.indexOf(' ') == - 1) {
+                           if (value.indexOf("doi:") == 0 || value.indexOf("http:") == 0) {
+                               queryTexts[i].value = '"' + value + '"';
+                           }
+                           
+                           if (value.indexOf("hdl:") == 0) {
+                               queryTexts[i].value = value.substring(4, value.length);
+                           }
+                       }
+                   }
+
+
                 var defaultedElements = document.getElementsByTagName("textarea");
                 for (var i=0; i != defaultedElements.length; i++){
                 if (defaultedElements[i].value == '<i18n:text>xmlui.dri2xhtml.default.textarea.value</i18n:text>'){
