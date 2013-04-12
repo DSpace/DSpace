@@ -222,8 +222,6 @@ public class SimpleSearch extends AbstractSearch implements
 
 		buildSearchControls(query);
 
-		query.addPara(null, "button-list").addButton("submit").setValue(T_go);
-
 		// Add the result division
 		try {
 			buildSearchResultsDivision(search);

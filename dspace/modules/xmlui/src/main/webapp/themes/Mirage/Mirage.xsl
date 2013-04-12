@@ -847,8 +847,15 @@ parameter that is being used (see variable defined above) -->
         <li class="ds-form-item">
             <label class="ds-form-label" for="aspect_discovery_SimpleSearch_field_query"><i18n:text><xsl:value-of select="dri:field/dri:label"/></i18n:text></label>
             <div class="ds-form-content">
-                <xsl:apply-templates/><a id="advanced-search" href="#">Advanced Search</a>
+                <xsl:apply-templates/>
+                <!-- Place the 'Go' button beside the search field -->
+                <input class="ds-button-field " name="submit" type="submit" i18n:attr="value"
+                       value="xmlui.general.go">
+                </input>
             </div>
+        </li>
+        <li class="ds-form-item">
+            <a id="advanced-search" href="#">Advanced Search</a>
         </li>
     </xsl:template>
 
