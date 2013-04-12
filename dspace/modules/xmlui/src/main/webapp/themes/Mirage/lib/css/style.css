@@ -1425,6 +1425,9 @@ a.learn-to-submit-button {
 /* general button radius */
 
 .ds-button-field,
+.link-to-button a,
+#aspect_discovery_SearchFilterTransformer_list_link-to-button a, 
+#aspect_discovery_SearchFilterTransformer_list_link-to-button a,
 #login-item, #sign-up-item {
     -webkit-border-top-left-radius: 5px;
     -webkit-border-top-right-radius: 5px;
@@ -2023,17 +2026,23 @@ a.learn-to-submit-button-option {
     border-bottom-right-radius: 5px;
 }
 
-.link-to-button{
+.link-to-button, 
+#aspect_discovery_SearchFilterTransformer_list_link-to-button, 
+#aspect_discovery_SearchFilterTransformer_list_link-to-button {
     text-align: center;
     padding-bottom: 12px;
+    list-style: none;
+    margin-left: 0;
 }
-.link-to-button a{
+.link-to-button a, 
+#aspect_discovery_SearchFilterTransformer_list_link-to-button a, 
+#aspect_discovery_SearchFilterTransformer_list_link-to-button a {
     text-decoration: none;
     font-weight:bold;
-    border:1px solid black;
-    background: green;
-    color: white;
-    padding: 2px 5px;
+    border:1px solid #555;
+    background: #40841C;
+    color: #FFF;
+    padding: 3px 8px 2px;
 }
 
 
