@@ -343,7 +343,7 @@
                 <h1 class="ds-div-head">Browse for data</h1>
                 <div id="browse-data-buttons" class="tab-buttons">
                     <a href="#recently-published-data"><span>Recently published</span></a>
-                    <a href="#most-viewed-data"><span>Most viewed</span></a>
+                    <a href="#most-viewed-data"><span>Popular</span></a>
                     <a href="#by-author"><span>By Author</span></a>
                     <a href="#by-journal"><span>By Journal</span></a>
                 </div>
