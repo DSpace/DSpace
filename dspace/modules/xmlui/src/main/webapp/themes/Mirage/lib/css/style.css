@@ -2224,3 +2224,7 @@ a.feedbackform-user-voice-link {
     }
     
 }
+
+.hidden_form_by{
+    display: none;
+}
