@@ -413,19 +413,15 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
                 results.setHead(message("xmlui.Discovery.AbstractSearch.type_" + field));
                 if (values != null && 0 < values.size()) {
 
-
+                    int offSet=0;
 
                     // Find our faceting offset
-                    int offSet = 0;
-                    //only get the query when the query facet equals the
-                    if(isQueryFacet)
-                    {
                     try {
-                        offSet = Integer.parseInt(queryArgs.get(FacetParams.FACET_OFFSET));
+                        offSet= Integer.parseInt(queryArgs.get(FacetParams.FACET_OFFSET));
                     } catch (NumberFormatException e) {
                         //Ignore
                     }
-                    }
+
                     String nextPageUrl = null;
                     if(facetField.getName().endsWith(".year")){
                         offSet = Util.getIntParameter(request, SearchFilterParam.OFFSET);
