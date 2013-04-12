@@ -1031,6 +1031,29 @@ parameter that is being used (see variable defined above) -->
         <xsl:apply-templates select="./dri:field"/>
     </xsl:template>
 
+    <!--add table for updated readme file information-->
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:list/dri:item[@id='aspect.submission.StepTransformer.item.submission-file-dc_readme']">
+        <li class="ds-form-item odd">
+            <span class="ds-form-label"><xsl:value-of select="../dri:label[position()=1]"/></span>
+            <table style="clear:both"><tr>
+                <xsl:for-each select="./dri:hi[@rend='head']">
+                    <th>
+                        <xsl:apply-templates/>
+                    </th>
+                </xsl:for-each>
+            </tr>
+                <tr>
+                    <xsl:for-each select="./dri:hi[@rend='content']">
+                        <td>
+                            <xsl:apply-templates/>
+                        </td>
+                    </xsl:for-each>
+                </tr>
+            </table>
+            <xsl:apply-templates select="./dri:field"/>
+        </li>
+    </xsl:template>
+
      <!--add attribute placeholder and title-->
     <xsl:template match="/dri:document/dri:body/dri:div/dri:list/dri:item/dri:field/dri:field[@id='aspect.submission.StepTransformer.field.datafile_identifier']" mode="normalField">
         <input>
