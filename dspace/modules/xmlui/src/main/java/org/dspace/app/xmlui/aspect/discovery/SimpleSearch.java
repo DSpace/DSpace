@@ -123,14 +123,17 @@ public class SimpleSearch extends AbstractSearch implements
 			Composite composite = queryList.addItem().addComposite(
 					"facet-controls");
 
-			composite.setLabel(T_FILTERS_SELECTED);
 
+            boolean addOptions=false;
 			CheckBox box = composite.addCheckBox("fq");
 
 			for (String name : fqs) {
 				String field = name;
 				String value = name;
-
+                if(!field.contains("location"))
+                {
+                    addOptions=true;
+                }
 				// We treat our locations differently; want them to work behind
 				// the scenes
 				if (name.startsWith("location:")) {
@@ -190,6 +193,10 @@ public class SimpleSearch extends AbstractSearch implements
 				option.addContent(": " + value);
 
 			}
+            if(addOptions)
+            {
+                composite.setLabel(T_FILTERS_SELECTED);
+            }
 		}
 
 		java.util.List<String> filterFields = SearchUtils.getSearchFilters();

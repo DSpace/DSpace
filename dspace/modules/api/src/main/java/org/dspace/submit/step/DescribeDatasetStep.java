@@ -465,10 +465,15 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
                     }
 
                     //For a readme file we change the name to README
-                    if(isReadmeFile)
-                        b.setName("README" + noPath.substring(noPath.lastIndexOf(".")));
-                    else
+                    if(isReadmeFile) {
+			String readmeExtension = "";
+			if(noPath.lastIndexOf(".") > 0) {
+			    readmeExtension = noPath.substring(noPath.lastIndexOf("."));
+			}
+			b.setName("README" + readmeExtension);
+		    } else {
                         b.setName(noPath);
+		    }
                     b.setSource(filePath);
                     b.setDescription(fileDescription);
 
