@@ -27,7 +27,7 @@ public class HandleIdentifierProvider extends IdentifierProvider {
     /** log4j category */
     private static Logger log = Logger.getLogger(HandleIdentifierProvider.class);
 
-    private String[] supportedPrefixes = new String[]{"info:hdl", "hdl", "http://"};
+    private String[] supportedPrefixes = new String[]{"info:hdl/", "hdl:", "http://hdl.handle.net/"};
 
     public boolean supports(String identifier)
     {
@@ -94,6 +94,10 @@ public class HandleIdentifierProvider extends IdentifierProvider {
     public DSpaceObject resolve(Context context, String identifier, String... attributes) {
         // We can do nothing with this, return null
         try{
+            if(identifier.startsWith("hdl:"))
+            {
+                identifier=identifier.replace("hdl:","");
+            }
             TableRow dbhandle = findHandleInternal(context, identifier);
 
             if (dbhandle == null) {

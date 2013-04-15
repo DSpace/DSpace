@@ -132,7 +132,7 @@
         <theme name="Dryad Lab Theme" handle="10255/dryad.7872" path="DryadLab/" />
 
         <!-- Default theme for all other pages -->
-        <theme name="Dryad Theme" regex=".*" path="Dryad/" />
+        <theme name="Dryad Theme" regex=".*" path="Mirage/" />
 
         <!-- Classic theme, inspired by the JSP UI -->
         <!-- <theme name="Classic" regex=".*" path="Classic/" /> -->

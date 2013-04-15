@@ -1,0 +1,277 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<!-- We have to comment out the DTD to run, but use it to validate when editing -->
+<!--
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+-->
+<html>
+ <head>
+  <title>Integrate your journal</title>
+     <style type="text/css">
+        div#ds-body { margin: 0px 0px 0px 0px;padding-right: 10px; top: 165px;}
+        tr.table-shims,
+        tr.table-shims td {
+            line-height: 0px;
+            height: 0px;
+            margin: 0;
+            padding: 0;
+        }
+        tr.odd td {
+            background-color: #eee;
+        }
+
+        #journal-policies {
+            width: 100%;
+        }
+
+        #journal-policies th,
+        #journal-policies td {
+            text-align: center;
+        }
+        #journal-policies th:first-child,
+        #journal-policies td:first-child {
+            text-align: left;
+        }
+
+        tr.default-policies td {
+            color: #b22;
+            font-style: italic;
+        }
+    </style>
+ </head>
+ <body>
+<div id="ds-body">
+<!-- TODO: This page requires inline STYLE above and contents of #ds-body -->
+  <h1 class="ds-div-head">Integrated Journals<a id="journals">&#160;</a></h1>
+  <div id="" class="ds-static-div primary" style="">
+    <!-- TODO: To generate this table dynamically:
+        * Add a row for each journal entry in database (first row is alwys default-policies)
+        * Each data row should have class 'odd', 'even', 'odd', ...
+    -->
+    <table id="journal-policies">
+        <tr class="table-shims">
+            <td width="200">&#160;</td>
+            <td width="*">&#160;</td>
+            <td width="100">&#160;</td>
+            <td width="100">&#160;</td>
+        </tr>
+        <tr>
+            <th>Journal</th>
+            <th>When to submit?<br/>R: Prior to Review,<br/>A: Upon Acceptance</th>
+            <th>Data embargo allowed?</th>
+            <th>Metadata hidden until publication?</th>
+        </tr>
+        <tr class="ds-table-row odd default-policies">
+            <td class="ds-table-cell">If your journal is not listed below...</td>
+            <td class="ds-table-cell">A</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">Y</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">American Naturalist, The</td>
+            <td class="ds-table-cell">A</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">N</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Biological Journal of the Linnean Society</td>
+            <td class="ds-table-cell">A</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">N</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">Biology Letters</td>
+            <td class="ds-table-cell">R</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">Y</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">BioRisk </td>
+            <td class="ds-table-cell">R</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">N</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">BMJ Open</td>
+            <td class="ds-table-cell">R</td>
+            <td class="ds-table-cell">N</td>
+            <td class="ds-table-cell">N</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Comparative Cytogenetics </td>
+            <td class="ds-table-cell">R</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">N</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">Ecological Monographs </td>
+            <td class="ds-table-cell">A</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">Y</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">eLife </td>
+            <td class="ds-table-cell">R</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">Y</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">Evolution</td>
+            <td class="ds-table-cell">A</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">N</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Evolutionary Applications</td>
+            <td class="ds-table-cell">A</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">Y</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">Functional Ecology </td>
+            <td class="ds-table-cell">R</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">Y</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">GMS German Medical Science</td>
+            <td class="ds-table-cell">R</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">N</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">Heredity </td>
+            <td class="ds-table-cell">R</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">N</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">International Journal of Myriapodology </td>
+            <td class="ds-table-cell">R</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">N</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">Journal of Animal Ecology</td>
+            <td class="ds-table-cell">A</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">Y</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Journal of Ecology</td>
+            <td class="ds-table-cell">A</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">Y</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">Journal of Evolutionary Biology</td>
+            <td class="ds-table-cell">A</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">N</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Journal of Fish and Wildlife Management </td>
+            <td class="ds-table-cell">A</td>
+            <td class="ds-table-cell">N</td>
+            <td class="ds-table-cell">N</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">Journal of Heredity</td>
+            <td class="ds-table-cell">A</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">N</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Journal of Open Public Health Data</td>
+            <td class="ds-table-cell">R</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">N</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">Journal of Paleontology </td>
+            <td class="ds-table-cell">A</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">N</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Methods in Ecology and Evolution</td>
+            <td class="ds-table-cell">A</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">Y</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">Molecular Ecology</td>
+            <td class="ds-table-cell">R</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">N</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Molecular Ecology Resources</td>
+            <td class="ds-table-cell">R</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">N</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">MycoKeys </td>
+            <td class="ds-table-cell">R</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">Y</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Nature Conservation </td>
+            <td class="ds-table-cell">R</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">N</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">NeoBiota </td>
+            <td class="ds-table-cell">R</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">N</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">Paleobiology </td>
+            <td class="ds-table-cell">A</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">N</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">PhytoKeys </td>
+            <td class="ds-table-cell">R</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">Y</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">PLOS Biology </td>
+            <td class="ds-table-cell">R</td>
+            <td class="ds-table-cell">N</td>
+            <td class="ds-table-cell">Y</td>
+        </tr>
+        <tr class="ds-table-row even">
+            <td class="ds-table-cell">Systematic Biology </td>
+            <td class="ds-table-cell">R</td>
+            <td class="ds-table-cell">N</td>
+            <td class="ds-table-cell">N</td>
+        </tr>
+        <tr class="ds-table-row odd">
+            <td class="ds-table-cell">ZooKeys </td>
+            <td class="ds-table-cell">R</td>
+            <td class="ds-table-cell">Y</td>
+            <td class="ds-table-cell">Y</td>
+        </tr>
+    </table>
+  </div>
+  <!-- end of DIV.primary -->
+  <div class="page-license">
+    <p>
+        <span>All text on this page is available under a 
+        <a href="http://creativecommons.org/licenses/by/3.0" target="_blank">CC-BY 3.0</a> license.
+        <a class="single-image-link" href="http://creativecommons.org/licenses/by/3.0" target="_blank">
+            <img src="/themes/Mirage/images/cc-by.png" alt="cc-by-3.0 icon"/>
+        </a>
+        </span>
+        <span>Last revised: 2013-03-01</span>
+    </p>
+  </div>
+  </div>
+ </body>
+</html>

@@ -161,6 +161,34 @@
             <ul>
                 <li>
                     <a href="#TODO">My Submissions</a>
+                        <ul>
+                            <li>
+                                <a href="#TODO">Integrate Your Journal</a>
+                                    <ul>
+                                        <li>
+                                            <a href="#TODO">Currently Integrated Journals</a>
+                                        </li>
+                                        <li>
+                                            <a href="#TODO">My Tasks</a>
+                                        </li>
+                                        <li>
+                                            <a href="#TODO">Profile</a>
+                                        </li>
+                                        <li class="after-divider">
+                                            <a href="#TODO">Logout</a>
+                                        </li>
+                                    </ul>
+                            </li>
+                            <li>
+                                <a href="#TODO">My Tasks</a>
+                            </li>
+                            <li>
+                                <a href="#TODO">Profile</a>
+                            </li>
+                            <li class="after-divider">
+                                <a href="#TODO">Logout</a>
+                            </li>
+                        </ul>
                 </li>
                 <li>
                     <a href="#TODO">My Tasks</a>
@@ -435,14 +463,16 @@
 </div>
 </div>
 </div>
-<script src="files/jquery.min.js" type="text/javascript"> </script>
-<script type="text/javascript">!window.jQuery && document.write('<script type="text/javascript" src="/static/js/jquery-1.6.2.min.js"> <\/script>')</script>
+<script type="text/javascript">var JsHost = (("https:" == document.location.protocol) ? "https://" : "http://");
+            document.write(unescape("%3Cscript src='" + JsHost + "ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js' type='text/javascript'%3E%3C/script%3E"));</script>
+<script type="text/javascript">!window.jQuery && document.write('<script type="text/javascript" src="/static/js/jquery-1.9.1.min.js"> <\/script>')</script>
 <script type="text/javascript" src="files/jquery-ui-1.8.15.custom.min.js"> </script><!--[if lt IE 7 ]>
 <script type="text/javascript" src="/themes/Mirage/lib/js/DD_belatedPNG_0.0.8a.js?v=1"> </script>
 <script type="text/javascript">DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');$.each($('img[src$=png]'), function() {DD_belatedPNG.fixPng(this);});</script><![endif]-->
 <script type="text/javascript" src="files/jquery.hoverIntent.js"></script>
 <script type="text/javascript" src="files/superfish.js"></script>
 <script type="text/javascript" src="files/supersubs.js"></script>
+<script type="text/javascript" src="files/supposition-BLACK-BLOG-MODS.js"></script>
 <script type="text/javascript">
             runAfterJSImports.execute();
         </script>
@@ -452,11 +482,12 @@
             $('#main-menu ul.sf-menu')
                 .supersubs({
                     // all numeric properties are in em
-                    minWidth: 22,
-                    maxWidth: 30,   // this isn't doing much...
+                    minWidth: 10,
+                    maxWidth: 20,   // this isn't doing much...
                     extraWidth: 1
                 })
-                .superfish();
+                .superfish()
+                .supposition();
         });
            </script>
 <div style="display: none;" id="hiddenlpsubmitdiv"></div><script>try{for(var lastpass_iter=0; lastpass_iter < document.forms.length; lastpass_iter++){ var lastpass_f = document.forms[lastpass_iter]; if(typeof(lastpass_f.lpsubmitorig2)=="undefined"){ lastpass_f.lpsubmitorig2 = lastpass_f.submit; lastpass_f.submit = function(){ var form=this; var customEvent = document.createEvent("Event"); customEvent.initEvent("lpCustomEvent", true, true); var d = document.getElementById("hiddenlpsubmitdiv"); for(var i = 0; i < document.forms.length; i++){ if(document.forms[i]==form){ d.innerText=i; } } d.dispatchEvent(customEvent); form.lpsubmitorig2(); } } }}catch(e){}</script></body></html>

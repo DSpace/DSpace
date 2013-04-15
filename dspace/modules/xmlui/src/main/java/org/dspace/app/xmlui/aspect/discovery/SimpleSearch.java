@@ -123,21 +123,27 @@ public class SimpleSearch extends AbstractSearch implements
 			Composite composite = queryList.addItem().addComposite(
 					"facet-controls");
 
-			composite.setLabel(T_FILTERS_SELECTED);
 
+            boolean addOptions=false;
 			CheckBox box = composite.addCheckBox("fq");
 
 			for (String name : fqs) {
 				String field = name;
 				String value = name;
-
+                if(!field.contains("location"))
+                {
+                    addOptions=true;
+                }
 				// We treat our locations differently; want them to work behind
 				// the scenes
 				if (name.startsWith("location:")) {
 					query.addHidden("fq").setValue(name);
 					continue;
 				}
-
+                if (name.startsWith("location.coll:")) {
+                    query.addHidden("fq").setValue(name);
+                    continue;
+                }
 				if (name.contains(":")) {
 					field = name.split(":")[0];
 					value = name.split(":")[1];
@@ -187,6 +193,10 @@ public class SimpleSearch extends AbstractSearch implements
 				option.addContent(": " + value);
 
 			}
+            if(addOptions)
+            {
+                composite.setLabel(T_FILTERS_SELECTED);
+            }
 		}
 
 		java.util.List<String> filterFields = SearchUtils.getSearchFilters();
@@ -218,8 +228,6 @@ public class SimpleSearch extends AbstractSearch implements
 		}
 
 		buildSearchControls(query);
-
-		query.addPara(null, "button-list").addButton("submit").setValue(T_go);
 
 		// Add the result division
 		try {
@@ -283,15 +291,18 @@ public class SimpleSearch extends AbstractSearch implements
 					&& request
 							.getParameter("submit_search-filter-controls_add") != null) {
 				String exactFq = (type.equals("*") ? "" : type + ":") + value;
+                if(!exactFq.contains("location.coll")){
 				fqs.add(exactFq + " OR " + exactFq + "*");
 			}
+            }
 
 			for (String fq : fqs) {
 				// Do not put a wildcard after a range query
-				if (fq.matches(".*\\:\\[.* TO .*\\](?![a-z 0-9]).*")) {
+                if (fq.matches(".*\\:\\[.* TO .*\\](?![a-z 0-9]).*") || fq.contains("location.coll")) {
 					allFilterQueries.add(fq);
 				}
 				else {
+
 					allFilterQueries.add(fq.endsWith("*") ? fq : fq + " OR "
 							+ fq + "*");
 				}
