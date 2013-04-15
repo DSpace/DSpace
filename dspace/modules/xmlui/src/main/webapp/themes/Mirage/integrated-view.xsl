@@ -25,6 +25,14 @@
     <xsl:template match="dri:referenceSet[@type = 'embeddedView']" priority="2">
       <h2 class="ds-list-head">Files in this package</h2>
         <div class="file-list">
+	   <!-- TODO: need to test if we have one of the specially-licensed items -->
+	   <p class="license-badges" style="font-size: 0.9em;">
+	     <i18n:text>xmlui.dri2xhtml.METS-1.0.license-cc0</i18n:text>
+	     <xsl:text> </xsl:text>
+	     <a href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank" class="single-image-link"><img src="/themes/Dryad/images/cc-zero.png"/></a>
+	     <a href="http://opendefinition.org/" target="_blank" class="single-image-link"><img src="/themes/Dryad/images/opendata.png"/></a>
+	   </p>
+	   
           <xsl:apply-templates select="*[not(name()='head')]" mode="embeddedView"/>
         </div>
     </xsl:template>
@@ -130,8 +138,8 @@
                               select="//dim:field[@element='identifier'][not(@qualifier)][starts-with(., 'doi:')]"/>
                 <xsl:variable name="my_uri"
                               select="//dim:field[@element='identifier'][@qualifier='uri'][not(starts-with(., 'doi'))]"/>
-                <a>
-
+		<xsl:text>&#160;</xsl:text>                
+		<a>
                     <!-- link -->
                     <xsl:attribute name="href">
                         <xsl:choose>
@@ -146,22 +154,15 @@
                         </xsl:choose>
                     </xsl:attribute>
 
-                    <xsl:text>View&#160;File&#160;Details</xsl:text>
+		    <xsl:text>View&#160;File&#160;Details</xsl:text>
                 </a>
-                <xsl:choose>
-                  <xsl:when test="//dim:field[@element='rights'][.='http://creativecommons.org/publicdomain/zero/1.0/']">
-                    <!-- For items with the normal CC0 license, display cc-zero.png && opendata.png -->
-                    <div class="license-badges">
-                      <a href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank" class="single-image-link"><img src="/themes/Dryad/images/cc-zero.png"/></a>
-                      <a href="http://opendefinition.org/" target="_blank" class="single-image-link"><img src="/themes/Dryad/images/opendata.png"/></a>
-                    </div>
-                    </xsl:when>
-                  </xsl:choose>
               </xsl:if>
             </td>
           </tr>
 
           </xsl:for-each>
+
+
           </tbody>
         </table>
 
@@ -222,38 +223,7 @@
             </xsl:when>
         </xsl:choose>
 
-        <xsl:choose>
-            <xsl:when test=".//dim:field[@element='rights'][.='http://creativecommons.org/publicdomain/zero/1.0/']">
-              <p style="font-size: 0.9em;">
-                  <i18n:text>xmlui.dri2xhtml.METS-1.0.license-cc0</i18n:text>
-                  <xsl:text> </xsl:text>
-              </p>
-            </xsl:when>
-            <xsl:when test=".//dim:field[@element='rights'][.='http://opensource.org/licenses/gpl-3.0']">
-	      <!-- It has a GPL license -->
-                <i18n:text>xmlui.dri2xhtml.METS-1.0.license-text</i18n:text>
-                <xsl:text> &#160; </xsl:text>
-                <a href="http://opensource.org/licenses/gpl-3.0">
-                    GPL 3.0
-                </a>
-            </xsl:when>
-	    <xsl:when test=".//dim:field[@element='rights']">
-	      <!-- It has some license explicitly stored in DSpace -->
-                <xsl:variable name="license"
-                    select=".//dim:field[@element='rights']" />
-                <i18n:text>xmlui.dri2xhtml.METS-1.0.license-text</i18n:text>
-                <xsl:text> &#160; </xsl:text>
-                <a>
-                    <xsl:attribute name="href">
-                        <xsl:value-of select="$license" />
-                    </xsl:attribute>        
-                    License
-                </a>
-	    </xsl:when>
-            <xsl:otherwise>
-	      <!-- If there isn't a license, do nothing. -->
-            </xsl:otherwise>
-        </xsl:choose>
+
     </xsl:template>
 
 
