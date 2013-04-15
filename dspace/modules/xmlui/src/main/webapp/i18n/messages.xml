@@ -674,8 +674,7 @@
 		you registered with Dryad. An email will be sent to that address with further
 		instructions.</message>
 	<message key="xmlui.EPerson.StartForgotPassword.email_address">Email Address</message>
-	<message key="xmlui.EPerson.StartForgotPassword.email_address_help">Enter the same address used
-		when registering.</message>
+	<message key="xmlui.EPerson.StartForgotPassword.email_address_help">Enter the same address used when registering.</message>
 	<message key="xmlui.EPerson.StartForgotPassword.error_not_found">Email address not
 		found.</message>
 	<message key="xmlui.EPerson.StartForgotPassword.submit">Send info</message>
@@ -692,8 +691,7 @@
 	<message key="xmlui.EPerson.StartRegistration.para2">Register an account to subscribe to
 		collections for email updates, and submit new items to Dryad.</message>
 	<message key="xmlui.EPerson.StartRegistration.email_address">Email Address</message>
-	<message key="xmlui.EPerson.StartRegistration.email_address_help">This address will be verified
-		and used as your login name.</message>
+	<message key="xmlui.EPerson.StartRegistration.email_address_help">This address will be verified	and used as your login name.</message>
 	<message key="xmlui.EPerson.StartRegistration.error_bad_email">Unable to send email to this
 		address.</message>
 	<message key="xmlui.EPerson.StartRegistration.submit_register">Register</message>
