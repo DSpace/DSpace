@@ -49,11 +49,26 @@
 
         <xsl:variable name="my_doi"
                       select=".//dim:field[@element='identifier'][not(@qualifier)][starts-with(., 'doi:')]"/>
+	
         <table class="package-file-description">
           <tbody>
           <tr>
             <th>Title</th>
-            <th><xsl:copy-of select=".//dim:field[@element='title']"/></th>
+            <th><xsl:copy-of select=".//dim:field[@element='title']"/></th>        
+	    <!-- Download count -->
+	    <xsl:variable name="downloads" select=".//dim:field[@element='dryad'][@qualifier='downloads']"/>
+	    <xsl:if test="$downloads > 0">
+	      <tr>
+		<th><i18n:text>xmlui.DryadItemSummary.downloads</i18n:text></th>
+		<td>
+		  <xsl:copy-of select="$downloads" />
+		  <xsl:choose>
+		    <xsl:when test="$downloads='1'"> time</xsl:when>
+		    <xsl:otherwise> times</xsl:otherwise>
+		  </xsl:choose>
+		</td>
+	      </tr>
+	    </xsl:if>
 	    <xsl:variable name="my_description" select=".//dim:field[@element='description'][@mdschema='dc'][not(@qualifier)]" />
 	    <xsl:if test="$my_description!=''">
 	      <tr>
@@ -97,27 +112,6 @@
                     </xsl:choose>
                     )</span>
               </a>
-              <!-- Download count -->
-              <xsl:variable name="downloads" select=".//dim:field[@element='dryad'][@qualifier='downloads']"/>
-              <xsl:if test="$downloads">
-                  <span style="font-size: 0.8em;">
-                      <xsl:text>   </xsl:text>
-                      <xsl:value-of select="$downloads"/>
-                      <xsl:choose>
-                          <xsl:when test="string($downloads) = '1'">
-                              <xsl:text>&#160;</xsl:text>
-                              <i18n:text>xmlui.DryadItemSummary.download</i18n:text>
-                          </xsl:when>
-                          <xsl:otherwise>
-                              <xsl:text>&#160;</xsl:text>
-                              <i18n:text>xmlui.DryadItemSummary.downloads</i18n:text>
-                          </xsl:otherwise>
-                      </xsl:choose>
-                  </span>
-              </xsl:if>
-              <xsl:if test="not($downloads)">
-                <span>&#160;&#160;</span>
-              </xsl:if>
               <!-- View File Details -->
               <xsl:if test="$token!=''">
                 <a>

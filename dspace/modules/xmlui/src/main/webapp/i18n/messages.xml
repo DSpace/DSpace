@@ -3043,7 +3043,6 @@
 	<message key="xmlui.DryadItemSummary.viewContentKNB">View Full Content in KNB</message>
 	<message key="xmlui.DryadItemSummary.dryadPkgID">Dryad Package Identifier</message>
 	<message key="xmlui.DryadItemSummary.dryadFileID">Dryad File Identifier</message>
-	<message key="xmlui.DryadItemSummary.download">download</message>
 	<message key="xmlui.DryadItemSummary.showFull">Show Full Metadata</message>
 	<message key="xmlui.DryadItemSummary.showFileFull">Show File Metadata</message>
 	<message key="xmlui.DryadItemSummary.sciNames">Scientific Names</message>
@@ -3052,7 +3051,7 @@
 	<message key="xmlui.DryadItemSummary.keywords">Keywords</message>
 	<message key="xmlui.DryadItemSummary.depDate">Date Submitted</message>
 	<message key="xmlui.DryadItemSummary.unknown">unknown</message>
-	<message key="xmlui.DryadItemSummary.downloads">downloads</message>
+	<message key="xmlui.DryadItemSummary.downloads">Downloaded</message>
 	<message key="xmlui.DryadItemSummary.view">view</message>
 	<message key="xmlui.DryadItemSummary.views">views</message>
     <message key="xmlui.Submission.Submissions.claimAction">Awaiting curator review</message>
