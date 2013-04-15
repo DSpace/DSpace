@@ -3041,8 +3041,8 @@
 	<message key="xmlui.DryadItemSummary.bibtexCompatible">(compatible with BibDesk, LaTeX)</message>
 	<message key="xmlui.DryadItemSummary.viewContentTB">View Full Content in TreeBASE</message>
 	<message key="xmlui.DryadItemSummary.viewContentKNB">View Full Content in KNB</message>
-	<message key="xmlui.DryadItemSummary.dryadPkgID">Dryad Package Identifier</message>
-	<message key="xmlui.DryadItemSummary.dryadFileID">Dryad File Identifier</message>
+	<message key="xmlui.DryadItemSummary.dryadPkgID">DOI</message>
+	<message key="xmlui.DryadItemSummary.dryadFileID">DOI</message>
 	<message key="xmlui.DryadItemSummary.showFull">Show Full Metadata</message>
 	<message key="xmlui.DryadItemSummary.showFileFull">Show File Metadata</message>
 	<message key="xmlui.DryadItemSummary.sciNames">Scientific Names</message>
