@@ -162,10 +162,6 @@
 
           </xsl:for-each>
 
-
-          </tbody>
-        </table>
-
         <!-- Embargo Notice -->
         <xsl:variable name="embargoedDate"
                       select=".//dim:field[@element='date' and @qualifier='embargoedUntil']"/>
@@ -182,6 +178,8 @@
         </xsl:variable>
         <xsl:choose>
             <xsl:when test="$embargoedDate!=''">
+	      <th> </th> <!-- Don't use a label on the embargo text -->
+	      <td>
                 <!-- this all might be overkill, need to confirm embargoedDate element
             disappears after time expires -->
                 <xsl:variable name="dateDiff">
@@ -220,9 +218,12 @@
                         </div>
                     </xsl:when>
                 </xsl:choose>
+	      </td>
             </xsl:when>
         </xsl:choose>
 
+      </tbody>
+    </table>
 
     </xsl:template>
 
