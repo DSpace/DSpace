@@ -3052,8 +3052,7 @@
 	<message key="xmlui.DryadItemSummary.depDate">Date Submitted</message>
 	<message key="xmlui.DryadItemSummary.unknown">unknown</message>
 	<message key="xmlui.DryadItemSummary.downloads">Downloaded</message>
-	<message key="xmlui.DryadItemSummary.view">view</message>
-	<message key="xmlui.DryadItemSummary.views">views</message>
+	<message key="xmlui.DryadItemSummary.views">Pageviews</message>
     <message key="xmlui.Submission.Submissions.claimAction">Awaiting curator review</message>
     <message key="xmlui.DryadItemSummary.withdrawn">The current Item is withdrawn</message>
     <message key="xmlui.DryadItemSummary.in_workflow">Unpublished data -- the associated article is in review </message>
