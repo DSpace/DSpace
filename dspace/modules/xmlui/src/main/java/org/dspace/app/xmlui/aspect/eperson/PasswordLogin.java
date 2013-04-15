@@ -275,7 +275,6 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements
 		Row regRow2 = regTable.addRow();
 		Cell regRow2Cell1 = regRow2.addCell();
 		Cell regRow2Cell2 = regRow2.addCell();
-		regRow2Cell2.addContent( "<span class=\"field-help\">" + T_email_address_help + "</span>" );
 
 		Row regRow3 = regTable.addRow();
 		Cell regRow3Cell1 = regRow3.addCell();
