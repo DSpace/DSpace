@@ -2197,7 +2197,9 @@ a.feedbackform-user-voice-link {
     margin: 5px 0;
 }
 
-
+.embargo_notice {
+    color: #FF0000;
+}
 
 /* ********************* Tweaks for webkit browsers (Chrome + Safari) only **************** */
 
