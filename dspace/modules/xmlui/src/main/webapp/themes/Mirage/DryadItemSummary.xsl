@@ -1841,7 +1841,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/MEECover.jpg"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/MEECover.jpg"
                          alt="Methods in Ecology and Evolution cover"/>
                 </a>
             </xsl:when>

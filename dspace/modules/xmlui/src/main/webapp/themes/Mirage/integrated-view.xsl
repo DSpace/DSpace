@@ -193,26 +193,26 @@
                     <xsl:when test="$embargoedDate='9999-01-01' and $embargoType='oneyear'">
                         <!-- The item is under one-year embargo, but the article has not been published yet,
                  so we don't have an end date. -->
-                        <div id="embargo_notice_new">
+                        <div class="embargo_notice">
                             <i18n:text>xmlui.ArtifactBrowser.RestrictedItem.head_resource.oneyear</i18n:text>
                         </div>
                     </xsl:when>
                     <xsl:when
                             test="$embargoedDate='9999-01-01' and ($embargoType='untilArticleAppears' or $embargoType='unknown')">
                         <!-- The item is under embargo, but the end date is not yet known -->
-                        <div id="embargo_notice_new">
+                        <div class="embargo_notice">
                             <i18n:text>xmlui.ArtifactBrowser.RestrictedItem.head_resource.publication</i18n:text>
                         </div>
                     </xsl:when>
                     <xsl:when test="$embargoedDate='9999-01-01' and $embargoType='custom'">
                         <!-- The item is under embargo, but the end date is not yet known. The editor has approved a custom length. -->
-                        <div id="embargo_notice_new">
+                        <div class="embargo_notice">
                             <i18n:text>xmlui.ArtifactBrowser.RestrictedItem.head_resource.custom</i18n:text>
                         </div>
                     </xsl:when>
                     <xsl:when test="not(starts-with($dateDiff, '-'))">
                         <!-- The item is under embargo, and the end date of the embargo is known. -->
-                        <div id="embargo_notice_new">
+                        <div class="embargo_notice">
                             <i18n:text>xmlui.ArtifactBrowser.RestrictedItem.head_resource</i18n:text>
                             <xsl:value-of select="$embargoedDate"/>
                         </div>
