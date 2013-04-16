@@ -87,6 +87,7 @@
 	    		<xsl:copy-of select="dri:referenceSet[@id='ar.edu.unlp.sedici.aspect.collectionViewer.CollectionViewer.referenceSet.community-view-root']"/>
 	  		    <xsl:copy-of select="dri:div[@id='aspect.xmlworkflow.WorkflowTransformer.div.general-message']"/>
 	    		<xsl:copy-of select="dri:list[@id='aspect.xmlworkflow.WorkflowTransformer.list.delete-workflow']"/>
+	    		<xsl:copy-of select="dri:list[@id='aspect.xmlworkflow.WorkflowTransformer.list.reject-workflow']"/>
 	  		</xsl:with-param>
 		</xsl:apply-templates>
 	</xsl:template>
