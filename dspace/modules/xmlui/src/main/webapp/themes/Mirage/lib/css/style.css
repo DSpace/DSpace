@@ -2180,7 +2180,6 @@ a.top-link {
 /* Contact Us (Feedback Form) style */
 
 h2.feedbackform-heading {
-    color: #40841c;
     font-size: 18px;
 }
 
@@ -2200,6 +2199,17 @@ a.feedbackform-user-voice-link {
 .embargo_notice {
     color: #FF0000;
 }
+
+#aspect_artifactbrowser_FeedbackForm_list_form li.ds-form-item .ds-form-label {
+    font-size: 110%;
+    font-style: italic;
+    font-weight: bold;
+    line-height: 1;
+    padding-bottom: 0;
+    padding-left: 5px; 
+}
+
+
 
 /* ********************* Tweaks for webkit browsers (Chrome + Safari) only **************** */
 
