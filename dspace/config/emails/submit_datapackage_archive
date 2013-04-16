@@ -24,6 +24,12 @@ If your article has not yet been published, we recommend you add text specifying
 
 Data deposited in the Dryad repository: {1}
 
+Please consult the journal instructions for guidance on how to cite the data package in the manuscript.  
+Your journal may follow the CrossRef recommendation that the data package be cited in the article Reference list.  
+If so, the citation should include the Dryad package DOI, e.g.: 
+
+Author(s), Year, Data from [title]. Dryad Digital Repository {1}
+
 To view your Dryad entry, you may visit the repository at http://datadryad.org
 
 Check out the information for depositors at http://www.datadryad.org/depositing

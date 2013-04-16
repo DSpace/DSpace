@@ -99,7 +99,8 @@
 
                 <xsl:value-of select="mets:FLocat/@xlink:title"/>
                 <!-- File Size -->
-                <span class="bitstream-filesize">(
+                <span class="bitstream-filesize">
+		  <xsl:text> (</xsl:text>
                     <xsl:choose>
                         <xsl:when test="@SIZE &lt; 1000">
                             <xsl:value-of select="@SIZE"/>
@@ -118,8 +119,7 @@
                             <i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
                         </xsl:otherwise>
                     </xsl:choose>
-                    )</span>
-              </a>
+		    <xsl:text>)</xsl:text></span></a>
               <!-- View File Details -->
               <xsl:if test="$token!=''">
                 <a>

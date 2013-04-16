@@ -675,8 +675,7 @@
 		you registered with Dryad. An email will be sent to that address with further
 		instructions.</message>
 	<message key="xmlui.EPerson.StartForgotPassword.email_address">Email Address</message>
-	<message key="xmlui.EPerson.StartForgotPassword.email_address_help">Enter the same address used
-		when registering.</message>
+	<message key="xmlui.EPerson.StartForgotPassword.email_address_help">Enter the same address used when registering.</message>
 	<message key="xmlui.EPerson.StartForgotPassword.error_not_found">Email address not
 		found.</message>
 	<message key="xmlui.EPerson.StartForgotPassword.submit">Send info</message>
@@ -693,8 +692,7 @@
 	<message key="xmlui.EPerson.StartRegistration.para2">Register an account to subscribe to
 		collections for email updates, and submit new items to Dryad.</message>
 	<message key="xmlui.EPerson.StartRegistration.email_address">Email Address</message>
-	<message key="xmlui.EPerson.StartRegistration.email_address_help">This address will be verified
-		and used as your login name.</message>
+	<message key="xmlui.EPerson.StartRegistration.email_address_help">This address will be verified	and used as your login name.</message>
 	<message key="xmlui.EPerson.StartRegistration.error_bad_email">Unable to send email to this
 		address.</message>
 	<message key="xmlui.EPerson.StartRegistration.submit_register">Register</message>
@@ -3042,8 +3040,8 @@
 	<message key="xmlui.DryadItemSummary.bibtexCompatible">(compatible with BibDesk, LaTeX)</message>
 	<message key="xmlui.DryadItemSummary.viewContentTB">View Full Content in TreeBASE</message>
 	<message key="xmlui.DryadItemSummary.viewContentKNB">View Full Content in KNB</message>
-	<message key="xmlui.DryadItemSummary.dryadPkgID">Dryad Package Identifier</message>
-	<message key="xmlui.DryadItemSummary.dryadFileID">Dryad File Identifier</message>
+	<message key="xmlui.DryadItemSummary.dryadPkgID">DOI</message>
+	<message key="xmlui.DryadItemSummary.dryadFileID">DOI</message>
 	<message key="xmlui.DryadItemSummary.showFull">Show Full Metadata</message>
 	<message key="xmlui.DryadItemSummary.showFileFull">Show File Metadata</message>
 	<message key="xmlui.DryadItemSummary.sciNames">Scientific Names</message>
