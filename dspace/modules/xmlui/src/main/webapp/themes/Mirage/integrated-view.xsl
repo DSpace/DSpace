@@ -118,8 +118,7 @@
                             <i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
                         </xsl:otherwise>
                     </xsl:choose>
-                    )</span>
-              </a>
+                    )</span></a>
               <!-- View File Details -->
               <xsl:if test="$token!=''">
                 <a>
