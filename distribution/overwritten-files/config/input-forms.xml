@@ -823,7 +823,9 @@
 					<dc-qualifier>note</dc-qualifier>
 					<label>Notas</label>
 					<input-type>textarea</input-type>
-					<hint>Si usted desea que su obra sea embargada debe indicarlo aquí. El período de embargo se contabiliza a partir de la fecha de presentación de la tesis o trabajo y puede abarcar desde tres (3) meses hasta un máximo de veinticuatro (24) meses. Indique por favor un período dentro de ese rango. Luego, deberá adjuntar una nota escrita en la que se justifique debidamente la solicitud de embargo para su obra.</hint>
+						<hint>
+					ATENCION: Si precisa que el contenido de su obra se mantenga oculto temporalmente, deberá comunicarlo en este campo y adjuntar en el paso siguiente una nota de solicitud de embargo ( Ver nota ejemplo en: http://sedici.unlp.edu.ar/blog/wp-content/uploads/2013/04/Modelo-nota-de-embargo.doc ) que justifique debidamente la solicitud de embargo para su obra. El período de embargo es un bloqueo temporal de hasta 24 meses que se contabiliza a partir de la fecha de presentación de la tesis o trabajo.
+					</hint>
 				</field>
 
 			</page>

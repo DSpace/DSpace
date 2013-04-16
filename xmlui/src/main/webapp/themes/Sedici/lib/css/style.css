@@ -818,7 +818,7 @@ span.field-help {
     display: block;
     font-size: 93%;
     margin-top: 3px;
-    width: 506px;
+    width: 690px;
     text-align: justify;
 }
 
@@ -3015,6 +3015,7 @@ div.simple-item-view-authors {
     margin-bottom: 5px;
     margin-top: 10px;
     text-align: justify;
+    width: 600px;
 }
 
 .metadata-label {
@@ -3433,6 +3434,33 @@ margin-bottom: 3px;
 	
 	
 }
+
+.item-summary-view-metadata .metadata-date {
+	float: right;
+	margin-top: -30px;
+}
+
+div.simple-item-view-title {
+    font-size: 27px;
+    font-weight: normal;
+    padding-bottom: 2px;
+    margin-bottom: 5px;
+    margin-top: 10px;
+    text-align: justify;
+    width: 570px;
+    float: left;
+}
+div.simple-item-view-date {
+    font-size: 27px;
+    float: right;
+    margin-top: 10px;
+ }
+
+div.simple-item-view-head{
+	display: block;
+	
+}
+
 
 
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
