@@ -94,7 +94,12 @@
     		</xsl:element>
     	</xsl:if>
     	
-    
+```<!-- language element: dc.language -->
+    	<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/elements/1.1/language' and ./@epdcx:vesURI='http://purl.org/dc/terms/RFC3066'">
+    		<dim:field mdschema="dc" element="language">
+    			<xsl:value-of select="epdcx:valueString"/>
+    		</dim:field>
+    	</xsl:if>    
     	
     	<!-- item type element: dc.type -->
     	<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/elements/1.1/type' and ./@epdcx:vesURI='http://purl.org/eprint/terms/Type'">
@@ -112,7 +117,14 @@
     		</dim:field>
     	</xsl:if>
     	
-    
+	<!-- publication status element: sedici.description.peerReview -->
+    	<xsl:if test="./@epdcx:propertyURI='http://purl.org/eprint/terms/status' and ./@epdcx:vesURI='http://purl.org/eprint/terms/Status'">
+    		<xsl:if test="./@epdcx:valueURI='http://purl.org/eprint/status/PeerReviewed'">
+	    		<dim:field mdschema="sedici" element="description" qualifier="peerReview">
+	    			Peer Reviewed
+	    		</dim:field>
+    		</xsl:if>
+    	</xsl:if>    
     	
     	
 
