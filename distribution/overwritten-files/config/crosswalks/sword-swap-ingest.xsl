@@ -112,14 +112,7 @@
     		</dim:field>
     	</xsl:if>
     	
-    	<!-- publication status element: dc.description.version -->
-    	<xsl:if test="./@epdcx:propertyURI='http://purl.org/eprint/terms/status' and ./@epdcx:vesURI='http://purl.org/eprint/terms/Status'">
-    		<xsl:if test="./@epdcx:valueURI='http://purl.org/eprint/status/PeerReviewed'">
-	    		<dim:field mdschema="dc" element="description" qualifier="version">
-	    			Peer Reviewed
-	    		</dim:field>
-    		</xsl:if>
-    	</xsl:if>
+    
     	
     	<!-- copyright holder element: dc.rights.holder -->
     	<xsl:if test="./@epdcx:propertyURI='http://purl.org/eprint/terms/copyrightHolder'">
