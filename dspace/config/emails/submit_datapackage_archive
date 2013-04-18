@@ -14,13 +14,13 @@ Subject: Dryad submission approved {1}
 
 Dear {4},
 
-Thank you for your recent submission to the Dryad repository. Your data package has been approved and assigned a unique identifier, called a DOI.
+Thank you for your submission to the Dryad repository. Your data package has been approved and assigned a unique identifier, called a DOI.
 
 Title: {0}
 Data identifier: {1}
 Journal manuscript number: {5}
 
-If your article has not yet been published, we recommend you add text specifying the location of the data, for example:
+If your article has been published and you did not request a data embargo, your data will now be publicly available.  If your article is still being prepared for publication, we recommend you add text specifying the location of the data, for example:
 
 Data deposited in the Dryad repository: {1}
 
@@ -32,7 +32,7 @@ Author(s), Year, Data from [title]. Dryad Digital Repository {1}
 
 To view your Dryad entry, you may visit the repository at http://datadryad.org
 
-Check out the information for depositors at http://www.datadryad.org/depositing
+Check out the information for depositors at http://datadryad.org/pages/faq
 - How do I refer to my Dryad data in my article?
 - How can I see how often my data package is viewed and downloaded?
 - How can I add my data package to a Data section on my CV?
