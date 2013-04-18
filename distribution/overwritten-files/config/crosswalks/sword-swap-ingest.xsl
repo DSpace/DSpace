@@ -94,12 +94,7 @@
     		</xsl:element>
     	</xsl:if>
     	
-    	<!-- language element: dc.language.iso -->
-    	<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/elements/1.1/language' and ./@epdcx:vesURI='http://purl.org/dc/terms/RFC3066'">
-    		<dim:field mdschema="dc" element="language">
-    			<xsl:value-of select="epdcx:valueString"/>
-    		</dim:field>
-    	</xsl:if>
+    
     	
     	<!-- item type element: dc.type -->
     	<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/elements/1.1/type' and ./@epdcx:vesURI='http://purl.org/eprint/terms/Type'">
