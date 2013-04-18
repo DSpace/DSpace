@@ -283,6 +283,11 @@
                 <meta name="{@element}" content="{.}"></meta>
             </xsl:for-each>
 
+        	<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request' and @qualifier='URI'] = ''">
+				<meta name="description" content="Repositorio institucional de la Universidad Nacional de La Plata"/>
+				<meta name="keywords" content="repositorio,dspace,argentina,acceso abierto,universidad nacional de la plata"/>
+			</xsl:if>
+
         </head>
     </xsl:template>
 
