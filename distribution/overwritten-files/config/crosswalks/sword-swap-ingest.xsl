@@ -114,12 +114,7 @@
     	
     
     	
-    	<!-- copyright holder element: dc.rights.holder -->
-    	<xsl:if test="./@epdcx:propertyURI='http://purl.org/eprint/terms/copyrightHolder'">
-    		<dim:field mdschema="dc" element="rights" qualifier="holder">
-    			<xsl:value-of select="epdcx:valueString"/>
-    		</dim:field>
-    	</xsl:if>
+    	
 
        
     	
