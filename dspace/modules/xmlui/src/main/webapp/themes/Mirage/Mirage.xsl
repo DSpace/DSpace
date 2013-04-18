@@ -384,9 +384,9 @@
                 <h1 class="ds-div-head">Recently integrated journals</h1>
                 <div id="recently_integrated_journals" class="ds-static-div primary">
 		  <div class="container">
-		    <a href="/discover?field=prism.publicationName_filter&amp;fq=location:l2&amp;fq=prism.publicationName_filter%3Amethods%5C+in%5C+ecology%5C+and%5C+evolution%5C%7C%5C%7C%5C%7CMethods%5C+in%5C+Ecology%5C+and%5C+Evolution"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-MEE.png" alt="Methods in Ecology and Evolution" /></a>
-		    <a href="/discover?field=prism.publicationName_filter&amp;fq=location:l2&amp;fq=prism.publicationName_filter%3Abiology\+letters\|\|\|Biology\+Letters"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-bioletts.png" alt="Biology Letters" /></a>
-		    <a href="/discover?field=prism.publicationName_filter&amp;fq=location:l2&amp;fq=prism.publicationName_filter%3Ajournal\+of\+animal\+ecology\|\|\|Journal\+of\+Animal\+Ecology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-jae.png" alt="Journal of Animal Ecology" /></a>
+		    <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;fq=location:l2&amp;fq=prism.publicationName_filter%3Amethods%5C+in%5C+ecology%5C+and%5C+evolution%5C%7C%5C%7C%5C%7CMethods%5C+in%5C+Ecology%5C+and%5C+Evolution"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-MEE.png" alt="Methods in Ecology and Evolution" /></a>
+		    <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;fq=location:l2&amp;fq=prism.publicationName_filter%3Abiology\+letters\|\|\|Biology\+Letters"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-bioletts.png" alt="Biology Letters" /></a>
+		    <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;fq=location:l2&amp;fq=prism.publicationName_filter%3Ajournal\+of\+animal\+ecology\|\|\|Journal\+of\+Animal\+Ecology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-jae.png" alt="Journal of Animal Ecology" /></a>
 		    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-GMS.png" alt="gms German Medical Science" />
 		  </div>
                 </div>
