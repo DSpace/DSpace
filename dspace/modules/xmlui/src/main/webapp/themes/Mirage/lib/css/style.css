@@ -175,7 +175,7 @@ a:hover {
     line-height: 1.6em;
 }
 
-#ds-footer img.powered-by {
+img.powered-by {
     vertical-align: middle;
     margin-top: -3px;
 }
@@ -1836,7 +1836,7 @@ table.package-file-description th {
 }
 table.package-metadata th:first-child,
 table.package-file-description th:first-child {
-    text-align: right;
+    text-align: left;
     color: #777;
 }
 table.package-metadata td,
@@ -2196,6 +2196,10 @@ a.feedbackform-user-voice-link {
     margin: 5px 0;
 }
 
+.embargo_notice {
+    color: #FF0000;
+}
+
 #aspect_artifactbrowser_FeedbackForm_list_form li.ds-form-item .ds-form-label {
     font-size: 110%;
     font-style: italic;
@@ -2204,6 +2208,7 @@ a.feedbackform-user-voice-link {
     padding-bottom: 0;
     padding-left: 5px; 
 }
+
 
 
 /* ********************* Tweaks for webkit browsers (Chrome + Safari) only **************** */

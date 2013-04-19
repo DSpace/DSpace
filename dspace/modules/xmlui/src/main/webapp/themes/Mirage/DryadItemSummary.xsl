@@ -1266,6 +1266,7 @@
         </div>
   
         <!-- we only want this view from item view - not the administrative pages -->
+	<!-- commented out so we don't allow easy access to the metadata
         <xsl:if test="$meta[@qualifier='URI' and contains(.., 'handle') and not(contains(..,'workflow'))]">
             <div style="padding: 10px; margin-top: 5px; margin-bottom: 5px;">
                 <a href="?show=full">
@@ -1273,7 +1274,7 @@
                 </a>
             </div>
         </xsl:if>
-
+	-->
         <xsl:variable name="embargoedDate"
                       select=".//dim:field[@element='date' and @qualifier='embargoedUntil']"/>
         <xsl:variable name="embargoType">
@@ -1840,7 +1841,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/MEECover.jpg"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/MEECover.jpg"
                          alt="Methods in Ecology and Evolution cover"/>
                 </a>
             </xsl:when>
