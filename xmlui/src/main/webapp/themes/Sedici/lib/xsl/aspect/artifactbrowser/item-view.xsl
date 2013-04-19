@@ -1110,9 +1110,11 @@
 					</xsl:when>
 					<!-- No hay otherwise -->
 				</xsl:choose>
+				<xsl:text>&#160;</xsl:text>
 			</div>	
 
 			<xsl:variable name="originInfoContent">
+				
 				<xsl:choose>
 					
 					<!-- Solo para el tipo tesis: grado alanzado e institución otorgante -->
@@ -1160,13 +1162,20 @@
 						<xsl:value-of select="$originInfoContent"/>
 					</xsl:otherwise>
 				</xsl:choose>
+				<xsl:text>&#160;</xsl:text>
 			</div>
 			
 			<div class="publisher-date">
-				<!-- date.issued : extraemos el año solamente -->
-				<xsl:if test="dim:field[@element='date' and @qualifier='issued'] ">
-					<xsl:value-of select="substring(dim:field[@element='date' and @qualifier='issued'],1,4)"></xsl:value-of>
-				</xsl:if>
+				<!-- date.exposure/date.issued : extraemos el año solamente -->
+				<xsl:choose>
+					<xsl:when test="dim:field[@element='date' and @qualifier='exposure']">
+						<xsl:value-of select="substring(dim:field[@element='date' and @qualifier='exposure'],1,4)"/>
+					</xsl:when>
+					<xsl:when test="dim:field[@element='date' and @qualifier='issued']">
+						<xsl:value-of select="substring(dim:field[@element='date' and @qualifier='issued'],1,4)"/>
+					</xsl:when>
+				</xsl:choose>
+				<xsl:text>&#160;</xsl:text>
 			</div>
 		</div>
 		
