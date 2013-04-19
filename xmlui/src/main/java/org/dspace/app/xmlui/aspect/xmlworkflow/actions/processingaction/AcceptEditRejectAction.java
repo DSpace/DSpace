@@ -136,12 +136,12 @@ public class AcceptEditRejectAction extends AbstractXMLUIAction {
 	        row = table.addRow();
 	        row.addCellContent(T_approve_help);
 	        row.addCell().addButton("submit_approve").setValue(T_approve_submit);
-	
-	        // Reject item
-	        row = table.addRow();
-	        row.addCellContent(T_reject_help);
-	        row.addCell().addButton("submit_reject").setValue(T_reject_submit);
         }
+
+        // Reject item
+        row = table.addRow();
+        row.addCellContent(T_reject_help);
+        row.addCell().addButton("submit_reject").setValue(T_reject_submit);
         
         try {
 			if (AuthorizeManager.authorizeActionBoolean(context,workflowItem.getItem(),org.dspace.core.Constants.DELETE)){
