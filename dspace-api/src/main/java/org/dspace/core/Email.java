@@ -7,9 +7,12 @@
  */
 package org.dspace.core;
 
+import java.io.BufferedReader;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -54,57 +57,47 @@ import javax.mail.internet.MimeMultipart;
  * starts with "Subject:" the text on the right of the colon is used for the
  * subject line. For example:
  * <P>
- * 
+ *
  * <pre>
- *    
+ *
  *     # This is a comment line which is stripped
  *     #
  *     # Parameters:   {0}  is a person's name
  *     #               {1}  is the name of a submission
  *     #
  *     Subject: Example e-mail
- *    
+ *
  *     Dear {0},
- *    
+ *
  *     Thank you for sending us your submission &quot;{1}&quot;.
- *     
+ *
  * </pre>
- * 
+ *
  * <P>
  * If the example code above was used to send this mail, the resulting mail
  * would have the subject <code>Example e-mail</code> and the body would be:
  * <P>
- * 
+ *
  * <pre>
- *    
- *    
+ *
+ *
  *     Dear John,
- *    
+ *
  *     Thank you for sending us your submission &quot;On the Testing of DSpace&quot;.
- *     
+ *
  * </pre>
- * 
+ *
  * <P>
  * Note that parameters like <code>{0}</code> cannot be placed in the subject
  * of the e-mail; they won't get filled out.
- * 
- * 
+ *
+ *
  * @author Robert Tansley
  * @author Jim Downing - added attachment handling code
  * @version $Revision$
  */
 public class Email
 {
-    /*
-     * Implementation note: It might be necessary to add a quick utility method
-     * like "send(to, subject, message)". We'll see how far we get without it -
-     * having all emails as templates in the config allows customisation and 
-     * internationalisation.
-     * 
-     * Note that everything is stored and the run in send() so that only send()
-     * throws a MessagingException.
-     */
-
     /** The content of the message */
     private String content;
 
@@ -143,7 +136,7 @@ public class Email
 
     /**
      * Add a recipient
-     * 
+     *
      * @param email
      *            the recipient's email address
      */
@@ -156,7 +149,7 @@ public class Email
      * Set the content of the message. Setting this "resets" the message
      * formatting -<code>addArgument</code> will start. Comments and any
      * "Subject:" line must be stripped.
-     * 
+     *
      * @param cnt
      *            the content of the message
      */
@@ -168,7 +161,7 @@ public class Email
 
     /**
      * Set the subject of the message
-     * 
+     *
      * @param s
      *            the subject of the message
      */
@@ -179,7 +172,7 @@ public class Email
 
     /**
      * Set the reply-to email address
-     * 
+     *
      * @param email
      *            the reply-to email address
      */
@@ -190,7 +183,7 @@ public class Email
 
     /**
      * Fill out the next argument in the template
-     * 
+     *
      * @param arg
      *            the value for the next argument
      */
@@ -224,7 +217,7 @@ public class Email
 
     /**
      * Sends the email.
-     * 
+     *
      * @throws MessagingException
      *             if there was a problem sending the mail.
      */
@@ -255,16 +248,16 @@ public class Email
         // If no character set specified, attempt to retrieve a default
         if (charset == null)
         {
-            charset = ConfigurationManager.getProperty("mail.charset");    
+            charset = ConfigurationManager.getProperty("mail.charset");
         }
 
         // Get session
         Session session;
-        
+
         // Get the SMTP server authentication information
         String username = ConfigurationManager.getProperty("mail.server.username");
         String password = ConfigurationManager.getProperty("mail.server.password");
-        
+
         if (username != null)
         {
             props.put("mail.smtp.auth", "true");
@@ -321,7 +314,7 @@ public class Email
         {
             message.setSubject(fullSubject);
         }
-        
+
         // Add attachments
         if (attachments.isEmpty())
         {
@@ -367,6 +360,78 @@ public class Email
     }
 
     /**
+     * Get the template for an email message. The message is suitable for
+     * inserting values using <code>java.text.MessageFormat</code>.
+     *
+     * @param emailFile
+     *            full name for the email template, for example "/dspace/config/emails/register".
+     *
+     * @return the email object, with the content and subject filled out from
+     *         the template
+     *
+     * @throws IOException
+     *             if the template couldn't be found, or there was some other
+     *             error reading the template
+     */
+    public static Email getEmail(String emailFile)
+            throws IOException
+    {
+        String charset = null;
+        String subject = "";
+        StringBuilder contentBuffer = new StringBuilder();
+        BufferedReader reader = null;
+        try
+        {
+            reader = new BufferedReader(new FileReader(emailFile));
+            boolean more = true;
+            while (more)
+            {
+                String line = reader.readLine();
+                if (line == null)
+                {
+                    more = false;
+                }
+                else if (line.toLowerCase().startsWith("subject:"))
+                {
+                    subject = line.substring(8).trim();
+                }
+                else if (line.toLowerCase().startsWith("charset:"))
+                {
+                    charset = line.substring(8).trim();
+                }
+                else if (!line.startsWith("#"))
+                {
+                    contentBuffer.append(line);
+                    contentBuffer.append("\n");
+                }
+            }
+        } finally
+        {
+            if (reader != null)
+            {
+                reader.close();
+            }
+        }
+        Email email = new Email();
+        email.setSubject(subject);
+        email.setContent(contentBuffer.toString());
+        if (charset != null)
+        {
+            email.setCharset(charset);
+        }
+        return email;
+    }
+    /*
+     * Implementation note: It might be necessary to add a quick utility method
+     * like "send(to, subject, message)". We'll see how far we get without it -
+     * having all emails as templates in the config allows customisation and
+     * internationalisation.
+     *
+     * Note that everything is stored and the run in send() so that only send()
+     * throws a MessagingException.
+     */
+
+    /**
      * Test method to send an email to check email server settings
      *
      * @param args Command line options
@@ -402,9 +467,9 @@ public class Email
 
     /**
      * Utility struct class for handling file attachments.
-     * 
+     *
      * @author ojd20
-     * 
+     *
      */
     private static class FileAttachment
     {
@@ -418,7 +483,7 @@ public class Email
 
         String name;
     }
-    
+
     /**
      * Inner Class for SMTP authentication information
      */
@@ -426,16 +491,16 @@ public class Email
     {
         // User name
         private String name;
-        
+
         // Password
         private String password;
-        
+
         public SMTPAuthenticator(String n, String p)
         {
             name = n;
             password = p;
         }
-        
+
         protected PasswordAuthentication getPasswordAuthentication()
         {
             return new PasswordAuthentication(name, password);

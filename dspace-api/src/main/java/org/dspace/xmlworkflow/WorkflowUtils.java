@@ -156,7 +156,7 @@ public class WorkflowUtils extends Util{
 
             if (recipient != null)
             {
-                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "internal_error"));
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "internal_error"));
 
                 email.addRecipient(recipient);
                 email.addArgument(ConfigurationManager
