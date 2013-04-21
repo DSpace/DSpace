@@ -7,16 +7,10 @@
  */
 package org.dspace.core;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -30,8 +24,7 @@ import org.apache.log4j.helpers.OptionConverter;
 
 /**
  * Class for reading the DSpace system configuration. The main configuration is
- * read in as properties from a standard properties file. Email templates and
- * configuration files for other tools are also be accessed via this class.
+ * read in as properties from a standard properties file.
  * <P>
  * The main configuration is by default read from the <em>resource</em>
  * <code>/dspace.cfg</code>.
