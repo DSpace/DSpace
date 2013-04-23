@@ -35,6 +35,10 @@ import org.dspace.content.Item;
 import org.dspace.content.crosswalk.MetadataValidationException;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
+import org.dspace.identifier.IdentifierService;
+import org.dspace.identifier.IdentifierNotFoundException;
+import org.dspace.identifier.IdentifierNotResolvableException;
+import org.dspace.utils.DSpace;
 
 import org.apache.log4j.Logger;
 
@@ -57,7 +61,7 @@ import org.apache.log4j.Logger;
 public class DataPackageStats extends AbstractCurationTask {
 
     private static Logger log = Logger.getLogger(DataPackageStats.class);
-
+    private IdentifierService identifierService = null;
     DocumentBuilderFactory dbf = null;
     DocumentBuilder docb = null;
     static long total = 0;
@@ -66,6 +70,8 @@ public class DataPackageStats extends AbstractCurationTask {
     public void init(Curator curator, String taskId) throws IOException {
         super.init(curator, taskId);
 
+        identifierService = new DSpace().getSingletonService(IdentifierService.class);            
+	
 	// init xml processing
 	try {
 	    dbf = DocumentBuilderFactory.newInstance();
@@ -90,15 +96,15 @@ public class DataPackageStats extends AbstractCurationTask {
 	String articleDOI = "[no article DOI found]";
 	String journal = "[no journal found]";
 	String numKeywords = "[no numKeywords found]";
-	String numKeywordsJournal = "";
+	String numKeywordsJournal = "[unknown]";
 	String numberOfFiles = "[no numberOfFiles found]";
 	int packageSize = 0;
-	String embargoType = "none";
-	String embargoDate = null;
+	String embargoType = "[unknown]";
+	String embargoDate = "[unknown]";
 	int maxDownloads = 0;
-	String numberOfDownloads = "0";
+	String numberOfDownloads = "[unknown]";
 	String manuscriptNum = null;
-	String dateAccessioned = "";
+	String dateAccessioned = "[unknown]";
 	
 	if (dso.getType() == Constants.COLLECTION) {
 	    // output headers for the CSV file that will be created by processing all items in this collection
@@ -248,46 +254,20 @@ public class DataPackageStats extends AbstractCurationTask {
 		    
 		    // for each data file in the package
 
-		    /* **************************
-		       THIS SECTION COMMENTED OUT -- we need to rework how files are retrieved from the database.
-		       **************************
-
 		    for(int i = 0; i < vals.length; i++) {
 			String fileID = vals[i].value;
 			log.debug(" ======= processing fileID = " + fileID);
 
-			/////////////////////////////////////////////////////////////////////////////////////////
-			// TODO: instead of the crude mess below (OAI calls, pulling the METS, querying SOLR),
-			// get the info directly from the fileItem object
-			/////////////////////////////////////////////////////////////////////////////////////////
+			// get the DSpace Item for this fileID
+			Item fileItem = getDSpaceItem(fileID);
 			
-			// TODO: THE fileID should always be a DOI now -- do we need the handle, or can we make use of the DOI directly?
-			// the DOI will work to get the database ID (for a package)
-
-			//TODO: Not sure if we need the section below, which ensures a handle, then gets an object... can we
-			// get the object directly from the DOI?
-			
-			// ensure fileID is a handle, so we can query OAI with it
-			String shortHandle = "";
-			if(fileID.startsWith("http://hdl.handle.net/10255/")) {
-			    shortHandle = fileID.substring("http://hdl.handle.net/".length());
-			} else if (fileID.startsWith("http://datadryad.org/handle/")) {
-			    shortHandle = fileID.substring("http://datadryad.org/handle/".length());
-			} else if (fileID.startsWith("doi:10.5061/")) {
-			    URL doiLookupURL = new URL("http://datadryad.org/doi?lookup=" + fileID);
-			    String lookupHandle = (new BufferedReader(new InputStreamReader(doiLookupURL.openStream()))).readLine();
-			    shortHandle = lookupHandle.substring("http://datadryad.org/handle/".length());
-			} else {
-			    shortHandle = "###### UNEXPECTED PARTOF FORMAT!!! " + fileID;
-			}
-			log.debug("data file handle = " + shortHandle);
-			
-			// get the internal database ID for this item
-			Item fileItem = getDSpaceItem(shortHandle);
 			log.debug("file internalID = " + fileItem.getID());
 			
 			// total package size
 			// get the file metadata via OAI, since it reports on the file sizes, even for embargoed items
+			/*
+			  Package size is currently commented out, because we don't want to use the handle or mess with OAI. We need to do this a better way.
+			  
 			URL oaiAccessURL = new URL("http://www.datadryad.org/oai/request?verb=GetRecord&identifier=oai:datadryad.org:" + shortHandle + "&metadataPrefix=mets");
 			log.debug("requesting " + oaiAccessURL);
 			Document oaidoc = docb.parse(oaiAccessURL.openStream());
@@ -310,9 +290,11 @@ public class DataPackageStats extends AbstractCurationTask {
 			    packageSize = packageSize + bitstreamSize;
 			}
 			log.debug("total package size = " + packageSize);
+			*/
 
 			// embargo setting (of last file processed)
 			// need to get embargo from mets metadata since oai doesn't have it
+			/* Temorarily disable embargo settings -- we don't want to use the handles, and we should be able to get this without using the METS
 			URL metsAccessURL = new URL("http://datadryad.org/metadata/handle/" + shortHandle + "/mets.xml");
 			Document metsdoc = docb.parse(metsAccessURL.openStream());
 			nl = metsdoc.getElementsByTagName("dim:field");
@@ -334,14 +316,14 @@ public class DataPackageStats extends AbstractCurationTask {
 				embargoType = "oneyear";
 			}
 			log.debug("embargoType = " + embargoType);
+			*/
 		       			    			
 			// number of downlaods for most downloaded file
-			// must translate between the shortHandle and the DSpace internal database ID
-			// (since the solr stats system is based on the DSpace database ID)
+			// must use the DSpace item ID, since the solr stats system is based on this ID
 			URL downloadStatURL = new URL("http://datadryad.org/solr/statistics/select/?indent=on&q=owningItem:" + fileItem.getID());
 			log.debug("fetching " + downloadStatURL);
 			Document statsdoc = docb.parse(downloadStatURL.openStream());
-			nl = statsdoc.getElementsByTagName("result");
+			NodeList nl = statsdoc.getElementsByTagName("result");
 			String downloadsAtt = nl.item(0).getAttributes().getNamedItem("numFound").getTextContent();
 			int currDownloads = Integer.parseInt(downloadsAtt);
 			if(currDownloads > maxDownloads) {
@@ -352,7 +334,7 @@ public class DataPackageStats extends AbstractCurationTask {
 			log.debug("max downloads = " + numberOfDownloads);
 			
 		    }
-		    */
+
 		}
 		log.info(handle + "done.");
 	    } catch (Exception e) {
@@ -393,15 +375,19 @@ public class DataPackageStats extends AbstractCurationTask {
 	return aNode.getChildNodes().item(0).getNodeValue();
     }
 
-    private Item getDSpaceItem(String shortHandle) {
+    private Item getDSpaceItem(String itemID) {
 	Item dspaceItem = null;
 	try {
 	    Context context = new Context();
-	    dspaceItem = (Item)HandleManager.resolveToObject(context, shortHandle);
+	    dspaceItem = (Item)identifierService.resolve(context, itemID);  
 	    context.complete();
         } catch (SQLException e) {
-	    log.fatal("Unable to get DSpace Item for " + shortHandle, e);
-        }
+	    log.fatal("Unable to get DSpace Item for " + itemID, e);
+        } catch (IdentifierNotFoundException e) {
+	    log.fatal("Unable to get DSpace Item for " + itemID, e);
+	} catch (IdentifierNotResolvableException e) {
+	    log.fatal("Unable to get DSpace Item for " + itemID, e);
+	}
 
 	return dspaceItem;
     }
