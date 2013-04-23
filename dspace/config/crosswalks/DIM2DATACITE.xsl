@@ -107,11 +107,6 @@
   	    <resourceType resourceTypeGeneral="Dataset">DataPackage</resourceType>
   	  </xsl:if>
 
-  	  <!-- *********** Formats - only for data files********* -->
-	    <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
-  	    <!-- how to include formats?  It's not in the dim:dim -->
-      </xsl:if>
-
       <!-- *********** Description - Only for data files********* -->
 	    <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
 	        <description descriptionType="">
@@ -121,7 +116,7 @@
 
 
 	    <!-- *********** Related Identifiers ********* -->
-            <xsl:if test="dspace:field[@element='relation']">
+      <xsl:if test="dspace:field[@element='relation']">
 	      <relatedIdentifiers>
                 <xsl:for-each select="dspace:field[@element='relation' and @qualifier='haspart']">
                     <relatedIdentifier relatedIdentifierType="DOI" relationType="HasPart">
