@@ -129,7 +129,7 @@ public class DataPackageStats extends AbstractCurationTask {
 		DCValue[] vals = item.getMetadata("dc.identifier");
 		if (vals.length == 0) {
 		    setResult("Object has no dc.identifier available " + handle);
-		    return Curator.CURATE_FAIL;
+		    return Curator.CURATE_SKIP;
 		} else {
 		    for(int i = 0; i < vals.length; i++) {
 			if (vals[i].value.startsWith("doi:")) {
@@ -166,7 +166,7 @@ public class DataPackageStats extends AbstractCurationTask {
 		vals = item.getMetadata("dc.date.accessioned");
 		if (vals.length == 0) {
 		    setResult("Object has no dc.date.accessioned available " + handle);
-		    return Curator.CURATE_FAIL;
+		    return Curator.CURATE_SKIP;
 		} else {
 		    dateAccessioned = vals[0].value;
 		}
@@ -247,7 +247,7 @@ public class DataPackageStats extends AbstractCurationTask {
 		vals = item.getMetadata("dc.relation.haspart");
 		if (vals.length == 0) {
 		    setResult("Object has no dc.relation.haspart available " + handle);
-		    return Curator.CURATE_FAIL;
+		    return Curator.CURATE_SKIP;
 		} else {
 		    numberOfFiles = "" + vals.length;
 		    packageSize = 0;
@@ -341,7 +341,7 @@ public class DataPackageStats extends AbstractCurationTask {
 		log.fatal("Exception in processing", e);
 		setResult("Object has a fatal error: " + handle + "\n" + e.getMessage());
 		report("Object has a fatal error: " + handle + "\n" + e.getMessage());
-		return Curator.CURATE_FAIL;
+		return Curator.CURATE_SKIP;
 	    }
 	} else {
 	    log.info("skipping non-item DSpace object");
