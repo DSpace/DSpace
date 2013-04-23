@@ -8,23 +8,23 @@
         <title>Restricted Access</title>
         <script type="text/javascript">jQuery.noConflict();</script> 
         <script src="http://platform.twitter.com/widgets.js" language="javascript" type="text/javascript"> </script> 
-        <script src="/themes/Dryad/lib/editor.js" language="javascript" type="text/javascript"> </script> 
-        <script type="text/javascript" src="/themes/Dryad/lib/jquery-1.3.1.min.js"> </script> 
-        <script type="text/javascript" src="/themes/Dryad/lib/utils.js"> </script> 
-        <script type="text/javascript" src="/themes/Dryad/lib/jquery.tooltip.js"> </script> 
+        <script src="/themes/Mirage/lib/editor.js" language="javascript" type="text/javascript"> </script> 
+        <script type="text/javascript" src="/themes/Mirage/lib/jquery-1.3.1.min.js"> </script> 
+        <script type="text/javascript" src="/themes/Mirage/lib/utils.js"> </script> 
+        <script type="text/javascript" src="/themes/Mirage/lib/jquery.tooltip.js"> </script> 
         <script type="text/javascript">var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));</script> 
         <script type="text/javascript">try {var pageTracker = _gat._getTracker("UA-16949847-1");pageTracker._trackPageview();} catch(err) {}</script> 
         
 	<style type="text/css">
-          div#ds-body { margin: 0px 0px 0px 130px;padding-right: 10px; top: 165px;}
+          div#ds-body { margin: 0px 0px 0px 0px;padding-right: 10px; top: 165px;}
 	</style>
 
     </head>
     <body>
         <div id="ds-body">
-            <h1>Content restricted ahead of article publication</h1>
-            
-            <form xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_artifactbrowser_FeedbackForm_div_feedback-form" class="ds-interactive-div primary" action="/feedback" method="post" onsubmit="javascript:tSubmit(this);"> 
+            <h1 class="ds-div-head">Content restricted ahead of article publication<a id="contentRestricted">&#160;</a></h1>
+            <div class="ds-static-div primary">
+                <form xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_artifactbrowser_FeedbackForm_div_feedback-form" class="ds-interactive-div primary" action="/feedback" method="post" onsubmit="javascript:tSubmit(this);"> 
                 <p class="ds-paragraph">As far as we know, the article
                 associated with this Dryad data package has not yet
                 been published, and the journal requires us to
@@ -62,15 +62,18 @@
                     <input id="aspect_artifactbrowser_FeedbackForm_field_page" class="ds-hidden-field" name="page" type="hidden" value="http://datadryad.org/publicationBlackout" /> 
                 </p> 
             </form> 
+            </div>
             <div class="page-license">
                 <p>
-                    All text on this page is 
-                    available under a <a href="http://creativecommons.org/licenses/by/3.0" target="_blank">CC-BY 3.0</a> license.
-                    <a href="http://creativecommons.org/licenses/by/3.0" target="_blank">
-                        <img src="/themes/Dryad/images/cc-by.png" alt="cc-by-3.0 icon"/>
-                    </a>             
+                    <span>All text on this page is available under a 
+                    <a href="http://creativecommons.org/licenses/by/3.0" target="_blank">CC-BY 3.0</a> license.
+                    <a class="single-image-link" href="http://creativecommons.org/licenses/by/3.0" target="_blank">
+                        <img src="/themes/Mirage/images/cc-by.png" alt="cc-by-3.0 icon"/>
+                    </a>
+                    </span>
+                    <span>Last revised: 2013-03-04</span>
                 </p>
-            </div>              
-        </div>
+            </div>
+          </div>
     </body>
 </html>

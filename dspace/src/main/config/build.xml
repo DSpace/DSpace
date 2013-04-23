@@ -1025,7 +1025,7 @@ Common usage:
 	</target>
     <target name="update_version" depends="git_information">
     	<echo>Generating version.xml with version ${git.revision} on ${build.date.web}</echo>
-    	<echoxml file="${dspace.dir}/webapps/xmlui/themes/Dryad/meta/version.xml" append="false">
+    	<echoxml file="${dspace.dir}/webapps/xmlui/themes/Mirage/meta/version.xml" append="false">
 <release>
 	<version>${git.revision}</version>
 	<date>${build.date.web}</date>

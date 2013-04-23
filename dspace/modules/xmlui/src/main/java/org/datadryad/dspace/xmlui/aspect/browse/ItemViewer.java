@@ -483,14 +483,14 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
             }
         }
 
+        /*
         ReferenceSet appearsInclude = itemRef.addReferenceSet(ReferenceSet.TYPE_DETAIL_LIST, null, "hierarchy");
         appearsInclude.setHead(T_head_parent_collections);
         //Reference all collections the item appears in.
         for (Collection collection : item.getCollections()) {
             appearsInclude.addReference(collection);
         }
-
-
+        */
 
         //add list of related Items
 	if(item.getMetadata(RELATED_ITEMS_SCHEMA + "." + RELATED_ITEMS_ELEMENT).length>0){

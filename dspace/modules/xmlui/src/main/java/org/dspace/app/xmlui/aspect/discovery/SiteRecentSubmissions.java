@@ -81,6 +81,8 @@ public class SiteRecentSubmissions extends AbstractFiltersTransformer {
 
         int numberOfItemsAdded=0;
         if (queryResults != null)  {
+            String searchUrl="discover?sort_by=dc.date.issued_dt_sort&order=DESC&submit=Go";
+            lastSubmittedDiv.addList("most_recent").addItemXref(searchUrl,"View more");
             for (SolrDocument doc : queryResults.getResults()) {
                 DSpaceObject obj = SearchUtils.findDSpaceObject(context, doc);
                 if(obj != null)
