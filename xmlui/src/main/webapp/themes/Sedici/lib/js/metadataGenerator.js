@@ -74,7 +74,7 @@
         notas: {label: "Notas"},
         revista_indizada_en: {label: "Revista indizada en"},
         localizacion_fisica: {label: "Localización física"},
-        localizacion_electronica: {label: "Localización electrónica", type: "link", linkLabel: "---Acceder al sitio web"},
+        localizacion_electronica: {label: "Localización electrónica", type: "link", linkLabel: "Acceder al sitio web"},
     };
 
     // Array con los codigos de los metadatos (para determinar la posicion de inserción)
