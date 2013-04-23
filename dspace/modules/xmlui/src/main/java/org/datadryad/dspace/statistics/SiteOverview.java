@@ -6,7 +6,8 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
+import java.text.DateFormat;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -126,11 +127,12 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
         }
 
         try {
-            dataFileCount = ((Collection) HandleManager.resolveToObject(
+            DateFormat dateFormat = new SimpleDateFormat("yyyy MM dd");
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE, -30);
+            dataFileCount_30day = ((Collection) HandleManager.resolveToObject(
                     context, ConfigurationManager
-                    .getProperty("stats.datafiles.coll"))).countItems();
-
-
+                    .getProperty("stats.datafiles.coll"))).countItems(dateFormat.format(cal.getTime()));
         }
         catch (ClassCastException details) {
             LOGGER.error("stats.datafiles.coll property isn't set properly");

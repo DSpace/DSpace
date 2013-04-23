@@ -350,7 +350,7 @@
                     </div>
                     <div id="most-viewed-data" class="browse-data-panel">
 
-                        <xsl:apply-templates select="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostViewedItem.div.home']"/>
+                        <xsl:apply-templates select="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostDownloadedBitstream.div.home']"/>
 
                     </div>
 
@@ -993,8 +993,8 @@ parameter that is being used (see variable defined above) -->
         </div>
     </xsl:template>
 
-    <xsl:template match="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostViewedItem.div.home']">
-        <div id="aspect_discovery_MostViewedItem_table_most-viewed">
+    <xsl:template match="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostDownloadedBitstream.div.home']">
+        <div id="aspect_discovery_MostDownloadedBitstream_table_most-downloaded">
             <xsl:apply-templates select="./dri:div/dri:head"/>
             <table>
                 <tr>
@@ -1007,7 +1007,7 @@ parameter that is being used (see variable defined above) -->
                     </xsl:variable>
                     <tr>
                         <td><xsl:apply-templates select="." mode="summaryList"/></td>
-                        <td><xsl:apply-templates select="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostViewedItem.div.home']/dri:div/dri:div[@n='count']/dri:list/dri:item[position()=$position]"/></td>
+                        <td><xsl:apply-templates select="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostDownloadedBitstream.div.home']/dri:div/dri:div[@n='count']/dri:list/dri:item[position()=$position]"/></td>
                     </tr>
                 </xsl:for-each>
 

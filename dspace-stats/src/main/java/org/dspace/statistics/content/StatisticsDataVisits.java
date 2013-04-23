@@ -606,6 +606,13 @@ public class StatisticsDataVisits extends StatisticsData
                         url += "?sequence="+bit.getSequenceID();
 
                         attrs.put("url", url);
+                        if(owningItem!=null){
+                            attrs.put("item", Integer.toString(owningItem.getID()));
+                        }
+                        else
+                        {
+                            attrs.put("bitstream",Integer.toString(bit.getID()));
+                        }
                         break;
 
                     case Constants.ITEM:
