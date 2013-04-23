@@ -3,10 +3,6 @@ RewriteEngine On
 #Redireccion para comprobantes
 RedirectMatch /comprobantes(.*)$ http://dataserver.prebi.unlp.edu.ar/comprobantes$1
 
-#redirecciones para el ws de fisica
-RewriteRule ^soap_ws\.php http://old.sedici.unlp.edu.ar/soap_ws.php [P]
-RewriteRule ^sediciwebservice\.wsdl$ http://old.sedici.unlp.edu.ar/sediciwebservice.wsdl [P]
-
 #Redireccion de www.sedici.unlp.edu.ar
 RewriteCond %{HTTP_HOST} ^www\.sedici\.unlp\.edu\.ar$
 RewriteRule ^.*$ http://sedici.unlp.edu.ar%{REQUEST_URI} [R=permanent,L]
