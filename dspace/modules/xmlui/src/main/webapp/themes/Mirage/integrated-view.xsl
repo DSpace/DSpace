@@ -62,14 +62,14 @@
           <tbody>
           <tr>
             <th>Title</th>
-            <th><xsl:copy-of select=".//dim:field[@element='title']"/></th>        
+            <th><xsl:value-of select=".//dim:field[@element='title']"/></th>        
 	    <!-- Download count -->
 	    <xsl:variable name="downloads" select=".//dim:field[@element='dryad'][@qualifier='downloads']"/>
 	    <xsl:if test="$downloads > 0">
 	      <tr>
 		<th><i18n:text>xmlui.DryadItemSummary.downloads</i18n:text></th>
 		<td>
-		  <xsl:copy-of select="$downloads" />
+		  <xsl:value-of select="$downloads" />
 		  <xsl:choose>
 		    <xsl:when test="$downloads='1'"> time</xsl:when>
 		    <xsl:otherwise> times</xsl:otherwise>
@@ -82,7 +82,7 @@
 	      <tr>
 		<th>Description</th>
 		<td>
-		  <xsl:copy-of select="$my_description" />
+		  <xsl:value-of select="$my_description" />
 		</td>
 	      </tr>
 	    </xsl:if>
