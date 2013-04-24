@@ -47,8 +47,8 @@
                              src="org.apache.cocoon.serialization.XMLSerializer"
                                  mime-type="text/html; charset=utf-8"
                              pool-grow="2" pool-max="64" pool-min="2">
-                             <doctype-public>-//W3C//DTD XHTML 1.0 Strict//EN</doctype-public>
-                 <doctype-system>http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd</doctype-system>
+                             <doctype-public>-//W3C//DTD XHTML 1.0 Transitional//EN</doctype-public>
+                 <doctype-system>http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd</doctype-system>
                  <encoding>UTF-8</encoding>
                  <indent>yes</indent>
                         </map:serializer>

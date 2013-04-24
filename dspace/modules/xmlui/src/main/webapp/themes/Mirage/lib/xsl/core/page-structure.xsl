@@ -545,9 +545,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <a href="/login">Login</a>
                                 </li>
                                 <li id="sign-up-item">
-                                    <a href="/login">
-                                        Sign Up
-                                    </a>
+                                    <a href="/login">Sign Up</a>
                                 </li>
                             </xsl:otherwise>
                         </xsl:choose>
