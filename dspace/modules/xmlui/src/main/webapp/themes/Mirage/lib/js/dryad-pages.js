@@ -72,11 +72,13 @@ jQuery(document).ready(function() {
         if(document.URL.indexOf("dc.contributor.author_filter")>=0||jQuery(".choose_browse_by").html()=="dc.contributor.author_filter")
         {
             jQuery('#by_author').click();
+            window.location.href = '#by_author';
 
         }
         else if(document.URL.indexOf("prism.publicationName_filter")>=0||jQuery(".choose_browse_by").html()=="prism.publicationName_filter")
         {
             jQuery('#by_journal').click();
+            window.location.href = '#by_journal';
         }
         else
         {
