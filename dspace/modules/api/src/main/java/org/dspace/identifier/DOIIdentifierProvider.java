@@ -79,7 +79,11 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         myHostname = configurationService.getProperty("dryad.url");
         myDataPkgColl = configurationService.getProperty("stats.datapkgs.coll");
         myDataFileColl = configurationService.getProperty("stats.datafiles.coll");
-        myDoiPrefix = configurationService.getProperty("doi.prefix");
+        if (configurationService.getPropertyAsType("doi.service.testmode", false)) {
+            myDoiPrefix = configurationService.getProperty("doi.testprefix");
+        } else {
+            myDoiPrefix = configurationService.getProperty("doi.prefix");
+        }
         myLocalPartPrefix = configurationService.getProperty("doi.localpart.suffix");
 
         try{
@@ -742,6 +746,18 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
 
     private boolean existsIdDOI(String idDoi) {
+        // This method is used to check if a newly generated DOI String collides
+        // with an existing DOI.  Since the DOIs are randomly-generated,
+        // collisions are possible.
+        //
+        // The lookup() method is used for this test.  When testmode is active,
+        // lookup() always finds a DOI, it doesn't actually perform a lookup.
+        // This would cause the system to perpetually generate DOIs when test
+        // mode is active, so we return false in that case.
+        if(configurationService.getPropertyAsType("doi.service.testmode", false)) {
+            return false;
+        }
+
         String dbDoiId = lookup(idDoi.toString());
 
         if (dbDoiId != null && !dbDoiId.equals(""))
