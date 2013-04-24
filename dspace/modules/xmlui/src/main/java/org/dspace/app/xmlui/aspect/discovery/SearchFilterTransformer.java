@@ -572,7 +572,7 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
                 jumpForm.addText("fq","fq_hidden_"+field).setValue(filterQuery);
             }
             jumpForm.addContent(T_starts_with);
-            jumpForm.addText("starts_with","starts_with_"+field).setHelp(T_starts_with_help);
+            jumpForm.addText("starts_with","starts_with_"+field);
 
             jumpForm.addButton("submit","submit_"+field).setValue(T_go);
 
