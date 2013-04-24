@@ -86,7 +86,8 @@ public class DataPackageStats extends AbstractCurationTask {
 	log.info("performing DataPackageStats task " + total++ );
 	
 	String handle = "[no handle found]";
-	String doi = "[no DOI found]";
+	String packageDOI = "[no package DOI found]";
+	String articleDOI = "[no article DOI found]";
 	String journal = "[no journal found]";
 	String numKeywords = "[no numKeywords found]";
 	String numKeywordsJournal = "";
@@ -101,7 +102,7 @@ public class DataPackageStats extends AbstractCurationTask {
 	
 	if (dso.getType() == Constants.COLLECTION) {
 	    // output headers for the CSV file that will be created by processing all items in this collection
-	    report("handle, doi, journal, numKeywords, numKeywordsJournal, numberOfFiles, packageSize, " +
+	    report("handle, packageDOI, articleDOI, journal, numKeywords, numKeywordsJournal, numberOfFiles, packageSize, " +
 		   "embargoType, numberOfDownloads, manuscriptNum, dateAccessioned");
 	} else if (dso.getType() == Constants.ITEM) {
             Item item = (Item)dso;
@@ -118,7 +119,7 @@ public class DataPackageStats extends AbstractCurationTask {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Item: ").append(handle);
 
-		// DOI
+		// package DOI
 		DCValue[] vals = item.getMetadata("dc.identifier");
 		if (vals.length == 0) {
 		    setResult("Object has no dc.identifier available " + handle);
@@ -126,11 +127,22 @@ public class DataPackageStats extends AbstractCurationTask {
 		} else {
 		    for(int i = 0; i < vals.length; i++) {
 			if (vals[i].value.startsWith("doi:")) {
-			    doi = vals[i].value;
+			    packageDOI = vals[i].value;
 			}
 		    }
 		}
-		log.debug("DOI = " + doi);
+		log.debug("packageDOI = " + packageDOI);
+
+		// article DOI
+		vals = item.getMetadata("dc.relation.isreferencedby");
+		if (vals.length == 0) {
+		    setResult("Object has no dc.relation.isreferencedby available " + handle);
+		    log.error("Object has no dc.relation.isreferencedby available " + handle);
+		    return Curator.CURATE_SKIP;
+		} else {
+		    articleDOI = vals[0].value;
+		}
+		log.debug("articleDOI = " + articleDOI);
 
 		
 		// journal
@@ -355,8 +367,8 @@ public class DataPackageStats extends AbstractCurationTask {
 	    return Curator.CURATE_SKIP;
         }
 
-	setResult("Last processed item = " + handle + " -- " + doi);
-	report(handle + ", " + doi + ", \"" + journal + "\", " + numKeywords + ", " +
+	setResult("Last processed item = " + handle + " -- " + packageDOI);
+	report(handle + ", " + packageDOI + ", " + articleDOI + ", \"" + journal + "\", " + numKeywords + ", " +
 	       numKeywordsJournal + ", " + numberOfFiles + ", " + packageSize + ", " +
 	       embargoType + ", " + numberOfDownloads + ", " + manuscriptNum + ", " + dateAccessioned);
 
