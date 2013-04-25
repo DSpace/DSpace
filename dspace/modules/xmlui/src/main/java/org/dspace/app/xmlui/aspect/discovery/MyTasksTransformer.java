@@ -32,6 +32,8 @@ import org.dspace.workflow.WorkflowItem;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
+import org.dspace.app.xmlui.wing.element.Body;
+import org.xml.sax.SAXException;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -116,6 +118,28 @@ public class MyTasksTransformer extends DiscoverySubmissions{
         //}// Empty query
 
     }
+
+    @Override
+    public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
+        String itemIDString = ObjectModelHelper.getRequest(objectModel).getParameter("itemID");
+        if(itemIDString != null) {
+            try {
+                int itemID = Integer.valueOf(itemIDString);
+                // after submission
+                Division statusDiv = body.addDivision("statusDiv");
+                Item item = Item.find(context, itemID);
+                if(item.isArchived()) {
+                    statusDiv.addPara(String.format("Item %d has been successfully archived and registered DOI: %s", item.getID(), ""));
+                } else {
+                    statusDiv.addPara(String.format("Item %d is not in the archive and registered DOI: %s", item.getID(), ""));
+                }
+            } catch (NumberFormatException nfe) {
+
+            }
+        }
+        super.addBody(body);
+    }
+
 
 
     protected void renderResultBlock(Division results, FacetField.Count count) throws SearchServiceException, WingException, SQLException {
