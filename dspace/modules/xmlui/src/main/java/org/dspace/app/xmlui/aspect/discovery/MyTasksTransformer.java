@@ -128,6 +128,12 @@ public class MyTasksTransformer extends DiscoverySubmissions{
                 // after submission
                 Division statusDiv = body.addDivision("statusDiv");
                 Item item = Item.find(context, itemID);
+                
+                // <title> with doi <doi> has been <verb> and is now
+                // in publication blackout
+                // available in the archive
+                // withdrawn from the archive
+
                 if(item.isArchived()) {
                     statusDiv.addPara(String.format("Item %d has been successfully archived and registered DOI: %s", item.getID(), ""));
                 } else {
