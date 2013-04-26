@@ -1,0 +1,406 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" class=" js flexbox canvas canvastext webgl no-touch geolocation postmessage no-websqldatabase indexeddb hashchange history draganddrop websockets rgba hsla multiplebgs backgroundsize borderimage borderradius boxshadow textshadow opacity cssanimations csscolumns cssgradients no-cssreflections csstransforms csstransforms3d csstransitions fontface video audio localstorage sessionstorage webworkers applicationcache svg inlinesvg smil svgclippaths"><head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+<meta content="width=device-width; initial-scale=1.0; maximum-scale=1.0;" name="viewport">
+<link rel="shortcut icon" href="http://ec2-54-243-233-143.compute-1.amazonaws.com/themes/Mirage/images/favicon.ico">
+<link rel="apple-touch-icon" href="http://ec2-54-243-233-143.compute-1.amazonaws.com/themes/Mirage/images/apple-touch-icon.png">
+<meta name="Generator" content="DSpace 1.8.2">
+<link type="text/css" rel="stylesheet" media="screen" href="files/reset.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/base.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/helper.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/jquery-ui-1.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/style.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/authority-control.css">
+<link type="text/css" rel="stylesheet" media="handheld" href="files/handheld.css">
+<link type="text/css" rel="stylesheet" media="print" href="files/print.css">
+<link type="text/css" rel="stylesheet" media="all" href="files/media.css">
+<link type="application/opensearchdescription+xml" rel="search" href="http://ec2-54-243-233-143.compute-1.amazonaws.com/open-search/description.xml" title="DSpace">
+<script type="text/javascript">
+                                //Clear default text of emty text areas on focus
+                                function tFocus(element)
+                                {
+                                        if (element.value == ' '){element.value='';}
+                                }
+                                //Clear default text of emty text areas on submit
+                                function tSubmit(form)
+                                {
+                                        var defaultedElements = document.getElementsByTagName("textarea");
+                                        for (var i=0; i != defaultedElements.length; i++){
+                                                if (defaultedElements[i].value == ' '){
+                                                        defaultedElements[i].value='';}}
+                                }
+                                //Disable pressing 'enter' key to submit a form (otherwise pressing 'enter' causes a submission to start over)
+                                function disableEnterKey(e)
+                                {
+                                     var key;
+
+                                     if(window.event)
+                                          key = window.event.keyCode;     //Internet Explorer
+                                     else
+                                          key = e.which;     //Firefox and Netscape
+
+                                     if(key == 13)  //if "Enter" pressed, then disable!
+                                          return false;
+                                     else
+                                          return true;
+                                }
+
+                                function FnArray()
+                                {
+                                    this.funcs = new Array;
+                                }
+
+                                FnArray.prototype.add = function(f)
+                                {
+                                    if( typeof f!= "function" )
+                                    {
+                                        f = new Function(f);
+                                    }
+                                    this.funcs[this.funcs.length] = f;
+                                };
+
+                                FnArray.prototype.execute = function()
+                                {
+                                    for( var i=0; i < this.funcs.length; i++ )
+                                    {
+                                        this.funcs[i]();
+                                    }
+                                };
+
+                                var runAfterJSImports = new FnArray();
+            </script>
+<script xmlns:i18n="http://apache.org/cocoon/i18n/2.1" type="text/javascript" src="files/modernizr-1.js"> </script>
+<title>Example Item</title>
+<link rel="schema.DCTERMS" href="http://purl.org/dc/terms/">
+<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
+<meta name="DCTERMS.dateAccepted" content="2012-09-27T00:09:39Z" scheme="DCTERMS.W3CDTF">
+<meta name="DCTERMS.available" content="2012-09-27T00:09:39Z" scheme="DCTERMS.W3CDTF">
+<meta name="DCTERMS.issued" content="2012-09-26" scheme="DCTERMS.W3CDTF">
+<meta name="DC.identifier" content="http://hdl.handle.net/123456789/3" scheme="DCTERMS.URI">
+<meta name="DC.title" content="Example Item">
+
+<meta content="Example Item" name="citation_title">
+<meta content="2012-09-26" name="citation_date">
+<meta content="http://54.243.233.143/handle/123456789/3" name="citation_abstract_html_url">
+<script>try {  for(var lastpass_iter=0; lastpass_iter < document.forms.length; lastpass_iter++){    var lastpass_f = document.forms[lastpass_iter];    if(typeof(lastpass_f.lpsubmitorig)=="undefined"){      if (typeof(lastpass_f.submit) == "function") {        lastpass_f.lpsubmitorig = lastpass_f.submit;        lastpass_f.submit = function(){          var form = this;          try {            if (document.documentElement && 'createEvent' in document)            {              var forms = document.getElementsByTagName('form');              for (var i=0 ; i<forms.length ; ++i)                if (forms[i]==form)                {                  var element = document.createElement('lpformsubmitdataelement');                  element.setAttribute('formnum',i);                  element.setAttribute('from','submithook');                  document.documentElement.appendChild(element);                  var evt = document.createEvent('Events');                  evt.initEvent('lpformsubmit',true,false);                  element.dispatchEvent(evt);                  break;                }            }          } catch (e) {}          try {            form.lpsubmitorig();          } catch (e) {}        }      }    }  }} catch (e) {}</script></head><!--[if lt IE 7 ]> <body class="ie6"> <![endif]-->
+                <!--[if IE 7 ]>    <body class="ie7"> <![endif]-->
+                <!--[if IE 8 ]>    <body class="ie8"> <![endif]-->
+                <!--[if IE 9 ]>    <body class="ie9"> <![endif]-->
+                <!--[if (gt IE 9)|!(IE)]><!--><body><!--<![endif]-->
+<div id="ds-main">
+<div id="ds-header-wrapper">
+<div class="clearfix" id="ds-header">
+<a id="ds-header-logo-link" href="http://ec2-54-243-233-143.compute-1.amazonaws.com/">
+<span id="ds-header-logo">&nbsp;</span>
+<span id="ds-header-logo-text">mirage</span>
+</a>
+<h1 class="pagetitle visuallyhidden">Example Item</h1>
+<h2 class="static-pagetitle visuallyhidden">DSpace/Manakin Repository</h2>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" id="ds-user-box">
+<p>
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/login">Login</a>
+</p>
+</div>
+</div>
+</div>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" id="ds-trail-wrapper">
+<ul id="ds-trail">
+<li class="ds-trail-link first-link ">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/">DSpace Home</a>
+</li>
+<li xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-trail-arrow">→</li>
+<li class="ds-trail-link ">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/handle/123456789/1">Example Community</a>
+</li>
+<li class="ds-trail-arrow">→</li>
+<li class="ds-trail-link ">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/handle/123456789/2">Example Collection</a>
+</li>
+<li class="ds-trail-arrow">→</li>
+<li class="ds-trail-link last-link">View Item</li>
+</ul>
+</div>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="hidden" id="no-js-warning-wrapper">
+<div id="no-js-warning">
+<div class="notice failure">JavaScript is disabled for your browser. Some features of this site may not work without it.</div>
+</div>
+</div>
+<div id="ds-content-wrapper">
+<div class="clearfix" id="ds-content">
+<div id="ds-body">
+<!-- publication header -->
+<div class="publication-header">
+    <img class="pub-cover" src="http://staging.datadryad.org/themes/Mirage/images/dryad.gs45f.jpg" style="">
+    <p style="margin: 20px 0 6px; font-size: 1.2em;">Data package from:</p>
+    <a class="pub-title" href="#TODO" >Running with the Red Queen: host-parasite coevolution selects for biparental sex</a>
+</div>
+<!-- package summary -->
+<div class="ds-static-div primary">
+
+<h2 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns:oreatom="http://www.openarchives.org/ore/atom/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:atom="http://www.w3.org/2005/Atom">Files in this package</h2>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns:oreatom="http://www.openarchives.org/ore/atom/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:atom="http://www.w3.org/2005/Atom" class="file-list">
+
+<table class="package-file-description">
+    <tr>
+        <th>Title</td>
+        <th>
+            23-hour mortality rate data
+        </th>
+    </tr>
+    <tr>
+        <th>Description</th>
+        <td>
+            C. elegans were exposed to different strains of Serratia for 24 hours and mortality rates calculated (Fig.2).
+        </td>
+    </tr>
+    <tr>
+        <th>Download</th>
+        <td>
+            <a href="#">SEEco infectivity data.xls ( 62.97Kb )</a> &nbsp; 
+            <a style="font-size: 0.8em;">11 downloads</a> &nbsp;
+            <a href="#">View File Details</a>
+            <div class="license-badges">
+                <img src="http://i.creativecommons.org/l/zero/1.0/80x15.png" />
+                <img src="http://assets.okfn.org/images/ok_buttons/od_80x15_blue.png" />
+            </div>
+        </td>
+    </tr>
+</table>
+
+<table class="package-file-description">
+    <tr>
+        <th>Title</td>
+        <th>
+            SEEco wildtype outcrossing
+        </th>
+    </tr>
+    <tr>
+        <th>Description</th>
+        <td>
+            Outcrossing rates were calculated from make frequency counts in the
+            wildtype populations taken every fourth generation during
+            experimental evolution.
+        </td>
+    </tr>
+    <tr>
+        <th>Download</th>
+        <td>
+            <a href="#">SEEco wildtype outcrisisngv.xls ( 42.49Kb )</a> &nbsp; 
+            <a style="font-size: 0.8em;">13 downloads</a> &nbsp;
+            <a href="#">View File Details</a>
+            <div class="license-badges">
+                <img src="http://i.creativecommons.org/l/zero/1.0/80x15.png" />
+                <img src="http://assets.okfn.org/images/ok_buttons/od_80x15_blue.png" />
+            </div>
+        </td>
+    </tr>
+</table>
+
+<p style="font-size: 0.9em;">
+To the extent possible under law, the authors have waived all copyright and related or neighboring rights to this data.
+</p>
+
+</div>
+
+</div>
+<div class="ds-static-div primary">
+
+<h2 class="ds-list-head">Citing this article and package</h2>
+<div class="secondary">
+    <p>When using this data, please cite the original article:</p>
+    <div class="citation-sample">
+        Morran LT, Schmidt OG, Gelarden IA, Parrish II RC, Lively CM (2011) Running
+        with the Red Queen: host-parasite coevolution selects for biparental sex. 
+        Science 333(6039): 216-218. doi:10.1126/science.1206360
+    </div>
+    <p>Additionally, please cite the Dryad data package:</p>
+    <div class="citation-sample">
+        Morran LT, Schmidt OG, Gelarden IA, Parrish II RC, Lively CM (2011) Data from: Running
+        with the Red Queen: host-parasite coevolution selects for biparental sex. 
+        Dryad Digital Repository. doi:10.5061/dryad.c010h
+    </div>
+</div>
+
+</div>
+<div class="ds-static-div primary">
+
+<h2 class="ds-list-head">Package metadata</h2>
+<!-- External Metadata URL: cocoon://metadata/handle/123456789/3/mets.xml-->
+<div xmlns:oreatom="http://www.openarchives.org/ore/atom/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:atom="http://www.w3.org/2005/Atom" class="item-summary-view-metadata">
+
+<table class="package-metadata">
+    <tr>
+        <th>
+            Dryad Package Identifier
+        </th>
+        <td>
+            <a href="#">doi:10.5061/dryad.c0q0h</a>
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Keywords
+        </th>
+        <td>
+            outcrossing, self-fertilization, experimental evolution
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Date Deposited
+        </th>
+        <td>
+            2011-05-16T30:10:48Z
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Scientific Names
+        </th>
+        <td>
+            Caenorhabditis elegans, Serratia marcenscens
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Statistics
+        </th>
+        <td>
+            287 views, 3 citations
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <div class="article-abstract" style="margin: 0;">
+            <b>Article Abstract</b><br/>
+            Most organisms reproduce through outcrossing, even though it comes with
+            substantial costs. The Red Queen hypothesis proposes that selection from
+            coevolving pathogens facilitates the persistence of outcrossing despite these
+            costs. We used experimental coevolution to test the Red Queen hypothesis and
+            found that coevolution with a bacterial pathogen (Serratia marcescens) resulted
+            in significantly more outcrossing in mixed mating experimental populations of
+            the nematode Caenorhabditis elegans. Furthermore, we found that coevolution
+            with the pathogen rapidly drove obligately selfing populations to extinction,
+            whereas outcrossing populations persisted through reciprocal coevolution. Thus,
+            consistent with the Red Queen hypothesis, coevolving pathogens can select for
+            biparental sex.
+            </div>
+        </td>
+    </tr>
+</table>
+
+</div>
+</div>
+</div>
+<div id="ds-options-wrapper">
+<div id="ds-options">
+<h1 class="ds-option-set-head" id="ds-search-option-head">Search DSpace</h1>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-option-set" id="ds-search-option">
+<form method="post" id="ds-search-form" action="/search">
+<fieldset>
+<input class="ds-text-field " name="query" type="text">
+<input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" value="Go" name="submit" class="ds-button-field " onclick='
+                                    var radio = document.getElementById("ds-search-form-scope-container");
+                                    if (radio != undefined &amp;&amp; radio.checked)
+                                    {
+                                    var form = document.getElementById("ds-search-form");
+                                    form.action=
+                                "/handle/" + radio.value + "/search" ; 
+                                    }
+                                ' type="submit">
+<label>
+<input checked="checked" value="" name="scope" id="ds-search-form-scope-all" type="radio">Search DSpace</label>
+<br xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
+<label>
+<input name="scope" id="ds-search-form-scope-container" value="123456789/2" type="radio">This Collection</label>
+</fieldset>
+</form>
+<a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" href="http://ec2-54-243-233-143.compute-1.amazonaws.com/advanced-search">Advanced Search</a>
+</div>
+<h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-option-set-head">Browse</h1>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_viewArtifacts_Navigation_list_browse" class="ds-option-set">
+<ul class="ds-options-list">
+<li>
+<h2 class="ds-sublist-head">All of DSpace</h2>
+<ul xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-simple-list sublist">
+<li>
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/community-list">Communities &amp; Collections</a>
+</li>
+<li xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/browse?type=dateissued">By Issue Date</a>
+</li>
+<li xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/browse?type=author">Authors</a>
+</li>
+<li xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/browse?type=title">Titles</a>
+</li>
+<li xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/browse?type=subject">Subjects</a>
+</li>
+</ul>
+</li>
+<li xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
+<h2 class="ds-sublist-head">This Collection</h2>
+<ul xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-simple-list sublist">
+<li>
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/handle/123456789/2/browse?type=dateissued">By Issue Date</a>
+</li>
+<li xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/handle/123456789/2/browse?type=author">Authors</a>
+</li>
+<li xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/handle/123456789/2/browse?type=title">Titles</a>
+</li>
+<li xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/handle/123456789/2/browse?type=subject">Subjects</a>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-option-set-head">My Account</h1>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_viewArtifacts_Navigation_list_account" class="ds-option-set">
+<ul class="ds-simple-list">
+<li>
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/login">Login</a>
+</li>
+<li xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/register">Register</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="ds-footer-wrapper">
+<div id="ds-footer">
+<div id="ds-footer-left">
+<a target="_blank" href="http://www.dspace.org/">DSpace software</a> copyright&nbsp;©&nbsp;2002-2011&nbsp; <a target="_blank" href="http://www.duraspace.org/">Duraspace</a>
+</div>
+<div id="ds-footer-right">
+<span class="theme-by">Theme by&nbsp;</span>
+<a id="ds-footer-logo-link" href="http://atmire.com/" target="_blank" title="@mire NV">
+<span id="ds-footer-logo">&nbsp;</span>
+</a>
+</div>
+<div id="ds-footer-links">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/contact">Contact Us</a> | <a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" href="http://ec2-54-243-233-143.compute-1.amazonaws.com/feedback">Send Feedback</a>
+</div>
+<a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="hidden" href="http://ec2-54-243-233-143.compute-1.amazonaws.com/htmlmap">&nbsp;</a>
+</div>
+</div>
+</div>
+<script src="files/jquery.js" type="text/javascript"> </script>
+<script type="text/javascript">!window.jQuery && document.write('<script type="text/javascript" src="/static/js/jquery-1.6.2.min.js"> <\/script>')</script>
+<script type="text/javascript" src="files/jquery-ui-1.js"> </script><!--[if lt IE 7 ]>
+<script type="text/javascript" src="/themes/Mirage/lib/js/DD_belatedPNG_0.0.8a.js?v=1"> </script>
+<script type="text/javascript">DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');$.each($('img[src$=png]'), function() {DD_belatedPNG.fixPng(this);});</script><![endif]-->
+<script type="text/javascript">
+            runAfterJSImports.execute();
+        </script>
+</body></html>

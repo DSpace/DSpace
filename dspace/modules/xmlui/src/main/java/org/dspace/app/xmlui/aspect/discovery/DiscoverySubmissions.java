@@ -190,8 +190,12 @@ public class DiscoverySubmissions extends SimpleSearch {
                     lastItemIndex, currentPage, pagesTotal, pageURLMask);
         }
 
-
-        Table resultTable = workflowResultsDiv.addTable("results", solrResults.size(), 2);
+        int row=1;
+        if(solrResults.size()>0)
+        {
+           row=solrResults.size();
+        }
+        Table resultTable = workflowResultsDiv.addTable("results", row, 2);
 
         boolean showMoreUrl = false;
         if(solrResults.size() < solrResults.getNumFound()){

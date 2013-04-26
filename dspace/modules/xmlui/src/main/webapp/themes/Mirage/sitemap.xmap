@@ -141,7 +141,8 @@
 
                 <map:transform type="IncludePageMeta">
                     <map:parameter name="stylesheet.all" value="lib/css/media.css"/>
-                    <map:parameter name="javascript" value="lib/js/jquery-ui-1.9.1.custom.min.js"/>
+                    <map:parameter name="javascript#1" value="lib/js/jquery-ui-1.9.1.custom.min.js"/>
+		     <map:parameter name="javascript#2" value="lib/js/utils.js"/>
                     <map:parameter name="theme.path" value="{global:theme-path}"/>
                     <map:parameter name="theme.name" value="{global:theme-name}"/>
                 </map:transform>
