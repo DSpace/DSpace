@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import org.dspace.app.xmlui.wing.element.Body;
+import org.dspace.content.DCValue;
 import org.xml.sax.SAXException;
 
 /**
@@ -128,17 +129,45 @@ public class MyTasksTransformer extends DiscoverySubmissions{
                 // after submission
                 Division statusDiv = body.addDivision("statusDiv");
                 Item item = Item.find(context, itemID);
-                
                 // <title> with doi <doi> has been <verb> and is now
-                // in publication blackout
-                // available in the archive
-                // withdrawn from the archive
+                DCValue[] titleValues = item.getMetadata("dc.title");
+                String title = "";
+                if(titleValues.length > 0) { title = titleValues[0].value; }
 
-                if(item.isArchived()) {
-                    statusDiv.addPara(String.format("Item %d has been successfully archived and registered DOI: %s", item.getID(), ""));
-                } else {
-                    statusDiv.addPara(String.format("Item %d is not in the archive and registered DOI: %s", item.getID(), ""));
+                DCValue[] identifierValues = item.getMetadata("dc.identifier");
+                String identifier = "";
+                if(identifierValues.length > 0) { identifier = identifierValues[0].value; }
+
+                String withIdentifier = " with identifier: ";
+                String archivedStatus = " has been moved to the archive.";
+                String withdrawnStatus = " has been withdrawn.";
+                String workflowStatus = " is in the workflow.";
+                String workspaceStatus = " has been returned to the workspace.";
+
+                StringBuilder paraContent = new StringBuilder();
+                paraContent.append("<p>");
+                paraContent.append(title);
+                paraContent.append(withIdentifier);
+
+                paraContent.append("<a href=\"");
+                paraContent.append(contextPath);
+                paraContent.append("/internal-item?itemID=");
+                paraContent.append(itemIDString);
+                paraContent.append("\">");
+                paraContent.append(identifier);
+                paraContent.append("</a>");
+
+                if(WorkflowItem.findByItemId(context, itemID) != null) {
+                    paraContent.append(workflowStatus);
+                } else if(WorkspaceItem.findByItemId(context, itemID) != null) {
+                    paraContent.append(workspaceStatus);
+                } else if (item.isArchived()) {
+                    paraContent.append(archivedStatus);
+                } else if(item.isWithdrawn()) {
+                    paraContent.append(withdrawnStatus);
                 }
+                paraContent.append("</p>");
+                statusDiv.addSimpleHTMLFragment(true, paraContent.toString());
             } catch (NumberFormatException nfe) {
 
             }
