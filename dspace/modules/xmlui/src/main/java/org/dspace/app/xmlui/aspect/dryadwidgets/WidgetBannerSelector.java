@@ -13,14 +13,16 @@ import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.selection.Selector;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.utils.DSpace;
+import org.dspace.workflow.WorkflowItem;
 
 /**
  * This simple selector attempts to resolve a DOI passed in as the pattern.  It
@@ -63,8 +65,19 @@ public class WidgetBannerSelector extends AbstractLogEnabled implements
                 // ignoring the exception, leave dso as null
             }
 
-            if (dso != null) {
-                return true;
+            if (dso != null && dso.getType() == Constants.ITEM) {
+                Item item = (Item)dso;
+                // need to check if item is in workflow or workspace
+                WorkflowItem wfi = WorkflowItem.findByItemId(context, item.getID());
+                WorkspaceItem wsi = WorkspaceItem.findByItem(context, item);
+
+                if(wfi == null && wsi == null) {
+                    // Item is found and not in workspace, return the banner
+                    return true;
+                } else {
+                    // Item is either in the workflow or workspace, do not return the banner
+                    return false;
+                }
             } else {
                 return false;
             }
