@@ -2278,6 +2278,8 @@
 <message key="sedici.comunidades.radio.info">Interveiws and artistic productions, among other audios</message>
 <message key="sedici.comunidades.radio.nombre">Digital Library</message>
 <message key="sedici.comunidades.radio.info">Historical documents and other external digital resources</message>
+<message key="sedici.comunidades.ehidrica.nombre">Emergencia hídrica</message>
+<message key="sedici.comunidades.ehidrica.info">Trabajos dentro del Plan de Gestión Integrada de Riesgos de Desastres</message>
 
 <message key="sedici.noticias.head">News</message>
 <message key="sedici.noticias.titulo">News list</message>
