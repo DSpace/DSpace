@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (C) 2011 SeDiCI <info@sedici.unlp.edu.ar>
+    Copyright (C) 2011 SEDICI <info@sedici.unlp.edu.ar>
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@
 <message key="xmlui.ArtifactBrowser.Navigation.links_browse">Paginas estáticas</message>
 
 	<!-- General keys -->
-	<message key="xmlui.general.dspace_home">SeDiCI - Repositorio de la Universidad Nacional de La Plata </message>
+	<message key="xmlui.general.dspace_home">SEDICI - Repositorio de la Universidad Nacional de La Plata </message>
 <message key="xmlui.general.search">Búsquedas</message>
 <message key="xmlui.general.go">Ir</message>
 <message key="xmlui.general.go_home">Ir a la página de inicio</message>
@@ -72,7 +72,7 @@
 <!--
 	This section is for feed syndications (RSS, atom, etc)
 -->
-<message key="xmlui.feed.general_description">El repositorio digital SeDiCI captura, almacena, indexa, preserva y distribuye materiales de investigación en formato digital.</message>
+<message key="xmlui.feed.general_description">El repositorio digital SEDICI captura, almacena, indexa, preserva y distribuye materiales de investigación en formato digital.</message>
 <message key="xmlui.feed.header">RSS Feeds</message>
 <message key="xmlui.feed.logo_title">Imagen</message>
 <message key="xmlui.feed.untitled">Sin título</message>
@@ -106,7 +106,7 @@
 <message key="xmlui.ArtifactBrowser.AbstractSearch.head2">Comunidades o colecciones que coinciden con la petición</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.head3">Ítems que coinciden con la petición</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.no_results">La búsqueda no produjo resultados</message>
-<message key="xmlui.ArtifactBrowser.AbstractSearch.all_of_dspace">Todo SeDiCI</message>
+<message key="xmlui.ArtifactBrowser.AbstractSearch.all_of_dspace">Todo SEDICI</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.title">título</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dateissued">fecha de publicación</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dateaccessioned">fecha de envío</message>
@@ -210,7 +210,7 @@
 <!-- org.dspace.app.xmlui.artifactbrowser.CollectionViewer.java -->
 
 <message key="xmlui.ArtifactBrowser.CollectionViewer.search_scope">Ámbito de la búsqueda</message>
-<message key="xmlui.ArtifactBrowser.CollectionViewer.all_of_dspace">Todo SeDiCI</message>
+<message key="xmlui.ArtifactBrowser.CollectionViewer.all_of_dspace">Todo SEDICI</message>
 <message key="xmlui.ArtifactBrowser.CollectionViewer.full_text_search">Búsqueda en el texto completo:</message>
 <message key="xmlui.ArtifactBrowser.CollectionViewer.head_browse">Listar por</message>
 <message key="xmlui.ArtifactBrowser.CollectionViewer.browse_titles">Títulos</message>
@@ -222,16 +222,16 @@
 
 <!-- org.dspace.app.xmlui.artifactbrowser.CommunityBrowser.java -->
 
-<message key="xmlui.ArtifactBrowser.CommunityBrowser.title">SeDiCI - Colecciones disponibles</message>
+<message key="xmlui.ArtifactBrowser.CommunityBrowser.title">SEDICI - Colecciones disponibles</message>
 <message key="xmlui.ArtifactBrowser.CommunityBrowser.trail">Colecciones</message>
-<message key="xmlui.ArtifactBrowser.CommunityBrowser.head">Colecciones en SeDiCI</message>
+<message key="xmlui.ArtifactBrowser.CommunityBrowser.head">Colecciones en SEDICI</message>
 <message key="xmlui.ArtifactBrowser.CommunityBrowser.select">Desde aquí usted puede navegar todas las colecciones de documentos disponibles en el repositorio</message>
 
 
 <!-- org.dspace.app.xmlui.artifactbrowser.CommunityViewer.java -->
 
 <message key="xmlui.ArtifactBrowser.CommunityViewer.search_scope">Ámbito de búsqueda</message>
-<message key="xmlui.ArtifactBrowser.CommunityViewer.all_of_dspace">Todo SeDiCI</message>
+<message key="xmlui.ArtifactBrowser.CommunityViewer.all_of_dspace">Todo SEDICI</message>
 <message key="xmlui.ArtifactBrowser.CommunityViewer.full_text_search">Búsqueda en el texto completo:</message>
 <message key="xmlui.ArtifactBrowser.CommunityViewer.head_browse">Listar por</message>
 <message key="xmlui.ArtifactBrowser.CommunityViewer.browse_titles">Títulos</message>
@@ -258,8 +258,8 @@
 
 <message key="xmlui.ArtifactBrowser.FeedbackForm.title">Comentarios y sugerencias</message>
 <message key="xmlui.ArtifactBrowser.FeedbackForm.trail">Comentarios y sugerencias</message>
-<message key="xmlui.ArtifactBrowser.FeedbackForm.head">Dudas, comentarios y sugerencias sobre SeDiCI</message>
-<message key="xmlui.ArtifactBrowser.FeedbackForm.para1">Gracias por compartir con nosotros sus comentarios y sugerencias sobre SeDiCI. Por favor utilice el siguiente formulario para hacernos llegar sus inquietudes.</message>
+<message key="xmlui.ArtifactBrowser.FeedbackForm.head">Dudas, comentarios y sugerencias sobre SEDICI</message>
+<message key="xmlui.ArtifactBrowser.FeedbackForm.para1">Gracias por compartir con nosotros sus comentarios y sugerencias sobre SEDICI. Por favor utilice el siguiente formulario para hacernos llegar sus inquietudes.</message>
 <message key="xmlui.ArtifactBrowser.FeedbackForm.email">Su correo electrónico</message>
 <message key="xmlui.ArtifactBrowser.FeedbackForm.email_help">Esta dirección será utilizada para el seguimiento de su sugerencia.</message>
 <message key="xmlui.ArtifactBrowser.FeedbackForm.comments">Comentarios</message>
@@ -268,13 +268,13 @@
 	<!-- org.dspace.app.xmlui.artifactbrowser.FeedbackSent.java -->
 <message key="xmlui.ArtifactBrowser.FeedbackSent.title">Comentarios y sugerencias</message>
 <message key="xmlui.ArtifactBrowser.FeedbackSent.trail">Comentarios y sugerencias</message>
-<message key="xmlui.ArtifactBrowser.FeedbackSent.head">Dudas, comentarios y sugerencias sobre SeDiCI</message>
+<message key="xmlui.ArtifactBrowser.FeedbackSent.head">Dudas, comentarios y sugerencias sobre SEDICI</message>
 <message key="xmlui.ArtifactBrowser.FeedbackSent.para1">Muchas gracias por compartir sus comentarios y sugerencias con nosotros. Nos comunicaremos con usted a la brevedad.</message>
 
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.FrontPageSearch.java -->
-	<message key="xmlui.ArtifactBrowser.FrontPageSearch.head">Buscar en SeDiCI</message>
-<message key="xmlui.ArtifactBrowser.FrontPageSearch.para1">Introduzca el texto a buscar en SeDiCI</message>
+	<message key="xmlui.ArtifactBrowser.FrontPageSearch.head">Buscar en SEDICI</message>
+<message key="xmlui.ArtifactBrowser.FrontPageSearch.para1">Introduzca el texto a buscar en SEDICI</message>
 
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.ItemViewer.java -->
@@ -285,7 +285,7 @@
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.Navigation.java -->
 	<message key="xmlui.ArtifactBrowser.Navigation.head_browse">Exploración</message>
-<message key="xmlui.ArtifactBrowser.Navigation.head_all_of_dspace">Todo SeDiCI</message>
+<message key="xmlui.ArtifactBrowser.Navigation.head_all_of_dspace">Todo SEDICI</message>
 <message key="xmlui.ArtifactBrowser.Navigation.communities_and_collections">Comunidades y colecciones</message>
 <message key="xmlui.ArtifactBrowser.Navigation.browse_title">Títulos</message>
 <message key="xmlui.ArtifactBrowser.Navigation.browse_author">Autores</message>
@@ -296,7 +296,7 @@
 <message key="xmlui.ArtifactBrowser.Navigation.head_this_community">Esta comunidad</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.SimpleSearch.java -->
-<message key="xmlui.ArtifactBrowser.SimpleSearch.title">SeDiCI - Buscar</message>
+<message key="xmlui.ArtifactBrowser.SimpleSearch.title">SEDICI - Buscar</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.trail">Buscar</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.head">Buscar</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.search_scope">Ámbito de búsqueda</message>
@@ -363,7 +363,7 @@
 	<!-- org.dspace.app.xmlui.eperson.CannotRegister.java -->
 <message key="xmlui.EPerson.CannotRegister.title">Registro no disponible</message>
 <message key="xmlui.EPerson.CannotRegister.head">Registro no disponible</message>
-<message key="xmlui.EPerson.CannotRegister.para1">La configuración de este repositorio SeDiCI no permite registro en este contexto. Por favor, contacte con el <a href="../contact">administrador</a>.</message>
+<message key="xmlui.EPerson.CannotRegister.para1">La configuración de este repositorio SEDICI no permite registro en este contexto. Por favor, contacte con el <a href="../contact">administrador</a>.</message>
 
 
 	<!-- org.dspace.app.xmlui.eperson.EditProfile.java -->
@@ -426,14 +426,14 @@
 
 	<!-- org.dspace.app.xmlui.eperson.PasswordLogin.java -->
 <message key="xmlui.EPerson.PasswordLogin.trail">Registrarse</message>
-<message key="xmlui.EPerson.PasswordLogin.head1">Iniciar sesión en SeDiCI</message>
-<message key="xmlui.EPerson.PasswordLogin.title">Iniciar sesión en SeDiCI</message>
+<message key="xmlui.EPerson.PasswordLogin.head1">Iniciar sesión en SEDICI</message>
+<message key="xmlui.EPerson.PasswordLogin.title">Iniciar sesión en SEDICI</message>
 <message key="xmlui.EPerson.PasswordLogin.email_address">Correo electrónico</message>
 <message key="xmlui.EPerson.PasswordLogin.error_bad_login">La clave o la dirección de correo electrónico introducida no es válida.</message>
 <message key="xmlui.EPerson.PasswordLogin.password">Clave</message>
 <message key="xmlui.EPerson.PasswordLogin.forgot_link">¿Olvidó su contraseña?</message>
 <message key="xmlui.EPerson.PasswordLogin.submit">Iniciar sesión</message>
-<message key="xmlui.EPerson.PasswordLogin.head2">¿No tiene una cuenta en SeDiCI?</message>
+<message key="xmlui.EPerson.PasswordLogin.head2">¿No tiene una cuenta en SEDICI?</message>
 <message key="xmlui.EPerson.PasswordLogin.para1">Sólo los usuarios registrados pueden publicar material en el repositorio.</message>
 <message key="xmlui.EPerson.PasswordLogin.register_link">Haga click aquí para registrarse</message>
 
@@ -441,7 +441,7 @@
 	<!-- org.dspace.app.xmlui.eperson.LDAPLogin.java -->
 <message key="xmlui.EPerson.LDAPLogin.title">Acceder</message>
 <message key="xmlui.EPerson.LDAPLogin.trail">Acceder</message>
-<message key="xmlui.EPerson.LDAPLogin.head1">Acceder a SeDiCI</message>
+<message key="xmlui.EPerson.LDAPLogin.head1">Acceder a SEDICI</message>
 <message key="xmlui.EPerson.LDAPLogin.title">Acceder</message>
 <message key="xmlui.EPerson.LDAPLogin.username">Nombre de usuario</message>
 <message key="xmlui.EPerson.LDAPLogin.error_bad_login">El nombre de usuario o la contraseña no son validos</message>
@@ -485,7 +485,7 @@
 	<!-- org.dspace.app.xmlui.eperson.RegistrationFinished.java -->
 	<message key="xmlui.EPerson.RegistrationFinished.title">Registro terminado</message>
 <message key="xmlui.EPerson.RegistrationFinished.head">Registro terminado</message>
-<message key="xmlui.EPerson.RegistrationFinished.para1">Ahora está registrado en el sistema SeDiCI. Puede suscribirse a colecciones para recibir por correo electrónico las modificaciones y las nuevas incorporaciones.</message>
+<message key="xmlui.EPerson.RegistrationFinished.para1">Ahora está registrado en el sistema SEDICI. Puede suscribirse a colecciones para recibir por correo electrónico las modificaciones y las nuevas incorporaciones.</message>
 
 
 	<!-- org.dspace.app.xmlui.eperson.ResetPassword.java -->
@@ -503,7 +503,7 @@
 	<!-- org.dspace.app.xmlui.eperson.StartForgotPassword.java -->
 	<message key="xmlui.EPerson.StartForgotPassword.title">Olvido de contraseña</message>
 <message key="xmlui.EPerson.StartForgotPassword.head">Olvido de contraseña</message>
-<message key="xmlui.EPerson.StartForgotPassword.para1">Introduzca la dirección de correo electrónico que proporcionó cuando se registró con SeDiCI. Se le enviará un mensaje a esa dirección con las instrucciones pertinentes.</message>
+<message key="xmlui.EPerson.StartForgotPassword.para1">Introduzca la dirección de correo electrónico que proporcionó cuando se registró con SEDICI. Se le enviará un mensaje a esa dirección con las instrucciones pertinentes.</message>
 <message key="xmlui.EPerson.StartForgotPassword.email_address">Dirección de correo electrónico</message>
 <message key="xmlui.EPerson.StartForgotPassword.email_address_help">Introduzca la misma dirección con la que se registró.</message>
 <message key="xmlui.EPerson.StartForgotPassword.error_not_found">Dirección de correo electrónico no encontrada.</message>
@@ -517,7 +517,7 @@
 <message key="xmlui.EPerson.StartRegistration.reset_password_for">Restablecer contraseña para:</message>
 <message key="xmlui.EPerson.StartRegistration.submit_reset">Restablecer contraseña</message>
 <message key="xmlui.EPerson.StartRegistration.head2">Registro de nuevo usuario</message>
-<message key="xmlui.EPerson.StartRegistration.para2">Regístrese en SeDICI y obtendrá información acerca de las colecciones de su interés, así como de las modificaciones e incorporaciones. Hacerlo es muy fácil, tan sólo debe introducir su dirección de correo electrónico debajo.</message>
+<message key="xmlui.EPerson.StartRegistration.para2">Regístrese en SEDICI y obtendrá información acerca de las colecciones de su interés, así como de las modificaciones e incorporaciones. Hacerlo es muy fácil, tan sólo debe introducir su dirección de correo electrónico debajo.</message>
 <message key="xmlui.EPerson.StartRegistration.email_address">Dirección de correo electrónico:</message>
 <message key="xmlui.EPerson.StartRegistration.email_address_help">(la misma será verificada y utilizada como su nombre de usuario)</message>
 <message key="xmlui.EPerson.StartRegistration.error_bad_email">Es imposible enviar un correo electrónico a esta dirección.</message>
@@ -547,8 +547,8 @@
 
 
 	<!-- general submission aspect messages -->
-<message key="xmlui.Submission.general.mydspace_home">SeDiCI Principal</message>
-<message key="xmlui.Submission.general.go_mydspace">Mi SeDiCI</message>
+<message key="xmlui.Submission.general.mydspace_home">SEDICI Principal</message>
+<message key="xmlui.Submission.general.go_mydspace">Mi SEDICI</message>
 <message key="xmlui.Submission.general.submission.title">Envío de ítems</message>
 <message key="xmlui.Submission.general.submission.trail">Envío de ítems</message>
 <message key="xmlui.Submission.general.submission.head">Envío de ítems</message>
@@ -632,7 +632,7 @@
 <message key="xmlui.Submission.Submissions.completed.head">Documentos aceptados</message>
 <message key="xmlui.Submission.Submissions.completed.limit">Solamente se listan {0} de sus envíos aceptados. </message>
 <message key="xmlui.Submission.Submissions.completed.displayall">Mostrar todos los envíos que he subido.</message>
-<message key="xmlui.Submission.Submissions.completed.info">Estos son sus envíos completados en SeDiCI.</message>
+<message key="xmlui.Submission.Submissions.completed.info">Estos son sus envíos completados en SEDICI.</message>
 
 	<!-- submission progress bar messages -->
 <message key="xmlui.Submission.submit.progressbar.initial-questions">Cuestiones iniciales</message>
@@ -763,9 +763,9 @@
 
 	<!-- org.dspace.app.xmlui.Submission.submit.LicenseStep -->
 <message key="xmlui.Submission.submit.LicenseStep.head">Licencia de distribución</message>
-<message key="xmlui.Submission.submit.LicenseStep.info1">Para permitir a la UNLP reproducir, distribuir al mundo y preservar para el futuro su obra através del SeDiCI, necesitamos su conformidad en los siguientes términos.</message>
+<message key="xmlui.Submission.submit.LicenseStep.info1">Para permitir a la UNLP reproducir, distribuir al mundo y preservar para el futuro su obra através del SEDICI, necesitamos su conformidad en los siguientes términos.</message>
 <message key="xmlui.Submission.submit.LicenseStep.info2">Por favor, lea atentamente la licencia de distribución no exclusiva y si está de acuerdo marque la casilla "Conceder licencia" que se encuentra debajo del texto y pulse "Completar el envío". </message>
-<message key="xmlui.Submission.submit.LicenseStep.info3">Si desea más informacion sobre el proceso de Autoarchivo y licencias, puede visitar el siguiente <a href="../../../../pages/comoAgregarTrabajos" target="_blank">Tutorial</a>. Si tiene alguna duda sobre la licencia, por favor, contactáctese con SeDiCI a traves de la siguiente página de <a href="../../../../contact" target="_blank">Contacto</a></message>
+<message key="xmlui.Submission.submit.LicenseStep.info3">Si desea más informacion sobre el proceso de Autoarchivo y licencias, puede visitar el siguiente <a href="../../../../pages/comoAgregarTrabajos" target="_blank">Tutorial</a>. Si tiene alguna duda sobre la licencia, por favor, contactáctese con SEDICI a traves de la siguiente página de <a href="../../../../contact" target="_blank">Contacto</a></message>
 <message key="xmlui.Submission.submit.LicenseStep.decision_label">Conceder Licencia de distribución: </message>
 <message key="xmlui.Submission.submit.LicenseStep.decision_checkbox">(Debe conceder la licencia para completar el envío)</message>
 <message key="xmlui.Submission.submit.LicenseStep.decision_error">Si no puede conceder la licencia por ahora, deberá guardar su trabajo y volver más tarde o eliminar inmediatamente el envío pulsando Borrar el envío.</message>
@@ -1172,7 +1172,7 @@
 	<!-- org.dspace.app.xmlui.administrative.registries.MetadatRegistryMain.java -->
 <message key="xmlui.administrative.registries.MetadataRegistryMain.title">Registro de metadatos</message>
 <message key="xmlui.administrative.registries.MetadataRegistryMain.head1">Registro de metadatos</message>
-<message key="xmlui.administrative.registries.MetadataRegistryMain.para1">El registro de metadatos mantiene una lista de todos los campos disponibles en el repositorio. Estos campos pueden distribuirse entre múltiples esquemas, sin embargo SeDiCI necesita el esquema de clasificación de Dublin Core. Puede extender el esquema Dublin Core con campos adicionales o añadir nuevos esquemas al registro.</message>
+<message key="xmlui.administrative.registries.MetadataRegistryMain.para1">El registro de metadatos mantiene una lista de todos los campos disponibles en el repositorio. Estos campos pueden distribuirse entre múltiples esquemas, sin embargo SEDICI necesita el esquema de clasificación de Dublin Core. Puede extender el esquema Dublin Core con campos adicionales o añadir nuevos esquemas al registro.</message>
 <message key="xmlui.administrative.registries.MetadataRegistryMain.column1"></message>
 <message key="xmlui.administrative.registries.MetadataRegistryMain.column2">ID</message>
 <message key="xmlui.administrative.registries.MetadataRegistryMain.column3">Área</message>
@@ -1390,7 +1390,7 @@
 <message key="xmlui.administrative.item.EditItemBitstreamsForm.submit_add">Cargar un nuevo archivo</message>
 <message key="xmlui.administrative.item.EditItemBitstreamsForm.submit_delete">Borrar archivos</message>
 <message key="xmlui.administrative.item.EditItemBitstreamsForm.no_upload">Necesita los privilegios AÑADIR y ESCRIBIR sobre el ítem y los bloques para poder cargar nuevos archivos.</message>
-<message key="xmlui.administrative.item.EditItemBitstreamsForm.no_remove">Sólo los administradores de SeDiCI pueden borrar archivos / bitstreams.</message>
+<message key="xmlui.administrative.item.EditItemBitstreamsForm.no_remove">Sólo los administradores de SEDICI pueden borrar archivos / bitstreams.</message>
 
 
 	<!-- org.dspace.app.xmlui.administrative.item.EditItemMetadataForm -->
@@ -1623,7 +1623,7 @@ Para asignar un item a esta colección, cerciórese de estar en la colección co
 <message key="xmlui.administrative.collection.GeneralCollectionHarvestingForm.trail">Recolectando</message>
 <message key="xmlui.administrative.collection.GeneralCollectionHarvestingForm.options_harvest">Origen del Contenido</message>
 <message key="xmlui.administrative.collection.GeneralCollectionHarvestingForm.label_source">Origen del Contenido</message>
-<message key="xmlui.administrative.collection.GeneralCollectionHarvestingForm.source_normal">Esta es una colección SeDiCI estándar</message>
+<message key="xmlui.administrative.collection.GeneralCollectionHarvestingForm.source_normal">Esta es una colección SEDICI estándar</message>
 <message key="xmlui.administrative.collection.GeneralCollectionHarvestingForm.source_harvested">Esta colección recolecta sus contenidos de una fuente externa</message>
 <message key="xmlui.administrative.collection.GeneralCollectionHarvestingForm.submit_save">Guardar</message>
 
@@ -1759,7 +1759,7 @@ Para asignar un item a esta colección, cerciórese de estar en la colección co
 <message key="xmlui.administrative.ControlPanel.trail">Panel de control</message>
 <message key="xmlui.administrative.ControlPanel.head">Panel de control</message>
 <message key="xmlui.administrative.ControlPanel.option_java">Información Java</message>
-<!--  <message key="xmlui.administrative.ControlPanel.option_dspace">Configuración de SeDiCI</message>-->
+<!--  <message key="xmlui.administrative.ControlPanel.option_dspace">Configuración de SEDICI</message>-->
 <message key="xmlui.administrative.ControlPanel.option_dspace">Configuración</message>
 <message key="xmlui.administrative.ControlPanel.option_alerts">Sistema de alarmas</message>
 <message key="xmlui.administrative.ControlPanel.hours">{0} h</message>
@@ -1777,10 +1777,10 @@ Para asignar un item a esta colección, cerciórese de estar en la colección co
 <message key="xmlui.administrative.ControlPanel.runtime_total">Memoria direccionada</message>
 <message key="xmlui.administrative.ControlPanel.runtime_used">Memoria utilizada</message>
 <message key="xmlui.administrative.ControlPanel.runtime_free">Memoria libre</message>
-<message key="xmlui.administrative.ControlPanel.dspace_head">Ajustes de SeDiCI</message>
-<message key="xmlui.administrative.ControlPanel.dspace_dir">Directorio de instalación de SeDiCI</message>
-<message key="xmlui.administrative.ControlPanel.dspace_url">URL Base de SeDiCI Base</message>
-<message key="xmlui.administrative.ControlPanel.dspace_hostname">SeDiCI Host Name</message>
+<message key="xmlui.administrative.ControlPanel.dspace_head">Ajustes de SEDICI</message>
+<message key="xmlui.administrative.ControlPanel.dspace_dir">Directorio de instalación de SEDICI</message>
+<message key="xmlui.administrative.ControlPanel.dspace_url">URL Base de SEDICI Base</message>
+<message key="xmlui.administrative.ControlPanel.dspace_hostname">SEDICI Host Name</message>
 <message key="xmlui.administrative.ControlPanel.dspace_name">Nombre del sitio</message>
 <message key="xmlui.administrative.ControlPanel.db_name">Nombre de la base de datos</message>
 <message key="xmlui.administrative.ControlPanel.db_url">URL de la base de datos</message>
@@ -1885,13 +1885,13 @@ Para asignar un item a esta colección, cerciórese de estar en la colección co
 <message key="xmlui.dri2xhtml.structural.contact-link">Contacto</message>	
 <message key="xmlui.dri2xhtml.structural.feedback-link">Sugerencias</message>	
 	
-<message key="xmlui.dri2xhtml.structural.head-subtitle">SeDiCI</message>	
+<message key="xmlui.dri2xhtml.structural.head-subtitle">SEDICI</message>	
 	
 <message key="xmlui.dri2xhtml.structural.profile">Mi Perfil</message>	
 <message key="xmlui.dri2xhtml.structural.logout">Salir</message>	
 <message key="xmlui.dri2xhtml.structural.login">Iniciar sesión</message>	
 	
-<message key="xmlui.dri2xhtml.structural.search">Buscar en SeDiCI</message>	
+<message key="xmlui.dri2xhtml.structural.search">Buscar en SEDICI</message>	
 <message key="xmlui.dri2xhtml.structural.search-advanced">Búsqueda avanzada</message>	
 <message key="xmlui.dri2xhtml.structural.search-in-community">Esta comunidad</message>	
 <message key="xmlui.dri2xhtml.structural.search-in-collection">Esta colección</message>	
@@ -1912,7 +1912,7 @@ Para asignar un item a esta colección, cerciórese de estar en la colección co
 <message key="xmlui.dri2xhtml.METS-1.0.no-title">Sin título</message>
 <message key="xmlui.dri2xhtml.METS-1.0.no-author">Autor desconocido</message>
 <message key="xmlui.dri2xhtml.METS-1.0.non-conformant">
-Este no es un objeto SeDiCI conforme con el perfil METS1.0,  por tanto no puede ser interpretado correctamente. 
+Este no es un objeto SEDICI conforme con el perfil METS1.0,  por tanto no puede ser interpretado correctamente. 
 Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejorar la función necesaria o crear una plantilla que se ajuste al perfil usado.
            </message>
 
@@ -1938,7 +1938,7 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 <message key="xmlui.dri2xhtml.METS-1.0.tesis-info">Información de la Tesis</message>
 <message key="xmlui.dri2xhtml.METS-1.0.general-info">Información general</message>
 
-<message key="xmlui.dri2xhtml.METS-1.0.item-date-available">Disponible en SeDiCI desde</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-date-available">Disponible en SEDICI desde</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-date-accessioned">Creado el</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-title-subtitle">Subtítulo</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-embargo-liftDate">Fecha fin de embargo</message>
@@ -2029,16 +2029,16 @@ La vista resumen de la comunidad no está actualmente en uso o implementada. Est
 
 
 <message key="xmlui.dri2xhtml.METS-1.0.item-availability-local">Descarga directa</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-availability-local-help">El documento se encuentra disponible para descarga directa desde SeDiCI</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-availability-local-help">El documento se encuentra disponible para descarga directa desde SEDICI</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-availability-linked">Link externo</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-availability-linked-help">El documento se encuentra alojado en un sitio web externo a SeDiCI</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-availability-linked-help">El documento se encuentra alojado en un sitio web externo a SEDICI</message>
 
 
 	<!-- Internationalization elements specific to the Qualified Dublin Core metadata handler.
 		DS-METS-1.0-QDC.xsl -->
 <message key="xmlui.dri2xhtml.METS-1.0.qdc-not-applicable">
-Qualified Dublin Core (QDC) no se puede aplicar a las comunidades y colecciones de SeDiCI en
-este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el uso de crosswalks QDC o bien DIM o MODS para el procesamiento de las comunidades y colecciones.          
+Qualified Dublin Core (QDC) no se puede aplicar a las comunidades y colecciones de SEDICI en
+este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el uso de crosswalks QDC o bien DIM o MODS para el procesamiento de las comunidades y colecciones.          
 </message>
 <message key="xmlui.dri2xhtml.METS-1.0.header-qdc-elements">Elementos Dublin Core</message>
 <message key="xmlui.dri2xhtml.METS-1.0.header-qdc-terms">Términos Dublin Core</message>
@@ -2099,7 +2099,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
     
     <message key="xmlui.administrative.CurateForm.title">Tareas de preservación del sistema</message>
     <message key="xmlui.administrative.CurateForm.trail">Tareas de preservación</message>
-    <message key="xmlui.administrative.CurateForm.object_label_name">Handle de objeto de SeDiCI</message>
+    <message key="xmlui.administrative.CurateForm.object_label_name">Handle de objeto de SEDICI</message>
     <message key="xmlui.administrative.CurateForm.object_hint">Nota: Ingrese [prefijo del handle]/0 para aplicar la tarea a través de todo el sitio (tenga en cuenta que no todas las tareas pueden aceptar esto). Pude aplicarse a todo el sitio, a una comunidad o una colección</message>
     <message key="xmlui.administrative.CurateForm.task_label_name">Tarea</message>
     <message key="xmlui.administrative.CurateForm.taskgroup_label_name">Elija de entre los siguientes grupos</message>
@@ -2203,7 +2203,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
      - JavaScript (AJAX) that completes the lookup popup window.
      - So, positional parameters are @1@, @2@, etc.
     -->
- <message key="xmlui.ChoiceLookupTransformer.title">Valor de la búsqueda SeDiCI</message>
+ <message key="xmlui.ChoiceLookupTransformer.title">Valor de la búsqueda SEDICI</message>
 <message key="xmlui.ChoiceLookupTransformer.accept">Aceptar</message>
 <message key="xmlui.ChoiceLookupTransformer.add">Añadir</message>
 <message key="xmlui.ChoiceLookupTransformer.cancel">Cancelar</message>
@@ -2337,8 +2337,8 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.XMLWorkflow.default.CollectionLevelReview.claimaction">Revisión Local</message>
 <message key="xmlui.XMLWorkflow.default.CollectionLevelReview.editaction">Revisión Local</message>
 <message key="xmlui.XMLWorkflow.default.SeDiCILevelReview">Revisión </message>
-<message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.claimaction">Revisión SeDiCI</message>
-<message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.editaction">Revisión SeDiCI</message>
+<message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.claimaction">Revisión SEDICI</message>
+<message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.editaction">Revisión SEDICI</message>
 
 <message key="xmlui.XMLWorkflow.workflow.ClaimAction.info1">Acciones que puedes realizar en esta tarea:</message>
 <message key="xmlui.XMLWorkflow.workflow.ClaimAction.take_help">Asignar esta tarea a uno mismo.</message>
@@ -2526,8 +2526,8 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.selectcollectionaction">Asignación de colección</message>
 
 <message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview">Revisión </message>
-<message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.claimaction">Revisión SeDiCI</message>
-<message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.editaction">Revisión SeDiCI</message>
+<message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.claimaction">Revisión SEDICI</message>
+<message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.editaction">Revisión SEDICI</message>
 <message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.selectcollectionaction">Asignación de colección</message>
 <message key="xmlui.XMLWorkflow.default.CollectionLevelReview.skipadminclaimaction">Revisión Local</message>
 <message key="sedici.Submission.submit.SelectCollection.collection_help">Seleccione la colección en la que se instalará el documento</message>
