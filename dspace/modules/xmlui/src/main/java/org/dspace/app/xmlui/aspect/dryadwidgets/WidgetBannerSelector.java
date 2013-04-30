@@ -12,10 +12,16 @@ import org.apache.avalon.framework.logger.AbstractLogEnabled;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.selection.Selector;
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.identifier.DOIIdentifierProvider;
@@ -25,11 +31,11 @@ import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowItem;
 
 /**
- * This simple selector attempts to resolve a DOI passed in as the pattern.  It
- * returns true if the identifier is found, false if not.
+ * This simple selector checks if a data package exists for a given article DOI.
+ * It returns true if the identifier is found, false if not.
  * Can be used to determine which widget banner to render.
  *
- * The publisher parameter must be provided, but is not recorded.
+ * The publisher parameter must be provided, but is not currently recorded here.
  * 
  * @author Dan Leehr
  */
@@ -54,33 +60,33 @@ public class WidgetBannerSelector extends AbstractLogEnabled implements
                 return false;
             }
 
-            // incoming identifier should be a DOI, try to resolve with DOIIdentifierPRovider
-            DSpaceObject dso = null;
-            DOIIdentifierProvider doiService = new DSpace().getSingletonService(DOIIdentifierProvider.class);
-            try {
-                dso = doiService.resolve(context, expression,  new String[]{});
-            } catch (IdentifierNotFoundException ex) {
-                // ignoring the exception, leaving dso as null
-            } catch (IdentifierNotResolvableException ex) {
-                // ignoring the exception, leave dso as null
+            // incoming identifier will be an Article DOI.  See if we have
+            // a Data package for this article
+
+            String articleDOI = expression;
+            if(articleDOI.startsWith("doi:")) {
+                articleDOI = articleDOI.substring("doi:".length());
             }
 
-            if (dso != null && dso.getType() == Constants.ITEM) {
-                Item item = (Item)dso;
-                // need to check if item is in workflow or workspace
-                WorkflowItem wfi = WorkflowItem.findByItemId(context, item.getID());
-                WorkspaceItem wsi = WorkspaceItem.findByItem(context, item);
+            CommonsHttpSolrServer solrServer;
+            String solrService = ConfigurationManager.getProperty("solr.search.server");
+            solrServer = new CommonsHttpSolrServer(solrService);
+            solrServer.setBaseURL(solrService);
 
-                if(wfi == null && wsi == null) {
-                    // Item is found and not in workspace, return the banner
-                    return true;
-                } else {
-                    // Item is either in the workflow or workspace, do not return the banner
-                    return false;
-                }
-            } else {
+            // Look it up in Solr
+            SolrQuery query = new SolrQuery();
+            query = query.setQuery("dc.relation.isreferencedby:l2 AND DSpaceStatus:Archived AND dc.type.embargo:none AND location.coll:2");
+            QueryResponse response = solrServer.query(query);
+            SolrDocumentList documentList = response.getResults();
+            if(documentList.isEmpty()) {
                 return false;
             }
+            SolrDocument document = documentList.get(0);
+            Object obj = document.get("dc.identifier");
+            obj.toString();
+            return true;
+
+
         }
         catch (Exception e)
         {
