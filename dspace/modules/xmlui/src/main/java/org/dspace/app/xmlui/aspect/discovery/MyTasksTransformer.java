@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import org.dspace.app.xmlui.wing.element.Body;
+import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.content.DCValue;
 import org.xml.sax.SAXException;
 
@@ -147,31 +148,21 @@ public class MyTasksTransformer extends DiscoverySubmissions{
                 DCValue[] identifierValues = item.getMetadata("dc.identifier");
                 String identifier = "";
                 if(identifierValues.length > 0) { identifier = identifierValues[0].value; }
+                Para para = statusDiv.addPara();
+                para.addContent(title);
 
-                StringBuilder paraContent = new StringBuilder();
-                paraContent.append("<p>");
-                paraContent.append(title);
-                paraContent.append(T_with_identifier);
-
-                paraContent.append("<a href=\"");
-                paraContent.append(contextPath);
-                paraContent.append("/internal-item?itemID=");
-                paraContent.append(itemIDString);
-                paraContent.append("\">");
-                paraContent.append(identifier);
-                paraContent.append("</a>");
+                para.addContent(T_with_identifier);
+                para.addXref(contextPath + "/internal-item?itemID=" + itemIDString, identifier);
 
                 if(WorkflowItem.findByItemId(context, itemID) != null) {
-                    paraContent.append(T_workflow_status);
+                    para.addContent(T_workflow_status);
                 } else if(WorkspaceItem.findByItemId(context, itemID) != null) {
-                    paraContent.append(T_workspace_status);
+                    para.addContent(T_workspace_status);
                 } else if (item.isArchived()) {
-                    paraContent.append(T_archived_status);
+                    para.addContent(T_archived_status);
                 } else if(item.isWithdrawn()) {
-                    paraContent.append(T_withdrawn_status);
+                    para.addContent(T_withdrawn_status);
                 }
-                paraContent.append("</p>");
-                statusDiv.addSimpleHTMLFragment(true, paraContent.toString());
             } catch (NumberFormatException nfe) {
 
             }
