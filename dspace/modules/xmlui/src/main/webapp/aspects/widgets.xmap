@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+    <map:components>
+        <map:matchers default="wildcard"/>
+        <map:actions>
+            <map:action name="WidgetBannerAction" src="org.dspace.app.xmlui.aspect.dryadwidgets.WidgetBannerAction"/>
+        </map:actions>
+        <map:selectors>
+            <map:selector name="WidgetBannerSelector" src="org.dspace.app.xmlui.aspect.dryadwidgets.WidgetBannerSelector"/>
+        </map:selectors>
+    </map:components>
+    <map:pipelines>
+        <map:pipeline>
+            <map:match pattern="banner">
+                <map:select type="WidgetBannerSelector">
+                    <map:parameter name="publisher" value="{request-param:publisher}"/>
+                    <map:when test="{request-param:identifier}">
+                        <!-- Return the Dryad banner image -->
+                        <map:read type="image" src="../static/Dryad_web_banner_small_v4e.jpg" mime-type="image/jpeg"/>
+                    </map:when>
+                    <map:otherwise>
+                        <!-- Return 1px transparent gif -->
+                        <map:read type="image" src="../static/Transparent.gif" mime-type="image/gif"/>
+                    </map:otherwise>
+                </map:select>
+            </map:match>
+            <map:match pattern="resource">
+                <!-- this should redirect the user to the resource specified by the identifier -->
+                <map:act type="WidgetBannerAction">
+                    <map:parameter name="publisher" value="{request-param:publisher}"/>
+                    <map:parameter name="identifier" value="{request-param:identifier}"/>
+                    <map:redirect-to uri="/resource/{package}"/>
+                </map:act>
+            </map:match>
+        </map:pipeline>
+    </map:pipelines>
+</map:sitemap>
