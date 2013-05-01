@@ -181,7 +181,7 @@ public class CDLDataCiteService {
         // if test env
         if (ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)) {
             doi = doi.substring(doi.indexOf('/') + 1);
-            doi = "doi:10.5072/" + doi;
+            doi = "doi:10.5072/FK2/" + doi;
         }
         return doi;
     }
