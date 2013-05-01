@@ -3196,6 +3196,13 @@
     <message key="xmlui.Submission.MyTasks.title">My Tasks</message>
     <message key="xmlui.Submission.MyTasks.trail">My Tasks</message>
     <message key="xmlui.Submission.MyTasks.no-results">You currently have no tasks assigned to you.</message>
+    
+    <!-- Messages for showing item status in MyTasks after approving/rejecting -->
+    <message key="xmlui.Submission.MyTasks.with_identifier"> with identifier: </message>
+    <message key="xmlui.Submission.MyTasks.archived_status"> has been moved to the archive.</message>
+    <message key="xmlui.Submission.MyTasks.withdrawn_status"> has been withdrawn.</message>
+    <message key="xmlui.Submission.MyTasks.workflow_status"> is in the workflow.</message>
+    <message key="xmlui.Submission.MyTasks.workspace_status"> has been returned to the workspace.</message>
 
     <message key="xmlui.Submission.result-table.head.title">Title</message>
     <message key="xmlui.Submission.result-table.head.submitter">Submitter</message>

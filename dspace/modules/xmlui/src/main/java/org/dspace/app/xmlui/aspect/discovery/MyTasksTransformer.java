@@ -51,6 +51,16 @@ public class MyTasksTransformer extends DiscoverySubmissions{
         message("xmlui.Submission.MyTasks.trail");
     private static final Message T_no_results =
             message("xmlui.Submission.MyTasks.no-results");
+    private static final Message T_with_identifier =
+            message("xmlui.Submission.MyTasks.with_identifier");
+    private static final Message T_archived_status =
+            message("xmlui.Submission.MyTasks.archived_status");
+    private static final Message T_withdrawn_status =
+            message("xmlui.Submission.MyTasks.withdrawn_status");
+    private static final Message T_workflow_status =
+            message("xmlui.Submission.MyTasks.workflow_status");
+    private static final Message T_workspace_status =
+            message("xmlui.Submission.MyTasks.workspace_status");
 
     @Override
     public void addPageMeta(PageMeta pageMeta) throws WingException, SQLException {
@@ -138,16 +148,10 @@ public class MyTasksTransformer extends DiscoverySubmissions{
                 String identifier = "";
                 if(identifierValues.length > 0) { identifier = identifierValues[0].value; }
 
-                String withIdentifier = " with identifier: ";
-                String archivedStatus = " has been moved to the archive.";
-                String withdrawnStatus = " has been withdrawn.";
-                String workflowStatus = " is in the workflow.";
-                String workspaceStatus = " has been returned to the workspace.";
-
                 StringBuilder paraContent = new StringBuilder();
                 paraContent.append("<p>");
                 paraContent.append(title);
-                paraContent.append(withIdentifier);
+                paraContent.append(T_with_identifier);
 
                 paraContent.append("<a href=\"");
                 paraContent.append(contextPath);
@@ -158,13 +162,13 @@ public class MyTasksTransformer extends DiscoverySubmissions{
                 paraContent.append("</a>");
 
                 if(WorkflowItem.findByItemId(context, itemID) != null) {
-                    paraContent.append(workflowStatus);
+                    paraContent.append(T_workflow_status);
                 } else if(WorkspaceItem.findByItemId(context, itemID) != null) {
-                    paraContent.append(workspaceStatus);
+                    paraContent.append(T_workspace_status);
                 } else if (item.isArchived()) {
-                    paraContent.append(archivedStatus);
+                    paraContent.append(T_archived_status);
                 } else if(item.isWithdrawn()) {
-                    paraContent.append(withdrawnStatus);
+                    paraContent.append(T_withdrawn_status);
                 }
                 paraContent.append("</p>");
                 statusDiv.addSimpleHTMLFragment(true, paraContent.toString());
