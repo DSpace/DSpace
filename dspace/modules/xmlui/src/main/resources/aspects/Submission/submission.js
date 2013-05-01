@@ -63,7 +63,7 @@ importClass(Packages.org.dspace.app.util.SubmissionConfigReader);
 importClass(Packages.org.dspace.app.util.SubmissionInfo);
 
 importClass(Packages.org.dspace.submit.AbstractProcessingStep);
-
+importClass(Packages.org.dspace.content.Collection);
 /**
  *
  * This file has been altered to support the dryad submission
@@ -187,6 +187,29 @@ function doSubmissionOverview()
         sendPageAndWait("submit/overviewStep",{"id":workItemID});
 
         var redirUrl = FlowUtils.processOverviewStep(getDSContext(), cocoon.request, cocoon.response, workItemID);
+        if(redirUrl != null){
+            cocoon.redirectTo(redirUrl,true);
+            cocoon.exit();
+        }
+    }while (true);
+
+}
+
+function doSubmissionCheckout()
+{
+    var workItemID = cocoon.request.get("workspaceID");
+    //Check for a workflow item
+    if(workItemID == null){
+        workItemID = "W" + cocoon.request.get("workflowID");
+    }else
+        workItemID = "S" + workItemID;
+
+
+    do {
+        //Send user to the overviewpage & await further steps.
+        sendPageAndWait("submit/checkout",{"id":workItemID});
+
+        var redirUrl = FlowUtils.processCheckoutStep(getDSContext(), cocoon.request, cocoon.response, workItemID);
         if(redirUrl != null){
             cocoon.redirectTo(redirUrl,true);
             cocoon.exit();
@@ -919,7 +942,39 @@ function doWorkflow()
             cocoon.exit();
         }else if((cocoon.request.get("submit_full_item_info") && !cocoon.request.get("submit_full_item_info").equals("true")) || cocoon.request.get("submit_simple_item_info")){
             //Don't do anything just go back to the start of the loop
-        }else{
+        }
+        else if (cocoon.request.get("skip_payment")||cocoon.request.get("submit_next")!=null)
+        {
+            // enter the reauthorization payment step and exit the workflow
+            var approved = FlowUtils.processReAuthorization(getDSContext(),workflowItemId,action,cocoon.request);
+            var contextPath = cocoon.request.getContextPath();
+            if(approved){
+
+                cocoon.redirectTo(contextPath+"/my-tasks",true);
+            }
+            else
+            {     //has an error when submit the reauthorization form, need to resubmit
+                var collection = Collection.find(getDSContext(),coll.getID());
+                cocoon.redirectTo(contextPath+"/handle/"+collection.getHandle()+"/workflow_new?workflowID="+workflowItemId+"&stepID=reAuthorizationPaymentStep&actionID=reAuthorizationPaymentAction&encountError=true",true);
+
+            }
+            getDSContext().complete();
+            cocoon.exit();
+        }
+        else if (cocoon.request.get("submit-voucher"))
+        {
+            var collection = Collection.find(getDSContext(),coll.getID());
+            cocoon.redirectTo(contextPath+"/handle/"+collection.getHandle()+"/workflow_new?workflowID="+workflowItemId+"&stepID=reAuthorizationPaymentStep&actionID=reAuthorizationPaymentAction",true);
+        }
+        else if (cocoon.request.get("submit_cancel"))
+        {
+            //cancel perform the reauthorizationpaymentaction
+            var contextPath = cocoon.request.getContextPath();
+            cocoon.redirectTo(contextPath+"/my-tasks",true);
+            getDSContext().complete();
+            cocoon.exit();
+        }
+        else{
             try{
                 action = WorkflowManager.doState(getDSContext(), getDSContext().getCurrentUser(), getHttpRequest(), workflowItemId, workflow, action);
             }catch(exception){

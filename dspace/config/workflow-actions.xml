@@ -5,7 +5,7 @@
     xmlns:util="http://www.springframework.org/schema/util"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
-    
+    <bean id="finalPaymentActionAPI" class="org.dspace.workflow.actions.processingaction.FinalPaymentAction"/>
     <bean id="dryadAcceptRejectEditActionAPI" class="org.dspace.workflow.actions.processingaction.EditMetadataAction" scope="prototype"/>
     <bean id="reviewActionAPI" class="org.dspace.workflow.actions.processingaction.DryadReviewAction"/>
     <bean id="pendingDeleteAPI" class="org.dspace.workflow.actions.processingaction.DryadPendingDeleteAction"/>
@@ -17,6 +17,8 @@
     <bean id="pendingPublicationActionAPI" class="org.dspace.workflow.actions.processingaction.PendingPublicationAction" scope="prototype"/>
 
     <bean id="registerPendingPublicationActionAPI" class="org.dspace.workflow.actions.processingaction.RegisterPendingPublicationAction" scope="prototype"/>
+
+    <bean id="reAuthorizationPaymentActionAPI" class="org.dspace.workflow.actions.processingaction.ReAuthorizationPaymentAction" scope="prototype"/>
 
     <bean id="dryadAcceptEditRejectAction" class="org.dspace.workflow.actions.WorkflowActionConfig" scope="prototype">
         <constructor-arg type="java.lang.String" value="dryadAcceptEditRejectAction"/>
@@ -31,8 +33,13 @@
         <property name="processingAction" ref="reviewActionAPI"/>
         <property name="requiresUI" value="true"/>
     </bean>
+    <bean id="finalPaymentAction" class="org.dspace.workflow.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="finalPaymentAction"/>
 
-    
+        <property name="processingAction" ref="finalPaymentActionAPI"/>
+        <property name="requiresUI" value="false"/>
+    </bean>
+
     <bean id="pendingdelete" class="org.dspace.workflow.actions.WorkflowActionConfig" scope="prototype">
         <constructor-arg type="java.lang.String" value="pendingdelete"/>
 
@@ -80,6 +87,13 @@
         <constructor-arg type="java.lang.String" value="claimAction"/>
 
         <property name="processingAction" ref="claimActionAPI"/>
+        <property name="requiresUI" value="true"/>
+    </bean>
+
+    <bean id="reAuthorizationPaymentAction" class="org.dspace.workflow.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="reAuthorizationPaymentAction"/>
+
+        <property name="processingAction" ref="reAuthorizationPaymentActionAPI"/>
         <property name="requiresUI" value="true"/>
     </bean>
 

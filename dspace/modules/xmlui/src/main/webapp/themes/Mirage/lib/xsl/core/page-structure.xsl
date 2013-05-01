@@ -558,10 +558,20 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             </xsl:when>
                             <xsl:otherwise>
                                 <li id="login-item">
-                                    <a href="/login">Login</a>
+                                    <a>
+                                        <xsl:attribute name="href">
+                                             <xsl:value-of select="/dri:document/dri:options/dri:list[@n='account']/dri:item/dri:xref/@target"/>
+                                        </xsl:attribute>
+                                        Login
+                                    </a>
                                 </li>
                                 <li id="sign-up-item">
-                                    <a href="/login">Sign Up</a>
+                                    <a>
+                                        <xsl:attribute name="href">
+                                            <xsl:value-of select="/dri:document/dri:options/dri:list[@n='account']/dri:item/dri:xref/@target"/>
+                                        </xsl:attribute>
+                                        Sign Up
+                                    </a>
                                 </li>
                             </xsl:otherwise>
                         </xsl:choose>
@@ -695,7 +705,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
     -->
     <xsl:template match="dri:body">
         <div id="ds-body">
-            <xsl:if test="not(/dri:document/dri:options/dri:list[@n='discovery'] or /dri:document/dri:options/dri:list[@n='DryadSubmitData'] or /dri:document/dri:options/dri:list[@n='DryadSearch'] or /dri:document/dri:options/dri:list[@n='DryadConnect'])">
+            <xsl:if test="not(/dri:document/dri:options/dri:list[@n='Payment'] or /dri:document/dri:options/dri:list[@n='discovery'] or /dri:document/dri:options/dri:list[@n='DryadSubmitData'] or /dri:document/dri:options/dri:list[@n='DryadSearch'] or /dri:document/dri:options/dri:list[@n='DryadConnect'])">
                 <xsl:attribute name="style">
                     <xsl:text>width:100%</xsl:text>
                 </xsl:attribute>

@@ -1,0 +1,21 @@
+# Approved email message
+#
+# {0}  Title of submission
+# {1}  Name of collection
+# {2}   Link to 'My DSpace' page
+# {3}   Name of the admin
+#
+Subject: DSpace: Payment Rejected
+
+You submitted: {0}
+
+To collection: {1}
+
+Your payment has been approved
+# by {3}
+
+Your credit card will be charged.
+You can access it from your
+"My DSpace" page: {2}
+
+DSpace

@@ -3058,6 +3058,8 @@
     <message key="xmlui.DryadItemSummary.in_workflow">Unpublished data -- the associated article is in review </message>
     <message key="xmlui.DryadItemSummary.notCurrentVersion">This is not the most current version of this Item</message>
     <message key="xmlui.DryadItemSummary.mostCurrentVersion">&#160;&#160;[View current version]</message>
+    <message key="xmlui.DryadItemSummary.charge">Payment Charge</message>
+    <message key="xmlui.DryadItemSummary.transactionId">Transaction Id</message>
 
     <message key="xmlui.ItemViewer.versionInSubmission">You have a version of this item in your Submission Queue</message>
     <message key="xmlui.ItemViewer.goToSubmissionPage">&#160;&#160;[go to submission overview]</message>
@@ -3324,7 +3326,74 @@
     <message key="xmlui.statistics.view.title">Most Viewed Items</message>
     <message key="xmlui.statistics.view.count">Number of Views</message>
     <message key="xmlui.statistics.most.viewed.items">Most Viewed Items</message>
-
+    
     <!--Most Downloaded Bitstreams -->
     <message key="xmlui.statistics.download.title">Most Downloaded Bitstreams</message>
+
+    <!--payment system-->
+    <message key="xmlui.PaymentSystem.shoppingcart.order.header">Order Summary</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.payer">Payer</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.price">Price</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.surcharge">Large File Surcharge</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.noIntegrateFee">No Integrate Fee</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.country">Country Based Fee Waiver</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.total">Your Total</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.voucher">Voucher code</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.apply">Apply</message>
+
+    <message key="xmlui.Submission.Submissions.step.head.reAuthorizationPaymentStep_claimed">Reauthorize payment : claimed</message>
+    <message key="xmlui.Submission.Submissions.step.head.reAuthorizationPaymentStep_pool">Reauthorize payment : Unclaimed</message>
+    <message key="xmlui.administrative.Navigation.administrative_access_shoppingcart">Shopping Cart</message>
+
+    <message key="xmlui.property.ManageShoppingcartMain.title">Manage Shopping Cart</message>
+    <message key="xmlui.property.ManageShoppingcartMain.main_head">Shopping Cart management</message>
+    <message key="xmlui.property.ManageShoppingcartMain.actions_head">Actions</message>
+    <message key="xmlui.property.ManageShoppingcartMain.actions_create">Create a new Shopping Cart</message>
+    <message key="xmlui.property.ManageShoppingcartMain.actions_create_link">Click here to add a new Shopping Cart.</message>
+    <message key="xmlui.property.ManageShoppingcartMain.actions_browse">Browse Shopping Cart</message>
+    <message key="xmlui.property.ManageShoppingcartMain.actions_browse_link">Click here to browse all Shopping carts.</message>
+    <message key="xmlui.property.ManageShoppingcartMain.actions_search">Search for Shopping Cart By key word</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_help">Shopping carts are searched by any partial match on status or transaction id</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_para1">Below is the list of Shopping Cart that matched your search query. Click on an Shopping Cart's name or value to edit them.</message>
+
+    <message key="xmlui.property.ManageShoppingcartMain.search_head">Search results</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column1"></message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column2">ID</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column3">Item title</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column4">Depositor</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column5">Voucher</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column6">Secure Token</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column7">Transaction Id</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column8">Status</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column9">Currency</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column10">Total</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column11">Status</message>
+
+    <message key="xmlui.Shoppingcart.EditProfile.name">Item title</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name1">Depositor</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name2">Voucher</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name3">Secure Token</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name4">Transaction Id</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name5">Status</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name6">Currency</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name7">Total</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name8">Country</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name9">Resource Item</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name10">Resource Item</message>
+
+
+    <message key="xmlui.administrative.Navigation.administrative_shoppingcart">Manage Shopping Cart</message>
+
+    <message key="xmlui.property.ManageShoppingcart.search_head">Search Results</message>
+    <message key="xmlui.property.ManageShoppingcartin.actions_head">Manage Shopping Cart</message>
+    <message key="xmlui.property.EditShoppingcartForm.head2">Shopping Cart values</message>
+
+    <message key="xmlui.property.EditShoppingcartForm.head1">Edit Shopping Cart</message>
+
+    <message key="xmlui.property.ManageShoppingcartin.main_head">Manage Shopping Cart</message>
+    <message key="xmlui.property.ManageShoppingcartin.actions_search">Search</message>
+    <message key="xmlui.property.ManageShoppingcartMain.no_results">No result</message>
+
+
+
 </catalogue>

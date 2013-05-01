@@ -325,6 +325,8 @@ function initFirstSubmissionForm() {
                 else {
                     jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").show();
                     jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
+                    //update the order form after enter journal name
+                    updateOrder();
                 }
             }
             enableNextButton();

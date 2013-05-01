@@ -1,0 +1,25 @@
+# Rejection email message
+#
+# {0}  Title of submission
+# {1}  Name of collection
+# {2}  Reason for the rejection
+# {3}   Link to 'My DSpace' page
+# {4}   Name of the rejector
+#
+Subject: DSpace: Payment Rejected
+
+You submitted: {0}
+
+To collection: {1}
+
+Your payment authorization has expired
+#been expired by {4}
+with the following explanation:
+
+{2}
+
+Your submission has not been deleted and need resubmit the payment information.
+You can access it from your
+"My DSpace" page: {3}
+
+DSpace
