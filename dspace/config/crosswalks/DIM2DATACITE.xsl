@@ -125,14 +125,6 @@
         </alternateIdentifiers>
       </xsl:if>
 
-      <!-- *********** Description - Only for data files********* -->
-	    <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
-	        <description descriptionType="">
-              <xsl:value-of select="dspace:field[@element='description']"/>
-	        </description>
-      </xsl:if>
-
-
 	    <!-- *********** Related Identifiers ********* -->
       <xsl:if test="dspace:field[@element='relation']">
 	      <relatedIdentifiers>
@@ -225,6 +217,15 @@
           <rights>
             <xsl:text>http://creativecommons.org/publicdomain/zero/1.0/</xsl:text>
           </rights>
+      </xsl:if>
+
+      <!-- *********** Description - Only for data files********* -->
+	    <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
+	      <descriptions>
+	        <description descriptionType="">
+              <xsl:value-of select="dspace:field[@element='description']"/>
+	        </description>
+	      </descriptions>
       </xsl:if>
     </resource>
   </xsl:template>
