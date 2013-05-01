@@ -311,7 +311,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
     private Map<String, String> createListMetadata(Item item){
         Map<String, String> metadata = new HashMap<String, String>();
-        CDLDataCiteService.createMetadataList(item);
+        metadata.putAll(CDLDataCiteService.createMetadataList(item));
         return metadata;
     }
 
