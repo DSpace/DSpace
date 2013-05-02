@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (C) 2011 SeDiCI <info@sedici.unlp.edu.ar> Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+
+	<map:components>
+		<map:readers>
+			<map:reader name="ConcatenationReader"
+				src="org.dspace.app.xmlui.cocoon.ConcatenationReader" />
+		</map:readers>
+
+		<map:transformers>
+			<map:transformer name="i18n"
+				src="org.dspace.app.xmlui.cocoon.DSpaceI18NTransformer">
+				<catalogues default="default">
+					<catalogue id="default" name="messages" aspects="true">
+						<location>context://i18n/</location>
+						<!-- Two locations for each installed aspect will be installed, one 
+							inside the aspect's directory and another inside the base location listed 
+							above -->
+					</catalogue>
+				</catalogues>
+				<untranslated-text>untranslated</untranslated-text>
+				<cache-at-startup>true</cache-at-startup>
+			</map:transformer>
+
+		</map:transformers>
+
+		<map:actions>
+			<map:action name="DspacePropertyAction"
+				src="ar.edu.unlp.sedici.xmlui.actions.DpsacePropertyAction" />
+				
+			<map:action name="ExceptionAction"
+				src="ar.edu.unlp.sedici.aspect.redirect.ExceptionAction" />
+			<map:action name="LoginRedirect" src="org.dspace.app.xmlui.aspect.eperson.LoginRedirect" />
+		</map:actions>
+
+		<map:selectors>
+			<map:selector name="ConfigurationParameterSelector"
+				src="ar.edu.unlp.sedici.aspect.redirect.ConfigurationParameterSelector" />
+			<map:selector logger="sitemap.selector.exception" name="exceptionSedici" src="org.apache.cocoon.selection.ExceptionSelector">
+								<exception name="bad-request" class="ar.edu.unlp.sedici.xmlui.exception.BadRequestException"/>
+                                <exception name="not-found" class="org.apache.cocoon.ResourceNotFoundException"/>
+                                <exception name="authorize-exception" class="org.dspace.authorize.AuthorizeException"/>
+                                <exception name="file-not-found-exception" class="java.io.FileNotFoundException"/>
+                                <exception name="invalid-continuation" class="org.apache.cocoon.components.flow.InvalidContinuationException"/>
+                                <!-- The statement below tells the selector to unroll as much exceptions as possible -->
+                                <exception class="java.lang.Throwable" unroll="true"/>
+            </map:selector>
+		</map:selectors>
+	</map:components>
+
+	<map:pipelines>
+
+		<!-- Define global theme variables that are used later in this sitemap. 
+			Two variables are typically defined here, the theme's path and name. The 
+			path is the directory name where this theme is located, such as "Reference" 
+			for the reference theme. The theme's name is used only for descriptive purposes 
+			to describe the theme. -->
+		<map:component-configurations>
+			<global-variables>
+				<theme-path>Sedici</theme-path>
+				<theme-name>Sedici</theme-name>
+			</global-variables>
+		</map:component-configurations>
+
+
+		<map:pipeline>
+			<!-- Allow the browser to cache static content for an hour -->
+			<map:parameter name="expires" value="access plus 1 hours" />
+
+
+			<!-- handle static js and css -->
+			<map:match pattern="themes/*/**.js">
+				<map:read type="ConcatenationReader" src="{2}.js">
+					<map:parameter name="requestQueryString" value="{request:queryString}" />
+				</map:read>
+			</map:match>
+			<map:match pattern="themes/*/**.css">
+				<map:read type="ConcatenationReader" src="{2}.css">
+					<map:parameter name="requestQueryString" value="{request:queryString}" />
+				</map:read>
+			</map:match>
+			<map:match pattern="themes/*/**.json">
+				<map:read type="ConcatenationReader" src="{2}.json">
+					<map:parameter name="requestQueryString" value="{request:queryString}" />
+				</map:read>
+			</map:match>
+
+			<!-- Static content -->
+			<map:match pattern="themes/*/**">
+				<map:read src="{2}" />
+			</map:match>
+		</map:pipeline>
+
+		<!-- The theme's pipeline is used to process all requests handled by the 
+			theme. It is broken up into two parts, the first part handles all static 
+			theme content while the second part handle all dynamic aspect generated content. 
+			The static content is such things as stylesheets, images, or static pages. 
+			Typically these are just stored on disk and passed directly to the browser 
+			without any processing. -->
+		<map:pipeline>
+			<!-- Never allow the browser to cache dynamic content -->
+			<map:parameter name="expires" value="now" />
+
+			<!-- Aspect content There are five steps to processing aspect content: 
+				1: Generate the DRI page The first step is to generate a DRI page for the 
+				request; this is handled by the aspect chain. Once it is generated it is 
+				the beginning of a theme's pipeline, the DRI page is ultimately transformed 
+				in the resulting XHTML that is given to the user's browser. 2: Add page metadata 
+				The next step is to add theme specific metadata to the DRI page. This is 
+				metadata about where the theme is located and its name. Typically this metadata 
+				is different depending on the users browser, this allows us to give different 
+				stylesheets to Internet Explorer than for other browsers. 3: Transform to 
+				XHTML The third step is the main component of a theme the XSL transformations 
+				will turn the DRI page from the aspects into an XHTML page useable by browsers. 
+				4: Localize the page The second to last step is to localize the content for 
+				the particular user, if they user is requesting a page in a particular language 
+				then those language strings are inserted into the resulting XHTML. 5: Serialize 
+				to the browser The last step sends the page to the user's browser. -->
+			<map:match pattern="**">
+
+				<!-- Step 1: Generate the DRI page -->
+				<map:generate type="file" src="cocoon://DRI/{1}" />
+
+				<!-- Step 2 Add page metadata -->
+
+				<!--3 different IncludePageMeta transformers to ensure that the stylesheets 
+					end up in the correct order -->
+				<map:transform type="IncludePageMeta">
+					<map:parameter name="stylesheet.screen#1" value="lib/css/reset.css" />
+					<map:parameter name="stylesheet.screen#2" value="lib/css/base.css" />
+					<map:parameter name="stylesheet.screen#3" value="lib/css/helper.css" />
+					<map:parameter name="stylesheet.screen#4"
+						value="lib/css/jquery-ui-1.8.15.custom.css" />
+					<map:parameter name="stylesheet.screen#5" value="lib/css/style.css" />
+					<map:parameter name="stylesheet.screen#6" value="lib/css/authority-control.css" />
+				</map:transform>
+
+				<map:transform type="IncludePageMeta">
+					<map:parameter name="stylesheet.handheld" value="lib/css/handheld.css" />
+					<map:parameter name="stylesheet.print" value="lib/css/print.css" />
+				</map:transform>
+
+
+				<map:match pattern='community-list'>
+					<map:transform type="IncludePageMeta">
+						<map:parameter name="stylesheet.all" value="lib/css/media.css" />
+						<map:parameter name="javascript#1" value="lib/js/menu-desplegable.js" />
+						<map:parameter name="javascript#2"
+							value="lib/js/jquery-ui-1.8.15.custom.min.js" />
+						<map:parameter name="theme.path" value="{global:theme-path}" />
+						<map:parameter name="theme.name" value="{global:theme-name}" />
+					</map:transform>
+				</map:match>
+
+				<map:match pattern=''>
+					<map:transform type="IncludePageMeta">
+						<map:parameter name="stylesheet" value="lib/css/slideshow-sedici.css" />
+						<map:parameter name="stylesheet.all" value="lib/css/media.css" />
+						<map:parameter name="javascript#1" value="lib/js/slideshow-sedici.js" />
+						<map:parameter name="javascript#2"
+							value="lib/js/jquery-ui-1.8.15.custom.min.js" />
+						<map:parameter name="theme.path" value="{global:theme-path}" />
+						<map:parameter name="theme.name" value="{global:theme-name}" />
+					</map:transform>
+				</map:match>
+
+				<map:transform type="IncludePageMeta">
+					<map:parameter name="stylesheet.all" value="lib/css/media.css" />
+					<map:parameter name="javascript"
+						value="lib/js/jquery-ui-1.8.15.custom.min.js" />
+					<map:parameter name="theme.path" value="{global:theme-path}" />
+					<map:parameter name="theme.name" value="{global:theme-name}" />
+				</map:transform>
+
+
+
+				<!-- Debuging output -->
+				<map:match type="request" pattern="XML">
+					<map:serialize type="xml" />
+				</map:match>
+
+				<!-- Step 3: Transform to XHTML -->
+				<map:select type="parameter">
+					<map:parameter name="parameter-selector-test" value="{1}" />
+					<map:when test="">
+						<map:transform src="Home.xsl" />
+					</map:when>
+					<map:otherwise>
+						<map:transform src="{global:theme-name}.xsl" />
+					</map:otherwise>
+				</map:select>
+
+				<!-- Step 4: Localize the page -->
+				<map:act type="locale">
+					<map:transform type="i18n">
+						<map:parameter name="locale" value="{locale}" />
+					</map:transform>
+				</map:act>
+
+				<!-- Step 5: Serialize to the browser -->
+				<map:serialize type="xhtml" />
+
+			</map:match>
+		</map:pipeline>
+
+
+		<map:handle-errors>
+			<map:act type="DspacePropertyAction" >
+				<map:parameter name="module" value="sedici-dspace" />
+				<map:parameter name="property" value="xmlui.debug" />
+				<map:parameter name="alias" value="xmlui_debug" />
+					
+	
+				<map:generate type="exception" />
+				
+				<map:select type="exceptionSedici">
+					<map:when test="bad-request">
+						<!--  Error 400/Bad Request -->
+						<map:transform src="exception2html.xslt">
+							<map:parameter name="contextPath" value="{request:contextPath}" />
+							<map:parameter name="printDebug" value="{xmlui_debug}" />
+							<map:parameter name="errorKind" value="badRequest" />
+							<map:parameter name="requestQueryString" value="{request:queryString}"/>
+						</map:transform>
+						<map:act type="locale">
+							<map:transform type="i18n">
+								<map:parameter name="locale" value="{locale}" />
+							</map:transform>
+						</map:act>
+						<map:serialize type="xhtml" status-code="400" />
+					</map:when>
+					
+					<map:when test="not-found">
+						<!--  Error 404/Resource not found -->
+						<map:transform src="exception2html.xslt">
+							<map:parameter name="contextPath" value="{request:contextPath}" />
+							<map:parameter name="printDebug" value="{xmlui_debug}" />
+							<map:parameter name="errorKind" value="resourceNotFound" />
+							<map:parameter name="requestQueryString" value="{request:queryString}"/>
+						</map:transform>
+						<map:act type="locale">
+							<map:transform type="i18n">
+								<map:parameter name="locale" value="{locale}" />
+							</map:transform>
+						</map:act>
+						<map:serialize type="xhtml" status-code="404" />
+					</map:when>
+					
+					<map:when test="invalid-continuation">
+						<!--  Error 404/invalidContinuation -->
+						<map:transform src="exception2html.xslt">
+							<map:parameter name="contextPath" value="{request:contextPath}" />
+							<map:parameter name="printDebug" value="{xmlui_debug}" />
+							<map:parameter name="errorKind" value="invalidContinuation" />
+						</map:transform>
+						<map:act type="locale">
+							<map:transform type="i18n">
+								<map:parameter name="locale" value="{locale}" />
+							</map:transform>
+						</map:act>
+						<map:serialize type="xhtml" status-code="404" />
+					</map:when>
+					
+					<map:when test="authorize-exception">
+						<map:transform src="exception2html.xslt">
+							<map:parameter name="contextPath" value="{request:contextPath}" />
+							<map:parameter name="printDebug" value="{xmlui_debug}" />
+							<map:parameter name="errorKind" value="notAuthorize" />
+							<map:parameter name="requestQueryString" value="{request:queryString}"/>
+						</map:transform>
+						<map:act type="locale">
+							<map:transform type="i18n">
+								<map:parameter name="locale" value="{locale}" />
+							</map:transform>
+						</map:act>
+						<map:serialize type="xhtml" status-code="404" />
+					</map:when>
+					
+					<map:when test="file-not-found-exception">
+					<!--  Error 404/Resource not found -->
+						<map:transform src="exception2html.xslt">
+							<map:parameter name="contextPath" value="{request:contextPath}" />
+							<map:parameter name="printDebug" value="{xmlui_debug}" />
+							<map:parameter name="errorKind" value="resourceNotFound" />
+							<map:parameter name="requestQueryString" value="{request:queryString}"/>
+						</map:transform>
+						<map:act type="locale">
+							<map:transform type="i18n">
+								<map:parameter name="locale" value="{locale}" />
+							</map:transform>
+						</map:act>
+						<map:serialize type="xhtml" status-code="404" />
+	                </map:when>
+					<map:otherwise>
+						<!--  Error 5xx -->
+						<map:act type="ExceptionAction" />
+						
+						<map:transform src="exception2html.xslt">
+							<map:parameter name="contextPath" value="{request:contextPath}" />
+							<map:parameter name="printDebug" value="{xmlui_debug}" />
+							<map:parameter name="errorKind" value="internalError" />
+						</map:transform>
+						
+						<map:act type="locale">
+							<map:transform type="i18n">
+								<map:parameter name="locale" value="{locale}" />
+							</map:transform>
+						</map:act>
+						<map:serialize type="xhtml" status-code="500" />
+					</map:otherwise>
+				</map:select>
+
+			</map:act>
+		</map:handle-errors>
+	</map:pipelines>
+</map:sitemap>
