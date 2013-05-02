@@ -11,10 +11,10 @@
     </map:components>
     <map:pipelines>
         <map:pipeline>
-            <map:match pattern="banner">
+            <map:match pattern="bannerForPub">
                 <map:select type="WidgetBannerSelector">
-                    <map:parameter name="publisher" value="{request-param:publisher}"/>
-                    <map:when test="{request-param:identifier}">
+                    <map:parameter name="referrer" value="{request-param:referrer}"/>
+                    <map:when test="{request-param:pubId}">
                         <!-- Return the Dryad banner image -->
                         <map:read type="image" src="../static/Dryad_web_banner_small_v4e.jpg" mime-type="image/jpeg"/>
                     </map:when>
@@ -24,11 +24,11 @@
                     </map:otherwise>
                 </map:select>
             </map:match>
-            <map:match pattern="resource">
+            <map:match pattern="dataPackageForPub">
                 <!-- this should redirect the user to the resource specified by the identifier -->
                 <map:act type="WidgetBannerAction">
-                    <map:parameter name="publisher" value="{request-param:publisher}"/>
-                    <map:parameter name="identifier" value="{request-param:identifier}"/>
+                    <map:parameter name="referrer" value="{request-param:referrer}"/>
+                    <map:parameter name="pubId" value="{request-param:pubId}"/>
                     <map:redirect-to uri="/resource/{package}"/>
                 </map:act>
             </map:match>
