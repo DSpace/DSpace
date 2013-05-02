@@ -25,24 +25,29 @@ import org.dspace.core.Context;
  */
 public class WidgetBannerLookup extends AbstractLogEnabled {
     private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(WidgetBannerLookup.class);
+    private final static String DOI_HTTP_PREFIX = "http://dx.doi.org/";
 
-    public String lookup(String articleDOI, String publisher, Map objectModel) throws SQLException {
+    public String lookup(String pubId, String referrer, Map objectModel) throws SQLException {
 
             Context context = ContextUtil.obtainContext(objectModel);
-            if(publisher == null || publisher.length() == 0) {
+            if(referrer == null || referrer.length() == 0) {
                 return null;
             }
-            if(articleDOI == null || articleDOI.length() == 0) {
+            if(pubId == null || pubId.length() == 0) {
                 return null;
             }
 
-            // Incoming identifier will be an Article DOI.  See if we have
+            // Incoming pubId should identify a publication/article.  See if we have
             // a data package that references this article
-            // The data package will be
-
-            if(!articleDOI.startsWith("doi:")) {
-                articleDOI = "doi:" + articleDOI;
+            String pubDoi = null;
+            if(pubId.toLowerCase().startsWith(DOI_HTTP_PREFIX)) {
+                pubDoi = "doi:" + pubId.substring(DOI_HTTP_PREFIX.length());
+            } else if(!pubId.toLowerCase().startsWith("doi:")) {
+                pubDoi = "doi:" + pubId;
+            } else {
+                pubDoi = pubId;
             }
+            
             try {
                 CommonsHttpSolrServer solrServer;
                 String solrService = ConfigurationManager.getProperty("solr.search.server");
@@ -51,7 +56,7 @@ public class WidgetBannerLookup extends AbstractLogEnabled {
 
                 // Look it up in Solr
                 SolrQuery query = new SolrQuery();
-                query.setQuery("dc.relation.isreferencedby:\"" + articleDOI + "\" AND DSpaceStatus:Archived AND dc.type.embargo:none AND location.coll:2");
+                query.setQuery("dc.relation.isreferencedby:\"" + pubDoi + "\" AND DSpaceStatus:Archived AND dc.type.embargo:none AND location.coll:2");
 
                 QueryResponse response = solrServer.query(query);
                 SolrDocumentList documentList = response.getResults();

@@ -25,11 +25,11 @@ public class WidgetBannerAction extends WidgetBannerLookup implements Action {
 
     @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel, String source, Parameters parameters) throws Exception {
-            String publisher = parameters.getParameter("publisher","");
-            String articleDOI = parameters.getParameter("identifier","");
+            String referrer = parameters.getParameter("referrer","");
+            String pubId = parameters.getParameter("pubId","");
             String packageDOI = null;
         try {
-            packageDOI = lookup(articleDOI, publisher, objectModel);
+            packageDOI = lookup(pubId, referrer, objectModel);
         } catch (SQLException ex) {
             log.error("Error looking up article DOI:", ex);
         }
