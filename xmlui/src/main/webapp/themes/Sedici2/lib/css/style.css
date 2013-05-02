@@ -88,19 +88,12 @@ select.multiple {
 }
 
 #ds-header-wrapper {
-    background-color: #b0d4ef;
-    color: white;
-    min-width: 950px;
-	background-image:url(../../images/marca_head4.png);
-	height:110px;
-	background-repeat:no-repeat;
-	background-position: -750px -41px;
-/*	border-bottom: 10px solid #144961;*/
+	height:157px;
+	background-image:url(../../images/background_header.png);
+	background-repeat: no-repeat;
 }
 
 #ds-header-wrapper #ds-header {
-position:absolute;
-left:120px;
 }
 
 #ds-header-logo-link {
@@ -110,15 +103,18 @@ left:120px;
 
 #ds-header-logo {
     float:left;
-    width: 559px;
-    height: 77px;
-    margin-top: 20px;
+    width: 211px;
+    height: 67px;
+    margin-top: 50px;
+    margin-left: 30px;
     background-image:url(../../images/sedici_logo.png);
     background-repeat: no-repeat;
     background-color: transparent;
-    margin-right: 15px;
-	position:relative;
-	left:-50px;
+}
+
+#unlp_logo {
+	float: right;
+	margin-top: 8px;
 }
 
 #ds-header-logo-text {
@@ -130,14 +126,6 @@ left:120px;
     float: left;
 	display:none;
 }
-
-
-#ds-user-box a {
-    color: #08597c;
-	text-decoration:none;
-}
-
-
 
 #ds-trail-wrapper {
 /*    background-color: #ebf8ff;*/
@@ -196,7 +184,7 @@ font-weight:bold;
 #ds-header,
 #ds-footer,
 #ds-content {
-    width: 970px;
+    width: 1350px;
     margin: auto;
     position: relative;
 }
@@ -212,10 +200,71 @@ font-weight:bold;
 }
 
 #ds-content-wrapper {
-background-image:url(../../images/marca_head3.png);
-background-position: -750px -215px;
-background-repeat: no-repeat;
 }
+
+#ds-left-section {
+	float: left;
+	width: 250px;
+	display: inline-block;
+	color: #4D4C4C;
+	padding-top: 70px;
+	padding-left: 20px;
+	padding-right: 20px;
+	background-color: #E4F2F9;
+}
+
+#ds-body {
+    width: 750px;
+	display: inline-block;
+	float: left;
+	margin-left: 30px;
+	margin-right: 30px;
+}
+
+#ds-right-section {
+	width: 250px;
+	display: inline-block;
+	float: right;
+}
+
+#ds-left-section h2 {
+	color: #3599C4;
+	border-bottom: solid 1px #9AD5F1;
+	font-size: 20px;
+	font-weight: normal;
+	padding-bottom: 5px;
+	margin-bottom: 5px;
+}
+
+#ds-left-section p {
+	font-size: 14px;
+}
+
+#home_search span.resource_count {
+	color: #F49717;
+	font-weight: bold;
+}
+
+#home_search input.ds-text-field {
+	width: 192px;
+	border-radius: 7px 0px 0px 7px;
+}
+#home_search input.ds-button-field {
+	color: #FFFFFF;
+	background-image: none;
+	background-color: #3F7A9F;
+	height: 31px;
+	border: 0px;
+	border-radius: 0px 7px 7px 0px;
+	margin-left: -4px;
+	padding: 0px;
+	width: 43px;
+}
+#home_autoarchivo div {
+	margin-top: 20px;
+	text-align: center;
+}
+
 
 .ie6 #ds-trail,
 .ie6 #ds-header,
@@ -275,13 +324,6 @@ background-repeat: no-repeat;
     visibility: hidden;
 }
 
-
-#ds-body {
-    float: left;
-    width: 675px;
-    padding-top: 10px;
-min-height: 400px;	
-}
 
 #ds-options-wrapper {
     float: right;
@@ -1737,23 +1779,19 @@ div.primary > ul > li > ul > li.community > div.artifact-description a {
 }
 
 
-div
 /*Menu*/
 
 #topNav { 
 	display:block; 
-/*	position:absolute; */
-	top:110px;
-	font: 13px Tahoma, Sans-serif; 
-	left: -30px;
-	background-image:url(../../images/marca_head4.png);
-	background-position:-750px -150px;
-/*	background-repeat:repeat-x;*/
+	font: 13px Tahoma, Sans-serif;
+	margin-top: -30px;
+	margin-left: 322px;
 }
 #topNav ul { 
 	padding:0; 
-	margin:0; 
-	}
+	margin:0;
+	background: #FFFFFF;
+}
 #topNav li { 
 	position:relative; 
 	float:left; 
@@ -1766,20 +1804,18 @@ div
 	clear:both; 
 	visibility:hidden; 
 }
-#topNav li a { 
+#topNav li a {
 	display:block; 
 	padding:7px 20px; 
 	color: black; /*#256e92; */
 	text-decoration:none; 
 	font-family:Arial, Helvetica, sans-serif;
 	font-size:14px;
- text-shadow:  white 1px 1px;
+	text-shadow:  white 1px 1px;
 }
-
 #topNav li a:focus { 
 	outline: none; 
 	text-decoration: none; 
-	
 }
 #topNav ul ul { 
 	display:none; 
@@ -1787,60 +1823,35 @@ div
 	position:absolute; 
 	left:0; 
 	background:#000000;
+	border: solid 1px #B8D9F2;
 }
 #topNav ul ul li { 
-	float:none; 
-
+	float:none;
 }
 
 #topNav ul ul a { 
 	background-color:#effaff; 
-
-
 }
 
 #topNav ul ul a:hover { 
-/*	background-color:#64a7cd; */
-/*	background-image:url(../../images/topnavhover.png);
-	background-repeat:repeat-x;*/
-	background-color: white; /*#d8f3ff;*/
-	
-
-	
+	background-color: #B8D9F2;
 }
 #topNav > ul {
 	padding: 0px; 
-/*	background-color: #000000;*/
 	position:relative;
-	left:40px;
-/*	background-image:url(../../images/fondo_topnav.png);*/
+/* 	left:40px; */
 	background-repeat:repeat-x;
 }
-
-
-
 #topNav a:visited {
-/*color:#256e92;*/
-
-
 }
-
 #topNav li a:hover {
-;
-	
 }
-
 #topNav ul {
 	z-index: 999;
 } 
 #topNav ul li:hover {
 	background-color:#f6fcff;
-
-	}
-/*	background-color:#346b8a;/*
-
 }
-
 
 /* Busqueda */
 /*Sort*/
@@ -1859,31 +1870,12 @@ border-radius:5px;
 
 /*login*/
 
-
 #ds-user-box {
-width:200px;
-padding:10px;
-/*border:1px dashed white;*/
-border-top:1px solid #D4EEFA;
-border-left:1px solid #D4EEFA;
-border-bottom:1px solid #1072a0;
-border-right:1px solid #1072a0;
-color:#1b86b4;
-    right: 100px;
-    top: 10px;
-    position: absolute;
-	text-align:center;
-    -webkit-border-radius: 5px;
--moz-border-radius: 5px;
-border-radius: 5px;
-background-image:url(../../images/fondo_usuario3.png);
-/*background-position:-108px -13px;*/
-/*background-image:url(../../images/fondo_login.png);*/
--moz-box-shadow: 2px 2px 10px;
--webkit-box-shadow: 2px 2px 10px;
-box-shadow: 2px 2px 10px;
+    color: #08597c;
+	padding: 10px;
+	border: 1px solid #D4EEFA;
+	border-radius: 3px;
 }
-
 
 #ds-user-box h1{
 font-size:12px;
@@ -2854,26 +2846,22 @@ font-size:12px;
 }
 
 
-#home_search h1.ds-div-head,
-#home_info h1.ds-div-head {
-display:none;
-}
-
-#home_search p.ds-paragraph{
-padding-top:5.intro-text
-px;
-margin:0px;
-font-family:trebuchet, Helvetica, sans-serif;
-}
-
 #home_info p.ds-paragraph{
-padding:0px;
-margin:0px;
-line-height:1.5;
-text-align:justify;
-position:relative;
-bottom:25px;
-} 
+	font-size: 12px;
+	padding: 13px 0px;
+	line-height: 1.5;
+	text-align: justify;
+	color: #478CB7;
+	border-top: solid 1px #B8D9F2;
+	border-bottom: solid 1px #B8D9F2;
+	margin: 0px;
+}
+#home_info {
+	margin: 20px 0px;
+	padding-left: 110px;
+	background: url(../../images/logo_s.png) no-repeat center left;
+	height: 81px;
+}
 
 #footer {
 	font-family: "Trebuchet MS", sans-serif;
@@ -3215,7 +3203,6 @@ background-position:center top;
 
 
 #home_slideshow {
-height:310px;
 }
 
 #aspect_submission_StepTransformer_div_submit-upload table {
@@ -3246,21 +3233,16 @@ table.detailtable td:nth-child(2){
 #home_main_communities {
 	margin-bottom: 30px;
 }
+
 h1.communities_header {
-	color:grey;
-	font-size:16px;
-	margin-bottom: 20px;
-	border-bottom:1px dashed #dedede;
+	color: #FFFFFF;
+	font-size:12px;
+	background-color: #478CB7;
+	padding: 4px 5px 3px 10px;
+	font-weight: normal;
 }
 .community_icon_container {
-	float: left;
-	height: 106px;
-	text-align:center;
-	width: 155px;
-	margin-right: 30px;
-}
-.community_icon_container img {
-	max-width: 150px;
+	margin-bottom: 10px;
 }
 .community_icon_container a:hover, .community_icon_container a:hover p {
 	background-color: #e3f1f9;
@@ -3273,19 +3255,41 @@ h1.communities_header {
 	color:#e79011;
 	font-size:12px;
 	font-weight:regular;
-	padding: 10px 0px;
+	padding: 5px 5px 5px 95px;
 	display: block;
-	border-radius: 10px;
-	min-height: 150px;
+	background-repeat: no-repeat;
+	background-position: left center;
+	min-height: 60px;
 }
 .community_icon_container h2 {
 	font-size: 14px;
-	margin-bottom: 10px;
 }
 .community_icon_container p {
-	max-width: 150px;
 	color: #a4a4a4;
+	margin: 0px;
 }
+#icono_tesis a {
+	background-image: url(../../images/icono_tesis.png);
+}
+#icono_revistas a {
+	background-image: url(../../images/icono_revistas.png);
+}
+#icono_eventos a {
+	background-image: url(../../images/icono_eventos.png);
+}
+#icono_libros a {
+	background-image: url(../../images/icono_libros.png);
+}
+#icono_redunci a {
+	background-image: url(../../images/icono_redunci.png);
+}
+#icono_radio a {
+	background-image: url(../../images/icono_radio.png);
+}
+#icono_ehidrica a {
+	background-image: url(../../images/icono_ehidrica.png);
+}
+
 
 .community_icon_row {
   clear: both;

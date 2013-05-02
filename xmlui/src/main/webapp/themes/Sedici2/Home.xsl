@@ -34,33 +34,81 @@
 	xmlns="http://www.w3.org/1999/xhtml"
 	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
 
-
     <xsl:import href="Sedici.xsl"/>
+
+    <xsl:output indent="yes"/>
+
     <xsl:include href="slideshow/slideshow.xsl"/>
     
 	<xsl:variable name="icon-row-size" select="3"/>
     
     <xsl:template match="dri:body">
+		<xsl:call-template name="buildLeftSection"/>    
+    	<xsl:call-template name="buildCentralSection"/>
+    	<xsl:call-template name="buildRightSection"/>
+   </xsl:template>
     
-       <div id="ds-body">
-         <div id='home_slideshow'>
-            <xsl:call-template name="slideshow"/>
-         </div>
+   <!-- Desde el home no mostramos options directamente -->
+   <xsl:template match="dri:options">
+   </xsl:template>
+
+   <!-- Columna izquierda con accesos principales -->
+   <xsl:template name="buildLeftSection">
+       <div id="ds-left-section">
+
+	         <div id='home_search'>
+	         	 <h2><i18n:text>sedici.home.buscar_material.title</i18n:text></h2>
+	         	 <p>
+	         	 	<i18n:text>sedici.home.buscar_material.info_pre</i18n:text>
+	         	 	<span class="resource_count">25000</span>
+	         	 	<i18n:text>sedici.home.buscar_material.info_post</i18n:text>
+	         	 </p>
+		         <xsl:apply-templates select="dri:div[@n='front-page-search']" mode="home"/>
+		     </div>
+
+			 <div id="home_autoarchivo">
+	         	<h2><i18n:text>sedici.home.subir_material.title</i18n:text></h2>
+	         	<div>
+				 	<a>
+			 			<xsl:attribute name="href">/handle/10915/50/submit</xsl:attribute>
+				 		<img>
+				            <xsl:attribute name="src">
+				                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+				                <xsl:text>/themes/</xsl:text>
+				                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+				                <xsl:text>/images/autoarchivo_home.png</xsl:text>
+				            </xsl:attribute>&#160;
+				 		</img>
+				 	</a>
+			 	</div>
+			 </div>
+	
+       </div>
+   </xsl:template>
+
+   <!-- Columna central con informacion institucional -->
+   <xsl:template name="buildCentralSection">
+       <div id="ds-body" class="home">
+
+<!-- Agregamos el slideshow -->
+<!--          <div id='home_slideshow'> -->
+<!--             <xsl:call-template name="slideshow"/> -->
+<!--          </div> -->
+		<!-- Por el momento mostramos una imagen estatica que simula ser el slideshow -->
+		<div id="home_slideshow">
+			<img>
+	            <xsl:attribute name="src">
+	                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+	                <xsl:text>/themes/</xsl:text>
+	                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+	                <xsl:text>/images/ejemplo_slideshow.png</xsl:text>
+	            </xsl:attribute>&#160;
+			</img>
+		</div>
+
          
-         <div id='home_search'>
-	         <xsl:apply-templates select="dri:div[@n='front-page-search']" mode="home"/>
-	     </div>
-	     
 	     <div id='home_info'>
 	         <xsl:apply-templates select="dri:div[@n='news']/dri:p"/>
-	     </div>
-	     
-	     <div id='home_main_communities'>
-	     	 <h1 class="communities_header"><i18n:text>sedici.comunidades.header</i18n:text></h1>
-	     	 <xsl:call-template name="render-community-section">
-	     	 	<xsl:with-param name="elements" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link']"/>
-	     	 	<xsl:with-param name="elements-count" select="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link'])"/>
-	     	 </xsl:call-template>
 	     </div>
 	     
 	     <div id='home_feed'>
@@ -79,72 +127,45 @@
 	         
 	     </div>
 	  </div>
-         
+   </xsl:template>
+   
+   <!-- Columna derecha con info de usuario y accesos a comunidades principales -->
+   <xsl:template name="buildRightSection">
+   		<div id="ds-right-section">
+<!-- 			<xsl:call-template name="buildUserBox"/> -->
+			<xsl:call-template name="buildCommunitiesBox"/>
+		</div>
    </xsl:template>
     
+   <xsl:template name="buildCommunitiesBox">
+	   <div id='home_main_communities'>
+	   	 <h1 class="communities_header"><i18n:text>sedici.comunidades.header</i18n:text></h1>
+	   	 <xsl:call-template name="render-community-section">
+	   	 	<xsl:with-param name="elements" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link']"/>
+<!-- 	   	 	<xsl:with-param name="elements-count" select="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link'])"/> -->
+	   	 </xsl:call-template>
+	   </div>
+   </xsl:template>
     
    <!-- mostramos los links del home basados en la propiedad de configuracion xmlui.community-list.home-links -->
    <xsl:template name="render-community-section">
    		<xsl:param name="elements"/>
-   		<xsl:param name="elements-count"/>
-   		<xsl:param name="element-index" select="1"/>
-   		<xsl:param name="row-index" select="1"/>
-   		
-   		<!-- Chequea si corresponde crear una nueva fila -->
-   		<xsl:if test="($row-index - 1) &lt; ($elements-count div $icon-row-size)">
-	     	<div class="community_icon_row">
-	     		<xsl:call-template name="render-community-icon-container">
-	     			<xsl:with-param name="elements" select="$elements"/>
-	     			<xsl:with-param name="elements-count" select="$elements-count"/>
-	     			<xsl:with-param name="element-index" select="$element-index"/>
-	     		</xsl:call-template>
-	     	</div>
-   		
-	   		<xsl:call-template name="render-community-section">
-	   			<xsl:with-param name="elements" select="$elements"/>
-	   			<xsl:with-param name="elements-count" select="$elements-count"/>
-	   			<xsl:with-param name="element-index" select="$element-index + $icon-row-size"/>
-	   			<xsl:with-param name="row-index" select="$row-index + 1"/>
-	   		</xsl:call-template>
-		</xsl:if>
-   </xsl:template>
 
-	<xsl:template name="render-community-icon-container">
-   		<xsl:param name="elements"/>
-   		<xsl:param name="elements-count"/>
-   		<xsl:param name="element-index"/>
-   		<xsl:param name="local-index" select="1"/>
-   		
-   		<xsl:if test="(($local-index - 1) &lt; $icon-row-size) and (($element-index - 1) &lt; $elements-count)">
-         	<xsl:variable name="slug" select="$elements[$element-index]/@qualifier"/>
-         	<xsl:variable name="link" select="$elements[$element-index]"/>
-
+		<xsl:for-each select="$elements">
+         	<xsl:variable name="slug" select="@qualifier"/>
+         	<xsl:variable name="link" select="."/>
+		
 	         <div class="community_icon_container">
 	         	<xsl:attribute name="id">icono_<xsl:value-of select="$slug"/></xsl:attribute>
 		 		<a>
 		 		    <xsl:attribute name="href"><xsl:value-of select="$link"/></xsl:attribute>
 			 		<h2><i18n:text>sedici.comunidades.<xsl:value-of select="$slug"/>.nombre</i18n:text></h2>
-			 		<img class="community_icon">
-			 			<xsl:attribute name="id">community_icon_<xsl:value-of select="$slug"/></xsl:attribute>
-			            <xsl:attribute name="src">
-			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-			                <xsl:text>/themes/</xsl:text>
-			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-			                <xsl:text>/images/icono_</xsl:text><xsl:value-of select="$slug"/><xsl:text>.png</xsl:text>
-			            </xsl:attribute>&#160;
-			 		</img>
 			 		<p><i18n:text>sedici.comunidades.<xsl:value-of select="$slug"/>.info</i18n:text></p>
 		 		</a>
 		 	 </div>
-		 	 
-	  		<xsl:call-template name="render-community-icon-container">
-	  			<xsl:with-param name="elements" select="$elements"/>
-	  			<xsl:with-param name="elements-count" select="$elements-count"/>
-	  			<xsl:with-param name="element-index" select="$element-index + 1"/>
-	  			<xsl:with-param name="local-index" select="$local-index + 1"/>
-	  		</xsl:call-template>
-		</xsl:if>
-	</xsl:template>
+   		</xsl:for-each>
+   
+   </xsl:template>
     
    <xsl:template match="dri:div[@n='front-page-search']" mode="home">
 
@@ -189,12 +210,8 @@
         </xsl:variable>
         <xsl:comment> External Metadata URL: <xsl:value-of select="$externalMetadataURL"/> </xsl:comment>
         <xsl:apply-templates select="document($externalMetadataURL)" mode="home"/>
-
-
    </xsl:template>
 
-
-    
     <xsl:template match='mets:METS' mode='home'>
        <a>
           <xsl:attribute name="href">
@@ -203,8 +220,5 @@
                <xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title']" disable-output-escaping="yes"/>
        </a> 
     </xsl:template>
-
-    <xsl:output indent="yes"/>
-    
 
 </xsl:stylesheet>
