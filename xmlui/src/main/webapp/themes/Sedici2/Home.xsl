@@ -76,7 +76,7 @@
 				                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
 				                <xsl:text>/themes/</xsl:text>
 				                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-				                <xsl:text>/images/autoarchivo_home.png</xsl:text>
+				                <xsl:text>/images/como_agrego.png</xsl:text>
 				            </xsl:attribute>&#160;
 				 		</img>
 				 	</a>
@@ -120,7 +120,7 @@
 	         <ul class="ul_envios_recientes">
 		       <xsl:for-each select="dri:div[@n='site-home']/dri:div/dri:referenceSet/dri:reference">
 		                <li class='li_envios_recientes'>
-		                   <xsl:apply-templates select='.' mode="home"/>
+		                   - <xsl:apply-templates select='.' mode="home"/>
 		                 </li>
 		       </xsl:for-each>
 		     </ul>
