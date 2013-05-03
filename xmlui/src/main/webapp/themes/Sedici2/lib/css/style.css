@@ -251,7 +251,7 @@ font-weight:bold;
 }
 #home_search input.ds-button-field {
 	color: #FFFFFF;
-	background-image: none;
+	background-image: ../images/lupita.png;
 	background-color: #3F7A9F;
 	height: 31px;
 	border: 0px;
