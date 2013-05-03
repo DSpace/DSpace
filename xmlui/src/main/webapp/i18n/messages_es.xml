@@ -1887,8 +1887,8 @@ Para asignar un item a esta colección, cerciórese de estar en la colección co
 	
 <message key="xmlui.dri2xhtml.structural.head-subtitle">SEDICI</message>	
 	
-<message key="xmlui.dri2xhtml.structural.profile">Mi Perfil</message>	
-<message key="xmlui.dri2xhtml.structural.logout">Salir</message>	
+<message key="xmlui.dri2xhtml.structural.profile">Perfil</message>	
+<message key="xmlui.dri2xhtml.structural.logout">Cerrar sesión</message>	
 <message key="xmlui.dri2xhtml.structural.login">Iniciar sesión</message>	
 	
 <message key="xmlui.dri2xhtml.structural.search">Buscar en SEDICI</message>	
@@ -2251,16 +2251,16 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="sedici.menuSuperior.institucional.staff">Staff</message>
 <message key="sedici.menuSuperior.institucional.comoLlegar">Cómo llegar</message>
 
-<message key="sedici.menuSuperior.informacion">Información</message>
+<message key="sedici.menuSuperior.preguntas">Preguntas frecuentes</message>
 <message key="sedici.menuSuperior.informacion.agregacion">Cómo agregar trabajos</message>
 <message key="sedici.menuSuperior.informacion.infoTesistas">Información para tesistas</message>
-<message key="sedici.menuSuperior.informacion.faq">FAQ</message>
+<message key="sedici.menuSuperior.informacion.faq">Más preguntas frecuentes</message>
 <message key="sedici.menuSuperior.informacion.revistasAccesoAbierto">Revistas de Acceso Abierto</message>
 
 <message key="sedici.menuSuperior.home">Inicio</message>
-<message key="sedici.menuSuperior.buscar">Buscar</message>
+<message key="sedici.menuSuperior.buscar">Buscar material</message>
 <message key="sedici.menuSuperior.contacto">Contacto</message>
-<message key="sedici.menuSuperior.subirMaterial">Subir Material</message>
+<message key="sedici.menuSuperior.subirMaterial">Subir material</message>
 
 <!-- Menu lateral -->
 <message key="sedici.menuLateral.cuenta.usuario"></message>

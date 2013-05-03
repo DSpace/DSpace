@@ -34,7 +34,7 @@
 	xmlns="http://www.w3.org/1999/xhtml"
 	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
 
-    <xsl:import href="Sedici.xsl"/>
+    <xsl:import href="Sedici2.xsl"/>
 
     <xsl:output indent="yes"/>
 
@@ -132,7 +132,7 @@
    <!-- Columna derecha con info de usuario y accesos a comunidades principales -->
    <xsl:template name="buildRightSection">
    		<div id="ds-right-section">
-<!-- 			<xsl:call-template name="buildUserBox"/> -->
+			<xsl:call-template name="buildUserBox"/>
 			<xsl:call-template name="buildCommunitiesBox"/>
 		</div>
    </xsl:template>
