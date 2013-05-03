@@ -35,7 +35,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import org.apache.log4j.Logger;
 
 /**
  * Class representing an e-mail message, also used to send e-mails.
@@ -225,21 +224,8 @@ public class Email
     public void send() throws MessagingException
     {
         // Get the mail configuration properties
-        String server = ConfigurationManager.getProperty("mail.server");
         String from = ConfigurationManager.getProperty("mail.from.address");
         boolean disabled = ConfigurationManager.getBooleanProperty("mail.server.disabled", false);
-
-        // Set up properties for mail session
-        Properties props = System.getProperties();
-        props.put("mail.smtp.host", server);
-
-        // Set the port number for the mail server
-        String portNo = ConfigurationManager.getProperty("mail.server.port");
-        if (portNo == null)
-        {
-            portNo = "25";
-        }
-        props.put("mail.smtp.port", portNo.trim());
 
         // If no character set specified, attempt to retrieve a default
         if (charset == null)
@@ -248,37 +234,8 @@ public class Email
         }
 
         // Get session
-        Session session;
-
-        // Get the SMTP server authentication information
-        String username = ConfigurationManager.getProperty("mail.server.username");
-        String password = ConfigurationManager.getProperty("mail.server.password");
-
-        if (username != null)
-        {
-            props.put("mail.smtp.auth", "true");
-            SMTPAuthenticator smtpAuthenticator = new SMTPAuthenticator(
-                    username, password);
-            session = Session.getInstance(props, smtpAuthenticator);
-        }
-        else
-        {
-            session = Session.getDefaultInstance(props);
-        }
-
-        // Set extra configuration properties
-        String extras = ConfigurationManager.getProperty("mail.extraproperties");
-        if ((extras != null) && (!"".equals(extras.trim())))
-        {
-            String arguments[] = extras.split(",");
-            String key, value;
-            for (String argument : arguments)
-            {
-                key = argument.substring(0, argument.indexOf('=')).trim();
-                value = argument.substring(argument.indexOf('=') + 1).trim();
-                props.put(key, value);
-            }
-        }
+        Session session = new DSpace().getServiceManager().
+                getServicesByType(EmailService.class).get(0).getSession();
 
         // Create message
         MimeMessage message = new MimeMessage(session);
@@ -524,29 +481,5 @@ public class Email
         File file;
 
         String name;
-    }
-
-    /**
-     * Inner Class for SMTP authentication information
-     */
-    private static class SMTPAuthenticator extends Authenticator
-    {
-        // User name
-        private String name;
-
-        // Password
-        private String password;
-
-        public SMTPAuthenticator(String n, String p)
-        {
-            name = n;
-            password = p;
-        }
-
-        @Override
-        protected PasswordAuthentication getPasswordAuthentication()
-        {
-            return new PasswordAuthentication(name, password);
-        }
     }
 }
