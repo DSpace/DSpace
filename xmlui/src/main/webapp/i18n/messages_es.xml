@@ -36,7 +36,7 @@
 	<!-- General keys -->
 	<message key="xmlui.general.dspace_home">SEDICI - Repositorio de la Universidad Nacional de La Plata </message>
 <message key="xmlui.general.search">Búsquedas</message>
-<message key="xmlui.general.go">Ir</message>
+<message key="xmlui.general.go"></message>
 <message key="xmlui.general.go_home">Ir a la página de inicio</message>
 <message key="xmlui.general.save">Guardar</message>
 <message key="xmlui.general.cancel">Cancelar</message>
