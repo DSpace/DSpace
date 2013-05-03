@@ -2310,4 +2310,9 @@
 
 <message key="sedici.EPerson.string-too-long">Field {0} exceded maximun length ({1} characteres) and was cut</message>
 
+<message key="sedici.home.buscar_material.title">Search resources</message>
+<message key="sedici.home.buscar_material.info_pre">Search among more than </message>
+<message key="sedici.home.buscar_material.info_post"> resources available in the repository</message>
+<message key="sedici.home.subir_material.title">Upload resources</message>
+
 </catalogue>
