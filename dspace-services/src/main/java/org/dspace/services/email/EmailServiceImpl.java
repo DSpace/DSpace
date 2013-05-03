@@ -13,11 +13,14 @@ import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import org.dspace.kernel.mixins.InitializedService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.EmailService;
 import org.dspace.utils.DSpace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Provides mail sending services through JavaMail.  If a {@link javax.mail.Session}
@@ -28,14 +31,21 @@ import org.slf4j.LoggerFactory;
  */
 public class EmailServiceImpl
         extends Authenticator
-        implements EmailService
+        implements EmailService, InitializedService
 {
+    private static final Logger logger = (Logger) LoggerFactory.getLogger(EmailServiceImpl.class);
+
     private Session session = null;
 
-    /** Lazy initialized since the service manager won't be running yet. */
-    private static ConfigurationService cfg = null;
+    private ConfigurationService cfg = null;
 
-    private static final Logger logger = (Logger) LoggerFactory.getLogger(EmailServiceImpl.class);
+    /** Inject the ConfigurationService */
+    @Autowired
+    @Required
+    public void setCfg(ConfigurationService cfg)
+    {
+        this.cfg = cfg;
+    }
 
     /**
      * Provide a reference to the JavaMail session.
@@ -45,22 +55,12 @@ public class EmailServiceImpl
     @Override
     public Session getSession()
     {
-        init();
         return session;
     }
 
-    private void init()
+    @Override
+    public void init()
     {
-        if (null != session)
-        {
-            return;
-        }
-
-        if (null == cfg)
-        {
-            cfg = new DSpace().getConfigurationService();
-        }
-
         // See if there is already a Session in our environment
         String sessionName = cfg.getProperty("mail.session.name");
         if (null == sessionName)

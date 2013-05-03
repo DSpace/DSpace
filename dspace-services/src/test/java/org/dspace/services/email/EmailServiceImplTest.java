@@ -61,7 +61,7 @@ public class EmailServiceImplTest
     {
         System.out.println("getSession");
         Session session;
-        EmailService instance = getService(EmailService.class);
+        EmailService instance = getService(EmailServiceImpl.class);
 
         // Try to get a Session
         session = instance.getSession();
@@ -88,7 +88,7 @@ public class EmailServiceImplTest
         cfg.setProperty(CFG_USERNAME, USERNAME);
         cfg.setProperty(CFG_PASSWORD, PASSWORD);
 
-        EmailServiceImpl instance = (EmailServiceImpl) getService(EmailService.class);
+        EmailServiceImpl instance = (EmailServiceImpl) getService(EmailServiceImpl.class);
 
         PasswordAuthentication result = instance.getPasswordAuthentication();
         assertNotNull(" null returned", result);

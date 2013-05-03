@@ -45,4 +45,11 @@
 	<!-- EVENTS -->
     <bean id="org.dspace.services.EventService" class="org.dspace.services.events.SystemEventService" />
 
+    <!-- EMAIL -->
+    <bean id="org.dspace.services.email.EmailServiceImpl"
+        class="org.dspace.services.email.EmailServiceImpl">
+        <property name="cfg"
+                  ref="org.dspace.services.ConfigurationService" />
+    </bean>
+
 </beans>
