@@ -218,6 +218,7 @@
           	<xsl:value-of select="@OBJID"/>
           </xsl:attribute>
                <xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title']" disable-output-escaping="yes"/>
+               <span> <xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='creator']" disable-output-escaping="yes"/></span>
        </a> 
     </xsl:template>
 
