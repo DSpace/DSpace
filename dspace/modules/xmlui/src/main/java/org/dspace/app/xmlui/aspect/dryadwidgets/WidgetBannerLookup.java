@@ -56,7 +56,7 @@ public class WidgetBannerLookup extends AbstractLogEnabled {
 
                 // Look it up in Solr
                 SolrQuery query = new SolrQuery();
-                query.setQuery("dc.relation.isreferencedby:\"" + pubDoi + "\" AND DSpaceStatus:Archived AND dc.type.embargo:none AND location.coll:2");
+                query.setQuery("dc.relation.isreferencedby:\"" + pubDoi + "\" AND DSpaceStatus:Archived AND location.coll:2");
 
                 QueryResponse response = solrServer.query(query);
                 SolrDocumentList documentList = response.getResults();
@@ -65,6 +65,14 @@ public class WidgetBannerLookup extends AbstractLogEnabled {
                 }
 
                 SolrDocument document = documentList.get(0);
+
+                // if the item is embargoed, don't return it
+                String firstEmbargoType = (String)document.getFirstValue("dc.type.embargo");
+                if(firstEmbargoType != null && !firstEmbargoType.equals("none")) {
+                    // item is embargoed
+                    return null;
+                }
+
                 String firstDOI = (String)document.getFirstValue("dc.identifier");
                 return firstDOI;
                 
