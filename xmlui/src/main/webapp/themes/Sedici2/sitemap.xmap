@@ -64,8 +64,8 @@
 			to describe the theme. -->
 		<map:component-configurations>
 			<global-variables>
-				<theme-path>Sedici</theme-path>
-				<theme-name>Sedici</theme-name>
+				<theme-path>Sedici2</theme-path>
+				<theme-name>Sedici2</theme-name>
 			</global-variables>
 		</map:component-configurations>
 
