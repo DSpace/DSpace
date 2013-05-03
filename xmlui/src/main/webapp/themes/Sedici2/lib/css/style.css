@@ -2807,13 +2807,19 @@ list-style-type:none;
 
 }
 
-#home_feed ul li a,
-#home_envios_recientes ul li a{
+#home_feed ul li a, #home_envios_reciente ul li a{
 	padding:0px;
 	text-decoration:none;
 	font-size:12px;
 	display: block;
 	padding-left: 40px;
+	
+}
+
+#home_envios_recientes ul li a span{
+	font-size:11px;
+	color: #c0c0c0;
+
 }
 
 .news_date  {
