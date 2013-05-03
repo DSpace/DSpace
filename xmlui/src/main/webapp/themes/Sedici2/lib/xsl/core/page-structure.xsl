@@ -358,7 +358,9 @@ placeholders for header images -->
                             <img class="vermapa">
                                 <xsl:attribute name="src">
                                     <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-                                    <xsl:text>/themes/Sedici/images/img1.png</xsl:text>
+                                    <xsl:text>/themes/</xsl:text>
+					                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+					                <xsl:text>/images/img1.png</xsl:text>
                                 </xsl:attribute>
                             </img>
                         </a>
@@ -372,7 +374,9 @@ placeholders for header images -->
 	                        <img class="contacto">
 	                            <xsl:attribute name="src">
 	                                <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-	                                <xsl:text>/themes/Sedici/images/img3.png</xsl:text>
+	                                <xsl:text>/themes/</xsl:text>
+					                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+					                <xsl:text>/images/img3.png</xsl:text>
 	                            </xsl:attribute>
 	                        </img>
 	                    </a>
