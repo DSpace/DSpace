@@ -2429,7 +2429,7 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.date.issued">Fecha de publicación</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dateIssued">Fecha de publicación</message>
 <!-- Site Leve Recently Added Content -->
-<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Últimos documentos agregados</message>
+<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Documentos destacados</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_type_filter">Tipo</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_publisher_filter">Editorial</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.ispartof">Es parte de</message>
