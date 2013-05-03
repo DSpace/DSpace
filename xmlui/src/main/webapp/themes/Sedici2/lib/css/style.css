@@ -668,6 +668,7 @@ padding:0px 0px 0px 20px;
 color:#939598;
 font-weight:bold;
 margin-left:8px;
+background-position: center;
 }
 
 #aspect_artifactbrowser_ConfigurableBrowse_field_submit:hover,
