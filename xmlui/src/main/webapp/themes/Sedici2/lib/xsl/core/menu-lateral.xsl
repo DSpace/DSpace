@@ -46,57 +46,8 @@
     <xsl:template match="dri:options">
         <div id="ds-options-wrapper">
             <div id="ds-options">                                   
-
-				<!-- <xsl:call-template name="options_search">
-				<xsl:with-param name="uri"> <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']"/></xsl:with-param>
-				</xsl:call-template>
-				 -->
 				
-				<!-- Genero la seccion de la cuenta del usuario -->
-			<!-- <xsl:if test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
-    				<div id="div-menu-lateral-cuenta">
-    				   <div id='div-menu-lateral-cuenta-superior'>
-    				      <div id='div-menu-lateral-cuenta-superior-izquierdo'>
-    				      	<h1><i18n:text>sedici.menuLateral.cuenta.usuario</i18n:text></h1>
-    				      	<h2><xsl:call-template name="buildUsuarioName"/></h2>
-    				      </div>
-    				      <div id='div-menu-lateral-cuenta-superior-derecho'>
-    				      	<a href="{$context-path}/logout"><i18n:text>sedici.menuLateral.cuenta.logout</i18n:text></a>
-    				      </div>
-    				   </div>
-    				   <div id='div-menu-lateral-cuenta-inferior'>
-    				       <ul>
-    				          <li><a href="{$context-path}/profile"><i18n:text>sedici.menuLateral.cuenta.perfil</i18n:text></a></li>
-    				          <li><a href="{$context-path}/submissions"><i18n:text>sedici.menuLateral.cuenta.submissions</i18n:text></a></li>
-    				          <xsl:if test="count(dri:list[@id='aspect.viewArtifacts.Navigation.list.account']/dri:item)>3">
-    				          	<li><a href="{$context-path}/admin/export"><i18n:text>sedici.menuLateral.cuenta.export</i18n:text></a></li>
-    				          </xsl:if>
-    				       </ul>
-    				   </div>
-    				
-    				</div>
-    			</xsl:if>    			
-    			  -->	
-    			  
-    			<!-- Genero la seccion del contexto-->	
-    			<xsl:if test="/dri:document/dri:meta/dri:userMeta[@authenticated='yes']">
-                	<xsl:apply-templates select="dri:list[@id='aspect.viewArtifacts.Navigation.list.context']"/>
-				</xsl:if>
-
-				<!-- Genero la seccion administrativa -->
-                <xsl:apply-templates select="dri:list[@id='aspect.viewArtifacts.Navigation.list.administrative']"/>
-                
-                <!-- Genero la seccion de otros -->
-				<xsl:if test="count(dri:list[@id='aspect.viewArtifacts.Navigation.list.account']/dri:item)>3">
-					<h1 id="ds-options-others" class="ds-option-set-head">
-						<i18n:text>sedici.menuLateral.otros.head</i18n:text>
-					</h1>
-					<div id="ds-others-set" class="ds-option-set">
-						<ul class="ds-simple-list">
-							<xsl:apply-templates select="dri:list[@id='aspect.viewArtifacts.Navigation.list.account']/dri:item[not(contains(dri:xref/@target,'/logout')) and not(contains(dri:xref/@target,'/submissions')) and not(contains(dri:xref/@target,'/profile'))]"/>
-						</ul>
-					</div>
-                </xsl:if>
+				<xsl:call-template name="buildUserBox"/>
 
                 <!-- Genero la seccion del discovery -->
                 <xsl:apply-templates select="dri:list[@id='aspect.discovery.Navigation.list.discovery']"/>

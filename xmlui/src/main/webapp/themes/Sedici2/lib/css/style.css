@@ -1826,7 +1826,6 @@ div.primary > ul > li > ul > li.community > div.artifact-description a {
 	position:absolute; 
 	left:0; 
 	background:#000000;
-	border: solid 1px #B8D9F2;
 }
 #topNav ul ul li { 
 	float:none;
@@ -1873,27 +1872,29 @@ border-radius:5px;
 /*login*/
 
 #ds-user-box {
-    color: #3698C7;
-	padding: 10px;
+	background: url(../../images/logo_usuario.png) no-repeat scroll 10px 10px;
+	color: #3698C7;
+	padding: 10px 10px 10px 75px;
 	border: 1px solid #E9EFFB;
 	margin: 5px 0px;
 	font-size: 11px;
+	min-height: 54px;
 }
 
+#ds-user-box span {
+	color: #C0C0C0;
+}
 #ds-user-box h2 {
 	font-size: 15px;
 }
-
 #div-menu-lateral-cuenta-superior-derecho {
 	float:right;
-	position:absolute;
-	right:12px;
 }
-
 #div-menu-lateral-cuenta-superior-izquierdo {
 	float: left;
+	border-bottom: 1px solid #B8D9F2;
+	margin-bottom: 5px;
 }
-
 #div-menu-lateral-cuenta-superior {
 }
 
@@ -1913,8 +1914,27 @@ border-radius:5px;
     color: red;
 	text-decoration:none;
 }
+#login_box {
+}
+#login_box a {
+	font-size: 14px;
+	display: inline-block;
+	margin-top: 21px;
+}
 
-
+#div-menu-context {
+	margin-top: 10px;
+}
+#div-menu-context h1 {
+	background: none;
+	margin: 0px;
+	height: auto;
+	padding: 0px;
+}
+#div-menu-context div, #div-menu-context div ul {
+	padding: 0px;
+}
+	
 .ds-static-div secondary browse {
 background-color:red;
 }
@@ -3225,7 +3245,7 @@ table.detailtable td:nth-child(2){
 h1.communities_header {
 	color: #FFFFFF;
 	font-size:12px;
-	background-color: #478CB7;
+	background-color: #72BBD9;
 	padding: 6px 5px 6px 10px;
 	font-weight: normal;
 	margin-bottom: 10px;
@@ -3233,20 +3253,20 @@ h1.communities_header {
 .community_icon_container {
 	margin-bottom: 10px;
 }
-.community_icon_container a:hover, .community_icon_container a:hover p {
+.community_icon_container a:hover {
 	background-color: #e3f1f9;
 	color: #398db3;
-	-moz-border-radius:5px;
 }
 .community_icon_container a {
 	color: #000000;
 	font-size:12px;
 	font-weight:regular;
-	padding: 5px 5px 5px 95px;
+	padding: 5px 5px 5px 75px;
 	display: block;
 	background-repeat: no-repeat;
 	background-position: left center;
-	min-height: 60px;
+	min-height: 55px;
+	border-radius: 5px 0px 0px 5px;
 }
 .community_icon_container h2 {
 	font-size: 11px;

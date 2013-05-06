@@ -394,44 +394,51 @@ placeholders for header images -->
     </xsl:template>
 
 	<xsl:template name="buildUserBox">
-	    <xsl:choose>
-	        <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
-	            <!-- Genero la seccion de la cuenta del usuario -->
-	            <div id="ds-user-box">
+        <!-- Genero la seccion de la cuenta del usuario -->
+        <div id="ds-user-box">
+		    <xsl:choose>
+		        <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
 	                <div id='div-menu-lateral-cuenta-superior'>
-	                    <div id='div-menu-lateral-cuenta-superior-izquierdo'>
-	                        <!--     				      	<h1><i18n:text>sedici.menuLateral.cuenta.usuario</i18n:text></h1> -->
-	                        <h2><xsl:call-template name="buildUsuarioName"/></h2>
-	                    </div>
 	                    <div id='div-menu-lateral-cuenta-superior-derecho'>
 	                        <a href="{$context-path}/logout"><i18n:text>sedici.menuLateral.cuenta.logout</i18n:text></a>
+	                    </div>
+	                    <div id='div-menu-lateral-cuenta-superior-izquierdo'>
+	                        <h2><xsl:call-template name="buildUsuarioName"/></h2>
 	                    </div>
 	                </div>
 	                <div id='div-menu-lateral-cuenta-inferior'>
 	                    <ul>
-	                        <li><a href="{$context-path}/profile"><i18n:text>sedici.menuLateral.cuenta.perfil</i18n:text></a></li>
-	                        <li><a href="{$context-path}/submissions"><i18n:text>sedici.menuLateral.cuenta.submissions</i18n:text></a></li>
-	                        <xsl:if test="count(dri:list[@id='aspect.viewArtifacts.Navigation.list.account']/dri:item)>3">
+	                        <xsl:if test="/dri:document/dri:options/dri:list[@id='aspect.viewArtifacts.Navigation.list.account']/dri:item/dri:xref[contains(@target,'/profile')]">
+		                        <li><a href="{$context-path}/profile"><i18n:text>sedici.menuLateral.cuenta.perfil</i18n:text></a></li>
+	                        </xsl:if>
+	                        <xsl:if test="/dri:document/dri:options/dri:list[@id='aspect.viewArtifacts.Navigation.list.account']/dri:item/dri:xref[contains(@target,'/submissions')]">
+		                        <li><a href="{$context-path}/submissions"><i18n:text>sedici.menuLateral.cuenta.submissions</i18n:text></a></li>
+	                        </xsl:if>
+	                        <xsl:if test="/dri:document/dri:options/dri:list[@id='aspect.viewArtifacts.Navigation.list.account']/dri:item/dri:xref[contains(@target,'/admin/export')]">
 	                            <li><a href="{$context-path}/admin/export"><i18n:text>sedici.menuLateral.cuenta.export</i18n:text></a></li>
 	                        </xsl:if>
 	                    </ul>
 	                </div>
-	
-	            </div>
-	        </xsl:when>
-	        <xsl:otherwise>
-	            <div id="ds-user-box">
-	                <p>
+
+	    			<!-- Genero la seccion del contexto-->
+	    			<xsl:if test="/dri:document/dri:options/dri:list[@id='aspect.viewArtifacts.Navigation.list.context']/*">
+		    			<div id="div-menu-context">
+	                		<xsl:apply-templates select="/dri:document/dri:options/dri:list[@id='aspect.viewArtifacts.Navigation.list.context']"/>
+						</div>
+					</xsl:if>
+		        </xsl:when>
+		        <xsl:otherwise>
+	                <div id="login_box">
 	                    <a>
 	                        <xsl:attribute name="href">
 	                            <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='loginURL']"/>
 	                        </xsl:attribute>
 	                        <i18n:text>xmlui.dri2xhtml.structural.login</i18n:text>
 	                    </a>
-	                </p>
-	            </div>
-	        </xsl:otherwise>
-	    </xsl:choose>
+	                </div>
+		        </xsl:otherwise>
+		    </xsl:choose>
+        </div>
 	</xsl:template>
 
     <xsl:template name="buildUsuarioName">
