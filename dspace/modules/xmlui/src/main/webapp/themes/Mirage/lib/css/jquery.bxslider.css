@@ -16,7 +16,7 @@
 
 .bx-wrapper {
     position: relative;
-    margin: 0 0 60px;
+    margin: 0;
     padding: 0;
     *zoom: 1;
 }
@@ -42,8 +42,6 @@
 
 .bx-wrapper .bx-pager,
 .bx-wrapper .bx-controls-auto {
-    position: absolute;
-    bottom: -30px;
     width: 100%;
 }
 
@@ -68,7 +66,7 @@
     font-family: Arial;
     font-weight: bold;
     color: #666;
-    padding-top: 20px;
+    padding-top: 6px;
 }
 
 .bx-wrapper .bx-pager .bx-pager-item,
