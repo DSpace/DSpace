@@ -33,11 +33,11 @@ public class WidgetBannerSelector extends WidgetBannerLookup implements Selector
      */
     public boolean select(String expression, Map objectModel,
             Parameters parameters) {
-            String publisher = parameters.getParameter("publisher","");
-            String articleDOI = expression;
+            String referrer = parameters.getParameter("referrer","");
+            String pubId = expression;
             String packageDOI = null;
         try {
-            packageDOI = lookup(articleDOI, publisher, objectModel);
+            packageDOI = lookup(pubId, referrer, objectModel);
         } catch (SQLException ex) {
             log.error("Error looking up article DOI:", ex);
         }

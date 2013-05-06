@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.acting.Action;
 import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.SourceResolver;
@@ -25,13 +26,16 @@ public class WidgetBannerAction extends WidgetBannerLookup implements Action {
 
     @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel, String source, Parameters parameters) throws Exception {
-            String publisher = parameters.getParameter("publisher","");
-            String articleDOI = parameters.getParameter("identifier","");
+            String referrer = parameters.getParameter("referrer","");
+            String pubId = parameters.getParameter("pubId","");
             String packageDOI = null;
         try {
-            packageDOI = lookup(articleDOI, publisher, objectModel);
+            packageDOI = lookup(pubId, referrer, objectModel);
         } catch (SQLException ex) {
             log.error("Error looking up article DOI:", ex);
+        }
+        if(packageDOI == null) {
+            throw new ResourceNotFoundException("No data package was found for pubId:" + pubId);
         }
         Map returnMap = new HashMap();
         returnMap.put("package", packageDOI);
