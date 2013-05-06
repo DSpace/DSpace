@@ -25,7 +25,6 @@
 	xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
 	xmlns:xhtml="http://www.w3.org/1999/xhtml"
 	xmlns:xalan="http://xml.apache.org/xalan"
-    xmlns:java="http://xml.apache.org/xalan/java"
 	xmlns:mods="http://www.loc.gov/mods/v3"
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
 	xmlns="http://www.w3.org/1999/xhtml"
@@ -52,11 +51,6 @@
                 <!-- Genero la seccion del discovery -->
                 <xsl:apply-templates select="dri:list[@id='aspect.discovery.Navigation.list.discovery']"/>
 
-                <!-- Genero la seccion de las estadísticas -->            
-                <xsl:if test="not(java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.matches(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'], 'handle/\d+/\d+/submit(.*)'))">
-					<xsl:apply-templates select='dri:list[@id="aspect.statistics.Navigation.list.statistics"]'/> 
-                </xsl:if> 
-            
                 <!-- DS-984 Add RSS Links to Options Box -->
                 <!-- <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='feed']) != 0">
                     <h1 id="ds-feed-option-head" class="ds-option-set-head">

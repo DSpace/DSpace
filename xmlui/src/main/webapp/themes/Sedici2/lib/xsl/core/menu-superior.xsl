@@ -8,9 +8,10 @@
 	xmlns:xhtml="http://www.w3.org/1999/xhtml"
 	xmlns:mods="http://www.loc.gov/mods/v3"
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:java="http://xml.apache.org/xalan/java"
     xmlns:confman="org.dspace.core.ConfigurationManager"
 	xmlns="http://www.w3.org/1999/xhtml"
-	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman">
+	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman java">
 
     <xsl:output indent="yes"/>
 
@@ -69,16 +70,51 @@
 				  <li><a href="{$context-path}/pages/revistasAccesoAbierto"> <i18n:text>sedici.menuSuperior.informacion.revistasAccesoAbierto</i18n:text></a></li>
 				  <li><a href="{$context-path}/pages/FAQ"> <i18n:text>sedici.menuSuperior.informacion.faq</i18n:text></a></li>
 				</ul>
-			
 			</li>
 			<li class="main">
 				<a href="{$context-path}/feedback"><i18n:text>sedici.menuSuperior.contacto</i18n:text></a>
 			</li>
+
+			<!-- Genero la seccion administrativa -->
+			<xsl:if test="/dri:document/dri:options/dri:list[@id='aspect.viewArtifacts.Navigation.list.administrative']/*">
+				<li class="main admin">
+					<a href="#"><i18n:text>sedici.menuSuperior.administracion</i18n:text></a>
+					<ul>
+						<div id="admin-menu-main-options">
+							<!-- Se muestran las opciones que pertenecen a un grupo -->
+							<xsl:apply-templates select="/dri:document/dri:options/dri:list[@id='aspect.viewArtifacts.Navigation.list.administrative']/dri:list" mode="admin-menu"/>
+	
+			                <!-- Se muestran las opciones de estadísticas -->            
+			                <xsl:if test="not(java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.matches(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'], 'handle/\d+/\d+/submit(.*)'))">
+								<xsl:apply-templates select='/dri:document/dri:options/dri:list[@id="aspect.statistics.Navigation.list.statistics"]' mode="admin-menu"/> 
+			                </xsl:if>
+            			</div>
+            			<!-- Se muestran las opciones que no pertenecen a ningun grupo -->
+            			<div id="admin-menu-other-options">
+							<li class="submenu"><i18n:text>sedici.menuSuperior.otrasOpciones</i18n:text></li>
+							<xsl:apply-templates select="/dri:document/dri:options/dri:list[@id='aspect.viewArtifacts.Navigation.list.administrative']/dri:item" mode="admin-menu"/>
+						</div>
+					</ul>
+				</li>
+            </xsl:if>
+
 			
 	     </ul>
      </div>
 
     </xsl:template>
     
-   
+	<xsl:template match="dri:list" mode="admin-menu">
+		<li class="submenu">
+			<xsl:copy-of select="dri:head"/>
+		</li>
+		<xsl:apply-templates select="dri:item" mode="admin-menu"/>
+	</xsl:template>
+	
+	<xsl:template match="dri:item" mode="admin-menu">
+		<li>
+			<xsl:apply-templates select="dri:xref"/>
+		</li>
+	</xsl:template>
+
 </xsl:stylesheet>

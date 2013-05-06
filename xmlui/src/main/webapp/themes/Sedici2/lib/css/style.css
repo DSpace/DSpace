@@ -1830,7 +1830,6 @@ div.primary > ul > li > ul > li.community > div.artifact-description a {
 #topNav ul ul li { 
 	float:none;
 }
-
 #topNav ul ul a { 
 	background-color:#effaff; 
 }
@@ -1843,15 +1842,17 @@ div.primary > ul > li > ul > li.community > div.artifact-description a {
 	position:relative;
 	margin-left: 31px;
 }
-#topNav a:visited {
-}
-#topNav li a:hover {
-}
 #topNav ul {
 	z-index: 999;
 } 
-#topNav ul li:hover {
-	background-color:#f6fcff;
+#topNav li.submenu {
+	font-weight: bold;
+	padding: 3px 10px;
+	background: #72BBD9;
+}
+#topNav li.admin li a {
+	padding-top: 3px;
+	padding-bottom: 3px;
 }
 
 /* Busqueda */
