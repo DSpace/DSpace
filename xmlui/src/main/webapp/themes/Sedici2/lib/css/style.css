@@ -2838,10 +2838,10 @@ margin:0px 200px 0px 0px;
 	display: block;
 	padding-left: 40px;
 }
-
-#home_envios_recientes ul li a span {
+#home_feed a.showall {
+	float: right;
+	color: #404040;
 }
-
 .news_date  {
     color: #A4A4A4;
     font-size: 12px;
