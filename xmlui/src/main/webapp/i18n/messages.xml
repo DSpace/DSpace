@@ -2167,6 +2167,9 @@
 <message key="sedici.menuSuperior.buscar">Search</message>
 <message key="sedici.menuSuperior.contacto">Contact</message>
 <message key="sedici.menuSuperior.subirMaterial">Upload Material</message>
+<message key="sedici.menuSuperior.administracion">Administration</message>
+<message key="sedici.menuSuperior.otrasOpciones">Other options</message>
+
 
 <!-- Menu lateral -->
 

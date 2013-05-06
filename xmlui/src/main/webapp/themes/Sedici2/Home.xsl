@@ -118,13 +118,12 @@
 	     <div id='home_envios_recientes'>
 	         <h1><i18n:text><xsl:value-of select="dri:div[@n='site-home']/dri:div/dri:head"/></i18n:text></h1>
 	         <ul class="ul_envios_recientes">
-		       <xsl:for-each select="dri:div[@n='site-home']/dri:div/dri:referenceSet/dri:reference">
-		                <li class='li_envios_recientes'>
-		                   - <xsl:apply-templates select='.' mode="home"/>
-		                 </li>
-		       </xsl:for-each>
+		     	<xsl:for-each select="dri:div[@n='site-home']/dri:div/dri:referenceSet/dri:reference">
+	             	<li class='li_envios_recientes'>
+	            		<xsl:apply-templates select='.' mode="home"/>
+		         	</li>
+		     	</xsl:for-each>
 		     </ul>
-	         
 	     </div>
 	  </div>
    </xsl:template>
@@ -217,8 +216,23 @@
           <xsl:attribute name="href">
           	<xsl:value-of select="@OBJID"/>
           </xsl:attribute>
-               <xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title']" disable-output-escaping="yes"/>
-               <span> <xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='creator']" disable-output-escaping="yes"/></span>
+          <span class="title">
+          	<xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title'][1]" disable-output-escaping="yes"/>
+          </span>
+          <xsl:if test="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title' and @qualifier='subtitle']">
+          	<span class="subtitle">
+          		<xsl:text> : </xsl:text>
+          		<xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title' and @qualifier='subtitle'][1]" disable-output-escaping="yes"/>
+          	</span>
+          </xsl:if>
+          <span class="author">
+          	<xsl:for-each select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='creator']">
+          		<xsl:value-of select="." disable-output-escaping="yes"/>
+				<xsl:if test="count(following-sibling::node()) != 0">
+					<xsl:text>; </xsl:text>
+				</xsl:if>
+          	</xsl:for-each>
+          </span>
        </a> 
     </xsl:template>
 

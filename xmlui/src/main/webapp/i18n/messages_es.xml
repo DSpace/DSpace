@@ -2261,12 +2261,14 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="sedici.menuSuperior.buscar">Buscar material</message>
 <message key="sedici.menuSuperior.contacto">Contacto</message>
 <message key="sedici.menuSuperior.subirMaterial">Subir material</message>
+<message key="sedici.menuSuperior.administracion">Administración</message>
+<message key="sedici.menuSuperior.otrasOpciones">Otras opciones</message>
 
 <!-- Menu lateral -->
-<message key="sedici.menuLateral.cuenta.usuario"></message>
-<message key="sedici.menuLateral.cuenta.perfil">Mi Perfil</message>
+<message key="sedici.menuLateral.cuenta.usuario">Usuario</message>
+<message key="sedici.menuLateral.cuenta.perfil">Editar perfil</message>
 <message key="sedici.menuLateral.cuenta.logout">Salir</message>
-<message key="sedici.menuLateral.cuenta.submissions">Carga de documentos</message>
+<message key="sedici.menuLateral.cuenta.submissions">Mis documentos</message>
 <message key="sedici.menuLateral.cuenta.export">Mis exportaciones</message>
 
 <message key="sedici.menuLateral.otros.head">Otros</message>
