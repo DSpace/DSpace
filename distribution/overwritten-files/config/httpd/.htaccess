@@ -1,54 +1,37 @@
-RewriteEngine On
+RewriteEngine on
 
-#Redireccion para comprobantes
-RedirectMatch /comprobantes(.*)$ http://dataserver.prebi.unlp.edu.ar/comprobantes$1
-
-#Redireccion de www.sedici.unlp.edu.ar
-RewriteCond %{HTTP_HOST} ^www\.sedici\.unlp\.edu\.ar$
-RewriteRule ^.*$ http://sedici.unlp.edu.ar%{REQUEST_URI} [R=permanent,L]
-
-#redireccion para el phpoai de sedici2003
+#External redirect para accessos phpoai de sedici2003
 RewriteRule ^phpoai/oai2.php(.*)$ /oai/request$1 [R=permanent,L]
 
-###################################################
-###################################################
-###################################################
-
-#/ARG-UNLP-EBook-0000000001/1789.pdf
-#/search/downloadp.php?id_document=ARG-UNLP-EBook-0000000001&id_parte=1789
+#Internal rewrite
+#De: /ARG-UNLP-EBook-0000000001/1789.pdf
+#A: /search/downloadp.php?id_document=ARG-UNLP-EBook-0000000001&id_parte=1789
 RewriteRule ^([^/]+)/([0-9]+)\.[a-z]{3}$ /search/downloadp.php?id_document=$1&id_parte=$2 [L,NC]
 
-#/?id=ARG-UNLP-EBook-0000000001
-#/index.php?id=ARG-UNLP-ART-0000008109
-#/search/request.php?id_document=ARG-UNLP-EBook-0000000001
+#Internal rewrite
+#De: /?id=ARG-UNLP-EBook-0000000001
+#De: /index.php?id=ARG-UNLP-ART-0000008109
+#A: /search/request.php?id_document=ARG-UNLP-EBook-0000000001
 RewriteCond %{QUERY_STRING} id=([^&]*)
 RewriteRule ^([^/]*)$ search/request.php?id_document=%1 [L,NC]
 
-#/static/redirector.php?adress=oai/oai
-#RewriteCond %{REQUEST_URI} ^/static/redirector.php$
+#Internal rewrite
+#De: /static/redirector.php?adress=oai/oai
+#A: /static/oai/oai.php
 RewriteCond %{QUERY_STRING} ^.*adress=([^&]*).*$
-RewriteRule ^static/redirector.php.*$ static2/%1
+RewriteRule ^static/redirector.php(.*)$ static/%1.php [L]
 
-#redirecciono todo lo que es .php, static o autoarchivo
+#Internal rewrite al aspecto de redirección de DSpace
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_URI} !redirect.php$
 RewriteCond %{REQUEST_URI} \.php$ [OR]
-#RewriteCond %{REQUEST_URI} ^static/.* [OR]
 RewriteCond %{REQUEST_URI} ^/autoarchivo/.*
 RewriteRule ^(.*)$ /redirect.php?old_url=\/$1\&%{QUERY_STRING}  [L]
-#[R=302,L]
 
 ###################################################
 ###################################################
 
-ErrorDocument 503 "/custom-errors/error-503.html"
-
-###################################################
-###################################################
-###################################################
-
-#Canalizo todo hacia dspace por mod_proxy
+#Canalizo todo hacia dspace por mod_proxy (el proxy se configura desde el virtual host)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*)$ ajp://localhost:8009/$1 [P]
-#retry=10
-#ajp://localhost:8009/
+
