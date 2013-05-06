@@ -1,3 +1,11 @@
+<IfModule mpm_prefork_module>
+	StartServers       1
+	MinSpareServers    1
+	MaxSpareServers    5
+	MaxClients        40
+    MaxRequestsPerChild   0
+</IfModule>
+
 NameVirtualHost *:80
 <VirtualHost *:80>
   ServerAdmin admin@sedici.unlp.edu.ar
