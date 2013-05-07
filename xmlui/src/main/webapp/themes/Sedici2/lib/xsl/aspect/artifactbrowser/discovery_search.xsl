@@ -182,7 +182,7 @@
     		</xsl:for-each>
     	</xsl:variable>
 		
-		<xsl:variable name="selectedValue" select="dri:value"/>
+		<xsl:variable name="selectedValue" select="$element/dri:value/@option"/>
 		
 		<div>
 			<xsl:attribute name="class">
@@ -198,6 +198,14 @@
 			<ul>
 				<xsl:for-each select="$element/dri:option">
 					<li>
+						<xsl:choose>
+							<xsl:when test="@returnValue=$selectedValue">
+								<xsl:attribute name="class">selected</xsl:attribute>
+							</xsl:when>
+							<xsl:when test="string($selectedValue)='' and position()=1">
+								<xsl:attribute name="class">selected</xsl:attribute>
+							</xsl:when>
+						</xsl:choose>
 						<a>
 							<xsl:attribute name="href">
 								<xsl:text>?</xsl:text>
@@ -207,7 +215,7 @@
 								<xsl:text>=</xsl:text>
 								<xsl:value-of select="@returnValue"/>
 							</xsl:attribute>
-							<xsl:copy-of select="."></xsl:copy-of>
+							<xsl:copy-of select="node()"></xsl:copy-of>
 						</a>
 					</li>
 				</xsl:for-each>
