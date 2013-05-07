@@ -351,10 +351,20 @@ line-height:1.5;
 
 
 }
+#ds-options #aspect_discovery_Navigation_list_discovery ul.sublist li.selected {
+color:grey;
+line-height:1.5;
+background-color: #AFEEEE;
 
+}
 
 #aspect_discovery_Navigation_list_discovery ul.sublist li a {
 text-decoration:line-through;
+}
+
+#ds-options h1 {
+	display: none;
+	
 }
 
 #input_mostrar_filtros {
@@ -400,12 +410,22 @@ font-weight:bold;
 margin-left:20px;
 font-size:14px;
 margin-bottom:3px;
+background-color: #72BBD9;
+border: 1px solid #72BBD9;
+width:100%;
+padding:5px;
+text-align: center;
+color: white;
+
 }
 
 #ds-options #aspect_discovery_Navigation_list_discovery a{
 text-decoration:none;
 line-height:1.4;
 }
+
+
+
 
 
 h1.ds-option-set-head {
