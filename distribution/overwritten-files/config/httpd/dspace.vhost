@@ -46,9 +46,9 @@ NameVirtualHost *:80
   #ProxyPass / ajp://localhost:8009/ retry=10
   #ProxyPassReverse / ajp://localhost:8009/
   <Proxy ajp://localhost:8009/>
-    #ProxySet timeout=1
+    ProxySet timeout=600
     ProxySet retry=0
-    #, timetout, ttl,ping=0 
+    #ttl,ping=0 
   </Proxy>
 
   #Se oculta el acceso al manager para orígenes confiables
