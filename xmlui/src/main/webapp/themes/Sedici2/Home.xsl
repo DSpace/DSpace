@@ -42,10 +42,45 @@
     
 	<xsl:variable name="icon-row-size" select="3"/>
     
+    <!-- Columna central -->
     <xsl:template match="dri:body">
-		<xsl:call-template name="buildLeftSection"/>    
-    	<xsl:call-template name="buildCentralSection"/>
-    	<xsl:call-template name="buildRightSection"/>
+       <div id="ds-body" class="home">
+
+<!-- Agregamos el slideshow -->
+<!--          <div id='home_slideshow'> -->
+<!--             <xsl:call-template name="slideshow"/> -->
+<!--          </div> -->
+		<!-- Por el momento mostramos una imagen estatica que simula ser el slideshow -->
+		<div id="home_slideshow">
+			<img>
+	            <xsl:attribute name="src">
+	                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+	                <xsl:text>/themes/</xsl:text>
+	                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+	                <xsl:text>/images/ejemplo_slideshow.png</xsl:text>
+	            </xsl:attribute>&#160;
+			</img>
+		</div>
+
+	     <div id='home_info'>
+	         <xsl:apply-templates select="dri:div[@n='news']/dri:p"/>
+	     </div>
+	     
+	     <div id='home_feed'>
+	         <xsl:apply-templates select="dri:div[@id='ar.edu.unlp.sedici.aspect.news.ShowNews.div.feed']"/>
+	     </div>
+	     
+	     <div id='home_envios_recientes'>
+	         <h1><i18n:text><xsl:value-of select="dri:div[@n='site-home']/dri:div/dri:head"/></i18n:text></h1>
+	         <ul class="ul_envios_recientes">
+		     	<xsl:for-each select="dri:div[@n='site-home']/dri:div/dri:referenceSet/dri:reference">
+	             	<li class='li_envios_recientes'>
+	            		<xsl:apply-templates select='.' mode="home"/>
+		         	</li>
+		     	</xsl:for-each>
+		     </ul>
+	     </div>
+	  </div>
    </xsl:template>
     
    <!-- Desde el home no mostramos options directamente -->
@@ -63,7 +98,7 @@
 	         	 	<span class="resource_count">25000</span>
 	         	 	<i18n:text>sedici.home.buscar_material.info_post</i18n:text>
 	         	 </p>
-		         <xsl:apply-templates select="dri:div[@n='front-page-search']" mode="home"/>
+		         <xsl:apply-templates select="/dri:document/dri:body/dri:div[@n='front-page-search']" mode="home"/>
 		     </div>
 
 			 <div id="home_autoarchivo">
@@ -86,48 +121,6 @@
        </div>
    </xsl:template>
 
-   <!-- Columna central con informacion institucional -->
-   <xsl:template name="buildCentralSection">
-       <div id="ds-body" class="home">
-
-<!-- Agregamos el slideshow -->
-<!--          <div id='home_slideshow'> -->
-<!--             <xsl:call-template name="slideshow"/> -->
-<!--          </div> -->
-		<!-- Por el momento mostramos una imagen estatica que simula ser el slideshow -->
-		<div id="home_slideshow">
-			<img>
-	            <xsl:attribute name="src">
-	                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-	                <xsl:text>/themes/</xsl:text>
-	                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-	                <xsl:text>/images/ejemplo_slideshow.png</xsl:text>
-	            </xsl:attribute>&#160;
-			</img>
-		</div>
-
-         
-	     <div id='home_info'>
-	         <xsl:apply-templates select="dri:div[@n='news']/dri:p"/>
-	     </div>
-	     
-	     <div id='home_feed'>
-	         <xsl:apply-templates select="dri:div[@id='ar.edu.unlp.sedici.aspect.news.ShowNews.div.feed']"/>
-	     </div>
-	     
-	     <div id='home_envios_recientes'>
-	         <h1><i18n:text><xsl:value-of select="dri:div[@n='site-home']/dri:div/dri:head"/></i18n:text></h1>
-	         <ul class="ul_envios_recientes">
-		     	<xsl:for-each select="dri:div[@n='site-home']/dri:div/dri:referenceSet/dri:reference">
-	             	<li class='li_envios_recientes'>
-	            		<xsl:apply-templates select='.' mode="home"/>
-		         	</li>
-		     	</xsl:for-each>
-		     </ul>
-	     </div>
-	  </div>
-   </xsl:template>
-   
    <!-- Columna derecha con info de usuario y accesos a comunidades principales -->
    <xsl:template name="buildRightSection">
    		<div id="ds-right-section">
@@ -141,7 +134,6 @@
 	   	 <h1 class="communities_header"><i18n:text>sedici.comunidades.header</i18n:text></h1>
 	   	 <xsl:call-template name="render-community-section">
 	   	 	<xsl:with-param name="elements" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link']"/>
-<!-- 	   	 	<xsl:with-param name="elements-count" select="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link'])"/> -->
 	   	 </xsl:call-template>
 	   </div>
    </xsl:template>

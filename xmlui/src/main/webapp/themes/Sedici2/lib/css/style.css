@@ -207,7 +207,7 @@ font-weight:bold;
 	width: 250px;
 	display: inline-block;
 	color: #4D4C4C;
-	padding-top: 70px;
+	padding-top: 20px;
 	padding-left: 20px;
 	padding-right: 20px;
 	background-image: url("../../images/fondo_repeat_izquierda.png");
@@ -242,18 +242,21 @@ font-weight:bold;
 	font-size: 14px;
 }
 
+#home_search
+{
+	margin-top: 30px;
+}
 #home_search span.resource_count {
 	color: #F49717;
 	font-weight: bold;
 }
-
 #home_search input.ds-text-field {
 	width: 192px;
 	border-radius: 7px 0px 0px 7px;
 }
 #home_search input.ds-button-field {
 	color: #FFFFFF;
-	background-image: ../images/lupita.png;
+	background-image: url(../../images/lupita.png);
 	background-color: #3F7A9F;
 	height: 31px;
 	border: 0px;
@@ -691,6 +694,7 @@ margin-left:8px;
 background-position: center;
 }
 
+/*
 #aspect_artifactbrowser_ConfigurableBrowse_field_submit:hover,
 #aspect_discovery_SiteViewer_field_submit:hover,
 #aspect_discovery_SimpleSearch_field_submit:hover,
@@ -699,12 +703,11 @@ background-position: center;
 #aspect_administrative_eperson_ManageEPeopleMain_field_submit_search:hover,
 #aspect_discovery_SearchFacetFilter_field_submit:hover,
 #aspect_xmlworkflow_admin_WorkflowOverviewTransformer_field_submit_search_controls.ds-button-field:hover
-
- {
+{
 color:#52BAE7;
-background-image:url(../../images/lupitahover.png);
+background-image: url(../../images/lupitahover.png);
 }
-
+*/
 
 .ie6 input.ds-text-field,
 .ie6 input.ds-password-field {
@@ -993,24 +996,6 @@ font-size:14px;
 
 .administrative.tabbed .pane {
     border-top: none;
-}
-
-.pagination,
-.pagination-masked {
-padding-top:20px;
-background-color:white;
-border:none;
-background-image:url(../../images/sombra_abajo2.png);
-height:26px;
-background-repeat:no-repeat;
-background-position:center -5px;
-padding-bottom:5px;
-
-/*    padding: 7px;
-    background-color: #fafafa;
-    border: 1px solid #ebebeb;
-    line-height: 1em;
-    vertical-align:middle;*/
 }
 
 .pagination-links {
@@ -2492,16 +2477,26 @@ border:none;
 #aspect_discovery_SimpleSearch_div_search-filters {
 border-color:#d9e6ed;
 }
-
-.pagination-masked,  {
-background-color:white;
-border:none;
-background-image:url(../../images/sombra_abajo.png);
-height:40px;
-background-repeat:no-repeat;
-background-position:top center;
-padding-bottom:5px;
+#aspect_discovery_SimpleSearch_div_search .pagination-masked.top {
+	margin: 0px;
+	padding: 0px;
 }
+#aspect_discovery_SimpleSearch_div_search .pagination-masked.top ul {
+	display: none;
+}
+#aspect_discovery_SimpleSearch_div_search h2.ds-div-head {
+	display: none;
+}
+#aspect_discovery_SimpleSearch_div_search-results {
+	margin: 0px;
+}
+#aspect_discovery_SimpleSearch_div_search .search-controls {
+	display: none;
+}
+.search-controls, .search-controls a {
+	color: #3499C3;
+}
+
 
 #aspect_artifactbrowser_ConfigurableBrowse_list_jump-list,
 #aspect_administrative_WithdrawnItems_list_jump-list,

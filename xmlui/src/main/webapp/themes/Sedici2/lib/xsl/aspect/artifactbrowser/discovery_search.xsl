@@ -15,6 +15,9 @@
     <xsl:output indent="yes"/>
     
  
+  <xsl:template match="dri:div[@n='search-filters']" priority="2">
+  </xsl:template>
+  
   <xsl:template match="dri:div[@n='search-filters']">
         <xsl:apply-templates select="dri:head"/>
         <xsl:apply-templates select="@pagination">
@@ -129,7 +132,87 @@
     <xsl:template match="dri:list[@id='aspect.discovery.SimpleSearch.list.primary-search']">
           <xsl:apply-templates select="dri:head"/>
           <xsl:apply-templates select="dri:item[2]"/>
-          <xsl:apply-templates select="dri:item[1]"/>
+<!--           <xsl:apply-templates select="dri:item[1]"/> -->
     </xsl:template>
+    
+    
+    <xsl:template match="dri:div[@id='aspect.discovery.SimpleSearch.div.search-controls']">
+    	<!-- preparamos el queryString base a partir de los hiddens -->
+    	<xsl:variable name="queryString">
+    		<xsl:for-each select="dri:p[@n='hidden-fields']/dri:field">
+    			<xsl:value-of select="@n"/>
+    			<xsl:text>=</xsl:text>
+    			<xsl:value-of select="dri:value[@type='raw']"/>
+    			<xsl:text>&amp;</xsl:text>
+    		</xsl:for-each>
+    	</xsl:variable>
+    	
+    	
+    	<div class="search-controls">
+	    	<!-- generamos los links de control -->
+	    	<xsl:call-template name="searchResultControls">
+	    		<xsl:with-param name="queryString" select="$queryString"/>
+	    		<xsl:with-param name="element" select="dri:list[@n='search-controls']/dri:item/dri:field[@n='rpp']"/>
+	    	</xsl:call-template>
+	    	<xsl:call-template name="searchResultControls">
+	    		<xsl:with-param name="queryString" select="$queryString"/>
+	    		<xsl:with-param name="element" select="dri:list[@n='search-controls']/dri:item/dri:field[@n='sort_by']"/>
+	    	</xsl:call-template>
+	    	<xsl:call-template name="searchResultControls">
+	    		<xsl:with-param name="queryString" select="$queryString"/>
+	    		<xsl:with-param name="element" select="dri:list[@n='search-controls']/dri:item/dri:field[@n='order']"/>
+	    	</xsl:call-template>
+    	</div>
+    	
+    </xsl:template>
+
+	<xsl:template name="searchResultControls">
+		<xsl:param name="queryString"/>
+		<xsl:param name="element"/>
+		
+		<xsl:variable name="controlName" select="$element/@n"/>
+		
+		<!-- incluimos los valores de los otros controles -->
+    	<xsl:variable name="otherSearchControls">
+    		<xsl:for-each select="dri:list[@n='search-controls']/dri:item/dri:field[not(@n=$controlName) and not(@type='button')]/dri:value">
+    			<xsl:value-of select="../@n"/>
+    			<xsl:text>=</xsl:text>
+    			<xsl:value-of select="@option"/>
+    			<xsl:text>&amp;</xsl:text>
+    		</xsl:for-each>
+    	</xsl:variable>
+		
+		<xsl:variable name="selectedValue" select="dri:value"/>
+		
+		<div>
+			<xsl:attribute name="class">
+				<xsl:text>single-search-control </xsl:text>
+				<xsl:value-of select="$element/@n"/>
+			</xsl:attribute>
+			<h2>
+				<i18n:text>
+					<xsl:text>xmlui.ArtifactBrowser.AbstractSearch.</xsl:text>
+					<xsl:value-of select="$element/@n"/>
+				</i18n:text>
+			</h2>
+			<ul>
+				<xsl:for-each select="$element/dri:option">
+					<li>
+						<a>
+							<xsl:attribute name="href">
+								<xsl:text>?</xsl:text>
+								<xsl:value-of select="$queryString"/>
+								<xsl:value-of select="$otherSearchControls"/>
+								<xsl:value-of select="$element/@n"/>
+								<xsl:text>=</xsl:text>
+								<xsl:value-of select="@returnValue"/>
+							</xsl:attribute>
+							<xsl:copy-of select="."></xsl:copy-of>
+						</a>
+					</li>
+				</xsl:for-each>
+			</ul>
+		</div>
+	</xsl:template>
     
 </xsl:stylesheet>

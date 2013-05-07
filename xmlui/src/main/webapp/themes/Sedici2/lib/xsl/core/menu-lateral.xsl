@@ -43,40 +43,15 @@
     -->
     <!-- TODO: figure out why i18n tags break the go button -->
     <xsl:template match="dri:options">
-        <div id="ds-options-wrapper">
-            <div id="ds-options">                                   
-				
-				<xsl:call-template name="buildUserBox"/>
-
-                <!-- Genero la seccion del discovery -->
-                
-                <xsl:apply-templates select="dri:list[@id='aspect.discovery.Navigation.list.discovery']"/>
-			
-                <!-- DS-984 Add RSS Links to Options Box -->
-                <!-- <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='feed']) != 0">
-                    <h1 id="ds-feed-option-head" class="ds-option-set-head">
-                        <i18n:text>xmlui.feed.header</i18n:text>
-                    </h1>
-                    <div id="ds-feed-option" class="ds-option-set">
-                        <ul>
-                            <xsl:call-template name="addRSSLinks"/>
-                        </ul>
-                    </div>
-                </xsl:if>
-               -->
-
-            </div>
-        </div>
-    </xsl:template>
-    
-    <xsl:template name="menuLateralAdmin">
-
-    </xsl:template>
-    
-    <xsl:template name="buildUsuarioName">
-        <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='firstName']"/>
-        <xsl:text> </xsl:text>
-        <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='lastName']"/>
+    	<!-- preguntamos si hay algo para mostrar del discovery -->
+    	<xsl:if test="dri:list[@id='aspect.discovery.Navigation.list.discovery']/*">
+	        <div id="ds-options-wrapper">
+	            <div id="ds-options">                                   
+	                <!-- Genero la seccion del discovery -->
+	                <xsl:apply-templates select="dri:list[@id='aspect.discovery.Navigation.list.discovery']"/>
+	            </div>
+	        </div>
+        </xsl:if>
     </xsl:template>
     
     <xsl:template name='options_search'>

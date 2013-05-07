@@ -110,12 +110,12 @@
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.title">título</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dateissued">fecha de publicación</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dateaccessioned">fecha de envío</message>
-<message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.relevance">relevancia</message>
+<message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.relevance">Relevancia</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by">Ordenar por</message>
-<message key="xmlui.ArtifactBrowser.AbstractSearch.order">en orden</message>
-<message key="xmlui.ArtifactBrowser.AbstractSearch.order.asc">ascendente</message>
-<message key="xmlui.ArtifactBrowser.AbstractSearch.order.desc">descendente</message>
-<message key="xmlui.ArtifactBrowser.AbstractSearch.rpp">Resultados/página</message>
+<message key="xmlui.ArtifactBrowser.AbstractSearch.order">Orden</message>
+<message key="xmlui.ArtifactBrowser.AbstractSearch.order.asc">Ascendente</message>
+<message key="xmlui.ArtifactBrowser.AbstractSearch.order.desc">Descendente</message>
+<message key="xmlui.ArtifactBrowser.AbstractSearch.rpp">Resultados</message>
 
 
 

@@ -65,10 +65,20 @@
                                the ds-options div that contains the navigation and action options available to the
                                user. The meta element is ignored since its contents are not processed directly, but
                                instead referenced from the different points in the document. -->
-                                <xsl:apply-templates/>
+
+								<!-- 
+								Cambiamos el apply-templates original por la 
+								invocación explicita de las tres columnas, en función 
+								del nuevo diseño de SEDICI
+								-->
+								<!-- <xsl:apply-templates/> -->
+
+								<xsl:call-template name="buildLeftSection"/>
+						    	<xsl:call-template name="buildCentralSection"/>
+						    	<xsl:call-template name="buildRightSection"/>
+
                             </div>
                         </div>
-
 
                         <!--
                             The footer div, dropping whatever extra information is needed on the page. It will
@@ -85,6 +95,31 @@
             <xsl:text disable-output-escaping="yes">&lt;/body&gt;</xsl:text>
         </html>
     </xsl:template>
+
+
+	<!-- Columna izquierda (redefinida en el Home) -->
+	<xsl:template name="buildLeftSection">
+		<div id="ds-left-section">
+			<xsl:apply-templates select="/dri:document/dri:options"/>
+			&#160;
+		</div>
+	</xsl:template>
+
+	<!-- Columna central -->
+	<xsl:template name="buildCentralSection">
+		<xsl:apply-templates select="/dri:document/dri:body"/>
+	</xsl:template>
+
+	<!-- Columna derecha (redefinida en el Home) -->
+	<xsl:template name="buildRightSection">
+		<div id="ds-right-section">
+			<!-- Caja con controles para la sesion del usuario y opciones contextuales -->
+			<xsl:call-template name="buildUserBox"/>
+			
+			<!-- Controles para las busquedas -->
+			<xsl:apply-templates select="dri:body/dri:div[@n='search']/dri:div[@id='aspect.discovery.SimpleSearch.div.search-controls']"/>
+		</div>
+	</xsl:template>
 
     <!-- The HTML head element contains references to CSS as well as embedded JavaScript code. Most of this
         information is either user-provided bits of post-processing (as in the case of the JavaScript), or
