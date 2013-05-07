@@ -48,7 +48,8 @@ NameVirtualHost *:80
   <Proxy ajp://localhost:8009/>
     ProxySet timeout=600
     ProxySet retry=0
-    #ttl,ping=0 
+    ProxySet ping=3
+    #ttl=0 
   </Proxy>
 
   #Se oculta el acceso al manager para orígenes confiables
