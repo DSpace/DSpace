@@ -503,11 +503,10 @@ public class ConfigurationManager
     private static File loadedFile = null;
 
     /**
-     * Return the file that configuration was actually loaded from. Only returns
-     * a valid File after configuration has been loaded.
+     * Return the file that configuration was actually loaded from.
      *
      * @deprecated Please remove all direct usage of the configuration file.
-     * @return File naming configuration data file, or null if not loaded yet.
+     * @return File naming configuration data file.
      */
     protected static File getConfigurationFile()
     {
