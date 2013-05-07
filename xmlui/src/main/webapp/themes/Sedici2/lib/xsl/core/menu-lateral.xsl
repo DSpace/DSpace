@@ -49,8 +49,9 @@
 				<xsl:call-template name="buildUserBox"/>
 
                 <!-- Genero la seccion del discovery -->
+                
                 <xsl:apply-templates select="dri:list[@id='aspect.discovery.Navigation.list.discovery']"/>
-
+			
                 <!-- DS-984 Add RSS Links to Options Box -->
                 <!-- <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='feed']) != 0">
                     <h1 id="ds-feed-option-head" class="ds-option-set-head">
@@ -211,6 +212,13 @@
             </ul>
         </li>
     </xsl:template>
+  
+ 	<!-- <xsl:template match="dri:item[@rend='selected']" mode="nested">
+        <li class="selected">
+   			<xsl:value-of select="."/>
+        </li>
+    </xsl:template>
+ -->
 
     <!-- Quick patch to remove empty lists from options -->
     <xsl:template match="dri:options//dri:list[count(child::*)=0]" priority="5" mode="nested">
