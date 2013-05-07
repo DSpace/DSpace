@@ -2216,13 +2216,11 @@ a.feedbackform-user-voice-link {
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
     /* misplaced pager controls */
     #dryad-home-carousel .bx-pager-item {
-        top: -7px !important;
     }
 
 
     /* force rounded corners in the slideshow (known Chrome bug) */
-    .bx-viewport, 
-    .bx-wrapper img {
+    .bx-viewport {
         -webkit-border-top-left-radius: 8px;
         -webkit-border-top-right-radius: 8px;
         border-top-left-radius: 8px;
@@ -2231,6 +2229,13 @@ a.feedbackform-user-voice-link {
         -webkit-border-bottom-right-radius: 8px;
         border-bottom-left-radius: 8px;
         border-bottom-right-radius: 8px;
+    }
+    /* slide images should be rounded on TOP only */
+    .bx-wrapper img {
+        -webkit-border-top-left-radius: 8px;
+        -webkit-border-top-right-radius: 8px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
     }
     
 }

@@ -179,8 +179,6 @@
             #dryad-home-carousel .bx-pager {
             }
             #dryad-home-carousel .bx-pager-item {
-                position: relative;
-                top: 2px;
             }
 
             #dryad-home-carousel .bx-controls-auto {
