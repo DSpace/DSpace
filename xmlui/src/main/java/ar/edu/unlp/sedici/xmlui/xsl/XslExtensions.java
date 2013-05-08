@@ -137,4 +137,8 @@ public class XslExtensions {
 			throw new PatternSyntaxException("El patrón de matcheo no está correctamente estructurado", regex, -1);
 		}
 	}
+	
+	public static String replace(String target, String search, String replacement) {
+		return target.replace(search, replacement);
+	}
 }
