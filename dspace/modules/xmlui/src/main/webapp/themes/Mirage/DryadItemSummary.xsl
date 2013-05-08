@@ -1266,6 +1266,7 @@
         </div>
   
         <!-- we only want this view from item view - not the administrative pages -->
+	<!-- commented out so we don't allow easy access to the metadata
         <xsl:if test="$meta[@qualifier='URI' and contains(.., 'handle') and not(contains(..,'workflow'))]">
             <div style="padding: 10px; margin-top: 5px; margin-bottom: 5px;">
                 <a href="?show=full">
@@ -1273,7 +1274,7 @@
                 </a>
             </div>
         </xsl:if>
-
+	-->
         <xsl:variable name="embargoedDate"
                       select=".//dim:field[@element='date' and @qualifier='embargoedUntil']"/>
         <xsl:variable name="embargoType">
@@ -2190,4 +2191,34 @@
         </xsl:choose>
     </xsl:template>
 
+    <!-- Override metadata field rendering to hide manuscript number -->
+    <xsl:template match="dim:field" mode="itemDetailView-DIM">
+        <xsl:if test="not(./@qualifier = 'manuscriptNumber')">
+            <tr>
+                <xsl:attribute name="class">
+                    <xsl:text>ds-table-row </xsl:text>
+                    <xsl:if test="(position() div 2 mod 2 = 0)">even </xsl:if>
+                    <xsl:if test="(position() div 2 mod 2 = 1)">odd </xsl:if>
+                </xsl:attribute>
+                <td>
+                    <xsl:value-of select="./@mdschema"/>
+                    <xsl:text>.</xsl:text>
+                    <xsl:value-of select="./@element"/>
+                    <xsl:if test="./@qualifier">
+                        <xsl:text>.</xsl:text>
+                        <xsl:value-of select="./@qualifier"/>
+                    </xsl:if>
+                </td>
+            <td>
+              <xsl:copy-of select="./node()"/>
+              <xsl:if test="./@authority and ./@confidence">
+                <xsl:call-template name="authorityConfidenceIcon">
+                  <xsl:with-param name="confidence" select="./@confidence"/>
+                </xsl:call-template>
+              </xsl:if>
+            </td>
+                <td><xsl:value-of select="./@language"/></td>
+            </tr>
+        </xsl:if>
+    </xsl:template>
 </xsl:stylesheet>
