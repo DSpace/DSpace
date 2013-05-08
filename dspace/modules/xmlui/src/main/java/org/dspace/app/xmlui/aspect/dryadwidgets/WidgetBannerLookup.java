@@ -65,14 +65,6 @@ public class WidgetBannerLookup extends AbstractLogEnabled {
                 }
 
                 SolrDocument document = documentList.get(0);
-
-                // if the item is embargoed, don't return it
-                String firstEmbargoType = (String)document.getFirstValue("dc.type.embargo");
-                if(firstEmbargoType != null && !firstEmbargoType.equals("none")) {
-                    // item is embargoed
-                    return null;
-                }
-
                 String firstDOI = (String)document.getFirstValue("dc.identifier");
                 return firstDOI;
                 
