@@ -482,8 +482,8 @@ public class BrowseListTag extends TagSupport
                             DCDate dd = new DCDate(metadataArray[0].value);
                             metadata = UIUtil.displayDate(dd, false, false, hrq);
                         }
-                        // format the title field correctly for withdrawn items (ie. don't link)
-                        else if (field.equals(titleField) && items[i].isWithdrawn())
+                        // format the title field correctly for withdrawn and private items (ie. don't link)
+                        else if (field.equals(titleField) && (items[i].isWithdrawn() || !items[i].isDiscoverable()))
                         {
                             metadata = Utils.addEntities(metadataArray[0].value);
                         }

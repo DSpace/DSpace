@@ -159,6 +159,11 @@ public class AccessStep extends AbstractProcessingStep
         // if Anonymous does not have right on this collection, create policies for any other groups with
         // DEFAULT_ITEM_READ specified.
         if(!isAdvancedFormEnabled){
+            int result = -1;
+            if ((result = checkForm(request)) != 0)
+            {
+                return result;
+            }
             AuthorizeManager.generateAutomaticPolicies(context, getEmbargoUntilDate(request), reason, item, (Collection)HandleManager.resolveToObject(context, subInfo.getCollectionHandle()));
         }
 //        else{

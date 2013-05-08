@@ -301,7 +301,7 @@ public class SolrBrowseDAO implements BrowseDAO
             // processing the query...
             Item item = (Item) solrDoc;
             BrowseItem bitem = new BrowseItem(context, item.getID(),
-                    item.isArchived(), item.isWithdrawn());
+                    item.isArchived(), item.isWithdrawn(), item.isDiscoverable());
             bitems.add(bitem);
         }
         return bitems;
