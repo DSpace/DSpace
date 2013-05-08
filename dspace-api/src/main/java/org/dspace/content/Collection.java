@@ -1397,7 +1397,7 @@ public class Collection extends DSpaceObject
                          "and item.item_id=metadatavalue.item_id " +
                          "AND in_archive ='1' AND item.withdrawn='0' " +
                          "and metadatavalue.metadata_field_id=11 " +
-                         "and to_date(metadatavalue.text_value, 'YYYYMMDD') >= to_date( ? , 'YYYYMMDD')";
+                         "and to_date(metadatavalue.text_value, 'YYYY-MM-DD') >= to_date( ? , 'YYYY-MM-DD')";
              }
 
             statement = ourContext.getDBConnection().prepareStatement(query);
