@@ -401,20 +401,16 @@ placeholders for header images -->
                         </a>
                     </div>
                     <div class="footer-icon">
-	                    <a title="Contáctese">
-	                        <xsl:attribute name="href">
-	                            <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-	                            <xsl:text>/feedback</xsl:text>
-	                        </xsl:attribute>
-	                        <img class="contacto">
-	                            <xsl:attribute name="src">
-	                                <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-	                                <xsl:text>/themes/</xsl:text>
-					                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-					                <xsl:text>/images/img3.png</xsl:text>
-	                            </xsl:attribute>
-	                        </img>
-	                    </a>
+	                    <a href="javascript:feedback()" title="Contáctese" data-uv-lightbox="classic_widget" data-uv-mode="full" data-uv-primary-color="#cc6d00" data-uv-link-color="#007dbf" data-uv-default-mode="support" data-uv-forum-id="150127">
+							<img class="contacto">
+		                    	<xsl:attribute name="src">
+		                        	<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+		                            <xsl:text>/themes/</xsl:text>
+						            <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+						            <xsl:text>/images/img3.png</xsl:text>
+		                        </xsl:attribute>
+		                      </img>
+						</a>
                     </div>
 	            </div>
             </div>
@@ -426,6 +422,15 @@ placeholders for header images -->
 	            </div>
             </div>
         </div>
+        <script type="text/javascript">
+			(function()
+					{var uv=document.createElement('script');
+					uv.type='text/javascript';
+					uv.async=true;
+					uv.src='//widget.uservoice.com/QIUtmn0eqp3spSPiyMziFg.js';
+					var s=document.getElementsByTagName('script')[0];
+					s.parentNode.insertBefore(uv,s)})()
+			</script>
     </xsl:template>
 
 	<xsl:template name="buildUserBox">
