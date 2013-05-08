@@ -213,10 +213,14 @@ font-weight:bold;
 	padding-right: 20px;
 	background-image: url("../../images/fondo_repeat_izquierda.png");
 	background-repeat: repeat-x;
+	position:relative;
+	top:-1px;
 }
 
 #ds-body {
-    width: 750px;
+	width:50%;
+/*  width: 750px;*/
+	min-width:600px;
 	display: inline-block;
 	float: left;
 	margin-left: 30px;
@@ -225,7 +229,8 @@ font-weight:bold;
 }
 
 #ds-right-section {
-	width: 250px;
+	width:24%;
+/*	width: 250px;*/
 	min-height: 400px;
 	display: inline-block;
 	float: right;
@@ -255,7 +260,8 @@ font-weight:bold;
 	border-radius: 7px 0px 0px 7px;
 }
 #home_search input.ds-text-field {
-	width: 192px;
+/*	width: 192px;*/
+	width:76%;
 }
 .discover-search-box.search input.ds-text-field {
 	width: 400px;
@@ -1806,6 +1812,7 @@ div.primary > ul > li > ul > li.community > div.artifact-description a {
 	margin-top: -30px;
 	margin-left: 291px;
 	background: url("../../images/fondo_transparente.png") repeat scroll 0 0 transparent;
+	min-width:768px;
 }
 #topNav ul { 
 	padding:0; 
