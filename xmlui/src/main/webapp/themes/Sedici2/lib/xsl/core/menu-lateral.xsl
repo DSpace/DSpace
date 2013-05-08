@@ -188,13 +188,12 @@
         </li>
     </xsl:template>
   
- 	<!-- <xsl:template match="dri:item[@rend='selected']" mode="nested">
+ 	<xsl:template match="dri:item[@rend='selected']" mode="nested">
         <li class="selected">
-   			<xsl:value-of select="."/>
+   			 <xsl:apply-templates select="."/>
         </li>
     </xsl:template>
- -->
-
+ 
     <!-- Quick patch to remove empty lists from options -->
     <xsl:template match="dri:options//dri:list[count(child::*)=0]" priority="5" mode="nested">
     </xsl:template>

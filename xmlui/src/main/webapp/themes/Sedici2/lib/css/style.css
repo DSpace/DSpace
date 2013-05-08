@@ -365,10 +365,22 @@ line-height:1.5;
 #ds-options #aspect_discovery_Navigation_list_discovery ul.sublist li.selected {
 color:grey;
 line-height:1.5;
-background-color: #AFEEEE;
+background-color: #bee4f7;
 
 }
 
+#ds-options #aspect_discovery_Navigation_list_discovery ul.sublist li.selected a {
+color:grey;
+line-height:1.5;
+background-color: #bee4f7;
+background-image: url(../../images/cerrar_filtro.png);
+background-repeat:no-repeat;
+padding-right:25px;
+background-position: right;
+
+}
+
+ 
 #aspect_discovery_Navigation_list_discovery ul.sublist li a {
 text-decoration:line-through;
 }
