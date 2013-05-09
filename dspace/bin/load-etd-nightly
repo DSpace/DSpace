@@ -48,10 +48,6 @@ if ($status == 0) then
      mv $incomingdir/$zipfile $processeddir
 
      @ count = $count + 1
-
-     # Transfer to Heckman
-     echo Transfering proquest file to HFGroup
-     $bindir/etd-to-heckman $processeddir $zipfile 
   end
 
   # Marc processing
@@ -69,11 +65,6 @@ if ($status == 0) then
     else
       echo Upload of the marc file is not enabled
     endif
-  endif
-
-  # email csv file
-  if ($count > 0) then
-     $bindir/etd-csv-mail $count $csvdir/$csvfile
   endif
 endif
 
