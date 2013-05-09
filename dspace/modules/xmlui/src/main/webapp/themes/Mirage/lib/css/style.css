@@ -273,7 +273,7 @@ h1.ds-option-set-head {
 .publication-header.ds-static-div {
     border: none;
     padding: 0;
-    margin-top: 0px;
+    margin-top: 6px;
     background-color: transparent;
     -moz-box-shadow: none;
     -webkit-box-shadow: none;
@@ -2224,3 +2224,19 @@ a.feedbackform-user-voice-link {
     }
     
 }
+
+.hidden_form_by{
+    display: none;
+}
+
+.hidden_form_by{
+    display: none;
+}
+
+.choose_browse_by{
+    display: none;
+}
+#aspect_discovery_SearchFilterTransformer_field_starts_with{
+        margin-left: 15px;
+
+    }
