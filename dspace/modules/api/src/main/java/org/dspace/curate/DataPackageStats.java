@@ -100,7 +100,7 @@ public class DataPackageStats extends AbstractCurationTask {
 	String numKeywords = "[no numKeywords found]";
 	String numKeywordsJournal = "[unknown]";
 	String numberOfFiles = "[no numberOfFiles found]";
-	int packageSize = 0;
+	long packageSize = 0;
 	String embargoType = "[unknown]";
 	String embargoDate = "[unknown]";
 	int maxDownloads = 0;
@@ -142,9 +142,7 @@ public class DataPackageStats extends AbstractCurationTask {
 		// article DOI
 		vals = item.getMetadata("dc.relation.isreferencedby");
 		if (vals.length == 0) {
-		    setResult("Object has no dc.relation.isreferencedby available " + handle);
-		    log.error("Skipping -- Object has no dc.relation.isreferencedby available " + handle);
-		    return Curator.CURATE_SKIP;
+		    log.debug("Object has no articleDOI (dc.relation.isreferencedby) " + handle);
 		} else {
 		    articleDOI = vals[0].value;
 		}
@@ -269,15 +267,18 @@ public class DataPackageStats extends AbstractCurationTask {
 			// add total size of the bitstreams in this data file 
 			// to the cumulative total for the package
 			// (includes metadata, readme, and textual conversions for indexing)
+			/*
 			for (Bundle bn : fileItem.getBundles()) {
 			    for (Bitstream bs : bn.getBitstreams()) {
 				packageSize = packageSize + bs.getSize();
 			    }
 			}
 			log.debug("total package size (as of file " + fileID + ") = " + packageSize);
-
+			*/
+			
 			// embargo setting (of last file processed)
-			vals = fileItem.getMetadata("dc.type.embargo");
+			/*
+			  vals = fileItem.getMetadata("dc.type.embargo");
 			if (vals.length > 0) {
 			    embargoType = vals[0].value;
 			}
@@ -292,7 +293,7 @@ public class DataPackageStats extends AbstractCurationTask {
 			}
 			log.debug("embargoType = " + embargoType);
 			log.debug("embargoDate = " + embargoDate);
-			
+			*/
 		       			    			
 			// number of downlaods for most downloaded file
 			// must use the DSpace item ID, since the solr stats system is based on this ID
@@ -334,7 +335,7 @@ public class DataPackageStats extends AbstractCurationTask {
 
 	// slow this down a bit so we don't overwhelm the production SOLR server with requests
 	try {
-	    Thread.sleep(20);
+	    Thread.sleep(200);
 	} catch(InterruptedException e) {
 	    // ignore it
 	}
