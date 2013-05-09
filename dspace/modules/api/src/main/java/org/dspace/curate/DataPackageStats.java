@@ -67,11 +67,12 @@ public class DataPackageStats extends AbstractCurationTask {
     DocumentBuilderFactory dbf = null;
     DocumentBuilder docb = null;
     static long total = 0;
+    private Context context;
     
     @Override 
     public void init(Curator curator, String taskId) throws IOException {
         super.init(curator, taskId);
-
+	
         identifierService = new DSpace().getSingletonService(IdentifierService.class);            
 	
 	// init xml processing
@@ -101,12 +102,19 @@ public class DataPackageStats extends AbstractCurationTask {
 	String numKeywordsJournal = "[unknown]";
 	String numberOfFiles = "[no numberOfFiles found]";
 	long packageSize = 0;
-	String embargoType = "[unknown]";
-	String embargoDate = "[unknown]";
+	String embargoType = "none";
+	String embargoDate = "";
 	int maxDownloads = 0;
 	String numberOfDownloads = "[unknown]";
 	String manuscriptNum = null;
 	String dateAccessioned = "[unknown]";
+
+	try {
+	    context = new Context();
+        } catch (SQLException e) {
+	    log.fatal("Unable to open database connection", e);
+	    return Curator.CURATE_FAIL;
+	}
 	
 	if (dso.getType() == Constants.COLLECTION) {
 	    // output headers for the CSV file that will be created by processing all items in this collection
@@ -129,6 +137,7 @@ public class DataPackageStats extends AbstractCurationTask {
 		if (vals.length == 0) {
 		    setResult("Object has no dc.identifier available " + handle);
 		    log.error("Skipping -- no dc.identifier available for " + handle);
+		    context.abort(); 
 		    return Curator.CURATE_SKIP;
 		} else {
 		    for(int i = 0; i < vals.length; i++) {
@@ -154,6 +163,7 @@ public class DataPackageStats extends AbstractCurationTask {
 		if (vals.length == 0) {
 		    setResult("Object has no prism.publicationName available " + handle);
 		    log.error("Skipping -- Object has no prism.publicationName available " + handle);
+		    context.abort();
 		    return Curator.CURATE_SKIP;
 		} else {
 		    journal = vals[0].value;
@@ -165,6 +175,7 @@ public class DataPackageStats extends AbstractCurationTask {
 		if (vals.length == 0) {
 		    setResult("Object has no dc.date.accessioned available " + handle);
 		    log.error("Skipping -- Object has no dc.date.accessioned available " + handle);
+		    context.abort();
 		    return Curator.CURATE_SKIP;
 		} else {
 		    dateAccessioned = vals[0].value;
@@ -241,21 +252,22 @@ public class DataPackageStats extends AbstractCurationTask {
 
 		*/
 		
-		// number of files
+		// count the files, and compute statistics that depend on the files
 		log.debug("getting data file info");
-		vals = item.getMetadata("dc.relation.haspart");
-		if (vals.length == 0) {
+		DCValue[] dataFiles = item.getMetadata("dc.relation.haspart");
+		if (dataFiles.length == 0) {
 		    setResult("Object has no dc.relation.haspart available " + handle);
 		    log.error("Skipping -- Object has no dc.relation.haspart available " + handle);
+		    context.abort();
 		    return Curator.CURATE_SKIP;
 		} else {
-		    numberOfFiles = "" + vals.length;
+		    numberOfFiles = "" + dataFiles.length;
 		    packageSize = 0;
 		    
 		    // for each data file in the package
 
-		    for(int i = 0; i < vals.length; i++) {
-			String fileID = vals[i].value;
+		    for(int i = 0; i < dataFiles.length; i++) {
+			String fileID = dataFiles[i].value;
 			log.debug(" ======= processing fileID = " + fileID);
 
 			// get the DSpace Item for this fileID
@@ -267,20 +279,18 @@ public class DataPackageStats extends AbstractCurationTask {
 			// add total size of the bitstreams in this data file 
 			// to the cumulative total for the package
 			// (includes metadata, readme, and textual conversions for indexing)
-			/*
 			for (Bundle bn : fileItem.getBundles()) {
 			    for (Bitstream bs : bn.getBitstreams()) {
 				packageSize = packageSize + bs.getSize();
 			    }
 			}
 			log.debug("total package size (as of file " + fileID + ") = " + packageSize);
-			*/
-			
+						
 			// embargo setting (of last file processed)
-			/*
-			  vals = fileItem.getMetadata("dc.type.embargo");
+			vals = fileItem.getMetadata("dc.type.embargo");
 			if (vals.length > 0) {
 			    embargoType = vals[0].value;
+			    log.debug("EMBARGO vals " + vals.length + " type " + embargoType);
 			}
 			vals = fileItem.getMetadata("dc.date.embargoedUntil");
 			if (vals.length > 0) {
@@ -288,12 +298,12 @@ public class DataPackageStats extends AbstractCurationTask {
 			}
 			if((embargoType == null || embargoType.equals("") || embargoType.equals("none")) &&
 			   (embargoDate != null && !embargoDate.equals(""))) {
-				// correctly encode embago type to "oneyear" if there is a date set, but the type is blank or none
-				embargoType = "oneyear";
+			    // correctly encode embago type to "oneyear" if there is a date set, but the type is blank or none
+			    embargoType = "oneyear";
 			}
 			log.debug("embargoType = " + embargoType);
 			log.debug("embargoDate = " + embargoDate);
-			*/
+			
 		       			    			
 			// number of downlaods for most downloaded file
 			// must use the DSpace item ID, since the solr stats system is based on this ID
@@ -315,16 +325,19 @@ public class DataPackageStats extends AbstractCurationTask {
 		    }
 
 		}
-		log.info(handle + "done.");
+		log.info(handle + " done.");
 	    } catch (Exception e) {
 		log.fatal("Skipping -- Exception in processing " + handle, e);
 		setResult("Object has a fatal error: " + handle + "\n" + e.getMessage());
 		report("Object has a fatal error: " + handle + "\n" + e.getMessage());
+		
+		context.abort();
 		return Curator.CURATE_SKIP;
 	    }
 	} else {
 	    log.info("Skipping -- non-item DSpace object");
 	    setResult("Object skipped (not an item)");
+	    context.abort();
 	    return Curator.CURATE_SKIP;
         }
 
@@ -335,13 +348,18 @@ public class DataPackageStats extends AbstractCurationTask {
 
 	// slow this down a bit so we don't overwhelm the production SOLR server with requests
 	try {
-	    Thread.sleep(200);
+	    Thread.sleep(20);
 	} catch(InterruptedException e) {
 	    // ignore it
 	}
 
-	
 	log.debug("DataPackageStats complete");
+
+	try { 
+	    context.complete();
+        } catch (SQLException e) {
+	    log.fatal("Unable to close database connection", e);
+	}
 	return Curator.CURATE_SUCCESS;
     }
 
@@ -355,11 +373,7 @@ public class DataPackageStats extends AbstractCurationTask {
     private Item getDSpaceItem(String itemID) {
 	Item dspaceItem = null;
 	try {
-	    Context context = new Context();
 	    dspaceItem = (Item)identifierService.resolve(context, itemID);  
-	    context.complete();
-        } catch (SQLException e) {
-	    log.fatal("Unable to get DSpace Item for " + itemID, e);
         } catch (IdentifierNotFoundException e) {
 	    log.fatal("Unable to get DSpace Item for " + itemID, e);
 	} catch (IdentifierNotResolvableException e) {
