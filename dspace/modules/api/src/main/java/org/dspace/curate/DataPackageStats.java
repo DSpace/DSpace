@@ -32,6 +32,8 @@ import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.Bundle;
+import org.dspace.content.Bitstream;
 import org.dspace.content.crosswalk.MetadataValidationException;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
@@ -43,17 +45,17 @@ import org.dspace.utils.DSpace;
 import org.apache.log4j.Logger;
 
 /**
- * DataPackageStats retrieves statistics based on an input data package.
+ * DataPackageStats retrieves detailed statistics about a data package.
  *
- * WARNING: This file is deprecated! Its original purpose was to generate
- * statistics for the 2011 Dryad NSF grant proposal. We are now breaking these stats out into their
- * own curation tasks, which makes it easier to update when we need to make changes. For summary stats,
- * see PackageSimpleStats. For a brief listing of fields from a particular package, see DataPackageInfo.
+ * Some statistics are calculated based on the files that are contained in the
+ * data package. Extra processing time is required to load and process the data
+ * file metadata, so this report takes some time to run. For simpler information
+ * about data packages, see DataPackageInfo.
  *
  * The task succeeds if it was able to locate all required stats, otherwise it fails.
  * Originally based on the RequiredMetadata task by Richard Rodgers.
  *
- * Input: a single data package (the curation framework can iterate over a collection of packages)
+ * Input: a single data package OR a collection that contains data packages
  * Output: CSV file with appropriate stats 
  * @author Ryan Scherle
  */
@@ -109,26 +111,24 @@ public class DataPackageStats extends AbstractCurationTask {
 	if (dso.getType() == Constants.COLLECTION) {
 	    // output headers for the CSV file that will be created by processing all items in this collection
 	    report("handle, packageDOI, articleDOI, journal, numKeywords, numKeywordsJournal, numberOfFiles, packageSize, " +
-		   "embargoType, numberOfDownloads, manuscriptNum, dateAccessioned");
+		   "embargoType, embargoDate, numberOfDownloads, manuscriptNum, dateAccessioned");
 	} else if (dso.getType() == Constants.ITEM) {
             Item item = (Item)dso;
-	    
+
 	    try {
 		handle = item.getHandle();
 		log.info("handle = " + handle);
 		
 		if (handle == null) {
-		    // we are still in workflow - no handle assigned
+		    // this item is still in workflow - no handle assigned
 		    handle = "in workflow";
 		}
-
-		StringBuilder sb = new StringBuilder();
-		sb.append("Item: ").append(handle);
-
+		
 		// package DOI
 		DCValue[] vals = item.getMetadata("dc.identifier");
 		if (vals.length == 0) {
 		    setResult("Object has no dc.identifier available " + handle);
+		    log.error("Skipping -- no dc.identifier available for " + handle);
 		    return Curator.CURATE_SKIP;
 		} else {
 		    for(int i = 0; i < vals.length; i++) {
@@ -143,7 +143,7 @@ public class DataPackageStats extends AbstractCurationTask {
 		vals = item.getMetadata("dc.relation.isreferencedby");
 		if (vals.length == 0) {
 		    setResult("Object has no dc.relation.isreferencedby available " + handle);
-		    log.error("Object has no dc.relation.isreferencedby available " + handle);
+		    log.error("Skipping -- Object has no dc.relation.isreferencedby available " + handle);
 		    return Curator.CURATE_SKIP;
 		} else {
 		    articleDOI = vals[0].value;
@@ -155,7 +155,7 @@ public class DataPackageStats extends AbstractCurationTask {
 		vals = item.getMetadata("prism.publicationName");
 		if (vals.length == 0) {
 		    setResult("Object has no prism.publicationName available " + handle);
-		    log.error("Object has no prism.publicationName available " + handle);
+		    log.error("Skipping -- Object has no prism.publicationName available " + handle);
 		    return Curator.CURATE_SKIP;
 		} else {
 		    journal = vals[0].value;
@@ -166,6 +166,7 @@ public class DataPackageStats extends AbstractCurationTask {
 		vals = item.getMetadata("dc.date.accessioned");
 		if (vals.length == 0) {
 		    setResult("Object has no dc.date.accessioned available " + handle);
+		    log.error("Skipping -- Object has no dc.date.accessioned available " + handle);
 		    return Curator.CURATE_SKIP;
 		} else {
 		    dateAccessioned = vals[0].value;
@@ -247,6 +248,7 @@ public class DataPackageStats extends AbstractCurationTask {
 		vals = item.getMetadata("dc.relation.haspart");
 		if (vals.length == 0) {
 		    setResult("Object has no dc.relation.haspart available " + handle);
+		    log.error("Skipping -- Object has no dc.relation.haspart available " + handle);
 		    return Curator.CURATE_SKIP;
 		} else {
 		    numberOfFiles = "" + vals.length;
@@ -264,51 +266,24 @@ public class DataPackageStats extends AbstractCurationTask {
 			log.debug("file internalID = " + fileItem.getID());
 			
 			// total package size
-			// get the file metadata via OAI, since it reports on the file sizes, even for embargoed items
-			/*
-			  Package size is currently commented out, because we don't want to use the handle or mess with OAI. We need to do this a better way.
-			  
-			URL oaiAccessURL = new URL("http://www.datadryad.org/oai/request?verb=GetRecord&identifier=oai:datadryad.org:" + shortHandle + "&metadataPrefix=mets");
-			log.debug("requesting " + oaiAccessURL);
-			Document oaidoc = docb.parse(oaiAccessURL.openStream());
-			NodeList nl = oaidoc.getElementsByTagName("mods:titleInfo");
-			if(nl.getLength() < 1) {
-			    log.error("Object has no mods:titleInfo available " + handle);
-			    return Curator.CURATE_SKIP;
-			}
-			String nodeText = nl.item(0).getTextContent();
-
-			// add total size of bitstreams in this data file 
+			// add total size of the bitstreams in this data file 
 			// to the cumulative total for the package
-			// (includes readme and textual conversions for indexing)
-			nl = oaidoc.getElementsByTagName("file");
-			
-			for(int j = 0; j < nl.getLength(); j++) {
-			    Node aNode = nl.item(j);
-			    Node sizeAtt = aNode.getAttributes().getNamedItem("SIZE");
-			    int bitstreamSize =  Integer.parseInt(sizeAtt.getTextContent());
-			    packageSize = packageSize + bitstreamSize;
+			// (includes metadata, readme, and textual conversions for indexing)
+			for (Bundle bn : fileItem.getBundles()) {
+			    for (Bitstream bs : bn.getBitstreams()) {
+				packageSize = packageSize + bs.getSize();
+			    }
 			}
-			log.debug("total package size = " + packageSize);
-			*/
+			log.debug("total package size (as of file " + fileID + ") = " + packageSize);
 
 			// embargo setting (of last file processed)
-			// need to get embargo from mets metadata since oai doesn't have it
-			/* Temorarily disable embargo settings -- we don't want to use the handles, and we should be able to get this without using the METS
-			URL metsAccessURL = new URL("http://datadryad.org/metadata/handle/" + shortHandle + "/mets.xml");
-			Document metsdoc = docb.parse(metsAccessURL.openStream());
-			nl = metsdoc.getElementsByTagName("dim:field");
-			for(int k = 0; k < nl.getLength(); k++) {
-			    Node aNode = nl.item(k);
-			    Node qualAtt = aNode.getAttributes().getNamedItem("qualifier");
-			    if(qualAtt != null && qualAtt.getTextContent().equals("embargoedUntil")) {
-				// extract embargo date
-				embargoDate = aNode.getTextContent();
-			    }
-			    if(qualAtt != null && qualAtt.getTextContent().equals("embargo")) {
-				// extract embargo type
-				embargoType = aNode.getTextContent();
-			    }
+			vals = fileItem.getMetadata("dc.type.embargo");
+			if (vals.length > 0) {
+			    embargoType = vals[0].value;
+			}
+			vals = fileItem.getMetadata("dc.date.embargoedUntil");
+			if (vals.length > 0) {
+			    embargoDate = vals[0].value;
 			}
 			if((embargoType == null || embargoType.equals("") || embargoType.equals("none")) &&
 			   (embargoDate != null && !embargoDate.equals(""))) {
@@ -316,10 +291,13 @@ public class DataPackageStats extends AbstractCurationTask {
 				embargoType = "oneyear";
 			}
 			log.debug("embargoType = " + embargoType);
-			*/
+			log.debug("embargoDate = " + embargoDate);
+			
 		       			    			
 			// number of downlaods for most downloaded file
 			// must use the DSpace item ID, since the solr stats system is based on this ID
+			// The SOLR address is hardcoded to the production system here, because even when we run on test servers,
+			// it's easiest to use the real stats --the test servers typically don't have useful stats available
 			URL downloadStatURL = new URL("http://datadryad.org/solr/statistics/select/?indent=on&q=owningItem:" + fileItem.getID());
 			log.debug("fetching " + downloadStatURL);
 			Document statsdoc = docb.parse(downloadStatURL.openStream());
@@ -331,20 +309,20 @@ public class DataPackageStats extends AbstractCurationTask {
 			    // rather than converting maxDownloads back to a string, just use the string we parsed above
 			    numberOfDownloads = downloadsAtt;
 			}
-			log.debug("max downloads = " + numberOfDownloads);
+			log.debug("max downloads (as of file " + fileID + ") = " + numberOfDownloads);
 			
 		    }
 
 		}
 		log.info(handle + "done.");
 	    } catch (Exception e) {
-		log.fatal("Exception in processing", e);
+		log.fatal("Skipping -- Exception in processing " + handle, e);
 		setResult("Object has a fatal error: " + handle + "\n" + e.getMessage());
 		report("Object has a fatal error: " + handle + "\n" + e.getMessage());
 		return Curator.CURATE_SKIP;
 	    }
 	} else {
-	    log.info("skipping non-item DSpace object");
+	    log.info("Skipping -- non-item DSpace object");
 	    setResult("Object skipped (not an item)");
 	    return Curator.CURATE_SKIP;
         }
@@ -352,13 +330,11 @@ public class DataPackageStats extends AbstractCurationTask {
 	setResult("Last processed item = " + handle + " -- " + packageDOI);
 	report(handle + ", " + packageDOI + ", " + articleDOI + ", \"" + journal + "\", " + numKeywords + ", " +
 	       numKeywordsJournal + ", " + numberOfFiles + ", " + packageSize + ", " +
-	       embargoType + ", " + numberOfDownloads + ", " + manuscriptNum + ", " + dateAccessioned);
+	       embargoType + ", " + embargoDate + ", " + numberOfDownloads + ", " + manuscriptNum + ", " + dateAccessioned);
 
-	// don't overwhelm the production server with requests
-	// TODO: remove this after the code above is rewritten to not use OAI or METS -- it will be much more
-	// efficient once it is accessing the database directly
+	// slow this down a bit so we don't overwhelm the production SOLR server with requests
 	try {
-	    Thread.sleep(200);
+	    Thread.sleep(20);
 	} catch(InterruptedException e) {
 	    // ignore it
 	}

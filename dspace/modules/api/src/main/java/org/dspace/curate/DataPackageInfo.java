@@ -41,10 +41,14 @@ import org.apache.log4j.Logger;
 /**
  * DataPackageInfo retrieves basic information about an input data package.
  *
+ * This report is intended for quick and simple information. It does not
+ * iterate over the data files that belong to a data package. For more
+ * detailed statistics, see DataPackageStats.
+ *
  * The task succeeds if it was able to locate all required stats, otherwise it fails.
  * Originally based on the RequiredMetadata task by Richard Rodgers.
  *
- * Input: a single data package (the curation framework can iterate over a collection of packages)
+ * Input: a single data package OR a collection that contains data packages
  * Output: CSV file with appropriate stats 
  * @author Ryan Scherle
  */
