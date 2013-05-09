@@ -770,6 +770,60 @@ public class ConfigurationManager
     }
 
     /**
+     * Wrapper for {@link NewsManager#getNewsFilePath()}.
+     * @deprecated since 4.0
+     */
+    public static String getNewsFilePath()
+    {
+        return NewsManager.getNewsFilePath();
+    }
+
+    /**
+     * Wrapper for {@link NewsManager#readNewsFile(java.lang.String)}.
+     * @deprecated since 4.0
+     */
+    public static String readNewsFile(String name)
+    {
+        return NewsManager.readNewsFile(name);
+    }
+
+    /**
+     * Wrapper for {@link NewsManager#writeNewsFile(java.lang.String, java.lang.String)}.
+     * @deprecated since 4.0
+     */
+    public static String writeNewsFile(String file, String news)
+    {
+        return NewsManager.writeNewsFile(file, news);
+    }
+
+    /**
+     * Wrapper for {@link LicenseManager#getLicenseText(java.lang.String)}.
+     * @deprecated since 4.0
+     */
+    public static String getLicenseText(String licenseFile)
+    {
+        return LicenseManager.getLicenseText(licenseFile);
+    }
+
+    /**
+     * Wrapper for {@link LicenseManager#getDefaultSubmissionLicense()}.
+     * @deprecated since 4.0
+     */
+    public static String getDefaultSubmissionLicense()
+    {
+        return LicenseManager.getDefaultSubmissionLicense();
+    }
+
+    /**
+     * Wrapper for {@link LicenseManager#writeLicenseFile(java.lang.String, java.lang.String)}.
+     * @deprecated since 4.0
+     */
+    public static void writeLicenseFile(String licenseFile, String newLicense)
+    {
+        LicenseManager.writeLicenseFile(licenseFile, newLicense);
+    }
+
+    /**
      * Recursively interpolate variable references in value of
      * property named "key".
      * @return new value if it contains interpolations, or null
