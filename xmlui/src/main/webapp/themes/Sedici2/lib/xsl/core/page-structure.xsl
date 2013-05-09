@@ -42,9 +42,6 @@
                         <!--The header div, complete with title, subtitle and other junk-->
                         <xsl:call-template name="buildHeader"/>
 
-                        <!--The trail is built by applying a template over pageMeta's trail children. -->
-<!--                         <xsl:call-template name="buildTrail"/> -->
-
                         <!--javascript-disabled warning, will be invisible if javascript is enabled-->
                         <div id="no-js-warning-wrapper" class="hidden">
                             <div id="no-js-warning">
@@ -736,6 +733,10 @@ placeholders for header images -->
     -->
     <xsl:template match="dri:body">
         <div id="ds-body">
+
+	        <!--The trail is built by applying a template over pageMeta's trail children. -->
+	        <xsl:call-template name="buildTrail"/>
+        
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']">
                 <div id="ds-system-wide-alert">
                     <p>
@@ -799,44 +800,29 @@ placeholders for header images -->
 
 
     <xsl:template name="buildTrail">
-        <div id="ds-trail-wrapper">
-            <ul id="ds-trail">
-                <!-- No muestro ni el home ni el base en caso de ser uno solo -->
-                <xsl:choose>
-                    <xsl:when test="count(/dri:document/dri:meta/dri:pageMeta/dri:trail) >2">
-                        <xsl:apply-templates select="/dri:document/dri:meta/dri:pageMeta/dri:trail"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-
-                    </xsl:otherwise>
-                </xsl:choose>
-            </ul>
-        </div>
+        <!-- No muestro ni el home ni el base en caso de ser uno solo -->
+        <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:trail) > 2">
+	        <div id="ds-trail-wrapper">
+	            <ul id="ds-trail">
+                	<xsl:apply-templates select="/dri:document/dri:meta/dri:pageMeta/dri:trail"/>
+	            </ul>
+	        </div>
+	    </xsl:if>
     </xsl:template>
 
     <!-- The header (distinct from the HTML head element) contains the title, subtitle, login box and various
 placeholders for header images -->
 
     <xsl:template match="dri:trail">
-        <!-- Este if controla que la ultima ocurrencia del trail no se muestre -->
-        <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:trail) - 1 > (position()-1)">
-            <!--put an arrow between the parts of the trail-->
-            <xsl:if test="position()>1">
+        	<!-- Omite el primer y el último elemento del trail -->
+            <xsl:if test="not(position()=1 or position()=last())">
+	            <!-- genera la flechita -->
                 <xsl:if test="position()>2">
                     <li class="ds-trail-arrow">
                         <xsl:text>&#8594;</xsl:text>
                     </li>
                 </xsl:if>
-                <li>
-                    <xsl:attribute name="class">
-                        <xsl:text>ds-trail-link </xsl:text>
-                        <xsl:if test="position()=2">
-                            <xsl:text>first-link </xsl:text>
-                        </xsl:if>
-                        <xsl:if test="position()=(last()-1)">
-                            <xsl:text>last-link</xsl:text>
-                        </xsl:if>
-                    </xsl:attribute>
+                <li class="ds-trail-link">
                     <!-- Determine whether we are dealing with a link or plain text trail link -->
                     <xsl:choose>
                         <xsl:when test="./@target">
@@ -853,7 +839,6 @@ placeholders for header images -->
                     </xsl:choose>
                 </li>
             </xsl:if>
-        </xsl:if>
     </xsl:template>
 
 

@@ -128,27 +128,15 @@ select.multiple {
 }
 
 #ds-trail-wrapper {
-/*    background-color: #ebf8ff;*/
-/*	background-color: #fff2e5;*/
-background-image:url(../../images/marca_head3.png);
     margin: 0;
-    padding: 6px 0px 0px 0px;
 	color:black;
-/*    border-top: 1px solid #9cacba;*/
-/*    border-bottom: 1px solid #9cacba;*/
-    min-width: 950px;
-	height:25px;
-/*	background-image:url(../../images/trail.png);*/
-/*	background-position:100px -10px;*/
 	border-bottom:1px dashed #dedede;
-	background-position:-750px -181px;
-
 }
 
-#ds-trail-wrapper a{
-text-decoration:none;
-color:f59021;
-font-weight:bold;
+#ds-trail-wrapper a {
+	text-decoration:none;
+	color:f59021;
+	font-weight:bold;
 }
 
 #ds-trail {
@@ -156,7 +144,6 @@ font-weight:bold;
     line-height: 138.5%;
     margin: 0;
     padding: 3px 0;
-	
 }
 
 #ds-trail li {
@@ -167,16 +154,8 @@ font-weight:bold;
 
 #ds-trail a {
     color: #8a4d0c;
-/*	background-image:url(../../images/icono_navegacion.png);
-	background-image:url(../../images/trailie.png);
-	background-position:bottom center;
-	background-repeat:no-repeat;
-*/
 	height:38px;
-/*	padding:5px 0px 0px 20px;*/
 	font-weight:normal;
-
-	
 }
 
 #no-js-warning,
