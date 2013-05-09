@@ -2191,4 +2191,34 @@
         </xsl:choose>
     </xsl:template>
 
+    <!-- Override metadata field rendering to hide manuscript number -->
+    <xsl:template match="dim:field" mode="itemDetailView-DIM">
+        <xsl:if test="not(./@qualifier = 'manuscriptNumber')">
+            <tr>
+                <xsl:attribute name="class">
+                    <xsl:text>ds-table-row </xsl:text>
+                    <xsl:if test="(position() div 2 mod 2 = 0)">even </xsl:if>
+                    <xsl:if test="(position() div 2 mod 2 = 1)">odd </xsl:if>
+                </xsl:attribute>
+                <td>
+                    <xsl:value-of select="./@mdschema"/>
+                    <xsl:text>.</xsl:text>
+                    <xsl:value-of select="./@element"/>
+                    <xsl:if test="./@qualifier">
+                        <xsl:text>.</xsl:text>
+                        <xsl:value-of select="./@qualifier"/>
+                    </xsl:if>
+                </td>
+            <td>
+              <xsl:copy-of select="./node()"/>
+              <xsl:if test="./@authority and ./@confidence">
+                <xsl:call-template name="authorityConfidenceIcon">
+                  <xsl:with-param name="confidence" select="./@confidence"/>
+                </xsl:call-template>
+              </xsl:if>
+            </td>
+                <td><xsl:value-of select="./@language"/></td>
+            </tr>
+        </xsl:if>
+    </xsl:template>
 </xsl:stylesheet>
