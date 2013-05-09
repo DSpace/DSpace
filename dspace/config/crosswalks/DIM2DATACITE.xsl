@@ -241,6 +241,3 @@
     </resource>
   </xsl:template>
 </xsl:stylesheet>
-
-
-
