@@ -73,8 +73,10 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
     protected SolrQuery queryArgs;
 
     private int DEFAULT_PAGE_SIZE = 10;
-    private String DEFAULT_FIELD = "dc.contributor.author_filter";
-    private String field =DEFAULT_FIELD;
+    private String field =null;
+    //indicate if the query facet is the facet field we are rendering now
+    //default to be false so the new facet search always starts with page 0
+    //private boolean isQueryFacet=false;
     private ConfigurationService config = null;
 
     private SearchService searchService = null;
@@ -174,6 +176,8 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
         Request request = ObjectModelHelper.getRequest(objectModel);
         Context context = ContextUtil.obtainContext(objectModel);
 
+        field = parameters.getParameter("field", "");
+
         if (queryResults != null)
         {
             return queryResults;
@@ -184,11 +188,16 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
         //Make sure we add our default filters
         queryArgs.addFilterQuery(SearchUtils.getDefaultFilters(getView()));
 
-        field = parameters.getParameter("field", DEFAULT_FIELD);
+        //get the current rendering facet
 
+        if(field.equals(request.getParameter(SearchFilterParam.FACET_FIELD))){
         queryArgs.setQuery("search.resourcetype: " + Constants.ITEM + ((request.getParameter("query") != null && !"".equals(request.getParameter("query"))) ? " AND (" + request.getParameter("query") + ")" : ""));
 //        queryArgs.setQuery("search.resourcetype:" + Constants.ITEM);
-
+        }
+        else
+        {
+            queryArgs.setQuery("search.resourcetype: " + Constants.ITEM);
+        }
         queryArgs.setRows(0);
 
         queryArgs.addFilterQuery(getSolrFilterQueries());
@@ -203,8 +212,16 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
 
         queryArgs.setFacet(true);
         String facetField = field;
+        int offset=0;
+        //only set the offeset when the search query equals current rendering facet
+        if(field.equals(request.getParameter(SearchFilterParam.FACET_FIELD))){
+        offset= RequestUtils.getIntParameter(request, SearchFilterParam.OFFSET);
+            if (offset == -1)
+            {
+                offset = 0;
+            }
+        }
 
-        int offset = 0;
 
         if(facetField.endsWith(".year")){
 //            TODO: dates are now handled in another way, throw this away?
@@ -270,7 +287,13 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
 
 
         } else {
-
+            //only set the start_with when the search query equals current rendering facet
+            if(field.equals(request.getParameter(SearchFilterParam.FACET_FIELD))){
+                if(request.getParameter(SearchFilterParam.STARTS_WITH) != null)
+                {
+                    queryArgs.setFacetPrefix(facetField, request.getParameter(SearchFilterParam.STARTS_WITH).toLowerCase());
+                }
+            }
             queryArgs.addFacetField(facetField);
         }
 
@@ -318,6 +341,7 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
         Request request = ObjectModelHelper.getRequest(objectModel);
         String facetField = field;
 
+        if(field.equals(request.getParameter(SearchFilterParam.FACET_FIELD))){
         pageMeta.addMetadata("title").addContent(message("xmlui.Discovery.AbstractSearch.type_" + facetField));
 
 
@@ -329,6 +353,7 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
         }
 
         pageMeta.addTrail().addContent(message("xmlui.Discovery.AbstractSearch.type_" + facetField));
+        }
     }
 
 
@@ -336,10 +361,19 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
         Request request = ObjectModelHelper.getRequest(objectModel);
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        SearchFilterParam browseParams=null;
+        //get the current rendering facet
+        field = parameters.getParameter("field", "");
 
-        SearchFilterParam browseParams = new SearchFilterParam(request);
+        if(field.equals(request.getParameter(SearchFilterParam.FACET_FIELD))){
+           browseParams= new SearchFilterParam(request);
+        }
+        else
+        {
+            browseParams=new SearchFilterParam(null);
+        }
         // Build the DRI Body
-        Division div = body.addDivision("browse-by-" + field, "primary");
+        Division div = body.addDivision("browse-by-" + field, "form_"+field);
 
         addBrowseJumpNavigation(div, browseParams, request);
 
@@ -348,15 +382,7 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
 
         // Build the collection viewer division.
 
-        //Make sure we get our results
-        if(queryResults==null){
-            try{
-            queryResults = searchService.search(context, queryArgs);
-            }catch (Exception e)
-            {
 
-            }
-        }
         queryResults = getQueryResponse(dso);
         if (this.queryResults != null) {
 
@@ -378,22 +404,37 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
 
                 }
 
-                Division results = body.addDivision("browse-by-" + field + "-results", "primary");
+                Division results = body.addDivision("browse-by-" + field + "-results", "primary_"+field);
 
                 results.setHead(message("xmlui.Discovery.AbstractSearch.type_" + field));
                 if (values != null && 0 < values.size()) {
 
-
+                    int offSet=0;
 
                     // Find our faceting offset
-                    int offSet = 0;
                     try {
-                        offSet = Integer.parseInt(queryArgs.get(FacetParams.FACET_OFFSET));
+                        offSet= Integer.parseInt(queryArgs.get(FacetParams.FACET_OFFSET));
                     } catch (NumberFormatException e) {
                         //Ignore
                     }
 
+                    String nextPageUrl = null;
+                    if(facetField.getName().endsWith(".year")){
+                        offSet = Util.getIntParameter(request, SearchFilterParam.OFFSET);
+                        offSet = offSet == -1 ? 0 : offSet;
 
+                        if ((offSet + DEFAULT_PAGE_SIZE) < values.size())
+                        {
+                            nextPageUrl = getNextPageURL(browseParams, request);
+                        }
+                    }else{
+                        if (values.size() == (DEFAULT_PAGE_SIZE + 1))
+                        {
+                            nextPageUrl = getNextPageURL(browseParams, request);
+                        }
+
+
+                    }
                     int shownItemsMax;
 
 
@@ -411,13 +452,21 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
 
                     }
 
+                    // We put our total results to -1 so this doesn't get shown in the results (will be hidden by the xsl)
+                    // The reason why we do this is because solr 1.4 can't retrieve the total number of facets found
+                    results.setSimplePagination(-1, offSet + 1,
+                                                    shownItemsMax, getPreviousPageURL(browseParams, request), nextPageUrl);
+
+
 
                     Table singleTable = results.addTable("browse-by-" + field + "-results", (int) (queryResults.getResults().getNumFound() + 1), 1);
 
                     List<String> filterQueries = new ArrayList<String>();
+                    if(field.equals(request.getParameter(SearchFilterParam.FACET_FIELD))){
                     if(request.getParameterValues("fq") != null)
                     {
                         filterQueries = Arrays.asList(request.getParameterValues("fq"));
+                    }
                     }
 
                     if(facetField.getName().endsWith(".year")){
@@ -451,8 +500,9 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
                             renderFacetField(browseParams, dso, facetField, singleTable, filterQueries, value);
                         }
                     }
-                    String url = ConfigurationManager.getProperty("dspace.url")+"/search-filter?query=&field="+field+"&fq=location:l2";
-		    results.addList("link-to-button").addItemXref(url,"View More");
+                    //don't need view more link anymore
+//                    String url = ConfigurationManager.getProperty("dspace.url")+"/search-filter?query=&field="+field+"&fq=location:l2";
+//		            results.addList("link-to-button-"+field).addItemXref(url,"View More");
                 }else{
                     results.addPara(message("xmlui.discovery.SearchFacetFilter.no-results"));
                 }
@@ -463,30 +513,31 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
 
     private void addBrowseJumpNavigation(Division div, SearchFilterParam browseParams, Request request)
             throws WingException, SQLException {
-        Division jump = div.addInteractiveDivision("filter-navigation."+field, contextPath + "/" + getSearchFilterUrl(),
+        Division jump = div.addInteractiveDivision("filter-navigation-"+field, contextPath + "/" + getSearchFilterUrl(),
                 Division.METHOD_POST, "secondary navigation");
 
         Map<String, String> params = new HashMap<String, String>();
-        params.putAll(browseParams.getCommonBrowseParams());
-        // Add all the query parameters as hidden fields on the form
-        for(Map.Entry<String, String> param : params.entrySet()){
-            jump.addHidden(param.getKey()).setValue(param.getValue());
-        }
-        String[] filterQueries = getParameterFilterQueries();
-        for (String filterQuery : filterQueries) {
-            jump.addHidden("fq").setValue(filterQuery);
+        if(field.equals(request.getParameter(SearchFilterParam.FACET_FIELD))){
+            params.putAll(browseParams.getCommonBrowseParams());
         }
 
         //We cannot create a filter for dates
         if(!field.endsWith(".year")){
             // Create a clickable list of the alphabet
-            org.dspace.app.xmlui.wing.element.List jumpList = jump.addList("jump-list", org.dspace.app.xmlui.wing.element.List.TYPE_SIMPLE, "alphabet");
-
+            org.dspace.app.xmlui.wing.element.List jumpList = jump.addList("jump-list-"+field, org.dspace.app.xmlui.wing.element.List.TYPE_SIMPLE, "alphabet");
+            String basicUrl=null;
+            if(field.equals(request.getParameter(SearchFilterParam.FACET_FIELD))){
             //Create our basic url
-            String basicUrl = generateURL(getSearchFilterUrl(), params);
+            basicUrl = generateURL(getSearchFilterUrl(), params);
             //Add any filter queries
             basicUrl = addFilterQueriesToUrl(basicUrl);
 
+            }
+            else
+            {
+                //add the current rendering facet filter in the url
+                basicUrl="?"+SearchFilterParam.FACET_FIELD+"="+field;
+            }
             //TODO: put this back !
 //            jumpList.addItemXref(generateURL("browse", letterQuery), "0-9");
             for (char c = 'A'; c <= 'Z'; c++)
@@ -496,12 +547,39 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
                         .toString(c));
             }
 
+
+
+            Para hiddenFrom=jump.addPara("hidden_form_"+field,"hidden_form_by");
+
+            hiddenFrom.addText("field",field+"_hidden_"+field).setValue(field);
+            //only add field when the query match the rend field
+            if(field.equals(request.getParameter(SearchFilterParam.FACET_FIELD))){
+                // Add all the query parameters as hidden fields on the form
+                for(Map.Entry<String, String> param : params.entrySet()){
+                    if(!param.getKey().equals("field"))
+                    {
+                        hiddenFrom.addText(param.getKey(),param.getKey()+"_hidden_"+field).setValue(param.getValue());
+                    }
+                }
+            }
+
+
             // Create a free text field for the initial characters
             Para jumpForm = jump.addPara();
-            jumpForm.addContent(T_starts_with);
-            jumpForm.addText("starts_with").setHelp(T_starts_with_help);
 
-            jumpForm.addButton("submit").setValue(T_go);
+            String[] filterQueries = getParameterFilterQueries();
+            for (String filterQuery : filterQueries) {
+                jumpForm.addText("fq","fq_hidden_"+field).setValue(filterQuery);
+            }
+            jumpForm.addContent(T_starts_with);
+            jumpForm.addText("starts_with","starts_with_"+field);
+
+            jumpForm.addButton("submit","submit_"+field).setValue(T_go);
+
+            if(field.equals(request.getParameter(SearchFilterParam.FACET_FIELD)))
+            {
+                jump.addPara("choose_browse_by_"+field,"choose_browse_by").addContent(field);
+            }
         }
     }
 
@@ -545,6 +623,58 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
         }
     }
 
+    private String getNextPageURL(SearchFilterParam browseParams, Request request) throws SQLException {
+        int offSet=0;
+        Map<String, String> parameters = new HashMap<String, String>();
+        if(field.equals(request.getParameter(SearchFilterParam.FACET_FIELD))){
+            offSet= Util.getIntParameter(request, SearchFilterParam.OFFSET);
+            if (offSet == -1)
+            {
+                offSet = 0;
+            }
+        parameters.putAll(browseParams.getCommonBrowseParams());
+        parameters.putAll(browseParams.getControlParameters());
+        }
+        parameters.put(SearchFilterParam.OFFSET, String.valueOf(offSet + DEFAULT_PAGE_SIZE));
+        parameters.put(SearchFilterParam.FACET_FIELD, field);
+
+        //TODO: correct  comm/collection url
+        // Add the filter queries
+        String url = generateURL(getSearchFilterUrl(), parameters);
+        url = addFilterQueriesToUrl(url);
+
+        return url;
+    }
+
+    private String getPreviousPageURL(SearchFilterParam browseParams, Request request) throws SQLException {
+        int offset=0;
+        Map<String, String> parameters = new HashMap<String, String>();
+        if(field.equals(request.getParameter(SearchFilterParam.FACET_FIELD))){
+            //If our offset should be 0 then we shouldn't be able to view a previous page url
+            if ("0".equals(queryArgs.get(FacetParams.FACET_OFFSET)) && Util.getIntParameter(request, "offset") == -1)
+            {
+                return null;
+            }
+
+            offset = Util.getIntParameter(request, SearchFilterParam.OFFSET);
+
+            parameters.putAll(browseParams.getCommonBrowseParams());
+            parameters.putAll(browseParams.getControlParameters());
+        }
+        if(offset == -1 || offset == 0)
+        {
+            return null;
+        }
+        parameters.put(SearchFilterParam.FACET_FIELD, field);
+        parameters.put(SearchFilterParam.OFFSET, String.valueOf(offset - DEFAULT_PAGE_SIZE));
+
+        //TODO: correct  comm/collection url
+        // Add the filter queries
+        String url = generateURL(getSearchFilterUrl(), parameters);
+        url = addFilterQueriesToUrl(url);
+        return url;
+    }
+
 
     /**
      * Recycle
@@ -574,6 +704,7 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
     public String[] getParameterFilterQueries() throws SQLException{
         Request request = ObjectModelHelper.getRequest(objectModel);
         java.util.List<String> fqs = new ArrayList<String>();
+        if(field.equals(request.getParameter(SearchFilterParam.FACET_FIELD))){
         if(request.getParameterValues("fq") != null)
         {
             fqs.addAll(Arrays.asList(request.getParameterValues("fq")));
@@ -583,6 +714,7 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
         if(request.getParameter("filter") != null && !"".equals(request.getParameter("filter")))
         {
             fqs.add((request.getParameter("filtertype").equals("*") ? "" : request.getParameter("filtertype") + ":") + request.getParameter("filter"));
+        }
         }
         return fqs.toArray(new String[fqs.size()]);
     }
@@ -597,15 +729,18 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
             java.util.List<String> allFilterQueries = new ArrayList<String>();
             Request request = ObjectModelHelper.getRequest(objectModel);
             java.util.List<String> fqs = new ArrayList<String>();
-
+            String type=null;
+            String value=null;
+            if(field.equals(request.getParameter(SearchFilterParam.FACET_FIELD))){
             if(request.getParameterValues("fq") != null)
             {
                 fqs.addAll(Arrays.asList(request.getParameterValues("fq")));
             }
 
-            String type = request.getParameter("filtertype");
-            String value = request.getParameter("filter");
 
+            type= request.getParameter("filtertype");
+            value = request.getParameter("filter");
+            }
             if(value != null && !value.equals("")){
                 String exactFq = (type.equals("*") ? "" : type + ":") + value;
                 fqs.add(exactFq + " OR " + exactFq + "*");
@@ -637,7 +772,7 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
     }
 
     public String getSearchFilterUrl(){
-        return "search-filter";
+        return "";
     }
 
     public String getDiscoverUrl(){
@@ -666,21 +801,23 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
 
         public Map<String, String> getCommonBrowseParams(){
             Map<String, String> result = new HashMap<String, String>();
+            if(this.request!=null){
             result.put(FACET_FIELD, request.getParameter(FACET_FIELD));
             if(request.getParameter(QUERY) != null)
                 result.put(QUERY, request.getParameter(QUERY));
+            }
             return result;
         }
 
         public Map<String, String> getControlParameters(){
             Map<String, String> paramMap = new HashMap<String, String>();
-
+            if(this.request!=null){
             paramMap.put(OFFSET, request.getParameter(OFFSET));
             if(request.getParameter(STARTS_WITH) != null)
             {
                 paramMap.put(STARTS_WITH, request.getParameter(STARTS_WITH));
             }
-
+            }
             return paramMap;
         }
 
