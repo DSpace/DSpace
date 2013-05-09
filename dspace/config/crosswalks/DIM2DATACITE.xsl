@@ -91,6 +91,27 @@
                     </xsl:for-each>
                 </subjects>
             </xsl:if>
+            
+      <!-- ************ Dates - Only for Data Files ************** -->
+	    <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
+          <xsl:variable name="embargoedUntil"
+                        select="dspace:field[@element='date' and @qualifier='embargoedUntil']"/>
+          <xsl:variable name="dateAccepted" select="dspace:field[@element='date' and @qualifier='issued']"/>
+          <xsl:if test="($embargoedUntil and not($embargoedUntil='9999-01-01')) or $dateAccepted">
+            <dates>
+              <xsl:if test="$embargoedUntil and not($embargoedUntil='9999-01-01')">
+                  <date dateType="Available">
+                      <xsl:value-of select="$embargoedUntil"/>
+                  </date>
+              </xsl:if>
+              <xsl:if test="$dateAccepted">
+                  <date dateType="Accepted">
+                      <xsl:value-of select="$dateAccepted"/>
+                  </date>
+              </xsl:if>
+            </dates>
+          </xsl:if>
+      </xsl:if>      
 
 	    <!-- ************ Resource Type ************** -->
 	    <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
@@ -162,17 +183,7 @@
           <xsl:variable name="embargoType"
                         select="dspace:field[@element='type' and @qualifier='embargo']"/>
           <xsl:variable name="dateAccepted" select="dspace:field[@element='date' and @qualifier='issued']"/>
-
-          <xsl:if test="$embargoedUntil and not($embargoedUntil='9999-01-01')">
-              <dateAvailable>
-                  <xsl:value-of select="$embargoedUntil"/>
-              </dateAvailable>
-          </xsl:if>
-          <xsl:if test="$dateAccepted">
-              <dateAccepted>
-                  <xsl:value-of select="$dateAccepted"/>
-              </dateAccepted>
-          </xsl:if>
+          
           <xsl:variable name="embargoText">
             <xsl:choose>
                 <!-- If the embargoredDate is empty, this item is no longer embargoed -->
@@ -222,7 +233,7 @@
       <!-- *********** Description - Only for data files********* -->
 	    <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
 	      <descriptions>
-	        <description descriptionType="">
+	        <description descriptionType="Other">
               <xsl:value-of select="dspace:field[@element='description']"/>
 	        </description>
 	      </descriptions>
