@@ -361,13 +361,9 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     public String lookup(String identifier) {
         String url=null;
         if (identifier != null && identifier.startsWith("doi:")) {
-            if (configurationService.getPropertyAsType("doi.service.testmode", false)) {
-                url = identifier.replace("doi:", "");
-            } else {
-                DOI doi = perstMinter.getKnownDOI(identifier);
-                if(doi!=null)
-                    url=doi.getTargetURL().toString();
-            }
+            DOI doi = perstMinter.getKnownDOI(identifier);
+            if(doi!=null)
+                url=doi.getTargetURL().toString();
         }
         return url;
     }
@@ -393,10 +389,8 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     public boolean remove(String identifier) {
 
         if (identifier != null && identifier.startsWith("doi:")) {
-            if (!configurationService.getPropertyAsType("doi.service.testmode", false)) {
-                DOI doi = perstMinter.getKnownDOI(identifier);
-                return perstMinter.remove(doi);
-            }
+            DOI doi = perstMinter.getKnownDOI(identifier);
+            return perstMinter.remove(doi);
         }
         return false;
     }
@@ -749,14 +743,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         // This method is used to check if a newly generated DOI String collides
         // with an existing DOI.  Since the DOIs are randomly-generated,
         // collisions are possible.
-        //
-        // The lookup() method is used for this test.  When testmode is active,
-        // lookup() always finds a DOI, it doesn't actually perform a lookup.
-        // This would cause the system to perpetually generate DOIs when test
-        // mode is active, so we return false in that case.
-        if(configurationService.getPropertyAsType("doi.service.testmode", false)) {
-            return false;
-        }
 
         String dbDoiId = lookup(idDoi.toString());
 
