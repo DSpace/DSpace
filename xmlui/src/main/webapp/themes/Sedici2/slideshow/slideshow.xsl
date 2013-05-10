@@ -18,8 +18,10 @@
 	    			</xsl:attribute>
 		    		<img>
 		    			<xsl:attribute name="src">
-		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-		    				 <xsl:text>/themes/Sedici/images/img_slideshow_1.jpg</xsl:text>
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+			                <xsl:text>/themes/</xsl:text>
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+		    				<xsl:text>/images/img_slideshow_1.jpg</xsl:text>
 		    			</xsl:attribute>
 		    		</img>
 				</a>
@@ -33,8 +35,10 @@
 				<a href="http://sedici.unlp.edu.ar/blog/2012/05/02/migracion-a-dspace/" target="_blank">
 		    		<img>
 		    			<xsl:attribute name="src">
-		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-		    					 <xsl:text>/themes/Sedici/images/img_slideshow_2.jpg</xsl:text>
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+			                <xsl:text>/themes/</xsl:text>
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+	    					<xsl:text>/images/img_slideshow_2.jpg</xsl:text>
 		    			</xsl:attribute>
 		    		</img>
 				</a>
@@ -44,23 +48,6 @@
 				</div>
 			</div>
 			
-			
-			<div class="slide">
-				<a href="http://sedici.unlp.edu.ar/blog/2012/04/25/libro-electronico-supera-las-3000-descargas/" target="_blank">
-		    		<img>
-		    			<xsl:attribute name="src">
-		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-		    				<xsl:text>/themes/Sedici/images/img_slideshow_3.jpg</xsl:text>
-		    			</xsl:attribute>
-		    		</img>
-				</a>
-				<div class="caption">
-					<h1>Libro electrónico supera las 3000 descargas</h1>
-					<p>El libro electrónico Cirugía. Bases clínicas y terapéuticas editado el año pasado por SeDiCI ya superó las 3000 descargas.</p>
-				</div>
-			</div>
-			
-			
 			<div class="slide">
 				<a target="_blank">
 	    			<xsl:attribute name="href">
@@ -69,8 +56,10 @@
 	    			</xsl:attribute>
 		    		<img>
 		    			<xsl:attribute name="src">
-		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-		    				<xsl:text>/themes/Sedici/images/img_slideshow_4.jpg</xsl:text>
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+			                <xsl:text>/themes/</xsl:text>
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+		    				<xsl:text>//images/img_slideshow_4.jpg</xsl:text>
 		    			</xsl:attribute>
 		    		</img>
 				</a>

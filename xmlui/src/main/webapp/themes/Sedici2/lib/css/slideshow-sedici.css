@@ -16,7 +16,6 @@
 */
 
 .slides_container {
-	width:700px;
 	overflow:hidden;
 	position:relative;
 	display:none;
@@ -31,8 +30,7 @@
 */
 
 .slides_container div.slide {
-	width:700px;
-	height:300px;
+	height:200px;
 	display:block;
 }
 
@@ -41,18 +39,19 @@
 	Next/prev buttons
 */
 
-#slides .next,#slides .prev {
-	position:absolute;
-	top:129px;
+#slides .next, #slides .prev {
+	position: relative;
+	top:-125px;
 	left:0px;
 	width:24px;
 	height:43px;
-	display:block;
+	/*display:block;*/
 	z-index:101;
 }
 
 #slides .next {
-	left:676px;
+	/*left:676px;*/
+	float: right;
 }
 
 /*
@@ -60,7 +59,7 @@
 */
 
 #slides .pagination {
-	margin:-15px auto auto;
+	margin:-40px auto auto;
 	width:100px;
 	background: none;
 }

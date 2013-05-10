@@ -115,6 +115,12 @@
 			
 			<!-- Controles para las busquedas -->
 			<xsl:apply-templates select="dri:body/dri:div[@n='search']/dri:div[@id='aspect.discovery.SimpleSearch.div.search-controls']"/>
+			
+			<!-- Recent submissions en comunidades y colecciones -->
+			<xsl:call-template name="recent-submissions">
+				<xsl:with-param name="head" select="dri:body/dri:div/dri:div[contains(@rend,'recent-submission')]/dri:head"/>
+	         	<xsl:with-param name="references" select="dri:body/dri:div/dri:div[contains(@rend,'recent-submission')]/dri:referenceSet/dri:reference"/>
+	        </xsl:call-template>
 		</div>
 	</xsl:template>
 
@@ -346,9 +352,8 @@ placeholders for header images -->
                 </div>
             </div>
 
+	        <xsl:call-template name="menuSuperior"/>
         </div>
-
-        <xsl:call-template name="menuSuperior"/>
 
     </xsl:template>
 
@@ -903,7 +908,13 @@ placeholders for header images -->
         </xsl:if>
     </xsl:template>
 
-
+	<xsl:template match="dri:div[@id='aspect.eperson.PasswordLogin.div.register']">
+		<p>
+			<strong><xsl:copy-of select="dri:head"/></strong>
+			<xsl:copy-of select="dri:p[1]/node()"/>
+			<xsl:apply-templates select="dri:p[2]/node()"/>
+		</p>
+	</xsl:template>
 
 
 </xsl:stylesheet>

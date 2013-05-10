@@ -120,7 +120,6 @@
         <xsl:apply-templates select="dri:head"/>
         <xsl:apply-templates select="dri:div[@n='collection-view']"/>
         <xsl:apply-templates select="dri:div[@n='collection-search-browse']"/>
-        <xsl:apply-templates select="dri:div[@n='collection-recent-submission']"/>
         <xsl:apply-templates select="dri:div[@n='community-view-root']"/>    
       </div>           
     </xsl:template>

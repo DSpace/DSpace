@@ -35,7 +35,7 @@
     xmlns:util="org.dspace.app.xmlui.utils.XSLUtils"
     xmlns:exts="ar.edu.unlp.sedici.xmlui.xsl.XslExtensions"
     xmlns:fn="http://www.w3.org/2005/xpath-functions"
-    exclude-result-prefixes="xalan java encoder i18n dri mets dim xlink xsl util">
+    exclude-result-prefixes="xalan java encoder i18n dri mets dim xlink xsl util atom ore oreatom str exts fn">
 
     <xsl:output indent="yes" method="xhtml" />
     
@@ -1322,5 +1322,74 @@
 		</p>
 	</xsl:template>
 
+	
+	<!-- ENVIOS RECIENTES -->
 
+	<xsl:template name="recent-submissions">
+		<xsl:param name="head"/>
+		<xsl:param name="references"/>
+		
+		<xsl:if test="count($references) > 0">
+			<xsl:if test="$head">
+				<xsl:apply-templates select="$head"/>
+			</xsl:if>
+			
+			<ul class="ul_envios_recientes">
+				<xsl:for-each select="$references">
+					<li class='li_envios_recientes'>
+						<xsl:apply-templates select='.' mode="recent-submission"/>
+					</li>
+				</xsl:for-each>
+			</ul>
+		</xsl:if>
+	</xsl:template>
+	
+   <xsl:template match='dri:reference' mode='recent-submission'>
+     <xsl:call-template name="single-recent-submission">
+            <xsl:with-param name="url">
+               <xsl:value-of select="@url"/>
+            </xsl:with-param>
+     </xsl:call-template>
+   </xsl:template>
+     
+   <xsl:template name="single-recent-submission">
+       <xsl:param name="url"/>
+       <xsl:variable name="externalMetadataURL">
+           <xsl:text>cocoon:/</xsl:text>
+           <xsl:value-of select="$url"/>
+       </xsl:variable>
+       <xsl:apply-templates select="document($externalMetadataURL)" mode="recent-submission"/>
+   </xsl:template>
+
+    <xsl:template match='mets:METS' mode='recent-submission'>
+       <a>
+          <xsl:attribute name="href">
+          	<xsl:value-of select="@OBJID"/>
+          </xsl:attribute>
+          <span class="type">
+          	<xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='type' and @qualifier='subtype'][1]" disable-output-escaping="yes"/>
+          </span>
+          <span class="title">
+          	<xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title'][1]" disable-output-escaping="yes"/>
+          </span>
+          <xsl:if test="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title' and @qualifier='subtitle']">
+          	<span class="subtitle">
+          		<xsl:text> : </xsl:text>
+          		<xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title' and @qualifier='subtitle'][1]" disable-output-escaping="yes"/>
+          	</span>
+          </xsl:if>
+          <span class="author">
+          	<xsl:for-each select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='creator']">
+          		<xsl:if test="position() &lt; 3">
+	          		<xsl:value-of select="." disable-output-escaping="yes"/>
+					<xsl:text>; </xsl:text>
+          		</xsl:if>
+          	</xsl:for-each>
+          	<xsl:if test="count(mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='creator'])>2">
+          		<xsl:text>...</xsl:text>
+          	</xsl:if>
+          </span>
+       </a> 
+    </xsl:template>
+	
 </xsl:stylesheet>

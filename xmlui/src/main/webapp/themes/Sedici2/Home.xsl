@@ -47,20 +47,20 @@
        <div id="ds-body" class="home">
 
 <!-- Agregamos el slideshow -->
-<!--          <div id='home_slideshow'> -->
-<!--             <xsl:call-template name="slideshow"/> -->
-<!--          </div> -->
+         <div id='home_slideshow'>
+            <xsl:call-template name="slideshow"/>
+         </div>
 		<!-- Por el momento mostramos una imagen estatica que simula ser el slideshow -->
-		<div id="home_slideshow">
-			<img>
-	            <xsl:attribute name="src">
-	                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-	                <xsl:text>/themes/</xsl:text>
-	                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-	                <xsl:text>/images/ejemplo_slideshow.png</xsl:text>
-	            </xsl:attribute>&#160;
-			</img>
-		</div>
+<!-- 		<div id="home_slideshow"> -->
+<!-- 			<img> -->
+<!-- 	            <xsl:attribute name="src"> -->
+<!-- 	                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/> -->
+<!-- 	                <xsl:text>/themes/</xsl:text> -->
+<!-- 	                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/> -->
+<!-- 	                <xsl:text>/images/ejemplo_slideshow.png</xsl:text> -->
+<!-- 	            </xsl:attribute>&#160; -->
+<!-- 			</img> -->
+<!-- 		</div> -->
 
 	     <div id='home_info'>
 	         <xsl:apply-templates select="dri:div[@n='news']/dri:p"/>
@@ -72,13 +72,9 @@
 	     
 	     <div id='home_envios_recientes'>
 	         <h1><i18n:text><xsl:value-of select="dri:div[@n='site-home']/dri:div/dri:head"/></i18n:text></h1>
-	         <ul class="ul_envios_recientes">
-		     	<xsl:for-each select="dri:div[@n='site-home']/dri:div/dri:referenceSet/dri:reference">
-	             	<li class='li_envios_recientes'>
-	            		<xsl:apply-templates select='.' mode="home"/>
-		         	</li>
-		     	</xsl:for-each>
-		     </ul>
+	         <xsl:call-template name="recent-submissions">
+	         	<xsl:with-param name="references" select="dri:div[@n='site-home']/dri:div/dri:referenceSet/dri:reference"/>
+	         </xsl:call-template>
 	     </div>
 	  </div>
    </xsl:template>
@@ -103,10 +99,31 @@
 
 			 <div id="home_autoarchivo">
 	         	<h2><i18n:text>sedici.home.subir_material.title</i18n:text></h2>
+	         	<p><i18n:text>sedici.home.subir_material.info</i18n:text></p>
+<!-- 	         	<p> -->
+<!-- 	         	 	<a> -->
+<!-- 			 			<xsl:attribute name="href"> -->
+<!-- 			 				<xsl:value-of select="$context-path"/> -->
+<!-- 							<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='autoArchive' and @qualifier='submit']='true'"> -->
+<!-- 								<xsl:text>/handle/</xsl:text> -->
+<!-- 								<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='autoArchive'][@qualifier='handle']"/> -->
+<!-- 							</xsl:if> -->
+<!-- 							<xsl:text>/submit</xsl:text> -->
+<!-- 			 			</xsl:attribute> -->
+<!-- 			 			<i18n:text>sedici.home.subir_material.linktext</i18n:text> -->
+<!-- 	         	 	</a> -->
+<!-- 	         	</p> -->
 	         	<div>
 				 	<a>
-			 			<xsl:attribute name="href">/handle/10915/50/submit</xsl:attribute>
-				 		<img>
+			 			<xsl:attribute name="href">
+			 				<xsl:value-of select="$context-path"/>
+							<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='autoArchive' and @qualifier='submit']='true'">
+								<xsl:text>/handle/</xsl:text>
+								<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='autoArchive'][@qualifier='handle']"/>
+							</xsl:if>
+							<xsl:text>/submit</xsl:text>
+			 			</xsl:attribute>
+				 		<img title="sedici.home.subir_material.linktext" i18n:attr="title">
 				            <xsl:attribute name="src">
 				                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
 				                <xsl:text>/themes/</xsl:text>
@@ -181,51 +198,6 @@
           
         </form>
             
-    </xsl:template>
-    
-    
-   <xsl:template match='dri:reference' mode='home'>
-     <xsl:call-template name="envio_reciente">
-            <xsl:with-param name="url">
-               <xsl:value-of select="@url"/>
-            </xsl:with-param>
-     </xsl:call-template>
-   </xsl:template>
-     
-   <xsl:template name="envio_reciente">
-       <xsl:param name="url"/>
-        <xsl:variable name="externalMetadataURL">
-            <xsl:text>cocoon:/</xsl:text>
-            <xsl:value-of select="$url"/>
-            <!-- No options selected, render the full METS document -->
-        </xsl:variable>
-        <xsl:comment> External Metadata URL: <xsl:value-of select="$externalMetadataURL"/> </xsl:comment>
-        <xsl:apply-templates select="document($externalMetadataURL)" mode="home"/>
-   </xsl:template>
-
-    <xsl:template match='mets:METS' mode='home'>
-       <a>
-          <xsl:attribute name="href">
-          	<xsl:value-of select="@OBJID"/>
-          </xsl:attribute>
-          <span class="title">
-          	<xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title'][1]" disable-output-escaping="yes"/>
-          </span>
-          <xsl:if test="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title' and @qualifier='subtitle']">
-          	<span class="subtitle">
-          		<xsl:text> : </xsl:text>
-          		<xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title' and @qualifier='subtitle'][1]" disable-output-escaping="yes"/>
-          	</span>
-          </xsl:if>
-          <span class="author">
-          	<xsl:for-each select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='creator']">
-          		<xsl:value-of select="." disable-output-escaping="yes"/>
-				<xsl:if test="count(following-sibling::node()) != 0">
-					<xsl:text>; </xsl:text>
-				</xsl:if>
-          	</xsl:for-each>
-          </span>
-       </a> 
     </xsl:template>
 
 </xsl:stylesheet>

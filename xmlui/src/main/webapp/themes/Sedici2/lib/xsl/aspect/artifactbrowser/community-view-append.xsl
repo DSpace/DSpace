@@ -113,7 +113,6 @@
      <div id="aspect_artifactbrowser_CommunityViewer_div_community-home" class="ds-static-div primary repository community">
         <xsl:apply-templates select="dri:head"/>
         <xsl:apply-templates select="dri:div[@n='community-view']"/>  
-        <xsl:apply-templates select="dri:div[@n='community-recent-submission']"/>
         <xsl:apply-templates select="dri:div[@n='community-view-root']"/>
      </div>              
     </xsl:template>
