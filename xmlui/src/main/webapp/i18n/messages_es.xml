@@ -217,7 +217,7 @@
 <message key="xmlui.ArtifactBrowser.CollectionViewer.browse_authors">Autores</message>
 <message key="xmlui.ArtifactBrowser.CollectionViewer.browse_dates">Fechas</message>
 <message key="xmlui.ArtifactBrowser.CollectionViewer.advanced_search_link">Búsqueda avanzada</message>
-<message key="xmlui.ArtifactBrowser.CollectionViewer.head_recent_submissions">Últimos documentos agregados en</message>
+<message key="xmlui.ArtifactBrowser.CollectionViewer.head_recent_submissions">Últimos documentos agregados</message>
 
 
 <!-- org.dspace.app.xmlui.artifactbrowser.CommunityBrowser.java -->
@@ -240,7 +240,7 @@
 <message key="xmlui.ArtifactBrowser.CommunityViewer.advanced_search_link">Búsqueda avanzada</message>
 <message key="xmlui.ArtifactBrowser.CommunityViewer.head_sub_communities">Subcomunidades en esta comunidad</message>
 <message key="xmlui.ArtifactBrowser.CommunityViewer.head_sub_collections">Colecciones en esta comunidad</message>
-<message key="xmlui.ArtifactBrowser.CommunityViewer.head_recent_submissions">Últimos documentos agregados en</message>
+<message key="xmlui.ArtifactBrowser.CommunityViewer.head_recent_submissions">Últimos documentos agregados</message>
 
 
 <!-- org.dspace.app.xmlui.artifactbrowser.Contact.java -->
@@ -2551,5 +2551,7 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="sedici.home.buscar_material.info_pre">Busque entre los mas de </message>
 <message key="sedici.home.buscar_material.info_post"> recursos disponibles en el repositorio</message>
 <message key="sedici.home.subir_material.title">Subir material</message>
+<message key="sedici.home.subir_material.info">Suba sus trabajos a SEDICI, amplíe su visibilidad y mejore su impacto</message>
+<message key="sedici.home.subir_material.linktext">Cargar un documento</message>
 
 </catalogue>

@@ -2317,5 +2317,7 @@
 <message key="sedici.home.buscar_material.info_pre">Search among more than </message>
 <message key="sedici.home.buscar_material.info_post"> resources available in the repository</message>
 <message key="sedici.home.subir_material.title">Upload resources</message>
+<message key="sedici.home.subir_material.info">Upload your works to SEDICI,  increase its visibility and improve its impact</message>
+<message key="sedici.home.subir_material.linktext">Upload a new document</message>
 
 </catalogue>
