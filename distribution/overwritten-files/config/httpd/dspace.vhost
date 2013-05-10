@@ -1,10 +1,10 @@
-<IfModule mpm_prefork_module>
-	StartServers       1
-	MinSpareServers    1
-	MaxSpareServers    5
-	MaxClients        40
-    MaxRequestsPerChild   0
-</IfModule>
+#<IfModule mpm_prefork_module>
+#	StartServers       1
+#	MinSpareServers    1
+#	MaxSpareServers    5
+#	MaxClients        40
+#    MaxRequestsPerChild   0
+#</IfModule>
 
 NameVirtualHost *:80
 <VirtualHost *:80>
@@ -47,8 +47,8 @@ NameVirtualHost *:80
   #ProxyPassReverse / ajp://localhost:8009/
   <Proxy ajp://localhost:8009/>
     ProxySet timeout=600
-    ProxySet retry=0
-    ProxySet ping=3
+    ProxySet retry=5
+    ProxySet ping=5
     #ttl=0 
   </Proxy>
 
@@ -79,5 +79,3 @@ NameVirtualHost *:80
   RewriteLogLevel 0
 
 </VirtualHost>
-
-
