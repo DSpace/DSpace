@@ -94,20 +94,20 @@ public class DataPackageStats extends AbstractCurationTask {
     public int perform(DSpaceObject dso) throws IOException {
 	log.info("performing DataPackageStats task " + total++ );
 	
-	String handle = "[no handle found]";
-	String packageDOI = "[no package DOI found]";
-	String articleDOI = "[no article DOI found]";
-	String journal = "[no journal found]";
-	String numKeywords = "[no numKeywords found]";
-	String numKeywordsJournal = "[unknown]";
-	String numberOfFiles = "[no numberOfFiles found]";
+	String handle = "\"[no handle found]\"";
+	String packageDOI = "\"[no package DOI found]\"";
+	String articleDOI = "\"[no article DOI found]\"";
+	String journal = "[no journal found]"; // don't add quotes here, because journal is always quoted when output below
+	String numKeywords = "\"[no numKeywords found]\"";
+	String numKeywordsJournal = "\"[unknown]\"";
+	String numberOfFiles = "\"[no numberOfFiles found]\"";
 	long packageSize = 0;
 	String embargoType = "none";
 	String embargoDate = "";
 	int maxDownloads = 0;
-	String numberOfDownloads = "[unknown]";
+	String numberOfDownloads = "\"[unknown]\"";
 	String manuscriptNum = null;
-	String dateAccessioned = "[unknown]";
+	String dateAccessioned = "\"[unknown]\"";
 
 	try {
 	    context = new Context();
@@ -272,7 +272,11 @@ public class DataPackageStats extends AbstractCurationTask {
 
 			// get the DSpace Item for this fileID
 			Item fileItem = getDSpaceItem(fileID);
-			
+
+			if(fileItem == null) {
+			    log.error("Skipping data file -- it's null");
+			    break;
+			}
 			log.debug("file internalID = " + fileItem.getID());
 			
 			// total package size
