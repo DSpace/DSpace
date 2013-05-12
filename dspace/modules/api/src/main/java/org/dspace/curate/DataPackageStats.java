@@ -191,14 +191,7 @@ public class DataPackageStats extends AbstractCurationTask {
 		numKeywords = "" + intNumKeywords; //convert integer to string by appending
 		log.debug("numKeywords = " + numKeywords);
 
-		// number of keywords in journal email
-
-		/* **************************
-		   COMMENTED OUT THIS SECTION -- we don't need the manuscript numbers right now, so removed until the error is fixed
-		   **************************
-		   
-		   //TODO: fix this for the new style of manuscript numbers -- it fails on anything deposited in 2012 and later
-		
+		// manuscript number
 		DCValue[] manuvals = item.getMetadata("dc.identifier.manuscriptNumber");
 		manuscriptNum = null;
 		if(manuvals.length > 0) {
@@ -206,7 +199,12 @@ public class DataPackageStats extends AbstractCurationTask {
 		}
 		if(manuscriptNum != null && manuscriptNum.trim().length() > 0) {
 		    log.debug("has a real manuscriptNum = " + manuscriptNum);
-		    //find file for manu
+
+
+		    /* 
+		    // number of keywords in journal email -- currently commented out because it wasn't working for 2012 and later.
+		    
+		    //find metadata file for the manuscript
 		    int firstdash = manuscriptNum.indexOf("-");
 		    String journalAbbrev = manuscriptNum.substring(0, firstdash);
 		    if(journalAbbrev.startsWith("0") ||
@@ -224,6 +222,7 @@ public class DataPackageStats extends AbstractCurationTask {
 			manuscriptNum = "amNat-" + manuscriptNum;
 			firstdash = 5;
 		    }
+
 		    if(!journalAbbrev.equals("new")) {
 			numKeywordsJournal = "0";
 			String journalDir="/opt/dryad/submission/journalMetadata/";
@@ -246,11 +245,12 @@ public class DataPackageStats extends AbstractCurationTask {
 			    report("Unable to parse manuscript number " +  manuvals[0].value);
 			    log.error("Unable to parse manuscript number " +  manuvals[0].value);
 			}
-		    }
+			log.debug("numKeywordsJournal = " + numKeywordsJournal);
+		     }
+		    */
 		}
-		log.debug("numKeywordsJournal = " + numKeywordsJournal);
 
-		*/
+
 		
 		// count the files, and compute statistics that depend on the files
 		log.debug("getting data file info");
