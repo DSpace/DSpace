@@ -2217,8 +2217,13 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
   <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.help">Nombre de la Editorial</message>
 <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.title">Buscar Editorial</message>
 
-  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.help">Nombre del Termino del Tesuaro</message>
-  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.title">Buscar Termino del Tesauro</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.help">Nombre del Termino del Tesuaro DECS</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.title">Buscar Termino del Tesauro DECS</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.nonauthority">Utilizar "@1@" (valor sin controlar)</message>
+
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_eurovoc.help">Nombre del Termino del Tesuaro Eurovoc</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_eurovoc.title">Buscar Termino del Tesauro Eurovoc</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_eurovoc.nonauthority">Utilizar "@1@" (valor sin controlar)</message>
 
   <!-- Params are: search-value -->
 <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.nonauthority">No es valor de Autoridad: @1@</message>
@@ -2230,6 +2235,10 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.help.first">Nombre(s) e.g. "Alfredo"</message>
 <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.title">Búsqueda de autores en la LC Name Authorithy</message>
 <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.nonauthority"> Valor local "@1@" (no se encuentra en la Autoridad)</message>
+
+<message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.help">Nombre de una ubicación geográfica</message>
+<message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.title">Ubicaciones geográficas</message>
+<message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.nonauthority">Utilizar "@1@" (valor sin controlar)</message>
 
 <!-- Choice authority -->
 <message key="sedici.choiceAuthorityControl.messageErrorConfidenceSingular">Verifique el valor</message>

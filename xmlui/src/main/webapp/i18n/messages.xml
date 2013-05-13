@@ -2050,8 +2050,14 @@
   <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.help">Name of Publisher</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.title">Look up Publisher</message>
   
-    <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.help">Nombre del Termino del Tesuaro</message>
-  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.title">Buscar Termino del Tesauro</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.help">Nombre del Termino del Tesuaro DECS</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.title">Buscar Termino del Tesauro DECS</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.nonauthority">Use "@1@" (no controlled)</message>
+
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_eurovoc.help">Nombre del Termino del Tesuaro Eurovoc</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_eurovoc.title">Buscar Termino del Tesauro Eurovoc</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_eurovoc.nonauthority">Utilizar "@1@" (valor sin controlar)</message>
+
   <!-- Params are: search-value -->
   <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.nonauthority">Non-authority value: @1@</message>
 
@@ -2061,6 +2067,10 @@
   <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.help.first">First name(s) e.g. "Fred"</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.title">LC Name Authority author lookup</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.nonauthority">Local value "@1@" (not in Naming Authority)</message>
+
+  <message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.help">Geographic location name</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.title">Geographic locations</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.nonauthority">Use "@1@" (no controlled)</message>
 
   <!-- Traducciones agregadas por SEDICI -->
   

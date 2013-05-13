@@ -3281,6 +3281,8 @@ background-position:center top;
 
 
 #home_slideshow {
+	width: 676px;
+	margin: auto;
 }
 
 #aspect_submission_StepTransformer_div_submit-upload table {
