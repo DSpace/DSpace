@@ -107,8 +107,10 @@ public class DataPackageStats extends AbstractCurationTask {
 	int maxDownloads = 0;
 	String numberOfDownloads = "\"[unknown]\"";
 	String manuscriptNum = null;
+	int numReadmes = 0;
 	String dateAccessioned = "\"[unknown]\"";
 
+	
 	try {
 	    context = new Context();
         } catch (SQLException e) {
@@ -119,7 +121,7 @@ public class DataPackageStats extends AbstractCurationTask {
 	if (dso.getType() == Constants.COLLECTION) {
 	    // output headers for the CSV file that will be created by processing all items in this collection
 	    report("handle, packageDOI, articleDOI, journal, numKeywords, numKeywordsJournal, numberOfFiles, packageSize, " +
-		   "embargoType, embargoDate, numberOfDownloads, manuscriptNum, dateAccessioned");
+		   "embargoType, embargoDate, numberOfDownloads, manuscriptNum, numReadmes, dateAccessioned");
 	} else if (dso.getType() == Constants.ITEM) {
             Item item = (Item)dso;
 
@@ -159,7 +161,7 @@ public class DataPackageStats extends AbstractCurationTask {
 
 		
 		// journal
-		vals = item.getMetadata("prism.publicationName");
+	 	vals = item.getMetadata("prism.publicationName");
 		if (vals.length == 0) {
 		    setResult("Object has no prism.publicationName available " + handle);
 		    log.error("Skipping -- Object has no prism.publicationName available " + handle);
@@ -170,6 +172,7 @@ public class DataPackageStats extends AbstractCurationTask {
 		}
 		log.debug("journal = " + journal);
 
+		
 		// accession date
 		vals = item.getMetadata("dc.date.accessioned");
 		if (vals.length == 0) {
@@ -289,7 +292,25 @@ public class DataPackageStats extends AbstractCurationTask {
 			    }
 			}
 			log.debug("total package size (as of file " + fileID + ") = " + packageSize);
-						
+
+			// Readmes
+			// Check for at least one readme bitstream. There may be more, due to indexing and cases
+			// where the file itself is named readme. We only count one readme per datafile.
+			boolean readmeFound = false;
+			for (Bundle bn : fileItem.getBundles()) {
+			    for (Bitstream bs : bn.getBitstreams()) {
+				String name = bs.getName().trim().toLowerCase();
+				if(name.startsWith("readme")) {
+				    readmeFound = true;
+				}
+			    }
+			}
+			if(readmeFound) {
+			    numReadmes++;
+			}
+			log.debug("total readmes (as of file " + fileID + ") = " + numReadmes);
+
+			
 			// embargo setting (of last file processed)
 			vals = fileItem.getMetadata("dc.type.embargo");
 			if (vals.length > 0) {
@@ -348,7 +369,8 @@ public class DataPackageStats extends AbstractCurationTask {
 	setResult("Last processed item = " + handle + " -- " + packageDOI);
 	report(handle + ", " + packageDOI + ", " + articleDOI + ", \"" + journal + "\", " + numKeywords + ", " +
 	       numKeywordsJournal + ", " + numberOfFiles + ", " + packageSize + ", " +
-	       embargoType + ", " + embargoDate + ", " + numberOfDownloads + ", " + manuscriptNum + ", " + dateAccessioned);
+	       embargoType + ", " + embargoDate + ", " + numberOfDownloads + ", " + manuscriptNum + ", " +
+	       numReadmes + ", " + dateAccessioned);
 
 	// slow this down a bit so we don't overwhelm the production SOLR server with requests
 	try {
