@@ -108,6 +108,7 @@ public class DataPackageStats extends AbstractCurationTask {
 	String numberOfDownloads = "\"[unknown]\"";
 	String manuscriptNum = null;
 	int numReadmes = 0;
+	boolean wentThroughReview = false;
 	String dateAccessioned = "\"[unknown]\"";
 
 	
@@ -121,7 +122,7 @@ public class DataPackageStats extends AbstractCurationTask {
 	if (dso.getType() == Constants.COLLECTION) {
 	    // output headers for the CSV file that will be created by processing all items in this collection
 	    report("handle, packageDOI, articleDOI, journal, numKeywords, numKeywordsJournal, numberOfFiles, packageSize, " +
-		   "embargoType, embargoDate, numberOfDownloads, manuscriptNum, numReadmes, dateAccessioned");
+		   "embargoType, embargoDate, numberOfDownloads, manuscriptNum, numReadmes, wentThroughReview, dateAccessioned");
 	} else if (dso.getType() == Constants.ITEM) {
             Item item = (Item)dso;
 
@@ -184,7 +185,21 @@ public class DataPackageStats extends AbstractCurationTask {
 		    dateAccessioned = vals[0].value;
 		}
 		log.debug("dateAccessioned = " + dateAccessioned);
-				
+
+		// wentThroughReview
+		vals = item.getMetadata("dc.description.provenance");
+		if (vals.length == 0) {
+		    log.warn("That's strange -- Object has no provenance data available " + handle);
+		} else {
+		    for(DCValue aVal : vals) {
+			if(aVal.value != null && aVal.value.contains("requiresReviewStep")) {
+			    wentThroughReview = true;
+			}
+		    }
+		}
+		log.debug("wentThroughReview = " + wentThroughReview);
+
+		
 		// number of keywords
 		int intNumKeywords = item.getMetadata("dc.subject").length +
 		    item.getMetadata("dwc.ScientificName").length +
@@ -370,7 +385,7 @@ public class DataPackageStats extends AbstractCurationTask {
 	report(handle + ", " + packageDOI + ", " + articleDOI + ", \"" + journal + "\", " + numKeywords + ", " +
 	       numKeywordsJournal + ", " + numberOfFiles + ", " + packageSize + ", " +
 	       embargoType + ", " + embargoDate + ", " + numberOfDownloads + ", " + manuscriptNum + ", " +
-	       numReadmes + ", " + dateAccessioned);
+	       numReadmes + ", " + wentThroughReview + ", " + dateAccessioned);
 
 	// slow this down a bit so we don't overwhelm the production SOLR server with requests
 	try {
