@@ -193,6 +193,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                     //Check if we are dealing with a date, sometimes the facet values arrive as dates !
                     if(facetValues.size() == 0 && field.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)){
                         facetValues = queryResults.getFacetResult(field.getIndexFieldName() + ".year");
+                     
                     }
 
                     int shownFacets = field.getFacetLimit()+1;
@@ -212,7 +213,8 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                         List filterValsList = browse.addList(field.getIndexFieldName());
 
                         filterValsList.setHead(message("xmlui.ArtifactBrowser.AdvancedSearch.type_" + field.getIndexFieldName()));
-
+                        java.util.List<Map<String,String>> fqsSelected = new ArrayList<Map<String,String>>();
+                        java.util.List<Map<String,String>> fqsNotSelected = new ArrayList<Map<String,String>>();
                         for (int i = 0; i < shownFacets; i++) {
 
                             if (!iter.hasNext())
@@ -221,36 +223,41 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                             }
 
                             DiscoverResult.FacetResult value = iter.next();
-
+                            
+                            
                             if (i < shownFacets - 1) {
                                 String displayedValue = value.getDisplayedValue();
                                 String filterQuery = value.getAsFilterQuery();
+                               
                                 if (fqs.contains(filterQuery)) {
-                                
-                                
-                                	String paramsQuery = retrieveParametersWithout(request,filterQuery,"fq");
+                                	  
                                 	
-                                	//filterValsList.addItem(Math.random() + "", "selected").addContent(displayedValue + " (" + value.getCount() + ")");
-                                    filterValsList.addItem(Math.random() + "", "selected").addXref(
-                                            contextPath +
-                                                    (dso == null ? "" : "/handle/" + dso.getHandle()) +
-                                                    "/discover?" +
-                                                    paramsQuery ).addContent(displayedValue + " (" + value.getCount() + ")");
-                                
-                                       
+                                	 String paramsQuery = retrieveParametersWithout(request,filterQuery,"fq");
+                                	 Map<String,String> map = new HashMap<String,String>();
+                                	 map.put("value", contextPath +
+                                            (dso == null ? "" : "/handle/" + dso.getHandle()) +
+                                            "/discover?" +
+                                            paramsQuery);
+                                	 map.put("displayValue",displayedValue + " (" + value.getCount() + ")" );
+                                	
+                                	 fqsSelected.add(map);
+                                	 
+                                	fqs.remove(filterQuery);
                                 } else {
-                                    String paramsQuery = retrieveParameters(request);
-
-                                    filterValsList.addItem().addXref(
-                                            contextPath +
-                                                    (dso == null ? "" : "/handle/" + dso.getHandle()) +
-                                                    "/discover?" +
-                                                    paramsQuery +
-                                                    "fq=" +
-                                                    URLEncoder.encode(filterQuery, "UTF-8"),
-                                            displayedValue + " (" + value.getCount() + ")"
-                                    );
+                                	String paramsQuery = retrieveParameters(request);
+                                	Map<String,String> map = new HashMap<String,String>();
+                               	    map.put("value",   contextPath +
+                                         (dso == null ? "" : "/handle/" + dso.getHandle()) +
+                                         "/discover?" +
+                                         paramsQuery +
+                                         "fq=" +
+                                         URLEncoder.encode(filterQuery, "UTF-8"));
+                               	    map.put("displayValue",displayedValue + " (" + value.getCount() + ")" );
+	                               	fqsNotSelected.add(map);
                                 }
+                                
+                               
+                                
                             }
                             //Show a view more url should there be more values, unless we have a date
                             if (i == shownFacets - 1 && !field.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)/*&& facetField.getGap() == null*/) {
@@ -258,6 +265,36 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                                 addViewMoreUrl(filterValsList, dso, request, field.getIndexFieldName());
                             }
                         }
+                       if (field.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)){
+	                	 	for (int t = 0; t < fqs.size(); t++) {
+	                    	    	String paramsQuery = retrieveParametersWithout(request,fqs.get(t),"fq");
+		                            
+	                    	    	String valueFace =fqs.get(t);
+	                    	    	valueFace=valueFace.substring(valueFace.indexOf(":")+1);
+	                    	    	valueFace=valueFace.replace("TO","-");
+	                    	    	valueFace=valueFace.replace("[","");
+	                    	    	valueFace=valueFace.replace("]","");
+	                    	    	//valueFace.matches("");
+	                    	    	
+	                    	    	Map<String,String> map = new HashMap<String,String>();
+                                	 map.put("value", contextPath +
+                                            (dso == null ? "" : "/handle/" + dso.getHandle()) +
+                                            "/discover?" +
+                                            paramsQuery);
+                                	 map.put("displayValue",valueFace + " (" + queryResults.getDspaceObjects().size() + ")" );
+	                    	    	
+	                    	    	fqsSelected.add(map);
+	                    	}
+	                    }    
+                     
+	                   for (Map<String,String> mapSelected : fqsSelected) {
+	                	       filterValsList.addItem(Math.random() + "", "selected").addXref(
+	                	       mapSelected.get("value")).addContent(mapSelected.get("displayValue"));
+                       }
+	                   for (Map<String,String> mapNotSelected : fqsNotSelected) {
+	                	   filterValsList.addItem().addXref(mapNotSelected.get("value"),mapNotSelected.get("displayValue"));
+	                	  
+                   }
                     }
                 }
             }
