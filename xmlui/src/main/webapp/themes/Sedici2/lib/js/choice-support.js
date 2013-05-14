@@ -45,9 +45,6 @@ function cambiarAuthority(inputID, authorityID, authorityValue, confidenceIndica
 		if ($('#'+inputID).val()!=$('#' + authorityLabelID).val()){
 			$('#' + authorityLabelID).show();
 		}
-		//var authLabel = document.getElementById(authorityLabelID);
-		//alert(authLabel);
-		//authLabel.value = authorityLabelValue;
     }
 
 	if (confidenceNameValue=='rejected'){
