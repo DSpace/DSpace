@@ -42,9 +42,14 @@ function cambiarAuthority(inputID, authorityID, authorityValue, confidenceIndica
 	cambiarAuthorityConfidence(confidenceNameID, confidenceNameValue);
 	DSpaceUpdateConfidence(document, confidenceIndicatorID, confidenceIndicatorValue);
 	if (authorityLabelID != null){
-		var authLabel = document.getElementById(authorityLabelID);
-		authLabel.value = authorityLabelValue;
+		if ($('#'+inputID).val()!=$('#' + authorityLabelID).val()){
+			$('#' + authorityLabelID).show();
+		}
+		//var authLabel = document.getElementById(authorityLabelID);
+		//alert(authLabel);
+		//authLabel.value = authorityLabelValue;
     }
+
 	if (confidenceNameValue=='rejected'){
 		$('#' + inputID).attr('class', 'ds-text-field error submit-text');
 	} else {
