@@ -29,6 +29,8 @@
                   select="/dri:document/dri:body//dri:div[@id='org.datadryad.dspace.xmlui.aspect.browse.ItemViewer.div.notice'][@rend='notice']"/>
     <xsl:variable name="latestDataVersion"
                   select="/dri:document/dri:body/dri:div[@id='aspect.versioning.VersionHistoryForm.div.view-verion-history']/dri:table/dri:row[2]/dri:cell[1]"/>
+    <xsl:variable name="embeddedViewReferenceSet" 
+                  select="//dri:referenceSet[@type='embeddedView']"/>
 
     <xsl:template name="itemSummaryView-DIM">
         <xsl:variable name="datafiles"
@@ -113,23 +115,9 @@
         </div>
         <!-- Data Files in package -->
         <xsl:if test="$datafiles">
-          <div class="ds-static-div primary">
-            <xsl:variable name="dryad_dri_url">
-              <xsl:if test="not($token!='')">
-                <xsl:value-of select="confman:getProperty('dspace.url')"/>
-                <xsl:text>/DRI</xsl:text>
-                <xsl:value-of select="@OBJID"/>
-              </xsl:if>
-              <xsl:if test="$token!=''">
-                <xsl:value-of select="confman:getProperty('dspace.url')"/>
-                <xsl:text>/DRI/review?doi=</xsl:text>
-                <xsl:value-of select=".//dim:field[@element='identifier'][@mdschema='dc'][not(@qualifier)]"/>
-                <xsl:text>&amp;token=</xsl:text>
-                <xsl:copy-of select="$token"/>
-              </xsl:if>
-            </xsl:variable>
-            <xsl:apply-templates select="document($dryad_dri_url)//dri:referenceSet[@type='embeddedView']"/>
-          </div>
+            <div class="ds-static-div primary">
+                <xsl:apply-templates select="$embeddedViewReferenceSet"/>
+            </div>
         </xsl:if>
         <!-- citing -->
         <!-- CITATION FOR DATA FILE -->
