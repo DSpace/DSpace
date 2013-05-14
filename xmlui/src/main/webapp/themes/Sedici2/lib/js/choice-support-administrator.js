@@ -281,6 +281,7 @@ function DSpaceSetupAutocomplete(formID, args) {
 	            				} else {
 	            					//es una variacion  del authority key
 	            					cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_change, args.confidenceName, confianza_600, null, null);
+	            					$('#' + authorityLabelID).show();
 	            				}
 	            			} else {
 	            				//es un nuevo elemento
