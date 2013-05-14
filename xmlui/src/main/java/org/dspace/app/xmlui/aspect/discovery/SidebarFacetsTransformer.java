@@ -215,6 +215,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                         filterValsList.setHead(message("xmlui.ArtifactBrowser.AdvancedSearch.type_" + field.getIndexFieldName()));
                         java.util.List<Map<String,String>> fqsSelected = new ArrayList<Map<String,String>>();
                         java.util.List<Map<String,String>> fqsNotSelected = new ArrayList<Map<String,String>>();
+                        int countTotal=0;
                         for (int i = 0; i < shownFacets; i++) {
 
                             if (!iter.hasNext())
@@ -231,7 +232,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                                
                                 if (fqs.contains(filterQuery)) {
                                 	  
-                                	
+                                	countTotal+=value.getCount();
                                 	 String paramsQuery = retrieveParametersWithout(request,filterQuery,"fq");
                                 	 Map<String,String> map = new HashMap<String,String>();
                                 	 map.put("value", contextPath +
@@ -244,6 +245,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                                 	 
                                 	fqs.remove(filterQuery);
                                 } else {
+                                	countTotal+=value.getCount();
                                 	String paramsQuery = retrieveParameters(request);
                                 	Map<String,String> map = new HashMap<String,String>();
                                	    map.put("value",   contextPath +
@@ -271,17 +273,16 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
 		                            
 	                    	    	String valueFace =fqs.get(t);
 	                    	    	valueFace=valueFace.substring(valueFace.indexOf(":")+1);
-	                    	    	valueFace=valueFace.replace("TO","-");
-	                    	    	valueFace=valueFace.replace("[","");
-	                    	    	valueFace=valueFace.replace("]","");
-	                    	    	//valueFace.matches("");
-	                    	    	
+	                    	    	Pattern pattern = Pattern.compile("^\\[(\\d{4}) TO (\\d+)\\]$");
+	                    	    	Matcher m = pattern.matcher(valueFace);
+	                    	    	m.find();
+	                    	    	valueFace=m.group(1)+" - "+m.group(2);
 	                    	    	Map<String,String> map = new HashMap<String,String>();
-                                	 map.put("value", contextPath +
+                                	map.put("value", contextPath +
                                             (dso == null ? "" : "/handle/" + dso.getHandle()) +
                                             "/discover?" +
                                             paramsQuery);
-                                	 map.put("displayValue",valueFace + " (" + queryResults.getDspaceObjects().size() + ")" );
+                                	map.put("displayValue",valueFace + " (" + countTotal + ")" );
 	                    	    	
 	                    	    	fqsSelected.add(map);
 	                    	}
