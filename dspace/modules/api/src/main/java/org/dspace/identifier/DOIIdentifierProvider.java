@@ -7,6 +7,7 @@ import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.doi.CDLDataCiteService;
+import org.dspace.doi.DryadDOIRegistrationHelper;
 import org.dspace.doi.DOI;
 
 import org.dspace.doi.DOIFormatException;
@@ -212,8 +213,11 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                     DOI doi_= upgradeDOIDataFile(context, doi, item, history);
                     if(doi_!=null){
                         remove(doi);
-                        mint(doi_, register, createListMetadata(item));
-
+                        if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(context, item)) {
+                            mint(doi_, "http://datadryad.org/publicationBlackout", register, createListMetadata(item));
+                        } else {
+                            mint(doi_, register, createListMetadata(item));
+                        }
                         item.clearMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, null);
                         item.update();
                         if (doi == null || doi.equals("")) throw new Exception();
@@ -238,7 +242,11 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             log.info("DOI just minted: " + doi_);
 
             doi = doi_.toString();
-            mint(doi_, register, createListMetadata(item));
+            if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(context, item)) {
+                mint(doi_, "http://datadryad.org/publicationBlackout", register, createListMetadata(item));
+            } else {
+                mint(doi_, register, createListMetadata(item));
+            }
 
             // CASE B1: Versioned DataPackage or DataFiles
             if (history != null) {
@@ -248,7 +256,11 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                 Version previous = history.getPrevious(version);
                 if (history.isFirstVersion(previous)) {
                     DOI firstDOI = calculateDOIFirstVersion(context, previous);
-                    mint(firstDOI, register, createListMetadata(previous.getItem()));
+                    if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(context, item)) {
+                        mint(firstDOI, "http://datadryad.org/publicationBlackout", register, createListMetadata(previous.getItem()));
+                    } else {
+                        mint(firstDOI, register, createListMetadata(previous.getItem()));
+                    }
                 }
             }
 
@@ -298,13 +310,17 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         mint(canonical, register, createListMetadata(item));
     }
 
-
     private void mint(DOI doi, boolean register, Map<String, String> metadata) throws IOException {
+        mint(doi, null, register, metadata);
+    }
+    
+    private void mint(DOI doi, String target, boolean register, Map<String, String> metadata) throws IOException {
 
         perstMinter.mintDOI(doi);
 
-        if(register)
-            perstMinter.register(doi, metadata);
+        if(register) {
+            perstMinter.register(doi, target, metadata);
+        }
 
     }
 

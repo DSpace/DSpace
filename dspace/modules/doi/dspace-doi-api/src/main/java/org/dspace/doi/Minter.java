@@ -36,11 +36,14 @@ public class Minter implements org.springframework.beans.factory.InitializingBea
 	 */
 	public Minter() {}
 
-	public DOI register(DOI aDOI, Map<String, String> metadata) throws IOException {
+	public DOI register(DOI aDOI, String target, Map<String, String> metadata) throws IOException {
 	    log.debug("Entering register(DOI) method");
 	    
 	    try {
-		String target = aDOI.getTargetURL().toString();
+                if(target == null) {
+                    target = aDOI.getTargetURL().toString();
+                }
+
 		String doi = aDOI.toID();
 		log.debug("doi to register: " + doi + ", target: " + target);
 

@@ -7,7 +7,6 @@ import java.util.*;
 
 import javax.mail.MessagingException;
 
-import com.sun.corba.se.impl.orbutil.concurrent.Sync;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthPolicy;
@@ -21,17 +20,12 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.crosswalk.CrosswalkException;
-import org.dspace.content.crosswalk.DIMDisseminationCrosswalk;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
-import org.dspace.content.crosswalk.XSLTDisseminationCrosswalk;
 import org.dspace.core.*;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.identifier.IdentifierService;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
 import org.dspace.utils.DSpace;
-import org.dspace.workflow.WorkflowItem;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -62,8 +56,6 @@ public class CDLDataCiteService {
     public static final String DATACITE_TITLE = "datacite.title";
     public static final String DATACITE_PUBLISHER = "datacite.publisher";
     public static final String DATACITE_PUBBLICATIONYEAR = "datacite.publicationyear";
-
-    public static final String DRYAD_PENDING_PUBLICATION_STEP = "pendingPublicationStep";
 
     public String publisher = null;
 
@@ -421,11 +413,7 @@ public class CDLDataCiteService {
             String crosswalk = "DIM2DATACITE";
 
             // If item is in publication blackout, get the appropriate crosswalk
-            // Publication Blackout is determined by the taskowner table,
-            // which is not a part of dspace, so it must be queried directly.
-            String query = "select taskowner.step_id from taskowner, workflowitem where taskowner.workflow_item_id = workflowitem.workflow_id and workflowitem.item_id = ?";
-            TableRow row = DatabaseManager.querySingleTable(context, "taskowner", query, item.getID());
-            if(row != null && DRYAD_PENDING_PUBLICATION_STEP.equals(row.getStringColumn("step_id"))) {
+            if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(context, item)) {
                 log.info("Item is in publication blackout, using blackout crosswalk");
                 crosswalk = "DIM2DATACITE-BLACKOUT";
             }
