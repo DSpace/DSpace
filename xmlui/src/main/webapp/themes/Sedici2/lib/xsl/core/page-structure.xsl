@@ -19,6 +19,24 @@
     <xsl:output indent="yes"/>
 
 
+    <xsl:variable name="jqueryVersion">
+        <xsl:text>1.7.2</xsl:text>
+    </xsl:variable>
+    <xsl:variable name="jqueryuiVersion">
+        <xsl:text>1.8.15</xsl:text>
+    </xsl:variable>
+
+    <xsl:variable name="protocol">
+        <xsl:choose>
+            <xsl:when test="starts-with(confman:getProperty('dspace.baseUrl'), 'https://')">
+                <xsl:text>https://</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:text>http://</xsl:text>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
+
     <!-- Se redefine este template para insertar el menu superior -->
     <xsl:template match="dri:document">
         <html class="no-js">
@@ -282,15 +300,6 @@
                 var runAfterJSImports = new FnArray();
             </script>
 
-            <!-- Modernizr enables HTML5 elements & feature detects -->
-            <script type="text/javascript">
-                <xsl:attribute name="src">
-                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                    <xsl:text>/themes/</xsl:text>
-                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-                    <xsl:text>/lib/js/modernizr-1.7.min.js</xsl:text>
-                </xsl:attribute>&#160;</script>
-
             <!-- Add the title in -->
             <xsl:variable name="page_title" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']" />
             <title>
@@ -482,33 +491,10 @@ placeholders for header images -->
     </xsl:template>
 
     <xsl:template name="addJavascript">
-        <xsl:variable name="jqueryVersion">
-            <xsl:text>1.6.2</xsl:text>
-        </xsl:variable>
 
-        <xsl:variable name="protocol">
-            <xsl:choose>
-                <xsl:when test="starts-with(confman:getProperty('dspace.baseUrl'), 'https://')">
-                    <xsl:text>https://</xsl:text>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:text>http://</xsl:text>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
         <script type="text/javascript" src="{concat($protocol, 'ajax.googleapis.com/ajax/libs/jquery/', $jqueryVersion ,'/jquery.min.js')}">&#160;</script>
 
-        <xsl:variable name="localJQuerySrc">
-            <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-            <xsl:text>/static/js/jquery-</xsl:text>
-            <xsl:value-of select="$jqueryVersion"/>
-            <xsl:text>.min.js</xsl:text>
-        </xsl:variable>
-
-        <script type="text/javascript">
-            <xsl:text disable-output-escaping="yes">!window.jQuery &amp;&amp; document.write('&lt;script type="text/javascript" src="</xsl:text><xsl:value-of
-                select="$localJQuerySrc"/><xsl:text disable-output-escaping="yes">"&gt;&#160;&lt;\/script&gt;')</xsl:text>
-        </script>
+        <script type="text/javascript" src="{concat($protocol, 'ajax.googleapis.com/ajax/libs/jqueryui/', $jqueryuiVersion ,'/jquery-ui.min.js')}">&#160;</script>
 
         <!-- Add theme javascipt  -->
         <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)]">
@@ -586,16 +572,20 @@ placeholders for header images -->
 
         <!--PNG Fix for IE6-->
         <xsl:text disable-output-escaping="yes">&lt;!--[if lt IE 7 ]&gt;</xsl:text>
-        <script type="text/javascript">
-            <xsl:attribute name="src">
-                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                <xsl:text>/themes/</xsl:text>
-                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-                <xsl:text>/lib/js/DD_belatedPNG_0.0.8a.js?v=1</xsl:text>
-            </xsl:attribute>&#160;</script>
-        <script type="text/javascript">
-            <xsl:text>DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');$.each($('img[src$=png]'), function() {DD_belatedPNG.fixPng(this);});</xsl:text>
-        </script>
+	        
+	        <script type="text/javascript">
+	            <xsl:attribute name="src">
+	                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+	                <xsl:text>/themes/</xsl:text>
+	                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+	                <xsl:text>/lib/js/DD_belatedPNG_0.0.8a.js?v=1</xsl:text>
+	            </xsl:attribute>&#160;
+	        </script>
+
+	        <script type="text/javascript">
+	            <xsl:text>DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');$.each($('img[src$=png]'), function() {DD_belatedPNG.fixPng(this);});</xsl:text>
+	        </script>
+
         <xsl:text disable-output-escaping="yes" >&lt;![endif]--&gt;</xsl:text>
 
 
@@ -670,10 +660,10 @@ placeholders for header images -->
 
         <script type="text/javascript">
             $(function() {
-            $( "#community-tabs" ).tabs({
-            collapsible: false,
-            fx: {opacity: 'toggle', duration: 'fast'}
-            });
+	            $( "#community-tabs" ).tabs({
+		            collapsible: false,
+		            fx: {opacity: 'toggle', duration: 'fast'}
+	            });
             });
         </script>
 
@@ -721,7 +711,8 @@ placeholders for header images -->
                 });
             </script>
         </xsl:if>
-  <script type="text/javascript">
+		
+		<script type="text/javascript">
 			(function()
 					{var uv=document.createElement('script');
 					uv.type='text/javascript';
@@ -729,7 +720,7 @@ placeholders for header images -->
 					uv.src='//widget.uservoice.com/QIUtmn0eqp3spSPiyMziFg.js';
 					var s=document.getElementsByTagName('script')[0];
 					s.parentNode.insertBefore(uv,s)})()
-			</script>
+		</script>
     </xsl:template>
 
     <!--
