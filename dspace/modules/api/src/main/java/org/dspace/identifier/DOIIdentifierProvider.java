@@ -213,11 +213,9 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                     DOI doi_= upgradeDOIDataFile(context, doi, item, history);
                     if(doi_!=null){
                         remove(doi);
-                        if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(context, item)) {
-                            mint(doi_, "http://datadryad.org/publicationBlackout", register, createListMetadata(item));
-                        } else {
-                            mint(doi_, register, createListMetadata(item));
-                        }
+                        // Not checking for blackout here because item is already archived
+                        mint(doi_, register, createListMetadata(item));
+
                         item.clearMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, null);
                         item.update();
                         if (doi == null || doi.equals("")) throw new Exception();
