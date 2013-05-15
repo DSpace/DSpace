@@ -8,13 +8,15 @@
 package org.dspace.curate;
 
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-import java.net.URL;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.URL;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -35,6 +37,7 @@ import org.dspace.content.Item;
 import org.dspace.content.Bundle;
 import org.dspace.content.Bitstream;
 import org.dspace.content.crosswalk.MetadataValidationException;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.identifier.IdentifierService;
@@ -68,6 +71,9 @@ public class DataPackageStats extends AbstractCurationTask {
     DocumentBuilder docb = null;
     static long total = 0;
     private Context context;
+    private static List<String> journalsThatAllowReview = new ArrayList<String>();
+    private static List<String> integratedJournals = new ArrayList<String>();
+    private static List<String> integratedJournalsThatAllowEmbargo = new ArrayList<String>();
     
     @Override 
     public void init(Curator curator, String taskId) throws IOException {
@@ -81,6 +87,35 @@ public class DataPackageStats extends AbstractCurationTask {
 	    docb = dbf.newDocumentBuilder();
 	} catch (ParserConfigurationException e) {
 	    throw new IOException("unable to initiate xml processor", e);
+	}
+
+
+	// init list of journals that support embargo and review
+        String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
+	log.info("initializing journal settings from property file " + journalPropFile);
+        Properties properties = new Properties();
+	try {
+	    properties.load(new FileInputStream(journalPropFile));
+	    String journalTypes = properties.getProperty("journal.order");
+	    for (int i = 0; i < journalTypes.split(",").length; i++) {
+		String journalType = journalTypes.split(",")[i].trim();
+		String journalDisplay = properties.getProperty("journal." + journalType + ".fullname");
+		String integrated = properties.getProperty("journal." + journalType + ".integrated");
+		String embargo = properties.getProperty("journal." + journalType + ".embargoAllowed", "true");
+		String allowReviewWorkflow = properties.getProperty("journal." + journalType + ".allowReviewWorkflow", "false");
+
+		if(integrated != null && Boolean.valueOf(integrated)) {
+		    integratedJournals.add(journalDisplay);
+		}
+		if(allowReviewWorkflow != null && Boolean.valueOf(allowReviewWorkflow)) {
+		    journalsThatAllowReview.add(journalDisplay);
+		}
+		if(embargo != null && Boolean.valueOf(embargo)) {
+		    integratedJournalsThatAllowEmbargo.add(journalDisplay);
+		}
+	    }
+	} catch(Exception e) {
+	    log.error("Unable to initialize the journal settings");
 	}
     }
     
@@ -98,6 +133,8 @@ public class DataPackageStats extends AbstractCurationTask {
 	String packageDOI = "\"[no package DOI found]\"";
 	String articleDOI = "\"[no article DOI found]\"";
 	String journal = "[no journal found]"; // don't add quotes here, because journal is always quoted when output below
+	boolean journalAllowsEmbargo = false;
+	boolean journalAllowsReview = false;
 	String numKeywords = "\"[no numKeywords found]\"";
 	String numKeywordsJournal = "\"[unknown]\"";
 	String numberOfFiles = "\"[no numberOfFiles found]\"";
@@ -121,7 +158,7 @@ public class DataPackageStats extends AbstractCurationTask {
 	
 	if (dso.getType() == Constants.COLLECTION) {
 	    // output headers for the CSV file that will be created by processing all items in this collection
-	    report("handle, packageDOI, articleDOI, journal, numKeywords, numKeywordsJournal, numberOfFiles, packageSize, " +
+	    report("handle, packageDOI, articleDOI, journal, journalAllowsEmbargo, journalAllowsReview, numKeywords, numKeywordsJournal, numberOfFiles, packageSize, " +
 		   "embargoType, embargoDate, numberOfDownloads, manuscriptNum, numReadmes, wentThroughReview, dateAccessioned");
 	} else if (dso.getType() == Constants.ITEM) {
             Item item = (Item)dso;
@@ -173,7 +210,18 @@ public class DataPackageStats extends AbstractCurationTask {
 		}
 		log.debug("journal = " + journal);
 
-		
+		// journalAllowsEmbargo
+		// embargoes are allowed for all non-integrated journals
+		// embargoes are also allowed for integrated journals that have set the embargoesAllowed option
+		if(!integratedJournals.contains(journal) || integratedJournalsThatAllowEmbargo.contains(journal)) {
+		    journalAllowsEmbargo = true;
+		} 
+
+		// journalAllowsReview
+		if(journalsThatAllowReview.contains(journal)) {
+		    journalAllowsReview = true;
+		}
+				
 		// accession date
 		vals = item.getMetadata("dc.date.accessioned");
 		if (vals.length == 0) {
@@ -382,7 +430,8 @@ public class DataPackageStats extends AbstractCurationTask {
         }
 
 	setResult("Last processed item = " + handle + " -- " + packageDOI);
-	report(handle + ", " + packageDOI + ", " + articleDOI + ", \"" + journal + "\", " + numKeywords + ", " +
+	report(handle + ", " + packageDOI + ", " + articleDOI + ", \"" + journal + "\", " +
+	       journalAllowsEmbargo + ", " + journalAllowsReview + ", " + numKeywords + ", " +
 	       numKeywordsJournal + ", " + numberOfFiles + ", " + packageSize + ", " +
 	       embargoType + ", " + embargoDate + ", " + numberOfDownloads + ", " + manuscriptNum + ", " +
 	       numReadmes + ", " + wentThroughReview + ", " + dateAccessioned);
