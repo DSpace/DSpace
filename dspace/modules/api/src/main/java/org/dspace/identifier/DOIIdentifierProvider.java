@@ -242,7 +242,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             log.info("DOI just minted: " + doi_);
 
             doi = doi_.toString();
-            if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(context, item)) {
+            if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
                 mint(doi_, "http://datadryad.org/publicationBlackout", register, createListMetadata(item));
             } else {
                 mint(doi_, register, createListMetadata(item));
@@ -256,7 +256,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                 Version previous = history.getPrevious(version);
                 if (history.isFirstVersion(previous)) {
                     DOI firstDOI = calculateDOIFirstVersion(context, previous);
-                    if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(context, item)) {
+                    if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
                         mint(firstDOI, "http://datadryad.org/publicationBlackout", register, createListMetadata(previous.getItem()));
                     } else {
                         mint(firstDOI, register, createListMetadata(previous.getItem()));

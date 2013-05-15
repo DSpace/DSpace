@@ -403,17 +403,9 @@ public class CDLDataCiteService {
     public static Map<String, String> createMetadataListXML(Item item) {
         Map<String, String> metadata = new HashMap<String, String>();
         try {
-            org.dspace.core.Context context = null;
-            try {
-                context = new org.dspace.core.Context();
-            } catch (SQLException e) {
-                System.exit(1);
-            }
-            context.turnOffAuthorisationSystem();
             String crosswalk = "DIM2DATACITE";
-
             // If item is in publication blackout, get the appropriate crosswalk
-            if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(context, item)) {
+            if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
                 log.info("Item is in publication blackout, using blackout crosswalk");
                 crosswalk = "DIM2DATACITE-BLACKOUT";
             }

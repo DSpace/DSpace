@@ -4,8 +4,11 @@
  */
 package org.dspace.doi;
 
+import com.sun.org.apache.bcel.internal.generic.L2D;
 import java.sql.SQLException;
+import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataSchema;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -16,18 +19,19 @@ import org.dspace.storage.rdbms.TableRow;
  */
 public class DryadDOIRegistrationHelper {
 
-    public static final String DRYAD_PENDING_PUBLICATION_STEP = "pendingPublicationStep";
+    public static final String REGISTER_PENDING_PUBLICATION_STEP = "registerPendingPublicationStep";
 
-    public static boolean isDataPackageInPublicationBlackout(Context context, Item dataPackage) throws SQLException {
-        // Publication Blackout is determined by the taskowner table,
-        // which is not a part of dspace, so it must be queried directly.
-        String query = "select taskowner.step_id from taskowner, workflowitem where taskowner.workflow_item_id = workflowitem.workflow_id and workflowitem.item_id = ?";
-        TableRow row = DatabaseManager.querySingleTable(context, "taskowner", query, dataPackage.getID());
-        if(row != null && DRYAD_PENDING_PUBLICATION_STEP.equals(row.getStringColumn("step_id"))) {
-            return true;
-        } else {
-            return false;
+    public static boolean isDataPackageInPublicationBlackout(Item dataPackage) throws SQLException {
+        // Publication blackout is indicated by provenance metadata
+        boolean isInBlackout = false;
+        DCValue provenance[] =  dataPackage.getMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en");
+        for(DCValue dcValue : provenance) {
+            if(dcValue.value != null && dcValue.value.contains("Entered publication blackout")) {
+                isInBlackout = true;
+            }
         }
+        // now find something that would negate blackout
+        return isInBlackout;
     }
 
 }

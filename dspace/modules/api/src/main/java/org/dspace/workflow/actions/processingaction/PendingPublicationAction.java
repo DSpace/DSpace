@@ -43,24 +43,9 @@ public class PendingPublicationAction extends ProcessingAction{
     @Override
     public ActionResult execute(Context c, WorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException {
         if(DryadJournalSubmissionUtils.isJournalBlackedOut(c, wfi.getItem(), wfi.getCollection())) {
-            return registerItemInBlackout(c, wfi);
+            return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, BLACKOUT_REQUIRED);
         } else {
             return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, BLACKOUT_NOT_REQUIRED);
         }
-    }
-
-    private ActionResult registerItemInBlackout(Context c, WorkflowItem wfi) throws AuthorizeException, SQLException, IOException {
-        DSpace dspace = new DSpace();
-        IdentifierService service = new DSpace().getSingletonService(IdentifierService.class);
-        try {
-            service.register(c, wfi.getItem());
-            Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wfi.getItem());
-            for (Item dataFile : dataFiles) {
-                service.register(c, dataFile);
-            }
-        } catch (IdentifierException e) {
-            throw new IOException(e);
-        }
-        return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, BLACKOUT_REQUIRED);
     }
 }
