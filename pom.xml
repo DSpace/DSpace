@@ -391,6 +391,21 @@
             </modules>
         </profile>
 
+        <!--
+            Builds LNI client for DSpace
+        -->
+        <profile>
+            <id>dspace-lni-client</id>
+            <activation>
+                <file>
+                    <exists>dspace-lni-client/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-lni-client</module>
+            </modules>
+        </profile>
+
 
       <!--
          The 'release' profile is used by the 'maven-release-plugin' (see above)
@@ -408,6 +423,7 @@
             <module>dspace-jspui</module>
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
+            <module>dspace-lni-client</module>
             <module>dspace-oai</module>
             <module>dspace-sword</module>
             <module>dspace-swordv2</module>
