@@ -377,7 +377,7 @@
         </profile>
 
         <!--
-           Builds LNI WAR for DSpace
+           Builds LNI WAR & Client for DSpace
         -->
         <profile>
             <id>dspace-lni</id>
@@ -388,6 +388,7 @@
             </activation>
             <modules>
                 <module>dspace-lni</module>
+                <module>dspace-lni/dspace-lni-client</module>
             </modules>
         </profile>
 
