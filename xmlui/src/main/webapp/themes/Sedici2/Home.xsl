@@ -46,21 +46,32 @@
     <xsl:template match="dri:body">
        <div id="ds-body" class="home">
 
-<!-- Agregamos el slideshow -->
-         <div id='home_slideshow'>
-            <xsl:call-template name="slideshow"/>
-         </div>
+		<!-- Agregamos el slideshow -->
+<!--          <div id='home_slideshow'> -->
+<!--             <xsl:call-template name="slideshow"/> -->
+<!--          </div> -->
+
 		<!-- Por el momento mostramos una imagen estatica que simula ser el slideshow -->
-<!-- 		<div id="home_slideshow"> -->
-<!-- 			<img> -->
-<!-- 	            <xsl:attribute name="src"> -->
-<!-- 	                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/> -->
-<!-- 	                <xsl:text>/themes/</xsl:text> -->
-<!-- 	                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/> -->
-<!-- 	                <xsl:text>/images/ejemplo_slideshow.png</xsl:text> -->
-<!-- 	            </xsl:attribute>&#160; -->
-<!-- 			</img> -->
-<!-- 		</div> -->
+		<div id="home_slideshow" class="html_content">
+			<div class="html_slide">
+				<div id="slide_recursos" class="html_slide_item">
+					<h2>Recursos para su investigación</h2>
+					<p>Acceda a mas de 25.000 recursos científicos y académicos producidos dentro de la UNLP</p>
+				</div>
+				<div id="slide_visibilidad" class="html_slide_item">
+					<h2>Visibilidad de sus obras</h2>
+					<p>Al publicar sus trabajos en SEDICI aumentará la visibilidad e imapcto de sus obras</p>
+				</div>
+				<div id="slide_preservacion" class="html_slide_item">
+					<h2>Preservación digital</h2>
+					<p>Asegure el acceso a su obra en el largo plazo, aún frente a los cambios tecnológicos</p>
+				</div>
+				<div id="slide_contacto" class="html_slide_item">
+					<h2>Contacto con pares</h2>
+					<p>Contáctese con investigadores que se encuentren trabajando en áreas relacionadas a la suya</p>
+				</div>
+			</div>
+		</div>
 
 	     <div id='home_info'>
 	         <xsl:apply-templates select="dri:div[@n='news']/dri:p"/>
