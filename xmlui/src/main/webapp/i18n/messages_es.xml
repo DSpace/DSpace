@@ -2563,4 +2563,6 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="sedici.home.subir_material.info">Suba sus trabajos a SEDICI, amplíe su visibilidad y mejore su impacto</message>
 <message key="sedici.home.subir_material.linktext">Cargar un documento</message>
 
+<message key="sedici.items.handle.utilizacion_URI">Por favor, utilice este identificador(URI) para citar o enlazar este ítem</message>
+
 </catalogue>
