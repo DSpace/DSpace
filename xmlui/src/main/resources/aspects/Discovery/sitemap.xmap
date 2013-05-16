@@ -71,6 +71,7 @@ and searching the repository.
                     3) Metadata about the search urls.
                     -->
             <map:transform type="Navigation"/>
+            <map:transform type="FrontPageSearch"/>
 
             <!--
                     Display the DSpace homepage. This includes the news.xml file
@@ -78,7 +79,6 @@ and searching the repository.
                     -->
             <map:match pattern="">
                 <map:transform type="SidebarFacetsTransformer"/>
-                <map:transform type="FrontPageSearch"/>
 
                 <map:transform type="SiteRecentSubmissions"/>
 

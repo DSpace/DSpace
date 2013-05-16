@@ -115,7 +115,18 @@
 	<!-- Columna izquierda (redefinida en el Home) -->
 	<xsl:template name="buildLeftSection">
 		<div id="ds-left-section">
-			<xsl:apply-templates select="/dri:document/dri:options"/>
+			<xsl:choose>
+				<xsl:when test="/dri:document/dri:options/dri:list[@n='discovery']/dri:list">
+					<xsl:apply-templates select="/dri:document/dri:options"/>
+				</xsl:when>
+				<!-- Si no hay facets y no estamos en el submit, se muestra la busqueda y link de autoarchivo en la columna izquierda -->
+				<xsl:when test="not(/dri:document/dri:options/dri:list[@n='discovery']/dri:list) 
+					and not(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request' and @qualifier='URI'][contains(.,'submit')])">
+					
+					<xsl:call-template name="buildHomeSearch"/>
+					<xsl:call-template name="buildHomeAutoarchivo"/>
+				</xsl:when>
+			</xsl:choose>
 			&#160;
 		</div>
 	</xsl:template>
@@ -747,16 +758,7 @@ placeholders for header images -->
                 </xsl:apply-templates>
             </xsl:if>
 
-
-
-            <xsl:apply-templates select="dri:div[@id='aspect.discovery.SiteViewer.div.front-page-search']">
-                <xsl:with-param name="muestra">true</xsl:with-param>
-            </xsl:apply-templates>
-
-
-
             <xsl:apply-templates/>
-
 
             <!-- <xsl:if test="not(java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.matches(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'], 'handle/\d+/\d+/submit(.*)'))">
             <xsl:apply-templates select='/dri:document/dri:options/dri:list[@id="aspect.statistics.Navigation.list.statistics"]'/>
@@ -775,22 +777,6 @@ placeholders for header images -->
                 <xsl:attribute name="class">ds-notice-div <xsl:value-of select="@rend"/></xsl:attribute>
                 <xsl:apply-templates select="dri:p"/>
             </div>
-        </xsl:if>
-    </xsl:template>
-
-
-    <xsl:template name="busqueda_inicio" match="dri:div[@id='aspect.discovery.SiteViewer.div.front-page-search']">
-        <xsl:param name="muestra">false</xsl:param>
-        <xsl:if test="$muestra = 'true'">
-            <form>
-                <xsl:attribute name="action">
-                    <xsl:value-of select="@action"/>
-                </xsl:attribute>
-                <xsl:attribute name="method">
-                    <xsl:value-of select="@method"/>
-                </xsl:attribute>
-                <xsl:apply-templates/>
-            </form>
         </xsl:if>
     </xsl:template>
 

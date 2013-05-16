@@ -161,4 +161,85 @@
         </xsl:apply-templates>
     </xsl:template>
 
+	<xsl:template name="buildHomeSearch">
+         <div id='home_search'>
+         	 <h2><i18n:text>sedici.home.buscar_material.title</i18n:text></h2>
+         	 <p>
+         	 	<i18n:text>sedici.home.buscar_material.info_pre</i18n:text>
+         	 	<span class="resource_count">25000</span>
+         	 	<i18n:text>sedici.home.buscar_material.info_post</i18n:text>
+         	 </p>
+	         <xsl:apply-templates select="/dri:document/dri:body/dri:div[@n='front-page-search']" mode="home"/>
+	     </div>
+	</xsl:template>
+
+	<xsl:template name="buildHomeAutoarchivo">
+		 <div id="home_autoarchivo">
+        	<h2><i18n:text>sedici.home.subir_material.title</i18n:text></h2>
+        	<p><i18n:text>sedici.home.subir_material.info</i18n:text></p>
+<!-- 	         	<p> -->
+<!-- 	         	 	<a> -->
+<!-- 			 			<xsl:attribute name="href"> -->
+<!-- 			 				<xsl:value-of select="$context-path"/> -->
+<!-- 							<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='autoArchive' and @qualifier='submit']='true'"> -->
+<!-- 								<xsl:text>/handle/</xsl:text> -->
+<!-- 								<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='autoArchive'][@qualifier='handle']"/> -->
+<!-- 							</xsl:if> -->
+<!-- 							<xsl:text>/submit</xsl:text> -->
+<!-- 			 			</xsl:attribute> -->
+<!-- 			 			<i18n:text>sedici.home.subir_material.linktext</i18n:text> -->
+<!-- 	         	 	</a> -->
+<!-- 	         	</p> -->
+         	<div>
+			 	<a>
+		 			<xsl:attribute name="href">
+		 				<xsl:value-of select="$context-path"/>
+						<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='autoArchive' and @qualifier='submit']='true'">
+							<xsl:text>/handle/</xsl:text>
+							<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='autoArchive'][@qualifier='handle']"/>
+						</xsl:if>
+						<xsl:text>/submit</xsl:text>
+		 			</xsl:attribute>
+			 		<img title="sedici.home.subir_material.linktext" i18n:attr="title">
+			            <xsl:attribute name="src">
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+			                <xsl:text>/themes/</xsl:text>
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+			                <xsl:text>/images/autoarchivo_home.png</xsl:text>
+			            </xsl:attribute>&#160;
+			 		</img>
+			 	</a>
+		 	</div>
+		 </div>
+	</xsl:template>
+
+   <xsl:template match="dri:div[@n='front-page-search']" mode="home">
+
+        <form>
+            <xsl:call-template name="standardAttributes">
+                <xsl:with-param name="class">ds-interactive-div</xsl:with-param>
+            </xsl:call-template>
+            <xsl:attribute name="action"><xsl:value-of select="@action"/></xsl:attribute>
+            <xsl:attribute name="method"><xsl:value-of select="@method"/></xsl:attribute>
+            <xsl:if test="@method='multipart'">
+                <xsl:attribute name="method">post</xsl:attribute>
+                <xsl:attribute name="enctype">multipart/form-data</xsl:attribute>
+            </xsl:if>
+            <xsl:attribute name="onsubmit">javascript:tSubmit(this);</xsl:attribute>
+                        <!--For Item Submission process, disable ability to submit a form by pressing 'Enter'-->
+                        <xsl:if test="starts-with(@n,'submit')">
+                                <xsl:attribute name="onkeydown">javascript:return disableEnterKey(event);</xsl:attribute>
+            </xsl:if>
+            <xsl:apply-templates select="dri:p[2]">
+	                     <xsl:with-param name="muestra">true</xsl:with-param>
+	         </xsl:apply-templates>          
+          
+        </form>
+            
+    </xsl:template>
+
+	<!-- Template vacio para evitar el renderizado default de la caja de busqueda en todas las paginas -->
+	<xsl:template match="dri:div[@n='front-page-search']">
+	</xsl:template>
+
 </xsl:stylesheet>
