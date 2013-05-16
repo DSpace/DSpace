@@ -1204,7 +1204,7 @@
         on release to deploy release versions to the repository by the
         release manager.
     -->
-   <distributionManagement>
+    <distributionManagement>
         <!-- further distribution management is found upstream in the sonatype parent -->
     </distributionManagement>
 
