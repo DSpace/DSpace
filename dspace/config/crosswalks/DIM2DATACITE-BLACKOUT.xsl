@@ -64,7 +64,7 @@
 
 	    <!-- ************ Publication Year ************** -->
             <xsl:if test="dspace:field[@element='date' and @qualifier='accessioned']">
-                <xsl:for-each select="dspace:field[@qualifier='accessioned']">
+                <xsl:for-each select="dspace:field[@qualifier='accessioned'][1]">
                     <publicationYear>
                         <xsl:variable name="date" select="."/>
                         <xsl:value-of select="substring($date, 0, 5)"/>
@@ -122,31 +122,6 @@
   	    <resourceType resourceTypeGeneral="Dataset">DataPackage</resourceType>
   	  </xsl:if>
   	  
-  	  <!-- ************ Alternate Identifiers ************** -->
-  	  <xsl:variable name="alternateIdentifiers">
-        <xsl:if test="dspace:field[@element ='identifier']">
-            <xsl:for-each select="dspace:field[@element ='identifier' and not(@qualifier='manuscriptNumber')]">
-                <xsl:variable name="id" select="."/>
-                <xsl:choose>
-                    <xsl:when test="not(starts-with($id,'doi'))">
-                        <xsl:element name="alternateIdentifier">
-                            <xsl:attribute name="alternateIdentifierType">
-                                <xsl:value-of select="@qualifier"/>
-                            </xsl:attribute>
-                            <xsl:value-of select="."/>
-                        </xsl:element>
-                    </xsl:when>
-                </xsl:choose>
-            </xsl:for-each>
-        </xsl:if>
-      </xsl:variable>
-      
-      <xsl:if test="$alternateIdentifiers">
-        <alternateIdentifiers>
-          <xsl:copy-of select="$alternateIdentifiers"/>
-        </alternateIdentifiers>
-      </xsl:if>
-
 	    <!-- *********** Related Identifiers ********* -->
       <xsl:if test="dspace:field[@element='relation']">
 	      <relatedIdentifiers>

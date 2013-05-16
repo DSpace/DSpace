@@ -63,7 +63,7 @@
 
 	    <!-- ************ Publication Year ************** -->
             <xsl:if test="dspace:field[@element='date' and @qualifier='accessioned']">
-                <xsl:for-each select="dspace:field[@qualifier='accessioned']">
+                <xsl:for-each select="dspace:field[@qualifier='accessioned'][1]">
                     <publicationYear>
                         <xsl:variable name="date" select="."/>
                         <xsl:value-of select="substring($date, 0, 5)"/>
@@ -140,7 +140,7 @@
         </xsl:if>
       </xsl:variable>
       
-      <xsl:if test="$alternateIdentifiers">
+      <xsl:if test="$alternateIdentifiers!=''">
         <alternateIdentifiers>
           <xsl:copy-of select="$alternateIdentifiers"/>
         </alternateIdentifiers>
@@ -216,7 +216,7 @@
             </xsl:choose>
           </xsl:variable>
           <!-- ************ Rights *************** -->
-          <xsl:if test="$embargoText">
+          <xsl:if test="$embargoText!=''">
               <rights>
                   <xsl:value-of select="$embargoText"/>
               </rights>
@@ -234,7 +234,7 @@
 	    <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
 	      <descriptions>
 	        <description descriptionType="Other">
-              <xsl:value-of select="dspace:field[@element='description']"/>
+              <xsl:value-of select="dspace:field[@element='description' and @qualifier='']"/>
 	        </description>
 	      </descriptions>
       </xsl:if>
