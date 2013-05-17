@@ -38,57 +38,65 @@ public class Minter implements org.springframework.beans.factory.InitializingBea
 
 	public DOI register(DOI aDOI, String target, Map<String, String> metadata) throws IOException {
 	    log.debug("Entering register(DOI) method");
-	    
-	    try {
-                if(target == null) {
-                    target = aDOI.getTargetURL().toString();
+
+            // DOI registration includes a target, which is typically
+            // the item's URI on datadryad.org (e.g. http://datadryad.org/resource/doi:10.5061/dryad.12345
+            // Items in publication blackout will be registered with a different
+            // target
+            if(target == null) {
+                target = aDOI.getTargetURL().toString();
+            }
+
+            String doi = aDOI.toID();
+            log.debug("doi to register: " + doi + ", target: " + target);
+
+            // This method may be called to register a new DOI or update an existing
+            // DOI.  Attempting to register a DOI that already exists will fail,
+            // so we cehck with EZID first to see if the DOI exists.
+            Boolean doiIsRegistered = false;
+            if(myDataCiteConnectionIsLive) {
+                String response = myDoiService.lookup(doi);
+                // look for 'error' in response or 'success'
+                log.debug("Checking for existing DOI (" + doi + "), response: " + response);
+                if(response != null && response.toUpperCase().contains("SUCCESS:")) {
+                    doiIsRegistered = true;
                 }
+            }
+            // If the DOI was already registered, update it with the provided
+            // target and metadata
+            if (doiIsRegistered) {
+                if (myDataCiteConnectionIsLive) {
+                    String response = myDoiService.update(doi, target, metadata);
+                    if(!response.toUpperCase().contains("OK") &&
+                       !response.toUpperCase().contains("CREATED") &&
+                       !response.toUpperCase().contains("SUCCESS")) {
+                        log.error("DOI Service reports problem on update: " + response);
+                        myDoiService.emailException(response, doi, "update");
+                    } else {
+                        log.debug("DOI updated: " + response);
+                    }
+                } else {
+                    log.info("DOI service not connected, DOI update skipped.");
+                }
+            } else {
+                // DOI is not registered, register as new
+                if (myDataCiteConnectionIsLive) {
+                    String response = myDoiService.registerDOI(doi, target, metadata);
+                    response = response.toUpperCase();
 
-		String doi = aDOI.toID();
-		log.debug("doi to register: " + doi + ", target: " + target);
+                    if(!response.contains("OK") &&
+                       !response.contains("CREATED") &&
+                       !response.contains("SUCCESS")) {
+                        log.error("DOI Service reports problem on registration: " + response);
+                        myDoiService.emailException(response, doi, "registration");
+                    } else {
+                        log.debug("DOI registered: " + response);
+                    }
+                } else {
+                    log.info("DOI service not connected, DOI registration skipped.");
+                }
+            }
 
-		// open connection to the DOI URL
-		URL url = aDOI.toURL();
-		HttpURLConnection http = (HttpURLConnection) url.openConnection();
-		http.connect();
-
-		// if the URL issues a redirect, the DOI is already registered, so try to update it
-		if (http.getResponseCode() == 303) {
-		    if (!http.getHeaderField("Location").equals(target)) {
-			if (myDataCiteConnectionIsLive) {
-			    String response = myDoiService.update(doi, target, metadata);
-			    log.debug("Response from DOI service: " + response);
-			} else {
-			    log.info("Dryad URL updated: " + aDOI + " = " + target);
-			}
-		    } else {
-			log.debug("Ignored: URL " + target + " already registered");
-		    }
-		} else {
-		    // DOI is not registered, create a new registration
-		    if (myDataCiteConnectionIsLive) {
-			String response = myDoiService.registerDOI(doi, target, metadata);
-			response = response.toUpperCase();
-			
-			if(!response.contains("OK") &&
-			   !response.contains("CREATED") &&
-			   !response.contains("SUCCESS")) {
-			    log.error("DOI Service reports problem: " + response);
-			    myDoiService.emailException(response, doi, "registration");
-			} else {
-			    log.debug("DOI registered: " + response);
-			}
-		    } else {
-			log.info("DOI service not connected, registration skipped.");
-		    }
-		}
-
-		http.disconnect();
-	    } catch (MalformedURLException details) {
-		log.error("Malformed URL", details);
-		throw new RuntimeException(details);
-	    }
-	
 	    return aDOI;
 	}
 
