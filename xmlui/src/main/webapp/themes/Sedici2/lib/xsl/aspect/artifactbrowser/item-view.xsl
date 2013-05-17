@@ -62,17 +62,19 @@
 
 		<xsl:if test="$ds_item_view_toggle_url != ''">
 			<div id="view-item-metadata">
-				<div id="item-URI-sugerence">
-					<!-- Message of form of use of URI -->
-					<i18n:text>sedici.items.handle.utilizacion_URI</i18n:text>
-					<xsl:text>: </xsl:text>
-					<a>
-						<xsl:attribute name="href">
+				<xsl:if test="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier'][@qualifier='uri']">
+					<div id="item-URI-sugerence">
+						<!-- Info about how to cite this document -->
+						<i18n:text>sedici.items.handle.utilizacion_URI</i18n:text>
+						<xsl:text>: </xsl:text>
+						<a>
+							<xsl:attribute name="href">
+								<xsl:value-of select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier'][@qualifier='uri']"/>
+							</xsl:attribute>
 							<xsl:value-of select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier'][@qualifier='uri']"/>
-						</xsl:attribute>
-						<xsl:value-of select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier'][@qualifier='uri']"/>
-					</a>
-				</div>
+						</a>
+					</div>
+				</xsl:if>
 				<a>
 					<xsl:attribute name="href"><xsl:value-of select="$ds_item_view_toggle_url" /></xsl:attribute>
 					<i18n:text>xmlui.ArtifactBrowser.ItemViewer.show_full</i18n:text>
