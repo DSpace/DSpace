@@ -105,7 +105,7 @@
 <message key="xmlui.ArtifactBrowser.AbstractSearch.result_query">Su petición "{0}" produjo {1} resultados</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.head2">Comunidades o colecciones que coinciden con la petición</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.head3">Ítems que coinciden con la petición</message>
-<message key="xmlui.ArtifactBrowser.AbstractSearch.no_results">La búsqueda no produjo resultados</message>
+<message key="xmlui.ArtifactBrowser.AbstractSearch.no_results">Lamentablemente no se encontraron coincidencias para su búsqueda</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.all_of_dspace">Todo SEDICI</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.title">título</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dateissued">fecha de publicación</message>
@@ -116,8 +116,10 @@
 <message key="xmlui.ArtifactBrowser.AbstractSearch.order.asc">Ascendente</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.order.desc">Descendente</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.rpp">Resultados</message>
-
-
+<message key="xmlui.ArtifactBrowser.AbstractSearch.tips_info_general">Puede intentar alguna de las siguientes opciones:</message>
+<message key="xmlui.ArtifactBrowser.AbstractSearch.tips_info1">Si está utilizando comillas en la cadena de búsqueda, puede intentar omitiendolas para generar una búsqueda con las palabras individuales</message>
+<message key="xmlui.ArtifactBrowser.AbstractSearch.tips_info2">Utilizar términos mas amplios para luego refinar su búsqueda utilizando los filtros</message>
+<message key="xmlui.ArtifactBrowser.AbstractSearch.tips_info3">Utilizar alguna de las exploraciones disponibles</message>
 
 
 <!-- org.dspace.app.xmlui.artifactbrowser.AdvancedSearch.java -->
@@ -2495,7 +2497,7 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.date.issued_dt">Fecha de publicación</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.date.accessioned_dt">Fecha de carga</message>
 <message key="xmlui.discovery.SearchFacetFilter.no-results">No se encontarron valores acordes a los filtros.</message>
-<message key="xmlui.discovery.AbstractFiltersTransformer.filters.head">Navegar por</message>
+<message key="xmlui.discovery.AbstractFiltersTransformer.filters.head">Refine su busqueda</message>
 <message key="xmlui.discovery.AbstractFiltersTransformer.filters.view-more">... Ver más</message>
 <message key="xmlui.discovery.SimpleSearch.search_label">Buscar</message>
 <message key="xmlui.Discovery.SimpleSearch.filter_head">Filtros</message>

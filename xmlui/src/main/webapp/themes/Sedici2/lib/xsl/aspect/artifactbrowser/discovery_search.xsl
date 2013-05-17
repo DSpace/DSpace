@@ -222,5 +222,18 @@
 			</ul>
 		</div>
 	</xsl:template>
-    
+	   <xsl:template match="dri:div[@id='aspect.discovery.SimpleSearch.div.search-results' and not(@itemsTotal)]">
+    	<div id="no_results_found"><i18n:text>xmlui.ArtifactBrowser.AbstractSearch.no_results</i18n:text></div>
+    	<div id="no_results_found_tips">
+			<p><i18n:text>xmlui.ArtifactBrowser.AbstractSearch.tips_info_general</i18n:text></p>
+			<p> </p>
+			<ul>
+				<li><i18n:text>xmlui.ArtifactBrowser.AbstractSearch.tips_info1</i18n:text></li>
+				<li><i18n:text>xmlui.ArtifactBrowser.AbstractSearch.tips_info2</i18n:text></li>
+				<li><i18n:text>xmlui.ArtifactBrowser.AbstractSearch.tips_info3</i18n:text></li>
+			</ul>
+			<p></p>
+		 </div>
+		 <br/>
+   	  </xsl:template>
 </xsl:stylesheet>

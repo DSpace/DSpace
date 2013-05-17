@@ -732,6 +732,7 @@ placeholders for header images -->
 					var s=document.getElementsByTagName('script')[0];
 					s.parentNode.insertBefore(uv,s)})()
 		</script>
+			
     </xsl:template>
 
     <!--
