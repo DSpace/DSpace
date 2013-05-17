@@ -62,19 +62,6 @@
 
 		<xsl:if test="$ds_item_view_toggle_url != ''">
 			<div id="view-item-metadata">
-				<xsl:if test="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier'][@qualifier='uri']">
-					<div id="item-URI-sugerence">
-						<!-- Info about how to cite this document -->
-						<i18n:text>sedici.items.handle.utilizacion_URI</i18n:text>
-						<xsl:text>: </xsl:text>
-						<a>
-							<xsl:attribute name="href">
-								<xsl:value-of select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier'][@qualifier='uri']"/>
-							</xsl:attribute>
-							<xsl:value-of select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier'][@qualifier='uri']"/>
-						</a>
-					</div>
-				</xsl:if>
 				<a>
 					<xsl:attribute name="href"><xsl:value-of select="$ds_item_view_toggle_url" /></xsl:attribute>
 					<i18n:text>xmlui.ArtifactBrowser.ItemViewer.show_full</i18n:text>
@@ -681,9 +668,23 @@
 			</div>
 		</xsl:if>
 		
+		<!-- Info about how to cite this document -->
+		<xsl:if test="./dim:field[@element='identifier'][@qualifier='uri']">
+			<div id="item-URI-sugerence">
+				<i18n:text>sedici.items.handle.utilizacion_URI</i18n:text>
+				<xsl:text>: </xsl:text>
+				<a>
+					<xsl:attribute name="href">
+						<xsl:value-of select="./dim:field[@element='identifier'][@qualifier='uri']"/>
+					</xsl:attribute>
+					<xsl:value-of select="./dim:field[@element='identifier'][@qualifier='uri']"/>
+				</a>
+			</div>
+		</xsl:if>
+		
 		<!-- Generate the Creative Commons license information from the file section (DSpace deposit license hidden by default) -->
 		<xsl:apply-templates select="mets:fileSec/mets:fileGrp[@USE='CC-LICENSE'] "/>
-
+		
 
 
 	</xsl:template>
