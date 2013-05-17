@@ -139,8 +139,13 @@
 	<!-- Columna derecha (redefinida en el Home) -->
 	<xsl:template name="buildRightSection">
 		<div id="ds-right-section">
-			<!-- Caja con controles para la sesion del usuario y opciones contextuales -->
-			<xsl:call-template name="buildUserBox"/>
+			<!-- 
+			Caja con controles para la sesion del usuario y opciones contextuales.
+			Solo cuando no esta en la pagina de login
+			 -->
+			<xsl:if test="not(contains(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request' and @qualifier='URI'],'login'))">
+				<xsl:call-template name="buildUserBox"/>
+			</xsl:if>
 			
 			<!-- Controles para las busquedas -->
 			<xsl:apply-templates select="dri:body/dri:div[@n='search']/dri:div[@id='aspect.discovery.SimpleSearch.div.search-controls']"/>
@@ -150,6 +155,7 @@
 				<xsl:with-param name="head" select="dri:body/dri:div/dri:div[contains(@rend,'recent-submission')]/dri:head"/>
 	         	<xsl:with-param name="references" select="dri:body/dri:div/dri:div[contains(@rend,'recent-submission')]/dri:referenceSet/dri:reference"/>
 	        </xsl:call-template>
+	        &#160;
 		</div>
 	</xsl:template>
 
