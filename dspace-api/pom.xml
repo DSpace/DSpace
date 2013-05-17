@@ -30,6 +30,7 @@
                 <directory>src/main/resources</directory>
                 <includes>
                     <include>maven.properties</include>
+                    <include>scm.properties</include>
                 </includes>
                 <filtering>true</filtering>
             </resource>
@@ -37,6 +38,7 @@
                 <directory>src/main/resources</directory>
                 <excludes>
                     <exclude>maven.properties</exclude>
+                    <exclude>scm.properties</exclude>
                 </excludes>
                 <filtering>false</filtering>
             </resource>
@@ -203,6 +205,20 @@
                         <phase>validate</phase>
                         <goals>
                             <goal>maven-version</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.2</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
                         </goals>
                     </execution>
                 </executions>

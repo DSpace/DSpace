@@ -25,11 +25,23 @@ public class Version
     public static void main(String[] argv)
         throws IOException
     {
+        InputStream propStream;
+
         Properties sys = System.getProperties();
 
         // DSpace version
         System.out.printf("DSpace version:  %s\n",
                           Util.getSourceVersion());
+
+        // SCM revision
+        Properties scm = new Properties();
+        propStream = Version.class.getResourceAsStream("/scm.properties");
+        if (null != propStream)
+        {
+            scm.load(propStream);
+        }
+        System.out.printf("  SCM revision:  %s\n", scm.get("revision"));
+        System.out.printf("    SCM branch:  %s\n", scm.get("branch"));
 
         // OS version
         System.out.printf("            OS:  %s(%s) version %s\n",
@@ -56,8 +68,6 @@ public class Version
         System.out.printf("           JRE:  %s version %s\n",
                           sys.get("java.vendor"),
                           sys.get("java.version"));
-
-        InputStream propStream;
 
         // ant version
         Properties ant = new Properties();
