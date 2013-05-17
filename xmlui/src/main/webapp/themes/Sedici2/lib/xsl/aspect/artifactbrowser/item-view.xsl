@@ -672,7 +672,6 @@
 		<xsl:if test="./dim:field[@element='identifier'][@qualifier='uri']">
 			<div id="item-URI-sugerence">
 				<i18n:text>sedici.items.handle.utilizacion_URI</i18n:text>
-				<xsl:text>: </xsl:text>
 				<a>
 					<xsl:attribute name="href">
 						<xsl:value-of select="./dim:field[@element='identifier'][@qualifier='uri']"/>
