@@ -31,4 +31,7 @@ META-INF/
 *.properties
 !build.properties
 !maven.properties
+<<<<<<< HEAD
 >>>>>>> Fix .gitignore to not ignore maven.properties
+=======
+>>>>>>> 879856b8ac90bf7d55b7b4f128ce354c32a0cc97
