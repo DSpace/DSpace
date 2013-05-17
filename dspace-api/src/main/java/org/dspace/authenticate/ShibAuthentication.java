@@ -187,9 +187,11 @@ public class ShibAuthentication implements AuthenticationMethod
 			log.debug("Starting Shibboleth Authentication");
 
 			String message = "Received the following headers:\n";
+			@SuppressWarnings("unchecked")
 			Enumeration<String> headerNames = request.getHeaderNames();
 			while (headerNames.hasMoreElements()) {
 				String headerName = headerNames.nextElement();
+				@SuppressWarnings("unchecked")
 				Enumeration<String> headerValues = request.getHeaders(headerName);
 				while (headerValues.hasMoreElements()) {
 					String headerValue = headerValues.nextElement();
@@ -483,7 +485,7 @@ public class ShibAuthentication implements AuthenticationMethod
 			// Shibboleth authentication initiator 
 			if (shibURL == null || shibURL.length() == 0)
 				shibURL = "/Shibboleth.sso/Login";
-			shibURL.trim();
+			shibURL = shibURL.trim();
 
 			// Determine the return URL, where shib will send the user after authenticating. We need it to go back
 			// to DSpace's shibboleth-login url so the we will extract the user's information and locally
@@ -619,7 +621,7 @@ public class ShibAuthentication implements AuthenticationMethod
 
 			if (email != null) {
 				foundRemoteUser = true;
-				email.toLowerCase();
+				email = email.toLowerCase();
 				eperson = EPerson.findByEmail(context, email);
 
 				if (eperson == null)
@@ -676,7 +678,7 @@ public class ShibAuthentication implements AuthenticationMethod
 		String fname = findSingleAttribute(request,fnameHeader);
 		String lname = findSingleAttribute(request,lnameHeader);
 
-		if ( email == null || fname == null || lname == null) {
+		if ( email == null || (fnameHeader != null && fname == null) || (lnameHeader != null && lname == null)) {
 			// We require that there be an email, first name, and last name. If we
 			// don't have at least these three pieces of information then we fail.
 			String message = "Unable to register new eperson because we are unable to find an email address along with first and last name for the user.\n";
@@ -690,11 +692,11 @@ public class ShibAuthentication implements AuthenticationMethod
 		}
 
 		// Truncate values of parameters that are too big.
-		if (fname.length() > NAME_MAX_SIZE) {
+		if (fname != null && fname.length() > NAME_MAX_SIZE) {
 			log.warn("Truncating eperson's first name because it is longer than "+NAME_MAX_SIZE+": '"+fname+"'");
 			fname = fname.substring(0,NAME_MAX_SIZE);
 		}
-		if (lname.length() > NAME_MAX_SIZE) {
+		if (lname != null && lname.length() > NAME_MAX_SIZE) {
 			log.warn("Truncating eperson's last name because it is longer than "+NAME_MAX_SIZE+": '"+lname+"'");
 			lname = lname.substring(0,NAME_MAX_SIZE);
 		}
@@ -707,8 +709,10 @@ public class ShibAuthentication implements AuthenticationMethod
 		if (netid != null)
 			eperson.setNetid(netid);
 		eperson.setEmail(email.toLowerCase());
-		eperson.setFirstName(fname);
-		eperson.setLastName(lname);
+		if ( fname != null )
+			eperson.setFirstName(fname);
+		if ( lname != null )
+			eperson.setLastName(lname);
 		eperson.setCanLogIn(true);
 
 		// Commit the new eperson
@@ -763,11 +767,11 @@ public class ShibAuthentication implements AuthenticationMethod
 		String lname = findSingleAttribute(request,lnameHeader);
 
 		// Truncate values of parameters that are too big.
-		if (fname.length() > NAME_MAX_SIZE) {
+		if (fname != null && fname.length() > NAME_MAX_SIZE) {
 			log.warn("Truncating eperson's first name because it is longer than "+NAME_MAX_SIZE+": '"+fname+"'");
 			fname = fname.substring(0,NAME_MAX_SIZE);
 		}
-		if (lname.length() > NAME_MAX_SIZE) {
+		if (lname != null && lname.length() > NAME_MAX_SIZE) {
 			log.warn("Truncating eperson's last name because it is longer than "+NAME_MAX_SIZE+": '"+lname+"'");
 			lname = lname.substring(0,NAME_MAX_SIZE);
 		}
@@ -1073,6 +1077,9 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * @return The value of the attribute or header requested, or null if none found.
 	 */
 	private String findAttribute(HttpServletRequest request, String name) {
+		if ( name == null ) {
+			return null;
+		}
 		// First try to get the value from the attribute
 		String value = (String) request.getAttribute(name);
 		if (StringUtils.isEmpty(value))
@@ -1108,6 +1115,9 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * @return The value of the header requested, or null if none found.
 	 */
 	private String findSingleAttribute(HttpServletRequest request, String name) {
+		if ( name == null) {
+			return null;
+		}
 
 		String value = findAttribute(request, name);
 
