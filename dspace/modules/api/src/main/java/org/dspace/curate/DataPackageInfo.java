@@ -156,7 +156,7 @@ public class DataPackageInfo extends AbstractCurationTask {
         }
 
 	setResult("Last processed item = " + handle + " -- " + doi);
-	report(handle + ", " + doi + ", \"" + journal + "\", " + ", " + dateAccessioned);
+	report(handle + ", " + doi + ", \"" + journal + "\", " + dateAccessioned);
 
 	
 	log.debug("DataPackageStats complete");
