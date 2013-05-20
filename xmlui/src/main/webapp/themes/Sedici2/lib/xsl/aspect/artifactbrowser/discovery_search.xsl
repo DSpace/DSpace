@@ -236,16 +236,7 @@
 		 </div>
 		 <br/>
 		 <div class="banners_no_result">
-			<a href="http://prebi.unlp.edu.ar/celsius"  target="_ban_k" title="Prebi" >
-				<img class="logo_no_result">
-			    	<xsl:attribute name="src">
-			        	<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-			            <xsl:text>/themes/</xsl:text>
-						<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-						<xsl:text>/images/banner-prebi.jpg</xsl:text>
-			        </xsl:attribute>
-			    </img>
-			</a>
+			
 		 	 <a href="http://www.biblioteca.mincyt.gov.ar/" target="_bank" title="BIblioteca Electronica" >
 				<img class="logo_no_result">
 			    	<xsl:attribute name="src">
@@ -263,6 +254,16 @@
 			            <xsl:text>/themes/</xsl:text>
 						<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
 						<xsl:text>/images/link_opac.png</xsl:text>
+			        </xsl:attribute>
+			    </img>
+			</a>
+			<a href="http://prebi.unlp.edu.ar/celsius"  target="_ban_k" title="Prebi" >
+				<img class="logo_no_result">
+			    	<xsl:attribute name="src">
+			        	<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+			            <xsl:text>/themes/</xsl:text>
+						<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+						<xsl:text>/images/banner-prebi.jpg</xsl:text>
 			        </xsl:attribute>
 			    </img>
 			</a>
