@@ -148,7 +148,9 @@
 			</xsl:if>
 			
 			<!-- Controles para las busquedas -->
-			<xsl:apply-templates select="dri:body/dri:div[@n='search']/dri:div[@id='aspect.discovery.SimpleSearch.div.search-controls']"/>
+			 <xsl:if test="dri:div[@id='aspect.discovery.SimpleSearch.div.search-results' and @itemsTotal]">
+				<xsl:apply-templates select="dri:body/dri:div[@n='search']/dri:div[@id='aspect.discovery.SimpleSearch.div.search-controls']"/>
+			</xsl:if>
 			
 			<!-- Recent submissions en comunidades y colecciones -->
 			<xsl:call-template name="recent-submissions">
