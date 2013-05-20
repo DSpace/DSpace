@@ -55,7 +55,7 @@ margin-bottom:5px;
 }
 
 h4 {
-    font-size: 108%;
+    font-size: 108%; 
 }
 
 h5, h6 {
@@ -231,10 +231,12 @@ min-width:500px;
 #ds-left-section h2 {
 	color: #3599C4;
 	border-bottom: solid 1px #9AD5F1;
-	font-size: 1.3em;
+	font-size: 1em;
 	font-weight: normal;
-	padding-bottom: 5px;
+	padding-bottom: 2px;
+	
 	margin-bottom: 5px;
+	width:100%;
 }
 
 #ds-left-section p {
@@ -249,18 +251,23 @@ min-width:500px;
 	color: #F49717;
 	font-weight: bold;
 }
-#home_search input.ds-text-field, .discover-search-box.search input.ds-text-field {
+#home_search input.ds-text-field, 
+.discover-search-box.search input.ds-text-field,
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-navigation input.ds-text-field,
+#aspect_discovery_SearchFacetFilter_div_filter-navigation input.ds-text-field {
 	border-radius: 7px 0px 0px 7px;
 }
 #home_search input.ds-text-field {
-/*	width: 192px;*/
 	width:65%;
 	min-width:130px;
 }
 .discover-search-box.search input.ds-text-field {
 	width: 400px;
 }
-#home_search input.ds-button-field, .discover-search-box.search input.ds-button-field {
+#home_search input.ds-button-field, 
+#aspect_discovery_SearchFacetFilter_field_submit,
+#aspect_artifactbrowser_ConfigurableBrowse_field_submit,
+.discover-search-box.search input.ds-button-field {
 	color: #FFFFFF;
 	background-image: url(../../images/lupita.png);
 	background-color: #3F7A9F;
@@ -370,15 +377,20 @@ line-height:1.5;
 background-color: #d1eaf7;
 background-image: url(../../images/cerrar_filtro_.png);
 background-repeat:no-repeat;
-padding:3px 25px 5px 5px;
+padding:4px 25px 5px 8px;
+border-radius:5px;
 background-position: right;
+margin-top:3px;
+position:relative;
+left:-5px;
+margin-bottom:5px;
+
 }
 
  
 #aspect_discovery_Navigation_list_discovery ul.sublist li a {
 text-decoration:line-through;
 }
-
 
 
 #input_mostrar_filtros {
@@ -419,7 +431,7 @@ text-decoration:none;!important
     padding: 0;
 }
 
-#ds-options #aspect_discovery_Navigation_list_discovery h2{
+h1.ds-option-set-head{
 font-weight:bold;
 margin-left:10px;
 font-size:1em;
@@ -439,23 +451,10 @@ line-height:1.4;
 }
 
 
-
-
-
-h1.ds-option-set-head {
-    margin-top: 18px;
-/* background-color: #f0f2f5;*/
-    padding: 2px 10px 0px 10px;
-/*   border-bottom: 1px solid #dedede;*/
-/*border-bottom:none;*/
-    font-size: 108%;
+ds-options #aspect_discovery_Navigation_list_discovery h2
+ {
 	color:#607890;
-	background-image:url(../../images/fondoh1.png);
-	height:35px;
-	background-position:left -10px;
-	background-repeat:no-repeat;
-	
-	
+	font-size: 110%;
 }
 
 #ds-search-option-head{
@@ -486,7 +485,7 @@ div.ds-option-set .ds-sublist-head {
 
 div.ds-option-set ul.sublist {
 /*    margin-left: 20px;*/
-	border-left:1px solid #dedede;
+	/*border-left:1px solid #dedede;*/
 	padding-left:8px;
     padding-top: 0;
     padding-bottom: 0;
@@ -682,13 +681,11 @@ color: #CD642F;
 #aspect_administrative_group_ManageGroupsMain_field_submit_search,
 #aspect_discovery_SiteViewer_field_submit, 
 #aspect_discovery_CommunitySearch_field_submit,
-#aspect_artifactbrowser_ConfigurableBrowse_field_submit,
 #aspect_discovery_CollectionSearch_field_submit,
 #aspect_administrative_eperson_ManageEPeopleMain_field_submit_search,
 #aspect_administrative_authorization_AuthorizationMain_field_submit_edit,
 #aspect_administrative_item_FindItemForm_field_submit_find,
 #aspect_administrative_WithdrawnItems_field_submit,
-#aspect_discovery_SearchFacetFilter_field_submit,
 #aspect_xmlworkflow_admin_WorkflowOverviewTransformer_field_submit_search_controls.ds-button-field
 
  {
@@ -1011,9 +1008,9 @@ font-size:14px;
 .pagination-links {
     list-style: none;
     float: right;
-    margin: 0;
-	clear:both;
-	margin-bottom:7px;
+    clear:both;
+	margin:0px 0px 20px 7px;
+	min-width:200px;
 }
 
 .pagination-links li {
@@ -1313,36 +1310,35 @@ div#no_results_found {
     background: none repeat scroll 0 0 #FFFFFF;
     color: #595959;
     font-size: 18px;
-    padding-bottom: 20px;
-    padding-top: 20px;
+    padding:20px 20px 0px 18px;
     text-align: center;
+	font-style:italic;
 }
 
 div#no_results_found_tips {
    
     color: #595959;
     font-size: 14px;
-    padding: 20px 60px;
+    padding: 20px 50px;
 }
 
 div#no_results_found_tips ul li {
     border: medium none;
     padding-left: 0;
-    list-style: circle outside none;
+    list-style: disc outside none;
 }
 
 .banners_no_result{
 	height: 80px;
 	margin-left: auto;
     margin-right: auto;
-    padding-left: 28%;
+    padding-left: 25%;
 	
 }
 .logo_no_result{
 	float: left;
-	padding: 4px;
+	padding: 1px;
 }
-
 
 
 
@@ -1450,6 +1446,8 @@ form.search p.ds-paragraph.button-list {
 
 p.ds-paragraph {
 /*margin-left:50px;*/
+padding-top:5px;
+line-height:1.5;
 
 }
 
@@ -1493,6 +1491,7 @@ form.search fieldset {
 form.search .ds-form-item {
     margin: 0;
     padding-bottom: 5px;
+	margin-top:7px;
 }
 
 form.search .ds-form-item select{
@@ -1892,7 +1891,7 @@ background-color:#f3faff;
 }
 #topNav ul ul a { 
 	background-color:#dcedfa; 
-	padding:5px;
+	padding:5px 0px 6px 21px;
 }
 
 #topNav ul ul a:hover { 
@@ -1997,6 +1996,9 @@ line-height:1.5;
 	margin: 0px;
 	height: auto;
 	padding: 0px;
+	color: inherit;
+	border: none;
+	font-size: 12px;
 }
 #div-menu-context div, #div-menu-context div ul {
 	padding: 0px;
@@ -2011,6 +2013,10 @@ background-color:#00FF33;
 }
 
 /*CAJAS DE BUSDQUEDA PRINCIPALES BATMAN*/
+#aspect_discovery_SearchFacetFilter_div_filter-navigation .ds-text-field {
+	margin-left:10px;
+}
+
 .ds-text-field, .ds-password-field, .ds-textarea-field
 {
 	margin-bottom: 5px;
@@ -2356,19 +2362,13 @@ margin:5px 0px 10px 0px;
 
 
 /*titulo*/
-.ds-div-head {
-/*border-top:1px solid grey;*/
-padding-top:5px;
-
-}
-
 #collection-title {
 display:block;
 }
 #collection-title h1.ds-div-head {
-color:#9c4f0a;
+/*color:#9c4f0a;*/
 background-image:none;
-width:550px;	
+max-width:507px;	
 display:block;
 padding:0;
 padding-bottom:5px;
@@ -2381,16 +2381,10 @@ left:155px;
 }
 
 h1.ds-div-head {
-background-image:url(../../images/libritos.png);
-border:none;
-background-repeat:no-repeat;
-background-position:left;
-padding:18px 0px 20px 45px;
-min-height:35px;
-display:block;
-color:#E27B2A;
-font-size:20px;
-
+	display:block;
+	color:#3886AA;
+	font-size:20px;
+	padding-bottom:5px;
 }
 
 #aspect_artifactbrowser_CommunityViewer_list_community-browse a,
@@ -2532,9 +2526,10 @@ background-position:bottom center;*/
 background-repeat:no-repeat;
 border:none;
 /*padding-bottom:50px;*/
-
 }
-
+#aspect_discovery_SimpleSearch_div_general-query div.ds-form-content {
+	margin-left: -8px;
+}
 #aspect_discovery_SimpleSearch_div_search-filters {
 	border-color:#d9e6ed;
 }
@@ -2575,7 +2570,7 @@ border:none;
 }
 .search-controls, .search-controls a {
 	color: #3499C3;
-	margin-top:45px;
+	margin-top:23px;
 }
 .search-controls .selected a {
 	text-decoration: underline;
@@ -2593,11 +2588,13 @@ color:black;
 #aspect_administrative_WithdrawnItems_list_jump-list,
 #aspect_discovery_SearchFacetFilter_list_jump-list {
 /*width:100%;*/
-padding:8px;
+padding:7px;
 margin-left:0PX;
 background-color:#daf3ff;
 text-align:center;
 margin-bottom:10px;
+font-size:0.8em;
+
 }
 
 #aspect_artifactbrowser_ConfigurableBrowse_list_jump-list a,
@@ -2863,7 +2860,7 @@ background-repeat:no-repeat;
 background-color:white;
 border:none;
 padding-top: 45px;
-margin-top: -60px;
+margin-top: -30px;
 }
 
 #aspect_submission_Submissions_div_submissions p.ds-paragraph {
@@ -2988,13 +2985,20 @@ margin:0px 200px 0px 0px;
 	background: url(../../images/logo_s.png) no-repeat center left;
 /*	height: 81px;*/
 }
+.datos_sedici strong, .datos_unlp a  {
+color:#d8ebf8;
+}
 
 #footer {
 	font-family: "Trebuchet MS", sans-serif;
 	font-size:11px;
 	width:100%;
-	border-top:1px solid #dedede;
+	border-top:3px solid #dedede;
 	padding-top:10px;
+	background-color:#3f687b;
+	color:white;
+	margin-top: 10px;
+	height:80px;
 }
 
 #footercol1, #footercol2 {
@@ -3012,18 +3016,23 @@ margin:0px 200px 0px 0px;
 }
 #footer .column {
 	display: inline;
-	width:31%;
+	width:38%;
 }
 #footer #dspace-info {
 	float: right;
 }
 #footer #dspace-info a {
-	background: url('../../images/logo_dspace.gif') no-repeat right;
-	padding-right: 100px;
-	padding-top: 15px;
-	height: 19px;
-	display: inline-block;
+	background: url("../../images/logo_dspace.gif") no-repeat scroll center bottom transparent;
+    color: white;
+    display: inline;
+    padding-right: 0px;
+    padding-bottom: 56px;
+    text-align: center;
+    width: 99px;
+	margin-right:100px;
 }
+
+
 #copyright-info {
 	font-size: 0.8em;	
 }
@@ -3034,21 +3043,19 @@ margin:0px 200px 0px 0px;
 }
 
 .datos_unlp {
-	padding-left: 52px;
+/*	padding-left: 52px;
+	background: url('../../images/img_unlp.png') no-repeat left;*/
 	font-size: 11px;
-	background: url('../../images/img_unlp.png') no-repeat left;
 	height: 57px;
-}
-.datos_unlp a {
-text-decoration:none;
-color:#e38338;
 }
 
 .datos_unlp a:hover {
-color:#1f7297;
+color:orange;
 }
 #footer .footer-icon {
 	display: inline;
+	float: right;
+	margin-top: 5px;
 }
 #footer .footer-icon a:hover {
 	border-bottom: solid 2px #607890;
@@ -3057,6 +3064,9 @@ color:#1f7297;
 .datos_sedici {
 font-family: "Trebuchet MS", sans-serif;
 font-size:12px;
+float:right;
+margin-right: 15px;
+margin-left: 5px;
 }
 
 .newsletter, .contacto {
@@ -3079,10 +3089,11 @@ background: url(../../images/mapa_grande_2.jpg);
 .pagina_estatica {
 	margin-top: 20px;
 	margin-bottom: 20px;
+	line-height:1.5;
 }
 .pagina_estatica p {
 	text-align: justify;
-	line-height: 17px;
+	line-height: 1.5;
 }
 .pagina_estatica ul {
 	list-style: circle;
@@ -3238,7 +3249,8 @@ border-bottom:1px solid #dedede;
     /*max-width: 325px;*/
 }
 .browse_column table {
-	width: 215px;
+/*	width: 215px;*/
+width:100%;
 }
 .browse_column li {
     padding: 3px 5px;
@@ -3261,6 +3273,7 @@ border-bottom:1px solid #dedede;
 #aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-author-results ul,
 #aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-subject-results ul {
 	margin-top: 0px;
+	min-width:650px;
 }
 form.submission {
 	margin-top: 30px;
@@ -3339,19 +3352,39 @@ background-position:center top;
 	background: url(../../images/fondo_highlight.png) no-repeat scroll center left;
 	height: 180px;
 	padding: 10px 10px 10px 0px;
+	border-bottom:1px solid #dedede;
+	border-right:1px solid #dedede;
+	border-left:1px solid #dedede;
+	border-top:1px solid #dedede;
+	
+}
+
+.dspace_link {
+	bottom: -5px;
+    color: white;
+/*    position: absolute;
+    right: 14px;*/
+}
+
+a.dspace_link {
+color:#D8EBF8;
 }
 .html_slide .html_slide_item {
 	display: inline-block;
-	width: 32%;
-	padding-left: 110px;
-	padding-top:9px;
+	width: 30%;
+	padding-left: 85px;
+	padding-top:15px;
 	height: 85px;
+	float:left;
 }
 .html_slide .html_slide_item h2 {
 	color: #2586B0;
+	font-size:1em;
 }
 .html_slide .html_slide_item p {
 	color: #5F6264;
+	font-size:0.8em;
+	line-height:1.5;
 }
 
 #slide_recursos {
@@ -3361,7 +3394,7 @@ background-position:center top;
 	background: url(../../images/icono_slide_visibilidad.png) no-repeat scroll center left;
 }
 #slide_preservacion {
-	background: url(../../images/icono_slide_recursos.png) no-repeat scroll center left;
+	background: url(../../images/icono_slide_preservacion.png) no-repeat scroll center left;
 }
 #slide_contacto {
 	background: url(../../images/icono_slide_contacto.png) no-repeat scroll center left;

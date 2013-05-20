@@ -391,31 +391,29 @@ placeholders for header images -->
 			<div id="ds-footer">
 	            <div class="column" id="footercol1">
 	                <div class="datos_unlp">
-	                    <strong>&#xA9; 2003-<xsl:value-of select="date:year()"/></strong>
-	                    <br/>
 	                    <strong>
-		                    <a href="http://prebi.unlp.edu.ar/" target="_blank">PrEBi</a>
+		                    <a href="http://prebi.unlp.edu.ar/" target="_blank">PREBI</a>
 		                    <span> - </span>
-		                    <a href="http://sedici.unlp.edu.ar/" target="_blank">SeDiCI</a>
+		                    <a href="http://sedici.unlp.edu.ar/" target="_blank">SEDICI</a>
+		                    &#xA9; 2003-<xsl:value-of select="date:year()"/>
 		                    <br/>
 		                    <a href="http://www.unlp.edu.ar" target="_blank">Universidad Nacional de La Plata</a>
 	                    </strong>
 	                    <br/>
 	                    <span id="copyright-info">Todos los derechos reservados conforme a la ley 11.723</span>
 	                </div>
-	            </div>
-	            <div class="column" id="footercol2">
-	                <div class="datos_sedici">
-	                    <strong>SeDiCI - Servicio de Difusión de la Creación Intelectual</strong>
-	                    <br/>
-	                    Calle 49 y 115 s/n 1er piso - Edificio ex Liceo
-	                    <br/>
-	                    1900 La Plata, Buenos Aires - Tel 0221 423 6696/6677 (int. 141)
-	                </div>
+	            	<a href="http://www.dspace.org" class="dspace_link" target="_blank">Soportado por <strong>DSpace</strong></a>
 	            </div>
 	            <div class="column" id="footercol3">
+	                <div class="datos_sedici">
+	                    Calle 49 y 115 s/n 1er piso - Edificio ex Liceo
+	                    <br/>
+	                    La Plata, Buenos Aires (C.P. 1900)
+	                    <br/>
+	                    Tel 0221 423 6696/6677 (int. 141)
+	                </div>
                     <div class="footer-icon">
-                        <a title="Como llegar a SeDiCI">
+                        <a title="Como llegar a SEDICI">
                             <xsl:attribute name="href">
                                 <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
                                 <xsl:text>/pages/comoLlegar</xsl:text>
@@ -425,30 +423,11 @@ placeholders for header images -->
                                     <xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
                                     <xsl:text>/themes/</xsl:text>
 					                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-					                <xsl:text>/images/img1.png</xsl:text>
+					                <xsl:text>/images/vermapa.png</xsl:text>
                                 </xsl:attribute>
                             </img>
                         </a>
                     </div>
-                    <div class="footer-icon">
-	                    <a href="#" title="Contáctese" data-uv-lightbox="classic_widget" data-uv-mode="full" data-uv-primary-color="#cc6d00" data-uv-link-color="#007dbf" data-uv-default-mode="support" data-uv-forum-id="150127">
-							<img class="contacto">
-		                    	<xsl:attribute name="src">
-		                        	<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-		                            <xsl:text>/themes/</xsl:text>
-						            <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-						            <xsl:text>/images/img3.png</xsl:text>
-		                        </xsl:attribute>
-		                      </img>
-						</a>
-                    </div>
-	            </div>
-            </div>
-            <div id="ds-footer">
-				<div id="dspace-info">
-	            	<a href="http://www.dspace.org" target="_blank">
-	            		<i18n:text>sedici.common.dspace-info</i18n:text>
-	            	</a>
 	            </div>
             </div>
         </div>
@@ -740,7 +719,6 @@ placeholders for header images -->
 					var s=document.getElementsByTagName('script')[0];
 					s.parentNode.insertBefore(uv,s)})()
 		</script>
-			
     </xsl:template>
 
     <!--

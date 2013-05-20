@@ -300,7 +300,7 @@
 	<!-- org.dspace.app.xmlui.artifactbrowser.SimpleSearch.java -->
 <message key="xmlui.ArtifactBrowser.SimpleSearch.title">SEDICI - Buscar</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.trail">Buscar</message>
-<message key="xmlui.ArtifactBrowser.SimpleSearch.head">Buscar</message>
+<message key="xmlui.ArtifactBrowser.SimpleSearch.head">Resultados de su búsqueda...</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.search_scope">Ámbito de búsqueda</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.full_text_search">Búsqueda a texto completo</message>
 

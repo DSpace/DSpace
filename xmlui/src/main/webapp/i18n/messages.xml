@@ -2259,9 +2259,9 @@
 <message key="xmlui.XMLWorkflow.default.CollectionLevelReview">Local review</message>
 <message key="xmlui.XMLWorkflow.default.CollectionLevelReview.claimaction">Local review</message>
 <message key="xmlui.XMLWorkflow.default.CollectionLevelReview.editaction">Local review</message>
-<message key="xmlui.XMLWorkflow.default.SeDiCILevelReview">SeDiCI review</message>
+<message key="xmlui.XMLWorkflow.default.SeDiCILevelReview">SEDICI review</message>
 <message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.claimaction">SEDICI review</message>
-<message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.editaction">SEDICi review</message>
+<message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.editaction">SEDICI review</message>
 
 <!-- extensión al messages.xml de discovery -->
 

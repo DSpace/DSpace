@@ -237,33 +237,33 @@
 		 <br/>
 		 <div class="banners_no_result">
 			
-		 	 <a href="http://www.biblioteca.mincyt.gov.ar/" target="_bank" title="BIblioteca Electronica" >
+		 	 <a href="http://www.biblioteca.mincyt.gov.ar/" target="_blank" title="Biblioteca Electrónica" >
 				<img class="logo_no_result">
 			    	<xsl:attribute name="src">
 			        	<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
 			            <xsl:text>/themes/</xsl:text>
 						<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-						<xsl:text>/images/biblioteca-electronica-square.jpg</xsl:text>
+						<xsl:text>/images/banner-biblioteca-electronica.png</xsl:text>
 			        </xsl:attribute>
 			    </img>
 			</a>
-			<a href="http://opac-istec.prebi.unlp.edu.ar/" target="_bank" title="Opac">
+			<a href="http://opac-istec.prebi.unlp.edu.ar/" target="_blank" title="OPAC-ISTEC">
 				<img class="logo_no_result">
 			    	<xsl:attribute name="src">
 			        	<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
 			            <xsl:text>/themes/</xsl:text>
 						<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-						<xsl:text>/images/link_opac.png</xsl:text>
+						<xsl:text>/images/banner-opac.png</xsl:text>
 			        </xsl:attribute>
 			    </img>
 			</a>
-			<a href="http://prebi.unlp.edu.ar/celsius"  target="_ban_k" title="Prebi" >
+			<a href="http://prebi.unlp.edu.ar/celsius"  target="_blank" title="PREBI" >
 				<img class="logo_no_result">
 			    	<xsl:attribute name="src">
 			        	<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
 			            <xsl:text>/themes/</xsl:text>
 						<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-						<xsl:text>/images/banner-prebi.jpg</xsl:text>
+						<xsl:text>/images/banner-prebi.png</xsl:text>
 			        </xsl:attribute>
 			    </img>
 			</a>

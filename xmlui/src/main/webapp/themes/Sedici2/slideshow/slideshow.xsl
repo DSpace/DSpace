@@ -26,8 +26,8 @@
 		    		</img>
 				</a>
 				<div class="caption">
-					<h1>¿Qué es SeDiCI?</h1>
-					<p>SeDiCI (Servicio de Difusión de la Creación Intelectual) es el repositorio institucional central de la Universidad Nacional de La Plata.</p>
+					<h1>¿Qué es SEDICI?</h1>
+					<p>SEDICI (Servicio de Difusión de la Creación Intelectual) es el repositorio institucional central de la Universidad Nacional de La Plata.</p>
 				</div>
 			</div>
 
@@ -44,7 +44,7 @@
 				</a>
 				<div class="caption">
 					<h1>Migración a DSpace</h1>
-					<p>Desde abril de 2012, SeDiCI se encuentra funcionando sobre plataforma de software completamente nueva. Bienvenidos a SeDiCI-DSpace.</p>
+					<p>Desde abril de 2012, SEDICI se encuentra funcionando sobre plataforma de software completamente nueva. Bienvenidos a SEDICI-DSpace.</p>
 				</div>
 			</div>
 			
@@ -65,7 +65,7 @@
 				</a>
 				<div class="caption">
 					<h1>Depósito de tesis de posgrado</h1>
-					<p>La resolución 78/11 de la UNLP dictamina que todos los alumnos de posgrado deben depositar una copia digital de sus tesis en SeDiCI.</p>
+					<p>La resolución 78/11 de la UNLP dictamina que todos los alumnos de posgrado deben depositar una copia digital de sus tesis en SEDICI.</p>
 				</div>
 			</div>
 

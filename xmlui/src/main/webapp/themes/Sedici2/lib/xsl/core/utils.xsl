@@ -177,28 +177,11 @@
 		 <div id="home_autoarchivo">
         	<h2><i18n:text>sedici.home.subir_material.title</i18n:text></h2>
         	<p><i18n:text>sedici.home.subir_material.info</i18n:text></p>
-<!-- 	         	<p> -->
-<!-- 	         	 	<a> -->
-<!-- 			 			<xsl:attribute name="href"> -->
-<!-- 			 				<xsl:value-of select="$context-path"/> -->
-<!-- 							<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='autoArchive' and @qualifier='submit']='true'"> -->
-<!-- 								<xsl:text>/handle/</xsl:text> -->
-<!-- 								<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='autoArchive'][@qualifier='handle']"/> -->
-<!-- 							</xsl:if> -->
-<!-- 							<xsl:text>/submit</xsl:text> -->
-<!-- 			 			</xsl:attribute> -->
-<!-- 			 			<i18n:text>sedici.home.subir_material.linktext</i18n:text> -->
-<!-- 	         	 	</a> -->
-<!-- 	         	</p> -->
          	<div>
 			 	<a>
 		 			<xsl:attribute name="href">
 		 				<xsl:value-of select="$context-path"/>
-						<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='autoArchive' and @qualifier='submit']='true'">
-							<xsl:text>/handle/</xsl:text>
-							<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='autoArchive'][@qualifier='handle']"/>
-						</xsl:if>
-						<xsl:text>/submit</xsl:text>
+						<xsl:text>/pages/comoAgregarTrabajos</xsl:text>
 		 			</xsl:attribute>
 			 		<img title="sedici.home.subir_material.linktext" i18n:attr="title">
 			            <xsl:attribute name="src">
