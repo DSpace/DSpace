@@ -215,13 +215,14 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                         filterValsList.setHead(message("xmlui.ArtifactBrowser.AdvancedSearch.type_" + field.getIndexFieldName()));
                         java.util.List<Map<String,String>> fqsSelected = new ArrayList<Map<String,String>>();
                         java.util.List<Map<String,String>> fqsNotSelected = new ArrayList<Map<String,String>>();
-                       
-                        for (int i = 0; i < shownFacets; i++) {
+                        
+                        int i = 0;
+                        for (; i < shownFacets && iter.hasNext() ; i++) {
 
-                            if (!iter.hasNext())
-                            {
-                                break;
-                            }
+//                            if (!iter.hasNext())
+//                            {
+//                                break;
+//                            }
 
                             DiscoverResult.FacetResult value = iter.next();
                             
@@ -261,14 +262,12 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                                
                                 
                             }
-                            //Show a view more url should there be more values, unless we have a date
-                            if (i == shownFacets - 1 && !field.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)/*&& facetField.getGap() == null*/) {
-
-                                addViewMoreUrl(filterValsList, dso, request, field.getIndexFieldName());
-                            }
-                        }
+                       }
                        if (field.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)){
 	                	 	for (int t = 0; t < fqs.size(); t++) {
+	                	 		// Incluye el filtro solo si corresponde al field en proceso
+	                	 		if(fqs.get(t).startsWith(field.getIndexFieldName())) {
+	                	 		
 	                    	    	String paramsQuery = retrieveParametersWithout(request,fqs.get(t),"fq");
 		                            
 	                    	    	String valueFace =fqs.get(t);
@@ -286,6 +285,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                                 	map.put("displayValue",valueFace + " (" + queryResults.getTotalSearchResults() + ")" );
 	                    	    	
 	                    	    	fqsSelected.add(map);
+	                	 		}
 	                    	}
 	                    }    
                      
@@ -295,8 +295,14 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                        }
 	                   for (Map<String,String> mapNotSelected : fqsNotSelected) {
 	                	   filterValsList.addItem().addXref(mapNotSelected.get("value"),mapNotSelected.get("displayValue"));
-	                	  
-                   }
+	                   }
+
+	                   //Show a view more url should there be more values, unless we have a date
+                       if (i == shownFacets && !field.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)/*&& facetField.getGap() == null*/) {
+
+                           addViewMoreUrl(filterValsList, dso, request, field.getIndexFieldName());
+                       }
+	                   
                     }
                 }
             }
@@ -357,8 +363,8 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                 contextPath +
                         (dso == null ? "" : "/handle/" + dso.getHandle()) +
                         "/search-filter?" + parameters + BrowseFacet.FACET_FIELD + "=" + fieldName,
-                T_VIEW_MORE
-
+                T_VIEW_MORE,
+                "view_more"
         );
     }
 
