@@ -28,8 +28,8 @@ import org.dspace.core.Context;
 import org.apache.log4j.Logger;
 
 /**
- * FileSimpleStats generates a list of journals and the first date on which Dryad archived a submission from that journal.
- * It computes stats both for the repository as a whole, and for a specific time window.
+ * FileSimpleStats generates summary statistics for the status of data files.
+ * It computes stats both for the repository as a whole, and for a specific time window, simultaneously.
  *
  * The task succeeds if it was able to calculate the correct result.
  *
@@ -47,7 +47,7 @@ public class FileSimpleStats extends AbstractCurationTask {
 
     // dates for the specific time window to analyze
     private static final String START_DATE_STRING = "2012-01-01T00:00:00Z";
-    private static final String END_DATE_STRING = "2012-07-01T00:00:00Z";
+    private static final String END_DATE_STRING = "2013-01-01T00:00:00Z";
     private static Date START_DATE = null;
     private static Date END_DATE = null;
 

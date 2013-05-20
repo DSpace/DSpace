@@ -218,7 +218,7 @@ public class DatabaseManager
 		    }
 		log.debug(sb.toString());
 	    }
-        
+
         PreparedStatement statement = context.getDBConnection().prepareStatement(query);
         try
         {
