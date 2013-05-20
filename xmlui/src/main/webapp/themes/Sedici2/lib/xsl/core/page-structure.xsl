@@ -120,7 +120,7 @@
 					<xsl:apply-templates select="/dri:document/dri:options"/>
 				</xsl:when>
 				<!-- Si no hay facets y no estamos en el submit, se muestra la busqueda y link de autoarchivo en la columna izquierda -->
-				<xsl:when test="not(/dri:document/dri:options/dri:list[@n='discovery']/dri:list) 
+				<xsl:when test="not(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request' and @qualifier='URI'][contains(.,'discover')]) 
 					and not(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request' and @qualifier='URI'][contains(.,'submit')])">
 					
 					<xsl:call-template name="buildHomeSearch"/>
@@ -148,7 +148,7 @@
 			</xsl:if>
 			
 			<!-- Controles para las busquedas -->
-			 <xsl:if test="dri:div[@id='aspect.discovery.SimpleSearch.div.search-results' and @itemsTotal]">
+			<xsl:if test="/dri:document/dri:body/dri:div/dri:div[@id='aspect.discovery.SimpleSearch.div.search-results' and @itemsTotal]">
 				<xsl:apply-templates select="dri:body/dri:div[@n='search']/dri:div[@id='aspect.discovery.SimpleSearch.div.search-controls']"/>
 			</xsl:if>
 			
