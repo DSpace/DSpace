@@ -222,7 +222,7 @@
 			</ul>
 		</div>
 	</xsl:template>
-	   <xsl:template match="dri:div[@id='aspect.discovery.SimpleSearch.div.search-results' and not(@itemsTotal)]">
+	    <xsl:template match="dri:div[@id='aspect.discovery.SimpleSearch.div.search-results' and not(@itemsTotal)]">
     	<div id="no_results_found"><i18n:text>xmlui.ArtifactBrowser.AbstractSearch.no_results</i18n:text></div>
     	<div id="no_results_found_tips">
 			<p><i18n:text>xmlui.ArtifactBrowser.AbstractSearch.tips_info_general</i18n:text></p>
@@ -235,5 +235,37 @@
 			<p></p>
 		 </div>
 		 <br/>
+		 <div class="banners_no_result">
+			<a href="http://prebi.unlp.edu.ar/celsius"  target="_ban_k" title="Prebi" >
+				<img class="logo_no_result">
+			    	<xsl:attribute name="src">
+			        	<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+			            <xsl:text>/themes/</xsl:text>
+						<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+						<xsl:text>/images/banner-prebi.jpg</xsl:text>
+			        </xsl:attribute>
+			    </img>
+			</a>
+		 	 <a href="http://www.biblioteca.mincyt.gov.ar/" target="_bank" title="BIblioteca Electronica" >
+				<img class="logo_no_result">
+			    	<xsl:attribute name="src">
+			        	<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+			            <xsl:text>/themes/</xsl:text>
+						<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+						<xsl:text>/images/biblioteca-electronica-square.jpg</xsl:text>
+			        </xsl:attribute>
+			    </img>
+			</a>
+			<a href="http://opac-istec.prebi.unlp.edu.ar/" target="_bank" title="Opac">
+				<img class="logo_no_result">
+			    	<xsl:attribute name="src">
+			        	<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
+			            <xsl:text>/themes/</xsl:text>
+						<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+						<xsl:text>/images/link_opac.png</xsl:text>
+			        </xsl:attribute>
+			    </img>
+			</a>
+		 </div>
    	  </xsl:template>
 </xsl:stylesheet>

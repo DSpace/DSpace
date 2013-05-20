@@ -1331,6 +1331,21 @@ div#no_results_found_tips ul li {
     list-style: circle outside none;
 }
 
+.banners_no_result{
+	height: 80px;
+	margin-left: auto;
+    margin-right: auto;
+    padding-left: 28%;
+	
+}
+.logo_no_result{
+	float: left;
+	padding: 1px;
+}
+
+
+
+
 #aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-dateissued-results .artifact-title,
 #aspect_discovery_SiteRecentSubmissions_div_site-recent-submission .artifact-title,
 #aspect_discovery_CommunityRecentSubmissions_div_community-recent-submission .artifact-title,
