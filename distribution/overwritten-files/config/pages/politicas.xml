@@ -3,7 +3,7 @@
 
 	<meta>
 		<pageMeta>
-			<metadata element="title">SeDiCI - Políticas del repositorio</metadata>
+			<metadata element="title">SEDICI - Políticas del repositorio</metadata>
 		</pageMeta>
 	</meta>
 
@@ -15,7 +15,7 @@
 			<div id="pagina_estatica" class="pagina_politicas">
 
 
-				<p>SeDiCI es el Repositorio Institucional de la Universidad Nacional
+				<p>SEDICI es el Repositorio Institucional de la Universidad Nacional
 					de La Plata, <a href="pages/resolucionSedici" title="ORDENANZA Nº 264/03">creado </a>
 					en el año 2003 para facilitar el depósito de la producción
 					científica e intelectual de las distintas unidades académicas de la
@@ -24,17 +24,17 @@
 					El objetivo prioritario es la socialización del conocimiento
 					generado en las diferentes áreas académicas de la universidad con
 					el fin de devolver a la comunidad los esfuerzos destinados a la
-					universidad pública. Es por ello que SeDiCI adhiere a la <a href="http://www.openarchives.org">Iniciativa
+					universidad pública. Es por ello que SEDICI adhiere a la <a href="http://www.openarchives.org">Iniciativa
 					Acceso Abierto (Open Access Initiative) </a>,
 					que sustenta el principio de la libre disposición de la información
 					únicamente con propósitos científicos y educativos. </p>
 
-				<p>SeDiCI se encuentra registrado en los siguientes registros
+				<p>SEDICI se encuentra registrado en los siguientes registros
 					internacionales de repositorios: <a href="http://roar.eprints.org">ROAR</a>, <a href="http://www.opendoar.org/">OPENDOAR</a>, <a href="http://www.oaister.org/">OAISTER</a>
 					y <a href="http://repositories.webometrics.info">Webometrics</a>. </p>
 
 				<p id="politicas">A continuación, se definen las políticas del repositorio
-					institucional SeDiCI:</p>
+					institucional SEDICI:</p>
 
 				<p>
 					<ul>
@@ -99,7 +99,7 @@
 
 				<h1 id="diseminacion">Política de diseminación</h1>
 
-				<p>SeDiCI fomenta la compartición de sus registros en favor de la
+				<p>SEDICI fomenta la compartición de sus registros en favor de la
 					difusión a través de protocolos estándares de intercambio de
 					metadatos, como <a href="http://www.openarchives.org/pmh/">OAI-PMH</a> .
 				</p>
@@ -108,11 +108,11 @@
 				<h1 id="deposito">Política de depósito</h1>
 
 				<p>Cualquier alumno, docente o investigador de la UNLP puede
-					publicar sus trabajos en forma gratuita en SeDiCI, personalmente o
+					publicar sus trabajos en forma gratuita en SEDICI, personalmente o
 					en línea (autoarchivo). Los tipos de materiales aceptados son obras
 					de naturaleza científica, académica y artística, tal como se
 					detalla en la política de contenidos. Para realizar la publicación
-					de los documentos en SeDiCI (mediante autoarchivo o personalmente)
+					de los documentos en SEDICI (mediante autoarchivo o personalmente)
 					es condición necesaria la aceptación, por parte del usuario, de un
 					<a href="static/resources/licencia_de_deposito.pdf">Acuerdo de Cesión No Exclusiva de Derechos </a>,
 					que permitirá a SeDiCi la preservación y difusión de la obra. La
@@ -125,7 +125,7 @@
 				<a class="volver" href="pages/politicas#politicas">Volver</a>
 				<h1 id="preservacion">Política de preservación digital</h1>
 
-				<p>SeDiCI tiene el propósito fundamental de preservar digitalmente y
+				<p>SEDICI tiene el propósito fundamental de preservar digitalmente y
 					a tiempo indefinido todos los documentos que alberga. Para ello,
 					desarrolla un plan de acción que incluye medidas que aseguran la
 					perdurabilidad del material digital presente en el repositorio.
@@ -148,12 +148,12 @@
 				<a class="volver" href="pages/politicas#politicas">Volver</a>
 				<h1 id="estadisticas">Política de estadísticas</h1>
 
-				<p>SeDiCI realiza estadísticas para analizar no sólo la difusión y
+				<p>SEDICI realiza estadísticas para analizar no sólo la difusión y
 					visibilidad de la producción de la UNLP, sino también el
 					crecimiento de los contenidos disponibles en el repositorio, las
 					visitas, descargas y modalidades de uso y navegación de sus
 					usuarios. Estas estadísticas se actualizan periódicamente, son de
-					carácter público y pueden ser consultadas en la web de SeDiCI por
+					carácter público y pueden ser consultadas en la web de SEDICI por
 					cualquier visitante  .</p>
 				<a class="volver" href="pages/politicas#politicas">Volver</a>
 

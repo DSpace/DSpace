@@ -3,7 +3,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
 <meta>
 	<pageMeta>
-		<metadata element="title">SeDiCI - Staff</metadata>
+		<metadata element="title">SEDICI - Staff</metadata>
 	</pageMeta>
 </meta>
 
@@ -14,7 +14,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
 <div id="pagina_estatica" class="pagina_staff">
 
-	<h1>Directora PrEBi-SeDiCI, Directora Iniciativa LibLink (ISTEC)</h1>
+	<h1>Directora PrEBi-SEDICI, Directora Iniciativa LibLink (ISTEC)</h1>
 	<ul>
 		<li>
 			<a href="http://prebi.unlp.edu.ar/wp-content/uploads/2007/12/Marisa-De-Giusti-CV-270611.pdf" title="Marisa R. De Giusti">Marisa R. De Giusti</a>
@@ -53,7 +53,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 		<li>María Marta Vila</li>
 		<li>Néstor Oviedo</li>
 		<li>Esteban Zozaya</li>
-		<li>NFacundo Adorno</li>
+		<li>Facundo Adorno</li>
 	</ul>
 
 

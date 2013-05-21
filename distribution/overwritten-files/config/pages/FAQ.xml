@@ -3,7 +3,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
 <meta>
 	<pageMeta>
-		<metadata element="title">SeDiCI - Preguntas frecuentes</metadata>
+		<metadata element="title">SEDICI - Preguntas frecuentes</metadata>
 	</pageMeta>
 </meta>
 
@@ -15,40 +15,40 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 <div id='pagina_estatica' class="pagina_faq">
 
 <div id="preguntas">
-	<h1>¿Qué es y como se compone SeDiCI?</h1>
+	<h1>¿Qué es y como se compone SEDICI?</h1>
 	<ul>
-		<li><a href="pages/FAQ#que_es">¿Qué es SeDiCI?</a></li>
-		<li><a href="pages/FAQ#acervo">¿Cómo se compone el acervo de SeDiCI?</a></li>
+		<li><a href="pages/FAQ#que_es">¿Qué es SEDICI?</a></li>
+		<li><a href="pages/FAQ#acervo">¿Cómo se compone el acervo de SEDICI?</a></li>
 	</ul>
 	
-	<h1>Tipos de documentos y ordenamiento en SeDiCI</h1>
+	<h1>Tipos de documentos y ordenamiento en SEDICI</h1>
 	<ul>
-		<li><a href="pages/FAQ#tipos">¿Qué tipos de documentos se pueden encontrar en SeDiCI?</a></li>
-		<li><a href="pages/FAQ#organizacion">¿Cómo están organizados los recursos en SeDiCI?</a></li>
+		<li><a href="pages/FAQ#tipos">¿Qué tipos de documentos se pueden encontrar en SEDICI?</a></li>
+		<li><a href="pages/FAQ#organizacion">¿Cómo están organizados los recursos en SEDICI?</a></li>
 	</ul>
 
-	<h1>Búsquedas en SeDiCI</h1>
+	<h1>Búsquedas en SEDICI</h1>
 	<ul>
-		<li><a href="pages/FAQ#busqueda">¿Cómo realizar una búsqueda en SeDiCI?</a></li>
+		<li><a href="pages/FAQ#busqueda">¿Cómo realizar una búsqueda en SEDICI?</a></li>
 	</ul>
 	
-	<h1>Publicar en SeDiCI</h1>
+	<h1>Publicar en SEDICI</h1>
 	<ul>
 		<li><a href="pages/FAQ#beneficios">¿Cuáles son los beneficios de registrarse como usuario del sitio?</a></li>
 		<li><a href="pages/FAQ#autoarchivo">¿Qué es el autoarchivo?</a></li>
 		<li><a href="pages/FAQ#autoarchivo_tesis">¿Qué diferencia existe entre el autorachivo convencional y el autoarchivo de una tesis de posgrado?</a></li>
 		<li><a href="pages/FAQ#info_tesistas">Si soy un tesista de posgrado, ¿puedo depositar mi tesis personalmente? ¿Qué se necesita?</a></li>
 		<li><a href="pages/FAQ#tipos_archivos">¿Qué tipos de archivos se admiten y cuáles son sus especificaciones?</a></li>
-		<li><a href="pages/FAQ#por_que">¿Por qué publicar en SeDiCI?</a></li>
+		<li><a href="pages/FAQ#por_que">¿Por qué publicar en SEDICI?</a></li>
 		<li><a href="pages/FAQ#licencia_cc">¿Qué son las licencias Creative Commons?</a></li>
-		<li><a href="pages/FAQ#licencia_distribucion">¿Qué es y para qué sirve la Licencia de Distribución No Exclusiva de SeDiCI?</a></li>
+		<li><a href="pages/FAQ#licencia_distribucion">¿Qué es y para qué sirve la Licencia de Distribución No Exclusiva de SEDICI?</a></li>
 	</ul>
 
 	<h1>Otros aspectos y preguntas frecuentes</h1>
 	<ul>
 		<li><a href="pages/FAQ#embargo">¿Qué es el período de embargo?</a></li>
-		<li><a href="pages/FAQ#isbn">¿SeDiCI tramita el número de ISBN para las tesis de posgrado?</a></li>
-		<li><a href="pages/FAQ#nuevos_materiales">¿De qué modo puedo estar al corriente de los materiales que se agregan diariamente a SeDiCI?</a></li>
+		<li><a href="pages/FAQ#isbn">¿SEDICI tramita el número de ISBN para las tesis de posgrado?</a></li>
+		<li><a href="pages/FAQ#nuevos_materiales">¿De qué modo puedo estar al corriente de los materiales que se agregan diariamente a SEDICI?</a></li>
 	</ul>
 </div>
 
@@ -58,9 +58,9 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
 <div id="respuestas">
 	<div id="que_es">
-		<h1>¿Qué es SeDiCI?</h1>
+		<h1>¿Qué es SEDICI?</h1>
 		<p>
-			El Servicio de Difusión de la Creación Intelectual (SeDiCI) es el repositorio institucional de la 
+			El Servicio de Difusión de la Creación Intelectual (SEDICI) es el repositorio institucional de la 
 			Universidad Nacional de La Plata. Esto significa que alberga, preserva y difunde mundialmente, a 
 			través de su sitio web, las creaciones y producciones intelectuales, científicas y artísticas de 
 			los diversos actores de la universidad (alumnos, profesores e investigadores). Dado que SeDICI adhiere 
@@ -72,15 +72,15 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 	
 				
 	<div id="acervo">
-		<h1>¿Cómo se compone el acervo de SeDiCI?</h1>
+		<h1>¿Cómo se compone el acervo de SEDICI?</h1>
 		<p>
-			El acervo de SeDiCI está compuesto por más de 18.000 recursos, en su gran mayoría artículos y tesis. 
+			El acervo de SEDICI está compuesto por más de 18.000 recursos, en su gran mayoría artículos y tesis. 
 			Los números exactos pueden observarse en la página de <a href="http://sedici.unlp.edu.ar">inicio</a>. 
-			Como repositorio institucional, SeDiCI tiene la misión, por la resolución 78/11, de preservar y difundir 
+			Como repositorio institucional, SEDICI tiene la misión, por la resolución 78/11, de preservar y difundir 
 			una copia digital de todas las tesis de posgrado, las que en este momento superan las 2800. Por otra 
-			parte, en los casos en que SeDiCI no cuenta con el texto completo del recurso se procura brindar el sitio 
+			parte, en los casos en que SEDICI no cuenta con el texto completo del recurso se procura brindar el sitio 
 			físico exacto donde se lo puede encontrar, vale decir, en qué ubicación de una biblioteca dada dentro de la 
-			UNLP se aloja. En otras ocasiones, SeDiCI brinda un enlace externo al recurso. De este modo, se trata siempre 
+			UNLP se aloja. En otras ocasiones, SEDICI brinda un enlace externo al recurso. De este modo, se trata siempre 
 			de asegurar la máxima disponibilidad del recurso para todos los usuarios.
 		</p>
 		<a class="volver" href="pages/FAQ#preguntas">Volver</a>
@@ -88,9 +88,9 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 	
 
 	<div id="tipos">
-		<h1>¿Qué tipos de documentos se pueden encontrar en SeDiCI?</h1>
+		<h1>¿Qué tipos de documentos se pueden encontrar en SEDICI?</h1>
 		<p>
-			A continuación se brinda una lista de los tipos de documento que pueden encontrarse en SeDiCI 
+			A continuación se brinda una lista de los tipos de documento que pueden encontrarse en SEDICI 
 			y una breve descripción de cada uno de ellos:
 			<ul>
 				<li>
@@ -132,7 +132,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 					información de corte estadístico y económico.
 				</li>
 				<li>
-					<b>Libro: </b>cualquier obra editada como tal, ya sea por una editorial o una institución, en digital o en papel. En SeDiCI 
+					<b>Libro: </b>cualquier obra editada como tal, ya sea por una editorial o una institución, en digital o en papel. En SEDICI 
 					albergamos tanto e-books (libros electrónicos navegables) como versiones digitales de libros originalmente editados en papel.
 				</li>
 				<li>
@@ -169,9 +169,9 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 	
 
 	<div id="organizacion">
-		<h1>¿Cómo están organizados los recursos en SeDiCI?</h1>
+		<h1>¿Cómo están organizados los recursos en SEDICI?</h1>
 		<p>
-			Los recursos en SeDiCI, están ordenados en comunidades y colecciones. Las comunidades sirven para hacer una primera delimitación del 
+			Los recursos en SEDICI, están ordenados en comunidades y colecciones. Las comunidades sirven para hacer una primera delimitación del 
 			material en grandes conjuntos, como "Tesis", "Eventos", "Revistas", etc. Del mismo modo, las colecciones sirven para hacer una 
 			delimitación más concreta y restringida del material. Por ejemplo, la comunidad "Revistas" contiene las diversas publicaciones 
 			periódicas de la UNLP, conformando cada una de las mismas una colección independiente. En el caso de la comunidad "Tesis", ésta 
@@ -186,9 +186,9 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 	
 
 	<div id="busqueda">
-		<h1>¿Cómo realizar una búsqueda en SeDiCI?</h1>
+		<h1>¿Cómo realizar una búsqueda en SEDICI?</h1>
 		<p>
-			Para realizar una búsqueda simple basta introducir una palabra (por ejemplo, "física") en el cuadro de búsqueda de la página principal de SeDiCI. 
+			Para realizar una búsqueda simple basta introducir una palabra (por ejemplo, "física") en el cuadro de búsqueda de la página principal de SEDICI. 
 			El sistema recuperará todos los registros que contengan la palabra "física" en cualquiera de sus metadatos (aquellos datos que sirven para 
 			catalogar correctamente un recurso). Sin embargo, este tipo de búsqueda puede traer resultados no deseados o no del todo atinados.
 			<br/> 
@@ -199,19 +199,19 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 			qué cantidad contienen la palabra buscada); materia; autor (qué autores y qué cantidad de trabajos por autor tienen la 
 			palabra buscada) y palabra-clave.
 			<br/> 
-			Otro tipo de búsquedas también son posibles en SeDiCI: por ejemplo, si se hace clic en el nombre de un autor, el sistema recuperará 
+			Otro tipo de búsquedas también son posibles en SEDICI: por ejemplo, si se hace clic en el nombre de un autor, el sistema recuperará 
 			todos los recursos donde ese autor figure (no necesariamente en calidad de autor, ya que también puede hacerlo en calidad de director de 
 			tesis, editor, etc.); del mismo modo, al hacer clic en un descriptor o una palabra-clave, el sistema recuperará todos los recursos que 
-			los incluyan. Asimismo, es posible buscar en todo SeDiCI o sólo en una determinada comunidad o colección.
+			los incluyan. Asimismo, es posible buscar en todo SEDICI o sólo en una determinada comunidad o colección.
 		</p>
 		<a class="volver" href="pages/FAQ#preguntas">Volver</a>			
 	</div>
 
 	
 	<div id="beneficios">
-		<h1>¿Cuáles son los beneficios de registrarme como usuario en SeDiCI?</h1>
+		<h1>¿Cuáles son los beneficios de registrarme como usuario en SEDICI?</h1>
 		<p>
-			El mayor beneficio de registrarse como usuario de SeDiCI es poder contribuir con sus propios trabajos a nuestro acervo. El registro es 
+			El mayor beneficio de registrarse como usuario de SEDICI es poder contribuir con sus propios trabajos a nuestro acervo. El registro es 
 			sencillo y consta sólo de dos pasos. Luego de ingresar en <a href="login">Iniciar sesión</a>, en la esquina superior derecha, dirigirse a <a href="register">Registro de nuevo usuario</a>. 
 			Allí se le pedirá que ingrese una dirección de e-mail válida. El sistema, tras comprobar la dirección, enviará a la misma un link desde el que se 
 			podrá validar el registro. Allí se podrán completar los datos personales y elegir una contraseña de acceso. Con esto, el usuario puede luego 
@@ -227,7 +227,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 			El autoarchivo es una tendencia mundial adoptada por todos los grandes repositorios institucionales. Es una modalidad muy eficaz 
 			para contribuir con material propio al acervo del repositorio. Consiste en una serie de pasos mediante los cuales un alumno, 
 			docente o investigador de la UNLP puede fácilmente subir sus trabajos al sitio para que luego los administradores completen 
-			su catalogación y los pongan a disposición del público. Los pasos para el autoarchivo en SeDiCI son:
+			su catalogación y los pongan a disposición del público. Los pasos para el autoarchivo en SEDICI son:
 			<ul>
 				<li>Iniciar sesión y dirigirse a <a href="submissions">Carga de documentos</a> (arriba a la derecha)</li>
 				<li>Una vez allí, hacer clic en "Agregar un documento".</li>
@@ -243,7 +243,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 				regresar y corregirlos.</li>
 				<li><b>Licencia CC:</b> en este paso usted deberá seleccionar que tipo de licencia <i>Creative Commons</i> desea asociar a su documento. Encontrará 
 				más información sobre este tipo de licencias en la pregunta <a href="pages/FAQ#licencia_cc">¿Que son las licencias <i>Creative Commons</i>?</a></li>
-				<li><b>Licencia SeDiCI:</b> para difundir y preservar a largo plazo su trabajo, es preciso que el usuario acepte nuestra licencia. 
+				<li><b>Licencia SEDICI:</b> para difundir y preservar a largo plazo su trabajo, es preciso que el usuario acepte nuestra licencia. 
 				En este paso se expone la misma para su lectura y se considera que tildar la casilla correspondiente 
 				("Conceder licencia de distribución") tiene la misma validez que la firma de puño y letra del autor o poseedor de los derechos de 
 				autor del trabajo.</li>
@@ -271,10 +271,10 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 	<div id="info_tesistas">
 		<h1>Si soy un tesista de posgrado, ¿puedo depositar mi tesis personalmente? ¿Qué se necesita?</h1>
 		<p>
-			Sí, los tesistas, así como todos los usuarios, pueden depositar personalmente sus trabajos en SeDiCI. En el caso de ser un 
+			Sí, los tesistas, así como todos los usuarios, pueden depositar personalmente sus trabajos en SEDICI. En el caso de ser un 
 			tesista de posgrado, los requisitos son los siguientes:
 			<ol> 
-				<li>Traer la licencia de distribución no exclusiva de SeDiCI firmada de puño y letra en tinta azul. La misma puede 
+				<li>Traer la licencia de distribución no exclusiva de SEDICI firmada de puño y letra en tinta azul. La misma puede 
 				descargarse <a href="static/resources/licencia_de_deposito.pdf">aquí</a></li>
  				<li>Traer una copia digital de la tesis, en CD o pen-drive (ver <a href="pages/FAQ#tipos_archivos">¿Qué tipos de archivos se admiten y cuáles son sus especificaciones?</a> para 
  				saber más al respecto).</li>
@@ -292,8 +292,8 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 	<div id="tipos_archivos">
 		<h1>¿Qué tipos de archivos se admiten y cuáles son sus especificaciones?</h1>
 		<p>
-			SeDiCI acepta para su publicación y difusión los siguientes tipos de documentos, los que se catalogarán 
-			de acuerdo a la tipología textual expresada en <a href="pages/FAQ#tipos">¿Qué tipos de documento se pueden encontrar en SeDiCI?</a>
+			SEDICI acepta para su publicación y difusión los siguientes tipos de documentos, los que se catalogarán 
+			de acuerdo a la tipología textual expresada en <a href="pages/FAQ#tipos">¿Qué tipos de documento se pueden encontrar en SEDICI?</a>
 			<ul>
 				<li>
 					<b>Tesis de grado y posgrado:</b> son todos aquellos trabajos presentados en forma escrita para obtener a cambio el 
@@ -326,7 +326,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 					<b>Publicaciones periódicas:</b> bajo esta denominación figuran todas aquellas revistas académicas y científicas, de 
 					preferencia con referato, producidas por cualquier unidad académica de la universidad, así como laboratorio, 
 					instituto o grupo de investigación de la misma. Las revistas deben poseer su correspondiente número de ISSN e 
-					indicación del staff. SeDiCI puede albergar tanto sus versiones digitales como ofrecer a sus directores/editores 
+					indicación del staff. SEDICI puede albergar tanto sus versiones digitales como ofrecer a sus directores/editores 
 					la posibilidad de escanear y digitalizar sin costo alguno los números que no estén disponibles en digital en 
 					la actualidad.
 				</li>
@@ -342,11 +342,11 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 					pero no excluyentemente libros.
 				</li>
 			</ul>
-			En cuanto a las especificaciones técnicas, para los trabajos escritos el formato de preferencia es .pdf. SeDiCI admitirá 
+			En cuanto a las especificaciones técnicas, para los trabajos escritos el formato de preferencia es .pdf. SEDICI admitirá 
 			otros formatos (.doc, .ppt, etc.) pero los transformará, por razones de seguridad y preservación, a .pdf. El tamaño de los 
 			archivos, de preferencia, no deberá superar los 5 MB. En caso de que los supere, queda a criterio de los administradores 
 			subir el archivo completo o dividirlo en partes, o bien ofrecer una versión en alta resolución y otra en baja resolución. 
-			En cuanto a los demás tipos de documentos, SeDiCI admite .jpg y similares para las imágenes y .avi y similares para 
+			En cuanto a los demás tipos de documentos, SEDICI admite .jpg y similares para las imágenes y .avi y similares para 
 			videos y animaciones. 
 		</p>
 		<a class="volver" href="pages/FAQ#preguntas" >Volver</a>
@@ -354,9 +354,9 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 	
 
 	<div id="por_que">
-		<h1>¿Por qué publicar en SeDiCI?</h1>
+		<h1>¿Por qué publicar en SEDICI?</h1>
 		<p>
-			A continuación se listan algunos de los beneficios de publicar en SeDiCI sus trabajos:
+			A continuación se listan algunos de los beneficios de publicar en SEDICI sus trabajos:
 			<ul>
 				<li>
 					<b>Visibilidad y estabilidad:</b> a diferencia de una página web, el repositorio institucional constituye un archivo digital 
@@ -371,11 +371,11 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 				<li>
 					<b>Integración en redes de investigación nacionales e internacionales:</b> numerosas instituciones del mundo promueven 
 					la creación de portales y estructuras para la difusión y la preservación del patrimonio intelectual, en las que 
-					los repositorios institucionales, como SeDiCI, se transforman en una herramienta prioritaria para el logro de estos fines.
+					los repositorios institucionales, como SEDICI, se transforman en una herramienta prioritaria para el logro de estos fines.
 				</li>
 				<li>
 					<b>Facilidad de difusión:</b> para los autores es un medio rápido y económico para difundir su obra de forma sencilla y compatible 
-					con la publicación editorial, ya que la difusión en SeDiCI se realiza a título no exclusivo y el autor conserva todos 
+					con la publicación editorial, ya que la difusión en SEDICI se realiza a título no exclusivo y el autor conserva todos 
 					sus derechos, lo que le permite publicar sus trabajos en los medios que considere pertinentes sin problema alguno.
 				</li>
 			</ul>
@@ -390,7 +390,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 			Cuando un recurso es difundido en Internet es una buena práctica indicar, a quienes lo acceden (ya sean personas o 
 			procesos de software), cuáles son las acciones permitidas respecto a dicho recurso. Así, debe indicarse si el recurso 
 			puede ser leído, copiado, guardado, redistribuido, reimpreso, usado como base de nuevas obras, etc. o nada de lo 
-			anterior. Por ello, en SeDiCI están disponibles las siguientes licencias Creative Commons:
+			anterior. Por ello, en SEDICI están disponibles las siguientes licencias Creative Commons:
 
 			<ul>
 				<li><a href="http://creativecommons.org/licenses/by/2.5/ar/" target="_blank">Atribución 2.5 Argentina</a></li>
@@ -406,13 +406,13 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
 
 	<div id="licencia_distribucion">
-		<h1>¿Qué es y para qué sirve la Licencia de Distribución No Exclusiva de SeDiCI?</h1>
+		<h1>¿Qué es y para qué sirve la Licencia de Distribución No Exclusiva de SEDICI?</h1>
 		<p>
-			La Licencia de Distribución No Exclusiva de SeDiCI es un acuerdo mediante el cual el autor y SeDiCI establecen bajo qué 
-			condiciones se dará a conocer una obra. El acuerdo habilita a SeDiCI, de forma no exclusiva, como expresamente se 
+			La Licencia de Distribución No Exclusiva de SEDICI es un acuerdo mediante el cual el autor y SEDICI establecen bajo qué 
+			condiciones se dará a conocer una obra. El acuerdo habilita a SEDICI, de forma no exclusiva, como expresamente se 
 			indica, a publicar, preservar y difundir los contenidos aportados por los usuarios. La condición de no exclusividad 
 			significa que el autor no pierde los derechos sobre su trabajo en ningún momento, y que puede, por ejemplo, publicar 
-			el mismo en los medios que considere oportuno en cualquier momento. Este acuerdo, a su vez, obliga a SeDiCI a preservar 
+			el mismo en los medios que considere oportuno en cualquier momento. Este acuerdo, a su vez, obliga a SEDICI a preservar 
 			debidamente el material aportado y a difundirlo por su portal web. De este modo, ambas partes acuerdan y reconocen los 
 			derechos que les son inherentes.
 		</p>
@@ -435,9 +435,9 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
 
 	<div id="isbn">
-		<h1>¿SeDiCI tramita el número de ISBN para las tesis de posgrado?</h1>
+		<h1>¿SEDICI tramita el número de ISBN para las tesis de posgrado?</h1>
 		<p>
-			<b>No</b>. SeDiCI simplemente elabora un listado con las tesis de posgrado recibidas y lo eleva a la Editorial de la Universidad Nacional 
+			<b>No</b>. SEDICI simplemente elabora un listado con las tesis de posgrado recibidas y lo eleva a la Editorial de la Universidad Nacional 
 			de La Plata (EDULP), quienes son los encargados de tramitarlo gratuitamente para las tesis que estén bajo la resolución 78/11. Todos 
 			aquellos autores que quieran solicitar un ISBN para otros trabajos, como libros o tesis de otros años, deben canalizar su pedido a 
 			través de la Dirección de Propiedad Intelectual de la Presidencia de la UNLP, quienes se encargarán del trámite pertinente.
@@ -447,10 +447,10 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
 
 	<div id="nuevos_materiales">
-		<h1>¿De qué modo puedo estar al corriente de los materiales que se agregan diariamente a SeDiCI?</h1>
+		<h1>¿De qué modo puedo estar al corriente de los materiales que se agregan diariamente a SEDICI?</h1>
 		<p>
 			Mediante cualquier lector de "feeds" los usuarios pueden estar al tanto de los últimos materiales cargados, ya sea en general o de 
-			una colección en particular. Para ello se han habilitado canales de RSS en cada una de las colecciones que conforman el acervo de SeDiCI; 
+			una colección en particular. Para ello se han habilitado canales de RSS en cada una de las colecciones que conforman el acervo de SEDICI; 
 			basta hacer clic en el ícono correspondiente para suscribirse.
 		</p>
 		<a class="volver" href="pages/FAQ#preguntas">Volver</a>
