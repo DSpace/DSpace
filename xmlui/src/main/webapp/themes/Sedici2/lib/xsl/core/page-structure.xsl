@@ -428,21 +428,6 @@ placeholders for header images -->
                             </img>
                         </a>
                     </div>
-<<<<<<< .mine
-                    <div class="footer-icon">
-	                    <a href="#" title="Contáctese" class="user_voice_feedback">
-							<img class="contacto">
-		                    	<xsl:attribute name="src">
-		                        	<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>
-		                            <xsl:text>/themes/</xsl:text>
-						            <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-						            <xsl:text>/images/img3.png</xsl:text>
-		                        </xsl:attribute>
-		                      </img>
-						</a>
-                    </div>
-=======
->>>>>>> .r11575
 	            </div>
             </div>
         </div>
