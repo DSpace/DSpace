@@ -84,9 +84,10 @@
          
          <div class="browse_column">
 		  <table>
-		     <xsl:call-template name="header_browse_columns">
-		     	<xsl:with-param name="header"><xsl:value-of select="dri:row[@role='header']"/></xsl:with-param>
-		     </xsl:call-template>
+		  		<!-- El header no se genera por pedido del diseñador -->
+<!-- 		     <xsl:call-template name="header_browse_columns"> -->
+<!-- 		     	<xsl:with-param name="header"><xsl:value-of select="dri:row[@role='header']"/></xsl:with-param> -->
+<!-- 		     </xsl:call-template> -->
 	         <xsl:apply-templates select="dri:row[floor((position()-1) div ($cantItemsXCol)) = $contador]"  mode="table_browse_columns"/>
 		  </table>
 	     </div>

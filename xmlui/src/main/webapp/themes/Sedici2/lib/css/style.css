@@ -364,12 +364,13 @@ color: #607890;
 line-height:1.5;
 }
 
+#aspect_discovery_Navigation_list_discovery li a.view_more {
+	color: #3599C4 !important;
+}
 
 #aspect_discovery_Navigation_list_discovery ul.sublist li {
-color:grey;
-line-height:1.5;
-
-
+	color:grey;
+	line-height:1.5;
 }
 #ds-options #aspect_discovery_Navigation_list_discovery ul.sublist li.selected a {
 color:black;
@@ -1010,25 +1011,32 @@ font-size:14px;
     float: right;
     clear:both;
 	margin:0px 0px 20px 7px;
-	min-width:200px;
 }
 
 .pagination-links li {
     display: inline;
 	padding:4px 4px 4px 6px;
-	border:1px solid #dedede;
 	margin-right: 3px;
 	position:relative;
 	top:5px;
 }
 
-.pagination-links li:hover {
+.pagination-links li.page-link, 
+.pagination-links li.current-page-link,
+.pagination-links li.previous-page-link,
+.pagination-links li.next-page-link,
+.pagination-links li.first-page-link,
+.pagination-links li.last-page-link {
+	border:1px solid #dedede;
+}
+.pagination-links li.page-link:hover {
 background-color:#f3f3f3;
 }
-
-.previous-page-link {
+.pagination-links li.page-dots {
+	font-size: 75%;
+	margin: 0px;
+	padding: 2px;
 }
-
 .current-page-link {
     font-weight: bold;
     color: #1F3F5E;
@@ -1037,18 +1045,17 @@ background-color:#f3f3f3;
 
 #aspect_submission_submit_SelectCollectionStep_field_submit,
 #aspect_submission_StepTransformer_field_submit_next,
-.next-page-link {
+.next-page-link a {
 background-image:url(../../images/paginasiguiente_off.png);
 background-repeat:no-repeat;
 background-position:right;
 padding-right:15px;
 text-decoration:none;
 color:#949494;
-margin-left:5px;
 padding-left:5px;
 }
 
-.previous-page-link,
+.previous-page-link a,
 #aspect_submission_StepTransformer_field_submit_prev {
 background-image:url(../../images/paginaprevia_off.png);
 background-repeat:no-repeat;
@@ -1056,12 +1063,11 @@ background-position:left;
 padding-left:16px;
 text-decoration:none;
 color:#949494;
-margin-right:10px;
 }
 
 
 #aspect_submission_submit_SelectCollectionStep_field_submit:hover,
-.next-page-link:hover,
+.next-page-link a:hover,
 #aspect_submission_StepTransformer_field_submit_next:hover{
 background-image:url(../../images/paginasiguiente.png);
 color:#607890;
@@ -1072,7 +1078,7 @@ color:#607890;
 }
 */
 
-.previous-page-link:hover,
+.previous-page-link a:hover,
 #aspect_submission_StepTransformer_field_submit_prev:hover{
 background-image:url(../../images/paginaprevia.png);
 color:#607890;
@@ -1150,9 +1156,10 @@ min-height:60px;
 
 
 ul.ds-artifact-list {
-margin-top:10px;
+/*margin-top:10px;
 border-top:1px solid #dedede;
-border-bottom:1px solid #dedede;
+border-bottom:1px solid #dedede;*/
+margin-bottom:0px !important;
 
 }
 
@@ -1170,16 +1177,16 @@ min-height:65px;
 padding-top:10px;
 margin:0px;
 overflow:hidden;
-border-left:1px solid #dedede;
+/*border-left:1px solid #dedede;
 border-right:1px solid #dedede;
-/*width:100%;*/
+width:100%;*/
 }
 
 
 ul.ds-artifact-list li.even {
 background-color:white;
 padding-top:10px;
-border:1px solid #dedede;
+/*border:1px solid #dedede;*/
 margin:0;
 overflow:hidden;
 /*width:100%;*/
@@ -1191,10 +1198,11 @@ background-repeat:repeat-x;*/
 
 .ds-artifact-item.collection,
 .ds-artifact-item.community {
-    padding-top: 1px;
+    padding-top: 0px !important;
     padding-bottom: 1px;
-	margin-top:3px;
-
+	margin-top:0px !important;
+	background-color:white !important;
+	padding-left:0px !important;
 }
 .ds-artifact-list .publisher-date {
 	float: right;
@@ -2545,7 +2553,9 @@ border:none;
 	margin: 0px;
 	padding: 0px;
 }
-#aspect_discovery_SimpleSearch_div_search .pagination-masked.top ul {
+#aspect_discovery_SimpleSearch_div_search .pagination-masked.top ul,
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-author .pagination.top ul,
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-subject .pagination.top ul {
 	display: none;
 }
 #aspect_discovery_SimpleSearch_div_search h2.ds-div-head {
@@ -2554,13 +2564,15 @@ border:none;
 #aspect_discovery_SimpleSearch_div_search-results {
 	margin: 0px;
 }
-#aspect_discovery_SimpleSearch_div_search .search-controls {
+#aspect_discovery_SimpleSearch_div_search .search-controls-box,
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-author .search-controls-box,
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-subject .search-controls-box {
 	display: none;
 }
-.search-controls {
+.search-controls-box {
 	margin-top: 25px;
 }
-.search-controls ul {
+.search-controls-box ul {
 	margin-left: 10px;
 }
 .single-search-control {
@@ -2568,17 +2580,20 @@ border:none;
 }
 .single-search-control li {
 }
-.search-controls, .search-controls a {
+.search-controls-box, .search-controls-box a {
 	color: #3499C3;
 	margin-top:23px;
 }
-.search-controls .selected a {
+.search-controls-box .selected a {
 	text-decoration: underline;
 	background-image:url(../../images/0_libros.png);
 
 }
-
-.search-controls a:hover {
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-subject-results,
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-author-results {
+	margin-top: 10px;
+}
+.search-controls-box a:hover {
 color:black;
 	
 }
@@ -2694,6 +2709,7 @@ margin-right:10px;
 /*font-family:Georgia, "Times New Roman", Times, serif;*/
 /*border-bottom:1px dashed #dedede;*/
 float:left;
+margin-top:3px;
 }
 
 
@@ -3261,8 +3277,6 @@ width:100%;
 .browse_column li a:hover {
     color: #9C4F0A;
 }
-#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-author-results,
-#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-subject-results,
 #aspect_discovery_SearchFacetFilter_div_browse-by-author-results,
 #aspect_discovery_SearchFacetFilter_div_browse-by-subject-results,
 #aspect_discovery_SearchFacetFilter_div_browse-by-keywords-results,
@@ -3636,8 +3650,13 @@ font-size: 100%;
 margin-top: 20px;
 border-bottom: 1px solid #D8E8EB;
 margin-bottom: 3px;
-	
-	
+		}
+
+.ds-list-head {
+font-size:12px;
+color:#5CB5E5;
+border-bottom:1px solid #5CB5E5;
+margin-top:5px;
 }
 
 .item-summary-view-metadata .metadata-date {
@@ -3669,6 +3688,19 @@ div.simple-item-view-head{
 body{ background-color:white;
 min-width:1161px;}
 
-
+.page_autoarchivo {
+width:100%;
+padding:0px 0px 8px 58px;
+background-image:url(../../images/icono_page_autoarchivo.png);
+background-repeat:no-repeat;
+background-position:top left;
+}
+.page_personally {
+width:100%;
+padding:0px 0px 15px 58px;
+background-image:url(../../images/icono_page_personal.png);
+background-repeat:no-repeat;
+background-position:top left;
+}
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
 body{ background-color:white;}

@@ -147,8 +147,11 @@
     		</xsl:for-each>
     	</xsl:variable>
     	
-    	
-    	<div class="search-controls">
+    	<div>
+    		<xsl:attribute name="class">
+    			<xsl:text>search-controls-box </xsl:text>
+    			<xsl:value-of select="@n"/>
+    		</xsl:attribute>
 	    	<!-- generamos los links de control -->
 	    	<xsl:call-template name="searchResultControls">
 	    		<xsl:with-param name="queryString" select="$queryString"/>
@@ -161,6 +164,34 @@
 	    	<xsl:call-template name="searchResultControls">
 	    		<xsl:with-param name="queryString" select="$queryString"/>
 	    		<xsl:with-param name="element" select="dri:list[@n='search-controls']/dri:item/dri:field[@n='order']"/>
+	    	</xsl:call-template>
+    	</div>
+    </xsl:template>
+
+    <xsl:template match="dri:div[@id='aspect.artifactbrowser.ConfigurableBrowse.div.browse-controls']">
+    	<!-- preparamos el queryString base a partir de los hiddens -->
+    	<xsl:variable name="queryString">
+    		<xsl:for-each select="dri:p[@n='hidden-fields']/dri:field">
+    			<xsl:value-of select="@n"/>
+    			<xsl:text>=</xsl:text>
+    			<xsl:value-of select="dri:value[@type='raw']"/>
+    			<xsl:text>&amp;</xsl:text>
+    		</xsl:for-each>
+    	</xsl:variable>
+    	
+    	<div>
+    		<xsl:attribute name="class">
+    			<xsl:text>search-controls-box </xsl:text>
+    			<xsl:value-of select="@n"/>
+    		</xsl:attribute>
+	    	<!-- generamos los links de control -->
+	    	<xsl:call-template name="searchResultControls">
+	    		<xsl:with-param name="queryString" select="$queryString"/>
+	    		<xsl:with-param name="element" select="dri:p/dri:field[@n='rpp']"/>
+	    	</xsl:call-template>
+	    	<xsl:call-template name="searchResultControls">
+	    		<xsl:with-param name="queryString" select="$queryString"/>
+	    		<xsl:with-param name="element" select="dri:p/dri:field[@n='order']"/>
 	    	</xsl:call-template>
     	</div>
     	
@@ -222,7 +253,8 @@
 			</ul>
 		</div>
 	</xsl:template>
-	    <xsl:template match="dri:div[@id='aspect.discovery.SimpleSearch.div.search-results' and not(@itemsTotal)]">
+	
+	<xsl:template match="dri:div[@id='aspect.discovery.SimpleSearch.div.search-results' and not(@itemsTotal)]">
     	<div id="no_results_found"><i18n:text>xmlui.ArtifactBrowser.AbstractSearch.no_results</i18n:text></div>
     	<div id="no_results_found_tips">
 			<p><i18n:text>xmlui.ArtifactBrowser.AbstractSearch.tips_info_general</i18n:text></p>

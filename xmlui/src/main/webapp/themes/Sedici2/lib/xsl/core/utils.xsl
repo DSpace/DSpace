@@ -225,4 +225,147 @@
 	<xsl:template match="dri:div[@n='front-page-search']">
 	</xsl:template>
 
+	<!-- Template de paginacion -->
+    <xsl:template match="@pagination">
+        <xsl:param name="position"/>
+        <xsl:choose>
+            <xsl:when test=". = 'simple'">
+                <div class="pagination clearfix {$position}">
+ 
+					<xsl:call-template name="pagination-info"/>
+					
+					<xsl:if test="parent::node()/@previousPage or parent::node()/@nextPage">
+	                    <ul class="pagination-links">
+	                        <xsl:if test="parent::node()/@previousPage">
+		                        <li class="previous-page-link">
+	                                <a>
+	                                    <xsl:attribute name="href">
+	                                        <xsl:value-of select="parent::node()/@previousPage"/>
+	                                    </xsl:attribute>
+	                                    <i18n:text>xmlui.dri2xhtml.structural.pagination-previous</i18n:text>
+	                                </a>
+		                        </li>
+	                        </xsl:if>
+	                        <xsl:if test="parent::node()/@nextPage">
+	    	                    <li class="next-page-link">
+	                                <a>
+	                                    <xsl:attribute name="href">
+	                                        <xsl:value-of select="parent::node()/@nextPage"/>
+	                                    </xsl:attribute>
+	                                    <i18n:text>xmlui.dri2xhtml.structural.pagination-next</i18n:text>
+	                                </a>
+	 	                       </li>
+	                        </xsl:if>
+	                    </ul>
+                    </xsl:if>
+                </div>
+            </xsl:when>
+            <xsl:when test=". = 'masked'">
+                <div class="pagination-masked clearfix {$position}">
+                	
+                	<xsl:call-template name="pagination-info"/>
+                	
+                    <ul class="pagination-links">
+                        <xsl:if test="not(parent::node()/@firstItemIndex = 0 or parent::node()/@firstItemIndex = 1)">
+                            <li class="previous-page-link">
+                                <a>
+                                    <xsl:attribute name="href">
+                                        <xsl:value-of select="substring-before(parent::node()/@pageURLMask,'{pageNum}')"/>
+                                        <xsl:value-of select="parent::node()/@currentPage - 1"/>
+                                        <xsl:value-of select="substring-after(parent::node()/@pageURLMask,'{pageNum}')"/>
+                                    </xsl:attribute>
+                                    <i18n:text>xmlui.dri2xhtml.structural.pagination-previous</i18n:text>
+                                </a>
+                            </li>
+                        </xsl:if>
+                        <xsl:if test="(parent::node()/@currentPage - 4) &gt; 0">
+                            <li class="first-page-link">
+                                <a>
+                                    <xsl:attribute name="href">
+                                        <xsl:value-of select="substring-before(parent::node()/@pageURLMask,'{pageNum}')"/>
+                                        <xsl:text>1</xsl:text>
+                                        <xsl:value-of select="substring-after(parent::node()/@pageURLMask,'{pageNum}')"/>
+                                    </xsl:attribute>
+                                    <xsl:text>1</xsl:text>
+                                </a>
+                            </li>
+                        </xsl:if>
+                        <xsl:if test="(parent::node()/@currentPage - 4) &gt; 1">
+                            <li class="page-dots">
+                            	<xsl:text> . . . </xsl:text>
+                            </li>
+                        </xsl:if>
+                        <xsl:call-template name="offset-link">
+                            <xsl:with-param name="pageOffset">-3</xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="offset-link">
+                            <xsl:with-param name="pageOffset">-2</xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="offset-link">
+                            <xsl:with-param name="pageOffset">-1</xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="offset-link">
+                            <xsl:with-param name="pageOffset">0</xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="offset-link">
+                            <xsl:with-param name="pageOffset">1</xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="offset-link">
+                            <xsl:with-param name="pageOffset">2</xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="offset-link">
+                            <xsl:with-param name="pageOffset">3</xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:if test="(parent::node()/@currentPage + 4) &lt; ((parent::node()/@pagesTotal))">
+                            <li class="page-dots">
+                                <xsl:text>. . .</xsl:text>
+                            </li>
+                        </xsl:if>
+                        <xsl:if test="(parent::node()/@currentPage + 4) &lt;= (parent::node()/@pagesTotal)">
+                            <li class="last-page-link">
+                                <a>
+                                    <xsl:attribute name="href">
+                                        <xsl:value-of select="substring-before(parent::node()/@pageURLMask,'{pageNum}')"/>
+                                        <xsl:value-of select="parent::node()/@pagesTotal"/>
+                                        <xsl:value-of select="substring-after(parent::node()/@pageURLMask,'{pageNum}')"/>
+                                    </xsl:attribute>
+                                    <xsl:value-of select="parent::node()/@pagesTotal"/>
+                                </a>
+                            </li>
+                        </xsl:if>
+                        <xsl:if test="not(parent::node()/@lastItemIndex = parent::node()/@itemsTotal)">
+                            <li class="next-page-link">
+                                <a>
+                                    <xsl:attribute name="href">
+                                        <xsl:value-of select="substring-before(parent::node()/@pageURLMask,'{pageNum}')"/>
+                                        <xsl:value-of select="parent::node()/@currentPage + 1"/>
+                                        <xsl:value-of select="substring-after(parent::node()/@pageURLMask,'{pageNum}')"/>
+                                    </xsl:attribute>
+                                    <i18n:text>xmlui.dri2xhtml.structural.pagination-next</i18n:text>
+                                </a>
+                            </li>
+                        </xsl:if>
+                    </ul>
+                </div>
+            </xsl:when>
+        </xsl:choose>
+    </xsl:template>
+
+	<xsl:template name="pagination-info">
+	    <p class="pagination-info">
+	        <i18n:translate>
+	            <xsl:choose>
+	                <xsl:when test="parent::node()/@itemsTotal = -1">
+	                    <i18n:text>xmlui.dri2xhtml.structural.pagination-info.nototal</i18n:text>
+	                </xsl:when>
+	                <xsl:otherwise>
+	                    <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
+	                </xsl:otherwise>
+	            </xsl:choose>
+	            <i18n:param><xsl:value-of select="parent::node()/@firstItemIndex"/></i18n:param>
+	            <i18n:param><xsl:value-of select="parent::node()/@lastItemIndex"/></i18n:param>
+	            <i18n:param><xsl:value-of select="parent::node()/@itemsTotal"/></i18n:param>
+	        </i18n:translate>
+	    </p>
+	</xsl:template>
 </xsl:stylesheet>

@@ -103,7 +103,7 @@
 <message key="xmlui.ArtifactBrowser.AbstractSearch.head1_collection">Resultados de la búsqueda en la colección: {0}</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.head1_none">Resultados de la búsqueda</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.result_query">Su petición "{0}" produjo {1} resultados</message>
-<message key="xmlui.ArtifactBrowser.AbstractSearch.head2">Comunidades o colecciones que coinciden con la petición</message>
+<message key="xmlui.ArtifactBrowser.AbstractSearch.head2">Colecciones que coinciden con su búsqueda</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.head3">Ítems que coinciden con la petición</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.no_results">Lamentablemente no se encontraron coincidencias para su búsqueda</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.all_of_dspace">Todo SEDICI</message>
@@ -1898,9 +1898,9 @@ Para asignar un item a esta colección, cerciórese de estar en la colección co
 <message key="xmlui.dri2xhtml.structural.search-in-community">Esta comunidad</message>	
 <message key="xmlui.dri2xhtml.structural.search-in-collection">Esta colección</message>	
 	
-<message key="xmlui.dri2xhtml.structural.pagination-previous">Página anterior</message>	
+<message key="xmlui.dri2xhtml.structural.pagination-previous">Anterior</message>	
 <message key="xmlui.dri2xhtml.structural.pagination-info">Mostrando ítems {0}-{1} de {2}</message>	
-<message key="xmlui.dri2xhtml.structural.pagination-next">Página siguiente</message>	
+<message key="xmlui.dri2xhtml.structural.pagination-next">Siguiente</message>	
 	
 <message key="xmlui.dri2xhtml.structural.link_cc">Creative Commons</message>	
 <message key="xmlui.dri2xhtml.structural.link_original_license">Licencia original</message>	
@@ -2498,7 +2498,7 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.date.accessioned_dt">Fecha de carga</message>
 <message key="xmlui.discovery.SearchFacetFilter.no-results">No se encontarron valores acordes a los filtros.</message>
 <message key="xmlui.discovery.AbstractFiltersTransformer.filters.head">Refine su busqueda</message>
-<message key="xmlui.discovery.AbstractFiltersTransformer.filters.view-more">... Ver más</message>
+<message key="xmlui.discovery.AbstractFiltersTransformer.filters.view-more">Ver más</message>
 <message key="xmlui.discovery.SimpleSearch.search_label">Buscar</message>
 <message key="xmlui.Discovery.SimpleSearch.filter_head">Filtros</message>
 <message key="xmlui.Discovery.SimpleSearch.filter_add">Agregar</message>

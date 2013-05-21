@@ -152,6 +152,9 @@
 				<xsl:apply-templates select="dri:body/dri:div[@n='search']/dri:div[@id='aspect.discovery.SimpleSearch.div.search-controls']"/>
 			</xsl:if>
 			
+			<!-- Controles para los browse -->
+			<xsl:apply-templates select="dri:body/dri:div/dri:div[@id='aspect.artifactbrowser.ConfigurableBrowse.div.browse-controls']"/>
+
 			<!-- Recent submissions en comunidades y colecciones -->
 			<xsl:call-template name="recent-submissions">
 				<xsl:with-param name="head" select="dri:body/dri:div/dri:div[contains(@rend,'recent-submission')]/dri:head"/>
