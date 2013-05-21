@@ -20,18 +20,18 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 			<a href="http://prebi.unlp.edu.ar/wp-content/uploads/2007/12/Marisa-De-Giusti-CV-270611.pdf" title="Marisa R. De Giusti">Marisa R. De Giusti</a>
 		</li>
 	</ul>
-	
 	<h1>Catalogación, digitalización, edición</h1>
 	<ul>
 		<li>Analía Pinto</li>
 		<li>Silvia Peloche</li>
 		<li>Ariel Matías Cánepa</li>
+		<li>Fernando Consolo</li>
 	</ul>
 
 	<h1>Diseño gráfico</h1>
 	<ul>
 		<li>Lucas Folegotto</li>
-		<li>Michael Dorka</li>
+		
 	</ul>
 
 	<h1>Referencia</h1>
@@ -44,6 +44,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 	<h1>Desarrollo, investigación y mantenimiento de software</h1>
 	<ul>
 		<li>Agustín Marisi</li>
+		<li>Agustín Terruzzi</li>
 		<li>Ariel Lira</li>
 		<li>Ariel Sobrado</li>
 		<li>Gonzalo Villarreal</li>
@@ -51,6 +52,8 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 		<li>José Daniel Texier</li>
 		<li>María Marta Vila</li>
 		<li>Néstor Oviedo</li>
+		<li>Esteban Zozaya</li>
+		<li>NFacundo Adorno</li>
 	</ul>
 
 
