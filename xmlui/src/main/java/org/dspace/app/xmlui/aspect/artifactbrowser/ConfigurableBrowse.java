@@ -282,13 +282,13 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                     browseInfo.getOverallPosition() + browseInfo.getResultCount(), getPreviousPageURL(
                             params, info), getNextPageURL(params, info));
 
-            // Reference all the browsed items
-            ReferenceSet referenceSet = results.addReferenceSet("browse-by-" + type,
-                    ReferenceSet.TYPE_SUMMARY_LIST, type, null);
-
             // Are we browsing items, or unique metadata?
             if (isItemBrowse(info))
             {
+                // Reference all the browsed items
+                ReferenceSet referenceSet = results.addReferenceSet("browse-by-" + type,
+                        ReferenceSet.TYPE_SUMMARY_LIST, type, null);
+
                 // Add the items to the browse results
                 for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
                 {
