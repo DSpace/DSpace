@@ -78,7 +78,7 @@
 				</ul>
 			</li>
 			<li class="main">
-				<a href="#" title="Contáctese" data-uv-lightbox="classic_widget" data-uv-mode="full" data-uv-primary-color="#cc6d00" data-uv-link-color="#007dbf" data-uv-default-mode="support" data-uv-forum-id="150127"><i18n:text>sedici.menuSuperior.contacto</i18n:text></a>
+				<a href="#" class="user_voice_feedback"><i18n:text>sedici.menuSuperior.contacto</i18n:text></a>
 			</li>
 
 			<!-- Genero la seccion administrativa -->
