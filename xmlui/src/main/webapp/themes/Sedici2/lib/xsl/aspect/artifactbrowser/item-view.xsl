@@ -280,7 +280,16 @@
 			</xsl:when>
 			<!-- No hay otherwise -->
 		</xsl:choose>
-
+		<!-- creator.interprete row -->
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'creator-interprete'"/>
+			<xsl:with-param name="elements" select="dim:field[@element='creator' and @qualifier='interprete'] "/>
+		</xsl:call-template>
+		<!-- relation.ciclo row -->
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'relation-ciclo'"/>
+			<xsl:with-param name="elements" select="dim:field[@element='relation' and @qualifier='ciclo'] "/>
+		</xsl:call-template>
 		<!-- title.alternative row -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'title-alternative'"/>

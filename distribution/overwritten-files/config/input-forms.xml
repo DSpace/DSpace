@@ -152,6 +152,31 @@
 					<type-bind>Audio</type-bind>
 				</field>
 
+
+               <!-- Campos para el tipo audio -->
+
+					<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>creator</dc-element>
+					<dc-qualifier>interprete</dc-qualifier>
+					<repeatable>true</repeatable>
+					<input-type>onebox</input-type>
+					<label>Creador del Audio(*)</label>
+					<hint>Seleccione el autor del audio</hint>
+					<required>Debe seleccionar un autor del audio</required>
+					<type-bind>Audio</type-bind>
+				</field>
+
+
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>ciclo</dc-qualifier>
+					<input-type>onebox</input-type>
+					<label>Ciclo</label>
+					<hint>Seleccione el ciclo del audio</hint>
+					<type-bind>Audio</type-bind>
+				</field>
 				<!-- /////////////////// FIN DE LOS TYPES Y SUBTYPES /////////////////// -->
 				
 
@@ -595,7 +620,7 @@
 					<label>Fecha de presentación</label>
 					<input-type>date</input-type>
 					<hint>Fecha en la que se expuso el trabajo para su aprobación</hint>
-					<type-bind>Tesis,Objeto de conferencia</type-bind>
+					<type-bind>Tesis,Objeto de conferencia, Audio</type-bind>
 				</field>
 
 				<!-- Nombre del evento (Obligatorio para Objetos de Conferencia) -->
@@ -763,7 +788,7 @@
 					<label>Editorial</label>
 					<input-type>onebox</input-type>
 					<hint>Editorial encargada de la publicación de la obra</hint>
-					<type-bind>Tesis,Libro</type-bind>
+					<type-bind>Tesis,Libro,Audio</type-bind>
 					<visibility>workflow</visibility>
 				</field>
 				
