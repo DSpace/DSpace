@@ -1138,6 +1138,10 @@
 
 		<value-pairs value-pairs-name="common_evaluations">
 			<pair>
+				<displayed-value>No aplica</displayed-value>
+				<stored-value></stored-value>
+			</pair>
+			<pair>
 				<displayed-value>Con revisión por pares</displayed-value>
 				<stored-value>peer-review</stored-value>
 			</pair>
