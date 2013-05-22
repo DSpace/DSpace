@@ -44,8 +44,13 @@ function cambiarAuthority(inputID, authorityID, authorityValue, confidenceIndica
 	if (authorityLabelID != null){
 		if ($('#'+inputID).val()!=$('#' + authorityLabelID).val()){
 			$('#' + authorityLabelID).show();
+		}else{
+			$('#' + authorityLabelID).hide();
 		}
+		var authLabel = document.getElementById(authorityLabelID);
+		authLabel.value = authorityLabelValue;
     }
+	
 
 	if (confidenceNameValue=='rejected'){
 		$('#' + inputID).attr('class', 'ds-text-field error submit-text');
