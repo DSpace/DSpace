@@ -344,6 +344,7 @@
 	<message key="xmlui.EPerson.EditProfile.first_name">First Name</message>
 	<message key="xmlui.EPerson.EditProfile.last_name">Last Name</message>
 	<message key="xmlui.EPerson.EditProfile.telephone">Contact Telephone</message>
+        <message key="xmlui.EPerson.EditProfile.netid">Single Sign-On Username</message>
         <message key="xmlui.EPerson.EditProfile.Language">Language</message>
 	<message key="xmlui.EPerson.EditProfile.subscriptions">Subscriptions</message>
 	<message key="xmlui.EPerson.EditProfile.subscriptions_help">You may subscribe to collections to receive daily e-mail alerts of new items added. You can subscribe to as many or as few collections as you wish. Another alternative to daily e-mail alerts is to use the RSS feeds available for all collections.</message>
@@ -420,6 +421,7 @@
 	<message key="xmlui.EPerson.LoginChooser.para1">Log in via:</message>
 	<message key="org.dspace.authenticate.ShibAuthentication.title">Shibboleth Authentication</message>
 	<message key="org.dspace.eperson.LDAPAuthentication.title">LDAP Authentication</message>
+        <message key="org.dspace.eperson.CASAuthentication.title">Single Sign-On CAS Authentication</message>
 	<message key="org.dspace.eperson.PasswordAuthentication.title">Password Authentication</message>
 	<message key="org.dspace.eperson.X509Authentication.title">Web Certificate Authentication</message>
 

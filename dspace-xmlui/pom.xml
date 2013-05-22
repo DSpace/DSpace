@@ -229,6 +229,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- CAS: Needed for CAS authentication -->
+        <dependency>
+            <groupId>cas</groupId>
+            <artifactId>casclient</artifactId>
+            <version>2.1.1</version>
+        </dependency>
     </dependencies>
 
 </project>
