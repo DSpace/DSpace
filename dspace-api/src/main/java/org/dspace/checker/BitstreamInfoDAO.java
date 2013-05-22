@@ -166,7 +166,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         checksumHistoryDAO = new ChecksumHistoryDAO();
     }
 
-    /**
+	/**
      * Updates most_recent_checksum with latest checksum and result of
      * comparison with previous checksum.
      * 
