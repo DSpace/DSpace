@@ -725,7 +725,6 @@ placeholders for header images -->
 		
 		<!-- UserVoice JavaScript -->
 		<script type="text/javascript">
-			var feedbackLinks;
 			var options = {
 				mode: 'full',
     			primary_color: '#cc6d00',
@@ -734,14 +733,10 @@ placeholders for header images -->
     			forum_id: 150127,
 			};
 			
-			feedbackLinks = $("a.user_voice_feedback");
-			feedbackLinks.click(CallUserVoice);
-			
-			function CallUserVoice()
-			{
+			$("a.user_voice_feedback").click(function() {
 				UserVoice.push(['showLightbox', 'classic_widget', options]);
 				return false;
-			}
+			});
 		</script>
     </xsl:template>
 
