@@ -679,7 +679,7 @@
 		
 		<!-- Info about how to cite this document -->
 		<xsl:if test="./dim:field[@element='identifier'][@qualifier='uri']">
-			<div id="item-URI-sugerence">
+			<div id="item-URI-suggestion">
 				<i18n:text>sedici.items.handle.utilizacion_URI</i18n:text>
 				<a>
 					<xsl:attribute name="href">
