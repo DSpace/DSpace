@@ -1219,7 +1219,7 @@
                     </span>
 					<xsl:if test="dim:field[@element='title' and @qualifier='subtitle']">
 						<span class="subtitle">
-							<xsl:text> : </xsl:text>
+							<xsl:text> . </xsl:text>
 							<xsl:value-of select="dim:field[@element='title' and @qualifier='subtitle'][1]/node()" disable-output-escaping="yes"/>
 						</span>
 					</xsl:if>
