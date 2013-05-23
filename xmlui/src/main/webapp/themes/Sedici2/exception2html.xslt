@@ -18,22 +18,46 @@
   <xsl:param name="contextPath">/</xsl:param>
   <xsl:param name="printDebug">false</xsl:param>
   <xsl:param name="requestQueryString"></xsl:param>
-  
+  <xsl:param name="themePath"></xsl:param>
 <xsl:template match="/">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 	<link rel="shortcut icon">
-		<xsl:attribute name="href"><xsl:value-of select="concat($contextPath,'/themes/Sedici/images/favicon.ico')"/></xsl:attribute>
+		 <xsl:attribute name="href">
+              <xsl:value-of select="$contextPath"/>
+              <xsl:text>/themes/</xsl:text>
+              <xsl:value-of select="$themePath"/>
+              <xsl:text>/images/favicon.ico</xsl:text>
+          </xsl:attribute>
+		
 	</link>
 	<link media="screen" rel="stylesheet" type="text/css" >
-		<xsl:attribute name="href"><xsl:value-of select="concat($contextPath,'/themes/Sedici/lib/css/base.css')"/></xsl:attribute>
+	<xsl:attribute name="href">
+              <xsl:value-of select="$contextPath"/>
+              <xsl:text>/themes/</xsl:text>
+              <xsl:value-of select="$themePath"/>
+              <xsl:text>/lib/css/base.css</xsl:text>
+          </xsl:attribute>
+		
 	</link>
 	<link media="screen" rel="stylesheet" type="text/css">
-		<xsl:attribute name="href"><xsl:value-of select="concat($contextPath,'/themes/Sedici/lib/css/reset.css')"/></xsl:attribute>
+		<xsl:attribute name="href">
+              <xsl:value-of select="$contextPath"/>
+              <xsl:text>/themes/</xsl:text>
+              <xsl:value-of select="$themePath"/>
+              <xsl:text>/lib/css/reset.css</xsl:text>
+          </xsl:attribute>
+		
 	</link>
 	<link media="screen" rel="stylesheet" type="text/css">
-		<xsl:attribute name="href"><xsl:value-of select="concat($contextPath,'/themes/Sedici/lib/css/style.css')"/></xsl:attribute>
+		<xsl:attribute name="href">
+              <xsl:value-of select="$contextPath"/>
+              <xsl:text>/themes/</xsl:text>
+              <xsl:value-of select="$themePath"/>
+              <xsl:text>/lib/css/style.css</xsl:text>
+          </xsl:attribute>
+	
 	</link>
 	<title><i18n:text>sedici.errorTitle.<xsl:value-of select="$errorKind"/></i18n:text></title>
         <style>
@@ -60,14 +84,28 @@
 	<div id="ds-main" xmlns="http://di.tamu.edu/DRI/1.0/"
 		xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
 		<div id="ds-header-wrapper">
-			<div id="ds-header" class="clearfix">
-				 <a id="ds-header-logo-link"><xsl:attribute name="href">
-                                     <xsl:value-of select="concat($contextPath,'/')"/>
-                                     </xsl:attribute>
-					<span id="ds-header-logo">&#160;</span>
-				</a>
-			</div>
-		</div>
+          	<div id="ds-header" class="clearfix">
+            	<a id="ds-header-logo-link">
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="concat($contextPath,'/')"/>
+                        <xsl:text>/</xsl:text>
+                    </xsl:attribute>
+                    <span id="ds-header-logo">&#160;</span>
+                    <span id="ds-header-logo-text"><i18n:text>xmlui.general.dspace_home</i18n:text></span>
+                </a>
+                
+                <div id="unlp_logo">
+			 		<img>
+			            <xsl:attribute name="src">
+			                <xsl:value-of select="$contextPath"/>
+			                <xsl:text>/themes/</xsl:text>
+			                <xsl:value-of select="$themePath"/>
+			                <xsl:text>/images/logo_unlp_grande.png</xsl:text>
+			            </xsl:attribute>&#160;
+			 		</img>
+                </div>
+            </div>
+	    </div>
 <!-- 		<div id="topNav" xmlns:i18n="http://apache.org/cocoon/i18n/2.1"> -->
 <!-- 		</div> -->
 
@@ -75,7 +113,7 @@
 			<div id="ds-content" class="clearfix">
 
 				<!--  BODYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY-->
-				<div id="ds-body">
+				<div id="ds-body" class="error_page">
 					<h1 class="errorTitle">
 						<i18n:text>sedici.errorTitle.<xsl:value-of select="$errorKind"/></i18n:text>
 				<!-- 		<xsl:value-of select="$requestQueryString"/> -->
@@ -90,7 +128,7 @@
 				</div>
 				<!--  BODYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY-->
 				
-				<div id="ds-options-wrapper">
+				<div id="ds-options-wrapper" class="error_page">
 					<div id="ds-options">
 <!-- 						<h1 class="ds-option-set-head"><i18n:text>xmlui.general.go</i18n:text></h1> -->
 						<div class="ds-option-set"
@@ -117,24 +155,52 @@
 			</div>
 		</div><!-- ds-content-wrapper -->
 
-		<div id="footer" xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
-			<div id="footercol1">
-				<div class="datos_unlp">
-					<strong>2003-2012 &#169; <a href="http://prebi.unlp.edu.ar/" target="_blank">PrEBi</a></strong> 
-					<br/> 
-					<a href="http://www.unlp.edu.ar" target="_blank">Universidad Nacional de La Plata</a> 
-					<br/> Todos los derechos reservados conforme a la ley 11.723
-				</div>
-			</div>
-			<div id="footercol2">
-				<div class="datos_sedici">
-					<strong>SeDiCI - Servicio de Difusión de la Creación
-						Intelectual</strong> <br/> Calle 49 y 115 s/n 1er piso - Edificio ex
-					Liceo <br/> 1900 La Plata, Buenos Aires - Tel 0221 423
-					6696/6677 (int. 141)
-				</div>
-			</div>
-		</div> <!-- del footer -->
+		<div id="footer">
+			<div id="ds-footer">
+	            <div class="column" id="footercol1">
+	                <div class="datos_unlp">
+	                    <strong>
+		                    <a href="http://prebi.unlp.edu.ar/" target="_blank">PREBI</a>
+		                    <span> - </span>
+		                    <a href="http://sedici.unlp.edu.ar/" target="_blank">SEDICI</a>
+		                    &#xA9; 2003-2013
+		                    <br/>
+		                    <a href="http://www.unlp.edu.ar" target="_blank">Universidad Nacional de La Plata</a>
+	                    </strong>
+	                    <br/>
+	                    <span id="copyright-info">Todos los derechos reservados conforme a la ley 11.723</span>
+	                </div>
+	            	<a href="http://www.dspace.org" class="dspace_link" target="_blank">Soportado por <strong>DSpace</strong></a>
+	            </div>
+	            <div class="column" id="footercol3">
+	                <div class="datos_sedici">
+	                    Calle 49 y 115 s/n 1er piso - Edificio ex Liceo
+	                    <br/>
+	                    La Plata, Buenos Aires (C.P. 1900)
+	                    <br/>
+	                    Tel 0221 423 6696/6677 (int. 141)
+	                </div>
+                    <div class="footer-icon">
+                        <a title="Como llegar a SEDICI">
+                            <xsl:attribute name="href">
+                                <xsl:value-of select="$contextPath"/>
+                                <xsl:text>/pages/comoLlegar</xsl:text>
+                            </xsl:attribute>
+                            <img class="vermapa">
+                                <xsl:attribute name="src">
+                                    <xsl:value-of select="$contextPath"/>
+                                    <xsl:text>/themes/</xsl:text>
+					                <xsl:value-of select="$themePath"/>
+					                <xsl:text>/images/vermapa.png</xsl:text>
+                                </xsl:attribute>
+                            </img>
+                       
+                        </a>
+                    </div>
+	            </div>
+            </div>
+        </div>
+<!-- del footer -->
 		
 		
 	</div><!-- ds-main -->

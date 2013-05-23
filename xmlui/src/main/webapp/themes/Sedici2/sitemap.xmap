@@ -221,6 +221,7 @@
 							<map:parameter name="printDebug" value="{xmlui_debug}" />
 							<map:parameter name="errorKind" value="badRequest" />
 							<map:parameter name="requestQueryString" value="{request:queryString}"/>
+							<map:parameter name="themePath" value="{global:theme-path}" />
 						</map:transform>
 						<map:act type="locale">
 							<map:transform type="i18n">
@@ -237,6 +238,7 @@
 							<map:parameter name="printDebug" value="{xmlui_debug}" />
 							<map:parameter name="errorKind" value="resourceNotFound" />
 							<map:parameter name="requestQueryString" value="{request:queryString}"/>
+							<map:parameter name="themePath" value="{global:theme-path}" />
 						</map:transform>
 						<map:act type="locale">
 							<map:transform type="i18n">

@@ -217,7 +217,15 @@ min-width:500px;
 /*	margin-right: 30px;*/
 	margin-top: 20px;
 }
-
+#ds-body.error_page {
+	width:49%;
+	min-width:400px;
+	display: inline-block;
+	float:none;
+	margin-left: 27px;
+	margin-top: 20px;
+	
+}
 #ds-right-section {
 	width:23%;
 	padding-top:15px;
@@ -357,6 +365,16 @@ background-repeat:no-repeat;*/
 min-height:400px;
 /*clear:both;*/
 }
+
+#ds-options-wrapper.error_page {
+    float: none;
+    width: 249px;
+    padding-top:10px;
+	min-height:400px;
+}
+
+
+
 
 #ds-options-wrapper a {
 /*color:#cd642f;*/
