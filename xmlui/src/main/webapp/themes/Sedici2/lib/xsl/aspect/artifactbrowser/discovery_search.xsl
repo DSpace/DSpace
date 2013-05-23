@@ -265,10 +265,10 @@
 				<li><i18n:text>xmlui.ArtifactBrowser.AbstractSearch.tips_info3</i18n:text></li>
 			</ul>
 			<p></p>
+			<div id="alternative_search_services_message">
+		 	<p><i18n:text>xmlui.ArtifactBrowser.AbstractSearch.other_services_no_results</i18n:text></p>
 		 </div>
-		 <br/>
-		 <div class="banners_no_result">
-			
+		 <div class="banners_no_result">	
 		 	 <a href="http://www.biblioteca.mincyt.gov.ar/" target="_blank" title="Biblioteca Electrónica" >
 				<img class="logo_no_result">
 			    	<xsl:attribute name="src">
@@ -300,5 +300,7 @@
 			    </img>
 			</a>
 		 </div>
+		 </div>
+		 <br/>
    	  </xsl:template>
 </xsl:stylesheet>

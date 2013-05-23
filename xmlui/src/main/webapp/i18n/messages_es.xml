@@ -106,6 +106,7 @@
 <message key="xmlui.ArtifactBrowser.AbstractSearch.head2">Colecciones que coinciden con su búsqueda</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.head3">Ítems que coinciden con la petición</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.no_results">Lamentablemente no se encontraron coincidencias para su búsqueda</message>
+<message key="xmlui.ArtifactBrowser.AbstractSearch.other_services_no_results">También puede realizar su búsqueda en algunos de los servicios listados a continuación:  </message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.all_of_dspace">Todo SEDICI</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.title">título</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dateissued">fecha de publicación</message>
