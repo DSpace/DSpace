@@ -5,9 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-/**
- * 
- */
+
 package org.dspace.statistics.util;
 
 import java.io.BufferedReader;
@@ -17,7 +15,6 @@ import java.security.Principal;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
-
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
@@ -25,8 +22,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 /**
- * @author mwood
+ * A mock request for testing.
  *
+ * @author mwood
  */
 class DummyHttpServletRequest implements HttpServletRequest
 {
@@ -91,9 +89,13 @@ class DummyHttpServletRequest implements HttpServletRequest
     public String getHeader(String key)
     {
         if ("User-Agent".equals(key))
+        {
             return agent;
+        }
         else
+        {
             return null;
+        }
     }
 
     /* (non-Javadoc)
@@ -521,8 +523,7 @@ class DummyHttpServletRequest implements HttpServletRequest
     @Override
     public void removeAttribute(String arg0)
     {
-        // TODO Auto-generated method stub
-
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /* (non-Javadoc)
@@ -531,8 +532,7 @@ class DummyHttpServletRequest implements HttpServletRequest
     @Override
     public void setAttribute(String arg0, Object arg1)
     {
-        // TODO Auto-generated method stub
-
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /* (non-Javadoc)
@@ -542,8 +542,31 @@ class DummyHttpServletRequest implements HttpServletRequest
     public void setCharacterEncoding(String arg0)
             throws UnsupportedEncodingException
     {
-        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 
+    @Override
+    public int getRemotePort()
+    {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public String getLocalName()
+    {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public String getLocalAddr()
+    {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public int getLocalPort()
+    {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

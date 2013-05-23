@@ -10,6 +10,7 @@ package org.dspace.statistics.util;
 import java.util.List;
 
 /**
+ * Holds a list of pattern strings.
  *
  * @author mwood
  */

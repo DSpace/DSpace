@@ -9,8 +9,9 @@ package org.dspace.statistics.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import static org.junit.Assert.assertEquals;
 import org.junit.*;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  *

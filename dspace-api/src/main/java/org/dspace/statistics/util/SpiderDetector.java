@@ -16,12 +16,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.statistics.SolrLogger;
 
 /**
  * SpiderDetector is used to find IP's that are spiders...
@@ -88,7 +85,7 @@ public class SpiderDetector {
      * Unpack a list of lists of patterns and compile them to Patterns.
      * We have to do the list-of-lists to get Spring to accumulate them across
      * configuration files.
-     * 
+     *
      * @param agentPatterns
      * @throws PatternSyntaxExpression
      */
@@ -97,11 +94,13 @@ public class SpiderDetector {
         clearAgentPatterns();
 
         for (AgentPatternList agentPatterns : agentPatternLists)
+        {
             for (String agentPattern : agentPatterns.getPatterns())
             {
                 Pattern newPattern = Pattern.compile(agentPattern);
                 agents.add(newPattern);
             }
+        }
         log.info("Received " + String.valueOf(agents.size()) + " agent patterns.");
     }
 
@@ -178,11 +177,15 @@ public class SpiderDetector {
         // See if any agent patterns match
         String agent = request.getHeader("User-Agent");
         if ((null != agent) && (null != agents))
+        {
             for (Pattern candidate : agents)
             {
                 if (candidate.matcher(agent).find())
+                {
                     return true;
+                }
             }
+        }
 
         // No.  See if any IP addresses match
         if (isUseProxies() && request.getHeader("X-Forwarded-For") != null) {
@@ -238,6 +241,5 @@ public class SpiderDetector {
 
         return useProxies;
     }
-
 
 }

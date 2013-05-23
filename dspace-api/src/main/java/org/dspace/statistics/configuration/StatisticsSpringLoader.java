@@ -13,8 +13,9 @@ import org.dspace.kernel.config.SpringLoader;
 import org.dspace.services.ConfigurationService;
 
 /**
- * @author mwood
+ * Supply paths for configuring statistical code.
  *
+ * @author mwood
  */
 public class StatisticsSpringLoader
         implements SpringLoader

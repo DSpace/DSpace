@@ -14,10 +14,10 @@ package org.dspace.statistics.configuration;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
 import org.junit.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  *
@@ -67,6 +67,8 @@ public class StatisticsSpringLoaderTest
         assertNotNull("getResourcePaths returned null", result);
         assertEquals("Wrong number of paths returned", 1, result.length);
         for (int i = 0; i < result.length; i++)
+        {
             System.out.printf("result[%d] = %s\n", i, result[i]);
+        }
     }
 }
