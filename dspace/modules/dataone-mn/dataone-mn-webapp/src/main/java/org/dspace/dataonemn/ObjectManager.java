@@ -862,7 +862,12 @@ public class ObjectManager implements Constants {
 		digest = md.digest();
 		
 		for (int index = 0; index < digest.length; index++) {
-		    hexString.append(Integer.toHexString(0xFF & digest[index]));
+                    String byteString = Integer.toHexString(0xFF & digest[index]);
+                    // Integer.toHexString does not add leading zeroes
+                    if(byteString.length() < 2) {
+                        hexString.append("0");
+                    }
+		    hexString.append(byteString);
 		}
 		
 		checksum = hexString.toString();
