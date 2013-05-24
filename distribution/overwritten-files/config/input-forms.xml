@@ -209,7 +209,7 @@
 					<dc-schema>dc</dc-schema>
 					<dc-element>title</dc-element>
 					<label>Título (*)</label>
-					<input-type>onebox</input-type>
+					<input-type>textarea</input-type>
 					<hint>El título principal de la obra </hint>
 					<required>El ingreso de un título es obligatorio</required>
 					<i18n>true</i18n>
@@ -221,7 +221,7 @@
 					<dc-element>title</dc-element>
 					<dc-qualifier>subtitle</dc-qualifier>
 					<label>Subtítulo</label>
-					<input-type>onebox</input-type>
+					<input-type>textarea</input-type>
 					<hint>Si el título de la obra se compone de título y subtítulo, éste último debe ingresarse en este campo</hint>
 					<visibility>workflow</visibility>
 					<i18n>true</i18n>
@@ -594,7 +594,7 @@
 					<dc-element>relation</dc-element>
 					<dc-qualifier>dossier</dc-qualifier>
 					<label>Nombre del Dossier</label>
-					<input-type>onebox</input-type>
+					<input-type>textarea</input-type>
 					<hint>Nombre de la sección Dossier en la que el artículo se encuentra</hint>
 					<type-bind>Articulo</type-bind>
 					<visibility>workflow</visibility>
@@ -629,7 +629,7 @@
 					<dc-element>relation</dc-element>
 					<dc-qualifier>event</dc-qualifier>
 					<label>Nombre del evento</label>
-					<input-type>onebox</input-type>
+					<input-type>textarea</input-type>
 					<hint>Nombre del congreso o conferencia en el que este objeto fue presentado</hint>
 					<type-bind>Objeto de conferencia</type-bind>
 					<required>Debe ingresar el nombre del evento al que este objeto pertenece</required>
