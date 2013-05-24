@@ -473,11 +473,22 @@
 			<xsl:with-param name="type" select="'i18n-code'"/>
 		</xsl:call-template>
 
-		<!-- publisher row -->
-		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'publisher'"/>
-			<xsl:with-param name="elements" select="dim:field[@element='publisher'] "/>
-		</xsl:call-template>
+		<!-- Solo para el tipo tesis -->
+		<xsl:choose>
+			<xsl:when test="dim:field[@element='type'] = $audio">
+				<!-- publisher row -->
+					<xsl:call-template name="render-normal-field">
+					<xsl:with-param name="name" select="'produccion'"/>
+					<xsl:with-param name="elements" select="dim:field[@element='publisher'] "/>
+					</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+					<xsl:call-template name="render-normal-field">
+					<xsl:with-param name="name" select="'publisher'"/>
+					<xsl:with-param name="elements" select="dim:field[@element='publisher'] "/>
+					</xsl:call-template>
+				</xsl:otherwise>		
+		</xsl:choose>	
 
 		<!-- Si hay informacion de la revista, mostramos el metadato -->
 		<xsl:if test="dim:field[@element='relation' and @qualifier='journalTitle']">
