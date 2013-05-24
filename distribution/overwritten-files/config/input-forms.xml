@@ -152,10 +152,11 @@
 					<type-bind>Audio</type-bind>
 				</field>
 
+				<!-- /////////////////// FIN DE LOS TYPES Y SUBTYPES /////////////////// -->
 
-               <!-- Campos para el tipo audio -->
 
-					<field>
+                <!-- Interprete en los Audios -->
+				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>creator</dc-element>
 					<dc-qualifier>interprete</dc-qualifier>
@@ -166,19 +167,6 @@
 					<required>Debe seleccionar un autor del audio</required>
 					<type-bind>Audio</type-bind>
 				</field>
-
-
-				<field>
-					<dc-schema>sedici</dc-schema>
-					<dc-element>relation</dc-element>
-					<dc-qualifier>ciclo</dc-qualifier>
-					<input-type>onebox</input-type>
-					<label>Ciclo</label>
-					<hint>Seleccione el ciclo del audio</hint>
-					<type-bind>Audio</type-bind>
-				</field>
-				<!-- /////////////////// FIN DE LOS TYPES Y SUBTYPES /////////////////// -->
-				
 
 				<!-- Autor (persona) -->
 				<field>
@@ -552,6 +540,17 @@
 					<input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
 					<hint>Otros códigos de identificación de la obra</hint>
 					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Nombre del Ciclo para los audios -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>ciclo</dc-qualifier>
+					<input-type>onebox</input-type>
+					<label>Ciclo</label>
+					<hint>Ingrese el ciclo del audio</hint>
+					<type-bind>Audio</type-bind>
 				</field>
 
 				<!-- Titulo de la revista -->
