@@ -253,13 +253,24 @@
 		</xsl:if>
 
 		<!-- date.issued row -->
-		<xsl:if test="dim:field[@element='date' and @qualifier='issued'] != substring-before(dim:field[@element='date' and @qualifier='accessioned'], 'T')">
-			<xsl:call-template name="render-normal-field">
-				<xsl:with-param name="name" select="'date-issued'"/>
-				<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='issued'] "/>
-				<xsl:with-param name="type" select="'date'"/>
-			</xsl:call-template>
-        </xsl:if>
+		<!-- date.exposure/date.issued : extraemos el año solamente -->
+		<xsl:choose>
+			<xsl:when test="dim:field[@element='date' and @qualifier='exposure']">
+				<xsl:call-template name="render-normal-field">
+					<xsl:with-param name="name" select="'date-exposure'"/>
+					<xsl:with-param name="elements" select="substring(dim:field[@element='date' and @qualifier='exposure'],1,4)"/>
+					<xsl:with-param name="type" select="'date'"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:when test="dim:field[@element='date' and @qualifier='issued']">
+				<xsl:call-template name="render-normal-field">
+					<xsl:with-param name="name" select="'date-issued'"/>
+					<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='issued'] "/>
+					<xsl:with-param name="type" select="'date'"/>
+				</xsl:call-template>
+			</xsl:when>
+		</xsl:choose>
+		<xsl:text>&#160;</xsl:text>
         
 		<!-- Para el Tipo de Documento mostramos el sedici.subtype porque es mas especifico -->
 		<!-- Si no hay subtype, mostramos el dc.type -->
@@ -355,7 +366,7 @@
 						<xsl:with-param name="type" select="'date'"/>
 					</xsl:call-template>
 				</xsl:when>
-				<xsl:when test="(dim:field[@element='date' and @qualifier='exposure']!=dim:field[@element='date' and @qualifier='available'])">
+				<xsl:when test="(dim:field[@element='date' and @qualifier='issued']!=dim:field[@element='date' and @qualifier='accessioned'])">
 					<!-- date.exposure row -->
 					<xsl:call-template name="render-normal-field">
 						<xsl:with-param name="name" select="'date-issued'"/>
