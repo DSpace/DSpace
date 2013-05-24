@@ -106,6 +106,39 @@
 
 			
 	     </ul>
+	     
+	     <div id="socialbar">
+	     	<a href="http://www.facebook.com/sedici.unlp" title="Visitenos en Facebook">
+	     		<img>
+	     			<xsl:attribute name="src">
+		                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+		                <xsl:text>/themes/</xsl:text>
+		                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+		                <xsl:text>/images/icono_facebook.png</xsl:text>
+	     			</xsl:attribute>
+	     		</img>
+	     	</a>
+	     	<a href="https://twitter.com/sedici_unlp" title="Síganos en Twitter">
+	     		<img>
+	     			<xsl:attribute name="src">
+		                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+		                <xsl:text>/themes/</xsl:text>
+		                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+		                <xsl:text>/images/icono_twitter.png</xsl:text>
+	     			</xsl:attribute>
+	     		</img>
+	     	</a>
+	     	<a href="http://sedici.unlp.edu.ar/blog" title="Visite el blog de SEDICI">
+	     		<img>
+	     			<xsl:attribute name="src">
+		                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+		                <xsl:text>/themes/</xsl:text>
+		                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+		                <xsl:text>/images/icono_blog.png</xsl:text>
+	     			</xsl:attribute>
+	     		</img>
+	     	</a>
+	     </div>
      </div>
     </xsl:template>
     

@@ -228,7 +228,7 @@ min-width:500px;
 }
 #ds-right-section {
 	width:23%;
-	padding-top:15px;
+	padding-top:0px;
 /*	width: 250px;*/
 	min-height: 400px;
 	display: inline-block;
@@ -443,7 +443,12 @@ font-weight:bold;
 } 
 
 ul.ds-simple-list  li a{
-text-decoration:none;!important
+text-decoration:none !important;
+}
+
+#ds-body ul.ul_envios_recientes li:nth-child(odd) {
+background-color:#F0F0F0;
+padding:10px;
 }
 
 #ds-options {
@@ -461,7 +466,7 @@ width:100%;
 padding:5px 0px 5px 10px;
 text-align: left;
 color: white;
-
+border-right:none;
 }
 
 #ds-options #aspect_discovery_Navigation_list_discovery a{
@@ -1003,7 +1008,7 @@ font-size:14px;
 
 .administrative.tabbed ul.horizontal li.active-tab{
     background-color: #fafafa;
-    z-index: 1;
+    z-index: 2;
     font-weight: bold;
 }
 
@@ -1129,7 +1134,8 @@ background-color:#808080;
     float: right;
     margin:0;
 	clear:both;
-	color:#c8986c;
+	color:grey;
+	font-style:italic;
 }
 
 .pagination-masked.top {
@@ -1182,7 +1188,7 @@ margin-bottom:0px !important;
 }
 
 .ds-artifact-item :hover{
-z-index:0;
+z-index:999;
 }
 
 ul.ds-artifact-list li.odd {
@@ -1200,11 +1206,14 @@ border-right:1px solid #dedede;
 width:100%;*/
 }
 
+ul.ul_envios_recientes li.even  
+ {background-color:red !important;
+}
 
 ul.ds-artifact-list li.even {
 background-color:white;
 padding-top:10px;
-/*border:1px solid #dedede;*/
+border:1px solid #f1f1f1;
 margin:0;
 overflow:hidden;
 /*width:100%;*/
@@ -1221,6 +1230,7 @@ background-repeat:repeat-x;*/
 	margin-top:0px !important;
 	background-color:white !important;
 	padding-left:0px !important;
+	border:none !important;
 }
 .ds-artifact-list .publisher-date {
 	float: right;
@@ -1659,14 +1669,14 @@ div.spacer{
 }
 
 .thumbnail-wrapper,
-.file-metadata,
 .file-link {
     float: left;
     margin-right: 5px;
 }
 
 #item-file-section div.file-metadata {
-    width: 90%;
+    width: 89%;
+	float:right;
 }
 
 .item-metadata {
@@ -1723,13 +1733,13 @@ div.spacer{
 #aspect_artifactbrowser_CollectionViewer_div_collection-home h2,
 h2.ds-div-head
  {
-    margin-top: 30px;
-/*    border-bottom:1px solid #D8E8EB;*/
-/*background-image:url(../../images/libritos_chicos.png);*/
+ margin-top: 30px;
+/*    border-bottom:1px solid #D8E8EB;
+background-image:url(../../images/libritos_chicos.png);*/
 background-repeat:no-repeat;
-/*padding-left:25px;*/
-/*border-bottom:1px solid #dedede;*/
-color:#9C4F0A;
+/*padding-left:25px;
+border-bottom:1px solid #dedede;*/
+color:#4194B9;
 clear:both;
 	padding-top: 0px;
     margin-bottom: 3px;
@@ -1878,6 +1888,7 @@ div.primary > ul > li > ul > li.community > div.artifact-description a {
 	position:relative; 
 	float:left; 
 	list-style-type:none; 
+	z-index:3;
 }
 #topNav ul:after { 
 	content:"."; 
@@ -1927,9 +1938,7 @@ background-color:#f3faff;
 	position:relative;
 	margin-left: 31px;
 }
-#topNav ul {
-	z-index: 999;
-} 
+
 #topNav li.submenu {
 	font-weight: bold;
 	padding: 3px 10px;
@@ -1954,17 +1963,36 @@ border-radius:5px;
 	height: auto;
 }
 
+#socialbar {
+   bottom: 26px;
+    float: right;
+    position: relative;
+	right:89px;
+}
+
+#socialbar a{
+padding-right:3px;
+}
 
 /*login*/
 
 #ds-user-box {
-	background: url(../../images/logo_usuario.png) no-repeat scroll 10px 10px;
 	color: #3698C7;
-	padding: 10px 10px 10px 75px;
-	border: 1px solid #E9EFFB;
-	margin: 5px 0px;
+	padding: 10px 10px 10px 10px;
+border: 1px solid #E9EFFB;
+/*	margin: 5px 0px;*/
 	font-size: 11px;
 	min-height: 54px;
+	margin-bottom:7px;
+	margin-top:-5px;
+}
+
+#login_box {
+background: url(../../images/lock.png);
+background-repeat:no-repeat;
+background-position:left bottom;
+padding:0 0 0 30px;
+margin-left:10px;
 }
 
 #ds-user-box span {
@@ -2005,8 +2033,7 @@ line-height:1.5;
     color: red;
 	text-decoration:none;
 }
-#login_box {
-}
+
 #login_box a {
 	font-size: 14px;
 	display: inline-block;
@@ -2072,7 +2099,7 @@ background-color:#00FF33;
 }
 
 .ds-textarea-field {
-	height: 153px;
+	height: 80px;
 	width: 100%;
 }
 
@@ -2107,8 +2134,6 @@ margin-left:5px;
 -moz-border-radius:9px;
 }
 
-
-
 #aspect_eperson_PasswordLogin_list_password-login span.error {
 color:red;
 position:absolute;
@@ -2117,6 +2142,7 @@ left:340px;
 top:25px;
 font-size:11px;
 }
+
 #aspect_eperson_PasswordLogin_list_password-login {
 padding:15px;
 margin-bottom:20px;
@@ -2657,10 +2683,11 @@ text-align:left;
 
 #aspect_artifactbrowser_ConfigurableBrowse_div_browse-navigation p.ds-paragraph{
 margin-left:0px;
+float:right;
 }
 
 tr:nth-child(2n+1) {
-background-color:#f2f2f2;
+background-color:#f7f5f4;
 }
 
 tr:nth-child(2n) {
@@ -2921,7 +2948,7 @@ margin:0px 200px 0px 0px;
 
 #home_feed {
 	line-height:1.5;
-	width:42%;
+	width:49%;
 	float:left;
 	margin-right: 10px;
 	padding-top:11px;
@@ -2934,7 +2961,7 @@ margin:0px 200px 0px 0px;
 	margin-left: 10px;
 	box-shadow:3px 3px 5px #DEDEDE;
 	border:1px solid #dedede;
-	padding:10px;
+	padding:10px 0 0;
 	margin-bottom:10px;
 }
 
@@ -2964,13 +2991,13 @@ margin:0px 200px 0px 0px;
 }
 .li_envios_recientes {
 	margin-bottom: 15px;
+	padding:0px 10px;
 }
 #ds-right-section .ul_envios_recientes {
 	margin: 0px;
 }
 
-#home_feed h1,
-#home_envios_recientes h1 {
+#home_feed h1 {
 	font-size: 14px;
 	text-transform:uppercase;
 	font-weight: normal;
@@ -2979,6 +3006,18 @@ margin:0px 200px 0px 0px;
 	padding-bottom: 5px;
 	margin-bottom: 10px;
 }
+
+#home_envios_recientes h1 {
+	font-size: 14px;
+	text-transform:uppercase;
+	font-weight: normal;
+	color: #4194b9;
+/*	border-bottom: solid 1px #B8D9F2;*/
+	padding-bottom: 5px;
+	margin-bottom: 10px;
+	padding-left:10px;
+}
+
 #home_feed ul li a, .li_envios_recientes a {
 	text-decoration:none;
 	font-size:12px;
@@ -2994,11 +3033,12 @@ margin:0px 200px 0px 0px;
 	text-decoration:underline;
 }
 .news_date  {
-    color: #A4A4A4;
+    color: #ed9445;
     font-size: 12px;
-    font-weight: bold;
     float: left;
     position: relative;
+	border-right: 1px solid #ed9445;
+	padding-right: 3px;
 }
 
 
@@ -3227,7 +3267,6 @@ span.ds-dc_contributor_author-authority {
 	text-align: left;
 }
 .item-summary-view-metadata .metadata.record-source {
-	float: right;
 }
 .item-summary-view-metadata .metadata.record-source span.metadata-value {
 	font-size: 81%;
@@ -3259,6 +3298,7 @@ margin-right:9px;
 	padding: 10px 15px 10px 15px;
 	margin-bottom:15px;
 	margin-top: 75px;
+	overflow:hidden;
 }
 
 #other_attributes h2{
@@ -3283,7 +3323,7 @@ border-bottom:1px solid #dedede;
 }
 .browse_column table {
 /*	width: 215px;*/
-width:100%;
+width:179px;
 }
 .browse_column li {
     padding: 3px 5px;
@@ -3304,7 +3344,8 @@ width:100%;
 #aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-author-results ul,
 #aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-subject-results ul {
 	margin-top: 0px;
-	min-width:650px;
+	width:100%;
+/*	min-width:650px;*/
 }
 form.submission {
 	margin-top: 30px;
@@ -3719,5 +3760,8 @@ background-image:url(../../images/icono_page_personal.png);
 background-repeat:no-repeat;
 background-position:top left;
 }
+
+.view_more {}
+
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
 body{ background-color:white;}
