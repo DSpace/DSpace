@@ -204,11 +204,17 @@ public class DescribeStep extends AbstractSubmissionStep
                     }
                     
                     // If the input is invisible in this scope, then skip it.
-                        if (!dcInput.isVisible(scope) && !readonly)
-                        {
-                            continue;
-                        }
+                    if (!dcInput.isVisible(scope) && !readonly)
+                    {
+                        continue;
+                    }
                         
+                    // Omit fields not visible based on user's group
+                    if(!dcInput.isVisibleOnGroup(context))
+                    {
+                    	continue;
+                    }
+                    
                         String schema = dcInput.getSchema();
                         String element = dcInput.getElement();
                         String qualifier = dcInput.getQualifier();
@@ -351,6 +357,12 @@ public class DescribeStep extends AbstractSubmissionStep
             
            // Omit fields not allowed for this document type
             if(!input.isAllowedFor(documentType))
+            {
+            	continue;
+            }
+
+            // Omit fields not visible based on user's group
+            if(!input.isVisibleOnGroup(context))
             {
             	continue;
             }

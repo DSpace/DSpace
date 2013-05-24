@@ -7,11 +7,16 @@
  */
 package org.dspace.app.util;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataSchema;
+import org.dspace.core.Context;
+import org.dspace.eperson.Group;
 
 /**
  * Class representing a line in an input form.
@@ -78,6 +83,13 @@ public class DCInput
      */
     private String requiredOnGroup = null;
     private boolean hasToBeMember = true;
+    
+    /**
+     * Group-based visibility restriction
+     * Saves a Map containing the list of groups on wich this field's visibility is restricted on.
+     * Map's keys are group names and map's values determine whether there is a NOT modifier for that group 
+     */
+    private Map<String, Boolean> visibilityOnGroup = null;
     
     /** 
      * The scope of the input sets, this restricts hidden metadata fields from 
@@ -158,6 +170,24 @@ public class DCInput
         	}
         	requiredOnGroup = requiredOnGroupDef;
         }
+        
+        // Has it a group-based visibility restriction?
+        visibilityOnGroup = new HashMap<String, Boolean>();
+        String visibilityOnGroupContent = fieldMap.get("visibility-on-group");
+        if(visibilityOnGroupContent != null && visibilityOnGroupContent.trim().length() > 0) {
+        	// Splits the field's content and parses them individually 
+        	for(String restriction : visibilityOnGroupContent.split(",")) {
+        		restriction = restriction.trim();
+        		Boolean isPositiveRestriction = true;
+	        	if(restriction.startsWith("!")) {
+	        		isPositiveRestriction = false;
+	        		restriction = restriction.substring(1);
+	        	}
+	        	// Register the restriction
+	        	visibilityOnGroup.put(restriction, isPositiveRestriction);
+        	}
+        }
+        
     }
 
     /**
@@ -454,4 +484,48 @@ public class DCInput
 	public boolean isI18nable() {
 		return i18nable;
 	}
+	
+	public boolean hasVisibilityOnGroup() {
+		return !(visibilityOnGroup.size() == 0);
+	}
+	
+	public String[] getVisibilityRestrictions() {
+		return visibilityOnGroup.keySet().toArray( new String[visibilityOnGroup.size()] );
+	}
+	
+	public boolean isVisibilityPositiveRestriction(String groupName) {
+		return visibilityOnGroup.get(groupName);
+	}
+	
+    /**
+     * Mini-cache of loaded groups for group-based validation
+     * 
+     * @return Group instance
+     */
+    private Map<String, Group> loadedGroups = new HashMap<String, Group>();
+    private Group findGroup(Context context, String groupName) throws SQLException {
+    	Group group = loadedGroups.get(groupName);
+    	if(group == null) {
+    		group = Group.findByName(context, groupName);
+    		loadedGroups.put(groupName, group);
+    	}
+    	return group;
+    }
+    
+    public boolean isVisibleOnGroup(Context context) throws SQLException, AuthorizeException {
+    	
+    	if(!hasVisibilityOnGroup())
+    		return true;
+    	
+    	boolean isVisible = false;
+    	for(String groupName : getVisibilityRestrictions()) {
+    		Group group = findGroup(context, groupName);
+        	if( group == null) {
+        		throw new AuthorizeException("Group "+groupName+ " does not exist, check your input_forms.xml");
+        	}
+        	isVisible = isVisible || !(Group.isMember(context, group.getID()) ^ isVisibilityPositiveRestriction(groupName)); 
+    	}
+		return isVisible;
+    }
+	
 }

@@ -212,6 +212,13 @@ public class DescribeStep extends AbstractProcessingStep
             {
                 continue;
             }
+            
+            // Omit fields not visible based on user's group
+            if(!inputs[j].isVisibleOnGroup(context))
+            {
+            	continue;
+            }
+            
             String element = inputs[j].getElement();
             String qualifier = inputs[j].getQualifier();
             String schema = inputs[j].getSchema();
