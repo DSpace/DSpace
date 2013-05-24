@@ -211,7 +211,7 @@
 					<label>Subtítulo</label>
 					<input-type>textarea</input-type>
 					<hint>Si el título de la obra se compone de título y subtítulo, éste último debe ingresarse en este campo</hint>
-					<visibility>workflow</visibility>
+					<visibility-on-group>SeDiCIAdmin,RadioAdmin</visibility-on-group>
 					<i18n>true</i18n>
 				</field>
 
@@ -295,7 +295,7 @@
 					<label>Alcance Geográfico</label>
 					<input-type>onebox</input-type>
 					<hint>Zona geográfica a la que se hace referencia en la obra</hint>
-					<visibility>workflow</visibility>
+					<visibility-on-group>SeDiCIAdmin,RadioAdmin</visibility-on-group>
 				</field>
 
 				<!-- Alcance Temporal -->
@@ -307,7 +307,7 @@
 					<label>Alcance Temporal</label>
 					<input-type>onebox</input-type>
 					<hint>Período temporal al que se hace referencia en el texto</hint>
-					<visibility>workflow</visibility>
+					<visibility-on-group>SeDiCIAdmin,RadioAdmin</visibility-on-group>
 				</field>
 
 				<!-- Descripción Física -->
@@ -319,7 +319,7 @@
 					<label>Descripción Física</label>
 					<input-type>onebox</input-type>
 					<hint>Cantidad de páginas, duración, tamaño, etc</hint>
-					<visibility>workflow</visibility>
+					<visibility-on-group>SeDiCIAdmin,RadioAdmin</visibility-on-group>
 				</field>
 
 				<!-- Fulltext -->
