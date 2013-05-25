@@ -15,10 +15,8 @@ import java.util.Calendar;
 
 /**
  * Encapsulate a range of dates for Solr query filtering.
- * Created by IntelliJ IDEA.
- * User: kevinvandevelde
- * Date: 13-mrt-2009
- * Time: 13:14:14
+ * 
+ * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class StatisticsSolrDateFilter implements StatisticsFilter {
     private Date startDate;
