@@ -265,7 +265,7 @@ public class Email
         String username = ConfigurationManager.getProperty("mail.server.username");
         String password = ConfigurationManager.getProperty("mail.server.password");
         
-        if (username != null)
+        if (username != null || username == "")
         {
             props.put("mail.smtp.auth", "true");
             SMTPAuthenticator smtpAuthenticator = new SMTPAuthenticator(
