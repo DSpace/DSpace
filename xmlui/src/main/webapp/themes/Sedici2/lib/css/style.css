@@ -1993,6 +1993,7 @@ background-repeat:no-repeat;
 background-position:left bottom;
 padding:0 0 0 30px;
 margin-left:10px;
+	
 }
 
 #ds-user-box span {
@@ -2557,7 +2558,9 @@ clear:both;
 #aspect_artifactbrowser_CommunityBrowser_div_comunity-browser {
 height:50px;
 }
-
+#aspect_artifactbrowser_CommunityViewer_div_community-browse h2.ds-head{
+display:inline;	
+}
 h2.ds-head {
 display:none;
 }

@@ -215,7 +215,7 @@
 <message key="xmlui.ArtifactBrowser.CollectionViewer.search_scope">Ámbito de la búsqueda</message>
 <message key="xmlui.ArtifactBrowser.CollectionViewer.all_of_dspace">Todo SEDICI</message>
 <message key="xmlui.ArtifactBrowser.CollectionViewer.full_text_search">Búsqueda en el texto completo:</message>
-<message key="xmlui.ArtifactBrowser.CollectionViewer.head_browse">Listar por</message>
+<message key="xmlui.ArtifactBrowser.CollectionViewer.head_browse">Explorar</message>
 <message key="xmlui.ArtifactBrowser.CollectionViewer.browse_titles">Títulos</message>
 <message key="xmlui.ArtifactBrowser.CollectionViewer.browse_authors">Autores</message>
 <message key="xmlui.ArtifactBrowser.CollectionViewer.browse_dates">Fechas</message>
@@ -236,7 +236,7 @@
 <message key="xmlui.ArtifactBrowser.CommunityViewer.search_scope">Ámbito de búsqueda</message>
 <message key="xmlui.ArtifactBrowser.CommunityViewer.all_of_dspace">Todo SEDICI</message>
 <message key="xmlui.ArtifactBrowser.CommunityViewer.full_text_search">Búsqueda en el texto completo:</message>
-<message key="xmlui.ArtifactBrowser.CommunityViewer.head_browse">Listar por</message>
+<message key="xmlui.ArtifactBrowser.CommunityViewer.head_browse">Explorar:</message>
 <message key="xmlui.ArtifactBrowser.CommunityViewer.browse_titles">Títulos</message>
 <message key="xmlui.ArtifactBrowser.CommunityViewer.browse_authors">Autores</message>
 <message key="xmlui.ArtifactBrowser.CommunityViewer.browse_dates">Fechas</message>
