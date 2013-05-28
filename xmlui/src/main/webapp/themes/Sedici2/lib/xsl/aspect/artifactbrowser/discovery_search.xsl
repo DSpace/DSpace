@@ -129,10 +129,10 @@
         </xsl:apply-templates>
     </xsl:template>
     
+    <!-- Se omite renderizar la combo para el scope-->
     <xsl:template match="dri:list[@id='aspect.discovery.SimpleSearch.list.primary-search']">
           <xsl:apply-templates select="dri:head"/>
-          <xsl:apply-templates select="dri:item[2]"/>
-           <xsl:apply-templates select="dri:item[1]"/> 
+          <xsl:apply-templates select="dri:item[dri:field[@n='query']]"/>
     </xsl:template>
     
     
