@@ -60,6 +60,8 @@ public class NewsManager
             }
 
             br.close();
+            ir.close();
+            fir.close();
         }
         catch (IOException e)
         {

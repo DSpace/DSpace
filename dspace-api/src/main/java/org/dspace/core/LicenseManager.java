@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -68,12 +69,14 @@ public class LicenseManager
      */
     public static String getLicenseText(String licenseFile)
     {
-        FileReader fr = null;
+        InputStream is = null;
+        InputStreamReader ir = null;
         BufferedReader br = null;
         try
         {
-            fr = new FileReader(licenseFile);
-            br = new BufferedReader(fr);
+            is = new FileInputStream(licenseFile);
+            ir = new InputStreamReader(is, "UTF-8");
+            br = new BufferedReader(ir);
             String lineIn;
             license = "";
             while ((lineIn = br.readLine()) != null)
@@ -95,11 +98,21 @@ public class LicenseManager
                 {
                 }
             }
-            if (fr != null)
+            if (ir != null)
             {
                 try
                 {
-                    fr.close();
+                    ir.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
+            if (is != null)
+            {
+                try
+                {
+                    is.close();
                 } catch (IOException ioe)
                 {
                 }

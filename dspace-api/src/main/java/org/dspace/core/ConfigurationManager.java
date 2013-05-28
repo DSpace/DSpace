@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -547,7 +548,7 @@ public class ConfigurationManager
                     {
                         modIR.close();
                     }
-                    
+
                     if (modIS != null)
                     {
                         modIS.close();

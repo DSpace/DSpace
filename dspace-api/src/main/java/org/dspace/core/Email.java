@@ -8,18 +8,17 @@
 package org.dspace.core;
 
 import java.io.BufferedReader;
-import org.apache.log4j.Logger;
-
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 import javax.mail.Address;
@@ -35,6 +34,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import org.apache.log4j.Logger;
 
 /**
  * Class representing an e-mail message, also used to send e-mails.
@@ -379,10 +379,14 @@ public class Email
         String charset = null;
         String subject = "";
         StringBuilder contentBuffer = new StringBuilder();
+        InputStream is = null;
+        InputStreamReader ir = null;
         BufferedReader reader = null;
         try
         {
-            reader = new BufferedReader(new FileReader(emailFile));
+            is = new FileInputStream(emailFile);
+            ir = new InputStreamReader(is, "UTF-8");
+            reader = new BufferedReader(ir);
             boolean more = true;
             while (more)
             {
@@ -409,7 +413,27 @@ public class Email
         {
             if (reader != null)
             {
-                reader.close();
+                try {
+                    reader.close();
+                } catch (IOException ioe)
+                {
+                }
+            }
+            if (ir != null)
+            {
+                try {
+                    ir.close();
+                } catch (IOException ioe)
+                {
+                }
+            }
+            if (is != null)
+            {
+                try {
+                    is.close();
+                } catch (IOException ioe)
+                {
+                }
             }
         }
         Email email = new Email();
@@ -501,6 +525,7 @@ public class Email
             password = p;
         }
 
+        @Override
         protected PasswordAuthentication getPasswordAuthentication()
         {
             return new PasswordAuthentication(name, password);
