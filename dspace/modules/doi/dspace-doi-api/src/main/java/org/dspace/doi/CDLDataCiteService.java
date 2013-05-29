@@ -81,24 +81,35 @@ public class CDLDataCiteService {
     public String registerDOI(String aDOI, String aURL, Map<String, String> metadata) throws IOException {
 
         if (ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)) {
-            if (aDOI.startsWith("doi")) {
-                aDOI = aDOI.substring(4);
-            }
-
-            PutMethod put = new PutMethod(BASEURL + "/id/doi%3A" + aDOI);
+            PutMethod put = new PutMethod(generateEzidUrl(aDOI));
             return executeHttpMethod(aURL, metadata, put);
         }
         return "datacite.notConnected";
     }
 
+    public String extractDataciteMetadata(String encodedResponse) {
+        if(encodedResponse == null) {
+            return "";
+        }
+        Map<String, String> decoded = decodeAnvl(encodedResponse);
+        if(decoded != null && decoded.containsKey("datacite")) {
+            return decoded.get("datacite");
+        } else {
+            return "";
+        }
+    }
+
+    public static String generateEzidUrl(String aDOI) {
+        if (aDOI.startsWith("doi")) {
+            aDOI = aDOI.substring(4);
+        }
+        return BASEURL + "/id/doi%3A" + aDOI;
+    }
+
     public String lookup(String aDOI) throws IOException {
 
         if (ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)) {
-            if (aDOI.startsWith("doi")) {
-                aDOI = aDOI.substring(4);
-            }
-
-            GetMethod get = new GetMethod(BASEURL + "/id/doi%3A" + aDOI);
+            GetMethod get = new GetMethod(generateEzidUrl(aDOI));
             HttpMethodParams params = new HttpMethodParams();
 
             get.setRequestHeader("Content-Type", "text/plain");
@@ -128,12 +139,8 @@ public class CDLDataCiteService {
 	    return "datacite.notConnected";
 	}
 
-	if (aDOI.startsWith("doi")) {
-	    aDOI = aDOI.substring(4);
-	}
-	
 	aDOI = aDOI.toUpperCase();
-	String fullURL = BASEURL + "/id/doi%3A" + aDOI;
+	String fullURL = generateEzidUrl(aDOI);
 	log.debug("posting to " + fullURL);
 	PostMethod post = new PostMethod(fullURL);
 	
