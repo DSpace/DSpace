@@ -121,7 +121,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
         Division mainSearchDiv = search.addInteractiveDivision("general-query",
                 "discover", Division.METHOD_GET, "discover-search-box search");
-
+      
         List searchList = mainSearchDiv.addList("primary-search", List.TYPE_FORM);
 
         searchList.setHead(T_search_label);
@@ -137,7 +137,11 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         text.setValue(queryString.replace("\\", ""));
         text.setSize(75);
         searchBoxItem.addButton("submit").setValue(T_go);
-        addHiddenFormFields("search", request, fqs, mainSearchDiv);
+     
+        /*
+         * Se comento esta linea para cuando se realiza una nueva busqueda, no tenga en cuentas los demas filtros, solo el del paramtro query
+         * */
+        //  addHiddenFormFields("search", request, fqs, mainSearchDiv);
 
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
