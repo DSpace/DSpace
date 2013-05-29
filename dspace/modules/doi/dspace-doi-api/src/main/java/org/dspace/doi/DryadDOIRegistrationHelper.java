@@ -4,14 +4,10 @@
  */
 package org.dspace.doi;
 
-import com.sun.org.apache.bcel.internal.generic.L2D;
 import java.sql.SQLException;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
-import org.dspace.core.Context;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
 
 /**
  * Convenience methods involved in registering DOIs.
@@ -26,9 +22,14 @@ public class DryadDOIRegistrationHelper {
         boolean isInBlackout = false;
         DCValue provenance[] =  dataPackage.getMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en");
         for(DCValue dcValue : provenance) {
-            if(dcValue.value != null && dcValue.value.contains("Entered publication blackout")) {
-                isInBlackout = true;
+            // only return true if the last recorded provenance indicates publication blackout
+            if(dcValue.value != null)
+                if(dcValue.value.contains("Entered publication blackout")) {
+                    isInBlackout = true;
+                } else {
+                    isInBlackout = false;
             }
+
         }
         // now find something that would negate blackout
         return isInBlackout;
