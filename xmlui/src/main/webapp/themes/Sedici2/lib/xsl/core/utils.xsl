@@ -195,15 +195,14 @@
 		 	</div>
 		 </div>
 	</xsl:template>
-	 <xsl:template match="//dri:list[@id='aspect.artifactbrowser.CommunityViewer.list.community-browse']" >
+	  <xsl:template match="//dri:list[@id='aspect.artifactbrowser.CommunityViewer.list.community-browse']" >
 	<xsl:variable name="URL">
           	<xsl:value-of select="$context-path"/>
 			<xsl:text>/</xsl:text>
 			<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']"/>
         </xsl:variable>
        
-	
-	<h2 class="ds-head">Explorar:</h2>
+	<xsl:apply-templates select="dri:head" />
 	<ul id="aspect_artifactbrowser_CommunityViewer_list_community-browse" class="ds-simple-list community-browse" xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
 		<li>
 			<a>
@@ -214,25 +213,8 @@
 			 	<i18n:text>xmlui.ArtifactBrowser.CommunityViewer.all_of_dspace</i18n:text>
 			 </a>
 		</li>
-		<li>
-			<a>
-		 		<xsl:attribute name="href">
-		 			<xsl:value-of select="$URL"/>
-					<xsl:text>/browse?type=author</xsl:text>
-			 	</xsl:attribute>
-			 	<i18n:text>xmlui.ArtifactBrowser.CommunityViewer.browse_authors</i18n:text>
-			 </a>
-			
-		</li>
-		<li xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
-			<a>
-		 		<xsl:attribute name="href">
-		 			<xsl:value-of select="$URL"/>
-					<xsl:text>/browse?type=subject</xsl:text>
-			 	</xsl:attribute>
-			 	<i18n:text>xmlui.ArtifactBrowser.Navigation.browse_subject</i18n:text>
-			 </a>
-		</li>   
+		<xsl:apply-templates select="dri:item" />
+		
 	</ul>	    
     </xsl:template>
 	
