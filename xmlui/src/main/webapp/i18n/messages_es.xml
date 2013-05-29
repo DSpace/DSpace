@@ -2501,6 +2501,7 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.date.accessioned_dt">Fecha de carga</message>
 <message key="xmlui.discovery.SearchFacetFilter.no-results">No se encontarron valores acordes a los filtros.</message>
 <message key="xmlui.discovery.AbstractFiltersTransformer.filters.head">Refine su busqueda</message>
+<message key="xmlui.discovery.AbstractFiltersTransformer.filters.head_collection">Contenido de la colección</message>
 <message key="xmlui.discovery.AbstractFiltersTransformer.filters.view-more">Ver más</message>
 <message key="xmlui.discovery.SimpleSearch.search_label">Buscar</message>
 <message key="xmlui.Discovery.SimpleSearch.filter_head">Filtros</message>

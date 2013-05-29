@@ -246,7 +246,27 @@
 	<!-- Template vacio para evitar el renderizado default de la caja de busqueda en todas las paginas -->
 	<xsl:template match="dri:div[@n='front-page-search']">
 	</xsl:template>
+	<xsl:template match="dri:document/dri:options/dri:list[@id='aspect.discovery.Navigation.list.discovery']">
+		 <xsl:choose>
+            <xsl:when test="contains(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'], 'discover')">
+		    	<h1 class="ds-option-set-head"><i18n:text>xmlui.discovery.AbstractFiltersTransformer.filters.head</i18n:text></h1> 
+		    </xsl:when>
+		    <xsl:otherwise>
+				<h1 class="ds-option-set-head"><i18n:text>xmlui.discovery.AbstractFiltersTransformer.filters.head_collection</i18n:text></h1> 
+		    </xsl:otherwise>
+        </xsl:choose>
+		<div id="aspect_discovery_Navigation_list_discovery" class="ds-option-set" xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
+			<ul class="ds-options-list">
+				<xsl:apply-templates select="dri:list" mode="local-list"/>
+			</ul>
+		</div>	
+	</xsl:template>
 
+	<xsl:template match="dri:list" mode="local-list">
+		<li><xsl:apply-templates select="." mode="nested"/></li>
+	</xsl:template>
+
+	
 	<!-- Template de paginacion -->
     <xsl:template match="@pagination">
         <xsl:param name="position"/>
