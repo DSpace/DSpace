@@ -100,6 +100,34 @@ public class Minter implements org.springframework.beans.factory.InitializingBea
 	    return aDOI;
 	}
 
+        public String getRegistrationURL(String aDOI) {
+            if(myDataCiteConnectionIsLive) {
+                return CDLDataCiteService.generateEzidUrl(aDOI);
+            } else {
+                return null;
+            }
+        }
+
+        /**
+         * Use the datacite connection to get metadata registered for this DOI
+         * @param doi
+         * @return String containing XML metadata from EZID or empty string if not registered
+         */
+        public String lookupDOIRegistration(String aDOI) throws IOException {
+            if(myDataCiteConnectionIsLive) {
+                String response = null;
+                response = myDoiService.lookup(aDOI);
+                // look for 'error' in response or 'success'
+                log.debug("Checking for existing DOI (" + aDOI + "), response: " + response);
+                if(response != null && response.toUpperCase().contains("SUCCESS:")) {
+                    return myDoiService.extractDataciteMetadata(response);
+                } else {
+                    return "";
+                }
+            } else {
+                return null;
+            }
+        }
     /**
      * Creates a DOI from the supplied DSpace URL string
      *

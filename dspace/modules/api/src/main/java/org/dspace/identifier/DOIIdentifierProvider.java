@@ -400,6 +400,16 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         return null;
     }
 
+    public String lookupEzidRegistration(Item item) throws IOException {
+        String aDOI = getDoiValue(item);
+        return perstMinter.lookupDOIRegistration(aDOI);
+    }
+
+    public String getEzidRegistrationURL(Item item) {
+        String aDoi = getDoiValue(item);
+        return  perstMinter.getRegistrationURL(aDoi);
+    }
+
     public boolean remove(String identifier) {
 
         if (identifier != null && identifier.startsWith("doi:")) {
