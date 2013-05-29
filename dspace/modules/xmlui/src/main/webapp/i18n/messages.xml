@@ -3198,11 +3198,21 @@
     <message key="xmlui.Submission.MyTasks.no-results">You currently have no tasks assigned to you.</message>
     
     <!-- Messages for showing item status in MyTasks after approving/rejecting -->
+    <message key="xmlui.Submission.MyTasks.item_status">Item Status:</message>
+    <message key="xmlui.Submission.MyTasks.item_title">Title:</message>
+    <message key="xmlui.Submission.MyTasks.doi_registration_status">DOI Registration Status:</message>
+    <message key="xmlui.Submission.MyTasks.doi">DOI:</message>
+    
+    <message key="xmlui.Submission.MyTasks.doi_not_registered">Not Registered with EZID</message>
+    <message key="xmlui.Submission.MyTasks.doi_registered">Successfully Registered with EZID</message>
+    
     <message key="xmlui.Submission.MyTasks.with_identifier"> with identifier: </message>
-    <message key="xmlui.Submission.MyTasks.archived_status"> has been moved to the archive.</message>
-    <message key="xmlui.Submission.MyTasks.withdrawn_status"> has been withdrawn.</message>
-    <message key="xmlui.Submission.MyTasks.workflow_status"> is in the workflow.</message>
-    <message key="xmlui.Submission.MyTasks.workspace_status"> has been returned to the workspace.</message>
+
+    <message key="xmlui.Submission.MyTasks.archived_status">Archived</message>
+    <message key="xmlui.Submission.MyTasks.blackout_status">Blackout</message>
+    <message key="xmlui.Submission.MyTasks.withdrawn_status">Withdrawn</message>
+    <message key="xmlui.Submission.MyTasks.workflow_status">Workflow</message>
+    <message key="xmlui.Submission.MyTasks.workspace_status">Workspace</message>
 
     <message key="xmlui.Submission.result-table.head.title">Title</message>
     <message key="xmlui.Submission.result-table.head.submitter">Submitter</message>
