@@ -91,7 +91,8 @@ public class ContentStatistics extends HttpServlet
             }
 
             row = DatabaseManager.querySingle(dsContext,
-                    "SELECT count(item_id) AS items FROM item WHERE NOT withdrawn;");
+                    "SELECT count(item_id) AS items FROM item"
+                    + " WHERE CAST(ITEM.WITHDRAWN AS INTEGER) = 0;");
             if (null != row)
             {
                 responseWriter.printf(
@@ -108,8 +109,8 @@ public class ContentStatistics extends HttpServlet
                                 "  JOIN bundle USING(bundle_id)" +
                                 "  JOIN item2bundle USING(bundle_id)" +
                                 "  JOIN item USING(item_id)" +
-                                " WHERE NOT withdrawn" +
-                                "  AND NOT deleted" +
+                                " WHERE CAST(ITEM.WITHDRAWN AS INTEGER) = 0" +
+                                "  AND CAST(ITEM.DELETED AS INTEGER) = 0" +
                                 "  AND bundle.name = 'ORIGINAL';");
             if (null != row)
             {
@@ -134,8 +135,8 @@ public class ContentStatistics extends HttpServlet
                     " JOIN item USING(item_id)" +
                     " WHERE bundle.name = 'ORIGINAL'" +
                     "  AND mimetype LIKE 'image/%'" +
-                    "  AND NOT deleted" +
-                    "  AND NOT withdrawn;"
+                    "  AND CAST(ITEM.DELETED AS INTEGER) = 0" +
+                    "  AND CAST(ITEM.WITHDRAWN AS INTEGER) = 0;"
                     );
             if (null != row)
             {
