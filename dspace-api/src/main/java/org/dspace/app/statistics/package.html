@@ -14,11 +14,40 @@
 </head>
 
 <body>
+<h1>Support for Statistics on the Content and Use of DSpace</h1>
+
+<h2>Generating Statistical Reports from Log Files</h2>
+<p>TBS</p>
+
+<h2>Content Statistics</h2>
 <p>
-Defines usage event instrumentation points and provides implementations for
-testing.
+The ContentStatistics class embodies a servlet for reporting simple counts of
+bitstreams, items, collections, communities, and the like.  Its output is in a
+machine-readable, XML-based format:
+</p>
+<pre>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;dspace-repository-statistics date="20100420T163205Z"&gt;
+  &lt;statistic name="communities"&gt;42&lt;/statistic&gt;
+  &lt;statistic name="collections"&gt;172&lt;/statistic&gt;
+  &lt;statistic name="items"&gt;1882&lt;/statistic&gt;
+  &lt;statistic name="bitstreams"&gt;5452&lt;/statistic&gt;
+  &lt;statistic name="totalBytes"&gt;5158304476&lt;/statistic&gt;
+  &lt;statistic name="images"&gt;118&lt;/statistic&gt;
+  &lt;statistic name="imageBytes"&gt;148091927&lt;/statistic&gt;
+&lt;/dspace-repository-statistics&gt;
+</pre>
+
+<p>
+Here an <em>image</em> is a bitstream in the <code>ORIGINAL</code> bundle whose MIME type
+is any of the <code>image/*</code> types.  This excludes thumbnails.
 </p>
 
+<p>
+Deleted and withdrawn items are excluded from all item, bitstream, and byte counts.
+</p>
+
+<h2>Usage Instrumentation</h2>
 <p>
 This package makes usage instrumentation (for statistics, or whatever else
 you may fancy) pluggable, while avoiding any unnecessary assumptions about how
