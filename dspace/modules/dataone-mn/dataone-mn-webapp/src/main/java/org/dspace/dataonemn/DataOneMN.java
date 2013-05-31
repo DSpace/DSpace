@@ -545,6 +545,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 		response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName);
 		objManager.writeBitstream(bitstream.retrieve(), response.getOutputStream());	
 	    } else if(id.contains("format=d1rem")) {
+		logent.setIdentifier(id + idTimestamp);
 		// return a (dataONE format) resource map
 		response.setContentType(RDF_CONTENT_TYPE);
 
@@ -553,8 +554,8 @@ public class DataOneMN extends HttpServlet implements Constants {
 		
 		log.debug("getting resource map for object id=" + id + idTimestamp);
 		objManager.getResourceMap(id, idTimestamp, response.getOutputStream());
-		logent.setIdentifier(id + idTimestamp);
 	    } else {
+		logent.setIdentifier(id + idTimestamp);
 		// return a metadata record (file or package)
 		response.setContentType(XML_CONTENT_TYPE);
 
@@ -563,7 +564,6 @@ public class DataOneMN extends HttpServlet implements Constants {
 		
 		log.debug("getting science metadata object id=" + id + idTimestamp);
 		objManager.getMetadataObject(id, idTimestamp, response.getOutputStream());
-		logent.setIdentifier(id + idTimestamp);
 	    }
 	    
 	} catch (NotFoundException details) {
