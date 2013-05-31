@@ -950,6 +950,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 
         try {
             if (!id.endsWith("/bitstream")) {
+                logent.setIdentifier(id);
                 // return a metadata record (file or package)
                 format = "dap";
                 fileName = simpleDOI + ".xml";
@@ -957,7 +958,6 @@ public class DataOneMN extends HttpServlet implements Constants {
         
                 log.debug("replicating object id=" + id +", format=" + format);
                 objManager.getMetadataObject(id, idTimestamp, response.getOutputStream());
-                logent.setIdentifier(id);
             }
             else {
                 // return a bitstream
