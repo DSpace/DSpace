@@ -19,6 +19,7 @@ import org.dspace.content.Item;
 import org.dspace.core.*;
 import org.swordapp.server.AuthCredentials;
 import org.swordapp.server.Deposit;
+import org.swordapp.server.DepositReceipt;
 import org.swordapp.server.SwordAuthException;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
@@ -68,8 +69,16 @@ public class DSpaceSwordAPI
     public SwordContext doAuth(AuthCredentials authCredentials)
             throws SwordAuthException, SwordError, DSpaceSwordException
     {
+        // if there is no supplied username, then we should request a retry
+        if (authCredentials.getUsername() == null)
+        {
+            log.error("no username supplied, unable to proceed with authentication");
+            throw new SwordAuthException(true);
+        }
+
         // first authenticate the request
         // note: this will build our various DSpace contexts for us
+        log.debug("attempting to authenticate ...");
         SwordAuthenticator auth = new SwordAuthenticator();
         SwordContext sc = auth.authenticate(authCredentials);
 
@@ -281,7 +290,7 @@ public class DSpaceSwordAPI
 
                     String fn = this.createEntryFilename(context, deposit, true);
                     entryBitstream.setName(fn);
-                    entryBitstream.setDescription("SWORD entry document");
+                    entryBitstream.setDescription("Original SWORD entry document");
 
                     BitstreamFormat bf = BitstreamFormat.findByMIMEType(context, "application/xml");
                     if (bf != null)
@@ -321,7 +330,7 @@ public class DSpaceSwordAPI
                     }
 
                     bitstream.setName(fn);
-                    bitstream.setDescription("SWORD deposit package");
+                    bitstream.setDescription("Orignal SWORD deposit file");
 
                     BitstreamFormat bf = BitstreamFormat.findByMIMEType(context, deposit.getMimeType());
                     if (bf != null)
@@ -336,7 +345,7 @@ public class DSpaceSwordAPI
                         // shouldn't mess with it
                         result.setOriginalDeposit(bitstream);
                     }
-                    verboseDescription.append("Original package stored as " + fn + ", in item bundle " + swordBundle);
+                    verboseDescription.append("Original deposit stored as " + fn + ", in item bundle " + swordBundle);
                 }
 
                 swordBundle.update();
@@ -369,11 +378,12 @@ public class DSpaceSwordAPI
     }
 
     /**
-     * Construct the most appropriate filename for the incoming deposit.
+     * Construct the most appropriate filename for the incoming deposit
      *
      * @param context
      * @param deposit
      * @param original
+     * @return
      * @throws DSpaceSwordException
      */
     public String createFilename(Context context, Deposit deposit, boolean original)
@@ -503,4 +513,13 @@ public class DSpaceSwordAPI
 		pw.println("User name=" + auth.getUsername());
 		pw.close();
 	}
+
+    protected void addVerboseDescription(DepositReceipt receipt, VerboseDescription verboseDescription)
+    {
+        boolean includeVerbose = ConfigurationManager.getBooleanProperty("swordv2-server", "verbose-description.receipt.enable");
+        if (includeVerbose)
+        {
+            receipt.setVerboseDescription(verboseDescription.toString());
+        }
+    }
 }

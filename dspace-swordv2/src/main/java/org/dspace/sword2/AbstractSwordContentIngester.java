@@ -11,6 +11,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
+import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
@@ -30,11 +31,31 @@ import java.util.StringTokenizer;
 
 public abstract class AbstractSwordContentIngester implements SwordContentIngester
 {
-	public abstract DepositResult ingest(Context context, Deposit deposit, DSpaceObject dso, VerboseDescription verboseDescription)
-			throws DSpaceSwordException, SwordError, SwordAuthException, SwordServerException;
+    public DepositResult ingest(Context context, Deposit deposit, DSpaceObject dso, VerboseDescription verboseDescription)
+            throws DSpaceSwordException, SwordError, SwordAuthException, SwordServerException
+    {
+        return this.ingest(context, deposit, dso, verboseDescription, null);
+    }
 
-    public abstract DepositResult ingest(Context context, Deposit deposit, DSpaceObject dso, VerboseDescription verboseDescription, DepositResult result)
-			throws DSpaceSwordException, SwordError, SwordAuthException, SwordServerException;
+    public DepositResult ingest(Context context, Deposit deposit, DSpaceObject dso, VerboseDescription verboseDescription, DepositResult result)
+            throws DSpaceSwordException, SwordError, SwordAuthException, SwordServerException
+    {
+        if (dso instanceof Collection)
+        {
+            return this.ingestToCollection(context, deposit, (Collection) dso, verboseDescription, result);
+        }
+        else if (dso instanceof Item)
+        {
+            return this.ingestToItem(context, deposit, (Item) dso, verboseDescription, result);
+        }
+        return null;
+    }
+
+    public abstract DepositResult ingestToCollection(Context context, Deposit deposit, Collection collection, VerboseDescription verboseDescription, DepositResult result)
+    			throws DSpaceSwordException, SwordError, SwordAuthException, SwordServerException;
+
+    public abstract DepositResult ingestToItem(Context context, Deposit deposit, Item item, VerboseDescription verboseDescription, DepositResult result)
+    			throws DSpaceSwordException, SwordError, SwordAuthException, SwordServerException;
 
 	protected BitstreamFormat getFormat(Context context, String fileName)
 			throws SQLException
@@ -124,15 +145,16 @@ public abstract class AbstractSwordContentIngester implements SwordContentIngest
 	}
 
 	/**
-	 * Utility method to turn given metadata fields of the form
+	 * utility method to turn given metadata fields of the form
 	 * schema.element.qualifier into DCValue objects which can be
 	 * used to access metadata in items.
 	 *
 	 * The def parameter should be null, * or "" depending on how
-	 * you intend to use the DCValue object.
+	 * you intend to use the DCValue object
 	 *
 	 * @param config
 	 * @param def
+	 * @return
 	 */
 	protected DCValue configToDC(String config, String def)
 	{

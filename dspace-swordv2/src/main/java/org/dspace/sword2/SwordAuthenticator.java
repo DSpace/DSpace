@@ -86,11 +86,12 @@ public class SwordAuthenticator
 	}
 
 	/**
-	 * Authenticate the given service document request.  This extracts the
-	 * appropriate information from the request and forwards to the
-	 * appropriate authentication method.
+	 * Authenticate the given service document request.  This extracts the appropriate
+	 * information from the request and forwards to the appropriate authentication
+	 * method
 	 *
 	 * @param auth
+	 * @return
 	 * @throws DSpaceSwordException
 	 * @throws SwordError
 	 * @throws SwordAuthException
@@ -138,115 +139,6 @@ public class SwordAuthenticator
         }
 		return sc; 
 	}
-
-	/**
-	 * Authenticate the given atom document request.  This extracts the appropriate information
-	 * from the request, and forwards to the appropriate authentication method
-	 *
-	 * @param request
-	 * @return
-	 * @throws SWORDException
-	 * @throws SWORDErrorException
-	 * @throws SWORDAuthenticationException
-	 */
-//	public SwordContext authenticate(AtomDocumentRequest request)
-//			throws SWORDException, SWORDErrorException, SWORDAuthenticationException
-//	{
-//		Context context = this.constructContext(request.getIPAddress());
-//		SwordContext sc = null;
-//		try
-//        {
-//            sc = this.authenticate(context, request);
-//        }
-//        catch (SWORDException e)
-//        {
-//            if (context != null && context.isValid())
-//            {
-//                context.abort();
-//            }
-//            throw e;
-//        }
-//        catch (SWORDErrorException e)
-//        {
-//            if (context != null && context.isValid())
-//            {
-//                context.abort();
-//            }
-//            throw e;
-//        }
-//        catch (SWORDAuthenticationException e)
-//        {
-//            if (context != null && context.isValid())
-//            {
-//                context.abort();
-//            }
-//            throw e;
-//        }
-//        catch (RuntimeException e)
-//        {
-//            if (context != null && context.isValid())
-//            {
-//                context.abort();
-//            }
-//            throw e;
-//        }
-//        return sc;
-//    }
-
-
-	/**
-	 * Authenticate the deposit request.
-	 *
-	 * @param deposit
-	 * @return
-	 * @throws SWORDException
-	 * @throws SWORDErrorException
-	 * @throws SWORDAuthenticationException
-	 */
-//	public SwordContext authenticate(Deposit deposit)
-//			throws SWORDException, SWORDErrorException, SWORDAuthenticationException
-//	{
-//		Context context = this.constructContext(deposit.getIPAddress());
-//		SwordContext sc = null;
-//		try
-//		{
-//		    sc = this.authenticate(context, deposit);
-//		}
-//        catch (SWORDException e)
-//        {
-//            if (context != null && context.isValid())
-//            {
-//                context.abort();
-//            }
-//            throw e;
-//        }
-//        catch (SWORDErrorException e)
-//        {
-//            if (context != null && context.isValid())
-//            {
-//                context.abort();
-//            }
-//            throw e;
-//        }
-//        catch (SWORDAuthenticationException e)
-//        {
-//            if (context != null && context.isValid())
-//            {
-//                context.abort();
-//            }
-//            throw e;
-//        }
-//        catch (RuntimeException e)
-//        {
-//            if (context != null && context.isValid())
-//            {
-//                context.abort();
-//            }
-//            throw e;
-//        }
-//        return sc;
-//	}
-
 
 	/**
 	 * Authenticate the given username/password pair, in conjunction with
@@ -355,7 +247,7 @@ public class SwordAuthenticator
 				if (ep != null)
 				{
 					log.info(LogManager.getHeader(context, "sword_unable_to_set_user", "username=" + un));
-					throw new SwordAuthException("Unable to authenticate the supplied used");
+					throw new SwordAuthException("Unable to authenticate with the supplied credentials");
 				}
 				else
 				{
@@ -469,6 +361,7 @@ public class SwordAuthenticator
 	 * or one of its sub groups?
 	 *
 	 * @param group
+	 * @return
 	 */
 	public boolean isUserInGroup(SwordContext swordContext, Group group)
 	{
@@ -482,9 +375,10 @@ public class SwordAuthenticator
 
 	/**
 	 * Is the onBehalfOf user a member of the given group or
-	 * one of its sub groups?
+	 * one of its sub groups
 	 *
 	 * @param group
+	 * @return
 	 */
 	public boolean isOnBehalfOfInGroup(SwordContext swordContext, Group group)
 	{
@@ -917,7 +811,7 @@ public class SwordAuthenticator
 
 	/**
 	 * Can the current SWORD Context permit deposit into the given
-	 * collection in the given DSpace Context?
+	 * collection in the given DSpace Context
 	 *
 	 * IF: the authenticated user is an administrator
 	 *   AND:
@@ -932,6 +826,7 @@ public class SwordAuthenticator
 	 *
 	 * @param swordContext
 	 * @param collection
+	 * @return
 	 * @throws DSpaceSwordException
 	 */
 	public boolean canSubmitTo(SwordContext swordContext, org.dspace.content.Collection collection)
@@ -984,6 +879,105 @@ public class SwordAuthenticator
 		}
 	}
 
+    public boolean canSubmitTo(SwordContext swordContext, Item item)
+            throws DSpaceSwordException
+    {
+        // a context can submit to an item if the following are satisfied
+        //
+        // 1/ the primary authenticating user is authenticated (which is implicit
+        //      in there being a context in the first place)
+        // 2/ If an On-Behalf-Of request, the On-Behalf-Of user is authorised to
+        //      carry out the action and the authenticating user is in the list
+        //      of allowed mediaters
+        // 3/ If not an On-Behalf-Of request, the authenticating user is authorised
+        //      to carry out the action
+
+        try
+        {
+            boolean isObo = swordContext.getOnBehalfOf() != null;
+            Context allowContext = null;
+            if (isObo)
+            {
+                // we need to find out if the authenticated user is permitted to mediate
+                if (!this.allowedToMediate(swordContext.getAuthenticatorContext()))
+                {
+                    return false;
+                }
+                allowContext = swordContext.getOnBehalfOfContext();
+            }
+            else
+            {
+                allowContext = swordContext.getAuthenticatorContext();
+            }
+
+            // we now need to check whether the selected context that we are authorising
+            // has the appropriate permissions
+            boolean write = AuthorizeManager.authorizeActionBoolean(allowContext, item, Constants.WRITE);
+
+            Bundle[] bundles = item.getBundles("ORIGINAL");
+            boolean add = false;
+            if (bundles.length == 0)
+            {
+                add = AuthorizeManager.authorizeActionBoolean(allowContext, item, Constants.ADD);
+            }
+            else
+            {
+                for (int i = 0; i < bundles.length; i++)
+                {
+                    add = AuthorizeManager.authorizeActionBoolean(allowContext, bundles[i], Constants.ADD);
+                    if (!add)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            boolean allowed = write && add;
+            return allowed;
+        }
+        catch (SQLException e)
+        {
+            log.error("Caught exception: ", e);
+            throw new DSpaceSwordException(e);
+        }
+    }
+
+    private boolean allowedToMediate(Context context)
+    {
+        // get the configuration
+        String mediatorCfg = ConfigurationManager.getProperty("swordv2-server", "on-behalf-of.update.mediators");
+        if (mediatorCfg == null)
+        {
+            // if there's no explicit list of mediators, then anyone can mediate
+            return true;
+        }
+
+        // get the email and netid of the mediator
+        EPerson eperson = context.getCurrentUser();
+        if (eperson == null)
+        {
+            return false;
+        }
+        String email = eperson.getEmail();
+        String netid = eperson.getNetid();
+
+        String[] mediators = mediatorCfg.split(",");
+        for (String mediator : mediators)
+        {
+            String m = mediator.trim();
+            if (email != null && m.equals(email.trim()))
+            {
+                return true;
+            }
+            if (netid != null && m.equals(netid.trim()))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 	/**
 	 * Does the given context have the authority to submit to the given item.
 	 *
@@ -1004,6 +998,7 @@ public class SwordAuthenticator
 	 * @return	the array of allowed collections
 	 * @throws DSpaceSwordException
 	 */
+    /*
 	public boolean canSubmitTo(SwordContext swordContext, Item item)
 			throws DSpaceSwordException
 	{
@@ -1094,15 +1089,17 @@ public class SwordAuthenticator
 			throw new DSpaceSwordException(e);
 		}
 	}
+	*/
 
 	/**
-	 * Can the given context submit to the specified DSpace object?
+	 * Can the given context submit to the specified dspace object.
 	 *
-	 * This forwards to the individual methods for different object types;
-	 * see their documentation for details of the conditions.
+	 * This forwards to the individual methods for different object types; see
+	 * their documentation for details of the conditions.
 	 *
 	 * @param context
 	 * @param dso
+	 * @return
 	 * @throws DSpaceSwordException
 	 */
 	public boolean canSubmitTo(SwordContext context, DSpaceObject dso)
