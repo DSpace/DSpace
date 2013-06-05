@@ -32,6 +32,8 @@ my $dspace_dir = realpath(dirname(abs_path($0)).'/..');
 my $assetstore_dir = GetConfigParameter( "assetstore.dir" );
 my $search_dir     = GetConfigParameter( "search.dir"     );
 my $logs_dir       = GetConfigParameter( "log.dir"        );
+my $db_name        = GetConfigParameter( "db.url"         );
+$db_name           =~ s/.*\///;
 
 # directories in this array are to be checked for ownership by
 # the dspace user
@@ -407,7 +409,7 @@ sub ExecuteSQL
     my $arg = shift;
 
     # do the SQL statement
-    open SQLOUT, "psql -d dspace -A -c '$arg' | ";
+    open SQLOUT, "psql -d $db_name -A -c '$arg' | ";
 
     # slurp up the results
     my @results = <SQLOUT>;
