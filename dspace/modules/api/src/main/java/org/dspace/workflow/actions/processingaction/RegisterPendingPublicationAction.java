@@ -20,8 +20,9 @@ import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowManager;
 
 /**
- * This action registers items that are in publication blackout.  It only applies to items in "Pending Publication Step"
- * This action must be executed after the item is in pendingPublicationStep.
+ * This action registers items that are in publication blackout.  
+ * It only applies to items in "registerPendingPublicationStep",
+ * and on success, items will be placed in "pendingpublicationStep"
  */
 public class RegisterPendingPublicationAction extends ProcessingAction{
 
