@@ -1842,17 +1842,15 @@ public class Item extends DSpaceObject
 
     private int getMetadataSchemaID(DCValue dcv) throws SQLException
     {
-        int schemaID;
         MetadataSchema schema = MetadataSchema.find(ourContext,dcv.schema);
         if (schema == null)
         {
-            schemaID = MetadataSchema.DC_SCHEMA_ID;
+            schema = MetadataSchema.findByNamespace(ourContext,dcv.schema);
+            if (schema == null) {
+                throw new RuntimeException("Metadata Schema does not exist: " + dcv.schema);
+            }
         }
-        else
-        {
-            schemaID = schema.getSchemaID();
-        }
-        return schemaID;
+        return schema.getSchemaID();
     }
 
     /**
