@@ -59,6 +59,11 @@ NameVirtualHost *:80
     Allow from 163.10.34 192.168 127.0
   </Location>
 
+  #Se restringe el acceso a /feedback para evitar la generación de exceptions masivas
+  <Location /feedback>
+    Order Deny,Allow
+    Deny from all
+  </Location>
 
   #Se comprime todos los contenidos textuales
   <IfModule mod_deflate.c>
