@@ -1246,7 +1246,7 @@ div.simple-item-view-description h3{
 }
 
 .file-metadata {
-    width: 300px;
+    width: 400px;
 }
 
 .file-metadata span,
@@ -1260,7 +1260,7 @@ div.simple-item-view-description h3{
 
 .file-metadata span.bold,
 .item-metadata span.bold {
-    width: 80px;
+    width: 130px;
     clear: left;
     text-align: right;
     margin-right: 7px;

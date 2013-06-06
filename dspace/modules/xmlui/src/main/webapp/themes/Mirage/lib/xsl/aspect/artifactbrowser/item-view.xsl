@@ -465,6 +465,17 @@
                         </span>
                     </div>
                 </xsl:if>
+                <div>
+                    <span class="bold">
+                        <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-checksum</i18n:text>
+                        <xsl:text> (</xsl:text>
+                        <xsl:value-of select="@CHECKSUMTYPE"/>
+                        <xsl:text>):</xsl:text>
+                    </span>
+                    <span>
+                        <xsl:value-of select="@CHECKSUM"/>
+                    </span>
+                </div>
             </div>
             <div class="file-link" style="height: {$thumbnail.maxheight}px;">
                 <a>
