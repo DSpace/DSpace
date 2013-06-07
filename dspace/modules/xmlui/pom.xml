@@ -123,6 +123,43 @@
             </dependency>
          </dependencies>
       </profile>
+
+        <profile>
+            <id>monitoring</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <repositories>
+                <repository>
+                    <id>atmire.com-releases</id>
+                    <name>atmire.com-releases</name>
+                    <url>https://atmire.com/artifactory/atmire.com-releases</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <checksumPolicy>fail</checksumPolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                        <checksumPolicy>fail</checksumPolicy>
+                    </snapshots>
+                </repository>
+            </repositories>
+            <dependencies>
+                <dependency>
+                    <groupId>com.atmire</groupId>
+                    <artifactId>atmire-responselogging-api</artifactId>
+                    <version>1.10.0</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.atmire</groupId>
+                    <artifactId>atmire-responselogging-xmlui</artifactId>
+                    <version>1.10.0</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
    </profiles>
 
    <dependencies>
