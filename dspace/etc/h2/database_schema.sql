@@ -807,8 +807,9 @@ CREATE TABLE versionitem
 CREATE SEQUENCE versionitem_seq;
 CREATE SEQUENCE versionhistory_seq;
 
-
-
-
-
-
+CREATE TABLE Webapp
+(
+    AppName VARCHAR(32) NOT NULL PRIMARY KEY,
+    URL VARCHAR NOT NULL,
+    Started TIMESTAMP
+);

@@ -12,14 +12,14 @@
 
 <web-app>
 
-	<display-name>DSpace SWORD 2.0 Server</display-name>
+    <display-name>DSpace SWORD 2.0 Server</display-name>
 
-	<context-param>
-		<param-name>dspace-config</param-name>
-		<param-value>${dspace.dir}/config/dspace.cfg</param-value>
-		<description>
-			The location of the main DSpace configuration file
-		</description>
+    <context-param>
+        <param-name>dspace-config</param-name>
+        <param-value>${dspace.dir}/config/dspace.cfg</param-value>
+        <description>
+            The location of the main DSpace configuration file
+        </description>
     </context-param>
 
     <!-- new ConfigurationService initialization for dspace.dir -->
@@ -29,6 +29,12 @@
         </description>
         <param-name>dspace.dir</param-name>
         <param-value>${dspace.dir}</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Name of the application</description>
+        <param-name>dspace.app.name</param-name>
+        <param-value>SWORDv2</param-value>
     </context-param>
 
 	<!-- Configuration Information -->

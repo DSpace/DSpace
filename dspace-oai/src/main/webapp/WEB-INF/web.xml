@@ -29,7 +29,13 @@
 		<param-name>dspace.dir</param-name>
 		<param-value>${dspace.dir}</param-value>
 	</context-param>
-	
+
+        <context-param>
+            <description>Name of the application</description>
+            <param-name>dspace.app.name</param-name>
+            <param-value>OAI</param-value>
+        </context-param>
+
 	<listener>
 		<listener-class>
 			org.dspace.app.util.DSpaceContextListener

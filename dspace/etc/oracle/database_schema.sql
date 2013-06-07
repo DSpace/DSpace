@@ -751,3 +751,10 @@ CREATE TABLE versionitem
   version_summary VARCHAR2(255),
   versionhistory_id INTEGER REFERENCES VersionHistory(versionhistory_id)
 );
+
+CREATE TABLE Webapp
+(
+    AppName VARCHAR(32) NOT NULL PRIMARY KEY,
+    URL VARCHAR NOT NULL,
+    Started TIMESTAMP
+);

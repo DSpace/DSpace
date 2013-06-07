@@ -798,9 +798,9 @@ CREATE TABLE versionitem
   versionhistory_id INTEGER REFERENCES VersionHistory(versionhistory_id)
 );
 
-
-
-
-
-
-
+CREATE TABLE Webapp
+(
+    AppName VARCHAR(32) NOT NULL PRIMARY KEY,
+    URL VARCHAR NOT NULL,
+    Started TIMESTAMP
+);

@@ -54,7 +54,13 @@
     <param-name>contextConfigLocation</param-name>
     <param-value>/WEB-INF/spring/*.xml</param-value>
   </context-param>
-  
+
+    <context-param>
+        <description>Name of the application</description>
+        <param-name>dspace.app.name</param-name>
+        <param-value>XMLUI</param-value>
+    </context-param>
+
   <!--
     - Use the Cocoon debug filter together with the Cocoon demo webapp
   <filter-mapping>
