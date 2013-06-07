@@ -55,20 +55,20 @@
 		<div id="home_slideshow" class="html_content">
 			<div class="html_slide">
 				<div id="slide_recursos" class="html_slide_item">
-					<h2>Recursos para su investigación</h2>
-					<p>Acceda a mas de 25.000 recursos científicos y académicos producidos dentro de la UNLP</p>
+					<h2><i18n:text>sedici.home.slide_resources.title</i18n:text></h2>
+					<p><i18n:text>sedici.home.slide_resources.info</i18n:text></p>
 				</div>
 				<div id="slide_visibilidad" class="html_slide_item">
-					<h2>Visibilidad de sus obras</h2>
-					<p>Al publicar sus trabajos en SEDICI aumentará la visibilidad e imapcto de sus obras</p>
+					<h2><i18n:text>sedici.home.slide_work_visibility.title</i18n:text></h2>
+					<p><i18n:text>sedici.home.slide_work_visibility.info</i18n:text></p>
 				</div>
 				<div id="slide_preservacion" class="html_slide_item">
-					<h2>Preservación digital</h2>
-					<p>Asegure el acceso a su obra en el largo plazo, aún frente a los cambios tecnológicos</p>
+					<h2><i18n:text>sedici.home.slide_digital_preservation.title</i18n:text></h2>
+					<p><i18n:text>sedici.home.slide_digital_preservation.info</i18n:text></p>
 				</div>
 				<div id="slide_contacto" class="html_slide_item">
-					<h2>Contacto con pares</h2>
-					<p>Contáctese con investigadores que se encuentren trabajando en áreas relacionadas a la suya</p>
+					<h2><i18n:text>sedici.home.slide_pairs_contact.title</i18n:text></h2>
+					<p><i18n:text>sedici.home.slide_pairs_contact.info</i18n:text></p>
 				</div>
 			</div>
 		</div>
