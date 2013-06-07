@@ -2555,9 +2555,6 @@ clear:both;
 
 */
 
-#aspect_artifactbrowser_CommunityBrowser_div_comunity-browser {
-height:50px;
-}
 #aspect_artifactbrowser_CommunityViewer_div_community-browse h2.ds-head{
 display:inline;	
 }
@@ -3765,6 +3762,10 @@ background-position:top left;
 }
 
 .view_more {}
+
+#accordion h3 span.topCommunity{
+	margin-left: 30px;
+}
 
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
 body{ background-color:white;}

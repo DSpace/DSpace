@@ -36,8 +36,8 @@
 
     <xsl:import href="../Mirage/Mirage.xsl"/>
     <xsl:import href="lib/xsl/core/constant.xsl"/>
+	<xsl:import href="lib/xsl/aspect/artifactbrowser/community-hierarchical-list.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/collection-list.xsl"/>
-    <xsl:import href="lib/xsl/aspect/artifactbrowser/community-list-page.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/item-view.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/collection-view-append.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/community-view-append.xsl"/>
