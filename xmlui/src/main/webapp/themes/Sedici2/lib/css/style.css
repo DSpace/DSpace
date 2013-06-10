@@ -1993,7 +1993,6 @@ background-repeat:no-repeat;
 background-position:left bottom;
 padding:0 0 0 30px;
 margin-left:10px;
-	
 }
 
 #ds-user-box span {
@@ -2100,7 +2099,7 @@ background-color:#00FF33;
 }
 
 .ds-textarea-field {
-	height: 80px;
+	height: 155px;
 	width: 100%;
 }
 
@@ -2440,9 +2439,7 @@ h1.ds-div-head {
 }
 
 #aspect_artifactbrowser_CommunityViewer_list_community-browse a,
-#aspect_artifactbrowser_CollectionViewer_list_collection-browse a
-
-{
+#aspect_artifactbrowser_CollectionViewer_list_collection-browse a {
 display:inline;
 text-decoration:none;
 color:black;
@@ -2464,27 +2461,25 @@ left:3px;
 width:620px;
 }
 
-#aspect_artifactbrowser_CommunityViewer_list_community-browse,
-#aspect_artifactbrowser_CollectionViewer_div_collection-search-browse 
-#aspect_artifactbrowser_CollectionViewer_list_collection-browse{
-background-color:white;
-position:relative;
-left:110px;
-/*
-height:50px;
-background-image:url(../../images/fondo_bandita3.png);
-background-repeat:no-repeat;
-background-position:80px 0px;*/
-padding:3px 0px;
-/*position:relative;
-top:-2px;
-left:80px;*/
-margin: 0auto;
-border-top:1px dashed #dedede;
-width:380px;
-right:40px;
-/*left:100px;*/
+#aspect_artifactbrowser_CommunityViewer_div_community-search-browse,
+#aspect_artifactbrowser_CollectionViewer_div_collection-search-browse {
+	position: relative;
+	left: 155px;
+	margin: 0px;
+	padding:3px 0px;
+	border-top:1px dashed #dedede;
+	color:#3886AA;
+}
 
+#aspect_artifactbrowser_CommunityViewer_div_community-search-browse *,
+#aspect_artifactbrowser_CollectionViewer_div_collection-search-browse * {
+	margin: 0px;
+}
+#aspect_artifactbrowser_CommunityViewer_div_community-search-browse h2,
+#aspect_artifactbrowser_CollectionViewer_div_collection-search-browse h2 {
+	display: inline;
+	float: left;
+	margin: 0px;
 }
 
 #aspect_artifactbrowser_CommunityViewer_list_community-browse li,
@@ -2494,7 +2489,6 @@ right:40px;
 display:inline;
 margin-left:5px;
 position:relative;
-/*left: -80px;*/
 }
 
 #aspect_artifactbrowser_CommunityViewer_list_community-browse a:hover,
@@ -2506,10 +2500,6 @@ color:#0c3e4d;
 /*background-color:#0a8eb7;*/
 
 }
-#aspect_artifactbrowser_CommunityViewer_div_community-browse h2{
-color:#3886AA;
-}
-
 
 .artifact-description-community {
 width:300px;
@@ -2555,9 +2545,6 @@ clear:both;
 
 */
 
-#aspect_artifactbrowser_CommunityViewer_div_community-browse h2.ds-head{
-display:inline;	
-}
 h2.ds-head {
 display:none;
 }
@@ -3637,6 +3624,7 @@ margin-bottom:10px;
 #aspect_submission_StepTransformer_field_sedici_title_subtitle,
 #aspect_submission_StepTransformer_field_dc_title_alternative {
 	width: 500px;
+	height:80px;
 }
 
 img.ds-authority-confidence {
@@ -3747,14 +3735,13 @@ body{ background-color:white;
 min-width:1161px;}
 
 .page_autoarchivo {
-width:100%;
 padding:0px 0px 8px 58px;
 background-image:url(../../images/icono_page_autoarchivo.png);
 background-repeat:no-repeat;
 background-position:top left;
 }
+
 .page_personally {
-width:100%;
 padding:0px 0px 15px 58px;
 background-image:url(../../images/icono_page_personal.png);
 background-repeat:no-repeat;
