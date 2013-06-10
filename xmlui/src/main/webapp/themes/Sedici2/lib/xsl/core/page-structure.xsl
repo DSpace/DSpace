@@ -743,7 +743,6 @@ placeholders for header images -->
 		<script type="text/javascript">
 				 $(function() {
 						$("#accordion").accordion({ autoHeight: false , collapsible: true});
-						console.log( $( "#accordion" ).accordion( "option", "heightStyle" ));
 					});
 		</script>
     </xsl:template>

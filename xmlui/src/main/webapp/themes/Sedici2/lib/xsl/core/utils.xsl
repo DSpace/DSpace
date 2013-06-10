@@ -255,7 +255,7 @@
 				<h1 class="ds-option-set-head"><i18n:text>xmlui.discovery.AbstractFiltersTransformer.filters.head_collection</i18n:text></h1> 
 		    </xsl:otherwise>
         </xsl:choose>
-		<div id="aspect_discovery_Navigation_list_discovery" class="ds-option-set" xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
+		<div id="aspect_discovery_Navigation_list_discovery" class="ds-option-set">
 			<ul class="ds-options-list">
 				<xsl:apply-templates select="dri:list" mode="local-list"/>
 			</ul>
