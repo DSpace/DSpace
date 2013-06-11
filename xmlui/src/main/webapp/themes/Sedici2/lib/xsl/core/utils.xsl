@@ -258,13 +258,6 @@
 		 <xsl:choose>
             <xsl:when test="contains(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'], 'discover')">
 		    	<h1 class="ds-option-set-head"><i18n:text>xmlui.discovery.AbstractFiltersTransformer.filters.head</i18n:text></h1> 
-		    	<xsl:variable name="URL_mets">
-          			<xsl:text>cocoon:/</xsl:text>
-					<xsl:text>/metadata/handle/</xsl:text>
-					<xsl:value-of select="substring-after(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='container'], 'hdl:')"/>
-					<xsl:text>/mets.xml</xsl:text>
-        		</xsl:variable>
-        			 <xsl:apply-templates select="document($URL_mets)" mode="label-collection"/>
 		    </xsl:when>
 		    <xsl:otherwise>
 				<h1 class="ds-option-set-head"><i18n:text>xmlui.discovery.AbstractFiltersTransformer.filters.head_collection</i18n:text></h1> 
@@ -277,9 +270,28 @@
 		</div>	
 	</xsl:template>
 	
-	<xsl:template match="/mets:METS" mode="label-collection">
- 	  <ul class="ds-simple-list sublist"><li class="selectedCollection"><xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title']"/></li></ul>
+	<xsl:template match="dri:div[@id='aspect.discovery.SimpleSearch.div.search']/dri:head">
+		    <xsl:if test="contains(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'], 'discover')">
+		    	<xsl:variable name="URL_mets">
+          			<xsl:text>cocoon:/</xsl:text>
+					<xsl:text>/metadata/handle/</xsl:text>
+					<xsl:value-of select="substring-after(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='container'], 'hdl:')"/>
+					<xsl:text>/mets.xml</xsl:text>
+        		</xsl:variable>
+        		<xsl:apply-templates select="document($URL_mets)" mode="label-collection"/>
+        		
+		 </xsl:if>
+		 <h1 class="ds-div-head"><i18n:text>xmlui.ArtifactBrowser.SimpleSearch.head</i18n:text></h1> 
+		
 	</xsl:template>
+	
+	
+	
+    <xsl:template match="/mets:METS" mode="label-collection">
+ 	  <h1 class="selectedCollection"><xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title']"/></h1>
+	</xsl:template>
+	
+
 	
 	
 	<xsl:template match="dri:list" mode="local-list">
