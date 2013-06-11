@@ -405,7 +405,20 @@ left:-5px;
 margin-bottom:5px;
 
 }
+.selectedCollection{
+color:black;
+line-height:1.5;
+background-color: #d1eaf7;
+background-repeat:no-repeat;
+padding:4px 25px 5px 8px;
+border-radius:5px;
+background-position: right;
+margin-top:3px;
+position:relative;
+left:-5px;
+margin-bottom:5px;
 
+}
  
 #aspect_discovery_Navigation_list_discovery ul.sublist li a {
 text-decoration:line-through;
@@ -2482,6 +2495,7 @@ width:620px;
 	margin: 0px;
 }
 
+
 #aspect_artifactbrowser_CommunityViewer_list_community-browse li,
 #aspect_artifactbrowser_CollectionViewer_div_collection-search-browse li,
 #aspect_artifactbrowser_CollectionViewer_list_collection-browse li
@@ -2500,6 +2514,7 @@ color:#0c3e4d;
 /*background-color:#0a8eb7;*/
 
 }
+
 
 .artifact-description-community {
 width:300px;

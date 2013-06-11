@@ -258,18 +258,17 @@
 		 <xsl:choose>
             <xsl:when test="contains(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'], 'discover')">
 		    	<h1 class="ds-option-set-head"><i18n:text>xmlui.discovery.AbstractFiltersTransformer.filters.head</i18n:text></h1> 
-		    </xsl:when>
-		    <xsl:otherwise>
-				<h1 class="ds-option-set-head"><i18n:text>xmlui.discovery.AbstractFiltersTransformer.filters.head_collection</i18n:text></h1> 
-				<xsl:variable name="URL_mets">
+		    	<xsl:variable name="URL_mets">
           			<xsl:text>cocoon:/</xsl:text>
 					<xsl:text>/metadata/handle/</xsl:text>
 					<xsl:value-of select="substring-after(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='container'], 'hdl:')"/>
 					<xsl:text>/mets.xml</xsl:text>
         		</xsl:variable>
         			 <xsl:apply-templates select="document($URL_mets)" mode="label-collection"/>
-        		
-		    </xsl:otherwise>
+		    </xsl:when>
+		    <xsl:otherwise>
+				<h1 class="ds-option-set-head"><i18n:text>xmlui.discovery.AbstractFiltersTransformer.filters.head_collection</i18n:text></h1> 
+			</xsl:otherwise>
         </xsl:choose>
 		<div id="aspect_discovery_Navigation_list_discovery" class="ds-option-set">
 			<ul class="ds-options-list">
@@ -279,8 +278,9 @@
 	</xsl:template>
 	
 	<xsl:template match="/mets:METS" mode="label-collection">
- 	  <ul><li><h2 class="ds-sublist"><xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title']"/></h2></li></ul>
+ 	  <ul class="ds-simple-list sublist"><li class="selectedCollection"><xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title']"/></li></ul>
 	</xsl:template>
+	
 	
 	<xsl:template match="dri:list" mode="local-list">
 		<li><xsl:apply-templates select="." mode="nested"/></li>
