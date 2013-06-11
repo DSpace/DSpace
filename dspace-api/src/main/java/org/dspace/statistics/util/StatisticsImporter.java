@@ -29,7 +29,9 @@ import com.maxmind.geoip.LookupService;
 import com.maxmind.geoip.Location;
 
 /**
- * Class to load intermediate statistics files into solr
+ * Class to load intermediate statistics files (produced from log files by <code>ClassicDSpaceLogConverter</code>) into Solr
+ *
+ * @see ClassicDSpaceLogConverter
  *
  * @author Stuart Lewis
  */

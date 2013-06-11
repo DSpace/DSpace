@@ -27,6 +27,9 @@ import java.text.ParsePosition;
  * by log4j) files into an intermediate format for ingestion into
  * the new solr stats.
  *
+ * @see StatisticsImporter
+ * @see StatisticsImporterElasticSearch
+ *
  * @author Stuart Lewis
  */
 public class ClassicDSpaceLogConverter {
