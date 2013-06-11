@@ -28,6 +28,7 @@
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
 	xmlns:exslt="http://exslt.org/common"
 	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ex="ar.edu.unlp.sedici.xmlui.xsl.XslExtensions"
 	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc exslt">
 
     <xsl:output indent="yes"/>
