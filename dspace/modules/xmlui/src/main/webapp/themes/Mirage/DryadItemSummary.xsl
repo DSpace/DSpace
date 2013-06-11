@@ -1899,7 +1899,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/mpe.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/MPENEW.gif"
                          alt="Molecular Phylogenetics and Evolution cover"/>
                 </a>
             </xsl:when>
