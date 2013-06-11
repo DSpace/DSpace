@@ -28,7 +28,7 @@
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
 	xmlns:exslt="http://exslt.org/common"
 	xmlns="http://www.w3.org/1999/xhtml"
-	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
+	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc exslt">
 
     <xsl:output indent="yes"/>
 
@@ -271,7 +271,11 @@
 	</xsl:template>
 	
 	<xsl:template match="dri:div[@id='aspect.discovery.SimpleSearch.div.search']/dri:head">
-		    <xsl:if test="contains(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'], 'discover')">
+		 <xsl:variable name="matchesCondition">
+         	<xsl:value-of select="ex:matches(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'], 'handle/.*/.*')"/>
+	     </xsl:variable>
+		 
+		 <xsl:if test="$matchesCondition">
 		    	<xsl:variable name="URL_mets">
           			<xsl:text>cocoon:/</xsl:text>
 					<xsl:text>/metadata/handle/</xsl:text>
@@ -281,8 +285,15 @@
         		<xsl:apply-templates select="document($URL_mets)" mode="label-collection"/>
         		
 		 </xsl:if>
-		 <h1 class="ds-div-head"><i18n:text>xmlui.ArtifactBrowser.SimpleSearch.head</i18n:text></h1> 
-		
+		 <h1>
+		 	<xsl:attribute name="class">
+		       <xsl:if test="not($matchesCondition)">
+		  				<xsl:text>main-title </xsl:text>
+		 		</xsl:if>	
+		 		<xsl:text>ds-div-head</xsl:text>
+		 	</xsl:attribute>
+		 	<i18n:text>xmlui.ArtifactBrowser.SimpleSearch.head</i18n:text>
+		 </h1> 
 	</xsl:template>
 	
 	
