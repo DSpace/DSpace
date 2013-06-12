@@ -137,12 +137,11 @@ public class DSpaceContextListener implements ServletContextListener
                 appName = "DSpace";
             }
 
-            String baseUrl = ConfigurationManager.getProperty("dspace.baseUrl");
-            if (null == baseUrl)
+            String url = ConfigurationManager.getProperty("dspace.url");
+            if (null == url)
             {
-                throw new IllegalStateException("dspace.baseUrl is undefined");
+                throw new IllegalStateException("dspace.url is undefined");
             }
-            String url = baseUrl + '/' + event.getServletContext().getContextPath();
 
             Timestamp now = new Timestamp(new Date().getTime());
             Context context = new Context();
