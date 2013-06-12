@@ -198,6 +198,9 @@
 	</xsl:template>
 	
 	<xsl:template match="dri:list[@id='aspect.artifactbrowser.CommunityViewer.list.community-browse' or @id='aspect.artifactbrowser.CollectionViewer.list.collection-browse']" >
+		<xsl:variable name="defaultDiscoveryQuery">
+			<xsl:text>?sort_by=dc.date.accessioned_dt&amp;order=DESC</xsl:text>
+		</xsl:variable>
 		<xsl:variable name="URL">
           	<xsl:value-of select="$context-path"/>
 			<xsl:text>/</xsl:text>
@@ -211,6 +214,7 @@
 			 		<xsl:attribute name="href">
 			 			<xsl:value-of select="$URL"/>
 						<xsl:text>/discover</xsl:text>
+						<xsl:value-of select="$defaultDiscoveryQuery"/>
 				 	</xsl:attribute>
 				 	<i18n:text>xmlui.ArtifactBrowser.CommunityViewer.all_of_dspace</i18n:text>
 				 </a>
@@ -218,9 +222,9 @@
 			<xsl:apply-templates select="dri:item" mode="community-browse"/>
 			
 		</ul>	    
-    </xsl:template>
-	
-	<xsl:template match="dri:item" mode="community-browse">
+   </xsl:template>
+   
+   <xsl:template match="dri:item" mode="community-browse">
 		<li>
 			<xsl:apply-templates/>
 		</li>
