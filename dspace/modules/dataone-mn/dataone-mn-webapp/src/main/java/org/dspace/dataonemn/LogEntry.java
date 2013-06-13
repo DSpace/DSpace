@@ -40,11 +40,12 @@ public class LogEntry{
     String dateLogged;
     long entryId;
     String nodeIdentifier;
+    boolean shouldRecord;
     
     static Logger log = Logger.getLogger(LogEntry.class.getName());
 
     public LogEntry(){
-        
+        shouldRecord = true;
     }
     
     //This doesn't seem to be picking up values...
@@ -73,10 +74,11 @@ public class LogEntry{
         if (doc.keySet().contains(NODEIDENTIFIERKEY)){
             nodeIdentifier = doc.get(NODEIDENTIFIERKEY).toString();
         }
+        shouldRecord = false;
     }
 
     public void setIdentifier(String idStr){
-        identifier= idStr;
+        identifier = idStr;
     }
     
     public void setIPAddress(String ipAddressStr){
@@ -97,6 +99,14 @@ public class LogEntry{
     
     public void setNodeIdentifier(String nodeIdStr){
         nodeIdentifier = nodeIdStr;
+    }
+
+    public void setShouldRecord(boolean record) {
+        shouldRecord = record;
+    }
+
+    public boolean getShouldRecord() {
+        return shouldRecord;
     }
     
     public SolrInputDocument getSolrInputDocument(long index) {

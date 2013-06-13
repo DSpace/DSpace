@@ -240,7 +240,11 @@ public class DataOneMN extends HttpServlet implements Constants {
 		    String objid = reqPath.substring("/object/".length());
 		    log.info("logging request for object id= " + objid + " queryString=" + request.getQueryString());
 		    le.setEvent(DataOneLogger.EVENT_READ);
-		    myRequestLogger.log(le);
+                    if(le.getShouldRecord()) {
+                        myRequestLogger.log(le);
+                    } else {
+                        log.info("Log entry marked as should not record, skipping log");
+                    }
 		}
 		else {
 		    response.sendError(HttpServletResponse.SC_NOT_FOUND,
@@ -267,7 +271,11 @@ public class DataOneMN extends HttpServlet implements Constants {
 		String objid = reqPath.substring("/replica/".length());
 		log.info("logging request for replica object id= " + objid);
 		le.setEvent(DataOneLogger.EVENT_REPLICATE);
-		myRequestLogger.log(le);
+                if(le.getShouldRecord()) {
+                    myRequestLogger.log(le);
+                } else {
+                    log.info("Log entry marked as should not record, skipping log");
+                }
 	    } else {
 		response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 	    }
@@ -567,6 +575,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 	    }
 	    
 	} catch (NotFoundException details) {
+            logent.setShouldRecord(false);
 	    log.error("Passed request returned not found", details);
 	    response.setStatus(404);
 	    String resStr = generateNotFoundResponse(id + idTimestamp, "mn.get","1020");
@@ -979,6 +988,7 @@ public class DataOneMN extends HttpServlet implements Constants {
         
         }
         catch (NotFoundException details) {
+            logent.setShouldRecord(false);
             log.error("Passed request returned not found", details);
             response.setStatus(404);
             String resStr = generateNotFoundResponse(id, "mn.getReplica","2185");
