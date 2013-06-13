@@ -8,7 +8,6 @@
 package org.dspace.app.util;
 
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.apache.log4j.Logger;
 
@@ -20,9 +19,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.sql.Driver;
 import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.Enumeration;
 
 /**
@@ -38,12 +34,8 @@ public class DSpaceContextListener implements ServletContextListener
      */
     public static final String DSPACE_CONFIG_PARAMETER = "dspace-config";
 
-    /** Name of context parameter giving this application's name. */
-    public static final String DSPACE_APP_NAME_PARAMETER = "dspace.app.name";
+    private AbstractDSpaceWebapp webApp;
 
-    /** This application's name */
-    private static String appName;
-    
     /**
      * Initialize any resources required by the application.
      * @param event
@@ -124,35 +116,22 @@ public class DSpaceContextListener implements ServletContextListener
                     "either the local servlet or global context.\n\n",e);
         }
 
-        /*
+        /**
          * Stage 3
          *
-         * Record that a DSpace web app. is running.
+         * Register that this application is running.
          */
+
         try {
-            appName = event.getServletContext().getInitParameter(DSPACE_APP_NAME_PARAMETER);
-            if (null == appName)
-            {
-                log.warn(DSPACE_APP_NAME_PARAMETER + " not defined -- using 'DSpace'");
-                appName = "DSpace";
-            }
-
-            String url = ConfigurationManager.getProperty("dspace.url");
-            if (null == url)
-            {
-                throw new IllegalStateException("dspace.url is undefined");
-            }
-
-            Timestamp now = new Timestamp(new Date().getTime());
-            Context context = new Context();
-            DatabaseManager.updateQuery(context,
-                    "DELETE FROM Webapp WHERE AppName = ?", appName);
-            DatabaseManager.updateQuery(context,
-                    "INSERT INTO Webapp (AppName, URL, Started) VALUES(?, ?, ?);",
-                    appName, url, now);
-            context.complete();
-        } catch (SQLException e) {
-            log.error("Failed to record startup in Webapp table.", e);
+            Class webappClass = Class.forName("org.dspace.utils.DSpaceWebapp");
+            webApp = (AbstractDSpaceWebapp) webappClass.newInstance();
+            webApp.register();
+        } catch (ClassNotFoundException ex) {
+            event.getServletContext().log("Can't create webapp MBean:  " + ex.getMessage());
+        } catch (InstantiationException ex) {
+            event.getServletContext().log("Can't create webapp MBean:  " + ex.getMessage());
+        } catch (IllegalAccessException ex) {
+            event.getServletContext().log("Can't create webapp MBean:  " + ex.getMessage());
         }
     }
 
@@ -164,15 +143,7 @@ public class DSpaceContextListener implements ServletContextListener
     @Override
     public void contextDestroyed(ServletContextEvent event)
     {
-        // Deregister this application
-        try {
-            Context context = new Context();
-            DatabaseManager.updateQuery(context,
-                    "DELETE FROM Webapp WHERE AppName = ?", appName);
-            context.complete();
-        } catch (SQLException e) {
-            log.error("Failed to record shutdown in Webapp table.", e);
-        }
+        webApp.deregister();
 
         try
         {
