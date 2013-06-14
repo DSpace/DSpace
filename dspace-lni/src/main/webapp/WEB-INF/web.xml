@@ -21,12 +21,6 @@
     </description>
   </context-param>
 
-  <context-param>
-      <description>Name of the application</description>
-      <param-name>dspace.app.name</param-name>
-      <param-value>LNI</param-value>
-  </context-param>
-
   <!-- 
    Listener to initialise DSpace configuration and clean up the application 
   -->
