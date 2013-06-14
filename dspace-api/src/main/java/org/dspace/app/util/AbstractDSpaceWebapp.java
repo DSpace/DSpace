@@ -8,20 +8,11 @@
 
 package org.dspace.app.util;
 
-import java.lang.management.ManagementFactory;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanRegistration;
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
-import javax.management.NotCompliantMBeanException;
-import javax.management.ObjectInstance;
-import javax.management.ObjectName;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -38,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * @author mwood
  */
 abstract public class AbstractDSpaceWebapp
-        implements DSpaceWebappMXBean, MBeanRegistration
+        implements DSpaceWebappMXBean
 {
     private static final Logger log = LoggerFactory.getLogger(AbstractDSpaceWebapp.class);
 
@@ -48,8 +39,7 @@ abstract public class AbstractDSpaceWebapp
 
     protected String url;
 
-    private ObjectInstance mbeanInstance;
-
+    /** Prevent null instantiation. */
     protected AbstractDSpaceWebapp()
     {
     }
@@ -88,19 +78,6 @@ abstract public class AbstractDSpaceWebapp
         } catch (SQLException e) {
             log.error("Failed to record startup in Webapp table.", e);
         }
-
-        // Create the MBean
-        try
-        {
-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            mbeanInstance = mbs.registerMBean(this, null);
-        } catch (InstanceAlreadyExistsException ex) {
-            log.error("Can't register webapp MBean:  {}", ex.getMessage());
-        } catch (MBeanRegistrationException ex) {
-            log.error("Can't register webapp MBean:  {}", ex.getMessage());
-        } catch (NotCompliantMBeanException ex) {
-            log.error("Can't register webapp MBean:  {}", ex.getMessage());
-        }
     }
 
     /** Record that this application is not running. */
@@ -114,19 +91,6 @@ abstract public class AbstractDSpaceWebapp
             context.complete();
         } catch (SQLException e) {
             log.error("Failed to record shutdown in Webapp table.", e);
-        }
-
-        // Tear down the WebappMBean
-        if (null != mbeanInstance)
-        {
-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            try {
-                mbs.unregisterMBean(mbeanInstance.getObjectName());
-            } catch (InstanceNotFoundException ex) {
-                log.error("Can't unregister webapp MBean:  {}", ex.getMessage());
-            } catch (MBeanRegistrationException ex) {
-                log.error("Can't unregister webapp MBean:  {}", ex.getMessage());
-            }
         }
     }
 
@@ -163,6 +127,19 @@ abstract public class AbstractDSpaceWebapp
         return apps;
     }
 
+    /** Container for retrieved database rows. */
+    static private class DSpaceWebapp
+            extends AbstractDSpaceWebapp
+    {
+        private boolean uiQ;
+
+        @Override
+        public boolean isUI()
+        {
+            return uiQ;
+        }
+    }
+
     /* DSpaceWebappMXBean methods */
 
     @Override
@@ -181,42 +158,5 @@ abstract public class AbstractDSpaceWebapp
     public String getStarted()
     {
         return started.toString();
-    }
-
-    /* MBeanRegistration methods */
-
-    @Override
-    public ObjectName preRegister(MBeanServer mbs, ObjectName on)
-            throws Exception
-    {
-        return new ObjectName(DSpaceWebappMXBean.class.getName(), "Kind", kind);
-    }
-
-    @Override
-    public void postRegister(Boolean bln)
-    {
-    }
-
-    @Override
-    public void preDeregister()
-            throws Exception
-    {
-    }
-
-    @Override
-    public void postDeregister()
-    {
-    }
-
-    static private class DSpaceWebapp
-            extends AbstractDSpaceWebapp
-    {
-        private boolean uiQ;
-
-        @Override
-        public boolean isUI()
-        {
-            return uiQ;
-        }
     }
 }
