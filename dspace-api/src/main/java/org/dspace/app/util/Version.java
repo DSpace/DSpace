@@ -49,7 +49,14 @@ public class Version
                           sys.get("os.arch"),
                           sys.get("os.version"));
 
-        // TODO UIs used
+        // UIs used
+        List<AbstractDSpaceWebapp> apps = AbstractDSpaceWebapp.getApps();
+        System.out.println("  Applications:");
+        for (AbstractDSpaceWebapp app : apps)
+        {
+            System.out.printf("                %s at %s\n",
+                    app.getKind(), app.getURL());
+        }
 
         // Is Discovery available?
         ConfigurationService config = new DSpace().getConfigurationService();
@@ -57,11 +64,13 @@ public class Version
         List<String> consumerList = Arrays.asList(consumers.split("\\s*,\\s*"));
         if (consumerList.contains("discovery"))
         {
-            System.out.println("Discovery enabled.");
+            System.out.println("     Discovery:  enabled.");
         }
+
+        // Is Lucene search enabled?
         if (consumerList.contains("search"))
         {
-            System.out.println("Lucene search enabled.");
+            System.out.println(" Lucene search:  enabled.");
         }
 
         // Java version
