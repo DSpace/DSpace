@@ -56,6 +56,7 @@
          <excludes>
             <exclude>src</exclude>
             <exclude>config/dspace.cfg</exclude>
+            <exclude>config/log4j.properties</exclude>
             <exclude>config/modules/**</exclude>
          </excludes>
       </fileSet>
@@ -69,10 +70,15 @@
       </fileSet>
    </fileSets>
 
-   <!-- Copy over the dspace.cfg & filter it -->
+   <!-- Copy over the dspace.cfg and log4j.properties files & filter them -->
    <files>
       <file>
          <source>config/dspace.cfg</source>
+         <outputDirectory>config</outputDirectory>
+         <filtered>true</filtered>
+      </file>
+      <file>
+         <source>config/log4j.properties</source>
          <outputDirectory>config</outputDirectory>
          <filtered>true</filtered>
       </file>
