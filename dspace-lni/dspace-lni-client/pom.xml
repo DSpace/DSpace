@@ -10,10 +10,15 @@
 
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>dspace-lni</artifactId>
-      <version>3.0-SNAPSHOT</version>
+      <artifactId>dspace-parent</artifactId>
+      <version>4.0-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
+   
+   <properties>
+       <!-- This is the path to the root [dspace-src] directory. -->
+       <root.basedir>${basedir}/../..</root.basedir>
+   </properties>
 
    <profiles>
       <profile>

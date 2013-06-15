@@ -14,20 +14,14 @@
 	xmlns:dc="http://purl.org/dc/doc:elements/1.1/"
 	exclude-result-prefixes="oai lyn oai_dc dc">
 
-	<xsl:output method="html" />
-
-	<xsl:template name="write-doctype">
-		<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"&gt;
-</xsl:text>
-	</xsl:template>
+	<xsl:output method="html" doctype-public="-//W3C//DTD HTML 4.01//EN" doctype-system="http://www.w3.org/TR/html4/strict.dtd" />
 
 	<xsl:template match="/">
-		<xsl:call-template name="write-doctype" />
 		<html>
 			<head>
 				<title>DSpace OAI-PMH Data Provider</title>
 				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-				<script src="http://code.jquery.com/jquery-1.7.2.min.js"
+				<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"
 					type="text/javascript"></script>
 				<style type="text/css">
 					a {
@@ -1193,7 +1187,7 @@
 							<p class="text">Stylesheet provided by</p>
 							<p class="image">
 								<a href="http://www.lyncode.com">
-									<img src="static/lyncode.png" alt="Lyncode logo" />
+									<img src="static/lyncode.png" alt="Lyncode logo" style='border:none' />
 								</a>
 							</p>
 						</div>

@@ -31,11 +31,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Created by IntelliJ IDEA.
- * User: kevinvandevelde
- * Date: 22-dec-2008
- * Time: 15:00:55
- * To change this template use File | Settings | File Templates.
+ * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class UsageLoggerAction extends AbstractAction {
 
@@ -239,7 +235,7 @@ public class UsageLoggerAction extends AbstractAction {
 
     	}
 
-    	// The named bitstream was not found and we exausted our the maximum path depth that
+    	// The named bitstream was not found and we exausted the maximum path depth that
     	// we search.
     	return null;
     }
