@@ -657,7 +657,7 @@ public class LDAPAuthentication
                     }
                 }
 
-                groupMap = ConfigurationManager.getProperty("ldap.login.groupmap." + ++i);
+                groupMap = ConfigurationManager.getProperty("authentication-ldap", "login.groupmap." + ++i);
             }
         }
     }
