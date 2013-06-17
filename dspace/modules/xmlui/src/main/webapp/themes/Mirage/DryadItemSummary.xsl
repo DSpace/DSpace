@@ -1276,6 +1276,9 @@
             </xsl:choose>
         </xsl:variable>
         <xsl:choose>
+            <xsl:when test="./mets:fileSec/mets:fileGrp[@USE='CONTENT']">
+                <xsl:call-template name="checkedAndNoEmbargo"/>
+            </xsl:when>
             <xsl:when test="$embargoedDate!=''">
                 <!-- this all might be overkill, need to confirm embargoedDate element
                         disappears after time expires -->
@@ -1319,9 +1322,6 @@
                         <xsl:call-template name="checkedAndNoEmbargo"/>
                     </xsl:otherwise>
                 </xsl:choose>
-            </xsl:when>
-            <xsl:when test="./mets:fileSec/mets:fileGrp[@USE='CONTENT']">
-                <xsl:call-template name="checkedAndNoEmbargo"/>
             </xsl:when>
         </xsl:choose>
 
