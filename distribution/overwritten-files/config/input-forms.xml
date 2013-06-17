@@ -164,7 +164,6 @@
 					<input-type>onebox</input-type>
 					<label>Creador del Audio(*)</label>
 					<hint>Seleccione el autor del audio</hint>
-					<required>Debe seleccionar un autor del audio</required>
 					<type-bind>Audio</type-bind>
 				</field>
 
