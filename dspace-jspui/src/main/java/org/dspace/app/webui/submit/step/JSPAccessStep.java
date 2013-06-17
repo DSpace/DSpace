@@ -41,7 +41,7 @@ public class JSPAccessStep extends JSPStep
     /** JSP which edits the selected resource policy to the user * */
     private static final String EDIT_POLICY_JSP = "/submit/edit-policy.jsp";
 
-    /** is AdvancedEmbargo enable? */
+    /** is AdvancedEmbargo enabled? */
     private static final boolean advanced = ConfigurationManager.getBooleanProperty("xmlui.submission.restrictstep.enableAdvancedForm", false);
     
     /**

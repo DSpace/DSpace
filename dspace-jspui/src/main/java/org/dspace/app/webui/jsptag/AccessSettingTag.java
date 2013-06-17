@@ -29,7 +29,7 @@ import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
 /**
- * Tag for display embargo settins
+ * Tag to display embargo settings
  *
  * @author Keiji Suzuki
  * @version $Revision$
@@ -39,28 +39,28 @@ public class AccessSettingTag extends TagSupport
 	/** log4j category */
     private static Logger log = Logger.getLogger(AccessSettingTag.class);
 
-    /** is enable advanced form? */
+    /** is advanced form enabled? */
     private static final boolean advanced = ConfigurationManager.getBooleanProperty("xmlui.submission.restrictstep.enableAdvancedForm", false);
 
-    /** Name of restricted group */
+    /** Name of the restricted group */
     private static final String restrictedGroup = ConfigurationManager.getProperty("xmlui.submission.restrictstep.groups");
 
     /** the SubmittionInfo */
     private transient SubmissionInfo subInfo = null;
 
-    /** DSpaceObject to be targeted */
+    /** the target DSpaceObject */
     private transient DSpaceObject dso = null;
 
-    /** DSpaceObject to be targeted */
+    /** the target DSpaceObject */
     private transient ResourcePolicy rp = null;
 
-    /** make disable open/embargo setting radio */
+    /** disable the radio button for open/embargo access */
     private boolean embargo = false;
 
-    /** make embargo date and reason to hidden fields */
+    /** hide the embargo date and reason fields */
     private boolean hidden = false;
 
-    /** make add policy button */
+    /** add the policy button */
     private boolean addpolicy = false;
 
 

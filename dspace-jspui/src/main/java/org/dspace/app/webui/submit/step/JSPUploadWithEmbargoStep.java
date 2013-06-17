@@ -49,7 +49,7 @@ import org.dspace.submit.step.UploadWithEmbargoStep;
  * <li>If showJSP() was specified from doPreProcessing(), then the JSP
  * specified will be displayed</li>
  * <li>If showJSP() was not specified from doPreProcessing(), then the
- * doProcessing() method is called an the step completes immediately</li>
+ * doProcessing() method is called and the step completes immediately</li>
  * <li>Call doProcessing() method on appropriate AbstractProcessingStep after the user returns from the JSP, in order
  * to process the user input</li>
  * <li>Call doPostProcessing() method to determine if more user interaction is

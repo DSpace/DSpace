@@ -28,7 +28,7 @@ import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
 /**
- * Tag for display embargo settins
+ * Tag to display embargo settings
  *
  * @author Keiji Suzuki
  * @version $Revision$
