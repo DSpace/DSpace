@@ -45,8 +45,8 @@ public class LDAPServlet extends DSpaceServlet
         HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
-        // check if ldap is enables and forward to the correct login form
-        boolean ldap_enabled = ConfigurationManager.getBooleanProperty("ldap.enable");
+        // check if ldap is enables and forward to the correct login form        
+        boolean ldap_enabled = ConfigurationManager.getBooleanProperty("authentication-ldap", "enable");
         if (ldap_enabled)
         {
             JSPManager.showJSP(request, response, "/login/ldap.jsp");

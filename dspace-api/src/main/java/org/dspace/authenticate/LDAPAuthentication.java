@@ -612,7 +612,7 @@ public class LDAPAuthentication
 
     /*
      * Add authenticated users to the group defined in dspace.cfg by
-     * the ldap.login.groupmap.* key.
+     * the authentication-ldap.login.groupmap.* key.
      */
     private void assignGroupsBasedOnLdapDn(String dn, Context context)
     {
@@ -644,7 +644,7 @@ public class LDAPAuthentication
                             // The group does not exist
                             log.warn(LogManager.getHeader(context,
                                     "ldap_assignGroupsBasedOnLdapDn",
-                                    "Group defined in ldap.login.groupmap." + i + " does not exist :: " + dspaceGroupName));
+                                    "Group defined in authentication-ldap.login.groupmap." + i + " does not exist :: " + dspaceGroupName));
                         }
                     }
                     catch (AuthorizeException ae)
@@ -657,7 +657,7 @@ public class LDAPAuthentication
                     }
                 }
 
-                groupMap = ConfigurationManager.getProperty("ldap.login.groupmap." + ++i);
+                groupMap = ConfigurationManager.getProperty("authentication-ldap", "login.groupmap." + ++i);
             }
         }
     }
