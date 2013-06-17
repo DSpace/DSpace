@@ -190,8 +190,12 @@ public class DiscoverySubmissions extends SimpleSearch {
                     lastItemIndex, currentPage, pagesTotal, pageURLMask);
         }
 
-
-        Table resultTable = workflowResultsDiv.addTable("results", solrResults.size(), 2);
+        int row=1;
+        if(solrResults.size()>0)
+        {
+           row=solrResults.size();
+        }
+        Table resultTable = workflowResultsDiv.addTable("results", row, 2);
 
         boolean showMoreUrl = false;
         if(solrResults.size() < solrResults.getNumFound()){
@@ -206,11 +210,12 @@ public class DiscoverySubmissions extends SimpleSearch {
 
         headerRow.addCell().addContent(message("xmlui.Submission.result-table.head.title"));
         headerRow.addCell().addContent(message("xmlui.Submission.result-table.head.datafiles"));
-
+                boolean showResult=false;
         for (SolrDocument doc : solrResults) {
             DSpaceObject resultDSO = SearchUtils.findDSpaceObject(context, doc);
 
             if (resultDSO instanceof Item) {
+                showResult = true;
                 Item item = (Item) resultDSO;
                 Row itemRow = resultTable.addRow();
 
@@ -271,7 +276,7 @@ public class DiscoverySubmissions extends SimpleSearch {
         }
 
 
-        if (count.getName().equalsIgnoreCase("Submission")) {
+        if (count.getName().equalsIgnoreCase("Submission")&&showResult) {
             headerRow = resultTable.addRow();
             Cell lastCell = headerRow.addCell(0,5);
             lastCell.addButton("submit_submissions_remove").setValue(T_s_submit_remove);

@@ -81,7 +81,8 @@
 	    <aspect name="AME" path="resource://aspects/AME/" />
 
         <aspect name="StaticPage" path="resource://aspects/StaticPage/"/>
-	    
+
+        <aspect name="Mailing Lists and Membership" path="resource://aspects/DryadFeedback/"/>
 	    
         <!--
             This aspect tests the various possible DRI features,
@@ -131,7 +132,7 @@
         <theme name="Dryad Lab Theme" handle="10255/dryad.7872" path="DryadLab/" />
 
         <!-- Default theme for all other pages -->
-        <theme name="Dryad Theme" regex=".*" path="Dryad/" />
+        <theme name="Dryad Theme" regex=".*" path="Mirage/" />
 
         <!-- Classic theme, inspired by the JSP UI -->
         <!-- <theme name="Classic" regex=".*" path="Classic/" /> -->

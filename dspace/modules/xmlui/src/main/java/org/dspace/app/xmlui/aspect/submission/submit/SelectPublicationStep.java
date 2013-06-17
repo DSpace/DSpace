@@ -109,7 +109,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         div.setHead(T_HEAD);
 
         List form = div.addList("submit-create-publication", List.TYPE_FORM);
-        form.setHead(T_FORM_HEAD);
+        //form.setHead(T_FORM_HEAD);
         Item content = form.addItem();
         boolean submitExisting = ConfigurationManager.getBooleanProperty("submit.dataset.existing-datasets", true);
         if(submitExisting)
@@ -435,7 +435,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
 
     private void addLicence(List form) throws WingException {
-        CheckBox licensebox = form.addItem().addCheckBox("license_accept");
+        CheckBox licensebox = form.addItem("license_accepted","license_accepted").addCheckBox("license_accept");
         licensebox.addOption(String.valueOf(Boolean.TRUE), T_PUB_LICENSE);
         if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.STATUS_LICENSE_NOT_ACCEPTED)
             licensebox.addError(T_PUB_LICENSE_ERROR);

@@ -178,8 +178,12 @@ public class WorkflowOverviewDiscovery extends SimpleSearch {
         if(count.getName().endsWith("_claimed")){
             isClaimedTask = true;
         }
+        int row=1;
+        if(solrResults.size()>0) {
+            row=solrResults.size();
+        }
 
-        Table resultTable = workflowResultsDiv.addTable("results", solrResults.size(), isClaimedTask ? 4 : 3);
+        Table resultTable = workflowResultsDiv.addTable("results", row, isClaimedTask ? 4 : 3);
 
         Row headerRow = resultTable.addRow(Row.ROLE_HEADER);
         headerRow.addCell().addContent(message("xmlui.Submission.result-table.head.title"));

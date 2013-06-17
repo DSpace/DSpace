@@ -7,6 +7,7 @@
 package org.dspace.dataonemn;
 
 import java.util.Date;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrDocument;
@@ -117,32 +118,32 @@ public class LogEntry{
         return d;
     }
     
-    public String getXml(int index){
+    public String getXml(){
         StringBuilder sb = new StringBuilder(500);
         sb.append("<logEntry>");
         sb.append("<entryId>");
         sb.append(entryId);
         sb.append("</entryId>");
         sb.append("<identifier>");
-        sb.append(identifier);
+        sb.append(StringEscapeUtils.escapeXml(identifier));
         sb.append("</identifier>");
         sb.append("<ipAddress>");
-        sb.append(ipAddress);
+        sb.append(StringEscapeUtils.escapeXml(ipAddress));
         sb.append("</ipAddress>");
         sb.append("<userAgent>");
-        sb.append(userAgent);
+        sb.append(StringEscapeUtils.escapeXml(userAgent));
         sb.append("</userAgent>");
         sb.append("<subject>");
-        sb.append(subject);
+        sb.append(StringEscapeUtils.escapeXml(subject));
         sb.append("</subject>");
         sb.append("<event>");
-        sb.append(event);
+        sb.append(StringEscapeUtils.escapeXml(event));
         sb.append("</event>");
         sb.append("<dateLogged>");
-        sb.append(dateLogged);
+        sb.append(StringEscapeUtils.escapeXml(dateLogged));
         sb.append("</dateLogged>");
         sb.append("<nodeIdentifier>");
-        sb.append(nodeIdentifier);
+        sb.append(StringEscapeUtils.escapeXml(nodeIdentifier));
         sb.append("</nodeIdentifier>");
         sb.append("</logEntry>");
         return sb.toString();

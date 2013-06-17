@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+    <map:components>
+        <map:transformers>
+            <map:transformer name="SubscribeMailingListForm" src="org.dspace.app.xmlui.aspect.dryadfeedback.SubscribeMailingListForm"/>
+            <map:transformer name="SubscribeMailingListConfirmed" src="org.dspace.app.xmlui.aspect.dryadfeedback.SubscribeMailingListConfirmed"/>
+            <map:transformer name="MembershipApplicationForm" src="org.dspace.app.xmlui.aspect.dryadfeedback.MembershipApplicationForm"/>
+            <map:transformer name="MembershipApplicationSubmitted" src="org.dspace.app.xmlui.aspect.dryadfeedback.MembershipApplicationSubmitted"/>
+            <map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.dryadinfo.Navigation"/>
+        </map:transformers>
+        <map:matchers default="wildcard"/>
+        <map:actions>
+            <map:action name="SubscribeMailingListAction" src="org.dspace.app.xmlui.aspect.dryadfeedback.SubscribeMailingListAction"/>
+            <map:action name="MembershipApplicationAction" src="org.dspace.app.xmlui.aspect.dryadfeedback.MembershipApplicationAction"/>
+        </map:actions>
+        <map:selectors/>
+    </map:components>
+
+    <map:pipelines>
+        <map:pipeline>
+            <map:generate/>
+            <map:match pattern="subscribe">
+                <map:act type="SubscribeMailingListAction">
+                    <map:transform type="Navigation"/>
+                    <map:transform type="SubscribeMailingListForm">
+                        <map:parameter name="email" value="{email}"/>
+                    </map:transform>
+                    <map:serialize type="xml"/>
+                </map:act>
+                <map:transform type="SubscribeMailingListConfirmed"/>
+                <map:serialize type="xml"/>
+            </map:match>
+            <map:match pattern="membership">
+                <map:act type="MembershipApplicationAction">
+                    <map:transform type="Navigation"/>
+                    <map:transform type="MembershipApplicationForm">
+                        <map:parameter name="org_name" value="{org_name}" />
+                        <map:parameter name="org_legalname" value="{org_legalname}" />
+                        <map:parameter name="org_type" value="{org_type}" />
+                        <map:parameter name="org_annual_revenue" value="{org_annual_revenue}" />
+                        <map:parameter name="org_annual_revenue_currency" value="{org_annual_revenue_currency}" />
+                        <map:parameter name="billing_contact_name" value="{billing_contact_name}" />
+                        <map:parameter name="billing_email" value="{billing_email}" />
+                        <map:parameter name="billing_address" value="{billing_address}" />
+                        <map:parameter name="publications" value="{publications}" />
+                        <map:parameter name="membership_year_start" value="{membership_year_start}" />
+                        <map:parameter name="membership_length" value="{membership_length}" />
+                        <map:parameter name="rep_name" value="{rep_name}" />
+                        <map:parameter name="rep_email" value="{rep_email}" />
+                        <map:parameter name="comments" value="{comments}" />
+                        <map:parameter name="submitted_once" value="{submitted_once}" />
+                        <map:parameter name="error_fields" value="{error_fields}" />
+                    </map:transform>
+                    <map:serialize type="xml"/>
+                </map:act>
+                <map:transform type="MembershipApplicationSubmitted"/>
+                <map:serialize type="xml"/>
+            </map:match>
+            <map:match pattern="feedback">
+                <map:transform type="Navigation"/>
+            </map:match>
+            <!-- Not a URL we care about, so just pass it on. -->
+            <map:serialize type="xml"/>
+        </map:pipeline>
+    </map:pipelines>
+</map:sitemap>

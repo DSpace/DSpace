@@ -197,6 +197,21 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         pageMeta.addMetadata("page","contactURL").addContent(contextPath + "/contact");
         pageMeta.addMetadata("page","feedbackURL").addContent(contextPath + "/feedback");
 
+        // Get realPort and nodeName
+        String port = ConfigurationManager.getProperty("dspace.port");
+        String nodeName = ConfigurationManager.getProperty("dryad.home");
+
+        // If we're using Apache, we may not have the real port in serverPort
+        if (port != null) {
+            pageMeta.addMetadata("request", "realServerPort").addContent(port);
+        }
+        else {
+            pageMeta.addMetadata("request", "realServerPort").addContent("80");
+        }
+        if (nodeName != null) {
+            pageMeta.addMetadata("dryad", "node").addContent(nodeName);
+        }
+
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (dso != null)
         {

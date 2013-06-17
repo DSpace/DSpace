@@ -72,7 +72,7 @@ var ERROR_FIELDS = null;
  */
 function getObjectModel()
 {
-  return FlowscriptUtils.getObjectModel(cocoon);
+    return FlowscriptUtils.getObjectModel(cocoon);
 }
 
 /**
@@ -82,7 +82,7 @@ function getObjectModel()
  */
 function getDSContext()
 {
-	return ContextUtil.obtainContext(getObjectModel());
+    return ContextUtil.obtainContext(getObjectModel());
 }
 
 
@@ -91,17 +91,17 @@ function getDSContext()
  */
 function getHttpRequest()
 {
-	//return getObjectModel().get(HttpEnvironment.HTTP_REQUEST_OBJECT)
+    //return getObjectModel().get(HttpEnvironment.HTTP_REQUEST_OBJECT)
 
-	// Cocoon's request object handles form encoding, thus if the users enters
-	// non-ascii characters such as those found in foriegn languages they will
-	// come through corruped if they are not obtained through the cocoon request
-	// object. However, since the dspace-api is built to accept only HttpServletRequest
-	// a wrapper class HttpServletRequestCocoonWrapper has bee built to translate
-	// the cocoon request back into a servlet request. This is not a fully complete
-	// translation as some methods are unimplemeted. But it is enough for our
-	// purposes here.
-	return new HttpServletRequestCocoonWrapper(getObjectModel());
+    // Cocoon's request object handles form encoding, thus if the users enters
+    // non-ascii characters such as those found in foriegn languages they will
+    // come through corruped if they are not obtained through the cocoon request
+    // object. However, since the dspace-api is built to accept only HttpServletRequest
+    // a wrapper class HttpServletRequestCocoonWrapper has bee built to translate
+    // the cocoon request back into a servlet request. This is not a fully complete
+    // translation as some methods are unimplemeted. But it is enough for our
+    // purposes here.
+    return new HttpServletRequestCocoonWrapper(getObjectModel());
 }
 
 /**
@@ -110,7 +110,7 @@ function getHttpRequest()
  */
 function getHttpResponse()
 {
-	return getObjectModel().get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+    return getObjectModel().get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 }
 
 
@@ -119,13 +119,13 @@ function getHttpResponse()
  * Start editing an individual item.
  */
 function startCreateNewVersionItem(){
-	var itemID = cocoon.request.get("itemID");
+    var itemID = cocoon.request.get("itemID");
 
-	assertEditItem(itemID);
+    assertEditItem(itemID);
 
-	doCreateNewVersion(itemID);
+    doCreateNewVersion(itemID);
 
-	var item = Item.find(getDSContext(),itemID);
+    var item = Item.find(getDSContext(),itemID);
     cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+item.getHandle(),true);
 
     getDSContext().complete();
@@ -141,7 +141,7 @@ function doCreateNewVersion(itemID){
     assertEditItem(itemID);
     do {
         sendPageAndWait("item/version/create",{"itemID":itemID, "summary":result.getParameter("summary")}, result);
-        
+
         if (cocoon.request.get("submit_cancel")){
             return null;
         }
@@ -151,9 +151,11 @@ function doCreateNewVersion(itemID){
             result = VersionManager.processCreateNewVersion(getDSContext(),itemID, summary);
 
             var wsid = result.getParameter("wsid");
-            cocoon.redirectTo(cocoon.request.getContextPath()+"/submit-overview?workspaceID=" + wsid,true);
-	        cocoon.exit();
-
+            if(wsid != null)
+            {
+                cocoon.redirectTo(cocoon.request.getContextPath()+"/submit-overview?workspaceID=" + wsid,true);
+                cocoon.exit();
+            }
         }
         else if (cocoon.request.get("submit_update_version")){
             var summary = cocoon.request.get("summary");
@@ -169,49 +171,49 @@ function doCreateNewVersion(itemID){
  * Start editing an individual item.
  */
 function startVersionHistoryItem(){
-	var itemID = cocoon.request.get("itemID");
+    var itemID = cocoon.request.get("itemID");
 
-	assertEditItem(itemID);
+    assertEditItem(itemID);
 
     var result= new FlowResult();
-	do{
-        result=doVersionHistoryItem(itemID, result);        
+    do{
+        result=doVersionHistoryItem(itemID, result);
     }while(result!=null);
 
-	var item = Item.find(getDSContext(),itemID);
+    var item = Item.find(getDSContext(),itemID);
 
-	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+item.getHandle(),true);
-	getDSContext().complete();
-	item = null;
-	cocoon.exit();
+    cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+item.getHandle(),true);
+    getDSContext().complete();
+    item = null;
+    cocoon.exit();
 }
 
 function doVersionHistoryItem(itemID, result){
     //var result;
-	do {
-		sendPageAndWait("item/versionhistory/show",{"itemID":itemID},result);
-		assertEditItem(itemID);
+    do {
+        sendPageAndWait("item/versionhistory/show",{"itemID":itemID},result);
+        assertEditItem(itemID);
         result = null;
 
         if (cocoon.request.get("submit_cancel")){
             return null;
         }
         else if (cocoon.request.get("submit_delete") && cocoon.request.get("remove")){
-			var versionIDs = cocoon.request.getParameterValues("remove");
-			result = doDeleteVersions(itemID, versionIDs);
-		}
+            var versionIDs = cocoon.request.getParameterValues("remove");
+            result = doDeleteVersions(itemID, versionIDs);
+        }
         else if (cocoon.request.get("submit_restore") && cocoon.request.get("versionID")){
-		    var versionID = cocoon.request.get("versionID");
+            var versionID = cocoon.request.get("versionID");
             itemID = cocoon.request.get("itemID");
 
-		    result = doRestoreVersion(itemID, versionID);
-		}
+            result = doRestoreVersion(itemID, versionID);
+        }
         else if (cocoon.request.get("submit_update") && cocoon.request.get("versionID")){
-		    var versionID = cocoon.request.get("versionID");
+            var versionID = cocoon.request.get("versionID");
             itemID = cocoon.request.get("itemID");
-		    result = doUpdateVersion(itemID, versionID);
-		}
-	} while (true)
+            result = doUpdateVersion(itemID, versionID);
+        }
+    } while (true)
 }
 
 /**
@@ -282,10 +284,10 @@ function doUpdateVersion(itemID, versionID){
  */
 function assertEditItem(itemID) {
 
-	if ( ! canEditItem(itemID)) {
-		sendPage("admin/not-authorized");
-		cocoon.exit();
-	}
+    if ( ! canEditItem(itemID)) {
+        sendPage("admin/not-authorized");
+        cocoon.exit();
+    }
 }
 
 /**

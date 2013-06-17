@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 
 /**
  * DataPackagesPerJournal generates a list of journals and the number of data packages associated with them. This
- * statistic can be calculated for any timeframe.
+ * statistic can be calculated for any timeframe by adjusting the static dates in this class.
  *
  * The task succeeds if it was able to calculate the correct result.
  *
@@ -43,7 +43,7 @@ import org.apache.log4j.Logger;
 public class DataPackagesPerJournal extends AbstractCurationTask {
 
     private static final String START_DATE_STRING = "2012-01-01T00:00:00Z";
-    private static final String END_DATE_STRING = "2012-07-01T00:00:00Z";
+    private static final String END_DATE_STRING = "2013-01-01T00:00:00Z";
     private static Date START_DATE = null;
     private static Date END_DATE = null;
     private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
@@ -61,6 +61,7 @@ public class DataPackagesPerJournal extends AbstractCurationTask {
 	try {
 	    START_DATE = df.parse(START_DATE_STRING);
 	    END_DATE = df.parse(END_DATE_STRING);
+	    report("Distribution of archived items, " + START_DATE_STRING + " to " + END_DATE_STRING);
 	} catch (ParseException ex) {
 	    log.fatal("Unable to parse start or end date", ex);
 	    return Curator.CURATE_FAIL;
@@ -82,9 +83,9 @@ public class DataPackagesPerJournal extends AbstractCurationTask {
 	// determine whether this item falls in our target date range
 	// TODO: change this to an external selector based on a query
 	String accDate = null;
-	DCValue[] accDates = item.getMetadata("dc.date.available");
+	DCValue[] accDates = item.getMetadata("dc.date.accessioned");
 	if (accDates.length == 0) {
-	    log.error("Object has no dc.date.available, " + item.getHandle());
+	    log.error("Object has no dc.date.accessioned, " + item.getHandle());
 	    return;
 	} else {
 	    accDate = accDates[0].value;

@@ -9,10 +9,14 @@ public class ObjectInfo extends Element implements Constants {
     private String myXMLChecksum;
     private String myChecksumAlgo;
     private long myXMLSize;
+    private String identifier;
+    private String idTimestamp;
       
-    public ObjectInfo(String aIdentifier) {
+    public ObjectInfo(String identifier, String idTimestamp) {
 	super("objectInfo"); 
-	addElement("identifier", aIdentifier);
+	addElement("identifier", identifier + idTimestamp);
+	this.identifier = identifier;
+	this.idTimestamp = idTimestamp;
     }
     
     public String getNamespace() {
@@ -43,10 +47,9 @@ public class ObjectInfo extends Element implements Constants {
 	Element[] elements = new Element[2];
 	
 	// create objects and set identifiers
-	Element thisID = getChildElements("identifier").get(0);
-	String baseID = thisID.getValue();
-	ObjectInfo metadataElem = new ObjectInfo(baseID);
-	ObjectInfo bitstreamElem = new ObjectInfo(baseID + "/bitstream");
+	// bitstreams never receive timestamps, because they are explicitly versioned
+	ObjectInfo metadataElem = new ObjectInfo(identifier, idTimestamp);
+	ObjectInfo bitstreamElem = new ObjectInfo(identifier + "/bitstream", "");
 	
 	// formats
 	Element thisFormat = getChildElements("formatId").get(0);
@@ -58,7 +61,12 @@ public class ObjectInfo extends Element implements Constants {
 	if (myXMLChecksum != null && myChecksumAlgo != null) {
 	    metadataElem.setChecksum(myChecksumAlgo, myXMLChecksum);
 	}
-	bitstreamElem.appendChild((Element)this.getChildElements("checksum").get(0).copy());
+        if(this.getChildElements("checksum").size() > 0) {
+            bitstreamElem.appendChild((Element)this.getChildElements("checksum").get(0).copy());
+        } else {
+            // checksum is required
+            bitstreamElem.setChecksum(myChecksumAlgo, "");
+        }
 	
 	// modification date
 	Element thisModDate = this.getChildElements("dateSysMetadataModified").get(0);
@@ -67,7 +75,12 @@ public class ObjectInfo extends Element implements Constants {
 	
 	// size
 	metadataElem.addElement("size", "" + myXMLSize);
-	bitstreamElem.appendChild((Element)this.getChildElements("size").get(0).copy());
+        if(this.getChildElements("size").size() > 0) {
+            bitstreamElem.appendChild((Element)this.getChildElements("size").get(0).copy());
+        } else {
+            // size is required
+            bitstreamElem.setSize(0);
+        }
 	
 	
 	// fill out our results array

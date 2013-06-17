@@ -55,7 +55,7 @@ public class EmailParserForAmNat extends EmailParser {
 	static Set<String> tagsTobeExcludedSet;
 
 	static {
-		fieldNameList = Arrays.asList("JOURNAL", "ISSN", "Journal URL",
+		fieldNameList = Arrays.asList("JOURNAL", "Journal Code", "ISSN", "Journal URL",
 				"SUBMISSION METADATA", "Manuscript Number", "Revision Number",
 				"Article Title", "Article Type", "Classification Description",
 				"All Authors", "Initial Date Submitted",
@@ -69,7 +69,7 @@ public class EmailParserForAmNat extends EmailParser {
 				"Address Line 3", "Address Line 4", "City", "State", "Zip",
 				"Country", "Secondary Phone Number", "Short Title", "ABSTRACT");
 
-		xmlTagNameList = Arrays.asList("Journal", "ISSN", "Journal_URL",
+		xmlTagNameList = Arrays.asList("Journal", "Journal_Code", "ISSN", "Journal_URL",
 				"Submission_Metadata", "Manuscript", "Revision_Number",
 				"Article_Title", "Article_Type", "Classification", "Authors",
 				"Initial_Date_Submitted", "Date_Revision_Submitted",

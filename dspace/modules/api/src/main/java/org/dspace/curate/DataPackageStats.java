@@ -8,13 +8,15 @@
 package org.dspace.curate;
 
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-import java.net.URL;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.URL;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -32,23 +34,31 @@ import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.Bundle;
+import org.dspace.content.Bitstream;
 import org.dspace.content.crosswalk.MetadataValidationException;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
+import org.dspace.identifier.IdentifierService;
+import org.dspace.identifier.IdentifierNotFoundException;
+import org.dspace.identifier.IdentifierNotResolvableException;
+import org.dspace.utils.DSpace;
 
 import org.apache.log4j.Logger;
 
 /**
- * DataPackageStats retrieves statistics based on an input data package.
+ * DataPackageStats retrieves detailed statistics about a data package.
  *
- * WARNING: This file is deprecated! Its original purpose was to generate
- * statistics for the 2011 Dryad NSF grant proposal. We are now breaking these stats out into their
- * own curation tasks, which makes it easier to update when we need to make changes.
+ * Some statistics are calculated based on the files that are contained in the
+ * data package. Extra processing time is required to load and process the data
+ * file metadata, so this report takes some time to run. For simpler information
+ * about data packages, see DataPackageInfo.
  *
  * The task succeeds if it was able to locate all required stats, otherwise it fails.
  * Originally based on the RequiredMetadata task by Richard Rodgers.
  *
- * Input: a single data package (the curation framework can iterate over a collection of packages)
+ * Input: a single data package OR a collection that contains data packages
  * Output: CSV file with appropriate stats 
  * @author Ryan Scherle
  */
@@ -56,20 +66,56 @@ import org.apache.log4j.Logger;
 public class DataPackageStats extends AbstractCurationTask {
 
     private static Logger log = Logger.getLogger(DataPackageStats.class);
-
+    private IdentifierService identifierService = null;
     DocumentBuilderFactory dbf = null;
     DocumentBuilder docb = null;
+    static long total = 0;
+    private Context context;
+    private static List<String> journalsThatAllowReview = new ArrayList<String>();
+    private static List<String> integratedJournals = new ArrayList<String>();
+    private static List<String> integratedJournalsThatAllowEmbargo = new ArrayList<String>();
     
     @Override 
     public void init(Curator curator, String taskId) throws IOException {
         super.init(curator, taskId);
-
+	
+        identifierService = new DSpace().getSingletonService(IdentifierService.class);            
+	
 	// init xml processing
 	try {
 	    dbf = DocumentBuilderFactory.newInstance();
 	    docb = dbf.newDocumentBuilder();
 	} catch (ParserConfigurationException e) {
 	    throw new IOException("unable to initiate xml processor", e);
+	}
+
+
+	// init list of journals that support embargo and review
+        String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
+	log.info("initializing journal settings from property file " + journalPropFile);
+        Properties properties = new Properties();
+	try {
+	    properties.load(new FileInputStream(journalPropFile));
+	    String journalTypes = properties.getProperty("journal.order");
+	    for (int i = 0; i < journalTypes.split(",").length; i++) {
+		String journalType = journalTypes.split(",")[i].trim();
+		String journalDisplay = properties.getProperty("journal." + journalType + ".fullname");
+		String integrated = properties.getProperty("journal." + journalType + ".integrated");
+		String embargo = properties.getProperty("journal." + journalType + ".embargoAllowed", "true");
+		String allowReviewWorkflow = properties.getProperty("journal." + journalType + ".allowReviewWorkflow", "false");
+
+		if(integrated != null && Boolean.valueOf(integrated)) {
+		    integratedJournals.add(journalDisplay);
+		}
+		if(allowReviewWorkflow != null && Boolean.valueOf(allowReviewWorkflow)) {
+		    journalsThatAllowReview.add(journalDisplay);
+		}
+		if(embargo != null && Boolean.valueOf(embargo)) {
+		    integratedJournalsThatAllowEmbargo.add(journalDisplay);
+		}
+	    }
+	} catch(Exception e) {
+	    log.error("Unable to initialize the journal settings");
 	}
     }
     
@@ -81,77 +127,126 @@ public class DataPackageStats extends AbstractCurationTask {
      */
     @Override
     public int perform(DSpaceObject dso) throws IOException {
-	log.info("performing DataPackageStats task");
+	log.info("performing DataPackageStats task " + total++ );
 	
-	String handle = "[no handle found]";
-	String doi = "[no DOI found]";
-	String journal = "[no journal found]";
-	String numKeywords = "[no numKeywords found]";
-	String numKeywordsJournal = "";
-	String numberOfFiles = "[no numberOfFiles found]";
-	int packageSize = 0;
+	String handle = "\"[no handle found]\"";
+	String packageDOI = "\"[no package DOI found]\"";
+	String articleDOI = "\"[no article DOI found]\"";
+	String journal = "[no journal found]"; // don't add quotes here, because journal is always quoted when output below
+	boolean journalAllowsEmbargo = false;
+	boolean journalAllowsReview = false;
+	String numKeywords = "\"[no numKeywords found]\"";
+	String numKeywordsJournal = "\"[unknown]\"";
+	String numberOfFiles = "\"[no numberOfFiles found]\"";
+	long packageSize = 0;
 	String embargoType = "none";
-	String embargoDate = null;
+	String embargoDate = "";
 	int maxDownloads = 0;
-	String numberOfDownloads = "0";
+	String numberOfDownloads = "\"[unknown]\"";
 	String manuscriptNum = null;
-	String dateAccessioned = "";
+	int numReadmes = 0;
+	boolean wentThroughReview = false;
+	String dateAccessioned = "\"[unknown]\"";
+
+	
+	try {
+	    context = new Context();
+        } catch (SQLException e) {
+	    log.fatal("Unable to open database connection", e);
+	    return Curator.CURATE_FAIL;
+	}
 	
 	if (dso.getType() == Constants.COLLECTION) {
 	    // output headers for the CSV file that will be created by processing all items in this collection
-	    report("handle, doi, journal, numKeywords, numKeywordsJournal, numberOfFiles, packageSize, " +
-		   "embargoType, numberOfDownloads, manuscriptNum, dateAccessioned");
+	    report("handle, packageDOI, articleDOI, journal, journalAllowsEmbargo, journalAllowsReview, numKeywords, numKeywordsJournal, numberOfFiles, packageSize, " +
+		   "embargoType, embargoDate, numberOfDownloads, manuscriptNum, numReadmes, wentThroughReview, dateAccessioned");
 	} else if (dso.getType() == Constants.ITEM) {
             Item item = (Item)dso;
-	    
+
 	    try {
 		handle = item.getHandle();
 		log.info("handle = " + handle);
 		
 		if (handle == null) {
-		    // we are still in workflow - no handle assigned
+		    // this item is still in workflow - no handle assigned
 		    handle = "in workflow";
 		}
-
-		StringBuilder sb = new StringBuilder();
-		sb.append("Item: ").append(handle);
-
-		// DOI
+		
+		// package DOI
 		DCValue[] vals = item.getMetadata("dc.identifier");
 		if (vals.length == 0) {
 		    setResult("Object has no dc.identifier available " + handle);
-		    return Curator.CURATE_FAIL;
+		    log.error("Skipping -- no dc.identifier available for " + handle);
+		    context.abort(); 
+		    return Curator.CURATE_SKIP;
 		} else {
 		    for(int i = 0; i < vals.length; i++) {
 			if (vals[i].value.startsWith("doi:")) {
-			    doi = vals[i].value;
+			    packageDOI = vals[i].value;
 			}
 		    }
 		}
-		log.debug("DOI = " + doi);
+		log.debug("packageDOI = " + packageDOI);
+
+		// article DOI
+		vals = item.getMetadata("dc.relation.isreferencedby");
+		if (vals.length == 0) {
+		    log.debug("Object has no articleDOI (dc.relation.isreferencedby) " + handle);
+		} else {
+		    articleDOI = vals[0].value;
+		}
+		log.debug("articleDOI = " + articleDOI);
 
 		
 		// journal
-		vals = item.getMetadata("prism.publicationName");
+	 	vals = item.getMetadata("prism.publicationName");
 		if (vals.length == 0) {
 		    setResult("Object has no prism.publicationName available " + handle);
-		    log.error("Object has no prism.publicationName available " + handle);
+		    log.error("Skipping -- Object has no prism.publicationName available " + handle);
+		    context.abort();
 		    return Curator.CURATE_SKIP;
 		} else {
 		    journal = vals[0].value;
 		}
 		log.debug("journal = " + journal);
 
+		// journalAllowsEmbargo
+		// embargoes are allowed for all non-integrated journals
+		// embargoes are also allowed for integrated journals that have set the embargoesAllowed option
+		if(!integratedJournals.contains(journal) || integratedJournalsThatAllowEmbargo.contains(journal)) {
+		    journalAllowsEmbargo = true;
+		} 
+
+		// journalAllowsReview
+		if(journalsThatAllowReview.contains(journal)) {
+		    journalAllowsReview = true;
+		}
+				
 		// accession date
 		vals = item.getMetadata("dc.date.accessioned");
 		if (vals.length == 0) {
 		    setResult("Object has no dc.date.accessioned available " + handle);
-		    return Curator.CURATE_FAIL;
+		    log.error("Skipping -- Object has no dc.date.accessioned available " + handle);
+		    context.abort();
+		    return Curator.CURATE_SKIP;
 		} else {
 		    dateAccessioned = vals[0].value;
 		}
 		log.debug("dateAccessioned = " + dateAccessioned);
-		
+
+		// wentThroughReview
+		vals = item.getMetadata("dc.description.provenance");
+		if (vals.length == 0) {
+		    log.warn("That's strange -- Object has no provenance data available " + handle);
+		} else {
+		    for(DCValue aVal : vals) {
+			if(aVal.value != null && aVal.value.contains("requiresReviewStep")) {
+			    wentThroughReview = true;
+			}
+		    }
+		}
+		log.debug("wentThroughReview = " + wentThroughReview);
+
 		
 		// number of keywords
 		int intNumKeywords = item.getMetadata("dc.subject").length +
@@ -162,8 +257,7 @@ public class DataPackageStats extends AbstractCurationTask {
 		numKeywords = "" + intNumKeywords; //convert integer to string by appending
 		log.debug("numKeywords = " + numKeywords);
 
-		// number of keywords in journal email
-		//TODO: fix this for the new style of manuscript numbers -- it fails on anything deposited in 2012 and later
+		// manuscript number
 		DCValue[] manuvals = item.getMetadata("dc.identifier.manuscriptNumber");
 		manuscriptNum = null;
 		if(manuvals.length > 0) {
@@ -171,7 +265,12 @@ public class DataPackageStats extends AbstractCurationTask {
 		}
 		if(manuscriptNum != null && manuscriptNum.trim().length() > 0) {
 		    log.debug("has a real manuscriptNum = " + manuscriptNum);
-		    //find file for manu
+
+
+		    /* 
+		    // number of keywords in journal email -- currently commented out because it wasn't working for 2012 and later.
+		    
+		    //find metadata file for the manuscript
 		    int firstdash = manuscriptNum.indexOf("-");
 		    String journalAbbrev = manuscriptNum.substring(0, firstdash);
 		    if(journalAbbrev.startsWith("0") ||
@@ -189,6 +288,7 @@ public class DataPackageStats extends AbstractCurationTask {
 			manuscriptNum = "amNat-" + manuscriptNum;
 			firstdash = 5;
 		    }
+
 		    if(!journalAbbrev.equals("new")) {
 			numKeywordsJournal = "0";
 			String journalDir="/opt/dryad/submission/journalMetadata/";
@@ -211,113 +311,96 @@ public class DataPackageStats extends AbstractCurationTask {
 			    report("Unable to parse manuscript number " +  manuvals[0].value);
 			    log.error("Unable to parse manuscript number " +  manuvals[0].value);
 			}
-		    }
+			log.debug("numKeywordsJournal = " + numKeywordsJournal);
+		     }
+		    */
 		}
-		log.debug("numKeywordsJournal = " + numKeywordsJournal);
 
 
 		
-		// number of files
+		// count the files, and compute statistics that depend on the files
 		log.debug("getting data file info");
-		vals = item.getMetadata("dc.relation.haspart");
-		if (vals.length == 0) {
+		DCValue[] dataFiles = item.getMetadata("dc.relation.haspart");
+		if (dataFiles.length == 0) {
 		    setResult("Object has no dc.relation.haspart available " + handle);
-		    return Curator.CURATE_FAIL;
+		    log.error("Skipping -- Object has no dc.relation.haspart available " + handle);
+		    context.abort();
+		    return Curator.CURATE_SKIP;
 		} else {
-		    numberOfFiles = "" + vals.length;
+		    numberOfFiles = "" + dataFiles.length;
 		    packageSize = 0;
 		    
 		    // for each data file in the package
-		    for(int i = 0; i < vals.length; i++) {
-			String fileID = vals[i].value;
+
+		    for(int i = 0; i < dataFiles.length; i++) {
+			String fileID = dataFiles[i].value;
 			log.debug(" ======= processing fileID = " + fileID);
 
-			/////////////////////////////////////////////////////////////////////////////////////////
-			// TODO: instead of the crude mess below (OAI calls, pulling the METS, querying SOLR),
-			// get the info directly from the fileItem object
-			/////////////////////////////////////////////////////////////////////////////////////////
-			
-			// TODO: THE fileID should always be a DOI now -- do we need the handle, or can we make use of the DOI directly?
-			// the DOI will work to get the database ID (for a package)
+			// get the DSpace Item for this fileID
+			Item fileItem = getDSpaceItem(fileID);
 
-			//TODO: Not sure if we need the section below, which ensures a handle, then gets an object... can we
-			// get the object directly from the DOI?
-			
-			// ensure fileID is a handle, so we can query OAI with it
-			String shortHandle = "";
-			if(fileID.startsWith("http://hdl.handle.net/10255/")) {
-			    shortHandle = fileID.substring("http://hdl.handle.net/".length());
-			} else if (fileID.startsWith("http://datadryad.org/handle/")) {
-			    shortHandle = fileID.substring("http://datadryad.org/handle/".length());
-			} else if (fileID.startsWith("doi:10.5061/")) {
-			    URL doiLookupURL = new URL("http://datadryad.org/doi?lookup=" + fileID);
-			    String lookupHandle = (new BufferedReader(new InputStreamReader(doiLookupURL.openStream()))).readLine();
-			    shortHandle = lookupHandle.substring("http://datadryad.org/handle/".length());
-			} else {
-			    shortHandle = "###### UNEXPECTED PARTOF FORMAT!!! " + fileID;
+			if(fileItem == null) {
+			    log.error("Skipping data file -- it's null");
+			    break;
 			}
-			log.debug("data file handle = " + shortHandle);
-			
-			// get the internal database ID for this item
-			Item fileItem = getDSpaceItem(shortHandle);
 			log.debug("file internalID = " + fileItem.getID());
 			
 			// total package size
-			// get the file metadata via OAI, since it reports on the file sizes, even for embargoed items
-			URL oaiAccessURL = new URL("http://www.datadryad.org/oai/request?verb=GetRecord&identifier=oai:datadryad.org:" + shortHandle + "&metadataPrefix=mets");
-			log.debug("requesting " + oaiAccessURL);
-			Document oaidoc = docb.parse(oaiAccessURL.openStream());
-			NodeList nl = oaidoc.getElementsByTagName("mods:titleInfo");
-			if(nl.getLength() < 1) {
-			    log.error("Object has no mods:titleInfo available " + handle);
-			    return Curator.CURATE_SKIP;
-			}
-			String nodeText = nl.item(0).getTextContent();
-
-			// add total size of bitstreams in this data file 
+			// add total size of the bitstreams in this data file 
 			// to the cumulative total for the package
-			// (includes readme and textual conversions for indexing)
-			nl = oaidoc.getElementsByTagName("file");
-			
-			for(int j = 0; j < nl.getLength(); j++) {
-			    Node aNode = nl.item(j);
-			    Node sizeAtt = aNode.getAttributes().getNamedItem("SIZE");
-			    int bitstreamSize =  Integer.parseInt(sizeAtt.getTextContent());
-			    packageSize = packageSize + bitstreamSize;
+			// (includes metadata, readme, and textual conversions for indexing)
+			for (Bundle bn : fileItem.getBundles()) {
+			    for (Bitstream bs : bn.getBitstreams()) {
+				packageSize = packageSize + bs.getSize();
+			    }
 			}
-			log.debug("total package size = " + packageSize);
+			log.debug("total package size (as of file " + fileID + ") = " + packageSize);
 
+			// Readmes
+			// Check for at least one readme bitstream. There may be more, due to indexing and cases
+			// where the file itself is named readme. We only count one readme per datafile.
+			boolean readmeFound = false;
+			for (Bundle bn : fileItem.getBundles()) {
+			    for (Bitstream bs : bn.getBitstreams()) {
+				String name = bs.getName().trim().toLowerCase();
+				if(name.startsWith("readme")) {
+				    readmeFound = true;
+				}
+			    }
+			}
+			if(readmeFound) {
+			    numReadmes++;
+			}
+			log.debug("total readmes (as of file " + fileID + ") = " + numReadmes);
+
+			
 			// embargo setting (of last file processed)
-			// need to get embargo from mets metadata since oai doesn't have it
-			URL metsAccessURL = new URL("http://datadryad.org/metadata/handle/" + shortHandle + "/mets.xml");
-			Document metsdoc = docb.parse(metsAccessURL.openStream());
-			nl = metsdoc.getElementsByTagName("dim:field");
-			for(int k = 0; k < nl.getLength(); k++) {
-			    Node aNode = nl.item(k);
-			    Node qualAtt = aNode.getAttributes().getNamedItem("qualifier");
-			    if(qualAtt != null && qualAtt.getTextContent().equals("embargoedUntil")) {
-				// extract embargo date
-				embargoDate = aNode.getTextContent();
-			    }
-			    if(qualAtt != null && qualAtt.getTextContent().equals("embargo")) {
-				// extract embargo type
-				embargoType = aNode.getTextContent();
-			    }
+			vals = fileItem.getMetadata("dc.type.embargo");
+			if (vals.length > 0) {
+			    embargoType = vals[0].value;
+			    log.debug("EMBARGO vals " + vals.length + " type " + embargoType);
+			}
+			vals = fileItem.getMetadata("dc.date.embargoedUntil");
+			if (vals.length > 0) {
+			    embargoDate = vals[0].value;
 			}
 			if((embargoType == null || embargoType.equals("") || embargoType.equals("none")) &&
 			   (embargoDate != null && !embargoDate.equals(""))) {
-				// correctly encode embago type to "oneyear" if there is a date set, but the type is blank or none
-				embargoType = "oneyear";
+			    // correctly encode embago type to "oneyear" if there is a date set, but the type is blank or none
+			    embargoType = "oneyear";
 			}
 			log.debug("embargoType = " + embargoType);
+			log.debug("embargoDate = " + embargoDate);
+			
 		       			    			
 			// number of downlaods for most downloaded file
-			// must translate between the shortHandle and the DSpace internal database ID
-			// (since the solr stats system is based on the DSpace database ID)
+			// must use the DSpace item ID, since the solr stats system is based on this ID
+			// The SOLR address is hardcoded to the production system here, because even when we run on test servers,
+			// it's easiest to use the real stats --the test servers typically don't have useful stats available
 			URL downloadStatURL = new URL("http://datadryad.org/solr/statistics/select/?indent=on&q=owningItem:" + fileItem.getID());
 			log.debug("fetching " + downloadStatURL);
 			Document statsdoc = docb.parse(downloadStatURL.openStream());
-			nl = statsdoc.getElementsByTagName("result");
+			NodeList nl = statsdoc.getElementsByTagName("result");
 			String downloadsAtt = nl.item(0).getAttributes().getNamedItem("numFound").getTextContent();
 			int currDownloads = Integer.parseInt(downloadsAtt);
 			if(currDownloads > maxDownloads) {
@@ -325,39 +408,48 @@ public class DataPackageStats extends AbstractCurationTask {
 			    // rather than converting maxDownloads back to a string, just use the string we parsed above
 			    numberOfDownloads = downloadsAtt;
 			}
-			log.debug("max downloads = " + numberOfDownloads);
+			log.debug("max downloads (as of file " + fileID + ") = " + numberOfDownloads);
 			
 		    }
-		}
 
+		}
+		log.info(handle + " done.");
 	    } catch (Exception e) {
-		log.fatal("Exception in processing", e);
+		log.fatal("Skipping -- Exception in processing " + handle, e);
 		setResult("Object has a fatal error: " + handle + "\n" + e.getMessage());
 		report("Object has a fatal error: " + handle + "\n" + e.getMessage());
-		return Curator.CURATE_FAIL;
+		
+		context.abort();
+		return Curator.CURATE_SKIP;
 	    }
 	} else {
-	    log.info("skipping non-item DSpace object");
+	    log.info("Skipping -- non-item DSpace object");
 	    setResult("Object skipped (not an item)");
+	    context.abort();
 	    return Curator.CURATE_SKIP;
         }
 
-	setResult("Last processed item = " + handle + " -- " + doi);
-	report(handle + ", " + doi + ", \"" + journal + "\", " + numKeywords + ", " +
+	setResult("Last processed item = " + handle + " -- " + packageDOI);
+	report(handle + ", " + packageDOI + ", " + articleDOI + ", \"" + journal + "\", " +
+	       journalAllowsEmbargo + ", " + journalAllowsReview + ", " + numKeywords + ", " +
 	       numKeywordsJournal + ", " + numberOfFiles + ", " + packageSize + ", " +
-	       embargoType + ", " + numberOfDownloads + ", " + manuscriptNum + ", " + dateAccessioned);
+	       embargoType + ", " + embargoDate + ", " + numberOfDownloads + ", " + manuscriptNum + ", " +
+	       numReadmes + ", " + wentThroughReview + ", " + dateAccessioned);
 
-	// don't overwhelm the production server with requests
-	// TODO: remove this after the code above is rewritten to not use OAI or METS -- it will be much more
-	// efficient once it is accessing the database directly
+	// slow this down a bit so we don't overwhelm the production SOLR server with requests
 	try {
-	    Thread.sleep(500);
+	    Thread.sleep(20);
 	} catch(InterruptedException e) {
 	    // ignore it
 	}
 
-	
 	log.debug("DataPackageStats complete");
+
+	try { 
+	    context.complete();
+        } catch (SQLException e) {
+	    log.fatal("Unable to close database connection", e);
+	}
 	return Curator.CURATE_SUCCESS;
     }
 
@@ -368,15 +460,15 @@ public class DataPackageStats extends AbstractCurationTask {
 	return aNode.getChildNodes().item(0).getNodeValue();
     }
 
-    private Item getDSpaceItem(String shortHandle) {
+    private Item getDSpaceItem(String itemID) {
 	Item dspaceItem = null;
 	try {
-	    Context context = new Context();
-	    dspaceItem = (Item)HandleManager.resolveToObject(context, shortHandle);
-	    context.complete();
-        } catch (SQLException e) {
-	    log.fatal("Unable to get DSpace Item for " + shortHandle, e);
-        }
+	    dspaceItem = (Item)identifierService.resolve(context, itemID);  
+        } catch (IdentifierNotFoundException e) {
+	    log.fatal("Unable to get DSpace Item for " + itemID, e);
+	} catch (IdentifierNotResolvableException e) {
+	    log.fatal("Unable to get DSpace Item for " + itemID, e);
+	}
 
 	return dspaceItem;
     }

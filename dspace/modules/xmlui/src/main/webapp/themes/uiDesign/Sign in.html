@@ -1,0 +1,236 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0064)http://ec2-54-243-233-143.compute-1.amazonaws.com/password-login -->
+<html xmlns="http://www.w3.org/1999/xhtml" class=" js flexbox canvas canvastext webgl no-touch geolocation postmessage websqldatabase indexeddb hashchange history draganddrop websockets rgba hsla multiplebgs backgroundsize borderimage borderradius boxshadow textshadow opacity cssanimations csscolumns cssgradients cssreflections csstransforms csstransforms3d csstransitions fontface video audio localstorage sessionstorage webworkers applicationcache svg inlinesvg smil svgclippaths"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+<meta content="width=device-width; initial-scale=1.0; maximum-scale=1.0;" name="viewport">
+<link rel="shortcut icon" href="files/images/favicon.ico">
+<link rel="apple-touch-icon" href="files/images/apple-touch-icon.png">
+<meta name="Generator" content="DSpace 1.8.2">
+<link type="text/css" rel="stylesheet" media="screen" href="files/reset.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/base.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/helper.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/jquery-ui-1.8.15.custom.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/style.css">
+<link type="text/css" rel="stylesheet" media="screen" href="files/authority-control.css">
+<link type="text/css" rel="stylesheet" media="handheld" href="files/handheld.css">
+<link type="text/css" rel="stylesheet" media="print" href="files/print.css">
+<link type="text/css" rel="stylesheet" media="all" href="files/media.css">
+<link type="application/opensearchdescription+xml" rel="search" href="http://ec2-54-243-233-143.compute-1.amazonaws.com/open-search/description.xml" title="DSpace">
+<script type="text/javascript">
+                                //Clear default text of emty text areas on focus
+                                function tFocus(element)
+                                {
+                                        if (element.value == ' '){element.value='';}
+                                }
+                                //Clear default text of emty text areas on submit
+                                function tSubmit(form)
+                                {
+                                        var defaultedElements = document.getElementsByTagName("textarea");
+                                        for (var i=0; i != defaultedElements.length; i++){
+                                                if (defaultedElements[i].value == ' '){
+                                                        defaultedElements[i].value='';}}
+                                }
+                                //Disable pressing 'enter' key to submit a form (otherwise pressing 'enter' causes a submission to start over)
+                                function disableEnterKey(e)
+                                {
+                                     var key;
+
+                                     if(window.event)
+                                          key = window.event.keyCode;     //Internet Explorer
+                                     else
+                                          key = e.which;     //Firefox and Netscape
+
+                                     if(key == 13)  //if "Enter" pressed, then disable!
+                                          return false;
+                                     else
+                                          return true;
+                                }
+
+                                function FnArray()
+                                {
+                                    this.funcs = new Array;
+                                }
+
+                                FnArray.prototype.add = function(f)
+                                {
+                                    if( typeof f!= "function" )
+                                    {
+                                        f = new Function(f);
+                                    }
+                                    this.funcs[this.funcs.length] = f;
+                                };
+
+                                FnArray.prototype.execute = function()
+                                {
+                                    for( var i=0; i < this.funcs.length; i++ )
+                                    {
+                                        this.funcs[i]();
+                                    }
+                                };
+
+                                var runAfterJSImports = new FnArray();
+            </script>
+<script xmlns:i18n="http://apache.org/cocoon/i18n/2.1" type="text/javascript" src="files/modernizr-1.7.min.js"> </script>
+<title>Sign in</title>
+<style id="bitmark_stylesheet" type="text/css"></style></head><!--[if lt IE 7 ]> <body class="ie6"> <![endif]-->
+                <!--[if IE 7 ]>    <body class="ie7"> <![endif]-->
+                <!--[if IE 8 ]>    <body class="ie8"> <![endif]-->
+                <!--[if IE 9 ]>    <body class="ie9"> <![endif]-->
+                <!--[if (gt IE 9)|!(IE)]><!--><body class=" hasGoogleVoiceExt"><!--<![endif]-->
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="ds-main">
+<div id="ds-header-wrapper">
+<div class="clearfix" id="ds-header">
+<a id="ds-header-logo-link" href="http://ec2-54-243-233-143.compute-1.amazonaws.com/">
+<span id="ds-header-logo">&nbsp;</span>
+<span id="ds-header-logo-text">mirage</span>
+</a>
+<h1 class="pagetitle visuallyhidden">Sign in</h1>
+<h2 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="static-pagetitle visuallyhidden">DSpace/Manakin Repository</h2>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" id="ds-user-box">
+<p>
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/login">Login</a>
+</p>
+</div>
+</div>
+</div>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" id="ds-trail-wrapper">
+<ul id="ds-trail">
+<li class="ds-trail-link first-link ">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/">DSpace Home</a>
+</li>
+<li xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-trail-arrow">→</li>
+<li class="ds-trail-link last-link">Sign in</li>
+</ul>
+</div>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="hidden" id="no-js-warning-wrapper">
+<div id="no-js-warning">
+<div class="notice failure">JavaScript is disabled for your browser. Some features of this site may not work without it.</div>
+</div>
+</div>
+<div id="ds-content-wrapper">
+<div class="clearfix" id="ds-content">
+<div id="ds-body">
+<h1 class="ds-div-head">Sign in to DSpace</h1>
+<form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_eperson_PasswordLogin_div_login" class="ds-interactive-div primary" action="files/Sign in.html" method="post" onsubmit="javascript:tSubmit(this);">
+<fieldset id="aspect_eperson_PasswordLogin_list_password-login" class="ds-form-list">
+<ol>
+<li class="ds-form-item">
+<label class="ds-form-label" for="aspect_eperson_PasswordLogin_field_login_email">E-Mail Address:</label>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-form-content">
+<input id="aspect_eperson_PasswordLogin_field_login_email" class="ds-text-field" name="login_email" type="text" value="">
+</div>
+</li>
+<li class="ds-form-item">
+<label class="ds-form-label" for="aspect_eperson_PasswordLogin_field_login_password">Password:</label>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-form-content">
+<input id="aspect_eperson_PasswordLogin_field_login_password" class="ds-password-field" name="login_password" type="password" value="">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/forgot"> Forgot your password?</a>
+</div>
+</li>
+<li xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_eperson_PasswordLogin_item_login-in" class="ds-form-item last">
+<label class="ds-form-label" for="aspect_eperson_PasswordLogin_field_submit">&nbsp;
+                                </label>
+<div class="ds-form-content">
+<input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" id="aspect_eperson_PasswordLogin_field_submit" class="ds-button-field" name="submit" type="submit" value="Sign in">
+</div>
+</li>
+</ol>
+</fieldset>
+</form>
+<h2 class="ds-div-head">Register new user</h2>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_eperson_PasswordLogin_div_register" class="ds-static-div">
+<p class="ds-paragraph">Register an account to subscribe to collections for email updates, and submit new items to DSpace.</p>
+<p xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-paragraph">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/register">Click here to register.</a>
+</p>
+</div>
+</div>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="ds-options-wrapper">
+<div id="ds-options">
+<h1 class="ds-option-set-head" id="ds-search-option-head">Search DSpace</h1>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-option-set" id="ds-search-option">
+<form method="post" id="ds-search-form" action="http://ec2-54-243-233-143.compute-1.amazonaws.com/search">
+<fieldset>
+<input type="text" class="ds-text-field " name="query">
+<input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" value="Go" type="submit" name="submit" class="ds-button-field " onclick="
+                                    var radio = document.getElementById(&quot;ds-search-form-scope-container&quot;);
+                                    if (radio != undefined &amp;&amp; radio.checked)
+                                    {
+                                    var form = document.getElementById(&quot;ds-search-form&quot;);
+                                    form.action=
+                                &quot;/handle/&quot; + radio.value + &quot;/search&quot; ; 
+                                    }
+                                ">
+</fieldset>
+</form>
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/advanced-search">Advanced Search</a>
+</div>
+<h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-option-set-head">Browse</h1>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_viewArtifacts_Navigation_list_browse" class="ds-option-set">
+<ul class="ds-options-list">
+<li>
+<h2 class="ds-sublist-head">All of DSpace</h2>
+<ul xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-simple-list sublist">
+<li>
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/community-list">Communities &amp; Collections</a>
+</li>
+<li xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/browse?type=dateissued">By Issue Date</a>
+</li>
+<li xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/browse?type=author">Authors</a>
+</li>
+<li xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/browse?type=title">Titles</a>
+</li>
+<li xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/browse?type=subject">Subjects</a>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<h1 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-option-set-head">My Account</h1>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_viewArtifacts_Navigation_list_account" class="ds-option-set">
+<ul class="ds-simple-list">
+<li>
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/login">Login</a>
+</li>
+<li xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/register">Register</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+<div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="ds-footer-wrapper">
+<div id="ds-footer">
+<div id="ds-footer-left">
+<a target="_blank" href="http://www.dspace.org/">DSpace software</a> copyright&nbsp;©&nbsp;2002-2011&nbsp; <a target="_blank" href="http://www.duraspace.org/">Duraspace</a>
+</div>
+<div id="ds-footer-right">
+<span class="theme-by">Theme by&nbsp;</span>
+<a id="ds-footer-logo-link" href="http://atmire.com/" target="_blank" title="@mire NV">
+<span id="ds-footer-logo">&nbsp;</span>
+</a>
+</div>
+<div id="ds-footer-links">
+<a href="http://ec2-54-243-233-143.compute-1.amazonaws.com/contact">Contact Us</a> | <a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" href="http://ec2-54-243-233-143.compute-1.amazonaws.com/feedback">Send Feedback</a>
+</div>
+<a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="hidden" href="http://ec2-54-243-233-143.compute-1.amazonaws.com/htmlmap">&nbsp;</a>
+</div>
+</div>
+</div>
+<script src="files/jquery.min.js" type="text/javascript"> </script>
+<script type="text/javascript">!window.jQuery && document.write('<script type="text/javascript" src="/static/js/jquery-1.6.2.min.js"> <\/script>')</script>
+<script type="text/javascript" src="files/jquery-ui-1.8.15.custom.min.js"> </script><!--[if lt IE 7 ]>
+<script type="text/javascript" src="/themes/Mirage/lib/js/DD_belatedPNG_0.0.8a.js?v=1"> </script>
+<script type="text/javascript">DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');$.each($('img[src$=png]'), function() {DD_belatedPNG.fixPng(this);});</script><![endif]-->
+<script type="text/javascript">
+            runAfterJSImports.execute();
+        </script>
+<div style="display: none;" id="hiddenlpsubmitdiv"></div><script>try{for(var lastpass_iter=0; lastpass_iter < document.forms.length; lastpass_iter++){ var lastpass_f = document.forms[lastpass_iter]; if(typeof(lastpass_f.lpsubmitorig2)=="undefined"){ lastpass_f.lpsubmitorig2 = lastpass_f.submit; lastpass_f.submit = function(){ var form=this; var customEvent = document.createEvent("Event"); customEvent.initEvent("lpCustomEvent", true, true); var d = document.getElementById("hiddenlpsubmitdiv"); for(var i = 0; i < document.forms.length; i++){ if(document.forms[i]==form){ d.innerText=i; } } d.dispatchEvent(customEvent); form.lpsubmitorig2(); } } }}catch(e){}</script></body></html>

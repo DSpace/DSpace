@@ -60,9 +60,7 @@ public class DataOneLogger {
 
     public DataOneLogger() {
 
-        final String serverString = "http://localhost:9999/solr/dataoneMNlog"; 
-        //TODO: This ought to work
-        //final String serverString = ConfigurationManager.getProperty(SOLR_LOG_SERVER_PROPERTY);
+        final String serverString = ConfigurationManager.getProperty(SOLR_LOG_SERVER_PROPERTY);
         log.info("solr.log.dataonemn.server from configuration :" + serverString);
 
         CommonsHttpSolrServer server = null;
@@ -151,7 +149,7 @@ public class DataOneLogger {
 
     final String logHeaderTemplate = "<d1:log xmlns:d1=\"http://ns.dataone.org/service/types/v1\" count=\"%s\" start=\"%s\" total=\"%s\"> \n";
     
-    public String buildLogHeader(int count, int start, int total){
+    public String buildLogHeader(int count, int start, long total){
         StringBuilder sb = new StringBuilder();
         Formatter formatter = new Formatter(sb);
         formatter.format(logHeaderTemplate,count,start,total);
@@ -161,12 +159,20 @@ public class DataOneLogger {
     /**
      * Ideally use the LogEntry class to avoid all these strings 
      */
-    public LogResults getLogRecords(Date fromDate,Date toDate, String event, String pidFilter, int start, int end ){
+    public LogResults getLogRecords(Date fromDate,Date toDate, String event, String pidFilter, int start, int count ){
         final List<LogEntry> matchingEntries = new ArrayList<LogEntry>(); 
         final SolrQuery solrQuery = buildSolrQuery(fromDate,toDate,event,pidFilter);
+        // Use setRows to specify count, otherwise rows is default from 
+        // solrconfig.xml (typically 10).  In earlier version, rows was not
+        // set to count and paging was performed on the results, which never
+        // exceeded 10 items.
+        solrQuery.setStart(start);
+        solrQuery.setRows(count);
+        long total = 0;
         try {
             QueryResponse rsp = solr.query(solrQuery);
             SolrDocumentList docs = rsp.getResults();
+            total = docs.getNumFound(); // Total number of matches
             for(SolrDocument doc : docs){
                 matchingEntries.add(new LogEntry(doc));
             }
@@ -175,27 +181,21 @@ public class DataOneLogger {
             log.error("Solr server threw an exception while retreiving log records: ",e);
             log.info("Solr query was: " + solrQuery.getQuery());
         }
-        if (start > matchingEntries.size()){
+        if (matchingEntries.size() == 0){
+            // is this necessary, or correct?
            return new LogResults(HttpServletResponse.SC_OK,0,emptyResults);
         }
-        int index = 0;
-        int copyCount = 0;
         final StringBuffer entryResults = new StringBuffer(200);
         for(LogEntry le : matchingEntries){
-            if (index>=start && index<end ){
-                entryResults.append(le.getXml(index));
-                copyCount++;                
-            }
-            index++;
+            entryResults.append(le.getXml());
         }
         StringBuffer xmlResults = new StringBuffer();
         xmlResults.append(xmlHeader);
-        final int total = matchingEntries.size();
-        xmlResults.append(buildLogHeader(total,start,copyCount));
+        xmlResults.append(buildLogHeader(matchingEntries.size(),start,total));
         xmlResults.append(entryResults.toString());
         xmlResults.append(logFooter);
-        LogResults testResults = new LogResults(HttpServletResponse.SC_OK,0,xmlResults.toString());
-        return testResults;
+        LogResults results = new LogResults(HttpServletResponse.SC_OK,0,xmlResults.toString());
+        return results;
     }
 
 
@@ -222,13 +222,13 @@ public class DataOneLogger {
                 result.addFilterQuery("dateLogged:[* TO " + zToDate + "]");
             }
         }
-        if (pidFilter != null){
+        if (pidFilter != null && !pidFilter.equalsIgnoreCase("null")){
             //need to escape the colon in the dryad identifier so solr will accept it
             int colonpos = pidFilter.indexOf(':');
             if (colonpos>-1){  //expect it to be there, but to be safe
                 pidFilter = pidFilter.substring(0,colonpos) + "\\:" + pidFilter.substring(colonpos+1);
             }
-            result.addFilterQuery("identifier:" + pidFilter);
+            result.addFilterQuery("identifier:" + pidFilter + "*");
             log.info("Adding pid filter: " + pidFilter);
         }
         return result;
@@ -245,7 +245,8 @@ public class DataOneLogger {
     }
 
     /**
-     * Generate the xml and return bundle of error code, detail Code (?, but it's in the dataone spec), and the xml string
+     * Generate the xml and return bundle of error code, detail Code (?, but 
+     * it's in the dataone spec), and the xml string
      **/
     public static class LogResults{
         private final int htmlErrorCode;

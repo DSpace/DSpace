@@ -251,11 +251,11 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements
 				reason.addPara(characters);
 		}
 
-		body.addDivision("reglogin-header", "").addPara(T_reglogin_head);
-
 		Division register = body.addInteractiveDivision("register",
 				contextPath + "/register", Division.METHOD_POST,
 				"register-left");
+
+		register.addPara(T_reglogin_head);
 
 		Table regTable = register.addTable("register", 2, 2);
 
@@ -267,11 +267,14 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements
 		Text regEmail = regRow1Cell2.addText("email");
 		regEmail.setRequired();
 		regEmail.setLabel(T_email_address);
-		regEmail.setHelp(T_email_address_help);
 		if (previousEmail != null) {
 			regEmail.setValue(previousEmail);
 			regEmail.addError(T_error_bad_login);
 		}
+
+		Row regRow2 = regTable.addRow();
+		Cell regRow2Cell1 = regRow2.addCell();
+		Cell regRow2Cell2 = regRow2.addCell();
 
 		Row regRow3 = regTable.addRow();
 		Cell regRow3Cell1 = regRow3.addCell();

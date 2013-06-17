@@ -5,11 +5,11 @@
 # See org.dspace.core.Email for information on the format of this file.
 #
 Subject: Dryad Account Registration
-To complete registration for a Dryad account, please click the link
-below:
 
-  {0}
+Thank you for registering for an account at datadryad.org.  To complete registration for your account, please click the link below:
 
-If you need assistance with your account, please email help@datadryad.org
+ {0}
+
+If you need assistance with your account, please email help@datadryad.org.  For more information about using or submitting data, please see http://datadryad.org/pages/faq.
 
 The Dryad Team
