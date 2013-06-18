@@ -58,9 +58,9 @@ public class EZIDRequest
      * Prepare a context for requests concerning a specific identifier or
      * authority prefix.
      * 
-     * @param scheme
-     * @param host
-     * @param authority DOI authority prefix.
+     * @param scheme URL scheme for access to the EZID service.
+     * @param host Host name for access to the EZID service.
+     * @param authority DOI authority prefix, e.g. "10.5072/FK2".
      * @param username an EZID user identity.
      * @param password user's password, or {@code null} for none.
      * @throws URISyntaxException if host or authority is bad.
@@ -69,8 +69,18 @@ public class EZIDRequest
             throws URISyntaxException
     {
         this.scheme = scheme;
+
         this.host = host;
-        this.authority = authority;
+
+        if (authority.charAt(authority.length()-1) == '/')
+        {
+            this.authority = authority.substring(0, authority.length()-1);
+        }
+        else
+        {
+            this.authority = authority;
+        }
+
         client = new DefaultHttpClient();
         if (null != username)
         {
@@ -94,6 +104,7 @@ public class EZIDRequest
         // GET path
         HttpGet request;
         URI uri = new URI(scheme, host, ID_PATH + authority + name, null);
+        log.debug("EZID lookup {}", uri.toASCIIString());
         request = new HttpGet(uri);
         HttpResponse response = client.execute(request);
         return new EZIDResponse(response);
@@ -112,7 +123,8 @@ public class EZIDRequest
     {
         // PUT path [+metadata]
         HttpPut request;
-        URI uri = new URI(scheme, host, ID_PATH + authority + name, null);
+        URI uri = new URI(scheme, host, ID_PATH + authority + '/' + name, null);
+        log.debug("EZID create {}", uri.toASCIIString());
         request = new HttpPut(uri);
         if (null != metadata)
         {
@@ -137,6 +149,7 @@ public class EZIDRequest
         // POST path [+metadata]
         HttpPost request;
         URI uri = new URI(scheme, host, SHOULDER_PATH + authority, null);
+        log.debug("EZID mint {}", uri.toASCIIString());
         request = new HttpPost(uri);
         if (null != metadata)
         {
@@ -164,6 +177,7 @@ public class EZIDRequest
         // POST path +metadata
         HttpPost request;
         URI uri = new URI(scheme, host, ID_PATH + authority + name, null);
+        log.debug("EZID modify {}", uri.toASCIIString());
         request = new HttpPost(uri);
         request.setEntity(new StringEntity(formatMetadata(metadata), UTF_8));
         HttpResponse response = client.execute(request);
@@ -179,6 +193,7 @@ public class EZIDRequest
         // DELETE path
         HttpDelete request;
         URI uri = new URI(scheme, host, ID_PATH + authority + name, null);
+        log.debug("EZID delete {}", uri.toASCIIString());
         request = new HttpDelete(uri);
         HttpResponse response = client.execute(request);
         return new EZIDResponse(response);
