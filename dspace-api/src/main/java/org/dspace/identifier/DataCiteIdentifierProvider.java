@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,6 +80,7 @@ public class DataCiteIdentifierProvider
 
     // DataCite metadata field names
     static final String DATACITE_PUBLISHER = "datacite.publisher";
+    static final String DATACITE_PUBLICATION_YEAR = "datacite.publicationyear";
 
     // DSpace metadata field name elements
     // XXX move these to MetadataSchema or some such
@@ -284,7 +286,10 @@ public class DataCiteIdentifierProvider
                             response.getHttpReasonPhrase(),
                             response.getEZIDStatusValue()
                                     });
-                throw new IdentifierException("DOI not created:  " + response.getHttpReasonPhrase());
+                throw new IdentifierException("DOI not created:  "
+                        + response.getHttpReasonPhrase()
+                        + ":  "
+                        + response.getEZIDStatusValue());
             }
 
 	// Extract the DOI from the content blob
@@ -657,8 +662,16 @@ public class DataCiteIdentifierProvider
 
             if (!mapped.containsKey(DATACITE_PUBLISHER))
             {
-                mapped.put(DATACITE_PUBLISHER,
-                        configurationService.getProperty(CFG_PUBLISHER));
+                String publisher = configurationService.getPropertyAsType(CFG_PUBLISHER, "unknown");
+                log.info("Supplying default publisher:  {}", publisher);
+                mapped.put(DATACITE_PUBLISHER, publisher);
+            }
+
+            if (!mapped.containsKey(DATACITE_PUBLICATION_YEAR))
+            {
+                String year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+                log.info("Supplying default publication year:  {}", year);
+                mapped.put(DATACITE_PUBLICATION_YEAR, year);
             }
         }
 
