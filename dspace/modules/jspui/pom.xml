@@ -148,26 +148,38 @@
 	</dependency>
 	
 	<dependency>
-		<groupId>jdyna-web-api</groupId>
-		<artifactId>jdyna-web-api</artifactId>
-		<version>3.0-beta</version>
+		<groupId>org.dspace</groupId>
+		<artifactId>pubmed-lookup</artifactId>
+		<version>0.1</version>
+	</dependency>
+	<dependency>
+		<groupId>org.dspace</groupId>
+		<artifactId>pubmed-lookup-web</artifactId>
+		<version>0.1</version>
+		<type>war</type>
 	</dependency>
 
 	<dependency>
-		<groupId>commons-cilea-webapi</groupId>
+		<groupId>org.jdyna</groupId>
+		<artifactId>jdyna-web-api</artifactId>
+		<version>3.0</version>
+	</dependency>
+
+	<dependency>
+		<groupId>it.cilea</groupId>
 		<artifactId>commons-cilea-webapi</artifactId>
 		<version>1.0</version>
 	</dependency>
 
     <dependency>
-		<groupId>jdyna-webmvc-api</groupId>
+		<groupId>org.jdyna</groupId>
 		<artifactId>jdyna-webmvc-api</artifactId>
-		<version>3.0-beta</version>
+		<version>3.0</version>
 	</dependency>
 	<dependency>
-		<groupId>jdyna-webmvc-webapp</groupId>
+		<groupId>org.jdyna</groupId>
 		<artifactId>jdyna-webmvc-webapp</artifactId>
-		<version>3.0-beta</version>
+		<version>3.0</version>
 		<type>war</type>
 	</dependency>
 
@@ -181,7 +193,35 @@
 		<artifactId>dspace-cris-jspui-api</artifactId>		
 	</dependency>
 		
+ 	<dependency>
+		<groupId>org.dspace</groupId>
+		<artifactId>dspace-cris-webservices-api</artifactId>
+		<version>1.8.2</version>
+	</dependency>
+
+	<dependency>
+		<groupId>org.dspace</groupId>
+		<artifactId>dspace-cris-webservices-webapp</artifactId>
+		<version>1.8.2</version>
+		<type>war</type>
+		<scope>compile</scope>
+	</dependency>
 		
+	<dependency>
+		<groupId>com.lowagie</groupId>
+		<artifactId>itext</artifactId>
+		<version>2.1.7</version>
+	</dependency>
+
+	<dependency>
+		<groupId>org.htmlcleaner</groupId>
+		<artifactId>htmlcleaner</artifactId>		
+	</dependency>
+	
+	 <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>jargon</artifactId>
+      </dependency>
 	</dependencies>
 
 </project>

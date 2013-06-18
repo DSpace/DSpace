@@ -123,6 +123,11 @@ public class DiscoverResult {
         }
 
         public String getAsFilterQuery() {
+        	if (asFilterQuery == null)
+        	{
+        		// missing facet filter query
+        		return "[* TO *]";
+        	}
             return asFilterQuery;
         }
 
@@ -146,7 +151,8 @@ public class DiscoverResult {
 
         public String getFilterType()
         {
-            return authorityKey != null?"authority":"equals";
+            return authorityKey != null?"authority":
+            	asFilterQuery != null?"equals":"notequals";
         }
     }
 

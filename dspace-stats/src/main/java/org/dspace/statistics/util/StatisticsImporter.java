@@ -7,49 +7,66 @@
  */
 package org.dspace.statistics.util;
 
-import org.apache.commons.cli.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Properties;
+import java.util.Random;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.*;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.common.SolrInputDocument;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
-import org.dspace.core.Context;
-import org.dspace.core.Constants;
+import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.statistics.SolrLogger;
 
-import java.sql.SQLException;
-import java.text.*;
-import java.io.*;
-import java.util.*;
-
-import com.maxmind.geoip.LookupService;
 import com.maxmind.geoip.Location;
+import com.maxmind.geoip.LookupService;
 
 /**
  * Class to load intermediate statistics files into solr
- *
+ * 
  * @author Stuart Lewis
  */
 public class StatisticsImporter
 {
-    private static final Logger log = Logger.getLogger(StatisticsImporter.class);
+    private static final Logger log = Logger
+            .getLogger(StatisticsImporter.class);
 
     /** Date format (for solr) */
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat(
+            "yyyy-MM-dd'T'HH:mm:ss");
 
     /** Solr server connection */
-    private static CommonsHttpSolrServer solr;
+    private static HttpSolrServer solr;
 
     /** GEOIP lookup service */
     private static LookupService geoipLookup;
-
-    /** Metadata storage information */
-    private static Map<String, String> metadataStorageInfo;
 
     /** Whether to skip the DNS reverse lookup or not */
     private static boolean skipReverseDNS = false;
@@ -69,15 +86,19 @@ public class StatisticsImporter
     /** Whether or not to replace item IDs with local values (for testing) */
     private boolean useLocal;
 
+    private Properties countries2Continent = new Properties();
+
     /**
-     * Constructor. Optionally loads local data to replace foreign data
-     * if using someone else's log files
-     *
-     * @param local Whether to use local data
+     * Constructor. Optionally loads local data to replace foreign data if using
+     * someone else's log files
+     * 
+     * @param local
+     *            Whether to use local data
      */
     public StatisticsImporter(boolean local)
     {
-        // Setup the lists of communities, collections, items & bitstreams if required
+        // Setup the lists of communities, collections, items & bitstreams if
+        // required
         useLocal = local;
         if (local)
         {
@@ -125,21 +146,56 @@ public class StatisticsImporter
                 }
                 System.out.println("Found " + localBitstreams.size());
 
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
-                System.err.println("Error retrieving items from DSpace database:");
+                System.err
+                        .println("Error retrieving items from DSpace database:");
                 e.printStackTrace();
                 System.exit(1);
+            }
+        }
+
+        FileInputStream fcc = null;
+        // FileInputStream fcn = null;
+        try
+        {
+            fcc = new FileInputStream(
+                    ConfigurationManager.getProperty("dspace.dir")
+                            + "/config/countries2continent.properties");
+            countries2Continent.load(fcc);
+        }
+        catch (Exception notfound)
+        {
+            throw new IllegalArgumentException(
+                    "Failed to load configuration file for GeoRefAdditionalStatisticsData",
+                    notfound);
+        }
+        finally
+        {
+            if (fcc != null)
+            {
+                try
+                {
+                    fcc.close();
+                }
+                catch (IOException ioe)
+                {
+                    // log.error(ioe.getMessage(), ioe);
+                }
             }
         }
     }
 
     /**
      * Method to load the lines from the statics file and load them into solr
-     *
-     * @param filename The filename of the file to load
-     * @param context The DSpace Context
-     * @param verbose Whether to display verbose output
+     * 
+     * @param filename
+     *            The filename of the file to load
+     * @param context
+     *            The DSpace Context
+     * @param verbose
+     *            Whether to display verbose output
      */
     private void load(String filename, Context context, boolean verbose)
     {
@@ -153,10 +209,11 @@ public class StatisticsImporter
 
         try
         {
-            BufferedReader input =  new BufferedReader(new FileReader(new File(filename)));
+            BufferedReader input = new BufferedReader(new FileReader(new File(
+                    filename)));
 
             String line;
-//            String uuid;
+            String uuid;
             String action;
             String id;
             Date date;
@@ -186,14 +243,15 @@ public class StatisticsImporter
                     System.out.println("Line:" + line);
                 }
                 String[] parts = line.split(",");
-//                uuid = parts[0];
+                uuid = parts[0];
                 action = parts[1];
                 id = parts[2];
                 date = dateFormat.parse(parts[3]);
                 user = parts[4];
                 ip = parts[5];
 
-                // Resolve the dns (if applicable) to get rid of search engine bots early on in the processing chain
+                // Resolve the dns (if applicable) to get rid of search engine
+                // bots early on in the processing chain
                 dns = "";
                 if (!skipReverseDNS)
                 {
@@ -201,7 +259,7 @@ public class StatisticsImporter
                     fromCache = dnsCache.get(ip);
                     if (fromCache != null)
                     {
-                        dns = (String)fromCache;
+                        dns = (String) fromCache;
                     }
                     else
                     {
@@ -209,7 +267,8 @@ public class StatisticsImporter
                         {
                             dns = DnsLookup.reverseDns(ip);
                             dnsCache.put(ip, dns);
-                        } catch (Exception e)
+                        }
+                        catch (Exception e)
                         {
                             dns = "";
                         }
@@ -218,9 +277,9 @@ public class StatisticsImporter
 
                 data += ("ip addr = " + ip);
                 data += (", dns name = " + dns);
-                if ((dns.endsWith(".googlebot.com.")) ||
-                    (dns.endsWith(".crawl.yahoo.net.")) ||
-                    (dns.endsWith(".search.msn.com.")))
+                if ((dns.endsWith(".googlebot.com."))
+                        || (dns.endsWith(".crawl.yahoo.net."))
+                        || (dns.endsWith(".search.msn.com.")))
                 {
                     if (verbose)
                     {
@@ -233,28 +292,36 @@ public class StatisticsImporter
 
                 // Get the geo information for the user
                 Location location;
-                try {
+                try
+                {
                     location = geoipLookup.getLocation(ip);
                     city = location.city;
                     country = location.countryName;
                     countryCode = location.countryCode;
                     longitude = location.longitude;
                     latitude = location.latitude;
-                    if(verbose) {
+                    if (verbose)
+                    {
                         data += (", country = " + country);
                         data += (", city = " + city);
                         System.out.println(data);
                     }
-                    try {
+                    try
+                    {
                         continent = LocationUtils.getContinentCode(countryCode);
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         if (verbose)
                         {
-                            System.out.println("Unknown country code: " + countryCode);
+                            System.out.println("Unknown country code: "
+                                    + countryCode);
                         }
                         continue;
                     }
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     // No problem - just can't look them up
                 }
 
@@ -265,7 +332,9 @@ public class StatisticsImporter
                     type = Constants.BITSTREAM;
                     if (useLocal)
                     {
-                        id = "" + localBitstreams.get(rand.nextInt(localBitstreams.size()));
+                        id = ""
+                                + localBitstreams.get(rand
+                                        .nextInt(localBitstreams.size()));
                     }
                 }
                 else if ("view_item".equals(action))
@@ -273,7 +342,9 @@ public class StatisticsImporter
                     type = Constants.ITEM;
                     if (useLocal)
                     {
-                        id = "" + localItems.get(rand.nextInt(localItems.size()));
+                        id = ""
+                                + localItems
+                                        .get(rand.nextInt(localItems.size()));
                     }
                 }
                 else if ("view_collection".equals(action))
@@ -281,7 +352,9 @@ public class StatisticsImporter
                     type = Constants.COLLECTION;
                     if (useLocal)
                     {
-                        id = "" + localCollections.get(rand.nextInt(localCollections.size()));
+                        id = ""
+                                + localCollections.get(rand
+                                        .nextInt(localCollections.size()));
                     }
                 }
                 else if ("view_community".equals(action))
@@ -289,16 +362,20 @@ public class StatisticsImporter
                     type = Constants.COMMUNITY;
                     if (useLocal)
                     {
-                        id = "" + localCommunities.get(rand.nextInt(localCommunities.size()));
+                        id = ""
+                                + localCommunities.get(rand
+                                        .nextInt(localCommunities.size()));
                     }
                 }
 
-                DSpaceObject dso = DSpaceObject.find(context, type, Integer.parseInt(id));
+                DSpaceObject dso = DSpaceObject.find(context, type,
+                        Integer.parseInt(id));
                 if (dso == null)
                 {
                     if (verbose)
                     {
-                        System.err.println(" - DSO with ID '" + id + "' is no longer in the system");
+                        System.err.println(" - DSO with ID '" + id
+                                + "' is no longer in the system");
                     }
                     continue;
                 }
@@ -316,9 +393,25 @@ public class StatisticsImporter
                 sid.addField("ip", ip);
                 sid.addField("type", dso.getType());
                 sid.addField("id", dso.getID());
-                sid.addField("time", DateFormatUtils.format(date, SolrLogger.DATE_FORMAT_8601));
+                sid.addField("time", DateFormatUtils.format(date,
+                        SolrLogger.DATE_FORMAT_8601));
                 sid.addField("continent", continent);
                 sid.addField("country", country);
+                if (countryCode != null)
+                {
+                    String continentCode = countries2Continent
+                            .getProperty(countryCode);
+                    if (continentCode == null)
+                    {
+                        continentCode = countries2Continent
+                                .getProperty("default");
+                    }
+                    if (continentCode != null)
+                    {
+                        sid.addField("continent", continentCode);
+                    }
+                }
+                // sid.addField("country", country);
                 sid.addField("countryCode", countryCode);
                 sid.addField("city", city);
                 sid.addField("latitude", latitude);
@@ -330,35 +423,12 @@ public class StatisticsImporter
                 if (dns != null)
                 {
                     sid.addField("dns", dns.toLowerCase());
+
+                    solr.add(sid);
+                    errors--;
                 }
-
-                if (dso instanceof Item) {
-                    Item item = (Item) dso;
-                    // Store the metadata
-                    for (String storedField : metadataStorageInfo.keySet()) {
-                        String dcField = metadataStorageInfo.get(storedField);
-
-                        DCValue[] vals = item.getMetadata(dcField.split("\\.")[0],
-                                dcField.split("\\.")[1], dcField.split("\\.")[2],
-                                Item.ANY);
-                        for (DCValue val1 : vals) {
-                            String val = val1.value;
-                            sid.addField(String.valueOf(storedField), val);
-                            sid.addField(String.valueOf(storedField + "_search"),
-                                    val.toLowerCase());
-                        }
-                    }
-                }
-
-                SolrLogger.storeParents(sid, dso);
-                solr.add(sid);
-                errors--;
             }
 
-        }
-        catch (RuntimeException re)
-        {
-            throw re;
         }
         catch (Exception e)
         {
@@ -372,11 +442,15 @@ public class StatisticsImporter
         if (counter > 0)
         {
             Double committedpercentage = 100d * committed / counter;
-            System.out.println(" - " + committed + " entries added to solr: " + percentage.format(committedpercentage) + "%");
+            System.out.println(" - " + committed + " entries added to solr: "
+                    + percentage.format(committedpercentage) + "%");
             Double errorpercentage = 100d * errors / counter;
-            System.out.println(" - " + errors + " errors: " + percentage.format(errorpercentage) + "%");
+            System.out.println(" - " + errors + " errors: "
+                    + percentage.format(errorpercentage) + "%");
             Double sepercentage = 100d * searchengines / counter;
-            System.out.println(" - " + searchengines + " search engine activity skipped: " + percentage.format(sepercentage) + "%");
+            System.out.println(" - " + searchengines
+                    + " search engine activity skipped: "
+                    + percentage.format(sepercentage) + "%");
             System.out.print("About to commit data to solr...");
 
             // Commit at the end because it takes a while
@@ -386,7 +460,8 @@ public class StatisticsImporter
             }
             catch (SolrServerException sse)
             {
-                System.err.println("Error committing statistics to solr server!");
+                System.err
+                        .println("Error committing statistics to solr server!");
                 sse.printStackTrace();
                 System.exit(1);
             }
@@ -398,13 +473,15 @@ public class StatisticsImporter
             }
         }
         System.out.println(" done!");
-	}
+    }
 
     /**
      * Print the help message
-     *
-     * @param options The command line options the user gave
-     * @param exitCode the system exit code to use
+     * 
+     * @param options
+     *            The command line options the user gave
+     * @param exitCode
+     *            the system exit code to use
      */
     private static void printHelp(Options options, int exitCode)
     {
@@ -416,24 +493,31 @@ public class StatisticsImporter
 
     /**
      * Main method to run the statistics importer.
-     *
-     * @param args The command line arguments
-     * @throws Exception If something goes wrong
+     * 
+     * @param args
+     *            The command line arguments
+     * @throws Exception
+     *             If something goes wrong
      */
-	public static void main(String[] args) throws Exception
+    public static void main(String[] args) throws Exception
     {
-		CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new PosixParser();
 
-		Options options = new Options();
+        Options options = new Options();
 
-        options.addOption("i", "in", true, "the inpout file");
-        options.addOption("l", "local", false, "developers tool - map external log file to local handles");
-        options.addOption("m", "multiple", false, "treat the input file as having a wildcard ending");
-        options.addOption("s", "skipdns", false, "skip performing reverse DNS lookups on IP addresses");
-        options.addOption("v", "verbose", false, "display verbose output (useful for debugging)");
+        options.addOption("i", "in", true,
+                "the input file ('-' or omit for standard input)");
+        options.addOption("l", "local", false,
+                "developers tool - map external log file to local handles");
+        options.addOption("m", "multiple", false,
+                "treat the input file as having a wildcard ending");
+        options.addOption("s", "skipdns", false,
+                "skip performing reverse DNS lookups on IP addresses");
+        options.addOption("v", "verbose", false,
+                "display verbose output (useful for debugging)");
         options.addOption("h", "help", false, "help");
 
-		CommandLine line = parser.parse(options, args);
+        CommandLine line = parser.parse(options, args);
 
         // Did the user ask to see the help?
         if (line.hasOption('h'))
@@ -443,7 +527,8 @@ public class StatisticsImporter
 
         if (!line.hasOption('i'))
         {
-            System.err.println("You must specify an input file using the -i flag");
+            System.err
+                    .println("You must specify an input file using the -i flag");
             printHelp(options, 1);
         }
 
@@ -456,35 +541,44 @@ public class StatisticsImporter
         // (useful if using someone else's log file for testing)
         boolean local = line.hasOption('l');
 
-		// We got all our parameters now get the rest
-		Context context = new Context();
+        // We got all our parameters now get the rest
+        Context context = new Context();
 
         // Verbose option
         boolean verbose = line.hasOption('v');
 
         // Find our solr server
-        String sserver = ConfigurationManager.getProperty("solr-statistics", "server");
+        String sserver = ConfigurationManager.getProperty(
+                SolrLogger.CFG_MODULE, "server");
         if (verbose)
         {
             System.out.println("Writing to solr server at: " + sserver);
         }
-		solr = new CommonsHttpSolrServer(sserver);
+        solr = new HttpSolrServer(sserver);
 
-		metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
-        String dbfile = ConfigurationManager.getProperty("solr-statistics", "dbfile");
+        String dbfile = ConfigurationManager.getProperty(SolrLogger.CFG_MODULE,
+                "dbfile");
         try
         {
-            geoipLookup = new LookupService(dbfile, LookupService.GEOIP_STANDARD);
+            geoipLookup = new LookupService(dbfile,
+                    LookupService.GEOIP_STANDARD);
         }
         catch (FileNotFoundException fe)
         {
-            log.error("The GeoLite Database file is missing (" + dbfile + ")! Solr Statistics cannot generate location based reports! Please see the DSpace installation instructions for instructions to install this file.", fe);
+            log.error(
+                    "The GeoLite Database file is missing ("
+                            + dbfile
+                            + ")! Solr Statistics cannot generate location based reports! Please see the DSpace installation instructions for instructions to install this file.",
+                    fe);
         }
         catch (IOException e)
         {
-            log.error("Unable to load GeoLite Database file (" + dbfile + ")! You may need to reinstall it. See the DSpace installation instructions for more details.", e);
+            log.error(
+                    "Unable to load GeoLite Database file ("
+                            + dbfile
+                            + ")! You may need to reinstall it. See the DSpace installation instructions for more details.",
+                    e);
         }
-		
 
         StatisticsImporter si = new StatisticsImporter(local);
         if (line.hasOption('m'))
@@ -503,7 +597,9 @@ public class StatisticsImporter
             for (String in : children)
             {
                 System.out.println(in);
-                si.load(dir.getAbsolutePath() + System.getProperty("file.separator") + in, context, verbose);
+                si.load(dir.getAbsolutePath()
+                        + System.getProperty("file.separator") + in, context,
+                        verbose);
             }
         }
         else
@@ -513,13 +609,13 @@ public class StatisticsImporter
         }
     }
 
-
     /**
      * Inner class to hold a cache of reverse lookups of IP addresses
+     * 
      * @param <K>
      * @param <V>
      */
-    static class DNSCache<K,V> extends LinkedHashMap<K,V>
+    class DNSCache<K, V> extends LinkedHashMap<K, V>
     {
         private int maxCapacity;
 
@@ -530,7 +626,7 @@ public class StatisticsImporter
         }
 
         @Override
-        protected boolean removeEldestEntry(java.util.Map.Entry<K,V> eldest)
+        protected boolean removeEldestEntry(java.util.Map.Entry<K, V> eldest)
         {
             return size() >= this.maxCapacity;
         }

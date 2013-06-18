@@ -210,8 +210,8 @@
       </td>
     </tr>
   </table>
-          <div align="center">
-                   <a class="statisticsLink" href="<%= request.getContextPath() %>/handle/<%= collection.getHandle() %>/statistics"><fmt:message key="jsp.collection-home.display-statistics"/></a>
+          <div align="center">          		
+ 				<a class="statisticsLink" href="<%= request.getContextPath() %>/cris/stats/collection.html?handle=<%= collection.getHandle() %>"><fmt:message key="jsp.collection-home.display-statistics"/></a> 				                   
           </div>
 
   <%= intro %>

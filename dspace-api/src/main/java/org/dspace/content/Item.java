@@ -25,6 +25,7 @@ import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.IndexBrowse;
 import org.dspace.core.Constants;
@@ -55,7 +56,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * @author Martin Hald
  * @version $Revision$
  */
-public class Item extends DSpaceObject
+public class Item extends DSpaceObject implements BrowsableDSpaceObject
 {
     /**
      * Wild card for Dublin Core metadata qualifiers/languages
@@ -2755,5 +2756,9 @@ public class Item extends DSpaceObject
 
             return null;
         }
+    }
+    
+    public String getTypeText() {
+        return Constants.typeText[Constants.ITEM];
     }
 }

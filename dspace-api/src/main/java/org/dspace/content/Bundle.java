@@ -811,4 +811,8 @@ public class Bundle extends DSpaceObject
             return null;
         }
     }
+    
+    public String getTypeText() {
+        return Constants.typeText[Constants.BUNDLE];
+    }
 }

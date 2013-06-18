@@ -41,7 +41,7 @@ public class UsageEvent extends Event {
 	    Action(String text) {
 	        this.text = text;
 	    }
-	    String text()   { return text; }
+	    public String text()   { return text; }
 	}
 	
 	/**
@@ -82,7 +82,7 @@ public class UsageEvent extends Event {
 		
 		try
 		{
-			String objText = Constants.typeText[object.getType()].toLowerCase();
+			String objText = object.getTypeText().toLowerCase();
 			return  objText + ":" + action.text();
 		}catch(Exception e)
 		{
@@ -99,7 +99,7 @@ public class UsageEvent extends Event {
 		
 		this.action = action;
 	
-		this.setResourceReference(object != null ? Constants.typeText[object.getType()].toLowerCase() + ":" + object.getID() : null);
+		this.setResourceReference(object != null ? object.getTypeText().toLowerCase() + ":" + object.getID() : null);
 		
 		switch(action)
 		{

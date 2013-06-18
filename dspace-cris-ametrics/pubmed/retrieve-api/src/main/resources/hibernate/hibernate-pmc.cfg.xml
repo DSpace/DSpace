@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+	<session-factory>
+
+		<!-- SEE HERE -> 
+				connection parameters in dspace.cfg
+				Dialect in hibernate.properties 
+		-->
+		<property name="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</property> 
+		<!-- <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>  -->
+		
+		<property name="hibernate.default_batch_fetch_size">10240</property>
+
+		<property name="hibernate.cache.use_second_level_cache">true</property>
+		<property name="hibernate.cache.use_query_cache">true</property>								
+		<property name="hibernate.cache.provider_class">net.sf.ehcache.hibernate.SingletonEhCacheProvider</property>	
+
+		<property name="hibernate.bytecode.use_reflection_optimizer">true</property>		
+		<property name="hibernate.show_sql">false</property>
+		<property name="hibernate.generate_statistics">false</property>
+		
+
+						
+		<!-- alternative to C3P0 -->
+		<property name="hibernate.connection.pool_size">30</property>  
+
+		<property name="hibernate.search.autoregister_listeners">false</property>
+
+		<!-- configuration pool via c3p0--> 
+		<property name="hibernate.connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property> 
+		<property name="hibernate.c3p0.max_statements">0</property> 		
+		<property name="hibernate.c3p0.timeout">100</property> <!-- seconds -->
+
+
+		<mapping class="it.cilea.osd.common.core.TimeStampInfo" />
+		<mapping class="it.cilea.osd.common.core.SingleTimeStampInfo" />
+		
+		<mapping class="org.dspace.app.cris.pmc.model.PMCRecord" />
+		<mapping class="org.dspace.app.cris.pmc.model.PMCCitation" />
+	</session-factory>
+
+</hibernate-configuration>
+

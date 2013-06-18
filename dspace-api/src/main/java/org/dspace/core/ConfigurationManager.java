@@ -58,7 +58,7 @@ public class ConfigurationManager
     private static Properties properties = null;
     
     /** module configuration properties */
-    private static Map<String, Properties> moduleProps = null;
+    private static Map<String, Properties> moduleProps = new HashMap<String, Properties>();
 
     /** The default license */
     private static String license;
@@ -148,7 +148,10 @@ public class ConfigurationManager
 
     private static Properties getMutableProperties(String module)
     {
-        Properties retProps = (module != null) ? moduleProps.get(module) : properties;
+        if (module == null)
+            return properties;
+
+        Properties retProps = moduleProps.get(module);
         if (retProps == null)
         {
             loadModuleConfig(module);
@@ -587,6 +590,7 @@ public class ConfigurationManager
     public static Email getEmail(String emailFile) throws IOException
     {
         String charset = null;
+        String contentType = null;
         String subject = "";
         StringBuffer contentBuffer = new StringBuffer();
 
@@ -617,6 +621,10 @@ public class ConfigurationManager
                     // Extract the character set from the email
                     charset = line.substring(8).trim();
                 }
+            	else if (line.toLowerCase().startsWith("content-type:"))
+        		{
+        		    contentType = line.substring(13).trim();
+        		}
                 else if (!line.startsWith("#"))
                 {
                     // Add non-comment lines to the content
@@ -637,6 +645,10 @@ public class ConfigurationManager
         email.setSubject(subject);
         email.setContent(contentBuffer.toString());
 
+    	if (contentType != null) {
+    	    email.setContentType(contentType);
+    	}
+    	
         if (charset != null)
         {
             email.setCharset(charset);
@@ -917,7 +929,6 @@ public class ConfigurationManager
             else
             {
                 properties = new Properties();
-                moduleProps = new HashMap<String, Properties>();
                 is = url.openStream();
                 properties.load(is);
 

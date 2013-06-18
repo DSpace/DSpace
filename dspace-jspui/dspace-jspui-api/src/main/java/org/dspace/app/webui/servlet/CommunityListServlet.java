@@ -9,7 +9,9 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -24,6 +26,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Subscribe;
 
 /**
  * Servlet for listing communities (and collections within them)
@@ -69,6 +73,17 @@ public class CommunityListServlet extends DSpaceServlet
             // set a variable to create an edit button
             request.setAttribute("admin_button", Boolean.TRUE);
         }
+       EPerson currUser = context.getCurrentUser();
+        List<Integer> commIDsubs = new ArrayList<Integer>();
+        List<Integer> collIDsubs = new ArrayList<Integer>();
+        if (currUser != null)
+        {
+            commIDsubs = Subscribe.getCommunityIDSubscriptions(context, currUser);
+            collIDsubs = Subscribe.getCollectionIDSubscriptions(context, currUser);
+            
+        }
+        request.setAttribute("subscription_communities", commIDsubs);
+        request.setAttribute("subscription_collections", collIDsubs);
 
         request.setAttribute("communities", communities);
         request.setAttribute("collections.map", colMap);

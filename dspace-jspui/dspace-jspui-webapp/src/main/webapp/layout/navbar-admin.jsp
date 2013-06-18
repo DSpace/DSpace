@@ -20,7 +20,8 @@
 <%@ page import="org.dspace.browse.BrowseInfo" %>
 <%@ page import="org.dspace.sort.SortOption" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
-<%@page import="org.dspace.core.ConfigurationManager"%>
+<%@ page import="org.dspace.core.ConfigurationManager"%>
+<%@ page import="org.dspace.app.cris.model.CrisConstants"%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -34,7 +35,7 @@
         currentPage = currentPage.substring(0, c);
     }
     
-    boolean crisModuleEnabled = ConfigurationManager.getBooleanProperty("feature.cris.enabled");
+    boolean crisModuleEnabled = ConfigurationManager.getBooleanProperty(CrisConstants.CFG_MODULE,"enabled");
 %>
 
 <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
@@ -190,6 +191,15 @@
     </td>
   </tr>
 
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/authority") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
+    </td>
+    <td nowrap="nowrap" class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/dspace-admin/authority"><fmt:message key="jsp.layout.navbar-admin.authority"/></a>
+    </td>
+  </tr>
+  
   <tr>
      <td colspan="2">&nbsp;</td>
   </tr>

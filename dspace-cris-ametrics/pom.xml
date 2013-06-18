@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>pom</packaging>
+    <groupId>org.dspace</groupId>
+    <artifactId>dspace-cris-ametrics</artifactId>
+    <version>0.1</version>
+    <name>Article Metrics :: Modules</name>
+
+    <parent>
+        <artifactId>dspace-parent</artifactId>
+		<groupId>org.dspace</groupId>
+		<version>1.8.3-SNAPSHOT</version>
+    </parent>
+    
+    <modules>
+        <module>pubmed</module>
+    </modules>
+
+   <!--Force UTF-8 encoding during build on all platforms-->
+   <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+   </properties>
+
+	<dependencyManagement>
+		<dependencies>
+		  <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>    
+            <version>1.8.3-SNAPSHOT</version>      
+        </dependency>
+        <dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-stats</artifactId>
+			<version>1.8.3-SNAPSHOT</version>
+		</dependency>
+		 <dependency>
+        	<groupId>org.dspace</groupId>
+        	<artifactId>dspace-jspui-api</artifactId>
+        	<version>1.8.3-SNAPSHOT</version>
+        </dependency>
+		
+		</dependencies>
+	</dependencyManagement>   
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>maven.dspace.org-snapshot</id>
+            <name>DSpace Maven Snapshot Repository</name>
+            <url>http://maven.dspace.org/snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+                <checksumPolicy>fail</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+
+
+	<developers>
+		<developer>
+			<name>Andrea Bollini</name>
+			<email>a.bollini@cineca.it</email>
+			<timezone>GMT +1</timezone>
+		</developer>
+		<developer>
+			<name>Luigi Andrea Pascarelli</name>
+			<email>luigiandrea.pascarelli@cineca.it</email>
+			<timezone>GMT +1</timezone>
+		</developer>
+	</developers>
+	
+   <!--
+        Distribution Management is currently used by the Continuum
+        server to update snapshots it generates. This will also be used
+        on release to deploy release versions to the repository by the
+        release manager.
+    -->
+    <distributionManagement>
+        <repository>
+            <id>maven.dspace.org/release</id>
+            <name>DSpace Maven Repository</name>
+            <url>scp://maven.dspace.org/var/maven/release
+            </url>
+        </repository>
+        <snapshotRepository>
+            <id>maven.dspace.org/snapshot</id>
+            <name>DSpace Maven Repository</name>
+            <url>scp://maven.dspace.org/var/maven/snapshot
+            </url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+        <site>
+            <id>website</id>
+            <url>scp://projects.dspace.org/var/www/projects.dspace.org/htdocs/${artifactId}</url>
+        </site>
+    </distributionManagement>
+
+    
+</project>

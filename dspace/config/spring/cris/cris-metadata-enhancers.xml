@@ -25,7 +25,23 @@
 		</property>
 		<property name="qualifiers2path">
 			<map>
-				<entry key="dept"><value>dept</value></entry>				
+				<entry key="dept">
+					<value>dept</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean class="org.dspace.app.cris.discovery.CrisEnhancer">
+		<property name="clazz">
+			<value>org.dspace.app.cris.model.Project</value>
+		</property>
+		<property name="alias" value="principalinvestigator" />
+		<property name="qualifiers2path">
+			<map>
+				<entry key="dept">
+					<value>dept</value>
+				</entry>
 			</map>
 		</property>
 	</bean>
@@ -37,9 +53,68 @@
 		<property name="alias" value="coinvestigators" />
 		<property name="qualifiers2path">
 			<map>
-				<entry key="dept"><value>dept</value></entry>		
+				<entry key="dept">
+					<value>dept</value>
+				</entry>
 			</map>
 		</property>
 	</bean>
 	
+	<bean class="org.dspace.app.cris.discovery.CrisNestedEnhancer"
+		scope="prototype">
+		<property name="applicationService" ref="applicationService" />
+		<property name="nestedClazz" value="org.dspace.app.cris.model.jdyna.RPNestedObject" />
+		<property name="clazz">
+			<value>org.dspace.app.cris.model.ResearcherPage</value>
+		</property>
+		<property name="alias" value="spoken" />
+		<property name="qualifiers2path">
+			<map>
+				<entry key="spokenEN">
+					<value>spokenEN</value>
+				</entry>
+				<entry key="spokenZH">
+					<value>spokenZH</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean class="org.dspace.app.cris.discovery.CrisNestedEnhancer"
+		scope="prototype">
+		<property name="applicationService" ref="applicationService" />
+		<property name="nestedClazz" value="org.dspace.app.cris.model.jdyna.RPNestedObject" />
+		<property name="clazz">
+			<value>org.dspace.app.cris.model.ResearcherPage</value>
+		</property>
+		<property name="alias" value="written" />
+		<property name="qualifiers2path">
+			<map>
+				<entry key="writtenEN">
+					<value>writtenEN</value>
+				</entry>
+				<entry key="writtenZH">
+					<value>writtenZH</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+
+	<bean class="org.dspace.app.cris.discovery.CrisNestedEnhancer"
+		scope="prototype">
+		<property name="applicationService" ref="applicationService" />
+		<property name="nestedClazz" value="org.dspace.app.cris.model.jdyna.ProjectNestedObject" />
+		<property name="clazz">
+			<value>org.dspace.app.cris.model.Project</value>
+		</property>
+		<property name="alias" value="grant" />
+		<property name="qualifiers2path">
+			<map>
+				<entry key="agencies">
+					<value>agencies</value>
+				</entry>				
+			</map>
+		</property>
+	</bean>
 </beans>

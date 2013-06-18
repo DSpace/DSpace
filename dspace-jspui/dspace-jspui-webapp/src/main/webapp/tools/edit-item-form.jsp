@@ -51,7 +51,12 @@
 <%@ page import="org.dspace.content.authority.Choices" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="java.util.ArrayList" %>
-
+<c:set var="dspace.layout.head.last" scope="request">
+    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/prototype.js"> </script>
+    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/effects.js"> </script>
+    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/builder.js"> </script>
+    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/controls.js"> </script>
+</c:set>
 <%
     Item item = (Item) request.getAttribute("item");
     String handle = (String) request.getAttribute("handle");

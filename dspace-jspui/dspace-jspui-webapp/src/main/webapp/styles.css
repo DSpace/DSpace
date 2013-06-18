@@ -702,3 +702,35 @@ input.ds-authority-lock.is-locked
   { background-image: url(./image/lock24.png); }
 input.ds-authority-lock.is-unlocked
   { background-image: url(./image/unlock24.png); }
+
+  
+/* this magic gets the 16x16 icon to show up.. setting height/width didn't
+   do it, but adding padding actually made it show up. */
+img.ds-authority-confidence,
+span.ds-authority-confidence
+{ width: 16px; height: 16px; margin: 5px; background-repeat: no-repeat;
+  padding: 0px 2px; vertical-align: bottom; color: transparent;}
+img.ds-authority-confidence.cf-UNSET,
+span.ds-authority-confidence.cf-UNSET
+  { background-image: url(image/confidence/0-unauthored.gif);}
+img.ds-authority-confidence.cf-NOVALUE,
+span.ds-authority-confidence.cf-NOVALUE
+  { background-image: url(image/authority/bug.png);}
+img.ds-authority-confidence.cf-REJECTED,
+span.ds-authority-confidence.cf-REJECTED
+  { background-image: url(image/confidence/3-circleslash.gif); }
+img.ds-authority-confidence.cf-FAILED,
+span.ds-authority-confidence.cf-FAILED
+  { background-image: url(image/confidence/2-errortriangle.gif); }
+img.ds-authority-confidence.cf-NOTFOUND,
+span.ds-authority-confidence.cf-NOTFOUND
+  { background-image: url(image/confidence/2-warntriangle.gif); }
+img.ds-authority-confidence.cf-AMBIGUOUS,
+span.ds-authority-confidence.cf-AMBIGUOUS
+  { background-image: url(image/confidence/4-question.gif); }
+img.ds-authority-confidence.cf-UNCERTAIN,
+span.ds-authority-confidence.cf-UNCERTAIN
+  { background-image: url(image/confidence/5-pinion.gif); }
+img.ds-authority-confidence.cf-ACCEPTED,
+span.ds-authority-confidence.cf-ACCEPTED
+  { background-image: url(image/confidence/6-greencheck.gif); }

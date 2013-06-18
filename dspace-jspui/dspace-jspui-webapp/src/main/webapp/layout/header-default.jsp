@@ -80,11 +80,7 @@
 %>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-1.8.2.min.js'></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.8.24.custom.min.js'></script>    
-    <script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>
-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/prototype.js"> </script>
-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/effects.js"> </script>
-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/builder.js"> </script>
-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/controls.js"> </script>
+    <script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>    
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/choice-support.js"> </script>
     <script type="text/javascript" src="<%=request.getContextPath()%>/js/jdyna/jdyna.js"></script>    
  <% if (extraHeadDataLast != null)

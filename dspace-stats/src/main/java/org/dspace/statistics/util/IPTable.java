@@ -123,7 +123,7 @@ public class IPTable {
 
         if (subnets.length != 4)
         {
-            throw new IPFormatException("needs to be single IP Address");
+            throw new IPFormatException("needs to be a single IP address");
         }
 
         Map<String, Map<String, Set<String>>> first = map.get(subnets[0]);

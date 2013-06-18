@@ -1102,5 +1102,9 @@ public class EPerson extends DSpaceObject
     {
         return getEmail();
     }
+    
+    public String getTypeText() {
+        return Constants.typeText[Constants.EPERSON];
+    }
 
 }

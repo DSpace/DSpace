@@ -12,10 +12,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Stack;
+
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.dspace.eperson.EPerson;
@@ -82,6 +86,9 @@ public class Context
     /** Event dispatcher name */
     private String dispName = null;
 
+    /** Autocommit */
+    private boolean isAutoCommit;
+
     /**
      * Construct a new context object. A database connection is opened. No user
      * is authenticated.
@@ -93,7 +100,13 @@ public class Context
     {
         // Obtain a non-auto-committing connection
         connection = DatabaseManager.getConnection();
-        connection.setAutoCommit(false);
+
+//	This is one heck of a bottleneck, most visitors were just outsider/robots, they should be
+//	querying our database most of the time, so just let them do the reading and guard only those
+//	updating our database instead, don't lock up the connection just for the sake of those people.
+//	Free up those "Idle in Transaction" connections.
+        connection.setAutoCommit(true);
+	isAutoCommit = true;
 
         currentUser = null;
         currentLocale = I18nUtil.DEFAULTLOCALE;
@@ -117,6 +130,12 @@ public class Context
         return connection;
     }
 
+    public void setAutoCommit(boolean b) throws SQLException
+    {
+	if (b != isAutoCommit)
+		connection.setAutoCommit(b);
+	isAutoCommit = b;
+    }
     /**
      * Set the current user. Authentication must have been performed by the
      * caller - this call does not attempt any authentication.
@@ -297,6 +316,7 @@ public class Context
         try
         {
             // Commit any changes made as part of the transaction
+	    if (!isAutoCommit)
             commit();
         }
         finally
@@ -332,11 +352,13 @@ public class Context
                 }
 
                 dispatcher = EventManager.getDispatcher(dispName);
+		if (!isAutoCommit)
                 connection.commit();
                 dispatcher.dispatch(this);
             }
             else
             {
+		if (!isAutoCommit)
                 connection.commit();
             }
 
@@ -407,14 +429,13 @@ public class Context
     {
         try
         {
-            if (!connection.isClosed())
-            {
+            if (!connection.isClosed() && !isAutoCommit)
                 connection.rollback();
             }
-        }
         catch (SQLException se)
         {
-            log.error(se.getMessage(), se);
+            log.error(se.getMessage());
+            se.printStackTrace();
         }
         finally
         {

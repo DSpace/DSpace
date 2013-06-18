@@ -430,11 +430,48 @@ public class HandleServlet extends DSpaceServlet
      */
     private void communityHome(Context context, HttpServletRequest request,
             HttpServletResponse response, Community community)
-            throws ServletException, IOException, SQLException
+            throws ServletException, IOException, SQLException, AuthorizeException
     {
         // Handle click on a browse or search button
         if (!handleButton(request, response, community.getHandle()))
         {
+         // Will need to know whether to commit to DB
+            boolean updated = false;
+
+            // No search or browse button pressed, check for
+            if (request.getParameter("submit_subscribe") != null)
+            {
+                // Subscribe button pressed.
+                // Only registered can subscribe, so redirect unless logged in.
+                if (context.getCurrentUser() == null &&
+                    !Authenticate
+                            .startAuthentication(context, request, response))
+
+                    return;
+                else
+                {
+                    // Unsubscribe button pressed.
+                    // Only registered can unsubscribe, so redirect unless logged in.
+                    if (context.getCurrentUser() == null &&
+                        !Authenticate
+                                .startAuthentication(context, request, response))
+
+                        return;
+                    else
+                    {
+                        Subscribe.subscribe(context, context.getCurrentUser(),
+                                community);
+                        updated = true;
+                    }
+                }
+            }
+            else if (request.getParameter("submit_unsubscribe") != null)
+            {
+                Subscribe.unsubscribe(context, context.getCurrentUser(),
+                        community);
+                updated = true;
+            }
+            
             // No button pressed, display community home page
             log.info(LogManager.getHeader(context, "view_community",
                     "community_id=" + community.getID()));
@@ -448,6 +485,15 @@ public class HandleServlet extends DSpaceServlet
             // perform any necessary pre-processing
             preProcessCommunityHome(context, request, response, community);
 
+            // Is the user logged in/subscribed?
+            EPerson e = context.getCurrentUser();
+            boolean subscribed = false;
+
+            if (e != null)
+            {
+                subscribed = Subscribe.isSubscribed(context, e, community);
+            }
+            
             // is the user a COMMUNITY_EDITOR?
             if (community.canEditBoolean())
             {
@@ -483,7 +529,14 @@ public class HandleServlet extends DSpaceServlet
             request.setAttribute("community", community);
             request.setAttribute("collections", collections);
             request.setAttribute("subcommunities", subcommunities);
+            request.setAttribute("logged.in", new Boolean(e != null));
+            request.setAttribute("subscribed", new Boolean(subscribed));
             JSPManager.showJSP(request, response, "/community-home.jsp");
+            
+            if (updated)
+            {
+                context.complete();
+            }
         }
     }
 
@@ -553,9 +606,19 @@ public class HandleServlet extends DSpaceServlet
             }
             else if (request.getParameter("submit_unsubscribe") != null)
             {
+                // Unsubscribe button pressed.
+                // Only registered can unsubscribe, so redirect unless logged in.
+                if (context.getCurrentUser() == null &&
+                    !Authenticate
+                            .startAuthentication(context, request, response))
+
+                    return;
+                else
+                {
                 Subscribe.unsubscribe(context, context.getCurrentUser(),
                         collection);
                 updated = true;
+            }
             }
 
             // display collection home page

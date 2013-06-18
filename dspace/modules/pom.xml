@@ -85,7 +85,7 @@
             <modules>
                 <module>swordv2</module>
             </modules>
-        </profile> -->
+        </profile> 
         <profile>
             <id>dspace-solr</id>
             <activation>
@@ -94,6 +94,6 @@
             <modules>
                 <module>solr</module>
             </modules>
-        </profile>
+        </profile> -->
     </profiles>
 </project>

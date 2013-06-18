@@ -116,11 +116,13 @@
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-sword-webapp</artifactId>
+         <version>1.8.3-SNAPSHOT</version>
          <type>war</type>
       </dependency>
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-sword-api</artifactId>
+         <version>1.8.3-SNAPSHOT</version>
       </dependency>
 <!--      <dependency>
          <groupId>org.dspace</groupId>

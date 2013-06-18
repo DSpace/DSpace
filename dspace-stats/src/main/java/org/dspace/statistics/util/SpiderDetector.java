@@ -21,30 +21,36 @@ import java.util.Set;
 
 /**
  * SpiderDetector is used to find IP's that are spiders...
- * In future someone may add UserAgents and Host Domains
  * to the detection criteria here.
  *
  * @author kevinvandevelde at atmire.com
  * @author ben at atmire.com
  * @author Mark Diggory (mdiggory at atmire.com)
  */
-public class SpiderDetector {
+public class SpiderDetector
+{
 
     private static Logger log = Logger.getLogger(SpiderDetector.class);
 
     /**
      * Sparse HAshTable structure to hold IP Address Ranges.
      */
-    private static IPTable table = null;
+    private IPTable table = null;
+
+    private UATable ua_table = null;
 
     /**
      * Utility method which Reads the ip addresses out a file & returns them in a Set
+     * a Set
      *
+     * @param spiderIpFile
      * @param spiderIpFile the location of our spider file
      * @return a vector full of ip's
+     * @throws IOException
      * @throws IOException could not happen since we check the file be4 we use it
      */
-    public static Set<String> readIpAddresses(File spiderIpFile) throws IOException {
+    public Set<String> readIpAddresses(File spiderIpFile) throws IOException
+    {
         Set<String> ips = new HashSet<String>();
 
         if (!spiderIpFile.exists() || !spiderIpFile.isFile())
@@ -55,20 +61,30 @@ public class SpiderDetector {
         //Read our file & get all them ip's
         BufferedReader in = new BufferedReader(new FileReader(spiderIpFile));
         String line;
-        while ((line = in.readLine()) != null) {
-            if (!line.startsWith("#")) {
+        while ((line = in.readLine()) != null)
+        {
+            if (!line.startsWith("#"))
+            {
                 line = line.trim();
 
-                if (!line.equals("") && !Character.isDigit(line.charAt(0))) {
+                if (!line.equals("") && !Character.isDigit(line.charAt(0)))
+                {
                     // is a hostname
                     // add this functionality later...
-                } else if (!line.equals("")) {
+                }
+                else if (!line.equals(""))
+                {
                     ips.add(line);
                     // is full v4 ip (too tired to deal with v6)...
                 }
-            } else {
-                //   ua.add(line.replaceFirst("#","").replaceFirst("UA","").trim());
-                // ... add this functionality later
+            }
+            else
+            {
+                String ua = line.replaceFirst("#", "").replaceFirst("UA", "")
+                        .trim();
+                if (ua.startsWith("\"") && ua.endsWith("\""))
+                    ua = ua.substring(1, ua.length() - 1);
+                ua_table.add(ua);
             }
         }
         in.close();
@@ -80,7 +96,8 @@ public class SpiderDetector {
      *
      * @return
      */
-    public static Set<String> getSpiderIpAddresses() {
+    public Set<String> getSpiderIpAddresses()
+    {
 
         loadSpiderIpAddresses();
         return table.toSet();
@@ -90,31 +107,40 @@ public class SpiderDetector {
         private loader to populate the table from files.
      */
 
-    private static void loadSpiderIpAddresses() {
+    private void loadSpiderIpAddresses()
+    {
 
-
-        if (table == null) {
+        if (table == null)
+        {
             table = new IPTable();
+            ua_table = new UATable();
 
             String filePath = ConfigurationManager.getProperty("dspace.dir");
 
-            try {
+            try
+            {
                 File spidersDir = new File(filePath, "config/spiders");
 
-                if (spidersDir.exists() && spidersDir.isDirectory()) {
-                    for (File file : spidersDir.listFiles()) {
-                        for (String ip : readIpAddresses(file)) {
+                if (spidersDir.exists() && spidersDir.isDirectory())
+                {
+                    for (File file : spidersDir.listFiles())
+                    {
+                        for (String ip : readIpAddresses(file))
+                        {
                             table.add(ip);
                         }
                         log.info("Loaded Spider IP file: " + file);
                     }
-                } else {
+                }
+                else
+                {
                     log.info("No spider file loaded");
                 }
 
 
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 log.error("Error Loading Spiders:" + e.getMessage(), e);
             }
 
@@ -136,20 +162,23 @@ public class SpiderDetector {
      * @param request
      * @return true|false if the request was detected to be from a spider
      */
-    public static boolean isSpider(HttpServletRequest request) {
+    public boolean isSpider(HttpServletRequest request, boolean isUseProxies)
+    {
 
-        if (SolrLogger.isUseProxies() && request.getHeader("X-Forwarded-For") != null) {
+        if (isUseProxies
+                && request.getHeader("X-Forwarded-For") != null)
+        {
             /* This header is a comma delimited list */
-            for (String xfip : request.getHeader("X-Forwarded-For").split(",")) {
-                if (isSpider(xfip))
+            for (String xfip : request.getHeader("X-Forwarded-For").split(","))
                 {
+                if (isSpiderByIp(xfip))
                     return true;
                 }
             }
-        }
 
-        return isSpider(request.getRemoteAddr());
-
+        return (isSpiderByIp(request.getRemoteAddr()) || (request
+                .getHeader("User-Agent") != null && isSpiderByUserAgent(request
+                .getHeader("User-Agent"))));
     }
 
     /**
@@ -158,23 +187,37 @@ public class SpiderDetector {
      * @param ip
      * @return if is spider IP
      */
-    public static boolean isSpider(String ip) {
+    public boolean isSpiderByIp(String ip)
+    {
 
-        if (table == null) {
-            SpiderDetector.loadSpiderIpAddresses();
+        if (table == null)
+        {
+            loadSpiderIpAddresses();
         }
 
-        try {
-            if (table.contains(ip)) {
+        try
+        {
+            if (table.contains(ip))
+            {
                 return true;
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return false;
         }
 
         return false;
 
+    }
 
+    public boolean isSpiderByUserAgent(String ua)
+    {
+        if (ua_table == null)
+        {
+            loadSpiderIpAddresses();
+        }
+        return ua_table.contains(ua);
     }
 
 }

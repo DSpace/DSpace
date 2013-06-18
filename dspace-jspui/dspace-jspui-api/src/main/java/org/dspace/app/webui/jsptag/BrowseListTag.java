@@ -37,6 +37,7 @@ import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.PluginManager;
+import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 
 /**
@@ -78,6 +79,9 @@ public class BrowseListTag extends TagSupport
 
     /** Config to use a specific configuration */
     private String config = null;
+    
+    private String sortBy = null;
+    private String order = null;
     
     /** The default fields to be displayed when listing items */
     private static final String DEFAULT_LIST_FIELDS;
@@ -426,12 +430,63 @@ public class BrowseListTag extends TagSupport
                 // prepare the strings for the header
                 String id = "t" + Integer.toString(colIdx + 1);
                 String css = "oddRow" + cOddOrEven[colIdx] + "Col";
+                String thJs = null;
                 String message = "itemlist." + field;
+                try {
+					for (SortOption tmpSo : SortOption.getSortOptions())
+					{
+					    if (field.equalsIgnoreCase(tmpSo.getMetadata()))
+					    {
+					    	css += " sortable sort_"+tmpSo.getNumber();
+					    	thJs = " onclick=\"sortBy(" + tmpSo.getNumber() + ",";
+					        if (browseInfo != null && browseInfo.getSortOption() != null &&
+					                browseInfo.getSortOption().getNumber() == tmpSo.getNumber())
+					        {                           
+					            if (!browseInfo.isAscending())
+					            {
+					                thJs += " 'ASC'";
+					                css += " sorted_desc";
+					            }
+					            else
+					            {
+					                thJs += " 'DESC'";
+					                css += " sorted_asc";
+					            }
+					        }
+					        else if (sortBy != null && Integer.parseInt(sortBy) == tmpSo.getNumber())
+					        {					            
+					        	if ("DESC".equalsIgnoreCase(order))
+					            {
+					        	    thJs += " 'ASC'";
+					                css += " sorted_desc";
+					            }
+					            else
+					            {
+					                thJs += " 'DESC'";
+					                css += " sorted_asc";
+					            }
+					        }
+					        else {
+					            thJs += " 'ASC'";
+	                            css += " sortable";
+					        }
+					        thJs += ")\"";
+					      
+					        break;
+					    }
+					}
+				
+
+				} catch (SortException e) {
+					log.error(e.getMessage(), e);
+				}
 
                 // output the header
                 out.print("<th id=\"" + id +  "\" class=\"" + css + "\">"
                         + (emph[colIdx] ? "<strong>" : "")
-                        + LocaleSupport.getLocalizedMessage(pageContext, message)
+                        + (thJs != null ? "<a " + thJs + " href=\"#\">" : "")
+                        + LocaleSupport.getLocalizedMessage(pageContext,
+                                message) + (thJs != null ? "</a>" : "")                        
                         + (emph[colIdx] ? "</strong>" : "") + "</th>");
             }
 
@@ -715,11 +770,29 @@ public class BrowseListTag extends TagSupport
         return config;
     }
 
+    public void setOrder(String order) {
+		this.order = order;
+	}
+    
+    public String getOrder() {
+		return order;
+	}
+    
+    public void setSortBy(String sortBy) {
+		this.sortBy = sortBy;
+	}
+    
+    public String getSortBy() {
+		return sortBy;
+	}
+
     public void release()
     {
         highlightRow = -1;
         emphColumn = null;
         items = null;
+        sortBy = null;
+        order = null;
     }
 
 

@@ -93,8 +93,7 @@ import javax.mail.internet.MimeMultipart;
  * @author Jim Downing - added attachment handling code
  * @version $Revision$
  */
-public class Email
-{
+public class Email {
     /*
      * Implementation note: It might be necessary to add a quick utility method
      * like "send(to, subject, message)". We'll see how far we get without it -
@@ -125,13 +124,14 @@ public class Email
     /** The character set this message will be sent in */
     private String charset;
 
+    private String contentType;
+
     private static final Logger log = Logger.getLogger(Email.class);
 
     /**
      * Create a new email message.
      */
-    Email()
-    {
+    Email() {
         arguments = new ArrayList<Object>(50);
         recipients = new ArrayList<String>(50);
         attachments = new ArrayList<FileAttachment>(10);
@@ -147,8 +147,7 @@ public class Email
      * @param email
      *            the recipient's email address
      */
-    public void addRecipient(String email)
-    {
+    public void addRecipient(String email) {
         recipients.add(email);
     }
 
@@ -160,8 +159,7 @@ public class Email
      * @param cnt
      *            the content of the message
      */
-    void setContent(String cnt)
-    {
+    void setContent(String cnt) {
         content = cnt;
         arguments = new ArrayList<Object>();
     }
@@ -172,8 +170,7 @@ public class Email
      * @param s
      *            the subject of the message
      */
-    void setSubject(String s)
-    {
+    public void setSubject(String s) {
         subject = s;
     }
 
@@ -183,8 +180,7 @@ public class Email
      * @param email
      *            the reply-to email address
      */
-    public void setReplyTo(String email)
-    {
+    public void setReplyTo(String email) {
         replyTo = email;
     }
 
@@ -194,27 +190,27 @@ public class Email
      * @param arg
      *            the value for the next argument
      */
-    public void addArgument(Object arg)
-    {
+    public void addArgument(Object arg) {
         arguments.add(arg);
     }
 
-    public void addAttachment(File f, String name)
-    {
+    public void addAttachment(File f, String name) {
         attachments.add(new FileAttachment(f, name));
     }
 
-    public void setCharset(String cs)
-    {
+    public void setCharset(String cs) {
         charset = cs;
+    }
+
+    public void setContentType(String ct) {
+        contentType = ct;
     }
 
     /**
      * "Reset" the message. Clears the arguments and recipients, but leaves the
      * subject and content intact.
      */
-    public void reset()
-    {
+    public void reset() {
         arguments = new ArrayList<Object>(50);
         recipients = new ArrayList<String>(50);
         attachments = new ArrayList<FileAttachment>(10);
@@ -228,12 +224,12 @@ public class Email
      * @throws MessagingException
      *             if there was a problem sending the mail.
      */
-    public void send() throws MessagingException
-    {
+    public void send() throws MessagingException {
         // Get the mail configuration properties
         String server = ConfigurationManager.getProperty("mail.server");
         String from = ConfigurationManager.getProperty("mail.from.address");
-        boolean disabled = ConfigurationManager.getBooleanProperty("mail.server.disabled", false);
+        boolean disabled = ConfigurationManager.getBooleanProperty(
+                "mail.server.disabled", false);
 
         if (disabled) {
             log.info("message not sent due to mail.server.disabled: " + subject);
@@ -246,15 +242,13 @@ public class Email
 
         // Set the port number for the mail server
         String portNo = ConfigurationManager.getProperty("mail.server.port");
-        if (portNo == null)
-        {
+        if (portNo == null) {
         	portNo = "25";
         }
         props.put("mail.smtp.port", portNo.trim());
 
         // If no character set specified, attempt to retrieve a default
-        if (charset == null)
-        {
+        if (charset == null) {
             charset = ConfigurationManager.getProperty("mail.charset");    
         }
 
@@ -262,29 +256,27 @@ public class Email
         Session session;
         
         // Get the SMTP server authentication information
-        String username = ConfigurationManager.getProperty("mail.server.username");
-        String password = ConfigurationManager.getProperty("mail.server.password");
+        String username = ConfigurationManager
+                .getProperty("mail.server.username");
+        String password = ConfigurationManager
+                .getProperty("mail.server.password");
         
-        if (username != null)
-        {
+        if (username != null) {
             props.put("mail.smtp.auth", "true");
             SMTPAuthenticator smtpAuthenticator = new SMTPAuthenticator(
                     username, password);
             session = Session.getDefaultInstance(props, smtpAuthenticator);
-        }
-        else
-        {
+        } else {
             session = Session.getDefaultInstance(props);
         }
 
         // Set extra configuration properties
-        String extras = ConfigurationManager.getProperty("mail.extraproperties");
-        if ((extras != null) && (!"".equals(extras.trim())))
-        {
+        String extras = ConfigurationManager
+                .getProperty("mail.extraproperties");
+        if ((extras != null) && (!"".equals(extras.trim()))) {
             String arguments[] = extras.split(",");
             String key, value;
-            for (String argument : arguments)
-            {
+            for (String argument : arguments) {
                 key = argument.substring(0, argument.indexOf('=')).trim();
                 value = argument.substring(argument.indexOf('=') + 1).trim();
                 props.put(key, value);
@@ -297,8 +289,7 @@ public class Email
         // Set the recipients of the message
         Iterator<String> i = recipients.iterator();
 
-        while (i.hasNext())
-        {
+        while (i.hasNext()) {
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(
                     i.next()));
         }
@@ -313,38 +304,35 @@ public class Email
 
         // Set the subject of the email (may contain parameters)
         String fullSubject = MessageFormat.format(subject, args);
-        if (charset != null)
-        {
+        if (charset != null) {
             message.setSubject(fullSubject, charset);
-        }
-        else
-        {
+        } else {
             message.setSubject(fullSubject);
         }
         
         // Add attachments
-        if (attachments.isEmpty())
-        {
-            // If a character set has been specified, or a default exists
-            if (charset != null)
-            {
-                message.setText(fullMessage, charset);
+        if (attachments.isEmpty()) {
+            if (contentType != null) {
+                message.setContent(fullMessage, contentType);
             }
-            else
-            {
+            // If a character set has been specified, or a default exists
+            else if (charset != null) {
+                message.setText(fullMessage, charset);
+            } else {
                 message.setText(fullMessage);
             }
-        }
-        else
-        {
+        } else {
             Multipart multipart = new MimeMultipart();
             // create the first part of the email
             BodyPart messageBodyPart = new MimeBodyPart();
+            if (contentType != null)
+                messageBodyPart.setContent(fullMessage, contentType);
+            else
             messageBodyPart.setText(fullMessage);
             multipart.addBodyPart(messageBodyPart);
 
-            for (Iterator<FileAttachment> iter = attachments.iterator(); iter.hasNext();)
-            {
+            for (Iterator<FileAttachment> iter = attachments.iterator(); iter
+                    .hasNext();) {
                 FileAttachment f = iter.next();
                 // add the file
                 messageBodyPart = new MimeBodyPart();
@@ -356,8 +344,7 @@ public class Email
             message.setContent(multipart);
         }
 
-        if (replyTo != null)
-        {
+        if (replyTo != null) {
             Address[] replyToAddr = new Address[1];
             replyToAddr[0] = new InternetAddress(replyTo);
             message.setReplyTo(replyToAddr);
@@ -369,10 +356,10 @@ public class Email
     /**
      * Test method to send an email to check email server settings
      *
+     * @param args
      * @param args Command line options
      */
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         String to = ConfigurationManager.getProperty("mail.admin");
         String subject = "DSpace test email";
         String server = ConfigurationManager.getProperty("mail.server");
@@ -385,15 +372,13 @@ public class Email
         System.out.println(" - To: " + to);
         System.out.println(" - Subject: " + subject);
         System.out.println(" - Server: " + server);
-        try
-        {
+        try {
             e.send();
-        }
-        catch (MessagingException me)
-        {
+        } catch (MessagingException me) {
             System.err.println("\nError sending email:");
             System.err.println(" - Error: " + me);
-            System.err.println("\nPlease see the DSpace documentation for assistance.\n");
+            System.err
+                    .println("\nPlease see the DSpace documentation for assistance.\n");
             System.err.println("\n");
             System.exit(1);
         }
@@ -406,10 +391,8 @@ public class Email
      * @author ojd20
      * 
      */
-    private static class FileAttachment
-    {
-        public FileAttachment(File f, String n)
-        {
+    private static class FileAttachment {
+        public FileAttachment(File f, String n) {
             this.file = f;
             this.name = n;
         }
@@ -422,22 +405,19 @@ public class Email
     /**
      * Inner Class for SMTP authentication information
      */
-    private static class SMTPAuthenticator extends Authenticator
-    {
+    private static class SMTPAuthenticator extends Authenticator {
         // User name
         private String name;
         
         // Password
         private String password;
         
-        public SMTPAuthenticator(String n, String p)
-        {
+        public SMTPAuthenticator(String n, String p) {
             name = n;
             password = p;
         }
         
-        protected PasswordAuthentication getPasswordAuthentication()
-        {
+        protected PasswordAuthentication getPasswordAuthentication() {
             return new PasswordAuthentication(name, password);
         }
     }

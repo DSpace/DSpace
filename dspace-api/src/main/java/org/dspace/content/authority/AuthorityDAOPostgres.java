@@ -307,9 +307,9 @@ public class AuthorityDAOPostgres implements AuthorityDAO {
 	 */
     private int getFieldId(String md) throws IllegalArgumentException, SQLException {
         String[] metadata = md.split("\\.");
-        int schemaID = MetadataSchema.find(context, metadata[0]).getSchemaID();
-        int fieldId;
+        int fieldId = -1;
         try {
+            int schemaID = MetadataSchema.find(context, metadata[0]).getSchemaID();
             fieldId = MetadataField.findByElement(context, schemaID, metadata[1], metadata.length > 2 ? metadata[2] : null).getFieldID();
         }catch (NullPointerException npe) {
             // the metadata field is not defined

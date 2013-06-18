@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+	<packaging>jar</packaging>
+	<groupId>org.dspace</groupId>
+	<artifactId>pubmed-lookup</artifactId>
+	<version>0.1</version>
+    <name>Article Metrics :: PubMed :: Lookup API</name>
+    <parent>
+        <groupId>org.dspace</groupId>
+        <artifactId>article-metrics-pubmed</artifactId>
+        <version>0.1</version>
+   </parent>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>            
+        </dependency>
+    
+        <dependency>
+        	<groupId>org.dspace</groupId>
+        	<artifactId>dspace-jspui-api</artifactId>
+        	<version>1.8.3-SNAPSHOT</version>
+        </dependency>
+
+	    <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>pubmed-retrieve</artifactId>
+            <version>0.1</version>
+        </dependency>
+
+        <dependency>
+        	<groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+        </dependency>
+
+        <dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-solrj</artifactId>
+			<!--version>1.4.1</version-->
+		</dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+<!-- 	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.5</version>
+			</plugin>
+		</plugins>
+	</build>  -->
+
+    <repositories>
+        <repository>
+            <id>maven.dspace.org-snapshot</id>
+            <name>DSpace Maven Snapshot Repository</name>
+            <url>http://maven.dspace.org/snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+                <checksumPolicy>fail</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+
+</project>

@@ -118,6 +118,7 @@
       <dependency>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-swordv2</artifactId>
+        <version>1.8.3-SNAPSHOT</version>
         <type>war</type>
       </dependency>
 
@@ -125,6 +126,7 @@
       <dependency>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-swordv2</artifactId>
+        <version>1.8.3-SNAPSHOT</version>
         <type>jar</type>
         <classifier>classes</classifier>
       </dependency>

@@ -200,8 +200,8 @@
     }
 %>
 
-<div align="center">
-    <a class="statisticsLink" href="<%= request.getContextPath() %>/handle/<%= handle %>/statistics"><fmt:message key="jsp.display-item.display-statistics"/></a>
+<div align="center">    
+    <a class="statisticsLink" href="<%= request.getContextPath() %>/cris/stats/item.html?handle=<%=handle %>"><fmt:message key="jsp.display-item.display-statistics"/></a>
 </div>
 
 <%

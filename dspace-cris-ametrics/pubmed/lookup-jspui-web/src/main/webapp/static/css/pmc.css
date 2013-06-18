@@ -1,0 +1,19 @@
+ul.pmcCitedByList li {
+	margin: 10px;	
+}
+
+span.pmcTitle {
+	font-weight: bold;
+}
+
+span.pmcAuthors {
+	font-style: italic;
+}
+
+span.pmcPubblication {
+	font-weight: bold;
+}
+
+a.pmcLink {
+	color: red;
+}

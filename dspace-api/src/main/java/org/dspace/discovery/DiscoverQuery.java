@@ -15,7 +15,8 @@ import java.util.*;
  * @author Kevin Van de Velde (kevin at atmire dot com)
  *
  */
-public class DiscoverQuery {
+public class DiscoverQuery
+{
 
     /** Main attributes for the discovery query **/
     private String query;
@@ -28,8 +29,7 @@ public class DiscoverQuery {
 
     /** Attributes used for sorting of results **/
     public enum SORT_ORDER {
-        desc,
-        asc
+        desc, asc
     }
     private String sortField;
     private SORT_ORDER sortOrder;
@@ -37,6 +37,9 @@ public class DiscoverQuery {
     /** Attributes required for the faceting of values **/
     private List<DiscoverFacetField> facetFields;
     private List<String> facetQueries;
+
+    private Map<String, String> namedFacetQueries;
+
     private int facetLimit = -1;
     private int facetMinCount = -1;
     private int facetOffset = 0;
@@ -48,8 +51,9 @@ public class DiscoverQuery {
     /** Misc attributes can be implementation dependent **/
     private Map<String, List<String>> properties;
 
-    public DiscoverQuery() {
-        //Initialize all our lists
+    public DiscoverQuery()
+    {
+        // Initialize all our lists
         this.filterQueries = new ArrayList<String>();
         this.fieldPresentQueries = new ArrayList<String>();
 
@@ -61,51 +65,62 @@ public class DiscoverQuery {
         this.properties = new LinkedHashMap<String, List<String>>();
     }
 
-
-    public void setQuery(String query) {
+    public void setQuery(String query)
+    {
         this.query = query;
     }
 
-    public String getQuery() {
+    public String getQuery()
+    {
         return query;
     }
 
-    public int getStart() {
+    public int getStart()
+    {
         return start;
     }
 
-    public void setStart(int start) {
+    public void setStart(int start)
+    {
         this.start = start;
     }
 
-    public void setSortField(String sortField, SORT_ORDER sortOrder){
+    public void setSortField(String sortField, SORT_ORDER sortOrder)
+    {
         this.sortField = sortField;
         this.sortOrder = sortOrder;
     }
 
-    public String getSortField() {
+    public String getSortField()
+    {
         return sortField;
     }
 
-    public SORT_ORDER getSortOrder() {
+    public SORT_ORDER getSortOrder()
+    {
         return sortOrder;
     }
 
     /**
      * Sets the DSpace object filter, must be an DSpace Object type integer
      * can be used to only return objects from a certain DSpace Object type
+     * 
      * @param DSpaceObjectFilter the DSpace object filer
+     *            the DSpace object filer
      */
-    public void setDSpaceObjectFilter(int DSpaceObjectFilter) {
+    public void setDSpaceObjectFilter(int DSpaceObjectFilter)
+    {
         this.DSpaceObjectFilter = DSpaceObjectFilter;
     }
 
     /**
+     * Gets the DSpace object filter can be used to only return objects from a
      * Gets the DSpace object filter
      * can be used to only return objects from a certain DSpace Object type
      * @return the DSpace object filer
      */
-    public int getDSpaceObjectFilter() {
+    public int getDSpaceObjectFilter()
+    {
         return DSpaceObjectFilter;
     }
 
@@ -113,23 +128,30 @@ public class DiscoverQuery {
      * The maximum number of results returned by this query
      * @return the number of results
      */
-    public int getMaxResults() {
+    public int getMaxResults()
+    {
         return maxResults;
     }
 
     /**
      * Sets the maximum number of results by this query
+     * 
+     * @param maxResults
      * @param maxResults the number of results
      */
-    public void setMaxResults(int maxResults) {
+    public void setMaxResults(int maxResults)
+    {
         this.maxResults = maxResults;
     }
 
     /**
      * Adds new filter queries
+     * 
+     * @param filterQueries
      * @param filterQueries the filter queries to be added
      */
-    public void addFilterQueries(String ...filterQueries){
+    public void addFilterQueries(String... filterQueries)
+    {
         this.filterQueries.addAll(Arrays.asList(filterQueries));
     }
 
@@ -137,27 +159,36 @@ public class DiscoverQuery {
      * Returns the filter queries
      * @return the filter queries in a list
      */
-    public List<String> getFilterQueries() {
+    public List<String> getFilterQueries()
+    {
         return filterQueries;
     }
 
     /**
      * Adds a query that will ensure that a certain field is present in the index
+     * index
+     * 
      * @param fieldPresentQueries the queries to be added
+     *            the queries to be added
      */
-    public void addFieldPresentQueries(String ...fieldPresentQueries){
+    public void addFieldPresentQueries(String... fieldPresentQueries)
+    {
         this.fieldPresentQueries.addAll(Arrays.asList(fieldPresentQueries));
     }
 
-    public List<String> getFieldPresentQueries() {
+    public List<String> getFieldPresentQueries()
+    {
         return fieldPresentQueries;
     }
 
     /**
      * Adds a new facet query
+     * 
+     * @param facetQuery
      * @param facetQuery the new facet query to be added
      */
-    public void addFacetQuery(String facetQuery){
+    public void addFacetQuery(String facetQuery)
+    {
         this.facetQueries.add(facetQuery);
     }
 
@@ -165,15 +196,19 @@ public class DiscoverQuery {
      * Returns the facet queries
      * @return the facet queries for this query
      */
-    public List<String> getFacetQueries() {
+    public List<String> getFacetQueries()
+    {
         return facetQueries;
     }
 
     /**
      * Adds a new facet field
+     * 
+     * @param facetField
      * @param facetField the new facet field to be added
      */
-    public void addFacetField(DiscoverFacetField facetField){
+    public void addFacetField(DiscoverFacetField facetField)
+    {
         facetFields.add(facetField);
     }
 
@@ -181,23 +216,32 @@ public class DiscoverQuery {
      * Gets the facets fields configured
      * @return the facet fields for this query
      */
-    public List<DiscoverFacetField> getFacetFields() {
+    public List<DiscoverFacetField> getFacetFields()
+    {
         return facetFields;
     }
 
     /**
      * Gets the minimum number of values that need to be present before a valid facet value has been found
+     * facet value has been found
+     * 
      * @return facetMinCount the minimum number of values to be present for a valid facet
+     *         valid facet
      */
-    public int getFacetMinCount() {
+    public int getFacetMinCount()
+    {
         return facetMinCount;
     }
 
     /**
      * Set the minimum number of values that need to be present before a valid facet value has been found
+     * facet value has been found
+     * 
+     * @param facetMinCount
      * @param facetMinCount the minimum number of values to be present for a valid facet
      */
-    public void setFacetMinCount(int facetMinCount) {
+    public void setFacetMinCount(int facetMinCount)
+    {
         this.facetMinCount = facetMinCount;
     }
 
@@ -205,23 +249,30 @@ public class DiscoverQuery {
      * Gets the facet field offset
      * @return the facet field offset
      */
-    public int getFacetOffset() {
+    public int getFacetOffset()
+    {
         return facetOffset;
     }
 
     /**
      * Sets the facet field offset, one facet offset will be used for all the facet fields
+     * facet fields
+     * 
+     * @param facetOffset
      * @param facetOffset an integer representing the offset
      */
-    public void setFacetOffset(int facetOffset) {
+    public void setFacetOffset(int facetOffset)
+    {
         this.facetOffset = facetOffset;
     }
 
-    public void addSearchField(String field){
+    public void addSearchField(String field)
+    {
         this.searchFields.add(field);
     }
 
-    public List<String> getSearchFields() {
+    public List<String> getSearchFields()
+    {
         return searchFields;
     }
 
@@ -229,18 +280,23 @@ public class DiscoverQuery {
      * Returns the misc search properties
      * @return a map containing the properties
      */
-    public Map<String, List<String>> getProperties() {
+    public Map<String, List<String>> getProperties()
+    {
         return properties;
     }
 
     /**
      * Adds a new search property to the misc search properties
+     * 
+     * @param property
      * @param property the name of the property
+     * @param value
      * @param value the value of the property
      */
-    public void addProperty(String property, String value){
+    public void addProperty(String property, String value)
+    {
         List<String> toAddList = properties.get(property);
-        if(toAddList == null)
+        if (toAddList == null)
         {
             toAddList = new ArrayList<String>();
         }
@@ -257,11 +313,36 @@ public class DiscoverQuery {
 
     public List<DiscoverHitHighlightingField> getHitHighlightingFields()
     {
-        return new ArrayList<DiscoverHitHighlightingField>(hitHighlighting.values());
+        return new ArrayList<DiscoverHitHighlightingField>(
+                hitHighlighting.values());
     }
 
-    public void addHitHighlightingField(DiscoverHitHighlightingField hitHighlighting)
+    public void addHitHighlightingField(
+            DiscoverHitHighlightingField hitHighlighting)
     {
         this.hitHighlighting.put(hitHighlighting.getField(), hitHighlighting);
+    }
+
+    public void setNamedFacetQueries(Map<String, String> namedFacetQueries)
+    {
+        this.namedFacetQueries = namedFacetQueries;
+    }
+
+    public Map<String, String> getNamedFacetQueries()
+    {
+        if(namedFacetQueries==null) {
+            this.namedFacetQueries = new HashMap<String, String>();
+        }
+        return namedFacetQueries;
+    }
+
+    public String getNamedFacetQuery(String facetQuery)
+    {
+        if (getNamedFacetQueries() != null
+                && getNamedFacetQueries().containsKey(facetQuery))
+        {
+            return getNamedFacetQueries().get(facetQuery);
+        }
+        return null;
     }
 }

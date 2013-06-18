@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util-3.0.xsd"
+    default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+	
+	
+	<bean id="relationRPVSItemConfiguration" class="org.dspace.app.cris.configuration.RelationConfiguration">    										
+		<property name="relationName" value="crisrp.publications" />		
+		<property name="relationClass" value="org.dspace.content.Item" />		
+		<property name="query">
+			<value>author_authority:{0}</value>
+		</property>
+	</bean>
+
+	<bean id="relationOUVSRPConfiguration" class="org.dspace.app.cris.configuration.RelationConfiguration">    										
+		<property name="relationName" value="crisou.persons" />		
+		<property name="relationClass" value="org.dspace.app.cris.model.ResearcherPage" />		
+		<property name="query">
+			<value>crisrp.dept_authority:{0}</value>
+		</property>
+	</bean>
+
+	<bean id="relationOUVSITEMViaRPConfiguration" class="org.dspace.app.cris.configuration.RelationConfiguration">    										
+		<property name="relationName" value="crisou.persons" />		
+		<property name="relationClass" value="org.dspace.content.Item" />		
+		<property name="query">
+			<value>crisitem.author.dept_authority:{0}</value>
+		</property>
+	</bean>
+	
+	<bean id="relationOUVSItemConfiguration" class="org.dspace.app.cris.configuration.RelationConfiguration">    										
+		<property name="relationName" value="crisou.publications" />		
+		<property name="relationClass" value="org.dspace.content.Item" />		
+		<property name="query">
+			<value>dc.description.sponsorship_authority:{0}</value>
+		</property>
+	</bean>
+
+	<bean id="relationOUVSPJConfiguration" class="org.dspace.app.cris.configuration.RelationConfiguration">    										
+		<property name="relationName" value="crisou.projects" />		
+		<property name="relationClass" value="org.dspace.app.cris.model.Project" />		
+		<property name="query">
+			<value>crisproject.grant.agencies_authority:{0}</value>
+		</property>
+	</bean>
+
+	<bean id="relationOUVSPJviaInvestigatorConfiguration" class="org.dspace.app.cris.configuration.RelationConfiguration">    										
+		<property name="relationName" value="crisou.projects" />		
+		<property name="relationClass" value="org.dspace.app.cris.model.Project" />		
+		<property name="query">
+			<value>projectinvestigators.dept_authority:{0}</value>
+		</property>
+	</bean>
+	
+	<bean id="relationOUVSOUConfiguration" class="org.dspace.app.cris.configuration.RelationConfiguration">    										
+		<property name="relationName" value="crisou.projects" />		
+		<property name="relationClass" value="org.dspace.app.cris.model.OrganizationUnit" />		
+		<property name="query">
+			<value>crisou.parentorgunit_authority:{0}</value>
+		</property>
+	</bean>
+	
+	<bean id="relationRPVSPJConfiguration" class="org.dspace.app.cris.configuration.RelationConfiguration">    										
+		<property name="relationName" value="crispj.projects" />		
+		<property name="relationClass" value="org.dspace.app.cris.model.ResearcherPage" />		
+		<property name="query">
+			<value>projectsinvestigators_authority:{0}</value>
+		</property>
+	</bean>
+
+	<bean id="relationPJVSItemConfiguration" class="org.dspace.app.cris.configuration.RelationConfiguration">    										
+		<property name="relationName" value="crispj.publications" />		
+		<property name="relationClass" value="org.dspace.content.Item" />		
+		<property name="query">
+			<value>dc.relation_authority:{0}</value>
+		</property>
+	</bean>
+
+						
+	<bean
+		class="org.dspace.app.cris.configuration.RelationPreferenceServiceConfiguration">
+		<property name="list">
+			<list>
+				<bean
+					class="org.dspace.app.cris.configuration.RelationPreferenceConfiguration">
+					<property name="relationConfiguration" ref="relationRPVSItemConfiguration"/>
+					<property name="selectActionAuthLevel">
+						<util:constant
+							static-field="org.dspace.app.cris.configuration.RelationPreferenceConfiguration.ENABLED" />
+					</property>
+					<property name="hideActionAuthLevel">
+						<util:constant
+							static-field="org.dspace.app.cris.configuration.RelationPreferenceConfiguration.ENABLED" />
+					</property>
+					<property name="unlinkActionAuthLevel">
+						<util:constant
+							static-field="org.dspace.app.cris.configuration.RelationPreferenceConfiguration.ONLY_SYSTEM_ADMIN" />
+					</property>
+					<property name="extraAction">
+						<bean class="org.dspace.app.cris.configuration.ItemExtraAction" />
+					</property>
+					<property name="columnsVisualizationConfiguration">
+						<list>
+							<bean class="org.dspace.app.cris.configuration.ColumnVisualizationConfiguration">
+								<property name="name" value="title" />
+								<property name="metadata">
+									<list>
+										<value>dc.title</value>
+									</list>
+								</property>	
+							</bean>
+							<bean class="org.dspace.app.cris.configuration.ColumnVisualizationConfiguration">
+								<property name="name" value="contributors" />
+								<property name="metadata">
+									<list>
+										<value>dc.contributor.*</value>
+									</list>
+								</property>	
+							</bean>
+							<bean class="org.dspace.app.cris.configuration.ColumnVisualizationConfiguration">
+								<property name="name" value="issued" />
+								<property name="metadata">
+									<list>
+										<value>dc.date.issued</value>
+									</list>
+								</property>	
+							</bean>
+							<bean class="org.dspace.app.cris.configuration.ColumnVisualizationConfiguration">
+								<property name="name" value="type" />
+								<property name="metadata">
+									<list>
+										<value>dc.type</value>
+									</list>
+								</property>	
+							</bean>
+						</list>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+</beans>

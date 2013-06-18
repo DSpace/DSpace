@@ -7,20 +7,15 @@
  */
 package org.dspace.statistics;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
+import org.dspace.utils.DSpace;
 
 /**
  * StatisticsLogging Consumer for SolrLogger which captures Create, Update
@@ -37,6 +32,10 @@ public class StatisticsLoggingConsumer implements Consumer
 
     private Set<String> toRemoveQueries = null;
 
+    DSpace dspace = new DSpace();
+
+    SolrLogger indexer = dspace.getServiceManager().getServiceByName(SolrLogger.class.getName(),SolrLogger.class);
+    
     public void initialize() throws Exception
     {
 
@@ -70,137 +69,22 @@ public class StatisticsLoggingConsumer implements Consumer
         else if (eventType == Event.MODIFY_METADATA
                 && event.getSubjectType() == Constants.ITEM)
         {
-            Item item = Item.find(ctx, event.getSubjectID());
-
-            String updateQuery = "id:" + item.getID() + " AND type:"
-                    + item.getType();
-            Map<String, List<String>> indexedValues = SolrLogger.queryField(
-                    updateQuery, null, null);
-
-            // Get all the metadata
-            Map<String, String> metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
-            List<String> storageFieldList = new ArrayList<String>();
-            List<List<Object>> storageValuesList = new ArrayList<List<Object>>();
-
-            for (Map.Entry<String, String> entry : metadataStorageInfo.entrySet())
-            {
-                String[] metadataFieldInfo = entry.getValue().split("\\.");
-
-                List<Object> values = new ArrayList<Object>();
-                List<Object> valuesLow = new ArrayList<Object>();
-                for (int i = 0; i < item.getMetadata(metadataFieldInfo[0],
-                        metadataFieldInfo[1], metadataFieldInfo[2], Item.ANY).length; i++)
-                {
-                    values.add(item.getMetadata(metadataFieldInfo[0],
-                            metadataFieldInfo[1], metadataFieldInfo[2],
-                            Item.ANY)[i].value);
-                    
-                    valuesLow.add(item.getMetadata(metadataFieldInfo[0],
-                            metadataFieldInfo[1], metadataFieldInfo[2],
-                            Item.ANY)[i].value.toLowerCase());
-                }
-
-                List<String> indexedVals = indexedValues.get(entry.getKey());
-
-                boolean update = true;
-                if (values.size() == indexedVals.size() && values.containsAll(indexedVals))
-                {
-                    update = false;
-                }
-
-                if (update)
-                {
-                    storageFieldList.add(entry.getKey());
-                    storageFieldList.add(entry.getKey() + "_search");
-                    storageValuesList.add(values);
-                    storageValuesList.add(valuesLow);
-                }
-            }
-
-            SolrLogger.update(updateQuery, "replace", storageFieldList,
-                    storageValuesList);
-
+            // use solr4 join feature no need to have metadata on core statistics
         }
 
         if (eventType == Event.ADD && dsoType == Constants.COLLECTION
                 && event.getObject(ctx) instanceof Item)
         {
-            // We are mapping a new item make sure that the owning collection is
-            // updated
-            Item newItem = (Item) event.getObject(ctx);
-            String updateQuery = "id: " + newItem.getID() + " AND type:"
-                    + newItem.getType();
-
-            List<String> fieldNames = new ArrayList<String>();
-            List<List<Object>> valuesList = new ArrayList<List<Object>>();
-            fieldNames.add("owningColl");
-            fieldNames.add("owningComm");
-
-            List<Object> valsList = new ArrayList<Object>();
-            valsList.add(dsoId);
-            valuesList.add(valsList);
-
-            valsList = new ArrayList<Object>();
-            valsList.addAll(findOwningCommunities(ctx, dsoId));
-            valuesList.add(valsList);
-
-            // Now make sure we also update the communities
-            SolrLogger.update(updateQuery, "addOne", fieldNames, valuesList);
+            // use solr4 join feature no need to have metadata on core statistics
 
         }
         else if (eventType == Event.REMOVE && dsoType == Constants.COLLECTION
                 && event.getObject(ctx) instanceof Item)
         {
-            // Unmapping items
-            Item newItem = (Item) event.getObject(ctx);
-            String updateQuery = "id: " + newItem.getID() + " AND type:"
-                    + newItem.getType();
-
-            List<String> fieldNames = new ArrayList<String>();
-            List<List<Object>> valuesList = new ArrayList<List<Object>>();
-            fieldNames.add("owningColl");
-            fieldNames.add("owningComm");
-
-            List<Object> valsList = new ArrayList<Object>();
-            valsList.add(dsoId);
-            valuesList.add(valsList);
-
-            valsList = new ArrayList<Object>();
-            valsList.addAll(findOwningCommunities(ctx, dsoId));
-            valuesList.add(valsList);
-
-            SolrLogger.update(updateQuery, "remOne", fieldNames, valuesList);
+            // use solr4 join feature no need to have metadata on core statistics          
         }
     }
 
-    private List<Object> findOwningCommunities(Context context, int collId)
-            throws SQLException
-    {
-        Collection coll = Collection.find(context, collId);
-
-        List<Object> owningComms = new ArrayList<Object>();
-        for (int i = 0; i < coll.getCommunities().length; i++)
-        {
-            Community community = coll.getCommunities()[i];
-            findComms(community, owningComms);
-        }
-
-        return owningComms;
-    }
-
-    private void findComms(Community comm, List<Object> parentComms)
-            throws SQLException
-    {
-        if (comm == null)
-        {
-            return;
-        }
-        if (!parentComms.contains(comm.getID()))
-        {
-            parentComms.add(comm.getID());
-        }
-        findComms(comm.getParentCommunity(), parentComms);
-    }
 
     public void end(Context ctx) throws Exception
     {
@@ -208,7 +92,7 @@ public class StatisticsLoggingConsumer implements Consumer
         {
             for (String query : toRemoveQueries)
             {
-                SolrLogger.removeIndex(query);
+                indexer.removeIndex(query);
             }
         }
         // clean out toRemoveQueries

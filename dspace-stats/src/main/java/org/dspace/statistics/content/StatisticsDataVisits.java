@@ -14,6 +14,7 @@ import org.dspace.statistics.SolrLogger;
 import org.dspace.statistics.content.filter.StatisticsFilter;
 import org.dspace.statistics.content.filter.StatisticsSolrDateFilter;
 import org.dspace.statistics.util.LocationUtils;
+import org.dspace.utils.DSpace;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.core.ConfigurationManager;
@@ -53,6 +54,11 @@ public class StatisticsDataVisits extends StatisticsData
     /** Current DSpaceObject for which to generate the statistics. */
     private DSpaceObject currentDso;
 
+    DSpace dspace = new DSpace();
+
+    SolrLogger indexer = dspace.getServiceManager().getServiceByName(SolrLogger.class.getName(),SolrLogger.class);
+
+    
     /** Construct a completely uninitialized query. */
     public StatisticsDataVisits()
     {
@@ -81,8 +87,8 @@ public class StatisticsDataVisits extends StatisticsData
     public Dataset createDataset(Context context) throws SQLException,
             SolrServerException, ParseException
     {
-        //Check if we already have one.
-        //If we do then give it back.
+        // Check if we already have one.
+        // If we do then give it back.
         if(getDataset() != null)
         {
             return getDataset();
@@ -97,8 +103,8 @@ public class StatisticsDataVisits extends StatisticsData
             processAxis(dataSet, datasetQueries);
         }
 
-        //Now lets determine our values.
-        //First check if we have a date facet & if so find it.
+        // Now lets determine our values.
+        // First check if we have a date facet & if so find it.
         DatasetTimeGenerator dateFacet = null;
         if (getDatasetGenerators().get(0) instanceof DatasetTimeGenerator
                 || (1 < getDatasetGenerators().size() && getDatasetGenerators()
@@ -167,8 +173,8 @@ public class StatisticsDataVisits extends StatisticsData
         //We determine our values on the queries resolved above
         Dataset dataset = null;
 
-        //Run over our queries.
-        //First how many queries do we have ?
+        // Run over our queries.
+        // First how many queries do we have ?
         if(dateFacet != null){
             //So do all the queries and THEN do the date facet
             for (int i = 0; i < datasetQueries.size(); i++) {
@@ -178,25 +184,25 @@ public class StatisticsDataVisits extends StatisticsData
                 }else{
                     String query = dataSetQuery.getQueries().get(0).getQuery();
                     if(dataSetQuery.getMax() == -1){
-                        //We are asking from our current query all the visits faceted by date
-                        ObjectCount[] results = SolrLogger.queryFacetDate(query, filterQuery, dataSetQuery.getMax(), dateFacet.getDateType(), dateFacet.getStartDate(), dateFacet.getEndDate(), showTotal);
+                        // We are asking from our current query all the visits faceted by date
+                        ObjectCount[] results = indexer.queryFacetDate(query, filterQuery, dataSetQuery.getMax(), dateFacet.getDateType(), dateFacet.getStartDate(), dateFacet.getEndDate(), showTotal);
                         dataset = new Dataset(1, results.length);
                         //Now that we have our results put em in a matrix
                         for(int j = 0; j < results.length; j++){
                             dataset.setColLabel(j, results[j].getValue());
                             dataset.addValueToMatrix(0, j, results[j].getCount());
                         }
-                        //TODO: change this !
-                        //Now add the column label
+                        // TODO: change this !
+                        // Now add the column label
                         dataset.setRowLabel(0, getResultName(dataSetQuery.getName(), dataSetQuery, context));
                         dataset.setRowLabelAttr(0, getAttributes(dataSetQuery.getName(), dataSetQuery, context));
                     }else{
-                        //We need to get the max objects and the next part of the query on them (next part beeing the datasettimequery
-                        ObjectCount[] maxObjectCounts = SolrLogger.queryFacetField(query, filterQuery, dataSetQuery.getFacetField(), dataSetQuery.getMax(), false, null);
+                        // We need to get the max objects and the next part of the query on them (next part beeing the datasettimequery
+                        ObjectCount[] maxObjectCounts = indexer.queryFacetField(query, filterQuery, dataSetQuery.getFacetField(), dataSetQuery.getMax(), false, null);
                         for (int j = 0; j < maxObjectCounts.length; j++) {
                             ObjectCount firstCount = maxObjectCounts[j];
                             String newQuery = dataSetQuery.getFacetField() + ": " + ClientUtils.escapeQueryChars(firstCount.getValue()) + " AND " + query;
-                            ObjectCount[] maxDateFacetCounts = SolrLogger.queryFacetDate(newQuery, filterQuery, dataSetQuery.getMax(), dateFacet.getDateType(), dateFacet.getStartDate(), dateFacet.getEndDate(), showTotal);
+                            ObjectCount[] maxDateFacetCounts = indexer.queryFacetDate(newQuery, filterQuery, dataSetQuery.getMax(), dateFacet.getDateType(), dateFacet.getStartDate(), dateFacet.getEndDate(), showTotal);
 
 
                             //Make sure we have a dataSet
@@ -284,12 +290,12 @@ public class StatisticsDataVisits extends StatisticsData
                         query += " AND type:" + firsDataset.getQueries().get(0).getDsoType();
                     }
 
-                    Map<String, Integer> facetResult = SolrLogger.queryFacetQuery(query, filterQuery, facetQueries);
+                    Map<String, Integer> facetResult = indexer.queryFacetQuery(query, filterQuery, facetQueries);
                     
                     
-                    //TODO: the show total
-                    //No need to add this many times
-                    //TODO: dit vervangen door te displayen value
+                    // TODO: the show total
+                    // No need to add this many times
+                    // TODO: dit vervangen door te displayen value
                     for (int j = 0; j < topCounts2.length; j++) {
                         ObjectCount count2 = topCounts2[j];
                         if(i == 0) {
@@ -370,7 +376,7 @@ public class StatisticsDataVisits extends StatisticsData
             for (int i = 0; i < dsoRepresentations.size(); i++){
                 DatasetQuery datasetQuery = new DatasetQuery();
                 Integer dsoType = dsoRepresentations.get(i).getType();
-                boolean seperate = dsoRepresentations.get(i).getSeparate();
+                boolean separate = dsoRepresentations.get(i).getSeparate();
                 Integer dsoLength = dsoRepresentations.get(i).getNameLength();
                 //Check if our type is our current object
                 if(currentDso != null && dsoType == currentDso.getType()){
@@ -380,9 +386,9 @@ public class StatisticsDataVisits extends StatisticsData
                 }else{
                     //TODO: only do this for bitstreams from an item
                     Query query = new Query();
-                    if(currentDso != null && seperate && dsoType == Constants.BITSTREAM){
-                        //CURRENTLY THIS IS ONLY POSSIBLE FOR AN ITEM ! ! ! ! ! ! !
-                        //We need to get the separate bitstreams from our item and make a query for each of them
+                    if(currentDso != null && separate && dsoType == Constants.BITSTREAM){
+                        // CURRENTLY THIS IS ONLY POSSIBLE FOR AN ITEM ! ! ! ! ! ! !
+                        // We need to get the separate bitstreams from our item and make a query for each of them
                         Item item = (Item) currentDso;
                         for (int j = 0; j < item.getBundles().length; j++) {
                             Bundle bundle = item.getBundles()[j];
@@ -395,8 +401,8 @@ public class StatisticsDataVisits extends StatisticsData
                             }
                         }
                     } else {
-                        //We have something else than our current object.
-                        //So we need some kind of children from it, so put this in our query
+                        // We have something else than our current object.
+                        // So we need some kind of children from it, so put this in our query
                         query.setOwningDso(currentDso);
                         query.setDsoLength(dsoLength);
 
@@ -456,10 +462,12 @@ public class StatisticsDataVisits extends StatisticsData
             Context context) throws SQLException
     {
         if("continent".equals(datasetQuery.getName())){
-            value = LocationUtils.getContinentName(value);
+            value = LocationUtils.getContinentName(value, context
+                    .getCurrentLocale());
         }else
         if("countryCode".equals(datasetQuery.getName())){
-            value = LocationUtils.getCountryName(value);
+            value = LocationUtils.getCountryName(value, context
+                    .getCurrentLocale());
         }else{
             Query query = datasetQuery.getQueries().get(0);
             //TODO: CHANGE & THROW AWAY THIS ENTIRE METHOD
@@ -637,7 +645,7 @@ public class StatisticsDataVisits extends StatisticsData
     {
         String facetType = dataset.getFacetField() == null ? "id" : dataset
                 .getFacetField();
-        return SolrLogger.queryFacetField(query, filterQuery, facetType,
+        return indexer.queryFacetField(query, filterQuery, facetType,
                 dataset.getMax(), false, null);
     }
 

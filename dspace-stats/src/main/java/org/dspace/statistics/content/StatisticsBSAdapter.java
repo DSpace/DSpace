@@ -15,6 +15,7 @@ import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.statistics.SolrLogger;
 import org.dspace.statistics.content.filter.StatisticsFilter;
+import org.dspace.utils.DSpace;
 
 /**
  * Class that will hold the data needed to show
@@ -39,6 +40,10 @@ public class StatisticsBSAdapter {
     /** visitType is TOTAL */
     public static final int TOTAL_VISITS = 2;
 
+    DSpace dspace = new DSpace();
+
+    SolrLogger indexer = dspace.getServiceManager().getServiceByName(SolrLogger.class.getName(),SolrLogger.class);
+        
     public StatisticsBSAdapter() {
         displayItemViews = false;
         displayBitstreamViews = false;
@@ -57,9 +62,9 @@ public class StatisticsBSAdapter {
     public long getNumberOfVisits(int visitType, Item item) throws SolrServerException {
         switch (visitType){
             case ITEM_VISITS:
-                return SolrLogger.queryTotal("type: " + Constants.ITEM + " AND id: " + item.getID(), resolveFilterQueries()).getCount();
+                return indexer.queryTotal("type: " + Constants.ITEM + " AND id: " + item.getID(), resolveFilterQueries()).getCount();
             case BITSTREAM_VISITS:
-                return SolrLogger.queryTotal("type: " + Constants.BITSTREAM + " AND owningItem: " + item.getID(), resolveFilterQueries()).getCount();
+                return indexer.queryTotal("type: " + Constants.BITSTREAM + " AND owningItem: " + item.getID(), resolveFilterQueries()).getCount();
             case TOTAL_VISITS:
                 return getNumberOfVisits(ITEM_VISITS, item) + getNumberOfVisits(BITSTREAM_VISITS, item);
 

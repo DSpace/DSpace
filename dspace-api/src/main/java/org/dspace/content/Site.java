@@ -109,4 +109,8 @@ public class Site extends DSpaceObject
     {
         return ConfigurationManager.getProperty("dspace.url");
     }
+    
+    public String getTypeText() {
+        return Constants.typeText[Constants.SITE];
+    }
 }

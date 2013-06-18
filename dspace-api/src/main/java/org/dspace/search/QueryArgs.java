@@ -185,6 +185,15 @@ public class QueryArgs
                 tmp_field = tmp_field.replace(':', ' ');
             }
 
+            if (tmp_query != null)
+            {
+                tmp_query = tmp_query.replace('/', ' ');
+                tmp_query = tmp_query.replace('<', ' ');
+                tmp_query = tmp_query.replace('\\', ' ');
+                tmp_query = tmp_query.replace(':', ' ');
+		tmp_query = tmp_query.replace('-', ' ');
+            }
+
             if (tmp_query != null && !tmp_query.equals(""))
         	{
         		query.add(tmp_query.trim());
@@ -218,8 +227,31 @@ public class QueryArgs
         		conj_curr = " " + iconj.next() + " ";
         	}
         }
+        if(conj_curr.isEmpty()) {
+        	newquery = "";
+        }
+        else {
+        	newquery = newquery + ")";
+        }
         
-        newquery = newquery + ")";
+        String fromYear = request.getParameter("fromYear");
+        String toYear = request.getParameter("toYear");
+        String location = request.getParameter("location");
+        String dateIssuedYear = "dateIssued.year";
+        if(location!=null) {
+        	if(location.equals("crisrp") || location.equals("crisproject") || location.equals("crisou")) {
+        		dateIssuedYear = "crisDateIssued.year";
+        	}
+        	
+        }
+     
+        if (fromYear != null && toYear != null)
+        {
+        
+				newquery += " +("+ dateIssuedYear +":[" + fromYear + " TO "
+				        + toYear + "])";
+        }
+        
         return (newquery);
     }
 
@@ -235,6 +267,8 @@ public class QueryArgs
     private String buildQueryPart(String myquery, String myfield)
     {
         StringBuilder newQuery = new StringBuilder();
+	if (!"ANY".equals(myfield))
+		newQuery.append(myfield).append(":");
         newQuery.append("(");
 
         boolean newTerm = true;
@@ -282,10 +316,10 @@ public class QueryArgs
 
                         // This is a new term in the query (ie. preceeded by nothing or whitespace)
                         // so apply a field restriction if specified
-                        if (newTerm && !myfield.equals("ANY"))
-                        {
-                            newQuery.append(myfield).append(":");
-                        }
+//                        if (newTerm && !myfield.equals("ANY"))
+  //                      {
+    //                        newQuery.append(myfield).append(":");
+     //                   }
 
                         // Open a new phrase, and closing at the corresponding character
                         // ie. 'my phrase' or "my phrase"

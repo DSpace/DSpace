@@ -12,4 +12,5 @@ public interface BrowsableDSpaceObject
     public DCValue[] getMetadata(String schema, String element,
             String qualifier, String lang);
 
+    public int getID();
 }

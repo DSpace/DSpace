@@ -129,6 +129,7 @@ public class DatabaseManager
         Statement statement = null;
         try
         {
+	    context.setAutoCommit(false);
             statement = context.getDBConnection().createStatement();
             statement.execute("SET CONSTRAINTS " + constraintName + " DEFERRED");
             statement.close();
@@ -163,6 +164,7 @@ public class DatabaseManager
         Statement statement = null;
         try
         {
+	    context.setAutoCommit(false);
             statement = context.getDBConnection().createStatement();
             statement.execute("SET CONSTRAINTS " + constraintName + " IMMEDIATE");
             statement.close();
@@ -415,6 +417,7 @@ public class DatabaseManager
 
         try
         {        	
+	        context.setAutoCommit(false);
         	statement = context.getDBConnection().prepareStatement(query);
         	loadParameters(statement, parameters);
         	
@@ -670,6 +673,7 @@ public class DatabaseManager
     public static void insert(Context context, TableRow row) throws SQLException
     {
         int newID;
+		context.setAutoCommit(false);
         if (isPostgres)
         {
             newID = doInsertPostgres(context, row);
@@ -726,6 +730,7 @@ public class DatabaseManager
             sql.append(" where ").append(pk.getName()).append(" = ?");
             columns.add(pk);
 
+	    context.setAutoCommit(false);
             return executeUpdate(context.getDBConnection(), sql.toString(), columns, row);
         }
 

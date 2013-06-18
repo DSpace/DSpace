@@ -7,26 +7,30 @@
  */
 package org.dspace.statistics.util;
 
-import org.apache.commons.cli.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.dspace.core.Context;
-import org.dspace.core.Constants;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Bitstream;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.statistics.SolrLogger;
+import org.dspace.statistics.SolrStatsIndexPlugin;
+import org.dspace.utils.DSpace;
 
-import java.util.Date;
-import java.util.Map;
-import java.text.SimpleDateFormat;
+import com.maxmind.geoip.Location;
 
 import com.maxmind.geoip.LookupService;
-import com.maxmind.geoip.Location;
 
 /**
  * Test class to generate random statistics data.
@@ -77,9 +81,7 @@ public class StatisticsDataGenerator {
 		long epersonEndId;
 
 		if (line.hasOption("n"))
-        {
             nrLogs = Integer.parseInt(line.getOptionValue("n"));
-        }
 		else {
 			System.out
 					.println("We need to know how many logs we need to create");
@@ -88,97 +90,53 @@ public class StatisticsDataGenerator {
 		if (line.hasOption("s")) {
 			startDate = getDateInMiliseconds(line.getOptionValue("s"));
 		} else
-        {
             startDate = getDateInMiliseconds("01/01/2006");
-        }
 		if (line.hasOption("e")) {
 			endDate = getDateInMiliseconds(line.getOptionValue("e"));
 		} else
-        {
             endDate = new Date().getTime();
-        }
 
 		if (line.hasOption("a"))
-        {
             commStartId = Long.parseLong(line.getOptionValue("a"));
-        }
 		else
-        {
             return;
-        }
 
 		if (line.hasOption("b"))
-        {
             commEndId = Long.parseLong(line.getOptionValue("b"));
-        }
 		else
-        {
             return;
-        }
 		if (line.hasOption("c"))
-        {
             collStartId = Long.parseLong(line.getOptionValue("c"));
-        }
 		else
-        {
             return;
-        }
 		if (line.hasOption("d"))
-        {
             collEndId = Long.parseLong(line.getOptionValue("d"));
-        }
 		else
-        {
             return;
-        }
 		if (line.hasOption("f"))
-        {
             itemStartId = Long.parseLong(line.getOptionValue("f"));
-        }
 		else
-        {
             return;
-        }
 		if (line.hasOption("g"))
-        {
             itemEndId = Long.parseLong(line.getOptionValue("g"));
-        }
 		else
-        {
             return;
-        }
 		if (line.hasOption("h"))
-        {
             bitStartId = Long.parseLong(line.getOptionValue("h"));
-        }
 		else
-        {
             return;
-        }
 		if (line.hasOption("i"))
-        {
             bitEndId = Long.parseLong(line.getOptionValue("i"));
-        }
 		else
-        {
             return;
-        }
 		if (line.hasOption("j"))
-        {
             epersonStartId = Long.parseLong(line.getOptionValue("j"));
-        }
 		else
-        {
             return;
-        }
 		if (line.hasOption("k"))
-        {
             epersonEndId = Long.parseLong(line.getOptionValue("k"));
-        }
 		else
-        {
             return;
-        }
 
 		// Get the max id range
 		long maxIdTotal = Math.max(commEndId, collEndId);
@@ -190,16 +148,14 @@ public class StatisticsDataGenerator {
 
 		// We got all our parameters now get the rest
 		Context context = new Context();
-		// Find our solr server
-		CommonsHttpSolrServer solr = new CommonsHttpSolrServer(
-				ConfigurationManager.getProperty("solr-statistics", "server"));
+		// Find our solrserver
+		HttpSolrServer solr = new HttpSolrServer(
+				ConfigurationManager.getProperty(SolrLogger.CFG_MODULE, "server"));
 		solr.deleteByQuery("*:*");
 		solr.commit();
 
-		Map<String, String> metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
-
 		String prevIp = null;
-		String dbfile = ConfigurationManager.getProperty("solr-statistics", "dbfile");
+		String dbfile = ConfigurationManager.getProperty(SolrLogger.CFG_MODULE, "dbfile");
 		LookupService cl = new LookupService(dbfile,
 				LookupService.GEOIP_STANDARD);
 		int countryErrors = 0;
@@ -299,18 +255,12 @@ public class StatisticsDataGenerator {
 				// If our dsoId gets higher then our maxIdtotal we need to lower
 				// to find a valid id
 				if (dsoId == maxIdTotal)
-                {
                     substract = true;
-                }
 
 				if (substract)
-                {
                     dsoId--;
-                }
 				else
-                {
                     dsoId++;
-                }
 
 				dso = DSpaceObject.find(context, type, dsoId);
 				if (dso instanceof Bitstream) {
@@ -322,12 +272,11 @@ public class StatisticsDataGenerator {
 				// System.out.println("REFIND");
 			}
 			// Find the person who is visting us
-			int epersonId = (int) getRandomNumberInRange(epersonStartId, epersonEndId);
+			int epersonId = (int) getRandomNumberInRange(epersonStartId,
+					epersonEndId);
 			EPerson eperson = EPerson.find(context, epersonId);
 			if (eperson == null)
-            {
                 epersonId = -1;
-            }
 
 			// System.out.println(ip);
 			// System.out.println(country + " " +
@@ -358,33 +307,19 @@ public class StatisticsDataGenerator {
 			doc1.addField("latitude", latitude);
 			doc1.addField("longitude", longitude);
 			if (epersonId > 0)
-            {
                 doc1.addField("epersonid", epersonId);
-            }
 			if (dns != null)
-            {
                 doc1.addField("dns", dns.toLowerCase());
-            }
 
-			if (dso instanceof Item) {
-				Item item = (Item) dso;
-				// Store the metadata
-                for (Map.Entry<String, String> entry : metadataStorageInfo.entrySet())
+			  // Do any additional indexing, depends on the plugins
+            List<SolrStatsIndexPlugin> solrServiceIndexPlugins = new DSpace()
+                    .getServiceManager().getServicesByType(
+                            SolrStatsIndexPlugin.class);
+            for (SolrStatsIndexPlugin solrServiceIndexPlugin : solrServiceIndexPlugins)
 				{
-					String dcField = entry.getValue();
-
-					DCValue[] vals = item.getMetadata(dcField.split("\\.")[0],
-							dcField.split("\\.")[1], dcField.split("\\.")[2],
-							Item.ANY);
-					for (DCValue val1 : vals) {
-						String val = val1.value;
-						doc1.addField(entry.getKey(), val);
-						doc1.addField(entry.getKey() + "_search", val.toLowerCase());
-					}
+                solrServiceIndexPlugin.additionalIndex(null, dso,
+                        doc1);
 				}
-			}
-
-			SolrLogger.storeParents(doc1, dso);
 
 			solr.add(doc1);
 

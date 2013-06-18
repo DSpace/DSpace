@@ -1419,4 +1419,8 @@ public class Group extends DSpaceObject
         }
         return null;
     }
+    
+    public String getTypeText() {
+        return Constants.typeText[Constants.GROUP];
+    }
 }

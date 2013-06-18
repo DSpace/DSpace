@@ -12,6 +12,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.services.model.Event;
 import org.dspace.usage.AbstractUsageEventListener;
 import org.dspace.usage.UsageEvent;
+import org.dspace.utils.DSpace;
 
 /**
  * Simple SolrLoggerUsageEvent facade to separate Solr specific 
@@ -24,6 +25,10 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
 
 	private static Logger log = Logger.getLogger(SolrLoggerUsageEventListener.class);
 	
+    DSpace dspace = new DSpace();
+
+    SolrLogger indexer = dspace.getServiceManager().getServiceByName(SolrLogger.class.getName(),SolrLogger.class);
+        
 	public void receiveEvent(Event event) {
 
 		if(event instanceof UsageEvent)
@@ -34,7 +39,7 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
 			
 			    EPerson currentUser = ue.getContext() == null ? null : ue.getContext().getCurrentUser();
 
-                SolrLogger.post(ue.getObject(), ue.getRequest(), currentUser);
+                indexer.post(ue.getObject(), ue.getRequest(), currentUser);
 
 			}
 			catch(Exception e)

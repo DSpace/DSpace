@@ -52,9 +52,14 @@ public interface IndexingService {
 
     void updateIndex(Context context, boolean force);
 
+    void updateIndex(Context context, boolean force, int type);
+
     void cleanIndex(boolean force) throws IOException,
             SQLException, SearchServiceException;
 
+    void cleanIndex(boolean force, int type) throws IOException,
+    SQLException, SearchServiceException;
+    
     void commit() throws SearchServiceException;
 
     void optimize() throws SearchServiceException;

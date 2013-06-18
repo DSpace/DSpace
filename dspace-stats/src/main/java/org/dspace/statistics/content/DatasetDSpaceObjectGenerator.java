@@ -32,8 +32,8 @@ public class DatasetDSpaceObjectGenerator extends DatasetGenerator {
         dsoRepresentations.add(representation);
     }
 
-    public void addDsoChild(int type, int max, boolean seperate, int nameLength){
-        DSORepresentation rep = new DSORepresentation(type, max, seperate);
+    public void addDsoChild(int type, int max, boolean separate, int nameLength){
+        DSORepresentation rep = new DSORepresentation(type, max, separate);
         rep.setNameLength(nameLength);
         dsoRepresentations.add(rep);
     }

@@ -393,4 +393,8 @@ public class BrowseItem extends DSpaceObject
     {
         return withdrawn;
     }
+    
+    public String getTypeText() {
+        return Constants.typeText[Constants.ITEM];
+    }
 }

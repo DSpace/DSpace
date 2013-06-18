@@ -239,6 +239,26 @@
           <required>false</required>
           <rtexprvalue>true</rtexprvalue>
       </attribute>
+      <attribute>
+        <name>itemStart</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+        <name>radioButton</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+        <name>inputName</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+        <name>order</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+      </attribute>
   </tag>
 
 <tag>
@@ -261,6 +281,16 @@
     </attribute>
     <attribute>
       <name>config</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>sortBy</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>order</name>
       <required>false</required>
       <rtexprvalue>true</rtexprvalue>
     </attribute>

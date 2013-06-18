@@ -72,18 +72,14 @@
 
 	<dependencies>
         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-services-api</artifactId>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-solrj</artifactId>
+			<!--version>1.4.1</version-->
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
         </dependency>
-		<dependency>
-			<groupId>org.apache.solr</groupId>
-			<artifactId>solr-solrj</artifactId>
-                        <version>3.3.0</version>
-		</dependency>
 		<dependency>
 			<groupId>org.dspace.dependencies</groupId>
 			<artifactId>dspace-geoip</artifactId>
@@ -102,6 +98,10 @@
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
 			<scope>provided</scope>
+		</dependency>
+        <dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-services-api</artifactId>
 		</dependency>
         <dependency>
             <groupId>org.ostermiller</groupId>

@@ -11,7 +11,7 @@ public class BrowseDSpaceObject extends BrowseItem
 
     public BrowseDSpaceObject(Context context, BrowsableDSpaceObject browseObject)
     {
-        super(context, -1, browseObject.isArchived(), browseObject.isWithdrawn());
+        super(context, browseObject.getID(), browseObject.isArchived(), browseObject.isWithdrawn());
         this.browseObject = browseObject;
     }
     

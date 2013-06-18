@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    $Id: $
+    $URL: $
+    *************************************************************************
+    Copyright (c) 2002-2009, DuraSpace.  All rights reserved
+    Licensed under the DuraSpace License.
+
+    A copy of the DuraSpace License has been included in this
+    distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+    default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+
+    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+    <!-- NOTE: I am not convinced this is a good idea, it is really slow and I think possibly dangerous -AZ -->
+    <!--
+    <context:component-scan base-package="org.dspace" name-generator="org.dspace.servicemanager.spring.FullPathBeanNameGenerator" />
+    -->
+
+	<bean id="org.dspace.app.cris.pmc.services.PMCPersistenceService" parent="txProxyTemplatePMC">
+		<property name="target">
+			<bean class="org.dspace.app.cris.pmc.services.PMCPersistenceService"
+				init-method="init">
+			<property name="modelDaos">
+				<map>
+					<entry key="org.dspace.app.cris.pmc.model.PMCCitation">
+						<ref bean="PMCCitationDao" />
+					</entry>
+					<entry key="org.dspace.app.cris.pmc.model.PMCRecord">
+						<ref bean="PMCRecordDao" />
+					</entry>
+				</map>
+			</property>		
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="PMCCitationDao" parent="abstractDaoPMC">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.pmc.dao.PMCCitationDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTargetPMC">
+				<constructor-arg>
+					<value>org.dspace.app.cris.pmc.model.PMCCitation</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="PMCRecordDao" parent="abstractDaoPMC">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.pmc.dao.PMCRecordDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTargetPMC">
+				<constructor-arg>
+					<value>org.dspace.app.cris.pmc.model.PMCRecord</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="txProxyTemplatePMC" abstract="true"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager" ref="transactionManagerPMC" />
+		<property name="proxyTargetClass" value="true" />
+		<property name="transactionAttributes">
+			<props>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>								
+				<prop key="*">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="transactionManagerPMC"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactoryPMC" />
+	</bean>
+	
+
+	<!--  resources  -->		
+	<bean id="dataSourcePMC"
+		class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass" ref="dspaceDBDriver" />
+		<property name="jdbcUrl" ref="dspaceDBUrl" />
+		<property name="user" ref="dspaceDBUsername" />
+		<property name="password" ref="dspaceDBPassword" />
+		
+		<!-- these are C3P0 properties -->
+        <property name="acquireIncrement" value="5" />
+        <property name="minPoolSize" value="20" />
+        <property name="maxPoolSize" value="100" />
+        <property name="maxIdleTime" value="100" />		
+	</bean>
+
+	<bean id="sessionFactoryPMC"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="dataSourcePMC" />
+		<property name="configLocation" value="classpath:hibernate/hibernate-pmc.cfg.xml" />
+		<property name="hibernateProperties" ref="hibernateProperties" />	
+	</bean>
+	
+	<bean id="namedQueryIntroductionAdvisorPMC"
+		class="it.cilea.osd.common.dao.impl.NamedQueryIntroductionAdvisor" />
+
+	<bean id="abstractDaoTargetPMC" class="it.cilea.osd.common.dao.impl.GenericDaoHibernateImpl"
+		abstract="true">
+		<property name="sessionFactory" ref="sessionFactoryPMC" />
+	</bean>
+
+	<bean id="abstractDaoPMC" class="org.springframework.aop.framework.ProxyFactoryBean"
+		abstract="true">
+		<property name="interceptorNames">
+			<list>
+				<value>namedQueryIntroductionAdvisorPMC</value>
+			</list>
+		</property>
+	</bean>	
+	
+</beans>

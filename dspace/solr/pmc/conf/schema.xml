@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schema name="pmc" version="1.1">
+  <types>
+    <!-- field type definitions. The "name" attribute is
+       just a label to be used by field definitions.  The "class"
+       attribute and any other attributes determine the real
+       behavior of the fieldType.
+         Class names starting with "solr" refer to java classes in the
+       org.apache.solr.analysis package.
+    -->
+
+    <!-- The StrField type is not analyzed, but indexed/stored verbatim.  
+       - StrField and TextField support an optional compressThreshold which
+       limits compression (if enabled in the derived fields) to values which
+       exceed a certain size (in characters).
+    -->
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="integer" class="solr.IntField" omitNorms="true"/>    
+  </types>
+ 
+ <fields>
+   <!-- Valid attributes for fields:
+     name: mandatory - the name for the field
+     type: mandatory - the name of a previously defined type from the <types> section
+     indexed: true if this field should be indexed (searchable or sortable)
+     stored: true if this field should be retrievable
+     compressed: [false] if this field should be stored using gzip compression
+       (this will only apply if the field type is compressable; among
+       the standard field types, only TextField and StrField are)
+     multiValued: true if this field may contain multiple values per document
+     omitNorms: (expert) set to true to omit the norms associated with
+       this field (this disables length normalization and index-time
+       boosting for the field, and saves some memory).  Only full-text
+       fields or fields that need an index-time boost need norms.
+     termVectors: [false] set to true to store the term vector for a given field.
+       When using MoreLikeThis, fields used for similarity should be stored for 
+       best performance.
+   -->
+    <field name="PMCID" type="string" indexed="true" stored="true" multiValued="false" />
+    <field name="PMID" type="integer" indexed="true" stored="true" multiValued="false" />
+    <field name="DOI" type="string" indexed="true" stored="true" multiValued="false" />  
+ </fields>
+
+ <uniqueKey>PMCID</uniqueKey>
+ <!-- field for the QueryParser to use when an explicit fieldname is absent -->
+ <defaultSearchField>PMCID</defaultSearchField>
+
+ <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
+ <solrQueryParser defaultOperator="AND"/>
+  
+</schema>

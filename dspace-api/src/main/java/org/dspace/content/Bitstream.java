@@ -735,4 +735,8 @@ public class Bitstream extends DSpaceObject
             }                                   
         }
     }
+    
+    public String getTypeText() {
+        return Constants.typeText[Constants.BITSTREAM];
+    }
 }

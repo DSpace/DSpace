@@ -33,9 +33,12 @@
 <%@ page import="org.dspace.content.*" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
-
+<%@ page import="java.util.List"%>
 
 <%
+	Boolean isAdminB = (Boolean) request.getAttribute("is.admin");
+	Boolean isAdmin = (isAdminB != null?isAdminB.booleanValue():false);
+
     // Retrieve attributes
     Community community = (Community) request.getAttribute( "community" );
     Collection[] collections =
@@ -44,7 +47,13 @@
         (Community[]) request.getAttribute("subcommunities");
     
     RecentSubmissions rs = (RecentSubmissions) request.getAttribute("recently.submitted");
-    
+    List<Integer> commSubscribed = (List<Integer>) request.getAttribute("subscription_communities");
+    List<Integer> collSubscribed = (List<Integer>) request.getAttribute("subscription_collections");
+    boolean loggedIn =
+        ((Boolean) request.getAttribute("logged.in")).booleanValue();
+    boolean subscribed =
+        ((Boolean) request.getAttribute("subscribed")).booleanValue();
+
     Boolean editor_b = (Boolean)request.getAttribute("editor_button");
     boolean editor_button = (editor_b == null ? false : editor_b.booleanValue());
     Boolean add_b = (Boolean)request.getAttribute("add_button");
@@ -158,6 +167,33 @@
 	}
 %>
 			  </td>
+	</tr><tr>		  
+			        <td class="oddRowEvenCol">
+        <form method="get" action="">
+        <input type="hidden" name="handle" value="<%= community.getHandle() %>"/>
+          <table>
+            <tr>
+              <td class="standard">
+<%  if (loggedIn && subscribed)
+    { %>
+                <small><fmt:message key="jsp.community-home.subscribed"/> <a href="<%= request.getContextPath() %>/subscribe"><fmt:message key="jsp.community-home.info"/></a></small>
+			  </td>
+              <td class="standard">
+            		<input type="submit" name="submit_unsubscribe" value="<fmt:message key="jsp.community-home.unsubscribe.msg"/>" />
+<%  } else { %>
+                <small>
+            		  <fmt:message key="jsp.community-home.subscribe.msg"/>
+                </small>
+              </td>
+              <td class="standard">
+				<input type="submit" name="submit_subscribe" value="<fmt:message key="jsp.community-home.subscribe.msg"/>" />
+<%  } %>
+              </td>
+         
+            </tr>
+          </table>
+        </form>
+      </td>
             </tr>
           </table>
     
@@ -190,6 +226,25 @@
             }
 %>
 	    </td>
+	    
+	    <td>
+		<% if(isAdmin || !ConfigurationManager.getBooleanProperty("solr-statistics","authorization.admin")) { %>
+		<%= "<a href=\"" + request.getContextPath() + "/cris/stats/collection.html?handle=" + collections[i].getHandle() + "\"><img src=\""+request.getContextPath() + "/images/chart_curve.png\" border=\"0\" title=\"usage statistics\"/></a>" %>
+				&nbsp;
+		<% } %>
+        <%= "<a href=\"" + request.getContextPath() + "/feed/rss_2.0/" + collections[i].getHandle() + "\"><img src=\""+request.getContextPath() + "/image/stats/feed.png\" border=\"0\" title=\"Content update: RSS feed\"/></a>" %>
+	 	<%
+		    out.print("&nbsp;<a href=\"" + request.getContextPath() + "/handle/"+collections[i].getHandle() + "?handle="+collections[i].getHandle()+"&submit_");
+		    if (collSubscribed!=null && collSubscribed.contains(collections[i].getID()))
+		    { // subscribed
+		        out.println("unsubscribe=unsubscribe\"><img src=\""+request.getContextPath() + "/image/stats/stop-bell.png\" border=\"0\" title=\"Content update: Email subscription\"/></a>");
+		    }
+		    else
+		    { // not yet subscribed
+		        out.println("subscribe=subscribe\"><img src=\""+request.getContextPath() + "/image/stats/start-bell.png\" border=\"0\" title=\"Content update: Email subscription\"/></a>");
+		    }
+    	%>
+		</td>
 	    <% if (remove_button) { %>
 	    <td>
 	      <form method="post" action="<%=request.getContextPath()%>/tools/edit-communities">
@@ -407,7 +462,7 @@
   </dspace:sidebar>
 
          <div align="center">
-                   <a class="statisticsLink" href="<%= request.getContextPath() %>/handle/<%= community.getHandle() %>/statistics"><fmt:message key="jsp.community-home.display-statistics"/></a>
+         		 <a class="statisticsLink" href="<%= request.getContextPath() %>/cris/stats/community.html?handle=<%= community.getHandle() %>"><fmt:message key="jsp.community-home.display-statistics"/></a>                   
           </div>
 
 

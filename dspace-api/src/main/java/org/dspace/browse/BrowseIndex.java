@@ -751,8 +751,7 @@ public final class BrowseIndex
         else
         {
             return new BrowseIndex("bi_"+displayType);
-        }
-        
+        }       
     }
     
     /**

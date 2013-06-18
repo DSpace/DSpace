@@ -12,12 +12,10 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.TimeZone;
 
 import javax.mail.MessagingException;
 
@@ -31,10 +29,13 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
@@ -66,11 +67,29 @@ public class Subscribe
      * @param eperson
      *            EPerson to subscribe
      * @param collection
+     *            The DSpace object to subscribe to (actually MUST BE a collection or a community)
      *            Collection to subscribe to
+     * @throws IllegalArgumentException
+     *         if the dso is nor a collection or a community
      */
     public static void subscribe(Context context, EPerson eperson,
-            Collection collection) throws SQLException, AuthorizeException
+            DSpaceObject dso) throws SQLException, AuthorizeException
     {
+        String column = null;
+        switch (dso.getType())
+        {
+        case Constants.COLLECTION:
+            column = "collection_id";
+            break;
+
+        case Constants.COMMUNITY:
+            column = "community_id";
+            break;
+        default:
+            throw new IllegalArgumentException(
+                    "Subscribe is not appliable to the resource "
+                            + dso.getName() + " of type " + dso.getType());
+        }
         // Check authorisation. Must be administrator, or the eperson.
         if (AuthorizeManager.isAdmin(context)
                 || ((context.getCurrentUser() != null) && (context
@@ -79,33 +98,31 @@ public class Subscribe
             // already subscribed?          
             TableRowIterator r = DatabaseManager.query(context,
                     "SELECT * FROM subscription WHERE eperson_id= ? " +
-                    " AND collection_id= ? ", 
-                    eperson.getID(),collection.getID());
+                    " AND "+ column + "= ? ", 
+                    eperson.getID(),dso.getID());
 
             try
             {
                 if (!r.hasNext())
                 {
                     // Not subscribed, so add them
-                    TableRow row = DatabaseManager.row("subscription");
+                    TableRow row = DatabaseManager.create(context, "subscription");
                     row.setColumn("eperson_id", eperson.getID());
-                    row.setColumn("collection_id", collection.getID());
-                    DatabaseManager.insert(context, row);
+                    row.setColumn(column, dso.getID());
+                    DatabaseManager.update(context, row);
 
                     log.info(LogManager.getHeader(context, "subscribe",
-                            "eperson_id=" + eperson.getID() + ",collection_id="
-                                    + collection.getID()));
+                            "eperson_id=" + eperson.getID() + ","+column+"="
+                                    + dso.getID()));
                 }
             }
             finally
             {
                 // close the TableRowIterator to free up resources
                 if (r != null)
-                {
                     r.close();
                 }
             }
-        }
         else
         {
             throw new AuthorizeException(
@@ -123,17 +140,35 @@ public class Subscribe
      * @param eperson
      *            EPerson to unsubscribe
      * @param collection
+     *            The DSpace object to unsubscribe to (actually MUST BE a collection or a community)
      *            Collection to unsubscribe from
+     * @throws IllegalArgumentException
+     *         if the dso is nor a collection or a community
      */
     public static void unsubscribe(Context context, EPerson eperson,
-            Collection collection) throws SQLException, AuthorizeException
+            DSpaceObject dso) throws SQLException, AuthorizeException
     {
+        String column = null;
+        switch (dso.getType())
+        {
+        case Constants.COLLECTION:
+            column = "collection_id";
+            break;
+
+        case Constants.COMMUNITY:
+            column = "community_id";
+            break;
+        default:
+            throw new IllegalArgumentException(
+                    "Unsubscribe is not appliable to the resource "
+                            + dso.getName() + " of type " + dso.getType());
+        }
         // Check authorisation. Must be administrator, or the eperson.
         if (AuthorizeManager.isAdmin(context)
                 || ((context.getCurrentUser() != null) && (context
                         .getCurrentUser().getID() == eperson.getID())))
         {
-            if (collection == null)
+            if (dso == null)
             {
                 // Unsubscribe from all
                 DatabaseManager.updateQuery(context,
@@ -144,18 +179,76 @@ public class Subscribe
             {       
                 DatabaseManager.updateQuery(context,
                         "DELETE FROM subscription WHERE eperson_id= ? " +
-                        "AND collection_id= ? ", 
-                        eperson.getID(),collection.getID());
+                        "AND "+column+"= ? ", 
+                        eperson.getID(),dso.getID());
 
                 log.info(LogManager.getHeader(context, "unsubscribe",
-                        "eperson_id=" + eperson.getID() + ",collection_id="
-                                + collection.getID()));
+                        "eperson_id=" + eperson.getID() + ","+column+"="
+                                + dso.getID()));
             }
         }
         else
         {
             throw new AuthorizeException(
                     "Only admin or e-person themselves can unsubscribe");
+        }
+    }
+
+    public static void unsubscribeCollection(Context context, EPerson e,
+            Collection c) throws SQLException, AuthorizeException
+    {
+        if (c != null)
+        {
+            unsubscribe(context, e, c);
+        }
+        else
+        {
+            // Check authorisation. Must be administrator, or the eperson.
+            if (AuthorizeManager.isAdmin(context)
+                    || ((context.getCurrentUser() != null) && (context
+                            .getCurrentUser().getID() == e.getID())))
+            {
+                // Unsubscribe from all collections
+                DatabaseManager
+                        .updateQuery(
+                                context,
+                                "DELETE FROM subscription WHERE eperson_id= ? and collection_id is not null",
+                                e.getID());
+            }
+            else
+            {
+                throw new AuthorizeException(
+                        "Only admin or e-person themselves can unsubscribe");
+            }
+        }
+    }
+
+    public static void unsubscribeCommunity(Context context, EPerson e,
+            Collection c) throws SQLException, AuthorizeException
+    {
+        if (c != null)
+        {
+            unsubscribe(context, e, c);
+        }
+        else
+        {
+            // Check authorisation. Must be administrator, or the eperson.
+            if (AuthorizeManager.isAdmin(context)
+                    || ((context.getCurrentUser() != null) && (context
+                            .getCurrentUser().getID() == e.getID())))
+            {
+                // Unsubscribe from all communities
+                DatabaseManager
+                        .updateQuery(
+                                context,
+                                "DELETE FROM subscription WHERE eperson_id= ? and community_id is not null",
+                                e.getID());
+            }
+            else
+            {
+                throw new AuthorizeException(
+                        "Only admin or e-person themselves can unsubscribe");
+            }
         }
     }
 
@@ -172,10 +265,10 @@ public class Subscribe
             throws SQLException
     {
         TableRowIterator tri = DatabaseManager.query(context,
-                "SELECT collection_id FROM subscription WHERE eperson_id= ? ",
+                "SELECT collection_id FROM subscription WHERE eperson_id= ? and collection_id is not null",
                 eperson.getID());
 
-        List<Collection> collections = new ArrayList<Collection>();
+        List collections = new ArrayList();
 
         try
         {
@@ -191,9 +284,7 @@ public class Subscribe
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
-            {
                 tri.close();
-            }
         }
         
         Collection[] collArray = new Collection[collections.size()];
@@ -201,24 +292,142 @@ public class Subscribe
         return (Collection[]) collections.toArray(collArray);
     }
 
+    public static List<Integer> getCollectionIDSubscriptions(Context context, EPerson eperson)
+            throws SQLException
+    {
+        TableRowIterator tri = DatabaseManager
+                .query(context,
+                        "SELECT collection_id FROM subscription WHERE eperson_id= ? and collection_id is not null",
+                        eperson.getID());
+
+        List<Integer> collections = new ArrayList<Integer>();
+
+        try
+        {
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+
+                collections.add(
+                        row.getIntColumn("collection_id"));
+            }
+        }
+        finally
+            {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
+
+        return collections;
+    }
+    
+    /**
+     * Find out which communities an e-person is subscribed to
+     * 
+     * @param context
+     *            DSpace context
+     * @param eperson
+     *            EPerson
+     * @return array of communities e-person is subscribed to
+     */
+    public static Community[] getCommunitySubscriptions(Context context, EPerson eperson)
+            throws SQLException
+    {
+        TableRowIterator tri = DatabaseManager.query(context,
+                "SELECT community_id FROM subscription WHERE eperson_id= ? and community_id is not null",
+                eperson.getID());
+
+        List communities = new ArrayList();
+
+        try
+        {
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+
+                communities.add(Community.find(context, row
+                        .getIntColumn("community_id")));
+            }
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+            }
+        
+        Community[] collArray = new Community[communities.size()];
+
+        return (Community[]) communities.toArray(collArray);
+        }
+        
+    public static List<Integer> getCommunityIDSubscriptions(Context context,
+            EPerson eperson) throws SQLException
+    {
+        TableRowIterator tri = DatabaseManager
+                .query(context,
+                        "SELECT community_id FROM subscription WHERE eperson_id= ? and community_id is not null",
+                        eperson.getID());
+
+        List<Integer> communities = new ArrayList<Integer>();
+
+        try
+        {
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+
+                communities.add(
+                        row.getIntColumn("community_id"));
+            }
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
+
+        return communities;
+    }
+
     /**
      * Is that e-person subscribed to that collection?
+     * a collection or a community)?
      * 
      * @param context
      *            DSpace context
      * @param eperson
      *            find out if this e-person is subscribed
      * @param collection
+     *            find out if subscribed to this dspace object (MUST BE a community or a collection)
      *            find out if subscribed to this collection
+     *         if the dso is nor a collection or a community
      * @return <code>true</code> if they are subscribed
      */
     public static boolean isSubscribed(Context context, EPerson eperson,
-            Collection collection) throws SQLException
+            DSpaceObject dso) throws SQLException
     {
+        String column = null;
+        switch (dso.getType())
+        {
+        case Constants.COLLECTION:
+            column = "collection_id";
+            break;
+
+        case Constants.COMMUNITY:
+            column = "community_id";
+            break;
+        default:
+            throw new IllegalArgumentException(
+                    "Unsubscribe is not appliable to the resource "
+                            + dso.getName() + " of type " + dso.getType());
+        }
     	TableRowIterator tri = DatabaseManager.query(context,
                 "SELECT * FROM subscription WHERE eperson_id= ? " +
-                "AND collection_id= ? ", 
-                eperson.getID(),collection.getID());
+                "AND "+column+"= ? ", 
+                eperson.getID(),dso.getID());
 
         try
         {
@@ -228,11 +437,9 @@ public class Subscribe
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
-            {
                 tri.close();
             }
         }
-    }
 
     /**
      * Process subscriptions. This must be invoked only once a day. Messages are
@@ -259,7 +466,7 @@ public class Subscribe
                 "SELECT * FROM subscription ORDER BY eperson_id");
 
         EPerson currentEPerson = null;
-        List<Collection> collections = null; // List of Collections
+        List<DSpaceObject> dsos = null; // List of dspace object (Community or Collection)
 
         try
         {
@@ -279,7 +486,7 @@ public class Subscribe
 
                         try
                         {
-                            sendEmail(context, currentEPerson, collections, test);
+                            sendEmail(context, currentEPerson, dsos, test);
                         }
                         catch (MessagingException me)
                         {
@@ -291,11 +498,24 @@ public class Subscribe
 
                     currentEPerson = EPerson.find(context, row
                             .getIntColumn("eperson_id"));
-                    collections = new ArrayList<Collection>();
+                    dsos = new ArrayList<DSpaceObject>();
                 }
-
-                collections.add(Collection.find(context, row
+                if (row.getIntColumn("collection_id") != -1)
+                {
+                    dsos.add(Collection.find(context, row
                         .getIntColumn("collection_id")));
+            }
+                else if (row.getIntColumn("community_id") != -1)
+                {
+                    dsos.add(Community.find(context, row
+                            .getIntColumn("community_id")));
+                }
+                else
+                {
+                    log.error(LogManager.getHeader(context, "processDaily",
+                            "found unprocessable subscription - subscription_id: "
+                                    + row.getIntColumn("subscription_id")));
+                }
             }
         }
         finally
@@ -312,7 +532,7 @@ public class Subscribe
         {
             try
             {
-                sendEmail(context, currentEPerson, collections, test);
+                sendEmail(context, currentEPerson, dsos, test);
             }
             catch (MessagingException me)
             {
@@ -337,7 +557,7 @@ public class Subscribe
      * @param test 
      */
     public static void sendEmail(Context context, EPerson eperson,
-            List<Collection> collections, boolean test) throws IOException, MessagingException,
+            List<DSpaceObject> dsos, boolean test) throws IOException, MessagingException,
             SQLException
     {
         // Get a resource bundle according to the eperson language preferences
@@ -345,22 +565,15 @@ public class Subscribe
         ResourceBundle labels =  ResourceBundle.getBundle("Messages", supportedLocale);
         
         // Get the start and end dates for yesterday
+        Date thisTimeYesterday = new Date(System.currentTimeMillis()
+                - (24 * 60 * 60 * 1000));
 
-        // The date should reflect the timezone as well. Otherwise we stand to lose that information 
-        // in truncation and roll to an earlier date than intended.
-        Calendar cal = Calendar.getInstance(TimeZone.getDefault());
-        cal.setTime(new Date());
+        DCDate dcDateYesterday = new DCDate(thisTimeYesterday);
         
-        // What we actually want to pass to Harvest is "Midnight of yesterday in my current timezone"
-        // Truncation will actually pass in "Midnight of yesterday in UTC", which will be,
-        // at least in CDT, "7pm, the day before yesterday, in my current timezone".
-        cal.add(Calendar.HOUR, -24);
-        Date thisTimeYesterday = cal.getTime();
+        // this time yesterday in ISO 8601, stripping the time
+        String isoDateYesterday = dcDateYesterday.toString().substring(0, 10);
         
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        Date midnightYesterday = cal.getTime();
+        String startDate = isoDateYesterday;
 
 
         // FIXME: text of email should be more configurable from an
@@ -368,15 +581,15 @@ public class Subscribe
         StringBuffer emailText = new StringBuffer();
         boolean isFirst = true;
 
-        for (int i = 0; i < collections.size(); i++)
+        for (int i = 0; i < dsos.size(); i++)
         {
-            Collection c = collections.get(i);
+            DSpaceObject c = dsos.get(i);
 
             try {
                 boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.subscription", true);
                 
                 // we harvest all the changed item from yesterday until now
-                List<HarvestedItemInfo> itemInfos = Harvest.harvest(context, c, new DCDate(midnightYesterday).toString(), null, 0, // Limit
+                List<HarvestedItemInfo> itemInfos = Harvest.harvest(context, c, new DCDate(startDate).toString(), null, 0, // Limit
                                                                                     // and
                                                                                     // offset
                                                                                     // zero,
@@ -413,7 +626,7 @@ public class Subscribe
                     }
     
                     emailText.append(labels.getString("org.dspace.eperson.Subscribe.new-items")).append(" ").append(
-                            c.getMetadata("name")).append(": ").append(
+                            c.getName()).append(": ").append(
                             itemInfos.size()).append("\n\n");
     
                     for (int j = 0; j < itemInfos.size(); j++)
