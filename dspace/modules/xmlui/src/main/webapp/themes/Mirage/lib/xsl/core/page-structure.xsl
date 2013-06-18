@@ -356,7 +356,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
     <xsl:template name="buildHeader">
         <div id="ds-header-wrapper">
             <div id="ds-header" class="clearfix">
-                <a id="skip-nav" href="#ds-body"><img src="/themes/Mirage/images/nada.gif" alt="Skip navigation" name="skipnav" width="1" height="1" border="0" id="skipnav" /></a>
+                <a id="skip-nav" href="#ds-body" class="accessibly-hidden">Skip navigation</a>
                 <a id="ds-header-logo-link">
                     <xsl:attribute name="href">
                         <xsl:value-of
@@ -396,7 +396,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     </a>
 		    -->
                     <a href="http://blog.datadryad.org/feed/">
-                        <img src="/themes/Mirage/images/dryad_rss_icon.png" alt="RSS feed"/>
+                        <img src="/themes/Mirage/images/dryad_rss_icon.png" alt="RSS feed - Dryad News"/>
                     </a>
                 </div>
 

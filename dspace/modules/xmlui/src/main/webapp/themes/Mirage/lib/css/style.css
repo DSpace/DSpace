@@ -1334,6 +1334,13 @@ form.discover-sort-box select{
     display:none;
     visibility:hidden;
 }
+/* alternating hiding that works on all screen readers, etc. 
+ *  http://alistapart.com/article/now-you-see-me
+ */
+.accessibly-hidden {
+    position: absolute; 
+    left: -999em;
+}
 
 .icon-button{
     padding:4px;
@@ -1499,10 +1506,6 @@ a.learn-to-submit-button:hover {
     color: #333;
 }
 
-#skip-nav {
-    float: right;
-    padding-top: 4px;
-}
 #sharing-tools {
     float: right;
     clear: right;

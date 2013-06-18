@@ -277,6 +277,7 @@
                       id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary" style="overflow: hidden;"
                       action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
                     <p class="ds-paragraph" style="overflow; hidden; margin-bottom: 0px;">
+                        <label for="aspect_discovery_SiteViewer_field_query" class="accessibly-hidden">Enter keyword, author, title, DOI</label>
                         <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                                id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
                                placeholder="Enter keyword, author, title, DOI, etc. Example: herbivory"
@@ -379,6 +380,7 @@
                           onsubmit="return subscribeMailingList(this);">
                         <p class="ds-paragraph" style="text-align: left; margin-bottom: 2px;">
                             <xsl:text>Sign up for announcements.</xsl:text>
+                            <label for="file_news_div_mailing_list_input_email" class="accessibly-hidden">Your email address</label>
                             <input placeholder="Your e-mail" title="Your e-mail" type="text" name="email" class="ds-text-field" style="width: 240px; margin-top: 8px;" id="file_news_div_mailing_list_input_email" />
                         </p>
                         <input value="Subscribe" type="submit" name="submit" class="ds-button-field" id="file_news_div_mailing_list_input_subscribe" />
