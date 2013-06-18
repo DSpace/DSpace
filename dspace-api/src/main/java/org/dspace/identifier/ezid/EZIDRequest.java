@@ -242,9 +242,13 @@ public class EZIDRequest
 
     /**
      * Percent-encode a few EZID-specific characters.
+     *
+     * @return null for null input.
      */
     private static String escape(String s)
     {
+        if (null == s) { return s; }
+
         return s.replace("%", "%25")
                 .replace("\n", "%0A")
                 .replace("\r", "%0D")
