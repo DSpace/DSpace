@@ -13,9 +13,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-    <bean id="org.dspace.identifier.DataCiteIdentifierProvider"
-          class="org.dspace.identifier.DataCiteIdentifierProvider"
+    <bean id="org.dspace.identifier.EZIDIdentifierProvider"
+          class="org.dspace.identifier.EZIDIdentifierProvider"
           scope='singleton'>
+        <description>Uses the EZID service to provide DOI identifiers from DataCite</description>
         <property name="configurationService"
                       ref="org.dspace.services.ConfigurationService"/>
         <property name='requestFactory'>

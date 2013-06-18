@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
  *
  * @author mwood
  */
-public class DataCiteIdentifierProviderTest
+public class EZIDIdentifierProviderTest
         extends AbstractUnitTest
 {
     /** Name of the reserved EZID test authority */
@@ -43,7 +43,7 @@ public class DataCiteIdentifierProviderTest
     /** The most recently created test Item's ID */
     private static int itemID;
 
-    public DataCiteIdentifierProviderTest()
+    public EZIDIdentifierProviderTest()
     {
     }
 
@@ -116,9 +116,9 @@ public class DataCiteIdentifierProviderTest
         config = kernelImpl.getConfigurationService();
 
         // Configure the service under test.
-        config.setProperty(DataCiteIdentifierProvider.CFG_SHOULDER, TEST_SHOULDER);
-        config.setProperty(DataCiteIdentifierProvider.CFG_USER, "apitest");
-        config.setProperty(DataCiteIdentifierProvider.CFG_PASSWORD, "apitest");
+        config.setProperty(EZIDIdentifierProvider.CFG_SHOULDER, TEST_SHOULDER);
+        config.setProperty(EZIDIdentifierProvider.CFG_USER, "apitest");
+        config.setProperty(EZIDIdentifierProvider.CFG_PASSWORD, "apitest");
 
         // Don't try to send mail.
         config.setProperty("mail.server.disabled", "true");
@@ -154,9 +154,9 @@ public class DataCiteIdentifierProviderTest
     {
         System.out.println("supports");
 
-        DataCiteIdentifierProvider instance
-                = (DataCiteIdentifierProvider)
-                sm.getServicesByType(DataCiteIdentifierProvider.class).get(0);
+        EZIDIdentifierProvider instance
+                = (EZIDIdentifierProvider)
+                sm.getServicesByType(EZIDIdentifierProvider.class).get(0);
 
         Class<? extends Identifier> identifier = DOI.class;
         boolean result = instance.supports(identifier);
@@ -171,9 +171,9 @@ public class DataCiteIdentifierProviderTest
     {
         System.out.println("supports");
 
-        DataCiteIdentifierProvider instance
-                = (DataCiteIdentifierProvider)
-                sm.getServicesByType(DataCiteIdentifierProvider.class).get(0);
+        EZIDIdentifierProvider instance
+                = (EZIDIdentifierProvider)
+                sm.getServicesByType(EZIDIdentifierProvider.class).get(0);
 
         String identifier = "doi:" + TEST_SHOULDER;
         boolean result = instance.supports(identifier);
@@ -189,9 +189,9 @@ public class DataCiteIdentifierProviderTest
     {
         System.out.println("register 2");
 
-        DataCiteIdentifierProvider instance
-                = (DataCiteIdentifierProvider)
-                sm.getServicesByType(DataCiteIdentifierProvider.class).get(0);
+        EZIDIdentifierProvider instance
+                = (EZIDIdentifierProvider)
+                sm.getServicesByType(EZIDIdentifierProvider.class).get(0);
 
         DSpaceObject dso = newItem(context);
 
@@ -209,9 +209,9 @@ public class DataCiteIdentifierProviderTest
     {
         System.out.println("register 3");
 
-        DataCiteIdentifierProvider instance
-                = (DataCiteIdentifierProvider)
-                sm.getServicesByType(DataCiteIdentifierProvider.class).get(0);
+        EZIDIdentifierProvider instance
+                = (EZIDIdentifierProvider)
+                sm.getServicesByType(EZIDIdentifierProvider.class).get(0);
 
         DSpaceObject object = newItem(context);
 
@@ -229,9 +229,9 @@ public class DataCiteIdentifierProviderTest
     {
         System.out.println("reserve");
 
-        DataCiteIdentifierProvider instance
-                = (DataCiteIdentifierProvider)
-                sm.getServicesByType(DataCiteIdentifierProvider.class).get(0);
+        EZIDIdentifierProvider instance
+                = (EZIDIdentifierProvider)
+                sm.getServicesByType(EZIDIdentifierProvider.class).get(0);
 
         DSpaceObject dso = newItem(context);
         String identifier = UUID.randomUUID().toString();
@@ -247,9 +247,9 @@ public class DataCiteIdentifierProviderTest
     {
         System.out.println("mint");
 
-        DataCiteIdentifierProvider instance
-                = (DataCiteIdentifierProvider)
-                sm.getServicesByType(DataCiteIdentifierProvider.class).get(0);
+        EZIDIdentifierProvider instance
+                = (EZIDIdentifierProvider)
+                sm.getServicesByType(EZIDIdentifierProvider.class).get(0);
 
         DSpaceObject dso = newItem(context);
         String result = instance.mint(context, dso);
@@ -265,9 +265,9 @@ public class DataCiteIdentifierProviderTest
     {
         System.out.println("resolve");
 
-        DataCiteIdentifierProvider instance
-                = (DataCiteIdentifierProvider)
-                sm.getServicesByType(DataCiteIdentifierProvider.class).get(0);
+        EZIDIdentifierProvider instance
+                = (EZIDIdentifierProvider)
+                sm.getServicesByType(EZIDIdentifierProvider.class).get(0);
 
         String identifier = UUID.randomUUID().toString();
         DSpaceObject expResult = newItem(context);
@@ -287,9 +287,9 @@ public class DataCiteIdentifierProviderTest
     {
         System.out.println("lookup");
 
-        DataCiteIdentifierProvider instance
-                = (DataCiteIdentifierProvider)
-                sm.getServicesByType(DataCiteIdentifierProvider.class).get(0);
+        EZIDIdentifierProvider instance
+                = (EZIDIdentifierProvider)
+                sm.getServicesByType(EZIDIdentifierProvider.class).get(0);
 
         String identifier = UUID.randomUUID().toString();
         DSpaceObject object = newItem(context);
@@ -308,9 +308,9 @@ public class DataCiteIdentifierProviderTest
     {
         System.out.println("delete 2");
 
-        DataCiteIdentifierProvider instance
-                = (DataCiteIdentifierProvider)
-                sm.getServicesByType(DataCiteIdentifierProvider.class).get(0);
+        EZIDIdentifierProvider instance
+                = (EZIDIdentifierProvider)
+                sm.getServicesByType(EZIDIdentifierProvider.class).get(0);
 
         DSpaceObject dso = newItem(context);
 
@@ -331,15 +331,15 @@ public class DataCiteIdentifierProviderTest
         // See if those identifiers were really deleted.
         ItemIterator found;
         found = Item.findByMetadataField(context,
-                DataCiteIdentifierProvider.MD_SCHEMA,
-                DataCiteIdentifierProvider.DOI_ELEMENT,
-                DataCiteIdentifierProvider.DOI_QUALIFIER, id1);
+                EZIDIdentifierProvider.MD_SCHEMA,
+                EZIDIdentifierProvider.DOI_ELEMENT,
+                EZIDIdentifierProvider.DOI_QUALIFIER, id1);
         assertFalse("A test identifier is still present", found.hasNext());
 
         found = Item.findByMetadataField(context,
-                DataCiteIdentifierProvider.MD_SCHEMA,
-                DataCiteIdentifierProvider.DOI_ELEMENT,
-                DataCiteIdentifierProvider.DOI_QUALIFIER, id2);
+                EZIDIdentifierProvider.MD_SCHEMA,
+                EZIDIdentifierProvider.DOI_ELEMENT,
+                EZIDIdentifierProvider.DOI_QUALIFIER, id2);
         assertFalse("A test identifier is still present", found.hasNext());
     }
 
@@ -352,9 +352,9 @@ public class DataCiteIdentifierProviderTest
     {
         System.out.println("delete 3");
 
-        DataCiteIdentifierProvider instance
-                = (DataCiteIdentifierProvider)
-                sm.getServicesByType(DataCiteIdentifierProvider.class).get(0);
+        EZIDIdentifierProvider instance
+                = (EZIDIdentifierProvider)
+                sm.getServicesByType(EZIDIdentifierProvider.class).get(0);
 
         DSpaceObject dso = newItem(context);
         String identifier = UUID.randomUUID().toString();
@@ -367,9 +367,9 @@ public class DataCiteIdentifierProviderTest
 
         // See if it is gone
         ItemIterator found = Item.findByMetadataField(context,
-                DataCiteIdentifierProvider.MD_SCHEMA,
-                DataCiteIdentifierProvider.DOI_ELEMENT,
-                DataCiteIdentifierProvider.DOI_QUALIFIER, identifier);
+                EZIDIdentifierProvider.MD_SCHEMA,
+                EZIDIdentifierProvider.DOI_ELEMENT,
+                EZIDIdentifierProvider.DOI_QUALIFIER, identifier);
         assertFalse("Test identifier is still present", found.hasNext());
     }
 }

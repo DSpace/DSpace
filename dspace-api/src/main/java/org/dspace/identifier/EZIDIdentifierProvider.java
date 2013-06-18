@@ -67,10 +67,10 @@ import org.springframework.beans.factory.annotation.Required;
  *
  * @author mwood
  */
-public class DataCiteIdentifierProvider
+public class EZIDIdentifierProvider
     extends IdentifierProvider
 {
-    private static final Logger log = LoggerFactory.getLogger(DataCiteIdentifierProvider.class);
+    private static final Logger log = LoggerFactory.getLogger(EZIDIdentifierProvider.class);
 
     // Configuration property names
     static final String CFG_SHOULDER = "identifier.doi.ezid.shoulder";
