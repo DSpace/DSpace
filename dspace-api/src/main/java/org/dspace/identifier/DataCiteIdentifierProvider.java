@@ -25,6 +25,7 @@ import org.dspace.core.Context;
 import org.dspace.identifier.ezid.EZIDRequest;
 import org.dspace.identifier.ezid.EZIDRequestFactory;
 import org.dspace.identifier.ezid.EZIDResponse;
+import org.dspace.identifier.ezid.Transform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
@@ -40,11 +41,11 @@ import org.springframework.beans.factory.annotation.Required;
  *
  * <dl>
  *  <dt>identifier.doi.ezid.shoulder</dt>
- *  <dd>base of the site's DOIs</dd>
+ *  <dd>base of the site's DOIs.  Example:  10.5072/FK2</dd>
  *  <dt>identifier.doi.ezid.user</dt>
- *  <dd>EZID username</dd>
+ *  <dd>EZID username.</dd>
  *  <dt>identifier.doi.ezid.password</dt>
- *  <dd>EZID password</dd>
+ *  <dd>EZID password.</dd>
  * </dl>
  *
  * <p>There is also a Map (with the property name "crosswalk") from EZID
@@ -76,6 +77,9 @@ public class DataCiteIdentifierProvider
     /** Map DataCite metadata into local metadata. */
     private static Map<String, String> crosswalk = new HashMap<String, String>();
 
+    /** Converters to be applied to specific fields. */
+    private static Map<String, Transform> transforms = new HashMap<String, Transform>();
+
     /** Factory for EZID requests. */
     private static EZIDRequestFactory requestFactory;
 
@@ -89,9 +93,13 @@ public class DataCiteIdentifierProvider
     public boolean supports(String identifier)
     {
         if (null == identifier)
+        {
             return false;
+        }
         else
-            return identifier.startsWith(DOI_SCHEME); // XXX more thorough test?
+        {
+            return identifier.startsWith(DOI_SCHEME);
+        } // XXX more thorough test?
     }
 
     @Override
@@ -101,13 +109,19 @@ public class DataCiteIdentifierProvider
         log.debug("register {}", dso);
 
         if (!(dso instanceof Item))
+        {
             throw new IdentifierException("Unsupported object type " + dso.getTypeText());
+        }
 
         Item item = (Item)dso;
         DCValue[] identifiers = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
         for (DCValue identifier : identifiers)
+        {
             if ((null != identifier.value) && (identifier.value.startsWith(DOI_SCHEME)))
+            {
                 return identifier.value;
+            }
+        }
 
         String id = mint(context, item);
         item.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, id);
@@ -250,8 +264,12 @@ public class DataCiteIdentifierProvider
         // Good response?
         if (HttpURLConnection.HTTP_CREATED != response.getHttpStatusCode())
             {
-                log.error("EZID server responded:  {} {}", response.getHttpStatusCode(),
-                        response.getHttpReasonPhrase());
+                log.error("EZID server responded:  {} {}: {}",
+                        new String[] {
+                            String.valueOf(response.getHttpStatusCode()),
+                            response.getHttpReasonPhrase(),
+                            response.getEZIDStatusValue()
+                                    });
                 throw new IdentifierException("DOI not created:  " + response.getHttpReasonPhrase());
             }
 
@@ -261,7 +279,9 @@ public class DataCiteIdentifierProvider
             String value = response.getEZIDStatusValue();
             int end = value.indexOf('|'); // Following pipe is "shadow ARK"
             if (end < 0)
+            {
                 end = value.length();
+            }
             String doi = value.substring(0, end).trim();
             log.info("Created {}", doi);
             return doi;
@@ -300,10 +320,14 @@ public class DataCiteIdentifierProvider
         }
         try {
             if (!found.hasNext())
+            {
                 throw new IdentifierNotFoundException("No object bound to " + identifier);
+            }
             Item found1 = found.next();
             if (found.hasNext())
+            {
                 log.error("More than one object bound to {}!", identifier);
+            }
             log.debug("Resolved to {}", found1);
             return found1;
         } catch (SQLException ex) {
@@ -319,24 +343,30 @@ public class DataCiteIdentifierProvider
         log.debug("lookup {}", object);
 
         if (!(object instanceof Item))
+        {
             throw new IllegalArgumentException("Unsupported type " + object.getTypeText());
+        }
 
         Item item = (Item)object;
         DCValue found = null;
         for (DCValue candidate : item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null))
+        {
             if (candidate.value.startsWith(DOI_SCHEME))
             {
                 found = candidate;
                 break;
             }
+        }
         if (null != found)
         {
             log.debug("Found {}", found.value);
             return found.value;
         }
         else
+        {
             throw new IdentifierNotFoundException(object.getTypeText() + " "
                     + object.getID() + " has no DOI");
+        }
     }
 
     @Override
@@ -346,7 +376,9 @@ public class DataCiteIdentifierProvider
         log.debug("delete {}", dso);
 
         if (!(dso instanceof Item))
+        {
             throw new IllegalArgumentException("Unsupported type " + dso.getTypeText());
+        }
 
         Item item = (Item)dso;
 
@@ -403,7 +435,9 @@ public class DataCiteIdentifierProvider
         }
 
         if (skipped > 0)
+        {
             throw new IdentifierException(skipped + " identifiers could not be deleted.");
+        }
     }
 
     @Override
@@ -413,7 +447,9 @@ public class DataCiteIdentifierProvider
         log.debug("delete {} from {}", identifier, dso);
 
         if (!(dso instanceof Item))
+        {
             throw new IllegalArgumentException("Unsupported type " + dso.getTypeText());
+        }
 
         Item item = (Item)dso;
 
@@ -470,7 +506,9 @@ public class DataCiteIdentifierProvider
         }
 
         if (skipped > 0)
+        {
             throw new IdentifierException(identifier + " could not be deleted.");
+        }
     }
 
     /**
@@ -494,9 +532,13 @@ public class DataCiteIdentifierProvider
     {
         String prefix = "doi:" + loadAuthority();
         if (DOI.startsWith(prefix))
+        {
             return DOI.substring(prefix.length());
+        }
         else
+        {
             return DOI;
+        }
     }
 
     /**
@@ -508,9 +550,13 @@ public class DataCiteIdentifierProvider
     {
         String user = configurationService.getProperty(CFG_USER);
         if (null != user)
+        {
             return user;
+        }
         else
+        {
             throw new IdentifierException("Unconfigured:  define " + CFG_USER);
+        }
     }
 
     /**
@@ -522,9 +568,13 @@ public class DataCiteIdentifierProvider
     {
         String password = configurationService.getProperty(CFG_PASSWORD);
         if (null != password)
+        {
             return password;
+        }
         else
+        {
             throw new IdentifierException("Unconfigured:  define " + CFG_PASSWORD);
+        }
     }
 
     /**
@@ -536,9 +586,13 @@ public class DataCiteIdentifierProvider
     {
         String shoulder = configurationService.getProperty(CFG_SHOULDER);
         if (null != shoulder)
+        {
             return shoulder;
+        }
         else
+        {
             throw new IdentifierException("Unconfigured:  define " + CFG_SHOULDER);
+        }
     }
 
     /**
@@ -547,7 +601,9 @@ public class DataCiteIdentifierProvider
     static private Map<String, String> crosswalkMetadata(DSpaceObject dso)
     {
         if ((null == dso) || !(dso instanceof Item))
+        {
             throw new IllegalArgumentException("Must be an Item");
+        }
         Item item = (Item) dso; // TODO generalize to DSO when all DSOs have metadata.
 
         Map<String, String> mapped = new HashMap<String, String>();
@@ -556,8 +612,34 @@ public class DataCiteIdentifierProvider
         {
             DCValue[] values = item.getMetadata(datum.getValue());
             if (null != values)
+            {
                 for (DCValue value : values)
-                    mapped.put(datum.getKey(), value.value);
+                {
+                    String key = datum.getKey();
+                    String mappedValue;
+                    Transform xfrm = transforms.get(key);
+                    if (null != xfrm)
+                    {
+                        try {
+                            mappedValue = xfrm.transform(value.value);
+                        } catch (Exception ex) {
+                            log.error("Unable to transform '{}' from {} to {}:  {}",
+                                    new String[] {
+                                        value.value,
+                                        value.toString(),
+                                        key,
+                                        ex.getMessage()
+                                    });
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        mappedValue = value.value;
+                    }
+                    mapped.put(key, mappedValue);
+                }
+            }
         }
 
         // TODO find a way to get a current direct URL to the object and set _target
@@ -571,6 +653,12 @@ public class DataCiteIdentifierProvider
     {
         crosswalk = aCrosswalk;
     }
+
+    public void setCrosswalkTransform(Map<String, Transform> transformMap)
+    {
+        transforms = transformMap;
+    }
+
     @Required
     public static void setRequestFactory(EZIDRequestFactory aRequestFactory)
     {

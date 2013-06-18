@@ -29,7 +29,15 @@
                 <entry key='datacite.creator' value='dc.contributor.author'/>
                 <entry key='datacite.title' value='dc.title'/>
                 <entry key='datacite.publisher' value='dc.publisher'/>
-                <entry key='datacite.publicationyear' value='dc.date.published'/>
+                <entry key='datacite.publicationyear' value='dc.date.issued'/>
+            </map>
+        </property>
+        <property name='crosswalkTransform'>
+            <description>How to compute the crosswalked value from the original.  Default is plain copy.</description>
+            <map>
+                <entry key='datacite.publicationyear'>
+                    <bean class='org.dspace.identifier.ezid.DateToYear'/>
+                </entry>
             </map>
         </property>
     </bean>
