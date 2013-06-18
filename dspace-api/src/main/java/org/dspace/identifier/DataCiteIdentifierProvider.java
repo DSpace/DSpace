@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * Provide service for DOIs through DataCite.
+ * Provide service for DOIs through DataCite using the EZID service.
  *
  * <p>Configuration of this class is is in two parts.</p>
  *
@@ -46,13 +46,23 @@ import org.springframework.beans.factory.annotation.Required;
  *  <dd>EZID username.</dd>
  *  <dt>identifier.doi.ezid.password</dt>
  *  <dd>EZID password.</dd>
+ *  <dt>identifier.doi.ezid.publisher</dt>
+ *  <dd>A default publisher, for Items not previously published.  EZID requires a publisher.</dd>
  * </dl>
  *
- * <p>There is also a Map (with the property name "crosswalk") from EZID
- * metadata field names into DSpace field names, injected by Spring.  Specify
- * the fully-qualified names of all metadata fields to be looked up on a DSpace
- * object and their values set on mapped fully-qualified names in the object's
- * DataCite metadata.</p>
+ * <p>Then there are properties injected using Spring:</p>
+ * <ul>
+ *  <li>There is a Map (with the property name "crosswalk") from EZID
+ *  metadata field names into DSpace field names, injected by Spring.  Specify
+ *  the fully-qualified names of all metadata fields to be looked up on a DSpace
+ *  object and their values set on mapped fully-qualified names in the object's
+ *  DataCite metadata.</li>
+ *
+ *  <li>A second map ("crosswalkTransform") provides Transform instances
+ *  mapped from EZID metadata field names.  This allows the crosswalk to rewrite
+ *  field values where the form maintained by DSpace is not directly usable in
+ *  EZID metadata.</li>
+ * </ul>
  *
  * @author mwood
  */
@@ -65,8 +75,12 @@ public class DataCiteIdentifierProvider
     static final String CFG_SHOULDER = "identifier.doi.ezid.shoulder";
     static final String CFG_USER = "identifier.doi.ezid.user";
     static final String CFG_PASSWORD = "identifier.doi.ezid.password";
+    static final String CFG_PUBLISHER = "identifier.doi.ezid.publisher";
 
-    // Metadata field name elements
+    // DataCite metadata field names
+    static final String DATACITE_PUBLISHER = "datacite.publisher";
+
+    // DSpace metadata field name elements
     // XXX move these to MetadataSchema or some such
     public static final String MD_SCHEMA = "dc";
     public static final String DOI_ELEMENT = "identifier";
@@ -598,7 +612,7 @@ public class DataCiteIdentifierProvider
     /**
      * Map selected DSpace metadata to fields recognized by DataCite.
      */
-    static private Map<String, String> crosswalkMetadata(DSpaceObject dso)
+    private Map<String, String> crosswalkMetadata(DSpaceObject dso)
     {
         if ((null == dso) || !(dso instanceof Item))
         {
@@ -639,6 +653,12 @@ public class DataCiteIdentifierProvider
                     }
                     mapped.put(key, mappedValue);
                 }
+            }
+
+            if (!mapped.containsKey(DATACITE_PUBLISHER))
+            {
+                mapped.put(DATACITE_PUBLISHER,
+                        configurationService.getProperty(CFG_PUBLISHER));
             }
         }
 
