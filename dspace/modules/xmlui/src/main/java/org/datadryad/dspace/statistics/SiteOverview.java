@@ -363,7 +363,7 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
         org.dspace.app.xmlui.wing.element.Table infoTable= overviewStats.addTable("list-table",5,3);
 
         Row headerRow = infoTable.addRow(Row.ROLE_HEADER);
-        headerRow.addCell().addContent("");
+        headerRow.addCell().addContent("<span class='accessibly-hidden'>Type</span>");
         headerRow.addCell().addContent("Total");
         headerRow.addCell().addContent("30 days"); 
 
