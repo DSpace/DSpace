@@ -175,7 +175,7 @@ a:hover {
     line-height: 1.6em;
 }
 
-img.powered-by {
+#ds-footer img.powered-by {
     vertical-align: middle;
     margin-top: -3px;
 }
@@ -273,7 +273,7 @@ h1.ds-option-set-head {
 .publication-header.ds-static-div {
     border: none;
     padding: 0;
-    margin-top: 6px;
+    margin-top: 0px;
     background-color: transparent;
     -moz-box-shadow: none;
     -webkit-box-shadow: none;
@@ -2180,6 +2180,7 @@ a.top-link {
 /* Contact Us (Feedback Form) style */
 
 h2.feedbackform-heading {
+    color: #40841c;
     font-size: 18px;
 }
 
@@ -2200,27 +2201,18 @@ a.feedbackform-user-voice-link {
     color: #FF0000;
 }
 
-#aspect_artifactbrowser_FeedbackForm_list_form li.ds-form-item .ds-form-label {
-    font-size: 110%;
-    font-style: italic;
-    font-weight: bold;
-    line-height: 1;
-    padding-bottom: 0;
-    padding-left: 5px; 
-}
-
-
-
 /* ********************* Tweaks for webkit browsers (Chrome + Safari) only **************** */
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
     /* misplaced pager controls */
     #dryad-home-carousel .bx-pager-item {
+        top: -7px !important;
     }
 
 
     /* force rounded corners in the slideshow (known Chrome bug) */
-    .bx-viewport {
+    .bx-viewport, 
+    .bx-wrapper img {
         -webkit-border-top-left-radius: 8px;
         -webkit-border-top-right-radius: 8px;
         border-top-left-radius: 8px;
@@ -2230,28 +2222,8 @@ a.feedbackform-user-voice-link {
         border-bottom-left-radius: 8px;
         border-bottom-right-radius: 8px;
     }
-    /* slide images should be rounded on TOP only */
-    .bx-wrapper img {
-        -webkit-border-top-left-radius: 8px;
-        -webkit-border-top-right-radius: 8px;
-        border-top-left-radius: 8px;
-        border-top-right-radius: 8px;
-    }
     
 }
-
-.hidden_form_by{
-    display: none;
+#aspect_discovery_MostDownloadedBitstream_table_most-downloaded th h2{
+    font-size: 1em;
 }
-
-.hidden_form_by{
-    display: none;
-}
-
-.choose_browse_by{
-    display: none;
-}
-#aspect_discovery_SearchFilterTransformer_field_starts_with{
-        margin-left: 15px;
-
-    }
