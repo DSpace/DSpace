@@ -106,6 +106,8 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     private static final Message T_order_asc = message("xmlui.ArtifactBrowser.ConfigurableBrowse.order.asc");
 
     private static final Message T_order_desc = message("xmlui.ArtifactBrowser.ConfigurableBrowse.order.desc");
+    
+    private static final Message T_show_all = message("xmlui.ArtifactBrowser.ConfigurableBrowse.etal.all");
 
     private static final String BROWSE_URL_BASE = "browse";
 
@@ -441,8 +443,13 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             {
                 letterQuery.remove(valueKey);
             }
-            letterQuery.put(BrowseParams.STARTS_WITH, "0");
-            jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), "0-9");
+            /*
+             * Here is replaced the default searchView by number (0-9) for a view of all items (T_show_all). 
+             */
+//            letterQuery.put(BrowseParams.STARTS_WITH, "0");
+//            jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), "0-9");
+
+            jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), T_show_all);
             
             for (char c = 'A'; c <= 'Z'; c++)
             {
