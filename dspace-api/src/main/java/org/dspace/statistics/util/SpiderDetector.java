@@ -17,8 +17,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * SpiderDetector is used to find IP's that are spiders...
@@ -31,7 +32,7 @@ import org.dspace.core.ConfigurationManager;
  */
 public class SpiderDetector {
 
-    private static Logger log = Logger.getLogger(SpiderDetector.class);
+    private static Logger log = LoggerFactory.getLogger(SpiderDetector.class);
 
     private static Boolean useProxies;
 
@@ -44,33 +45,31 @@ public class SpiderDetector {
     private static List<Pattern> agents = new ArrayList<Pattern>();
 
     /**
-     * Utility method which reads IP addresses from a file & returns them in a Set.
+     * Utility method which reads lines from a file & returns them in a Set.
      *
-     * @param spiderIpFile the location of our spider file
-     * @return a vector full of IPs
+     * @param patternFile the location of our spider file
+     * @return a vector full of patterns
      * @throws IOException could not happen since we check the file be4 we use it
      */
-    public static Set<String> readIpAddresses(File spiderIpFile) throws IOException {
-        Set<String> ips = new HashSet<String>();
+    public static Set<String> readPatterns(File patternFile)
+            throws IOException
+    {
+        Set<String> patterns = new HashSet<String>();
 
-        if (!spiderIpFile.exists() || !spiderIpFile.isFile())
+        if (!patternFile.exists() || !patternFile.isFile())
         {
-            return ips;
+            return patterns;
         }
 
-        //Read our file & get all them ip's
-        BufferedReader in = new BufferedReader(new FileReader(spiderIpFile));
+        //Read our file & get all them patterns.
+        BufferedReader in = new BufferedReader(new FileReader(patternFile));
         String line;
         while ((line = in.readLine()) != null) {
             if (!line.startsWith("#")) {
                 line = line.trim();
 
-                if (!line.equals("") && !Character.isDigit(line.charAt(0))) {
-                    // is a hostname
-                    // add this functionality later...
-                } else if (!line.equals("")) {
-                    ips.add(line);
-                    // is full v4 ip (too tired to deal with v6)...
+                if (!line.equals("")) {
+                    patterns.add(line);
                 }
             } else {
                 //   ua.add(line.replaceFirst("#","").replaceFirst("UA","").trim());
@@ -78,7 +77,7 @@ public class SpiderDetector {
             }
         }
         in.close();
-        return ips;
+        return patterns;
     }
 
     /**
@@ -124,11 +123,10 @@ public class SpiderDetector {
     }
 
     /*
-        private loader to populate the table from files.
+     *  private loader to populate the table from files.
      */
 
     private static void loadSpiderIpAddresses() {
-
 
         if (table == null) {
             table = new IPTable();
@@ -140,7 +138,18 @@ public class SpiderDetector {
 
                 if (spidersDir.exists() && spidersDir.isDirectory()) {
                     for (File file : spidersDir.listFiles()) {
-                        for (String ip : readIpAddresses(file)) {
+                        for (String ip : readPatterns(file)) {
+                            log.debug("Loading {}", ip);
+                            if (!Character.isDigit(ip.charAt(0)))
+                            {
+                                try {
+                                    ip = DnsLookup.forward(ip);
+                                    log.debug("Resolved to {}", ip);
+                                } catch (IOException e) {
+                                    log.warn("Not loading {}:  {}", ip, e.getMessage());
+                                    continue;
+                                }
+                            }
                             table.add(ip);
                         }
                         log.info("Loaded Spider IP file: " + file);
@@ -148,18 +157,43 @@ public class SpiderDetector {
                 } else {
                     log.info("No spider file loaded");
                 }
-
-
             }
             catch (Exception e) {
                 log.error("Error Loading Spiders:" + e.getMessage(), e);
             }
 
-
         }
 
     }
 
+    /** Load agent name patterns from all files in config/spiders/agents. */
+    private static void loadAgentPatterns()
+    {
+        String dspaceHome = ConfigurationManager.getProperty("dspace.dir");
+        File agentsDir = new File(dspaceHome, "config/spiders/agents");
+        if (agentsDir.exists() && agentsDir.isDirectory())
+        {
+            for (File file : agentsDir.listFiles())
+            {
+                Set<String> patterns;
+                try
+                {
+                    patterns = readPatterns(file);
+                } catch (IOException ex)
+                {
+                    log.error("Agent patterns not read from {}:  {}",
+                            file.getPath(), ex.getMessage());
+                    continue;
+                }
+                for (String pattern : patterns)
+                {
+                    agents.add(Pattern.compile(pattern));
+                }
+            }
+        }
+    }
+
+    /* TODO Load host name patterns from all files in config/spiders/dns. */
 
     /**
      * Static Service Method for testing spiders against existing spider files.
@@ -172,12 +206,15 @@ public class SpiderDetector {
      * @param request
      * @return true|false if the request was detected to be from a spider
      */
-    public static boolean isSpider(HttpServletRequest request) {
-
+    public static boolean isSpider(HttpServletRequest request)
+    {
         // See if any agent patterns match
         String agent = request.getHeader("User-Agent");
-        if ((null != agent) && (null != agents))
+        if (null != agent)
         {
+            if (null == agents)
+                loadAgentPatterns();
+
             for (Pattern candidate : agents)
             {
                 if (candidate.matcher(agent).find())
@@ -199,7 +236,6 @@ public class SpiderDetector {
         }
 
         return isSpider(request.getRemoteAddr());
-
     }
 
     /**
