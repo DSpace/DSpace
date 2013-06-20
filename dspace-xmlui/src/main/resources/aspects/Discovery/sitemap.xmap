@@ -178,6 +178,7 @@ and searching the repository.
                             <map:serialize type="xml"/>
                         </map:match>
                     </map:match>
+                </map:match>
 
             </map:match> <!-- End match handle/*/** -->
 
