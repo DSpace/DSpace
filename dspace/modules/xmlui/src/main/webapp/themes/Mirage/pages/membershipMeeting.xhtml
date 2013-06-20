@@ -8,13 +8,11 @@
   <title>Membership Meeting</title>
      <style type="text/css">
          div#ds-body { margin: 0px 0px 0px 0px; padding-right: 10px; top: 165px;}
-         div.agenda { display:table;}
-         span.agenda-row { display: table-row; margin: 5px; }
-         span.event { display: table-cell; padding-bottom: 5px;}
-         span.title { display: block; font-weight: bold;}
-         span.description { display: block; }
-         span.agenda-bold { font-weight: bold; display: block; }
-         span.agenda-italics { font-style: italic; display: block; }
+         ul.presentations li { list-style-type: none; }
+         ul.presentations li ul  { padding-bottom: 0.2em; padding-top: 0.2em;}
+         ul.presentations li.title { font-weight: bold; padding-bottom: 0.2em; padding-top: 0.2em;}
+         span.forum_person { font-weight: bold; }
+         span.forum_topic { font-style: italic; }
       </style>
  </head>
  <body>
@@ -62,57 +60,123 @@
     <h2>Dryad Membership Meeting, 24 May 2013</h2>
     
     <h3>Presentations</h3>
-        <div class="agenda">
-          <span class="agenda-row">
-       
-            <span class="event">
-              <span class="agenda-bold">Introduction</span>
-                <span class="description">What is Dryad, review of agenda by William Michener (Board Chairman) 
-                <a href="http://wiki.datadryad.org/wg/dryad/images/b/b2/2013May_DRYAD-intro_Michener.pdf"> Slides</a></span>
-                <span class="agenda-bold">Current status and future plans for the Dryad Digital Repository</span>
-              <span class="description">Uptake by users and journals, Todd Vision (Secretary &amp; NSF Principal Investigator) 
-              <a href="http://wiki.datadryad.org/wg/dryad/images/b/b7/2013MayVision.pdf"> Slides</a></span>
-<span class="description">Content and curation, Elena Feinstein (Lead Curator) <a href="http://wiki.datadryad.org/wg/dryad/images/0/07/2013May_AnnualMeeting_Curation.pdf"> Slides</a></span>
-<span class="description">:Recent and upcoming features, Ryan Scherle (Repository Architect) <a href="http://wiki.datadryad.org/wg/dryad/images/b/bd/2013May_AnnualMeeting_Features.pdf"> Slides</a> </span>
-</span>          
-</span>
-          <span class="agenda-row">
-          
-            <span class="event">
-              <span class="agenda-bold">Current status of Dryad the nonprofit organization</span>
-              <span class="description">Governance, William Michener</span>
-              <span class="description">Membership and pricing plans, Laura Wendell <a href="http://wiki.datadryad.org/wg/dryad/images/2/29/2013May_AnnualMeeting_Sustainability2.pdf"> Slides</a></span>
-            </span>
-          </span>
-
-          <span class="agenda-row">
-    
-            <span class="event">
-              <span class="agenda-bold">Emerging issues forum</span>
-              <span class="agenda-bold">Marianne Bamkin <a href="http://www.jisc.ac.uk/whatwedo/programmes/di_researchmanagement/managingresearchdata/research-data-publication/jord.aspx/"> JoRD</a></span>
-              <span class="agenda-italics">Model journal policies and implementation <a href="http://prezi.com/zdgosofqiaev/the-jord-project/"> Prezi</a></span>
-              <span class="agenda-bold">Jonathan Tedds <a href="http://www.jisc.ac.uk/whatwedo/programmes/di_researchmanagement/managingresearchdata/research-data-publication/preparde.aspx"> PREPARDE</a></span>
-<span class="agenda-italics">Review of data associated with publications <a href="http://wiki.datadryad.org/wg/dryad/images/9/96/Tedds-Oxford-Dryad-24May2013-PREPARDE-Data-Peer-Review.pdf"> Slides</a></span>
- <span class="agenda-bold">Simon Hodson <a href="http://www.jisc.ac.uk/whatwedo/topics/researchinnovation.aspx"> JISC</a></span>
-         <span class="agenda-italics">Using grant and institutional funds for data archiving costs <a href="#"> Slides</a> </span>
- <span class="agenda-bold">Sarah Callaghan <a href="http://www.codata.org/taskgroups/TGdatacitation/"> CODATA-ICSTI Task Group on Data Citation</a>
-<span class="agenda-italics">The CODATA-ICSTI data citation recommendations <a href="http://wiki.datadryad.org/wg/dryad/images/9/9c/REVISEDData_Citation_TG_Presentation_to_Dryad_23May2013.pdf"> Slides </a> </span>
-<span class="agenda-bold">Martin Fenner <a href="http://article-level-metrics.plos.org"> PLOS ALM</a></span>
-<span class="agenda-italics">Tracking data usage and impact</span>
-
-
-<span class="agenda-bold">Eefke Smit <a href="http://www.stm-assoc.org/"> STM</a></span>
-<span class="agenda-italics">The how and why of repository certification <a href="http://wiki.datadryad.org/wg/dryad/images/d/da/2013MaySmit.pdf">Slides</a></span>
-<span class="agenda-bold">Susanna-Assunta Sansone <a href="http://www.isa-tools.org">ISA</a> and <a href="http://biosharing.org">Biosharing</a></span>
-<span class="agenda-italics">Helping researchers to collect, curate, analyse, share and publish - ISA and BioSharing roles <a href="http://wiki.datadryad.org/wg/dryad/images/d/d4/BioSharing-Sansone-Dryad-May13.pdf"> Slides</a></span>
-<span class="agenda-bold">Bill Michener <a href="http://www.dataone.org/"> DataOne</a></span>
-<span class="agenda-italics">Relevance of DataONE &amp; the DataNet program to Dryad <a href="http://wiki.datadryad.org/wg/dryad/images/d/d1/Dryad_DataNet_Relevance_Michener_2013.pd"> Slides</a></span>
-            </span>
-          </span>
-          </span>
-         
-        </div>
-        
+    <ul class="presentations">
+      <li class="title">Introduction</li>
+      <li>What is Dryad, review of agenda by William Michener (Board Chairman) 
+                <a href="http://wiki.datadryad.org/wg/dryad/images/b/b2/2013May_DRYAD-intro_Michener.pdf"> Slides</a></li>
+      <li class="title">Current status and future plans for the Dryad Digital Repository</li>
+      <li class="presentation_block">
+        <ul>
+        <li>Uptake by users and journals, Todd Vision (Secretary &amp; NSF Principal Investigator) 
+              <a href="http://wiki.datadryad.org/wg/dryad/images/b/b7/2013MayVision.pdf"> Slides</a></li>
+        <li>Content and curation, Elena Feinstein (Lead Curator) <a href="http://wiki.datadryad.org/wg/dryad/images/0/07/2013May_AnnualMeeting_Curation.pdf"> Slides</a></li>
+        <li>Recent and upcoming features, Ryan Scherle (Repository Architect) <a href="http://wiki.datadryad.org/wg/dryad/images/b/bd/2013May_AnnualMeeting_Features.pdf"> Slides</a></li>
+        </ul>
+      </li>
+      <li class="title">Current status of Dryad the nonprofit organization</li>
+      <li class="presentation_block">
+        <ul>
+          <li>Governance, William Michener</li>
+          <li>Membership and pricing plans, Laura Wendell <a href="http://wiki.datadryad.org/wg/dryad/images/2/29/2013May_AnnualMeeting_Sustainability2.pdf"> Slides</a></li>
+        </ul>
+      </li>
+      <li class="title">Emerging issues forum</li>
+      <li class="presentation_block">
+        <ul>
+          <li>
+            <span class="forum_person">Marianne Bamkin</span>
+            <a href="http://www.jisc.ac.uk/whatwedo/programmes/di_researchmanagement/managingresearchdata/research-data-publication/jord.aspx/">JoRD</a>
+          </li>
+          <li>
+            <span class="forum_topic">Model journal policies and implementation</span>
+            <a href="http://prezi.com/zdgosofqiaev/the-jord-project/">Prezi</a>
+          </li>
+        </ul>
+      </li>
+      <li class="presentation_block">
+        <ul>
+          <li>
+            <span class="forum_person">Jonathan Tedds</span>
+            <a href="http://www.jisc.ac.uk/whatwedo/programmes/di_researchmanagement/managingresearchdata/research-data-publication/preparde.aspx">PREPARDE</a>
+          </li>
+          <li>
+            <span class="forum_topic">Review of data associated with publications</span>
+            <a href="http://wiki.datadryad.org/wg/dryad/images/9/96/Tedds-Oxford-Dryad-24May2013-PREPARDE-Data-Peer-Review.pdf"> Slides</a>
+          </li>
+        </ul>
+      </li>
+      <li class="presentation_block">
+        <ul>
+          <li>
+            <span class="forum_person">Simon Hodson</span>
+            <a href="http://www.jisc.ac.uk/whatwedo/topics/researchinnovation.aspx">JISC</a>
+          </li>
+          <li>
+            <span class="forum_topic">Using grant and institutional funds for data archiving costs</span>
+            <a href="#"></a>
+          </li>
+        </ul>
+      </li>
+      <li class="presentation_block">
+        <ul>
+          <li>
+            <span class="forum_person">Sarah Callaghan</span>
+            <a href="http://www.codata.org/taskgroups/TGdatacitation/"> CODATA-ICSTI Task Group on Data Citation</a>
+          </li>
+          <li>
+            <span class="forum_topic">The CODATA-ICSTI data citation recommendations</span>
+            <a href="http://wiki.datadryad.org/wg/dryad/images/9/9c/REVISEDData_Citation_TG_Presentation_to_Dryad_23May2013.pdf">Slides</a>
+          </li>
+        </ul>
+      </li>
+      <li class="presentation_block">
+        <ul>
+          <li>
+            <span class="forum_person">Martin Fenner</span>
+            <a href="http://article-level-metrics.plos.org">PLOS ALM</a>
+          </li>
+          <li>
+            <span class="forum_topic">Tracking data usage and impact</span>
+          </li>
+        </ul>
+      </li>
+      <li class="presentation_block">
+        <ul>
+          <li>
+            <span class="forum_person">Eefke Smit</span>
+            <a href="http://www.stm-assoc.org/">STM</a>
+          </li>
+          <li>
+            <span class="forum_topic">The how and why of repository certification</span>
+            <a href="http://wiki.datadryad.org/wg/dryad/images/d/da/2013MaySmit.pdf">Slides</a>
+          </li>
+        </ul>
+      </li>
+      <li class="presentation_block">
+        <ul>
+          <li>
+            <span class="forum_person">Susanna-Assunta Sansone</span>
+            <a href="http://www.isa-tools.org">ISA</a> and <a href="http://biosharing.org">Biosharing</a>
+          </li>
+          <li>
+            <span class="forum_topic">Helping researchers to collect, curate, analyse, share and publish - ISA and BioSharing roles</span>
+            <a href="http://wiki.datadryad.org/wg/dryad/images/d/d4/BioSharing-Sansone-Dryad-May13.pdf"> Slides</a>
+          </li>
+        </ul>
+      </li>
+      <li class="presentation_block">
+        <ul>
+          <li>
+            <span class="forum_person">Bill Michener</span>
+            <a href="http://www.dataone.org/">DataOne</a>
+          </li>
+          <li>
+            <span class="forum_topic">Relevance of DataONE &amp; the DataNet program to Dryad</span>
+            <a href="http://wiki.datadryad.org/wg/dryad/images/d/d1/Dryad_DataNet_Relevance_Michener_2013.pdf">Slides</a>
+          </li>
+        </ul>
+      </li>
+    </ul>
     </div>
     <div class="page-license">
         <p>
