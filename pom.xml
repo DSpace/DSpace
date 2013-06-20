@@ -47,11 +47,11 @@
 			<url>https://github.com/CILEA/mvn-repo/raw/master/releases</url>
 			<releases>
 				<enabled>true</enabled>
-				<checksumPolicy>fail</checksumPolicy>
+				<checksumPolicy>never</checksumPolicy>
 			</releases>
 			<snapshots>
 				<enabled>false</enabled>
-				<checksumPolicy>fail</checksumPolicy>
+				<checksumPolicy>never</checksumPolicy>
 			</snapshots>
 		</repository>
 	</repositories>
