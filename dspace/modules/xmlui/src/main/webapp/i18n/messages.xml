@@ -2624,6 +2624,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-viewOpen">View/<wbr/>Open</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-no-files">There are no files associated with this
 		item.</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-files-checksum">Checksum</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.size-bytes">bytes</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.size-kilobytes">Kb</message>

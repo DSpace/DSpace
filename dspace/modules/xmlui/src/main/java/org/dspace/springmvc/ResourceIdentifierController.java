@@ -68,7 +68,7 @@ public class ResourceIdentifierController {
 
             DSpaceObject dso = dis.resolve(context, resourceIdentifier);
 
-            if (dso == null) throw new RuntimeException("Cannot find Item!");
+            if (dso == null) throw new IdentifierNotFoundException("Cannot find Item!");
 
             request.setAttribute(DSPACE_OBJECT, dso);
 

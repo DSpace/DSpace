@@ -120,48 +120,51 @@
                         </xsl:otherwise>
                     </xsl:choose>
 		    <xsl:text>)</xsl:text></span></a>
-              <!-- View File Details -->
-              <xsl:if test="$token!=''">
-                <a>
-                    <xsl:attribute name="href">
-                        <xsl:text>/review?doi=</xsl:text>
-                        <xsl:copy-of select="$my_doi"/>
-                        <xsl:text>&amp;token=</xsl:text>
-                        <xsl:copy-of select="$token"/>
-                    </xsl:attribute>
-                    <xsl:text>View File Details</xsl:text>
-                </a>
-            </xsl:if>
-
-            <xsl:if test="not($token!='')">
-                <xsl:variable name="my_doi"
-                              select="//dim:field[@element='identifier'][not(@qualifier)][starts-with(., 'doi:')]"/>
-                <xsl:variable name="my_uri"
-                              select="//dim:field[@element='identifier'][@qualifier='uri'][not(starts-with(., 'doi'))]"/>
-		<xsl:text>&#160;</xsl:text>                
-		<a>
-                    <!-- link -->
-                    <xsl:attribute name="href">
-                        <xsl:choose>
-                            <xsl:when test="$my_doi">
-                                <xsl:call-template name="checkURL">
-                                    <xsl:with-param name="doiIdentifier" select="$my_doi"/>
-                                </xsl:call-template>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="$my_uri"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:attribute>
-
-		    <xsl:text>View&#160;File&#160;Details</xsl:text>
-                </a>
-              </xsl:if>
             </td>
           </tr>
 
           </xsl:for-each>
-
+        <tr>
+        <!-- View File Details -->
+        <th>Details</th>
+        <td>
+          <a>
+            <!-- link -->
+            <xsl:choose>
+              <!-- Have token -->
+              <xsl:when test="$token!=''">
+              <xsl:attribute name="href">
+                <xsl:text>/review?doi=</xsl:text>
+                <xsl:copy-of select="$my_doi"/>
+                <xsl:text>&amp;token=</xsl:text>
+                <xsl:copy-of select="$token"/>
+              </xsl:attribute>
+              <xsl:text>View File Details</xsl:text>
+              </xsl:when>
+              <!-- No token -->
+              <xsl:otherwise>
+                <xsl:variable name="my_doi"
+                              select="//dim:field[@element='identifier'][not(@qualifier)][starts-with(., 'doi:')]"/>
+                <xsl:variable name="my_uri"
+                              select="//dim:field[@element='identifier'][@qualifier='uri'][not(starts-with(., 'doi'))]"/>
+                <xsl:attribute name="href">
+                  <xsl:choose>
+                    <xsl:when test="$my_doi">
+                      <xsl:call-template name="checkURL">
+                        <xsl:with-param name="doiIdentifier" select="$my_doi"/>
+                      </xsl:call-template>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$my_uri"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+                <xsl:text>View File Details</xsl:text>
+            </xsl:otherwise>
+            </xsl:choose>
+          </a>
+        </td>
+    </tr>
         <!-- Embargo Notice -->
         <xsl:variable name="embargoedDate"
                       select=".//dim:field[@element='date' and @qualifier='embargoedUntil']"/>

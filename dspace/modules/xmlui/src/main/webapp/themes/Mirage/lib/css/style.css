@@ -76,16 +76,35 @@ a:hover {
     cursor: pointer;
 }
 
-#ds-header-logo {
+.ds-header-logo {
     float:left;
     width: 155px;
     height: 88px;
     margin-top: 10px;
-    background: url('../../images/dryad-logo.png');
     background-position: left bottom;
     background-repeat: no-repeat;
     background-color: transparent;
     margin-right: 15px;
+}
+
+#ds-header-logo-prod {
+    background: url('../../images/dryad-logo.png');
+}
+
+#ds-header-logo-dev {
+    background: url('../../images/dryad-logo-dev.png');
+}
+
+#ds-header-logo-demo {
+    background: url('../../images/dryad-logo-demo.png');
+}
+
+#ds-header-logo-staging {
+    background: url('../../images/dryad-logo-staging.png');
+}
+
+#ds-header-logo-mrc {
+    background: url('../../images/dryad-logo-mrc.png');
 }
 
 #ds-header-logo-text {
@@ -216,7 +235,7 @@ a.discreet {
 
 
 /*make transparent PNGs invisible in IE6 until PNG-fix is applied*/
-.ie6 #ds-header-logo,
+.ie6 .ds-header-logo,
 .ie6 #ds-footer-logo {
     visibility: hidden;
 }
@@ -1246,7 +1265,7 @@ div.simple-item-view-description h3{
 }
 
 .file-metadata {
-    width: 300px;
+    width: 400px;
 }
 
 .file-metadata span,
@@ -1260,7 +1279,7 @@ div.simple-item-view-description h3{
 
 .file-metadata span.bold,
 .item-metadata span.bold {
-    width: 80px;
+    width: 130px;
     clear: left;
     text-align: right;
     margin-right: 7px;

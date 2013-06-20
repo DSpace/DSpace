@@ -15,11 +15,17 @@ import org.dspace.workflow.actions.Action;
 import org.dspace.workflow.actions.processingaction.AcceptAction;
 import org.dspace.workflow.actions.processingaction.EditMetadataAction;
 import org.xml.sax.SAXException;
+import org.dspace.content.DCValue;
+import org.dspace.content.DSpaceObject;
+import org.dspace.identifier.DOIIdentifierProvider;
+import org.dspace.identifier.IdentifierNotFoundException;
+import org.dspace.identifier.IdentifierNotResolvableException;
+import org.dspace.versioning.Version;
+import org.dspace.versioning.VersionHistory;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import org.dspace.versioning.Version;
-import org.dspace.versioning.VersionHistory;
+import java.util.ArrayList;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -76,6 +82,8 @@ public class EditMetadataActionXMLUI extends AbstractXMLUIAction {
     protected static final Message T_cancel_submit =
             message("xmlui.general.cancel");
 
+    private static final Message T_head_has_part =
+            message("xmlui.ArtifactBrowser.ItemViewer.head_hasPart");
 
     @Override
     public void addBody(Body body) throws SAXException, WingException, SQLException, IOException, AuthorizeException {
@@ -96,7 +104,30 @@ public class EditMetadataActionXMLUI extends AbstractXMLUIAction {
         Division div = body.addInteractiveDivision("perform-task", actionURL, Division.METHOD_POST, "primary workflow");
         div.setHead(T_HEAD);
 
-        addWorkflowItemInformation(div, item, request);
+        //addWorkflowItemInformation(div, item, request);
+         // Add datafile list
+        String showfull = request.getParameter("submit_full_item_info");
+
+        // if the user selected showsimple, remove showfull.
+        if (showfull != null && request.getParameter("submit_simple_item_info") != null)
+            showfull = null;
+
+        ReferenceSet referenceSet;
+        if (showfull == null){
+            referenceSet = div.addReferenceSet("collection-viewer", ReferenceSet.TYPE_SUMMARY_VIEW);
+        } else {
+            referenceSet = div.addReferenceSet("collection-viewer", ReferenceSet.TYPE_DETAIL_VIEW);
+        }
+        org.dspace.app.xmlui.wing.element.Reference itemRef = referenceSet.addReference(item);
+        if (item.getMetadata("dc.relation.haspart").length > 0) {
+            ReferenceSet hasParts;
+            hasParts = itemRef.addReferenceSet("embeddedView", null, "hasPart");
+            hasParts.setHead(T_head_has_part);
+
+            for (Item obj : retrieveDataFiles(item)) {
+                hasParts.addReference(obj);
+            }
+        }
 
         switch (page){
             case EditMetadataAction.MAIN_PAGE:
@@ -178,5 +209,27 @@ public class EditMetadataActionXMLUI extends AbstractXMLUIAction {
         actions.addButton("submit_reject").setValue(T_submit_reject);
         actions.addButton("submit_cancel").setValue(T_submit_cancel);
 
+    }
+    
+    private java.util.List<Item> retrieveDataFiles(Item item) throws SQLException {
+        java.util.List<Item> dataFiles = new ArrayList<Item>();
+        DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
+
+        if (item.getMetadata("dc.relation.haspart").length > 0) {
+
+            for (DCValue value : item.getMetadata("dc.relation.haspart")) {
+
+                DSpaceObject obj = null;
+                try {
+                    obj = dis.resolve(context, value.value);
+                } catch (IdentifierNotFoundException e) {
+                    // just keep going
+                } catch (IdentifierNotResolvableException e) {
+                    // just keep going
+                }
+                if (obj != null) dataFiles.add((Item) obj);
+            }
+        }
+        return dataFiles;
     }
 }
