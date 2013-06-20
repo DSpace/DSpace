@@ -697,7 +697,7 @@ Common usage:
 
 
     <!-- ============================================================= -->
-    <!-- Install DSpace and Dependencies                               -->
+    <!-- Install DSpace and DSpace-CRIS and Dependencies                               -->
     <!-- ============================================================= -->
 
     <target name="init_installation">
@@ -729,6 +729,12 @@ Common usage:
         <mkdir dir="${report.dir}" />
 
     	<mkdir dir="${dspace.dir}/solr" />
+    	
+    	<mkdir dir="${dspace.dir}/rp-files" />
+    	
+    	<mkdir dir="${dspace.dir}/rg-files" />
+    	
+    	<mkdir dir="${dspace.dir}/ou-files" />
 
     </target>
 
@@ -786,6 +792,28 @@ Common usage:
             <arg value="database_schema.sql" />
         </java>
 
+    	<!-- Install CRIS -->
+    	<java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <sysproperty key="dspace.configuration" value="${config}" />
+        	<arg value="addon-crismodule.sql" />
+		</java>
+
+        <java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <sysproperty key="dspace.configuration" value="${config}" />
+        	<arg value="addon-crispubmed.sql" />
+		</java>
+
+        <java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <sysproperty key="dspace.configuration" value="${config}" />
+        	<arg value="addon-subscription.sql" />
+		</java>
+    	
         <!-- Add the browse tables -->
         <java classname="org.dspace.browse.IndexBrowse" classpathref="class.path" fork="yes" failonerror="yes">
             <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />

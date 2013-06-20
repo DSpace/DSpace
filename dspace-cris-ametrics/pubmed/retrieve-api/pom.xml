@@ -39,8 +39,9 @@
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-stats</artifactId>			
 		</dependency>
+		
 		<dependency>
-			<groupId>commons-cilea-genericdao</groupId>
+			<groupId>it.cilea</groupId>
 			<artifactId>commons-cilea-genericdao</artifactId>
 			<version>1.0</version>			
 		</dependency>
@@ -189,7 +190,7 @@
 						inheritRefs="true"> <target name="create-tables-and-GEN-DDL" /> </ant> </tasks> 
 						</configuration> </execution> 
 					
-					-->
+					
 					<execution>
 						<id>generate-ddl</id>
 						<phase>process-classes</phase>
@@ -207,7 +208,7 @@
 							</tasks>
 						</configuration>
 					</execution> 
-				
+-->			
 <!-- 
 				<execution>
 						<id>generate-drop-ddl</id>
@@ -287,7 +288,7 @@
 					</dependency>
 					
 					<dependency>
-						<groupId>commons-cilea-genericdao</groupId>
+						<groupId>it.cilea</groupId>
 						<artifactId>commons-cilea-genericdao</artifactId>
 						<version>1.0</version>
 					</dependency>
@@ -339,20 +340,5 @@
 	</build>
 
 
-    <repositories>
-        <repository>
-            <id>maven.dspace.org-snapshot</id>
-            <name>DSpace Maven Snapshot Repository</name>
-            <url>http://maven.dspace.org/snapshot</url>
-            <releases>
-                <enabled>false</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </snapshots>
-        </repository>
-    </repositories>
-
+   
 </project>

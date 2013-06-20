@@ -62,6 +62,10 @@ public class InitializeDatabase
                 DatabaseManager.loadSql(getScript(argv[0]));
                 
             }
+            else if(argv[0].startsWith("addon-")) {
+                DatabaseManager.loadSql(getScript(argv[0]));
+                System.exit(0);
+            }
             else
             {
                 
