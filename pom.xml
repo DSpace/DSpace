@@ -42,15 +42,15 @@
     
     <repositories>
 		<repository>
-			<id>cilea-snapshots</id>
+			<id>cilea-repo</id>
 			<name>CILEA Maven Repository</name>
-			<url>https://github.com/CILEA/mvn-repo/raw/master/snapshots</url>
+			<url>https://github.com/CILEA/mvn-repo/raw/master/releases</url>
 			<releases>
-				<enabled>false</enabled>
+				<enabled>true</enabled>
 				<checksumPolicy>fail</checksumPolicy>
 			</releases>
 			<snapshots>
-				<enabled>true</enabled>
+				<enabled>false</enabled>
 				<checksumPolicy>fail</checksumPolicy>
 			</snapshots>
 		</repository>
