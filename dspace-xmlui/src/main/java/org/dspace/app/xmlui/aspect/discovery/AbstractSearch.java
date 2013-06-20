@@ -208,13 +208,17 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      */
     protected void buildMainForm(Division searchDiv) throws WingException, SQLException {
         Request request = ObjectModelHelper.getRequest(objectModel);
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
         //We set our action to context path, since the eventual action will depend on which url we click on
         Division mainForm = searchDiv.addInteractiveDivision("main-form", getBasicUrl(), Division.METHOD_POST, "");
 
         String query = getQuery();
+        //Indicate that the form we are submitting lists search results
+        mainForm.addHidden("search-result").setValue(Boolean.TRUE.toString());
         mainForm.addHidden("query").setValue(query);
 
+        mainForm.addHidden("current-scope").setValue(dso == null ? "" : dso.getHandle());
         Map<String, String[]> fqs = getParameterFilterQueries();
         if (fqs != null)
         {
@@ -245,7 +249,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         {
             order.setValue(request.getParameter("order"));
         }else{
-            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
             DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(dso);
             order.setValue(discoveryConfiguration.getSearchSortConfiguration().getDefaultSortOrder().toString());
         }
@@ -253,8 +256,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         {
             mainForm.addHidden("page").setValue(request.getParameter("page"));
         }
-        //Optional redirect url !
-        mainForm.addHidden("redirectUrl");
     }
 
     protected abstract String getBasicUrl() throws SQLException;
