@@ -41,8 +41,11 @@ public class SpiderDetector {
      */
     private static IPTable table = null;
 
-    /** Collection of regular expressions to match known spiders' agents */
+    /** Collection of regular expressions to match known spiders' agents. */
     private static List<Pattern> agents = new ArrayList<Pattern>();
+
+    /** Collection of regular expressions to match known spiders' domain names. */
+    private static List<Pattern> domains = new ArrayList<Pattern>();
 
     /**
      * Utility method which reads lines from a file & returns them in a Set.
@@ -166,14 +169,15 @@ public class SpiderDetector {
 
     }
 
-    /** Load agent name patterns from all files in config/spiders/agents. */
-    private static void loadAgentPatterns()
+    /** Load agent name patterns from all files in a single subdirectory of config/spiders. */
+    private static void loadPatterns(String directory, List<Pattern> patternList)
     {
         String dspaceHome = ConfigurationManager.getProperty("dspace.dir");
-        File agentsDir = new File(dspaceHome, "config/spiders/agents");
-        if (agentsDir.exists() && agentsDir.isDirectory())
+        File spidersDir = new File(dspaceHome, "config/spiders");
+        File patternsDir = new File(spidersDir, directory);
+        if (patternsDir.exists() && patternsDir.isDirectory())
         {
-            for (File file : agentsDir.listFiles())
+            for (File file : patternsDir.listFiles())
             {
                 Set<String> patterns;
                 try
@@ -181,13 +185,13 @@ public class SpiderDetector {
                     patterns = readPatterns(file);
                 } catch (IOException ex)
                 {
-                    log.error("Agent patterns not read from {}:  {}",
+                    log.error("Patterns not read from {}:  {}",
                             file.getPath(), ex.getMessage());
                     continue;
                 }
                 for (String pattern : patterns)
                 {
-                    agents.add(Pattern.compile(pattern));
+                    patternList.add(Pattern.compile(pattern));
                 }
             }
         }
@@ -212,8 +216,8 @@ public class SpiderDetector {
         String agent = request.getHeader("User-Agent");
         if (null != agent)
         {
-            if (null == agents)
-                loadAgentPatterns();
+            if (agents.isEmpty())
+                loadPatterns("agents", agents);
 
             for (Pattern candidate : agents)
             {
@@ -235,7 +239,26 @@ public class SpiderDetector {
             }
         }
 
-        return isSpider(request.getRemoteAddr());
+        if (isSpider(request.getRemoteAddr()))
+            return true;
+
+        // No.  See if any DNS names match
+        String hostname = request.getRemoteHost();
+        if (domains.isEmpty())
+        {
+            loadPatterns("domains", domains);
+        }
+
+        for (Pattern candidate : domains)
+        {
+            if (candidate.matcher(hostname).find())
+            {
+                return true;
+            }
+        }
+
+        // Not a known spider.
+        return false;
     }
 
     /**
