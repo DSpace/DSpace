@@ -702,7 +702,7 @@ public class EPerson extends DSpaceObject
         }
         else
         {
-            return (f + " " + l);
+            return (l + ", " + f);
         }
     }
 

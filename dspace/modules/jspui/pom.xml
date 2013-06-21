@@ -214,7 +214,7 @@
 	</dependency>
 
 	<dependency>
-		<groupId>org.htmlcleaner</groupId>
+		<groupId>net.sourceforge.htmlcleaner</groupId>
 		<artifactId>htmlcleaner</artifactId>		
 	</dependency>
 	

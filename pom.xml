@@ -22,7 +22,7 @@
 		<lucene.version>3.5.0</lucene.version>
 		<solr.version>4.0.0</solr.version>
 	</properties>
-    <!--
+    <!-- 
     <repositories>
         <repository>
             <id>sonatype-nexus-releases</id>
@@ -38,10 +38,9 @@
             </snapshots>
         </repository>
     </repositories>
-    -->
-    
-    <repositories>
-		<repository>
+     -->
+	<repositories>        
+        	<repository>
 			<id>cilea-repo</id>
 			<name>CILEA Maven Repository</name>
 			<url>https://github.com/CILEA/mvn-repo/raw/master/releases</url>
@@ -54,9 +53,8 @@
 				<checksumPolicy>never</checksumPolicy>
 			</snapshots>
 		</repository>
-	</repositories>
-
-    <build>
+    </repositories>
+        <build>
       <plugins>
          <plugin>
             <artifactId>maven-release-plugin</artifactId>
@@ -861,12 +859,12 @@
          </dependency>
 
 
-	<dependency>
-	    <groupId>org.htmlcleaner</groupId>
-	    <artifactId>htmlcleaner</artifactId>
-	    <version>2.2</version>
-	</dependency>
-
+		<dependency>
+			<groupId>net.sourceforge.htmlcleaner</groupId>
+			<artifactId>htmlcleaner</artifactId>
+			<version>2.2</version>
+		</dependency>
+		
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>

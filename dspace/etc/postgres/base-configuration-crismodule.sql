@@ -120,7 +120,7 @@ INSERT INTO "public"."cris_pj_no_pdef" VALUES ('1557', '1', 'f', '0', 'em', 'em'
 -- ----------------------------
 -- Records of cris_pj_no_typo
 -- ----------------------------
-INSERT INTO "public"."cris_pj_no_tp" VALUES ('24', 'Grant', 'grant', '1', null, 't', 'f', 't', '0', 't');
+INSERT INTO "public"."cris_pj_no_tp" VALUES ('24', 'Grant', 'grant', '1', null, 'f', 'f', 't', '0', 't');
 
 -- ----------------------------
 -- Records of cris_pj_no_typo2pdef
