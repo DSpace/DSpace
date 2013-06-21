@@ -32,6 +32,8 @@ class DummyHttpServletRequest implements HttpServletRequest
 
     private String address = null;
 
+    private String remoteHost = null;
+
     public void setAgent(String agent)
     {
         this.agent = agent;
@@ -40,6 +42,11 @@ class DummyHttpServletRequest implements HttpServletRequest
     public void setAddress(String address)
     {
         this.address = address;
+    }
+
+    public void setRemoteHost(String host)
+    {
+        this.remoteHost = host;
     }
 
     /* (non-Javadoc)
@@ -463,8 +470,7 @@ class DummyHttpServletRequest implements HttpServletRequest
     @Override
     public String getRemoteHost()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return remoteHost;
     }
 
     /* (non-Javadoc)

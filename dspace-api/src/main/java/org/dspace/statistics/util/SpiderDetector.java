@@ -84,37 +84,6 @@ public class SpiderDetector {
     }
 
     /**
-     * Unpack a list of lists of patterns and compile them to Patterns.
-     * We have to do the list-of-lists to get Spring to accumulate them across
-     * configuration files.
-     *
-     * @param agentPatterns
-     * @throws PatternSyntaxExpression
-     */
-    static public void setAgentPatterns(List<AgentPatternList> agentPatternLists)
-    {
-        clearAgentPatterns();
-
-        for (AgentPatternList agentPatterns : agentPatternLists)
-        {
-            for (String agentPattern : agentPatterns.getPatterns())
-            {
-                Pattern newPattern = Pattern.compile(agentPattern);
-                agents.add(newPattern);
-            }
-        }
-        log.info("Received " + String.valueOf(agents.size()) + " agent patterns.");
-    }
-
-    /**
-     * Empty the agent pattern list.
-     */
-    static void clearAgentPatterns()
-    {
-        agents.clear();
-    }
-
-    /**
      * Get an immutable Set representing all the Spider Addresses here
      *
      * @return
@@ -141,21 +110,24 @@ public class SpiderDetector {
 
                 if (spidersDir.exists() && spidersDir.isDirectory()) {
                     for (File file : spidersDir.listFiles()) {
-                        for (String ip : readPatterns(file)) {
-                            log.debug("Loading {}", ip);
-                            if (!Character.isDigit(ip.charAt(0)))
-                            {
-                                try {
-                                    ip = DnsLookup.forward(ip);
-                                    log.debug("Resolved to {}", ip);
-                                } catch (IOException e) {
-                                    log.warn("Not loading {}:  {}", ip, e.getMessage());
-                                    continue;
+                        if (file.isFile())
+                        {
+                            for (String ip : readPatterns(file)) {
+                                log.debug("Loading {}", ip);
+                                if (!Character.isDigit(ip.charAt(0)))
+                                {
+                                    try {
+                                        ip = DnsLookup.forward(ip);
+                                        log.debug("Resolved to {}", ip);
+                                    } catch (IOException e) {
+                                        log.warn("Not loading {}:  {}", ip, e.getMessage());
+                                        continue;
+                                    }
                                 }
+                                table.add(ip);
                             }
-                            table.add(ip);
+                            log.info("Loaded Spider IP file: " + file);
                         }
-                        log.info("Loaded Spider IP file: " + file);
                     }
                 } else {
                     log.info("No spider file loaded");
@@ -169,7 +141,15 @@ public class SpiderDetector {
 
     }
 
-    /** Load agent name patterns from all files in a single subdirectory of config/spiders. */
+    /**
+     * Load agent name patterns from all files in a single subdirectory of config/spiders.
+     *
+     * @param directory simple directory name (e.g. "agents").
+     *      "${dspace.dir}/config/spiders" will be prepended to yield the path to
+     *      the directory of pattern files.
+     * @param patternList patterns read from the files in {@code directory} will
+     *      be added to this List.
+     */
     private static void loadPatterns(String directory, List<Pattern> patternList)
     {
         String dspaceHome = ConfigurationManager.getProperty("dspace.dir");
@@ -193,11 +173,14 @@ public class SpiderDetector {
                 {
                     patternList.add(Pattern.compile(pattern));
                 }
+                log.info("Loaded pattern file:  {}", file.getPath());
             }
         }
+        else
+        {
+            log.info("No patterns loaded from {}", patternsDir.getPath());
+        }
     }
-
-    /* TODO Load host name patterns from all files in config/spiders/dns. */
 
     /**
      * Static Service Method for testing spiders against existing spider files.
@@ -251,7 +234,7 @@ public class SpiderDetector {
 
         for (Pattern candidate : domains)
         {
-            if (candidate.matcher(hostname).find())
+            if (candidate.matcher(hostname).find()) // XXX anchored?
             {
                 return true;
             }

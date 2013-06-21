@@ -24,19 +24,10 @@ public class SpiderDetectorTest
 {
 
     /**
-     * Test method for {@link org.dspace.statistics.util.SpiderDetector#readIpAddresses(java.io.File)}.
+     * Test method for {@link org.dspace.statistics.util.SpiderDetector#readPatterns(java.io.File)}.
      */
     @Test
-    public void testReadIpAddresses()
-    {
-// FIXME        fail("Not yet implemented");
-    }
-
-    /**
-     * Test method for {@link org.dspace.statistics.util.SpiderDetector#setAgentPatterns(java.util.List)}.
-     */
-    @Test
-    public void testSetAgentPatterns()
+    public void testReadPatterns()
     {
 // FIXME        fail("Not yet implemented");
     }
@@ -58,25 +49,38 @@ public class SpiderDetectorTest
     {
         Mockit.setUpMocks(MockSolrLogger.class); // Don't test SolrLogger here
 
+        final String NOT_A_BOT_ADDRESS = "192.168.0.1";
+
         DummyHttpServletRequest req = new DummyHttpServletRequest();
-        req.setAddress("192.168.0.1"); // avoid surprises
+        req.setAddress(NOT_A_BOT_ADDRESS); // avoid surprises
+        req.setRemoteHost("notabot.example.com"); // avoid surprises
+        req.setAgent("Firefox"); // avoid surprises
 
-        // Some pattern strings
-        List<String> testPatterns = new ArrayList<String>();
-        testPatterns.add("^msnbot");
-        // Wrap it in an AgentPatternList
-        AgentPatternList patternList = new AgentPatternList(testPatterns);
-        List<AgentPatternList> patternLists = new ArrayList<AgentPatternList>();
-        patternLists.add(patternList);
-        // Test!
-        SpiderDetector.clearAgentPatterns(); // start fresh, in case Spring is active
-        SpiderDetector.setAgentPatterns(patternLists);
+        String candidate;
 
+        // Test agent patterns
         req.setAgent("msnbot is watching you");
         assertTrue("'msnbot' did not match any pattern", SpiderDetector.isSpider(req));
 
         req.setAgent("Firefox");
         assertFalse("'Firefox' matched a pattern", SpiderDetector.isSpider(req));
+
+        // Test IP patterns
+        candidate = "192.168.2.1";
+        req.setAddress(candidate);
+        assertTrue(candidate + " did not match IP patterns", SpiderDetector.isSpider(req));
+
+        req.setAddress(NOT_A_BOT_ADDRESS);
+        assertFalse(NOT_A_BOT_ADDRESS + " matched IP patterns", SpiderDetector.isSpider(req));
+
+        // Test DNS patterns
+        candidate = "baiduspider-dspace-test.crawl.baidu.com";
+        req.setRemoteHost(candidate);
+        assertTrue(candidate + " did not match DNS patterns", SpiderDetector.isSpider(req));
+
+        candidate = "wiki.dspace.org";
+        req.setRemoteHost(candidate);
+        assertFalse(candidate + " matched DNS patterns", SpiderDetector.isSpider(req));
     }
 
     /**
