@@ -25,14 +25,22 @@
             <action id="reviewAction"/>
         </step>
 
+        <!-- The default nextStep after dryadAcceptEditReject is null, which ends the workflow -->
         <step id="dryadAcceptEditReject" userSelectionMethod="claimAction" role="editors">
             <action id="dryadAcceptEditRejectAction"/>
             <action id="pendingPublicationAction"/>
             <alternativeOutcome>
-                <step status="1">pendingPublicationStep</step>
+                <!-- If result of pendingPublicationAction is 1, publication uses blackout.  Next step is registerPendingPublicationStep -->
+                <step status="1">registerPendingPublicationStep</step>
             </alternativeOutcome>
         </step>
 
+        <!-- Register an identifier and then send to pendingPublicationStep -->
+        <step id="registerPendingPublicationStep" nextStep="pendingPublicationStep" userSelectionMethod="noUserSelectionAction" role="curator">
+            <action id="registerPendingPublicationAction"/>
+        </step>
+        
+        <!-- Parked after registration, waiting for a curator to claim -->
         <step id="pendingPublicationStep" userSelectionMethod="claimAction" role="curator">
             <action id="dryadAcceptEditRejectAction"/>
         </step>

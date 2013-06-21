@@ -928,7 +928,8 @@ function doWorkflow()
             }
             if(action == null){
                 var contextPath = cocoon.request.getContextPath();
-                cocoon.redirectTo(contextPath+"/my-tasks",true);
+                var itemID = workflowItem.getItem().getID();
+                cocoon.redirectTo(contextPath+"/my-tasks?itemID=" + itemID,true);
                 getDSContext().complete();
                 cocoon.exit();
             }

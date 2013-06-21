@@ -16,6 +16,7 @@
 
     <bean id="pendingPublicationActionAPI" class="org.dspace.workflow.actions.processingaction.PendingPublicationAction" scope="prototype"/>
 
+    <bean id="registerPendingPublicationActionAPI" class="org.dspace.workflow.actions.processingaction.RegisterPendingPublicationAction" scope="prototype"/>
 
     <bean id="dryadAcceptEditRejectAction" class="org.dspace.workflow.actions.WorkflowActionConfig" scope="prototype">
         <constructor-arg type="java.lang.String" value="dryadAcceptEditRejectAction"/>
@@ -53,7 +54,12 @@
         <property name="requiresUI" value="false"/>
     </bean>
 
+    <bean id="registerPendingPublicationAction" class="org.dspace.workflow.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="registerPendingPublicationAction"/>
 
+        <property name="processingAction" ref="registerPendingPublicationActionAPI"/>
+        <property name="requiresUI" value="false"/>
+    </bean>
 
     <!--User selection actions-->
     <bean id="assignOriginalSubmitterAction" class="org.dspace.workflow.actions.UserSelectionActionConfig" scope="prototype">

@@ -32,6 +32,14 @@ import org.dspace.workflow.WorkflowItem;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
+import org.dspace.app.xmlui.wing.element.Body;
+import org.dspace.app.xmlui.wing.element.Cell;
+import org.dspace.app.xmlui.wing.element.Para;
+import org.dspace.content.DCValue;
+import org.dspace.doi.DryadDOIRegistrationHelper;
+import org.dspace.identifier.DOIIdentifierProvider;
+import org.dspace.utils.DSpace;
+import org.xml.sax.SAXException;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -48,6 +56,31 @@ public class MyTasksTransformer extends DiscoverySubmissions{
         message("xmlui.Submission.MyTasks.trail");
     private static final Message T_no_results =
             message("xmlui.Submission.MyTasks.no-results");
+
+    private static final Message T_blackout_status =
+            message("xmlui.Submission.MyTasks.blackout_status");
+    private static final Message T_archived_status =
+            message("xmlui.Submission.MyTasks.archived_status");
+    private static final Message T_withdrawn_status =
+            message("xmlui.Submission.MyTasks.withdrawn_status");
+    private static final Message T_workflow_status =
+            message("xmlui.Submission.MyTasks.workflow_status");
+    private static final Message T_workspace_status =
+            message("xmlui.Submission.MyTasks.workspace_status");
+
+    private static final Message T_item_status =
+        message("xmlui.Submission.MyTasks.item_status");
+    private static final Message T_item_title =
+        message("xmlui.Submission.MyTasks.item_title");
+    private static final Message T_doi =
+        message("xmlui.Submission.MyTasks.doi");
+    private static final Message T_doi_registration_status =
+        message("xmlui.Submission.MyTasks.doi_registration_status");
+
+    private static final Message T_doi_not_registered =
+        message("xmlui.Submission.MyTasks.doi_not_registered");
+    private static final Message T_doi_registered =
+        message("xmlui.Submission.MyTasks.doi_registered");
 
     @Override
     public void addPageMeta(PageMeta pageMeta) throws WingException, SQLException {
@@ -116,6 +149,69 @@ public class MyTasksTransformer extends DiscoverySubmissions{
         //}// Empty query
 
     }
+
+    @Override
+    public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
+        String itemIDString = ObjectModelHelper.getRequest(objectModel).getParameter("itemID");
+        if(itemIDString != null) {
+            try {
+                int itemID = Integer.valueOf(itemIDString);
+                // after submission
+                Division statusDiv = body.addDivision("statusDiv");
+                Item item = Item.find(context, itemID);
+
+                DCValue[] titleValues = item.getMetadata("dc.title");
+                String title = "";
+                if(titleValues.length > 0) { title = titleValues[0].value; }
+
+                Table t = statusDiv.addTable("statusTable", 3, 2, null);
+                // Status row
+                Row statusRow = t.addRow();
+                statusRow.addCell(Cell.ROLE_HEADER).addContent(T_item_status);
+                Cell c = statusRow.addCell(Cell.ROLE_DATA);
+                if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
+                    c.addContent(T_blackout_status);
+                } else if (item.isArchived()) {
+                    c.addContent(T_archived_status);
+                } else if(item.isWithdrawn()) {
+                    c.addContent(T_withdrawn_status);
+                } else if(WorkflowItem.findByItemId(context, itemID) != null) {
+                    c.addContent(T_workflow_status);
+                } else if(WorkspaceItem.findByItem(context, item) != null) {
+                    c.addContent(T_workspace_status);
+                }
+
+                // DOI Row
+                Row doiRow = t.addRow();
+                doiRow.addCell(Cell.ROLE_HEADER).addContent(T_doi);
+                doiRow.addCell(Cell.ROLE_DATA).addContent(DOIIdentifierProvider.getDoiValue(item));
+
+
+                // Registration Status Row
+                Row registrationRow = t.addRow();
+                registrationRow.addCell(Cell.ROLE_HEADER).addContent(T_doi_registration_status);
+                c = registrationRow.addCell(Cell.ROLE_DATA);
+
+                DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
+                String dataciteMetadata = dis.lookupEzidRegistration(item);
+                if(dataciteMetadata != null && dataciteMetadata.length() > 0) {
+                    String linkTarget = dis.getEzidRegistrationURL(item);
+                    c.addXref(linkTarget, T_doi_registered);
+                } else {
+                    // no DOI registration info
+                    c.addContent(T_doi_not_registered);
+                }
+
+                Row titleRow = t.addRow();
+                titleRow.addCell(Cell.ROLE_HEADER).addContent(T_item_title);
+                titleRow.addCell(Cell.ROLE_DATA).addXref(contextPath + "/internal-item?itemID=" + itemIDString, title);
+            } catch (NumberFormatException nfe) {
+
+            }
+        }
+        super.addBody(body);
+    }
+
 
 
     protected void renderResultBlock(Division results, FacetField.Count count) throws SearchServiceException, WingException, SQLException {
