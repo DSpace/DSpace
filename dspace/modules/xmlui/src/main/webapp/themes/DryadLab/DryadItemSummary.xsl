@@ -336,10 +336,10 @@
                         <xsl:text> &#160; </xsl:text>
                         <a href="http://creativecommons.org/publicdomain/zero/1.0/"
                            target="_blank">
-                            <img src="/themes/Dryad/images/cc-zero.png"/>
+                            <img src="/themes/Dryad/images/cc-zero.png" alt="CC0 (opens a new window)"/>
                         </a>
                         <a href="http://opendefinition.org/">
-                            <img src="/themes/Dryad/images/opendata.png"/>
+                            <img src="/themes/Dryad/images/opendata.png" alt="Open Data (opens a new window)"/>
                         </a>
                     </div>
         </xsl:if>
