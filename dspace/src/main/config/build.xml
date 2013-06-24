@@ -735,6 +735,8 @@ Common usage:
     	<mkdir dir="${dspace.dir}/rg-files" />
     	
     	<mkdir dir="${dspace.dir}/ou-files" />
+    	
+    	<mkdir dir="${dspace.dir}/ws-xsd" />
 
     </target>
 
@@ -918,6 +920,10 @@ Common usage:
     	    <fileset dir="solr" />
     	</copy>
 
+        <copy todir="${dspace.dir}/ws-xsd" preservelastmodified="true">
+            <fileset dir="etc/webservice" />
+        </copy>
+        	
         <delete failonerror="no">
             <fileset dir="${dspace.dir}/webapps" includes="**/*" />
         </delete>

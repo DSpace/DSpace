@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:item="http://www.cilea.it/publications/schemas"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+	targetNamespace="http://www.cilea.it/publications/schemas">
+
+	<xs:element name="crisobjects" type="item:ItemValueList"></xs:element>
+
+	<xs:complexType name="ItemValueList">
+		<xs:sequence>
+			<xs:element ref="item:crisobject" maxOccurs="unbounded"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="crisobject">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="communities" type="item:communities"
+					maxOccurs="1"></xs:element>
+				<xs:element name="collections" type="item:collections"
+					maxOccurs="1"></xs:element>
+				<xs:element name="metadataitem" type="item:wsMetadata"
+					nillable="true" minOccurs="0" maxOccurs="1"></xs:element>
+			</xs:sequence>
+			<xs:attribute name="itemID" type="xs:int" use="required" />
+			<xs:attribute name="handle" type="xs:string" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="communities">
+		<xs:sequence>
+			<xs:element name="community" type="item:community"
+				minOccurs="0" maxOccurs="unbounded"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="community">
+		<xs:sequence>
+			<xs:element ref="item:name"></xs:element>
+			<xs:element ref="item:handle"></xs:element>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" />
+	</xs:complexType>
+
+	<xs:complexType name="collections">
+		<xs:sequence>
+			<xs:element name="collection" type="item:collection"
+				minOccurs="0" maxOccurs="unbounded"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="collection">
+		<xs:sequence>
+			<xs:element ref="item:name"></xs:element>
+			<xs:element ref="item:handle"></xs:element>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" />
+	</xs:complexType>
+
+
+	<xs:element name="name" type="xs:string"></xs:element>
+	<xs:element name="handle" type="xs:string"></xs:element>
+
+	<xs:complexType name="wsMetadata">
+		<xs:sequence>
+			<xs:element name="metadata" type="item:wsMetadataValue"
+				maxOccurs="unbounded"></xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" />
+	</xs:complexType>
+
+	<xs:complexType name="wsMetadataValue">
+		<xs:sequence>
+			<xs:element name="term" type="xs:string"></xs:element>
+			<xs:element name="values" type="item:wsMetadataSingleValue"
+				minOccurs="0" maxOccurs="1"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="wsMetadataSingleValue">
+		<xs:sequence>
+			<xs:element name="value" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="authority" type="xs:string" />
+							<xs:attribute name="place" type="xs:int" />
+							<xs:attribute name="share" type="xs:int" />	
+						</xs:extension>
+					</xs:simpleContent>				
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+</xs:schema>

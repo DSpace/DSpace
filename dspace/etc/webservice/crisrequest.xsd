@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:reqgrant="http://www.cilea.it/grant/listmetadata/schemas"
+	xmlns:reqitem="http://www.cilea.it/publications/listmetadata/schemas"
+	xmlns:reqrp="http://www.cilea.it/researcherpage/listmetadata/schemas"
+	xmlns:reqou="http://www.cilea.it/orgunit/listmetadata/schemas"
+	xmlns:grant="http://www.cilea.it/grant/schemas" 
+	xmlns:rp="http://www.cilea.it/researcherpage/schemas"
+	xmlns:orgunit="http://www.cilea.it/orgunit/schemas"
+	xmlns:item="http://www.cilea.it/publications/schemas"
+	xmlns:cris="http://www.cilea.it/cris/schemas" elementFormDefault="qualified"
+	targetNamespace="http://www.cilea.it/cris/schemas">
+
+	<xs:import namespace="http://www.cilea.it/grant/listmetadata/schemas"
+		schemaLocation="xsd/requestresearchergrants.xsd">
+	</xs:import>
+	<xs:import namespace="http://www.cilea.it/publications/listmetadata/schemas"
+		schemaLocation="xsd/staticrequestpublications.xsd">
+	</xs:import>
+	<xs:import namespace="http://www.cilea.it/orgunit/listmetadata/schemas"
+		schemaLocation="xsd/requestorgunits.xsd">
+	</xs:import>
+	<xs:import namespace="http://www.cilea.it/researcherpage/listmetadata/schemas"
+		schemaLocation="xsd/requestresearcherpage.xsd">
+	</xs:import>
+	<xs:import namespace="http://www.cilea.it/grant/schemas"
+		schemaLocation="xsd/responseresearchergrants.xsd">
+	</xs:import>
+	<xs:import namespace="http://www.cilea.it/researcherpage/schemas"
+		schemaLocation="xsd/responseresearcherpage.xsd">
+	</xs:import>
+	<xs:import namespace="http://www.cilea.it/orgunit/schemas"
+		schemaLocation="xsd/responseorgunits.xsd">
+	</xs:import>
+	
+	<xs:import namespace="http://www.cilea.it/publications/schemas"
+		schemaLocation="xsd/staticresponsepublication.xsd">
+	</xs:import>
+
+	
+	<xs:element name="NormalAuthQueryResponse">
+		<xs:complexType>
+			<xs:choice>
+				<xs:element ref="rp:crisobjects"/>
+				<xs:element ref="grant:crisobjects"/>
+				<xs:element ref="orgunit:crisobjects"/>
+				<xs:element ref="item:crisobjects"/>
+			</xs:choice>	
+			<xs:attribute name="hit" type="xs:int"/>
+			<xs:attribute name="start" type="xs:int"/>
+			<xs:attribute name="rows" type="xs:int"/>
+			<xs:attribute name="type" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="TokenAuthQueryResponse">	
+		<xs:complexType>
+			<xs:choice>
+				<xs:element ref="rp:crisobjects"/>
+				<xs:element ref="grant:crisobjects"/>
+				<xs:element ref="orgunit:crisobjects"/>
+				<xs:element ref="item:crisobjects"/>
+			</xs:choice>
+			<xs:attribute name="hit" type="xs:int"/>
+			<xs:attribute name="start" type="xs:int"/>
+			<xs:attribute name="rows" type="xs:int"/>
+			<xs:attribute name="type" type="xs:string"/>	
+		</xs:complexType>
+		
+	</xs:element>
+
+	
+	<xs:element name="NormalAuthQueryRequest">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Auth" type="cris:NormalAuthType" />
+				<xs:element name="InfoQuery" type="cris:QueryType" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TokenAuthQueryRequest">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Auth" type="cris:SpecialAuthType" />
+				<xs:element name="InfoQuery" type="cris:QueryType" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="NormalAuthType">
+		<xs:sequence>
+			<xs:element name="Username" type="xs:string" />
+			<xs:element name="Password" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SpecialAuthType">
+		<xs:sequence>
+			<xs:element name="Token" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="QueryType">
+		<xs:sequence>
+			<xs:element name="Query" type="xs:string" />
+			<xs:element name="PaginationRows" type="xs:int" default="20" />
+			<xs:element name="PaginationStart" type="xs:int" default="0" />
+			<xs:element name="Projection" type="cris:ProjectionType" />
+			<xs:element name="Type" type="cris:TType" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ProjectionType">
+		<xs:choice minOccurs="1" maxOccurs="1">
+			<xs:element name="publicationProjection" type="cris:ProjectionPublicationsType" />
+			<xs:element name="researcherProjection" type="cris:ProjectionResearchersType" />
+			<xs:element name="grantProjection" type="cris:ProjectionGrantsType" />
+			<xs:element name="orgunitProjection" type="cris:ProjectionOrgUnitsType" />
+		</xs:choice>
+	</xs:complexType>
+
+	<xs:complexType name="TType">
+		<xs:choice minOccurs="1" maxOccurs="1">
+			<xs:element name="type" type="cris:TTType" />
+		</xs:choice>
+	</xs:complexType>
+
+	<xs:simpleType name="TTType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="publications" />
+			<xs:enumeration value="researcherPages" />
+			<xs:enumeration value="grants" />
+			<xs:enumeration value="orgunits" />
+		</xs:restriction>
+	</xs:simpleType>
+
+
+	<xs:simpleType name="ProjectionPublicationsType">
+		<xs:list itemType="reqitem:metadata" />
+	</xs:simpleType>
+
+	<xs:simpleType name="ProjectionResearchersType">
+		<xs:list itemType="reqrp:RPmetadata" />
+	</xs:simpleType>
+
+	<xs:simpleType name="ProjectionGrantsType">
+		<xs:list itemType="reqgrant:GRANTmetadata" />
+	</xs:simpleType>
+
+	<xs:simpleType name="ProjectionOrgUnitsType">
+		<xs:list itemType="reqou:OUmetadata" />
+	</xs:simpleType>
+</xs:schema>

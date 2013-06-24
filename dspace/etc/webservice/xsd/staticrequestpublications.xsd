@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified"
+	targetNamespace="http://www.cilea.it/publications/listmetadata/schemas">
+
+	<xs:simpleType name="metadata">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="dc.type" />
+			<xs:enumeration value="dc.title" />
+			<xs:enumeration value="dc.title.alternative" />
+			<xs:enumeration value="dc.subject" />
+			<xs:enumeration value="dc.subject.mesh" />
+			<xs:enumeration value="dc.subject.lcsh" />
+			<xs:enumeration value="dc.subject.lcc" />
+			<xs:enumeration value="dc.subject.ddc" />
+			<xs:enumeration value="dc.source" />
+			<xs:enumeration value="dc.source.uri" />
+			<xs:enumeration value="dc.rights" />
+			<xs:enumeration value="dc.relation.replaces" />
+			<xs:enumeration value="dc.relation.isreplacedby" />
+			<xs:enumeration value="dc.relation.ispartofseries" />
+			<xs:enumeration value="dc.relation.ispartof" />
+			<xs:enumeration value="dc.publisher" />
+			<xs:enumeration value="dc.language" />
+			<xs:enumeration value="dc.language.iso" />
+			<xs:enumeration value="dc.identifier" />
+			<xs:enumeration value="dc.identifier.uri" />
+			<xs:enumeration value="dc.identifier.pmid" />
+			<xs:enumeration value="dc.identifier.pmcid" />
+			<xs:enumeration value="dc.identifier.other" />
+			<xs:enumeration value="dc.identifier.openurl" />
+			<xs:enumeration value="dc.identifier.issn" />
+			<xs:enumeration value="dc.identifier.isbn" />
+			<xs:enumeration value="dc.identifier.hkuros" />
+			<xs:enumeration value="dc.identifier.hkul" />
+			<xs:enumeration value="dc.identifier.email" />
+			<xs:enumeration value="dc.identifier.doi" />
+			<xs:enumeration value="dc.identifier.citation" />
+			<xs:enumeration value="dc.identifier.authority" />
+			<xs:enumeration value="dc.format.mimetype" />
+			<xs:enumeration value="dc.format.extent" />
+			<xs:enumeration value="dc.embargo.remark" />
+			<xs:enumeration value="dc.description" />
+			<xs:enumeration value="dc.description.uri" />
+			<xs:enumeration value="dc.description.tableofcontents" />
+			<xs:enumeration value="dc.description.sponsorship" />
+			<xs:enumeration value="dc.description.nature" />
+			<xs:enumeration value="dc.description.abstract" />
+			<xs:enumeration value="dc.degree.name" />
+			<xs:enumeration value="dc.degree.level" />
+			<xs:enumeration value="dc.degree.discipline" />
+			<xs:enumeration value="dc.date.issued" />
+			<xs:enumeration value="dc.date.created" />
+			<xs:enumeration value="dc.date.available" />
+			<xs:enumeration value="dc.date.accessioned" />
+			<xs:enumeration value="dc.creator" />
+			<xs:enumeration value="dc.coverage.temporal" />
+			<xs:enumeration value="dc.contributor" />
+			<xs:enumeration value="dc.contributor.reviewer" />
+			<xs:enumeration value="dc.contributor.other" />
+			<xs:enumeration value="dc.contributor.inventor" />
+			<xs:enumeration value="dc.contributor.editor" />
+			<xs:enumeration value="dc.contributor.author" />
+		</xs:restriction>
+	</xs:simpleType>
+
+
+</xs:schema>
