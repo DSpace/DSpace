@@ -170,7 +170,18 @@
          	 	<span class="resource_count">25000</span>
          	 	<i18n:text>sedici.home.buscar_material.info_post</i18n:text>
          	 </p>
-	         <xsl:apply-templates select="/dri:document/dri:body/dri:div[@n='front-page-search']" mode="home"/>
+	     <form>
+          <xsl:call-template name="standardAttributes">
+                <xsl:with-param name="class">ds-interactive-div</xsl:with-param>
+            </xsl:call-template>
+            <xsl:attribute name="action"><xsl:value-of select="$context-path"/>/discover</xsl:attribute>
+            <xsl:attribute name="method">GET</xsl:attribute>
+            <xsl:attribute name="onsubmit">javascript:tSubmit(this);</xsl:attribute>
+            <p class="ds-paragraph">
+		 		<input id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" type="text" value="" name="query" />
+				<input id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" type="submit" value="" name="submit" />
+		    </p>
+        </form>
 	     </div>
 	</xsl:template>
 
@@ -228,35 +239,6 @@
 		<li>
 			<xsl:apply-templates/>
 		</li>
-	</xsl:template>
-	
-   <xsl:template match="dri:div[@n='front-page-search']" mode="home">
-
-        <form>
-            <xsl:call-template name="standardAttributes">
-                <xsl:with-param name="class">ds-interactive-div</xsl:with-param>
-            </xsl:call-template>
-            <xsl:attribute name="action"><xsl:value-of select="@action"/></xsl:attribute>
-            <xsl:attribute name="method"><xsl:value-of select="@method"/></xsl:attribute>
-            <xsl:if test="@method='multipart'">
-                <xsl:attribute name="method">post</xsl:attribute>
-                <xsl:attribute name="enctype">multipart/form-data</xsl:attribute>
-            </xsl:if>
-            <xsl:attribute name="onsubmit">javascript:tSubmit(this);</xsl:attribute>
-                        <!--For Item Submission process, disable ability to submit a form by pressing 'Enter'-->
-                        <xsl:if test="starts-with(@n,'submit')">
-                                <xsl:attribute name="onkeydown">javascript:return disableEnterKey(event);</xsl:attribute>
-            </xsl:if>
-            <xsl:apply-templates select="dri:p[2]">
-	                     <xsl:with-param name="muestra">true</xsl:with-param>
-	         </xsl:apply-templates>          
-          
-        </form>
-            
-    </xsl:template>
-
-	<!-- Template vacio para evitar el renderizado default de la caja de busqueda en todas las paginas -->
-	<xsl:template match="dri:div[@n='front-page-search']">
 	</xsl:template>
 	
 	<xsl:template match="dri:document/dri:options/dri:list[@id='aspect.discovery.Navigation.list.discovery']">
