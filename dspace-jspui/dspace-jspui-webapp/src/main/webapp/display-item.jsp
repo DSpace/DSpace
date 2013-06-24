@@ -78,7 +78,7 @@
 		}
 	}
     
-    Boolean pmcEnabled = ConfigurationManager.getProperty("cris","pmc.enabled",false);
+    Boolean pmcEnabled = ConfigurationManager.getBooleanProperty("cris","pmc.enabled",false);
         
         
 %>
@@ -86,24 +86,28 @@
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
 
 <% if(pmcEnabled) { %>
-<c:set var="dspace.layout.head" scope="request">
+<c:set var="dspace.layout.head.last" scope="request">
 <script type="text/javascript"><!--
 var j = jQuery.noConflict();
 
 ajaxPMCCitedBy = function(args) {
-        new Ajax.Request("<%= request.getContextPath() %>/pmcCitedBy?item_id=" + encodeURIComponent(args), {
-                method: "get",
-                onSuccess: function(transport) {
-                },
-                onComplete: function(transport) {
-                        var respPmc = jQuery.trim(String(transport.responseText));
-			if (respPmc.charAt(0) == '<') {
-                                j('#pmcCitedResult').append(respPmc);
-				j('.citedCount').show();
-				j('#pmcCitedCount').show();
-			}
-                }
+        new j.ajax({
+        	 url: "<%= request.getContextPath() %>/pmcCitedBy",
+        	 data: { item_id: encodeURIComponent(args)}
+        }).done(function(transport) {
+        	var respPmc = jQuery.trim(String(transport.textContent));
+        	if(respPmc=="null") {
+        		j('#pmcCitedResult').html("No data found");        		
+        	}
+        	else {
+        		j('#pmcCitedResult').html(transport);
+    			j('.citedCount').show();    				
+        	}
+        	j('#pmcCitedCount').show();
+            
+			
         });
+        
 }
 
 j(document).ready(function() {        
