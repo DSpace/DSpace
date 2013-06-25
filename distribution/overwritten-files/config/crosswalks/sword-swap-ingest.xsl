@@ -60,7 +60,7 @@
          template matching process -->
     <xsl:template match="/epdcx:descriptionSet">
     	<dim:dim>
-		<xsl:call-template name="el_titulo"/>
+			<xsl:call-template name="el_titulo"/>
     		<xsl:apply-templates/>
     	</dim:dim>
     </xsl:template>
@@ -74,15 +74,26 @@
     			<xsl:value-of select="epdcx:valueString"/>
     		</dim:field>
     	</xsl:if>
-    	
-    	<!-- creator element: dc.contributor.author -->
-    	<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/elements/1.1/creator'">
-    		<dim:field mdschema="sedici" element="creator" qualifier="person">
-    			<xsl:value-of select="epdcx:valueString"/>
+
+       	<!-- UNLP fix: issue number: dc.terms.isPartOf -->
+    	<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/terms/isPartOf'">
+    		<dim:field mdschema="sedici" element="relation" qualifier="journalVolumeAndIssue">
+    			<xsl:value-of select="substring-before(epdcx:valueString,'*')"/>
     		</dim:field>
+		<dim:field mdschema="sedici" element="relation" qualifier="journalTitle">
+			<xsl:value-of select="substring-after(epdcx:valueString,'*')"/>
+		</dim:field>
     	</xsl:if>
-    	
-    	<!-- identifier element: dc.identifier.* -->
+
+    	<!-- creator element: dc.contributor.author -->
+        <xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/elements/1.1/creator'">
+        	<dim:field mdschema="sedici" element="creator" qualifier="person">
+            	<xsl:value-of select="epdcx:valueString"/>
+            </dim:field>
+        </xsl:if>
+
+
+		<!-- identifier element: dc.identifier.* -->
     	<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/elements/1.1/identifier'">
     		<xsl:element name="dim:field">
     			<xsl:attribute name="mdschema">dc</xsl:attribute>
@@ -94,21 +105,21 @@
     		</xsl:element>
     	</xsl:if>
     	
-```<!-- language element: dc.language -->
+		<!-- language element: dc.language -->
     	<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/elements/1.1/language' and ./@epdcx:vesURI='http://purl.org/dc/terms/RFC3066'">
     		<dim:field mdschema="dc" element="language">
     			<xsl:value-of select="epdcx:valueString"/>
     		</dim:field>
     	</xsl:if>    
     	
-    	<!-- item type element: dc.type -->
-    	<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/elements/1.1/type' and ./@epdcx:vesURI='http://purl.org/eprint/terms/Type'">
-    		<xsl:if test="./@epdcx:valueURI='http://purl.org/eprint/type/JournalArticle'">
-    			<dim:field mdschema="dc" element="type">
-    				Journal Article
-    			</dim:field>
-    		</xsl:if>
-    	</xsl:if>
+    	<!-- item type element: dc.type  Se setea Article por defecto si viene como JournalArticle -->
+   		<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/elements/1.1/type' and ./@epdcx:vesURI='http://purl.org/eprint/terms/Type'">
+   	 		<xsl:if test="./@epdcx:valueURI='http://purl.org/eprint/type/JournalArticle'">
+   	 			<dim:field mdschema="dc" element="type">
+   	 				Article
+   	 			</dim:field>
+   	 		</xsl:if>
+   		</xsl:if>
     	
     	<!-- date available element: dc.date.issued -->
     	<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/terms/available'">
@@ -125,11 +136,7 @@
 	    		</dim:field>
     		</xsl:if>
     	</xsl:if>    
-    	
-    	
-
-       
-    	
+    	 	
     </xsl:template>
 
     <!---title and alternative title -->
