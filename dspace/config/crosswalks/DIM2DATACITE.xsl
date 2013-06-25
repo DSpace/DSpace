@@ -21,7 +21,7 @@
 
 	    <!-- ********** Identifiers ********** -->
       <xsl:if test="dspace:field[@element ='identifier']">
-          <xsl:for-each select="dspace:field[@element ='identifier']">
+          <xsl:for-each select="dspace:field[@element ='identifier' and not(@qualifier)]">
               <xsl:variable name="id" select="."/>
               <xsl:choose>
                   <xsl:when test="starts-with($id,'doi')">
@@ -124,7 +124,7 @@
   	  <!-- ************ Alternate Identifiers ************** -->
   	  <xsl:variable name="alternateIdentifiers">
         <xsl:if test="dspace:field[@element ='identifier']">
-            <xsl:for-each select="dspace:field[@element ='identifier' and not(@qualifier='manuscriptNumber')]">
+            <xsl:for-each select="dspace:field[@element ='identifier' and not(@qualifier='manuscriptNumber') and not(@qualifier='uri')]">
                 <xsl:variable name="id" select="."/>
                 <xsl:choose>
                     <xsl:when test="not(starts-with($id,'doi'))">
