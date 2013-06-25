@@ -50,7 +50,7 @@ public class CDLDataCiteConsumer implements Consumer {
                             Map<String, String> metadatalist = dataCiteService.createMetadataList(item);
                             DOI aDOI = new DOI(doi, item);
                             String target = aDOI.getTargetURL().toString();
-                            String response = dataCiteService.update(doi, target, metadatalist);
+                            String response = dataCiteService.update(aDOI.toID(), target, metadatalist);
 
                             if(response.contains("bad request") || response.contains("BAD REQUEST") || response.contains("UNAUTHORIZED")){
                                 dataCiteService.emailException(response, doi, "update");

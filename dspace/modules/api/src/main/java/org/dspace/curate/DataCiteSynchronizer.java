@@ -63,7 +63,7 @@ public class DataCiteSynchronizer extends AbstractCurationTask{
             this.setResult("Unable to check if item is in publication blackout: " + ex.getLocalizedMessage());
             return Curator.CURATE_FAIL;
         }
-        String response = dataCiteService.update(doi, target, metadatalist);
+        String response = dataCiteService.update(aDOI.toID(), target, metadatalist);
 
         if(response.contains("bad request") || response.contains("BAD REQUEST")){
             this.setResult(response);

@@ -276,7 +276,7 @@ public class CDLDataCiteService {
             } catch (SQLException ex) {
                 log.error("Error checking if item is in blackout: " + ex.getLocalizedMessage());
             }
-            log.debug("Update Item: " + doi + " result: " + this.update(doi, target, createMetadataList(item)));
+            log.debug("Update Item: " + doi + " result: " + this.update(aDOI.toID(), target, createMetadataList(item)));
 
         } catch (DOIFormatException de) {
             log.debug("Can't sync the following Item: " + item.getID() + " - " + doi);
