@@ -741,9 +741,13 @@ placeholders for header images -->
 		
 		<!-- Accordion Widget - JQueryUI -->
 		<script type="text/javascript">
-				 $(function() {
-						$("#accordion").accordion({ autoHeight: false , collapsible: true});
+				$(function() {
+					$("#accordion").accordion({autoHeight: false , collapsible: true});
+					$("#accordion h3 a").click(function(){
+						location.href = $(this).attr("href");
+						return false;
 					});
+				});
 		</script>
     </xsl:template>
 

@@ -56,7 +56,7 @@
 		</xsl:variable>
 		<xsl:apply-templates select="document($externalMetadataURL)" mode="accordionHeader"/>
 			<div>
-				<xsl:apply-templates select="document($externalMetadataURL)" mode="communityLink"/>
+<!-- 				<xsl:apply-templates select="document($externalMetadataURL)" mode="communityLink"/> -->
 				<xsl:if test="$currentLevel &lt; $maxHierarchyLevel">
 				<ul>
 					<xsl:apply-templates select="dri:referenceSet/dri:reference" mode="flatMode">
@@ -102,10 +102,8 @@
 				<xsl:when test="not(contains($topCommunitiesId,$communityId))">
 					<li>
 						<xsl:call-template name="classStandardAttributes"/>
-						<xsl:apply-templates select="document($externalMetadataURL)"
-								mode="summaryList" />
-						<xsl:apply-templates select="dri:referenceSet"
-							mode="render-flat-communities">
+						<xsl:apply-templates select="document($externalMetadataURL)" mode="summaryList" />
+						<xsl:apply-templates select="dri:referenceSet" mode="render-flat-communities">
 							<xsl:with-param name="currentLevel">
 								<xsl:value-of select="number($currentLevel + 1)" />
 							</xsl:with-param>
@@ -119,7 +117,7 @@
 	<xsl:template match="mets:METS" mode="accordionHeader">
 		<xsl:variable name="data" select="./mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim"/>
 		<h3>
-            <span id="{@OBJID}" class="topCommunity">
+			<a class="communityAccessLink topCommunity" href="{@OBJID}">
                  <xsl:choose>
                      <xsl:when test="string-length($data/dim:field[@element='title'][1]) &gt; 0">
                          <xsl:value-of select="$data/dim:field[@element='title'][1]"/>
@@ -128,13 +126,23 @@
                          <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
                      </xsl:otherwise>
                  </xsl:choose>
-             </span>
+			</a>
+<!--             <span id="{@OBJID}" class="topCommunity"> -->
+<!--                  <xsl:choose> -->
+<!--                      <xsl:when test="string-length($data/dim:field[@element='title'][1]) &gt; 0"> -->
+<!--                          <xsl:value-of select="$data/dim:field[@element='title'][1]"/> -->
+<!--                      </xsl:when> -->
+<!--                      <xsl:otherwise> -->
+<!--                          <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text> -->
+<!--                      </xsl:otherwise> -->
+<!--                  </xsl:choose> -->
+<!--              </span> -->
 		</h3>
 	</xsl:template>
 	
-	<xsl:template match="mets:METS" mode="communityLink">
-		<a class="communityAccessLink" href="{@OBJID}">Acceder</a>
-	</xsl:template>
+<!-- 	<xsl:template match="mets:METS" mode="communityLink"> -->
+<!-- 		<a class="communityAccessLink" href="{@OBJID}">Acceder</a> -->
+<!-- 	</xsl:template> -->
 		
 	<xsl:template name="classStandardAttributes">
 		<xsl:attribute name="class">

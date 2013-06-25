@@ -2495,7 +2495,6 @@ width:620px;
 	margin: 0px;
 }
 
-
 #aspect_artifactbrowser_CommunityViewer_list_community-browse li,
 #aspect_artifactbrowser_CollectionViewer_div_collection-search-browse li,
 #aspect_artifactbrowser_CollectionViewer_list_collection-browse li
@@ -2514,7 +2513,6 @@ color:#0c3e4d;
 /*background-color:#0a8eb7;*/
 
 }
-
 
 .artifact-description-community {
 width:300px;
@@ -3768,6 +3766,122 @@ background-position:top left;
 #accordion h3 span.topCommunity{
 	margin-left: 30px;
 }
+
+/*ACCORDEON*/
+/* Interaction states ----------------------------------*/
+#accordion .ui-state-default, 
+#accordion .ui-widget-content .ui-state-default, 
+#accordion .ui-widget-header .ui-state-default {  
+	font-weight: bold; 
+	color: #444444; 
+	background:none; 
+	border:none;
+}
+
+#accordion .ui-state-hover, 
+#accordion .ui-widget-content .ui-state-hover, 
+#accordion .ui-widget-header .ui-state-hover, 
+#accordion .ui-state-focus, 
+#accordion .ui-widget-content .ui-state-focus, 
+#accordion .ui-widget-header .ui-state-focus {
+	color: #f4971b; 
+	background:none;
+}
+
+#accordion .ui-state-hover a {
+	color: #f4971b; 
+}
+#accordion .ui-state-hover a:hover { 
+	text-decoration: underline; 
+}
+
+#accordion .ui-state-active, 
+#accordion .ui-widget-content .ui-state-active, 
+#accordion .ui-widget-header .ui-state-active { 
+	background: #ffffff url(../../images/jquery_ui/ui-bg_glass_65_ffffff_1x400.png) 50% 50% repeat-x; 
+	font-weight: bold; 
+	color: #f4971b; 
+	border:none;
+}
+
+#accordion .ui-state-active a, 
+#accordion .ui-state-active a:link, 
+#accordion .ui-state-active a:visited { 
+	color: orange; 
+	text-decoration: none; 
+}
+
+#accordion .ui-state-active a:hover {
+	text-decoration: underline;
+}
+
+#accordion.ui-accordion .ui-accordion-header a {
+	display:inline-block;
+	padding: 0px;
+	margin: 5px 0px 5px 35px;
+}
+
+
+/* states and images */
+#accordion .ui-state-hover .ui-icon, 
+#accordion .ui-state-focus .ui-icon {
+	background-image:url(../../images/jquery_ui/ui-icons-custom.png); 
+}
+#accordion .ui-state-active .ui-icon {
+	background-image: url(../../images/jquery_ui/ui-icons-custom.png); 
+}
+#accordion .ui-state-highlight .ui-icon {
+	background-image:url(../../images/jquery_ui/ui-icons_444444_256x240.png); 
+}
+
+
+/* positioning */
+#accordion .ui-icon-triangle-1-e:hover { 
+	background-image:url(../../images/jquery_ui/ui-icons-custom.png);
+	background-position: -32px -16px; 
+}
+
+
+/* IE/Win - Fix animation bug - #4615 */
+#accordion .ui-accordion .ui-accordion-content { 
+	padding:0px 0px 0px 10px; 
+	border-top: 0; 
+	margin-top: -2px; 
+	position: relative; 
+	top: 1px; 
+	margin-bottom: 2px; 
+	overflow: auto; 
+	display: none; 
+	zoom: 1;
+}
+#accordion .ui-accordion .ui-accordion-content-active { 
+	display: block; 
+	margin-left:20px;
+}
+
+/* Estilado personalizado */
+#accordion .artifact-title a{
+	font-size:14px;
+	line-height:1.5;
+}
+ 
+#accordion .artifact-title a:hover{
+	text-decoration:underline;
+}
+
+#accordion ul .artifact-description {
+	float: none;
+}
+
+#accordion .ui-accordion-content ul li {
+	list-style: circle;
+	margin: 5px 0px;
+}
+
+#accordion .communityAccessLink {
+margin-left:10px;}
+
+
 
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
 body{ background-color:white;}
