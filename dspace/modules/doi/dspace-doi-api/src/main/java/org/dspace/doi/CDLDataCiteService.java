@@ -266,7 +266,17 @@ public class CDLDataCiteService {
 
     private void updateItem(Item item, String doi) throws IOException {
         try {
-            log.debug("Update Item: " + doi + " result: " + this.update(doi, null, createMetadataList(item)));
+            DOI aDOI = new DOI(doi, item);
+            String target = aDOI.getTargetURL().toString();
+            try {
+                // if item is in blackout, change target to the blackout URL
+                if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
+                    target = "http://datadryad.org/publicationBlackout";
+                }
+            } catch (SQLException ex) {
+                log.error("Error checking if item is in blackout: " + ex.getLocalizedMessage());
+            }
+            log.debug("Update Item: " + doi + " result: " + this.update(doi, target, createMetadataList(item)));
 
         } catch (DOIFormatException de) {
             log.debug("Can't sync the following Item: " + item.getID() + " - " + doi);
@@ -380,6 +390,7 @@ public class CDLDataCiteService {
                 System.out.println(service.registerDOI(doiID, target, metadata));
             } else if (action.equals("update")) {
                 if (target.equals("NULL")) target = null;
+
                 System.out.println(service.update(doiID, target, metadata));
             }
             else {
@@ -479,7 +490,10 @@ public class CDLDataCiteService {
     private String encodeAnvl(String target, Map<String, String> metadata) {
         Iterator<Map.Entry<String, String>> i = metadata.entrySet().iterator();
         StringBuffer b = new StringBuffer();
-	b.append("_target: " + escape(target) + "\n");
+        // anvil is _key: value. If incoming target is null, do not include it in the result
+        if(target != null) {
+            b.append("_target: " + escape(target) + "\n");
+        }
 	while (i.hasNext()) {
             Map.Entry<String, String> e = i.next();
             b.append(escape(e.getKey()) + ": " + escape(e.getValue()) + "");
@@ -488,6 +502,9 @@ public class CDLDataCiteService {
     }
 
      private String escape(String s) {
+         if(s == null) {
+             return "";
+         }
         return s.replace("%", "%25").replace("\n", "%0A").
                 replace("\r", "%0D").replace(":", "%3A");
     }

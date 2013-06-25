@@ -47,9 +47,10 @@ public class CDLDataCiteConsumer implements Consumer {
                             CDLDataCiteService dataCiteService = new CDLDataCiteService(ConfigurationManager.getProperty("doi.username"), ConfigurationManager.getProperty("doi.password"));
 
                             String doi = getDoiValue(item);
-
                             Map<String, String> metadatalist = dataCiteService.createMetadataList(item);
-                            String response = dataCiteService.update(doi, null, metadatalist);
+                            DOI aDOI = new DOI(doi, item);
+                            String target = aDOI.getTargetURL().toString();
+                            String response = dataCiteService.update(doi, target, metadatalist);
 
                             if(response.contains("bad request") || response.contains("BAD REQUEST") || response.contains("UNAUTHORIZED")){
                                 dataCiteService.emailException(response, doi, "update");
