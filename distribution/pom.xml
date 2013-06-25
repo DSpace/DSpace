@@ -73,6 +73,7 @@
  		<module>overwritten-files/modules/oai</module> 
  		<module>overwritten-files/modules/xoai</module>
  		<module>../xmlui</module>  
+ 		<module>overwritten-files/modules/sword</module> 
 	</modules>
 	
 	<dependencies>
