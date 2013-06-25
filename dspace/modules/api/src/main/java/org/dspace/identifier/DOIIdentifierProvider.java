@@ -80,7 +80,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         myHostname = configurationService.getProperty("dryad.url");
         myDataPkgColl = configurationService.getProperty("stats.datapkgs.coll");
         myDataFileColl = configurationService.getProperty("stats.datafiles.coll");
-        if (configurationService.getPropertyAsType("doi.service.testmode", false)) {
+        if (configurationService.getPropertyAsType("doi.service.testmode", true)) {
             myDoiPrefix = configurationService.getProperty("doi.testprefix");
         } else {
             myDoiPrefix = configurationService.getProperty("doi.prefix");
