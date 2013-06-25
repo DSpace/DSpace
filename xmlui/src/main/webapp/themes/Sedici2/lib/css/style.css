@@ -405,21 +405,15 @@ left:-5px;
 margin-bottom:5px;
 
 }
-.selectedCollection{
-color:black;
-line-height:1.5;
-background-color: #d1eaf7;
-background-repeat:no-repeat;
-padding:4px 25px 5px 8px;
-border-radius:5px;
-background-position: right;
-margin-top:3px;
-position:relative;
-left:-5px;
-margin-bottom:5px;
 
+h1.selectedCollection {
 }
- 
+
+h1.ds-div-head.search-head {
+	font-size: 15px;
+	color: #3599C4;
+}
+
 #aspect_discovery_Navigation_list_discovery ul.sublist li a {
 text-decoration:line-through;
 }

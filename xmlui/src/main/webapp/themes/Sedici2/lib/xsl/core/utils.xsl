@@ -261,8 +261,8 @@
 		 <xsl:variable name="matchesCondition">
          	<xsl:value-of select="ex:matches(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'], 'handle/.*/.*')"/>
 	     </xsl:variable>
-		 
-		 <xsl:if test="$matchesCondition">
+
+		 <xsl:if test="$matchesCondition = 'true'">
 		    	<xsl:variable name="URL_mets">
           			<xsl:text>cocoon:/</xsl:text>
 					<xsl:text>/metadata/handle/</xsl:text>
@@ -270,23 +270,24 @@
 					<xsl:text>/mets.xml</xsl:text>
         		</xsl:variable>
         		<xsl:apply-templates select="document($URL_mets)" mode="label-collection"/>
-        		
 		 </xsl:if>
+
 		 <h1>
 		 	<xsl:attribute name="class">
-		       <xsl:if test="not($matchesCondition)">
-		  				<xsl:text>main-title </xsl:text>
-		 		</xsl:if>	
+	 			<xsl:if test="$matchesCondition = 'true'">
+	 				<xsl:text>search-head </xsl:text>
+	 			</xsl:if>
 		 		<xsl:text>ds-div-head</xsl:text>
 		 	</xsl:attribute>
 		 	<i18n:text>xmlui.ArtifactBrowser.SimpleSearch.head</i18n:text>
 		 </h1> 
+		 
 	</xsl:template>
 	
 	
 	
     <xsl:template match="/mets:METS" mode="label-collection">
- 	  <h1 class="selectedCollection"><xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title']"/></h1>
+ 	  <h1 class="ds-div-head selectedCollection"><xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title']"/></h1>
 	</xsl:template>
 	
 
