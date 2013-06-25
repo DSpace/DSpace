@@ -8,11 +8,17 @@
 
 package org.dspace.app.util;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.HeadMethod;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -38,6 +44,8 @@ abstract public class AbstractDSpaceWebapp
     protected Date started;
 
     protected String url;
+
+    private TableRow row;
 
     /** Prevent null instantiation. */
     protected AbstractDSpaceWebapp()
@@ -66,14 +74,15 @@ abstract public class AbstractDSpaceWebapp
     public void register()
     {
         // Create the database entry
-        Timestamp now = new Timestamp(new Date().getTime());
+        Timestamp now = new Timestamp(started.getTime());
         try {
             Context context = new Context();
-            DatabaseManager.updateQuery(context,
-                    "DELETE FROM Webapp WHERE AppName = ?", kind);
-            DatabaseManager.updateQuery(context,
-                    "INSERT INTO Webapp (AppName, URL, Started, isUI) VALUES(?, ?, ?, ?);",
-                    kind, url, now, isUI() ? 1 : 0);
+            row = DatabaseManager.create(context, "Webapp");
+            row.setColumn("AppName", kind);
+            row.setColumn("URL", url);
+            row.setColumn("Started", now);
+            row.setColumn("isUI", isUI() ? 1 : 0); // update won't widen boolean to integer
+            DatabaseManager.update(context, row);
             context.complete();
         } catch (SQLException e) {
             log.error("Failed to record startup in Webapp table.", e);
@@ -86,8 +95,7 @@ abstract public class AbstractDSpaceWebapp
         // Remove the database entry
         try {
             Context context = new Context();
-            DatabaseManager.updateQuery(context,
-                    "DELETE FROM Webapp WHERE AppName = ?", kind);
+            DatabaseManager.delete(context, row);
             context.complete();
         } catch (SQLException e) {
             log.error("Failed to record shutdown in Webapp table.", e);
@@ -101,10 +109,11 @@ abstract public class AbstractDSpaceWebapp
         TableRowIterator tri;
 
         Context context = null;
+        HttpMethod request = null;
         try {
             context = new Context();
             tri = DatabaseManager.queryTable(context, "Webapp",
-                    "SELECT AppName, URL, Started, isUI FROM Webapp");
+                    "SELECT * FROM Webapp");
 
             for (TableRow row : tri.toList())
             {
@@ -113,11 +122,31 @@ abstract public class AbstractDSpaceWebapp
                 app.url = row.getStringColumn("URL");
                 app.started = row.getDateColumn("Started");
                 app.uiQ = row.getBooleanColumn("isUI");
+
+                HttpClient client = new HttpClient();
+                request = new HeadMethod(app.url);
+                int status = client.executeMethod(request);
+                request.getResponseBody();
+                if (status != HttpStatus.SC_OK)
+                {
+                    DatabaseManager.delete(context, row);
+                    context.commit();
+                    continue;
+                }
+
                 apps.add(app);
             }
         } catch (SQLException e) {
             log.error("Unable to list running applications", e);
+        } catch (HttpException e) {
+            log.error("Failure checking for a running webapp", e);
+        } catch (IOException e) {
+            log.error("Failure checking for a running webapp", e);
         } finally {
+            if (null != request)
+            {
+                request.releaseConnection();
+            }
             if (null != context)
             {
                 context.abort();

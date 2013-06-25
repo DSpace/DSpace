@@ -109,6 +109,7 @@ CREATE SEQUENCE harvested_collection_seq;
 CREATE SEQUENCE harvested_item_seq;
 CREATE SEQUENCE versionitem_seq;
 CREATE SEQUENCE versionhistory_seq;
+CREATE SEQUENCE webapp_seq;
 
 -------------------------------------------------------
 -- BitstreamFormatRegistry table
@@ -800,8 +801,9 @@ CREATE TABLE versionitem
 
 CREATE TABLE Webapp
 (
-    AppName VARCHAR(32) NOT NULL PRIMARY KEY,
-    URL VARCHAR NOT NULL,
+    webapp_id INTEGER NOT NULL PRIMARY KEY,
+    AppName VARCHAR(32),
+    URL VARCHAR,
     Started TIMESTAMP,
-    isUI Boolean
+    isUI INTEGER
 );
