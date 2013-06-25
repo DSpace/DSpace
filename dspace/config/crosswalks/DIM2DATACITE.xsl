@@ -21,7 +21,7 @@
 
 	    <!-- ********** Identifiers ********** -->
       <xsl:if test="dspace:field[@element ='identifier']">
-          <xsl:for-each select="dspace:field[@element ='identifier']">
+          <xsl:for-each select="dspace:field[@element ='identifier'][1]">
               <xsl:variable name="id" select="."/>
               <xsl:choose>
                   <xsl:when test="starts-with($id,'doi')">
