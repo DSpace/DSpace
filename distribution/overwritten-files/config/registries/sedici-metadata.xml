@@ -430,7 +430,12 @@
 		<qualifier>ciclo</qualifier>
 		<scope_note></scope_note>
 	</dc-type>
-	
+	<dc-type>
+		<schema>sedici</schema>
+		<element>sword</element>
+		<qualifier>updated</qualifier>
+		<scope_note></scope_note>
+	</dc-type>
 
 
 </dspace-dc-types>
