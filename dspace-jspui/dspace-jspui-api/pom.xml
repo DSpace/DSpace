@@ -18,16 +18,10 @@
       <relativePath>..</relativePath>
    </parent>
 
-   <!-- 
-      The Subversion repository location is used by Continuum to update against
-      when changes have occured, this spawns a new build cycle and releases snapshots
-      into the snapshot repository below.
-   -->
-   <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-jspui/dspace-jspui-api</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-jspui/dspace-jspui-api</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-jspui/dspace-jspui-api</url>
-   </scm>
+   <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/../..</root.basedir>
+   </properties>
 
    <dependencies>
       <dependency>

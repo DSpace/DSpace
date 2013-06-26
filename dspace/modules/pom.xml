@@ -14,11 +14,10 @@
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
-    <scm>
-      <connection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace/modules</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace/modules</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace/modules</url>
-    </scm>
+    <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/../..</root.basedir>
+    </properties>
     
     <!-- 
          List of enabled DSpace Modules to build/install.
