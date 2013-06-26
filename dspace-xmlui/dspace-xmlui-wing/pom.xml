@@ -11,14 +11,13 @@
         <groupId>org.dspace</groupId>
         <artifactId>dspace-xmlui</artifactId>
         <version>1.7.3-SNAPSHOT</version>
+		<relativePath>..</relativePath>
     </parent>
 
-    <scm>
-        <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui/dspace-xmlui-wing</connection>
-        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui/dspace-xmlui-wing
-        </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui/dspace-xmlui-wing</url>
-    </scm>
+    <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/../..</root.basedir>
+    </properties>
 
     <dependencies>
 

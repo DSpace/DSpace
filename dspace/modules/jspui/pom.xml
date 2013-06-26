@@ -11,8 +11,14 @@
 		<groupId>org.dspace</groupId>
 		<artifactId>modules</artifactId>
 		<version>1.7.3-SNAPSHOT</version>
+		<relativePath>..</relativePath>
 	</parent>
 
+	<properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/../../..</root.basedir>
+    </properties>
+	
 	<profiles>
 
 		<!-- 
@@ -71,12 +77,6 @@
 		</profile>
 
 	</profiles>
-
-	<scm>
-		<connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/jspui</connection>
-		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/jspui</developerConnection>
-		<url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/jspui</url>
-	</scm>
 
 	<build>
 		<plugins>

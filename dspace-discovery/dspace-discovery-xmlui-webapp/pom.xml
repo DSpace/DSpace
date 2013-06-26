@@ -28,7 +28,13 @@
         <groupId>org.dspace</groupId>
         <artifactId>discovery-modules</artifactId>
         <version>1.7.3-SNAPSHOT</version>
+		<relativePath>..</relativePath>
    </parent>
+
+   <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/../..</root.basedir>
+   </properties>
 
     <dependencies>
 
@@ -65,6 +71,7 @@
             <plugin>
                 <groupId>org.apache.cocoon</groupId>
                 <artifactId>cocoon-maven-plugin</artifactId>
+				<version>1.0.0</version>
                 <executions>
                     <execution>
                         <id>prepare</id>
@@ -138,18 +145,5 @@
             -->
         </plugins>
     </build>
-
-    <!--
-       The Subversion repository location is used by Continuum to update
-       against when changes have occured, this spawns a new build cycle
-       and releases snapshots into the snapshot repository below.
-    -->
-    <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery/dspace-discovery-xmlui-webapp</connection>
-        <developerConnection>
-            scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery/dspace-discovery-xmlui-webapp
-        </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery/dspace-discovery-xmlui-webapp</url>
-    </scm>
 
 </project>

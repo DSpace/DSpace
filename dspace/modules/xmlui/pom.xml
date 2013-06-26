@@ -14,13 +14,13 @@
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
       <version>1.7.3-SNAPSHOT</version>
+	  <relativePath>..</relativePath>
    </parent>
 
-   <scm>
-      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/xmlui</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/xmlui</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/xmlui</url>
-   </scm>
+   <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/../../..</root.basedir>
+   </properties>
 
    <build>
       <plugins>
@@ -82,6 +82,7 @@
          web.xml etc.
       -->
       <profile>
+         <id>dspace-config</id>
          <activation>
             <property>
                <name>dspace.config</name>

@@ -13,18 +13,13 @@
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
       <version>1.7.3-SNAPSHOT</version>
+	  <relativePath>..</relativePath>
    </parent>
 
-      <!-- 
-      The Subversion repository location is used by Continuum to update against
-      when changes have occured, this spawns a new build cycle and releases snapshots
-      into the snapshot repository below.
-   -->
-   <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui</url>
-   </scm>
+   <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/..</root.basedir>
+   </properties>
    
    <modules>
       <module>dspace-xmlui-wing</module>

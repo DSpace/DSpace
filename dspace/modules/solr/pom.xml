@@ -8,26 +8,22 @@
       DSpace SOLR Service Provider Web Application
    </description>
 
-   <!--
-      A Parent POM that Maven inherits DSpace Default
-      POM atrributes from.
+
+   <!-- 
+      A Parent POM that Maven inherits DSpace Default 
+      POM atrributes from. 
    -->
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
       <version>1.7.3-SNAPSHOT</version>
+      <relativePath>..</relativePath>
    </parent>
    
-   <!--
-      The Subversion repository location is used by Continuum to update
-      against when changes have occured, this spawns a new build cycle
-      and releases snapshots into the snapshot repository below.
-   -->
-   <scm>
-      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/solr</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/solr</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/solr</url>
-   </scm>
+   <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/../../..</root.basedir>
+   </properties>
 
    <build>
       <plugins>
