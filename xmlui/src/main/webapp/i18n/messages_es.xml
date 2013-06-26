@@ -2032,7 +2032,9 @@ La vista resumen de la comunidad no está actualmente en uso o implementada. Est
 <message key="xmlui.dri2xhtml.METS-1.0.news">Novedades</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-relation-ciclo">Ciclo</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-creator-interprete">Interprete</message>
-
+<message key="xmlui.dri2xhtml.METS-1.0.item-creators-interprete">Interpretes</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-creators-person">Autores</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-creator-person">Autor</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-availability-local">Descarga directa</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-availability-local-help">El documento se encuentra disponible para descarga directa desde SEDICI</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-availability-linked">Link externo</message>

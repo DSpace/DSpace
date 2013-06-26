@@ -128,116 +128,9 @@
     		<xsl:with-param name="name" select="'relation-isPartOfSeries'"/>
     		<xsl:with-param name="elements"    select="dim:field[@element='relation' and @qualifier='isPartOfSeries'] "/>
 		</xsl:call-template>
-		<!-- Author(s) row -->
+		<!-- Author(s) row -->	
 		<div class="simple-item-view-authors">
-			<xsl:choose>
-				<xsl:when test="dim:field[@element='creator']">
-					<span class="metadata-label">
-						<xsl:choose>
-							<xsl:when test="count(dim:field[@element='creator']) &gt; 1">
-								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-authors</i18n:text>:
-							</xsl:when>
-							<xsl:otherwise>
-								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-author</i18n:text>:
-							</xsl:otherwise>
-						</xsl:choose>
-					</span>
-					<xsl:for-each select="dim:field[@element='creator']">
-						<span class="metadata-value">
-							<xsl:if test="@authority">
-								<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
-							</xsl:if>	
-								
-							<a>
-								<xsl:attribute name="href">
-									<xsl:call-template name="filterLink">
-										<xsl:with-param name="filter">author_filter</xsl:with-param>
-										<xsl:with-param name="value" select="."/>
-									</xsl:call-template>
-								</xsl:attribute>
-								<xsl:copy-of select="node()" />
-							</a>
-	
-							<xsl:if test="count(following-sibling::dim:field[@element='creator']) != 0">
-								<xsl:text> | </xsl:text>
-							</xsl:if>
-						</span>
-					</xsl:for-each>
-				</xsl:when>
-				<xsl:when test="dim:field[@element='contributor' and @qualifier='compiler']">
-					<span class="metadata-label">
-						<xsl:choose>
-							<xsl:when test="count(dim:field[@element='contributor' and @qualifier='compiler']) &gt; 1">
-								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-contributor-compilers</i18n:text>:
-							</xsl:when>
-							<xsl:otherwise>
-								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-contributor-compiler</i18n:text>:
-							</xsl:otherwise>
-						</xsl:choose>
-					</span>
-					<xsl:for-each select="dim:field[@element='contributor' and @qualifier='compiler']">
-						<span class="metadata-value">
-							<xsl:if test="@authority">
-								<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
-							</xsl:if>
-							<xsl:copy-of select="node()" />
-							<xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='compiler']) != 0">
-								<xsl:text> | </xsl:text>
-							</xsl:if>
-						</span>
-					</xsl:for-each>
-				</xsl:when>
-				<xsl:when test="dim:field[@element='contributor' and @qualifier='editor']">
-					<span class="metadata-label">
-						<xsl:choose>
-							<xsl:when test="count(dim:field[@element='contributor' and @qualifier='editor']) &gt; 1">
-								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-contributor-editors</i18n:text>:
-							</xsl:when>
-							<xsl:otherwise>
-								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-contributor-editor</i18n:text>:
-							</xsl:otherwise>
-						</xsl:choose>
-					</span>
-					<xsl:for-each select="dim:field[@element='contributor' and @qualifier='editor']">
-						<span class="metadata-value">
-							<xsl:if test="@authority">
-								<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
-							</xsl:if>
-							<xsl:copy-of select="node()" />
-							<xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='editor']) != 0">
-								<xsl:text> | </xsl:text>
-							</xsl:if>
-						</span>
-					</xsl:for-each>
-				</xsl:when>
-				<xsl:when test="dim:field[@element='contributor' and @qualifier='translator']">
-					<span class="metadata-label">
-						<xsl:choose>
-							<xsl:when test="count(dim:field[@element='contributor' and @qualifier='translator']) &gt; 1">
-								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-contributor-translators</i18n:text>:
-							</xsl:when>
-							<xsl:otherwise>
-								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-contributor-translator</i18n:text>:
-							</xsl:otherwise>
-						</xsl:choose>
-					</span>
-					<xsl:for-each select="dim:field[@element='contributor' and @qualifier='translator']">
-						<span class="metadata-value">
-							<xsl:if test="@authority">
-								<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
-							</xsl:if>
-							<xsl:copy-of select="node()" />
-							<xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='translator']) != 0">
-								<xsl:text> | </xsl:text>
-							</xsl:if>
-						</span>
-					</xsl:for-each>
-				</xsl:when>
-				<xsl:otherwise>
-					<i18n:text>xmlui.dri2xhtml.METS-1.0.no-author</i18n:text>
-				</xsl:otherwise>
-				
-			</xsl:choose>
+			<xsl:call-template name="show-common-authors"/>
 		</div>
 
 		<!-- embargo rows -->
@@ -291,11 +184,6 @@
 			</xsl:when>
 			<!-- No hay otherwise -->
 		</xsl:choose>
-		<!-- creator.interprete row -->
-		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'creator-interprete'"/>
-			<xsl:with-param name="elements" select="dim:field[@element='creator' and @qualifier='interprete'] "/>
-		</xsl:call-template>
 		<!-- relation.ciclo row -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'relation-ciclo'"/>
@@ -719,7 +607,133 @@
 
 	</xsl:template>
 
-
+	<xsl:template name="show-common-authors">
+				<xsl:choose>
+					<xsl:when test="dim:field[@element='creator']">
+						<xsl:call-template name="render-author-metadata-field">
+							<xsl:with-param name="metadata-fields" select="dim:field[@element='creator'][@qualifier='person' or @qualifier='corporate']"/>
+							<xsl:with-param name="general-qualifier" select="'person'"/>
+						</xsl:call-template>
+						<xsl:call-template name="render-author-metadata-field">
+							<xsl:with-param name="metadata-fields" select="dim:field[@element='creator'][@qualifier='interprete']"/>
+							<xsl:with-param name="general-qualifier" select="'interprete'"/>
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:when test="dim:field[@element='contributor' and @qualifier='compiler']">
+						<span class="metadata-label">
+							<xsl:choose>
+								<xsl:when test="count(dim:field[@element='contributor' and @qualifier='compiler']) &gt; 1">
+									<i18n:text>xmlui.dri2xhtml.METS-1.0.item-contributor-compilers</i18n:text>:
+								</xsl:when>
+								<xsl:otherwise>
+									<i18n:text>xmlui.dri2xhtml.METS-1.0.item-contributor-compiler</i18n:text>:
+								</xsl:otherwise>
+							</xsl:choose>
+						</span>
+						<xsl:for-each select="dim:field[@element='contributor' and @qualifier='compiler']">
+							<span class="metadata-value">
+								<xsl:if test="@authority">
+									<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
+								</xsl:if>
+								<xsl:copy-of select="node()" />
+								<xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='compiler']) != 0">
+									<xsl:text> | </xsl:text>
+								</xsl:if>
+							</span>
+						</xsl:for-each>
+					</xsl:when>
+					<xsl:when test="dim:field[@element='contributor' and @qualifier='editor']">
+						<span class="metadata-label">
+							<xsl:choose>
+								<xsl:when test="count(dim:field[@element='contributor' and @qualifier='editor']) &gt; 1">
+									<i18n:text>xmlui.dri2xhtml.METS-1.0.item-contributor-editors</i18n:text>:
+								</xsl:when>
+								<xsl:otherwise>
+									<i18n:text>xmlui.dri2xhtml.METS-1.0.item-contributor-editor</i18n:text>:
+								</xsl:otherwise>
+							</xsl:choose>
+						</span>
+						<xsl:for-each select="dim:field[@element='contributor' and @qualifier='editor']">
+							<span class="metadata-value">
+								<xsl:if test="@authority">
+									<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
+								</xsl:if>
+								<xsl:copy-of select="node()" />
+								<xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='editor']) != 0">
+									<xsl:text> | </xsl:text>
+								</xsl:if>
+							</span>
+						</xsl:for-each>
+					</xsl:when>
+					<xsl:when test="dim:field[@element='contributor' and @qualifier='translator']">
+						<span class="metadata-label">
+							<xsl:choose>
+								<xsl:when test="count(dim:field[@element='contributor' and @qualifier='translator']) &gt; 1">
+									<i18n:text>xmlui.dri2xhtml.METS-1.0.item-contributor-translators</i18n:text>:
+								</xsl:when>
+								<xsl:otherwise>
+									<i18n:text>xmlui.dri2xhtml.METS-1.0.item-contributor-translator</i18n:text>:
+								</xsl:otherwise>
+							</xsl:choose>
+						</span>
+						<xsl:for-each select="dim:field[@element='contributor' and @qualifier='translator']">
+							<span class="metadata-value">
+								<xsl:if test="@authority">
+									<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
+								</xsl:if>
+								<xsl:copy-of select="node()" />
+								<xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='translator']) != 0">
+									<xsl:text> | </xsl:text>
+								</xsl:if>
+							</span>
+						</xsl:for-each>
+					</xsl:when>
+					<xsl:otherwise>
+						<i18n:text>xmlui.dri2xhtml.METS-1.0.no-author</i18n:text>
+					</xsl:otherwise>
+					
+				</xsl:choose>
+	</xsl:template>
+	
+	<!-- This template receives an authors collection ('metadata-fields'), with same or different qualifiers (person,corporate,etc), and associates them with a 'general-qualifier' received as parameter. -->
+	<xsl:template name="render-author-metadata-field">
+		<xsl:param name="metadata-fields"/>
+		<xsl:param name="general-qualifier"/>
+			<xsl:if test="count($metadata-fields) &gt; 0">
+				<div>
+					<span class="metadata-label">
+						<xsl:choose>
+							<xsl:when test="count($metadata-fields) &gt; 1">
+								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-creators-<xsl:value-of select="$general-qualifier"/></i18n:text>: 
+							</xsl:when>
+							<xsl:otherwise>
+								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-creator-<xsl:value-of select="$general-qualifier"/></i18n:text>: 
+							</xsl:otherwise>
+						</xsl:choose>
+					</span>
+					<xsl:for-each select="$metadata-fields">
+						<span class="metadata-value">
+							<xsl:if test="@authority">
+								<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
+							</xsl:if>	
+								
+							<a>
+								<xsl:attribute name="href">
+									<xsl:call-template name="filterLink">
+										<xsl:with-param name="filter">author_filter</xsl:with-param>
+										<xsl:with-param name="value" select="."/>
+									</xsl:call-template>
+								</xsl:attribute>
+								<xsl:copy-of select="node()" />
+							</a>
+							<xsl:if test="position() != last()">
+								<xsl:text> | </xsl:text>
+							</xsl:if>
+						</span>
+					</xsl:for-each>
+				</div>
+			</xsl:if>
+	</xsl:template>
 
 	<!-- Renderiza un campo con su correspondiente label (solo si hay elementos para mostrar) -->
 	<xsl:template name="render-normal-field">
