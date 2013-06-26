@@ -20,7 +20,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-pom</artifactId>
-      <version>10</version>
+      <version>12</version>
    </parent>
 
    <groupId>org.dspace</groupId>
@@ -36,6 +36,11 @@
       <url>http://issues.apache.org/jira/browse/SOLR</url>
    </issueManagement>
 
+    <properties>
+        <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
+             as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
+        <root.basedir>${basedir}</root.basedir>
+    </properties>
 
    <inceptionYear>2006</inceptionYear>
 
@@ -87,6 +92,7 @@
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.9</version>
             <executions>
                <execution>
                   <id>attach-javadocs</id>
@@ -99,25 +105,25 @@
          </plugin>
 
          <plugin>
-                <groupId>com.google.code.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
-                <version>1.4.0</version>
-                <configuration>
-                    <header>http://scm.dspace.org/svn/repo/licenses/LICENSE_HEADER</header>
-                    <excludes>
-                        <exclude>src/**</exclude>
-                    </excludes>
-                    <properties />
-                    <encoding>UTF-8</encoding>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+             <groupId>com.mycila.maven-license-plugin</groupId>
+             <artifactId>maven-license-plugin</artifactId>
+             <version>1.9.0</version>
+             <configuration>
+                 <header>${root.basedir}/LICENSE_HEADER</header>
+                 <excludes>
+                     <exclude>src/main/*/org/apache/**</exclude>
+                 </excludes>
+                 <properties />
+                 <encoding>UTF-8</encoding>
+             </configuration>
+             <executions>
+                 <execution>
+                     <goals>
+                         <goal>check</goal>
+                     </goals>
+                 </execution>
+             </executions>
+         </plugin>
 
       </plugins>
    </build>
