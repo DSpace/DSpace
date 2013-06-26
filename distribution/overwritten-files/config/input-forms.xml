@@ -162,8 +162,8 @@
 					<dc-qualifier>interprete</dc-qualifier>
 					<repeatable>true</repeatable>
 					<input-type>onebox</input-type>
-					<label>Creador del Audio(*)</label>
-					<hint>Seleccione el autor del audio</hint>
+					<label>Interprete(*)</label>
+					<hint>Seleccione el interprete del audio</hint>
 					<type-bind>Audio</type-bind>
 				</field>
 
@@ -547,7 +547,7 @@
 					<dc-element>relation</dc-element>
 					<dc-qualifier>ciclo</dc-qualifier>
 					<input-type>onebox</input-type>
-					<label>Ciclo</label>
+					<label>Programa</label>
 					<hint>Ingrese el ciclo del audio</hint>
 					<type-bind>Audio</type-bind>
 				</field>
@@ -786,7 +786,18 @@
 					<label>Editorial</label>
 					<input-type>onebox</input-type>
 					<hint>Editorial encargada de la publicación de la obra</hint>
-					<type-bind>Tesis,Libro,Audio</type-bind>
+					<type-bind>Tesis,Libro</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+				
+				<!-- Produccion -->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>publisher</dc-element>
+					<label>Produccion</label>
+					<input-type>onebox</input-type>
+					<hint>Productora encargada de la publicación de la obra</hint>
+					<type-bind>Audio</type-bind>
 					<visibility>workflow</visibility>
 				</field>
 				
