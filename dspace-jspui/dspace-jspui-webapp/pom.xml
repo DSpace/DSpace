@@ -49,6 +49,18 @@
                </execution>
             </executions>
          </plugin>
+		 <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <configuration>
+                    <!--Exclude license check for JSPUI files which don't need it-->
+                    <excludes>
+					    <exclude>**/robots.txt</exclude>
+                        <exclude>**/readme*</exclude>
+					    <exclude>**/*.tld</exclude>
+                    </excludes>
+                </configuration>
+         </plugin>
       </plugins>
    </build>
 

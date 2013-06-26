@@ -82,6 +82,16 @@
                </execution>
             </executions>
          </plugin>
+		 <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <configuration>
+                    <!--Exclude license check for LNI files which don't need it-->
+                    <excludes>
+					    <exclude>**/*.wsdl</exclude>
+                    </excludes>
+                </configuration>
+         </plugin>
          
          <!--
             This is another approach to packaging the LNI client that may be approached.

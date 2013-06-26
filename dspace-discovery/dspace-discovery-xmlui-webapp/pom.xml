@@ -129,6 +129,21 @@
                     </systemProperties>
                 </configuration>
             </plugin>
+			<plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <configuration>
+                    <!--Exclude license check for Discovery files which don't need it-->
+                    <excludes>
+					    <exclude>**/COPYRIGHT.txt</exclude>
+						<exclude>**/LICENSE.txt</exclude>
+                        <exclude>**/*.LICENSE</exclude>
+                        <exclude>**/jquery*</exclude>
+						<exclude>**/jquery/*</exclude>
+						<exclude>**/*.xmap</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
             <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

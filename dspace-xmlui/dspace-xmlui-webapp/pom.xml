@@ -48,6 +48,27 @@
                     </execution>
                 </executions>
             </plugin>
+			<plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <configuration>
+                    <!--Exclude license check for XMLUI files which don't need it-->
+                    <excludes>
+                        <exclude>**/META-INF/**</exclude>
+                        <exclude>**/robots.txt</exclude>
+                        <exclude>**/readme*</exclude>
+                        <exclude>**/*.LICENSE</exclude>
+						<exclude>**/*.LICENCE</exclude>
+                        <exclude>**/cocoon/**</exclude>
+                        <exclude>**/scriptaculous/**</exclude>
+                        <exclude>**/jquery*</exclude>
+                        <exclude>**/modernizr*</exclude>
+                        <exclude>**/DD_belated*</exclude>
+						<exclude>**/*.xmap</exclude>
+						<exclude>**/exception2html.xslt</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
