@@ -112,6 +112,7 @@
                  <header>${root.basedir}/LICENSE_HEADER</header>
                  <excludes>
                      <exclude>src/main/*/org/apache/**</exclude>
+                     <exclude>**/web.xml</exclude>
                  </excludes>
                  <properties />
                  <encoding>UTF-8</encoding>
