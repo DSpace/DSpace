@@ -20,18 +20,10 @@
         <module>dspace-sword-client-xmlui-webapp</module>
     </modules>
 
-    <!--
-       The Subversion repository location is used by Continuum to update
-       against when changes have occurred, this spawns a new build cycle
-       and releases snapshots into the snapshot repository below.
-    -->
-    <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-sword-client</connection>
-        <developerConnection>
-            scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-sword-client
-        </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-sword-client</url>
-    </scm>
+    <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/..</root.basedir>
+    </properties>
 
     <issueManagement>
       <system>JIRA</system>

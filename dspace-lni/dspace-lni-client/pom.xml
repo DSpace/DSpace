@@ -13,14 +13,13 @@
       <groupId>org.dspace</groupId>
       <artifactId>dspace-lni</artifactId>
       <version>1.8.3-SNAPSHOT</version>
-      <relativePath>..</relativePath>
+      <relativePath>../..</relativePath>
    </parent>
 
-   <scm>
-      <connection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-lni/dspace-lni-client</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-lni/dspace-lni-client</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-lni/dspace-lni-client</url>
-   </scm>
+   <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/../..</root.basedir>
+   </properties>
 
    <profiles>
       <profile>

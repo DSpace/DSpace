@@ -14,6 +14,11 @@
       <relativePath>..</relativePath>
    </parent>
 
+   <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/../..</root.basedir>
+   </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.dspace</groupId>
@@ -46,16 +51,4 @@
 
     </dependencies>
 
-	<!--
-       The Subversion repository location is used by Continuum to update
-       against when changes have occured, this spawns a new build cycle
-       and releases snapshots into the snapshot repository below.
-    -->
-    <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-discovery/dspace-discovery-solr</connection>
-        <developerConnection>
-            scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-discovery/dspace-discovery-solr
-        </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-discovery/dspace-discovery-solr</url>
-    </scm>
 </project>
