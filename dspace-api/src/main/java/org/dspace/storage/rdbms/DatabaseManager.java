@@ -143,6 +143,52 @@ public class DatabaseManager
             }
         }
     }
+    
+    public static void addDBServerSpecificLimitExpressionsToSelectQueries(StringBuffer queryBuf,int limit,int offset )
+    {
+        if(queryBuf ==null || queryBuf.toString().trim().length()==0)
+            return;
+                // Add offset and limit restrictions - Oracle requires special code
+        if (isOracle)
+        {
+            // First prepare the query to generate row numbers
+            if (limit > 0 || offset > 0)
+            {
+                queryBuf.insert(0, "SELECT /*+ FIRST_ROWS(n) */ rec.*, ROWNUM rnum  FROM (");
+                queryBuf.append(") ");
+            }
+
+            // Restrict the number of rows returned based on the limit
+            if (limit > 0)
+            {
+                queryBuf.append("rec WHERE rownum<=? ");
+                // If we also have an offset, then convert the limit into the maximum row number
+                if (offset > 0)
+                {
+                    limit += offset;
+                }
+            }
+
+            // Return only the records after the specified offset (row number)
+            if (offset > 0)
+            {
+                queryBuf.insert(0, "SELECT * FROM (");
+                queryBuf.append(") WHERE rnum>?");
+            }
+        }
+        else
+        {
+            if (limit > 0)
+            {
+                queryBuf.append(" LIMIT ? ");
+            }
+
+            if (offset > 0)
+            {
+                queryBuf.append(" OFFSET ? ");
+            }
+        }
+    }
 
     /**
      * Set the constraint check to immediate (every query)
@@ -177,6 +223,8 @@ public class DatabaseManager
             }
         }
     }
+    
+    
     
     /**
      * Return an iterator with the results of the query. The table parameter

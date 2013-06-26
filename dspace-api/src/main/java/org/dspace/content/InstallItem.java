@@ -17,6 +17,7 @@ import org.dspace.embargo.EmbargoManager;
 import org.dspace.event.Event;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierService;
+import static org.dspace.submit.step.DescribeStep.LANGUAGE_QUALIFIER;
 import org.dspace.utils.DSpace;
 
 /**
@@ -188,6 +189,21 @@ public class InstallItem
     {
         // create collection2item mapping
         is.getCollection().addItem(item);
+        
+       DCValue[] collIds=item.getMetadata("dc", "collectionChosen", "authorWise", LANGUAGE_QUALIFIER);    
+       
+       if(collIds!=null&&collIds.length>0)
+       {
+           for(int i=0;i<collIds.length;i++)
+           {
+               Collection coll=Collection.find(c, Integer.parseInt(collIds[i].value));
+               if(coll!=null && coll.getID()!=is.getCollection().getID())
+               {
+                   coll.addItem(item);
+               }
+           }
+       }
+                  
 
         // set owning collection
         item.setOwningCollection(is.getCollection());

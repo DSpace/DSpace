@@ -9,8 +9,14 @@ package org.dspace.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +43,7 @@ import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.submit.AbstractProcessingStep;
 
 /**
@@ -208,8 +215,28 @@ public class DescribeStep extends AbstractProcessingStep
             String inputType = inputs[j].getInputType();
             if (inputType.equals("name"))
             {
-                readNames(request, item, schema, element, qualifier, inputs[j]
+                ArrayList<List<String>> nameInputs=readNames(request, item, schema, element, qualifier, inputs[j]
                         .getRepeatable());
+                
+                List<String> firstNames=nameInputs.get(0);
+                List<String> lastNames=nameInputs.get(1);
+                Iterator<String> iterLast=lastNames.iterator();
+                Iterator<String> iterFirst=firstNames.iterator();
+                
+                while(iterLast.hasNext()&&iterFirst.hasNext())
+                {
+                    String lastName= iterLast.next();
+                    String firstName= iterFirst.next();
+                    EPerson[] ePeople=EPerson.searchByCustomQueryNameParams(context, firstName, lastName, -1, -1);
+                    if(ePeople!=null && ePeople.length>0)
+                    {
+                        for(int z=0;z<ePeople.length;z++)
+                        {
+                            if(ePeople[z]!=null)
+                            item.addMetadata(schema, "author", "epersonIdentified", LANGUAGE_QUALIFIER, ePeople[z].getID()+"");
+                        }
+                    }
+                }
             }
             else if (inputType.equals("date"))
             {
@@ -268,7 +295,42 @@ public class DescribeStep extends AbstractProcessingStep
             {
                 readText(request, item, schema, element, qualifier, inputs[j]
                         .getRepeatable(), LANGUAGE_QUALIFIER);
-            }
+            }else if ((inputType.equals("author")))
+             { 
+                 //Do nothing. Authors are taken from name inputs
+             }
+            else if ((inputType.equals("authorChosen")))
+             {         
+               item.clearMetadata(schema, "authorChosen", "epersonIdentified", LANGUAGE_QUALIFIER);
+                  String[] colIds = request.getParameterValues("dc_author_epersonIdentified"); 
+                 if(colIds!=null)
+                 {
+                  for(int x=0;x<colIds.length;x++)
+                  {
+                      item.addMetadata(schema, "authorChosen", "epersonIdentified", LANGUAGE_QUALIFIER, colIds[x]);
+                  }
+                 }
+             }
+            else if ((inputType.equals("collectionAvailable")))
+             {         
+               //Do nothing. Collections are taken from authors taken from name inputs
+             }
+            else if ((inputType.equals("collectionChosen")))
+             {         
+               item.clearMetadata(schema, "collectionChosen", "authorWise", LANGUAGE_QUALIFIER);
+                  String[] colIds = request.getParameterValues("chk-name2coll"); 
+                 if(colIds!=null)
+                 {
+                     HashSet<String> uniqueCollIds=new HashSet();
+                  for(int x=0;x<colIds.length;x++)
+                  {
+                       if(  uniqueCollIds.add(colIds[x]))//If collection not already added
+                      {
+                      item.addMetadata(schema, "collectionChosen", "authorWise", LANGUAGE_QUALIFIER, colIds[x]);    
+                      }
+                  }
+                 }
+             }
             else
             {
                 throw new ServletException("Field " + fieldName
@@ -324,7 +386,7 @@ public class DescribeStep extends AbstractProcessingStep
                 }
             }
         }
-
+        
         // Step 4:
         // Save changes to database
         subInfo.getSubmissionItem().update();
@@ -496,7 +558,7 @@ public class DescribeStep extends AbstractProcessingStep
      * @param repeated
      *            set to true if the field is repeatable on the form
      */
-    protected void readNames(HttpServletRequest request, Item item,
+    protected ArrayList<List<String>> readNames(HttpServletRequest request, Item item,
             String schema, String element, String qualifier, boolean repeated)
     {
         String metadataField = MetadataField
@@ -510,7 +572,9 @@ public class DescribeStep extends AbstractProcessingStep
         List<String> lasts = new LinkedList<String>();
         List<String> auths = new LinkedList<String>();
         List<String> confs = new LinkedList<String>();
-
+        
+        ArrayList<List<String>> nameParams=new ArrayList<List<String>>();
+        
         if (repeated)
         {
             firsts = getRepeatedParameter(request, metadataField, metadataField
@@ -628,6 +692,12 @@ public class DescribeStep extends AbstractProcessingStep
                 }
             }
         }
+        
+        nameParams.add(firsts);
+        nameParams.add(lasts);
+        nameParams.add(auths);
+        nameParams.add(confs);
+        return nameParams;
     }
 
     /**

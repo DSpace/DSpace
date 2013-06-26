@@ -183,6 +183,90 @@ public class AuthorizeManager
                     + oid + " by user " + userid, o, action);
         }
     }
+    
+     /**
+     * Checks that the context's current user can perform the given action on
+     * the given object. Throws an exception if the user is not authorized,
+     * otherwise the method call does nothing.
+     *
+     * @param c
+     *         context
+     * @param o
+     *         a DSpaceObject
+     * @param useInheritance
+     *         flag to say if ADMIN action on the current object or parent
+     *         object can be used
+     * @param action
+     *         action to perform from <code>org.dspace.core.Constants</code>
+     * @throws AuthorizeException
+     *         if the user is denied
+     */
+    public static void authorizeActionForGivenUser(Context c, DSpaceObject o, int action,
+            EPerson givenUser,boolean useInheritance)
+            throws AuthorizeException, SQLException
+    {
+        if (o == null)
+        {
+            // action can be -1 due to a null entry
+            String actionText;
+
+            if (action == -1)
+            {
+                actionText = "null";
+            } else
+            {
+                actionText = Constants.actionText[action];
+            }
+
+           
+            int userid;
+
+            if (givenUser == null)
+            {
+                userid = 0;
+            } else
+            {
+                userid = givenUser.getID();
+            }
+
+            throw new AuthorizeException(
+                    "Authorization attempted on null DSpace object "
+                            + actionText + " by user " + userid);
+        }
+
+        if (!authorizeForUser(c, o, action, givenUser, useInheritance))
+        {
+            // denied, assemble and throw exception
+            int otype = o.getType();
+            int oid = o.getID();
+            int userid;
+
+            if (givenUser == null)
+            {
+                userid = 0;
+            } else
+            {
+                userid = givenUser.getID();
+            }
+
+            //            AuthorizeException j = new AuthorizeException("Denied");
+            //            j.printStackTrace();
+            // action can be -1 due to a null entry
+            String actionText;
+
+            if (action == -1)
+            {
+                actionText = "null";
+            } else
+            {
+                actionText = Constants.actionText[action];
+            }
+
+            throw new AuthorizeException("Authorization denied for action "
+                    + actionText + " on " + Constants.typeText[otype] + ":"
+                    + oid + " by user " + userid, o, action);
+        }
+    }
 
     /**
      * same authorize, returns boolean for those who don't want to deal with
@@ -241,6 +325,84 @@ public class AuthorizeManager
 
         return isAuthorized;
     }
+    
+    /**
+     * Check to see if the given user can perform the given action on the given
+     * object. Always returns true if the ignore authorization flat is set in
+     * the current context.
+     *
+     * @param c
+     *         current context. User is irrelevant; "ignore authorization"
+     *         flag is relevant
+     * @param o
+     *         object action is being attempted on
+     * @param action
+     *         ID of action being attempted, from
+     *         <code>org.dspace.core.Constants</code>
+     * @param e
+     *         user attempting action
+     * @param useInheritance
+     *         flag to say if ADMIN action on the current object or parent
+     *         object can be used
+     * @return <code>true</code> if user is authorized to perform the given
+     *         action, <code>false</code> otherwise
+     * @throws SQLException
+     */
+    public static boolean authorizeForUser(Context c, DSpaceObject o, int action,
+                                     EPerson e, boolean useInheritance) throws SQLException
+    {
+        // return FALSE if there is no DSpaceObject
+        if (o == null)
+        {
+            return false;
+        }
+
+        // is authorization disabled for this context?
+        if (c.ignoreAuthorization())
+        {
+            return true;
+        }
+
+        // is eperson set? if not, userid = 0 (anonymous)
+        int userid = 0;
+        if (e != null)
+        {
+            userid = e.getID();
+
+            // perform isAdmin check to see
+            // if user is an Admin on this object
+            DSpaceObject testObject = useInheritance ? o.getAdminObject(action) : null;
+
+            if (isAdminGivenUser(c, testObject,e))
+            {
+                return true;
+            }
+        }
+
+        for (ResourcePolicy rp : getPoliciesActionFilter(c, o, action))
+        {
+            // check policies for date validity
+            if (rp.isDateValid())
+            {
+                if ((rp.getEPersonID() != -1) && (rp.getEPersonID() == userid))
+                {
+                    return true; // match
+                }
+
+                if ((rp.getGroupID() != -1)
+                        && (Group.isMemberGivenUser(c, rp.getGroupID(),e)))
+                {
+                    // group was set, and eperson is a member
+                    // of that group
+                    return true;
+                }
+            }
+        }
+
+        // default authorization is denial
+        return false;
+    }
+
 
     /**
      * Check to see if the given user can perform the given action on the given
@@ -264,7 +426,7 @@ public class AuthorizeManager
      *         action, <code>false</code> otherwise
      * @throws SQLException
      */
-    private static boolean authorize(Context c, DSpaceObject o, int action,
+    public static boolean authorize(Context c, DSpaceObject o, int action,
                                      EPerson e, boolean useInheritance) throws SQLException
     {
         // return FALSE if there is no DSpaceObject
@@ -397,6 +559,78 @@ public class AuthorizeManager
         return false;
     }
 
+    /**
+     * Check to see if the current user is an Administrator of a given object
+     * within DSpace. Always return <code>true</code> if the user is a System
+     * Admin
+     *
+     * @param c
+     *         current context
+     * @param o
+     *         current DSpace Object, if <code>null</code> the call will be
+     *         equivalent to a call to the <code>isAdmin(Context c)</code>
+     *         method
+     * @return <code>true</code> if user has administrative privileges on the
+     *         given DSpace object
+     */
+    public static boolean isAdminGivenUser(Context c, DSpaceObject o,EPerson e) throws SQLException
+    {
+
+        // return true if user is an Administrator
+        if (isAdminGivenUser(c,e))
+        {
+            return true;
+        }
+
+        if (o == null)
+        {
+            return false;
+        }
+
+        // is eperson set? if not, userid = 0 (anonymous)
+        int userid = 0;
+        if (e != null)
+        {
+            userid = e.getID();
+        }
+
+        //
+        // First, check all Resource Policies directly on this object
+        //
+        List<ResourcePolicy> policies = getPoliciesActionFilter(c, o, Constants.ADMIN);
+
+        for (ResourcePolicy rp : policies)
+        {
+            // check policies for date validity
+            if (rp.isDateValid())
+            {
+                if ((rp.getEPersonID() != -1) && (rp.getEPersonID() == userid))
+                {
+                    return true; // match
+                }
+
+                if ((rp.getGroupID() != -1)
+                        && (Group.isMember(c, rp.getGroupID())))
+                {
+                    // group was set, and eperson is a member
+                    // of that group
+                    return true;
+                }
+            }
+        }
+
+        // If user doesn't have specific Admin permissions on this object,
+        // check the *parent* objects of this object.  This allows Admin
+        // permissions to be inherited automatically (e.g. Admin on Community
+        // is also an Admin of all Collections/Items in that Community)
+        DSpaceObject parent = o.getParentObject();
+        if (parent != null)
+        {
+            return isAdminGivenUser(c, parent,e);
+        }
+
+        return false;
+    }
 
     /**
      * Check to see if the current user is a System Admin. Always return
@@ -424,6 +658,36 @@ public class AuthorizeManager
         } else
         {
             return Group.isMember(c, 1);
+        }
+    }
+    
+    
+    
+    /**
+     * Check to see if the given user is a System Admin. Always return
+     * <code>true</code> if c.ignoreAuthorization is set. Anonymous users
+     * can't be Admins (EPerson set to NULL)
+     *
+     * @param c
+     *         current context
+     * @return <code>true</code> if user is an admin or ignore authorization
+     *         flag set
+     */
+    public static boolean isAdminGivenUser(Context c,EPerson e) throws SQLException
+    {
+        // if we're ignoring authorization, user is member of admin
+        if (c.ignoreAuthorization())
+        {
+            return true;
+        }
+
+
+        if (e == null)
+        {
+            return false; // anonymous users can't be admins....
+        } else
+        {
+            return Group.isMemberGivenUser(c, 1,e);
         }
     }
 

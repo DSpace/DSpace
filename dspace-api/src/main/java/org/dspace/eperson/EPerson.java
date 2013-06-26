@@ -280,7 +280,7 @@ public class EPerson extends DSpaceObject
     public static EPerson[] search(Context context, String query, int offset, int limit) 
     		throws SQLException
 	{
-		String params = "%"+query.toLowerCase()+"%";
+	String params = "%"+query.toLowerCase()+"%";
         StringBuffer queryBuf = new StringBuffer();
         queryBuf.append("SELECT * FROM eperson WHERE eperson_id = ? OR ");
         queryBuf.append("LOWER(firstname) LIKE LOWER(?) OR LOWER(lastname) LIKE LOWER(?) OR LOWER(email) LIKE LOWER(?) ORDER BY lastname, firstname ASC ");
@@ -388,6 +388,114 @@ public class EPerson extends DSpaceObject
             }
         }
     }
+    
+    public static EPerson[] searchByCustomQueryNameParams(Context context,String firstName,String lastName, int offset, int limit) 
+    		throws SQLException
+	{
+            if(firstName!=null)
+                firstName=firstName.trim();
+            else
+                firstName="";
+            
+            if(lastName!=null)
+                lastName=lastName.trim();
+            else
+                lastName="";
+            
+           StringBuffer queryBuf = new StringBuffer();
+           queryBuf.append("SELECT * FROM eperson WHERE ");
+           queryBuf.append("LOWER(firstname) LIKE LOWER(?) AND LOWER(lastname) LIKE LOWER(?)  ORDER BY lastname, firstname ASC ");
+           
+           ArrayList queryParamList=new ArrayList();
+           queryParamList.add(firstName);
+           queryParamList.add(lastName);
+           EPerson[] epeople=searchByCustomQuery(context,queryBuf,queryParamList,0,1);
+           return epeople;
+    
+        }
+     /**
+     * Find the epeople that match the search query across firstname, lastname or email. 
+     * This method also allows offsets and limits for pagination purposes. 
+     * 
+     * @param context
+     *            DSpace context
+     * @param query
+     *            The search string
+     * @param offset
+     *            Inclusive offset 
+     * @param limit
+     *            Maximum number of matches returned
+     * 
+     * @return array of EPerson objects
+     */
+    public static EPerson[] searchByCustomQuery(Context context,StringBuffer queryBuf,ArrayList queryParamList, int offset, int limit) 
+    		throws SQLException
+	{
+	
+        DatabaseManager.addDBServerSpecificLimitExpressionsToSelectQueries(queryBuf, limit, offset);
+
+        String dbquery = queryBuf.toString();
+
+        // Create the parameter array, including limit and offset if part of the query
+        Object[] paramArr =null;                
+        if( queryParamList!=null && queryParamList.size()>0)
+        {
+            
+        if (limit > 0 && offset > 0)
+        {
+            queryParamList.add(limit);
+            queryParamList.add(offset);
+            paramArr = queryParamList.toArray();
+        }
+        else if (limit > 0)
+        {
+            queryParamList.add(limit);
+            paramArr =  queryParamList.toArray();
+        }
+        else if (offset > 0)
+        {
+           queryParamList.add(offset);
+            paramArr =  queryParamList.toArray();
+        }
+        }
+
+        // Get all the epeople that match the query
+		TableRowIterator rows = DatabaseManager.query(context, 
+		        dbquery, paramArr);
+		try
+        {
+            List<TableRow> epeopleRows = rows.toList();
+            EPerson[] epeople = new EPerson[epeopleRows.size()];
+
+            for (int i = 0; i < epeopleRows.size(); i++)
+            {
+                TableRow row = (TableRow) epeopleRows.get(i);
+
+                // First check the cache
+                EPerson fromCache = (EPerson) context.fromCache(EPerson.class, row
+                        .getIntColumn("eperson_id"));
+
+                if (fromCache != null)
+                {
+                    epeople[i] = fromCache;
+                }
+                else
+                {
+                    epeople[i] = new EPerson(context, row);
+                }
+            }
+
+            return epeople;
+        }
+        finally
+        {
+            if (rows != null)
+            {
+                rows.close();
+            }
+        }
+    }
+
 
     /**
      * Returns the total number of epeople returned by a specific query, without the overhead 
