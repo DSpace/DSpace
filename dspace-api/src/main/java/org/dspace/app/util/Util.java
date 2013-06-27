@@ -9,16 +9,23 @@ package org.dspace.app.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.dspace.content.Collection;
+import org.dspace.content.DCValue;
+import org.dspace.content.Item;
 import org.dspace.core.Constants;
+import org.dspace.core.I18nUtil;
 
 
 /**
@@ -349,5 +356,114 @@ public class Util {
             sourceVersion = constants.getProperty("version", "none");
         }
         return sourceVersion;
+    }
+
+    /**
+     * Get a list of all the respective "displayed-value(s)" from the given
+     * "stored-value(s)" for a specific metadata field of a DSpace Item, by
+     * reading input-forms.xml
+     * 
+     * @param item
+     *            The Dspace Item
+     * @param values
+     *            A DCValue[] array of the specific "stored-value(s)"
+     * @param schema
+     *            A String with the schema name of the metadata field
+     * @param element
+     *            A String with the element name of the metadata field
+     * @param qualifier
+     *            A String with the qualifier name of the metadata field
+     * @return A list of the respective "displayed-values"
+     */
+
+    public static List<String> getControlledVocabulariesDisplayValueLocalized(
+            Item item, DCValue[] values, String schema, String element,
+            String qualifier, Locale locale) throws SQLException,
+            DCInputsReaderException
+    {
+        List<String> toReturn = new ArrayList<String>();
+        DCInput myInputs = null;
+        boolean myInputsFound = false;
+        String formFileName = I18nUtil.getInputFormsFileName(locale);
+        String col_handle = "";
+
+        Collection collection = item.getOwningCollection();
+
+        if (collection == null)
+        {
+            // set an empty handle so to get the default input set
+            col_handle = "";
+        }
+        else
+        {
+            col_handle = collection.getHandle();
+        }
+
+        // Read the input form file for the specific collection
+        DCInputsReader inputsReader = new DCInputsReader(formFileName);
+
+        DCInputSet inputSet = inputsReader.getInputs(col_handle);
+
+        // Replace the values of DCValue[] with the correct ones in case of
+        // controlled vocabularies
+        String currentField = schema + "." + element
+                + (qualifier == null ? "" : "." + qualifier);
+
+        if (inputSet != null)
+        {
+
+            int pageNums = inputSet.getNumberPages();
+
+            for (int p = 0; p < pageNums; p++)
+            {
+
+                DCInput[] inputs = inputSet.getPageRows(p, false, false);
+
+                if (inputs != null)
+                {
+
+                    for (int i = 0; i < inputs.length; i++)
+                    {
+                        String inputField = inputs[i].getSchema()
+                                + "."
+                                + inputs[i].getElement()
+                                + (inputs[i].getQualifier() == null ? "" : "."
+                                        + inputs[i].getQualifier());
+                        if (currentField.equals(inputField))
+                        {
+
+                            myInputs = inputs[i];
+                            myInputsFound = true;
+                            break;
+
+                        }
+                    }
+                }
+                if (myInputsFound)
+                    break;
+            }
+        }
+
+        if (myInputsFound)
+        {
+
+            for (int j = 0; j < values.length; j++)
+            {
+
+                String pairsName = myInputs.getPairsType();
+                String stored_value = values[j].value;
+                String displayVal = myInputs.getDisplayString(pairsName,
+                        stored_value);
+
+                if (displayVal != null && !"".equals(displayVal))
+                {
+
+                    toReturn.add(displayVal);
+                }
+
+            }
+        }
+
+        return toReturn;
     }
 }

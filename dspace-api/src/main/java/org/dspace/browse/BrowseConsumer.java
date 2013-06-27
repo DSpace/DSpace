@@ -73,7 +73,7 @@ public class BrowseConsumer implements Consumer
 
         // If an Item is created or its metadata is modified..
         case Constants.ITEM:
-            if (et == Event.MODIFY_METADATA || et == Event.CREATE)
+            if (et == Event.MODIFY_METADATA || et == Event.CREATE || et == Event.MODIFY)
             {
                 Item subj = (Item)event.getSubject(ctx);
                 if (subj != null)

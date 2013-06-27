@@ -10,130 +10,75 @@
     </description>
     <!--
        A Parent POM that Maven inherits DSpace Default
-       POM atrributes from.
+       POM attributes from.
     -->
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>3.0-SNAPSHOT</version>
+        <version>4.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <properties>
-        <default.dspace.dir>/dspace</default.dspace.dir>
-        <default.mail.server>smtp.example.com</default.mail.server>
-        <default.solr.server>http://localhost:8080/solr</default.solr.server>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/..</root.basedir>
     </properties>
 
-    <profiles>
-
-        <!--
-           This profile is used by all children such that
-           when activated a dspace.config configuration
-           file location passed on the commandline
-           (-Ddspace.config=...) can be passed through
-           to be used as a filter source by projects for
-           tasks such as updating the ${dspace.dir} in
-           web.xml etc.
-
-           When activated, the child project will inherit
-           the configuration.
-        -->
-        <profile>
-            <id>dspace-config</id>
-            <activation>
-                <property>
-                    <name>dspace.config</name>
-                </property>
-            </activation>
-            <build>
-                <filters>
-                    <filter>${dspace.config}</filter>
-                </filters>
-            </build>
-        </profile>
-
-        <!--
-           These profiles setup properties and build configuration
-           appropriate to the database that DSpace will be installed
-           against.
-
-           They are activated by using the profile id - ie. -Ppostgres,
-           or defining db.name - ie. -Ddb.name=oracle
-        -->
-        <!--
-           Default profile for Postgres database configuration
-           Use -Ppostgres to activate.
-        -->
-
-        <profile>
-            <id>postgres</id>
-            <activation>
-                <property>
-                    <name>!db.name</name>
-                </property>
-            </activation>
-            <properties>
-                <default.db.name>postgres</default.db.name>
-                <default.db.driver>org.postgresql.Driver</default.db.driver>
-                <default.db.url>
-                    jdbc:postgresql://localhost:5432/dspace
-                </default.db.url>
-                <default.db.username>dspace</default.db.username>
-                <default.db.password>dspace</default.db.password>
-            </properties>
-        </profile>
-
-        <!--
-           Default profile for Oracle database configuration
-           Use -Poracle or -Ddb.name=oracle to activate.
-        -->
-        <profile>
-            <id>oracle</id>
-            <activation>
-                <property>
-                    <name>db.name</name>
-                    <value>oracle</value>
-                </property>
-            </activation>
-            <properties>
-                <default.db.name>oracle</default.db.name>
-                <default.db.driver>
-                    oracle.jdbc.OracleDriver
-                </default.db.driver>
-                <default.db.url>
-                    jdbc:oracle:thin:@//localhost:1521/xe
-                </default.db.url>
-                <default.db.username>dspace</default.db.username>
-                <default.db.password>dspace</default.db.password>
-            </properties>
-        </profile>
-
-    </profiles>
-
-    <!--
-       Builds Overlay Modules for DSpace
-    -->
-    <modules>
-        <module>modules</module>
-    </modules>
-
     <build>
+        <filters>
+            <!-- Filter using the properties file defined by dspace-parent POM -->
+            <filter>${filters.file}</filter>
+        </filters>
+         <resources>
+            <!-- Enumerate filtered files explicitly to avoid issues with other config tech. -->
+            <resource>
+                <directory>${basedir}</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>config/default.context.xml</include>
+                    <include>config/dspace.cfg</include>
+                    <include>config/log4j-handle-plugin.properties</include>
+                    <include>config/log4j.properties</include>
+                    <include>config/modules/curate.cfg</include>
+                    <include>config/modules/oai.cfg</include>
+                    <include>config/modules/solr-statistics.cfg</include>
+                </includes>
+            </resource>
+            <!-- Declare a mutually exclusive resource set for non-filtered files. -->
+            <resource>
+                <directory>${basedir}</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>config/default.context.xml</exclude>
+                    <exclude>config/dspace.cfg</exclude>
+                    <exclude>config/log4j-handle-plugin.properties</exclude>
+                    <exclude>config/log4j.properties</exclude>
+                    <exclude>config/modules/curate.cfg</exclude>
+                    <exclude>config/modules/oai.cfg</exclude>
+                    <exclude>config/modules/solr-statistics.cfg</exclude>
+                </excludes>
+            </resource>
+        </resources>
+    
         <plugins>
-            <!--  overall project assembly -->
+            <!--  Default project assembly. Calls 'assembly.xml', which
+                  generates the DSpace build directory. -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2.1</version>
                 <configuration>
+                    <!-- Don't "attach" the assembly results to this project. As
+                         this assembly builds a directory, setting this to "true"
+                         (default value) will just result in a WARNING message.-->
+                    <attach>false</attach>
                     <descriptors>
-                        <descriptor>src/assemble/assembly.xml</descriptor>
+                        <descriptor>src/main/assembly/assembly.xml</descriptor>
                     </descriptors>
                 </configuration>
                 <executions>
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <goal>directory-single</goal>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -141,5 +86,77 @@
         </plugins>
     </build>
 
+    <profiles>
 
+        <!-- Default Profile. This builds all Overlay modules for DSpace -->
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <!--
+                Builds Overlay Modules for DSpace
+            -->
+            <modules>
+                <module>modules</module>
+            </modules>
+        </profile>
+
+
+        <!--
+            Run this profile (e.g. 'mvn package -Pdistributions') to create
+            zip / tarball distributions to upload to SourceForge or similar.
+            When this profile is run, DSpace is NOT compiled as normal.
+            Instead, a zip/tarball is generated from the parent [dspace-src] directory.
+        -->
+        <profile>
+           <id>distributions</id>
+           <activation>
+              <activeByDefault>false</activeByDefault>
+           </activation>
+           <build>
+              <plugins>
+                 <plugin>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <inherited>false</inherited>
+                    <executions>
+                       <execution>
+                          <inherited>false</inherited>
+                          <configuration>
+                             <descriptors>
+                                <descriptor>src/main/assembly/release.xml</descriptor>
+                                <descriptor>src/main/assembly/src-release.xml</descriptor>
+                             </descriptors>
+                             <tarLongFileMode>gnu</tarLongFileMode>
+                             <finalName>dspace-${project.version}</finalName>
+                          </configuration>
+                          <phase>package</phase>
+                          <goals>
+                             <goal>single</goal>
+                          </goals>
+                       </execution>
+                    </executions>
+                 </plugin>
+              </plugins>
+           </build>
+        </profile>
+
+    </profiles>
+
+    <dependencies>
+    	<!-- This dependency ensures DSpace OAI JAR is added to [dspace]/lib/,
+             so that the 'dspace oai' launcher.xml command works.  -->
+    	<dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-oai</artifactId>
+            <type>jar</type>
+            <classifier>classes</classifier>
+    	</dependency>
+        <!-- The Servlet API is also needed by the 'dspace oai' launcher.xml
+             command. -->
+    	<dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+    	</dependency>
+    </dependencies>
 </project>

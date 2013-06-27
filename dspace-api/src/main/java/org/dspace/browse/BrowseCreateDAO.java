@@ -332,7 +332,7 @@ public interface BrowseCreateDAO
 	 * @param table		the name of the distinct table which holds the target of the mapping
 	 * @param map		the name of the mapping table itself
 	 * @param execute	whether to execute the query or not
-	 * @return
+	 * @return the instructions (SQL) which effect the creation.
 	 * @throws BrowseException
 	 */
 	public String createDistinctMap(String table, String map, boolean execute) throws BrowseException;

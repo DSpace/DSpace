@@ -355,7 +355,7 @@ public class WorkflowItem implements InProgressSubmission
     /**
      * Update the workflow item, including the unarchived item.
      */
-    public void update() throws SQLException, IOException, AuthorizeException
+    public void update() throws SQLException, AuthorizeException
     {
         // FIXME check auth
         log.info(LogManager.getHeader(ourContext, "update_workflow_item",

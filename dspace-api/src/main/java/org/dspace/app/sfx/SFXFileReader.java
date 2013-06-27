@@ -29,6 +29,20 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+/**
+ * XML configuration file reader for DSpace metadata fields (DC) mapping
+ * to OpenURL parameters.
+ * <p>
+ * This class reads the [dspace]/config/sfx.xml configuration file, which
+ * contains pairs of DSpace item metadata values and OpenURL parameter names.
+ * Then it takes an item and constructs an OpenURL for it with values of
+ * parameters filled in from the paired metadata fields.
+ * </p>
+ *
+ * @author Stuart Lewis
+ * @author Graham Triggs
+ * @version $Revision$
+ */
 
 public class SFXFileReader {
 
@@ -43,7 +57,7 @@ public class SFXFileReader {
      * Loads the SFX configuraiton file
      *
      * @param fileName The name of the SFX configuration file
-     * @param item The item to process
+     * @param item The item to process, from which metadata values will be taken
      *
      * @return the SFX string
      * @throws IOException
@@ -62,7 +76,7 @@ public class SFXFileReader {
 
    /** Parses XML file and returns XML document.
     * @param fileName XML file to parse
-    * @return XML document or <B>null</B> if error occured
+    * @return XML document or <B>null</B> if error occured. The error is caught and logged.
     */
 
    public static Document parseFile(String fileName) {
@@ -94,18 +108,19 @@ public class SFXFileReader {
    }
 
     /**
-     * Process the item
+     * Process the item, mapping each of its metadata fields defined in the
+     * configuration file to an OpenURL parameter
      *
-     * @param node
-     * @param item
-     * @return
+     * @param node DOM node of the mapping pair in the XML file (field element)
+     * @param item The item to process, from which metadata values will be taken
+     * @return processed fields.
      * @throws IOException
      */
    public static String doNodes(Node node, Item item) throws IOException
    {
         if (node == null)
         {
-                   log.error (" Empty Node ");
+	    log.error (" Empty Node ");
             return null;
         }
         Node e = getElement(node);
@@ -135,11 +150,12 @@ public class SFXFileReader {
    }
 
     /**
-     * Process the fields
+     * Process the field nodes, mapping each metadata field defined in the
+     * configuration file to an OpenURL parameter
      *
-     * @param e
-     * @param item
-     * @return
+     * @param e DOM node of the mapping pair in the XML file (field element)
+     * @param item The item to process, from which metadata values will be taken
+     * @return assembled OpenURL query.
      * @throws IOException
      */
    private static String processFields(Node e, Item item) throws IOException
@@ -315,7 +331,7 @@ public class SFXFileReader {
    		short type = kid.getNodeType();
    		if (type == Node.TEXT_NODE)
    		{
-   			return kid.getNodeValue().trim();
+		    return kid.getNodeValue().trim();
    		}
    	}
    	// Didn't find a text node

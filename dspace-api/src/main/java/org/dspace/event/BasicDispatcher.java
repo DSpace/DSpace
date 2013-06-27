@@ -7,9 +7,7 @@
  */
 package org.dspace.event;
 
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
@@ -72,9 +70,8 @@ public class BasicDispatcher extends Dispatcher
     {
         if (!consumers.isEmpty())
         {
-            List<Event> events = Collections.synchronizedList(ctx.getEvents());
 
-            if (events == null)
+            if (!ctx.hasEvents())
             {
                 return;
             }
@@ -82,7 +79,7 @@ public class BasicDispatcher extends Dispatcher
             if (log.isDebugEnabled())
             {
                 log.debug("Processing queue of "
-                        + String.valueOf(events.size()) + " events.");
+                        + String.valueOf(ctx.getEvents().size()) + " events.");
             }
 
             // transaction identifier applies to all events created in
@@ -90,8 +87,9 @@ public class BasicDispatcher extends Dispatcher
             // some letters so RDF readers don't mistake it for an integer.
             String tid = "TX" + Utils.generateKey();
 
-            for (Event event : events)
+            while (ctx.hasEvents())
             {
+                Event event = ctx.pollEvent();
                 event.setDispatcher(getIdentifier());
                 event.setTransactionID(tid);
 

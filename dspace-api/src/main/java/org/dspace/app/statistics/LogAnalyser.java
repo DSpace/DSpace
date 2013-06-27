@@ -855,9 +855,7 @@ public class LogAnalyser
     }
 
     /**
-     * read in the given config file and populate the class globals
-     *
-     * @param   configFile  the config file to read in
+     * Read in the current config file and populate the class globals.
      */
     public static void readConfig() throws IOException
     {
@@ -865,7 +863,7 @@ public class LogAnalyser
     }
 
     /**
-     * read in the given config file and populate the class globals
+     * Read in the given config file and populate the class globals.
      *
      * @param   configFile  the config file to read in
      */

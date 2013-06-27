@@ -7,6 +7,7 @@
  */
 package org.dspace.app.util;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  * @author Robert Tansley
  * @version $Revision$
  */
-public class SubmissionInfo
+public class SubmissionInfo extends HashMap
 {
     /** log4j logger */
     private static Logger log = Logger.getLogger(SubmissionInfo.class);

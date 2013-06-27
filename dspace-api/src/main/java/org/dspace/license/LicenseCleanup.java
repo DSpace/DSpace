@@ -188,8 +188,8 @@ public class LicenseCleanup
     /**
      * Fast stream copy routine
      * 
-     * @param b
-     * @return
+     * @param b the Bitstream to be copied.
+     * @return copy of the content of {@code b}.
      * @throws IOException
      * @throws SQLException
      * @throws AuthorizeException

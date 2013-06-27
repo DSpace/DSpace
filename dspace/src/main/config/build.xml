@@ -34,6 +34,15 @@ Common usage:
 
 ========================================================================
   </description>
+  
+  	<!-- DS-1391: Ant 1.8.0+ is required, fail if not available. -->
+	<fail message="Ant 1.8.0+ is required, ${ant.version} is not supported">
+        <condition>
+			<not>
+				<antversion atleast="1.8.0"/>
+			</not>
+        </condition>
+    </fail>
 
     <!-- ============================================================= -->
     <!-- Will be using various environment variables                   -->
@@ -133,7 +142,9 @@ Common usage:
         <echo message="load_registries --> Load metadata &amp; file format registries into the " />
         <echo message="                    database" />
         <echo message="" />
+        <echo message="clean_backups   --> Remove .bak directories under install directory" />
         <echo message="clean_database  --> Remove DSpace database tables, destroying data" />
+        <echo message="test_database   --> Attempt to connect to the DSpace database in order to verify that configuration is correct" />
         <echo message="" />
         <echo message="" />
         <echo message="Available parameters are:" />
@@ -250,7 +261,7 @@ Common usage:
 
         <echo>
 
-  * To properly merge your previous configuration files, its
+  * To properly merge your previous configuration files, it's
     best to try to take the newer version and copy your
     previous changes into it.
 ====================================================================
@@ -309,7 +320,7 @@ Common usage:
 
         <echo>
 
-  * To properly merge your previous configuration files, its
+  * To properly merge your previous configuration files, it's
     best to try to take the newer version and copy your
     previous changes into it. Delete the old and remove the
     ".new" suffix from the new file.
@@ -347,6 +358,7 @@ Common usage:
                 <expandproperties />
             </filterchain>
         </copy>
+        <echo file='config-temp/ant.properties' message='ant.version = ${ant.version}'/>
 
     </target>
 
@@ -424,7 +436,7 @@ Common usage:
 
         <echo>
 
-  * To properly merge your previous configuration files, its
+  * To properly merge your previous configuration files, it's
     best to try to take the newer version and copy your
     previous changes into it.
 ====================================================================
@@ -491,7 +503,7 @@ Common usage:
 
         <echo>
 
-  * To properly merge your previous configuration files, its
+  * To properly merge your previous configuration files, it's
     best to try to take the newer version and copy your
     previous changes into it. Delete the old and remove the
     ".new" suffix from the new file.
@@ -730,6 +742,10 @@ Common usage:
 
     	<mkdir dir="${dspace.dir}/solr" />
 
+    	<!-- Runtime files (Could be erased - just for performing purposes) -->
+    	<mkdir dir="${dspace.dir}/var" />
+    	<!-- Runtime files for OAI 2.0 -->
+    	<mkdir dir="${dspace.dir}/var/oai" />
     </target>
 
 
@@ -751,6 +767,8 @@ Common usage:
         </copy>
 
         <copy file="${config}" tofile="${dspace.dir}/config/dspace.cfg" preservelastmodified="true" />
+
+        <echo file='${dspace.dir}/config/ant.properties' message='ant.version = ${ant.version}'/>
 
 
     </target>
@@ -964,9 +982,6 @@ Common usage:
 
    ${dspace.url}
 
- You should also be able to access the administrator UI:
-
-   ${dspace.url}/dspace-admin
 ====================================================================
         </echo>
 

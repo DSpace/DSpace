@@ -9,13 +9,7 @@ package org.dspace.core;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.EmptyStackException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.dspace.eperson.EPerson;
@@ -24,6 +18,7 @@ import org.dspace.event.Dispatcher;
 import org.dspace.event.Event;
 import org.dspace.event.EventManager;
 import org.dspace.storage.rdbms.DatabaseManager;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Class representing the context of a particular DSpace operation. This stores
@@ -45,6 +40,9 @@ import org.dspace.storage.rdbms.DatabaseManager;
 public class Context
 {
     private static final Logger log = Logger.getLogger(Context.class);
+
+    /** option flags */
+    public static final short READ_ONLY = 0x01;
 
     /** Database connection */
     private Connection connection;
@@ -77,19 +75,47 @@ public class Context
     private List<Integer> specialGroups;
 
     /** Content events */
-    private List<Event> events = null;
+    private LinkedList<Event> events = null;
 
     /** Event dispatcher name */
     private String dispName = null;
 
+    /** options */
+    private short options = 0;
+
     /**
-     * Construct a new context object. A database connection is opened. No user
-     * is authenticated.
+     * Construct a new context object with default options. A database connection is opened.
+     * No user is authenticated.
      * 
      * @exception SQLException
      *                if there was an error obtaining a database connection
      */
     public Context() throws SQLException
+    {
+        init();
+    }
+
+    /**
+     * Construct a new context object with passed options. A database connection is opened.
+     * No user is authenticated.
+     * 
+     * @param options   context operation flags
+     * @exception SQLException
+     *                if there was an error obtaining a database connection
+     */
+    public Context(short options) throws SQLException
+    {
+        this.options = options;
+        init();
+    }
+
+    /**
+     * Initializes a new context object. 
+     *
+     * @exception SQLException
+     *                if there was an error obtaining a database connection
+     */
+    private void init() throws SQLException
     {
         // Obtain a non-auto-committing connection
         connection = DatabaseManager.getConnection();
@@ -297,7 +323,10 @@ public class Context
         try
         {
             // Commit any changes made as part of the transaction
-            commit();
+            if (! isReadOnly())
+            {
+                commit();
+            }
         }
         finally
         {
@@ -318,6 +347,14 @@ public class Context
      */
     public void commit() throws SQLException
     {
+        /* 
+         * invalid condition if in read-only mode: no valid
+         * transactions can be committed: no recourse but to bail
+         */
+        if (isReadOnly())
+        {
+            throw new IllegalStateException("Attempt to commit transaction in read-only context");
+        }
         // Commit any changes made as part of the transaction
         Dispatcher dispatcher = null;
 
@@ -373,9 +410,17 @@ public class Context
      */
     public void addEvent(Event event)
     {
+        /* 
+         * invalid condition if in read-only mode: events - which
+         * indicate mutation - are firing: no recourse but to bail
+         */
+        if (isReadOnly())
+        {
+            throw new IllegalStateException("Attempt to mutate object in read-only context");
+        }
         if (events == null)
         {
-            events = new ArrayList<Event>();
+            events = new LinkedList<Event>();
         }
 
         events.add(event);
@@ -385,15 +430,30 @@ public class Context
      * Get the current event list. If there is a separate list of events from
      * already-committed operations combine that with current list.
      * 
-     * TODO WARNING: events uses an ArrayList, a class not ready for concurrency.
-     * Read http://download.oracle.com/javase/6/docs/api/java/util/Collections.html#synchronizedList%28java.util.List%29
-     * on how to properly synchronize the class when calling this method
-     *
      * @return List of all available events.
      */
-    public List<Event> getEvents()
+    public LinkedList<Event> getEvents()
     {
         return events;
+    }
+
+    public boolean hasEvents()
+    {
+        return !CollectionUtils.isEmpty(events);
+    }
+
+    /**
+     * Retrieves the first element in the events list & removes it from the list of events once retrieved
+     * @return The first event of the list or <code>null</code> if the list is empty
+     */
+    public Event pollEvent()
+    {
+        if(hasEvents())
+        {
+            return events.poll();
+        }else{
+            return null;
+        }
     }
 
     /**
@@ -409,7 +469,10 @@ public class Context
         {
             if (!connection.isClosed())
             {
-                connection.rollback();
+                if (! isReadOnly())
+                {
+                    connection.rollback();
+                }
             }
         }
         catch (SQLException se)
@@ -450,6 +513,17 @@ public class Context
     }
 
     /**
+     * Reports whether context supports updating DSpaceObjects, or only reading.
+     * 
+     * @return <code>true</code> if the context is read-only, otherwise
+     *         <code>false</code>
+     */
+    public boolean isReadOnly()
+    {
+        return (options & READ_ONLY) > 0;
+    }
+
+    /**
      * Store an object in the object cache.
      * 
      * @param objectClass
@@ -477,8 +551,12 @@ public class Context
      */
     public void cache(Object o, int id)
     {
-        String key = o.getClass().getName() + id;
-        objectCache.put(key, o);
+        // bypass cache if in read-only mode
+        if (! isReadOnly())
+        {
+            String key = o.getClass().getName() + id;
+            objectCache.put(key, o);
+        }
     }
 
     /**
@@ -551,10 +629,8 @@ public class Context
     }
 
     /**
-     * gets an array of all of the special groups that current user is a member
-     * of
-     * 
-     * @return
+     * Get an array of all of the special groups that current user is a member
+     * of.
      * @throws SQLException
      */
     public Group[] getSpecialGroups() throws SQLException

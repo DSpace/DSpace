@@ -9,7 +9,18 @@ package org.dspace.eperson;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.codec.DecoderException;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -603,7 +614,7 @@ public class EPerson extends DSpaceObject
     /**
      * Get the e-person's language
      * 
-     * @return  language
+     * @return language code (or null if the column is an SQL NULL)
      */
      public String getLanguage()
      {
@@ -616,7 +627,7 @@ public class EPerson extends DSpaceObject
      * e.g. "en", "en_US", "pt_BR" (the latter is Brazilian Portugese).
      * 
      * @param language
-     *            language
+     *            language code
      */
      public void setLanguage(String language)
      {
@@ -624,8 +635,11 @@ public class EPerson extends DSpaceObject
      }
   
 
-
-
+    /**
+     * Get the e-person's handle
+     * 
+     * @return current implementation always returns null
+     */
     public String getHandle()
     {
         // No Handles for e-people
@@ -635,7 +649,7 @@ public class EPerson extends DSpaceObject
     /**
      * Get the e-person's email address
      * 
-     * @return their email address
+     * @return their email address (or null if the column is an SQL NULL)
      */
     public String getEmail()
     {
@@ -662,7 +676,7 @@ public class EPerson extends DSpaceObject
     /**
      * Get the e-person's netid
      * 
-     * @return their netid
+     * @return their netid (DB constraints ensure it's never NULL)
      */
     public String getNetid()
     {
@@ -685,7 +699,7 @@ public class EPerson extends DSpaceObject
      * Get the e-person's full name, combining first and last name in a
      * displayable string.
      * 
-     * @return their full name
+     * @return their full name (first + last name; if both are NULL, returns email)
      */
     public String getFullName()
     {
@@ -709,7 +723,7 @@ public class EPerson extends DSpaceObject
     /**
      * Get the eperson's first name.
      * 
-     * @return their first name
+     * @return their first name (or null if the column is an SQL NULL)
      */
     public String getFirstName()
     {
@@ -731,7 +745,7 @@ public class EPerson extends DSpaceObject
     /**
      * Get the eperson's last name.
      * 
-     * @return their last name
+     * @return their last name (or null if the column is an SQL NULL)
      */
     public String getLastName()
     {
@@ -787,7 +801,7 @@ public class EPerson extends DSpaceObject
     /**
      * Get require certificate or not
      * 
-     * @return boolean, yes/no
+     * @return boolean, yes/no (or false if the column is an SQL NULL)
      */
     public boolean getRequireCertificate()
     {
@@ -807,9 +821,9 @@ public class EPerson extends DSpaceObject
     }
 
     /**
-     * Can the user log in?
+     * Is the user self-registered?
      * 
-     * @return boolean, yes/no
+     * @return boolean, yes/no (or false if the column is an SQL NULL)
      */
     public boolean getSelfRegistered()
     {
@@ -822,7 +836,7 @@ public class EPerson extends DSpaceObject
      * @param field
      *            the name of the metadata field to get
      * 
-     * @return the value of the metadata field
+     * @return the value of the metadata field (or null if the column is an SQL NULL)
      * 
      * @exception IllegalArgumentException
      *                if the requested metadata field doesn't exist
@@ -836,7 +850,7 @@ public class EPerson extends DSpaceObject
      * Set a metadata value
      * 
      * @param field
-     *            the name of the metadata field to get
+     *            the name of the metadata field to set
      * @param value
      *            value to set the field to
      * 
@@ -851,43 +865,64 @@ public class EPerson extends DSpaceObject
     }
 
     /**
-     * Set the EPerson's password
+     * Set the EPerson's password.
      * 
      * @param s
-     *            the new email
+     *            the new password.
      */
     public void setPassword(String s)
     {
-        // FIXME: encoding
-        String encoded = Utils.getMD5(s);
-
-        myRow.setColumn("password", encoded);
+        PasswordHash hash = new PasswordHash(s);
+        myRow.setColumn("password", Utils.toHex(hash.getHash()));
+        myRow.setColumn("salt", Utils.toHex(hash.getSalt()));
+        myRow.setColumn("digest_algorithm", hash.getAlgorithm());
         modified = true;
     }
 
     /**
-     * Set the EPerson's password hash
+     * Set the EPerson's password hash.
      * 
-     * @param s
-     *          hash of the password
+     * @param password
+     *          hashed password, or null to set row data to NULL.
      */
-    public void setPasswordHash(String s)
+    public void setPasswordHash(PasswordHash password)
     {
-        myRow.setColumn("password", s);
+        if (null == password)
+        {
+            myRow.setColumnNull("digest_algorithm");
+            myRow.setColumnNull("salt");
+            myRow.setColumnNull("password");
+        }
+        else
+        {
+            myRow.setColumn("digest_algorithm", password.getAlgorithm());
+            myRow.setColumn("salt", password.getSaltString());
+            myRow.setColumn("password", password.getHashString());
+        }
         modified = true;
     }
 
     /**
-     * Return the EPerson's password hash
+     * Return the EPerson's password hash.
+     *
      * @return hash of the password
      */
-    public String getPasswordHash()
+    public PasswordHash getPasswordHash()
     {
-        return myRow.getStringColumn("password");
+        PasswordHash hash = null;
+        try {
+            hash = new PasswordHash(myRow.getStringColumn("digest_algorithm"),
+                    myRow.getStringColumn("salt"),
+                    myRow.getStringColumn("password"));
+        } catch (DecoderException ex) {
+            log.error("Problem decoding stored salt or hash:  " + ex.getMessage());
+        }
+        return hash;
     }
 
     /**
-     * Check EPerson's password
+     * Check EPerson's password.  Side effect:  original unsalted MD5 hashes are
+     * converted using the current algorithm.
      * 
      * @param attempt
      *            the password attempt
@@ -895,9 +930,58 @@ public class EPerson extends DSpaceObject
      */
     public boolean checkPassword(String attempt)
     {
-        String encoded = Utils.getMD5(attempt);
+        PasswordHash myHash;
+        try
+        {
+            myHash = new PasswordHash(
+                    myRow.getStringColumn("digest_algorithm"),
+                    myRow.getStringColumn("salt"),
+                    myRow.getStringColumn("password"));
+        } catch (DecoderException ex)
+        {
+            log.error(ex.getMessage());
+            return false;
+        }
+        boolean answer = myHash.matches(attempt);
 
-        return (encoded.equals(myRow.getStringColumn("password")));
+        // If using the old unsalted hash, and this password is correct, update to a new hash
+        if (answer && (null == myRow.getStringColumn("digest_algorithm")))
+        {
+            log.info("Upgrading password hash for EPerson " + getID());
+            setPassword(attempt);
+            try {
+                myContext.turnOffAuthorisationSystem();
+                update();
+            } catch (SQLException ex) {
+                log.error("Could not update password hash", ex);
+            } catch (AuthorizeException ex) {
+                log.error("Could not update password hash", ex);
+            } finally {
+                myContext.restoreAuthSystemState();
+            }
+        }
+
+        return answer;
+    }
+
+    /**
+     * Stamp the EPerson's last-active date.
+     * 
+     * @param when latest activity timestamp, or null to clear.
+     */
+    public void setLastActive(Date when)
+    {
+        myRow.setColumn("last_active", when);
+    }
+
+    /**
+     * Get the EPerson's last-active stamp.
+     * 
+     * @return date when last logged on, or null.
+     */
+    public Date getLastActive()
+    {
+        return myRow.getDateColumn("last_active");
     }
 
     /**
@@ -1098,9 +1182,427 @@ public class EPerson extends DSpaceObject
         }
     }
 
+    @Override
     public String getName()
     {
         return getEmail();
     }
 
+    @Override
+    public void updateLastModified()
+    {
+
+    }
+
+    /*
+     * Commandline tool for manipulating EPersons.
+     */
+
+    private static final Option VERB_ADD = new Option("a", "add", false, "create a new EPerson");
+    private static final Option VERB_DELETE = new Option("d", "delete", false, "delete an existing EPerson");
+    private static final Option VERB_LIST = new Option("L", "list", false, "list EPersons");
+    private static final Option VERB_MODIFY = new Option("M", "modify", false, "modify an EPerson");
+
+    private static final Option OPT_GIVENNAME = new Option("g", "givenname", true, "the person's actual first or personal name");
+    private static final Option OPT_SURNAME = new Option("s", "surname", true, "the person's actual last or family name");
+    private static final Option OPT_PHONE = new Option("t", "telephone", true, "telephone number, empty for none");
+    private static final Option OPT_LANGUAGE = new Option("l", "language", true, "the person's preferred language");
+    private static final Option OPT_REQUIRE_CERTIFICATE = new Option("c", "requireCertificate", true, "if 'true', an X.509 certificate will be required for login");
+    private static final Option OPT_CAN_LOGIN = new Option("C", "canLogIn", true, "'true' if the user can log in");
+
+    private static final Option OPT_EMAIL = new Option("m", "email", true, "the user's email address, empty for none");
+    private static final Option OPT_NETID = new Option("n", "netid", true, "network ID associated with the person, empty for none");
+
+    private static final Option OPT_NEW_EMAIL = new Option("i", "newEmail", true, "new email address");
+    private static final Option OPT_NEW_NETID = new Option("I", "newNetid", true, "new network ID");
+    
+    /**
+     * Tool for manipulating user accounts.
+     */
+    public static void main(String argv[])
+            throws ParseException, SQLException
+    {
+        final OptionGroup VERBS = new OptionGroup();
+        VERBS.addOption(VERB_ADD);
+        VERBS.addOption(VERB_DELETE);
+        VERBS.addOption(VERB_LIST);
+        VERBS.addOption(VERB_MODIFY);
+
+        final Options globalOptions = new Options();
+        globalOptions.addOptionGroup(VERBS);
+        globalOptions.addOption("h", "help", false, "explain options");
+
+        GnuParser parser = new GnuParser();
+        CommandLine command = parser.parse(globalOptions, argv, true);
+
+        Context context = new Context();
+
+        // Disable authorization since this only runs from the local commandline.
+        context.turnOffAuthorisationSystem();
+
+        int status = 0;
+        if (command.hasOption(VERB_ADD.getOpt()))
+        {
+            status = cmdAdd(context, argv);
+        }
+        else if (command.hasOption(VERB_DELETE.getOpt()))
+        {
+            status = cmdDelete(context, argv);
+        }
+        else if (command.hasOption(VERB_MODIFY.getOpt()))
+        {
+            status = cmdModify(context, argv);
+        }
+        else if (command.hasOption(VERB_LIST.getOpt()))
+        {
+            status = cmdList(context, argv);
+        }
+        else if (command.hasOption('h'))
+        {
+            new HelpFormatter().printHelp("user [options]", globalOptions);
+        }
+        else
+        {
+            System.err.println("Unknown operation.");
+            new HelpFormatter().printHelp("user [options]", globalOptions);
+            context.abort();
+            status = 1;
+            throw new IllegalArgumentException();
+        }
+
+        if (context.isValid())
+        {
+            try {
+                context.complete();
+            } catch (SQLException ex) {
+                System.err.println(ex.getMessage());
+            }
+        }
+    }
+
+    /** Command to create an EPerson. */
+    private static int cmdAdd(Context context, String[] argv)
+    {
+        Options options = new Options();
+
+        options.addOption(VERB_ADD);
+
+        final OptionGroup identityOptions = new OptionGroup();
+        identityOptions.addOption(OPT_EMAIL);
+        identityOptions.addOption(OPT_NETID);
+
+        options.addOptionGroup(identityOptions);
+
+        options.addOption(OPT_GIVENNAME);
+        options.addOption(OPT_SURNAME);
+        options.addOption(OPT_PHONE);
+        options.addOption(OPT_LANGUAGE);
+        options.addOption(OPT_REQUIRE_CERTIFICATE);
+
+        Option option = new Option("p", "password", true, "password to match the EPerson name");
+        options.addOption(option);
+
+        options.addOption("h", "help", false, "explain --add options");
+
+        // Rescan the command for more details.
+        GnuParser parser = new GnuParser();
+        CommandLine command;
+        try {
+            command = parser.parse(options, argv);
+        } catch (ParseException e) {
+            System.err.println(e.getMessage());
+            return 1;
+        }
+
+        if (command.hasOption('h'))
+        {
+            new HelpFormatter().printHelp("user --add [options]", options);
+            return 0;
+        }
+
+        // Check that we got sufficient credentials to define a user.
+        if ((!command.hasOption(OPT_EMAIL.getOpt())) && (!command.hasOption(OPT_NETID.getOpt())))
+        {
+            System.err.println("You must provide an email address or a netid to identify the new user.");
+            return 1;
+        }
+
+        if (!command.hasOption('p'))
+        {
+            System.err.println("You must provide a password for the new user.");
+            return 1;
+        }
+
+        // Create!
+        EPerson eperson = null;
+        try {
+            eperson = create(context);
+        } catch (SQLException ex) {
+            context.abort();
+            System.err.println(ex.getMessage());
+            return 1;
+        } catch (AuthorizeException ex) { /* XXX SNH */ }
+        eperson.setCanLogIn(true);
+        eperson.setSelfRegistered(false);
+
+        eperson.setEmail(command.getOptionValue(OPT_EMAIL.getOpt()));
+        eperson.setFirstName(command.getOptionValue(OPT_GIVENNAME.getOpt()));
+        eperson.setLastName(command.getOptionValue(OPT_SURNAME.getOpt()));
+        eperson.setLanguage(command.getOptionValue(OPT_LANGUAGE.getOpt(),
+                Locale.getDefault().getLanguage()));
+        eperson.setMetadata("phone", command.getOptionValue(OPT_PHONE.getOpt()));
+        eperson.setNetid(command.getOptionValue(OPT_NETID.getOpt()));
+        eperson.setPassword(command.getOptionValue('p'));
+        if (command.hasOption(OPT_REQUIRE_CERTIFICATE.getOpt()))
+        {
+            eperson.setRequireCertificate(Boolean.valueOf(command.getOptionValue(
+                OPT_REQUIRE_CERTIFICATE.getOpt())));
+        }
+        else
+        {
+            eperson.setRequireCertificate(false);
+        }
+
+        try {
+            eperson.update();
+            context.commit();
+            System.out.printf("Created EPerson %d\n", eperson.getID());
+        } catch (SQLException ex) {
+            context.abort();
+            System.err.println(ex.getMessage());
+            return 1;
+        } catch (AuthorizeException ex) { /* XXX SNH */ }
+
+        return 0;
+    }
+
+    /** Command to delete an EPerson. */
+    private static int cmdDelete(Context context, String[] argv)
+    {
+        Options options = new Options();
+
+        options.addOption(VERB_DELETE);
+
+        final OptionGroup identityOptions = new OptionGroup();
+        identityOptions.addOption(OPT_EMAIL);
+        identityOptions.addOption(OPT_NETID);
+
+        options.addOptionGroup(identityOptions);
+
+        options.addOption("h", "help", false, "explain --delete options");
+
+        GnuParser parser = new GnuParser();
+        CommandLine command;
+        try {
+            command = parser.parse(options, argv);
+        } catch (ParseException e) {
+            System.err.println(e.getMessage());
+            return 1;
+        }
+
+        if (command.hasOption('h'))
+        {
+            new HelpFormatter().printHelp("user --delete [options]", options);
+            return 0;
+        }
+
+        // Delete!
+        EPerson eperson = null;
+        try {
+            if (command.hasOption(OPT_NETID.getOpt()))
+            {
+                eperson = findByNetid(context, command.getOptionValue(OPT_NETID.getOpt()));
+            }
+            else if (command.hasOption(OPT_EMAIL.getOpt()))
+            {
+                eperson = findByEmail(context, command.getOptionValue(OPT_EMAIL.getOpt()));
+            }
+            else
+            {
+                System.err.println("You must specify the user's email address or netid.");
+                return 1;
+            }
+        } catch (SQLException e) {
+            System.err.append(e.getMessage());
+            return 1;
+        } catch (AuthorizeException e) { /* XXX SNH */ }
+
+        if (null == eperson)
+        {
+            System.err.println("No such EPerson");
+            return 1;
+        }
+
+        try {
+            eperson.delete();
+            context.commit();
+            System.out.printf("Deleted EPerson %d\n", eperson.getID());
+        } catch (SQLException ex) {
+            System.err.println(ex.getMessage());
+            return 1;
+        } catch (AuthorizeException ex) {
+            System.err.println(ex.getMessage());
+            return 1;
+        } catch (EPersonDeletionException ex) {
+            System.err.println(ex.getMessage());
+            return 1;
+        }
+
+        return 0;
+    }
+
+    /** Command to modify an EPerson. */
+    private static int cmdModify(Context context, String[] argv)
+    {
+        Options options = new Options();
+
+        options.addOption(VERB_MODIFY);
+
+        final OptionGroup identityOptions = new OptionGroup();
+        identityOptions.addOption(OPT_EMAIL);
+        identityOptions.addOption(OPT_NETID);
+
+        options.addOptionGroup(identityOptions);
+
+        options.addOption(OPT_GIVENNAME);
+        options.addOption(OPT_SURNAME);
+        options.addOption(OPT_PHONE);
+        options.addOption(OPT_LANGUAGE);
+        options.addOption(OPT_REQUIRE_CERTIFICATE);
+
+        options.addOption(OPT_CAN_LOGIN);
+        options.addOption(OPT_NEW_EMAIL);
+        options.addOption(OPT_NEW_NETID);
+
+        options.addOption("h", "help", false, "explain --modify options");
+
+        GnuParser parser = new GnuParser();
+        CommandLine command;
+        try {
+            command = parser.parse(options, argv);
+        } catch (ParseException e) {
+            System.err.println(e.getMessage());
+            return 1;
+        }
+
+        if (command.hasOption('h'))
+        {
+            new HelpFormatter().printHelp("user --modify [options]", options);
+            return 0;
+        }
+
+        // Modify!
+        EPerson eperson = null;
+        try {
+            if (command.hasOption(OPT_NETID.getOpt()))
+            {
+                eperson = findByNetid(context, command.getOptionValue(OPT_NETID.getOpt()));
+            }
+            else if (command.hasOption(OPT_EMAIL.getOpt()))
+            {
+                eperson = findByEmail(context, command.getOptionValue(OPT_EMAIL.getOpt()));
+            }
+            else
+            {
+                System.err.println("No EPerson selected");
+                return 1;
+            }
+        } catch (SQLException e) {
+            System.err.append(e.getMessage());
+            return 1;
+        } catch (AuthorizeException e) { /* XXX SNH */ }
+
+        boolean modified = false;
+        if (null == eperson)
+        {
+            System.err.println("No such EPerson");
+            return 1;
+        }
+        else
+        {
+            if (command.hasOption(OPT_NEW_EMAIL.getOpt()))
+            {
+                eperson.setEmail(command.getOptionValue(OPT_NEW_EMAIL.getOpt()));
+                modified = true;
+            }
+            if (command.hasOption(OPT_NEW_NETID.getOpt()))
+            {
+                eperson.setNetid(command.getOptionValue(OPT_NEW_NETID.getOpt()));
+                modified = true;
+            }
+            if (command.hasOption(OPT_GIVENNAME.getOpt()))
+            {
+                eperson.setFirstName(command.getOptionValue(OPT_GIVENNAME.getOpt()));
+                modified = true;
+            }
+            if (command.hasOption(OPT_SURNAME.getOpt()))
+            {
+                eperson.setLastName(command.getOptionValue(OPT_SURNAME.getOpt()));
+                modified = true;
+            }
+            if (command.hasOption(OPT_PHONE.getOpt()))
+            {
+                eperson.setMetadata("phone", command.getOptionValue(OPT_PHONE.getOpt()));
+                modified = true;
+            }
+            if (command.hasOption(OPT_LANGUAGE.getOpt()))
+            {
+                eperson.setLanguage(command.getOptionValue(OPT_LANGUAGE.getOpt()));
+                modified = true;
+            }
+            if (command.hasOption(OPT_REQUIRE_CERTIFICATE.getOpt()))
+            {
+                eperson.setRequireCertificate(Boolean.valueOf(command.getOptionValue(
+                        OPT_REQUIRE_CERTIFICATE.getOpt())));
+                modified = true;
+            }
+            if (command.hasOption(OPT_CAN_LOGIN.getOpt()))
+            {
+                eperson.setCanLogIn(Boolean.valueOf(command.getOptionValue(OPT_CAN_LOGIN.getOpt())));
+                modified = true;
+            }
+            if (modified)
+            {
+                try {
+                    eperson.update();
+                    context.commit();
+                    System.out.printf("Modified EPerson %d\n", eperson.getID());
+                } catch (SQLException ex) {
+                    context.abort();
+                    System.err.println(ex.getMessage());
+                    return 1;
+                } catch (AuthorizeException ex) { /* XXX SNH */ }
+            }
+            else
+            {
+                System.out.println("No changes.");
+            }
+        }
+
+        return 0;
+    }
+
+    /** Command to list known EPersons. */
+    private static int cmdList(Context context, String[] argv)
+    {
+        // XXX ideas:
+        // specific user/netid
+        // wild or regex match user/netid
+        // select details (pseudo-format string)
+        try {
+            for (EPerson person : findAll(context, EMAIL))
+            {
+                System.out.printf("%d\t%s/%s\t%s, %s\n",
+                        person.getID(),
+                        person.getEmail(),
+                        person.getNetid(),
+                        person.getLastName(), person.getFirstName()); // TODO more user details
+            }
+        } catch (SQLException ex) {
+            System.err.println(ex.getMessage());
+            return 1;
+        }
+
+        return 0;
+    }
 }
