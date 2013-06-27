@@ -53,6 +53,9 @@ public class ConfigureLog4jListener
         }
         else
         {
+            ctx.log(" In context " + ctx.getContextPath() +
+                    ", configuring Log4J from " + configURL.toExternalForm());
+
             String configuratorName = ctx.getInitParameter("log4j.configuratorClass");
             if (null != configuratorName)
             {
