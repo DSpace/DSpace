@@ -14,6 +14,11 @@
         <relativePath>..</relativePath>
 	</parent>
 
+	<properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/../../..</root.basedir>
+    </properties>
+	
 	<profiles>
 
 		<!-- 
@@ -73,12 +78,6 @@
 		</profile>
 
 	</profiles>
-
-	<scm>
-		<connection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace/modules/jspui</connection>
-		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace/modules/jspui</developerConnection>
-		<url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace/modules/jspui</url>
-	</scm>
 
 	<build>
 		<plugins>

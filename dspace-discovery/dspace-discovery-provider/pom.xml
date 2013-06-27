@@ -21,6 +21,11 @@
       <relativePath>..</relativePath>
    </parent>
 
+    <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/../..</root.basedir>
+    </properties>
+
     <dependencies>
 
         <dependency>
@@ -96,53 +101,6 @@
 				<version>2.5</version>
 			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.apache.cocoon
-										</groupId>
-										<artifactId>
-											cocoon-maven-plugin
-										</artifactId>
-										<versionRange>
-											[1.0.0-M2,)
-										</versionRange>
-										<goals>
-											<goal>prepare</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 	</build>
 
-    <!--
-       The Subversion repository location is used by Continuum to update
-       against when changes have occured, this spawns a new build cycle
-       and releases snapshots into the snapshot repository below.
-    -->
-    <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-discovery/dspace-discovery-provider</connection>
-        <developerConnection>
-            scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-discovery/dspace-discovery-provider
-        </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-discovery/dspace-discovery-provider</url>
-    </scm>
 </project>
