@@ -152,6 +152,7 @@
                                       <xsl:when
                                               test="$article_doi and not(contains($citation, $article_doi))">
                                           <xsl:value-of select="$citation"/>
+					  <xsl:text> </xsl:text>
                                           <a>
                                               <xsl:attribute name="href">
                                                   <xsl:choose>
@@ -190,6 +191,7 @@
                                               <xsl:value-of select="$journal"/>
                                               <xsl:text>. </xsl:text>
                                               <i18n:text>xmlui.DryadItemSummary.citationNotYet2</i18n:text>
+					      <xsl:text> </xsl:text>
                                               <xsl:if test="$article_doi">
                                                   <a>
                                                       <xsl:attribute name="href">
@@ -242,6 +244,7 @@
                         </span>
                         <!-- if Item not_archived don't add the link. -->
                         <xsl:variable name="id" select="$meta[@element='identifier'][@qualifier='package']"/>
+			<xsl:text> </xsl:text>
                         <xsl:choose>
                             <xsl:when
                                     test="not(/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@mdschema='dc'][@element='date' ][@qualifier='accessioned'])">
@@ -499,6 +502,7 @@
                                     <xsl:when
                                             test="$article_doi and not(contains($citation, $article_doi))">
                                         <xsl:value-of select="$citation"/>
+					<xsl:text> </xsl:text>
                                         <a>
                                             <xsl:attribute name="href">
                                                 <xsl:value-of
