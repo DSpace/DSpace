@@ -96,7 +96,9 @@
                 <artifactId>maven-license-plugin</artifactId>
                 <version>1.9.0</version>
              </plugin>
-	  
+		</plugins>
+	  </pluginManagement>  
+	  <plugins>
 	  <!-- These plugin settings only apply to this single POM and are not inherited
            to any submodules. -->
          <plugin>
