@@ -99,7 +99,11 @@
   </filter-mapping>
 
   <!-- Otherwise it will continue to the old servlets -->
-  
+
+  <listener>
+    <listener-class>org.dspace.solr.filters.ConfigureLog4jListener</listener-class>
+  </listener>
+
   <servlet>
     <servlet-name>SolrServer</servlet-name>
     <display-name>Solr</display-name>
