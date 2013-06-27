@@ -112,6 +112,16 @@
          <version>3.5.0</version>
          <type>jar</type>
       </dependency>
+      <dependency>
+         <groupId>org.apache.solr</groupId>
+         <artifactId>solr-solrj</artifactId>
+         <version>3.5.0</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-core</artifactId>
+         <version>3.5.0</version>
+      </dependency>
 
       <!-- Replace J.U.L. logging with log4j -->
       <dependency>
@@ -124,13 +134,6 @@
           <artifactId>slf4j-log4j12</artifactId>
           <version>1.6.1</version>
           <scope>runtime</scope>
-      </dependency>
-
-      <!-- Commons Logging is needed for the LocalHostRestrictionFilter-->
-      <dependency>
-         <groupId>commons-logging</groupId>
-         <artifactId>commons-logging</artifactId>
-         <version>1.0.4</version>
       </dependency>
    </dependencies>
 
