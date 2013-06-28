@@ -1943,6 +1943,7 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 
 <message key="xmlui.dri2xhtml.METS-1.0.item-date-available">Disponible en SEDICI desde</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-date-accessioned">Creado el</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-date-created">Fecha de creación del objeto</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-title-subtitle">Subtítulo</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-embargo-liftDate">Fecha fin de embargo</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-institucion-desarrollo">Institucion de Desarrollo</message>
@@ -1977,6 +1978,7 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 <message key="xmlui.dri2xhtml.METS-1.0.item-coverage-spatial">Referencias geográficas</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-coverage-temporal">Referencias temporales</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-format-extent">Extensión</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-format-medium">Materiales</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-materias">Materias</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-decs">Tesauro DECS</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-eurovoc">Tesauro Eurovoc</message>

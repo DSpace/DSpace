@@ -364,12 +364,19 @@
 
 
 		</xsl:if>
-
+			
 		<!-- language row -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'language'"/>
 			<xsl:with-param name="elements" select="dim:field[@element='language' and not(@qualifier)] "/>
 			<xsl:with-param name="type" select="'i18n-code'"/>
+		</xsl:call-template>
+		
+		<!-- Creation date, not Issued Date-->
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'date-created'"/>
+			<xsl:with-param name="elements" select="dim:field[@element='date'][@qualifier='created']"/>
+			<xsl:with-param name="type" select="'date'"/>
 		</xsl:call-template>
 
 		<!-- Solo para el tipo tesis -->
@@ -474,6 +481,12 @@
 			<xsl:with-param name="elements" select="dim:field[@element='coverage' and @qualifier='temporal'] "/>
 		</xsl:call-template>
 
+		<!-- format.medium row -->
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'format-medium'"/>
+			<xsl:with-param name="elements" select="dim:field[@element='format'][@qualifier='medium']"/>
+		</xsl:call-template>
+		
 		<!-- format.extent row -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'format-extent'"/>

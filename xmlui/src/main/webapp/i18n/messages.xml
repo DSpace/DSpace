@@ -2097,6 +2097,7 @@
 
 <message key="xmlui.dri2xhtml.METS-1.0.item-date-available">Available since</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-date-accessioned">Created</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-date-created">Object creation date</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-title-subtitle">Subtitle</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-embargo-liftDate">End of embargo date</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-institucion-desarrollo">Developed at </message>
@@ -2130,6 +2131,7 @@
 <message key="xmlui.dri2xhtml.METS-1.0.item-coverage-spatial">Geographical references</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-coverage-temporal">Temporal references</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-format-extent">Extent</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-format-medium">Materials</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-materias">Subjects</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-decs">DECS Thesaurus</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-eurovoc">Eurovoc Thesaurus</message>

@@ -100,6 +100,17 @@
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>subtype</dc-element>
+					<label>Especifique el tipo de Objeto Físico (*)</label>
+					<input-type value-pairs-name="common_subtypes_objeto_fisico">dropdown</input-type>
+					<hint>Seleccione el tipo de objeto físico que desea cargar</hint>
+					<required>Debe seleccionar un subtipo de objeto físico</required>
+					<visibility>workflow</visibility>
+					<type-bind>Objeto Fisico</type-bind>
+				</field>
+				
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subtype</dc-element>
 					<label>Especifique el tipo de Objeto de Conferencia (*)</label>
 					<input-type value-pairs-name="common_subtypes_objeto_conferencia">dropdown</input-type>
 					<hint>Seleccione el tipo de objeto de conferencia que desea cargar</hint>
@@ -273,6 +284,18 @@
 					<visibility>workflow</visibility>
 				</field>
 
+				<!-- Fecha de creación de un objeto -->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>date</dc-element>
+					<dc-qualifier>created</dc-qualifier>
+					<label>Fecha de Creación</label>
+					<hint>Fecha de creación o manufacturación del objeto.</hint>
+					<input-type>date</input-type>
+					<type-bind>Objeto Fisico</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+
 				<!-- Localización fisica -->
 				<field>
 					<dc-schema>mods</dc-schema>
@@ -309,16 +332,29 @@
 					<visibility-on-group>SeDiCIAdmin,RadioAdmin</visibility-on-group>
 				</field>
 
-				<!-- Descripción Física -->
+				<!-- Descripción Física / Extension -->
 				<field>
 					<dc-schema>dc</dc-schema>
 					<dc-element>format</dc-element>
 					<dc-qualifier>extent</dc-qualifier>
 					<repeatable>true</repeatable>
-					<label>Descripción Física</label>
+					<label>Extensión</label>
 					<input-type>onebox</input-type>
 					<hint>Cantidad de páginas, duración, tamaño, etc</hint>
 					<visibility-on-group>SeDiCIAdmin,RadioAdmin</visibility-on-group>
+				</field>
+				
+				<!-- Medio Fisico / Materiales-->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>format</dc-element>
+					<dc-qualifier>medium</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Materiales</label>
+					<input-type>onebox</input-type>
+					<hint>Materiales que conforman el objeto.</hint>
+					<visibility>workflow</visibility>
+					<type-bind>Objeto Fisico</type-bind>
 				</field>
 
 				<!-- Fulltext -->
@@ -621,6 +657,7 @@
 					<type-bind>Tesis,Objeto de conferencia, Audio</type-bind>
 				</field>
 
+
 				<!-- Nombre del evento (Obligatorio para Objetos de Conferencia) -->
 				<field>
 					<dc-schema>sedici</dc-schema>
@@ -632,6 +669,7 @@
 					<type-bind>Objeto de conferencia</type-bind>
 					<required>Debe ingresar el nombre del evento al que este objeto pertenece</required>
 				</field>
+				
 
 				<!-- Nombre del evento (Opcional para articulos) -->
 				<field>
@@ -938,6 +976,10 @@
 				<stored-value>Libro</stored-value>
 			</pair>
 			<pair>
+				<displayed-value>Objeto Fisico</displayed-value>
+				<stored-value>Objeto Fisico</stored-value>
+			</pair>
+			<pair>
 				<displayed-value>Objeto de conferencia</displayed-value>
 				<stored-value>Objeto de conferencia</stored-value>
 			</pair>
@@ -1029,6 +1071,17 @@
 			<pair>
 				<displayed-value>Capítulo de libro</displayed-value>
 				<stored-value>Capitulo de libro</stored-value>
+			</pair>
+		</value-pairs>
+		
+		<value-pairs value-pairs-name="common_subtypes_objeto_fisico" dc-term="type">
+			<pair>
+				<displayed-value>- Seleccione un subtipo -</displayed-value>
+				<stored-value></stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Instrumento musical</displayed-value>
+				<stored-value>Instrumento musical</stored-value>
 			</pair>
 		</value-pairs>
 
