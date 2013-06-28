@@ -59,7 +59,7 @@
 
 	<!-- Dryad defined elements -->
 	<xs:element name="status" type="xs:string"/>
-	<xs:element name="external" substitutionGroup="dcterms:identifier"/>
+	<xs:element name="external" type="xs:string"/>
 	<xs:element name="embargoedUntil" substitutionGroup="dcterms:date"/>
 
 </xs:schema>
