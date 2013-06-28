@@ -2485,10 +2485,14 @@ width:620px;
 #aspect_artifactbrowser_CommunityViewer_div_community-search-browse h2,
 #aspect_artifactbrowser_CollectionViewer_div_collection-search-browse h2 {
 	display: inline;
-	float: left;
 	margin: 0px;
 }
-
+div#aspect_artifactbrowser_CollectionViewer_div_collection-search-browse,
+#aspect_artifactbrowser_CollectionViewer_div_collection-search-browse div,
+#aspect_artifactbrowser_CollectionViewer_div_collection-search-browse ul{
+	display: inline;
+	
+}
 #aspect_artifactbrowser_CommunityViewer_list_community-browse li,
 #aspect_artifactbrowser_CollectionViewer_div_collection-search-browse li,
 #aspect_artifactbrowser_CollectionViewer_list_collection-browse li
