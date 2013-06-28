@@ -833,7 +833,9 @@ placeholders for header images -->
                             </a>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:apply-templates />
+                          <xsl:if test="/dri:document/dri:meta/dri:pageMeta[contains(@qualifier,'discover')]">
+                              <xsl:apply-templates />
+                          </xsl:if>   
                         </xsl:otherwise>
                     </xsl:choose>
                 </li>
