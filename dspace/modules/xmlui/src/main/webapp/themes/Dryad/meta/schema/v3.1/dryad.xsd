@@ -19,7 +19,7 @@
 				<xs:element ref="dcterms:title" maxOccurs="unbounded"/>
 				<xs:element ref="dcterms:identifier" maxOccurs="unbounded"/>
 				<xs:element ref="dcterms:description" minOccurs="0"/>
-				<xs:element ref="dcterms:subject" maxOccurs="unbounded"/>
+				<xs:element ref="dcterms:subject" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="dwc:scientificName" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="dcterms:spatial" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="dcterms:temporal" minOccurs="0" maxOccurs="unbounded"/>
