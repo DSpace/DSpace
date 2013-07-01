@@ -1,5 +1,8 @@
 RewriteEngine on
 
+#External redirect para accessos a la colección de la radiouniversidad. No quitar
+RewriteRule ^radio(.*)$ /handle/10915/25224$1 [R=permanent,L]
+
 #External redirect para accessos phpoai de sedici2003
 RewriteRule ^phpoai/oai2.php(.*)$ /oai/request$1 [R=permanent,L]
 
