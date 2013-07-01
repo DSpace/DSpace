@@ -190,6 +190,7 @@ public class InstallItem
         // create collection2item mapping
         is.getCollection().addItem(item);
         
+       //Here the collections chosen to map the item are going to add the item . 
        DCValue[] collIds=item.getMetadata("dc", "collectionChosen", "authorWise", LANGUAGE_QUALIFIER);    
        
        if(collIds!=null&&collIds.length>0)
