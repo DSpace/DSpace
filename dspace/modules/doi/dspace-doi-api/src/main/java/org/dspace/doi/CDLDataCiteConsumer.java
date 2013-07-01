@@ -56,7 +56,7 @@ public class CDLDataCiteConsumer implements Consumer {
                                 dataCiteService.emailException(response, doi, "update");
                             }
                             else if(!response.contains("OK")){
-                                dataCiteService.emailException("Verified generic error.", doi, "update");
+                                dataCiteService.emailException("Generic error (Response is not 'OK'): " + response, doi, "update");
                             }
 
                             if(response.contains("error"))
