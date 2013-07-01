@@ -53,6 +53,11 @@ public class EditMetadataActionXMLUI extends AbstractXMLUIAction {
     protected static final Message T_reject_submit =
             message("xmlui.Submission.workflow.EditMetadataActionXMLUI.reject_submit");
 
+    protected static final Message T_return_help =
+            message("xmlui.Submission.workflow.EditMetadataActionXMLUI.return_help");
+    protected static final Message T_return_submit =
+            message("xmlui.Submission.workflow.EditMetadataActionXMLUI.return_submit");
+
     protected static final Message T_edit_help =
             message("xmlui.Submission.workflow.EditMetadataActionXMLUI.edit_help");
     protected static final Message T_edit_submit =
@@ -162,6 +167,11 @@ public class EditMetadataActionXMLUI extends AbstractXMLUIAction {
         row = table.addRow();
         row.addCellContent(T_edit_help);
         row.addCell().addButton("submit_edit").setValue(T_edit_submit);
+
+        // Return to the pool
+        row = table.addRow();
+        row.addCellContent(T_return_help);
+        row.addCell().addButton("submit_return").setValue(T_return_submit);
 
 
         // Delete versioned tem
