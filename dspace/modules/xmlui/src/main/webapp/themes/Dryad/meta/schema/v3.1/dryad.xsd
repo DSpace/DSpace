@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
-	xmlns:dcterms="http://purl.org/dc/terms/" xmlns="http://purl.org/dryad/terms/"
-	   xmlns:bibo="http://purl.org/ontology/bibo/" targetNamespace="http://purl.org/dryad/terms/">
+	xmlns:dcterms="http://purl.org/dc/terms/" xmlns="http://purl.org/dryad/schema/terms/v3.1"
+	   xmlns:bibo="http://purl.org/ontology/bibo/" targetNamespace="http://purl.org/dryad/schema/terms/v3.1">
 
 	<xs:import namespace="http://purl.org/dc/terms/" schemaLocation="dcterms.xsd"/>
 	<xs:import namespace="http://rs.tdwg.org/dwc/terms/"
@@ -19,7 +19,7 @@
 				<xs:element ref="dcterms:title" maxOccurs="unbounded"/>
 				<xs:element ref="dcterms:identifier" maxOccurs="unbounded"/>
 				<xs:element ref="dcterms:description" minOccurs="0"/>
-				<xs:element ref="dcterms:subject" maxOccurs="unbounded"/>
+				<xs:element ref="dcterms:subject" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="dwc:scientificName" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="dcterms:spatial" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="dcterms:temporal" minOccurs="0" maxOccurs="unbounded"/>
@@ -43,7 +43,7 @@
 				<xs:element ref="dcterms:identifier" maxOccurs="unbounded"/>
 				<xs:element ref="dcterms:rights"/>
 				<xs:element ref="dcterms:description" minOccurs="0"/>
-				<xs:element ref="dcterms:subject" maxOccurs="unbounded"/>
+				<xs:element ref="dcterms:subject" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="dwc:scientificName" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="dcterms:spatial" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="dcterms:temporal" minOccurs="0" maxOccurs="unbounded"/>
@@ -59,7 +59,7 @@
 
 	<!-- Dryad defined elements -->
 	<xs:element name="status" type="xs:string"/>
-	<xs:element name="external" substitutionGroup="dcterms:identifier"/>
+	<xs:element name="external" type="xs:string"/>
 	<xs:element name="embargoedUntil" substitutionGroup="dcterms:date"/>
 
 </xs:schema>
