@@ -73,21 +73,43 @@ function toDollars(amt) {
 function updateResults() {
   var articlesPerYear = $('#articles_per_year').val();
   var percentageWithDeposits = $('#percentage_with_deposits').val();
+  var error;
   
-  if(articlesPerYear.length == 0 || isNaN(Number(articlesPerYear)) 
-  || percentageWithDeposits.length == 0 || isNaN(Number(percentageWithDeposits))) {
-    return;
+  // make sure articles per year is a number
+  if(articlesPerYear.length == 0 || isNaN(Number(articlesPerYear))) {
+    // return errors!
+    error = "Please enter a number.";
+  }
+  
+  // make sure percentage with deposits is a number
+  if(percentageWithDeposits.length == 0 || isNaN(Number(percentageWithDeposits))) {
+    error = "Please enter a number.";
+  }
+  
+  // check if articles per year is less than 0
+  if(Number(articlesPerYear) < 0) {
+    error = "Please enter a number greater than 0.";
+  }
+  
+  // check if percentage is within range
+  if(Number(percentageWithDeposits) < 0 || Number(percentageWithDeposits) > 100) {
+    error = "Please enter a percentage between 0 and 100.";
   }
   
   var grossIncomePerYearUnderTenMillion = $("input[name='gross_income_under_10_million']").filter(':checked').val() == "yes";
   var result = calculatePercentage(articlesPerYear, percentageWithDeposits, grossIncomePerYearUnderTenMillion);
-
-  $('#subscription_cost_non_member').text(toDollars(result.subscriptionCostNonMember));
-  $('#subscription_cost_member').text(toDollars(result.subscriptionCostMember));
-  $('#deferred_cost_non_member').text(toDollars(result.deferredCostNonMember));
-  $('#deferred_cost_member').text(toDollars(result.deferredCostMember));
-  $('#voucher_cost_non_member').text(toDollars(result.voucherCostNonMember));
-  $('#voucher_cost_member').text(toDollars(result.voucherCostMember));
+  
+  if(error) {
+    $('#errors').text(error);
+  } else {
+    $('#errors').text('');
+    $('#subscription_cost_non_member').text(toDollars(result.subscriptionCostNonMember));
+    $('#subscription_cost_member').text(toDollars(result.subscriptionCostMember));
+    $('#deferred_cost_non_member').text(toDollars(result.deferredCostNonMember));
+    $('#deferred_cost_member').text(toDollars(result.deferredCostMember));
+    $('#voucher_cost_non_member').text(toDollars(result.voucherCostNonMember));
+    $('#voucher_cost_member').text(toDollars(result.voucherCostMember));
+  }
 }
 
 $(document).ready(function() {
