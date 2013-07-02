@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>calculator</title>
+</head>
+<body>
+  <form>
+    Articles per year <input type="number" id="articles_per_year" name="articles_per_year"></input>
+    Percentage with deposits <input type="number" id="percentage_with_deposits" name="deposits_per_year"></input>
+    Gross income under 10 million <input type="radio" id="under_10_million" name="gross_income_under_10_million" value="yes" checked>Yes</input>
+    <input type="radio" id="over_10_million" name="gross_income_under_10_million" value="no">No</input>
+  </form>
+  <hr/>
+  <table id="results">
+    <thead>
+      <tr><th></th><th>Subscription</th><th>Voucher</th><th>Deferred</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>Non-Member</th>
+        <td id="subscription_cost_non_member"></td>
+        <td id="voucher_cost_non_member"></td>
+        <td id="deferred_cost_non_member"></td>
+      </tr>
+      <tr>
+        <th>Member</th>
+        <td id="subscription_cost_member"></td>
+        <td id="voucher_cost_member"></td>
+        <td id="deferred_cost_member"></td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script type="text/javascript" src="paymentCalculator.js">
+</script>
+</html>
