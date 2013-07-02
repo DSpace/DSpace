@@ -8,6 +8,32 @@
   <title>Pricing Plan Comparison Tool</title>
      <style type="text/css">
          div#ds-body { margin: 0px 0px 0px 0px;padding-right: 10px; top: 165px;}
+         form.pricing-calculator {
+            width: 90%;
+            margin: 1.5em auto 0.5em;
+          }
+         input.pricing { float: right; }
+         input.percentage, input.articles { width: 4em; }
+         label.income { float: right; }
+         .add-on { float: right; }
+        .pricing-table {
+          width: 90%;
+          margin: 1.5em auto 1.5em;
+        }
+        .pricing-table td {
+           text-align: center;
+        }
+        .pricing-table th:first-child,
+        .pricing-table td:first-child {
+          text-align: left;
+          padding-left: 8px;
+        }
+        .pricing-table tr {
+          background-color: #eee;
+        }
+        .pricing-table tr.odd {
+          background-color: #fff;
+        }
      </style>
  </head>
  <body>
@@ -19,29 +45,31 @@
        <p>Use this calculator to compare the annual cost of Dryad's pricing plans for
        members and non-members.</p>
        <!-- form -->
-       <form>
+       <form class="pricing-calculator">
         <fieldset>
-          <label class="ds-form-label" for="articles_per_year">How many articles do you publish per year?</label>
-          <input class="ds-text-field" type="number" id="articles_per_year" name="articles_per_year" />
+          <label class="pricing_label" for="articles_per_year">How many articles do you publish per year?</label>
+          <input class="pricing articles ds-form-field" id="articles_per_year" name="articles_per_year" />
         </fieldset>
         <fieldset>
-          <label class="ds-form-label" for="percentage_with_deposits">What percentage of articles do you expect will have data in Dryad?</label>
-          <input class="ds-text-field" type="number" id="percentage_with_deposits" name="percentage_with_deposits" />
+          <label class="pricing_label" for="percentage_with_deposits">What percentage of articles do you expect will have data in Dryad?</label>
+          <input class="pricing percentage ds-form-field" id="percentage_with_deposits" name="percentage_with_deposits" />
         </fieldset>
-        <fieldset>
-          <label class="ds-form-label" for="gross_income_under_10_million">Is your gross income LESS than 10 Million Dollars?</label>
-          <input type="radio" id="under_10_million" name="gross_income_under_10_million" value="yes" checked="true">Yes</input>
-          <input type="radio" id="over_10_million" name="gross_income_under_10_million" value="no">No</input>
-        </fieldset>
-       </form>
+       <fieldset>
+          <label class="pricing_label" for="gross_income_under_10_million">Is your gross income LESS than 10 Million Dollars?</label>
+          <label class="pricing income">
+            <input class="income" type="radio" id="under_10_million" name="gross_income_under_10_million" value="yes" checked="true" /><span class="income">Yes</span>
+            <input class="income" type="radio" id="over_10_million" name="gross_income_under_10_million" value="no" /><span class="income">No</span>
+          </label>
+        </fieldset>       
+        </form>
         
        <!-- table -->
-      <table id="results">
+      <table class="pricing-table">
         <thead>
           <tr><th></th><th>Subscription</th><th>Voucher</th><th>Deferred</th></tr>
         </thead>
         <tbody>
-          <tr>
+          <tr class="odd">
             <th>Non-Member</th>
             <td id="subscription_cost_non_member"></td>
             <td id="voucher_cost_non_member"></td>
@@ -54,8 +82,12 @@
             <td id="deferred_cost_member"></td>
           </tr>
         </tbody>
-      </table>       
+      </table>
        <!-- ready to sign up?  need more info? -->
+       <div class="ready-to-signup">
+        <h4>Ready to sign up?  Need more info?</h4>
+        <p><a href="mailto:director@datadryad.org">Email</a> us.  Learn more about <a href="/pages/membershipOverview">membership</a> and <a href="/pages/pricing">pricing plans</a>.</p>
+       </div>
     </div>
 
     <!-- Page license div -->
