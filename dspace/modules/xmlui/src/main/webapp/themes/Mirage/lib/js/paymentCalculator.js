@@ -113,7 +113,8 @@ function updateResults() {
 }
 
 $(document).ready(function() {
-  $('#articles_per_year').change(updateResults);
-  $('#percentage_with_deposits').change(updateResults);
-  $("input[name='gross_income_under_10_million']").change(updateResults);
+  $('#calculate_button').click(function() {
+    updateResults();
+    return false;
+  });
 });

@@ -16,6 +16,9 @@
          input.percentage, input.articles { width: 4em; }
          span.income { float: right; }
          .add-on { float: right; }
+         
+         #calculate_buttons { float: right; }
+         #calculate_button { margin-right: 0px; }
         .pricing-table {
           width: 90%;
           margin: 1.5em auto 1.5em;
@@ -62,8 +65,14 @@
             <label for="over_10_million" class="income">No</label>
             <input class="income" type="radio" id="over_10_million" name="gross_income_under_10_million" value="no" />
           </span>
-        </fieldset>       
-        </form>
+        </fieldset>
+        <div class="tab-buttons" id="calculate_buttons">
+          <a id="calculate_button" href="#">
+            <span>Calculate</span>
+          </a>
+        </div>
+        
+      </form>
         
        <!-- table -->
       <table class="pricing-table">
