@@ -67,7 +67,7 @@ var n = this,
  };
 
 function toDollars(amt) {
-  return '$' + amt.formatMoney(2, '.', ',');
+  return '$' + amt.formatMoney(0, '.', ',');
 }
 
 function updateResults() {
