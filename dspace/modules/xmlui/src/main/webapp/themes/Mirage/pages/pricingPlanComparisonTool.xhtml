@@ -37,6 +37,10 @@
         .pricing-table tr.odd {
           background-color: #fff;
         }
+        .pricing_errors {
+          display: none;
+          color: red;
+        }
      </style>
  </head>
  <body>
@@ -50,12 +54,18 @@
        <!-- form -->
        <form class="pricing-block">
         <fieldset>
-          <label class="pricing_label" for="articles_per_year">How many articles do you publish per year?</label>
+          <label class="pricing_label" for="articles_per_year">How many research articles do you publish per year?</label>
           <input class="pricing articles ds-form-field" id="articles_per_year" name="articles_per_year" />
+        </fieldset>
+        <fieldset>
+          <label class="pricing_errors" id="articles_per_year_error">&#160;</label>
         </fieldset>
         <fieldset>
           <label class="pricing_label" for="percentage_with_deposits">What percentage of articles do you expect will have data in Dryad?</label>
           <input class="pricing percentage ds-form-field" id="percentage_with_deposits" name="percentage_with_deposits" />
+        </fieldset>
+        <fieldset>
+          <label class="pricing_errors" id="percentage_with_deposits_error">&#160;</label>
         </fieldset>
        <fieldset>
           <label class="pricing_label" for="gross_income_under_10_million">Is your gross income LESS than 10 Million Dollars?</label>
@@ -78,20 +88,20 @@
        <div class="pricing-block">
         <table class="pricing-table">
           <thead>
-            <tr><th>Annual Cost</th><th>Subscription</th><th>Voucher</th><th>Deferred</th></tr>
+            <tr><th>Annual Cost</th><th>Voucher</th><th>Deferred</th><th>Subscription</th></tr>
           </thead>
           <tbody>
             <tr class="odd">
               <th><span class="member">Member</span> (includes dues)*</th>
-              <td id="subscription_cost_member"></td>
               <td id="voucher_cost_member"></td>
               <td id="deferred_cost_member"></td>
+              <td id="subscription_cost_member"></td>
             </tr>
             <tr>
               <th>Non-Member</th>
-              <td id="subscription_cost_non_member"></td>
               <td id="voucher_cost_non_member"></td>
               <td id="deferred_cost_non_member"></td>
+              <td id="subscription_cost_non_member"></td>
             </tr>
           </tbody>
         </table>

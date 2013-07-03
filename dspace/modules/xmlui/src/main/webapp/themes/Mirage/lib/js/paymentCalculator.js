@@ -73,36 +73,49 @@ function toDollars(amt) {
 function updateResults() {
   var articlesPerYear = $('#articles_per_year').val();
   var percentageWithDeposits = $('#percentage_with_deposits').val();
-  var error;
+  var articlesPerYearError;
+  var percentageWithDepositsError;
   
   // make sure articles per year is a number
   if(articlesPerYear.length == 0 || isNaN(Number(articlesPerYear))) {
-    // return errors!
-    error = "Please enter a number.";
+    articlesPerYearError = "Please enter a number.";
   }
   
   // make sure percentage with deposits is a number
   if(percentageWithDeposits.length == 0 || isNaN(Number(percentageWithDeposits))) {
-    error = "Please enter a number.";
+    percentageWithDepositsError = "Please enter a number.";
   }
   
   // check if articles per year is less than 0
   if(Number(articlesPerYear) < 0) {
-    error = "Please enter a number greater than 0.";
+    articlesPerYearError = "Please enter a number greater than 0.";
   }
   
   // check if percentage is within range
   if(Number(percentageWithDeposits) < 0 || Number(percentageWithDeposits) > 100) {
-    error = "Please enter a percentage between 0 and 100.";
+    percentageWithDepositsError = "Please enter a number between 0 and 100.";
   }
   
   var grossIncomePerYearUnderTenMillion = $("input[name='gross_income_under_10_million']").filter(':checked').val() == "yes";
   var result = calculatePercentage(articlesPerYear, percentageWithDeposits, grossIncomePerYearUnderTenMillion);
   
-  if(error) {
-    $('#errors').text(error);
+  if(articlesPerYearError || percentageWithDepositsError) {
+    if(articlesPerYearError) {
+      $('#articles_per_year_error').text('Error: ' + articlesPerYearError);
+      $('#articles_per_year_error').show();
+    } else {
+      $('#articles_per_year_error').hide();
+    }
+    if(percentageWithDepositsError) {
+      $('#percentage_with_deposits_error').text('Error: ' + percentageWithDepositsError);
+      $('#percentage_with_deposits_error').show();
+    } else {
+      $('#percentage_with_deposits_error').hide();
+    }
   } else {
-    $('#errors').text('');
+    // no errors
+    $('.pricing_errors').text('');
+    $('.pricing_errors').hide();
     $('#subscription_cost_non_member').text(toDollars(result.subscriptionCostNonMember));
     $('#subscription_cost_member').text(toDollars(result.subscriptionCostMember));
     $('#deferred_cost_non_member').text(toDollars(result.deferredCostNonMember));
