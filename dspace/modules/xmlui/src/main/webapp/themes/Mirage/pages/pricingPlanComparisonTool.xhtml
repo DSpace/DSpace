@@ -18,12 +18,16 @@
          .pricing { float: right; }
          input.percentage, input.articles { width: 3em; }
          span.income { float: right; }
-         .add-on { float: right; }
-         
+         .add-on {
+            display: inline-block;
+            width: 1em;
+            padding: 4px 0px;
+         }
          #calculate_buttons { float: right; }
          #calculate_button { margin-right: 0px; }
         .pricing-table {
           width: 100%;
+          margin-bottom: 0.5em;
         }
         .member { color: #87C033; }
         .pricing-table td {
@@ -58,12 +62,18 @@
        <form class="pricing-block">
         <fieldset>
           <label class="pricing_label" for="articles_per_year">How many research articles do you publish per year?</label>
-          <input class="pricing articles ds-form-field" id="articles_per_year" name="articles_per_year" />
+          <div class="pricing input-append">
+            <input class="articles ds-form-field" id="articles_per_year" name="articles_per_year" />
+            <span class="add-on">&#160;</span>
+          </div>
           <div class="pricing_errors" id="articles_per_year_error">&#160;</div>
         </fieldset>
         <fieldset>
           <label class="pricing_label" for="percentage_with_deposits">What percentage of articles do you expect will have data in Dryad?</label>
-          <input class="pricing percentage ds-form-field" id="percentage_with_deposits" name="percentage_with_deposits" />
+          <div class="pricing input-append">
+            <input class="percentage ds-form-field" id="percentage_with_deposits" name="percentage_with_deposits" />
+            <span class="add-on">%</span>
+          </div>
           <div class="pricing_errors" id="percentage_with_deposits_error">&#160;</div>
         </fieldset>
        <fieldset>
@@ -105,7 +115,9 @@
             </tr>
           </tbody>
         </table>
-        <span><em>For additional benefits of membership and the dues chart, please see the <a href="/pages/membershipOverview">membership overview</a>.</em></span>
+        <div>
+          <p>For additional benefits of membership and the dues chart, please see the <a href="/pages/membershipOverview">membership overview</a>.</p>
+        </div>
       </div>
        <!-- ready to sign up?  need more info? -->
        <div class="ready-to-signup">
