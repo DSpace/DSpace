@@ -687,9 +687,9 @@
 					<dc-schema>sedici</dc-schema>
 					<dc-element>contributor</dc-element>
 					<dc-qualifier>director</dc-qualifier>
-					<label>Director de la Tésis</label>
+					<label>Director de la Tesis</label>
 					<input-type>onebox</input-type>
-					<hint>Nombre del director de la Tésis</hint>
+					<hint>Nombre del director de la Tesis</hint>
 					<type-bind>Tesis</type-bind>
 				</field>
 
@@ -699,9 +699,9 @@
 					<dc-element>contributor</dc-element>
 					<dc-qualifier>codirector</dc-qualifier>
 					<repeatable>true</repeatable>
-					<label>Co-Director de la Tésis</label>
+					<label>Co-Director de la Tesis</label>
 					<input-type>onebox</input-type>
-					<hint>Nombre de los co-directores de la Tésis</hint>
+					<hint>Nombre de los co-directores de la Tesis</hint>
 					<type-bind>Tesis</type-bind>
 					<visibility>workflow</visibility>
 				</field>
