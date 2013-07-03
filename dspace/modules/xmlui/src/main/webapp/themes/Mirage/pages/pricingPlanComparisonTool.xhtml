@@ -12,8 +12,11 @@
             width: 90%;
             margin: 1.5em auto 1.5em;
           }
-         input.pricing { float: right; }
-         input.percentage, input.articles { width: 4em; }
+          .pricing-block fieldset {
+            margin-bottom: .5em;
+          }
+         .pricing { float: right; }
+         input.percentage, input.articles { width: 3em; }
          span.income { float: right; }
          .add-on { float: right; }
          
@@ -56,16 +59,12 @@
         <fieldset>
           <label class="pricing_label" for="articles_per_year">How many research articles do you publish per year?</label>
           <input class="pricing articles ds-form-field" id="articles_per_year" name="articles_per_year" />
-        </fieldset>
-        <fieldset>
-          <label class="pricing_errors" id="articles_per_year_error">&#160;</label>
+          <div class="pricing_errors" id="articles_per_year_error">&#160;</div>
         </fieldset>
         <fieldset>
           <label class="pricing_label" for="percentage_with_deposits">What percentage of articles do you expect will have data in Dryad?</label>
           <input class="pricing percentage ds-form-field" id="percentage_with_deposits" name="percentage_with_deposits" />
-        </fieldset>
-        <fieldset>
-          <label class="pricing_errors" id="percentage_with_deposits_error">&#160;</label>
+          <div class="pricing_errors" id="percentage_with_deposits_error">&#160;</div>
         </fieldset>
        <fieldset>
           <label class="pricing_label" for="gross_income_under_10_million">Is your gross income LESS than 10 Million Dollars?</label>
@@ -76,12 +75,13 @@
             <input class="income" type="radio" id="over_10_million" name="gross_income_under_10_million" value="no" />
           </span>
         </fieldset>
-        <div class="tab-buttons" id="calculate_buttons">
-          <a id="calculate_button" href="#">
-            <span>Calculate</span>
-          </a>
-        </div>
-        
+        <fieldset>
+          <div class="tab-buttons" id="calculate_buttons">
+            <a id="calculate_button" href="#">
+              <span>Calculate</span>
+            </a>
+          </div>
+        </fieldset>
       </form>
         
        <!-- table -->
@@ -110,7 +110,7 @@
        <!-- ready to sign up?  need more info? -->
        <div class="ready-to-signup">
         <h4>Ready to sign up?  Need more info?</h4>
-        <p><a href="mailto:director@datadryad.org">Email</a> us.  Learn more about <a href="/pages/membershipOverview">membership</a> and <a href="/pages/pricing">pricing plans</a>.</p>
+        <p>Email <a href="mailto:director@datadryad.org">Laura Wendell</a> or learn more about <a href="/pages/membershipOverview">membership</a> and <a href="/pages/pricing">pricing plans</a>.</p>
        </div>
     </div>
 
