@@ -8,9 +8,9 @@
   <title>Pricing Plan Comparison Tool</title>
      <style type="text/css">
          div#ds-body { margin: 0px 0px 0px 0px;padding-right: 10px; top: 165px;}
-         form.pricing-calculator {
+         .pricing-block {
             width: 90%;
-            margin: 1.5em auto 0.5em;
+            margin: 1.5em auto 1.5em;
           }
          input.pricing { float: right; }
          input.percentage, input.articles { width: 4em; }
@@ -20,8 +20,10 @@
          #calculate_buttons { float: right; }
          #calculate_button { margin-right: 0px; }
         .pricing-table {
-          width: 90%;
+          width: 100%;
+<!-- 
           margin: 1.5em auto 1.5em;
+ -->
         }
         .pricing-table td {
            text-align: center;
@@ -48,7 +50,7 @@
        <p>Use this calculator to compare the annual cost of Dryad's pricing plans for
        members and non-members.</p>
        <!-- form -->
-       <form class="pricing-calculator">
+       <form class="pricing-block">
         <fieldset>
           <label class="pricing_label" for="articles_per_year">How many articles do you publish per year?</label>
           <input class="pricing articles ds-form-field" id="articles_per_year" name="articles_per_year" />
@@ -75,25 +77,28 @@
       </form>
         
        <!-- table -->
-      <table class="pricing-table">
-        <thead>
-          <tr><th></th><th>Subscription</th><th>Voucher</th><th>Deferred</th></tr>
-        </thead>
-        <tbody>
-          <tr class="odd">
-            <th>Non-Member</th>
-            <td id="subscription_cost_non_member"></td>
-            <td id="voucher_cost_non_member"></td>
-            <td id="deferred_cost_non_member"></td>
-          </tr>
-          <tr>
-            <th>Member</th>
-            <td id="subscription_cost_member"></td>
-            <td id="voucher_cost_member"></td>
-            <td id="deferred_cost_member"></td>
-          </tr>
-        </tbody>
-      </table>
+       <div class="pricing-block">
+        <table class="pricing-table">
+          <thead>
+            <tr><th>Annual Cost</th><th>Subscription</th><th>Voucher</th><th>Deferred</th></tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <th>Non-Member</th>
+              <td id="subscription_cost_non_member"></td>
+              <td id="voucher_cost_non_member"></td>
+              <td id="deferred_cost_non_member"></td>
+            </tr>
+            <tr>
+              <th>Member (includes dues)*</th>
+              <td id="subscription_cost_member"></td>
+              <td id="voucher_cost_member"></td>
+              <td id="deferred_cost_member"></td>
+            </tr>
+          </tbody>
+        </table>
+        <span>For additional benefits of membership and the dues chart, please see the<a href="/pages/membershipOverview"> membership overview</a>.</span>
+      </div>
        <!-- ready to sign up?  need more info? -->
        <div class="ready-to-signup">
         <h4>Ready to sign up?  Need more info?</h4>
