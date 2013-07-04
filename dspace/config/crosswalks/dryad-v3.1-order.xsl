@@ -8,7 +8,7 @@
 	schemaLocation added in this XSL rather than first since order is added here
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-	xmlns:bibo="http://purl.org/ontology/bibo/" xmlns:dcterms="http://purl.org/dc/terms/"
+	xmlns:bibo="http://purl.org/dryad/schema/terms/v3.1" xmlns:dcterms="http://purl.org/dc/terms/"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
 	xmlns="http://purl.org/dryad/schema/terms/v3.1" xmlns:dryad="http://purl.org/dryad/schema/terms/v3.1" version="1.0">
 

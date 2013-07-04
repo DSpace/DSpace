@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" xmlns:mets="http://www.loc.gov/METS/"
-	xmlns:bibo="http://purl.org/ontology/bibo/" xmlns:dcterms="http://purl.org/dc/terms/"
+	xmlns:bibo="http://purl.org/dryad/schema/dryad-bibo/v3.1" xmlns:dcterms="http://purl.org/dc/terms/"
 	xmlns:dwc="http://rs.tdwg.org/dwc/terms/" xmlns="http://purl.org/dryad/schema/terms/v3.1"
 	version="1.0" exclude-result-prefixes="xsl mets dim">
 
