@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://purl.org/ontology/bibo/" xmlns="http://purl.org/ontology/bibo/"
+	targetNamespace="http://purl.org/dryad/schema/dryad-bibo/v3.1" xmlns="http://purl.org/dryad/schema/dryad-bibo/v3.1"
 	elementFormDefault="qualified" attributeFormDefault="unqualified">
 	
 	<!-- This is not the full bibo, just the elements we're reusing -->
