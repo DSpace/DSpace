@@ -528,7 +528,7 @@
 					<label>ISSN</label>
 					<input-type>onebox</input-type>
 					<hint>ISSN de la revista en la que el artículo fué publicado</hint>
-					<type-bind>Articulo,Objeto de conferencia</type-bind>
+					<type-bind>Libro, Articulo,Objeto de conferencia</type-bind>
 				</field>
 
 				<!-- ISBN - TESIS (opcional) -->
@@ -896,7 +896,7 @@
 					<label>Notas</label>
 					<input-type>textarea</input-type>
 					<hint>
-						ATENCION: Si precisa que el contenido de su obra se mantenga oculto temporalmente, deberá comunicarlo en este campo y adjuntar en el paso siguiente una nota de solicitud de embargo ( &lt;a href="http://sedici.unlp.edu.ar/blog/wp-content/uploads/2013/04/Modelo-nota-de-embargo.doc " target="_blank"&gt; Ver nota ejemplo&lt;/a&gt;) que justifique debidamente la solicitud de embargo para su obra. El período de embargo es un bloqueo temporal de hasta 24 meses que se contabiliza a partir de la fecha de presentación de la tesis o trabajo.
+					   Agregue aquí cualquier otra información que considere pertinente para una mejor catalogación de este item
 				    </hint>
 				</field>
 
