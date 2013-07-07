@@ -21,9 +21,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -821,16 +824,17 @@ public class ItemExport
         // items
         // it will be checked against the config file entry
         double size = 0;
-        final ArrayList<Integer> items = new ArrayList<Integer>();
+        final HashMap<String, List<Integer>> itemsMap = new HashMap<String, List<Integer>>();
         for (DSpaceObject dso : dsObjects)
         {
             if (dso.getType() == Constants.COMMUNITY)
             {
                 Community community = (Community) dso;
                 // get all the collections in the community
-                Collection[] collections = community.getCollections();
+                Collection[] collections = community.getAllCollections();
                 for (Collection collection : collections)
                 {
+                    ArrayList<Integer> items = new ArrayList<Integer>();
                     // get all the items in each collection
                     ItemIterator iitems = collection.getItems();
                     try
@@ -859,12 +863,18 @@ public class ItemExport
                         {
                             iitems.close();
                         }
+                        if (items.size() > 0)
+                        {
+                            itemsMap.put("collection_"+collection.getID(), items);
+                        }
                     }
                 }
             }
             else if (dso.getType() == Constants.COLLECTION)
             {
                 Collection collection = (Collection) dso;
+                ArrayList<Integer> items = new ArrayList<Integer>();
+
                 // get all the items in the collection
                 ItemIterator iitems = collection.getItems();
                 try
@@ -893,6 +903,10 @@ public class ItemExport
                     {
                         iitems.close();
                     }
+                    if (items.size() > 0)
+                    {
+                        itemsMap.put("collection_"+collection.getID(), items);
+                    }
                 }
             }
             else if (dso.getType() == Constants.ITEM)
@@ -910,7 +924,9 @@ public class ItemExport
                         size += bit.getSize();
                     }
                 }
+                ArrayList<Integer> items = new ArrayList<Integer>();
                 items.add(item.getID());
+                itemsMap.put("item_"+item.getID(), items);
             }
             else
             {
@@ -942,7 +958,7 @@ public class ItemExport
         }
 
         // if we have any items to process then kick off annonymous thread
-        if (items.size() > 0)
+        if (itemsMap.size() > 0)
         {
             Thread go = new Thread()
             {
@@ -955,40 +971,52 @@ public class ItemExport
                         // create a new dspace context
                         context = new Context();
                         // ignore auths
-                        context.setIgnoreAuthorization(true);
-                        iitems = new ItemIterator(context, items);
+                        context.turnOffAuthorisationSystem();
 
                         String fileName = assembleFileName("item", eperson,
                                 new Date());
-                        String workDir = getExportWorkDirectory()
+                        String workParentDir = getExportWorkDirectory()
                                 + System.getProperty("file.separator")
                                 + fileName;
                         String downloadDir = getExportDownloadDirectory(eperson
                                 .getID());
-
-                        File wkDir = new File(workDir);
-                        if (!wkDir.exists() && !wkDir.mkdirs())
-                        {
-                            log.error("Unable to create working directory");
-                        }
-
                         File dnDir = new File(downloadDir);
                         if (!dnDir.exists() && !dnDir.mkdirs())
                         {
                             log.error("Unable to create download directory");
                         }
 
-                        // export the items using normal export method
-                        exportItem(context, iitems, workDir, 1, migrate);
+                        Iterator<String> iter = itemsMap.keySet().iterator();
+                        while(iter.hasNext())
+                        {
+                            String keyName = iter.next();
+                            iitems = new ItemIterator(context, itemsMap.get(keyName));
+
+                            String workDir = workParentDir 
+                                    + System.getProperty("file.separator")
+                                    + keyName;
+
+                            File wkDir = new File(workDir);
+                            if (!wkDir.exists() && !wkDir.mkdirs())
+                            {
+                                log.error("Unable to create working directory");
+                            }
+
+
+                            // export the items using normal export method
+                            exportItem(context, iitems, workDir, 1, migrate);
+                            iitems.close();
+                        }
+
                         // now zip up the export directory created above
-                        zip(workDir, downloadDir
+                        zip(workParentDir, downloadDir
                                 + System.getProperty("file.separator")
                                 + fileName + ".zip");
                         // email message letting user know the file is ready for
                         // download
                         emailSuccessMessage(context, eperson, fileName + ".zip");
                         // return to enforcing auths
-                        context.setIgnoreAuthorization(false);
+                        context.restoreAuthSystemState();
                     }
                     catch (Exception e1)
                     {
@@ -1022,6 +1050,11 @@ public class ItemExport
 
             go.isDaemon();
             go.start();
+        }
+        else
+        {
+            Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
+            emailErrorMessage(eperson, I18nUtil.getMessage("org.dspace.app.itemexport.no-result", supportedLocale));
         }
     }
 
