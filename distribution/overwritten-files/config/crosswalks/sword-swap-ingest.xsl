@@ -60,7 +60,7 @@
          template matching process -->
     <xsl:template match="/epdcx:descriptionSet">
     	<dim:dim>
-			<xsl:call-template name="el_titulo"/>
+		<xsl:call-template name="the_title"/>
     		<xsl:apply-templates/>
     	</dim:dim>
     </xsl:template>
@@ -71,6 +71,9 @@
 	  	<!-- abstract element: dc.description.abstract -->
     	<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/terms/abstract'">
     		<dim:field mdschema="dc" element="description" qualifier="abstract">
+			<xsl:attribute name="lang">
+                        	<xsl:value-of select="./epdcx:valueString/@lang"/>
+                	</xsl:attribute>
     			<xsl:value-of select="epdcx:valueString"/>
     		</dim:field>
     	</xsl:if>
@@ -93,21 +96,30 @@
         </xsl:if>
 
 
-		<!-- identifier element: dc.identifier.* -->
+		<!--UNLP fix  identifier elements: dc.identifier.*, adapt to the specific sedici metadata -->
     	<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/elements/1.1/identifier'">
-    		<xsl:element name="dim:field">
-    			<xsl:attribute name="mdschema">dc</xsl:attribute>
-    			<xsl:attribute name="element">identifier</xsl:attribute>
-    			<xsl:if test="epdcx:valueString[@epdcx:sesURI='http://purl.org/dc/terms/URI']">
-    				<xsl:attribute name="qualifier">uri</xsl:attribute>
-    			</xsl:if>
-    			<xsl:value-of select="epdcx:valueString"/>
-    		</xsl:element>
+    		<xsl:choose>
+			<xsl:when test="substring-before(epdcx:valueString,':')='doi'">
+				<dim:field mdschema="sedici" element="identifier" qualifier="doi">
+    					<xsl:value-of select="epdcx:valueString"/>
+    				</dim:field>
+			</xsl:when>
+			<xsl:when test="substring-before(epdcx:valueString,':')='http'">
+				<dim:field mdschema="sedici" element="identifier" qualifier="uri">
+					<xsl:value-of select="epdcx:valueString"/>
+				</dim:field>
+			</xsl:when>
+			<xsl:otherwise mdschema="sedici" element="identifier" qualifier="other">
+				<dim:field>
+					<xsl:value-of select="epdcx:valueString"/>
+				</dim:field>
+			</xsl:otherwise>
+		</xsl:choose>
     	</xsl:if>
     	
 		<!-- language element: dc.language -->
     	<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/elements/1.1/language' and ./@epdcx:vesURI='http://purl.org/dc/terms/RFC3066'">
-    		<dim:field mdschema="dc" element="language">
+    		<dim:field mdschema="dc" element="language" language="es">
     			<xsl:value-of select="epdcx:valueString"/>
     		</dim:field>
     	</xsl:if>    
@@ -116,17 +128,27 @@
    		<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/elements/1.1/type' and ./@epdcx:vesURI='http://purl.org/eprint/terms/Type'">
    	 		<xsl:if test="./@epdcx:valueURI='http://purl.org/eprint/type/JournalArticle'">
    	 			<dim:field mdschema="dc" element="type">
-   	 				Article
-   	 			</dim:field>
+   	 				Articulo
+				</dim:field>
    	 		</xsl:if>
    		</xsl:if>
     	
-    	<!-- date available element: dc.date.issued -->
-    	<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/terms/available'">
-    		<dim:field mdschema="dc" element="date" qualifier="issued">
-    			<xsl:value-of select="epdcx:valueString"/>
-    		</dim:field>
-    	</xsl:if>
+    	<!-- date available element: dc.date.issued--> 
+    		<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/terms/available'">
+			<xsl:choose>
+          			<xsl:when test="/epdcx:descriptionSet/epdcx:description/epdcx:statement[@epdcx:valueURI='http://purl.org/eprint/type/JournalArticle']">
+            				<dim:field mdschema="dc" element="date" qualifier="issued">
+						<xsl:value-of select="substring-before(epdcx:valueString,'-')"/>-<xsl:value-of select="substring-before(substring-after(epdcx:valueString,'-'),'-')"/>
+					</dim:field>
+          			</xsl:when>
+        		 	<xsl:otherwise>
+            				<dim:field mdschema="dc" element="date" qualifier="issued">
+						<xsl:value-of select="epdcx:valueString"/>	
+					</dim:field>
+          			</xsl:otherwise>
+        		</xsl:choose>
+    	
+    		</xsl:if>
     	
 	<!-- publication status element: sedici.description.peerReview -->
     	<xsl:if test="./@epdcx:propertyURI='http://purl.org/eprint/terms/status' and ./@epdcx:vesURI='http://purl.org/eprint/terms/Status'">
@@ -140,16 +162,22 @@
     </xsl:template>
 
     <!---title and alternative title -->
-    <xsl:template name="el_titulo">
+    <xsl:template name="the_title">
 	<xsl:if test="epdcx:description/epdcx:statement[@epdcx:propertyURI='http://purl.org/dc/elements/1.1/title'][1]">
 	    <dim:field mdschema="dc" element="title">
-		    <xsl:value-of select="epdcx:description/epdcx:statement[@epdcx:propertyURI='http://purl.org/dc/elements/1.1/title'][1]/epdcx:valueString"/>
+		<xsl:attribute name="lang">
+			<xsl:value-of select="epdcx:description/epdcx:statement[@epdcx:propertyURI='http://purl.org/dc/elements/1.1/title'][1]/epdcx:valueString/@lang"/>
+		</xsl:attribute>
+		<xsl:value-of select="epdcx:description/epdcx:statement[@epdcx:propertyURI='http://purl.org/dc/elements/1.1/title'][1]/epdcx:valueString"/>
 	    </dim:field>
 	</xsl:if>
     </xsl:template>
     
     <xsl:template match="/epdcx:descriptionSet/epdcx:description/epdcx:statement[@epdcx:propertyURI='http://purl.org/dc/elements/1.1/title']">
 	<dim:field mdschema="dc" element="title" qualifier="alternative">
+		 <xsl:attribute name="lang">
+                        <xsl:value-of select="epdcx:valueString/@lang"/>
+                </xsl:attribute>
 		<xsl:value-of select="epdcx:valueString"/>
 	</dim:field>
     </xsl:template>    
