@@ -56,10 +56,7 @@
     java.text.SimpleDateFormat f = new java.text.SimpleDateFormat("MMMM dd, yyyy");
     %>
     <p>At the request of the author, this file is not available online 
-       until <%= f.format(date) %>.  For more information on the
-       availability of this file, please contact DRUM Help at 
-       <a href="mailto:drum-help@umd.edu">drum-help@umd.edu</a> or 
-       +1 301 314-1328.
+       until <%= f.format(date) %>.
     </p>
     <%
     
@@ -67,9 +64,6 @@
   else {
     %>
     <p>At the request of the author, this file is not available online.  
-       For more information on the availability of this file, please 
-       contact DRUM Help at <a href="mailto:drum-help@umd.edu">drum-help@umd.edu</a> 
-       or +1 301 314-1328.
     </p>
     <%
   }
