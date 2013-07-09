@@ -1099,4 +1099,20 @@ parameter that is being used (see variable defined above) -->
             <xsl:apply-templates />
         </input>
     </xsl:template>
+    
+    <!-- make sure search labels appear -->
+    <xsl:template match="dri:table[@id='aspect.discovery.SimpleSearch.table.search-controls']/dri:row/dri:cell/dri:field[@type='select']">
+        <xsl:variable name="currentId">
+          <xsl:value-of select="./@id" />
+        </xsl:variable>
+        <label style="font-weight: normal;">
+          <xsl:attribute name="for">
+              <xsl:value-of select="translate($currentId,'.','_')"/>
+          </xsl:attribute>
+          <i18n:text>
+              <xsl:value-of select="dri:label"/>
+          </i18n:text>
+        </label>
+        <xsl:apply-templates select="." mode="normalField"/>
+    </xsl:template>
 </xsl:stylesheet>

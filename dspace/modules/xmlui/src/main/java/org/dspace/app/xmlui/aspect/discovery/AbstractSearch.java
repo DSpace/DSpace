@@ -701,8 +701,8 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
 
         // Create a control for the number of records to display
         Cell rppCell = controlsRow.addCell();
-        rppCell.addContent(T_rpp);
         Select rppSelect = rppCell.addSelect("rpp");
+        rppSelect.setLabel(T_rpp);
         for (int i : RESULTS_PER_PAGE_PROGRESSION) {
             rppSelect.addOption((i == getParameterRpp()), i, Integer.toString(i));
         }
@@ -730,8 +730,8 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
 
         Cell sortCell = controlsRow.addCell();
         // Create a drop down of the different sort columns available
-        sortCell.addContent(T_sort_by);
         Select sortSelect = sortCell.addSelect("sort_by");
+        sortSelect.setLabel(T_sort_by);
         sortSelect.addOption(false, "score", T_sort_by_relevance);
         for (String sortField : SearchUtils.getSortFields()) {
             sortField += "_sort";
@@ -741,8 +741,8 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
 
         // Create a control to changing ascending / descending order
         Cell orderCell = controlsRow.addCell();
-        orderCell.addContent(T_order);
         Select orderSelect = orderCell.addSelect("order");
+        orderSelect.setLabel(T_order);
         orderSelect.addOption(SortOption.ASCENDING.equals(getParameterOrder()), SortOption.ASCENDING, T_order_asc);
         orderSelect.addOption(SortOption.DESCENDING.equals(getParameterOrder()), SortOption.DESCENDING, T_order_desc);
 
