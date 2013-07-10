@@ -15,11 +15,16 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.*;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.handle.HandleManager;
+import org.dspace.search.DSQuery;
+import org.dspace.search.QueryArgs;
+import org.dspace.search.QueryResults;
 import org.dspace.sort.SortOption;
 
 import javax.servlet.ServletException;
@@ -28,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -270,69 +276,32 @@ public class ItemMapServlet extends DSpaceServlet
     	}
     	else if (action.equals("Search Authors"))
     	{
-    		String name = (String) request.getParameter("namepart");
-    		String bidx = ConfigurationManager.getProperty("itemmap.author.index");
-    		if (bidx == null)
-    		{
-    			throw new ServletException("There is no configuration for itemmap.author.index");
-    		}
-    		Map<Integer, Item> items = new HashMap<Integer, Item>();
-    		try
-    		{
-    			BrowserScope bs = new BrowserScope(context);
-    			BrowseIndex bi = BrowseIndex.getBrowseIndex(bidx);
-    			
-    			// set up the browse scope
-    			bs.setBrowseIndex(bi);
-    			bs.setOrder(SortOption.ASCENDING);
-    			bs.setFilterValue(name);
-                bs.setFilterValuePartial(true);
-    			bs.setJumpToValue(null);
-    			bs.setResultsPerPage(10000);	// an arbitrary number (large) for the time being
-    			bs.setBrowseLevel(1);
-    			
-    			BrowseEngine be = new BrowseEngine(context);
-    			BrowseInfo results = be.browse(bs);
-    			Item[] browseItems = results.getItemResults(context);
-    			
-    			// FIXME: oh god this is so annoying - what an API /Richard
-    			// we need to deduplicate against existing items in this collection
-    			ItemIterator itr = myCollection.getItems();
-                try
-                {
-                    ArrayList<Integer> idslist = new ArrayList<Integer>();
-                    while (itr.hasNext())
-                    {
-                        idslist.add(Integer.valueOf(itr.nextID()));
-                    }
+            String name = (String) request.getParameter("namepart");
+            QueryArgs queryArgs = new QueryArgs();
+            queryArgs.setQuery("author:"+name);
+            queryArgs.setPageSize(Integer.MAX_VALUE);
+            QueryResults results = DSQuery.doQuery(context, queryArgs);
 
-                    for (int i = 0; i < browseItems.length; i++)
-                    {
-                        // only if it isn't already in this collection
-                        if (!idslist.contains(Integer.valueOf(browseItems[i].getID())))
-                        {
-                            // only put on list if you can read item
-                            if (AuthorizeManager.authorizeActionBoolean(context, browseItems[i], Constants.READ))
-                            {
-                                items.put(Integer.valueOf(browseItems[i].getID()), browseItems[i]);
-                            }
-                        }
-                    }
-                }
-                finally
+            Map<Integer, Item> items = new HashMap<Integer, Item>();
+            List<String> handles = results.getHitHandles();
+            for (String handle : handles)
+            {
+                DSpaceObject resultDSO = HandleManager.resolveToObject(context, handle);
+
+                if (resultDSO.getType() == Constants.ITEM)
                 {
-                    if (itr != null)
+                    Item item = (Item) resultDSO;
+                    if (item.isOwningCollection(myCollection))
                     {
-                        itr.close();
+                        continue;
+                    }
+                    if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.READ))
+                    {
+                        items.put(Integer.valueOf(item.getID()),item);
                     }
                 }
             }
-    		catch (BrowseException e)
-    		{
-    			log.error("caught exception: ", e);
-    			throw new ServletException(e);
-    		}
-    		
+
     		request.setAttribute("collection", myCollection);
     		request.setAttribute("browsetext", name);
     		request.setAttribute("items", items);
