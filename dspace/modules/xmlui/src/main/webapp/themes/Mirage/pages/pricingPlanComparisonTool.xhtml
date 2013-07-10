@@ -29,7 +29,6 @@
           width: 100%;
           margin-bottom: 0.5em;
         }
-        .member { color: #87C033; }
         .pricing-table td {
            text-align: center;
         }
@@ -56,8 +55,8 @@
     <h1 class="ds-div-head">Pricing Plan Comparison Tool<a id="pricing_plan_comparison_tool">&#160;</a></h1>
     <!-- Primary content div -->
     <div class="ds-static-div primary">
-       <p>Use this calculator to compare the annual cost of Dryad's pricing plans for
-       members and non-members.</p>
+       <p><strong>Use this calculator to compare the annual cost of Dryad's pricing plans for
+       members and non-members.</strong></p>
        <!-- form -->
        <form class="pricing-block">
         <fieldset>
@@ -77,13 +76,14 @@
           <div class="pricing_errors" id="percentage_with_deposits_error">&#160;</div>
         </fieldset>
        <fieldset>
-          <label class="pricing_label" for="gross_income_under_10_million">Is your gross income LESS than 10 Million Dollars?</label>
-          <span class="pricing income">
-            <label for="under_10_million" class="income">Yes</label>
-            <input class="income" type="radio" id="under_10_million" name="gross_income_under_10_million" value="yes" checked="true" />
-            <label for="over_10_million" class="income">No</label>
-            <input class="income" type="radio" id="over_10_million" name="gross_income_under_10_million" value="no" />
-          </span>
+          <label class="pricing_label">Is your gross income LESS than 10 Million Dollars?
+            <span class="pricing income">
+              <label for="under_10_million" class="income">Yes</label>
+              <input class="income" type="radio" id="under_10_million" name="gross_income_under_10_million" value="yes" checked="true" />
+              <label for="over_10_million" class="income">No</label>
+              <input class="income" type="radio" id="over_10_million" name="gross_income_under_10_million" value="no" />
+            </span>
+          </label>
         </fieldset>
         <fieldset>
           <div class="tab-buttons" id="calculate_buttons">
@@ -98,11 +98,11 @@
        <div class="pricing-block">
         <table class="pricing-table">
           <thead>
-            <tr><th>Annual Cost</th><th>Voucher</th><th>Deferred</th><th>Subscription</th></tr>
+            <tr><th>&#160;</th><th>Voucher</th><th>Deferred</th><th>Subscription</th></tr>
           </thead>
           <tbody>
             <tr class="odd">
-              <th><span class="member">Member</span> (includes dues)*</th>
+              <th>Member (includes dues)*</th>
               <td id="voucher_cost_member"></td>
               <td id="deferred_cost_member"></td>
               <td id="subscription_cost_member"></td>
@@ -122,7 +122,7 @@
        <!-- ready to sign up?  need more info? -->
        <div class="ready-to-signup">
         <h4>Ready to sign up?  Need more info?</h4>
-        <p>Email <a href="mailto:director@datadryad.org">Laura Wendell</a> or learn more about <a href="/pages/membershipOverview">membership</a> and <a href="/pages/pricing">pricing plans</a>.</p>
+        <p>Email <a href="mailto:director@datadryad.org">director@datadryad.org</a> or learn more about <a href="/pages/membershipOverview">membership</a> and <a href="/pages/pricing">pricing plans</a>.</p>
        </div>
     </div>
 
@@ -138,7 +138,7 @@
     </div>  
 
     <!-- Last modified div -->
-		<div class="lastmodified">Last revised: 2013-07-03</div>
+		<div class="lastmodified">Last revised: 2013-07-10</div>
   </div>
    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js">
    </script>
