@@ -142,7 +142,7 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
         request.setAttribute("groups",groups);
         request.setAttribute("wsItems",wsItems);
 
-        // set error message if there is no WorkspaceItem
+        // set error message key when there is no workspace item
         if (wsItems.length == 0)
         {
             request.setAttribute("errorKey", 
@@ -280,7 +280,7 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
         int groupID = UIUtil.getIntParameter(request,"TargetGroup");
         int wsItemID = UIUtil.getIntParameter(request,"TargetWSItem");
         
-        // set error message if there is no WorkspaceItem
+        // set error message key when no workspace item is selected
         if (wsItemID == -1)
         {
             request.setAttribute("errorKey", 
