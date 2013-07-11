@@ -15,6 +15,7 @@ import java.io.File;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.ResourceBundle.Control;
 import java.util.StringTokenizer;
 import java.util.List;
 import java.util.ArrayList;
@@ -275,7 +276,11 @@ public class I18nUtil
         {
             locale = DEFAULTLOCALE;
         }
-        ResourceBundle messages = ResourceBundle.getBundle("Messages", locale);
+        ResourceBundle.Control control = 
+            ResourceBundle.Control.getNoFallbackControl(
+            ResourceBundle.Control.FORMAT_DEFAULT);
+
+        ResourceBundle messages = ResourceBundle.getBundle("Messages", locale, control);
         message = messages.getString(key.trim());
         
         return message;
