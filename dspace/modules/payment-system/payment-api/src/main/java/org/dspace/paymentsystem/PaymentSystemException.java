@@ -7,6 +7,8 @@
  */
 package org.dspace.paymentsystem;
 
+import org.dspace.content.DSpaceObject;
+
 import java.util.List;
 
 /**
@@ -42,5 +44,16 @@ public class PaymentSystemException extends Exception{
     public List<String> getTables()
     {
         return myTableList;
+    }
+
+    /**
+     * Create an authorize exception with a message
+     *
+     * @param message
+     *            the message
+     */
+    public PaymentSystemException(String message)
+    {
+        super(message);
     }
 }

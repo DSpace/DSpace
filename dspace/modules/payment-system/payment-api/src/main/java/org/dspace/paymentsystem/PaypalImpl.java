@@ -11,6 +11,7 @@ import org.apache.cocoon.environment.Request;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.xmlui.aspect.submission.FlowUtils;
@@ -37,6 +38,8 @@ import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.Random;
 
 import org.dspace.app.xmlui.wing.Message;
 
@@ -133,10 +136,12 @@ public class PaypalImpl implements PaypalService{
 
         try{
             PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
-            ShoppingCart shoppingCart = paymentSystemService.getTransactionByItemId(c,wfi.getItem().getID());
-            if(shoppingCart.getVoucher()!=null&&ConfigurationManager.getProperty("payment-system","paypal.failed.voucher")!=null)
+            ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(c,wfi.getItem().getID());
+            Voucher voucher = Voucher.findById(c,shoppingCart.getVoucher());
+
+            if(voucher!=null&&ConfigurationManager.getProperty("payment-system","paypal.failed.voucher")!=null)
             {
-                 if(shoppingCart.getVoucher().equals(ConfigurationManager.getProperty("payment-system","paypal.failed.voucher")))
+                 if(voucher.getCode().equals(ConfigurationManager.getProperty("payment-system","paypal.failed.voucher"))||voucher.getStatus().equals(Voucher.STATUS_USED))
                  {
                      return false;
                  }
@@ -151,9 +156,6 @@ public class PaypalImpl implements PaypalService{
                 {
                     return chargeCard(c, wfi, request,shoppingCart);
                 }
-            }
-            else{
-                //todo:doesn't have a shopping cart for this item, should return it back to item submission process to create a shoppingcart
             }
 
         }catch (Exception e)
@@ -199,8 +201,7 @@ public class PaypalImpl implements PaypalService{
             String secureToken=request.getParameter("SECURETOKEN");
             String secureTokenId=request.getParameter("SECURETOKENID");
             PaymentSystemService paymentSystemService =  new DSpace().getSingletonService(PaymentSystemService.class);
-            shoppingCart= paymentSystemService.getTransactionByItemId(context,item.getID());
-            shoppingCart = paymentSystemService.getTransactionByItemId(context, item.getID());
+            shoppingCart= paymentSystemService.getShoppingCartByItemId(context,item.getID());
 
 
             if(secureToken!=null&&secureTokenId!=null&&shoppingCart!=null){
@@ -351,7 +352,7 @@ public class PaypalImpl implements PaypalService{
         String secureToken = generateSecureToken(shoppingCart,secureTokenId,Integer.toString(shoppingCart.getItem()),type);
 
         if(secureToken==null){
-            addSkipPaymentButton(maindiv,"Secure token is null");
+            showSkipPaymentButton(maindiv,"Secure token is null");
 
         }
         else{
@@ -364,11 +365,11 @@ public class PaypalImpl implements PaypalService{
         }
     }
 
-    public void generateVoucherForm(Division form,ShoppingCart shoppingCart,String actionURL,String knotId) throws WingException{
+    public void generateVoucherForm(Division form,String voucherCode,String actionURL,String knotId) throws WingException{
 
         List list=form.addList("voucher-list");
         list.addLabel("Voucher Code");
-        list.addItem().addText("voucher").setValue(shoppingCart.getVoucher());
+        list.addItem().addText("voucher").setValue(voucherCode);
         list.addItem().addButton("submit-voucher").setValue("Apply");
 
     }
@@ -400,7 +401,7 @@ public class PaypalImpl implements PaypalService{
         finDiv.addHidden("show_button").setValue("submit next");
     }
 
-    public void addSkipPaymentButton(Division mainDiv,String message)throws WingException{
+    public void showSkipPaymentButton(Division mainDiv,String message)throws WingException{
         Division error = mainDiv.addDivision("error");
         error.addPara(message);
         error.addHidden("show_button").setValue("Skip payment and submit");
@@ -420,19 +421,37 @@ public class PaypalImpl implements PaypalService{
         PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
         PaymentSystemService payementSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
         PaypalService paypalService = new DSpace().getSingletonService(PaypalService.class);
-
+        mainDiv.setHead("Checkout");
+        String errorMessage = request.getParameter("encountError");
         try{
             //create new transaction or update transaction id with item
             String previous_email = request.getParameter("login_email");
             EPerson eperson = EPerson.findByEmail(context,previous_email);
-                    ShoppingCart shoppingCart = getShoppingCart(context,dso,item,payementSystemService,eperson);
+            ShoppingCart shoppingCart = payementSystemService.getShoppingCartByItemId(context,item.getID());
+            VoucherValidationService voucherValidationService = new DSpace().getSingletonService(VoucherValidationService.class);
+            String voucherCode = "";
             if(request.getParameter("submit-voucher")!=null)
             {    //user is using the voucher code
-                String voucherCode = request.getParameter("voucher");
-                shoppingCart.setVoucher(voucherCode);
-                shoppingCart.setTotal(payementSystemService.calculateTransactionTotal(context,shoppingCart,""));
-                shoppingCart.update();
+                voucherCode = request.getParameter("voucher");
+                if(voucherCode!=null&&voucherCode.length()>0){
+                    if(!voucherValidationService.voucherUsed(context,voucherCode)) {
+                        Voucher voucher = Voucher.findByCode(context,voucherCode);
+                        shoppingCart.setVoucher(voucher.getID());
+                        payementSystemService.updateTotal(context,shoppingCart,null);
+                    }
+                    else
+                    {
+                        errorMessage = "The voucher code is not valid:can't find the voucher code or the voucher code has been used";
+                    }
+                }
+                else
+                {
+                    shoppingCart.setVoucher(null);
+                    payementSystemService.updateTotal(context,shoppingCart,null);
+                }
+
             }
+
             if(shoppingCart.getTotal()==0||shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED))
             {
                 paypalService.generateNoCostForm(mainDiv, shoppingCart,item, manager, payementSystemService);
@@ -440,12 +459,22 @@ public class PaypalImpl implements PaypalService{
             else
             {
 
-                Radio methodSelection = mainDiv.addDivision("paymeny-selection").addList("payment-method").addItem().addRadio("payment-method");
-                methodSelection.addOption("voucher").addContent("Use voucher code");
-                methodSelection.addOption("creditcard").addContent("Use credit card");
                 Division voucher = mainDiv.addDivision("voucher");
+                if(errorMessage!=null&&errorMessage.length()>0) {
+                    voucher.addPara("voucher-error","voucher-error").addHighlight("bold").addContent("Your card will not be charged untill your submission is approved by Dyrad. Your card information will NOT be stored By Dryad."+errorMessage);
 
-                paypalService.generateVoucherForm(voucher,shoppingCart,actionURL,knotId);
+                }
+
+                Voucher voucher1 = Voucher.findById(context,shoppingCart.getVoucher());
+                if(voucher1!=null){
+                    paypalService.generateVoucherForm(voucher,voucher1.getCode(),actionURL,knotId);
+                }
+                else if(voucherCode!=null&&voucherCode.length()>0){
+                    paypalService.generateVoucherForm(voucher,voucherCode,actionURL,knotId);
+                }
+                else{
+                    paypalService.generateVoucherForm(voucher,null,actionURL,knotId);
+                }
                 Division creditcard = mainDiv.addDivision("creditcard");
                 paypalService.generatePaypalForm(creditcard,shoppingCart,actionURL,type);
 
@@ -455,7 +484,7 @@ public class PaypalImpl implements PaypalService{
         }catch (Exception e)
         {
             //TODO: handle the exceptions
-            paypalService.addSkipPaymentButton(mainDiv,"errors in generate the payment form");
+            paypalService.showSkipPaymentButton(mainDiv,"errors in generate the payment form");
             log.error("Exception when entering the checkout step:", e);
         }
 
@@ -464,19 +493,5 @@ public class PaypalImpl implements PaypalService{
         mainDiv.addPara().addContent("NOTE : Proceed only if your submission is finalized. After submitting, a Dryad curator will review your submission. After this review, your data will be archived in Dryad, and your payment will be processed.");
         paypalService.addButtons(mainDiv);
 
-    }
-    private ShoppingCart getShoppingCart(Context context,DSpaceObject dso, Item item, PaymentSystemService payementSystemService,EPerson eperson) throws AuthorizeException, SQLException, PaymentSystemException, IOException {
-        ShoppingCart transaction=null;
-        if(item!=null){
-            transaction = payementSystemService.getTransactionByItemId(context,item.getID());
-            if(transaction==null)
-            {
-                //first time create the transaction
-                transaction= payementSystemService.createNewTrasaction(context, dso,item.getID(), eperson.getID(), ShoppingCart.COUNTRY_US, ShoppingCart.CURRENCY_US, ShoppingCart.STATUS_OPEN);
-            }
-
-        }
-
-        return transaction;
     }
 }

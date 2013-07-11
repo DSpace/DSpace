@@ -28,6 +28,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.paymentsystem.ShoppingCart;
 import org.dspace.paymentsystem.PaymentSystemConfigurationManager;
 import org.dspace.paymentsystem.PaymentSystemService;
+import org.dspace.paymentsystem.Voucher;
 import org.dspace.utils.DSpace;
 
 import javax.swing.*;
@@ -160,14 +161,14 @@ public class ManageShoppingcartMain extends AbstractDSpaceTransformer {
         //shoppingCarts = paymentSystemService.findAllShoppingCart(context,dsoID);
         ShoppingCart[] shoppingCarts = ShoppingCart.search(context, query, page*PAGE_SIZE, PAGE_SIZE);
 
-        //  properties = Shoppingcart.findAllByName(context,query);
+        ShoppingCart[] totalCount = ShoppingCart.findAll(context);
 
         // DIVISION: Shoppingcart-main
         main = body.addInteractiveDivision("shoppingcart-main", contextPath
                 + "/shoppingcart", Division.METHOD_POST,
                 "primary administrative shoppingcart");
 
-        int resultCount   = shoppingCarts.length;
+        int resultCount   = totalCount.length;
 
 
 
@@ -237,7 +238,7 @@ public class ManageShoppingcartMain extends AbstractDSpaceTransformer {
         {
             String shoppingcartID = String.valueOf(shoppingCart.getID());
 
-            String voucher = shoppingCart.getVoucher();
+            Integer voucherId = shoppingCart.getVoucher();
             String country = shoppingCart.getCountry();
             String currency = shoppingCart.getCurrency();
             Integer resourceId = shoppingCart.getItem();
@@ -288,7 +289,24 @@ public class ManageShoppingcartMain extends AbstractDSpaceTransformer {
                  System.out.println(e.getMessage());
              }
             row.addCellContent(depositor.getFullName());
-            row.addCellContent(voucher);
+            if(voucherId!=null)
+            {
+                Voucher voucher = Voucher.findById(context,voucherId);
+
+                if(voucher!=null)
+                {
+                    row.addCellContent(voucher.getCode());
+                }
+                else
+                {
+                    row.addCellContent("");
+                }
+            }else{
+                row.addCellContent("");
+            }
+
+
+
 //            row.addCellContent(secureToken);
             row.addCellContent(transactionId);
             row.addCellContent(status);

@@ -34,10 +34,6 @@ import java.util.Properties;
  */
 public class PaymentSystemImpl implements PaymentSystemService {
 
-
-    private int transactionId;
-    private ShoppingCart transactions;
-
     /** log4j log */
     private static Logger log = Logger.getLogger(PaymentSystemImpl.class);
 
@@ -48,108 +44,123 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
 
 
-    public ShoppingCart createNewTrasaction(Context context,DSpaceObject dso, Integer itemId, Integer epersonId, String country, String currency, String status) throws SQLException,
-            AuthorizeException,IOException {
-        ShoppingCart newTransaction = ShoppingCart.create(context, dso);
-        newTransaction.setCountry(country);
-        newTransaction.setCurrency(currency);
-        newTransaction.setDepositor(epersonId);
-        newTransaction.setExpiration(null);
+    public ShoppingCart createNewShoppingCart(Context context, Integer itemId, Integer epersonId, String country, String currency, String status) throws SQLException,
+            PaymentSystemException {
+        ShoppingCart newShoppingcart = ShoppingCart.create(context);
+        newShoppingcart.setCountry(country);
+        newShoppingcart.setCurrency(currency);
+        newShoppingcart.setDepositor(epersonId);
+        newShoppingcart.setExpiration(null);
         if(itemId !=null){
-            //make sure we only create the transaction for data package
+            //make sure we only create the shoppingcart for data package
             Item item = Item.find(context,itemId);
             org.dspace.content.Item dataPackage = DryadWorkflowUtils.getDataPackage(context, item);
             if(dataPackage!=null)
             {
                 itemId = dataPackage.getID();
             }
-            newTransaction.setItem(itemId);
+            newShoppingcart.setItem(itemId);
         }
-        newTransaction.setStatus(status);
-        newTransaction.setVoucher(null);
-        newTransaction.setTransactionId(null);
-        Double totalPrice =  calculateTransactionTotal(context,newTransaction,null);
-        newTransaction.setTotal(totalPrice);
-        newTransaction.update();
-        return newTransaction;
+        newShoppingcart.setStatus(status);
+        newShoppingcart.setVoucher(null);
+        newShoppingcart.setTransactionId(null);
+
+        newShoppingcart.setBasicFee(PaymentSystemConfigurationManager.getCurrencyProperty(currency));
+        newShoppingcart.setNoInteg(PaymentSystemConfigurationManager.getNotIntegratedJournalFeeProperty(currency));
+        newShoppingcart.setSurcharge(PaymentSystemConfigurationManager.getSizeFileFeeProperty(currency));
+        Double totalPrice =  calculateShoppingCartTotal(context, newShoppingcart, null);
+        newShoppingcart.setTotal(totalPrice);
+        newShoppingcart.update();
+        return newShoppingcart;
     }
 
 
-    public void modifyTransaction(Context context,ShoppingCart transaction,DSpaceObject dso)throws AuthorizeException, SQLException,PaymentSystemException{
-//TODO:add authorization
-//        try{
-//            AuthorizeManager.authorizeAction(context, dso, Constants.WRITE);
-//        }catch (AuthorizeException e)
-//        {
-//            throw new AuthorizeException(
-//                    "You must be an admin to create a Transaction");
-//        }
-        if(transaction.getModified())
+    public void modifyShoppingCart(Context context,ShoppingCart shoppingcart,DSpaceObject dso)throws AuthorizeException, SQLException,PaymentSystemException{
+
+        if(shoppingcart.getModified())
         {
-            transaction.update();
-            transaction.setModified(false);
+            shoppingcart.update();
+            shoppingcart.setModified(false);
         }
 
     }
 
-    public void deleteTransaction(Context context,Integer transactionId) throws AuthorizeException, SQLException, PaymentSystemException {
-           ShoppingCart trasaction = ShoppingCart.findByTransactionId(context, transactionId);
+    public void setCurrency(ShoppingCart shoppingCart,String currency)throws SQLException{
+        shoppingCart.setCurrency(currency);
+        shoppingCart.setBasicFee(PaymentSystemConfigurationManager.getCurrencyProperty(currency));
+        shoppingCart.setNoInteg(PaymentSystemConfigurationManager.getNotIntegratedJournalFeeProperty(currency));
+        shoppingCart.setSurcharge(PaymentSystemConfigurationManager.getSizeFileFeeProperty(currency));
+        shoppingCart.update();
+        shoppingCart.setModified(false);
+
+    }
+
+    public void deleteShoppingCart(Context context,Integer shoppingcartId) throws AuthorizeException, SQLException, PaymentSystemException {
+           ShoppingCart trasaction = ShoppingCart.findByTransactionId(context, shoppingcartId);
            trasaction.delete();
     }
 
-    public ShoppingCart getTransaction(Context context,Integer transactionId) throws SQLException
+    public ShoppingCart getShoppingCart(Context context,Integer shoppingcartId) throws SQLException
     {
-        return ShoppingCart.findByTransactionId(context, transactionId);
+        return ShoppingCart.findByTransactionId(context, shoppingcartId);
     }
 
-    public ShoppingCart[] findAllShoppingCart(Context context,Integer itemId)throws SQLException{
+    public ShoppingCart[] findAllShoppingCart(Context context,Integer itemId)throws SQLException,PaymentSystemException{
         if(itemId==null||itemId==-1){
             return ShoppingCart.findAll(context);
         }
         else
         {
             ShoppingCart[] shoppingCarts = new ShoppingCart[1];
-            shoppingCarts[0] = getTransactionByItemId(context,itemId);
+            shoppingCarts[0] = getShoppingCartByItemId(context, itemId);
             return shoppingCarts;
         }
     }
 
-    public ShoppingCart getTransactionByItemId(Context context,Integer itemId) throws SQLException
+    public ShoppingCart getShoppingCartByItemId(Context context,Integer itemId) throws SQLException,PaymentSystemException
     {
-        //make sure we get correct transaction for data package
+        //make sure we get correct shoppingcart for data package
         Item item = Item.find(context,itemId);
         org.dspace.content.Item dataPackage = DryadWorkflowUtils.getDataPackage(context, item);
         if(dataPackage!=null)
         {
             itemId = dataPackage.getID();
         }
-        List<ShoppingCart> transactionList= ShoppingCart.findAllByItem(context, itemId);
-        if(transactionList!=null && transactionList.size()>0)
-            return transactionList.get(0);
-        return null;
+        List<ShoppingCart> shoppingcartList= ShoppingCart.findAllByItem(context, itemId);
+        if(shoppingcartList!=null && shoppingcartList.size()>0)
+            return shoppingcartList.get(0);
+        else
+        {
+            //if no shopping cart , create a new one
+            return createNewShoppingCart(context,itemId,context.getCurrentUser().getID(),ShoppingCart.COUNTRY_US,ShoppingCart.CURRENCY_US,ShoppingCart.STATUS_OPEN);
+        }
+
     }
 
-    public Double calculateTransactionTotal(Context context,ShoppingCart transaction,String journal) throws SQLException{
+    public Double calculateShoppingCartTotal(Context context,ShoppingCart shoppingcart,String journal) throws SQLException{
 
 
         Double price = new Double(0);
-        PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
 
-        if(!hasDiscount(context,transaction,journal))
+        if(hasDiscount(context,shoppingcart,journal))
+        {
+            //has discount , only caculate the file surcharge fee
+            price =getSurchargeLargeFileFee(context, shoppingcart);
+        }
+        else
         {
             //no journal,voucher,country discount
-            Double basicFee =  manager.getCurrencyProperty(transaction.getCurrency());
-            double fileSizeFee=getSurchargeLargeFileFee(context, transaction);
+            Double basicFee = shoppingcart.getBasicFee();
+            double fileSizeFee=getSurchargeLargeFileFee(context, shoppingcart);
             price = basicFee+fileSizeFee;
-            price = price+getNoIntegrateFee(context,transaction,journal);
-
+            price = price+getNoIntegrateFee(context,shoppingcart,journal);
         }
         return price;
     }
 
-    public double getSurchargeLargeFileFee(Context context, ShoppingCart transaction) throws SQLException {
+    public double getSurchargeLargeFileFee(Context context, ShoppingCart shoppingcart) throws SQLException {
 
-        Item item =Item.find(context, transaction.getItem());
+        Item item =Item.find(context, shoppingcart.getItem());
         Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, item);
         Long allowedSizeT=PaymentSystemConfigurationManager.getMaxFileSize();
         long allowedSize = allowedSizeT;
@@ -171,7 +182,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
         }
 
         if(totalSizeDataFile > allowedSize){
-            totalSurcharge+=PaymentSystemConfigurationManager.getSizeFileFeeProperty(transaction.getCurrency());
+            totalSurcharge+=shoppingcart.getSurcharge();
             int unit =0;
             Long UNITSIZE=PaymentSystemConfigurationManager.getUnitSize();  //1 GB
             //eg. $10 after every 1 gb
@@ -179,7 +190,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
                 Long overSize = (totalSizeDataFile-allowedSize)/UNITSIZE;
                 unit = overSize.intValue();
             }
-            totalSurcharge = totalSurcharge+Double.parseDouble(PaymentSystemConfigurationManager.getSizeFileFeeAfterProperty(transaction.getCurrency()))*unit;
+            totalSurcharge = totalSurcharge+shoppingcart.getSurcharge()*unit;
 
         }
 
@@ -187,9 +198,9 @@ public class PaymentSystemImpl implements PaymentSystemService {
         return totalSurcharge;
     }
 
-    public boolean getJournalSubscription(Context context, ShoppingCart transaction, String journal) throws SQLException {
+    public boolean getJournalSubscription(Context context, ShoppingCart shoppingcart, String journal) throws SQLException {
         if(journal==null){
-            Item item = Item.find(context,transaction.getItem()) ;
+            Item item = Item.find(context,shoppingcart.getItem()) ;
             if(item!=null)
             {
                 try{
@@ -223,12 +234,11 @@ public class PaymentSystemImpl implements PaymentSystemService {
         return false;
     }
 
-    public double getNoIntegrateFee(Context context, ShoppingCart transaction, String journal) throws SQLException {
+    public double getNoIntegrateFee(Context context, ShoppingCart shoppingcart, String journal) throws SQLException {
 
         Double totalPrice = new Double(0);
-        PaymentSystemConfigurationManager paymentSystemConfigurationManager =new PaymentSystemConfigurationManager();
         if(journal==null){
-            Item item = Item.find(context,transaction.getItem()) ;
+            Item item = Item.find(context,shoppingcart.getItem()) ;
             if(item!=null)
             {
                 try{
@@ -253,14 +263,14 @@ public class PaymentSystemImpl implements PaymentSystemService {
                 if(subscription==null || !subscription.equals(ShoppingCart.FREE))
                 {
 
-                    totalPrice= paymentSystemConfigurationManager.getNotIntegratedJournalFeeProperty(transaction.getCurrency());
+                    totalPrice= shoppingcart.getNoInteg();
                 }
 
 
             }
             else
             {
-                totalPrice= paymentSystemConfigurationManager.getNotIntegratedJournalFeeProperty(transaction.getCurrency());
+                totalPrice= shoppingcart.getNoInteg();
             }
             }catch(Exception e){
                 log.error("Exception when get no integration fee:", e);
@@ -268,29 +278,36 @@ public class PaymentSystemImpl implements PaymentSystemService {
         }
         else
         {
-            totalPrice= paymentSystemConfigurationManager.getNotIntegratedJournalFeeProperty(transaction.getCurrency());
+            totalPrice= shoppingcart.getNoInteg();
         }
         return totalPrice;
     }
 
-    private boolean voucherValidate(Context context,ShoppingCart transaction){
+    private boolean voucherValidate(Context context,ShoppingCart shoppingcart){
         VoucherValidationService voucherValidationService = new DSpace().getSingletonService(VoucherValidationService.class);
-        return voucherValidationService.validate(context,transaction.getVoucher());
+        return voucherValidationService.validate(context,shoppingcart.getVoucher(),shoppingcart);
     }
 
-        public boolean hasDiscount(Context context,ShoppingCart transaction,String journal)throws SQLException{
+    public boolean hasDiscount(Context context,ShoppingCart shoppingcart,String journal)throws SQLException{
         //this method check all the discount: journal,country,voucher
             PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
-            Properties currencyArray = manager.getAllCurrencyProperty();
             Properties countryArray = manager.getAllCountryProperty();
-            Boolean journalSubscription =  getJournalSubscription(context, transaction, journal);
-            Boolean countryDiscount = countryArray.get(transaction.getCountry()).equals(ShoppingCart.COUNTRYFREE);
-            Boolean voucherDiscount = voucherValidate(context,transaction);
+            Boolean journalSubscription =  getJournalSubscription(context, shoppingcart, journal);
+            Boolean countryDiscount = countryArray.get(shoppingcart.getCountry()).equals(ShoppingCart.COUNTRYFREE);
+            Boolean voucherDiscount = voucherValidate(context,shoppingcart);
 
             if(journalSubscription||countryDiscount||voucherDiscount){
                 return true;
             }
             return false;
         }
+
+    public void updateTotal(Context context, ShoppingCart shoppingCart, String journal) throws SQLException{
+        Double newPrice = calculateShoppingCartTotal(context,shoppingCart,journal);
+        //TODO:only setup the price when the old total price is higher than the price right now
+        shoppingCart.setTotal(newPrice);
+        shoppingCart.update();
+        shoppingCart.setModified(false);
+    }
 
 }

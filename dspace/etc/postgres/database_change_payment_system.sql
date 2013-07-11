@@ -20,9 +20,24 @@ CREATE TABLE shoppingcart
   item INTEGER,
   currency VARCHAR(256),
   country VARCHAR(256),
-  voucher VARCHAR(256),
+  voucher INTEGER,
   total DOUBLE PRECISION,
   transaction_id VARCHAR(256),
-  securetoken VARCHAR(256)
+  securetoken VARCHAR(256),
+  basic_fee DOUBLE PRECISION,
+  no_integ DOUBLE PRECISION,
+  surcharge DOUBLE PRECISION
 );
 
+CREATE SEQUENCE voucher_seq;
+
+CREATE TABLE voucher
+(
+  voucher_id INTEGER PRIMARY KEY,
+  creation date,
+  status VARCHAR(256),
+  code VARCHAR(256),
+  customer VARCHAR(256),
+  generator INTEGER,
+  explanation VARCHAR(256)
+);

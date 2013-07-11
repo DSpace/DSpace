@@ -3395,5 +3395,61 @@
     <message key="xmlui.property.ManageShoppingcartMain.no_results">No result</message>
 
 
+    <message key="xmlui.voucher.ManageVoucherMain.search_column1">Id</message>
+    <message key="xmlui.voucher.ManageVoucherMain.search_column2">Code</message>
+    <message key="xmlui.voucher.ManageVoucherMain.search_column3">Value</message>
+    <message key="xmlui.voucher.ManageVoucherMain.search_column4">Create Date</message>
+    <message key="xmlui.voucher.ManageVoucherMain.search_column5">Explanation</message>
+    <message key="xmlui.voucher.ManageVoucherMain.actions_create_link">Create new voucher</message>
+    <message key="xmlui.voucher.ManageVoucherMain.actions_browse_link">Browse all voucher</message>
+    <message key="xmlui.voucher.ManageVoucherMain.actions_create">Create new voucher</message>
+    <message key="xmlui.voucher.ManageVoucherMain.actions_browse">Browse all voucher</message>
+    <message key="xmlui.property.ManageVoucherMain.actions_search">Search voucher</message>
+    <message key="xmlui.voucher.ManageVoucherMain.actions_search">Search voucher</message>
+
+    <message key="xmlui.voucher.ManageVoucherMain.search_help">Search voucher by its code, value and expiration date</message>
+    <message key="xmlui.property.ManageVoucherMain.actions_browse_link">Browse All vouchers</message>
+    <message key="xmlui.property.ManageVoucherMain.actions_create_link">Create new voucher</message>
+
+    <message key="xmlui.property.ManageVoucherin.actions_head">Manage vouchers</message>
+
+    <message key="xmlui.property.ManageVoucherin.main_head">Manage vouchers</message>
+    <message key="xmlui.property.ManageVoucher.search_head">Search result vouchers</message>
+    <message key="xmlui.property.ManageVoucherMain.no_results">No result</message>
+
+    <message key="xmlui.property.AddVoucher.head1">Add new voucher</message>
+    <message key="xmlui.property.AddVoucher.head2">Vouchers Creation</message>
+    <message key="xmlui.voucher.AddVoucher.name">Vouchers Creation</message>
+    <message key="xmlui.voucher.AddVoucher.value">Voucher value</message>
+    <message key="xmlui.voucher.AddVoucher.number">Number of Vouchers</message>
+    <message key="xmlui.voucher.AddVoucher.explanation">Explanation for generating vouchers</message>
+
+    <message key="xmlui.administrative.Navigation.administrative_voucher">Manage Vouchers</message>
+    <message key="xmlui.property.EditVoucherForm.head1">Edit Vouchers</message>
+    <message key="xmlui.property.EditVoucherForm.head2">Edit Vouchers</message>
+    <message key="xmlui.voucher.EditProfile.name1">Edit Vouchers</message>
+    <message key="xmlui.voucher.EditProfile.name2">Voucher Code</message>
+    <message key="xmlui.voucher.EditProfile.name3">Voucher Value</message>
+    <message key="xmlui.voucher.EditProfile.name4">Create Date</message>
+    <message key="xmlui.voucher.EditProfile.name5">Expire Date</message>
+
+
+    <message key="xmlui.Shoppingcart.EditProfile.voucher_null">Can't find the Voucher</message>
+    <message key="xmlui.Shoppingcart.EditProfile.voucher_used">Voucher Used</message>
+    <message key="xmlui.voucher.AddVoucherForm.submit_create">Create</message>
+    <message key="xmlui.voucher.AddVoucherForm.head1">Title</message>
+    <message key="xmlui.voucher.AddVoucherForm.head2">Voucher Creation</message>
+    <message key="xmlui.voucher.AddVoucherForm.customer">Customer ID</message>
+    <message key="xmlui.voucher.AddVoucherForm.number">Number of vouchers (min. of 25)</message>
+    <message key="xmlui.voucher.AddVoucherForm.explanation">Explanation for generating vouchers</message>
+    <message key="xmlui.voucher.ManageVoucherMain.search_column6">Generator</message>
+
+    <message key="xmlui.Shoppingcart.EditProfile.name9">Basic Fee Rate</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name10">No Integration Fee Rate</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name11">Surcharge Fee Rate</message>
+
+    <message key="xmlui.voucher.ManageVoucher.search_head">Search Result</message>
+    <message key="xmlui.voucher.ManageVoucherin.actions_head">Manage Voucher</message>
+    <message key="xmlui.voucher.ManageVoucherin.main_head">Manage Voucher</message>
 
 </catalogue>

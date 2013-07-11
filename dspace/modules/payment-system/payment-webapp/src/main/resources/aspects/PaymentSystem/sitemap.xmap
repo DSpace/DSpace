@@ -16,6 +16,14 @@
                              src="org.dspace.app.xmlui.aspect.paymentsystem.ShoppingCartTransformer"/>
             <map:transformer name="paypalReturnStep"
                              src="org.dspace.app.xmlui.aspect.submission.submit.PaypalReturnStep"/>
+
+             <map:transformer name="ManageVoucherMain"
+                              src="org.dspace.app.xmlui.aspect.shoppingcart.ManageVoucherMain"/>
+             <map:transformer name="EditVoucherForm"
+                              src="org.dspace.app.xmlui.aspect.shoppingcart.EditVoucherForm"/>
+             <map:transformer name="AddVoucherForm"
+                            src="org.dspace.app.xmlui.aspect.shoppingcart.AddVoucherForm"/>
+
             <map:transformer name="ManageShoppingcartMain"
                              src="org.dspace.app.xmlui.aspect.shoppingcart.ManageShoppingcartMain"/>
             <map:transformer name="EditShoppingcartForm"
@@ -50,6 +58,12 @@
                             <map:call continuation="{1}"/>
                         </map:match>
                         <map:call function="startManageShoppingcart"/>
+                    </map:match>
+                    <map:match pattern="voucher">
+                        <map:match type="request" pattern="administrative-continue">
+                            <map:call continuation="{1}"/>
+                        </map:match>
+                        <map:call function="startManageVoucher"/>
                     </map:match>
 
                     <map:match pattern="shoppingcart/site">
@@ -111,11 +125,36 @@
                             </map:transform>
                         </map:match>
 
+                       <map:match pattern="voucher/main">
+                            <map:transform type="ManageVoucherMain">
+                                <map:parameter name="query" value="{flow-attribute:query}"/>
+                                <map:parameter name="page" value="{flow-attribute:page}"/>
+                                <map:parameter name="highlightID" value="{flow-attribute:highlightID}"/>
+                            </map:transform>
+                        </map:match>
 
+                        <map:match pattern="voucher/edit">
+                            <map:transform type="EditVoucherForm">
+                                <map:parameter name="voucher_id" value="{flow-attribute:voucher_id}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                            </map:transform>
+                        </map:match>
+                        <map:match pattern="voucher/add">
+                            <map:transform type="AddVoucherForm">
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                                <map:parameter name="dsoID" value="{flow-attribute:dsoID}"/>
+                                <map:parameter name="typeID" value="{flow-attribute:typeID}"/>
+
+                            </map:transform>
+                         </map:match>
                     </map:match>
                 </map:when>
                 <map:otherwise>
                     <map:match pattern="shoppingcart">
+                        <map:act type="StartAuthentication"/>
+                    </map:match>
+
+                    <map:match pattern="voucher">
                         <map:act type="StartAuthentication"/>
                     </map:match>
                 </map:otherwise>
@@ -142,8 +181,16 @@
             <map:match type="wildcard" pattern="handle/*/*/workflow/**">
                 <map:transform type="ShoppingCart"/>
             </map:match>
+            <map:match type="wildcard" pattern="deposit-confirmed">
+                            <map:transform type="ShoppingCart"/>
+                        </map:match>
 
-
+             <map:match type="wildcard" pattern="handle/*/*/workflow_new/**">
+                 <map:transform type="ShoppingCart"/>
+             </map:match>
+                  <map:match type="wildcard" pattern="handle/*/*/workflow_new">
+                                  <map:transform type="ShoppingCart"/>
+                              </map:match>
             <map:match type="wildcard" pattern="workflow">
                 <map:transform type="ShoppingCart"/>
             </map:match>

@@ -29,7 +29,6 @@ importClass(Packages.org.dspace.core.ConfigurationManager);
 
 importClass(Packages.javax.mail.internet.AddressException);
 
-importClass(Packages.org.dspace.app.xmlui.utils.FlowscriptUtils);
 
 importClass(Packages.org.dspace.core.ConfigurationManager);
 importClass(Packages.org.dspace.core.Context);
@@ -41,6 +40,7 @@ importClass(Packages.org.dspace.app.xmlui.utils.AuthenticationUtil);
 
 importClass(Packages.java.lang.String);
 importClass(Packages.org.dspace.app.xmlui.aspect.shoppingcart.FlowShoppingcartUtils);
+importClass(Packages.org.dspace.app.xmlui.aspect.shoppingcart.FlowVoucherUtils);
 /**
  * This class defines the workflows for three flows within the EPerson aspect.
  *
@@ -668,16 +668,6 @@ function doManageShoppingcartSite(dsoID){
             page = 0
             highlightID = -1;
         }
-        else if (cocoon.request.get("submit_add"))
-        {
-            // Add a new shopping cart
-            assertAdministrator();
-
-            result = doAddSimplerPropertyDSO(typeID,dsoID);
-
-            if (result != null && result.getParameter("shoppingcart_id"))
-                highlightID = result.getParameter("shoppingcart_id");
-        }
         else if (cocoon.request.get("submit_edit") && cocoon.request.get("shoppingcart_id"))
         {
             // Edit an exting shopping cart
@@ -688,13 +678,85 @@ function doManageShoppingcartSite(dsoID){
             highlightID = shoppingcart_id;
 
         }
-        else if (cocoon.request.get("submit_delete") && cocoon.request.get("select_shoppingcart"))
+        else if (cocoon.request.get("submit_return"))
         {
-            // Delete a set of shoppingcart
+            // Not implemented in the UI, but should be incase someone links to us.
+            return;
+        }
+
+    } while (true) // only way to exit is to hit the submit_back button.
+}
+
+
+
+/**
+ * Start managing Voucher
+ */
+function startManageVoucher()
+{
+    assertAdministrator();
+
+    doManageVoucher();
+
+    // This should never return, but just in case it does then point
+    // the user to the home page.
+    cocoon.redirectTo(cocoon.request.getContextPath());
+    getDSContext().complete();
+    cocoon.exit();
+}
+
+function doManageVoucher()
+{
+    assertAdministrator();
+
+    var query = "";
+    var page = 0;
+    var handle = -1;
+    var highlightID=-1;
+    var result;
+    do {
+
+        sendPageAndWait("voucher/main",{"page":page,"query":query,"highlightID":highlightID},result);
+        result = null;
+
+        // Update the page parameter if supplied.
+        if (cocoon.request.get("page"))
+            page = cocoon.request.get("page");
+
+        if (cocoon.request.get("submit_search"))
+        {
+            // Grab the new query and reset the page parameter
+            query = cocoon.request.get("query");
+            page = 0
+            highlightID = -1;
+        }
+        else if (cocoon.request.get("submit_add"))
+        {
+            // Add a new shopping cart
             assertAdministrator();
 
-            var shoppingcart_ids = cocoon.request.getParameterValues("select_shoppingcart");
-            result = doDeleteSimpleProperties(shoppingcart_ids);
+            result = doAddVoucher();
+
+            if (result != null && result.getParameter("voucher_id"))
+                highlightID = result.getParameter("voucher_id");
+        }
+        else if (cocoon.request.get("submit_edit") && cocoon.request.get("voucher_id"))
+        {
+            // Edit an exting shopping cart
+            assertAdministrator();
+
+            var voucher_id = cocoon.request.get("voucher_id");
+            result = doEditVoucher(voucher_id);
+            highlightID = voucher_id;
+
+        }
+        else if (cocoon.request.get("submit_delete") && cocoon.request.get("select_voucher"))
+        {
+            // Delete a set of voucher
+            assertAdministrator();
+
+            var voucher_ids = cocoon.request.getParameterValues("select_voucher");
+            result = doDeleteVoucher(voucher_ids);
             highlightID = -1;
         }
         else if (cocoon.request.get("submit_return"))
@@ -705,3 +767,61 @@ function doManageShoppingcartSite(dsoID){
 
     } while (true) // only way to exit is to hit the submit_back button.
 }
+
+function doAddVoucher()
+{
+    assertAdministrator();
+
+    var result;
+    do {
+        sendPageAndWait("voucher/add",{},result);
+        result = null;
+
+        if (cocoon.request.get("submit_save"))
+        {
+            // Save the new eperson, assuming they have meet all the requirements.
+            assertAdministrator();
+
+            result = FlowVoucherUtils.processAddVoucher(getDSContext(),cocoon.request,getObjectModel());
+        }
+        else if (cocoon.request.get("submit_cancel"))
+        {
+            // The user can cancel at any time.
+            return null;
+        }
+
+    } while (result == null || !result.getContinue())
+
+    return result;
+}
+
+/**
+ * Edit an exiting shopping cart, all standard metadata elements are presented for editing. The same
+ * validation is required as is in adding a new eperson: unique email, first name, and last name
+ */
+function doEditVoucher(voucher_id)
+{
+    // We can't assert any privleges at this point, the user could be a collection
+    // admin or a supper admin. Instead we protect each operation.
+    var result;
+    do {
+        sendPageAndWait("voucher/edit",{"voucher_id":voucher_id},result);
+        result == null;
+
+        if (cocoon.request.get("submit_save"))
+        {
+            // Attempt to save the changes.
+            assertAdministrator();
+            result = FlowVoucherUtils.processEditVoucher(getDSContext(),cocoon.request,getObjectModel(),voucher_id);
+        }
+        else if (cocoon.request.get("submit_cancel"))
+        {
+            // Cancel out and return to where ever the user came from.
+            return null;
+        }
+
+    } while (result == null || !result.getContinue())
+
+    return result;
+}
+

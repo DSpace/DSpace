@@ -63,6 +63,10 @@ public class ShoppingCart {
 
     public static final int SECURETOKEN = 11;
 
+    public static final int BASIC_FEE =12;
+    public static final int NO_INTEG =13;
+    public static final int SURCHARGE =14;
+
     public static final String STATUS_COMPLETED = "completed";
     public static final String STATUS_OPEN = "open";
     public static final String STATUS_DENIlED = "deniled";
@@ -87,9 +91,6 @@ public class ShoppingCart {
     /** Flag set when data is modified, for events */
     private boolean modified;
 
-    /** Flag set when metadata is modified, for events */
-    private boolean modifiedMetadata;
-
 
     ShoppingCart(Context context, TableRow row)
     {
@@ -98,7 +99,6 @@ public class ShoppingCart {
         // Cache ourselves
         context.cache(this, row.getIntColumn("cart_id"));
         modified = false;
-        modifiedMetadata = false;
     }
 
     public String getHandle(){
@@ -188,9 +188,9 @@ public class ShoppingCart {
      *
      * @return text_lang code (or null if the column is an SQL NULL)
      */
-    public String getVoucher()
+    public Integer getVoucher()
     {
-        return myRow.getStringColumn("voucher");
+        return myRow.getIntColumn("voucher");
     }
 
     /**
@@ -329,7 +329,7 @@ public class ShoppingCart {
      *
      * @return text_lang code (or null if the column is an SQL NULL)
      */
-    public void setVoucher(String voucher)
+    public void setVoucher(Integer voucher)
     {
         if(voucher==null)
         {
@@ -338,6 +338,7 @@ public class ShoppingCart {
         else{
         myRow.setColumn("voucher",voucher);
         }
+        modified = true;
     }
 
 
@@ -349,16 +350,12 @@ public class ShoppingCart {
 
         DatabaseManager.update(myContext, myRow);
 
-        log.info(LogManager.getHeader(myContext, "update_payment",
-                "payment_id=" + getID()));
+        log.info(LogManager.getHeader(myContext, "update_shoppingcart",
+                "shoppingcart_id=" + getID()));
 
         if (modified)
         {
             modified = false;
-        }
-        if (modifiedMetadata)
-        {
-            modifiedMetadata = false;
         }
     }
 
@@ -374,17 +371,8 @@ public class ShoppingCart {
      * @param context
      *            DSpace context object
      */
-    public static ShoppingCart create(Context context,DSpaceObject dso) throws SQLException,
-            AuthorizeException
+    public static ShoppingCart create(Context context) throws SQLException
     {
-        // authorized?
-        try{
-            AuthorizeManager.authorizeAction(context,dso, Constants.WRITE);
-        }catch (AuthorizeException e)
-        {
-            throw new AuthorizeException(
-                    "You must be an admin to create a ShoppingCart");
-        }
 
         // Create a table row
         TableRow row = DatabaseManager.create(context, "shoppingcart");
@@ -399,18 +387,12 @@ public class ShoppingCart {
     }
 
     /**
-     * Delete an simpleproperty
+     * Delete an shoppingcart
      *
      */
-    public void delete() throws SQLException, AuthorizeException,
+    public void delete() throws SQLException,
             PaymentSystemException
     {
-        // authorized?
-        if (!AuthorizeManager.isAdmin(myContext))
-        {
-            throw new AuthorizeException(
-                    "You must be an admin to delete an shoppingcart");
-        }
 
         // Remove from cache
         myContext.removeCached(this, getID());
@@ -437,7 +419,7 @@ public class ShoppingCart {
         {
             List<TableRow> propertyRows = rows.toList();
 
-            ArrayList<ShoppingCart> transactions = new ArrayList<ShoppingCart>();
+            ArrayList<ShoppingCart> shoppingCarts = new ArrayList<ShoppingCart>();
 
             for (int i = 0; i < propertyRows.size(); i++)
             {
@@ -449,16 +431,16 @@ public class ShoppingCart {
 
                 if (fromCache != null)
                 {
-                    transactions.add(fromCache);
+                    shoppingCarts.add(fromCache);
                 }
                 else
                 {
                     ShoppingCart newProperty = new ShoppingCart(context, row);
-                    transactions.add(newProperty);
+                    shoppingCarts.add(newProperty);
                 }
             }
 
-            return transactions;
+            return shoppingCarts;
         }
         finally
         {
@@ -483,7 +465,7 @@ public class ShoppingCart {
         {
             List<TableRow> propertyRows = rows.toList();
 
-            ArrayList<ShoppingCart> transactions = new ArrayList<ShoppingCart>();
+            ArrayList<ShoppingCart> shoppingCarts = new ArrayList<ShoppingCart>();
 
             for (int i = 0; i < propertyRows.size(); i++)
             {
@@ -495,16 +477,16 @@ public class ShoppingCart {
 
                 if (fromCache != null)
                 {
-                    transactions.add(fromCache);
+                    shoppingCarts.add(fromCache);
                 }
                 else
                 {
                     ShoppingCart newProperty = new ShoppingCart(context, row);
-                    transactions.add(newProperty);
+                    shoppingCarts.add(newProperty);
                 }
             }
 
-            return transactions;
+            return shoppingCarts;
         }
         finally
         {
@@ -528,7 +510,7 @@ public class ShoppingCart {
         {
             List<TableRow> propertyRows = rows.toList();
 
-            ArrayList<ShoppingCart> transactions = new ArrayList<ShoppingCart>();
+            ArrayList<ShoppingCart> shoppingCarts = new ArrayList<ShoppingCart>();
 
             for (int i = 0; i < propertyRows.size(); i++)
             {
@@ -540,16 +522,16 @@ public class ShoppingCart {
 
                 if (fromCache != null)
                 {
-                    transactions.add(fromCache);
+                    shoppingCarts.add(fromCache);
                 }
                 else
                 {
                     ShoppingCart newProperty = new ShoppingCart(context, row);
-                    transactions.add(newProperty);
+                    shoppingCarts.add(newProperty);
                 }
             }
 
-            return transactions.get(0);
+            return shoppingCarts.get(0);
         }
         finally
         {
@@ -561,7 +543,7 @@ public class ShoppingCart {
     }
 
     /**
-     * Find the transaction by its id.
+     * Find the shoppingCarts by its id.
      *
      * @return Transaction, or {@code null} if none such exists.
      */
@@ -607,6 +589,7 @@ public class ShoppingCart {
     }
     public void setTotal(double total){
         myRow.setColumn("total",total);
+        modified = true;
     }
 
 
@@ -829,6 +812,62 @@ public class ShoppingCart {
         }
     }
 
+    public static ShoppingCart findByVoucher(Context context,Integer voucherId) throws SQLException
+        {
+            if(voucherId==null)
+            {
+                return null;
+            }
+            else
+            {
+                // All name addresses are stored as lowercase, so ensure that the name address is lowercased for the lookup
+                TableRow row = DatabaseManager.findByUnique(context, "shoppingcart",
+                        "voucher", voucherId);
 
+                if (row == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    // First check the cache
+                    ShoppingCart fromCache = (ShoppingCart) context.fromCache(ShoppingCart.class, row
+                            .getIntColumn("cart_id"));
+
+                    if (fromCache != null)
+                    {
+                        return fromCache;
+                    }
+                    else
+                    {
+                        return new ShoppingCart(context, row);
+                    }
+                }
+            }
+        }
+//    public static final int BASIC_FEE =12;
+//    public static final int NO_INTEG =13;
+//    public static final int SURCHARGE =14;
+    public void setBasicFee(double basicFee){
+        myRow.setColumn("basic_fee",basicFee);
+        modified = true;
+    }
+    public double getBasicFee(){
+       return myRow.getDoubleColumn("basic_fee");
+    }
+    public void setNoInteg(double noInteg){
+        myRow.setColumn("no_integ",noInteg);
+        modified = true;
+    }
+    public double getNoInteg(){
+       return myRow.getDoubleColumn("no_integ");
+    }
+    public void setSurcharge(double surcharge){
+        myRow.setColumn("surcharge",surcharge);
+        modified = true;
+    }
+    public double getSurcharge(){
+        return myRow.getDoubleColumn("surcharge");
+    }
 
 }

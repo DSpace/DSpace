@@ -25,19 +25,19 @@ import java.sql.SQLException;
 public interface PaymentSystemService
 {
 
-    public ShoppingCart createNewTrasaction(Context context, DSpaceObject dso, Integer itemId, Integer epersonId, String country, String currency, String status) throws SQLException, AuthorizeException, IOException;
+    public ShoppingCart createNewShoppingCart(Context context, Integer itemId, Integer epersonId, String country, String currency, String status) throws SQLException, PaymentSystemException;
 
-    public void modifyTransaction(Context context, ShoppingCart transaction, DSpaceObject dso) throws AuthorizeException, SQLException, PaymentSystemException;
+    public void modifyShoppingCart(Context context, ShoppingCart transaction, DSpaceObject dso) throws AuthorizeException, SQLException, PaymentSystemException;
 
-    public void deleteTransaction(Context context, Integer transactionId) throws AuthorizeException, SQLException, PaymentSystemException;
+    public void deleteShoppingCart(Context context, Integer transactionId) throws AuthorizeException, SQLException, PaymentSystemException;
 
-    public ShoppingCart getTransaction(Context context, Integer transactionId) throws SQLException;
+    public ShoppingCart getShoppingCart(Context context, Integer transactionId) throws SQLException;
 
-    public ShoppingCart[] findAllShoppingCart(Context context, Integer itemId) throws SQLException;
+    public ShoppingCart[] findAllShoppingCart(Context context, Integer itemId) throws SQLException,PaymentSystemException;
 
-    public ShoppingCart getTransactionByItemId(Context context, Integer itemId) throws SQLException;
+    public ShoppingCart getShoppingCartByItemId(Context context, Integer itemId) throws SQLException,PaymentSystemException;
 
-    public Double calculateTransactionTotal(Context context, ShoppingCart transaction, String journal) throws SQLException;
+    public Double calculateShoppingCartTotal(Context context, ShoppingCart transaction, String journal) throws SQLException;
 
     public double getSurchargeLargeFileFee(Context context, ShoppingCart transaction) throws SQLException;
 
@@ -46,4 +46,8 @@ public interface PaymentSystemService
     public double getNoIntegrateFee(Context context, ShoppingCart transaction, String journal) throws SQLException;
 
     public boolean hasDiscount(Context context, ShoppingCart transaction, String journal) throws SQLException;
+
+    public void updateTotal(Context context, ShoppingCart transaction, String journal) throws SQLException;
+
+    public void setCurrency(ShoppingCart shoppingCart,String currency)throws SQLException;
 }

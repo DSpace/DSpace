@@ -40,12 +40,26 @@ public class FlowShoppingcartUtils {
         FlowResult result = new FlowResult();
         result.setContinue(false); // default to failure
         // Get all our request parameters
-        String voucher = request.getParameter("voucher");
-        String total = request.getParameter("total");
+        String voucherCode = request.getParameter("voucher");
         String country = request.getParameter("country");
         String currency = request.getParameter("currency");
+        String basicFee = request.getParameter("basicFee");
+        String noInteg = request.getParameter("noInteg");
+        String surCharge = request.getParameter("surCharge");
         String transactionId = request.getParameter("transactionId");
         PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
+        VoucherValidationService voucherValidationService = new DSpace().getSingletonService(VoucherValidationService.class);
+        Voucher voucher = null;
+        if (!StringUtils.isEmpty(voucherCode)) {
+            voucher = Voucher.findByCode(context,voucherCode);
+        }
+
+
+        ShoppingCart shoppingCart = paymentSystemService.getShoppingCart(context, shoppingcartID);
+
+        String countryOriginal = shoppingCart.getCountry();
+        String currencyOriginal = shoppingCart.getCurrency();
+        String transactionIdOriginal = shoppingCart.getTransactionId();
 
 
         // If we have errors, the form needs to be resubmitted to fix those problems
@@ -56,37 +70,80 @@ public class FlowShoppingcartUtils {
         if (StringUtils.isEmpty(currency)) {
             result.addError("currency");
         }
+        if (!StringUtils.isEmpty(voucherCode)) {
+           if(voucher==null)
+           {
+               result.addError("voucher_null");
+           }
+            else
+           {
+               if(!voucherValidationService.validate(context,voucher.getID(),shoppingCart))
+               {
+                   result.addError("voucher_used");
+               }
+           }
+        }
+
 
         if (result.getErrors() == null) {
-            // Grab the person in question
-            ShoppingCart shoppingCart = paymentSystemService.getTransaction(context, shoppingcartID);
 
+            if (!StringUtils.isEmpty(voucherCode)) {
 
-            String voucherOriginal = shoppingCart.getVoucher();
-            Double totalOriginal = shoppingCart.getTotal();
-            String countryOriginal = shoppingCart.getCountry();
-            String currencyOriginal = shoppingCart.getCurrency();
-            String transactionIdOriginal = shoppingCart.getTransactionId();
+                if(!voucherValidationService.voucherUsed(context,voucherCode))
+                {
+                    shoppingCart.setVoucher(voucher.getID());
+                }
 
-            if (!voucherOriginal.equals(voucher)) {
-                shoppingCart.setVoucher(voucher);
+            }
+            else
+            {
+                //delete the voucher
+                shoppingCart.setVoucher(null);
             }
 
-            if (totalOriginal!=Double.parseDouble(total)) {
-                shoppingCart.setTotal(Double.parseDouble(total));
-            }
             if (country != null && !countryOriginal.equals(country)) {
                 shoppingCart.setCountry(country);
             }
             if (currency != null && !currencyOriginal.equals(currency)) {
-                shoppingCart.setCurrency(currency);
+                paymentSystemService.setCurrency(shoppingCart,currency);
+            }
+            else{
+                //only when the currency doesn't change then change the individual rate
+                if (surCharge != null && surCharge.length()>0 && Double.parseDouble(surCharge)>0) {
+                    shoppingCart.setSurcharge(Double.parseDouble(surCharge));
+                }
+                else
+                {
+                    shoppingCart.setSurcharge(new Double(0.0));
+                }
+                if (noInteg != null && noInteg.length()>0 && Double.parseDouble(noInteg)>0) {
+                    shoppingCart.setNoInteg(Double.parseDouble(noInteg));
+                }
+                else
+                {
+                    shoppingCart.setNoInteg(new Double(0.0));
+                }
+                if (basicFee != null && basicFee.length()>0 && Double.parseDouble(basicFee)>0) {
+                    shoppingCart.setBasicFee(Double.parseDouble(basicFee));
+                }
+                else
+                {
+                    shoppingCart.setBasicFee(new Double(0.0));
+                }
             }
 
-            if (transactionId!=null&&!transactionIdOriginal.equals(transactionId)) {
-                shoppingCart.setTransactionId(transactionId);
+
+            if (StringUtils.isEmpty(transactionId)){
+                shoppingCart.setTransactionId(null);
+            }
+            else
+            {
+                if(!transactionId.equals(transactionIdOriginal)) {
+                    shoppingCart.setTransactionId(transactionId);
+                }
             }
 
-            shoppingCart.update();
+            paymentSystemService.updateTotal(context,shoppingCart,null);
             context.commit();
 
             result.setContinue(true);

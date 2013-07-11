@@ -45,8 +45,6 @@ public interface PaypalService
 
     public boolean getReferenceTransaction(Context context, WorkflowItem workItem, HttpServletRequest request);
 
-    public boolean getReferenceTransaction(Context context, WorkspaceItem workItem, HttpServletRequest request);
-
     public boolean verifyCreditCard(Context context, Item item, HttpServletRequest request);
 
     public void generateUserForm(Context context, Division mainDiv, String actionURL, String knotId, String type, Request request, Item item, DSpaceObject dso) throws WingException, SQLException;
@@ -55,11 +53,11 @@ public interface PaypalService
 
     public void generatePaypalForm(Division mandiv, ShoppingCart shoppingCart, String actionURL, String type) throws WingException, SQLException;
 
-    public void generateVoucherForm(Division form, ShoppingCart shoppingCart, String actionURL, String knotId) throws WingException;
+    public void generateVoucherForm(Division form, String voucherCode, String actionURL, String knotId) throws WingException;
 
     public void generateNoCostForm(Division actionsDiv, ShoppingCart transaction, org.dspace.content.Item item, PaymentSystemConfigurationManager manager, PaymentSystemService paymentSystemService) throws WingException, SQLException;
 
-    public void addSkipPaymentButton(Division mainDiv, String message) throws WingException;
+    public void showSkipPaymentButton(Division mainDiv, String message) throws WingException;
 
     public void addButtons(Division mainDiv) throws WingException;
 }

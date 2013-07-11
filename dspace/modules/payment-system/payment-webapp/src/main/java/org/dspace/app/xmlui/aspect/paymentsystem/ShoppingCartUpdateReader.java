@@ -52,7 +52,7 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
         try{
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
             Context context = ContextUtil.obtainContext(objectModel);
-            ShoppingCart transaction = payementSystemService.getTransaction(context,Integer.parseInt(transactionId));
+            ShoppingCart transaction = payementSystemService.getShoppingCart(context,Integer.parseInt(transactionId));
             if(transaction==null)
             {
                 //can't find the transaction
@@ -86,10 +86,17 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
         Double total = transaction.getTotal();
         //{ "firstName":"John" , "lastName":"Doe" }
         String journal =request.getParameter("journal");
-        Double basicFee =paymentSystemConfigurationManager.getCurrencyProperty(transaction.getCurrency());
+        Double basicFee =transaction.getBasicFee();
         Double surcharge = payementSystemService.getSurchargeLargeFileFee(context,transaction);
         Double noIntegrateFee = payementSystemService.getNoIntegrateFee(context,transaction,journal);
-        String voucherCode = transaction.getVoucher();
+        Integer voucherId= transaction.getVoucher();
+        Voucher voucher = Voucher.findById(context,voucherId);
+        String voucherCode = "";
+        if(voucher!=null)
+        {
+            voucherCode = voucher.getCode();
+        }
+
 
         String result = "{\"total\":\""+String.valueOf(Double.toString(total))+"\",\"price\":\""+basicFee+"\",\"surcharge\":\""+surcharge+"\",\"noIntegrateFee\":\""+noIntegrateFee+"\",\"voucher\":\""+voucherCode+"\"}";
 
@@ -146,7 +153,7 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
         if(request.getParameter("currency")!=null)
         {
             String currency=request.getParameter("currency") .toString();
-            transaction.setCurrency(currency);
+            payementSystemService.setCurrency(transaction,currency);
 
         }
         if(request.getParameter("country")!=null)
@@ -156,21 +163,23 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
         }
         if(request.getParameter("voucher")!=null&&!request.getParameter("voucher").equals("undefined"))
         {
-            String voucher=request.getParameter("voucher").toString();
+            String voucherCode=request.getParameter("voucher").toString();
+            Voucher voucher = Voucher.findByCode(context,voucherCode);
             VoucherValidationService voucherValidationService =  new DSpace().getSingletonService(VoucherValidationService.class);
-//            if(voucherValidationService.validate(context,voucher))
-//            {
-                transaction.setVoucher(voucher);
-//            }
-//            else
-//            {
-//                //try to update the voucher with an invalid voucher code will cause the saved voucher code be deleted
-//                transaction.setVoucher(null);
-//            }
+            if(voucher!=null&&!voucherValidationService.voucherUsed(context,voucherCode))
+            {
+                transaction.setVoucher(voucher.getID());
+            }
+            else
+            {
+                transaction.setVoucher(null);
+            }
+
         }
-        //TODO:only setup the price when the old total price is higher than the price right now
-        transaction.setTotal(payementSystemService.calculateTransactionTotal(context,transaction,journal));
-        transaction.setModified(true);
-        payementSystemService.modifyTransaction(context,transaction,dso);
+        else
+        {
+            transaction.setVoucher(null);
+        }
+        payementSystemService.updateTotal(context,transaction,journal);
     }
 }

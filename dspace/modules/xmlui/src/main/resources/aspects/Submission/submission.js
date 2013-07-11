@@ -905,7 +905,7 @@ function doWorkflow()
     var workflow = WorkflowFactory.getWorkflow(coll);
     var step = workflow.getStep(cocoon.request.get("stepID"));
 
-
+    var contextPath = cocoon.request.getContextPath();
     if (workflowItemId == null)
     {
         throw "Unable to find workflow, no workflow id supplied.";
@@ -963,8 +963,7 @@ function doWorkflow()
         }
         else if (cocoon.request.get("submit-voucher"))
         {
-            var collection = Collection.find(getDSContext(),coll.getID());
-            cocoon.redirectTo(contextPath+"/handle/"+collection.getHandle()+"/workflow_new?workflowID="+workflowItemId+"&stepID=reAuthorizationPaymentStep&actionID=reAuthorizationPaymentAction",true);
+            cocoon.redirectTo(contextPath+"/handle/"+handle+"/workflow_new?workflowID="+workflowItemId+"&stepID=reAuthorizationPaymentStep&actionID=reAuthorizationPaymentAction&submit-voucher=true&voucher="+cocoon.request.get("voucher"),true);
         }
         else if (cocoon.request.get("submit_cancel"))
         {

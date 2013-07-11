@@ -50,7 +50,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_administrative_access_shoppingcart 	= message("xmlui.administrative.Navigation.administrative_access_shoppingcart");
 
     private static final Message T_administrative_shoppingcart 			= message("xmlui.administrative.Navigation.administrative_shoppingcart");
-
+    private static final Message T_administrative_voucher 			= message("xmlui.administrative.Navigation.administrative_voucher");
 
     private static final Message T_my_account                       = message("xmlui.EPerson.Navigation.my_account");
 
@@ -178,6 +178,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             List property = admin.addList("properties");
             property.setHead(T_administrative_access_shoppingcart);
             property.addItemXref(contextPath+"/shoppingcart", T_administrative_shoppingcart);
+            property.addItemXref(contextPath+"/voucher", T_administrative_voucher);
         }
     }
 

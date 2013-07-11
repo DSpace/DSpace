@@ -65,12 +65,12 @@ public class ShoppingCartConsumer implements Consumer {
             if(publication==null) publication=item[0];
 
             DCValue[] journal = publication.getMetadata("prism.publicationName");
-            ShoppingCart shoppingCart = paymentSystemService.getTransactionByItemId(context,publication.getID());
+            ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(context,publication.getID());
             if(shoppingCart!=null)
             {
                Double oldPrice = shoppingCart.getTotal();
                //recaculate based on the current rate
-               Double newPrice = paymentSystemService.calculateTransactionTotal(context,shoppingCart,journal[0].value);
+               Double newPrice = paymentSystemService.calculateShoppingCartTotal(context,shoppingCart,journal[0].value);
 
                Double oversized = paymentSystemService.getSurchargeLargeFileFee(context,shoppingCart);
 

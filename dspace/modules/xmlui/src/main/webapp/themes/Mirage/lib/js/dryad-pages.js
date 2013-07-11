@@ -17,24 +17,6 @@ jQuery(document).ready(function() {
         jQuery(buttonId).val(showButton.val());
     }
 
-    jQuery("#aspect_submission_submit_CheckoutStep_div_voucher").hide();
-    jQuery("#aspect_submission_workflow_WorkflowTransformer_div_voucher").hide();
-    jQuery('input[value=foobar]:radio').attr('checked',true);
-    jQuery('input[name=payment-method]:radio').change(function(){
-
-        var id = "#aspect_submission_submit_CheckoutStep_div_"+this.value;
-        if(jQuery(this).prop('checked'))
-            jQuery(id).show();
-        else
-            jQuery(id).hide();
-
-        var id = "#aspect_submission_workflow_WorkflowTransformer_div_"+this.value;
-        if(jQuery(this).prop('checked'))
-            jQuery(id).show();
-        else
-            jQuery(id).hide();
-    });
-
 
 
 /* If the page has separate sidebar boxes, try to align the topmost

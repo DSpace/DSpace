@@ -45,7 +45,7 @@ public class PaymentSystemConfigurationManager {
 
     private static String UnitSize = ConfigurationManager.getProperty("payment-system","dryad.paymentsystem.unitSize");
 
-    public PaymentSystemConfigurationManager()
+    static
     {
         country = new Properties();
         currency = new Properties();
