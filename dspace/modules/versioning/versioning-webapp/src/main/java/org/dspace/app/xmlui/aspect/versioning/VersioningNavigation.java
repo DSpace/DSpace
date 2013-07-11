@@ -196,7 +196,7 @@ public class VersioningNavigation extends AbstractDSpaceTransformer implements C
 		// Temporariliy disabling versioning for normal users -- at the request of curators.
 		// When we're ready to re-enable versioning, uncomment the following line and remove the opening "if" line below it:
 		//                if(isCurrentEpersonItemOwner(item) || canCurrentEPersonEditTheItem(item) || isCurrentEpersonACurator()){
-		if(isCurrentEpersonACurator()){
+		if(isCurrentEpersonACurator() || canCurrentEPersonEditTheItem(item) ){
                     boolean headAdded=false;
                     if(isLatest(item) && item.isArchived()){
                         context.setHead(T_context_head);

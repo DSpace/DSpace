@@ -247,11 +247,11 @@ public class DSpaceCocoonServletFilter implements Filter
 
         } catch (RuntimeException e) {
             ContextUtil.abortContext(realRequest);
-            LOG.debug("Serious Runtime Error Occurred Processing Request!", e);
+            LOG.error("Serious Runtime Error Occurred Processing Request!", e);
             throw e;
         } catch (Exception e) {
             ContextUtil.abortContext(realRequest);
-            LOG.debug("Serious Error Occurred Processing Request!", e);
+            LOG.error("Serious Error Occurred Processing Request!", e);
         } finally {
             // Close out the DSpace context no matter what.
             ContextUtil.completeContext(realRequest);

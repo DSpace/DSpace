@@ -7,7 +7,6 @@ import java.util.*;
 
 import javax.mail.MessagingException;
 
-import com.sun.corba.se.impl.orbutil.concurrent.Sync;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthPolicy;
@@ -21,9 +20,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.crosswalk.CrosswalkException;
-import org.dspace.content.crosswalk.DIMDisseminationCrosswalk;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
-import org.dspace.content.crosswalk.XSLTDisseminationCrosswalk;
 import org.dspace.core.*;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
@@ -84,24 +81,35 @@ public class CDLDataCiteService {
     public String registerDOI(String aDOI, String aURL, Map<String, String> metadata) throws IOException {
 
         if (ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)) {
-            if (aDOI.startsWith("doi")) {
-                aDOI = aDOI.substring(4);
-            }
-
-            PutMethod put = new PutMethod(BASEURL + "/id/doi%3A" + aDOI);
+            PutMethod put = new PutMethod(generateEzidUrl(aDOI));
             return executeHttpMethod(aURL, metadata, put);
         }
         return "datacite.notConnected";
     }
 
+    public String extractDataciteMetadata(String encodedResponse) {
+        if(encodedResponse == null) {
+            return "";
+        }
+        Map<String, String> decoded = decodeAnvl(encodedResponse);
+        if(decoded != null && decoded.containsKey("datacite")) {
+            return decoded.get("datacite");
+        } else {
+            return "";
+        }
+    }
+
+    public static String generateEzidUrl(String aDOI) {
+        if (aDOI.startsWith("doi")) {
+            aDOI = aDOI.substring(4);
+        }
+        return BASEURL + "/id/doi%3A" + aDOI;
+    }
+
     public String lookup(String aDOI) throws IOException {
 
         if (ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)) {
-            if (aDOI.startsWith("doi")) {
-                aDOI = aDOI.substring(4);
-            }
-
-            GetMethod get = new GetMethod(BASEURL + "/id/doi%3A" + aDOI);
+            GetMethod get = new GetMethod(generateEzidUrl(aDOI));
             HttpMethodParams params = new HttpMethodParams();
 
             get.setRequestHeader("Content-Type", "text/plain");
@@ -131,12 +139,8 @@ public class CDLDataCiteService {
 	    return "datacite.notConnected";
 	}
 
-	if (aDOI.startsWith("doi")) {
-	    aDOI = aDOI.substring(4);
-	}
-	
 	aDOI = aDOI.toUpperCase();
-	String fullURL = BASEURL + "/id/doi%3A" + aDOI;
+	String fullURL = generateEzidUrl(aDOI);
 	log.debug("posting to " + fullURL);
 	PostMethod post = new PostMethod(fullURL);
 	
@@ -176,7 +180,7 @@ public class CDLDataCiteService {
         // if test env
         if (ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)) {
             doi = doi.substring(doi.indexOf('/') + 1);
-            doi = "doi:10.5072/" + doi;
+            doi = "doi:10.5072/FK2/" + doi;
         }
         return doi;
     }
@@ -262,7 +266,17 @@ public class CDLDataCiteService {
 
     private void updateItem(Item item, String doi) throws IOException {
         try {
-            log.debug("Update Item: " + doi + " result: " + this.update(doi, null, createMetadataList(item)));
+            DOI aDOI = new DOI(doi, item);
+            String target = aDOI.getTargetURL().toString();
+            try {
+                // if item is in blackout, change target to the blackout URL
+                if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
+                    target = "http://datadryad.org/publicationBlackout";
+                }
+            } catch (SQLException ex) {
+                log.error("Error checking if item is in blackout: " + ex.getLocalizedMessage());
+            }
+            log.debug("Update Item: " + doi + " result: " + this.update(aDOI.toID(), target, createMetadataList(item)));
 
         } catch (DOIFormatException de) {
             log.debug("Can't sync the following Item: " + item.getID() + " - " + doi);
@@ -376,6 +390,7 @@ public class CDLDataCiteService {
                 System.out.println(service.registerDOI(doiID, target, metadata));
             } else if (action.equals("update")) {
                 if (target.equals("NULL")) target = null;
+
                 System.out.println(service.update(doiID, target, metadata));
             }
             else {
@@ -406,7 +421,13 @@ public class CDLDataCiteService {
     public static Map<String, String> createMetadataListXML(Item item) {
         Map<String, String> metadata = new HashMap<String, String>();
         try {
-            DisseminationCrosswalk dc = (DisseminationCrosswalk) PluginManager.getNamedPlugin(DisseminationCrosswalk.class, "DIM2DATACITE");
+            String crosswalk = "DIM2DATACITE";
+            // If item is in publication blackout, get the appropriate crosswalk
+            if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
+                log.info("Item is in publication blackout, using blackout crosswalk");
+                crosswalk = "DIM2DATACITE-BLACKOUT";
+            }
+            DisseminationCrosswalk dc = (DisseminationCrosswalk) PluginManager.getNamedPlugin(DisseminationCrosswalk.class, crosswalk);
             Element element = dc.disseminateElement(item);
             XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
             String xmlout = outputter.outputString(element);
@@ -469,7 +490,10 @@ public class CDLDataCiteService {
     private String encodeAnvl(String target, Map<String, String> metadata) {
         Iterator<Map.Entry<String, String>> i = metadata.entrySet().iterator();
         StringBuffer b = new StringBuffer();
-	b.append("_target: " + escape(target) + "\n");
+        // anvil is _key: value. If incoming target is null, do not include it in the result
+        if(target != null) {
+            b.append("_target: " + escape(target) + "\n");
+        }
 	while (i.hasNext()) {
             Map.Entry<String, String> e = i.next();
             b.append(escape(e.getKey()) + ": " + escape(e.getValue()) + "");
@@ -478,6 +502,9 @@ public class CDLDataCiteService {
     }
 
      private String escape(String s) {
+         if(s == null) {
+             return "";
+         }
         return s.replace("%", "%25").replace("\n", "%0A").
                 replace("\r", "%0D").replace(":", "%3A");
     }

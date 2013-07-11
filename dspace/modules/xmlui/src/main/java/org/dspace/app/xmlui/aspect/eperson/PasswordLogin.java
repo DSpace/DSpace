@@ -259,7 +259,7 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements
 
 		Table regTable = register.addTable("register", 2, 2);
 
-		regTable.setHead(T_head1);
+		regTable.setHead(T_head2);
 		Row regRow1 = regTable.addRow();
 		Cell regRow1Cell1 = regRow1.addCell();
 		Cell regRow1Cell2 = regRow1.addCell();
@@ -288,7 +288,7 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements
 				+ "/password-login", Division.METHOD_POST, "login-right");
 
 		Table loginTable = login.addTable("login", 3, 2);
-		loginTable.setHead(T_head2);
+		loginTable.setHead(T_head1);
 
 		Row loginRow1 = loginTable.addRow();
 		Cell loginRow1Cell1 = loginRow1.addCell();

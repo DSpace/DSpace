@@ -53,10 +53,11 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.authority.Choices;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.content.packager.PackageDisseminator;
+import org.dspace.content.packager.PackageParameters;
+import org.dspace.core.*;
 import org.dspace.eperson.EPerson;
+import org.dspace.handle.HandleManager;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.workflow.*;
 import org.xml.sax.SAXException;
@@ -67,6 +68,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
@@ -1155,7 +1157,51 @@ public class FlowUtils {
                         args.add("-");
 
                         log.info("Calling the packager (for thread: " + threadId + ") with arguments: " + Arrays.toString(args.toArray(new String[args.size()])));
-                        Packager.main(args.toArray(new String[args.size()]));
+                        Context context = new Context();
+                        PackageParameters pkgParams = new PackageParameters();
+                        //-d option
+                        //-i option
+                        String identifier = datasetHandle;
+                        //-e option
+                        EPerson myEPerson = EPerson.findByEmail(context, currentUser.getEmail());
+                        context.setCurrentUser(myEPerson);
+                        //-o option
+                        pkgParams.addProperty("files", "10255/dryad.42095");
+                        //-t option
+                        String packagerType ="BAGIT";
+                        //-o option
+                        pkgParams.addProperty("xwalk", "DRYAD-V3");
+                        //-o option
+                        pkgParams.addProperty("repo", "TreeBASE");
+                        //- option
+                        String sourceFile = "-";
+
+                        //Packager.main(args.toArray(new String[args.size()]));
+                        PackageDisseminator dip = (PackageDisseminator) PluginManager
+                                .getNamedPlugin(PackageDisseminator.class, packagerType);
+                        if (dip == null)
+                        {
+                            usageError("Error, Unknown package type: "+packagerType);
+                        }
+
+                        DSpaceObject dso = HandleManager.resolveToObject(context, identifier);
+                        if (dso == null)
+                        {
+                            throw new IllegalArgumentException("Bad identifier/handle -- "
+                                    + "Cannot resolve handle \"" + identifier + "\"");
+                        }
+
+                        //disseminate the requested object
+                       // Packager.disseminate(context, dip, dso, pkgParams, sourceFile);
+                        File pkgFile = new File(sourceFile);
+                        System.out.println("\nDisseminating DSpace " + Constants.typeText[dso.getType()] +
+                                " [ hdl=" + dso.getHandle() + " ] to " + sourceFile);
+                        dip.disseminate(context, dso, pkgParams, pkgFile);
+                        if(pkgFile!=null && pkgFile.exists())
+                        {
+                            System.out.println("\nCREATED package file: " + pkgFile.getCanonicalPath());
+                        }
+
 
                     } catch (Exception e){
                         log.error("Error an unknown exception occurred when posting a handle in the export handles thread, logdata: [" + getLogData() + " repoName:" + repoName + " handlesToPost:" + Arrays.toString(handles.toArray(new String[handles.size()])) +  " ]");
@@ -1197,5 +1243,13 @@ public class FlowUtils {
             throw new UIException("Unable to parse metedata field name: "+name);
         }
         return parts;
+    }
+
+    // die from illegal command line
+    private static void usageError(String msg)
+    {
+        System.out.println(msg);
+        System.out.println(" (run with -h flag for details)");
+        System.exit(1);
     }
 }

@@ -228,7 +228,7 @@ public class DataOneLogger {
             if (colonpos>-1){  //expect it to be there, but to be safe
                 pidFilter = pidFilter.substring(0,colonpos) + "\\:" + pidFilter.substring(colonpos+1);
             }
-            result.addFilterQuery("identifier:" + pidFilter);
+            result.addFilterQuery("identifier:" + pidFilter + "*");
             log.info("Adding pid filter: " + pidFilter);
         }
         return result;

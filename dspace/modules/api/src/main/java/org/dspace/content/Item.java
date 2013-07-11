@@ -716,14 +716,17 @@ public class Item extends DSpaceObject
             {
                 dcv.value = null;
             }
-            dublinCore.add(dcv);
-            addDetails(fieldName);
+            if(!dublinCore.contains(dcv)){
+                dublinCore.add(dcv);
+                addDetails(fieldName);
+                dublinCoreChanged = true;
+            }
         }
 
-        if (values.length > 0)
-        {
-            dublinCoreChanged = true;
-        }
+//        if (values.length > 0)
+//        {
+//            dublinCoreChanged = true;
+//        }
     }
 
     /**

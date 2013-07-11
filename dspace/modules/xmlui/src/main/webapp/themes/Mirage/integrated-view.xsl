@@ -29,8 +29,8 @@
 	   <p class="license-badges" style="font-size: 0.9em;">
 	     <i18n:text>xmlui.dri2xhtml.METS-1.0.license-cc0</i18n:text>
 	     <xsl:text> </xsl:text>
-	     <a href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank" class="single-image-link"><img src="/themes/Dryad/images/cc-zero.png"/></a>
-	     <a href="http://opendefinition.org/" target="_blank" class="single-image-link"><img src="/themes/Dryad/images/opendata.png"/></a>
+	     <a href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank" class="single-image-link"><img src="/themes/Dryad/images/cc-zero.png" alt="CC0 (opens a new window)"/></a>
+	     <a href="http://opendefinition.org/" target="_blank" class="single-image-link"><img src="/themes/Dryad/images/opendata.png" alt="Open Data (opens a new window)"/></a>
 	   </p>
 	   
           <xsl:apply-templates select="*[not(name()='head')]" mode="embeddedView"/>
@@ -62,14 +62,14 @@
           <tbody>
           <tr>
             <th>Title</th>
-            <th><xsl:copy-of select=".//dim:field[@element='title']"/></th>        
+            <th><xsl:value-of select=".//dim:field[@element='title']"/></th>        
 	    <!-- Download count -->
 	    <xsl:variable name="downloads" select=".//dim:field[@element='dryad'][@qualifier='downloads']"/>
 	    <xsl:if test="$downloads > 0">
 	      <tr>
 		<th><i18n:text>xmlui.DryadItemSummary.downloads</i18n:text></th>
 		<td>
-		  <xsl:copy-of select="$downloads" />
+		  <xsl:value-of select="$downloads" />
 		  <xsl:choose>
 		    <xsl:when test="$downloads='1'"> time</xsl:when>
 		    <xsl:otherwise> times</xsl:otherwise>
@@ -82,7 +82,7 @@
 	      <tr>
 		<th>Description</th>
 		<td>
-		  <xsl:copy-of select="$my_description" />
+		  <xsl:value-of select="$my_description" />
 		</td>
 	      </tr>
 	    </xsl:if>
@@ -120,48 +120,51 @@
                         </xsl:otherwise>
                     </xsl:choose>
 		    <xsl:text>)</xsl:text></span></a>
-              <!-- View File Details -->
-              <xsl:if test="$token!=''">
-                <a>
-                    <xsl:attribute name="href">
-                        <xsl:text>/review?doi=</xsl:text>
-                        <xsl:copy-of select="$my_doi"/>
-                        <xsl:text>&amp;token=</xsl:text>
-                        <xsl:copy-of select="$token"/>
-                    </xsl:attribute>
-                    <xsl:text>View File Details</xsl:text>
-                </a>
-            </xsl:if>
-
-            <xsl:if test="not($token!='')">
-                <xsl:variable name="my_doi"
-                              select="//dim:field[@element='identifier'][not(@qualifier)][starts-with(., 'doi:')]"/>
-                <xsl:variable name="my_uri"
-                              select="//dim:field[@element='identifier'][@qualifier='uri'][not(starts-with(., 'doi'))]"/>
-		<xsl:text>&#160;</xsl:text>                
-		<a>
-                    <!-- link -->
-                    <xsl:attribute name="href">
-                        <xsl:choose>
-                            <xsl:when test="$my_doi">
-                                <xsl:call-template name="checkURL">
-                                    <xsl:with-param name="doiIdentifier" select="$my_doi"/>
-                                </xsl:call-template>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="$my_uri"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:attribute>
-
-		    <xsl:text>View&#160;File&#160;Details</xsl:text>
-                </a>
-              </xsl:if>
             </td>
           </tr>
 
           </xsl:for-each>
-
+        <tr>
+        <!-- View File Details -->
+        <th>Details</th>
+        <td>
+          <a>
+            <!-- link -->
+            <xsl:choose>
+              <!-- Have token -->
+              <xsl:when test="$token!=''">
+              <xsl:attribute name="href">
+                <xsl:text>/review?doi=</xsl:text>
+                <xsl:copy-of select="$my_doi"/>
+                <xsl:text>&amp;token=</xsl:text>
+                <xsl:copy-of select="$token"/>
+              </xsl:attribute>
+              <xsl:text>View File Details</xsl:text>
+              </xsl:when>
+              <!-- No token -->
+              <xsl:otherwise>
+                <xsl:variable name="my_doi"
+                              select="//dim:field[@element='identifier'][not(@qualifier)][starts-with(., 'doi:')]"/>
+                <xsl:variable name="my_uri"
+                              select="//dim:field[@element='identifier'][@qualifier='uri'][not(starts-with(., 'doi'))]"/>
+                <xsl:attribute name="href">
+                  <xsl:choose>
+                    <xsl:when test="$my_doi">
+                      <xsl:call-template name="checkURL">
+                        <xsl:with-param name="doiIdentifier" select="$my_doi"/>
+                      </xsl:call-template>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$my_uri"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+                <xsl:text>View File Details</xsl:text>
+            </xsl:otherwise>
+            </xsl:choose>
+          </a>
+        </td>
+    </tr>
         <!-- Embargo Notice -->
         <xsl:variable name="embargoedDate"
                       select=".//dim:field[@element='date' and @qualifier='embargoedUntil']"/>

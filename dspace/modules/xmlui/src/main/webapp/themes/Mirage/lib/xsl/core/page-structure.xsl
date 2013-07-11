@@ -356,14 +356,30 @@ references to stylesheets pulled directly from the pageMeta element. -->
     <xsl:template name="buildHeader">
         <div id="ds-header-wrapper">
             <div id="ds-header" class="clearfix">
-                <a id="skip-nav" href="#ds-body"><img src="/themes/Mirage/images/nada.gif" alt="Skip navigation" name="skipnav" width="1" height="1" border="0" id="skipnav" /></a>
+                <a id="skip-nav" href="#ds-body" class="accessibly-hidden">Skip navigation</a>
                 <a id="ds-header-logo-link">
                     <xsl:attribute name="href">
                         <xsl:value-of
                                 select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                         <xsl:text>/</xsl:text>
                     </xsl:attribute>
-                    <span id="ds-header-logo">&#160;</span>
+                    <xsl:choose>
+                        <xsl:when test="$meta[@element='request'][@qualifier='realServerPort'][. = '9999']">
+                            <span class="ds-header-logo" id="ds-header-logo-dev">&#160;</span>
+                        </xsl:when>
+                        <xsl:when test="$meta[@element='request'][@qualifier='realServerPort'][. = '7777']">
+                            <span class="ds-header-logo" id="ds-header-logo-demo">&#160;</span>
+                        </xsl:when>
+                        <xsl:when test="$meta[@element='request'][@qualifier='realServerPort'][. = '8888']">
+                            <span class="ds-header-logo" id="ds-header-logo-staging">&#160;</span>
+                        </xsl:when>
+                        <xsl:when test="$meta[@element='request'][@qualifier='realServerPort'][. = '6666']">
+                            <span class="ds-header-logo" id="ds-header-logo-mrc">&#160;</span>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <span class="ds-header-logo" id="ds-header-logo-prod">&#160;</span>
+                        </xsl:otherwise>
+                    </xsl:choose>
                     <span id="ds-header-logo-text">mirage</span>
                 </a>
                 <h1 class="pagetitle visuallyhidden">
@@ -396,7 +412,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     </a>
 		    -->
                     <a href="http://blog.datadryad.org/feed/">
-                        <img src="/themes/Mirage/images/dryad_rss_icon.png" alt="RSS feed"/>
+                        <img src="/themes/Mirage/images/dryad_rss_icon.png" alt="RSS feed - Dryad News"/>
                     </a>
                 </div>
 
@@ -545,9 +561,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <a href="/login">Login</a>
                                 </li>
                                 <li id="sign-up-item">
-                                    <a href="/login">
-                                        Sign Up
-                                    </a>
+                                    <a href="/login">Sign Up</a>
                                 </li>
                             </xsl:otherwise>
                         </xsl:choose>
@@ -894,7 +908,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
             &#160;
         </script>
         <script type="text/javascript">
-            <xsl:text>DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');jQuery.each(jQuery('img[src$=png]'), function() {DD_belatedPNG.fixPng(this);});</xsl:text>
+            <xsl:text>DD_belatedPNG.fix('.ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');jQuery.each(jQuery('img[src$=png]'), function() {DD_belatedPNG.fixPng(this);});</xsl:text>
         </script>
         <xsl:text disable-output-escaping="yes">&lt;![endif]--&gt;</xsl:text>
 

@@ -13,6 +13,10 @@ import org.dspace.workflow.actions.ActionResult;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.sql.SQLException;
+import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.IdentifierService;
+import org.dspace.utils.DSpace;
+import org.dspace.workflow.DryadWorkflowUtils;
 
 /**
  * Created by IntelliJ IDEA.
@@ -38,10 +42,10 @@ public class PendingPublicationAction extends ProcessingAction{
 
     @Override
     public ActionResult execute(Context c, WorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException {
-        if(DryadJournalSubmissionUtils.isJournalBlackedOut(c, wfi.getItem(), wfi.getCollection()))
+        if(DryadJournalSubmissionUtils.isJournalBlackedOut(c, wfi.getItem(), wfi.getCollection())) {
             return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, BLACKOUT_REQUIRED);
-
-        return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, BLACKOUT_NOT_REQUIRED);
-
+        } else {
+            return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, BLACKOUT_NOT_REQUIRED);
+        }
     }
 }

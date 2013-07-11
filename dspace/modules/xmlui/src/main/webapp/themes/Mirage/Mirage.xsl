@@ -179,8 +179,6 @@
             #dryad-home-carousel .bx-pager {
             }
             #dryad-home-carousel .bx-pager-item {
-                position: relative;
-                top: 2px;
             }
 
             #dryad-home-carousel .bx-controls-auto {
@@ -232,11 +230,6 @@
                 <div id="dryad-home-carousel" class="ds-static-div primary">
                     <div class="bxslider" style="">
                         <div>
-                            <a href="/pages/membershipMeeting">
-                                <img src="/themes/Mirage/images/2013membershipMeeting.jpg" alt="Dryad Membership Meeting, May 24, Oxford, UK" />
-                            </a>
-                        </div>
-                        <div>
                             <p Xid="ds-dryad-is" style="font-size: 88%; line-height: 1.35em;"
                                xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
                                 <span style="color: #595;">DataDryad.org</span>
@@ -284,6 +277,7 @@
                       id="aspect_discovery_SiteViewer_div_front-page-search" class="ds-interactive-div primary" style="overflow: hidden;"
                       action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
                     <p class="ds-paragraph" style="overflow; hidden; margin-bottom: 0px;">
+                        <label for="aspect_discovery_SiteViewer_field_query" class="accessibly-hidden">Enter keyword, author, title, DOI</label>
                         <input xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                                id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
                                placeholder="Enter keyword, author, title, DOI, etc. Example: herbivory"
@@ -357,7 +351,7 @@
                     </div>
                     <div id="most-viewed-data" class="browse-data-panel">
 
-                        <xsl:apply-templates select="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostViewedItem.div.home']"/>
+                        <xsl:apply-templates select="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostDownloadedBitstream.div.home']"/>
 
                     </div>
 
@@ -386,6 +380,7 @@
                           onsubmit="return subscribeMailingList(this);">
                         <p class="ds-paragraph" style="text-align: left; margin-bottom: 2px;">
                             <xsl:text>Sign up for announcements.</xsl:text>
+                            <label for="file_news_div_mailing_list_input_email" class="accessibly-hidden">Your email address</label>
                             <input placeholder="Your e-mail" title="Your e-mail" type="text" name="email" class="ds-text-field" style="width: 240px; margin-top: 8px;" id="file_news_div_mailing_list_input_email" />
                         </p>
                         <input value="Subscribe" type="submit" name="submit" class="ds-button-field" id="file_news_div_mailing_list_input_subscribe" />
@@ -398,10 +393,13 @@
                 <h1 class="ds-div-head">Recently integrated journals</h1>
                 <div id="recently_integrated_journals" class="ds-static-div primary">
 		  <div class="container">
-		    <a href="/discover?field=prism.publicationName_filter&amp;fq=location:l2&amp;fq=prism.publicationName_filter%3Amethods%5C+in%5C+ecology%5C+and%5C+evolution%5C%7C%5C%7C%5C%7CMethods%5C+in%5C+Ecology%5C+and%5C+Evolution"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-MEE.png" alt="Methods in Ecology and Evolution" /></a>
-		    <a href="/discover?field=prism.publicationName_filter&amp;fq=location:l2&amp;fq=prism.publicationName_filter%3Abiology\+letters\|\|\|Biology\+Letters"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-bioletts.png" alt="Biology Letters" /></a>
-		    <a href="/discover?field=prism.publicationName_filter&amp;fq=location:l2&amp;fq=prism.publicationName_filter%3Ajournal\+of\+animal\+ecology\|\|\|Journal\+of\+Animal\+Ecology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-jae.png" alt="Journal of Animal Ecology" /></a>
-		    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-GMS.png" alt="gms German Medical Science" />
+        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;fq=location:l2&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+open%5C+public%5C+health%5C+data%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+Open%5C+Public%5C+Health%5C+Data"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-jophdCover.png" alt="Journal of Open Public Health Data" /></a>
+
+        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;fq=location:l2&amp;fq=prism.publicationName_filter%3Aplos%5C+genetics%5C%7C%5C%7C%5C%7CPLoS%5C+Genetics"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-PLOS-Genetics.png" alt="PLOS Genetics" /></a>
+
+        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;fq=location:l2&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+ecology%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+Ecology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JECOLcover.gif" alt="Journal of Ecology" /></a>
+
+        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;fq=location:l2&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+applied%5C+ecology%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+Applied%5C+Ecology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JAPPLcover.gif" alt="Journal of Applied Ecology" /></a>
 		  </div>
                 </div>
             </div>
@@ -1000,8 +998,8 @@ parameter that is being used (see variable defined above) -->
         </div>
     </xsl:template>
 
-    <xsl:template match="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostViewedItem.div.home']">
-        <div id="aspect_discovery_MostViewedItem_table_most-viewed">
+    <xsl:template match="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostDownloadedBitstream.div.home']">
+        <div id="aspect_discovery_MostDownloadedBitstream_table_most-downloaded">
             <xsl:apply-templates select="./dri:div/dri:head"/>
             <table>
                 <tr>
@@ -1014,7 +1012,7 @@ parameter that is being used (see variable defined above) -->
                     </xsl:variable>
                     <tr>
                         <td><xsl:apply-templates select="." mode="summaryList"/></td>
-                        <td><xsl:apply-templates select="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostViewedItem.div.home']/dri:div/dri:div[@n='count']/dri:list/dri:item[position()=$position]"/></td>
+                        <td><xsl:apply-templates select="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostDownloadedBitstream.div.home']/dri:div/dri:div[@n='count']/dri:list/dri:item[position()=$position]"/></td>
                     </tr>
                 </xsl:for-each>
 

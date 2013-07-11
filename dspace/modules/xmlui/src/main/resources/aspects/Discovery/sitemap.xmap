@@ -67,7 +67,7 @@ and searching the repository.
             <map:transformer name="FrontPageSearch" src="org.dspace.app.xmlui.aspect.discovery.SiteViewer"/>
             <map:transformer name="SiteRecentSubmissions" src="org.dspace.app.xmlui.aspect.discovery.SiteRecentSubmissions"/>
             <map:transformer name="SearchFilterTransformer" src="org.dspace.app.xmlui.aspect.discovery.SearchFilterTransformer"/>
-            <map:transformer name="MostViewedItems" src="org.dspace.app.xmlui.aspect.discovery.MostViewedItem"/>
+            <map:transformer name="MostDownloadedBitstream" src="org.dspace.app.xmlui.aspect.discovery.MostDownloadedBitstream"/>
 
             <map:transformer name="CommunitySearch" src="org.dspace.app.xmlui.aspect.discovery.CommunitySearch"/>
             <map:transformer name="CommunityViewer" src="org.dspace.app.xmlui.aspect.discovery.CommunityViewer"/>
@@ -159,11 +159,11 @@ and searching the repository.
                          <map:parameter name="field" value="prism.publicationName_filter" />
                 </map:transform>
 
-                <map:transform type="MostViewedItems"/>
+                <map:transform type="MostDownloadedBitstream"/>
                 <map:serialize type="xml"/>
             </map:match>
-            <map:match pattern="most_viewed_items">
-                <map:transform type="MostViewedItems"/>
+            <map:match pattern="most_downloaded_bitstreams">
+                <map:transform type="MostDownloadedBitstream"/>
                 <map:serialize type="xml"/>
             </map:match>
 

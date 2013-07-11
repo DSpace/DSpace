@@ -8,9 +8,14 @@ import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.services.ConfigurationService;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.dspace.doi.DOI;
+import org.dspace.doi.DryadDOIRegistrationHelper;
 
 /**
  * Created by IntelliJ IDEA.
@@ -47,7 +52,18 @@ public class DataCiteSynchronizer extends AbstractCurationTask{
         String doi = DOIIdentifierProvider.getDoiValue(item);
 
         Map<String, String> metadatalist = dataCiteService.createMetadataList(item);
-        String response = dataCiteService.update(doi, null, metadatalist);
+        DOI aDOI = new DOI(doi, item);
+        String target = aDOI.getTargetURL().toString();
+        try {
+            // if item is in blackout, change target to the blackout URL
+            if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
+                target = "http://datadryad.org/publicationBlackout";
+            }
+        } catch (SQLException ex) {
+            this.setResult("Unable to check if item is in publication blackout: " + ex.getLocalizedMessage());
+            return Curator.CURATE_FAIL;
+        }
+        String response = dataCiteService.update(aDOI.toID(), target, metadatalist);
 
         if(response.contains("bad request") || response.contains("BAD REQUEST")){
             this.setResult(response);

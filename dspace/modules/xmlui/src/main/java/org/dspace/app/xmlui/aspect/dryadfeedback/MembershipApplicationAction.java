@@ -174,11 +174,6 @@ public class MembershipApplicationAction extends AbstractAction
             }
         }
 
-        if ((fromPage == null) || ((fromPage.indexOf(basicHost) == -1) && (validReferral == false)))
-        {
-            // N.B. must use old message catalog because Cocoon i18n is only available to transformed pages.
-            throw new AuthorizeException(I18nUtil.getMessage("feedback.error.forbidden"));
-        }
 
         // All data is there, send the email
         Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "membership_application"));

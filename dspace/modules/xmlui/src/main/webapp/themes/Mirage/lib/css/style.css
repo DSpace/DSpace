@@ -76,16 +76,35 @@ a:hover {
     cursor: pointer;
 }
 
-#ds-header-logo {
+.ds-header-logo {
     float:left;
     width: 155px;
     height: 88px;
     margin-top: 10px;
-    background: url('../../images/dryad-logo.png');
     background-position: left bottom;
     background-repeat: no-repeat;
     background-color: transparent;
     margin-right: 15px;
+}
+
+#ds-header-logo-prod {
+    background: url('../../images/dryad-logo.png');
+}
+
+#ds-header-logo-dev {
+    background: url('../../images/dryad-logo-dev.png');
+}
+
+#ds-header-logo-demo {
+    background: url('../../images/dryad-logo-demo.png');
+}
+
+#ds-header-logo-staging {
+    background: url('../../images/dryad-logo-staging.png');
+}
+
+#ds-header-logo-mrc {
+    background: url('../../images/dryad-logo-mrc.png');
 }
 
 #ds-header-logo-text {
@@ -216,7 +235,7 @@ a.discreet {
 
 
 /*make transparent PNGs invisible in IE6 until PNG-fix is applied*/
-.ie6 #ds-header-logo,
+.ie6 .ds-header-logo,
 .ie6 #ds-footer-logo {
     visibility: hidden;
 }
@@ -273,7 +292,7 @@ h1.ds-option-set-head {
 .publication-header.ds-static-div {
     border: none;
     padding: 0;
-    margin-top: 6px;
+    margin-top: 0px;
     background-color: transparent;
     -moz-box-shadow: none;
     -webkit-box-shadow: none;
@@ -1246,7 +1265,7 @@ div.simple-item-view-description h3{
 }
 
 .file-metadata {
-    width: 300px;
+    width: 400px;
 }
 
 .file-metadata span,
@@ -1260,7 +1279,7 @@ div.simple-item-view-description h3{
 
 .file-metadata span.bold,
 .item-metadata span.bold {
-    width: 80px;
+    width: 130px;
     clear: left;
     text-align: right;
     margin-right: 7px;
@@ -1333,6 +1352,13 @@ form.discover-sort-box select{
 .hidden {
     display:none;
     visibility:hidden;
+}
+/* alternating hiding that works on all screen readers, etc. 
+ *  http://alistapart.com/article/now-you-see-me
+ */
+.accessibly-hidden {
+    position: absolute; 
+    left: -999em;
 }
 
 .icon-button{
@@ -1499,10 +1525,6 @@ a.learn-to-submit-button:hover {
     color: #333;
 }
 
-#skip-nav {
-    float: right;
-    padding-top: 4px;
-}
 #sharing-tools {
     float: right;
     clear: right;
@@ -2224,19 +2246,6 @@ a.feedbackform-user-voice-link {
     }
     
 }
-
-.hidden_form_by{
-    display: none;
+#aspect_discovery_MostDownloadedBitstream_table_most-downloaded th h2{
+    font-size: 1em;
 }
-
-.hidden_form_by{
-    display: none;
-}
-
-.choose_browse_by{
-    display: none;
-}
-#aspect_discovery_SearchFilterTransformer_field_starts_with{
-        margin-left: 15px;
-
-    }

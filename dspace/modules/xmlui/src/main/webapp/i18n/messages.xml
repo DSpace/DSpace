@@ -120,7 +120,7 @@
 	<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Recently Published
 		Data&#160;&#160;<a href="/feed/atom_1.0/10255/3" class="single-image-link"
 			title="Web feed of data packages recently added to Dryad"><img
-				src="/themes/Dryad/images/rss.jpg" style="border: 0px;" alt="RSS feed"/></a>
+				src="/themes/Dryad/images/rss.jpg" style="border: 0px;" alt="RSS feed - Recently Published Data"/></a>
 	</message>
 
 
@@ -357,7 +357,7 @@
 	<message key="xmlui.Site.stats">As of {0}, Dryad contains <span class="bold">{1} data
 			packages</span> and <span class="bold">{2} data files</span>, associated with articles in <span class="bold"
 			>{3} journals</span>.</message>
-	<message key="xmlui.Site.blogfeed.title">News and Views <a href="http://blog.datadryad.org/feed/"><img class="feed-icon" src="/themes/Mirage/images/dryad_rss_icon.png" alt="RSS feed" /></a></message>
+	<message key="xmlui.Site.blogfeed.title">News and Views <a href="http://blog.datadryad.org/feed/"><img class="feed-icon" src="/themes/Mirage/images/dryad_rss_icon.png" alt="RSS feed - News and Views" /></a></message>
 
 
 
@@ -580,14 +580,14 @@
 	<!-- org.dspace.app.xmlui.eperson.PasswordLogin.java -->
 	<message key="xmlui.EPerson.PasswordLogin.title">Sign in to Dryad</message>
 	<message key="xmlui.EPerson.PasswordLogin.trail">Sign in to Dryad</message>
-	<message key="xmlui.EPerson.PasswordLogin.head1">I do not have a Dryad account<br/>and would like to create one</message>
+	<message key="xmlui.EPerson.PasswordLogin.head1">I have a Dryad account<br/>and would like to login</message>
+	<message key="xmlui.EPerson.PasswordLogin.head2">I do not have a Dryad account<br/>and would like to create one</message>
 	<message key="xmlui.EPerson.PasswordLogin.email_address"><nobr>E-Mail Address: </nobr></message>
 	<message key="xmlui.EPerson.PasswordLogin.error_bad_login">The email address and/or password
 		supplied were not valid.</message>
 	<message key="xmlui.EPerson.PasswordLogin.password">Password: </message>
 	<message key="xmlui.EPerson.PasswordLogin.forgot_link"> Forgot your password?</message>
 	<message key="xmlui.EPerson.PasswordLogin.submit">Sign in</message>
-	<message key="xmlui.EPerson.PasswordLogin.head2">I have a Dryad account<br/>and would like to login</message>
 	<message key="xmlui.EPerson.PasswordLogin.para1">Create an account to submit data and/or
 	subscribe to email updates.</message>
 	<message key="xmlui.EPerson.PasswordLogin.submitReg">Register</message>
@@ -2581,7 +2581,7 @@
 	<message key="xmlui.dri2xhtml.structural.search-in-collection">This Collection</message>
 
 	<message key="xmlui.dri2xhtml.structural.pagination-previous">&lt;&lt; Previous Page</message>
-	<message key="xmlui.dri2xhtml.structural.pagination-info">Now showing items {0}-{1}</message>
+	<message key="xmlui.dri2xhtml.structural.pagination-info">Now showing items {0}-{1} of {2}</message>
 	<message key="xmlui.dri2xhtml.structural.pagination-next">Next Page &gt;&gt;</message>
 
 	<message key="xmlui.dri2xhtml.structural.link_cc">Creative Commons</message>
@@ -2624,6 +2624,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-viewOpen">View/<wbr/>Open</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-no-files">There are no files associated with this
 		item.</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-files-checksum">Checksum</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.size-bytes">bytes</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.size-kilobytes">Kb</message>
@@ -3196,6 +3197,23 @@
     <message key="xmlui.Submission.MyTasks.title">My Tasks</message>
     <message key="xmlui.Submission.MyTasks.trail">My Tasks</message>
     <message key="xmlui.Submission.MyTasks.no-results">You currently have no tasks assigned to you.</message>
+    
+    <!-- Messages for showing item status in MyTasks after approving/rejecting -->
+    <message key="xmlui.Submission.MyTasks.item_status">Item Status:</message>
+    <message key="xmlui.Submission.MyTasks.item_title">Title:</message>
+    <message key="xmlui.Submission.MyTasks.doi_registration_status">DOI Registration Status:</message>
+    <message key="xmlui.Submission.MyTasks.doi">DOI:</message>
+    
+    <message key="xmlui.Submission.MyTasks.doi_not_registered">Not Registered with EZID</message>
+    <message key="xmlui.Submission.MyTasks.doi_registered">Successfully Registered with EZID</message>
+    
+    <message key="xmlui.Submission.MyTasks.with_identifier"> with identifier: </message>
+
+    <message key="xmlui.Submission.MyTasks.archived_status">Archived</message>
+    <message key="xmlui.Submission.MyTasks.blackout_status">Blackout</message>
+    <message key="xmlui.Submission.MyTasks.withdrawn_status">Withdrawn</message>
+    <message key="xmlui.Submission.MyTasks.workflow_status">Workflow</message>
+    <message key="xmlui.Submission.MyTasks.workspace_status">Workspace</message>
 
     <message key="xmlui.Submission.result-table.head.title">Title</message>
     <message key="xmlui.Submission.result-table.head.submitter">Submitter</message>
@@ -3306,4 +3324,7 @@
     <message key="xmlui.statistics.view.title">Most Viewed Items</message>
     <message key="xmlui.statistics.view.count">Number of Views</message>
     <message key="xmlui.statistics.most.viewed.items">Most Viewed Items</message>
+
+    <!--Most Downloaded Bitstreams -->
+    <message key="xmlui.statistics.download.title">Most Downloaded Bitstreams</message>
 </catalogue>

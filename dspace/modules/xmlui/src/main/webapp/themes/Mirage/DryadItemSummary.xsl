@@ -29,6 +29,8 @@
                   select="/dri:document/dri:body//dri:div[@id='org.datadryad.dspace.xmlui.aspect.browse.ItemViewer.div.notice'][@rend='notice']"/>
     <xsl:variable name="latestDataVersion"
                   select="/dri:document/dri:body/dri:div[@id='aspect.versioning.VersionHistoryForm.div.view-verion-history']/dri:table/dri:row[2]/dri:cell[1]"/>
+    <xsl:variable name="embeddedViewReferenceSet" 
+                  select="//dri:referenceSet[@type='embeddedView']"/>
 
     <xsl:template name="itemSummaryView-DIM">
         <xsl:variable name="datafiles"
@@ -113,23 +115,9 @@
         </div>
         <!-- Data Files in package -->
         <xsl:if test="$datafiles">
-          <div class="ds-static-div primary">
-            <xsl:variable name="dryad_dri_url">
-              <xsl:if test="not($token!='')">
-                <xsl:value-of select="confman:getProperty('dspace.url')"/>
-                <xsl:text>/DRI</xsl:text>
-                <xsl:value-of select="@OBJID"/>
-              </xsl:if>
-              <xsl:if test="$token!=''">
-                <xsl:value-of select="confman:getProperty('dspace.url')"/>
-                <xsl:text>/DRI/review?doi=</xsl:text>
-                <xsl:copy-of select=".//dim:field[@element='identifier'][@mdschema='dc'][not(@qualifier)]"/>
-                <xsl:text>&amp;token=</xsl:text>
-                <xsl:copy-of select="$token"/>
-              </xsl:if>
-            </xsl:variable>
-            <xsl:apply-templates select="document($dryad_dri_url)//dri:referenceSet[@type='embeddedView']"/>
-          </div>
+            <div class="ds-static-div primary">
+                <xsl:apply-templates select="$embeddedViewReferenceSet"/>
+            </div>
         </xsl:if>
         <!-- citing -->
         <!-- CITATION FOR DATA FILE -->
@@ -163,7 +151,8 @@
                                   <xsl:choose>
                                       <xsl:when
                                               test="$article_doi and not(contains($citation, $article_doi))">
-                                          <xsl:copy-of select="$citation"/>
+                                          <xsl:value-of select="$citation"/>
+					  <xsl:text> </xsl:text>
                                           <a>
                                               <xsl:attribute name="href">
                                                   <xsl:choose>
@@ -202,6 +191,7 @@
                                               <xsl:value-of select="$journal"/>
                                               <xsl:text>. </xsl:text>
                                               <i18n:text>xmlui.DryadItemSummary.citationNotYet2</i18n:text>
+					      <xsl:text> </xsl:text>
                                               <xsl:if test="$article_doi">
                                                   <a>
                                                       <xsl:attribute name="href">
@@ -248,12 +238,13 @@
                         <xsl:text> </xsl:text>
                         <xsl:variable name="title"
                                       select="$meta[@element='title'][@qualifier='package']"/>
-                        <xsl:copy-of select="$title"/>
+                        <xsl:value-of select="$title"/>
                         <span>
                             <i18n:text>xmlui.DryadItemSummary.dryadRepo</i18n:text>
                         </span>
                         <!-- if Item not_archived don't add the link. -->
                         <xsl:variable name="id" select="$meta[@element='identifier'][@qualifier='package']"/>
+			<xsl:text> </xsl:text>
                         <xsl:choose>
                             <xsl:when
                                     test="not(/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@mdschema='dc'][@element='date' ][@qualifier='accessioned'])">
@@ -510,7 +501,8 @@
                                     </xsl:when>
                                     <xsl:when
                                             test="$article_doi and not(contains($citation, $article_doi))">
-                                        <xsl:copy-of select="$citation"/>
+                                        <xsl:value-of select="$citation"/>
+					<xsl:text> </xsl:text>
                                         <a>
                                             <xsl:attribute name="href">
                                                 <xsl:value-of
@@ -520,7 +512,7 @@
                                         </a>
                                     </xsl:when>
                                     <xsl:when test="$article_doi">
-                                        <xsl:copy-of select="substring-before($citation, $article_doi)"/>
+                                        <xsl:value-of select="substring-before($citation, $article_doi)"/>
                                         <a>
                                             <xsl:attribute name="href">
                                                 <xsl:value-of
@@ -530,7 +522,7 @@
                                         </a>
                                     </xsl:when>
                                     <xsl:when test="$article_pmid">
-                                        <xsl:copy-of select="$citation"/>
+                                        <xsl:value-of select="$citation"/>
                                         <xsl:text> </xsl:text>
                                         <xsl:value-of select="$article_pmid"/>
                                     </xsl:when>
@@ -601,7 +593,7 @@
                                     <xsl:for-each select=".//dim:field[@element='creator']">
                                         <xsl:choose>
                                             <xsl:when test="contains(., ',')">
-                                                <xsl:copy-of select="."/>
+                                                <xsl:value-of select="."/>
                                             </xsl:when>
                                             <xsl:otherwise>
                                                 <xsl:call-template name="name-parse">
@@ -619,7 +611,7 @@
                                     <xsl:for-each select=".//dim:field[@element='contributor']">
                                         <xsl:choose>
                                             <xsl:when test="contains(., ',')">
-                                                <xsl:copy-of select="."/>
+                                                <xsl:value-of select="."/>
                                             </xsl:when>
                                             <xsl:otherwise>
                                                 <xsl:call-template name="name-parse">
@@ -649,7 +641,7 @@
                                     <xsl:if test="not(starts-with($title, 'Data from: '))">
                                         <i18n:text>xmlui.DryadItemSummary.dataFrom</i18n:text>
                                     </xsl:if>
-                                    <xsl:copy-of select="$title"/>
+                                    <xsl:value-of select="$title"/>
                                     <xsl:variable name="titleEndChar"
                                                   select="substring($title, string-length($title), 1)"/>
                                     <xsl:choose>
@@ -940,7 +932,7 @@
 		      <tr>
 			<th><i18n:text>xmlui.DryadItemSummary.views</i18n:text></th>
 			<td>
-			  <xsl:copy-of select="$pageviews" />
+			  <xsl:value-of select="$pageviews" />
 			</td>
 		      </tr>
                     </xsl:if>
@@ -949,7 +941,7 @@
 		      <tr>
 			<th><i18n:text>xmlui.DryadItemSummary.downloads</i18n:text></th>
 			<td>
-			  <xsl:copy-of select="$downloads" />
+			  <xsl:value-of select="$downloads" />
 			  <xsl:choose>
 			    <xsl:when test="$downloads='1'"> time</xsl:when>
 			    <xsl:otherwise> times</xsl:otherwise>
@@ -993,7 +985,7 @@
             <xsl:variable name="keywords">
                 <xsl:for-each
                         select=".//dim:field[@element='subject'][@mdschema='dc'][not(@qualifier)]">
-                    <xsl:copy-of select="node()"/>
+                    <xsl:value-of select="node()"/>
                     <xsl:if test="position() != last()">
                         <xsl:text>, </xsl:text>
                     </xsl:if>
@@ -1005,7 +997,7 @@
                         <i18n:text>xmlui.DryadItemSummary.keywords</i18n:text>
                     </th>
                     <td>
-                        <xsl:copy-of select="$keywords"/>
+                        <xsl:value-of select="$keywords"/>
                     </td>
                     <td>
                     </td>
@@ -1019,7 +1011,7 @@
                         <i18n:text>xmlui.DryadItemSummary.depDate</i18n:text>
                     </th>
                     <td>
-                        <xsl:copy-of
+                        <xsl:value-of
                                 select=".//dim:field[@element='date' and @qualifier='accessioned']"/>
                     </td>
                     <td>
@@ -1029,7 +1021,7 @@
 
             <xsl:variable name="sciNames">
                 <xsl:for-each select=".//dim:field[@element='ScientificName']">
-                    <xsl:copy-of select="node()"/>
+                    <xsl:value-of select="node()"/>
                     <xsl:if test="position() != last()">
                         <xsl:text>, </xsl:text>
                     </xsl:if>
@@ -1041,7 +1033,7 @@
                         <i18n:text>xmlui.DryadItemSummary.sciNames</i18n:text>
                     </th>
                     <td>
-                        <xsl:copy-of select="$sciNames"/>
+                        <xsl:value-of select="$sciNames"/>
                     </td>
                 </tr>
             </xsl:if>
@@ -1049,7 +1041,7 @@
             <xsl:variable name="spatialCoverage">
                 <xsl:for-each
                         select=".//dim:field[@element='coverage'][@qualifier='spatial']">
-                    <xsl:copy-of select="node()"/>
+                    <xsl:value-of select="node()"/>
                     <xsl:if test="position() != last()">
                         <xsl:text>, </xsl:text>
                     </xsl:if>
@@ -1061,7 +1053,7 @@
                         <i18n:text>xmlui.DryadItemSummary.spatialCov</i18n:text>
                     </th>
                     <td>
-                        <xsl:copy-of select="$spatialCoverage"/>
+                        <xsl:value-of select="$spatialCoverage"/>
                     </td>
                 </tr>
             </xsl:if>
@@ -1069,7 +1061,7 @@
             <xsl:variable name="temporalCoverage">
                 <xsl:for-each
                         select=".//dim:field[@element='coverage'][@qualifier='temporal']">
-                    <xsl:copy-of select="node()"/>
+                    <xsl:value-of select="node()"/>
                     <xsl:if test="position() != last()">
                         <xsl:text>, </xsl:text>
                     </xsl:if>
@@ -1081,7 +1073,7 @@
                         <i18n:text>xmlui.DryadItemSummary.temporalCov</i18n:text>
                     </th>
                     <td>
-                        <xsl:copy-of select="$temporalCoverage"/>
+                        <xsl:value-of select="$temporalCoverage"/>
                     </td>
                 </tr>
             </xsl:if>
@@ -1160,9 +1152,9 @@
                     </span>
                     <a>
                         <xsl:attribute name="href">
-                            <xsl:copy-of select="."/>
+                            <xsl:value-of select="."/>
                         </xsl:attribute>
-                        <xsl:copy-of select="."/>
+                        <xsl:value-of select="."/>
                     </a>
                     <br/>
                 </xsl:for-each>
@@ -1173,7 +1165,7 @@
                         <i18n:text>xmlui.DryadItemSummary.otherRepos</i18n:text>
                     </th>
                     <td>
-                        <xsl:copy-of select="$externalDataSets"/>
+                        <xsl:value-of select="$externalDataSets"/>
                     </td>
                     <td>
                     </td>
@@ -1194,7 +1186,7 @@
                                 <xsl:value-of select="$meta[@element='title'][@qualifier='package']"/>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:copy-of select="."/>
+                                <xsl:value-of select="."/>
                             </xsl:otherwise>
                         </xsl:choose>
                     </a>
@@ -1207,7 +1199,7 @@
                         <i18n:text>xmlui.DryadItemSummary.containedInPackage</i18n:text>
                     </th>
                     <td>
-                        <xsl:copy-of select="$describedBy"/>
+                        <xsl:value-of select="$describedBy"/>
                     </td>
                 </tr>
             </xsl:if>
@@ -1233,7 +1225,7 @@
             <xsl:variable name="description">
                 <xsl:for-each
                         select=".//dim:field[@element='description'][not(@qualifier='provenance')]">
-                    <xsl:copy-of select="node()"/>
+                    <xsl:value-of select="node()"/>
                     <br/>
                 </xsl:for-each>
             </xsl:variable>
@@ -1247,12 +1239,12 @@
                             <xsl:when
                                     test=".//dim:field[@element='relation'][@qualifier='ispartof']">
                                 <div class="article-abstract"><b><i18n:text>xmlui.DryadItemSummary.description</i18n:text></b><br/>
-                                  <xsl:copy-of select="$description"/>
+                                  <xsl:value-of select="$description"/>
                                 </div>
                             </xsl:when>
                             <xsl:otherwise>
                                 <div class="article-abstract"><b><i18n:text>xmlui.DryadItemSummary.abstract</i18n:text></b><br/>
-                                  <xsl:copy-of select="$description"/>
+                                  <xsl:value-of select="$description"/>
                                 </div>
                             </xsl:otherwise>
                         </xsl:choose>
@@ -1288,6 +1280,9 @@
             </xsl:choose>
         </xsl:variable>
         <xsl:choose>
+            <xsl:when test="./mets:fileSec/mets:fileGrp[@USE='CONTENT']">
+                <xsl:call-template name="checkedAndNoEmbargo"/>
+            </xsl:when>
             <xsl:when test="$embargoedDate!=''">
                 <!-- this all might be overkill, need to confirm embargoedDate element
                         disappears after time expires -->
@@ -1331,9 +1326,6 @@
                         <xsl:call-template name="checkedAndNoEmbargo"/>
                     </xsl:otherwise>
                 </xsl:choose>
-            </xsl:when>
-            <xsl:when test="./mets:fileSec/mets:fileGrp[@USE='CONTENT']">
-                <xsl:call-template name="checkedAndNoEmbargo"/>
             </xsl:when>
         </xsl:choose>
 
@@ -1896,24 +1888,7 @@
                     <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/MolEcolRes.png"
                          alt="Molecular Ecology Resources cover"/>
                 </a>
-            </xsl:when>
-            <xsl:when test='$journal-name = "Molecular Phylogenetics and Evolution"'>
-                <a target="_blank">
-                    <xsl:attribute name="href">
-                        <xsl:choose>
-                            <xsl:when test="contains($article-doi,'doi:')">
-                                <xsl:value-of
-                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of
-                                        select="string('http://www.elsevier.com/wps/find/journaldescription.cws_home/622921/description')"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/mpe.png"
-                         alt="Molecular Phylogenetics and Evolution cover"/>
-                </a>
+            
             </xsl:when>
             <xsl:when test='$journal-name = "MycoKeys"'>
                 <a target="_blank">
@@ -2190,4 +2165,34 @@
         </xsl:choose>
     </xsl:template>
 
+    <!-- Override metadata field rendering to hide manuscript number -->
+    <xsl:template match="dim:field" mode="itemDetailView-DIM">
+        <xsl:if test="not(./@qualifier = 'manuscriptNumber')">
+            <tr>
+                <xsl:attribute name="class">
+                    <xsl:text>ds-table-row </xsl:text>
+                    <xsl:if test="(position() div 2 mod 2 = 0)">even </xsl:if>
+                    <xsl:if test="(position() div 2 mod 2 = 1)">odd </xsl:if>
+                </xsl:attribute>
+                <td>
+                    <xsl:value-of select="./@mdschema"/>
+                    <xsl:text>.</xsl:text>
+                    <xsl:value-of select="./@element"/>
+                    <xsl:if test="./@qualifier">
+                        <xsl:text>.</xsl:text>
+                        <xsl:value-of select="./@qualifier"/>
+                    </xsl:if>
+                </td>
+            <td>
+              <xsl:copy-of select="./node()"/>
+              <xsl:if test="./@authority and ./@confidence">
+                <xsl:call-template name="authorityConfidenceIcon">
+                  <xsl:with-param name="confidence" select="./@confidence"/>
+                </xsl:call-template>
+              </xsl:if>
+            </td>
+                <td><xsl:value-of select="./@language"/></td>
+            </tr>
+        </xsl:if>
+    </xsl:template>
 </xsl:stylesheet>

@@ -7,6 +7,7 @@ import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.doi.CDLDataCiteService;
+import org.dspace.doi.DryadDOIRegistrationHelper;
 import org.dspace.doi.DOI;
 
 import org.dspace.doi.DOIFormatException;
@@ -79,7 +80,11 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         myHostname = configurationService.getProperty("dryad.url");
         myDataPkgColl = configurationService.getProperty("stats.datapkgs.coll");
         myDataFileColl = configurationService.getProperty("stats.datafiles.coll");
-        myDoiPrefix = configurationService.getProperty("doi.prefix");
+        if (configurationService.getPropertyAsType("doi.service.testmode", true)) {
+            myDoiPrefix = configurationService.getProperty("doi.testprefix");
+        } else {
+            myDoiPrefix = configurationService.getProperty("doi.prefix");
+        }
         myLocalPartPrefix = configurationService.getProperty("doi.localpart.suffix");
 
         try{
@@ -208,6 +213,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                     DOI doi_= upgradeDOIDataFile(context, doi, item, history);
                     if(doi_!=null){
                         remove(doi);
+                        // Not checking for blackout here because item is already archived
                         mint(doi_, register, createListMetadata(item));
 
                         item.clearMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, null);
@@ -234,7 +240,11 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             log.info("DOI just minted: " + doi_);
 
             doi = doi_.toString();
-            mint(doi_, register, createListMetadata(item));
+            if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
+                mint(doi_, "http://datadryad.org/publicationBlackout", register, createListMetadata(item));
+            } else {
+                mint(doi_, register, createListMetadata(item));
+            }
 
             // CASE B1: Versioned DataPackage or DataFiles
             if (history != null) {
@@ -244,7 +254,11 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                 Version previous = history.getPrevious(version);
                 if (history.isFirstVersion(previous)) {
                     DOI firstDOI = calculateDOIFirstVersion(context, previous);
-                    mint(firstDOI, register, createListMetadata(previous.getItem()));
+                    if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
+                        mint(firstDOI, "http://datadryad.org/publicationBlackout", register, createListMetadata(previous.getItem()));
+                    } else {
+                        mint(firstDOI, register, createListMetadata(previous.getItem()));
+                    }
                 }
             }
 
@@ -294,20 +308,24 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         mint(canonical, register, createListMetadata(item));
     }
 
-
     private void mint(DOI doi, boolean register, Map<String, String> metadata) throws IOException {
+        mint(doi, null, register, metadata);
+    }
+    
+    private void mint(DOI doi, String target, boolean register, Map<String, String> metadata) throws IOException {
 
         perstMinter.mintDOI(doi);
 
-        if(register)
-            perstMinter.register(doi, metadata);
+        if(register) {
+            perstMinter.register(doi, target, metadata);
+        }
 
     }
 
 
     private Map<String, String> createListMetadata(Item item){
         Map<String, String> metadata = new HashMap<String, String>();
-        CDLDataCiteService.createMetadataList(item);
+        metadata.putAll(CDLDataCiteService.createMetadataList(item));
         return metadata;
     }
 
@@ -357,13 +375,9 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     public String lookup(String identifier) {
         String url=null;
         if (identifier != null && identifier.startsWith("doi:")) {
-            if (configurationService.getPropertyAsType("doi.service.testmode", false)) {
-                url = identifier.replace("doi:", "");
-            } else {
-                DOI doi = perstMinter.getKnownDOI(identifier);
-                if(doi!=null)
-                    url=doi.getTargetURL().toString();
-            }
+            DOI doi = perstMinter.getKnownDOI(identifier);
+            if(doi!=null)
+                url=doi.getTargetURL().toString();
         }
         return url;
     }
@@ -386,13 +400,21 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         return null;
     }
 
+    public String lookupEzidRegistration(Item item) throws IOException {
+        String aDOI = getDoiValue(item);
+        return perstMinter.lookupDOIRegistration(aDOI);
+    }
+
+    public String getEzidRegistrationURL(Item item) {
+        String aDoi = getDoiValue(item);
+        return  perstMinter.getRegistrationURL(aDoi);
+    }
+
     public boolean remove(String identifier) {
 
         if (identifier != null && identifier.startsWith("doi:")) {
-            if (!configurationService.getPropertyAsType("doi.service.testmode", false)) {
-                DOI doi = perstMinter.getKnownDOI(identifier);
-                return perstMinter.remove(doi);
-            }
+            DOI doi = perstMinter.getKnownDOI(identifier);
+            return perstMinter.remove(doi);
         }
         return false;
     }
@@ -742,6 +764,10 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
 
     private boolean existsIdDOI(String idDoi) {
+        // This method is used to check if a newly generated DOI String collides
+        // with an existing DOI.  Since the DOIs are randomly-generated,
+        // collisions are possible.
+
         String dbDoiId = lookup(idDoi.toString());
 
         if (dbDoiId != null && !dbDoiId.equals(""))

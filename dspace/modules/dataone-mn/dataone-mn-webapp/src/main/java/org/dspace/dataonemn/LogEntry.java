@@ -7,6 +7,7 @@
 package org.dspace.dataonemn;
 
 import java.util.Date;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrDocument;
@@ -39,11 +40,12 @@ public class LogEntry{
     String dateLogged;
     long entryId;
     String nodeIdentifier;
+    boolean shouldRecord;
     
     static Logger log = Logger.getLogger(LogEntry.class.getName());
 
     public LogEntry(){
-        
+        shouldRecord = true;
     }
     
     //This doesn't seem to be picking up values...
@@ -72,10 +74,11 @@ public class LogEntry{
         if (doc.keySet().contains(NODEIDENTIFIERKEY)){
             nodeIdentifier = doc.get(NODEIDENTIFIERKEY).toString();
         }
+        shouldRecord = false;
     }
 
     public void setIdentifier(String idStr){
-        identifier= idStr;
+        identifier = idStr;
     }
     
     public void setIPAddress(String ipAddressStr){
@@ -96,6 +99,14 @@ public class LogEntry{
     
     public void setNodeIdentifier(String nodeIdStr){
         nodeIdentifier = nodeIdStr;
+    }
+
+    public void setShouldRecord(boolean record) {
+        shouldRecord = record;
+    }
+
+    public boolean getShouldRecord() {
+        return shouldRecord;
     }
     
     public SolrInputDocument getSolrInputDocument(long index) {
@@ -124,25 +135,25 @@ public class LogEntry{
         sb.append(entryId);
         sb.append("</entryId>");
         sb.append("<identifier>");
-        sb.append(identifier);
+        sb.append(StringEscapeUtils.escapeXml(identifier));
         sb.append("</identifier>");
         sb.append("<ipAddress>");
-        sb.append(ipAddress);
+        sb.append(StringEscapeUtils.escapeXml(ipAddress));
         sb.append("</ipAddress>");
         sb.append("<userAgent>");
-        sb.append(userAgent);
+        sb.append(StringEscapeUtils.escapeXml(userAgent));
         sb.append("</userAgent>");
         sb.append("<subject>");
-        sb.append(subject);
+        sb.append(StringEscapeUtils.escapeXml(subject));
         sb.append("</subject>");
         sb.append("<event>");
-        sb.append(event);
+        sb.append(StringEscapeUtils.escapeXml(event));
         sb.append("</event>");
         sb.append("<dateLogged>");
-        sb.append(dateLogged);
+        sb.append(StringEscapeUtils.escapeXml(dateLogged));
         sb.append("</dateLogged>");
         sb.append("<nodeIdentifier>");
-        sb.append(nodeIdentifier);
+        sb.append(StringEscapeUtils.escapeXml(nodeIdentifier));
         sb.append("</nodeIdentifier>");
         sb.append("</logEntry>");
         return sb.toString();
