@@ -65,8 +65,8 @@
 				<dc:title><xsl:value-of select="." /></dc:title>
 			</xsl:for-each>
 			
-			<!-- sedici.creator.(person|corporate)  = creator -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='creator']/doc:element[@name='person' or @name='corporate']/doc:element/doc:field[@name='value']">
+			<!-- sedici.creator.(person|corporate|interprete)  = creator -->
+			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='creator']/doc:element[@name='person' or @name='corporate' or @name='interprete']/doc:element/doc:field[@name='value']">
 				<dc:creator><xsl:value-of select="." /></dc:creator>
 			</xsl:for-each>
 
@@ -226,6 +226,11 @@
 			
 			<!--  dc.format.extent -->
  			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='format']/doc:element[@name='extent']/doc:element/doc:field[@name='value']">
+				<dc:format><xsl:value-of select="." /></dc:format>
+			</xsl:for-each>
+			
+			<!--  dc.format.medium -->
+ 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='format']/doc:element[@name='medium']/doc:element/doc:field[@name='value']">
 				<dc:format><xsl:value-of select="." /></dc:format>
 			</xsl:for-each>
 			

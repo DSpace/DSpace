@@ -258,6 +258,7 @@
 					<input-type value-pairs-name="common_iso_languages">dropdown</input-type>
 					<hint>Idioma principal de la obra</hint>
 					<required>Debe indicar el idioma principal de la obra</required>
+					<type-bind>Articulo,Tesis,Libro,Objeto de conferencia,Documento institucional,Imagen fija,Imagen en movimiento,Audio</type-bind>
 					<visibility>workflow</visibility>
 				</field>
 				
