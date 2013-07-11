@@ -18,8 +18,6 @@
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
-<%@ page import="org.dspace.browse.BrowseInfo" %>
-<%@ page import="org.dspace.sort.SortOption" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
 
@@ -160,16 +158,21 @@
      <td colspan="2">&nbsp;</td>
   </tr>
 
-<%
-	// get the browse indices
-	BrowseInfo binfo = (BrowseInfo) request.getAttribute("browse.info");
-%>
 	<tr class="navigationBarItem">
    		<td>
-     			<img alt="" src="<%= request.getContextPath() %>/image/<%= ( binfo != null ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16"/>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/withdrawn") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
    		</td>
    		<td nowrap="nowrap" class="navigationBarItem">
      			<a href="<%= request.getContextPath() %>/dspace-admin/withdrawn"><fmt:message key="jsp.layout.navbar-admin.withdrawn"/></a>
+   		</td>
+	</tr>
+
+	<tr class="navigationBarItem">
+   		<td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/privateitems") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
+   		</td>
+   		<td nowrap="nowrap" class="navigationBarItem">
+     			<a href="<%= request.getContextPath() %>/dspace-admin/privateitems"><fmt:message key="jsp.layout.navbar-admin.privateitems"/></a>
    		</td>
 	</tr>
 

@@ -443,13 +443,17 @@
   	<servlet-name>json</servlet-name>
   	<servlet-class>org.dspace.app.webui.servlet.JSONServlet</servlet-class>
   </servlet>
+
+  <servlet>
+  	<servlet-name>privateitems</servlet-name>
+  	<servlet-class>org.dspace.app.webui.servlet.admin.PrivateItemsServlet</servlet-class>
+  </servlet>
 	
   <servlet-mapping>
     <servlet-name>shibboleth-login</servlet-name>
     <url-pattern>/shibboleth-login</url-pattern>
   </servlet-mapping>
  
-
   <!-- Servlet Mappings -->
 
   <servlet-mapping>
@@ -730,6 +734,11 @@
   <servlet-mapping>
       <servlet-name>SearchResultLogServlet</servlet-name>
       <url-pattern>/dso-display</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>privateitems</servlet-name>
+    <url-pattern>/dspace-admin/privateitems</url-pattern>
   </servlet-mapping>
 
   <!-- Icon MIME type -->
