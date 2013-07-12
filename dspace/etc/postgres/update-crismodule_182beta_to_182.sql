@@ -57,3 +57,5 @@ create table cris_do_wfile (id int4 not null, fileDescription text, labelAnchor 
 create table cris_do_tp2notp (cris_do_tp_id int4 not null, cris_do_no_tp_id int4 not null);
 alter table cris_do_tp2notp add constraint FKDB5908A55EBB4E96 foreign key (cris_do_no_tp_id) references cris_do_no_tp;
 alter table cris_do_tp2notp add constraint FKDB5908A51EEE761 foreign key (cris_do_tp_id) references cris_do_tp;
+alter table jdyna_values add column dovalue int4;
+alter table jdyna_values add constraint FK51AA118F8565BC6B foreign key (dovalue) references cris_do;
