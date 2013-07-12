@@ -10,6 +10,7 @@ import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
+import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 import org.dspace.workflow.*;
 import org.dspace.workflow.actions.ActionResult;
 
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -54,13 +56,9 @@ public class DryadReviewAction extends ProcessingAction {
                     }
                 }
             }
-            DCValue[] journalReviewers = wf.getItem().getMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "review", "mailUsers", Item.ANY);
-            for (DCValue journalReviewer : journalReviewers) {
-                if(!mailsSent.contains(journalReviewer.value)){
-                    sendReviewerEmail(c, journalReviewer.value, wf, uuid.toString());
-                    mailsSent.add(journalReviewer.value);
-                }
-            }
+
+            addJournalNotifyOnReview(wf, mailsSent);
+
             if(!mailsSent.contains(wf.getItem().getSubmitter().getEmail())){
                 sendReviewerEmail(c, wf.getItem().getSubmitter().getEmail(), wf, uuid.toString());
             }
@@ -70,6 +68,25 @@ public class DryadReviewAction extends ProcessingAction {
             throw new WorkflowException("Error while activating dryad review action");
         }
 
+    }
+
+    private void addJournalNotifyOnReview(WorkflowItem wf, List<String> mailsSent)
+    {
+        DCValue[] values=wf.getItem().getMetadata("prism.publicationName");
+        if(values!=null && values.length> 0){
+            String journal = values[0].value;
+            if(journal!=null){
+                Map<String, String> properties = DryadJournalSubmissionUtils.getPropertiesByJournal(journal);
+                String emails = properties.get(DryadJournalSubmissionUtils.NOTIFY_ON_REVIEW);
+                String[] emails_=emails.split(",");
+                for(String email : emails_){
+                    if(!mailsSent.contains(email)){
+                        mailsSent.add(email);
+                    }
+                }
+
+            }
+        }
     }
 
     @Override
