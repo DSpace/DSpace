@@ -66,6 +66,10 @@
     for (String md : authoritiesMd)
     {
         AuthorityInfo info = infos.get(md);
+        String type = md;
+        if(detail==null) {
+        	type = md.substring(0,(md.length()-9));
+        }
 %>
 <h3><fmt:message key="jsp.dspace-admin.authority-heading">
         <fmt:param value="<%= md %>"/>
@@ -79,7 +83,7 @@
         </thead>
         <tbody>
             <tr>
-                <td scope="row"><fmt:message key="jsp.dspace-admin.authority-statistics.numTotMetadata-level" /></td>
+                <td scope="row"><fmt:message key="jsp.dspace-admin.authority-statistics.numTotMetadata-level"><fmt:param><%= type %></fmt:param></fmt:message></td>
                 <td>
                     <table>
                         <thead>
@@ -105,30 +109,37 @@
                 </td>
             </tr>
             <tr>
-                <td scope="row"><fmt:message key="jsp.dspace-admin.authority-statistics.numTotMetadata" />
+                <td scope="row"><fmt:message key="jsp.dspace-admin.authority-statistics.numTotMetadata"><fmt:param><%= type %></fmt:param></fmt:message>
                 <td><%= info.getNumTotMetadata() %></td>
             </tr>
             <tr>
-                <td scope="row"><fmt:message key="jsp.dspace-admin.authority-statistics.numAuthorityKey" /></td>
+                <td scope="row"><fmt:message key="jsp.dspace-admin.authority-statistics.numAuthorityKey"><fmt:param><%= type %></fmt:param></fmt:message></td>
                 <td><%= info.getNumAuthorityKey() %></td>
             </tr>
             <tr>
-                <td scope="row"><fmt:message key="jsp.dspace-admin.authority-statistics.numAuthorityIssued" /></td>
+                <td scope="row"><fmt:message key="jsp.dspace-admin.authority-statistics.numAuthorityIssued"><fmt:param><%= type %></fmt:param></fmt:message></td>
                 <td><%= info.getNumAuthorityIssued() %></td>
             </tr>
             <tr>
-                <td scope="row"><fmt:message key="jsp.dspace-admin.authority-statistics.numItems" /></td>
+                <td scope="row"><fmt:message key="jsp.dspace-admin.authority-statistics.numItems"><fmt:param><%= type %></fmt:param></fmt:message></td>
                 <td><%= info.getNumItems() %></td>
             </tr>
             <tr>
-                <td scope="row"><fmt:message key="jsp.dspace-admin.authority-statistics.numIssuedItems" /></td>
+                <td scope="row"><fmt:message key="jsp.dspace-admin.authority-statistics.numIssuedItems"><fmt:param><%= type %></fmt:param></fmt:message></td>
                 <td><%= info.getNumIssuedItems() %></td>
             </tr>
-            <tr>
-                <td scope="row"><fmt:message key="jsp.dspace-admin.authority-statistics.numTotalItems" /></td>
-                <td><%= numItems %></td>
-            </tr>
+
         </tbody>
     </table>
 <% } %>
+	<div>
+	<h3><fmt:message key="jsp.dspace-admin.authority-heading.info"/></h3>  
+	<table>
+ 		<tr>
+                <td scope="row"><fmt:message key="jsp.dspace-admin.authority-statistics.numTotalItems" /></td>
+                <td><%= numItems %></td>
+           </tr>
+        
+    </table>
+    </div>
 </dspace:layout>

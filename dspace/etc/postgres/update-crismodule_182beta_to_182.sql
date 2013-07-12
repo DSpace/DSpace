@@ -47,3 +47,13 @@ alter table jdyna_containable add constraint FK504277E15EBB4E40 foreign key (cri
 alter table jdyna_containable add constraint FK504277E16EAF9194 foreign key (cris_do_no_pdef_fk) references cris_do_no_pdef;
 create sequence CRIS_DYNAOBJ_SEQ;
 create sequence CRIS_TYPODYNAOBJ_SEQ;
+alter table cris_do_box add column typeDef_id int4;
+alter table cris_do_etab add column typeDef_id int4;
+alter table cris_do_tab add column typeDef_id int4;
+alter table cris_do_box add constraint FK29BBA93D1ED73E00 foreign key (typeDef_id) references cris_do_tp;
+alter table cris_do_etab add constraint FKDBAEBDE1ED73E00 foreign key (typeDef_id) references cris_do_tp;
+alter table cris_do_tab add constraint FK29BBEB071ED73E00 foreign key (typeDef_id) references cris_do_tp;
+create table cris_do_wfile (id int4 not null, fileDescription text, labelAnchor varchar(255), showPreview bool not null, widgetSize int4, useInStatistics bool not null, primary key (id));
+create table cris_do_tp2notp (cris_do_tp_id int4 not null, cris_do_no_tp_id int4 not null);
+alter table cris_do_tp2notp add constraint FKDB5908A55EBB4E96 foreign key (cris_do_no_tp_id) references cris_do_no_tp;
+alter table cris_do_tp2notp add constraint FKDB5908A51EEE761 foreign key (cris_do_tp_id) references cris_do_tp;

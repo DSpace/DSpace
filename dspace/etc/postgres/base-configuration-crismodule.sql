@@ -442,3 +442,21 @@ SELECT setval('JDYNA_WIDGET_SEQ', max(id)) FROM jdyna_widget_text;
 SELECT setval('JDYNA_CONTAINABLE_SEQ', max(id)) FROM jdyna_containable;
 SELECT setval('JDYNA_BOX_SEQ', max(id)) FROM cris_ou_box;
 SELECT setval('JDYNA_TAB_SEQ', max(id)) FROM cris_ou_tab;
+SELECT setval('JDYNA_PDEF_SEQ', max(aa.id)) FROM (
+SELECT  a.id
+FROM    cris_ou_pdef a
+UNION
+SELECT  b.id
+FROM    cris_pj_pdef b
+UNION
+SELECT  c.id
+FROM    cris_rp_pdef c
+UNION
+SELECT  d.id
+FROM    cris_ou_no_pdef d
+UNION
+SELECT  f.id
+FROM    cris_pj_no_pdef f
+UNION
+SELECT  g.id
+FROM    cris_rp_no_pdef g) aa;

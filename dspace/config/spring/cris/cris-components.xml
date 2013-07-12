@@ -389,4 +389,12 @@
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>5</value></property>					
 	</bean>
+	
+	<!-- Dynamic object component -->
+	<bean id="doComponentsService" class="org.dspace.app.cris.integration.CrisComponentsService">
+		<property name="components">
+			<map>				
+			</map>
+		</property>
+	</bean>
 </beans>
