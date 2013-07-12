@@ -2136,6 +2136,15 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.presentation">OpenOffice Impress</message>
 <message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.spreadsheet">OpenOffice Calc</message>
 <message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.text">OpenOffice Writer</message>
+<message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.chart">OpenOffice Chart</message>
+<message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.graphics-template">OpenOffice Draw Template</message>
+<message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.image">OpenOffice Image</message>
+<message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.presentation-template">OpenOffice Impress Template</message>
+<message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.spreadsheet-template">OpenOffice Calc Template</message>
+<message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.text-master">OpenOffice Master Document</message>
+<message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.text-template">OpenOffice Writer Template</message>
+<message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.text-web">OpenOffice Web Page Template</message>
+<message key="xmlui.dri2xhtml.mimetype.application/vnd.openofficeorg.extension">OpenOffice.org extension</message>
 <message key="xmlui.dri2xhtml.mimetype.application/vnd.openxmlformats-officedocument.presentationml.presentation">Microsoft PowerPoint 2007</message>
 <message key="xmlui.dri2xhtml.mimetype.application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">Microsoft Excel 2007</message>
 <message key="xmlui.dri2xhtml.mimetype.application/vnd.openxmlformats-officedocument.wordprocessingml.document">Microsoft Word 2007</message>
@@ -2143,6 +2152,13 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.draw">OpenOffice Draw (1.x)</message>
 <message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.impress">OpenOffice Impress (1.x)</message>
 <message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.writer.global">OpenOffice Writer (1.x)</message>
+<message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.calc.template">OpenOffice Calc template (1.x)</message>
+<message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.draw.template">OpenOffice Draw template (1.x)</message>
+<message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.impress.template">OpenOffice Impress template (1.x)</message>
+<message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.math">OpenOffice Math (1.x)</message>
+<message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.writer">OpenOffice Writer (1.x)</message>
+<message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.writer.template">OpenOffice Writer template (1.x)</message>
+<message key="xmlui.dri2xhtml.mimetype.application/x-shockwave-flash">Shockwave Flash</message>
 <message key="xmlui.dri2xhtml.mimetype.application/vnd.visio">Microsoft Visio</message>
 <message key="xmlui.dri2xhtml.mimetype.application/wordperfect5.1">WordPerfect</message>
 <message key="xmlui.dri2xhtml.mimetype.application/x-dvi">TeX DVI</message>
@@ -2151,6 +2167,8 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="xmlui.dri2xhtml.mimetype.application/x-latex">LaTeX</message>
 <message key="xmlui.dri2xhtml.mimetype.application/x-photoshop">Photoshop</message>
 <message key="xmlui.dri2xhtml.mimetype.application/x-tex">TeX</message>
+<message key="xmlui.dri2xhtml.mimetype.application/epub">ePub</message>
+<message key="xmlui.dri2xhtml.mimetype.application/mobi">MOBI</message>
 
   <!-- Audio-based formats -->
 <message key="xmlui.dri2xhtml.mimetype.audio/basic">Basic Audio</message>
