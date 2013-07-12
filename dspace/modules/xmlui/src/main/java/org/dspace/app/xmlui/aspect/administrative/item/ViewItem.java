@@ -104,6 +104,8 @@ public class ViewItem extends AbstractDSpaceTransformer {
 
     private static final Message T_option_curate = message("xmlui.administrative.item.general.option_curate");
 
+    private static final Message T_option_embargo = message("xmlui.administrative.item.general.option_embargo");
+
 	public void addPageMeta(PageMeta pageMeta) throws WingException,
 			SQLException, AuthorizeException, IOException {
 		StringBuilder buffer = new StringBuilder();
@@ -267,6 +269,7 @@ public class ViewItem extends AbstractDSpaceTransformer {
 		List options = main.addList("options", List.TYPE_SIMPLE, "horizontal");
 		options.addItem().addXref(baseURL + "&submit_status", T_option_status);
 		options.addItem().addXref(baseURL + "&submit_bitstreams",T_option_bitstreams);
+        options.addItem().addXref(baseURL + "&submit_embargo", T_option_embargo);
 		options.addItem().addXref(baseURL + "&submit_metadata",T_option_metadata);
 		options.addItem().addHighlight("bold").addXref(tabLink, T_option_view);
         options.addItem().addXref(baseURL + "&submit_curate", T_option_curate);

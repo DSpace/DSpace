@@ -46,6 +46,7 @@ public class EditItemEmbargoForm extends AbstractDSpaceTransformer {
     private static final Message T_embargo_curator_note  = message("xmlui.administrative.item.EditItemEmbargoForm.embargo_curator_note");
     private static final Message T_embargo_until = message("xmlui.administrative.item.EditItemEmbargoForm.embargo_until");
     private static final Message T_submit_lift_embargo = message("xmlui.administrative.item.EditItemEmbargoForm.lift_embargo");
+    private static final Message T_option_curate = message("xmlui.administrative.item.general.option_curate");
 
 
     public void addPageMeta(PageMeta pageMeta) throws WingException
@@ -89,6 +90,7 @@ public class EditItemEmbargoForm extends AbstractDSpaceTransformer {
         options.addItem().addHighlight("bold").addXref(baseURL + "&submit_embargo", T_option_embargo);
         options.addItem().addXref(baseURL+"&submit_metadata",T_option_metadata);
         options.addItem().addXref(baseURL + "&view_item", T_option_view);
+        options.addItem().addXref(baseURL + "&submit_curate", T_option_curate);
     }
 
     private Division createForm(Division main, String dateString, Item item) throws WingException {
