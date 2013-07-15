@@ -261,12 +261,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                     }
                 }
             }
-
-            // CASE B2: new DataFiles for a versioned DataPackage
-            Item dataPackage = DryadWorkflowUtils.getDataPackage(context, item);
-            if(!collection.equals(myDataPkgColl) && retrieveVersionHistory(context, dataPackage)!=null){
-                moveCanonical(item, register, collection, myDataPkgColl, doi_);
-            }
         }
         return doi;
     }
