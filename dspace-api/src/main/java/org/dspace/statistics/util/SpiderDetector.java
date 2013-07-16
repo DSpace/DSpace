@@ -185,18 +185,19 @@ public class SpiderDetector {
     /**
      * Static Service Method for testing spiders against existing spider files.
      * <p>
-     * In the future this will be extended to support Domain Name detection.
-     * <p>
      * In future spiders HashSet may be optimized as byte offset array to
      * improve performance and memory footprint further.
      *
-     * @param request
-     * @return true|false if the request was detected to be from a spider
+     * @param clientIP address of the client.
+     * @param proxyIPs comma-list of X-Forwarded-For addresses, or null.
+     * @param hostname domain name of host, or null.
+     * @param agent User-Agent header value, or null.
+     * @return true if the client matches any spider characteristics list.
      */
-    public static boolean isSpider(HttpServletRequest request)
+    public static boolean isSpider(String clientIP, String proxyIPs,
+            String hostname, String agent)
     {
         // See if any agent patterns match
-        String agent = request.getHeader("User-Agent");
         if (null != agent)
         {
             if (agents.isEmpty())
@@ -212,9 +213,9 @@ public class SpiderDetector {
         }
 
         // No.  See if any IP addresses match
-        if (isUseProxies() && request.getHeader("X-Forwarded-For") != null) {
+        if (isUseProxies() && proxyIPs != null) {
             /* This header is a comma delimited list */
-            for (String xfip : request.getHeader("X-Forwarded-For").split(",")) {
+            for (String xfip : proxyIPs.split(",")) {
                 if (isSpider(xfip))
                 {
                     return true;
@@ -222,26 +223,42 @@ public class SpiderDetector {
             }
         }
 
-        if (isSpider(request.getRemoteAddr()))
+        if (isSpider(clientIP))
             return true;
 
         // No.  See if any DNS names match
-        String hostname = request.getRemoteHost();
-        if (domains.isEmpty())
+        if (null != hostname)
         {
-            loadPatterns("domains", domains);
-        }
-
-        for (Pattern candidate : domains)
-        {
-            if (candidate.matcher(hostname).find()) // XXX anchored?
+            if (domains.isEmpty())
             {
-                return true;
+                loadPatterns("domains", domains);
+            }
+
+            for (Pattern candidate : domains)
+            {
+                if (candidate.matcher(hostname).find())
+                {
+                    return true;
+                }
             }
         }
 
         // Not a known spider.
         return false;
+    }
+
+    /**
+     * Static Service Method for testing spiders against existing spider files.
+     *
+     * @param request
+     * @return true|false if the request was detected to be from a spider.
+     */
+    public static boolean isSpider(HttpServletRequest request)
+    {
+        return isSpider(request.getRemoteAddr(),
+                request.getHeader("X-Forwarded-For"),
+                request.getRemoteHost(),
+                request.getHeader("User-Agent"));
     }
 
     /**

@@ -7,21 +7,28 @@
  */
 package org.dspace.statistics.util;
 
-import java.util.ArrayList;
-import java.util.List;
 import mockit.Mock;
 import mockit.MockClass;
 import mockit.Mockit;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author mwood
  */
 public class SpiderDetectorTest
 {
+    private static final String NOT_A_BOT_ADDRESS = "192.168.0.1";
+
+    @BeforeClass
+    static public void before()
+    {
+        Mockit.setUpMocks(MockSolrLogger.class); // Don't test SolrLogger here
+    }
 
     /**
      * Test method for {@link org.dspace.statistics.util.SpiderDetector#readPatterns(java.io.File)}.
@@ -47,10 +54,6 @@ public class SpiderDetectorTest
     @Test
     public void testIsSpiderHttpServletRequest()
     {
-        Mockit.setUpMocks(MockSolrLogger.class); // Don't test SolrLogger here
-
-        final String NOT_A_BOT_ADDRESS = "192.168.0.1";
-
         DummyHttpServletRequest req = new DummyHttpServletRequest();
         req.setAddress(NOT_A_BOT_ADDRESS); // avoid surprises
         req.setRemoteHost("notabot.example.com"); // avoid surprises
@@ -84,12 +87,57 @@ public class SpiderDetectorTest
     }
 
     /**
+     * Test method for {@link org.dspace.statistics.util.SpiderDetector#isSpider(java.lang.String, java.lang.String, java.lang.String, java.lang.String)}.
+     */
+    @Test
+    public void testIsSpiderStringStringStringString()
+    {
+        String candidate;
+
+        // Test IP patterns
+        candidate = "192.168.2.1";
+        assertTrue(candidate + " did not match IP patterns",
+                SpiderDetector.isSpider(candidate, null, null, null));
+
+        candidate = NOT_A_BOT_ADDRESS;
+        assertFalse(candidate + " matched IP patterns",
+                SpiderDetector.isSpider(candidate, null, null, null));
+
+        // Test DNS patterns
+        candidate = "baiduspider-dspace-test.crawl.baidu.com";
+        assertTrue(candidate + " did not match DNS patterns",
+                SpiderDetector.isSpider(NOT_A_BOT_ADDRESS, null, candidate, null));
+
+        candidate = "wiki.dspace.org";
+        assertFalse(candidate + " matched DNS patterns",
+                SpiderDetector.isSpider(NOT_A_BOT_ADDRESS, null, candidate, null));
+
+        // Test agent patterns
+        candidate = "msnbot is watching you";
+        assertTrue("'" + candidate + "' did not match agent patterns",
+                SpiderDetector.isSpider(NOT_A_BOT_ADDRESS, null, null, candidate));
+
+        candidate = "Firefox";
+        assertFalse("'" + candidate + "' matched agent patterns",
+                SpiderDetector.isSpider(NOT_A_BOT_ADDRESS, null, null, candidate));
+    }
+
+    /**
      * Test method for {@link org.dspace.statistics.util.SpiderDetector#isSpider(java.lang.String)}.
      */
     @Test
     public void testIsSpiderString()
     {
-// FIXME        fail("Not yet implemented");
+        String candidate;
+
+        candidate = "192.168.2.1";
+        assertTrue(candidate + " did not match IP patterns",
+                SpiderDetector.isSpider(candidate, null, null, null));
+
+        candidate = NOT_A_BOT_ADDRESS;
+        assertFalse(candidate + " matched IP patterns",
+                SpiderDetector.isSpider(candidate, null, null, null));
+
     }
 
     /**
