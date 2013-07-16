@@ -10,6 +10,8 @@ package org.dspace.statistics.util;
 import mockit.Mock;
 import mockit.MockClass;
 import mockit.Mockit;
+import org.dspace.statistics.SolrLogger;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -25,9 +27,15 @@ public class SpiderDetectorTest
     private static final String NOT_A_BOT_ADDRESS = "192.168.0.1";
 
     @BeforeClass
-    static public void before()
+    static public void beforeClass()
     {
         Mockit.setUpMocks(MockSolrLogger.class); // Don't test SolrLogger here
+    }
+    @AfterClass
+
+    static public void afterClass()
+    {
+        Mockit.tearDownMocks(SolrLogger.class);
     }
 
     /**
