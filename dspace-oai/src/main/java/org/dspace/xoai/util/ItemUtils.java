@@ -165,7 +165,7 @@ public class ItemUtils
                     Element bitstream = create(factory, "bitstream");
                     bitstreams.getElement().add(bitstream);
                     String url = "";
-                    String bsName = bitstream.getName();
+                    String bsName = bit.getName();
                     String sid = String.valueOf(bit.getSequenceID());
                     String baseUrl = ConfigurationManager.getProperty("oai",
                             "bitstream.baseUrl");
@@ -190,7 +190,7 @@ public class ItemUtils
                     if (handle != null && baseUrl != null)
                     {
                         url = baseUrl + "/bitstream/"
-                                + URLUtils.encode(handle) + "/"
+                                + handle + "/"
                                 + sid + "/"
                                 + URLUtils.encode(bsName);
                     }
