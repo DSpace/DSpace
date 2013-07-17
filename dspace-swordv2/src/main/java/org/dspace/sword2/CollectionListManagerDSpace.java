@@ -46,6 +46,10 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI implements Colle
 			SwordUrlManager urlManager = config.getUrlManager(context, config);
 
 			Collection collection = urlManager.getCollection(context, colIRI.toString());
+            if (collection == null)
+            {
+                throw new SwordError(404);
+            }
 
 			List<Item> items = this.listItems(sc, collection, swordConfig);
 			Feed feed = this.itemListToFeed(sc, items, swordConfig);

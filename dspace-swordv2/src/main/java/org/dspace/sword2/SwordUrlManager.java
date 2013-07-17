@@ -150,7 +150,7 @@ public class SwordUrlManager
 		catch (SQLException e)
 		{
 			// log.error("Caught exception:", e);
-			throw new DSpaceSwordException("There was a problem resolving the collection", e);
+			throw new DSpaceSwordException("There was a problem resolving the item", e);
 		}
     }
 
@@ -202,6 +202,10 @@ public class SwordUrlManager
 			}
 
 			DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+            if (dso == null)
+            {
+                return null;
+            }
 
 			if (!(dso instanceof Collection))
 			{
@@ -218,11 +222,11 @@ public class SwordUrlManager
 	}
 
 	/**
-	 * Construct the service document URL for the given object, which will
-	 * be supplied in the sword:service element of other service document
-	 * entries.
+	 * Construct the service document url for the given object, which will
+	 * be supplied in the sword:service element of other service document entries
 	 *
 	 * @param community
+	 * @return
 	 * @throws DSpaceSwordException
 	 */
 	public String constructSubServiceUrl(Community community)
@@ -234,11 +238,11 @@ public class SwordUrlManager
 	}
 
 	/**
-	 * Construct the service document URL for the given object, which will
-	 * be supplied in the sword:service element of other service document
-	 * entries.
+	 * Construct the service document url for the given object, which will
+	 * be supplied in the sword:service element of other service document entries
 	 *
 	 * @param collection
+	 * @return
 	 * @throws DSpaceSwordException
 	 */
 	public String constructSubServiceUrl(Collection collection)
@@ -250,10 +254,11 @@ public class SwordUrlManager
 	}
 
 	/**
-	 * Extract a DSpaceObject from the given URL.  If this method is unable to
-	 * locate a meaningful and appropriate DSpace object it will throw the
-	 * appropriate SWORD error.
+	 * Extract a DSpaceObject from the given url.  If this method is unable to
+	 * locate a meaningful and appropriate dspace object it will throw the
+	 * appropriate sword error
 	 * @param url
+	 * @return
 	 * @throws DSpaceSwordException
 	 * @throws SwordError
 	 */
@@ -281,7 +286,11 @@ public class SwordUrlManager
 				}
 
 				DSpaceObject dso = HandleManager.resolveToObject(context, url);
-				if (dso instanceof Collection || dso instanceof Community)
+                if (dso == null)
+                {
+                    return null;
+                }
+				else if (dso instanceof Collection || dso instanceof Community)
 				{
 					return dso;
 				}
@@ -304,8 +313,9 @@ public class SwordUrlManager
 	}
 
 	/**
-	 * Get the base URL for service document requests.
+	 * get the base url for service document requests
 	 *
+	 * @return
 	 * @throws DSpaceSwordException
 	 */
 	public String getBaseServiceDocumentUrl()
@@ -381,9 +391,10 @@ public class SwordUrlManager
 	}
 
 	/**
-	 * Is the given URL the base service document URL?
+	 * is the given url the base service document url
 	 *
 	 * @param url
+	 * @return
 	 * @throws DSpaceSwordException
 	 */
 	public boolean isBaseServiceDocumentUrl(String url)
@@ -393,10 +404,11 @@ public class SwordUrlManager
 	}
 
 	/**
-	 * Central location for constructing usable URLs for DSpace bitstreams.
-	 * There is no place in the main DSpace code base for doing this.
+	 * Central location for constructing usable urls for dspace bitstreams.  There
+	 * is no place in the main DSpace code base for doing this.
 	 *
 	 * @param bitstream
+	 * @return
 	 * @throws DSpaceSwordException
 	 */
 	public String getBitstreamUrl(Bitstream bitstream)
@@ -435,7 +447,9 @@ public class SwordUrlManager
 			}
 			else
 			{
-				bsLink = bsLink + "/retrieve/" + bitstream.getID() + "/" + bitstream.getName();
+                // NOTE: retrieve link doesn't appear to work, but looking at the XMLUI, the bitstream/id url works
+				//bsLink = bsLink + "/retrieve/" + bitstream.getID() + "/" + bitstream.getName();
+                bsLink = bsLink + "/bitstream/id/" + bitstream.getID() + "/" + bitstream.getName();
 			}
 
 			return bsLink;
@@ -486,56 +500,6 @@ public class SwordUrlManager
 		}
 	}
 
-	/**
-	 * Get the media link URL for the given bitstream.
-	 *
-	 * @param bitstream
-	 * @throws DSpaceSwordException
-	 */
-	public String getMediaLink(Bitstream bitstream)
-			throws DSpaceSwordException
-	{
-//		try
-//		{
-//			Bundle[] bundles = bitstream.getBundles();
-//			Bundle parent = null;
-//			if (bundles.length > 0)
-//			{
-//				parent = bundles[0];
-//			}
-//			else
-//			{
-//				throw new DSpaceSwordException("Encountered orphaned bitstream");
-//			}
-//
-//			Item[] items = parent.getItems();
-//			Item item;
-//			if (items.length > 0)
-//			{
-//				item = items[0];
-//			}
-//			else
-//			{
-//				throw new DSpaceSwordException("Encountered orphaned bundle");
-//			}
-//
-//			String itemUrl = this.getMediaLink(item);
-//			if (itemUrl.equals(this.getBaseMediaLinkUrl()))
-//			{
-//				return itemUrl;
-//			}
-//
-//			String bsUrl = itemUrl + "/bitstream/" + bitstream.getID();
-//
-//			return bsUrl;
-//		}
-//		catch (SQLException e)
-//		{
-//			throw new DSpaceSWORDException(e);
-//		}
-		return null;
-	}
-
 	// FIXME: we need a totally new kind of URL scheme; perhaps we write the identifier into the item
 	public String getAtomStatementUri(Item item)
 			throws DSpaceSwordException
@@ -562,9 +526,34 @@ public class SwordUrlManager
 	}
 
 	public String getSplashUrl(Item item)
+			throws DSpaceSwordException
 	{
-        // FIXME: this appears not to return the item's handle
-		return HandleManager.getCanonicalForm(item.getHandle());
+		WorkflowTools wft = new WorkflowTools();
+
+        // if the item is in the workspace, we need to give it it's own
+        // special identifier
+        if (wft.isItemInWorkspace(context, item))
+        {
+            String urlTemplate = ConfigurationManager.getProperty("swordv2-server", "workspace.url-template");
+            if (urlTemplate != null)
+            {
+                return urlTemplate.replace("#wsid#", Integer.toString(wft.getWorkspaceItem(context, item).getID()));
+            }
+        }
+        // otherwise, it may be in the workflow, in which case there is
+        // no identifier
+        else if (wft.isItemInWorkflow(context, item))
+        {
+            // do nothing
+            return null;
+        }
+        // finally, otherwise we need to just return the handle of the
+        // item
+        else
+        {
+		    return HandleManager.getCanonicalForm(item.getHandle());
+        }
+        return null;
 	}
 
 	public IRI getContentUrl(Item item)

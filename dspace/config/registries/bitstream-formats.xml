@@ -733,5 +733,32 @@
       <extension>rdf</extension>
     </bitstream-type>
 
+	<bitstream-type>
+        <mimetype>application/zip</mimetype>
+        <short_description>Zip File</short_description>
+        <description>A Zipped archive file</description>
+        <support_level>1</support_level>
+        <internal>false</internal>
+        <extension>zip</extension>
+      </bitstream-type>
+
+    <bitstream-type>
+        <mimetype>application/atom+xml; type=entry</mimetype>
+        <short_description>Atom Entry Document (1)</short_description>
+        <description>An Atom Entry Document</description>
+        <support_level>1</support_level>
+        <internal>false</internal>
+    	<extension>xml</extension>
+      </bitstream-type>
+
+    <bitstream-type>
+        <mimetype>application/atom+xml;type=entry</mimetype>
+        <short_description>Atom Entry Document (2)</short_description>
+        <description>An Atom Entry Document</description>
+        <support_level>1</support_level>
+        <internal>false</internal>
+        <extension>xml</extension>
+      </bitstream-type>
+
 
 </dspace-bitstream-types>

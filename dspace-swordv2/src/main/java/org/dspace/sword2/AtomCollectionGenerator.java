@@ -20,9 +20,10 @@ import org.swordapp.server.SwordCollection;
 public interface AtomCollectionGenerator
 {
 	/**
-	 * Build the ATOM Collection which represents the given DSpace Object.
+	 * Build the ATOM Collection which represents the given DSpace Object
 	 * 
 	 * @param dso
+	 * @return
 	 * @throws DSpaceSwordException
 	 */
 	public SwordCollection buildCollection(Context context, DSpaceObject dso, SwordConfigurationDSpace config) throws DSpaceSwordException;

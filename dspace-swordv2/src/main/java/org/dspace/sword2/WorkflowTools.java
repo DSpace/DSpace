@@ -8,32 +8,30 @@
 package org.dspace.sword2;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
-import org.dspace.xmlworkflow.WorkflowConfigurationException;
-import org.dspace.xmlworkflow.WorkflowException;
-import org.dspace.xmlworkflow.XmlWorkflowManager;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
-import javax.mail.MessagingException;
 import java.io.IOException;
 import java.sql.SQLException;
 
 public class WorkflowTools
 {
     /**
-     * Is the given item in the DSpace workflow?
+     * Is the given item in the DSpace workflow
      *
      * This method queries the database directly to determine if this is the
-     * case rather than using the DSpace API (which is very slow).
+     * case rather than using the DSpace API (which is very slow)
      *
      * @param context
      * @param item
+     * @return
      * @throws DSpaceSwordException
      */
     public boolean isItemInWorkflow(Context context, Item item)
@@ -41,11 +39,15 @@ public class WorkflowTools
     {
         try
         {
-            if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
-                return XmlWorkflowItem.findByItem(context, item) != null;
-            }else{
-                return WorkflowItem.findByItem(context, item) != null;
+            String query = "SELECT workflow_id FROM workflowitem WHERE item_id = ?";
+            Object[] params = { item.getID() };
+            TableRowIterator tri = DatabaseManager.query(context, query, params);
+            if (tri.hasNext())
+            {
+                tri.close();
+                return true;
             }
+            return false;
         }
         catch (SQLException e)
         {
@@ -57,10 +59,11 @@ public class WorkflowTools
      * Is the given item in a DSpace workspace?
      *
      * This method queries the database directly to determine if this is the
-     * case rather than using the DSpace API (which is very slow).
+     * case rather than using the DSpace API (which is very slow)
      *
      * @param context
      * @param item
+     * @return
      * @throws DSpaceSwordException
      */
     public boolean isItemInWorkspace(Context context, Item item)
@@ -68,7 +71,15 @@ public class WorkflowTools
     {
         try
         {
-            return WorkspaceItem.findByItem(context, item) != null;
+            String query = "SELECT workspace_item_id FROM workspaceitem WHERE item_id = ?";
+            Object[] params = { item.getID() };
+            TableRowIterator tri = DatabaseManager.query(context, query, params);
+            if (tri.hasNext())
+            {
+                tri.close();
+                return true;
+            }
+            return false;
         }
         catch (SQLException e)
         {
@@ -77,25 +88,33 @@ public class WorkflowTools
     }
 
     /**
-     * Obtain the WorkflowItem object which wraps the given Item.
+     * Obtain the WorkflowItem object which wraps the given Item
      *
      * This method queries the database directly to determine if this is the
-     * case rather than using the DSpace API (which is very slow).
+     * case rather than using the DSpace API (which is very slow)
      *
      * @param context
      * @param item
+     * @return
      * @throws DSpaceSwordException
      */
-    public InProgressSubmission getWorkflowItem(Context context, Item item)
+    public WorkflowItem getWorkflowItem(Context context, Item item)
             throws DSpaceSwordException
     {
         try
         {
-            if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
-                return XmlWorkflowItem.findByItem(context, item);
-            }else{
-                return WorkflowItem.findByItem(context, item);
+            String query = "SELECT workflow_id FROM workflowitem WHERE item_id = ?";
+            Object[] params = { item.getID() };
+            TableRowIterator tri = DatabaseManager.query(context, query, params);
+            if (tri.hasNext())
+            {
+                TableRow row = tri.next();
+                int wfid = row.getIntColumn("workflow_id");
+                WorkflowItem wfi = WorkflowItem.find(context, wfid);
+                tri.close();
+                return wfi;
             }
+            return null;
         }
         catch (SQLException e)
         {
@@ -104,13 +123,14 @@ public class WorkflowTools
     }
 
     /**
-     * Obtain the WorkspaceItem object which wraps the given Item.
+     * Obtain the WorkspaceItem object which wraps the given Item
      *
      * This method queries the database directly to determine if this is the
-     * case rather than using the DSpace API (which is very slow).
+     * case rather than using the DSpace API (which is very slow)
      *
      * @param context
      * @param item
+     * @return
      * @throws DSpaceSwordException
      */
     public WorkspaceItem getWorkspaceItem(Context context, Item item)
@@ -118,7 +138,18 @@ public class WorkflowTools
     {
         try
         {
-            return WorkspaceItem.findByItem(context, item);
+            String query = "SELECT workspace_item_id FROM workspaceitem WHERE item_id = ?";
+            Object[] params = { item.getID() };
+            TableRowIterator tri = DatabaseManager.query(context, query, params);
+            if (tri.hasNext())
+            {
+                TableRow row = tri.next();
+                int wsid = row.getIntColumn("workspace_item_id");
+                WorkspaceItem wsi = WorkspaceItem.find(context, wsid);
+                tri.close();
+                return wsi;
+            }
+            return null;
         }
         catch (SQLException e)
         {
@@ -142,18 +173,13 @@ public class WorkflowTools
 
             // kick off the workflow
             boolean notify = ConfigurationManager.getBooleanProperty("swordv2-server", "workflow.notify");
-            if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow")) {
-                if (notify) {
-                    XmlWorkflowManager.start(context, wsi);
-                } else {
-                    XmlWorkflowManager.startWithoutNotify(context, wsi);
-                }
-            } else {
-                if (notify) {
-                    WorkflowManager.start(context, wsi);
-                } else {
-                    WorkflowManager.startWithoutNotify(context, wsi);
-                }
+            if (notify)
+            {
+                WorkflowManager.start(context, wsi);
+            }
+            else
+            {
+                WorkflowManager.startWithoutNotify(context, wsi);
             }
         }
         catch (SQLException e)
@@ -166,12 +192,6 @@ public class WorkflowTools
         }
         catch (IOException e)
         {
-            throw new DSpaceSwordException(e);
-        } catch (WorkflowException e) {
-            throw new DSpaceSwordException(e);
-        } catch (WorkflowConfigurationException e) {
-            throw new DSpaceSwordException(e);
-        } catch (MessagingException e) {
             throw new DSpaceSwordException(e);
         }
     }
@@ -188,17 +208,12 @@ public class WorkflowTools
         try
         {
             // find the item in the workflow if it exists
-            InProgressSubmission wfi = this.getWorkflowItem(context, item);
+            WorkflowItem wfi = this.getWorkflowItem(context, item);
 
             // abort the workflow
             if (wfi != null)
             {
-                if(wfi instanceof WorkflowItem)
-                {
-                    WorkflowManager.abort(context, (WorkflowItem) wfi, context.getCurrentUser());
-                }else{
-                    XmlWorkflowManager.abort(context, (XmlWorkflowItem) wfi, context.getCurrentUser());
-                }
+                WorkflowManager.abort(context, wfi, context.getCurrentUser());
             }
         }
         catch (SQLException e)
