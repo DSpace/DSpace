@@ -242,6 +242,13 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
                 colHandle = collection.getHandle();
             }
 
+            // unset because these values are invalid with 'item' index
+            if (bi.isItemIndex())
+            {
+                value = null;
+                authority = null;
+            }
+
             String arguments = "type=" + type + ",order=" + order + ",value=" + value +
                 ",month=" + month + ",year=" + year + ",starts_with=" + startsWith +
                 ",vfocus=" + valueFocus + ",focus=" + focus + ",rpp=" + resultsperpage +
