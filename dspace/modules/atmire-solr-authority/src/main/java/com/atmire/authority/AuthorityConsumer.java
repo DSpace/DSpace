@@ -58,13 +58,13 @@ public class AuthorityConsumer implements Consumer {
             ctx = new Context();
             ctx.turnOffAuthorisationSystem();
             switch (st) {
-
-                // Versioning: when the new version is archived, set previousVersion.inArchive=false(if there is one.)
                 case Constants.ITEM: {
                     if (et == Event.MODIFY_METADATA) {
                         Item item = (Item) event.getSubject(ctx);
-                        addAuthority(item);
-                        ctx.commit();   
+                        if(item.isArchived()){
+                            addAuthority(item);
+                            ctx.commit();
+                        }
                     }
                     break;
                 }                              
