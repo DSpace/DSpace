@@ -58,7 +58,7 @@ class DAVCollection extends DAVDSpaceObject
 
     /** The temporary upload directory. */
     private static String tempDirectory = ConfigurationManager
-            .getProperty("upload.temp.dir");
+            .getProperty("upload.temp.dir", System.getProperty("java.io.tmpdir"));
 
     /** The Constant short_descriptionProperty. */
     private static final Element short_descriptionProperty = new Element(
