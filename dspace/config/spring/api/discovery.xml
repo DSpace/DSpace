@@ -45,6 +45,11 @@
 	<bean id="bitstreamIndexer" class="org.dspace.app.cris.discovery.BitstreamSolrIndexer">
 	</bean>
 
+	<!-- Additional indexing plugin to add resource type in human format readable to item SOLR 
+		document -->
+	<bean id="resourceTypeIndexer" class="org.dspace.app.cris.discovery.ResourceTypeSolrIndexer">
+	</bean>
+	
 	<!--Bean that is used for mapping communities/collections to certain discovery 
 		configurations. -->
 	<bean
@@ -228,7 +233,7 @@
 		<property name="defaultFilterQueries">
 			<list>
 				<!--Only find items, communities and collections -->
-				<value>search.resourcetype:[2 TO 11]</value>
+				<value>search.resourcetype:[2 TO 11] OR search.resourcetype:[1001 TO 9999]</value>
 			</list>
 		</property>
 	</bean>

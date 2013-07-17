@@ -59,3 +59,21 @@ alter table cris_do_tp2notp add constraint FKDB5908A55EBB4E96 foreign key (cris_
 alter table cris_do_tp2notp add constraint FKDB5908A51EEE761 foreign key (cris_do_tp_id) references cris_do_tp;
 alter table jdyna_values add column dovalue int4;
 alter table jdyna_values add constraint FK51AA118F8565BC6B foreign key (dovalue) references cris_do;
+create table cris_do_wpointer (id int4 not null, display text, filtro text, indexName varchar(255), widgetSize int4, target varchar(255), filterExtended text, primary key (id));
+create table cris_ou_wpointer (id int4 not null, display text, filtro text, indexName varchar(255), widgetSize int4, target varchar(255), primary key (id));
+create table cris_pj_wpointer (id int4 not null, display text, filtro text, indexName varchar(255), widgetSize int4, target varchar(255), primary key (id));
+create table cris_rp_wpointer (id int4 not null, display text, filtro text, indexName varchar(255), widgetSize int4, target varchar(255), primary key (id));
+insert into cris_rp_wpointer
+(id, display, filtro, indexname, widgetsize, target)
+SELECT id, display, filtro, indexname, widgetsize, target
+  FROM jdyna_widget_pointer where target = 'org.dspace.app.cris.model.jdyna.value.RPPointer';
+insert into cris_pj_wpointer
+(id, display, filtro, indexname, widgetsize, target)
+SELECT id, display, filtro, indexname, widgetsize, target
+  FROM jdyna_widget_pointer where target = 'org.dspace.app.cris.model.jdyna.value.ProjectPointer';
+insert into cris_ou_wpointer
+(id, display, filtro, indexname, widgetsize, target)
+SELECT id, display, filtro, indexname, widgetsize, target
+  FROM jdyna_widget_pointer where target = 'org.dspace.app.cris.model.jdyna.value.OUPointer';
+DROP table jdyna_widget_pointer; 
+ 

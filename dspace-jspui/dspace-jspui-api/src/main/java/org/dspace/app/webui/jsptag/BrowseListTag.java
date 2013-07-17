@@ -42,13 +42,13 @@ import org.dspace.sort.SortOption;
 
 /**
  * Tag for display a list of items
- *
+ * 
  * @author Robert Tansley
  * @version $Revision$
  */
 public class BrowseListTag extends TagSupport
 {
-	 /** log4j category */
+    /** log4j category */
     private static Logger log = Logger.getLogger(BrowseListTag.class);
 
     /** Items to display */
@@ -79,10 +79,11 @@ public class BrowseListTag extends TagSupport
 
     /** Config to use a specific configuration */
     private String config = null;
-    
+
     private String sortBy = null;
+
     private String order = null;
-    
+
     /** The default fields to be displayed when listing items */
     private static final String DEFAULT_LIST_FIELDS;
 
@@ -91,17 +92,20 @@ public class BrowseListTag extends TagSupport
 
     /** The default field which is bound to the browse by date */
     private static String dateField = "dc.date.issued";
-    
+
     /** The default field which is bound to the browse by title */
     private static String titleField = "dc.title";
 
     private static String authorField = "dc.contributor.*";
 
     private static int authorLimit = -1;
-    
-    /** regex pattern to capture the style of a field, ie <code>schema.element.qualifier(style)</code> */
+
+    /**
+     * regex pattern to capture the style of a field, ie
+     * <code>schema.element.qualifier(style)</code>
+     */
     private Pattern fieldStylePatter = Pattern.compile(".*\\((.*)\\)");
-    
+
     // is the export enabled for list?
     private static boolean exportCitation;
 
@@ -113,7 +117,7 @@ public class BrowseListTag extends TagSupport
     {
         showThumbs = ConfigurationManager
                 .getBooleanProperty("webui.browse.thumbnail.show");
-        
+
         if (showThumbs)
         {
             DEFAULT_LIST_FIELDS = "thumbnail, dc.date.issued(date), dc.title, dc.contributor.*";
@@ -126,26 +130,28 @@ public class BrowseListTag extends TagSupport
         }
 
         // get the date and title fields
-        String dateLine = ConfigurationManager.getProperty("webui.browse.index.date");
+        String dateLine = ConfigurationManager
+                .getProperty("webui.browse.index.date");
         if (dateLine != null)
         {
             dateField = dateLine;
         }
 
-        String titleLine = ConfigurationManager.getProperty("webui.browse.index.title");
+        String titleLine = ConfigurationManager
+                .getProperty("webui.browse.index.title");
         if (titleLine != null)
         {
             titleField = titleLine;
         }
 
         // get the author truncation config
-        String authorLine = ConfigurationManager.getProperty("webui.browse.author-field");
+        String authorLine = ConfigurationManager
+                .getProperty("webui.browse.author-field");
         if (authorLine != null)
         {
             authorField = authorLine;
         }
     }
-
 
     public BrowseListTag()
     {
@@ -157,23 +163,23 @@ public class BrowseListTag extends TagSupport
         JspWriter out = pageContext.getOut();
         HttpServletRequest hrq = (HttpServletRequest) pageContext.getRequest();
 
-        /* just leave this out now
-        boolean emphasiseDate = false;
-        boolean emphasiseTitle = false;
-
-        if (emphColumn != null)
-        {
-            emphasiseDate = emphColumn.equalsIgnoreCase("date");
-            emphasiseTitle = emphColumn.equalsIgnoreCase("title");
-        }
-        */
+        /*
+         * just leave this out now boolean emphasiseDate = false; boolean
+         * emphasiseTitle = false;
+         * 
+         * if (emphColumn != null) { emphasiseDate =
+         * emphColumn.equalsIgnoreCase("date"); emphasiseTitle =
+         * emphColumn.equalsIgnoreCase("title"); }
+         */
 
         // get the elements to display
-        String browseListLine  = null;
+        String browseListLine = null;
         String browseWidthLine = null;
 
-        // As different indexes / sort options may require different columns to be displayed
-        // try to obtain a custom configuration based for the browse that has been performed
+        // As different indexes / sort options may require different columns to
+        // be displayed
+        // try to obtain a custom configuration based for the browse that has
+        // been performed
         if (browseInfo != null)
         {
             SortOption so = browseInfo.getSortOption();
@@ -182,14 +188,22 @@ public class BrowseListTag extends TagSupport
             // We have obtained the index that was used for this browse
             if (bix != null)
             {
-                // First, try to get a configuration for this browse and sort option combined
+                // First, try to get a configuration for this browse and sort
+                // option combined
                 if (so != null && browseListLine == null)
                 {
-                    browseListLine  = ConfigurationManager.getProperty("webui.itemlist.browse." + bix.getName() + ".sort." + so.getName() + ".columns");
-                    browseWidthLine = ConfigurationManager.getProperty("webui.itemlist.browse." + bix.getName() + ".sort." + so.getName() + ".widths");
+                    browseListLine = ConfigurationManager
+                            .getProperty("webui.itemlist.browse."
+                                    + bix.getName() + ".sort." + so.getName()
+                                    + ".columns");
+                    browseWidthLine = ConfigurationManager
+                            .getProperty("webui.itemlist.browse."
+                                    + bix.getName() + ".sort." + so.getName()
+                                    + ".widths");
                 }
 
-                // We haven't got a sort option defined, so get one for the index
+                // We haven't got a sort option defined, so get one for the
+                // index
                 // - it may be required later
                 if (so == null)
                 {
@@ -200,67 +214,95 @@ public class BrowseListTag extends TagSupport
             // If no config found, attempt to get one for this sort option
             if (so != null && browseListLine == null)
             {
-                browseListLine  = ConfigurationManager.getProperty("webui.itemlist.sort." + so.getName() + ".columns");
-                browseWidthLine = ConfigurationManager.getProperty("webui.itemlist.sort." + so.getName() + ".widths");
+                browseListLine = ConfigurationManager
+                        .getProperty("webui.itemlist.sort." + so.getName()
+                                + ".columns");
+                browseWidthLine = ConfigurationManager
+                        .getProperty("webui.itemlist.sort." + so.getName()
+                                + ".widths");
             }
 
             // If no config found, attempt to get one for this browse index
             if (bix != null && browseListLine == null)
             {
-                browseListLine  = ConfigurationManager.getProperty("webui.itemlist.browse." + bix.getName() + ".columns");
-                browseWidthLine = ConfigurationManager.getProperty("webui.itemlist.browse." + bix.getName() + ".widths");
+                browseListLine = ConfigurationManager
+                        .getProperty("webui.itemlist.browse." + bix.getName()
+                                + ".columns");
+                browseWidthLine = ConfigurationManager
+                        .getProperty("webui.itemlist.browse." + bix.getName()
+                                + ".widths");
             }
 
-            // If no config found, attempt to get a general one, using the sort name
+            // If no config found, attempt to get a general one, using the sort
+            // name
             if (so != null && browseListLine == null)
             {
-                browseListLine  = ConfigurationManager.getProperty("webui.itemlist." + so.getName() + ".columns");
-                browseWidthLine = ConfigurationManager.getProperty("webui.itemlist." + so.getName() + ".widths");
+                browseListLine = ConfigurationManager
+                        .getProperty("webui.itemlist." + so.getName()
+                                + ".columns");
+                browseWidthLine = ConfigurationManager
+                        .getProperty("webui.itemlist." + so.getName()
+                                + ".widths");
             }
 
-            // If no config found, attempt to get a general one, using the index name
+            // If no config found, attempt to get a general one, using the index
+            // name
             if (bix != null && browseListLine == null)
             {
-                browseListLine  = ConfigurationManager.getProperty("webui.itemlist." + bix.getName() + ".columns");
-                browseWidthLine = ConfigurationManager.getProperty("webui.itemlist." + bix.getName() + ".widths");
+                browseListLine = ConfigurationManager
+                        .getProperty("webui.itemlist." + bix.getName()
+                                + ".columns");
+                browseWidthLine = ConfigurationManager
+                        .getProperty("webui.itemlist." + bix.getName()
+                                + ".widths");
             }
         }
 
         if (browseListLine == null && config != null)
         {
-            browseListLine  = ConfigurationManager.getProperty("webui.itemlist."+config+".columns");
-            browseWidthLine = ConfigurationManager.getProperty("webui.itemlist."+config+".widths");
+            browseListLine = ConfigurationManager.getProperty("webui.itemlist."
+                    + config + ".columns");
+            browseWidthLine = ConfigurationManager
+                    .getProperty("webui.itemlist." + config + ".widths");
         }
 
         if (browseListLine == null)
         {
-            browseListLine  = ConfigurationManager.getProperty("webui.itemlist.columns");
-            browseWidthLine = ConfigurationManager.getProperty("webui.itemlist.widths");
+            browseListLine = ConfigurationManager
+                    .getProperty("webui.itemlist.columns");
+            browseWidthLine = ConfigurationManager
+                    .getProperty("webui.itemlist.widths");
         }
 
         // Have we read a field configration from dspace.cfg?
         if (browseListLine != null)
         {
-            // If thumbnails are disabled, strip out any thumbnail column from the configuration
+            // If thumbnails are disabled, strip out any thumbnail column from
+            // the configuration
             if (!showThumbs && browseListLine.contains("thumbnail"))
             {
                 // Ensure we haven't got any nulls
-                browseListLine  = browseListLine  == null ? "" : browseListLine;
-                browseWidthLine = browseWidthLine == null ? "" : browseWidthLine;
+                browseListLine = browseListLine == null ? "" : browseListLine;
+                browseWidthLine = browseWidthLine == null ? ""
+                        : browseWidthLine;
 
                 // Tokenize the field and width lines
-                StringTokenizer bllt = new StringTokenizer(browseListLine,  ",");
+                StringTokenizer bllt = new StringTokenizer(browseListLine, ",");
                 StringTokenizer bwlt = new StringTokenizer(browseWidthLine, ",");
 
                 StringBuilder newBLLine = new StringBuilder();
                 StringBuilder newBWLine = new StringBuilder();
                 while (bllt.hasMoreTokens() || bwlt.hasMoreTokens())
                 {
-                    String browseListTok  = bllt.hasMoreTokens() ? bllt.nextToken() : null;
-                    String browseWidthTok = bwlt.hasMoreTokens() ? bwlt.nextToken() : null;
+                    String browseListTok = bllt.hasMoreTokens() ? bllt
+                            .nextToken() : null;
+                    String browseWidthTok = bwlt.hasMoreTokens() ? bwlt
+                            .nextToken() : null;
 
-                    // Only use the Field and Width tokens, if the field isn't 'thumbnail'
-                    if (browseListTok == null || !browseListTok.trim().equals("thumbnail"))
+                    // Only use the Field and Width tokens, if the field isn't
+                    // 'thumbnail'
+                    if (browseListTok == null
+                            || !browseListTok.trim().equals("thumbnail"))
                     {
                         if (browseListTok != null)
                         {
@@ -285,21 +327,34 @@ public class BrowseListTag extends TagSupport
                 }
 
                 // Use the newly built configuration file
-                browseListLine  = newBLLine.toString();
+                browseListLine = newBLLine.toString();
                 browseWidthLine = newBWLine.toString();
             }
         }
         else
         {
-            browseListLine  = DEFAULT_LIST_FIELDS;
-            browseWidthLine = DEFAULT_LIST_WIDTHS;
+            if (config.startsWith("cris"))
+            {
+                browseListLine = ConfigurationManager
+                        .getProperty("webui.itemlist.crisdo.columns");
+                browseWidthLine = ConfigurationManager
+                        .getProperty("webui.itemlist.crisdo.widths");
+            }
+            else
+            {
+                browseListLine = DEFAULT_LIST_FIELDS;
+                browseWidthLine = DEFAULT_LIST_WIDTHS;
+            }
         }
 
-        // Arrays used to hold the information we will require when outputting each row
-        String[] fieldArr  = browseListLine == null  ? new String[0] : browseListLine.split("\\s*,\\s*");
-        String[] widthArr  = browseWidthLine == null ? new String[0] : browseWidthLine.split("\\s*,\\s*");
+        // Arrays used to hold the information we will require when outputting
+        // each row
+        String[] fieldArr = browseListLine == null ? new String[0]
+                : browseListLine.split("\\s*,\\s*");
+        String[] widthArr = browseWidthLine == null ? new String[0]
+                : browseWidthLine.split("\\s*,\\s*");
         String useRender[] = new String[fieldArr.length];
-        boolean emph[]     = new boolean[fieldArr.length];
+        boolean emph[] = new boolean[fieldArr.length];
         boolean isAuthor[] = new boolean[fieldArr.length];
         boolean viewFull[] = new boolean[fieldArr.length];
         String[] browseType = new String[fieldArr.length];
@@ -307,20 +362,27 @@ public class BrowseListTag extends TagSupport
 
         try
         {
-        	// Get the interlinking configuration too
+            // Get the interlinking configuration too
             CrossLinks cl = new CrossLinks();
 
             // Get a width for the table
-            String tablewidth = ConfigurationManager.getProperty("webui.itemlist.tablewidth");
+            String tablewidth = ConfigurationManager
+                    .getProperty("webui.itemlist.tablewidth");
 
-            // If we have column widths, try to use a fixed layout table - faster for browsers to render
-            // but not if we have to add an 'edit item' button - we can't know how big it will be
-            if (widthArr.length > 0 && widthArr.length == fieldArr.length && !linkToEdit)
+            // If we have column widths, try to use a fixed layout table -
+            // faster for browsers to render
+            // but not if we have to add an 'edit item' button - we can't know
+            // how big it will be
+            if (widthArr.length > 0 && widthArr.length == fieldArr.length
+                    && !linkToEdit)
             {
-                // If the table width has been specified, we can make this a fixed layout
+                // If the table width has been specified, we can make this a
+                // fixed layout
                 if (!StringUtils.isEmpty(tablewidth))
                 {
-                    out.println("<table style=\"width: " + tablewidth + "; table-layout: fixed;\" align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
+                    out.println("<table style=\"width: "
+                            + tablewidth
+                            + "; table-layout: fixed;\" align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
                 }
                 else
                 {
@@ -335,14 +397,17 @@ public class BrowseListTag extends TagSupport
                 {
                     out.print("<col width=\"");
 
-                    // For a thumbnail column of width '*', use the configured max width for thumbnails
-                    if (fieldArr[w].equals("thumbnail") && widthArr[w].equals("*"))
+                    // For a thumbnail column of width '*', use the configured
+                    // max width for thumbnails
+                    if (fieldArr[w].equals("thumbnail")
+                            && widthArr[w].equals("*"))
                     {
                         out.print(thumbItemListMaxWidth);
                     }
                     else
                     {
-                        out.print(StringUtils.isEmpty(widthArr[w]) ? "*" : widthArr[w]);
+                        out.print(StringUtils.isEmpty(widthArr[w]) ? "*"
+                                : widthArr[w]);
                     }
 
                     out.print("\" />");
@@ -352,7 +417,9 @@ public class BrowseListTag extends TagSupport
             }
             else if (!StringUtils.isEmpty(tablewidth))
             {
-                out.println("<table width=\"" + tablewidth + "\" align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
+                out.println("<table width=\""
+                        + tablewidth
+                        + "\" align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
             }
             else
             {
@@ -368,7 +435,7 @@ public class BrowseListTag extends TagSupport
                 cOddOrEven[colIdx] = (((colIdx + 1) % 2) == 0 ? "Odd" : "Even");
 
                 String style = null;
- 
+
                 // backward compatibility, special fields
                 if (field.equals("thumbnail"))
                 {
@@ -382,15 +449,16 @@ public class BrowseListTag extends TagSupport
                 {
                     style = "date";
                 }
-                
+
                 Matcher fieldStyleMatcher = fieldStylePatter.matcher(field);
-                if (fieldStyleMatcher.matches()){
+                if (fieldStyleMatcher.matches())
+                {
                     style = fieldStyleMatcher.group(1);
                 }
-                
+
                 if (style != null)
                 {
-                    field = field.replaceAll("\\("+style+"\\)", "");
+                    field = field.replaceAll("\\(" + style + "\\)", "");
                     useRender[colIdx] = style;
                 }
                 else
@@ -404,27 +472,27 @@ public class BrowseListTag extends TagSupport
                 // find out if this is the author column
                 if (field.equals(authorField))
                 {
-                	isAuthor[colIdx] = true;
+                    isAuthor[colIdx] = true;
                 }
 
-                // find out if this field needs to link out to other browse views
+                // find out if this field needs to link out to other browse
+                // views
                 if (cl.hasLink(field))
                 {
-                	browseType[colIdx] = cl.getLinkType(field);
-                	viewFull[colIdx] = BrowseIndex.getBrowseIndex(browseType[colIdx]).isItemIndex();
+                    browseType[colIdx] = cl.getLinkType(field);
+                    viewFull[colIdx] = BrowseIndex.getBrowseIndex(
+                            browseType[colIdx]).isItemIndex();
                 }
 
                 // find out if we are emphasising this field
                 /*
-                if ((field.equals(dateField) && emphasiseDate) ||
-                        (field.equals(titleField) && emphasiseTitle))
-                {
-                    emph[colIdx] = true;
-                }
-                */
+                 * if ((field.equals(dateField) && emphasiseDate) ||
+                 * (field.equals(titleField) && emphasiseTitle)) { emph[colIdx]
+                 * = true; }
+                 */
                 if (field.equals(emphColumn))
                 {
-                	emph[colIdx] = true;
+                    emph[colIdx] = true;
                 }
 
                 // prepare the strings for the header
@@ -432,73 +500,86 @@ public class BrowseListTag extends TagSupport
                 String css = "oddRow" + cOddOrEven[colIdx] + "Col";
                 String thJs = null;
                 String message = "itemlist." + field;
-                try {
-					for (SortOption tmpSo : SortOption.getSortOptions())
-					{
-					    if (field.equalsIgnoreCase(tmpSo.getMetadata()))
-					    {
-					    	css += " sortable sort_"+tmpSo.getNumber();
-					    	thJs = " onclick=\"sortBy(" + tmpSo.getNumber() + ",";
-					        if (browseInfo != null && browseInfo.getSortOption() != null &&
-					                browseInfo.getSortOption().getNumber() == tmpSo.getNumber())
-					        {                           
-					            if (!browseInfo.isAscending())
-					            {
-					                thJs += " 'ASC'";
-					                css += " sorted_desc";
-					            }
-					            else
-					            {
-					                thJs += " 'DESC'";
-					                css += " sorted_asc";
-					            }
-					        }
-					        else if (sortBy != null && Integer.parseInt(sortBy) == tmpSo.getNumber())
-					        {					            
-					        	if ("DESC".equalsIgnoreCase(order))
-					            {
-					        	    thJs += " 'ASC'";
-					                css += " sorted_desc";
-					            }
-					            else
-					            {
-					                thJs += " 'DESC'";
-					                css += " sorted_asc";
-					            }
-					        }
-					        else {
-					            thJs += " 'ASC'";
-	                            css += " sortable";
-					        }
-					        thJs += ")\"";
-					      
-					        break;
-					    }
-					}
-				
+                try
+                {
+                    for (SortOption tmpSo : SortOption.getSortOptions())
+                    {
+                        if (field.equalsIgnoreCase(tmpSo.getMetadata()))
+                        {
+                            css += " sortable sort_" + tmpSo.getNumber();
+                            thJs = " onclick=\"sortBy(" + tmpSo.getNumber()
+                                    + ",";
+                            if (browseInfo != null
+                                    && browseInfo.getSortOption() != null
+                                    && browseInfo.getSortOption().getNumber() == tmpSo
+                                            .getNumber())
+                            {
+                                if (!browseInfo.isAscending())
+                                {
+                                    thJs += " 'ASC'";
+                                    css += " sorted_desc";
+                                }
+                                else
+                                {
+                                    thJs += " 'DESC'";
+                                    css += " sorted_asc";
+                                }
+                            }
+                            else if (sortBy != null
+                                    && Integer.parseInt(sortBy) == tmpSo
+                                            .getNumber())
+                            {
+                                if ("DESC".equalsIgnoreCase(order))
+                                {
+                                    thJs += " 'ASC'";
+                                    css += " sorted_desc";
+                                }
+                                else
+                                {
+                                    thJs += " 'DESC'";
+                                    css += " sorted_asc";
+                                }
+                            }
+                            else
+                            {
+                                thJs += " 'ASC'";
+                                css += " sortable";
+                            }
+                            thJs += ")\"";
 
-				} catch (SortException e) {
-					log.error(e.getMessage(), e);
-				}
+                            break;
+                        }
+                    }
+
+                }
+                catch (SortException e)
+                {
+                    log.error(e.getMessage(), e);
+                }
 
                 // output the header
-                out.print("<th id=\"" + id +  "\" class=\"" + css + "\">"
+                out.print("<th id=\""
+                        + id
+                        + "\" class=\""
+                        + css
+                        + "\">"
                         + (emph[colIdx] ? "<strong>" : "")
                         + (thJs != null ? "<a " + thJs + " href=\"#\">" : "")
                         + LocaleSupport.getLocalizedMessage(pageContext,
-                                message) + (thJs != null ? "</a>" : "")                        
+                                message) + (thJs != null ? "</a>" : "")
                         + (emph[colIdx] ? "</strong>" : "") + "</th>");
             }
 
             if (linkToEdit)
             {
                 String id = "t" + Integer.toString(cOddOrEven.length + 1);
-                String css = "oddRow" + cOddOrEven[cOddOrEven.length - 2] + "Col";
+                String css = "oddRow" + cOddOrEven[cOddOrEven.length - 2]
+                        + "Col";
 
                 // output the header
-                out.print("<th id=\"" + id +  "\" class=\"" + css + "\">"
-                        + (emph[emph.length - 2] ? "<strong>" : "")
-                        + "&nbsp;" //LocaleSupport.getLocalizedMessage(pageContext, message)
+                out.print("<th id=\"" + id + "\" class=\"" + css + "\">"
+                        + (emph[emph.length - 2] ? "<strong>" : "") + "&nbsp;" // LocaleSupport.getLocalizedMessage(pageContext,
+                                                                               // message)
                         + (emph[emph.length - 2] ? "</strong>" : "") + "</th>");
             }
 
@@ -507,7 +588,7 @@ public class BrowseListTag extends TagSupport
             // now output each item row
             for (int i = 0; i < items.length; i++)
             {
-            	out.print("<tr>"); 
+                out.print("<tr>");
                 // now prepare the XHTML frag for this division
                 String rOddOrEven;
                 if (i == highlightRow)
@@ -525,15 +606,15 @@ public class BrowseListTag extends TagSupport
 
                     // get the schema and the element qualifier pair
                     // (Note, the schema is not used for anything yet)
-                    // (second note, I hate this bit of code.  There must be
-                    // a much more elegant way of doing this.  Tomcat has
+                    // (second note, I hate this bit of code. There must be
+                    // a much more elegant way of doing this. Tomcat has
                     // some weird problems with variations on this code that
                     // I tried, which is why it has ended up the way it is)
                     StringTokenizer eq = new StringTokenizer(field, ".");
 
                     String[] tokens = { "", "", "" };
                     int k = 0;
-                    while(eq.hasMoreTokens())
+                    while (eq.hasMoreTokens())
                     {
                         tokens[k] = eq.nextToken().toLowerCase().trim();
                         k++;
@@ -546,21 +627,24 @@ public class BrowseListTag extends TagSupport
                     DCValue[] metadataArray;
                     if (qualifier.equals("*"))
                     {
-                        metadataArray = items[i].getMetadata(schema, element, Item.ANY, Item.ANY);
+                        metadataArray = items[i].getMetadata(schema, element,
+                                Item.ANY, Item.ANY);
                     }
                     else if (qualifier.equals(""))
                     {
-                        metadataArray = items[i].getMetadata(schema, element, null, Item.ANY);
+                        metadataArray = items[i].getMetadata(schema, element,
+                                null, Item.ANY);
                     }
                     else
                     {
-                        metadataArray = items[i].getMetadata(schema, element, qualifier, Item.ANY);
+                        metadataArray = items[i].getMetadata(schema, element,
+                                qualifier, Item.ANY);
                     }
 
                     // save on a null check which would make the code untidy
                     if (metadataArray == null)
                     {
-                    	metadataArray = new DCValue[0];
+                        metadataArray = new DCValue[0];
                     }
 
                     // now prepare the content of the table division
@@ -575,7 +659,7 @@ public class BrowseListTag extends TagSupport
                             .getNamedPlugin(
                                     IDisplayMetadataValueStrategy.class,
                                     useRender[colIdx]);
-                    
+
                     // fallback compatibility
                     if (strategy == null)
                     {
@@ -587,7 +671,8 @@ public class BrowseListTag extends TagSupport
                         {
                             strategy = new DateDisplayStrategy();
                         }
-                        else if (useRender[colIdx].equalsIgnoreCase("thumbnail"))
+                        else if (useRender[colIdx]
+                                .equalsIgnoreCase("thumbnail"))
                         {
                             strategy = new ThumbDisplayStrategy();
                         }
@@ -600,20 +685,23 @@ public class BrowseListTag extends TagSupport
                             strategy = new DefaultDisplayStrategy();
                         }
                     }
-                            
+
                     String metadata = strategy.getMetadataDisplay(hrq, limit,
-                                    viewFull[colIdx], browseType[colIdx], colIdx, field,
-                                    metadataArray, items[i], disableCrossLinks, emph[colIdx], pageContext);
+                            viewFull[colIdx], browseType[colIdx], colIdx,
+                            field, metadataArray, items[i], disableCrossLinks,
+                            emph[colIdx], pageContext);
 
                     // prepare extra special layout requirements for dates
                     String extras = strategy.getExtraCssDisplay(hrq, limit,
-                            viewFull[colIdx], browseType[colIdx], colIdx, field,
-                            metadataArray, items[i], disableCrossLinks, emph[colIdx], pageContext);
-                    
+                            viewFull[colIdx], browseType[colIdx], colIdx,
+                            field, metadataArray, items[i], disableCrossLinks,
+                            emph[colIdx], pageContext);
+
                     String id = "t" + Integer.toString(colIdx + 1);
                     out.print("<td headers=\"" + id + "\" class=\""
-                    	+ rOddOrEven + "Row" + cOddOrEven[colIdx] + "Col\" " + (extras != null?extras:"") + ">"
-                    	+  metadata + "</td>");
+                            + rOddOrEven + "Row" + cOddOrEven[colIdx]
+                            + "Col\" " + (extras != null ? extras : "") + ">"
+                            + metadata + "</td>");
                 }
 
                 // Add column for 'edit item' links
@@ -621,12 +709,21 @@ public class BrowseListTag extends TagSupport
                 {
                     String id = "t" + Integer.toString(cOddOrEven.length + 1);
 
-                    out.print("<td headers=\"" + id + "\" class=\""
-                        + rOddOrEven + "Row" + cOddOrEven[cOddOrEven.length - 2] + "Col\" nowrap>"
-                        + "<form method=\"get\" action=\"" + hrq.getContextPath() + "/tools/edit-item\">"
-                        + "<input type=\"hidden\" name=\"handle\" value=\"" + items[i].getHandle() + "\" />"
-                        + "<input type=\"submit\" value=\"Edit Item\" /></form>"
-                        + "</td>");
+                    out.print("<td headers=\""
+                            + id
+                            + "\" class=\""
+                            + rOddOrEven
+                            + "Row"
+                            + cOddOrEven[cOddOrEven.length - 2]
+                            + "Col\" nowrap>"
+                            + "<form method=\"get\" action=\""
+                            + hrq.getContextPath()
+                            + "/tools/edit-item\">"
+                            + "<input type=\"hidden\" name=\"handle\" value=\""
+                            + items[i].getHandle()
+                            + "\" />"
+                            + "<input type=\"submit\" value=\"Edit Item\" /></form>"
+                            + "</td>");
                 }
 
                 out.println("</tr>");
@@ -641,11 +738,11 @@ public class BrowseListTag extends TagSupport
         }
         catch (SQLException e)
         {
-        	throw new JspException(e);
+            throw new JspException(e);
         }
         catch (BrowseException e)
         {
-        	throw new JspException(e);
+            throw new JspException(e);
         }
 
         return SKIP_BODY;
@@ -653,14 +750,14 @@ public class BrowseListTag extends TagSupport
 
     public BrowseInfo getBrowseInfo()
     {
-    	return browseInfo;
+        return browseInfo;
     }
 
     public void setBrowseInfo(BrowseInfo browseInfo)
     {
-    	this.browseInfo = browseInfo;
-    	setItems(browseInfo.getBrowseItemResults());
-    	authorLimit = browseInfo.getEtAl();
+        this.browseInfo = browseInfo;
+        setItems(browseInfo.getBrowseItemResults());
+        authorLimit = browseInfo.getEtAl();
     }
 
     public boolean getLinkToEdit()
@@ -685,7 +782,7 @@ public class BrowseListTag extends TagSupport
 
     /**
      * Get the items to list
-     *
+     * 
      * @return the items
      */
     public BrowseItem[] getItems()
@@ -695,7 +792,7 @@ public class BrowseListTag extends TagSupport
 
     /**
      * Set the items to list
-     *
+     * 
      * @param itemsIn
      *            the items
      */
@@ -706,7 +803,7 @@ public class BrowseListTag extends TagSupport
 
     /**
      * Get the row to highlight - null or -1 for no row
-     *
+     * 
      * @return the row to highlight
      */
     public String getHighlightrow()
@@ -716,7 +813,7 @@ public class BrowseListTag extends TagSupport
 
     /**
      * Set the row to highlight
-     *
+     * 
      * @param highlightRowIn
      *            the row to highlight or -1 for no highlight
      */
@@ -741,7 +838,7 @@ public class BrowseListTag extends TagSupport
 
     /**
      * Get the column to emphasise - "title", "date" or null
-     *
+     * 
      * @return the column to emphasise
      */
     public String getEmphcolumn()
@@ -751,7 +848,7 @@ public class BrowseListTag extends TagSupport
 
     /**
      * Set the column to emphasise - "title", "date" or null
-     *
+     * 
      * @param emphColumnIn
      *            column to emphasise
      */
@@ -764,27 +861,31 @@ public class BrowseListTag extends TagSupport
     {
         this.config = config;
     }
-    
+
     public String getConfig()
     {
         return config;
     }
 
-    public void setOrder(String order) {
-		this.order = order;
-	}
-    
-    public String getOrder() {
-		return order;
-	}
-    
-    public void setSortBy(String sortBy) {
-		this.sortBy = sortBy;
-	}
-    
-    public String getSortBy() {
-		return sortBy;
-	}
+    public void setOrder(String order)
+    {
+        this.order = order;
+    }
+
+    public String getOrder()
+    {
+        return order;
+    }
+
+    public void setSortBy(String sortBy)
+    {
+        this.sortBy = sortBy;
+    }
+
+    public String getSortBy()
+    {
+        return sortBy;
+    }
 
     public void release()
     {
@@ -794,6 +895,5 @@ public class BrowseListTag extends TagSupport
         sortBy = null;
         order = null;
     }
-
 
 }
