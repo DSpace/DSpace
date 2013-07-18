@@ -325,7 +325,7 @@
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.address.head"><h2 class="feedbackform-heading">Postal Address</h2></message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.address.para1">Dryad<br/>PO Box 585<br/>Durham, NC 27702-0585 USA</message>
   <message key="xmlui.ArtifactBrowser.FeedbackForm.forum.head"><h2 class="feedbackform-heading">Suggest and vote for new features</h2></message>
-  <message key="xmlui.ArtifactBrowser.FeedbackForm.forumLink"><a class="feedbackform-user-voice-link" href="#" onclick="jQuery('#forum-link').click(); return false;"><img width="16" height="16" src="/themes/Mirage/images/icon.idea.16px.png" alt="Give your Feedback"></img>&#160;Ideas Forum&#160;</a></message>
+  <message key="xmlui.ArtifactBrowser.FeedbackForm.forumLink"><a class="feedbackform-user-voice-link" href="#" onclick="showClassicWidget(); return false;"><img width="16" height="16" src="/themes/Mirage/images/icon.idea.16px.png" alt="Give your Feedback"></img>&#160;Ideas Forum&#160;</a></message>
   <message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.head"><h2 class="feedbackform-heading">Contact Form</h2></message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.para1">You may also submit your inquiry or help ticket using the form below.</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.email">Your Email</message>
