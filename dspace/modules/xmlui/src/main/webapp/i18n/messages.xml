@@ -3233,7 +3233,7 @@
     <message key="xmlui_submit_publication_article_status_in_review">&#160; In review</message>
     <message key="xmlui_submit_publication_article_status_not_yet_submitted">&#160; Not yet submitted</message>
     <message key="xmlui.submit.publication.unknown_doi">&#160; This article has been published in the journal I will name, but I do not know the DOI or PubMedID for it.</message>
-    <message key="xmlui.submit.publication.article_status">Select Your Article Status</message>
+    <message key="xmlui.submit.publication.article_status"><span class="ds-form-label">Select Your Article Status</span><br/></message>
     <message key="xmlui.submit.publication.article_status_help">All data in Dryad must be associated with an article or other publication. Please select the status of your article.</message>
     <message key="xmlui.submit.publication.journal.manu.acc.label">&#160; This manuscript has been accepted for publication in the above named journal.</message>
     <message key="xmlui.submit.publication.journal.help_not_yet_submitted">If your journal is not listed, you can't submit data to Dryad at this stage.
