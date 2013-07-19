@@ -35,7 +35,7 @@
     <!-- - - - - - New templates for Choice/Authority control - - - - -  -->
 
     <!-- choose 'hidden' for invisible auth, 'text' lets CSS control it. -->
-    <xsl:variable name="authorityInputType" select="'text'"/>
+    <xsl:variable name="authorityInputType" select="'hidden'"/>
 
     <!-- add button to invoke Choices lookup popup.. assume
       -  that the context is a dri:field, where dri:params/@choices is true.
