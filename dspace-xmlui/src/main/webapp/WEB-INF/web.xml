@@ -117,9 +117,6 @@
   <filter-mapping>
         <filter-name>dspace.request</filter-name>
         <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>FORWARD</dispatcher>
-        <dispatcher>INCLUDE</dispatcher>
   </filter-mapping>
   
   <!--
