@@ -616,9 +616,14 @@
                         <xsl:attribute name="checked">checked</xsl:attribute>
                     </xsl:if>
                 </input>
-                <i18n:text>
-                    <xsl:value-of select="."/>
-                </i18n:text>
+                <label>
+                    <xsl:attribute name="for">
+                        <xsl:value-of select="."/>
+                    </xsl:attribute>
+                    <i18n:text>
+                        <xsl:value-of select="."/>
+                    </i18n:text>
+                </label>
                 <br/>
             </xsl:for-each>
         </div>
