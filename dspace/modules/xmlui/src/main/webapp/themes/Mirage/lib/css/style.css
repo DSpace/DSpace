@@ -2215,9 +2215,12 @@ a.top-link {
 
 /* Contact Us (Feedback Form) style */
 
-h2.feedbackform-heading {
+h2.feedbackform-heading,
+div.ds-form-content legend {
     color: #40841c;
     font-size: 18px;
+    font-weight: bold;
+    margin-left: 0;
 }
 
 a.feedbackform-user-voice-link {
