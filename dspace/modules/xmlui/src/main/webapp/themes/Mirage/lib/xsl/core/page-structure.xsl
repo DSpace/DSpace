@@ -249,7 +249,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                    for (var i = 0; i != queryTexts.length; i++) {
                        var value = queryTexts[i].value;
                        if (value.indexOf(' ') == - 1) {
-                           if (value.indexOf("doi:") == 0 || value.indexOf("http:") == 0 || value.indexOf("pmid:") == 0) {
+                           if (value.indexOf("doi:") == 0 || value.indexOf("DOI:") == 0 || value.indexOf("http:") == 0 || value.indexOf("pmid:") == 0 || value.indexOf("PMID:") == 0) {
                                queryTexts[i].value = '"' + value + '"';
                            }
                            
