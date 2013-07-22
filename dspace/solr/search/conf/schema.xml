@@ -135,6 +135,7 @@
    <copyField source="crisrp.variants" dest="crisauthoritylookup"/>
    <copyField source="crisproject.title" dest="crisauthoritylookup"/>
    <copyField source="crisou.name" dest="crisauthoritylookup"/>
+   <copyField source="crisdo.name" dest="crisauthoritylookup"/>
    
     <!-- index for build a facet on the resource type -->
    <field name="resourcetype_filter" type="keywordFilter" indexed="true" stored="true" required="true" omitNorms="true" />
