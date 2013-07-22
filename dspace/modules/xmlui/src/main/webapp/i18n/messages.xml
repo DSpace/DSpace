@@ -407,8 +407,7 @@
 
 	<message key="xmlui.Discovery.SimpleSearch.filter_help"> </message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.selected">Refinements</message>
-	<message key="xmlui.Discovery.SimpleSearch.filter_head">Add refinement</message>
-	<message key="xmlui.Discovery.SimpleSearch.filter_head">Add refinement</message>
+	<message key="xmlui.Discovery.SimpleSearch.filter_head">Add refinement &#160;</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.all">In any field</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dc.date.issued.year">Publication date</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dc.subject_filter">Subject</message>
