@@ -8,10 +8,13 @@
 package org.dspace.app.xmlui.objectmanager;
 
 import org.dspace.app.util.MetadataExposure;
+import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
@@ -31,6 +34,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -52,8 +56,13 @@ import org.dspace.content.DSpaceObject;
  *
  * There are four parts to an item's METS document: descriptive metadata,
  * file section, structural map, and extra sections.
- *
+ * 
+ * Request item-support
+ * Original Concept, JSPUI version:    Universidade do Minho   at www.uminho.pt
+ * Sponsorship of XMLUI version:    Instituto Oceanográfico de España at www.ieo.es
+ * 
  * @author Scott Phillips
+ * @author Adán Román Ruiz at arvo.es (for request item support) 
  */
 
 public class ItemAdapter extends AbstractAdapter
@@ -728,7 +737,7 @@ public class ItemAdapter extends AbstractAdapter
                 }
   
                 // Render the actual file & flocate elements.
-                renderFile(item, bitstream, fileID, groupID, admIDs);
+                renderFileWithAllowed(item, bitstream, fileID, groupID, admIDs);
 
                 // Remember all the viewable content bitstreams for later in the
                 // structMap.
@@ -973,4 +982,141 @@ public class ItemAdapter extends AbstractAdapter
         // Didn't find it
         return null;
     }
+    /**
+     * Generate a METS file element for a given bitstream.
+     * 
+     * @param item
+     *            If the bitstream is associated with an item provide the item
+     *            otherwise leave null.
+     * @param bitstream
+     *            The bitstream to build a file element for.
+     * @param fileID
+     *            The unique file id for this file.
+     * @param groupID
+     *            The group id for this file, if it is derived from another file
+     *            then they should share the same groupID.
+     * @param admID
+     *            The IDs of the administrative metadata sections which pertain
+     *            to this file
+     */
+    
+    // FIXME: this method is a copy of the one inherited. However the
+    // original method is final so we must rename it.
+	protected void renderFileWithAllowed(Item item, Bitstream bitstream, String fileID, String groupID, String admID) throws SAXException
+	{
+		AttributeMap attributes;
+		
+		// //////////////////////////////
+    	// Determine the file attributes
+        BitstreamFormat format = bitstream.getFormat();
+        String mimeType = null;
+        if (format != null)
+        {
+            mimeType = format.getMIMEType();
+        }
+        String checksumType = bitstream.getChecksumAlgorithm();
+        String checksum = bitstream.getChecksum();
+        long size = bitstream.getSize();
+    	
+        // ////////////////////////////////
+        // Start the actual file
+        attributes = new AttributeMap();
+        attributes.put("ID", fileID);
+        attributes.put("GROUPID",groupID);
+        if (admID != null && admID.length()>0)
+        {
+            attributes.put("ADMID", admID);
+        }
+        if (mimeType != null && mimeType.length()>0)
+        {
+            attributes.put("MIMETYPE", mimeType);
+        }
+        if (checksumType != null && checksum != null)
+        {
+        	attributes.put("CHECKSUM", checksum);
+        	attributes.put("CHECKSUMTYPE", checksumType);
+        }
+        attributes.put("SIZE", String.valueOf(size));
+        startElement(METS,"file",attributes);
+        
+        
+        // ////////////////////////////////////
+        // Determine the file location attributes
+        String name = bitstream.getName();
+        String description = bitstream.getDescription();
+
+        
+        // If possible reference this bitstream via a handle, however this may
+        // be null if a handle has not yet been assigned. In this case reference the
+        // item its internal id. In the last case where the bitstream is not associated
+        // with an item (such as a community logo) then reference the bitstreamID directly.
+        String identifier = null;
+        if (item != null && item.getHandle() != null)
+        {
+            identifier = "handle/" + item.getHandle();
+        }
+        else if (item != null)
+        {
+            identifier = "item/" + item.getID();
+        }
+        else
+        {
+            identifier = "id/" + bitstream.getID();
+        }
+        
+        
+        String url = contextPath + "/bitstream/"+identifier+"/";
+        
+        // If we can put the pretty name of the bitstream on the end of the URL
+        try
+        {
+        	if (bitstream.getName() != null)
+            {
+                url += Util.encodeBitstreamName(bitstream.getName(), "UTF-8");
+            }
+        }
+        catch (UnsupportedEncodingException uee)
+        {
+            // just ignore it, we don't have to have a pretty
+            // name on the end of the URL because the sequence id will 
+        	// locate it. However it means that links in this file might
+        	// not work....
+        }
+        
+        url += "?sequence="+bitstream.getSequenceID();
+
+	// Test if we are allowed to see this item
+	String isAllowed = "n";
+	try {
+	    if (AuthorizeManager.authorizeActionBoolean(context, bitstream, Constants.READ)) {
+		isAllowed = "y";
+	    }
+	} catch (SQLException e) {/* Do nothing */}
+	
+	url += "&isAllowed=" + isAllowed;
+
+        // //////////////////////
+        // Start the file location
+        attributes = new AttributeMap();
+        AttributeMap attributesXLINK = new AttributeMap();
+        attributesXLINK.setNamespace(XLINK);
+        attributes.put("LOCTYPE", "URL");
+        attributesXLINK.put("type","locator");
+        attributesXLINK.put("title", name);
+        if (description != null)
+        {
+            attributesXLINK.put("label", description);
+        }
+        attributesXLINK.put("href", url);
+        startElement(METS,"FLocat",attributes,attributesXLINK);
+        
+
+        // ///////////////////////
+        // End file location
+        endElement(METS,"FLocate");
+        
+        // ////////////////////////////////
+        // End the file
+        endElement(METS,"file");
+	}
 }
