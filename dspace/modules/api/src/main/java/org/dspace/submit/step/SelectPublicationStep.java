@@ -460,13 +460,13 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         addSingleMetadataValueFromJournal(context, item, "status", String.valueOf(pBean.isSkipReviewStep()));
         
         // These values differ based on the Article Type
-        if(pBean.getArticleType() == null || pBean.getArticleType().equals(PublicationBean.TYPE_REGULAR)) {
-            addSingleMetadataValueFromJournal(context, item, "title", pBean.getTitle());
-        } else if(pBean.getArticleType().equals(PublicationBean.TYPE_GR_NOTE)) {
+        if(pBean.getArticleType().equals(PublicationBean.TYPE_GR_NOTE)) {
             final String title = String.format("\"%s\" in %s", pBean.getTitle(), pBean.getCitationTitle());
             addSingleMetadataValueFromJournal(context, item, "title", title);
             addSingleMetadataValueFromJournal(context, item, "citationTitle", pBean.getCitationTitle());
             // Citation Authors are not stored in the Item
+        } else { // Assume Regular
+            addSingleMetadataValueFromJournal(context, item, "title", pBean.getTitle());
         }
     }
 
