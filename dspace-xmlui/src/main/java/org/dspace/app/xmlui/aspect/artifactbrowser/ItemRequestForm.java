@@ -42,7 +42,10 @@ import org.xml.sax.SAXException;
 /**
  * Display to the user a simple form letting the user to request a protected item.
  * 
- * @author Adán Román Ruiz at arvo.es
+ * Original Concept, JSPUI version:    Universidade do Minho   at www.uminho.pt
+ * Sponsorship of XMLUI version:    Instituto Oceanográfico de España at www.ieo.es
+ * 
+ * @author Adán Román Ruiz at arvo.es (added request item support)
  */
 public class ItemRequestForm extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {

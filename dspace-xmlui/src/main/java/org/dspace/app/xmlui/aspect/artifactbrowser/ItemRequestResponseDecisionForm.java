@@ -43,7 +43,10 @@ import org.xml.sax.SAXException;
  * Display to the user a simple decision form to select sending or not a file to
  * requester.
  * 
- * @author Adán Román Ruiz at arvo.es
+ * Original Concept, JSPUI version:    Universidade do Minho   at www.uminho.pt
+ * Sponsorship of XMLUI version:    Instituto Oceanográfico de España at www.ieo.es
+ * 
+ * @author Adán Román Ruiz at arvo.es (added request item support)
  */
 public class ItemRequestResponseDecisionForm extends AbstractDSpaceTransformer
 		implements CacheableProcessingComponent {

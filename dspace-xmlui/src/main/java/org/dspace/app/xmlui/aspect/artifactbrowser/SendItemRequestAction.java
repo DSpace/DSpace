@@ -43,7 +43,10 @@ import org.dspace.storage.rdbms.TableRow;
  * This action will send a mail to request a item to administrator when all mandatory data is present.
  * It will record the request into the database.
  * 
- * @author Adán Román Ruiz at arvo.es
+ * Original Concept, JSPUI version:    Universidade do Minho   at www.uminho.pt
+ * Sponsorship of XMLUI version:    Instituto Oceanográfico de España at www.ieo.es
+ * 
+ * @author Adán Román Ruiz at arvo.es (added request item support)
  */
 public class SendItemRequestAction extends AbstractAction
 {

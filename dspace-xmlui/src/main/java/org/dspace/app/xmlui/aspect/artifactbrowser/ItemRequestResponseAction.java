@@ -49,9 +49,12 @@ import org.dspace.storage.rdbms.TableRow;
 
 
 /**
- * @author Adán Román Ruiz at arvo.es
+ * 
+ * Original Concept, JSPUI version:    Universidade do Minho   at www.uminho.pt
+ * Sponsorship of XMLUI version:    Instituto Oceanográfico de España at www.ieo.es
+ * 
+ * @author Adán Román Ruiz at arvo.es (added request item support)
  */
-
 public class ItemRequestResponseAction extends AbstractAction
 {
 	/** log4j log */
