@@ -557,21 +557,17 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                 </li>
                             </xsl:when>
                             <xsl:otherwise>
-                                <li id="login-item">
-                                    <a href="/login">Login</a>
-                                </li>
-                                <li id="sign-up-item">
-                                    <a href="/login">Sign Up</a>
+                                <li class="no-hover-highlight">
+                                    <a href="/login">
+                                        <span id="login-item">Login</span>
+                                        <span class="accessibly-hidden"> or </span>
+                                        <span id="sign-up-item">Sign Up</span>
+                                    </a>
                                 </li>
                             </xsl:otherwise>
                         </xsl:choose>
-
-
                     </ul>
-
                 </div>
-
-
             </div>
         </div>
     </xsl:template>
