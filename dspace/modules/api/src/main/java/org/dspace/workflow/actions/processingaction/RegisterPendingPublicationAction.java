@@ -39,13 +39,11 @@ public class RegisterPendingPublicationAction extends ProcessingAction{
                 String provDescription = getProvenanceStartId() + " Entered publication blackout by " + usersName + "," +
                         " on " + now + " (GMT) ";
                 dataPackage.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
-                dataPackage.addMetadata(MetadataSchema.DC_SCHEMA, "date", "accessioned", null, now.toString());
                 dataPackage.update();
                 // Also add this provenance to the files
                 Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, dataPackage);
                 for(Item dataFile : dataFiles) {
                     dataFile.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
-                    dataFile.addMetadata(MetadataSchema.DC_SCHEMA, "date", "accessioned", null, now.toString());
                     dataFile.update();
                 }
             }

@@ -55,8 +55,8 @@ public class CDLDataCiteConsumer implements Consumer {
                             if(response.contains("bad request") || response.contains("BAD REQUEST") || response.contains("UNAUTHORIZED")){
                                 dataCiteService.emailException(response, doi, "update");
                             }
-                            else if(!response.contains("OK")){
-                                dataCiteService.emailException("Generic error (Response is not 'OK'): " + response, doi, "update");
+                            else if(!response.contains("OK") && !response.contains("success") && !response.contains("SUCCESS")){
+                                dataCiteService.emailException("Unrecognized response: " + response, doi, "update");
                             }
 
                             if(response.contains("error"))

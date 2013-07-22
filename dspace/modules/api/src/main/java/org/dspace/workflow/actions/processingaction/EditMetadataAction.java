@@ -17,6 +17,7 @@ import org.dspace.handle.HandleManager;
 import org.dspace.workflow.*;
 import org.dspace.workflow.actions.ActionResult;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -91,12 +92,35 @@ public class EditMetadataAction extends ProcessingAction {
         else if(request.getParameter("submit_remove") != null){
             removeSubmission(c, wfi, request);
             return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
+        }
+        else if(request.getParameter("submit_return") != null){
+            returnToThePool(c, wfi);
+            return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
 
         }
 
         else {
             //We pressed the leave button so return to our submissions page
             return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
+        }
+    }
+
+    private void returnToThePool(Context c, WorkflowItem wfi) throws SQLException, AuthorizeException, IOException
+    {
+        try{
+            if(wfi != null){
+                //Reject the item
+                List<ClaimedTask> claimedTasks = ClaimedTask.findByWorkflowId(c, wfi.getID());
+
+                //Remove all the claimed tasks
+                for (ClaimedTask claimedTask : claimedTasks) {
+                    WorkflowManager.deleteClaimedTask(c, wfi, claimedTask);
+                    WorkflowRequirementsManager.removeClaimedUser(c, wfi, c.getCurrentUser(), claimedTask.getStepID());
+                    wfi.update();
+                }
+            }
+        }catch (WorkflowConfigurationException wce){
+            throw new RuntimeException("Problem with the workflow configuration" , wce);
         }
     }
 

@@ -74,6 +74,8 @@
     <message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.reject_submit">Reject item</message>
     <message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.approve_help">If you have reviewed the item and it is suitable for inclusion in the collection, select "Approve".</message>
     <message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.approve_submit">Approve item</message>
+    <message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.return_help">Return the task to the pool so that another user may perform the task.</message>
+    <message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.return_submit">Return task to pool</message>
     <message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.edit_help">Select this option to change the item's metadata.</message>
     <message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.edit_submit">Edit metadata</message>
     <message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.delete_help">Select this option to delete this version.</message>
