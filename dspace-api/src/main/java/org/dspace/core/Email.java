@@ -8,11 +8,14 @@
 package org.dspace.core;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,6 +23,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.mail.Address;
 import javax.mail.BodyPart;
@@ -94,7 +98,8 @@ import org.dspace.utils.DSpace;
  *
  * @author Robert Tansley
  * @author Jim Downing - added attachment handling code
- * @version $Revision$
+ * @author Adan Roman Ruiz at arvo.es - added inputstream attachment handling code
+ * @version $Revision: 5844 $
  */
 public class Email
 {
@@ -114,6 +119,7 @@ public class Email
     private String replyTo;
 
     private List<FileAttachment> attachments;
+    private List<InputStreamAttachment> moreAttachments;
 
     /** The character set this message will be sent in */
     private String charset;
@@ -128,6 +134,7 @@ public class Email
         arguments = new ArrayList<Object>(50);
         recipients = new ArrayList<String>(50);
         attachments = new ArrayList<FileAttachment>(10);
+        moreAttachments = new ArrayList<InputStreamAttachment>(10);
         subject = "";
         content = "";
         replyTo = null;
@@ -196,6 +203,10 @@ public class Email
     {
         attachments.add(new FileAttachment(f, name));
     }
+    public void addAttachment(InputStream is, String name,String mimetype)
+    {
+        moreAttachments.add(new InputStreamAttachment(is, name,mimetype));
+    }
 
     public void setCharset(String cs)
     {
@@ -211,6 +222,7 @@ public class Email
         arguments = new ArrayList<Object>(50);
         recipients = new ArrayList<String>(50);
         attachments = new ArrayList<FileAttachment>(10);
+        moreAttachments = new ArrayList<InputStreamAttachment>(10);
         replyTo = null;
         charset = null;
     }
@@ -220,8 +232,9 @@ public class Email
      *
      * @throws MessagingException
      *             if there was a problem sending the mail.
+     * @throws IOException 
      */
-    public void send() throws MessagingException
+    public void send() throws MessagingException, IOException
     {
         // Get the mail configuration properties
         String from = ConfigurationManager.getProperty("mail.from.address");
@@ -269,7 +282,7 @@ public class Email
         }
 
         // Add attachments
-        if (attachments.isEmpty())
+        if (attachments.isEmpty() && moreAttachments.isEmpty())
         {
             // If a character set has been specified, or a default exists
             if (charset != null)
@@ -281,25 +294,37 @@ public class Email
                 message.setText(fullMessage);
             }
         }
-        else
-        {
-            Multipart multipart = new MimeMultipart();
-            // create the first part of the email
-            BodyPart messageBodyPart = new MimeBodyPart();
-            messageBodyPart.setText(fullMessage);
-            multipart.addBodyPart(messageBodyPart);
-
-            for (Iterator<FileAttachment> iter = attachments.iterator(); iter.hasNext();)
-            {
-                FileAttachment f = iter.next();
-                // add the file
-                messageBodyPart = new MimeBodyPart();
-                messageBodyPart.setDataHandler(new DataHandler(
-                        new FileDataSource(f.file)));
-                messageBodyPart.setFileName(f.name);
-                multipart.addBodyPart(messageBodyPart);
-            }
-            message.setContent(multipart);
+        else{
+        	 Multipart multipart = new MimeMultipart();
+	            // create the first part of the email
+	            BodyPart messageBodyPart = new MimeBodyPart();
+	            messageBodyPart.setText(fullMessage);
+	            multipart.addBodyPart(messageBodyPart);
+        	 if(!attachments.isEmpty()){
+	            for (Iterator<FileAttachment> iter = attachments.iterator(); iter.hasNext();)
+	            {
+	                FileAttachment f = iter.next();
+	                // add the file
+	                messageBodyPart = new MimeBodyPart();
+	                messageBodyPart.setDataHandler(new DataHandler(
+	                        new FileDataSource(f.file)));
+	                messageBodyPart.setFileName(f.name);
+	                multipart.addBodyPart(messageBodyPart);
+	            }
+	            message.setContent(multipart);
+        	 }
+        	 if(!moreAttachments.isEmpty()){
+ 	            for (Iterator<InputStreamAttachment> iter = moreAttachments.iterator(); iter.hasNext();)
+ 	            {
+ 	            	InputStreamAttachment isa = iter.next();
+ 	                // add the stream
+ 	                messageBodyPart = new MimeBodyPart();
+ 	                messageBodyPart.setDataHandler(new DataHandler(new InputStreamDataSource(isa.name,isa.mimetype,isa.is)));
+ 	                messageBodyPart.setFileName(isa.name);
+ 	                multipart.addBodyPart(messageBodyPart);
+ 	            }
+ 	            message.setContent(multipart);
+        	 }
         }
 
         if (replyTo != null)
@@ -460,6 +485,12 @@ public class Email
             System.err.println("\nPlease see the DSpace documentation for assistance.\n");
             System.err.println("\n");
             System.exit(1);
+        }catch (IOException e1) {
+        	System.err.println("\nError sending email:");
+            System.err.println(" - Error: " + e1);
+            System.err.println("\nPlease see the DSpace documentation for assistance.\n");
+            System.err.println("\n");
+            System.exit(1);
         }
         System.out.println("\nEmail sent successfully!\n");
     }
@@ -482,4 +513,62 @@ public class Email
 
         String name;
     }
+
+    /**
+     * Utility struct class for handling file attachments.
+     * 
+     * @author Adán Román Ruiz at arvo.es
+     * 
+     */
+    private static class InputStreamAttachment
+    {
+        public InputStreamAttachment(InputStream is, String name, String mimetype)
+        {
+            this.is = is;
+            this.name = name;
+            this.mimetype = mimetype;
+        }
+
+        InputStream is;
+        String mimetype;
+        String name;
+    }
+    
+    /**
+    *
+    * @author arnaldo
+    */
+   public class InputStreamDataSource implements DataSource {
+       private String name;       
+       private String contentType;        
+       private ByteArrayOutputStream baos;                
+       
+       InputStreamDataSource(String name, String contentType, InputStream inputStream) throws IOException {            
+           this.name = name;            
+           this.contentType = contentType;                        
+           baos = new ByteArrayOutputStream();                        
+           int read;            
+           byte[] buff = new byte[256];            
+           while((read = inputStream.read(buff)) != -1) {                
+               baos.write(buff, 0, read);            
+           }        
+       }                
+       
+       public String getContentType() {            
+           return contentType;        
+       }         
+       
+       public InputStream getInputStream() throws IOException {            
+           return new ByteArrayInputStream(baos.toByteArray());        
+       }         
+       
+       public String getName() {            
+           return name;        
+       }         
+       
+       public OutputStream getOutputStream() throws IOException {            
+           throw new IOException("Cannot write to this read-only resource");        
+       }    
+   }
+
 }
