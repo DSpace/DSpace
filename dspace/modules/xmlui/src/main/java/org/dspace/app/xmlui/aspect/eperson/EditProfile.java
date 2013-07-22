@@ -285,7 +285,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        List form = profile.addList("form",List.TYPE_FORM);
        
        List identity = form.addList("identity",List.TYPE_FORM);
-       identity.setHead(T_head_identify);
+       identity.addItem(T_head_identify);
        
        // Email
        identity.addLabel(T_email_address);
@@ -392,7 +392,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        if (allowSetPassword)
        {
            List security = form.addList("security",List.TYPE_FORM);
-           security.setHead(T_head_security);
+           security.addItem(T_head_security);
            
            if (registering)
            {

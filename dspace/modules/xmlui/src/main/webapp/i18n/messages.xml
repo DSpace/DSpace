@@ -544,8 +544,8 @@
 	<message key="xmlui.EPerson.EditProfile.error_unconfirmed_password">Please retype your password to
 		confirm</message>
 	<message key="xmlui.EPerson.EditProfile.head_auth">Authorization groups you belong to</message>
-	<message key="xmlui.EPerson.EditProfile.head_identify">Identity</message>
-	<message key="xmlui.EPerson.EditProfile.head_security">Security</message>
+	<message key="xmlui.EPerson.EditProfile.head_identify"><legend class="ds-head">Identity</legend></message>
+	<message key="xmlui.EPerson.EditProfile.head_security"><legend class="ds-head">Security</legend></message>
 
 	<!-- org.dspace.app.xmlui.eperson.EPersonUtils.java -->
 	<message key="xmlui.EPerson.EPersonUtils.register_verify_email">Verify Email</message>
