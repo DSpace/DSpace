@@ -16,11 +16,10 @@
       <relativePath>..</relativePath>
    </parent>
 
-   <scm>
-      <connection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-lni/dspace-lni-webapp</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-lni/dspace-lni-webapp</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-lni/dspace-lni-webapp</url>
-   </scm>
+   <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/../..</root.basedir>
+   </properties>
 
    <build>
       <plugins>   

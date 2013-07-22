@@ -56,31 +56,7 @@
       </analyzer>
     </fieldType>
     
-   <fieldType name="resourcetypeinverted" class="solr.TextField" sortMissingLast="true" omitNorms="true">
-      <analyzer>
-        <!-- KeywordTokenizer does no actual tokenizing, so the entire
-             input string is preserved as a single token
-          -->
-        <tokenizer class="solr.KeywordTokenizerFactory"/>
-        <filter class="solr.SynonymFilterFactory" synonyms="synresourcetype.txt" ignoreCase="false"
-          expand="false"/>  
-          <filter class="solr.PatternReplaceFilterFactory"
-                pattern="\S+(?:\s*\|\|\|(\s*\S+))+" replacement="$1" replace="all"
-        />
-      </analyzer>
-    </fieldType>
-    
-     <fieldType name="resourcetypeautocomplete" class="solr.TextField" sortMissingLast="true" omitNorms="true">
-      <analyzer>
-        <!-- KeywordTokenizer does no actual tokenizing, so the entire
-             input string is preserved as a single token
-          -->
-        <tokenizer class="solr.KeywordTokenizerFactory"/>
-        <filter class="solr.SynonymFilterFactory" synonyms="synresourcetype.txt" ignoreCase="false"
-          expand="false"/>        
-      </analyzer>
-    </fieldType>
-
+ 
    <fieldType name="sint" class="solr.SortableIntField" sortMissingLast="true" omitNorms="true"/>
 
    <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
@@ -161,13 +137,10 @@
    <copyField source="crisou.name" dest="crisauthoritylookup"/>
    
     <!-- index for build a facet on the resource type -->
-   <field name="resourcetype_filter" type="resourcetypeinverted" indexed="true" stored="true" required="true" omitNorms="true" />
-   <field name="resourcetype_keyword" type="resourcetypeinverted" indexed="true" stored="true" required="true" omitNorms="true" />
-   <field name="resourcetype_ac" type="resourcetypeautocomplete" indexed="true" stored="true" required="true" omitNorms="true" />
-   <copyField source="search.resourcetype" dest="resourcetype_filter"/>
-   <copyField source="search.resourcetype" dest="resourcetype_keyword"/>
-   <copyField source="search.resourcetype" dest="resourcetype_ac"/>
-   
+   <field name="resourcetype_filter" type="keywordFilter" indexed="true" stored="true" required="true" omitNorms="true" />
+   <field name="resourcetype_keyword" type="keywordFilter" indexed="true" stored="true" required="true" omitNorms="true" />
+   <field name="resourcetype_ac" type="keywordFilter" indexed="true" stored="true" required="true" omitNorms="true" />
+      
    <dynamicField name="*_mvuntokenized" type="string" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
    <dynamicField name="*_untokenized" type="string" indexed="true" stored="true" required="false" omitNorms="true" />
    

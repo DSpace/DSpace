@@ -20,21 +20,12 @@
         <relativePath>..</relativePath>
     </parent>
 
-    <!--
-         The Subversion repository location is used by Continuum to update against
-         when changes have occured, this spawns a new build cycle and releases snapshots
-         into the snapshot repository below.
-    -->
-    <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace</connection>
-        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace</developerConnection>
-        <url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace</url>
-    </scm>
-
     <properties>
         <default.dspace.dir>/dspace</default.dspace.dir>
         <default.mail.server>smtp.example.com</default.mail.server>
         <default.solr.server>http://localhost:8080/solr</default.solr.server>
+		<!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/..</root.basedir>
     </properties>
 
     <profiles>
