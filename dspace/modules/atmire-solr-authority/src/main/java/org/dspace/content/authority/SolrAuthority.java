@@ -42,7 +42,9 @@ public class SolrAuthority implements SolrChoiceAuthority, SolrDocumentFields{
             queryArgs.setQuery("*:*");
         }else{
             //queryArgs.setQuery("value:" + text + "* or value:\"" + text +"\"");
-            queryArgs.setQuery("full-text:" + text.toLowerCase() + "* or full-text:\"" + text.toLowerCase() +"\"");
+            //queryArgs.setQuery("full-text:" + text.toLowerCase() + "* or full-text:\"" + text.toLowerCase() +"\"");
+            queryArgs.setQuery("value:" + text);
+            queryArgs.set("q.op", "AND");
         }
 
         if(field != null)
