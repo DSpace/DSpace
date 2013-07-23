@@ -25,6 +25,7 @@
 <%@ page import="org.dspace.content.SupervisedItem" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.eperson.Group" %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%
     // get the object array out of the request
@@ -97,7 +98,7 @@
             <%= supervisors[j].getName() %>
         </td>
         <td class="<%= row %>RowOddCol">
-            <a href="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></a>
+            <a href="mailto:<%= submitter.getEmail() %>"><%= Utils.addEntities(submitter.getFullName()) %></a>
         </td>
         <td class="<%= row %>RowEvenCol">
 <%
