@@ -281,7 +281,7 @@ function clearEPeople()
     {
         EPerson e = epeople[i];
 		// Make sure no quotes in full name will mess up our Javascript
-        String fullname = e.getFullName().replace('\'', ' ');
+        String fullname = Utils.addEntities(e.getFullName().replace('\'', ' '));
 %>
         <tr>
 			<td headers="t1" class="<%= row %>RowOddCol">
@@ -291,10 +291,10 @@ function clearEPeople()
 			<td headers="t2" class="<%= row %>RowEvenCol"><%= e.getID() %></td>
 			<td headers="t3" class="<%= row %>RowOddCol"><%= e.getEmail() %></td>
             <td headers="t4" class="<%= row %>RowEvenCol">
-                <%= (e.getLastName() == null ? "" : e.getLastName()) %>
+                <%= (e.getLastName() == null ? "" : Utils.addEntities(e.getLastName())) %>
             </td>
             <td headers="t5" class="<%= row %>RowOddCol">
-                <%= (e.getFirstName() == null ? "" : e.getFirstName()) %>
+                <%= (e.getFirstName() == null ? "" : Utils.addEntities(e.getFirstName())) %>
             </td>
             <td headers="t6" class="<%= row %>RowOddCol">
                 <%= (e.getLanguage() == null ? "" : e.getLanguage()) %>
