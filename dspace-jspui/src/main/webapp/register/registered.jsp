@@ -25,6 +25,7 @@
 
 <%@ page import="org.dspace.app.webui.servlet.RegisterServlet" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%
     EPerson eperson = (EPerson) request.getAttribute("eperson");
@@ -35,9 +36,9 @@
     <%-- <h1>Registration Complete</h1> --%>
 	<h1><fmt:message key="jsp.register.registered.title"/></h1>
     
-    <%-- <p>Thank you <%= eperson.getFirstName() %>,</p> --%>
+    <%-- <p>Thank you <%= Utils.addEntities(eperson.getFirstName()) %>,</p> --%>
 	<p><fmt:message key="jsp.register.registered.thank">
-        <fmt:param><%= eperson.getFirstName() %></fmt:param>
+        <fmt:param><%= Utils.addEntities(eperson.getFirstName()) %></fmt:param>
     </fmt:message></p>
 
     <%-- <p>You're now registered to use the DSpace system.  You can subscribe to
