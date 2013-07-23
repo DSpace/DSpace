@@ -356,7 +356,10 @@ INSERT INTO "public"."jdyna_widget_text" VALUES ('1600', 'f', '100', 'em', 'em',
 INSERT INTO "public"."jdyna_widget_text" VALUES ('1601', 'f', '30', 'em', 'em', '1', null, 'f', null);
 INSERT INTO "public"."jdyna_widget_text" VALUES ('1700', 'f', '100', 'em', 'em', '1', null, 'f', null);
 INSERT INTO "public"."jdyna_widget_text" VALUES ('1800', 'f', '30', 'em', 'em', '1', null, 'f', null);
-
+INSERT INTO "public"."jdyna_widget_text" VALUES ('90050', 'f', '30', 'em', 'em', '1', null, 'f', null);
+INSERT INTO "public"."jdyna_widget_text" VALUES ('90051', 'f', '30', 'em', 'em', '1', null, 'f', null);
+INSERT INTO "public"."jdyna_widget_text" VALUES ('90052', 'f', '30', 'em', 'em', '1', null, 'f', null);
+INSERT INTO "public"."jdyna_widget_text" VALUES ('90053', 'f', '30', 'em', 'em', '1', null, 'f', null);
 
 -- ----------------------------
 -- Records of cris_ou_box2con
