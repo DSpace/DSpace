@@ -201,6 +201,17 @@ it, please enter the types and the actual numbers or codes below.</hint>
 
        <field>
 		 <dc-schema>dc</dc-schema>
+         <dc-element>relation</dc-element>
+         <dc-qualifier>ispartof</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Journal</label>
+         <input-type>onebox</input-type>
+         <hint> Enter the name of journal.</hint>
+         <required></required>
+       </field>
+       
+       <field>
+		 <dc-schema>dc</dc-schema>
          <dc-element>description</dc-element>
          <dc-qualifier></dc-qualifier>
          <repeatable>false</repeatable>
