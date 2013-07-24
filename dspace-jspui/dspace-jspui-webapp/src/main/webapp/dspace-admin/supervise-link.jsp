@@ -28,6 +28,7 @@
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.eperson.Group" %>
 <%@ page import="org.dspace.eperson.Supervisor" %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%
     // get objects from request
@@ -109,7 +110,7 @@
                         <%= workspaceItems[i].getID() %>
                     </td>
                     <td class="<%= row %>RowEvenCol">
-                        <a href="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></a>
+                        <a href="mailto:<%= submitter.getEmail() %>"><%= Utils.addEntities(submitter.getFullName()) %></a>
                     </td>
                     <td class="<%= row %>RowOddCol">
 <%
