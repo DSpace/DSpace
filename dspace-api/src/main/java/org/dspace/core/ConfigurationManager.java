@@ -422,7 +422,7 @@ public class ConfigurationManager
             fatal("Can't load configuration", e);
 
             // FIXME: Maybe something more graceful here, but with the
-           // configuration we can't do anything
+            // configuration we can't do anything
             throw new IllegalStateException("Failed to read default license.", e);
         }
         finally

@@ -32,12 +32,11 @@ public class SwordIngesterFactory
 	 * of the interface to return.
 	 * 
 	 * To configure how this method will respond, configure the package ingester
-	 * for the appropriate media types and defaults.  See the sword configuration
+	 * for the appropriate media types and defaults.  See the SWORD configuration
 	 * documentation for more details.
 	 * 
 	 * @param context
 	 * @param deposit
-	 * @return
 	 * @throws DSpaceSwordException
 	 */
 	public static SwordContentIngester getContentInstance(Context context, Deposit deposit, DSpaceObject dso)

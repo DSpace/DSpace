@@ -776,7 +776,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             // retrieve bundle name from manifest
             String bundleName = METSManifest.getBundleName(mfile);
 
-            // Find or create the bundle where bitstrem should be attached
+            // Find or create the bundle where bitstream should be attached
             Bundle bundle;
             Bundle bns[] = item.getBundles(bundleName);
             if (bns != null && bns.length > 0)
@@ -1326,7 +1326,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      *            DSpace Context
      * @param manifest
      *            METS manifest
-     * @returns a DSpace Object which is the parent (or null, if not found)
+     * @return a DSpace Object which is the parent (or null, if not found)
      * @throws PackageValidationException
      *             if parent reference cannot be found in manifest
      * @throws MetadataValidationException
@@ -1377,7 +1377,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * 
      * @param manifest
      *            METS manifest
-     * @returns handle as a string (or null, if not found)
+     * @return handle as a string (or null, if not found)
      * @throws PackageValidationException
      *             if handle cannot be found in manifest
      */
@@ -1574,7 +1574,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
     /**
      * Determines what type of DSpace object is represented in this METS doc.
      * 
-     * @returns one of the object types in Constants.
+     * @return one of the object types in Constants.
      */
     public abstract int getObjectType(METSManifest manifest)
             throws PackageValidationException;

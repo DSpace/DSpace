@@ -163,7 +163,7 @@ public abstract class AbstractPackageDisseminator
 
     /**
      * Add File to list of successfully disseminated package files
-     * @param file File
+     * @param f added File.
      */
     protected void addToPackageList(File f)
     {

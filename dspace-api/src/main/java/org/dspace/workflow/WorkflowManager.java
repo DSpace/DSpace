@@ -41,6 +41,8 @@ import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.usage.UsageWorkflowEvent;
+import org.dspace.utils.DSpace;
 
 /**
  * Workflow state machine
@@ -518,6 +520,9 @@ public class WorkflowManager
         Group mygroup = null;
         boolean archived = false;
 
+        //Gather our old data for launching the workflow event
+        int oldState = wi.getState();
+
         wi.setState(newstate);
 
         switch (newstate)
@@ -657,12 +662,30 @@ public class WorkflowManager
             break;
         }
 
+        logWorkflowEvent(c, wi.getItem(), wi, c.getCurrentUser(), newstate, newowner, mycollection, oldState, mygroup);
+
         if (!archived)
         {
             wi.update();
         }
 
         return archived;
+    }
+
+    private static void logWorkflowEvent(Context c, Item item, WorkflowItem workflowItem, EPerson actor, int newstate, EPerson newOwner, Collection mycollection, int oldState, Group newOwnerGroup) {
+        if(newstate == WFSTATE_ARCHIVE || newstate == WFSTATE_STEP1POOL || newstate == WFSTATE_STEP2POOL || newstate == WFSTATE_STEP3POOL){
+            //Clear the newowner variable since this one isn't owned anymore !
+            newOwner = null;
+        }
+
+        UsageWorkflowEvent usageWorkflowEvent = new UsageWorkflowEvent(c, item, workflowItem, workflowText[newstate], workflowText[oldState], mycollection, actor);
+        if(newOwner != null){
+            usageWorkflowEvent.setEpersonOwners(newOwner);
+        }
+        if(newOwnerGroup != null){
+            usageWorkflowEvent.setGroupOwners(newOwnerGroup);
+        }
+        new DSpace().getEventService().fireEvent(usageWorkflowEvent);
     }
 
     /**
@@ -816,6 +839,8 @@ public class WorkflowManager
             String rejection_message) throws SQLException, AuthorizeException,
             IOException
     {
+
+        int oldState = wi.getState();
         // authorize a DSpaceActions.REJECT
         // stop workflow
         deleteTasks(c, wi);
@@ -847,6 +872,8 @@ public class WorkflowManager
                 + wi.getID() + "item_id=" + wi.getItem().getID()
                 + "collection_id=" + wi.getCollection().getID() + "eperson_id="
                 + e.getID()));
+
+        logWorkflowEvent(c, wsi.getItem(), wi, e, WFSTATE_SUBMIT, null, wsi.getCollection(), oldState, null);
 
         return wsi;
     }

@@ -4,7 +4,6 @@
     <artifactId>dspace-api</artifactId>
     <name>DSpace Kernel :: API and Implementation</name>
     <description>DSpace core data model and service APIs.</description>
-    <url>http://projects.dspace.org/dspace-api</url>
 
     <!--
        A Parent POM that Maven inherits DSpace Defaults
@@ -13,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>1.8.3-SNAPSHOT</version>
+        <version>3.2-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -27,13 +26,11 @@
     -->
     <build>
         <plugins>
-        	<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-					<debug>true</debug>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <debug>true</debug>
                     <showDeprecation>true</showDeprecation>
 				</configuration>
 			</plugin>            
@@ -56,6 +53,130 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <id>setupTestEnvironment</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/testing</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.dspace</groupId>
+                                    <artifactId>dspace-parent</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <classifier>testEnvironment</classifier>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- This plugin allows us to run a Groovy script in our Maven POM
+                    (see: http://gmaven.codehaus.org/Executing+Groovy+Code )
+                    We are generating a OS-agnostic version (agnostic.build.dir) of
+                    the ${project.build.directory} property (full path of target dir).
+                    This is necessary so that the FileWeaver & Surefire plugins can
+                    use it to initialize the Unit Test Framework's dspace.cfg file.
+                    Otherwise, the Unit Test Framework will not work on Windows OS.
+                    This Groovy code was mostly borrowed from:
+                    http://stackoverflow.com/questions/3872355/how-to-convert-file-separator-in-maven
+            -->
+            <plugin>
+                <groupId>org.codehaus.gmaven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>setproperty</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <source>
+                            pom.properties['agnostic.build.dir']=project.build.directory.replace('\\','/');
+                            println("Initializing Maven property 'agnostic.build.dir' to: " + project.properties['agnostic.build.dir']);
+                            </source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- FileWeaver plugin is in charge of initializing & "weaving" together
+                 the dspace.cfg file to be used by the Unit Testing framework -->
+            <plugin>
+                <groupId>edu.iu.ul.maven.plugins</groupId>
+                <artifactId>fileweaver</artifactId>
+                <version>1.0</version>
+                <configuration>
+                    <outputs>
+                        <output>
+                            <outputPath>${agnostic.build.dir}/testing</outputPath>
+                            <name>dspace.cfg.woven</name>
+                            <parts>
+                                <part>
+                                    <path>${agnostic.build.dir}/testing/dspace/config/dspace.cfg</path>
+                                </part>
+                                <part>
+                                    <path>${agnostic.build.dir}/testing/dspace.cfg.more</path>
+                                </part>
+                            </parts>
+                            <properties>
+                                <dspace.install.dir>${agnostic.build.dir}/testing/dspace</dspace.install.dir>
+                            </properties>
+                        </output>
+                    </outputs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>edit-dspace-cfg</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>weave</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--
+                The ant plugin below ensures that the dspace "woven" configuration file ends up in the dspace directory
+                The dspace service manager needs this "woven" configuration file when it starts
+            -->
+            <plugin>
+              <artifactId>maven-antrun-plugin</artifactId>
+              <executions>
+                <execution>
+                  <phase>process-test-resources</phase>
+                  <configuration>
+                    <tasks>
+                        <copy file="${agnostic.build.dir}/testing/dspace.cfg.woven" tofile="${agnostic.build.dir}/testing/dspace/config/dspace.cfg" />
+                    </tasks>
+                  </configuration>
+                  <goals>
+                    <goal>run</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <dspace.dir>${agnostic.build.dir}/testing/dspace</dspace.dir>
+                        <dspace.dir.static>${basedir}/src/test/data/dspaceFolder</dspace.dir.static>
+                        <dspace.configuration>${agnostic.build.dir}/testing/dspace/config/dspace.cfg</dspace.configuration>
+                        <db.schema.path>${agnostic.build.dir}/testing/dspace/etc/h2/database_schema.sql</db.schema.path>
+                        <dspace.log.init.disable>true</dspace.log.init.disable>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -63,7 +184,6 @@
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
-            <version>6.2</version>
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
@@ -105,6 +225,12 @@
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -155,12 +281,10 @@
         <dependency>
            <groupId>org.apache.pdfbox</groupId>
            <artifactId>fontbox</artifactId>
-           <version>1.2.1</version>
         </dependency>
         <dependency>
            <groupId>org.apache.pdfbox</groupId>
            <artifactId>jempbox</artifactId>
-           <version>1.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
@@ -216,15 +340,7 @@
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-services-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-services-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
+            <artifactId>dspace-services</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -255,17 +371,67 @@
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
             <version>${solr.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>jcl-over-slf4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
+	<dependency> 
+	    <groupId>gr.ekt</groupId>
+            <artifactId>biblio-transformation-engine</artifactId>
+            <version>0.82</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jbibtex</groupId>
+            <artifactId>jbibtex</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+            <version>1.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace.dependencies</groupId>
+            <artifactId>dspace-geoip</artifactId>
+            <version>1.2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace.dnsjava</groupId>
+            <artifactId>dnsjava</artifactId>
+            <version>2.0.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>0.18.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.coverity.security</groupId>
+            <artifactId>coverity-escapers</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+ 
+        <!--  Gson: Java to Json conversion -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.2.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

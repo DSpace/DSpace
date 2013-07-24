@@ -292,6 +292,14 @@
     </command>
 
     <command>
+        <name>stats-log-importer-elasticsearch</name>
+        <description>Import solr-format converted log files into Elastic Search statistics</description>
+        <step>
+            <class>org.dspace.statistics.util.StatisticsImporterElasticSearch</class>
+        </step>
+    </command>
+
+    <command>
         <name>stats-util</name>
         <description>Statistics Client for Maintenance of Solr Statistics Indexes</description>
         <step>
@@ -323,6 +331,22 @@
         </step>
     </command>
 
+     <command>
+        <name>setup-database</name>
+        <description>Create the database tables</description>
+        <step>
+            <class>org.dspace.storage.rdbms.InitializeDatabase</class>
+        </step>
+    </command>
+
+    <command>
+        <name>clean-database</name>
+        <description>Remove the database tables</description>
+        <step>
+            <class>org.dspace.storage.rdbms.InitializeDatabase</class>
+        </step>
+    </command>
+
     <command>
         <name>test-email</name>
         <description>Test the DSpace email server settings are OK</description>
@@ -340,12 +364,27 @@
     </command>
 
     <command>
-		<name>update-discovery-index</name>
-		<description>Update Discovery Solr Search Index</description>
-		<step>
-			<class>org.dspace.discovery.IndexClient</class>
-		</step>
-	</command>
+        <name>update-discovery-index</name>
+        <description>Update Discovery Solr Search Index</description>
+        <step>
+            <class>org.dspace.discovery.IndexClient</class>
+        </step>
+    </command>
 
+    <command>
+        <name>migrate-embargo</name>
+        <description>Embargo manager tool used to migrate old version of Embargo to the new one included in dspace3</description>
+        <step>
+            <class>org.dspace.embargo.EmbargoManager</class>
+        </step>
+    </command>
+
+    <command>
+        <name>oai</name>
+        <description>OAI script manager</description>
+        <step>
+            <class>org.dspace.xoai.app.XOAI</class>
+        </step>
+    </command>
 
 </commands>

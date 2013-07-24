@@ -604,7 +604,7 @@ public class GoogleMetadata
             for (DCValue v : allMD)
             {
 
-                // De-dup multiple occurances of field names in item
+                // De-dup multiple occurrences of field names in item
                 if (!expandedDC.contains(buildFieldName(v)))
                 {
                     expandedDC.add(buildFieldName(v));
@@ -669,6 +669,9 @@ public class GoogleMetadata
 
         // ISBN
         addSingleField(ISBN);
+
+        // JOURNAL_TITLE
+        addSingleField(JOURNAL_TITLE);
 
         // VOLUME
         addSingleField(VOLUME);
@@ -769,7 +772,6 @@ public class GoogleMetadata
 
     /**
      * Produce meta elements that can easily be put into the head.
-     * @return
      */
     public List<Element> disseminateList()
     {
@@ -1156,7 +1158,7 @@ public class GoogleMetadata
                 }
                 else
                 {
-                    // Otherwise, add it as the first occurance of this field
+                    // Otherwise, add it as the first occurrence of this field
                     ArrayList<String> newField = new ArrayList<String>();
                     newField.add(parsedPair[1].trim());
                     mdPairs.put(parsedPair[0].trim(), newField);

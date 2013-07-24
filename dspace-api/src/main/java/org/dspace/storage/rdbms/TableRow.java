@@ -582,7 +582,7 @@ public class TableRow
             return canonicalized;
         }
 
-        throw new IllegalArgumentException("No such column " + canonicalized);
+        throw new IllegalArgumentException("No such column '" + canonicalized + "'");
     }
 
     /**

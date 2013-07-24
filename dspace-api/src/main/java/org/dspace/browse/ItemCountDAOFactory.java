@@ -24,7 +24,6 @@ public class ItemCountDAOFactory
 	 * for the specific DSpace instance.
 	 * 
 	 * @param context
-	 * @return
 	 * @throws ItemCountException
 	 */
 	public static ItemCountDAO getInstance(Context context)

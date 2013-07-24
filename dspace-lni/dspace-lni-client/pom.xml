@@ -7,18 +7,17 @@
    <description>
       Example Client for working with DSpace LNI Service.
    </description>
-   <url>http://projects.dspace.org/dspace-lni/dspace-lni-client</url>
 
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>dspace-lni</artifactId>
-      <version>1.8.3-SNAPSHOT</version>
-      <relativePath>..</relativePath>
+      <artifactId>dspace-parent</artifactId>
+      <version>3.2-SNAPSHOT</version>
+      <relativePath>../..</relativePath>
    </parent>
-
+   
    <properties>
-        <!-- This is the path to the root [dspace-src] directory. -->
-        <root.basedir>${basedir}/../..</root.basedir>
+       <!-- This is the path to the root [dspace-src] directory. -->
+       <root.basedir>${basedir}/../..</root.basedir>
    </properties>
 
    <profiles>
@@ -62,7 +61,6 @@
       <plugins>
          <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
-			<version>2.2-beta-1</version>
             <configuration>
                <descriptorRefs>
                   <descriptorRef>jar-with-dependencies</descriptorRef>

@@ -153,7 +153,6 @@ public class CCLookup {
 	 * @return A Collection of LicenseField objects.
 	 *
 	 * @see CCLicense
-	 * @see LicenseField
 	 *
 	 */
 	public Collection<CCLicenseField> getLicenseFields(String license) {

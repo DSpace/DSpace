@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2002-2010, DuraSpace.  All rights reserved
+    Licensed under the DuraSpace License.
+
+    A copy of the DuraSpace License has been included in this
+    distribution and is available at: http://www.dspace.org/license
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+
+    <!-- Versioning Service Application Interface for DSpace Will be autowired with
+         a Versioning Provider present in Spring context.
+         Default Item Versioning Provider, defines behavior for replicating
+         Item, Metadata, Bundles and Bitstreams. Autowired at this time.
+     -->
+    <bean id="org.dspace.versioning.VersioningService"
+          class="org.dspace.versioning.VersioningServiceImpl"
+          autowire="byType"
+          scope="singleton">
+       <property name="versionDAO">
+          <bean class="org.dspace.versioning.VersionDAO"/>
+       </property>
+       <property name="versionHistoryDAO">
+          <bean class="org.dspace.versioning.VersionHistoryDAO"/>
+       </property>
+       <property name="provider">
+           <!-- Default Item Versioning Provider, defines behavior for replicating
+                Item, Metadata, Budles and Bitstreams. Autowired at this time. -->
+           <bean class="org.dspace.versioning.DefaultItemVersionProvider">
+               <property name="ignoredMetadataFields">
+                   <set>
+                       <value>dc.date.accessioned</value>
+                       <value>dc.description.provenance</value>
+                   </set>
+               </property>
+               
+           </bean>
+       </property>
+ 
+    </bean>
+    
+</beans>

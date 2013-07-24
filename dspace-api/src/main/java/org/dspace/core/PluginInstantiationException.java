@@ -34,7 +34,7 @@ public class PluginInstantiationException extends RuntimeException
 
     /**
      * @param msg Error message text.
-     * @cause cause other exception that this one is wrapping.
+     * @param cause other exception that this one is wrapping.
      */
     public PluginInstantiationException(String msg, Throwable cause)
     {
@@ -42,7 +42,7 @@ public class PluginInstantiationException extends RuntimeException
     }
 
     /**
-     * @cause cause other exception that this one is wrapping.
+     * @param cause other exception that this one is wrapping.
      */
     public PluginInstantiationException(Throwable cause)
     {

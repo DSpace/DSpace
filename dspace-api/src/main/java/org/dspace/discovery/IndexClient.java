@@ -9,9 +9,7 @@ package org.dspace.discovery;
 
 import org.apache.log4j.Logger;
 import org.apache.commons.cli.*;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
 import org.dspace.utils.DSpace;
 
 import java.io.IOException;
@@ -75,22 +73,6 @@ public class IndexClient {
                                 "if updating existing index, force each handle to be reindexed even if uptodate")
                         .create("f"));
 
-        options
-        .addOption(OptionBuilder
-                .isRequired(false)
-                .hasArg(true)
-                .withDescription(
-                        "clean and update a specific class of objects based on its type")
-                .create("t"));
-
-        options
-        .addOption(OptionBuilder
-                .isRequired(false)
-                .hasArg(true)
-                .withDescription(
-                "clean and update an Item, Collection or Community from index based on its handle")
-                .create("u"));
-        
         options.addOption(OptionBuilder.isRequired(false).withDescription(
                 "print this help message").create("h"));
 
@@ -132,14 +114,6 @@ public class IndexClient {
         } else if (line.hasOption("o")) {
             log.info("Optimizing search core.");
             indexer.optimize();
-        } else if (line.hasOption("t")) {
-        	log.info("Updating and Cleaning a specific Index");
-            String optionValue = line.getOptionValue("t");			
-            indexer.updateIndex(context, true, Integer.valueOf(optionValue));
-        } else if (line.hasOption("u")) {         	
-        	String optionValue = line.getOptionValue("u");
-        	DSpaceObject dso = HandleManager.resolveToObject(context, optionValue);
-            indexer.indexContent(context, dso);
         } else {
             log.info("Updating and Cleaning Index");
             indexer.cleanIndex(line.hasOption("f"));
