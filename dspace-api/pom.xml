@@ -8,7 +8,7 @@
 
     <!--
        A Parent POM that Maven inherits DSpace Defaults
-       POM atrributes from.
+       POM attributes from.
     -->
     <parent>
         <groupId>org.dspace</groupId>
@@ -249,6 +249,16 @@
             <artifactId>contiperf</artifactId>
             <scope>test</scope>
         </dependency>
-    </dependencies>
+        <dependency>
+            <groupId>org.rometools</groupId>
+            <artifactId>rome-modules</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.coverity.security</groupId>
+            <artifactId>coverity-escapers</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+      </dependencies>
 
 </project>

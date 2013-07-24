@@ -28,6 +28,7 @@
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.eperson.Group" %>
 <%@ page import="org.dspace.content.WorkspaceItem" %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%
     // get item and group out of the request
@@ -75,7 +76,7 @@
 <br/><br/>
 <strong><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.authorheader"/></strong>:
 <br/>
-<a href="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></a>
+<a href="mailto:<%= submitter.getEmail() %>"><%= Utils.addEntities(submitter.getFullName()) %></a>
 <br/><br/>
 <strong><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.supervisorgroupheader"/></strong>:
 <br/>
