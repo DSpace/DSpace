@@ -19,6 +19,8 @@
   -    subscribed - Boolean, true if user is subscribed to this collection
   -    admin_button - Boolean, show admin 'edit' button
   -    editor_button - Boolean, show collection editor (edit submitters, item mapping) buttons
+  -    show.title - Boolean, show item list
+  -    browse.info - BrowseInfo, item list
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -31,11 +33,15 @@
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.browse.BrowseIndex" %>
+<%@ page import="org.dspace.browse.BrowserScope" %>
+<%@ page import="org.dspace.browse.BrowseInfo" %>
 <%@ page import="org.dspace.browse.ItemCounter"%>
 <%@ page import="org.dspace.content.*"%>
 <%@ page import="org.dspace.core.ConfigurationManager"%>
+<%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.eperson.Group"     %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="java.net.URLEncoder" %>
 
 
 <%
@@ -93,6 +99,8 @@
     }
     
     ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
+
+    boolean show_title = ((Boolean)request.getAttribute("show.title")).booleanValue();
 %>
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
@@ -210,11 +218,122 @@
       </td>
     </tr>
   </table>
-          <div align="center">
-                   <a class="statisticsLink" href="<%= request.getContextPath() %>/handle/<%= collection.getHandle() %>/statistics"><fmt:message key="jsp.collection-home.display-statistics"/></a>
-          </div>
 
   <%= intro %>
+
+<% if (show_title)
+   {
+        BrowseInfo bi = (BrowseInfo) request.getAttribute("browse.info");
+        BrowseIndex bix = bi.getBrowseIndex();
+
+        // prepare the next and previous links
+        String linkBase = request.getContextPath() + "/";
+        linkBase = linkBase + "handle/" + collection.getHandle() + "/";
+        
+        String direction = (bi.isAscending() ? "ASC" : "DESC");
+        String valueString = "";
+        if (bi.hasValue())
+        {
+            valueString = "&amp;value=" + URLEncoder.encode(bi.getValue());
+        }
+
+        String sharedLink = linkBase + "browse?";
+
+        if (bix.getName() != null)
+            sharedLink += "type=" + URLEncoder.encode(bix.getName());
+
+        String next = sharedLink;
+        String prev = sharedLink;
+        
+        if (bi.hasNextPage())
+        {
+            next = next + "&amp;offset=" + bi.getNextOffset();
+        }
+        
+        if (bi.hasPrevPage())
+        {
+            prev = prev + "&amp;offset=" + bi.getPrevOffset();
+        }
+%>
+    <%-- give us the top report on what we are looking at --%>
+    <div align="center" class="browse_range">
+        <fmt:message key="browse.full.range">
+            <fmt:param value="<%= Integer.toString(bi.getStart()) %>"/>
+            <fmt:param value="<%= Integer.toString(bi.getFinish()) %>"/>
+            <fmt:param value="<%= Integer.toString(bi.getTotal()) %>"/>
+        </fmt:message>
+    </div>
+
+    <%--  do the top previous and next page links --%>
+    <div align="center">
+<% 
+      if (bi.hasPrevPage())
+      {
+%>
+      <a href="<%= prev %>"><fmt:message key="browse.full.prev"/></a>&nbsp;
+<%
+      }
+
+      if (bi.hasNextPage())
+      {
+%>
+      &nbsp;<a href="<%= next %>"><fmt:message key="browse.full.next"/></a>
+<%
+      }
+%>
+    </div>
+
+<%-- output the results using the browselist tag --%>
+<%
+      if (bix.isMetadataIndex())
+      {
+%>
+      <dspace:browselist browseInfo="<%= bi %>" emphcolumn="<%= bix.getMetadata() %>" />
+<%
+      }
+      else
+      {
+%>
+      <dspace:browselist browseInfo="<%= bi %>" emphcolumn="<%= bix.getSortOption().getMetadata() %>" />
+<%
+      }
+%>
+
+    <%-- give us the bottom report on what we are looking at --%>
+    <div align="center" class="browse_range">
+        <fmt:message key="browse.full.range">
+            <fmt:param value="<%= Integer.toString(bi.getStart()) %>"/>
+            <fmt:param value="<%= Integer.toString(bi.getFinish()) %>"/>
+            <fmt:param value="<%= Integer.toString(bi.getTotal()) %>"/>
+        </fmt:message>
+    </div>
+
+    <%--  do the bottom previous and next page links --%>
+    <div align="center">
+<% 
+      if (bi.hasPrevPage())
+      {
+%>
+      <a href="<%= prev %>"><fmt:message key="browse.full.prev"/></a>&nbsp;
+<%
+      }
+
+      if (bi.hasNextPage())
+      {
+%>
+      &nbsp;<a href="<%= next %>"><fmt:message key="browse.full.next"/></a>
+<%
+      }
+%>
+    </div>
+
+<%
+   } // end of if (show_title)
+%>
+
+    <div align="center">
+      <a class="statisticsLink" href="<%= request.getContextPath() %>/handle/<%= collection.getHandle() %>/statistics"><fmt:message key="jsp.collection-home.display-statistics"/></a>
+    </div>
 
   <p class="copyrightText"><%= copyright %></p>
 
