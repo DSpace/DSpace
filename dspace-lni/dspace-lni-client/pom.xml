@@ -20,13 +20,23 @@
        <root.basedir>${basedir}/../..</root.basedir>
    </properties>
 
+   <!--
+        Running this profile will regenerate (from WSDL) most of the classes
+        under the 'org.dspace.app.dav.client' package, based on the existing
+        'org.dspace.app.dav.LNISoapServlet' class in the dspace-lni API.
+
+        This profile is only activated if you explicitly run:
+           mvn package -P regenerate-wsdl
+
+        Please note that after regenerating these classes, you will need to manually
+        re-apply the DSpace license header, in order for them to pass license header
+        checks executed during "mvn install" or "mvn release".
+   -->
    <profiles>
       <profile>
+         <id>regenerate-wsdl</id>
          <activation>
-            <property>
-               <name>regenerate-wsdl</name>
-               <value>true</value>
-            </property>
+            <activeByDefault>false</activeByDefault>
          </activation>
          <build>
             <plugins>
@@ -178,6 +188,12 @@
          <groupId>javax.servlet</groupId>
          <artifactId>servlet-api</artifactId>
          <scope>provided</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-lni</artifactId>
+         <type>jar</type>
+         <classifier>classes</classifier>
       </dependency>
    </dependencies>
 
