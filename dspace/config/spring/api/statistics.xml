@@ -67,6 +67,24 @@
 		<property name="crisComponentsService" ref="pjComponentsService"/>
 		<property name="selectedObject" ref="pjSelectedObject"/>
 	</bean>
+
+	<bean id="doStatsComponent" class="org.dspace.app.cris.integration.statistics.CrisStatComponentsService">
+
+		<property name="excludeBot" value="true"/> <!-- <value>-isBot:true</value>  -->
+		<property name="showSelectedObject" value="true"/>
+		<property name="showExtraTab" value="false"/>
+		<property name="topRelation" value="20"/>
+				
+		<property name="topCountryLength" value="10" />
+		<property name="topContinentLength" value="-1" />
+		<property name="topCityLength" value="10" />		
+		<property name="showMoreLength" value="20" />
+		<property name="yearsQuery" value="5" />
+		
+		<property name="crisComponentsService" ref="doComponentsService"/>
+		<property name="selectedObject" ref="doSelectedObject"/>
+	</bean>
+
 	
 	<bean id="rpSelectedObject"
 		class="org.dspace.app.webui.cris.components.statistics.CrisRPStatsDualSelectedComponent">	
@@ -83,6 +101,10 @@
 		<property name="applicationService" ref="applicationService" />
 	</bean>
 
+	<bean id="doSelectedObject"
+		class="org.dspace.app.webui.cris.components.statistics.CrisDOStatsDualSelectedComponent">	
+		<property name="applicationService" ref="applicationService" />
+	</bean>
 	<!-- Components for ITEM -->
 	
 	<bean id="itemStatsComponent" class="org.dspace.app.cris.integration.statistics.StatComponentsService">

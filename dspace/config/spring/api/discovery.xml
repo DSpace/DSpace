@@ -50,6 +50,11 @@
 	<bean id="resourceTypeIndexer" class="org.dspace.app.cris.discovery.ResourceTypeSolrIndexer">
 	</bean>
 	
+	<!-- Additional indexing plugin to add cris authoritylookup for authority framework works with dynamic resource type to item SOLR 
+		document -->
+	<bean id="researchObjectAuthorityLookupIndexer" class="org.dspace.app.cris.discovery.ResearchObjectAuthorityLookupSolrIndexer">
+	</bean>
+	
 	<!--Bean that is used for mapping communities/collections to certain discovery 
 		configurations. -->
 	<bean

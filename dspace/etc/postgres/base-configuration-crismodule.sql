@@ -261,48 +261,48 @@ INSERT INTO "public"."cris_rp_wfile" VALUES ('1300', 'Upload photo', null, 't', 
 -- Records of jdyna_containable
 -- ----------------------------
 
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '50', null,'50', null, null, null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '51', null,'51', null, null, null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '52', null,'52', null, null, null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '53', null,'53', null, null, null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '54', null,'54', null, null, null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '55', null,'55', null, null, null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionproject', '100', null, null, '100', null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionproject', '101', null, null, '101', null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('typerpnestedobject', '350', null,null, null, null, null, null, null, '5', null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('typerpnestedobject', '351', null,null, null, null, null, null, null, '6', null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('pdrpnestedobject', '352', null,null, null, null, '300', null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('pdrpnestedobject', '353', null,null, null, null, '301', null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('pdrpnestedobject', '354', null,null, null, null, '302', null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('pdrpnestedobject', '355',null, null, null, null, '303', null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionproject', '1100', null,null, '950', null, null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionproject', '1101', null,null, '951', null, null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionou', '1150', null,null, null, '1000', null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionou', '1200', null,null, null, '1050', null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '1401', null,'1251', null, null, null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '1450', null,'1300', null, null, null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('typerpnestedobject', '1451', null,null, null, null, null, null, null, '20', null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('pdrpnestedobject', '1452', null,null, null, null, '1301', null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('pdrpnestedobject', '1453', null,null, null, null, '1302', null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('pdrpnestedobject', '1500', null,null, null, null, '1350', null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '1550', null,'1400', null, null, null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionproject', '1700', null,null, '1550', null, null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionproject', '1701', null,null, '1551', null, null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionproject', '1702', null,null, '1552', null, null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionproject', '1703', null,null, '1553', null, null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('typeprojectnestedobject', '1704', null,null, null, null, null, null, null, null, '24', null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('pdprojectnestedobject', '1705', null,null, null, null, null, '1554', null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('pdprojectnestedobject', '1706',null, null, null, null, null, '1555', null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('pdprojectnestedobject', '1707', null,null, null, null, null, '1556', null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('pdprojectnestedobject', '1708', null,null, null, null, null, '1557', null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionproject', '1750', null,null, '1600', null, null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionproject', '1751', null,null, '1601', null, null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionou', '1801', null,null, null, '1651', null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionou', '1802',null, null, null, '1652', null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionou', '1803',null, null, null, '1653', null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionou', '1850',null, null, null, '1700', null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionou', '1851',null, null, null, '1701', null, null, null, null, null, null, null);
-INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '1800', null,'1800', null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '50', null,'50', null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '51', null,'51', null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '52', null,'52', null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '53', null,'53', null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '54', null,'54', null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '55', null,'55', null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionproject', '100', null, null, '100', null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionproject', '101', null, null, '101', null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('typerpnestedobject', '350', null,null, null, null, null, null, null, '5', null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('typerpnestedobject', '351', null,null, null, null, null, null, null, '6', null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('pdrpnestedobject', '352', null,null, null, null, '300', null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('pdrpnestedobject', '353', null,null, null, null, '301', null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('pdrpnestedobject', '354', null,null, null, null, '302', null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('pdrpnestedobject', '355',null, null, null, null, '303', null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionproject', '1100', null,null, '950', null, null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionproject', '1101', null,null, '951', null, null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionou', '1150', null,null, null, '1000', null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionou', '1200', null,null, null, '1050', null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '1401', null,'1251', null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '1450', null,'1300', null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('typerpnestedobject', '1451', null,null, null, null, null, null, null, '20', null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('pdrpnestedobject', '1452', null,null, null, null, '1301', null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('pdrpnestedobject', '1453', null,null, null, null, '1302', null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('pdrpnestedobject', '1500', null,null, null, null, '1350', null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '1550', null,'1400', null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionproject', '1700', null,null, '1550', null, null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionproject', '1701', null,null, '1551', null, null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionproject', '1702', null,null, '1552', null, null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionproject', '1703', null,null, '1553', null, null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('typeprojectnestedobject', '1704', null,null, null, null, null, null, null, null, '24', null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('pdprojectnestedobject', '1705', null,null, null, null, null, '1554', null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('pdprojectnestedobject', '1706',null, null, null, null, null, '1555', null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('pdprojectnestedobject', '1707', null,null, null, null, null, '1556', null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('pdprojectnestedobject', '1708', null,null, null, null, null, '1557', null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionproject', '1750', null,null, '1600', null, null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionproject', '1751', null,null, '1601', null, null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionou', '1801', null,null, null, '1651', null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionou', '1802',null, null, null, '1652', null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionou', '1803',null, null, null, '1653', null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionou', '1850',null, null, null, '1700', null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitionou', '1851',null, null, null, '1701', null, null, null, null, null, null, null, null, null);
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '1800', null,'1800', null, null, null, null, null, null, null, null, null, null, null);
 
 -- ----------------------------
 -- Records of jdyna_widget_date
@@ -321,14 +321,14 @@ INSERT INTO "public"."jdyna_widget_link" VALUES ('55', 'Insert here the label to
 -- ----------------------------
 -- Records of jdyna_widget_pointer
 -- ----------------------------
-INSERT INTO "public"."jdyna_widget_pointer" VALUES ('950', '${displayObject.anagrafica4view[''preferredName''][0].value}', 'search.resourcetype:9', null, '20', 'org.dspace.app.cris.model.jdyna.value.RPPointer');
-INSERT INTO "public"."jdyna_widget_pointer" VALUES ('951', '${displayObject.preferredName.value}', 'search.resourcetype:9', null, '20', 'org.dspace.app.cris.model.jdyna.value.RPPointer');
-INSERT INTO "public"."jdyna_widget_pointer" VALUES ('1000', '${displayObject.preferredName.value}', 'search.resourcetype:9', null, '20', 'org.dspace.app.cris.model.jdyna.value.RPPointer');
-INSERT INTO "public"."jdyna_widget_pointer" VALUES ('1251', '${displayObject.name}', 'search.resourcetype:11', null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer');
-INSERT INTO "public"."jdyna_widget_pointer" VALUES ('1400', '${displayObject.name}', 'search.resourcetype:11', null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer');
-INSERT INTO "public"."jdyna_widget_pointer" VALUES ('1557', '${displayObject.name}', 'search.resourcetype:11', null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer');
-INSERT INTO "public"."jdyna_widget_pointer" VALUES ('1651', '${displayObject.name}', null, null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer');
-INSERT INTO "public"."jdyna_widget_pointer" VALUES ('1652', '${displayObject.fullName}', null, null, '20', 'org.dspace.app.cris.model.jdyna.value.RPPointer');
+INSERT INTO "public"."cris_rp_wpointer" VALUES ('950', '${displayObject.anagrafica4view[''preferredName''][0].value}', 'search.resourcetype:9', null, '20', 'org.dspace.app.cris.model.jdyna.value.RPPointer');
+INSERT INTO "public"."cris_rp_wpointer" VALUES ('951', '${displayObject.preferredName.value}', 'search.resourcetype:9', null, '20', 'org.dspace.app.cris.model.jdyna.value.RPPointer');
+INSERT INTO "public"."cris_rp_wpointer" VALUES ('1000', '${displayObject.preferredName.value}', 'search.resourcetype:9', null, '20', 'org.dspace.app.cris.model.jdyna.value.RPPointer');
+INSERT INTO "public"."cris_ou_wpointer" VALUES ('1251', '${displayObject.name}', 'search.resourcetype:11', null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer');
+INSERT INTO "public"."cris_ou_wpointer" VALUES ('1400', '${displayObject.name}', 'search.resourcetype:11', null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer');
+INSERT INTO "public"."cris_ou_wpointer" VALUES ('1557', '${displayObject.name}', 'search.resourcetype:11', null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer');
+INSERT INTO "public"."cris_ou_wpointer" VALUES ('1651', '${displayObject.name}', null, null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer');
+INSERT INTO "public"."cris_rp_wpointer" VALUES ('1652', '${displayObject.fullName}', null, null, '20', 'org.dspace.app.cris.model.jdyna.value.RPPointer');
 
 -- ----------------------------
 -- Records of jdyna_widget_text
@@ -356,7 +356,10 @@ INSERT INTO "public"."jdyna_widget_text" VALUES ('1600', 'f', '100', 'em', 'em',
 INSERT INTO "public"."jdyna_widget_text" VALUES ('1601', 'f', '30', 'em', 'em', '1', null, 'f', null);
 INSERT INTO "public"."jdyna_widget_text" VALUES ('1700', 'f', '100', 'em', 'em', '1', null, 'f', null);
 INSERT INTO "public"."jdyna_widget_text" VALUES ('1800', 'f', '30', 'em', 'em', '1', null, 'f', null);
-
+INSERT INTO "public"."jdyna_widget_text" VALUES ('90050', 'f', '30', 'em', 'em', '1', null, 'f', null);
+INSERT INTO "public"."jdyna_widget_text" VALUES ('90051', 'f', '30', 'em', 'em', '1', null, 'f', null);
+INSERT INTO "public"."jdyna_widget_text" VALUES ('90052', 'f', '30', 'em', 'em', '1', null, 'f', null);
+INSERT INTO "public"."jdyna_widget_text" VALUES ('90053', 'f', '30', 'em', 'em', '1', null, 'f', null);
 
 -- ----------------------------
 -- Records of cris_ou_box2con
@@ -369,7 +372,6 @@ INSERT INTO "public"."cris_ou_box2con" VALUES ('300', '1803');
 INSERT INTO "public"."cris_ou_box2con" VALUES ('300', '1851');
 INSERT INTO "public"."cris_ou_box2con" VALUES ('750', '1150');
 INSERT INTO "public"."cris_ou_box2con" VALUES ('750', '1200');
-INSERT INTO "public"."cris_ou_box2con" VALUES ('750', '1200');
 INSERT INTO "public"."cris_ou_box2con" VALUES ('750', '1801');
 INSERT INTO "public"."cris_ou_box2con" VALUES ('750', '1803');
 INSERT INTO "public"."cris_ou_box2con" VALUES ('750', '1851');
@@ -380,24 +382,13 @@ INSERT INTO "public"."cris_ou_box2con" VALUES ('800', '1850');
 -- Records of cris_rp_box2con
 -- ----------------------------
 INSERT INTO "public"."cris_rp_box2con" VALUES ('50', '50');
-INSERT INTO "public"."cris_rp_box2con" VALUES ('50', '50');
-INSERT INTO "public"."cris_rp_box2con" VALUES ('50', '50');
 INSERT INTO "public"."cris_rp_box2con" VALUES ('50', '51');
 INSERT INTO "public"."cris_rp_box2con" VALUES ('50', '52');
-INSERT INTO "public"."cris_rp_box2con" VALUES ('50', '52');
-INSERT INTO "public"."cris_rp_box2con" VALUES ('50', '53');
 INSERT INTO "public"."cris_rp_box2con" VALUES ('50', '53');
 INSERT INTO "public"."cris_rp_box2con" VALUES ('50', '54');
-INSERT INTO "public"."cris_rp_box2con" VALUES ('50', '54');
-INSERT INTO "public"."cris_rp_box2con" VALUES ('50', '55');
-INSERT INTO "public"."cris_rp_box2con" VALUES ('50', '55');
-INSERT INTO "public"."cris_rp_box2con" VALUES ('50', '55');
 INSERT INTO "public"."cris_rp_box2con" VALUES ('50', '55');
 INSERT INTO "public"."cris_rp_box2con" VALUES ('50', '1401');
-INSERT INTO "public"."cris_rp_box2con" VALUES ('50', '1401');
 INSERT INTO "public"."cris_rp_box2con" VALUES ('50', '1450');
-INSERT INTO "public"."cris_rp_box2con" VALUES ('50', '1450');
-INSERT INTO "public"."cris_rp_box2con" VALUES ('50', '1550');
 INSERT INTO "public"."cris_rp_box2con" VALUES ('50', '1550');
 INSERT INTO "public"."cris_rp_box2con" VALUES ('200', '1451');
 INSERT INTO "public"."cris_rp_box2con" VALUES ('250', '350');
@@ -415,17 +406,12 @@ INSERT INTO "public"."cris_rp_box2con" VALUES ('250', '1800');
 -- ----------------------------
 INSERT INTO "public"."cris_pj_box2con" VALUES ('100', '1704');
 INSERT INTO "public"."cris_pj_box2con" VALUES ('650', '100');
-INSERT INTO "public"."cris_pj_box2con" VALUES ('650', '100');
-INSERT INTO "public"."cris_pj_box2con" VALUES ('650', '100');
 INSERT INTO "public"."cris_pj_box2con" VALUES ('650', '101');
 INSERT INTO "public"."cris_pj_box2con" VALUES ('650', '1100');
 INSERT INTO "public"."cris_pj_box2con" VALUES ('650', '1101');
 INSERT INTO "public"."cris_pj_box2con" VALUES ('650', '1700');
-INSERT INTO "public"."cris_pj_box2con" VALUES ('650', '1700');
 INSERT INTO "public"."cris_pj_box2con" VALUES ('650', '1701');
 INSERT INTO "public"."cris_pj_box2con" VALUES ('650', '1702');
-INSERT INTO "public"."cris_pj_box2con" VALUES ('650', '1703');
-INSERT INTO "public"."cris_pj_box2con" VALUES ('650', '1703');
 INSERT INTO "public"."cris_pj_box2con" VALUES ('650', '1703');
 INSERT INTO "public"."cris_pj_box2con" VALUES ('700', '100');
 INSERT INTO "public"."cris_pj_box2con" VALUES ('700', '101');
@@ -437,11 +423,106 @@ INSERT INTO "public"."cris_pj_box2con" VALUES ('700', '1703');
 INSERT INTO "public"."cris_pj_box2con" VALUES ('701', '1750');
 INSERT INTO "public"."cris_pj_box2con" VALUES ('701', '1751');
 
+
+--
+-- Data for Name: cris_do_wfile; Type: TABLE DATA; Schema: public; Owner: dspace
+--
+
+INSERT INTO "public"."cris_do_wfile" (id, filedescription, labelanchor, showpreview, widgetsize, useinstatistics) VALUES (90100, 'Upload logo', NULL, true, 40, false);
+
+--
+-- Data for Name: cris_do_pdef; Type: TABLE DATA; Schema: public; Owner: dspace
+--
+
+INSERT INTO "public"."cris_do_pdef" (id, accesslevel, advancedsearch, fieldmin_col, fieldmin_col_unit, fieldmin_row_unit, fieldmin_row, help, label, labelminsize, labelminsizeunit, mandatory, newline, oncreation, priority, repeatable, shortname, showinlist, simplesearch, rendering_id) VALUES (90052, 3, false, 0, 'em', 'em', 0, NULL, 'Description', 0, 'em', false, false, false, 0, false, 'journalsdescription', false, false, 90052);
+INSERT INTO "public"."cris_do_pdef" (id, accesslevel, advancedsearch, fieldmin_col, fieldmin_col_unit, fieldmin_row_unit, fieldmin_row, help, label, labelminsize, labelminsizeunit, mandatory, newline, oncreation, priority, repeatable, shortname, showinlist, simplesearch, rendering_id) VALUES (90100, 1, false, 0, 'em', 'em', 0, NULL, NULL, 0, 'em', false, false, false, 1000, false, 'journalspicture', false, false, 90100);
+INSERT INTO "public"."cris_do_pdef" (id, accesslevel, advancedsearch, fieldmin_col, fieldmin_col_unit, fieldmin_row_unit, fieldmin_row, help, label, labelminsize, labelminsizeunit, mandatory, newline, oncreation, priority, repeatable, shortname, showinlist, simplesearch, rendering_id) VALUES (90050, 3, false, 0, 'em', 'em', 0, NULL, 'Name', 0, 'em', true, false, false, 900, false, 'journalsname', false, false, 90050);
+INSERT INTO "public"."cris_do_pdef" (id, accesslevel, advancedsearch, fieldmin_col, fieldmin_col_unit, fieldmin_row_unit, fieldmin_row, help, label, labelminsize, labelminsizeunit, mandatory, newline, oncreation, priority, repeatable, shortname, showinlist, simplesearch, rendering_id) VALUES (90053, 3, false, 0, 'em', 'em', 0, NULL, 'Subject Classifications', 0, 'em', false, false, false, 850, true, 'journalskeywords', false, false, 90053);
+INSERT INTO "public"."cris_do_pdef" (id, accesslevel, advancedsearch, fieldmin_col, fieldmin_col_unit, fieldmin_row_unit, fieldmin_row, help, label, labelminsize, labelminsizeunit, mandatory, newline, oncreation, priority, repeatable, shortname, showinlist, simplesearch, rendering_id) VALUES (90051, 3, false, 0, 'em', 'em', 0, NULL, 'ISSN', 0, 'em', false, false, false, 800, false, 'journalsissn', false, false, 90051);
+
+
+
+
+--
+-- Data for Name: cris_do_tp; Type: TABLE DATA; Schema: public; Owner: dspace
+--
+
+INSERT INTO "public"."cris_do_tp" (id, label, shortname) VALUES (1, 'Journals', 'journals');
+
+
+--
+-- Data for Name: cris_do_box; Type: TABLE DATA; Schema: public; Owner: dspace
+--
+
+INSERT INTO "public"."cris_do_box" (id, collapsed, externaljsp, priority, shortname, title, unrelevant, visibility, typedef_id) VALUES (42551, false, NULL, 0, 'journalsdescription', 'Description', false, 1, 1);
+INSERT INTO "public"."cris_do_box" (id, collapsed, externaljsp, priority, shortname, title, unrelevant, visibility, typedef_id) VALUES (42600, false, 'dspaceitems', 0, 'journalspublications', 'Journal''s Article', false, 1, 1);
+
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitiondynaobj', '92602', null, null, null, null, null, null, null, null, null, null, null, null, '90052');
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitiondynaobj', '92601', null, null, null, null, null, null, null, null, null, null, null, null, '90051');
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitiondynaobj', '92603', null, null, null, null, null, null, null, null, null, null, null, null, '90053');
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitiondynaobj', '92600', null, null, null, null, null, null, null, null, null, null, null, null, '90050');
+INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinitiondynaobj', '92650', null, null, null, null, null, null, null, null, null, null, null, null, '90100');
+
+--
+-- Data for Name: cris_do_box2con; Type: TABLE DATA; Schema: public; Owner: dspace
+--
+
+INSERT INTO "public"."cris_do_box2con" (cris_do_box_id, jdyna_containable_id) VALUES (42551, 92602);
+INSERT INTO "public"."cris_do_box2con" (cris_do_box_id, jdyna_containable_id) VALUES (42551, 92601);
+INSERT INTO "public"."cris_do_box2con" (cris_do_box_id, jdyna_containable_id) VALUES (42551, 92603);
+INSERT INTO "public"."cris_do_box2con" (cris_do_box_id, jdyna_containable_id) VALUES (42551, 92600);
+INSERT INTO "public"."cris_do_box2con" (cris_do_box_id, jdyna_containable_id) VALUES (42551, 92650);
+
+
+
+--
+-- Data for Name: cris_do_tab; Type: TABLE DATA; Schema: public; Owner: dspace
+--
+
+INSERT INTO "public"."cris_do_tab" (id, ext, mandatory, mime, priority, shortname, title, visibility, typedef_id) VALUES (20250, NULL, false, NULL, 0, 'journalsinformation', 'Details', 3, 1);
+
+
+--
+-- Data for Name: cris_do_etab; Type: TABLE DATA; Schema: public; Owner: dspace
+--
+
+INSERT INTO "public"."cris_do_etab" (id, ext, mandatory, mime, priority, shortname, title, visibility, displaytab_id, typedef_id) VALUES (20251, NULL, false, NULL, 0, 'editjournalsinformation', 'Edit Details', 1, NULL, 1);
+
+
+--
+-- Data for Name: cris_do_etab2box; Type: TABLE DATA; Schema: public; Owner: dspace
+--
+
+INSERT INTO "public"."cris_do_etab2box" (cris_do_etab_id, cris_do_box_id) VALUES (20251, 42551);
+
+
+--
+-- Data for Name: cris_do_tab2box; Type: TABLE DATA; Schema: public; Owner: dspace
+--
+
+INSERT INTO "public"."cris_do_tab2box" (cris_do_tab_id, cris_do_box_id) VALUES (20250, 42551);
+INSERT INTO "public"."cris_do_tab2box" (cris_do_tab_id, cris_do_box_id) VALUES (20250, 42600);
+
+
+--
+-- Data for Name: cris_do_tp2pdef; Type: TABLE DATA; Schema: public; Owner: dspace
+--
+
+INSERT INTO "public"."cris_do_tp2pdef" (cris_do_tp_id, cris_do_pdef_id) VALUES (1, 90050);
+INSERT INTO "public"."cris_do_tp2pdef" (cris_do_tp_id, cris_do_pdef_id) VALUES (1, 90051);
+INSERT INTO "public"."cris_do_tp2pdef" (cris_do_tp_id, cris_do_pdef_id) VALUES (1, 90052);
+INSERT INTO "public"."cris_do_tp2pdef" (cris_do_tp_id, cris_do_pdef_id) VALUES (1, 90053);
+INSERT INTO "public"."cris_do_tp2pdef" (cris_do_tp_id, cris_do_pdef_id) VALUES (1, 90100);
+
+
+
+
+
 -- update seq
-SELECT setval('JDYNA_WIDGET_SEQ', max(id)) FROM jdyna_widget_text;
+SELECT setval('JDYNA_WIDGET_SEQ', max(id)) FROM cris_do_wfile;
 SELECT setval('JDYNA_CONTAINABLE_SEQ', max(id)) FROM jdyna_containable;
-SELECT setval('JDYNA_BOX_SEQ', max(id)) FROM cris_ou_box;
-SELECT setval('JDYNA_TAB_SEQ', max(id)) FROM cris_ou_tab;
+SELECT setval('JDYNA_BOX_SEQ', max(id)) FROM cris_do_box;
+SELECT setval('JDYNA_TAB_SEQ', max(id)) FROM cris_do_tab;
 SELECT setval('JDYNA_PDEF_SEQ', max(aa.id)) FROM (
 SELECT  a.id
 FROM    cris_ou_pdef a
@@ -451,6 +532,9 @@ FROM    cris_pj_pdef b
 UNION
 SELECT  c.id
 FROM    cris_rp_pdef c
+UNION
+SELECT  g.id
+FROM    cris_do_pdef g
 UNION
 SELECT  d.id
 FROM    cris_ou_no_pdef d

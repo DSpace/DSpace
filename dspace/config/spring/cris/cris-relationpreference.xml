@@ -70,9 +70,9 @@
 	
 	<bean id="relationRPVSPJConfiguration" class="org.dspace.app.cris.configuration.RelationConfiguration">    										
 		<property name="relationName" value="crispj.projects" />		
-		<property name="relationClass" value="org.dspace.app.cris.model.ResearcherPage" />		
+		<property name="relationClass" value="org.dspace.app.cris.model.Project" />		
 		<property name="query">
-			<value>projectsinvestigators_authority:{0}</value>
+			<value>projectinvestigators_authority:{0}</value>
 		</property>
 	</bean>
 
@@ -81,6 +81,14 @@
 		<property name="relationClass" value="org.dspace.content.Item" />		
 		<property name="query">
 			<value>dc.relation_authority:{0}</value>
+		</property>
+	</bean>
+
+	<bean id="relationJOURNALVSItemConfiguration" class="org.dspace.app.cris.configuration.RelationConfiguration">    										
+		<property name="relationName" value="crisjournals.publications" />		
+		<property name="relationClass" value="org.dspace.content.Item" />		
+		<property name="query">
+			<value>dc.relation.ispartof_authority:{0}</value>
 		</property>
 	</bean>
 

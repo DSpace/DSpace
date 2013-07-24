@@ -125,7 +125,7 @@
 	<bean id="investigatoredComponent"
 		class="org.dspace.app.webui.cris.components.BeanFacetComponent">
 		<property name="componentIdentifier" value="investigatored" />
-		<property name="facetQuery"><value>crisproject.principalinvestigator_authority:{1} -relationpreferences.crisproject.projects.selected:{1}</value></property>
+		<property name="facetQuery"><value>crisproject.principalinvestigator_authority:{0} -relationpreferences.crisproject.projects.selected:{1}</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>5</value></property>		
@@ -134,7 +134,7 @@
 	<bean id="coinvestigatoredComponent"
 		class="org.dspace.app.webui.cris.components.BeanFacetComponent">
 		<property name="componentIdentifier" value="coinvestigatored" />
-		<property name="facetQuery"><value>crisproject.coinvestigators_authority:{1} -relationpreferences.crisproject.projects.selected:{1}</value></property>
+		<property name="facetQuery"><value>crisproject.coinvestigators_authority:{0} -relationpreferences.crisproject.projects.selected:{1}</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>5</value></property>		
@@ -149,7 +149,7 @@
 				<entry key="projects" value-ref="projectlistforou" />				
 				<entry key="rpprojects" value-ref="projectlistinvestigatorforou" />
 				<entry key="rp" value-ref="personslist" />				
-				<entry key="organizations" value-ref="organizationslist" />
+				<entry key="organizations" value-ref="organizationslist" />				
 			</map>
 		</property>
 	</bean>
@@ -270,7 +270,7 @@
 		<property name="facetQuery"><value>*:*</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>5</value></property>
-		<property name="sortby"><value>6</value></property>			
+		<property name="sortby"><value>4</value></property>			
 	</bean>
 		
 		
@@ -323,7 +323,7 @@
 		<property name="facetQuery"><value>*:*</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>
-		<property name="sortby"><value>5</value></property>		
+		<property name="sortby"><value>6</value></property>		
 	</bean>
 	
 	<!-- Workgroup list for OU entity -->
@@ -344,7 +344,7 @@
 		<property name="facetQuery"><value>*:*</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>
-		<property name="sortby"><value>5</value></property>			
+		<property name="sortby"><value>6</value></property>			
 	</bean>
 	
 	<!-- Project Components -->
@@ -378,7 +378,7 @@
 		<property name="facetQuery"><value>relationpreferences.crisproject.publications.selected:{1}</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>
-		<property name="sortby"><value>5</value></property>		
+		<property name="sortby"><value>1</value></property>		
 	</bean>
 	
 	<bean id="allPublicationForProjectComponent"
@@ -387,14 +387,62 @@
 		<property name="facetQuery"><value>*:*</value></property>
 		<property name="order"><value>asc</value></property>
 		<property name="rpp"><value>20</value></property>
-		<property name="sortby"><value>5</value></property>					
+		<property name="sortby"><value>1</value></property>					
 	</bean>
 	
 	<!-- Dynamic object component -->
 	<bean id="doComponentsService" class="org.dspace.app.cris.integration.CrisComponentsService">
 		<property name="components">
-			<map>				
+			<map>
+				<entry key="journalspublications" value-ref="publicationlistforjournals" />				
 			</map>
+		</property>
+	</bean>
+
+	<!-- Publication list for Journal dynamic entity -->
+	<bean id="publicationlistforjournals"
+		class="org.dspace.app.webui.cris.components.ItemsConfigurerComponent">
+		<property name="relationConfiguration" ref="relationJOURNALVSItemConfiguration" />
+		<property name="commonFilter"><util:constant static-field="org.dspace.app.webui.cris.util.RelationPreferenceUtil.HIDDEN_FILTER" /></property>		
+		<property name="target" value="org.dspace.app.cris.model.ResearchObject" />
+		<property name="types">
+			<map>
+				<entry key="selected" value-ref="selectedPublicationForJournalComponent" />				
+				<entry key="all" value-ref="allPublicationForJournalComponent" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="selectedPublicationForJournalComponent" class="org.dspace.app.webui.cris.components.BeanFacetComponent">
+		<property name="componentIdentifier" value="selected" />
+		<property name="facetQuery">
+			<value>relationpreferences.crisjournals.publications.selected:{1}
+			</value>
+		</property>
+		<property name="order">
+			<value>asc</value>
+		</property>
+		<property name="rpp">
+			<value>20</value>
+		</property>
+		<property name="sortby">
+			<value>1</value>
+		</property>
+	</bean>
+
+	<bean id="allPublicationForJournalComponent" class="org.dspace.app.webui.cris.components.BeanFacetComponent">
+		<property name="componentIdentifier" value="all" />
+		<property name="facetQuery">
+			<value>*:*</value>
+		</property>
+		<property name="order">
+			<value>asc</value>
+		</property>
+		<property name="rpp">
+			<value>20</value>
+		</property>
+		<property name="sortby">
+			<value>1</value>
 		</property>
 	</bean>
 </beans>

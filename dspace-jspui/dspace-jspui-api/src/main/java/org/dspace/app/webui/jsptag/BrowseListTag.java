@@ -333,7 +333,7 @@ public class BrowseListTag extends TagSupport
         }
         else
         {
-            if (config.startsWith("cris"))
+            if (config!=null && config.startsWith("cris"))
             {
                 browseListLine = ConfigurationManager
                         .getProperty("webui.itemlist.crisdo.columns");
