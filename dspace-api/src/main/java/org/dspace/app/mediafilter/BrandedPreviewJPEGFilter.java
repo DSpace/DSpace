@@ -8,6 +8,7 @@
 package org.dspace.app.mediafilter;
 
 import java.awt.Graphics2D;
+import java.awt.Color;
 import java.awt.image.*;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
@@ -268,7 +269,7 @@ public class BrandedPreviewJPEGFilter extends MediaFilter
             BufferedImage tmp = new BufferedImage(w, h, type);
             Graphics2D g2d = tmp.createGraphics();
             g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, hint);
-            g2d.drawImage(scalebuf, 0, 0, w, h, null);
+            g2d.drawImage(scalebuf, 0, 0, w, h, Color.WHITE, null);
             g2d.dispose();
 
             scalebuf = tmp;
