@@ -33,6 +33,7 @@ import org.dspace.content.authority.AuthorityInfo;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.MetadataAuthorityManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
@@ -276,8 +277,16 @@ public class AuthorityManagementServlet extends DSpaceServlet
         if (detail)
         {
             MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
-            List<String> authorityMetadata = mam.getAuthorityMetadata();
-            
+            List<String> authorityMetadata = new ArrayList<String>();
+            List<String> tmpAuthorityMetadata = mam.getAuthorityMetadata();
+            final String authManagementPrefix = "authority.management.";
+            for(String tmp : tmpAuthorityMetadata) {
+                boolean req = ConfigurationManager.getBooleanProperty(
+                        authManagementPrefix + tmp, true);
+                if(req) {
+                    authorityMetadata.add(tmp);
+                }
+            }
             Collections.sort(authorityMetadata, configurationKeyComparator);
             
             request.setAttribute("authorities", authorityMetadata);

@@ -17,7 +17,9 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 
 /**
@@ -81,27 +83,46 @@ public final class ChoiceAuthorityManager
                                 + ": does not have schema.element.qualifier");
                         continue property;
                     }
-
-                    // XXX FIXME maybe add sanity check, call
-                    // MetadataField.findByElement to make sure it's a real
-                    // field.
-
-                    ChoiceAuthority ma = (ChoiceAuthority) PluginManager
-                            .getNamedPlugin(ChoiceAuthority.class,
-                                    ConfigurationManager.getProperty(key));
-                    if (ma == null)
-                    {
-                        log.warn("Skipping invalid configuration for " + key
-                                + " because named plugin not found: "
-                                + ConfigurationManager.getProperty(key));
-                        continue property;
-                    }
-                    controller.put(fkey, ma);
-
-                    md2authorityname.put(fkey, ConfigurationManager.getProperty(key));
                     
-                    log.debug("Choice Control: For field=" + fkey + ", Plugin="
-                            + ma);
+                    Context context = null;
+                    try {
+                        String[] metadata = fkey.split("\\_");
+                        context = new Context();
+                        int schemaID = MetadataSchema.find(context, metadata[0]).getSchemaID();
+                        MetadataField.findByElement(context, schemaID, metadata[1], metadata.length > 2 ? metadata[2] : null).getFieldID();
+                        ChoiceAuthority ma = (ChoiceAuthority) PluginManager
+                                .getNamedPlugin(ChoiceAuthority.class,
+                                        ConfigurationManager.getProperty(key));
+                        if (ma == null)
+                        {
+                            log.warn("Skipping invalid configuration for "
+                                    + key + " because named plugin not found: "
+                                    + ConfigurationManager.getProperty(key));
+                            continue property;
+                        }
+                        controller.put(fkey, ma);
+
+                        md2authorityname.put(fkey,
+                                ConfigurationManager.getProperty(key));
+
+                        log.debug("Choice Control: For field=" + fkey
+                                + ", Plugin=" + ma);
+                    }
+                    catch (Exception e)
+                    {
+                        log.warn("Skipping invalid ChoiceAuthority configuration property: "
+                                + key
+                                + ": sanity check failure, it's not a real field - note that could be an item enhancer tips");
+                    }
+                    finally
+                    {
+                        if (context != null && context.isValid())
+                        {
+                            context.abort();
+                        }
+                    }
+                  
+                    
                 }
                 else if (key.startsWith(choicesPresentation))
                 {
