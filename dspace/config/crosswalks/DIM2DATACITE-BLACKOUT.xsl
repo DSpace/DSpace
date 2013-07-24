@@ -19,79 +19,42 @@
                   xsi:schemaLocation="http://datacite.org/schema/kernel-2.2 http://schema.datacite.org/meta/kernel-2.2/metadata.xsd"
                   lastMetadataUpdate="2006-05-04" metadataVersionNumber="1">
 
+      <xsl:variable name="identifier-doi" select="dspace:field[@element='identifier' and not(@qualifier)]" />
 	    <!-- ********** Identifiers ********** -->
-      <xsl:if test="dspace:field[@element ='identifier']">
-          <xsl:for-each select="dspace:field[@element ='identifier' and not(@qualifier)][1]">
-              <xsl:variable name="id" select="."/>
-              <xsl:choose>
-                  <xsl:when test="starts-with($id,'doi')">
-                      <identifier identifierType="DOI">
-                          <xsl:value-of select="translate(substring-after($id,'doi:'), $smallcase, $uppercase)"/>
-                      </identifier>
-                  </xsl:when>
-              </xsl:choose>
-          </xsl:for-each>
-      </xsl:if>
+      <identifier identifierType="DOI">
+          <xsl:value-of select="translate(substring-after($identifier-doi,'doi:'), $smallcase, $uppercase)"/>
+      </identifier>
 
 	    <!-- ********** Creators ************* -->
-            <xsl:if test="dspace:field[@element ='contributor' and @qualifier='author']">
-                <creators>
-                    <xsl:for-each select="dspace:field[@element ='contributor' and @qualifier='author']">
-                        <creator>
-                            <creatorName>
-                                <xsl:text>(:tba)</xsl:text>
-                            </creatorName>
-                        </creator>
-                    </xsl:for-each>
-                </creators>
-            </xsl:if>
-
+	    <creators>
+	      <creator>
+	        <creatorName>
+	          <xsl:text>(:tba)</xsl:text>
+	        </creatorName>
+	      </creator>
+	    </creators>
 	    <!-- ********* Title *************** -->
-            <xsl:if test="dspace:field[@element ='title']">
-                <xsl:variable name="title-doi" select="dspace:field[@element='identifier' and not(@qualifier)]" />
-                <titles>
-                    <xsl:for-each select="dspace:field[@element ='title']">
-                        <title>
-                            <xsl:text>Dryad Item </xsl:text>
-                            <xsl:value-of select="translate(substring-after($title-doi,'doi:'), $smallcase, $uppercase)"/>
-                        </title>
-                    </xsl:for-each>
-                </titles>
-            </xsl:if>
+      <titles>
+        <title>
+          <xsl:text>Dryad Item </xsl:text>
+          <xsl:value-of select="translate(substring-after($identifier-doi,'doi:'), $smallcase, $uppercase)"/>
+        </title>
+      </titles>
 
 	    <!-- *********** Publisher ************ -->
-            <publisher>Dryad Digital Repository</publisher>
+      <publisher>Dryad Digital Repository</publisher>
 
 	    <!-- ************ Publication Year ************** -->
-            <xsl:if test="dspace:field[@element='date' and @qualifier='accessioned']">
-                <xsl:for-each select="dspace:field[@qualifier='accessioned'][1]">
-                    <publicationYear>
-                        <xsl:variable name="date" select="."/>
-                        <xsl:value-of select="substring($date, 0, 5)"/>
-                    </publicationYear>
-                </xsl:for-each>
-            </xsl:if>
+	    <publicationYear>
+        <xsl:text>9999</xsl:text>
+	    </publicationYear>
 
 	    <!-- ************ Subjects ************** -->
-            <xsl:if test="dspace:field[@element ='subject' or @element='coverage']">
-                <subjects>
-                    <xsl:for-each select="dspace:field[@element ='subject']">
-                        <subject>
-                          <xsl:text>(:tba)</xsl:text>
-                        </subject>
-                    </xsl:for-each>
-                    <xsl:for-each select="dspace:field[@element ='coverage']">
-                        <subject>
-                          <xsl:text>(:tba)</xsl:text>
-                        </subject>
-                    </xsl:for-each>
-                    <xsl:for-each select="dspace:field[@element ='ScientificName']">
-                        <subject>
-                          <xsl:text>(:tba)</xsl:text>
-                        </subject>
-                    </xsl:for-each>
-                </subjects>
-            </xsl:if>
+	    <subjects>
+	      <subject>
+          <xsl:text>(:tba)</xsl:text>
+        </subject>
+	    </subjects>
             
       <!-- ************ Dates - Only for Data Files ************** -->
 	    <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
