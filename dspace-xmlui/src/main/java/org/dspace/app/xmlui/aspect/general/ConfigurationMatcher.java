@@ -3,9 +3,7 @@
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
  *
- * 
- * Original Concept, JSPUI version:    Universidade do Minho   at www.uminho.pt
- * Sponsorship of XMLUI version:    Instituto Oceanográfico de España at www.ieo.es
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.general;
 
@@ -29,6 +27,9 @@ import org.dspace.core.Context;
 
 /**
  * Use the configuration in Dspace.cfg to select paths in sitemap.xmap
+ * 
+ * Original Concept, JSPUI version:    Universidade do Minho   at www.uminho.pt
+ * Sponsorship of XMLUI version:    Instituto Oceanográfico de España at www.ieo.es
  * 
  * @author Adán Román Ruiz at arvo.es
  */
