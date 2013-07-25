@@ -112,8 +112,8 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer{
 
             org.dspace.app.xmlui.wing.element.Item help = options.addList("need-help").addItem();
             help.addContent("Email us at ");
-            help.addXref(ConfigurationManager.getProperty("payment-system", "paypal.help.email"), ConfigurationManager.getProperty("payment-system", "paypal.help.email"));
-            help.addContent(" or call us at "+ConfigurationManager.getProperty("payment-system","paypal.help.call"));
+            help.addXref(ConfigurationManager.getProperty("payment-system", "dryad.paymentsystem.help.email"), ConfigurationManager.getProperty("payment-system", "dryad.paymentsystem.help.email"));
+            help.addContent(" or call us at "+ConfigurationManager.getProperty("payment-system","dryad.paymentsystem.help.call"));
 
         }catch (Exception pe)
         {

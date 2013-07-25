@@ -71,6 +71,15 @@
 				<default.bagit.testing.mode>true</default.bagit.testing.mode>
 				<!-- Location for the journal-submit config file -->
 				<default.submit.journal.config>/opt/dryad/config/DryadJournalSubmission.properties</default.submit.journal.config>
+                <paypal.vendor>[PayPal]</paypal.vendor>
+                <paypal.user>[user name in paypal manager]</paypal.user>
+                <paypal.pwd>[password in paypal manager]</paypal.pwd>
+                <paypal.payflow.link>[paypal payflow link]</paypal.payflow.link>
+                <paypal.link>[paypal link like:https://payflowlink.paypal.com]</paypal.link>
+                <paypal.partner>[partner : PayPal]</paypal.partner>
+                <paypal.verbosity>[paypal verbosity : HIGH]</paypal.verbosity>
+                <paypal.slienttran>[ paypal slienttran:TRUE]</paypal.slienttran>
+                <paypal.mode>[paypal mode:test]</paypal.mode>
 			</properties>
 		</profile>
 	</profiles>

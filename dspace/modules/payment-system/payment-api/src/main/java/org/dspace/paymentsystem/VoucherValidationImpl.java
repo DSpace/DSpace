@@ -37,7 +37,7 @@ public class VoucherValidationImpl implements VoucherValidationService
                 {
                     //if the voucher haven't been used than return true
                     ShoppingCart newShoppingCart = ShoppingCart.findByVoucher(context,voucherId);
-                    if(newShoppingCart==null||shoppingCart.equals(newShoppingCart))
+                    if(newShoppingCart==null||(shoppingCart.equals(newShoppingCart)&&!shoppingCart.getStatus().equals(Voucher.STATUS_USED)))
                     {
                         //no shopping cart is using the voucher or the voucher is used by the shopping cart it self
                         return true;
@@ -62,7 +62,8 @@ public class VoucherValidationImpl implements VoucherValidationService
                     Integer voucherId = voucher.getID();
                     //if the voucher haven't been used than return true
                     ShoppingCart newShoppingCart = ShoppingCart.findByVoucher(context,voucherId);
-                    if(newShoppingCart==null)
+                    if(newShoppingCart==null||newShoppingCart.getStatus().equals(Voucher.STATUS_USED))
+
                     {
                         //no shopping cart is using the voucher
                         return false;

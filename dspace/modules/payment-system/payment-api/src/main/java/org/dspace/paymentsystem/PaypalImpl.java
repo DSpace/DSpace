@@ -74,8 +74,8 @@ public class PaypalImpl implements PaypalService{
 
             get.addParameter("SECURETOKENID",secureTokenId);
             get.addParameter("CREATESECURETOKEN","Y");
-            get.addParameter("MODE","TEST");
-            get.addParameter("PARTNER","PayPal");
+            get.addParameter("MODE",ConfigurationManager.getProperty("payment-system","paypal.mode"));
+            get.addParameter("PARTNER",ConfigurationManager.getProperty("payment-system","paypal.partner"));
 
             get.addParameter("VENDOR",ConfigurationManager.getProperty("payment-system","paypal.vendor"));
             get.addParameter("USER",ConfigurationManager.getProperty("payment-system","paypal.user"));
@@ -141,7 +141,8 @@ public class PaypalImpl implements PaypalService{
 
             if(voucher!=null&&ConfigurationManager.getProperty("payment-system","paypal.failed.voucher")!=null)
             {
-                 if(voucher.getCode().equals(ConfigurationManager.getProperty("payment-system","paypal.failed.voucher"))||voucher.getStatus().equals(Voucher.STATUS_USED))
+                String failedVoucher = ConfigurationManager.getProperty("payment-system","paypal.failed.voucher");
+                 if(voucher.getCode().equals(failedVoucher)||voucher.getStatus().equals(Voucher.STATUS_USED))
                  {
                      return false;
                  }
@@ -212,16 +213,16 @@ public class PaypalImpl implements PaypalService{
                 get.addParameter("SECURETOKENID",secureTokenId);
                 get.addParameter("SECURETOKEN",secureToken);
 
-                get.addParameter("SILENTTRAN","TRUE");
+                get.addParameter("SILENTTRAN",ConfigurationManager.getProperty("payment-system","paypal.slienttran"));
 
-                get.addParameter("PARTNER","PayPal");
+                get.addParameter("PARTNER",ConfigurationManager.getProperty("payment-system","paypal.partner"));
                 get.addParameter("VENDOR",ConfigurationManager.getProperty("payment-system","paypal.vendor"));
                 get.addParameter("USER",ConfigurationManager.getProperty("payment-system","paypal.user"));
                 get.addParameter("PWD", ConfigurationManager.getProperty("payment-system","paypal.pwd"));
                 //setup the reference transaction
                 get.addParameter("TENDER", "C");
                 get.addParameter("TRXTYPE", "A");
-                get.addParameter("VERBOSITY", "HIGH");
+                get.addParameter("VERBOSITY", ConfigurationManager.getProperty("payment-system","paypal.verbosity"));
                 get.addParameter("AMT", "0");
                 get.addParameter("CREDITCARD",cardNumber);
                 get.addParameter("CVV2",CVV2);
@@ -291,7 +292,6 @@ public class PaypalImpl implements PaypalService{
         if(shoppingCart.getTransactionId()==null){
             return false;
         }
-       // TRXTYPE=S&TENDER=C&PWD=x1y2z3&PARTNER=PayPal&VENDOR=SuperMerchant&USER=SuperMerchant&ORIGID=VXYZ01234567&AMT=34.00
         String requestUrl = ConfigurationManager.getProperty("payment-system","paypal.payflow.link");
         try {
 
@@ -305,7 +305,7 @@ public class PaypalImpl implements PaypalService{
             get.addParameter("PWD", ConfigurationManager.getProperty("payment-system","paypal.pwd"));
             get.addParameter("AMT", Double.toString(shoppingCart.getTotal()));
             get.addParameter("VENDOR",ConfigurationManager.getProperty("payment-system","paypal.vendor"));
-            get.addParameter("PARTNER","PayPal");
+            get.addParameter("PARTNER",ConfigurationManager.getProperty("payment-system","paypal.partner"));
             get.addParameter("USER", ConfigurationManager.getProperty("payment-system","paypal.user"));
             get.addParameter("ORIGID", shoppingCart.getTransactionId());
 
