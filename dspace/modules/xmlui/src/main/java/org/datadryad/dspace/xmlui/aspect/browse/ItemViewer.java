@@ -555,6 +555,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
             //     c. If the current user in not in the cases previous cases (a,b) and the version doesn't have a next archived version don't show any message, if it does show  NOT_CURRENT_VERSION
             Item lastestItemVersion = history.getLatestVersion().getItem();
             if (!lastestItemVersion.isArchived()) {
+                WorkflowItem wfi = WorkflowItem.findByItemId(context, lastestItemVersion.getID());
                 if (isCurrentEpersonItemOwner(lastestItemVersion) || item.canEdit()) {
                     WorkspaceItem wsi = WorkspaceItem.findByItemId(context, lastestItemVersion.getID());
                     if (wsi != null) {
@@ -562,16 +563,20 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
                         addMessage(division, T_version_in_submission, link, T_go_to_submission_page);
                         return;
                     }
-                    WorkflowItem wfi = WorkflowItem.findByItemId(context, lastestItemVersion.getID());
-                    if (wfi != null) {
+                    else if (wfi != null) {
                         addMessage(division, T_version_in_workflow, null, null);
                         return;
                     }
                 } else {
                     Version latestArchived = findLastArchivedVersion(history);
                     // next version is archived. Display: NOT_CURRENT_VERSION
-                    if (latestArchived.getItem().getID() != item.getID())
+                    if (latestArchived.getItem().getID() != item.getID()){
                         addMessage(division, T_not_current_version, getItemURL(latestArchived.getItem()), T_most_current_version);
+                    }
+                    else if (wfi != null) {
+                        addMessage(division, T_version_in_workflow, null, null);
+                        return;
+                    }
                 }
 
             }

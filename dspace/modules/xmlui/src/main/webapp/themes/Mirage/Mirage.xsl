@@ -261,7 +261,12 @@
             <div id="submit-data-sidebar-box" class="home-col-2 simple-box" style="padding: 8px 34px; width: 230px; margin: 8px 0 12px;">
                 <div class="ds-static-div primary" id="file_news_div_news" style="height: 75px;">
                     <p class="ds-paragraph">
-                        <a class="submitnowbutton" href="/handle/10255/3/submit">Submit data now</a>
+                        <a class="submitnowbutton">
+                            <xsl:attribute name="href">
+                                <xsl:value-of select="/dri:document/dri:options/dri:list[@n='submitNow']/dri:item[@n='submitnowitem']/dri:xref[@rend='submitnowbutton']/@target"/>
+                            </xsl:attribute>
+                            Submit data now
+                        </a>
                     </p>
                     <p style="margin: 14px 0 4px;">
                         <a href="/pages/faq#deposit">How and why?</a>
@@ -451,6 +456,8 @@
             <div id="ds-options">
                 <!-- Once the search box is built, the other parts of the options are added -->
                 <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSubmitData']|dri:list[@n='DryadSearch']|dri:list[@n='DryadConnect']"/>
+                <xsl:apply-templates select="dri:list[@n='Payment']"/>
+                <xsl:apply-templates select="dri:list[@n='need-help']"/>
             </div>
         </div>
     </xsl:template>
@@ -548,7 +555,12 @@
         <!-- START DEPOSIT -->
         <div class="ds-static-div primary" id="file_news_div_news">
             <p class="ds-paragraph">
-                <a class="submitnowbutton" href="/handle/10255/3/submit">Submit data now</a>
+                <a class="submitnowbutton">
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="/dri:document/dri:options/dri:list[@n='submitNow']/dri:item[@n='submitnowitem']/dri:xref[@rend='submitnowbutton']/@target"/>
+                    </xsl:attribute>
+                    Submit data now
+                </a>
             </p>
             <p style="margin: 1em 0 4px;">
                 <a href="/pages/faq#deposit">How and why?</a>
@@ -1098,5 +1110,49 @@ parameter that is being used (see variable defined above) -->
             </xsl:if>
             <xsl:apply-templates />
         </input>
+    </xsl:template>
+
+    <!--payment-->
+    <xsl:template match="//dri:field[@id='aspect.paymentsystem.ShoppingCartTransformer.field.currency' or @id='aspect.paymentsystem.ShoppingCartTransformer.field.country']">
+        <select onchange="javascrit:updateOrder()">
+            <xsl:attribute name="name">
+                <xsl:value-of select="@n"/>
+            </xsl:attribute>
+            <xsl:apply-templates select="*"/>
+        </select>
+    </xsl:template>
+
+    <xsl:template match="//dri:field[@id='aspect.paymentsystem.ShoppingCartTransformer.field.apply']">
+        <button onclick="javascrit:updateOrder()" class="ds-button-field">
+            <xsl:attribute name="name">
+                <xsl:value-of select="@n"/>
+            </xsl:attribute>
+            <xsl:value-of select="@n"/>
+        </button>
+    </xsl:template>
+
+
+    <xsl:template match="//dri:list[@id='aspect.paymentsystem.PayPalConfirmationTransformer.list.paypal-form']">
+        <form action="https://pilot-payflowpro.paypal.com/" method="post">
+            <xsl:apply-templates select="*"/>
+        </form>
+    </xsl:template>
+
+
+    <xsl:template match="//dri:div[@n='paypal-iframe']">
+        <iframe name="paypal-iframe" width="650px"  scrolling="no"  height="300px">
+            <xsl:attribute name="src">
+                <xsl:value-of select="dri:list/dri:item[@n='link']" />
+                <xsl:text disable-output-escaping="yes">?MODE=TEST&amp;SECURETOKENID=</xsl:text>
+                <xsl:value-of select="dri:list/dri:item[@n='secureTokenId']" />
+                <xsl:text disable-output-escaping="yes">&amp;SECURETOKEN=</xsl:text>
+                <xsl:value-of select="dri:list/dri:item[@n='secureToken']" />
+            </xsl:attribute>
+              error when load payment form
+        </iframe>
+    </xsl:template>
+
+    <xsl:template match="//dri:list[@n='voucher-list']">
+                 <xsl:apply-templates/>
     </xsl:template>
 </xsl:stylesheet>

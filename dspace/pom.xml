@@ -764,6 +764,13 @@
     </dependencyManagement>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>payment-api</artifactId>
+            <version>1.7.3-SNAPSHOT</version>
+        </dependency>
+
       
       <!-- Customized API (included here to get this in /home/dspace/dspace/lib/) -->
       <dependency>

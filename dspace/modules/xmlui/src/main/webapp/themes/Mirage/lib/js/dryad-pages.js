@@ -2,14 +2,31 @@
 /* JS behaviors for all Dryad pages */
 jQuery(document).ready(function() {
 
-    /* If the page has separate sidebar boxes, try to align the topmost
-     * box with the first topmost element on the page, preferably:
-     *  > a button-bar for intra-page navigation
-     *  > a main page title
-     *  > a publication-header box
-     *  > a featured image
-     *  > or any .primary box
-     */
+
+
+    jQuery('#aspect_submission_workflow_WorkflowTransformer_field_skip_payment').css('display','none');
+    jQuery('#aspect_submission_submit_CheckoutStep_field_skip_payment').css('display','none');
+    //if there is error in generate the paypal form or payment is 0 enable the skip button
+    var showButton = jQuery('input[name=show_button]');
+    if(showButton!='undefined'&&showButton!=null&&showButton.length>0){
+        var buttonId = "#aspect_submission_submit_CheckoutStep_field_skip_payment";
+        jQuery(buttonId).show();
+        jQuery(buttonId).val(showButton.val());
+        buttonId = "#aspect_submission_workflow_WorkflowTransformer_field_skip_payment";
+        jQuery(buttonId).show();
+        jQuery(buttonId).val(showButton.val());
+    }
+
+
+
+/* If the page has separate sidebar boxes, try to align the topmost
+* box with the first topmost element on the page, preferably:
+*  > a button-bar for intra-page navigation
+*  > a main page title
+*  > a publication-header box
+*  > a featured image
+*  > or any .primary box
+*/
     var topMainPageElement = jQuery('#ds-body .tab-buttons, #ds-body h1, #ds-body .publication-header, #ds-body .featured-image, #ds-body .primary').eq(0);
     var topSidebarBox = jQuery('#ds-options .simple-box:eq(0)');
     if (topMainPageElement.length && topSidebarBox.length) {
@@ -278,4 +295,30 @@ jQuery(document).ready(function() {
         }
 
 });
+function updateOrder(){
+    var transactionId = document.getElementsByName("transactionId")[0].value;
+    var country =document.getElementsByName("country")[0].value;
+    var currency =document.getElementsByName("currency")[0].value;
+    var journal =jQuery("#aspect_submission_StepTransformer_field_prism_publicationName").val();
+    if(journal=="undefined")
+    {
+        journal = "";
+    }
+    var voucher = jQuery("#aspect_paymentsystem_ShoppingCartTransformer_field_voucher").val();
+    var baseUrl = document.getElementsByName("baseUrl")[0].value;
+    var searchUrl =baseUrl+"/JSON/transaction/shoppingcart?country="+country+"&currency="+currency+"&transactionId="+transactionId+"&journal="+journal+"&voucher="+voucher;
+    jQuery.ajax({
+        url: searchUrl,
+        beforeSend: function ( xhr ) {
+            xhr.overrideMimeType("text/plain; charset=x-user-defined");
+        }
+    }).done(function ( data ) {
 
+                obj = jQuery.parseJSON(data);
+                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_price div').html(obj.price);
+                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_total div').html(obj.total);
+                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_surcharge div').html(obj.surcharge);
+                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_no-integret div').html(obj.noIntegrateFee);
+                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').html(obj.voucher);
+        });
+}

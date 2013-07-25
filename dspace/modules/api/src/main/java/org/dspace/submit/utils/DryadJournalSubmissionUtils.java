@@ -35,6 +35,8 @@ public class DryadJournalSubmissionUtils {
     public static final String NOTIFY_ON_REVIEW = "notifyOnReview";
     public static final String NOTIFY_ON_ARCHIVE = "notifyOnArchive";
     public static final String JOURNAL_ID = "journalID";
+    public static final String SUBSCRIPTION_PAID = "subscriptionPaid";
+
 
 
     public static final java.util.Map<String, Map<String, String>> journalProperties = new HashMap<String, Map<String, String>>();
@@ -58,6 +60,7 @@ public class DryadJournalSubmissionUtils {
                 map.put(NOTIFY_ON_REVIEW, properties.getProperty(str + NOTIFY_ON_REVIEW));
                 map.put(NOTIFY_ON_ARCHIVE, properties.getProperty(str + NOTIFY_ON_ARCHIVE));
                 map.put(JOURNAL_ID, journalType);
+                map.put(SUBSCRIPTION_PAID, properties.getProperty(str + SUBSCRIPTION_PAID));
 
                 String key = properties.getProperty(str + FULLNAME);
                 journalProperties.put(key, map);

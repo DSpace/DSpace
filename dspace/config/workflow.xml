@@ -26,8 +26,22 @@
         </step>
 
         <!-- The default nextStep after dryadAcceptEditReject is null, which ends the workflow -->
-        <step id="dryadAcceptEditReject" userSelectionMethod="claimAction" role="editors">
+        <step id="dryadAcceptEditReject" nextStep="finalPaymentStep" userSelectionMethod="claimAction" role="editors">
             <action id="dryadAcceptEditRejectAction"/>
+        </step>
+
+        <step id="finalPaymentStep" nextStep="prePendingPublicationStep" userSelectionMethod="noUserSelectionAction">
+            <action id="finalPaymentAction"/>
+            <alternativeOutcome>
+                <step status="1">reAuthorizationPaymentStep</step>
+            </alternativeOutcome>
+        </step>
+
+        <step id="reAuthorizationPaymentStep" nextStep="prePendingPublicationStep" userSelectionMethod="claimAction" role="curator">
+            <action id="reAuthorizationPaymentAction"/>
+        </step>
+
+        <step id="prePendingPublicationStep" userSelectionMethod="noUserSelectionAction">
             <action id="pendingPublicationAction"/>
             <alternativeOutcome>
                 <!-- If result of pendingPublicationAction is 1, publication uses blackout.  Next step is registerPendingPublicationStep -->

@@ -483,9 +483,7 @@ div.bioText {
     float: right;
     margin-right: 180px;
     display: inline-block;
-    margin-top: -72px;
     padding: 10px;
-    width: 500px;
     position: relative;
     -webkit-border-top-left-radius: 5px;
     -webkit-border-top-right-radius: 5px;
@@ -2248,4 +2246,119 @@ a.feedbackform-user-voice-link {
 }
 #aspect_discovery_MostDownloadedBitstream_table_most-downloaded th h2{
     font-size: 1em;
+}
+
+.choose_browse_by{
+    display: none;
+}
+#aspect_discovery_SearchFilterTransformer_field_starts_with{
+        margin-left: 15px;
+
+    }
+
+#aspect_paymentsystem_ShoppingCartTransformer_list_Payment{
+    background-color:white;
+
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_transaction li{
+    display: none;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_currency-section{
+    text-decoration: none;
+}
+
+.paypal-next-button{
+    display: none;
+}
+
+#aspect_submission_workflow_WorkflowTransformer_field_skip_payment{
+    display:none;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_Payment h1{
+    font-size:15px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_Payment ol{
+    padding:15px;
+
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_Payment{
+    border: 2px solid black;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_currency-section{
+    list-style-type: none;
+    display: inline;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_currency-section li{
+    width:100px;
+    display: inline;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_Payment li{
+    margin-bottom:10px;
+    width:220px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_Payment li span{
+    font-size: 13px;
+    width:110px;
+    padding: 0px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_item_currency-list label{
+    font-size: 14px;
+    width:120px;
+    font-weight: bold;
+    padding: 0px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_Payment li div{
+    width:100px;
+    display: inline;
+    text-align: left;
+    margin: 0px;
+    padding: 0px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_country-section{
+    list-style-type: none;
+}
+
+#aspect_paymentsystem_ShoppingCartTransformer_item_payer{
+    border-top:2px solid gray;
+    margin-top: 5px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_item_total{
+    border-top:2px solid gray;
+    border-bottom:2px solid gray;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_item_country-list label{
+    font-size: 13px;
+    width:100%;
+}
+li#aspect_paymentsystem_ShoppingCartTransformer_item_country-list div select{
+    width:220px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list label{
+    font-size:13px;
+    width:100%;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_field_voucher{
+    width:160px;
+    display: inline;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list button{
+    display: inline;
+}
+li#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list div{
+    width:100%;
+    text-align: center;
+}
+#aspect_submission_submit_CheckoutStep_list_payment-method{
+    list-style: none;
+}
+#aspect_submission_workflow_WorkflowTransformer_list_payment-method{
+    list-style: none;
+    }
+#aspect_submission_workflow_WorkflowTransformer_list_paypal-form-buttons{
+    list-style: none;
+    padding:10px;
+}
+#aspect_submission_submit_CheckoutStep_list_paypal-form-buttons{
+    list-style: none;
+    padding:10px;
 }

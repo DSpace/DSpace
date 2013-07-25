@@ -1250,10 +1250,49 @@
                         </xsl:choose>
                     </td>
                 </tr>
-            </xsl:if>        
+            </xsl:if>
+
+
+                <!-- payment goes here -->
+                <xsl:variable name="payment">
+                    <xsl:for-each
+                            select=".//dim:field[@element='payment'][@qualifier='charge'][@mdschema='internal']">
+                        <xsl:value-of select="node()"/>
+                        <br/>
+                    </xsl:for-each>
+                </xsl:variable>
+
+                <xsl:if test="$payment!=''">
+                    <tr>
+                        <th><i18n:text>xmlui.DryadItemSummary.charge</i18n:text></th>
+                        <td colspan="2">
+                            <!-- Display "Description" for data files and "Abstract" for data packages. -->
+                            <xsl:value-of select="$payment"/>
+                        </td>
+                    </tr>
+                </xsl:if>
+
+                <xsl:variable name="transaction">
+                    <xsl:for-each
+                            select=".//dim:field[@element='payment'][@qualifier='transactionID'][@mdschema='internal']">
+                        <xsl:value-of select="node()"/>
+                        <br/>
+                    </xsl:for-each>
+                </xsl:variable>
+
+                <xsl:if test="$transaction!=''">
+                    <tr>
+                        <th><i18n:text>xmlui.DryadItemSummary.transactionId</i18n:text></th>
+                        <td colspan="2">
+                            <!-- Display "Description" for data files and "Abstract" for data packages. -->
+                            <xsl:value-of select="$transaction"/>
+                        </td>
+                    </tr>
+                </xsl:if>
         </tbody>
         </table>
         
+
           </div>
         </div>
   

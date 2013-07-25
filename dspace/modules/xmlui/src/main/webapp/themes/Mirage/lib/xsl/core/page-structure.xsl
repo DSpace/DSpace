@@ -249,7 +249,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                    for (var i = 0; i != queryTexts.length; i++) {
                        var value = queryTexts[i].value;
                        if (value.indexOf(' ') == - 1) {
-                           if (value.indexOf("doi:") == 0 || value.indexOf("http:") == 0) {
+                           if (value.indexOf("doi:") == 0 || value.indexOf("DOI:") == 0 || value.indexOf("http:") == 0 || value.indexOf("pmid:") == 0 || value.indexOf("PMID:") == 0) {
                                queryTexts[i].value = '"' + value + '"';
                            }
                            
@@ -558,10 +558,20 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             </xsl:when>
                             <xsl:otherwise>
                                 <li id="login-item">
-                                    <a href="/login">Login</a>
+                                    <a>
+                                        <xsl:attribute name="href">
+                                             <xsl:value-of select="/dri:document/dri:options/dri:list[@n='account']/dri:item/dri:xref/@target"/>
+                                        </xsl:attribute>
+                                        Login
+                                    </a>
                                 </li>
                                 <li id="sign-up-item">
-                                    <a href="/login">Sign Up</a>
+                                    <a>
+                                        <xsl:attribute name="href">
+                                            <xsl:value-of select="/dri:document/dri:options/dri:list[@n='account']/dri:item/dri:xref/@target"/>
+                                        </xsl:attribute>
+                                        Sign Up
+                                    </a>
                                 </li>
                             </xsl:otherwise>
                         </xsl:choose>
@@ -695,7 +705,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
     -->
     <xsl:template match="dri:body">
         <div id="ds-body">
-            <xsl:if test="not(/dri:document/dri:options/dri:list[@n='discovery'] or /dri:document/dri:options/dri:list[@n='DryadSubmitData'] or /dri:document/dri:options/dri:list[@n='DryadSearch'] or /dri:document/dri:options/dri:list[@n='DryadConnect'])">
+            <xsl:if test="not(/dri:document/dri:options/dri:list[@n='Payment'] or /dri:document/dri:options/dri:list[@n='discovery'] or /dri:document/dri:options/dri:list[@n='DryadSubmitData'] or /dri:document/dri:options/dri:list[@n='DryadSearch'] or /dri:document/dri:options/dri:list[@n='DryadConnect'])">
                 <xsl:attribute name="style">
                     <xsl:text>width:100%</xsl:text>
                 </xsl:attribute>
@@ -929,10 +939,6 @@ references to stylesheets pulled directly from the pageMeta element. -->
             runAfterJSImports.execute();
         </script>
 
-        <!-- Add hidden trigger for Ideas Forum launcher (formerly in a menu item) -->
-        <script type="text/javascript"><xsl:text>(function(){var uv=document.createElement('script'); uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/oW4J4by2WMgw3H4qYuJsDQ.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</xsl:text></script>
-        <a style="display: none;" data-uv-feedback-tab_name="Ideas Forum" data-uv-forum-id="197408" data-uv-link-color="#333333" data-uv-primary-color="#88c033" data-uv-mode="feedback" data-uv-lightbox="classic_widget" href="javascript:void(0)" id="forum-link">Ideas Forum</a>
-
         <!-- Add a google analytics script if the key is present -->
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']">
             <script type="text/javascript"><xsl:text>
@@ -948,6 +954,23 @@ references to stylesheets pulled directly from the pageMeta element. -->
            </xsl:text>
             </script>
         </xsl:if>
+        <!-- UserVoice SDK -->
+        <script><xsl:text>(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/oW4J4by2WMgw3H4qYuJsDQ.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</xsl:text></script>
+        <!-- A function to launch the UserVoice Classic Widget -->
+        <script>
+        <xsl:text>
+        UserVoice = window.UserVoice || [];
+        function showClassicWidget() {
+          UserVoice.push(['showLightbox', 'classic_widget', {
+            mode: 'feedback',
+            primary_color: '#88c033',
+            link_color: '#333333',
+            forum_id: 197408,
+            feedback_tab_name: 'Ideas Forum'
+          }]);
+        }
+        </xsl:text>
+        </script>
     </xsl:template>
 
 </xsl:stylesheet>

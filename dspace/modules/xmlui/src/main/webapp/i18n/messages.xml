@@ -325,7 +325,7 @@
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.address.head"><h2 class="feedbackform-heading">Postal Address</h2></message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.address.para1">Dryad<br/>PO Box 585<br/>Durham, NC 27702-0585 USA</message>
   <message key="xmlui.ArtifactBrowser.FeedbackForm.forum.head"><h2 class="feedbackform-heading">Suggest and vote for new features</h2></message>
-  <message key="xmlui.ArtifactBrowser.FeedbackForm.forumLink"><a class="feedbackform-user-voice-link" href="#" onclick="jQuery('#forum-link').click(); return false;"><img width="16" height="16" src="/themes/Mirage/images/icon.idea.16px.png" alt="Give your Feedback"></img>&#160;Ideas Forum&#160;</a></message>
+  <message key="xmlui.ArtifactBrowser.FeedbackForm.forumLink"><a class="feedbackform-user-voice-link" href="#" onclick="showClassicWidget(); return false;"><img width="16" height="16" src="/themes/Mirage/images/icon.idea.16px.png" alt="Give your Feedback"></img>&#160;Ideas Forum&#160;</a></message>
   <message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.head"><h2 class="feedbackform-heading">Contact Form</h2></message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.para1">You may also submit your inquiry or help ticket using the form below.</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.email">Your Email</message>
@@ -3058,6 +3058,8 @@
     <message key="xmlui.DryadItemSummary.in_workflow">Unpublished data -- the associated article is in review </message>
     <message key="xmlui.DryadItemSummary.notCurrentVersion">This is not the most current version of this Item</message>
     <message key="xmlui.DryadItemSummary.mostCurrentVersion">&#160;&#160;[View current version]</message>
+    <message key="xmlui.DryadItemSummary.charge">Payment Charge</message>
+    <message key="xmlui.DryadItemSummary.transactionId">Transaction Id</message>
 
     <message key="xmlui.ItemViewer.versionInSubmission">You have a version of this item in your Submission Queue</message>
     <message key="xmlui.ItemViewer.goToSubmissionPage">&#160;&#160;[go to submission overview]</message>
@@ -3324,7 +3326,130 @@
     <message key="xmlui.statistics.view.title">Most Viewed Items</message>
     <message key="xmlui.statistics.view.count">Number of Views</message>
     <message key="xmlui.statistics.most.viewed.items">Most Viewed Items</message>
-
+    
     <!--Most Downloaded Bitstreams -->
     <message key="xmlui.statistics.download.title">Most Downloaded Bitstreams</message>
+
+    <!--payment system-->
+    <message key="xmlui.PaymentSystem.shoppingcart.order.header">Order Summary</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.payer">Payer</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.price">Price</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.surcharge">Large File Surcharge</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.noIntegrateFee">No Integrate Fee</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.country">Country Based Fee Waiver</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.total">Your Total</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.voucher">Voucher code</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.apply">Apply</message>
+
+    <message key="xmlui.Submission.Submissions.step.head.reAuthorizationPaymentStep_claimed">Reauthorize payment : claimed</message>
+    <message key="xmlui.Submission.Submissions.step.head.reAuthorizationPaymentStep_pool">Reauthorize payment : Unclaimed</message>
+    <message key="xmlui.administrative.Navigation.administrative_access_shoppingcart">Shopping Cart</message>
+
+    <message key="xmlui.property.ManageShoppingcartMain.title">Manage Shopping Cart</message>
+    <message key="xmlui.property.ManageShoppingcartMain.main_head">Shopping Cart management</message>
+    <message key="xmlui.property.ManageShoppingcartMain.actions_head">Actions</message>
+    <message key="xmlui.property.ManageShoppingcartMain.actions_create">Create a new Shopping Cart</message>
+    <message key="xmlui.property.ManageShoppingcartMain.actions_create_link">Click here to add a new Shopping Cart.</message>
+    <message key="xmlui.property.ManageShoppingcartMain.actions_browse">Browse Shopping Cart</message>
+    <message key="xmlui.property.ManageShoppingcartMain.actions_browse_link">Click here to browse all Shopping carts.</message>
+    <message key="xmlui.property.ManageShoppingcartMain.actions_search">Search for Shopping Cart By key word</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_help">Shopping carts are searched by any partial match on status or transaction id</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_para1">Below is the list of Shopping Cart that matched your search query. Click on an Shopping Cart's name or value to edit them.</message>
+
+    <message key="xmlui.property.ManageShoppingcartMain.search_head">Search results</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column1"></message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column2">ID</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column3">Item title</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column4">Depositor</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column5">Voucher</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column6">Secure Token</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column7">Transaction Id</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column8">Status</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column9">Currency</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column10">Total</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_column11">Status</message>
+
+    <message key="xmlui.Shoppingcart.EditProfile.name">Item title</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name1">Depositor</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name2">Voucher</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name3">Secure Token</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name4">Transaction Id</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name5">Status</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name6">Currency</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name7">Total</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name8">Country</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name9">Resource Item</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name10">Resource Item</message>
+
+
+    <message key="xmlui.administrative.Navigation.administrative_shoppingcart">Manage Shopping Cart</message>
+
+    <message key="xmlui.property.ManageShoppingcart.search_head">Search Results</message>
+    <message key="xmlui.property.ManageShoppingcartin.actions_head">Manage Shopping Cart</message>
+    <message key="xmlui.property.EditShoppingcartForm.head2">Shopping Cart values</message>
+
+    <message key="xmlui.property.EditShoppingcartForm.head1">Edit Shopping Cart</message>
+
+    <message key="xmlui.property.ManageShoppingcartin.main_head">Manage Shopping Cart</message>
+    <message key="xmlui.property.ManageShoppingcartin.actions_search">Search</message>
+    <message key="xmlui.property.ManageShoppingcartMain.no_results">No result</message>
+
+
+    <message key="xmlui.voucher.ManageVoucherMain.search_column1">Id</message>
+    <message key="xmlui.voucher.ManageVoucherMain.search_column2">Code</message>
+    <message key="xmlui.voucher.ManageVoucherMain.search_column3">Value</message>
+    <message key="xmlui.voucher.ManageVoucherMain.search_column4">Create Date</message>
+    <message key="xmlui.voucher.ManageVoucherMain.search_column5">Explanation</message>
+    <message key="xmlui.voucher.ManageVoucherMain.actions_create_link">Create new voucher</message>
+    <message key="xmlui.voucher.ManageVoucherMain.actions_browse_link">Browse all voucher</message>
+    <message key="xmlui.voucher.ManageVoucherMain.actions_create">Create new voucher</message>
+    <message key="xmlui.voucher.ManageVoucherMain.actions_browse">Browse all voucher</message>
+    <message key="xmlui.property.ManageVoucherMain.actions_search">Search voucher</message>
+    <message key="xmlui.voucher.ManageVoucherMain.actions_search">Search voucher</message>
+
+    <message key="xmlui.voucher.ManageVoucherMain.search_help">Search voucher by its code, value and expiration date</message>
+    <message key="xmlui.property.ManageVoucherMain.actions_browse_link">Browse All vouchers</message>
+    <message key="xmlui.property.ManageVoucherMain.actions_create_link">Create new voucher</message>
+
+    <message key="xmlui.property.ManageVoucherin.actions_head">Manage vouchers</message>
+
+    <message key="xmlui.property.ManageVoucherin.main_head">Manage vouchers</message>
+    <message key="xmlui.property.ManageVoucher.search_head">Search result vouchers</message>
+    <message key="xmlui.property.ManageVoucherMain.no_results">No result</message>
+
+    <message key="xmlui.property.AddVoucher.head1">Add new voucher</message>
+    <message key="xmlui.property.AddVoucher.head2">Vouchers Creation</message>
+    <message key="xmlui.voucher.AddVoucher.name">Vouchers Creation</message>
+    <message key="xmlui.voucher.AddVoucher.value">Voucher value</message>
+    <message key="xmlui.voucher.AddVoucher.number">Number of Vouchers</message>
+    <message key="xmlui.voucher.AddVoucher.explanation">Explanation for generating vouchers</message>
+
+    <message key="xmlui.administrative.Navigation.administrative_voucher">Manage Vouchers</message>
+    <message key="xmlui.property.EditVoucherForm.head1">Edit Vouchers</message>
+    <message key="xmlui.property.EditVoucherForm.head2">Edit Vouchers</message>
+    <message key="xmlui.voucher.EditProfile.name1">Edit Vouchers</message>
+    <message key="xmlui.voucher.EditProfile.name2">Voucher Code</message>
+    <message key="xmlui.voucher.EditProfile.name3">Voucher Value</message>
+    <message key="xmlui.voucher.EditProfile.name4">Create Date</message>
+    <message key="xmlui.voucher.EditProfile.name5">Expire Date</message>
+
+
+    <message key="xmlui.Shoppingcart.EditProfile.voucher_null">Can't find the Voucher</message>
+    <message key="xmlui.Shoppingcart.EditProfile.voucher_used">Voucher Used</message>
+    <message key="xmlui.voucher.AddVoucherForm.submit_create">Create</message>
+    <message key="xmlui.voucher.AddVoucherForm.head1">Title</message>
+    <message key="xmlui.voucher.AddVoucherForm.head2">Voucher Creation</message>
+    <message key="xmlui.voucher.AddVoucherForm.customer">Customer ID</message>
+    <message key="xmlui.voucher.AddVoucherForm.number">Number of vouchers (min. of 25)</message>
+    <message key="xmlui.voucher.AddVoucherForm.explanation">Explanation for generating vouchers</message>
+    <message key="xmlui.voucher.ManageVoucherMain.search_column6">Generator</message>
+
+    <message key="xmlui.Shoppingcart.EditProfile.name9">Basic Fee Rate</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name10">No Integration Fee Rate</message>
+    <message key="xmlui.Shoppingcart.EditProfile.name11">Surcharge Fee Rate</message>
+
+    <message key="xmlui.voucher.ManageVoucher.search_head">Search Result</message>
+    <message key="xmlui.voucher.ManageVoucherin.actions_head">Manage Voucher</message>
+    <message key="xmlui.voucher.ManageVoucherin.main_head">Manage Voucher</message>
+
 </catalogue>
