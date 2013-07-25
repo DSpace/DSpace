@@ -116,7 +116,7 @@ public class SendItemRequestAction extends AbstractAction
             emailRequest=ConfigurationManager.getProperty("mail.admin");
         }
         // All data is there, send the email
-        Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "requestItem.author"));
+        Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.author"));
         email.addRecipient(emailRequest);
 
         email.addArgument(requesterName);    
