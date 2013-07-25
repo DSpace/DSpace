@@ -4,9 +4,6 @@
  * tree and available online at
  *
  * http://www.dspace.org/license/
- * 
- * Original Concept, JSPUI version:    Universidade do Minho   at www.uminho.pt
- * Sponsorship of XMLUI version:    Instituto Oceanográfico de España at www.ieo.es
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
