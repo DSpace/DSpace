@@ -5,13 +5,13 @@
     <packaging>war</packaging>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-discovery-xmlui-webapp</artifactId>
-    <version>1.8.3</version>
+    <version>1.8.4-SNAPSHOT</version>
     <name>DSpace Discovery :: Discovery XMLUI Webapp</name>
 
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-discovery</artifactId>
-        <version>1.8.3</version>
+        <version>1.8.4-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -36,7 +36,7 @@
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-discovery-xmlui-api</artifactId>
-            <version>1.8.3</version>
+            <version>1.8.4-SNAPSHOT</version>
         </dependency>
 
             <!-- external -->

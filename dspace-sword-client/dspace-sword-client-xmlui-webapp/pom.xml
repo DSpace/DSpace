@@ -4,13 +4,13 @@
     <packaging>war</packaging>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-sword-client-xmlui-webapp</artifactId>
-    <version>1.8.3</version>
+    <version>1.8.4-SNAPSHOT</version>
     <name>DSpace Sword Client :: Sword Client XMLUI Webapp</name>
 
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-sword-client</artifactId>
-        <version>1.8.3</version>
+        <version>1.8.4-SNAPSHOT</version>
       <relativePath>..</relativePath>
     </parent>
 
