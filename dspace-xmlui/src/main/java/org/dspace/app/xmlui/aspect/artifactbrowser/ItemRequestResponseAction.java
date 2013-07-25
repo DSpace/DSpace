@@ -140,7 +140,7 @@ public class ItemRequestResponseAction extends AbstractAction
             if(emailRequest==null){
                 emailRequest=ConfigurationManager.getProperty("mail.admin");
             }
-	    	Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "requestItem.admin"));
+	    	Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.admin"));
 	        email.addRecipient(emailRequest);
 	        
 	        email.addArgument(Bitstream.find(context,requestItem.getIntColumn("bitstream_id")).getName());
@@ -159,7 +159,7 @@ public class ItemRequestResponseAction extends AbstractAction
     	String message = request.getParameter("message");
     	        
         EPerson submiter = item.getSubmitter();
-    	Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "requestItem.aprove"));
+    	Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.aprove"));
         email.addRecipient(requestItem.getStringColumn("request_email"));
         
         email.addArgument(requestItem.getStringColumn("request_name"));
@@ -199,7 +199,7 @@ public class ItemRequestResponseAction extends AbstractAction
     	        
         EPerson submiter = item.getSubmitter();
         
-    	Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "requestItem.reject"));
+    	Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.reject"));
         email.addRecipient(requestItem.getStringColumn("request_email"));
         
         email.addArgument(requestItem.getStringColumn("request_name"));
