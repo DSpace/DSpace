@@ -141,7 +141,7 @@ public class ManageVoucherMain extends AbstractDSpaceTransformer {
 
         Division main = null;
 
-        baseURL=  contextPath+"/voucher?administrative-continue="+knot.getId();
+        baseURL=  contextPath+"/admin/voucher?administrative-continue="+knot.getId();
         ArrayList<Voucher> totalVouchers = Voucher.findAll(context);
 
 
@@ -151,7 +151,7 @@ public class ManageVoucherMain extends AbstractDSpaceTransformer {
 
         // DIVISION: Voucher-main
         main = body.addInteractiveDivision("voucher-main", contextPath
-                + "/voucher", Division.METHOD_POST,
+                + "/admin/voucher", Division.METHOD_POST,
                 "primary administrative voucher");
 
         int resultCount   = totalVouchers.size();

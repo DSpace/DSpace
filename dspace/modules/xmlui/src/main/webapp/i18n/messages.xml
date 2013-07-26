@@ -576,6 +576,7 @@
 	<message key="xmlui.EPerson.Navigation.logout">Logout</message>
 	<message key="xmlui.EPerson.Navigation.login">Login or Register</message>
 	<message key="xmlui.EPerson.Navigation.register">Register</message>
+    <message key="xmlui.EPerson.Navigation.paymentsystem">Payment System</message>
 
 	<!-- org.dspace.app.xmlui.eperson.PasswordLogin.java -->
 	<message key="xmlui.EPerson.PasswordLogin.title">Sign in to Dryad</message>
@@ -1043,6 +1044,10 @@
 
 	<!-- action-generated messages. These are referenced from the sitemap rather than a transformer -->
 
+    <message key="xmlui.administrative.FlowShoppingcartUtils.add_shoppingcart_success_notice">The shopping Cart was added
+        successfully.</message>
+    <message key="xmlui.administrative.FlowVoucherUtils.add_voucher_success_notice">The voucher was added
+        successfully.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.add_eperson_success_notice">The user was added
 		successfully.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.edit_eperson_success_notice">The user was

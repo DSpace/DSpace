@@ -155,7 +155,7 @@ public class ManageShoppingcartMain extends AbstractDSpaceTransformer {
 
         Division main = null;
 
-        baseURL=  contextPath+"/shoppingcart?administrative-continue="+knot.getId();
+        baseURL=  contextPath+"/admin/shoppingcart?administrative-continue="+knot.getId();
         PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
 
         //shoppingCarts = paymentSystemService.findAllShoppingCart(context,dsoID);
@@ -165,7 +165,7 @@ public class ManageShoppingcartMain extends AbstractDSpaceTransformer {
 
         // DIVISION: Shoppingcart-main
         main = body.addInteractiveDivision("shoppingcart-main", contextPath
-                + "/shoppingcart", Division.METHOD_POST,
+                + "/admin/shoppingcart", Division.METHOD_POST,
                 "primary administrative shoppingcart");
 
         int resultCount   = totalCount.length;

@@ -78,7 +78,7 @@ public class AddVoucherForm extends AbstractDSpaceTransformer
     {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-        pageMeta.addTrailLink(contextPath + "/voucher",T_voucher_trail);
+        pageMeta.addTrailLink(contextPath + "/admin/voucher",T_voucher_trail);
         pageMeta.addTrail().addContent(T_trail);
     }
 
@@ -99,7 +99,7 @@ public class AddVoucherForm extends AbstractDSpaceTransformer
         }
         Division add = null;
 
-        add = body.addInteractiveDivision("voucher-add",contextPath+"/voucher",Division.METHOD_MULTIPART,"primary administrative voucher");
+        add = body.addInteractiveDivision("voucher-add",contextPath+"/admin/voucher",Division.METHOD_MULTIPART,"primary administrative voucher");
 
 
         String customerCode  = request.getParameter("customerCode");

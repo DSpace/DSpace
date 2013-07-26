@@ -53,20 +53,20 @@
         <map:pipeline>
             <map:select type="AuthenticatedSelector">
                 <map:when test="eperson">
-                    <map:match pattern="shoppingcart">
+                    <map:match pattern="admin/shoppingcart">
                         <map:match type="request" pattern="administrative-continue">
                             <map:call continuation="{1}"/>
                         </map:match>
                         <map:call function="startManageShoppingcart"/>
                     </map:match>
-                    <map:match pattern="voucher">
+                    <map:match pattern="admin/voucher">
                         <map:match type="request" pattern="administrative-continue">
                             <map:call continuation="{1}"/>
                         </map:match>
                         <map:call function="startManageVoucher"/>
                     </map:match>
 
-                    <map:match pattern="shoppingcart/site">
+                    <map:match pattern="admin/shoppingcart/site">
 
                         <!-- editing an existing site -->
                         <map:match type="request" pattern="siteID">
@@ -74,7 +74,7 @@
 
                         </map:match>
                     </map:match>
-                    <map:match pattern="shoppingcart/item">
+                    <map:match pattern="admin/shoppingcart/item">
 
                         <!-- editing an existing site -->
                         <map:match type="request" pattern="siteID">
@@ -101,7 +101,7 @@
                         </map:match>
 
 
-                        <map:match pattern="shoppingcart/site/main">
+                        <map:match pattern="admin/shoppingcart/site/main">
                             <map:transform type="ManageShoppingcartMain">
                                 <map:parameter name="query" value="{flow-attribute:query}"/>
                                 <map:parameter name="page" value="{flow-attribute:page}"/>
@@ -110,7 +110,7 @@
                                 <map:parameter name="highlightID" value="{flow-attribute:highlightID}"/>
                             </map:transform>
                         </map:match>
-                        <map:match pattern="shoppingcart/main">
+                        <map:match pattern="admin/shoppingcart/main">
                             <map:transform type="ManageShoppingcartMain">
                                 <map:parameter name="query" value="{flow-attribute:query}"/>
                                 <map:parameter name="page" value="{flow-attribute:page}"/>
@@ -118,14 +118,14 @@
                             </map:transform>
                         </map:match>
 
-                        <map:match pattern="shoppingcart/edit">
+                        <map:match pattern="admin/shoppingcart/edit">
                             <map:transform type="EditShoppingcartForm">
                                 <map:parameter name="shoppingcart_id" value="{flow-attribute:shoppingcart_id}"/>
                                 <map:parameter name="errors" value="{flow-attribute:errors}"/>
                             </map:transform>
                         </map:match>
 
-                       <map:match pattern="voucher/main">
+                       <map:match pattern="admin/voucher/main">
                             <map:transform type="ManageVoucherMain">
                                 <map:parameter name="query" value="{flow-attribute:query}"/>
                                 <map:parameter name="page" value="{flow-attribute:page}"/>
@@ -133,13 +133,13 @@
                             </map:transform>
                         </map:match>
 
-                        <map:match pattern="voucher/edit">
+                        <map:match pattern="admin/voucher/edit">
                             <map:transform type="EditVoucherForm">
                                 <map:parameter name="voucher_id" value="{flow-attribute:voucher_id}"/>
                                 <map:parameter name="errors" value="{flow-attribute:errors}"/>
                             </map:transform>
                         </map:match>
-                        <map:match pattern="voucher/add">
+                        <map:match pattern="admin/voucher/add">
                             <map:transform type="AddVoucherForm">
                                 <map:parameter name="errors" value="{flow-attribute:errors}"/>
                                 <map:parameter name="dsoID" value="{flow-attribute:dsoID}"/>
@@ -150,11 +150,11 @@
                     </map:match>
                 </map:when>
                 <map:otherwise>
-                    <map:match pattern="shoppingcart">
+                    <map:match pattern="/admin/shoppingcart">
                         <map:act type="StartAuthentication"/>
                     </map:match>
 
-                    <map:match pattern="voucher">
+                    <map:match pattern="admin/voucher">
                         <map:act type="StartAuthentication"/>
                     </map:match>
                 </map:otherwise>

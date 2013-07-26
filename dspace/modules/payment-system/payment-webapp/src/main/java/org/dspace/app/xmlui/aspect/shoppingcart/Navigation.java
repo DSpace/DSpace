@@ -54,7 +54,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
     private static final Message T_my_account                       = message("xmlui.EPerson.Navigation.my_account");
 
-    private static final Message T_administrative_edit_shoppingcart  =   message("xmlui.EPerson.Navigation.edit_community_shoppingcart");
+    private static final Message T_administrative_edit_paymentsystem  =   message("xmlui.EPerson.Navigation.paymentsystem");
     /** Cached validity object */
     private SourceValidity validity;
 
@@ -177,8 +177,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             admin.setHead(T_administrative_head);
             List property = admin.addList("properties");
             property.setHead(T_administrative_access_shoppingcart);
-            property.addItemXref(contextPath+"/shoppingcart", T_administrative_shoppingcart);
-            property.addItemXref(contextPath+"/voucher", T_administrative_voucher);
+            property.addItemXref(contextPath+"/admin/shoppingcart", T_administrative_shoppingcart);
+            property.addItemXref(contextPath+"/admin/voucher", T_administrative_voucher);
         }
     }
 
@@ -197,7 +197,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             // can they admin this collection?
             if (isSystemAdmin)
             {
-                context.addItemXref(contextPath+"/shoppingcart/site?siteID=" + site.getID(), T_administrative_edit_shoppingcart);
+                context.addItemXref(contextPath+"/admin/paymentsystem/site?siteID=" + site.getID(), T_administrative_edit_paymentsystem);
                 options++;
             }
         }

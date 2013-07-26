@@ -81,7 +81,7 @@ public class EditVoucherForm  extends AbstractDSpaceTransformer
     {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-        pageMeta.addTrailLink(contextPath + "/voucher",T_trail);
+        pageMeta.addTrailLink(contextPath + "/admin/voucher",T_trail);
         pageMeta.addTrail().addContent(T_trail);
     }
 
@@ -124,7 +124,7 @@ public class EditVoucherForm  extends AbstractDSpaceTransformer
         }
 
         // DIVISION: voucher-edit
-        Division edit = body.addInteractiveDivision("voucher-edit",contextPath+"/voucher",Division.METHOD_MULTIPART,"primary administrative voucher");
+        Division edit = body.addInteractiveDivision("voucher-edit",contextPath+"/admin/voucher",Division.METHOD_MULTIPART,"primary administrative voucher");
         edit.setHead(T_head1);
 
 

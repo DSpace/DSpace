@@ -101,7 +101,7 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
     {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-        pageMeta.addTrailLink(contextPath + "/simple-property",T_trail);
+        pageMeta.addTrailLink(contextPath + "/admin/shoppingcart",T_trail);
         pageMeta.addTrail().addContent(T_trail);
     }
 
@@ -244,7 +244,7 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
 
 
         // DIVISION: shoppingcart-edit
-        Division edit = body.addInteractiveDivision("shoppingcart-edit",contextPath+"/shoppingcart",Division.METHOD_MULTIPART,"primary administrative shoppingcart");
+        Division edit = body.addInteractiveDivision("shoppingcart-edit",contextPath+"/admin/shoppingcart",Division.METHOD_MULTIPART,"primary administrative shoppingcart");
         edit.setHead(T_head1);
 
         if (errors.contains("country")) {

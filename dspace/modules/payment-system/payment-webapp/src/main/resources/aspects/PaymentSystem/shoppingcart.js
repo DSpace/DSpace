@@ -152,7 +152,7 @@ function doManageShoppingcart()
     var result;
     do {
 
-        sendPageAndWait("shoppingcart/main",{"page":page,"query":query,"highlightID":highlightID},result);
+        sendPageAndWait("admin/shoppingcart/main",{"page":page,"query":query,"highlightID":highlightID},result);
         result = null;
 
         // Update the page parameter if supplied.
@@ -215,7 +215,7 @@ function doEditShoppingcart(shoppingcart_id)
     // admin or a supper admin. Instead we protect each operation.
     var result;
     do {
-        sendPageAndWait("shoppingcart/edit",{"shoppingcart_id":shoppingcart_id},result);
+        sendPageAndWait("admin/shoppingcart/edit",{"shoppingcart_id":shoppingcart_id},result);
         result == null;
 
         if (cocoon.request.get("submit_save"))
@@ -511,7 +511,7 @@ function doManageShoppingcartCommunity(dsoID){
     var result;
     do {
 
-        sendPageAndWait("shoppingcart/community/main",{"page":page,"query":query,"typeID":typeID,"dsoID":dsoID,"highlightID":highlightID},result);
+        sendPageAndWait("admin/shoppingcart/community/main",{"page":page,"query":query,"typeID":typeID,"dsoID":dsoID,"highlightID":highlightID},result);
         result = null;
 
         // Update the page parameter if supplied.
@@ -654,7 +654,7 @@ function doManageShoppingcartSite(dsoID){
     var result;
     do {
 
-        sendPageAndWait("shoppingcart/site/main",{"page":page,"query":query,"typeID":typeID,"dsoID":dsoID,"highlightID":highlightID},result);
+        sendPageAndWait("admin/shoppingcart/site/main",{"page":page,"query":query,"typeID":typeID,"dsoID":dsoID,"highlightID":highlightID},result);
         result = null;
 
         // Update the page parameter if supplied.
@@ -716,7 +716,7 @@ function doManageVoucher()
     var result;
     do {
 
-        sendPageAndWait("voucher/main",{"page":page,"query":query,"highlightID":highlightID},result);
+        sendPageAndWait("admin/voucher/main",{"page":page,"query":query,"highlightID":highlightID},result);
         result = null;
 
         // Update the page parameter if supplied.
@@ -774,7 +774,7 @@ function doAddVoucher()
 
     var result;
     do {
-        sendPageAndWait("voucher/add",{},result);
+        sendPageAndWait("admin/voucher/add",{},result);
         result = null;
 
         if (cocoon.request.get("submit_save"))
@@ -805,7 +805,7 @@ function doEditVoucher(voucher_id)
     // admin or a supper admin. Instead we protect each operation.
     var result;
     do {
-        sendPageAndWait("voucher/edit",{"voucher_id":voucher_id},result);
+        sendPageAndWait("admin/voucher/edit",{"voucher_id":voucher_id},result);
         result == null;
 
         if (cocoon.request.get("submit_save"))
