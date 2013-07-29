@@ -457,6 +457,7 @@ public class SWORDConfiguration
 	public String getTempDir()
 			throws DSpaceSWORDException
 	{
-        	return ConfigurationManager.getProperty("upload.temp.dir", System.getProperty("java.io.tmpdir"));
+        	return (ConfigurationManager.getProperty("upload.temp.dir") != null)
+                    ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir"); 
 	}
 }
