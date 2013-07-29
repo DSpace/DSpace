@@ -78,4 +78,4 @@ CREATE TABLE requestitem
   expires timestamp,
   CONSTRAINT requestitem_pkey PRIMARY KEY (requestitem_id),
   CONSTRAINT requestitem_token_key UNIQUE (token)
-)  WITH OIDS;
+);
