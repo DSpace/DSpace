@@ -10,52 +10,52 @@
         on top of the default JSP-UI web application provided with DSpace.
     </description>
 
-	<parent>
-		<groupId>org.dspace</groupId>
-		<artifactId>modules</artifactId>
-		<version>3.2-SNAPSHOT</version>
-		<relativePath>..</relativePath>
-	</parent>
+    <parent>
+        <groupId>org.dspace</groupId>
+        <artifactId>modules</artifactId>
+        <version>3.3-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
 
-	<properties>
-		<!-- This is the path to the root [dspace-src] directory. -->
-		<root.basedir>${basedir}/../../..</root.basedir>
-	</properties>
+    <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/../../..</root.basedir>
+    </properties>
 
-	<profiles>
-		<profile>
-			<id>oracle-support</id>
-			<activation>
-				<property>
-					<name>db.name</name>
-					<value>oracle</value>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>com.oracle</groupId>
-					<artifactId>ojdbc6</artifactId>
-				</dependency>
-			</dependencies>
-		</profile>
-	</profiles>
-
-	<build>
-		<filters>
-			<!-- Filter using the properties file defined by dspace-parent POM -->
-			<filter>${filters.file}</filter>
-		</filters>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-					<archiveClasses>false</archiveClasses>
-					<webResources>
-						<resource>
-							<filtering>true</filtering>
-							<directory>
-								${basedir}/src/main/webapp
+    <profiles>
+        <profile>
+            <id>oracle-support</id>
+            <activation>
+                <property>
+                    <name>db.name</name>
+                    <value>oracle</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle</groupId>
+                    <artifactId>ojdbc6</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+    
+    <build>
+        <filters>
+            <!-- Filter using the properties file defined by dspace-parent POM -->
+            <filter>${filters.file}</filter>
+        </filters>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <archiveClasses>false</archiveClasses>
+                    <webResources>
+                        <resource>
+                            <filtering>true</filtering>
+                            <directory>
+                                ${basedir}/src/main/webapp
                             </directory>
 							<includes>
 								<include>WEB-INF/web.xml</include>
