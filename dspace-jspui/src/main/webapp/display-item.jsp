@@ -29,6 +29,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.DCValue" %>
@@ -76,9 +77,45 @@
 			title = "Item " + handle;
 		}
 	}
+    
+    Boolean pmcEnabled = ConfigurationManager.getBooleanProperty("cris","pmc.enabled",false);
+        
+        
 %>
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
+
+<% if(pmcEnabled) { %>
+<c:set var="dspace.layout.head.last" scope="request">
+<script type="text/javascript"><!--
+var j = jQuery.noConflict();
+
+ajaxPMCCitedBy = function(args) {
+        new j.ajax({
+        	 url: "<%= request.getContextPath() %>/pmcCitedBy",
+        	 data: { item_id: encodeURIComponent(args)}
+        }).done(function(transport) {
+        	var respPmc = jQuery.trim(String(transport.textContent));
+        	if(respPmc=="null") {
+        		j('#pmcCitedResult').html("No data found");        		
+        	}
+        	else {
+        		j('#pmcCitedResult').html(transport);
+    			j('.citedCount').show();    				
+        	}
+        	j('#pmcCitedCount').show();
+            
+			
+        });
+        
+}
+
+j(document).ready(function() {        
+        ajaxPMCCitedBy('<%= item.getID()%>');
+});
+--></script>
+</c:set>
+<% } %>
 <dspace:layout title="<%= title %>">
 
 <%
@@ -200,8 +237,22 @@
     }
 %>
 
+
+<% if(pmcEnabled) { %>
+
 <div align="center">
-    <a class="statisticsLink" href="<%= request.getContextPath() %>/handle/<%= handle %>/statistics"><fmt:message key="jsp.display-item.display-statistics"/></a>
+<span>Citations:</span>
+<ul>	
+	<li id="pmcCitedCount" style="display: none;">PubMed Central: <div id="pmcCitedResult" class="citedByDiv"></div></li>
+</ul>
+</div>
+
+<% } %>
+
+
+
+<div align="center">
+    <a class="statisticsLink" href="<%= request.getContextPath() %>/cris/stats/item.html?handle=<%=handle %>"><fmt:message key="jsp.display-item.display-statistics"/></a>
 </div>
 
 <%

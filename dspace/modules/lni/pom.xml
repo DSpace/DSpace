@@ -13,15 +13,6 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-<<<<<<< HEAD
-      <version>1.8.3-SNAPSHOT</version>
-        <relativePath>..</relativePath>
-   </parent>
-
-   <properties>
-        <!-- This is the path to the root [dspace-src] directory. -->
-        <root.basedir>${basedir}/../../..</root.basedir>
-=======
       <version>3.2-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
@@ -29,7 +20,6 @@
    <properties>
        <!-- This is the path to the root [dspace-src] directory. -->
        <root.basedir>${basedir}/../../..</root.basedir>
->>>>>>> upstream/dspace-3_x
    </properties>
 
    <build>
@@ -41,7 +31,7 @@
 
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
+            <artifactId>maven-war-plugin</artifactId>            
             <configuration>
                <archiveClasses>false</archiveClasses>
                <webResources>
@@ -95,17 +85,12 @@
          <type>war</type>
       </dependency>
 
-<!--  <dependency>
-         <groupId>org.dspace</groupId>
-<<<<<<< HEAD
-         <artifactId>dspace-discovery-provider</artifactId>
-      </dependency> -->
-=======
+     <dependency>
+     	 <groupId>org.dspace</groupId>
          <artifactId>dspace-lni</artifactId>
           <type>jar</type>
           <classifier>classes</classifier>
       </dependency>
->>>>>>> upstream/dspace-3_x
 
       <dependency>
          <groupId>javax.servlet</groupId>

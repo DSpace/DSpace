@@ -10,6 +10,7 @@ package org.dspace.core;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,6 +22,7 @@ import java.util.Stack;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -81,7 +83,7 @@ public class Context
     private List<Integer> specialGroups;
 
     /** Content events */
-    private List<Event> events = null;
+    private LinkedList<Event> events = null;
 
     /** Event dispatcher name */
     private String dispName = null;
@@ -397,7 +399,7 @@ public class Context
     {
         if (events == null)
         {
-            events = new ArrayList<Event>();
+            events = new LinkedList<Event>();
         }
 
         events.add(event);
@@ -418,6 +420,25 @@ public class Context
         return events;
     }
 
+    public boolean hasEvents()
+    {
+        return !CollectionUtils.isEmpty(events);
+    }
+
+    /**
+     * Retrieves the first element in the events list & removes it from the list of events once retrieved
+     * @return The first event of the list or <code>null</code> if the list is empty
+     */
+    public Event pollEvent()
+    {
+        if(hasEvents())
+        {
+            return events.poll();
+        }else{
+            return null;
+        }
+    }
+
     /**
      * Close the context, without committing any of the changes performed using
      * this context. The database connection is freed. No exception is thrown if
@@ -434,8 +455,7 @@ public class Context
             }
         catch (SQLException se)
         {
-            log.error(se.getMessage());
-            se.printStackTrace();
+            log.error(se.getMessage(), se);
         }
         finally
         {
@@ -572,10 +592,8 @@ public class Context
     }
 
     /**
-     * gets an array of all of the special groups that current user is a member
-     * of
-     * 
-     * @return
+     * Get an array of all of the special groups that current user is a member
+     * of.
      * @throws SQLException
      */
     public Group[] getSpecialGroups() throws SQLException

@@ -7,13 +7,18 @@
  */
 package org.dspace.statistics.util;
 
-import org.apache.commons.cli.*;
+import java.io.File;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 import org.apache.tools.ant.taskdefs.Get;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.statistics.SolrLogger;
 
-import java.io.*;
+import org.dspace.utils.DSpace;
 import java.net.URL;
 
 /**
@@ -66,6 +71,11 @@ public class StatisticsClient
 
 		CommandLine line = parser.parse(options, args);
 
+        DSpace dspace = new DSpace();
+
+        SolrLogger statsService = dspace.getServiceManager().getServiceByName(
+                SolrLogger.class.getName(), SolrLogger.class);
+
         // Did the user ask to see the help?
         if (line.hasOption('h'))
         {
@@ -78,27 +88,28 @@ public class StatisticsClient
         }
         else if (line.hasOption('m'))
         {
-            SolrLogger.markRobotsByIP();
+            statsService.markRobotsByIP();
+            statsService.markRobotsByUserAgent();
         }
         else if(line.hasOption('f'))
         {
-            SolrLogger.deleteRobotsByIsBotFlag();
+            statsService.deleteRobotsByIsBotFlag();
         }
         else if(line.hasOption('i'))
         {
-            SolrLogger.deleteRobotsByIP();
+            statsService.deleteRobotsByIP();
         }
         else if(line.hasOption('o'))
         {
-            SolrLogger.optimizeSOLR();
+            statsService.optimizeSOLR();
         }
         else if(line.hasOption('b'))
         {
-            SolrLogger.reindexBitstreamHits(line.hasOption('r'));
+            statsService.reindexBitstreamHits(line.hasOption('r'));
         }
         else if(line.hasOption('s'))
         {
-            SolrLogger.shardSolrIndex();
+            statsService.shardSolrIndex();
         }
         else
         {

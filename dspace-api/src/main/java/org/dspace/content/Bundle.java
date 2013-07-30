@@ -815,4 +815,13 @@ public class Bundle extends DSpaceObject
     public String getTypeText() {
         return Constants.typeText[Constants.BUNDLE];
     }
+    
+    /**
+     * Method that updates the last modified date of the item
+     * The modified boolean will be set to true and the actual date update will occur on item.update().
+     */
+    public void updateLastModified()
+    {
+        modified = true;
+    }
 }

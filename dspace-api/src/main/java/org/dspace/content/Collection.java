@@ -974,7 +974,7 @@ public class Collection extends DSpaceObject
      * @throws IOException
      * @throws AuthorizeException
      */
-    public void update() throws SQLException, IOException, AuthorizeException
+    public void update() throws SQLException, AuthorizeException
     {
         // Check authorisation
         canEdit(true);
@@ -1490,5 +1490,14 @@ public class Collection extends DSpaceObject
     
     public String getTypeText() {
         return Constants.typeText[Constants.COLLECTION];
+    }
+    
+    /**
+     * Method that updates the last modified date of the item
+     * The modified boolean will be set to true and the actual date update will occur on item.update().
+     */
+    public void updateLastModified()
+    {
+        modified = true;
     }
 }

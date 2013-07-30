@@ -40,6 +40,9 @@ public class StatisticsDataSearches extends StatisticsData {
     /** Current DSpaceObject for which to generate the statistics. */
     private DSpaceObject currentDso;
 
+    DSpace dspace = new DSpace();
+    SolrLogger searcher = dspace.getServiceManager().getServiceByName(SolrLogger.class.getName(),SolrLogger.class);
+    
     public StatisticsDataSearches(DSpaceObject dso) {
         super();
         this.currentDso = dso;
@@ -82,7 +85,7 @@ public class StatisticsDataSearches extends StatisticsData {
                     }
                     fqBuffer.append(getSearchFilterQuery());
 
-                    ObjectCount[] topCounts = SolrLogger.queryFacetField(query, fqBuffer.toString(), typeGenerator.getType(), typeGenerator.getMax(), (typeGenerator.isPercentage() || typeGenerator.isIncludeTotal()), null);
+                    ObjectCount[] topCounts = searcher.queryFacetField(query, fqBuffer.toString(), typeGenerator.getType(), typeGenerator.getMax(), (typeGenerator.isPercentage() || typeGenerator.isIncludeTotal()), null);
                     long totalCount = -1;
                     if(typeGenerator.isPercentage() && 0 < topCounts.length){
                         //Retrieve the total required to calculate the percentage
@@ -135,7 +138,7 @@ public class StatisticsDataSearches extends StatisticsData {
                 }else
                 if(typeGenerator.getMode() == DatasetSearchGenerator.Mode.SEARCH_OVERVIEW_TOTAL){
                     //Retrieve the total counts !
-                    ObjectCount totalCount = SolrLogger.queryTotal(query, getSearchFilterQuery());
+                    ObjectCount totalCount = searcher.queryTotal(query, getSearchFilterQuery());
 
                     //Retrieve the filtered count by using the default filter query
                     StringBuilder fqBuffer = new StringBuilder(defaultFilterQuery);
@@ -145,7 +148,7 @@ public class StatisticsDataSearches extends StatisticsData {
                     }
                     fqBuffer.append(getSearchFilterQuery());
 
-                    ObjectCount totalFiltered = SolrLogger.queryTotal(query, fqBuffer.toString());
+                    ObjectCount totalFiltered = searcher.queryTotal(query, fqBuffer.toString());
 
 
                     fqBuffer = new StringBuilder(defaultFilterQuery);
@@ -220,7 +223,7 @@ public class StatisticsDataSearches extends StatisticsData {
 
 
         //Retrieve the number of page views by this query !
-        return SolrLogger.queryTotal(query, fqBuffer.toString());
+        return searcher.queryTotal(query, fqBuffer.toString());
     }
 
     /**

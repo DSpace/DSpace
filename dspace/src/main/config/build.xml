@@ -142,7 +142,6 @@ Common usage:
         <echo message="load_registries --> Load metadata &amp; file format registries into the " />
         <echo message="                    database" />
         <echo message="" />
-        <echo message="clean_backups  --> Remove .bak directories under install directory" />
         <echo message="clean_database  --> Remove DSpace database tables, destroying data" />
         <echo message="" />
         <echo message="" />
@@ -739,7 +738,7 @@ Common usage:
         <mkdir dir="${report.dir}" />
 
     	<mkdir dir="${dspace.dir}/solr" />
-    	
+
     	<mkdir dir="${dspace.dir}/rp-files" />
     	
     	<mkdir dir="${dspace.dir}/rg-files" />
@@ -747,7 +746,7 @@ Common usage:
     	<mkdir dir="${dspace.dir}/ou-files" />
     	
     	<mkdir dir="${dspace.dir}/ws-xsd" />
-
+    	
     	<!-- Runtime files (Could be erased - just for performing purposes) -->
     	<mkdir dir="${dspace.dir}/var" />
     	<!-- Runtime files for OAI 2.0 -->
@@ -809,28 +808,6 @@ Common usage:
             <arg value="database_schema.sql" />
         </java>
 
-    	<!-- Install CRIS -->
-    	<java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-        	<arg value="addon-crismodule.sql" />
-		</java>
-
-        <java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-        	<arg value="addon-crispubmed.sql" />
-		</java>
-
-        <java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-        	<arg value="addon-subscription.sql" />
-		</java>
-    	
         <!-- Add the browse tables -->
         <java classname="org.dspace.browse.InitializeBrowseDatabase" classpathref="class.path" fork="yes" failonerror="yes">
             <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
@@ -839,6 +816,29 @@ Common usage:
             <arg value="database_schema.sql" />
         </java>
 
+        <java classname="org.dspace.app.launcher.ScriptLauncher" classpathref="class.path" fork="yes" failonerror="yes">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <sysproperty key="dspace.configuration" value="${config}" />
+            <arg value="setup-database" />
+            <arg value="addon-crismodule.sql" />
+        </java>
+
+        <java classname="org.dspace.app.launcher.ScriptLauncher" classpathref="class.path" fork="yes" failonerror="yes">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <sysproperty key="dspace.configuration" value="${config}" />
+            <arg value="setup-database" />
+            <arg value="addon-crispubmed.sql" />
+        </java>
+        
+		<java classname="org.dspace.app.launcher.ScriptLauncher" classpathref="class.path" fork="yes" failonerror="yes">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <sysproperty key="dspace.configuration" value="${config}" />
+            <arg value="setup-database" />
+            <arg value="addon-subscription.sql" />
+        </java>
     </target>
 
 
@@ -950,7 +950,25 @@ Common usage:
         <copy todir="${dspace.dir}/ws-xsd" preservelastmodified="true">
             <fileset dir="etc/webservice" />
         </copy>
-        	
+
+
+        <echo>
+====================================================================
+ The DSpace code has been installed.
+====================================================================
+        </echo>
+
+    </target>
+
+
+    <!-- ============================================================= -->
+    <!-- Do a fresh system install                                     -->
+    <!-- ============================================================= -->
+
+    <target name="fresh_install"
+            depends="init_installation,init_configs,test_database,setup_database,load_registries,install_code"
+            description="Do a fresh install of the system, overwriting any data">
+
         <delete failonerror="no">
             <fileset dir="${dspace.dir}/webapps" includes="**/*" />
         </delete>

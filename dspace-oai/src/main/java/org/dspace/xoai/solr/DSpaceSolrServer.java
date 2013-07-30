@@ -8,13 +8,11 @@
 
 package org.dspace.xoai.solr;
 
-import java.net.MalformedURLException;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.dspace.core.ConfigurationManager;
 
 /**
@@ -31,20 +29,12 @@ public class DSpaceSolrServer
     {
         if (_server == null)
         {
-            try
-            {
-                _server = new CommonsHttpSolrServer(
+            
+                _server = new HttpSolrServer(
                         ConfigurationManager.getProperty("oai", "solr.url"));
                 log.debug("Solr Server Initialized");
-            }
-            catch (MalformedURLException e)
-            {
-                throw new SolrServerException(e);
-            }
-            catch (Exception e)
-            {
-                log.error(e.getMessage(), e);
-            }
+            
+            
         }
         return _server;
     }

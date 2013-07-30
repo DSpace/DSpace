@@ -509,7 +509,7 @@ public class Community extends DSpaceObject
     /**
      * Update the community metadata (including logo) to the database.
      */
-    public void update() throws SQLException, IOException, AuthorizeException
+    public void update() throws SQLException, AuthorizeException
     {
         // Check authorisation
         canEdit();
@@ -1285,5 +1285,14 @@ public class Community extends DSpaceObject
     
     public String getTypeText() {
         return Constants.typeText[Constants.COMMUNITY];
+    }
+    
+    /**
+     * Method that updates the last modified date of the item
+     * The modified boolean will be set to true and the actual date update will occur on item.update().
+     */
+    public void updateLastModified()
+    {
+        modified = true;
     }
 }

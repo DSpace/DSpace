@@ -151,11 +151,7 @@
              so that the 'dspace oai' launcher.xml command works.  -->
     	<dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-services-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-services-utils</artifactId>
+            <artifactId>dspace-services</artifactId>
         </dependency>
          <dependency>
              <groupId>org.dspace</groupId>
@@ -169,13 +165,15 @@
          <dependency>
             <groupId>org.dspace</groupId>
 			 <artifactId>dspace-cris-jspui-api</artifactId>
-         </dependency>
-     
+         </dependency>     
          <dependency>
+          	<groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
             <type>jar</type>
             <classifier>classes</classifier>
     	</dependency>
+    	
+    	
         <!-- The Servlet API is also needed by the 'dspace oai' launcher.xml
              command. -->
     	<dependency>
