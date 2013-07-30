@@ -933,7 +933,7 @@
         <dependency>
 	    <groupId>org.apache.httpcomponents</groupId>
 	    <artifactId>httpclient</artifactId>
-	    <version>4.2.1</version>
+	    <version>4.2.1</version>	    
 	</dependency>
 
          <dependency>
@@ -971,18 +971,23 @@
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-api</artifactId>
-			<version>1.8.2</version>
+			<version>3.3-SNAPSHOT</version>			
 		</dependency>
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-jspui-api</artifactId>
-			<version>1.8.2</version>
+			<version>3.3-SNAPSHOT</version>			
 		</dependency>
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-jspui-webapp</artifactId>
-			<version>1.8.2</version>
+			<version>3.3-SNAPSHOT</version>			
 		</dependency>
+		 <dependency>
+             <groupId>org.dspace</groupId>
+			 <artifactId>pubmed-retrieve</artifactId>
+			 <version>3.3-SNAPSHOT</version>
+         </dependency>
 		<dependency>
 			<groupId>net.sf.flexjson</groupId>
 			<artifactId>flexjson</artifactId>

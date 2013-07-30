@@ -4,8 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 	<packaging>jar</packaging>
 	<groupId>org.dspace</groupId>
-	<artifactId>pubmed-retrieve</artifactId>
-	<version>0.1</version>
+	<artifactId>pubmed-retrieve</artifactId>	
     <name>Article Metrics :: PubMed :: Retrieve API</name>
     
     <properties>
@@ -16,7 +15,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>article-metrics-pubmed</artifactId>
-        <version>0.1</version>
+        <version>3.3-SNAPSHOT</version>
    </parent>
 
     <dependencies>

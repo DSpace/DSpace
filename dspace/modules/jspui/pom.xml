@@ -20,8 +20,13 @@
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/../../..</root.basedir>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<org.hibernate.version>3.6.10.Final</org.hibernate.version>
+		<org.dspace.version>3.3-SNAPSHOT</org.dspace.version>
+		<org.jdyna.version>4.0</org.jdyna.version>		
+		<org.ccommons.version>1.2</org.ccommons.version>
     </properties>
-
+	
     <profiles>
         <profile>
             <id>oracle-support</id>
@@ -91,7 +96,7 @@
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-jspui-webapp</artifactId>
-			<version>1.8.2</version>
+			<version>${org.dspace.version}</version>
 			<type>war</type>
 		</dependency>
 
@@ -103,36 +108,36 @@
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>pubmed-lookup</artifactId>
-			<version>0.1</version>
+			<version>${org.dspace.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>pubmed-lookup-web</artifactId>
-			<version>0.1</version>
+			<version>${org.dspace.version}</version>
 			<type>war</type>
 		</dependency>
 
 		<dependency>
 			<groupId>org.jdyna</groupId>
 			<artifactId>jdyna-web-api</artifactId>
-			<version>4.0</version>
+			<version>${org.jdyna.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>it.cilea</groupId>
 			<artifactId>commons-cilea-webapi</artifactId>
-			<version>1.1</version>
+			<version>${org.ccommons.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.jdyna</groupId>
 			<artifactId>jdyna-webmvc-api</artifactId>
-			<version>4.0</version>
+			<version>${org.jdyna.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jdyna</groupId>
 			<artifactId>jdyna-webmvc-webapp</artifactId>
-			<version>4.0</version>
+			<version>${org.jdyna.version}</version>
 			<type>war</type>
 		</dependency>
 
@@ -149,13 +154,13 @@
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-webservices-api</artifactId>
-			<version>1.8.2</version>
+			<version>${org.dspace.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-webservices-webapp</artifactId>
-			<version>1.8.2</version>
+			<version>${org.dspace.version}</version>
 			<type>war</type>
 			<scope>compile</scope>
 		</dependency>

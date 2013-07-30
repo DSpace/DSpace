@@ -6,13 +6,13 @@
     <packaging>pom</packaging>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-cris-ametrics</artifactId>
-    <version>0.1</version>
+    <version>3.3-SNAPSHOT</version>
     <name>Article Metrics :: Modules</name>
 
     <parent>
         <artifactId>dspace-parent</artifactId>
 		<groupId>org.dspace</groupId>
-		<version>3.2-SNAPSHOT</version>
+		<version>3.3-SNAPSHOT</version>
     </parent>
     
     <modules>

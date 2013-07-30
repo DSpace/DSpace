@@ -155,8 +155,7 @@
         </dependency>
          <dependency>
              <groupId>org.dspace</groupId>
-			 <artifactId>pubmed-retrieve</artifactId>
-			 <version>0.1</version>
+			 <artifactId>pubmed-retrieve</artifactId>		
          </dependency>
          <dependency>
              <groupId>org.dspace</groupId>
