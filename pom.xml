@@ -1,4 +1,7 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version='1.0' encoding='UTF-8'?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
    <!--
       Licensed to the Apache Software Foundation (ASF) under one or more
@@ -17,25 +20,33 @@
 
    <modelVersion>4.0.0</modelVersion>
 
-   <parent>
-      <groupId>org.dspace</groupId>
-      <artifactId>dspace-pom</artifactId>
-      <version>10</version>
-   </parent>
-
    <groupId>org.dspace</groupId>
    <artifactId>dspace-solr-parent</artifactId>
-   <name>Apache Solr Parent POM</name>
    <version>3.5.0.2-SNAPSHOT</version>
-   <description>Apache Solr Parent POM</description>
-   <url>http://lucene.apache.org/solr</url>
    <packaging>pom</packaging>
 
-   <issueManagement>
-      <system>JIRA</system>
-      <url>http://issues.apache.org/jira/browse/SOLR</url>
-   </issueManagement>
+   <name>Apache Solr Parent POM</name>
+   <description>Apache Solr Parent POM</description>
+   <url>http://lucene.apache.org/solr</url>
 
+   <organization>
+       <name>DuraSpace</name>
+       <url>http://www.dspace.org</url>
+   </organization>
+
+   <parent>
+      <groupId>org.sonatype.oss</groupId>
+      <artifactId>oss-parent</artifactId>
+      <version>7</version>
+      <relativePath></relativePath>
+   </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
+             as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
+        <root.basedir>${basedir}</root.basedir>
+    </properties>
 
    <inceptionYear>2006</inceptionYear>
 
@@ -44,18 +55,99 @@
          <name>Apache 2</name>
          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
       </license>
+      <license>
+         <name>DuraSpace BSD License</name>
+         <url>https://raw.github.com/DSpace/DSpace/master/LICENSE</url>
+         <distribution>repo</distribution>
+         <comments>
+            A BSD 3-Clause license for the DSpace codebase.
+         </comments>
+      </license>
    </licenses>
 
-   <!--
-      The Subversion repository location is used by Continuum to update against
-      when changes have occurred.  This spawns a new build cycle and releases
-      snapshots into the snapshot repository below.
-   -->
+   <issueManagement>
+      <system>JIRA</system>
+      <url>https://jira.duraspace.org/browse/DS</url>
+   </issueManagement>
+
    <scm>
       <connection>scm:git:git@github.com:DSpace/dspace-solr.git</connection>
       <developerConnection>scm:git:git@github.com:DSpace/dspace-solr.git</developerConnection>
       <url>git@github.com:DSpace/dspace-solr.git</url>
    </scm>
+
+   <mailingLists>
+      <mailingList>
+         <name>DSpace Technical Users List</name>
+         <subscribe>
+            http://lists.sourceforge.net/mailman/listinfo/dspace-tech
+         </subscribe>
+         <unsubscribe>
+            http://lists.sourceforge.net/mailman/listinfo/dspace-tech
+         </unsubscribe>
+         <post>dspace-tech AT lists.sourceforge.net</post>
+         <archive>
+            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-tech
+         </archive>
+      </mailingList>
+      <mailingList>
+         <name>DSpace Developers List</name>
+         <subscribe>
+            http://lists.sourceforge.net/mailman/listinfo/dspace-devel
+         </subscribe>
+         <unsubscribe>
+            http://lists.sourceforge.net/mailman/listinfo/dspace-devel
+         </unsubscribe>
+         <post>dspace-devel AT lists.sourceforge.net</post>
+         <archive>
+            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-devel
+         </archive>
+      </mailingList>
+      <mailingList>
+         <name>DSpace General Issues List</name>
+         <subscribe>
+            http://lists.sourceforge.net/mailman/listinfo/dspace-general
+         </subscribe>
+         <unsubscribe>
+            http://lists.sourceforge.net/mailman/listinfo/dspace-general
+         </unsubscribe>
+         <post>dspace-general AT lists.sourceforge.net</post>
+         <archive>
+            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-general
+         </archive>
+      </mailingList>
+      <mailingList>
+         <name>DSpace SCM Commit Change-Log</name>
+         <subscribe>
+            http://lists.sourceforge.net/mailman/listinfo/dspace-changelog
+         </subscribe>
+         <unsubscribe>
+            http://lists.sourceforge.net/mailman/listinfo/dspace-changelog
+         </unsubscribe>
+         <post>noreply AT lists.sourceforge.net</post>
+         <archive>
+            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-changelog
+         </archive>
+      </mailingList>
+   </mailingLists>
+
+   <developers>
+       <!-- If you developed this, please fill in -->
+   </developers>
+
+   <contributors>
+      <contributor>
+         <name>Add Your Name Here and submit a patch!</name>
+         <email>contributor at myu.edu</email>
+         <url>http://www.myu.edu/me</url>
+         <organization>My University</organization>
+         <organizationUrl>http://www.myu.edu</organizationUrl>
+         <roles>
+            <role>developer</role>
+         </roles>
+         <timezone>0</timezone>
+      </contributor>
+   </contributors>
 
    <modules>
       <module>webapp</module>
@@ -65,15 +157,16 @@
       <plugins>
          <plugin>
             <artifactId>maven-compiler-plugin</artifactId>
+            <version>2.5.1</version>
             <configuration>
-               <source>1.5</source>
-               <target>1.5</target>
+               <source>1.6</source>
+               <target>1.6</target>
             </configuration>
          </plugin>
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>2.1.1</version>
+            <version>2.2.1</version>
             <executions>
                <execution>
                   <id>attach-sources</id>
@@ -87,6 +180,7 @@
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.9.1</version>
             <executions>
                <execution>
                   <id>attach-javadocs</id>
@@ -99,25 +193,43 @@
          </plugin>
 
          <plugin>
-                <groupId>com.google.code.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
-                <version>1.4.0</version>
-                <configuration>
-                    <header>http://scm.dspace.org/svn/repo/licenses/LICENSE_HEADER</header>
-                    <excludes>
-                        <exclude>src/**</exclude>
-                    </excludes>
-                    <properties />
-                    <encoding>UTF-8</encoding>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+             <groupId>com.mycila.maven-license-plugin</groupId>
+             <artifactId>maven-license-plugin</artifactId>
+             <version>1.9.0</version>
+             <configuration>
+                <header>${root.basedir}/LICENSE_HEADER</header>
+                <excludes>
+                    <exclude>src/main/*/org/apache/**</exclude>
+                    <exclude>**/web.xml</exclude>
+                    <exclude>**/src/test/resources/**</exclude>
+                    <exclude>**/META-INF/**</exclude>
+                    <exclude>**/robots.txt</exclude>
+                    <exclude>**/*.LICENSE</exclude>
+                    <exclude>**/LICENSE*</exclude>
+                    <exclude>**/README*</exclude>
+                    <exclude>**/NOTICE</exclude>
+                    <exclude>**/readme*</exclude>
+                    <exclude>**/.gitignore</exclude>
+                </excludes>
+                <mapping>
+                    <!-- Custom DSpace file extensions which are not recognized by maven-release-plugin:
+                            *.xmap, *.xslt, *.LICENSE -->
+                    <xmap>XML_STYLE</xmap>
+                    <xslt>XML_STYLE</xslt>
+                    <LICENSE>TEXT</LICENSE>
+                </mapping>
+                <properties />
+                <encoding>UTF-8</encoding>
+                <strictCheck>true</strictCheck>
+             </configuration>
+             <executions>
+                 <execution>
+                     <goals>
+                         <goal>check</goal>
+                     </goals>
+                 </execution>
+             </executions>
+         </plugin>
 
       </plugins>
    </build>
@@ -136,4 +248,5 @@
          <scope>test</scope>
       </dependency>
    </dependencies>
+
 </project>

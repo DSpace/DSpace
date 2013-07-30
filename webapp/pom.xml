@@ -30,12 +30,18 @@
    <description>Apache Solr Server</description>
    <packaging>war</packaging>
 
+    <properties>
+        <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
+             as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
+        <root.basedir>${basedir}/..</root.basedir>
+    </properties>
+
    <build>
       <plugins>
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
-            <version>2.1-alpha-2</version>
+            <version>2.4</version>
             <configuration>
               <!-- This 'dspace-solr' WAR overlays the Apache Solr Web Application 
                    available in Maven Central -->
@@ -88,6 +94,7 @@
          </plugin>
       </plugins>
    </build>
+
    <dependencies>
       <!-- Depends on the Apache 'solr' web application (see Overlay settings above)-->
       <dependency>
