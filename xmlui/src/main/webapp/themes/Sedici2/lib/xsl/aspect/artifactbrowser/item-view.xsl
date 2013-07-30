@@ -425,7 +425,7 @@
 		<!-- originInfo row -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'originInfo'"/>
-			<xsl:with-param name="elements" select="dim:field[@element=' '] "/>
+			<xsl:with-param name="elements" select="dim:field[@element='originInfo']"/>
 		</xsl:call-template>
 
 		<xsl:call-template name="render-normal-field">
