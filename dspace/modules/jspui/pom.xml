@@ -20,8 +20,7 @@
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/../../..</root.basedir>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<org.hibernate.version>3.6.10.Final</org.hibernate.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>		
 		<org.dspace.version>3.3-SNAPSHOT</org.dspace.version>
 		<org.jdyna.version>4.1</org.jdyna.version>		
 		<it.cilea.ccommons.version>1.2</it.cilea.ccommons.version>

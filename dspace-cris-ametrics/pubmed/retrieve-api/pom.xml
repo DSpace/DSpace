@@ -1,88 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 	<packaging>jar</packaging>
 	<groupId>org.dspace</groupId>
-	<artifactId>pubmed-retrieve</artifactId>	
-    <name>Article Metrics :: PubMed :: Retrieve API</name>
-    
-    <properties>
+	<artifactId>pubmed-retrieve</artifactId>
+	<name>Article Metrics :: PubMed :: Retrieve API</name>
+
+	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- Warning hibernate core point to 3.3.2.GA to be compliant with hibernate-annotation 3.4.0.GA (required by spring ORM 3.1.1.RELEASE)-->
 		<org.hibernate.version>3.6.10.Final</org.hibernate.version>
 		<it.cilea.ccommons.version>1.2</it.cilea.ccommons.version>
 	</properties>
-	
-    <parent>
-        <groupId>org.dspace</groupId>
-        <artifactId>article-metrics-pubmed</artifactId>
-        <version>3.3-SNAPSHOT</version>
-   </parent>
 
-    <dependencies>
+	<parent>
+		<groupId>org.dspace</groupId>
+		<artifactId>article-metrics-pubmed</artifactId>
+		<version>3.3-SNAPSHOT</version>
+	</parent>
 
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-api</artifactId>          
-        </dependency>
-    
-        <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-        </dependency>
+	<dependencies>
 
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-        </dependency>
-        
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>
-		
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>it.cilea</groupId>
 			<artifactId>commons-cilea-genericdao</artifactId>
-			<version>${it.cilea.ccommons.version}</version>			
-		</dependency>
-	
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<version>${org.hibernate.version}</version>
+			<version>${it.cilea.ccommons.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-commons-annotations</artifactId>
-			<version>3.2.0.Final</version>
+			<artifactId>hibernate-core</artifactId>
+			<version>3.3.2.GA</version>
 		</dependency>
-			
+
 		<dependency>
 			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>4.0.2.GA</version>
+			<artifactId>hibernate-annotations</artifactId>
+			<version>3.4.0.GA</version>
 		</dependency>
-			
+
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-ehcache</artifactId>
 			<version>${org.hibernate.version}</version>
 		</dependency>
-	
+
 		<dependency>
 			<groupId>cglib</groupId>
 			<artifactId>cglib-nodep</artifactId>
 			<version>2.2</version>
 		</dependency>
-	
+
 		<dependency>
 			<groupId>javassist</groupId>
 			<artifactId>javassist</artifactId>
 			<version>3.12.1.GA</version>
 		</dependency>
-	
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
@@ -91,88 +86,67 @@
 
 	<profiles>
 
-        <!--
-           This profile is used by all children such that
-           when activated a dspace.config configuration
-           file location passed on the commandline
-           (-Ddspace.config=...) can be passed through
-           to be used as a filter source by projects for
-           tasks such as updating the ${dspace.dir} in
-           web.xml etc.
-
-           When activated, the child project will inherit
-           the configuration.
-        -->
-        <profile>
-            <id>dspace-config</id>
-            <activation>
-                <property>
-                    <name>dspace.config</name>
-                </property>
-            </activation>
-            <build>
-                <filters>
-                    <filter>${dspace.config}</filter>
-                </filters>
-            </build>
-        </profile>
-    </profiles>
+		<!-- This profile is used by all children such that when activated a dspace.config 
+			configuration file location passed on the commandline (-Ddspace.config=...) 
+			can be passed through to be used as a filter source by projects for tasks 
+			such as updating the ${dspace.dir} in web.xml etc. When activated, the child 
+			project will inherit the configuration. -->
+		<profile>
+			<id>dspace-config</id>
+			<activation>
+				<property>
+					<name>dspace.config</name>
+				</property>
+			</activation>
+			<build>
+				<filters>
+					<filter>${dspace.config}</filter>
+				</filters>
+			</build>
+		</profile>
+	</profiles>
 
 	<build>
 		<plugins>
-<!-- 				<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
+			<!-- <plugin> <artifactId>maven-compiler-plugin</artifactId> <configuration> 
+				<source>1.6</source> <target>1.6</target> </configuration> </plugin> <plugin> 
+				<artifactId>maven-eclipse-plugin</artifactId> <version>2.5</version> </plugin> -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<classpathScope>test</classpathScope>
+					<longClasspath>true</longClasspath>
+					<executable>java</executable>
+					<arguments>
+						<argument>-Ddspace.configuration=${dspace.config}</argument>
+						<argument>-Xdebug</argument>
+						<argument>-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000</argument>
+						<argument>-classpath</argument>
+						<!-- automatically creates the classpath using all project dependencies, 
+							also adding the project build directory -->
+						<classpath />
+						<argument>org.dspace.app.launcher.ScriptLauncher</argument>
+						<argument>dsrun</argument>
+						<argument>org.dspace.app.cris.pmc.script.RetrieveCitationInPMC</argument>
+						<argument>-x 10</argument>
+					</arguments>
+					<!-- <mainClass>org.dspace.app.launcher.ScriptLauncher</mainClass> <systemProperties> 
+						<systemProperty> <key>dspace.configuration</key> <value>E:/data/apphome/dspace/config/dspace.cfg</value> 
+						</systemProperty> </systemProperties> <arguments> <argument>dsrun</argument> 
+						<argument>org.dspace.app.cris.pmc.script.RetrieveCitationInPMC</argument> 
+						</arguments> -->
 				</configuration>
 			</plugin>
-			<plugin>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.5</version>
-			</plugin>  -->
-			 <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>1.2</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-        <classpathScope>test</classpathScope>
-        <longClasspath>true</longClasspath>
-        <executable>java</executable>
-          <arguments>
-            <argument>-Ddspace.configuration=${dspace.config}</argument>
-            <argument>-Xdebug</argument>
-            <argument>-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000</argument>
-            <argument>-classpath</argument>
-            <!-- automatically creates the classpath using all project dependencies,
-                 also adding the project build directory -->
-            <classpath/>
-            <argument>org.dspace.app.launcher.ScriptLauncher</argument>
-            <argument>dsrun</argument>
-            <argument>org.dspace.app.cris.pmc.script.RetrieveCitationInPMC</argument>
-            <argument>-x 10</argument>
-          </arguments>
-<!-- <mainClass>org.dspace.app.launcher.ScriptLauncher</mainClass>
-          <systemProperties>
-            <systemProperty>
-              <key>dspace.configuration</key>
-              <value>E:/data/apphome/dspace/config/dspace.cfg</value>
-            </systemProperty>
-           </systemProperties>
-           <arguments>
-				<argument>dsrun</argument>
-           		<argument>org.dspace.app.cris.pmc.script.RetrieveCitationInPMC</argument>
-           </arguments> -->           
-        </configuration>
-      </plugin>
-			
+
 
 			<!--This plugin's configuration is used to store Eclipse m2e settings 
 				only. It has no influence on the Maven build itself. -->
@@ -189,72 +163,28 @@
 				<executions>
 					<!-- To use this plugin set <phase> on process classes, after create 
 						an eclipse configuration with goal process-classes and run it - problem with 
-						update ddl (perhaps next version of hbtool fix it? NOW applied patch to run update-ddl with annotation) -->
+						update ddl (perhaps next version of hbtool fix it? NOW applied patch to run 
+						update-ddl with annotation) -->
 					<!-- with m2e 1.0 or newest you need to add process classes phase and 
 						to get in plugin at line 200 <groupId>org.eclipse.m2e</groupId> see http://stackoverflow.com/questions/7391201/maven-plugin-error-execution-not-covered-by-lifecycle-configuration?lq=1 -->
 					<!-- <execution> <id>create-tables-and-GEN-DDL</id> <goals> <goal>run</goal> 
 						</goals> <configuration> <tasks> <ant antfile="${basedir}/src/main/resources/build.xml" 
 						inheritRefs="true"> <target name="create-tables-and-GEN-DDL" /> </ant> </tasks> 
-						</configuration> </execution> 
-					
-					
-					<execution>
-						<id>generate-ddl</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<tasks>
-								<property name="dspace.dir" value="E:/var/hkudspace"/>
-								<property name="tool.dir" value="E:/var/tooldspace"/>
-								<ant antfile="${basedir}/src/main/resources/build.xml"
-									inheritRefs="true">
-									<target name="generate-ddl" />
-								</ant>
-							</tasks>
-						</configuration>
-					</execution> 
--->			
-<!-- 
-				<execution>
-						<id>generate-drop-ddl</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<tasks>
-								<ant antfile="${basedir}/src/main/resources/build.xml"
-									inheritRefs="true">
-									<target name="generate-drop-ddl" />
-								</ant>
-							</tasks>
-						</configuration>
-					</execution> 
-				
-			
-						<execution>
-							<id>generate-update-ddl</id>
-							<phase>process-classes</phase>
-							<goals>
-								<goal>run</goal>
-							</goals>
-							<configuration>
-								<tasks>
-									<property name="maven_compile_classpath" refid="maven.compile.classpath"/>
-									<property name="maven_runtime_classpath" refid="maven.runtime.classpath"/>
-									<property name="dspace.dir" value="E:/var/hkudspace"/>
-									<property name="tool.dir" value="E:/var/tooldspace"/>
-									<ant antfile="${basedir}/src/main/resources/build.xml"
-										inheritRefs="true">
-										<target name="generate-update-ddl" />
-									</ant>
-								</tasks>
-							</configuration>
-						</execution> 
-				 
-					 <execution> <id>refresh-database</id> <phase>process-classes</phase> 
+						</configuration> </execution> <execution> <id>generate-ddl</id> <phase>process-classes</phase> 
+						<goals> <goal>run</goal> </goals> <configuration> <tasks> <property name="dspace.dir" 
+						value="E:/var/hkudspace"/> <property name="tool.dir" value="E:/var/tooldspace"/> 
+						<ant antfile="${basedir}/src/main/resources/build.xml" inheritRefs="true"> 
+						<target name="generate-ddl" /> </ant> </tasks> </configuration> </execution> -->
+					<!-- <execution> <id>generate-drop-ddl</id> <phase>process-classes</phase> 
+						<goals> <goal>run</goal> </goals> <configuration> <tasks> <ant antfile="${basedir}/src/main/resources/build.xml" 
+						inheritRefs="true"> <target name="generate-drop-ddl" /> </ant> </tasks> </configuration> 
+						</execution> <execution> <id>generate-update-ddl</id> <phase>process-classes</phase> 
+						<goals> <goal>run</goal> </goals> <configuration> <tasks> <property name="maven_compile_classpath" 
+						refid="maven.compile.classpath"/> <property name="maven_runtime_classpath" 
+						refid="maven.runtime.classpath"/> <property name="dspace.dir" value="E:/var/hkudspace"/> 
+						<property name="tool.dir" value="E:/var/tooldspace"/> <ant antfile="${basedir}/src/main/resources/build.xml" 
+						inheritRefs="true"> <target name="generate-update-ddl" /> </ant> </tasks> 
+						</configuration> </execution> <execution> <id>refresh-database</id> <phase>process-classes</phase> 
 						<goals> <goal>run</goal> </goals> <configuration> <tasks> <ant antfile="${basedir}/src/main/resources/build.xml" 
 						inheritRefs="true"> <target name="refresh-database" /> </ant> </tasks> </configuration> 
 						</execution> -->
@@ -263,7 +193,7 @@
 					<dependency>
 						<groupId>postgresql</groupId>
 						<artifactId>postgresql</artifactId>
-						<version>9.0-801.jdbc3</version>
+						<version>9.1-901.jdbc4</version>
 					</dependency>
 
 					<dependency>
@@ -271,32 +201,13 @@
 						<artifactId>hibernate-tools</artifactId>
 						<version>3.2.3.GA</version>
 					</dependency>
-			
+
 					<dependency>
 						<groupId>org.hibernate</groupId>
-						<artifactId>hibernate-core</artifactId>
+						<artifactId>hibernate-entitymanager</artifactId>
 						<version>${org.hibernate.version}</version>
 					</dependency>
-			
-					<dependency>
-						<groupId>org.hibernate</groupId>
-						<artifactId>hibernate-commons-annotations</artifactId>
-						<version>3.2.0.Final</version>
-					</dependency>
-				
-					<dependency>
-						<groupId>org.hibernate</groupId>
-						<artifactId>hibernate-validator</artifactId>
-						<version>4.0.2.GA</version>
-					</dependency>
-		        
-					<dependency>
-						<groupId>org.hibernate</groupId>
-						<artifactId>hibernate-ehcache</artifactId>
-						<version>${org.hibernate.version}</version>
-					</dependency>
-					
-			
+
 					<dependency>
 						<groupId>log4j</groupId>
 						<artifactId>log4j</artifactId>
@@ -314,25 +225,22 @@
 						<artifactId>slf4j-nop</artifactId>
 						<version>1.6.1</version>
 					</dependency>
-					
+
 					<dependency>
 						<groupId>it.cilea</groupId>
 						<artifactId>commons-cilea-genericdao</artifactId>
 						<version>${it.cilea.ccommons.version}</version>
 					</dependency>
-				<!-- 	
-					<dependency>
-						<groupId>org.dspace</groupId>
-						<artifactId>dspace-cris-api</artifactId>
-						<version>1.8.2</version>
-					</dependency> -->
+					<!-- <dependency> <groupId>org.dspace</groupId> <artifactId>dspace-cris-api</artifactId> 
+						<version>1.8.2</version> </dependency> -->
 				</dependencies>
 			</plugin>
 		</plugins>
-		
-			<pluginManagement>
+
+		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -368,5 +276,5 @@
 	</build>
 
 
-   
+
 </project>
