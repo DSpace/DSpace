@@ -40,6 +40,12 @@
        <env-entry-type>java.lang.String</env-entry-type>
     </env-entry>
    -->
+
+  <context-param>
+      <param-name>log4j.configuration</param-name>
+      <param-value>file://${dspace.dir}/config/log4j.properties</param-value>
+      <description>URL locating a Log4J configuration file (properties or XML).</description>
+  </context-param>
    
   <!-- Any path (name) registered in solrconfig.xml will be sent to that filter -->
   <filter>
@@ -99,7 +105,11 @@
   </filter-mapping>
 
   <!-- Otherwise it will continue to the old servlets -->
-  
+
+  <listener>
+    <listener-class>org.dspace.solr.filters.ConfigureLog4jListener</listener-class>
+  </listener>
+
   <servlet>
     <servlet-name>SolrServer</servlet-name>
     <display-name>Solr</display-name>

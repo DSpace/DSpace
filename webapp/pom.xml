@@ -69,7 +69,11 @@
                      <attachClasses>true</attachClasses>
                      <classesClassifier>classes</classesClassifier>
                      <warSourceExcludes>WEB-INF/classes/**</warSourceExcludes>
-                     <packagingExcludes>WEB-INF/classes/**</packagingExcludes>
+                     <packagingExcludes>
+                         WEB-INF/classes/**,
+                         WEB-INF/lib/slf4j-jdk14-*.jar,
+                         WEB-INF/lib/log4j-over-slf4j-*.jar
+                     </packagingExcludes>
                   </configuration>
                   <goals>
                      <goal>war</goal>
@@ -109,11 +113,34 @@
          <version>3.5.0</version>
          <type>jar</type>
       </dependency>
-      <!-- Commons Logging is needed for the LocalHostRestrictionFilter-->
       <dependency>
-         <groupId>commons-logging</groupId>
-         <artifactId>commons-logging</artifactId>
-         <version>1.0.4</version>
+         <groupId>org.apache.solr</groupId>
+         <artifactId>solr-solrj</artifactId>
+         <version>3.5.0</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-core</artifactId>
+         <version>3.5.0</version>
+      </dependency>
+
+      <!-- Replace J.U.L. logging with log4j -->
+      <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>jul-to-slf4j</artifactId>
+          <version>1.6.1</version>
+      </dependency>
+      <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+          <version>1.6.1</version>
+          <scope>runtime</scope>
+      </dependency>
+      <dependency>
+         <artifactId>log4j</artifactId>
+         <groupId>log4j</groupId>
+         <type>jar</type>
+         <version>1.2.16</version>
       </dependency>
    </dependencies>
 
