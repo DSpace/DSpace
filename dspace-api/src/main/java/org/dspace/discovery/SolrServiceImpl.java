@@ -16,6 +16,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.validator.UrlValidator;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -43,6 +44,7 @@ import org.dspace.utils.DSpace;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -89,21 +91,33 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     private CommonsHttpSolrServer solr = null;
 
 
-    protected CommonsHttpSolrServer getSolr() throws java.net.MalformedURLException, org.apache.solr.client.solrj.SolrServerException
+    protected CommonsHttpSolrServer getSolr()
     {
         if ( solr == null)
         {
            String solrService = new DSpace().getConfigurationService().getProperty("discovery.search.server") ;
 
-            log.debug("Solr URL: " + solrService);
+            UrlValidator urlValidator = new UrlValidator();
+            if(urlValidator.isValid(solrService))
+            {
+                try {
+                    log.debug("Solr URL: " + solrService);
                     solr = new CommonsHttpSolrServer(solrService);
 
-            solr.setBaseURL(solrService);
+                    solr.setBaseURL(solrService);
 
-            SolrQuery solrQuery = new SolrQuery()
-                        .setQuery("search.resourcetype:2 AND search.resourceid:1");
+                    SolrQuery solrQuery = new SolrQuery()
+                            .setQuery("search.resourcetype:2 AND search.resourceid:1");
 
-            solr.query(solrQuery);
+                    solr.query(solrQuery);
+                } catch (MalformedURLException e) {
+                    log.error("Error while initialinging solr server", e);
+                } catch (SolrServerException e) {
+                    log.error("Error while initialinging solr server", e);
+                }
+            }else{
+                log.error("Error while initializing solr, invalid url: " + solrService);
+            }
         }
 
         return solr;
@@ -255,10 +269,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             throws SQLException, IOException {
 
         try {
-            getSolr().deleteByQuery("handle:\""+handle+"\"");
-            if(commit)
-            {
-                getSolr().commit();
+            if(getSolr() != null){
+                getSolr().deleteByQuery("handle:\"" + handle + "\"");
+                if(commit)
+                {
+                    getSolr().commit();
+                }
             }
         } catch (SolrServerException e)
         {
@@ -354,7 +370,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 context.removeCached(community, community.getID());
             }
 
-            getSolr().commit();
+            if(getSolr() != null)
+            {
+                getSolr().commit();
+            }
 
         } catch (Exception e)
         {
@@ -379,6 +398,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         try
         {
+            if(getSolr() == null)
+            {
+                return;
+            }
             if (force)
             {
                 getSolr().deleteByQuery("search.resourcetype:[2 TO 4]");
@@ -433,6 +456,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     public void optimize()
     {
         try {
+            if(getSolr() == null)
+            {
+                return;
+            }
             long start = System.currentTimeMillis();
             System.out.println("SOLR Search Optimize -- Process Started:"+start);
             getSolr().optimize();
@@ -516,6 +543,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         QueryResponse rsp;
 
         try {
+            if(getSolr() == null)
+            {
+                return false;
+            }
             rsp = getSolr().query(query);
         } catch (SolrServerException e)
         {
@@ -598,7 +629,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     protected void writeDocument(SolrInputDocument doc) throws IOException {
 
         try {
-            getSolr().add(doc);
+            if(getSolr() != null)
+            {
+                getSolr().add(doc);
+            }
         } catch (SolrServerException e)
         {
             log.error(e.getMessage(), e);
@@ -1437,6 +1471,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
     public DiscoverResult search(Context context, DiscoverQuery discoveryQuery, boolean includeWithdrawn) throws SearchServiceException {
         try {
+            if(getSolr() == null){
+                return new DiscoverResult();
+            }
             SolrQuery solrQuery = resolveToSolrQuery(context, discoveryQuery, includeWithdrawn);
 
 
@@ -1594,6 +1631,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
 
     public InputStream searchJSON(Context context, DiscoverQuery discoveryQuery, String jsonIdentifier) throws SearchServiceException {
+        if(getSolr() == null)
+        {
+            return null;
+        }
+
         SolrQuery solrQuery = resolveToSolrQuery(context, discoveryQuery, false);
         //We use json as out output type
         solrQuery.setParam("json.nl", "map");
@@ -1601,7 +1643,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         solrQuery.setParam(CommonParams.WT, "json");
 
         StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(solr.getBaseURL()).append("/select?");
+        urlBuilder.append(getSolr().getBaseURL()).append("/select?");
         urlBuilder.append(solrQuery.toString());
 
         try {
@@ -1757,21 +1799,18 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
     /** Simple means to return the search result as an InputStream */
     public java.io.InputStream searchAsInputStream(DiscoverQuery query) throws SearchServiceException, java.io.IOException {
-        try {
-            org.apache.commons.httpclient.methods.GetMethod method =
-                new org.apache.commons.httpclient.methods.GetMethod(getSolr().getHttpClient().getHostConfiguration().getHostURL() + "");
-
-            method.setQueryString(query.toString());
-
-            getSolr().getHttpClient().executeMethod(method);
-
-            return method.getResponseBodyAsStream();
-
-        } catch (org.apache.solr.client.solrj.SolrServerException e)
+        if(getSolr() == null)
         {
-            throw new SearchServiceException(e.getMessage(), e);
+            return null;
         }
+        org.apache.commons.httpclient.methods.GetMethod method =
+            new org.apache.commons.httpclient.methods.GetMethod(getSolr().getHttpClient().getHostConfiguration().getHostURL() + "");
 
+        method.setQueryString(query.toString());
+
+        getSolr().getHttpClient().executeMethod(method);
+
+        return method.getResponseBodyAsStream();
     }
 
     public List<DSpaceObject> search(Context context, String query, int offset, int max, String... filterquery)
@@ -1783,6 +1822,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     {
 
         try {
+            if(getSolr() == null)
+            {
+                return Collections.emptyList();
+            }
+
             SolrQuery solrQuery = new SolrQuery();
             solrQuery.setQuery(query);
             solrQuery.setFields("search.resourceid", "search.resourcetype");
@@ -1902,6 +1946,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             solrQuery.setParam(MoreLikeThisParams.DOC_COUNT, String.valueOf(mltConfig.getMax()));
             solrQuery.setParam(MoreLikeThisParams.MIN_WORD_LEN, String.valueOf(mltConfig.getMinWordLength()));
 
+            if(getSolr() == null)
+            {
+                return Collections.emptyList();
+            }
             QueryResponse rsp = getSolr().query(solrQuery);
             NamedList mltResults = (NamedList) rsp.getResponse().get("moreLikeThis");
             if(mltResults != null && mltResults.get(item.getType() + "-" + item.getID()) != null)
@@ -2097,7 +2145,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 	@Override
 	public void commit() throws SearchServiceException {
 		try {
-			getSolr().commit();
+            if(getSolr() != null)
+            {
+                getSolr().commit();
+            }
 		} catch (Exception e) {
 			throw new SearchServiceException(e.getMessage(), e);
 		}
