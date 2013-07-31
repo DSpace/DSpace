@@ -46,6 +46,10 @@ public class StatisticsDataWorkflow extends StatisticsData {
     private DSpaceObject currentDso;
     /** Variable used to indicate of how many months an average is required (-1 is inactive) **/
     private int averageMonths = -1;
+    
+    DSpace dspace = new DSpace();
+
+    SolrLogger searcher = dspace.getServiceManager().getServiceByName(SolrLogger.class.getName(),SolrLogger.class);
 
     public StatisticsDataWorkflow(DSpaceObject dso, int averageMonths) {
         super();
@@ -80,7 +84,7 @@ public class StatisticsDataWorkflow extends StatisticsData {
             DatasetGenerator datasetGenerator = datasetGenerators.get(0);
             if(datasetGenerator instanceof DatasetTypeGenerator){
                 DatasetTypeGenerator typeGenerator = (DatasetTypeGenerator) datasetGenerator;
-                ObjectCount[] topCounts = SolrLogger.queryFacetField(query, defaultFilterQuery, typeGenerator.getType(), typeGenerator.getMax(), typeGenerator.isIncludeTotal(), null);
+                ObjectCount[] topCounts = searcher.queryFacetField(query, defaultFilterQuery, typeGenerator.getType(), typeGenerator.getMax(), typeGenerator.isIncludeTotal(), null);
 
                 //Retrieve our total field counts
                 Map<String, Long> totalFieldCounts = new HashMap<String, Long>();
@@ -155,7 +159,7 @@ public class StatisticsDataWorkflow extends StatisticsData {
      * @throws org.apache.solr.client.solrj.SolrServerException
      */
     protected Map<String, Long> getTotalFacetCounts(DatasetTypeGenerator typeGenerator) throws SolrServerException {
-        ObjectCount[] objectCounts = SolrLogger.queryFacetField(getQuery(), null, typeGenerator.getType(), -1, false, null);
+        ObjectCount[] objectCounts = searcher.queryFacetField(getQuery(), null, typeGenerator.getType(), -1, false, null);
         Map<String, Long> result = new HashMap<String, Long>();
         for (ObjectCount objectCount : objectCounts) {
             result.put(objectCount.getValue(), objectCount.getCount());
@@ -170,7 +174,7 @@ public class StatisticsDataWorkflow extends StatisticsData {
         String workflowStartDate = configurationService.getProperty("usage-statistics.workflow-start-date");
         if(workflowStartDate == null){
             //Query our solr for it !
-            QueryResponse oldestRecord = SolrLogger.query(getQuery(), null, null, 1, 0, null, null, null, null, "time", true);
+            QueryResponse oldestRecord = searcher.query(getQuery(), null, null, 1, 0, null, null, null, null, "time", true);
             if(0 < oldestRecord.getResults().getNumFound()){
                 SolrDocument solrDocument = oldestRecord.getResults().get(0);
                 Date oldestDate = (Date) solrDocument.getFieldValue("time");

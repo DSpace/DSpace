@@ -92,7 +92,7 @@
 
 <dspace:layout titlekey="jsp.search.results.title">
 
-<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.6.2.min.js"> </script>
+
 <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/search-results.js"> </script>
 
 

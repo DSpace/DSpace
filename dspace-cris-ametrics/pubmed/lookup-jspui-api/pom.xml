@@ -4,15 +4,14 @@
     <modelVersion>4.0.0</modelVersion>
 	<packaging>jar</packaging>
 	<groupId>org.dspace</groupId>
-	<artifactId>pubmed-lookup</artifactId>
-	<version>0.1</version>
+	<artifactId>pubmed-lookup</artifactId>	
     <name>Article Metrics :: PubMed :: Lookup API</name>
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>article-metrics-pubmed</artifactId>
-        <version>0.1</version>
+        <version>3.3-SNAPSHOT</version>
    </parent>
-
+    
     <dependencies>
 
         <dependency>
@@ -20,16 +19,17 @@
             <artifactId>dspace-api</artifactId>            
         </dependency>
     
-        <dependency>
-        	<groupId>org.dspace</groupId>
-        	<artifactId>dspace-jspui-api</artifactId>
-        	<version>1.8.3-SNAPSHOT</version>
-        </dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-jspui</artifactId>
+			<type>jar</type>
+			<classifier>classes</classifier>			
+		</dependency>
 
 	    <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>pubmed-retrieve</artifactId>
-            <version>0.1</version>
+            <version>${project.version}</version>            
         </dependency>
 
         <dependency>

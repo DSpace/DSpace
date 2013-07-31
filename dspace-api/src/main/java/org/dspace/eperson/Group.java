@@ -70,6 +70,10 @@ public class Group extends DSpaceObject
     /** Flag set when metadata is modified, for events */
     private boolean modifiedMetadata;
 
+    /** Flag set when data is modified, for events */
+    private boolean modified;
+
+    
     /**
      * Construct a Group from a given context and tablerow
      * 
@@ -1422,5 +1426,14 @@ public class Group extends DSpaceObject
     
     public String getTypeText() {
         return Constants.typeText[Constants.GROUP];
+    }
+    
+    /**
+     * Method that updates the last modified date of the item
+     * The modified boolean will be set to true and the actual date update will occur on item.update().
+     */
+    public void updateLastModified()
+    {
+        modified = true;
     }
 }

@@ -32,6 +32,8 @@
   -   admin_button     - If the user is an admin
   --%>
 
+<%@page import="org.dspace.browse.BrowseInfo"%>
+<%@page import="org.dspace.browse.BrowseDSpaceObject"%>
 <%@page import="org.dspace.discovery.configuration.DiscoverySearchFilterFacet"%>
 <%@page import="org.dspace.app.webui.util.UIUtil"%>
 <%@page import="java.util.HashMap"%>
@@ -46,6 +48,7 @@
 <%@page import="org.dspace.discovery.DiscoverResult"%>
 <%@page import="org.dspace.content.DSpaceObject"%>
 <%@page import="java.util.List"%>
+<%@page import="org.dspace.app.cris.model.ACrisObject" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
@@ -66,7 +69,11 @@
 <%
     // Get the attributes
     DSpaceObject scope = (DSpaceObject) request.getAttribute("scope" );
-    String searchScope = scope!=null?scope.getHandle():"";
+    String searchScope = (String) request.getParameter("location" );
+    if (searchScope == null)
+    {
+        searchScope = "";
+    }
     List<DSpaceObject> scopes = (List<DSpaceObject>) request.getAttribute("scopes");
     List<String> sortOptions = (List<String>) request.getAttribute("sortOptions");
 
@@ -168,13 +175,17 @@
         // "all of DSpace" and the communities.
 %>
                                     <%-- <option selected value="/">All of DSpace</option> --%>
-                                    <option selected="selected" value="/"><fmt:message key="jsp.general.genericScope"/></option>
+                                    <option selected="selected" value="site"><fmt:message key="jsp.general.genericScope"/></option>
 <%  }
     else
     {
 %>
-									<option value="/"><fmt:message key="jsp.general.genericScope"/></option>
-<%  }      
+									<option value="site"><fmt:message key="jsp.general.genericScope"/></option>
+<%  }
+%>
+	<optgroup label="Repository">
+		<option value="dspacebasic" <%="dspacebasic".equals(searchScope)?"selected=\"selected\"":"" %>>All the repository</option>
+<%
     for (DSpaceObject dso : scopes)
     {
 %>
@@ -182,7 +193,13 @@
                                 	<%= dso.getName() %></option>
 <%
     }
-%>                                </select><br/>
+%>	</optgroup>
+	<optgroup label="CRIS">
+								<option value="crisrp" <%="crisrp".equals(searchScope)?"selected=\"selected\"":"" %>>Researcher profiles</option>
+								<option value="crisou" <%="crisou".equals(searchScope)?"selected=\"selected\"":"" %>>Organization Units</option>
+								<option value="crisproject" <%="crisproject".equals(searchScope)?"selected=\"selected\"":"" %>>Projects</option>
+	</optgroup>							
+                                </select><br/>
                                 <label for="query"><fmt:message key="jsp.search.results.searchfor"/></label>
                                 <input type="text" size="50" name="query" value="<%= (query==null ? "" : StringEscapeUtils.escapeHtml(query)) %>"/>
                                 <input type="submit" value="<fmt:message key="jsp.general.go"/>" />
@@ -399,7 +416,7 @@ DiscoverResult qResults = (DiscoverResult)request.getAttribute("queryresults");
 Item      [] items       = (Item[]      )request.getAttribute("items");
 Community [] communities = (Community[] )request.getAttribute("communities");
 Collection[] collections = (Collection[])request.getAttribute("collections");
-
+Map<Integer, BrowseDSpaceObject[]> mapOthers = (Map<Integer, BrowseDSpaceObject[]>) request.getAttribute("resultsMapOthers"); 
 if( error )
 {
  %>
@@ -423,10 +440,10 @@ else if( qResults != null)
     long pageFirst   = ((Long)request.getAttribute("pagefirst"  )).longValue();
     
     // create the URLs accessing the previous and next search result pages
-    String baseURL =  request.getContextPath()
-                    + searchScope
+    String baseURL =  request.getContextPath()                    
                     + "/simple-search?query="
                     + URLEncoder.encode(query,"UTF-8")
+                    + "&amp;location="+ searchScope
                     + httpFilters
                     + "&amp;sort_by=" + sortedBy
                     + "&amp;order=" + order
@@ -512,6 +529,21 @@ if (pageTotal > pageCurrent)
 <!-- give a content to the div -->
 </div>
 <div class="discovery-result-results">
+<%
+	Set<Integer> otherTypes = mapOthers.keySet();
+	if (otherTypes != null && otherTypes.size() > 0)
+	{
+	    for (Integer otype : otherTypes)
+	    {
+	        %>
+	        <c:set var="typeName"><%= ((ACrisObject) mapOthers.get(otype)[0].getBrowsableDSpaceObject()).getPublicPath() %></c:set>
+	        <%-- <h3>Community Hits:</h3> --%>
+	        <h3><fmt:message key="jsp.search.results.cris.${typeName}"/></h3>
+	        <dspace:browselist config="cris${typeName}" items="<%= mapOthers.get(otype) %>" />
+	    <% 	        
+	    }
+	}
+%>
 <% if (communities.length > 0 ) { %>
     <%-- <h3>Community Hits:</h3> --%>
     <h3><fmt:message key="jsp.search.results.comhits"/></h3>
@@ -656,10 +688,10 @@ if (pageTotal > pageCurrent)
 	    }
 	    if (currFp > 0)
 	    {
-	        %><li class="facet-previous"><a href="<%= request.getContextPath()
-	                + (searchScope!=""?"/handle/"+searchScope:"")
+	        %><li class="facet-previous"><a href="<%= request.getContextPath()	                
 	                + "/simple-search?query="
 	                + URLEncoder.encode(query,"UTF-8")
+	                + "&amp;location=" + searchScope
 	                + "&amp;sort_by=" + sortedBy
 	                + "&amp;order=" + order
 	                + "&amp;rpp=" + rpp
@@ -672,10 +704,10 @@ if (pageTotal > pageCurrent)
 	    { 
 	        if (idx == limit)
 	        {
-	            %><li class="facet-next"><a href="<%= request.getContextPath()
-	            + (searchScope!=""?"/handle/"+searchScope:"")
+	            %><li class="facet-next"><a href="<%= request.getContextPath()	            
                 + "/simple-search?query="
                 + URLEncoder.encode(query,"UTF-8")
+                + "&amp;location=" + searchScope
                 + "&amp;sort_by=" + sortedBy
                 + "&amp;order=" + order
                 + "&amp;rpp=" + rpp
@@ -688,9 +720,9 @@ if (pageTotal > pageCurrent)
 	        else if(!appliedFilterQueries.contains(f+"::"+fvalue.getFilterType()+"::"+fvalue.getAsFilterQuery()))
 	        {
 	        %><li><a href="<%= request.getContextPath()
-                + (searchScope!=""?"/handle/"+searchScope:"")
                 + "/simple-search?query="
                 + URLEncoder.encode(query,"UTF-8")
+                + "&amp;location=" + searchScope
                 + "&amp;sort_by=" + sortedBy
                 + "&amp;order=" + order
                 + "&amp;rpp=" + rpp

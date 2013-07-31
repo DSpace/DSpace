@@ -35,6 +35,8 @@ import org.dspace.app.webui.search.SearchRequestProcessor;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.browse.BrowseDSpaceObject;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -216,8 +218,10 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
             throw new SearchProcessorException(e.getMessage(), e);
         }
 
+        String configurationName = request.getParameter("location");
+        
         DiscoveryConfiguration discoveryConfiguration = SearchUtils
-                .getDiscoveryConfiguration(scope);
+                .getDiscoveryConfigurationByName(configurationName);
         List<DiscoverySortFieldConfiguration> sortFields = discoveryConfiguration
                 .getSearchSortConfiguration().getSortFields();
         List<String> sortOptions = new ArrayList<String>();
@@ -231,7 +235,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         request.setAttribute("sortOptions", sortOptions);
         
         DiscoverQuery queryArgs = DiscoverUtility.getDiscoverQuery(context,
-                request, scope, true);
+                request, scope, configurationName, true);
 
         List<DiscoverySearchFilterFacet> availableFacet = discoveryConfiguration
                 .getSidebarFacets();
@@ -324,7 +328,9 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
             List<Community> resultsListComm = new ArrayList<Community>();
             List<Collection> resultsListColl = new ArrayList<Collection>();
             List<Item> resultsListItem = new ArrayList<Item>();
-
+            
+            Map<Integer, List<DSpaceObject>> resultsListOther = new HashMap<Integer, List<DSpaceObject>>();
+            
             for (DSpaceObject dso : qResults.getDspaceObjects())
             {
                 if (dso instanceof Item)
@@ -340,13 +346,33 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
                 {
                     resultsListComm.add((Community) dso);
                 }
+                else if (dso instanceof BrowsableDSpaceObject)
+                {
+                    List<DSpaceObject> currList = resultsListOther.get(dso.getType());
+                    if (currList != null)
+                    {
+                        currList.add(new BrowseDSpaceObject(context, (BrowsableDSpaceObject) dso));
+                    }
+                    else
+                    {
+                        List<DSpaceObject> newlist = new ArrayList<DSpaceObject>();
+                        resultsListOther.put(dso.getType(), newlist);
+                        newlist.add(new BrowseDSpaceObject(context, (BrowsableDSpaceObject) dso));
+                    }
+                }
             }
 
             // Make objects from the handles - make arrays, fill them out
             resultsCommunities = new Community[resultsListComm.size()];
             resultsCollections = new Collection[resultsListColl.size()];
             resultsItems = new Item[resultsListItem.size()];
-
+            Map<Integer, BrowseDSpaceObject[]> resultsMapOthers = new HashMap<Integer, BrowseDSpaceObject[]>();
+            for (Integer key : resultsListOther.keySet())
+            {
+                BrowseDSpaceObject[] resultsOther = new BrowseDSpaceObject[resultsListOther.get(key).size()];
+                resultsOther = resultsListOther.get(key).toArray(resultsOther);
+                resultsMapOthers.put(key, resultsOther);
+            }
             resultsCommunities = resultsListComm.toArray(resultsCommunities);
             resultsCollections = resultsListColl.toArray(resultsCollections);
             resultsItems = resultsListItem.toArray(resultsItems);
@@ -378,7 +404,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
             request.setAttribute("items", resultsItems);
             request.setAttribute("communities", resultsCommunities);
             request.setAttribute("collections", resultsCollections);
-
+            request.setAttribute("resultsMapOthers", resultsMapOthers);
             request.setAttribute("pagetotal", new Long(pageTotal));
             request.setAttribute("pagecurrent", new Long(pageCurrent));
             request.setAttribute("pagelast", new Long(pageLast));
@@ -465,7 +491,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
     /**
      * Method for constructing the discovery advanced search form
      * 
-     * author: Andrea Bollini
+     * @author Andrea Bollini
      */
     @Override
     public void doAdvancedSearch(Context context, HttpServletRequest request,

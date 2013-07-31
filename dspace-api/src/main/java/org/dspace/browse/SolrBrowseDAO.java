@@ -139,6 +139,8 @@ public class SolrBrowseDAO implements BrowseDAO
 
     private boolean showFrequencies;
     
+    private boolean enableBrowseFrequencies = true;
+    
     private DiscoverResult getSolrResponse() throws BrowseException
     {
         if (sResponse == null)
@@ -774,5 +776,13 @@ public class SolrBrowseDAO implements BrowseDAO
     public void setAuthorityValue(String value)
     {
         this.authority = value;
+    }
+    
+    public boolean isEnableBrowseFrequencies() {
+        return enableBrowseFrequencies;
+    }
+
+    public void setEnableBrowseFrequencies(boolean enableBrowseFrequencies) {
+        this.enableBrowseFrequencies = enableBrowseFrequencies;
     }
 }

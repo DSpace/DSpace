@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>3.2-SNAPSHOT</version>
+        <version>3.3-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -151,16 +151,11 @@
              so that the 'dspace oai' launcher.xml command works.  -->
     	<dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-services-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-services-utils</artifactId>
+            <artifactId>dspace-services</artifactId>
         </dependency>
          <dependency>
              <groupId>org.dspace</groupId>
-			 <artifactId>pubmed-retrieve</artifactId>
-			 <version>0.1</version>
+			 <artifactId>pubmed-retrieve</artifactId>		
          </dependency>
          <dependency>
              <groupId>org.dspace</groupId>
@@ -169,13 +164,15 @@
          <dependency>
             <groupId>org.dspace</groupId>
 			 <artifactId>dspace-cris-jspui-api</artifactId>
-         </dependency>
-     
+         </dependency>     
          <dependency>
+          	<groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
             <type>jar</type>
             <classifier>classes</classifier>
     	</dependency>
+    	
+    	
         <!-- The Servlet API is also needed by the 'dspace oai' launcher.xml
              command. -->
     	<dependency>

@@ -7,7 +7,6 @@
  */
 package org.dspace.statistics.content;
 
-import org.apache.commons.lang.StringUtils;
 import org.dspace.content.*;
 import org.dspace.statistics.Dataset;
 import org.dspace.statistics.ObjectCount;
@@ -15,6 +14,7 @@ import org.dspace.statistics.SolrLogger;
 import org.dspace.statistics.content.filter.StatisticsFilter;
 import org.dspace.statistics.content.filter.StatisticsSolrDateFilter;
 import org.dspace.statistics.util.LocationUtils;
+import org.dspace.utils.DSpace;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.core.ConfigurationManager;
@@ -54,6 +54,11 @@ public class StatisticsDataVisits extends StatisticsData
     /** Current DSpaceObject for which to generate the statistics. */
     private DSpaceObject currentDso;
 
+    DSpace dspace = new DSpace();
+
+    SolrLogger indexer = dspace.getServiceManager().getServiceByName(SolrLogger.class.getName(),SolrLogger.class);
+
+    
     /** Construct a completely uninitialized query. */
     public StatisticsDataVisits()
     {
@@ -119,7 +124,7 @@ public class StatisticsDataVisits extends StatisticsData
         // 2. DETERMINE VALUES //
         /////////////////////////
         boolean showTotal = false;
-        // Check if we need our total
+        //Check if we need our total
         if ((getDatasetGenerators().get(0) != null && getDatasetGenerators()
                 .get(0).isIncludeTotal())
                 || (1 < getDatasetGenerators().size()
@@ -148,9 +153,13 @@ public class StatisticsDataVisits extends StatisticsData
             addFilters(dateFilter);
         }
 
-        // Determine our filterQuery
-        String filterQuery = "";
+        //Determine our filterQuery
+        String filterQuery = null;
         for (int i = 0; i < getFilters().size(); i++) {
+            if(filterQuery == null)
+            {
+                filterQuery = "";
+            }
             StatisticsFilter filter = getFilters().get(i);
 
             filterQuery += "(" + filter.toQuery() + ")";
@@ -159,34 +168,26 @@ public class StatisticsDataVisits extends StatisticsData
                 filterQuery += " AND ";
             }
         }
-        if(StringUtils.isNotBlank(filterQuery)){
-            filterQuery += " AND ";
-        }
-        //Only use the view type and make sure old data (where no view type is present) is also supported
-        //Solr doesn't explicitly apply boolean logic, so this query cannot be simplified to an OR query
-        filterQuery += "-(statistics_type:[* TO *] AND -statistics_type:" + SolrLogger.StatisticsType.VIEW.text() + ")";
-
-
 //        System.out.println("FILTERQUERY: " + filterQuery);
 
-        // We determine our values on the queries resolved above
+        //We determine our values on the queries resolved above
         Dataset dataset = null;
 
         // Run over our queries.
         // First how many queries do we have ?
         if(dateFacet != null){
-            // So do all the queries and THEN do the date facet
+            //So do all the queries and THEN do the date facet
             for (int i = 0; i < datasetQueries.size(); i++) {
                 DatasetQuery dataSetQuery = datasetQueries.get(i);
                 if(dataSetQuery.getQueries().size() != 1){
-                    // TODO: do this
+                    //TODO: do this
                 }else{
                     String query = dataSetQuery.getQueries().get(0).getQuery();
                     if(dataSetQuery.getMax() == -1){
                         // We are asking from our current query all the visits faceted by date
-                        ObjectCount[] results = SolrLogger.queryFacetDate(query, filterQuery, dataSetQuery.getMax(), dateFacet.getDateType(), dateFacet.getStartDate(), dateFacet.getEndDate(), showTotal);
+                        ObjectCount[] results = indexer.queryFacetDate(query, filterQuery, dataSetQuery.getMax(), dateFacet.getDateType(), dateFacet.getStartDate(), dateFacet.getEndDate(), showTotal);
                         dataset = new Dataset(1, results.length);
-                        // Now that we have our results put em in a matrix
+                        //Now that we have our results put em in a matrix
                         for(int j = 0; j < results.length; j++){
                             dataset.setColLabel(j, results[j].getValue());
                             dataset.addValueToMatrix(0, j, results[j].getCount());
@@ -197,26 +198,26 @@ public class StatisticsDataVisits extends StatisticsData
                         dataset.setRowLabelAttr(0, getAttributes(dataSetQuery.getName(), dataSetQuery, context));
                     }else{
                         // We need to get the max objects and the next part of the query on them (next part beeing the datasettimequery
-                        ObjectCount[] maxObjectCounts = SolrLogger.queryFacetField(query, filterQuery, dataSetQuery.getFacetField(), dataSetQuery.getMax(), false, null);
+                        ObjectCount[] maxObjectCounts = indexer.queryFacetField(query, filterQuery, dataSetQuery.getFacetField(), dataSetQuery.getMax(), false, null);
                         for (int j = 0; j < maxObjectCounts.length; j++) {
                             ObjectCount firstCount = maxObjectCounts[j];
                             String newQuery = dataSetQuery.getFacetField() + ": " + ClientUtils.escapeQueryChars(firstCount.getValue()) + " AND " + query;
-                            ObjectCount[] maxDateFacetCounts = SolrLogger.queryFacetDate(newQuery, filterQuery, dataSetQuery.getMax(), dateFacet.getDateType(), dateFacet.getStartDate(), dateFacet.getEndDate(), showTotal);
+                            ObjectCount[] maxDateFacetCounts = indexer.queryFacetDate(newQuery, filterQuery, dataSetQuery.getMax(), dateFacet.getDateType(), dateFacet.getStartDate(), dateFacet.getEndDate(), showTotal);
 
 
-                            // Make sure we have a dataSet
+                            //Make sure we have a dataSet
                             if(dataset == null)
                             {
                                 dataset = new Dataset(maxObjectCounts.length, maxDateFacetCounts.length);
                             }
 
-                            // TODO: this is a very dirty fix change this ! ! ! ! ! !
+                            //TODO: this is a very dirty fix change this ! ! ! ! ! !
                             dataset.setRowLabel(j, getResultName(firstCount.getValue(), dataSetQuery, context));
                             dataset.setRowLabelAttr(j, getAttributes(firstCount.getValue(), dataSetQuery, context));
 
                             for (int k = 0; k < maxDateFacetCounts.length; k++) {
                                 ObjectCount objectCount = maxDateFacetCounts[k];
-                                // No need to add this many times
+                                //No need to add this many times
                                 if(j == 0)
                                 {
                                     dataset.setColLabel(k, objectCount.getValue());
@@ -231,15 +232,15 @@ public class StatisticsDataVisits extends StatisticsData
                 }
             }
         }else{
-            // We do NOT have a date facet so just do queries after each other
+            //We do NOT have a date facet so just do queries after each other
             /*
             for (int i = 0; i < datasetQueries.size(); i++) {
                 DatasetQuery datasetQuery = datasetQueries.get(i);
                 if(datasetQuery.getQueries().size() != 1){
-                    // TODO: do this
+                    //TODO: do this
                 }else{
                     String query = datasetQuery.getQueries().get(0);
-                    // Loop over the queries & do em
+                    //Loop over the queries & do em
 //                    ObjectCount[] topCounts = SolrLogger.queryFacetField(query, );
                 }
             }
@@ -253,16 +254,16 @@ public class StatisticsDataVisits extends StatisticsData
 //            }else{
 //                TODO: do this
 //            }
-            // Check if we have more queries that need to be done
+            //Check if we have more queries that need to be done
             if(datasetQueries.size() == 2){
                 DatasetQuery secondDataSet = datasetQueries.get(1);
-                // Now do the second one
+                //Now do the second one
                 ObjectCount[] topCounts2 = queryFacetField(secondDataSet, secondDataSet.getQueries().get(0).getQuery(), filterQuery);
-                // Now that have results for both of them lets do x.y queries
+                //Now that have results for both of them lets do x.y queries
                 List<String> facetQueries = new ArrayList<String>();
                 for (ObjectCount count2 : topCounts2) {
                     String facetQuery = secondDataSet.getFacetField() + ":" + ClientUtils.escapeQueryChars(count2.getValue());
-                    // Check if we also have a type present (if so this should be put into the query)
+                    //Check if we also have a type present (if so this should be put into the query
                     if ("id".equals(secondDataSet.getFacetField()) && secondDataSet.getQueries().get(0).getDsoType() != -1)
                     {
                         facetQuery += " AND type:" + secondDataSet.getQueries().get(0).getDsoType();
@@ -274,7 +275,7 @@ public class StatisticsDataVisits extends StatisticsData
                     ObjectCount count1 = topCounts1[i];
                     ObjectCount[] currentResult = new ObjectCount[topCounts2.length];
 
-                    // Make sure we have a dataSet
+                    //Make sure we have a dataSet
                     if(dataset == null)
                     {
                         dataset = new Dataset(topCounts2.length, topCounts1.length);
@@ -283,13 +284,13 @@ public class StatisticsDataVisits extends StatisticsData
                     dataset.setColLabelAttr(i, getAttributes(count1.getValue(), firsDataset, context));
 
                     String query = firsDataset.getFacetField() + ":" + ClientUtils.escapeQueryChars(count1.getValue());
-                    // Check if we also have a type present (if so this should be put into the query)
+                    //Check if we also have a type present (if so this should be put into the query
                     if("id".equals(firsDataset.getFacetField()) && firsDataset.getQueries().get(0).getDsoType() != -1)
                     {
                         query += " AND type:" + firsDataset.getQueries().get(0).getDsoType();
                     }
 
-                    Map<String, Integer> facetResult = SolrLogger.queryFacetQuery(query, filterQuery, facetQueries);
+                    Map<String, Integer> facetResult = indexer.queryFacetQuery(query, filterQuery, facetQueries);
                     
                     
                     // TODO: the show total
@@ -302,15 +303,15 @@ public class StatisticsDataVisits extends StatisticsData
                             dataset.setRowLabelAttr(j, getAttributes(count2.getValue(), secondDataSet, context));
 
                         }
-                        // Get our value the value is the same as the query
+                        //Get our value the value is the same as the query
                         String facetQuery = secondDataSet.getFacetField() + ":" + ClientUtils.escapeQueryChars(count2.getValue());
-                        // Check if we also have a type present (if so this should be put into the query
+                        //Check if we also have a type present (if so this should be put into the query
                         if ("id".equals(secondDataSet.getFacetField()) && secondDataSet.getQueries().get(0).getDsoType() != -1)
                         {
                             facetQuery += " AND type:" + secondDataSet.getQueries().get(0).getDsoType();
                         }
 
-                        // We got our query so now get the value
+                        //We got our query so now get the value
                         dataset.addValueToMatrix(j, i, facetResult.get(facetQuery));
                     }
 
@@ -318,20 +319,20 @@ public class StatisticsDataVisits extends StatisticsData
                     for (int j = 0; j < topCounts2.length; j++) {
                         ObjectCount count2 = topCounts2[j];
                         String query = firsDataset.getFacetField() + ":" + count1.getValue();
-                        // Check if we also have a type present (if so this should be put into the query
+                        //Check if we also have a type present (if so this should be put into the query
                         if("id".equals(firsDataset.getFacetField()) && firsDataset.getQueries().get(0).getDsoType() != -1)
                             query += " AND type:" + firsDataset.getQueries().get(0).getDsoType();
 
                         query += " AND " + secondDataSet.getFacetField() + ":" + count2.getValue();
-                        // Check if we also have a type present (if so this should be put into the query
+                        //Check if we also have a type present (if so this should be put into the query
                         if("id".equals(secondDataSet.getFacetField()) && secondDataSet.getQueries().get(0).getDsoType() != -1)
                             query += " AND type:" + secondDataSet.getQueries().get(0).getDsoType();
 
                         long count = SolrLogger.queryFacetQuery(query, filterQuery);
 
-                        // TODO: the show total
-                        // No need to add this many times
-                        // TODO: dit vervangen door te displayen value
+                        //TODO: the show total
+                        //No need to add this many times
+                        //TODo: dit vervangen door te displayen value
                         if(i == 0) {
                             dataset.setRowLabel(j, getResultName(count2.getValue(), secondDataSet, context));
                             dataset.setRowLabelAttr(j, getAttributes(count2.getValue(), secondDataSet, context));
@@ -346,7 +347,7 @@ public class StatisticsDataVisits extends StatisticsData
 //                System.out.println("BOTH");
 
             } else{
-                // Make sure we have a dataSet
+                //Make sure we have a dataSet
                 dataset = new Dataset(1, topCounts1.length);
                 for (int i = 0; i < topCounts1.length; i++) {
                     ObjectCount count = topCounts1[i];
@@ -370,20 +371,20 @@ public class StatisticsDataVisits extends StatisticsData
     private void processAxis(DatasetGenerator datasetGenerator, List<DatasetQuery> queries) throws SQLException {
         if(datasetGenerator instanceof DatasetDSpaceObjectGenerator){
             DatasetDSpaceObjectGenerator dspaceObjAxis = (DatasetDSpaceObjectGenerator) datasetGenerator;
-            // Get the types involved
+            //Get the types involved
             List<DSORepresentation> dsoRepresentations = dspaceObjAxis.getDsoRepresentations();
             for (int i = 0; i < dsoRepresentations.size(); i++){
                 DatasetQuery datasetQuery = new DatasetQuery();
                 Integer dsoType = dsoRepresentations.get(i).getType();
                 boolean separate = dsoRepresentations.get(i).getSeparate();
                 Integer dsoLength = dsoRepresentations.get(i).getNameLength();
-                // Check if our type is our current object
+                //Check if our type is our current object
                 if(currentDso != null && dsoType == currentDso.getType()){
                     Query query = new Query();
                     query.setDso(currentDso.getID(), currentDso.getType(), dsoLength);
                     datasetQuery.addQuery(query);
                 }else{
-                    // TODO: only do this for bitstreams from an item
+                    //TODO: only do this for bitstreams from an item
                     Query query = new Query();
                     if(currentDso != null && separate && dsoType == Constants.BITSTREAM){
                         // CURRENTLY THIS IS ONLY POSSIBLE FOR AN ITEM ! ! ! ! ! ! !
@@ -394,7 +395,7 @@ public class StatisticsDataVisits extends StatisticsData
                             for (int k = 0; k < bundle.getBitstreams().length; k++) {
                                 Bitstream bitstream = bundle.getBitstreams()[k];
                                 if(!bitstream.getFormat().isInternal()){
-                                    // Add a separate query for each bitstream
+                                    //Add a separate query for each bitstream
                                     query.setDso(bitstream.getID(), bitstream.getType(), dsoLength);
                                 }
                             }
@@ -421,7 +422,7 @@ public class StatisticsDataVisits extends StatisticsData
                                 break;
                         }
                         datasetQuery.setName(title);
-                        // Put the type in so we only get the children of the type specified
+                        //Put the type in so we only get the children of the type specified
                         query.setDsoType(dsoType);
                     }
                     datasetQuery.addQuery(query);
@@ -436,7 +437,7 @@ public class StatisticsDataVisits extends StatisticsData
             DatasetTypeGenerator typeAxis = (DatasetTypeGenerator) datasetGenerator;
             DatasetQuery datasetQuery = new DatasetQuery();
 
-            // First make sure our query is in order
+            //First make sure our query is in order
             Query query = new Query();
             if(currentDso != null)
             {
@@ -444,7 +445,7 @@ public class StatisticsDataVisits extends StatisticsData
             }
             datasetQuery.addQuery(query);
 
-            // Then add the rest
+            //Then add the rest
             datasetQuery.setMax(typeAxis.getMax());
             datasetQuery.setFacetField(typeAxis.getType());
             datasetQuery.setName(typeAxis.getType());
@@ -574,7 +575,7 @@ public class StatisticsDataVisits extends StatisticsData
                         }
 
                         // If possible reference this bitstream via a handle, however this may
-                        // be null if a handle has not yet been assigned. In this case reference the
+                        // be null if a handle has not yet been assigned. In this case refrence the
                         // item its internal id. In the last case where the bitstream is not associated
                         // with an item (such as a community logo) then reference the bitstreamID directly.
                         String identifier = null;
@@ -644,7 +645,7 @@ public class StatisticsDataVisits extends StatisticsData
     {
         String facetType = dataset.getFacetField() == null ? "id" : dataset
                 .getFacetField();
-        return SolrLogger.queryFacetField(query, filterQuery, facetType,
+        return indexer.queryFacetField(query, filterQuery, facetType,
                 dataset.getMax(), false, null);
     }
 

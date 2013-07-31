@@ -69,13 +69,6 @@ public class DiscoverUtility
         return scope;
     }
 
-    public static DiscoverQuery getDiscoverQuery(Context context,
-            HttpServletRequest request, DSpaceObject scope, 
-            boolean enableFacet)
-    {
-        return getDiscoverQuery(context, request, scope,
-                scope != null ? scope.getHandle() : null, enableFacet);
-    }
     /**
      * Build a DiscoverQuery object using the parameter in the request
      * 
@@ -84,12 +77,11 @@ public class DiscoverUtility
      * @throws SearchServiceException
      */
     public static DiscoverQuery getDiscoverQuery(Context context,
-            HttpServletRequest request, DSpaceObject scope, 
-            String configurationName, boolean enableFacet)
+            HttpServletRequest request, DSpaceObject scope, boolean enableFacet)
     {
         DiscoverQuery queryArgs = new DiscoverQuery();
         DiscoveryConfiguration discoveryConfiguration = SearchUtils
-                .getDiscoveryConfigurationByName(configurationName);
+                .getDiscoveryConfiguration(scope);
 
         List<String> userFilters = setupBasicQuery(context,
                 discoveryConfiguration, request, queryArgs);
@@ -207,7 +199,7 @@ public class DiscoverUtility
         {
             for (String f : defaultFilterQueries)
             {
-                queryArgs.addFilterQueries(f);
+                queryArgs.addFacetQuery(f);
             }
         }
         List<String[]> filters = getFilters(request);
@@ -219,7 +211,7 @@ public class DiscoverUtility
             String newFilterQuery = SearchUtils.getSearchService()
                     .toFilterQuery(context, f[0], f[1], f[2])
                     .getFilterQuery();
-            if (StringUtils.isNotBlank(newFilterQuery))
+            if (newFilterQuery != null)
             {
                 queryArgs.addFilterQueries(newFilterQuery);
                 userFilters.add(newFilterQuery);

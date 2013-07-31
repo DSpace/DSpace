@@ -11,6 +11,8 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.dspace.statistics.SolrLogger;
+import org.dspace.utils.DSpace;
 
 import java.io.*;
 import java.util.HashSet;
@@ -36,6 +38,12 @@ public class ApacheLogRobotsProcessor {
      */
 
     public static void main(String[] args) throws Exception {
+        
+        DSpace dspace = new DSpace();
+
+        SolrLogger solrLogger = dspace.getServiceManager().getServiceByName(SolrLogger.class.getName(),SolrLogger.class);
+
+        
         // create an Options object and populate it
         CommandLineParser parser = new PosixParser();
 
@@ -76,16 +84,16 @@ public class ApacheLogRobotsProcessor {
         }
         else
         {
-            File spiderIpFile = new File(spiderIpPath);
+        File spiderIpFile = new File(spiderIpPath);
 
-            if (spiderIpFile.exists())
-            {
-                logSpiders = SpiderDetector.readIpAddresses(spiderIpFile);
-            }
-            else
-            {
-                logSpiders = new HashSet<String>();
-            }
+        if (spiderIpFile.exists())
+        {
+                logSpiders = solrLogger.getSpiderDetector().readIpAddresses(spiderIpFile);
+        }
+        else
+        {
+            logSpiders = new HashSet<String>();
+        }
             output = new BufferedWriter(new FileWriter(spiderIpFile));
         }
 

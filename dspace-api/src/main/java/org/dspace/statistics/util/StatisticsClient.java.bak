@@ -97,19 +97,19 @@ public class StatisticsClient
         }
         else if(line.hasOption('i'))
         {
-            statsService.deleteRobotsByIP();
+            SolrLogger.deleteRobotsByIP();
         }
         else if(line.hasOption('o'))
         {
-            statsService.optimizeSOLR();
+            SolrLogger.optimizeSOLR();
         }
         else if(line.hasOption('b'))
         {
-            statsService.reindexBitstreamHits(line.hasOption('r'));
+            SolrLogger.reindexBitstreamHits(line.hasOption('r'));
         }
         else if(line.hasOption('s'))
         {
-            statsService.shardSolrIndex();
+            SolrLogger.shardSolrIndex();
         }
         else
         {

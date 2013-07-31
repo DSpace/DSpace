@@ -9,35 +9,19 @@
         on top of the default OAI 2.0 web application provided with DSpace.
     </description>
 
-<<<<<<< HEAD
-   <!-- 
-      A Parent POM that Maven inherits DSpace Default 
-      POM atrributes from. 
-   -->
-   <parent>
-      <groupId>org.dspace</groupId>
-      <artifactId>modules</artifactId>
-      <version>1.8.3-SNAPSHOT</version>
-=======
+
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>3.2-SNAPSHOT</version>
->>>>>>> upstream/dspace-3_x
+        <version>3.3-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
-<<<<<<< HEAD
-   <properties>
-        <!-- This is the path to the root [dspace-src] directory. -->
-        <root.basedir>${basedir}/../../..</root.basedir>
-   </properties>
-=======
+
     <properties>
        <!-- This is the path to the root [dspace-src] directory. -->
        <root.basedir>${basedir}/../../..</root.basedir>
     </properties>
->>>>>>> upstream/dspace-3_x
 
     <build>
         <filters>
@@ -87,27 +71,7 @@
         </profile>
     </profiles>
 
-<<<<<<< HEAD
-   <dependencies>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-oai-webapp</artifactId>
-         <version>1.8.3-SNAPSHOT</version>
-         <type>war</type>
-      </dependency>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-oai-api</artifactId>
-         <version>1.8.3-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-         <groupId>javax.servlet</groupId>
-         <artifactId>servlet-api</artifactId>
-         <version>2.3</version>
-         <scope>provided</scope>
-      </dependency>
-   </dependencies>
-=======
+
     <dependencies>
         <dependency>
             <groupId>org.dspace.modules</groupId>
@@ -136,8 +100,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
-            <artifactId>solr-core</artifactId>
-            <version>3.3.0</version>
+            <artifactId>solr-solrj</artifactId>            
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -146,14 +109,4 @@
         </dependency>
     </dependencies>
 
-    <developers>
-        <developer>
-            <id>lyncode</id>
-            <email>dspace@lyncode.com</email>
-            <name>DSpace @ Lyncode</name>
-            <url>http://www.lyncode.com</url>
-        </developer>
-    </developers>
 </project>
->>>>>>> upstream/dspace-3_x
-

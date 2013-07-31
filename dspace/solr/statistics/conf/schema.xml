@@ -214,8 +214,6 @@
    <field name="uuid" type="uuid" indexed="true" stored="true" />
  </fields>
 
- <uniqueKey>uid</uniqueKey>
-
  <!-- field for the QueryParser to use when an explicit fieldname is absent -->
  <defaultSearchField>id</defaultSearchField>
 
