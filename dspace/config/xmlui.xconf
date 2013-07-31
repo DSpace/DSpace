@@ -82,7 +82,7 @@
         <!-- Base DSpace XMLUI Aspects for Display, Browse, Search, Admin, Login and Submission -->
         <aspect name="Displaying Artifacts" path="resource://aspects/ViewArtifacts/" />
         <aspect name="Browsing Artifacts" path="resource://aspects/BrowseArtifacts/" />
-        <aspect name="Searching Artifacts" path="resource://aspects/SearchArtifacts/" />
+        <aspect name="Discovery" path="resource://aspects/Discovery/" />
         <aspect name="Administration" path="resource://aspects/Administrative/" />
         <aspect name="E-Person" path="resource://aspects/EPerson/" />
         <aspect name="Submission and Workflow" path="resource://aspects/Submission/" />
@@ -115,14 +115,14 @@
         <!-- ==============
              Search Engines
              ============== -->
-        <!-- By default, DSpace uses a basic (Lucene based) search engine (see SearchArtifacts aspect above) -->
         <!--
-            To enable Discovery (faceted/filtered search), uncomment this aspect.
-            Also make sure to comment out the above 'SearchArtifacts' aspect 
+            To enable the old lucene based search (no facets, filters), uncomment this aspect.
+            Also make sure to comment out the above 'Discovery' aspect
             (in the "Basic Features/Aspects" group) as leaving it on together
-            with Discovery will cause UI overlap issues
+            with Searching Artifacts aspect will cause UI overlap issues
         -->
-        <!-- <aspect name="Discovery" path="resource://aspects/Discovery/" /> -->
+        <!--<aspect name="Searching Artifacts" path="resource://aspects/SearchArtifacts/" />-->
+
 
         <!-- ==============
              SWORDv1 Client
