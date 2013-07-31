@@ -11,7 +11,7 @@
         <artifactId>article-metrics-pubmed</artifactId>
         <version>3.3-SNAPSHOT</version>
    </parent>
-
+    
     <dependencies>
 
         <dependency>

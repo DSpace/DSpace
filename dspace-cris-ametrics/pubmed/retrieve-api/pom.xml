@@ -10,6 +10,7 @@
     <properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<org.hibernate.version>3.6.10.Final</org.hibernate.version>
+		<it.cilea.ccommons.version>1.2</it.cilea.ccommons.version>
 	</properties>
 	
     <parent>
@@ -43,7 +44,7 @@
 		<dependency>
 			<groupId>it.cilea</groupId>
 			<artifactId>commons-cilea-genericdao</artifactId>
-			<version>1.1</version>			
+			<version>${it.cilea.ccommons.version}</version>			
 		</dependency>
 	
 		<dependency>
@@ -274,7 +275,7 @@
 					<dependency>
 						<groupId>org.hibernate</groupId>
 						<artifactId>hibernate-core</artifactId>
-						<version>3.6.10.Final</version>
+						<version>${org.hibernate.version}</version>
 					</dependency>
 			
 					<dependency>
@@ -292,7 +293,7 @@
 					<dependency>
 						<groupId>org.hibernate</groupId>
 						<artifactId>hibernate-ehcache</artifactId>
-						<version>3.6.10.Final</version>
+						<version>${org.hibernate.version}</version>
 					</dependency>
 					
 			
@@ -317,7 +318,7 @@
 					<dependency>
 						<groupId>it.cilea</groupId>
 						<artifactId>commons-cilea-genericdao</artifactId>
-						<version>1.1</version>
+						<version>${it.cilea.ccommons.version}</version>
 					</dependency>
 				<!-- 	
 					<dependency>

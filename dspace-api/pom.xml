@@ -369,8 +369,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
-            <artifactId>solr-solrj</artifactId>
-            <version>${solr.version}</version>
+            <artifactId>solr-solrj</artifactId>            
         </dependency>
 	<dependency> 
 	    <groupId>gr.ekt</groupId>

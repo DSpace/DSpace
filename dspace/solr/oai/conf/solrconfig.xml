@@ -31,7 +31,7 @@
          -Dsolr.abortOnConfigurationError=false
      -->
   <abortOnConfigurationError>${solr.abortOnConfigurationError:true}</abortOnConfigurationError>
-
+  <luceneMatchVersion>LUCENE_40</luceneMatchVersion>
   <!-- lib directives can be used to instruct Solr to load an Jars identified
        and use them to resolve any "plugins" specified in your solrconfig.xml or
        schema.xml (ie: Analyzers, Request Handlers, etc...).
@@ -74,7 +74,7 @@
   <!-- WARNING: this <indexDefaults> section only provides defaults for index writers
        in general. See also the <mainIndex> section after that when changing parameters
        for Solr's main Lucene index. -->
-  <indexDefaults>
+  <indexConfig>
    <!-- Values here affect all index writers and act as a default unless overridden. -->
     <useCompoundFile>false</useCompoundFile>
 
@@ -141,36 +141,7 @@
      Expert:
     Controls how often Lucene loads terms into memory -->
     <!--<termIndexInterval>256</termIndexInterval>-->
-  </indexDefaults>
-
-  <mainIndex>
-    <!-- options specific to the main on-disk lucene index -->
-    <useCompoundFile>false</useCompoundFile>
-    <ramBufferSizeMB>32</ramBufferSizeMB>
-    <mergeFactor>10</mergeFactor>
-    <!-- Deprecated -->
-    <!--<maxBufferedDocs>1000</maxBufferedDocs>-->
-    <!--<maxMergeDocs>2147483647</maxMergeDocs>-->
-
-    <!-- inherit from indexDefaults <maxFieldLength>10000</maxFieldLength> -->
-
-    <!-- If true, unlock any held write or commit locks on startup.
-         This defeats the locking mechanism that allows multiple
-         processes to safely access a lucene index, and should be
-         used with care.
-         This is not needed if lock type is 'none' or 'single'
-     -->
-    <unlockOnStartup>false</unlockOnStartup>
-
-    <!-- If true, IndexReaders will be reopened (often more efficient) instead
-         of closed and then opened.  -->
-    <reopenReaders>true</reopenReaders>
-
-    <!--
-     Expert:
-    Controls how often Lucene loads terms into memory.  Default is 128 and is likely good for most everyone. -->
-    <!--<termIndexInterval>256</termIndexInterval>-->
-
+    
     <!--
         Custom deletion policies can specified here. The class must
         implement org.apache.lucene.index.IndexDeletionPolicy.
@@ -202,8 +173,8 @@
       Setting to true will set the file that the underlying Lucene IndexWriter
       will write its debug infostream to.  -->
      <infoStream file="INFOSTREAM.txt">false</infoStream>
-
-  </mainIndex>
+     
+  </indexConfig>
 
   <!--	Enables JMX if and only if an existing MBeanServer is found, use this
     if you want to configure JMX through JVM parameters. Remove this to disable
@@ -1012,7 +983,7 @@
        in Solr's conf/xslt directory.  Changes to xslt files are checked for
        every xsltCacheLifetimeSeconds.
    -->
-  <queryResponseWriter name="xslt" class="org.apache.solr.request.XSLTResponseWriter">
+  <queryResponseWriter name="xslt" class="org.apache.solr.response.XSLTResponseWriter">
     <int name="xsltCacheLifetimeSeconds">5</int>
   </queryResponseWriter>
 
