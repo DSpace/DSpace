@@ -63,7 +63,7 @@ public class UsageEvent extends Event
             throw new IllegalStateException("action cannot be null");
         }
 
-        if (request == null)
+        if (action != Action.WORKFLOW && request == null)
         {
             throw new IllegalStateException("request cannot be null");
         }
