@@ -378,8 +378,6 @@ public class PaypalImpl implements PaypalService{
 
         Division finDiv = actionsDiv.addDivision("finalizedivision");
 
-        finDiv.addPara("help-text", "bold").addContent("General help text");
-
         if(shoppingCart.getStatus().equals(ShoppingCart.STATUS_VERIFIED))
         {
             finDiv.addPara("data-label", "bold").addContent("Your payment information has been verified.");
@@ -398,7 +396,7 @@ public class PaypalImpl implements PaypalService{
         }
 
 
-        finDiv.addHidden("show_button").setValue("submit next");
+        finDiv.addHidden("show_button").setValue("Finalize and submit data for curation");
     }
 
     public void showSkipPaymentButton(Division mainDiv,String message)throws WingException{

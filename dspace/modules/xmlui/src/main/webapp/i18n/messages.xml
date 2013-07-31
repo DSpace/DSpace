@@ -2970,7 +2970,7 @@
 	<message key="xmlui.Submission.submit.OverviewStep.steps.3">Upload data files to partner repositories (optional):</message>
 	<message key="xmlui.Submission.submit.OverviewStep.steps.4">Finalize submission:</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.add-datafile">Add new data file</message>
-	<message key="xmlui.Submission.submit.OverviewStep.button.finalize">Finalize and send submission to curator</message>
+	<message key="xmlui.Submission.submit.OverviewStep.button.finalize">Continue to checkout</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.datafile.edit">Edit</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.datafile.delete">Delete</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.datafile.continue">Continue submission</message>
