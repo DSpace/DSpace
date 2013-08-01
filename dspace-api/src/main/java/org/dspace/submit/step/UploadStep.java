@@ -470,7 +470,7 @@ public class UploadStep extends AbstractProcessingStep
                 String fileDescription =  (String) request.getAttribute(param + "-description");
                 if(fileDescription==null ||fileDescription.length()==0)
                 {
-                    request.getParameter("description");
+                    fileDescription = request.getParameter("description");
                 }
                 
                 // if information wasn't passed by User Interface, we had a problem
