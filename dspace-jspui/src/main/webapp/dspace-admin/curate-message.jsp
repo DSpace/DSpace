@@ -1,4 +1,5 @@
 <%
+    CurateTaskResult result = (CurateTaskResult) request.getAttribute("task_result");
     if (result != null)
     {
         String type   = result.getType();

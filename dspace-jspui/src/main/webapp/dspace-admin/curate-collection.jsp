@@ -34,7 +34,6 @@
     private static final String TASK_QUEUE_NAME = ConfigurationManager.getProperty("curate", "ui.queuename");
 %>
 <%
-    CurateTaskResult result = (CurateTaskResult) request.getAttribute("task_result");
     Collection collection = (Collection) request.getAttribute("collection");
     int collectionID = (collection != null ? collection.getID() : -1);
     int communityID = (collection.getParentObject() != null ? collection.getParentObject().getID() : -1);

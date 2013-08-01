@@ -33,7 +33,6 @@
     private static final String TASK_QUEUE_NAME = ConfigurationManager.getProperty("curate", "ui.queuename");
 %>
 <%
-    CurateTaskResult result = (CurateTaskResult) request.getAttribute("task_result");
     String handle  = (String) request.getAttribute("handle");
     if (handle == null)
     {
