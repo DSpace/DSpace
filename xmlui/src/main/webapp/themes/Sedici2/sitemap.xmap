@@ -254,6 +254,7 @@
 							<map:parameter name="contextPath" value="{request:contextPath}" />
 							<map:parameter name="printDebug" value="{xmlui_debug}" />
 							<map:parameter name="errorKind" value="invalidContinuation" />
+							<map:parameter name="themePath" value="{global:theme-path}" />
 						</map:transform>
 						<map:act type="locale">
 							<map:transform type="i18n">
@@ -269,6 +270,7 @@
 							<map:parameter name="printDebug" value="{xmlui_debug}" />
 							<map:parameter name="errorKind" value="notAuthorize" />
 							<map:parameter name="requestQueryString" value="{request:queryString}"/>
+							<map:parameter name="themePath" value="{global:theme-path}" />
 						</map:transform>
 						<map:act type="locale">
 							<map:transform type="i18n">
@@ -285,6 +287,7 @@
 							<map:parameter name="printDebug" value="{xmlui_debug}" />
 							<map:parameter name="errorKind" value="resourceNotFound" />
 							<map:parameter name="requestQueryString" value="{request:queryString}"/>
+							<map:parameter name="themePath" value="{global:theme-path}" />
 						</map:transform>
 						<map:act type="locale">
 							<map:transform type="i18n">
@@ -301,6 +304,7 @@
 							<map:parameter name="contextPath" value="{request:contextPath}" />
 							<map:parameter name="printDebug" value="{xmlui_debug}" />
 							<map:parameter name="errorKind" value="internalError" />
+							<map:parameter name="themePath" value="{global:theme-path}" />
 						</map:transform>
 						
 						<map:act type="locale">
