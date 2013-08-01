@@ -122,12 +122,6 @@
 			<xsl:with-param name="elements" select="dim:field[@element='relation' and @qualifier='bookTitle'] "/>
 		</xsl:call-template>
 
-		<!-- relation.isPartOfSeries row -->
-		
-        <xsl:call-template name="render-normal-field">
-    		<xsl:with-param name="name" select="'relation-isPartOfSeries'"/>
-    		<xsl:with-param name="elements"    select="dim:field[@element='relation' and @qualifier='isPartOfSeries'] "/>
-		</xsl:call-template>
 		<!-- Author(s) row -->	
 		<div class="simple-item-view-authors">
 			<xsl:call-template name="show-common-authors"/>
@@ -529,6 +523,13 @@
 			<xsl:with-param name="name" select="'relation-reviewed-by'"/>
 			<xsl:with-param name="elements" select="dim:field[@element='relation' and @qualifier='isReviewedBy'] "/>
 			<xsl:with-param name="type">url</xsl:with-param>
+		</xsl:call-template>
+		
+		<!-- relation.isPartOfSeries row -->
+		
+        <xsl:call-template name="render-normal-field">
+    		<xsl:with-param name="name" select="'relation-isPartOfSeries'"/>
+    		<xsl:with-param name="elements"    select="dim:field[@element='relation' and @qualifier='isPartOfSeries'] "/>
 		</xsl:call-template>
 
 		<!-- Mostramos los documentos relacionados (es probable que sean muchos) -->
