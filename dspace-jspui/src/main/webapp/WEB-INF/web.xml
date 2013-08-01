@@ -230,6 +230,11 @@
   </servlet>
   
   <servlet>
+    <servlet-name>curate</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.CurateServlet</servlet-class>
+  </servlet>
+  
+  <servlet>
     <servlet-name>feed</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.FeedServlet</servlet-class>
   </servlet>
@@ -527,6 +532,11 @@
   <servlet-mapping>
     <servlet-name>group-select-list</servlet-name>
     <url-pattern>/tools/group-select-list</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>curate</servlet-name>
+    <url-pattern>/dspace-admin/curate</url-pattern>
   </servlet-mapping>
   
  <servlet-mapping>
