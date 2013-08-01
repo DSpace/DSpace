@@ -35,7 +35,6 @@
     private static final String TASK_QUEUE_NAME = ConfigurationManager.getProperty("curate", "ui.queuename");
 %>
 <%
-    CurateTaskResult result = (CurateTaskResult) request.getAttribute("task_result");
     Item item = (Item) request.getAttribute("item");
     int itemID = (item != null ? item.getID() : -1);
     String title = "Unknown Item";
