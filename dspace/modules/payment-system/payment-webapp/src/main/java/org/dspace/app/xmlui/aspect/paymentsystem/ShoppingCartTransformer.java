@@ -194,15 +194,21 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer{
 
         info.addLabel(T_Country);
         Select countryList = info.addItem("country-list", "select-list").addSelect("country");
-        countryList.addOption(false,"","");
-        for(String temp:countryArray.stringPropertyNames()){
-            if(transaction.getCountry().equals(temp)) {
-                countryList.addOption(true,temp,temp);
+        countryList.addOption(false,"","Select a country");
+        String countriesList = ConfigurationManager.getProperty("payment-system","dryad.paymentsystem.countries");
+        while(countriesList.indexOf(";")>0)
+        {
+            int index = countriesList.indexOf(";");
+            String countryTemp = countriesList.substring(0,index);
+            String[] counties = countryTemp.split(":");
+            if(transaction.getCountry().equals(counties[0])) {
+                countryList.addOption(true,counties[0],counties[0]);
             }
             else
             {
-                countryList.addOption(false,temp,temp);
+                countryList.addOption(false,counties[0],counties[0]);
             }
+            countriesList= countriesList.substring(index+1);
         }
 
         info.addLabel(T_Voucher);
