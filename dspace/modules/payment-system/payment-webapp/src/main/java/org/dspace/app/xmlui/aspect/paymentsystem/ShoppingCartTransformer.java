@@ -172,20 +172,21 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer{
 
 
         //add the large file surcharge section
-        info.addLabel(T_Surcharge);
-        info.addItem("surcharge","surcharge").addContent(Double.toString(paymentSystemService.getSurchargeLargeFileFee(context,transaction)));
+
+        Double surcharge = paymentSystemService.getSurchargeLargeFileFee(context,transaction);
+        if(surcharge>0)
+        {   info.addLabel(T_Surcharge);
+            info.addItem("surcharge","surcharge").addContent(Double.toString(surcharge));
+        }
+
 
         Double noIntegrateFee =  paymentSystemService.getNoIntegrateFee(context,transaction,null);
         //add the no integrate fee if it is not 0
-        info.addLabel(T_noInteg);
+
         if(!paymentSystemService.hasDiscount(context,transaction,null)&&noIntegrateFee>0&&!paymentSystemService.hasDiscount(context,transaction,null))
-            {
+            {   info.addLabel(T_noInteg);
                 info.addItem("no-integret","no-integret").addContent(Double.toString(noIntegrateFee));
             }
-        else
-        {
-            info.addItem("no-integret","no-integret").addContent("0.0");
-        }
 
 
         //add the total price
@@ -257,15 +258,17 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer{
         }
 
         //add the large file surcharge section
-        info.addLabel(T_Surcharge);
-        info.addItem("surcharge","surcharge").addContent(Double.toString(paymentSystemService.getSurchargeLargeFileFee(context,transaction)));
 
+        Double surcharge = paymentSystemService.getSurchargeLargeFileFee(context,transaction);
+        if(surcharge>0)
+        {   info.addLabel(T_Surcharge);
+            info.addItem("surcharge","surcharge").addContent(Double.toString(surcharge));
+        }
 
         Double noIntegrateFee = paymentSystemService.getNoIntegrateFee(context,transaction,null);
         //add the no integrate fee if it is not 0
-        info.addLabel(T_noInteg);
-        if(!paymentSystemService.hasDiscount(context,transaction,null)&&noIntegrateFee>0&&!paymentSystemService.hasDiscount(context,transaction,null)){
-
+        if(!paymentSystemService.hasDiscount(context,transaction,null)&&noIntegrateFee>0&&!paymentSystemService.hasDiscount(context,transaction,null))
+        {   info.addLabel(T_noInteg);
             info.addItem("no-integret","no-integret").addContent(Double.toString(noIntegrateFee));
         }
 
