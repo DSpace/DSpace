@@ -381,4 +381,12 @@
             <class>org.dspace.workflow.CheckPendingDeletions</class>
         </step>
     </command>
+
+    <command>
+        <name>update-authority-index</name>
+        <description>Update Authority Solr Index</description>
+        <step>
+            <class>com.atmire.authority.IndexClient</class>
+        </step>
+    </command>
 </commands>

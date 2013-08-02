@@ -50,7 +50,6 @@ public class LocalIndexer implements com.atmire.authority.indexer.IndexerInterfa
             context =getContext();
             DSpaceObject dso = HandleManager.resolveToObject(context, ConfigurationManager.getProperty("stats.datapkgs.coll"));
             itemIterator = ((Collection)dso).getAllItems();
-            //itemIterator = Item.findAll(getContext());
         } catch (SQLException e) {
             e.printStackTrace();
             return;
@@ -97,15 +96,12 @@ public class LocalIndexer implements com.atmire.authority.indexer.IndexerInterfa
 
 
     private void populateAuthorities(Item item) throws SQLException {
-        if (item != null) {
+        if (item != null && item.isArchived()) {
             for (String fieldName : authorityControlledFields) {
-
-
                 DCValue[] dcVaslues = item.getMetadata("dc.identifier");
                 String doi=null;
                 if(dcVaslues.length > 0) doi=dcVaslues[0].value;
 
-                //System.out.println(" item.id ******************************* " + item.getID() + " - " + doi + " *******************************");
                 DCValue[] values = item.getMetadata(fieldName);
 
                 for (DCValue value : values) {
@@ -114,7 +110,6 @@ public class LocalIndexer implements com.atmire.authority.indexer.IndexerInterfa
                         Map<String, String> doc = createHashMap(fieldName, value.value);
                         authorities.push(doc);
                     }
-                    //else System.out.println("VALUE NOT PROCESSED! " + value.authority + " " + value.value);
                 }
             }
         }
