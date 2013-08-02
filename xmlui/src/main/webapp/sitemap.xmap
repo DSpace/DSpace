@@ -637,13 +637,14 @@
 
                                 <map:otherwise>
                                         <map:generate type="exception"/>
-                                        <map:transform src="exception2html.                                        <map:transform src="themes/{session-attr:theme}exception2html.xslt">
+										<map:transform src="themes/{session-attr:theme}exception2html.xslt">
 				   							<map:parameter name="contextPath" value="{request:contextPath}" />
 											<map:parameter name="printDebug" value="{xmlui_debug}" />
 											<map:parameter name="errorKind" value="internalError" />
 											<map:parameter name="requestQueryString" value="{request:queryString}"/>
 											<map:parameter name="themePath" value="{session-attr:theme}" />
-                      <map:act type="locale">
+                     					</map:transform>
+                     					<map:act type="locale">
                                             <map:transform type="i18n">
                                                     <map:parameter name="locale" value="{locale}"/>
                                             </map:transform>
