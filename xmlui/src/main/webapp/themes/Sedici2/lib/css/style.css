@@ -3242,10 +3242,6 @@ span.ds-dc_contributor_author-authority {
 	color: #707070;
 	font-size: 75%;
 }
-.item-summary-view-metadata .metadata.date-issued {
-	float: right;
-	margin-top: 0px;
-}
 .item-summary-view-metadata .metadata.title-subtitle span.metadata-label {
 	display: none;
 }
@@ -3875,6 +3871,9 @@ background-position:top left;
 margin-left:10px;}
 
 
+.simple-metadata-view-date{
+	float:right;
+}
 
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
 body{ background-color:white;}

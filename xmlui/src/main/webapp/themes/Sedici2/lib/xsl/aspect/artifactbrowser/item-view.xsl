@@ -74,6 +74,20 @@
 
     </xsl:template>
 
+	<xsl:template name="render-date-year">
+			<xsl:param name="typeDate"/>
+			<xsl:param name="dateString"/>
+		<div class="simple-metadata-view-date">
+			<span>
+				<xsl:attribute name="class">
+					<xsl:text>date-</xsl:text>
+					<xsl:value-of select="$typeDate"/>
+				</xsl:attribute>
+				<xsl:value-of select="java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.parseDateToYear($dateString)"/>
+			</span>
+		</div>
+	</xsl:template>
+
 <!-- Aca va la muestra sencilla de un item -->
     <xsl:template match="dim:dim" mode="itemSummaryView-DIM">
         <div class="item-summary-view-metadata">
@@ -143,17 +157,19 @@
 		<!-- date.exposure/date.issued : extraemos el año solamente -->
 		<xsl:choose>
 			<xsl:when test="dim:field[@element='date' and @qualifier='exposure']">
-				<xsl:call-template name="render-normal-field">
-					<xsl:with-param name="name" select="'date-exposure'"/>
-					<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='exposure']"/>
-					<xsl:with-param name="type" select="'date'"/>
+				<xsl:call-template name="render-date-year">
+					<xsl:with-param name="typeDate" select="dim:field[@element='date' and @qualifier='exposure']/@qualifier"/>
+					<xsl:with-param name="dateString">
+						<xsl:value-of select="dim:field[@element='date' and @qualifier='exposure']"/>
+					</xsl:with-param>
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test="dim:field[@element='date' and @qualifier='issued']">
-				<xsl:call-template name="render-normal-field">
-					<xsl:with-param name="name" select="'date-issued'"/>
-					<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='issued'] "/>
-					<xsl:with-param name="type" select="'date'"/>
+				<xsl:call-template name="render-date-year">
+					<xsl:with-param name="typeDate" select="dim:field[@element='date' and @qualifier='issued']/@qualifier"/>
+					<xsl:with-param name="dateString">
+						<xsl:value-of select="dim:field[@element='date' and @qualifier='issued']"/>
+					</xsl:with-param>
 				</xsl:call-template>
 			</xsl:when>
 		</xsl:choose>

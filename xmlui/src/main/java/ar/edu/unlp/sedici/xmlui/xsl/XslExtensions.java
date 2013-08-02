@@ -15,6 +15,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.xpath.NodeSet;
 import org.dspace.core.ConfigurationManager;
 import org.slf4j.Logger;
@@ -102,6 +103,17 @@ public class XslExtensions {
 			return fecha;
 		}
 
+	}
+	
+	public static String parseDateToYear(String date)
+	{
+		try{
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyy");
+			Date parsedDate = sdf.parse(date);
+			return sdf.format(parsedDate);
+		}catch (ParseException e){
+			return date;
+		}
 	}
 	
 	public static String codificarURL(String url){
