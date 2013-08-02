@@ -194,7 +194,7 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer{
 
         info.addLabel(T_Country);
         Select countryList = info.addItem("country-list", "select-list").addSelect("country");
-
+        countryList.addOption(false,"","");
         for(String temp:countryArray.stringPropertyNames()){
             if(transaction.getCountry().equals(temp)) {
                 countryList.addOption(true,temp,temp);
