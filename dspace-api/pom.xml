@@ -96,6 +96,18 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/src/test/resources/**</exclude>
+                        <exclude>**/src/test/data/**</exclude>
+                        <exclude>**/.gitignore</exclude>
+                        <exclude>src/test/data/dspaceFolder/config/spiders/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
             <!-- This plugin allows us to run a Groovy script in our Maven POM
                     (see: http://gmaven.codehaus.org/Executing+Groovy+Code )
                     We are generating a OS-agnostic version (agnostic.build.dir) of
