@@ -4,7 +4,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-parent</artifactId>
    <packaging>pom</packaging>
-   <version>3.3-SNAPSHOT</version>
+   <version>CRIS-3.2.0-beta</version>
    <name>DSpace Parent Project</name>
    <url>https://github.com/CILEA/DSpace</url>
 

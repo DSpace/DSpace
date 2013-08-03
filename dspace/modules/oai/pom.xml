@@ -13,7 +13,7 @@
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>3.3-SNAPSHOT</version>
+        <version>CRIS-3.2.0-beta</version>
         <relativePath>..</relativePath>
     </parent>
 
