@@ -21,7 +21,6 @@
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/../../..</root.basedir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>		
-		<org.dspace.version>3.3-SNAPSHOT</org.dspace.version>
 		<org.jdyna.version>4.1</org.jdyna.version>		
 		<it.cilea.ccommons.version>1.2</it.cilea.ccommons.version>
     </properties>
@@ -95,7 +94,6 @@
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-jspui-webapp</artifactId>
-			<version>${org.dspace.version}</version>
 			<type>war</type>
 		</dependency>
 
@@ -107,12 +105,10 @@
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>pubmed-lookup</artifactId>
-			<version>${org.dspace.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>pubmed-lookup-web</artifactId>
-			<version>${org.dspace.version}</version>
 			<type>war</type>
 		</dependency>
 
@@ -153,13 +149,11 @@
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-webservices-api</artifactId>
-			<version>${org.dspace.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-webservices-webapp</artifactId>
-			<version>${org.dspace.version}</version>
 			<type>war</type>
 			<scope>compile</scope>
 		</dependency>
