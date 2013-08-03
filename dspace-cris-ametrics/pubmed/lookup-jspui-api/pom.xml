@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>article-metrics-pubmed</artifactId>
-        <version>CRIS-3.2.0-beta</version>
+        <version>CRIS-3.2.1-SNAPSHOT</version>
    </parent>
     
    <!--Force UTF-8 encoding during build on all platforms-->
