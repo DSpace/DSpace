@@ -12,6 +12,12 @@
         <version>3.3-SNAPSHOT</version>
    </parent>
     
+   <!--Force UTF-8 encoding during build on all platforms-->
+   <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <root.basedir>${basedir}/../..</root.basedir>
+   </properties>
+   
     <dependencies>
 
         <dependency>
@@ -29,7 +35,6 @@
 	    <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>pubmed-retrieve</artifactId>
-            <version>${project.version}</version>            
         </dependency>
 
         <dependency>

@@ -1,3 +1,12 @@
+<%--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+--%>
 <%@ page language="java" pageEncoding="UTF-8" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="java.util.List" %>

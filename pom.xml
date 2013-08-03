@@ -6,20 +6,21 @@
    <packaging>pom</packaging>
    <version>3.3-SNAPSHOT</version>
    <name>DSpace Parent Project</name>
-   <url>https://github.com/dspace/DSpace</url>
+   <url>https://github.com/CILEA/DSpace</url>
 
    <organization>
       <name>DuraSpace</name>
       <url>http://www.dspace.org</url>
    </organization>
 
-    <!-- brings the sonatype snapshot repository and signing requirement on board -->
+    <!-- 
+    comment this out to avoid accidental release on sonatype under org.dspace group id
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
         <version>7</version>
-    </parent>
-
+    </parent> -->
+    
     <!--Force UTF-8 encoding during build on all platforms-->
     <properties>
 	<lucene.version>3.5.0</lucene.version>
@@ -114,7 +115,7 @@
                 <releaseProfiles>release</releaseProfiles>
                 <goals>deploy</goals>
                 <!-- Suggest tagging the release in SCM as "dspace-[version]" -->
-                <tagNameFormat>dspace-@{project.version}</tagNameFormat>
+                <tagNameFormat>dspace-cris-@{project.version}</tagNameFormat>
                 <!-- Auto-Version all modules the same as the parent module -->
                 <autoVersionSubmodules>true</autoVersionSubmodules>
             </configuration>
@@ -983,6 +984,16 @@
 			<artifactId>dspace-cris-jspui-webapp</artifactId>
 			<version>3.3-SNAPSHOT</version>			
 		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-cris-webservices-api</artifactId>
+			<version>3.3-SNAPSHOT</version>			
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-cris-webservices-webapp</artifactId>
+			<version>3.3-SNAPSHOT</version>			
+		</dependency>
 		 <dependency>
              <groupId>org.dspace</groupId>
 			 <artifactId>pubmed-retrieve</artifactId>
@@ -1071,10 +1082,10 @@
    <developers>
       <developer>
          <name>Andrea Bollini</name>
-         <email>bollini at users.sourceforge.net</email>
+         <email>a.bollini at cineca.it</email>
          <url>http://www.linkedin.com/in/andreabollini</url>
-         <organization>CILEA</organization>
-         <organizationUrl>http://www.cilea.it</organizationUrl>
+         <organization>CINECA</organization>
+         <organizationUrl>http://www.cineca.it</organizationUrl>
          <roles>
             <role>commiter</role>
          </roles>
@@ -1282,12 +1293,6 @@
    </scm>
 
    <repositories>
-      <repository>
-         <id>sonatype-releases</id>
-         <name>Sonatype Releases Repository</name>
-         <url>http://oss.sonatype.org/content/repositories/releases/</url>
-      </repository>
-   
        <repository>
 			<id>cilea-repo</id>
 			<name>CILEA Maven Repository</name>
@@ -1301,6 +1306,13 @@
 				<checksumPolicy>never</checksumPolicy>
 			</snapshots>
 		</repository>
+		
+		<repository>
+	         <id>sonatype-releases</id>
+	         <name>Sonatype Releases Repository</name>
+	         <url>http://oss.sonatype.org/content/repositories/releases/</url>
+	    </repository>
+   
    </repositories>
    
     <!--
@@ -1309,8 +1321,21 @@
         on release to deploy release versions to the repository by the
         release manager.
     -->
-    <distributionManagement>
-        <!-- further distribution management is found upstream in the sonatype parent -->
-    </distributionManagement>
+   	<distributionManagement>
+    	<repository>
+        	<id>repo</id>
+        	<name>CILEA Maven Repository</name>
+        	<url>https://github.com/CILEA/mvn-repo/raw/master/releases</url>
+    	</repository>
+    	<snapshotRepository>
+        	<id>snapshot-repo</id>
+        	<name>CILEA Maven Repository</name>
+        	<url>https://github.com/CILEA/mvn-repo/raw/master/snapshots</url>
+    	</snapshotRepository>
+    	<site>
+            <id>website</id>
+            <url>http://cilea.github.io/dspace-cris/index.html</url>
+        </site>        
+	</distributionManagement>
 
 </project>

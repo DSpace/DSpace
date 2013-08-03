@@ -10,4 +10,10 @@
   </parent>
   
   <name>Article Metrics :: PubMed :: Lookup JSP Web</name>
+  
+   <!--Force UTF-8 encoding during build on all platforms-->
+   <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <root.basedir>${basedir}/../..</root.basedir>
+   </properties>
 </project>

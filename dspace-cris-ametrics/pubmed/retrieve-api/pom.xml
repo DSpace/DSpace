@@ -12,6 +12,7 @@
 		<!-- Warning hibernate core point to 3.3.2.GA to be compliant with hibernate-annotation 3.4.0.GA (required by spring ORM 3.1.1.RELEASE)-->
 		<org.hibernate.version>3.6.10.Final</org.hibernate.version>
 		<it.cilea.ccommons.version>1.2</it.cilea.ccommons.version>
+        <root.basedir>${basedir}/../..</root.basedir>
 	</properties>
 
 	<parent>
