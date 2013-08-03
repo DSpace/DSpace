@@ -5,13 +5,13 @@
     <packaging>pom</packaging>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-cris-ametrics</artifactId>
-    <version>CRIS-3.2.1-SNAPSHOT</version>
+    <version>CRIS-4.0.0-SNAPSHOT</version>
     <name>Article Metrics :: Modules</name>
 
     <parent>
         <artifactId>dspace-parent</artifactId>
 		<groupId>org.dspace</groupId>
-		<version>CRIS-3.2.1-SNAPSHOT</version>
+		<version>CRIS-4.0.0-SNAPSHOT</version>
     </parent>
     
     <modules>
