@@ -1,4 +1,11 @@
 /*
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/CILEA/dspace-cris/wiki/License
+ */
+/*
 ModalBox - The pop-up window thingie with AJAX, based on prototype and script.aculo.us.
 
 Copyright Andrey Okonetchnikov (andrej.okonetschnikow@gmail.com), 2006-2007

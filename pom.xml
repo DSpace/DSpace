@@ -984,6 +984,16 @@
 			<artifactId>dspace-cris-jspui-webapp</artifactId>
 			<version>3.3-SNAPSHOT</version>			
 		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-cris-webservices-api</artifactId>
+			<version>3.3-SNAPSHOT</version>			
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-cris-webservices-webapp</artifactId>
+			<version>3.3-SNAPSHOT</version>			
+		</dependency>
 		 <dependency>
              <groupId>org.dspace</groupId>
 			 <artifactId>pubmed-retrieve</artifactId>
