@@ -1286,10 +1286,10 @@
       snapshots into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:git:git@github.com:DSpace/DSpace.git</connection>
-      <developerConnection>scm:git:git@github.com:DSpace/DSpace.git</developerConnection>
-      <url>git@github.com:DSpace/DSpace.git</url>
-      <tag>HEAD</tag>
+      <connection>scm:git:git@github.com:CILEA/DSpace.git</connection>
+      <developerConnection>scm:git:git@github.com:CILEA/DSpace.git</developerConnection>
+      <url>git@github.com:CILEA/DSpace.git</url>
+      <tag>dspace-cris-master</tag>
    </scm>
 
    <repositories>
