@@ -336,7 +336,7 @@ public class ShibAuthentication implements AuthenticationMethod
 					}
 
 					if (groupNames == null) {
-						log.debug("Unable to find role mapping for the value, '"+affiliation+"', there should be a mapping in the dspace.cfg:  authentication.shib.role."+affiliation+" = <some group name>");
+						log.debug("Unable to find role mapping for the value, '"+affiliation+"', there should be a mapping in config/modules/authentication-shibboleth.cfg:  role."+affiliation+" = <some group name>");
 						continue;
 					} else {
 						log.debug("Mapping role affiliation to DSpace group: '"+groupNames+"'");
@@ -1158,7 +1158,7 @@ public class ShibAuthentication implements AuthenticationMethod
 				// prevent an endless loop in an error condition.
 				values = values.substring(1,values.length());
 
-			} else if (idx > 0 && values.charAt(idx-1) != '\\' ) {
+			} else if (idx > 0 && values.charAt(idx-1) == '\\' ) {
 				// The attribute starts with an escaped semicolon
 				idx++;
 			} else if ( idx > 0) {

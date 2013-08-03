@@ -114,7 +114,9 @@ public class METSDisseminationCrosswalk
             pparams.put("manifestOnly", "true");
 
             // Create a temporary file to disseminate into
-            String tempDirectory = ConfigurationManager.getProperty("upload.temp.dir");
+            String tempDirectory = (ConfigurationManager.getProperty("upload.temp.dir") != null)
+                ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir"); 
+
             File tempFile = File.createTempFile("METSDissemination" + dso.hashCode(), null, new File(tempDirectory));
             tempFile.deleteOnExit();
 

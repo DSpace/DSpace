@@ -203,7 +203,8 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 
 	public String getTempDirectory()
 	{
-		return this.getStringProperty("swordv2-server", "upload.tempdir", null);
+		return (ConfigurationManager.getProperty("upload.temp.dir") != null)
+                    ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir"); 
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////

@@ -10,11 +10,9 @@ package org.dspace.kernel.config;
 import org.dspace.services.ConfigurationService;
 
 /**
- * User: kevin (kevin at atmire.com)
- * Date: 3-aug-2011
- * Time: 11:19:33
- *
  * Interface that is used so that modules can determine their own spring file locations
+ *
+ * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public interface SpringLoader {
 
@@ -26,6 +24,5 @@ public interface SpringLoader {
      * @return an array containing spring file locations
      */
     public String[] getResourcePaths(ConfigurationService configurationService);
-
 
 }
