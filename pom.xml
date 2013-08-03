@@ -4,7 +4,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-parent</artifactId>
    <packaging>pom</packaging>
-   <version>CRIS-3.2.0-beta</version>
+   <version>CRIS-3.2.1-SNAPSHOT</version>
    <name>DSpace Parent Project</name>
    <url>https://github.com/CILEA/DSpace</url>
 
@@ -481,125 +481,125 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
-            <version>CRIS-3.2.0-beta</version>
+            <version>CRIS-3.2.1-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace.modules</groupId>
             <artifactId>additions</artifactId>
-            <version>CRIS-3.2.0-beta</version>
+            <version>CRIS-3.2.1-SNAPSHOT</version>
          </dependency>
 
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-sword</artifactId>
-            <version>CRIS-3.2.0-beta</version>
+            <version>CRIS-3.2.1-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-sword</artifactId>
-            <version>CRIS-3.2.0-beta</version>
+            <version>CRIS-3.2.1-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-swordv2</artifactId>
-            <version>CRIS-3.2.0-beta</version>
+            <version>CRIS-3.2.1-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-swordv2</artifactId>
-            <version>CRIS-3.2.0-beta</version>
+            <version>CRIS-3.2.1-SNAPSHOT</version>
             <type>war</type>
          </dependency>
 
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui</artifactId>
-            <version>CRIS-3.2.0-beta</version>
+            <version>CRIS-3.2.1-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui</artifactId>
-            <version>CRIS-3.2.0-beta</version>
+            <version>CRIS-3.2.1-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
-            <version>CRIS-3.2.0-beta</version>
+            <version>CRIS-3.2.1-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
-            <version>CRIS-3.2.0-beta</version>
+            <version>CRIS-3.2.1-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni</artifactId>
-            <version>CRIS-3.2.0-beta</version>
+            <version>CRIS-3.2.1-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-client</artifactId>
-            <version>CRIS-3.2.0-beta</version>
+            <version>CRIS-3.2.1-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni</artifactId>
-            <version>CRIS-3.2.0-beta</version>
+            <version>CRIS-3.2.1-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui</artifactId>
-            <version>CRIS-3.2.0-beta</version>
+            <version>CRIS-3.2.1-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui</artifactId>
-            <version>CRIS-3.2.0-beta</version>
+            <version>CRIS-3.2.1-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-cris-jspui-webapp</artifactId>
-            <version>CRIS-3.2.0-beta</version>
+            <version>CRIS-3.2.1-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-cris-webservices-webapp</artifactId>
-            <version>CRIS-3.2.0-beta</version>
+            <version>CRIS-3.2.1-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>pubmed-lookup</artifactId>
-            <version>CRIS-3.2.0-beta</version>
+            <version>CRIS-3.2.1-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>pubmed-lookup-web</artifactId>
-            <version>CRIS-3.2.0-beta</version>
+            <version>CRIS-3.2.1-SNAPSHOT</version>
             <type>war</type>
          </dependency>         
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
-            <version>CRIS-3.2.0-beta</version>
+            <version>CRIS-3.2.1-SNAPSHOT</version>
          </dependency>
          <!-- DSpace Localization Packages -->
          <dependency>
@@ -995,32 +995,32 @@
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-api</artifactId>
-			<version>CRIS-3.2.0-beta</version>			
+			<version>CRIS-3.2.1-SNAPSHOT</version>			
 		</dependency>
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-jspui-api</artifactId>
-			<version>CRIS-3.2.0-beta</version>			
+			<version>CRIS-3.2.1-SNAPSHOT</version>			
 		</dependency>
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-jspui-webapp</artifactId>
-			<version>CRIS-3.2.0-beta</version>			
+			<version>CRIS-3.2.1-SNAPSHOT</version>			
 		</dependency>
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-webservices-api</artifactId>
-			<version>CRIS-3.2.0-beta</version>			
+			<version>CRIS-3.2.1-SNAPSHOT</version>			
 		</dependency>
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-webservices-webapp</artifactId>
-			<version>CRIS-3.2.0-beta</version>			
+			<version>CRIS-3.2.1-SNAPSHOT</version>			
 		</dependency>
 		 <dependency>
              <groupId>org.dspace</groupId>
 			 <artifactId>pubmed-retrieve</artifactId>
-			 <version>CRIS-3.2.0-beta</version>
+			 <version>CRIS-3.2.1-SNAPSHOT</version>
          </dependency>
 		<dependency>
 			<groupId>net.sf.flexjson</groupId>
