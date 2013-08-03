@@ -93,6 +93,9 @@ public class Context
 
     /** Autocommit */
     private boolean isAutoCommit;
+    
+    /** options */
+    private short options = 0;
 
     /**
      * Construct a new context object with default options. A database connection is opened.
@@ -130,6 +133,7 @@ public class Context
     {
         // Obtain a non-auto-committing connection
         connection = DatabaseManager.getConnection();
+        connection.setAutoCommit(false);
 
 //	This is one heck of a bottleneck, most visitors were just outsider/robots, they should be
 //	querying our database most of the time, so just let them do the reading and guard only those
@@ -346,8 +350,10 @@ public class Context
         try
         {
             // Commit any changes made as part of the transaction
-	    if (!isAutoCommit)
-            commit();
+            if (! isReadOnly() && !isAutoCommit)
+            {
+                commit();
+            }
         }
         finally
         {
@@ -453,13 +459,9 @@ public class Context
      * Get the current event list. If there is a separate list of events from
      * already-committed operations combine that with current list.
      * 
-     * TODO WARNING: events uses an ArrayList, a class not ready for concurrency.
-     * Read http://download.oracle.com/javase/6/docs/api/java/util/Collections.html#synchronizedList%28java.util.List%29
-     * on how to properly synchronize the class when calling this method
-     *
      * @return List of all available events.
      */
-    public List<Event> getEvents()
+    public LinkedList<Event> getEvents()
     {
         return events;
     }
@@ -494,8 +496,13 @@ public class Context
     {
         try
         {
-            if (!connection.isClosed() && !isAutoCommit)
-                connection.rollback();
+            if (!connection.isClosed())
+            {
+                if (! isReadOnly() && !isAutoCommit)
+                {
+                    connection.rollback();
+                }
+            }
         }
         catch (SQLException se)
         {
