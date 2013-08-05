@@ -1,252 +1,153 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-   <!--
-      Licensed to the Apache Software Foundation (ASF) under one or more
-      contributor license agreements. See the NOTICE file distributed
-      with this work for additional information regarding copyright
-      ownership. The ASF licenses this file to you under the Apache
-      License, Version 2.0 (the "License"); you may not use this file
-      except in compliance with the License. You may obtain a copy of
-      the License at http://www.apache.org/licenses/LICENSE-2.0 Unless
-      required by applicable law or agreed to in writing, software
-      distributed under the License is distributed on an "AS IS" BASIS,
-      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-      implied. See the License for the specific language governing
-      permissions and limitations under the License.
-   -->
+    <!--
+       Licensed to the Apache Software Foundation (ASF) under one or more
+       contributor license agreements. See the NOTICE file distributed
+       with this work for additional information regarding copyright
+       ownership. The ASF licenses this file to you under the Apache
+       License, Version 2.0 (the "License"); you may not use this file
+       except in compliance with the License. You may obtain a copy of
+       the License at http://www.apache.org/licenses/LICENSE-2.0 Unless
+       required by applicable law or agreed to in writing, software
+       distributed under the License is distributed on an "AS IS" BASIS,
+       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+       implied. See the License for the specific language governing
+       permissions and limitations under the License.
+    -->
 
-   <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-   <groupId>org.dspace</groupId>
-   <artifactId>dspace-solr-parent</artifactId>
-   <version>3.5.0.2-SNAPSHOT</version>
-   <packaging>pom</packaging>
+    <parent>
+        <groupId>org.dspace</groupId>
+        <artifactId>dspace-parent</artifactId>
+        <version>4.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
 
-   <name>Apache Solr Parent POM</name>
-   <description>Apache Solr Parent POM</description>
-   <url>http://lucene.apache.org/solr</url>
-
-   <organization>
-       <name>DuraSpace</name>
-       <url>http://www.dspace.org</url>
-   </organization>
-
-   <parent>
-      <groupId>org.sonatype.oss</groupId>
-      <artifactId>oss-parent</artifactId>
-      <version>7</version>
-      <relativePath></relativePath>
-   </parent>
+    <groupId>org.dspace</groupId>
+    <artifactId>dspace-solr</artifactId>
+    <name>Apache Solr Webapp</name>
+    <description>Apache Solr Server</description>
+    <packaging>war</packaging>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
-        <root.basedir>${basedir}</root.basedir>
+        <root.basedir>${basedir}/..</root.basedir>
     </properties>
 
-   <inceptionYear>2006</inceptionYear>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <!-- This 'dspace-solr' WAR overlays the Apache Solr Web Application
+                         available in Maven Central -->
+                    <overlays>
+                        <overlay>
+                            <groupId>org.apache.solr</groupId>
+                            <artifactId>solr</artifactId>
+                            <!--
+                            Exclude the solr core named apache-solr-core, this is needed because the dspace-solr changes
+                            need to take precendence over the solr-core, the solr-core will still be loaded in the solr-core.jar
+                            -->
+                            <excludes>
+                                <exclude>WEB-INF/lib/apache-solr-core-3.5.0.jar</exclude>
+                            </excludes>
+                        </overlay>
+                    </overlays>
+                </configuration>
+                <executions>
+                    <execution>
+                        <!-- This execution creates a normal WAR (with all JARs, etc)-->
+                        <id>webapp</id>
+                        <configuration>
+                            <primaryArtifact>true</primaryArtifact>
+                            <archiveClasses>true</archiveClasses>
+                            <attachClasses>true</attachClasses>
+                            <classesClassifier>classes</classesClassifier>
+                            <warSourceExcludes>WEB-INF/classes/**</warSourceExcludes>
+                            <packagingExcludes>
+                                WEB-INF/classes/**,
+                                WEB-INF/lib/slf4j-jdk14-*.jar,
+                                WEB-INF/lib/log4j-over-slf4j-*.jar
+                            </packagingExcludes>
+                        </configuration>
+                        <goals>
+                            <goal>war</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                    <execution>
+                        <!-- This execution creates a "skinny" WAR (without any JARs included)-->
+                        <id>skinny</id>
+                        <configuration>
+                            <primaryArtifact>false</primaryArtifact>
+                            <classifier>skinny</classifier>
+                            <warSourceExcludes>WEB-INF/lib/**,WEB-INF/classes/**</warSourceExcludes>
+                            <packagingExcludes>WEB-INF/lib/**,WEB-INF/classes/**</packagingExcludes>
+                        </configuration>
+                        <goals>
+                            <goal>war</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
-   <licenses>
-      <license>
-         <name>Apache 2</name>
-         <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      </license>
-      <license>
-         <name>DuraSpace BSD License</name>
-         <url>https://raw.github.com/DSpace/DSpace/master/LICENSE</url>
-         <distribution>repo</distribution>
-         <comments>
-            A BSD 3-Clause license for the DSpace codebase.
-         </comments>
-      </license>
-   </licenses>
+    <dependencies>
+        <!-- Depends on the Apache 'solr' web application (see Overlay settings above)-->
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr</artifactId>
+            <version>3.5.0</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-core</artifactId>
+            <version>3.5.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-solrj</artifactId>
+            <version>3.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>3.5.0</version>
+        </dependency>
 
-   <issueManagement>
-      <system>JIRA</system>
-      <url>https://jira.duraspace.org/browse/DS</url>
-   </issueManagement>
-
-   <scm>
-      <connection>scm:git:git@github.com:DSpace/dspace-solr.git</connection>
-      <developerConnection>scm:git:git@github.com:DSpace/dspace-solr.git</developerConnection>
-      <url>git@github.com:DSpace/dspace-solr.git</url>
-   </scm>
-
-   <mailingLists>
-      <mailingList>
-         <name>DSpace Technical Users List</name>
-         <subscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-tech
-         </subscribe>
-         <unsubscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-tech
-         </unsubscribe>
-         <post>dspace-tech AT lists.sourceforge.net</post>
-         <archive>
-            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-tech
-         </archive>
-      </mailingList>
-      <mailingList>
-         <name>DSpace Developers List</name>
-         <subscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-devel
-         </subscribe>
-         <unsubscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-devel
-         </unsubscribe>
-         <post>dspace-devel AT lists.sourceforge.net</post>
-         <archive>
-            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-devel
-         </archive>
-      </mailingList>
-      <mailingList>
-         <name>DSpace General Issues List</name>
-         <subscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-general
-         </subscribe>
-         <unsubscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-general
-         </unsubscribe>
-         <post>dspace-general AT lists.sourceforge.net</post>
-         <archive>
-            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-general
-         </archive>
-      </mailingList>
-      <mailingList>
-         <name>DSpace SCM Commit Change-Log</name>
-         <subscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-changelog
-         </subscribe>
-         <unsubscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-changelog
-         </unsubscribe>
-         <post>noreply AT lists.sourceforge.net</post>
-         <archive>
-            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-changelog
-         </archive>
-      </mailingList>
-   </mailingLists>
-
-   <developers>
-       <!-- If you developed this, please fill in -->
-   </developers>
-
-   <contributors>
-      <contributor>
-         <name>Add Your Name Here and submit a patch!</name>
-         <email>contributor at myu.edu</email>
-         <url>http://www.myu.edu/me</url>
-         <organization>My University</organization>
-         <organizationUrl>http://www.myu.edu</organizationUrl>
-         <roles>
-            <role>developer</role>
-         </roles>
-         <timezone>0</timezone>
-      </contributor>
-   </contributors>
-
-   <modules>
-      <module>webapp</module>
-   </modules>
-
-   <build>
-      <plugins>
-         <plugin>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <version>2.5.1</version>
-            <configuration>
-               <source>1.6</source>
-               <target>1.6</target>
-            </configuration>
-         </plugin>
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <version>2.2.1</version>
-            <executions>
-               <execution>
-                  <id>attach-sources</id>
-                  <phase>package</phase>
-                  <goals>
-                     <goal>jar-no-fork</goal>
-                  </goals>
-               </execution>
-            </executions>
-         </plugin>
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.9.1</version>
-            <executions>
-               <execution>
-                  <id>attach-javadocs</id>
-                  <phase>package</phase>
-                  <goals>
-                     <goal>jar</goal>
-                  </goals>
-               </execution>
-            </executions>
-         </plugin>
-
-         <plugin>
-             <groupId>com.mycila.maven-license-plugin</groupId>
-             <artifactId>maven-license-plugin</artifactId>
-             <version>1.9.0</version>
-             <configuration>
-                <header>${root.basedir}/LICENSE_HEADER</header>
-                <excludes>
-                    <exclude>src/main/*/org/apache/**</exclude>
-                    <exclude>**/web.xml</exclude>
-                    <exclude>**/src/test/resources/**</exclude>
-                    <exclude>**/META-INF/**</exclude>
-                    <exclude>**/robots.txt</exclude>
-                    <exclude>**/*.LICENSE</exclude>
-                    <exclude>**/LICENSE*</exclude>
-                    <exclude>**/README*</exclude>
-                    <exclude>**/NOTICE</exclude>
-                    <exclude>**/readme*</exclude>
-                    <exclude>**/.gitignore</exclude>
-                </excludes>
-                <mapping>
-                    <!-- Custom DSpace file extensions which are not recognized by maven-release-plugin:
-                            *.xmap, *.xslt, *.LICENSE -->
-                    <xmap>XML_STYLE</xmap>
-                    <xslt>XML_STYLE</xslt>
-                    <LICENSE>TEXT</LICENSE>
-                </mapping>
-                <properties />
-                <encoding>UTF-8</encoding>
-                <strictCheck>true</strictCheck>
-             </configuration>
-             <executions>
-                 <execution>
-                     <goals>
-                         <goal>check</goal>
-                     </goals>
-                 </execution>
-             </executions>
-         </plugin>
-
-      </plugins>
-   </build>
-    
-   <dependencies>
-      <dependency>
-         <groupId>javax.servlet</groupId>
-         <artifactId>servlet-api</artifactId>
-         <version>2.5</version>
-         <scope>provided</scope>
-      </dependency>
-      <dependency>
-         <groupId>junit</groupId>
-         <artifactId>junit</artifactId>
-         <version>4.7</version>
-         <scope>test</scope>
-      </dependency>
-   </dependencies>
+        <!-- Replace J.U.L. logging with log4j -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.6.1</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <artifactId>log4j</artifactId>
+            <groupId>log4j</groupId>
+            <type>jar</type>
+            <version>1.2.16</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
 </project>
