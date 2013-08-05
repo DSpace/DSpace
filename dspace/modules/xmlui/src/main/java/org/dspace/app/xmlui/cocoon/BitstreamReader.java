@@ -544,7 +544,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         {
             // Check for if-modified-since header -- ONLY if not authenticated
             long modSince = request.getDateHeader("If-Modified-Since");
-            if (modSince != -1 && item != null && item.getLastModified().getTime() < modSince)
+            if (modSince != -1 && item != null && item.getLastModified().getTime() <= modSince)
             {
                 // Item has not been modified since requested date,
                 // hence bitstream has not; return 304
