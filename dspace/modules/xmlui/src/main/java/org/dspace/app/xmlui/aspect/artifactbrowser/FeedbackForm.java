@@ -21,6 +21,7 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Text;
@@ -87,7 +88,7 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
     
     private static final Message T_contactform_submit =
         message("xmlui.ArtifactBrowser.FeedbackForm.contactform.submit");
-    
+   
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
@@ -137,10 +138,10 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
         feedback.addPara(T_address_head);
         feedback.addPara(T_address_para1);
 
-        feedback.addPara(T_contactform_head);
-        feedback.addPara(T_contactform_para1);
-        
         List form = feedback.addList("form",List.TYPE_FORM);
+        Item headItem = form.addItem();
+        headItem.addContent(T_contactform_head);
+        headItem.addContent(T_contactform_para1);
         
         Text email = form.addItem().addText("email");
         email.setLabel(T_contactform_email);

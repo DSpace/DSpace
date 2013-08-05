@@ -205,8 +205,8 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     private void addArticleStatusRadios(Request request, List form, String journalStatus, PublicationBean pBean) throws WingException {
         // add "article status" radios
         Item articleStatus = form.addItem("article_status", "");
+        articleStatus.addContent(T_article_status);
         Radio accessRadios = articleStatus.addRadio("article_status");
-        accessRadios.setLabel(T_article_status);
         accessRadios.setHelp(T_article_status_help);
         accessRadios.addOption(org.dspace.submit.step.SelectPublicationStep.ARTICLE_STATUS_PUBLISHED, T_article_status_published);
         accessRadios.addOption(org.dspace.submit.step.SelectPublicationStep.ARTICLE_STATUS_ACCEPTED, T_article_status_accepted);
