@@ -1,0 +1,14 @@
+This is a special build of Apache Solr for DSpace (http://www.dspace.org).
+
+This build is just a Maven WAR Overlay of the default Apache Solr Web application.
+This Overlay adds the following DSpace customizations:
+
+* A new 'org.dspace.solr.filters.LocalHostRestrictionFilter' class (which restricts Solr access to localhost)
+* Customizes the default web.xml to utilize this new LocalHostRestrictionFilter
+
+For more information about Maven WAR Overlays see:
+http://maven.apache.org/plugins/maven-war-plugin/overlays.html
+
+This project has been created under an alternate groupId to 
+be supported within the DSpace community and distributed 
+within the the 'org.dspace' groupId.
