@@ -14,6 +14,9 @@ import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
+import org.dspace.app.xmlui.wing.Message;
+import org.dspace.app.xmlui.wing.WingException;
+import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.discovery.*;
@@ -31,6 +34,7 @@ import java.util.List;
  */
 public abstract class AbstractRecentSubmissionTransformer extends AbstractDSpaceTransformer implements CacheableProcessingComponent {
 
+    private static final Message view_more = message("xmlui.ArtifactBrowser.AbstractRecentSubmissionTransformer.recent_submissions_more");
     private static final Logger log = Logger.getLogger(AbstractRecentSubmissionTransformer.class);
 
     /**
@@ -145,6 +149,22 @@ public abstract class AbstractRecentSubmissionTransformer extends AbstractDSpace
         }catch (SearchServiceException se){
             log.error("Caught SearchServiceException while retrieving recent submission for: " + (dso == null ? "home page" : dso.getHandle()), se);
         }
+    }
+
+    /**
+     * Add a view more link at the bottom of a recent submission view
+     * @param recentSubmissionDiv recent submission div to which we are to add the link
+     * @param dso the site/community/collection on who's home page we are
+     * @throws WingException ...
+     */
+    protected void addViewMoreLink(Division recentSubmissionDiv, DSpaceObject dso) throws WingException {
+        String url = contextPath;
+        if(dso != null)
+        {
+            url += "/handle/" + dso.getHandle();
+        }
+        url += "/recent-submissions";
+        recentSubmissionDiv.addPara("recent-submission-view-more", "recentSubmissionViewMore").addXref(url).addContent(view_more);
     }
 
     @Override

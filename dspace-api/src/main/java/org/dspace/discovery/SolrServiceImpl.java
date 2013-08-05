@@ -16,7 +16,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.commons.validator.UrlValidator;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -97,7 +97,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         {
            String solrService = new DSpace().getConfigurationService().getProperty("discovery.search.server") ;
 
-            UrlValidator urlValidator = new UrlValidator();
+            UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
             if(urlValidator.isValid(solrService))
             {
                 try {

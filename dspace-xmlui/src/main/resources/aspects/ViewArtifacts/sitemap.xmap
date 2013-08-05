@@ -37,6 +37,7 @@ and searching the repository.
                 <map:matchers default="wildcard">
                         <map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
                         <map:matcher name="HandleAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.general.HandleAuthorizedMatcher"/>
+                        <map:matcher name="ContainerHomePageSelector" src="org.dspace.app.xmlui.aspect.viewArtifacts.ContainerHomePageMatcher"/>
                 </map:matchers>
 
 
@@ -130,8 +131,10 @@ and searching the repository.
                                                         <map:parameter name="type" value="collection"/>
                                                         <map:parameter name="eventType" value="view"/>
                                                 </map:act>
+                                                    <map:match type="ContainerHomePageSelector" pattern="metadata">
                                                         <map:transform type="CollectionViewer"/>
                                                         <map:serialize type="xml"/>
+                                                    </map:match>
                                                 </map:match>
                                                 <map:match type="HandleTypeMatcher" pattern="item">
                                                   <map:act type="UsageLoggerAction">

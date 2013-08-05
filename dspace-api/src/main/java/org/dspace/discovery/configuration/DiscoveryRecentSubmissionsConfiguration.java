@@ -18,6 +18,7 @@ public class DiscoveryRecentSubmissionsConfiguration {
     private String type;
 
     private int max = 5;
+    private boolean useAsHomePage;
 
     public String getMetadataSortField() {
         return metadataSortField;
@@ -43,5 +44,13 @@ public class DiscoveryRecentSubmissionsConfiguration {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public void setUseAsHomePage(boolean useAsHomePage) {
+        this.useAsHomePage = useAsHomePage;
+    }
+
+    public boolean getUseAsHomePage() {
+        return useAsHomePage;
     }
 }
