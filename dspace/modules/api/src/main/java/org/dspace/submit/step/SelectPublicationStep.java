@@ -211,7 +211,10 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 	    
             // ARTICLE_STATUS_ACCEPTED ||  ARTICLE_STATUS_IN_REVIEW ||  ARTICLE_STATUS_NOT_YET_SUBMITTED
             else{
-                if(!processJournal(journalID, manuscriptNumber, item, context, request, articleStatus)){
+                if(journalID==null||journalID.equals("")){
+                    return ERROR_INVALID_JOURNAL;
+                }
+                else if(!processJournal(journalID, manuscriptNumber, item, context, request, articleStatus)){
 
                     if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) return ENTER_MANUSCRIPT_NUMBER;
 
