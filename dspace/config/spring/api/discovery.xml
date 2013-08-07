@@ -137,7 +137,7 @@
                 <property name="type" value="date"/>
                 <property name="max" value="5"/>
                 <!-- If enabled the collection home page will not display metadata but show a pageable list of recent submissions -->
-                <property name="useAsHomePage" value="true"/>
+                <property name="useAsHomePage" value="false"/>
             </bean>
         </property>
         <!--Default result per page  -->
