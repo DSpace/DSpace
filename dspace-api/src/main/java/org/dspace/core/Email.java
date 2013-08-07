@@ -13,6 +13,7 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -235,11 +236,6 @@ public class Email
         String from = ConfigurationManager.getProperty("mail.from.address");
         boolean disabled = ConfigurationManager.getBooleanProperty("mail.server.disabled", false);
 
-        if (disabled) {
-            log.info("message not sent due to mail.server.disabled: " + subject);
-            return;
-        }
-
         // Set up properties for mail session
         Properties props = System.getProperties();
         props.put("mail.smtp.host", server);
@@ -248,7 +244,7 @@ public class Email
         String portNo = ConfigurationManager.getProperty("mail.server.port");
         if (portNo == null)
         {
-        	portNo = "25";
+            portNo = "25";
         }
         props.put("mail.smtp.port", portNo.trim());
 
@@ -260,11 +256,11 @@ public class Email
 
         // Get session
         Session session;
-        
+
         // Get the SMTP server authentication information
         String username = ConfigurationManager.getProperty("mail.server.username");
         String password = ConfigurationManager.getProperty("mail.server.password");
-        
+
         if (username != null)
         {
             props.put("mail.smtp.auth", "true");
@@ -363,7 +359,21 @@ public class Email
             message.setReplyTo(replyToAddr);
         }
 
-        Transport.send(message);
+        if (disabled)
+        {
+            StringBuffer text = new StringBuffer(
+                    "Message not sent due to mail.server.disabled:\n");
+
+            Enumeration<String> headers = message.getAllHeaderLines();
+            while (headers.hasMoreElements())
+                text.append(headers.nextElement()).append('\n');
+
+            text.append('\n').append(fullMessage);
+
+            log.info(text);
+        }
+        else
+            Transport.send(message);
     }
 
     /**
