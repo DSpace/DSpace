@@ -368,6 +368,14 @@ public class Email
             while (headers.hasMoreElements())
                 text.append(headers.nextElement()).append('\n');
 
+            if (!attachments.isEmpty())
+            {
+                text.append("\nAttachments:\n");
+                for (FileAttachment f : attachments)
+                    text.append(f.name).append('\n');
+                text.append('\n');
+            }
+
             text.append('\n').append(fullMessage);
 
             log.info(text);
