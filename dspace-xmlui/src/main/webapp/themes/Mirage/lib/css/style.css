@@ -1373,3 +1373,8 @@ table.discovery-filters th.new-filter-header
 .searchTime{
     color: #999999;
 }
+
+.recentSubmissionViewMore{
+    text-align: right;
+    font-size: 120%;
+}

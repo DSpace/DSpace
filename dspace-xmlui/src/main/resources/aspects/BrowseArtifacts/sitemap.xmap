@@ -32,6 +32,7 @@ collections / items / and bitstreams.
         <map:matchers default="wildcard">
                 <map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
                 <map:matcher name="HandleAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.general.HandleAuthorizedMatcher"/>
+                <map:matcher name="ContainerHomePageSelector" src="org.dspace.app.xmlui.aspect.viewArtifacts.ContainerHomePageMatcher"/>
         </map:matchers>
     </map:components>
 
@@ -90,8 +91,10 @@ collections / items / and bitstreams.
 
                         <map:match type="HandleTypeMatcher" pattern="collection">
                             <map:match pattern="handle/*/*">
-                                <map:transform type="CollectionBrowse"/>
-                                <map:transform type="CollectionRecentSubmissions"/>
+                                <map:match type="ContainerHomePageSelector" pattern="metadata">
+                                    <map:transform type="CollectionBrowse"/>
+                                    <map:transform type="CollectionRecentSubmissions"/>
+                                </map:match>
                             </map:match>
                         </map:match>
 
