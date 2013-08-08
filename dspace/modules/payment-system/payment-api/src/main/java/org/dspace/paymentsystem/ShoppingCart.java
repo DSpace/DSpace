@@ -72,8 +72,8 @@ public class ShoppingCart {
     public static final String STATUS_DENIlED = "deniled";
     public static final String STATUS_VERIFIED = "verified";
 
-    public static final String COUNTRY_US = "us";
-    public static final String CURRENCY_US = "dollar";
+    public static final String COUNTRY_US = "US";
+    public static final String CURRENCY_US = "USD";
 
     public static final String FREE = "true";
 

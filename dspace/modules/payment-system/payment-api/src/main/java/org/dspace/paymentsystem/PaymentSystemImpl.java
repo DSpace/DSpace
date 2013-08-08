@@ -132,7 +132,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
         else
         {
             //if no shopping cart , create a new one
-            return createNewShoppingCart(context,itemId,context.getCurrentUser().getID(),ShoppingCart.COUNTRY_US,ShoppingCart.CURRENCY_US,ShoppingCart.STATUS_OPEN);
+            return createNewShoppingCart(context,itemId,context.getCurrentUser().getID(),"",ShoppingCart.CURRENCY_US,ShoppingCart.STATUS_OPEN);
         }
 
     }
@@ -293,7 +293,13 @@ public class PaymentSystemImpl implements PaymentSystemService {
             PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
             Properties countryArray = manager.getAllCountryProperty();
             Boolean journalSubscription =  getJournalSubscription(context, shoppingcart, journal);
-            Boolean countryDiscount = countryArray.get(shoppingcart.getCountry()).equals(ShoppingCart.COUNTRYFREE);
+            Boolean countryDiscount = false;
+            if(shoppingcart.getCountry()!=null&&shoppingcart.getCurrency().length()>0&&countryArray.get(shoppingcart.getCountry())!=null)
+            {
+                countryDiscount = countryArray.get(shoppingcart.getCountry()).equals(ShoppingCart.COUNTRYFREE);
+            }
+
+
             Boolean voucherDiscount = voucherValidate(context,shoppingcart);
 
             if(journalSubscription||countryDiscount||voucherDiscount){
