@@ -32,20 +32,8 @@ public class BrowseDAOFactory
 	    String className = ConfigurationManager.getProperty("browseDAO.class");
         if (className == null)
         {
-            // For compatibility with previous versions
-            String db = ConfigurationManager.getProperty("db.name");
-            if ("postgres".equals(db))
-            {
-                return new BrowseDAOPostgres(context);
-            }
-            else if ("oracle".equals(db))
-            {
-                return new BrowseDAOOracle(context);
-            }
-            else
-            {
-                throw new BrowseException("The configuration for db.name is either invalid, or contains an unrecognised database");
-            }    
+            // SOLR implementation is the default since DSpace 4.0        	
+            return new SolrBrowseDAO(context);
         }
         try
         {
@@ -73,20 +61,8 @@ public class BrowseDAOFactory
 	    String className = ConfigurationManager.getProperty("browseCreateDAO.class");
         if (className == null)
         {
-            // For compatibility with previous versions
-            String db = ConfigurationManager.getProperty("db.name");
-            if ("postgres".equals(db))
-            {
-                return new BrowseCreateDAOPostgres(context);
-            }
-            else if ("oracle".equals(db))
-            {
-                return new BrowseCreateDAOOracle(context);
-            }
-            else
-            {
-                throw new BrowseException("The configuration for db.name is either invalid, or contains an unrecognised database");
-            }
+            // SOLR implementation is the default since DSpace 4.0
+			return new SolrBrowseCreateDAO(context);
         }
         try
         {
