@@ -613,6 +613,21 @@ public class DataOneMN extends HttpServlet implements Constants {
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
+       Returns an ID with http slashes corrected.
+    **/
+    private String correctSlashes(String id) {
+	String result = id;
+
+	if (id != null) {
+	    result = result.replaceAll("http:/d","http://d");
+	    result = result.replaceAll("https:/d","https://d");
+	}
+
+	return result;
+    }
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
        Returns the system metadata associated with an object.       
     **/
     private void getSystemMetadata(String reqPath, String reqQueryString, HttpServletResponse response, ObjectManager objManager) throws ServletException, IOException {
@@ -621,6 +636,8 @@ public class DataOneMN extends HttpServlet implements Constants {
 	if(reqQueryString != null) {
 	    id = id + '?' + reqQueryString;
 	}
+	id = correctSlashes(id);
+	
 	String idTimestamp = "";
 	
 	// perform corrections for timestamped IDs
