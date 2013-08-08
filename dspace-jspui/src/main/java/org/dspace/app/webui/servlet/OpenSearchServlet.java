@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.webui.discovery.DiscoverySearchRequestProcessor;
 import org.dspace.app.webui.search.LuceneSearchRequestProcessor;
 import org.dspace.app.webui.search.SearchProcessorException;
 import org.dspace.app.webui.search.SearchRequestProcessor;
@@ -57,8 +58,8 @@ public class OpenSearchServlet extends DSpaceServlet
                     e);
         }
         if (internalLogic == null)
-        {   // backward compatibility
-            internalLogic = new LuceneSearchRequestProcessor();
+        {   // Discovery is the default search provider since DSpace 4.0
+            internalLogic = new DiscoverySearchRequestProcessor();
         }
     }
 
