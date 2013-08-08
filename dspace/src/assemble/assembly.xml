@@ -32,8 +32,17 @@
 			<excludes>
 				<exclude>src</exclude>
 				<exclude>config/dspace.cfg</exclude>
+				<exclude>config/modules/**</exclude>
 			</excludes>
 		</fileSet>
+		<!-- Copy over all module configs & filter them -->
+                <fileSet>
+                        <outputDirectory>.</outputDirectory>
+                        <includes>
+                                    <include>config/modules/**</include>
+                        </includes>
+                        <filtered>true</filtered>
+                </fileSet>
 	</fileSets>
 
 	<files>
