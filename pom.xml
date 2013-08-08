@@ -347,6 +347,22 @@
             </modules>
         </profile>
 
+
+        <!--
+           Builds SOLR WAR for DSpace
+        -->
+        <profile>
+            <id>dspace-solr</id>
+            <activation>
+                <file>
+                    <exists>dspace-solr/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-solr</module>
+            </modules>
+        </profile>
+
         <!--
            Builds SWORDv2 WAR for DSpace
         -->
