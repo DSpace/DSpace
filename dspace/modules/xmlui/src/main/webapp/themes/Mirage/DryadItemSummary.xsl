@@ -1836,23 +1836,6 @@
                          alt="Methods in Ecology and Evolution cover"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "Molecular Biology and Evolution"'>
-                <a target="_blank">
-                    <xsl:attribute name="href">
-                        <xsl:choose>
-                            <xsl:when test="contains($article-doi,'doi:')">
-                                <xsl:value-of
-                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="string('http://mbe.oxfordjournals.org/')"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/mbe.png"
-                         alt="Molecular Biology and Evolution cover"/>
-                </a>
-            </xsl:when>
             <xsl:when test='$journal-name = "Molecular Ecology"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
