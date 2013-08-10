@@ -372,6 +372,9 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
     public void insertIndex(String table, int itemID, Map sortCols)
             throws BrowseException
     {
+		// this is required to be sure that communities2item will be cleaned
+		// after the switch to SOLRBrowseDAOs. See DS-1619
+    	dbCreateDAO.deleteCommunityMappings(itemID);
     }
 
     @Override
