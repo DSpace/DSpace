@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.app.webui.util.UIUtil;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -21,6 +22,8 @@ import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowserScope;
 import org.dspace.browse.BrowseException;
+import org.dspace.sort.SortException;
+import org.dspace.sort.SortOption;
 
 /**
  * This class obtains item list of the given collection by
@@ -31,42 +34,58 @@ import org.dspace.browse.BrowseException;
  */
 public class CollectionItemList implements CollectionHomeProcessor
 {
-    // the name of browse index
-    private static String type = ConfigurationManager.getProperty("webui.collectionhome.browse-name");
+    // the number of authors to display before trncating
+    private static final int etal    = ConfigurationManager.getIntProperty("webui.browse.author-limit", -1);
+    // the number of items to display per page
+    private static final int perpage = ConfigurationManager.getIntProperty("webui.collectionhome.perpage", 20);
+    // the sort option: use "dateaccessioned" if exists
+    private static int sort_by = -1;
     static
     {
-        if (type == null)
+        try
         {
-            type = "dateissued";
+            for (SortOption option : SortOption.getSortOptions())
+            {
+                if ("dateaccessioned".equals(option.getName()))
+                {
+                    sort_by = option.getNumber();
+                    break;
+                }
+            }
+        }
+        catch (SortException e)
+        {
+            // does nothing
         }
     }
 
-    // 
-    private static final int etal    = ConfigurationManager.getIntProperty("webui.browse.author-limit", -1);
-    //
-    private static final int perpage = ConfigurationManager.getIntProperty("webui.collectionhome.perpage", 20);
-
-	/**
-	 * blank constructor - does nothing.
-	 *
-	 */
-	public CollectionItemList()
-	{
-		
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.dspace.plugin.CommunityHomeProcessor#process(org.dspace.core.Context, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.dspace.content.Community)
-	 */
-	public void process(Context context, HttpServletRequest request, HttpServletResponse response, Collection collection) 
-		throws PluginException, AuthorizeException
-	{
+    /**
+     * blank constructor - does nothing.
+     *
+     */
+    public CollectionItemList()
+    {
+        
+    }
+    
+    /* (non-Javadoc)
+     * @see org.dspace.plugin.CommunityHomeProcessor#process(org.dspace.core.Context, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.dspace.content.Community)
+     */
+    public void process(Context context, HttpServletRequest request, HttpServletResponse response, Collection collection) 
+        throws PluginException, AuthorizeException
+    {
+        int offset = UIUtil.getIntParameter(request, "offset");
+        if (offset < 0)
+        {
+            offset = 0;
+        }
+        
         try
         {
-            BrowseIndex bi = BrowseIndex.getBrowseIndex(type);
-            if (bi == null || !"item".equals(bi.getDisplayType()))
+            BrowseIndex bi = BrowseIndex.getBrowseIndex("title");
+            if (bi == null)
             {
-                request.setAttribute("show.title", new Boolean(false));
+                request.setAttribute("show.title", Boolean.FALSE);
                 return;
             }
 
@@ -74,23 +93,29 @@ public class CollectionItemList implements CollectionHomeProcessor
             scope.setBrowseContainer(collection);
             scope.setBrowseIndex(bi);
             scope.setEtAl(etal);
-            scope.setResultsPerPage(perpage);  
+            scope.setOffset(offset);
+            scope.setResultsPerPage(perpage);
+            if (sort_by != -1)
+            {
+                scope.setSortBy(sort_by);
+                scope.setOrder(SortOption.DESCENDING);
+            }
             BrowseEngine be = new BrowseEngine(context);
             BrowseInfo binfo = be.browse(scope);
             request.setAttribute("browse.info", binfo);
 
             if (binfo.hasResults())
             {
-                request.setAttribute("show.title", new Boolean(true));
+                request.setAttribute("show.title", Boolean.TRUE);
             }
             else
             {
-                request.setAttribute("show.title", new Boolean(false));
+                request.setAttribute("show.title", Boolean.FALSE);
             }
         }
         catch (BrowseException e)
         {
-            request.setAttribute("show.title", new Boolean(false));
+            request.setAttribute("show.title", Boolean.FALSE);
         }
-	}
+    }
 }

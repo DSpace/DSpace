@@ -227,37 +227,24 @@
         BrowseIndex bix = bi.getBrowseIndex();
 
         // prepare the next and previous links
-        String linkBase = request.getContextPath() + "/";
-        linkBase = linkBase + "handle/" + collection.getHandle() + "/";
+        String linkBase = request.getContextPath() + "/handle/" + collection.getHandle();
         
-        String direction = (bi.isAscending() ? "ASC" : "DESC");
-        String valueString = "";
-        if (bi.hasValue())
-        {
-            valueString = "&amp;value=" + URLEncoder.encode(bi.getValue());
-        }
-
-        String sharedLink = linkBase + "browse?";
-
-        if (bix.getName() != null)
-            sharedLink += "type=" + URLEncoder.encode(bix.getName());
-
-        String next = sharedLink;
-        String prev = sharedLink;
+        String next = linkBase;
+        String prev = linkBase;
         
         if (bi.hasNextPage())
         {
-            next = next + "&amp;offset=" + bi.getNextOffset();
+            next = next + "?offset=" + bi.getNextOffset();
         }
         
         if (bi.hasPrevPage())
         {
-            prev = prev + "&amp;offset=" + bi.getPrevOffset();
+            prev = prev + "?offset=" + bi.getPrevOffset();
         }
 %>
     <%-- give us the top report on what we are looking at --%>
     <div align="center" class="browse_range">
-        <fmt:message key="browse.full.range">
+        <fmt:message key="jsp.collection-home.recentsub.range">
             <fmt:param value="<%= Integer.toString(bi.getStart()) %>"/>
             <fmt:param value="<%= Integer.toString(bi.getFinish()) %>"/>
             <fmt:param value="<%= Integer.toString(bi.getTotal()) %>"/>
@@ -301,7 +288,7 @@
 
     <%-- give us the bottom report on what we are looking at --%>
     <div align="center" class="browse_range">
-        <fmt:message key="browse.full.range">
+        <fmt:message key="jsp.collection-home.recentsub.range">
             <fmt:param value="<%= Integer.toString(bi.getStart()) %>"/>
             <fmt:param value="<%= Integer.toString(bi.getFinish()) %>"/>
             <fmt:param value="<%= Integer.toString(bi.getTotal()) %>"/>
@@ -422,11 +409,12 @@
     </table>
 <%  } %>
 
-
-	<h3><fmt:message key="jsp.collection-home.recentsub"/></h3>
 <%
 	if (rs != null)
 	{
+%>
+	<h3><fmt:message key="jsp.collection-home.recentsub"/></h3>
+<%
 		Item[] items = rs.getRecentSubmissions();
 		for (int i = 0; i < items.length; i++)
 		{
@@ -441,9 +429,10 @@
 			}
 			%><p class="recentItem"><a href="<%= request.getContextPath() %>/handle/<%= items[i].getHandle() %>"><%= displayTitle %></a></p><%
 		}
-	}
 %>
     <p>&nbsp;</p>
+<%      } %>
+
 <%
     if(feedEnabled)
     {
