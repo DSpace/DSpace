@@ -33,7 +33,6 @@
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.browse.BrowseIndex" %>
-<%@ page import="org.dspace.browse.BrowserScope" %>
 <%@ page import="org.dspace.browse.BrowseInfo" %>
 <%@ page import="org.dspace.browse.ItemCounter"%>
 <%@ page import="org.dspace.content.*"%>
