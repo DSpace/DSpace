@@ -34,14 +34,22 @@ import org.dspace.sort.SortOption;
  */
 public class CollectionItemList implements CollectionHomeProcessor
 {
+    // the name of a browse index to display collection's items
+    private static String name = ConfigurationManager.getProperty("webui.collectionhome.browse-name");
     // the number of authors to display before trncating
     private static final int etal    = ConfigurationManager.getIntProperty("webui.browse.author-limit", -1);
     // the number of items to display per page
     private static final int perpage = ConfigurationManager.getIntProperty("webui.collectionhome.perpage", 20);
     // the sort option: use "dateaccessioned" if exists
     private static int sort_by = -1;
+
     static
     {
+        if (name == null)
+        {
+            name = "title";
+        }
+
         try
         {
             for (SortOption option : SortOption.getSortOptions())
@@ -82,8 +90,8 @@ public class CollectionItemList implements CollectionHomeProcessor
         
         try
         {
-            BrowseIndex bi = BrowseIndex.getBrowseIndex("title");
-            if (bi == null)
+            BrowseIndex bi = BrowseIndex.getBrowseIndex(name);
+            if (bi == null || !"item".equals(bi.getDisplayType()))
             {
                 request.setAttribute("show.title", Boolean.FALSE);
                 return;
