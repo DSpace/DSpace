@@ -25,7 +25,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 		<li>Analía Pinto</li>
 		<li>Silvia Peloche</li>
 		<li>Ariel Matías Cánepa</li>
-		<li>Fernando Consolo</li>
+		<li>Paula Salamone Lacunza</li>
 	</ul>
 
 	<h1>Diseño gráfico</h1>
@@ -40,6 +40,11 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 		<li>Esteban Fernandez</li>
 		<li>Bruno Percivale</li>
 	</ul>
+	
+	<h1>Administración</h1>
+	<ul>
+		<li>Gustavo Jaquenod</li>
+	</ul>
 
 	<h1>Desarrollo, investigación y mantenimiento de software</h1>
 	<ul>
@@ -48,12 +53,10 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 		<li>Ariel Lira</li>
 		<li>Ariel Sobrado</li>
 		<li>Gonzalo Villarreal</li>
-		<li>José Giraldo</li>
 		<li>José Daniel Texier</li>
 		<li>María Marta Vila</li>
-		<li>Néstor Oviedo</li>
 		<li>Esteban Zozaya</li>
-		<li>Facundo Adorno</li>
+		<li>Facundo Gabriel Adorno</li>
 	</ul>
 
 
