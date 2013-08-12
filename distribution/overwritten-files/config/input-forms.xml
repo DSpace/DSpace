@@ -173,7 +173,7 @@
 					<dc-qualifier>interprete</dc-qualifier>
 					<repeatable>true</repeatable>
 					<input-type>onebox</input-type>
-					<label>Interprete(*)</label>
+					<label>Interprete</label>
 					<hint>Seleccione el interprete del audio</hint>
 					<type-bind>Audio</type-bind>
 				</field>
