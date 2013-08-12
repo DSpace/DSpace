@@ -1418,6 +1418,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         // Choose the likely date formats based on string length
         switch (t.length())
         {
+			// case from 1 to 3 go through adding anyone a single 0. Case 4 define
+			// for all the SimpleDateFormat
+        	case 1:
+        		t = "0" + t;
+        	case 2:
+        		t = "0" + t;
+        	case 3:
+        		t = "0" + t;
             case 4:
                 dfArr = new SimpleDateFormat[]{new SimpleDateFormat("yyyy")};
                 break;
