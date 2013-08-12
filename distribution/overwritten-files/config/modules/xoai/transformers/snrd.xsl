@@ -108,6 +108,13 @@
 	<!-- Removing other dc.date.* -->
 	<xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name!='issued']" />
 	
+ 	<!-- Formatting sedici.date.exposure -->
+	<xsl:template match="/doc:metadata/doc:element[@name='sedici']/doc:element[@name='date']/doc:element[@name='exposure']/doc:element/doc:field/text()">
+		<xsl:call-template name="formatdate">
+			<xsl:with-param name="datestr" select="." />
+		</xsl:call-template>
+	</xsl:template>
+ 	
  	<!-- Formatting dc.date.issued -->
 	<xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='issued']/doc:element/doc:field/text()">
 		<xsl:call-template name="formatdate">
