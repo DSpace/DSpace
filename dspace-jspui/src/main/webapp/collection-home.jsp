@@ -19,7 +19,7 @@
   -    subscribed - Boolean, true if user is subscribed to this collection
   -    admin_button - Boolean, show admin 'edit' button
   -    editor_button - Boolean, show collection editor (edit submitters, item mapping) buttons
-  -    show.title - Boolean, show item list
+  -    show.items - Boolean, show item list
   -    browse.info - BrowseInfo, item list
   --%>
 
@@ -99,8 +99,8 @@
     
     ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
 
-    Boolean showTitle = (Boolean)request.getAttribute("show.title");
-    boolean show_title = showTitle != null ? showTitle.booleanValue() : false;
+    Boolean showItems = (Boolean)request.getAttribute("show.items");
+    boolean show_items = showItems != null ? showItems.booleanValue() : false;
 %>
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
@@ -221,7 +221,7 @@
 
   <%= intro %>
 
-<% if (show_title)
+<% if (show_items)
    {
         BrowseInfo bi = (BrowseInfo) request.getAttribute("browse.info");
         BrowseIndex bix = bi.getBrowseIndex();
@@ -241,10 +241,17 @@
         {
             prev = prev + "?offset=" + bi.getPrevOffset();
         }
+
+        String bi_name_key = "browse.menu." + bi.getSortOption().getName();
+        String so_name_key = "browse.order." + (bi.isAscending() ? "asc" : "desc");
 %>
     <%-- give us the top report on what we are looking at --%>
+    <fmt:message var="bi_name" key="<%= bi_name_key %>"/>
+    <fmt:message var="so_name" key="<%= so_name_key %>"/>
     <div align="center" class="browse_range">
         <fmt:message key="jsp.collection-home.content.range">
+            <fmt:param value="${bi_name}"/>
+            <fmt:param value="${so_name}"/>
             <fmt:param value="<%= Integer.toString(bi.getStart()) %>"/>
             <fmt:param value="<%= Integer.toString(bi.getFinish()) %>"/>
             <fmt:param value="<%= Integer.toString(bi.getTotal()) %>"/>
@@ -289,6 +296,8 @@
     <%-- give us the bottom report on what we are looking at --%>
     <div align="center" class="browse_range">
         <fmt:message key="jsp.collection-home.content.range">
+            <fmt:param value="${bi_name}"/>
+            <fmt:param value="${so_name}"/>
             <fmt:param value="<%= Integer.toString(bi.getStart()) %>"/>
             <fmt:param value="<%= Integer.toString(bi.getFinish()) %>"/>
             <fmt:param value="<%= Integer.toString(bi.getTotal()) %>"/>

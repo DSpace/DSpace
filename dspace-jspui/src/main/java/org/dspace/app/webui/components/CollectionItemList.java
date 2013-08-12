@@ -40,8 +40,12 @@ public class CollectionItemList implements CollectionHomeProcessor
     private static final int etal    = ConfigurationManager.getIntProperty("webui.browse.author-limit", -1);
     // the number of items to display per page
     private static final int perpage = ConfigurationManager.getIntProperty("webui.collectionhome.perpage", 20);
-    // the sort option: use "dateaccessioned" if exists
-    private static int sort_by = -1;
+    // whether does use "dateaccessioned" as a sort option
+    //   If true and the sort option "dateaccessioned" exists, use "dateaccessioned" as a sort option.
+    //   Otherwise use the sort option pertaining the specified browse index
+    private static boolean useDateaccessioned = ConfigurationManager.getBooleanProperty("webui.collectionhome.use.dateaccessioned", true);
+    // the number of sort option "dateaccessioned"
+    private static int number = -1;
 
     static
     {
@@ -49,21 +53,24 @@ public class CollectionItemList implements CollectionHomeProcessor
         {
             name = "title";
         }
-
-        try
+        
+        if (useDateaccessioned)
         {
-            for (SortOption option : SortOption.getSortOptions())
+            try
             {
-                if ("dateaccessioned".equals(option.getName()))
+                for (SortOption option : SortOption.getSortOptions())
                 {
-                    sort_by = option.getNumber();
-                    break;
+                    if ("dateaccessioned".equals(option.getName()))
+                    {
+                        number = option.getNumber();
+                        break;
+                    }
                 }
             }
-        }
-        catch (SortException e)
-        {
-            // does nothing
+            catch (SortException e)
+            {
+                // does nothing
+            }
         }
     }
 
@@ -93,7 +100,7 @@ public class CollectionItemList implements CollectionHomeProcessor
             BrowseIndex bi = BrowseIndex.getBrowseIndex(name);
             if (bi == null || !"item".equals(bi.getDisplayType()))
             {
-                request.setAttribute("show.title", Boolean.FALSE);
+                request.setAttribute("show.items", Boolean.FALSE);
                 return;
             }
 
@@ -103,9 +110,9 @@ public class CollectionItemList implements CollectionHomeProcessor
             scope.setEtAl(etal);
             scope.setOffset(offset);
             scope.setResultsPerPage(perpage);
-            if (sort_by != -1)
+            if (number != -1)
             {
-                scope.setSortBy(sort_by);
+                scope.setSortBy(number);
                 scope.setOrder(SortOption.DESCENDING);
             }
             BrowseEngine be = new BrowseEngine(context);
@@ -114,16 +121,16 @@ public class CollectionItemList implements CollectionHomeProcessor
 
             if (binfo.hasResults())
             {
-                request.setAttribute("show.title", Boolean.TRUE);
+                request.setAttribute("show.items", Boolean.TRUE);
             }
             else
             {
-                request.setAttribute("show.title", Boolean.FALSE);
+                request.setAttribute("show.items", Boolean.FALSE);
             }
         }
         catch (BrowseException e)
         {
-            request.setAttribute("show.title", Boolean.FALSE);
+            request.setAttribute("show.items", Boolean.FALSE);
         }
     }
 }
