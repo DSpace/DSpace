@@ -905,7 +905,7 @@ public class EPerson extends DSpaceObject
     /**
      * Return the EPerson's password hash.
      *
-     * @return hash of the password
+     * @return hash of the password, or null on failure (such as no password).
      */
     public PasswordHash getPasswordHash()
     {

@@ -479,19 +479,25 @@ public class RoleDisseminator implements PackageDisseminator
         if (emitPassword)
         {
             PasswordHash password = eperson.getPasswordHash();
+            if (null != password)
+            {
+                writer.writeStartElement(PASSWORD_HASH);
 
-            writer.writeStartElement(PASSWORD_HASH);
+                String algorithm = password.getAlgorithm();
+                if (null != algorithm)
+                {
+                    writer.writeAttribute(PASSWORD_DIGEST, algorithm);
+                }
 
-            String algorithm = password.getAlgorithm();
-            if (null != algorithm)
-                writer.writeAttribute(PASSWORD_DIGEST, algorithm);
+                String salt = password.getSaltString();
+                if (null != salt)
+                {
+                    writer.writeAttribute(PASSWORD_SALT, salt);
+                }
 
-            String salt = password.getSaltString();
-            if (null != salt)
-                writer.writeAttribute(PASSWORD_SALT, salt);
-
-            writer.writeCharacters(password.getHashString());
-            writer.writeEndElement();
+                writer.writeCharacters(password.getHashString());
+                writer.writeEndElement();
+            }
         }
 
         if (eperson.canLogIn())
