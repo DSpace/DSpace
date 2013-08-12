@@ -541,7 +541,7 @@ public class DiscoverUtility
                             // Create facet queries but limit then to 11
                             // (11
                             // == when we need to show a show more url)
-                            for (int year = topYear - gap; year > oldestYear
+                            for (int year = topYear; year > oldestYear
                                     && (facetQueries.size() < 11); year -= gap)
                             {
                                 // Add a filter to remove the last year
