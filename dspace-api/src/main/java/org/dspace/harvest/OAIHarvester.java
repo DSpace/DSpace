@@ -919,7 +919,7 @@ public class OAIHarvester {
     		return errorSet;
     	}
 
-    	// Next, make sure the metadata we need is supported by the target server
+        // Next, make sure the metadata we need is supported by the target server
         Namespace DMD_NS = OAIHarvester.getDMDNamespace(metaPrefix);
         if (null == DMD_NS)
         {
@@ -927,8 +927,8 @@ public class OAIHarvester {
             return errorSet;
         }
 
-    	String OREOAIPrefix = null;
-    	String DMDOAIPrefix = null;
+        String OREOAIPrefix = null;
+        String DMDOAIPrefix = null;
 
         try {
             OREOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, ORE_NS.getURI());
