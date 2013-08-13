@@ -1,7 +1,7 @@
              LICENCIA DE DISTRIBUCION NO EXCLUSIVA - SEDICI
                        Versión 1.6 – Junio 2013
 
-El presente acuerdo se establece entre el Repositorio Institucional SeDiCI, en representación de la Universidad Nacional de La Plata, en adelante denominada "LA UNIVERSIDAD", y "%1$s %2$s" ("EL TITULAR"), DECLARA que ostenta la condición de titular o co-titular de los derechos de propiedad intelectual de la obra titulada "%6$s", en adelante denominada "LA OBRA". 
+El presente acuerdo se establece entre el Repositorio Institucional SeDiCI, en representación de la Universidad Nacional de La Plata, en adelante denominada "LA UNIVERSIDAD", y "%1$s %2$s", en adelante denominado "EL TITULAR", DECLARA que ostenta la condición de titular o co-titular de los derechos de propiedad intelectual de la obra titulada "%6$s", en adelante denominada "LA OBRA". 
 
 EL TITULAR CEDE a LA UNIVERSIDAD, de forma gratuita y no exclusiva, por el máximo plazo legal y con ámbito universal, los derechos de reproducción, distribución y comunicación pública de LA OBRA por cualquier medio y soporte, y autoriza asimismo a:
 	
@@ -21,7 +21,5 @@ La UNIVERSIDAD se compromete a exponer junto con LA OBRA la licencia de uso eleg
 
 EL TITULAR podrá solicitar el retiro de LA OBRA de los Repositorios de LA UNIVERSIDAD por causa debidamente justificada y acreditada por escrito ante los responsables directos de cada repositorio. Asimismo, LA UNIVERSIDAD podrá retirar la OBRA en supuestos suficientemente justificados, o en caso de reclamaciones de terceros.
 
-Resumen:
-   Fecha de aprobacion de la presente licencia: %4$s
-   Usuario que aprueba la licencia: %1$s %2$s (%3$s)
-   Titulo de la obra: %6$s
+Fecha de aceptación de la presente licencia: %4$s
+Responsable:  %1$s %2$s (%3$s)
