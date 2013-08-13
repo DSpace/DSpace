@@ -41,6 +41,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
@@ -480,4 +481,62 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
                 response.sendRedirect(request.getContextPath() + "/simple-search");
             }
 
+    /**
+     * Method for searching authors in item map
+     * 
+     * author: gam
+     */
+    @Override
+    public void doItemMapSearch(Context context, HttpServletRequest request,
+            HttpServletResponse response) throws SearchProcessorException, ServletException, IOException
+    {
+        String name = (String) request.getParameter("namepart");
+        Collection collection = (Collection) request.getAttribute("collection");
+
+        DiscoverQuery query = new DiscoverQuery();
+        query.setQuery("author:"+name);
+        query.setMaxResults(Integer.MAX_VALUE);
+
+        DiscoverResult results = null;
+        try
+        {
+            results = SearchUtils.getSearchService().search(context, query);
+        }
+        catch (SearchServiceException e)
+        {
+            throw new SearchProcessorException(e.getMessage(), e);
+        }
+
+        Map<Integer, Item> items = new HashMap<Integer, Item>();
+
+        List<DSpaceObject> resultDSOs = results.getDspaceObjects();
+        try
+        {
+            for (DSpaceObject dso : resultDSOs)
+            {
+                if (dso.getType() == Constants.ITEM)
+                {
+                    Item item = (Item) dso;
+                    if (item.isOwningCollection(collection) || item.isIn(collection))
+                    {
+                        continue;
+                    }
+                    if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.READ))
+                    {
+                        items.put(Integer.valueOf(item.getID()), item);
+                    }
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new SearchProcessorException(e.getMessage(), e);
+        }
+
+        request.setAttribute("browsetext", name);
+        request.setAttribute("items", items);
+        request.setAttribute("browsetype", "Add");
+        
+        JSPManager.showJSP(request, response, "itemmap-browse.jsp");
+    }
 }

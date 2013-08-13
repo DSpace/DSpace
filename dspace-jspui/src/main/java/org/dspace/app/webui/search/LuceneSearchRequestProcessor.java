@@ -668,6 +668,57 @@ public class LuceneSearchRequestProcessor implements SearchRequestProcessor
     }
 
     /**
+     * Method for searching authors in item map
+     * 
+     * author: gam
+     */
+    @Override
+    public void doItemMapSearch(Context context, HttpServletRequest request,
+            HttpServletResponse response) throws SearchProcessorException, ServletException, IOException
+    {
+        String name = (String) request.getParameter("namepart");
+        Collection collection = (Collection) request.getAttribute("collection");
+
+        QueryArgs queryArgs = new QueryArgs();
+        queryArgs.setQuery("author:"+name);
+        queryArgs.setPageSize(Integer.MAX_VALUE);
+        QueryResults results = DSQuery.doQuery(context, queryArgs);
+
+        Map<Integer, Item> items = new HashMap<Integer, Item>();
+        List<String> handles = results.getHitHandles();
+        try
+        {
+            for (String handle : handles)
+            {
+                DSpaceObject resultDSO = HandleManager.resolveToObject(context, handle);
+    
+                if (resultDSO.getType() == Constants.ITEM)
+                {
+                    Item item = (Item) resultDSO;
+                    if (item.isOwningCollection(collection) || item.isIn(collection))
+                    {
+                        continue;
+                    }
+                    if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.READ))
+                    {
+                        items.put(Integer.valueOf(item.getID()), item);
+                    }
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new SearchProcessorException(e.getMessage(), e);
+        }
+
+        request.setAttribute("browsetext", name);
+        request.setAttribute("items", items);
+        request.setAttribute("browsetype", "Add");
+        
+        JSPManager.showJSP(request, response, "itemmap-browse.jsp");
+    }
+
+    /**
      * Export the search results as a csv file
      *
      * @param context The DSpace context

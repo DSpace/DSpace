@@ -8,6 +8,10 @@
 package org.dspace.app.webui.servlet.admin;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.webui.discovery.DiscoverySearchRequestProcessor;
+import org.dspace.app.webui.search.LuceneSearchRequestProcessor;
+import org.dspace.app.webui.search.SearchProcessorException;
+import org.dspace.app.webui.search.SearchRequestProcessor;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -22,10 +26,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
-import org.dspace.search.DSQuery;
-import org.dspace.search.QueryArgs;
-import org.dspace.search.QueryResults;
-import org.dspace.sort.SortOption;
+import org.dspace.core.PluginConfigurationError;
+import org.dspace.core.PluginManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -43,9 +45,30 @@ import java.util.Map;
  */
 public class ItemMapServlet extends DSpaceServlet
 {
-	/** Logger */
+    private SearchRequestProcessor internalLogic;
+
+    /** Logger */
     private static Logger log = Logger.getLogger(ItemMapServlet.class);
-	
+
+    public void init()
+    {
+        try
+        {
+            internalLogic = (SearchRequestProcessor) PluginManager
+                    .getSinglePlugin(SearchRequestProcessor.class);
+        }
+        catch (PluginConfigurationError e)
+        {
+            log.warn(
+                    "ItemMapServlet not properly configurated, please configure the SearchRequestProcessor plugin",
+                    e);
+        }
+        if (internalLogic == null)
+        {   // Discovery is the default search provider since DSpace 4.0
+            internalLogic = new DiscoverySearchRequestProcessor();
+        }
+    }
+
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws java.sql.SQLException,
             javax.servlet.ServletException, java.io.IOException,
@@ -276,40 +299,16 @@ public class ItemMapServlet extends DSpaceServlet
     	}
     	else if (action.equals("Search Authors"))
     	{
-            String name = (String) request.getParameter("namepart");
-            QueryArgs queryArgs = new QueryArgs();
-            queryArgs.setQuery("author:"+name);
-            queryArgs.setPageSize(Integer.MAX_VALUE);
-            QueryResults results = DSQuery.doQuery(context, queryArgs);
-
-            Map<Integer, Item> items = new HashMap<Integer, Item>();
-            List<String> handles = results.getHitHandles();
-            for (String handle : handles)
+            request.setAttribute("collection", myCollection);
+            try
             {
-                DSpaceObject resultDSO = HandleManager.resolveToObject(context, handle);
-
-                if (resultDSO.getType() == Constants.ITEM)
-                {
-                    Item item = (Item) resultDSO;
-                    if (item.isOwningCollection(myCollection))
-                    {
-                        continue;
-                    }
-                    if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.READ))
-                    {
-                        items.put(Integer.valueOf(item.getID()),item);
-                    }
-                }
+                internalLogic.doItemMapSearch(context, request, response);
             }
-
-    		request.setAttribute("collection", myCollection);
-    		request.setAttribute("browsetext", name);
-    		request.setAttribute("items", items);
-    		request.setAttribute("browsetype", "Add");
-    		
-    		jspPage = "itemmap-browse.jsp";
-    		JSPManager.showJSP(request, response, jspPage);
-    	}
+            catch (SearchProcessorException e)
+            {
+                throw new ServletException(e.getMessage(), e);
+            }
+        }
     	else if (action.equals("browse"))
     	{
     		// target collection to browse
