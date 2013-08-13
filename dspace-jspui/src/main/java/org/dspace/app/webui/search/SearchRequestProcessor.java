@@ -29,4 +29,8 @@ public interface SearchRequestProcessor
             HttpServletResponse response) throws SearchProcessorException,
             IOException, ServletException;
 
+    public void doItemMapSearch(Context context, HttpServletRequest request,
+            HttpServletResponse response) throws SearchProcessorException,
+            IOException, ServletException;
+
 }
