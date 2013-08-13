@@ -128,7 +128,8 @@
         <!-- <theme name="Test Theme 2" regex="community-list" path="theme2/"/> -->
 
         <!-- Default theme -->
-        <theme name="Default Reference Theme" regex=".*" path="Sedici/" />
+        <!-- <theme name="Default Reference Theme" regex=".*" path="Sedici/" /> -->
+        <theme name="Sedici2" regex=".*" path="Sedici2/" />
 
         <!-- Mirage theme, @mire contribution of new theme to support easier development and branding -->
         <!-- <theme name="Atmire Mirage Theme" regex=".*" path="Mirage/" /> -->
