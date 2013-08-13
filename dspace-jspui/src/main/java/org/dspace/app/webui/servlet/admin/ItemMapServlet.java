@@ -28,7 +28,6 @@ import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.dspace.core.PluginConfigurationError;
 import org.dspace.core.PluginManager;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
