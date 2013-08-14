@@ -190,6 +190,20 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
         return null;
     }
 
+    public BufferedImage getNormalizedInstance(BufferedImage buf)
+    {
+     int type = (buf.getTransparency() == Transparency.OPAQUE) ?
+            BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB_PRE;
+     int w, h;
+     w = buf.getWidth();
+     h = buf.getHeight();
+     BufferedImage normal = new BufferedImage(w, h, type);
+     Graphics2D g2d = normal.createGraphics();
+     g2d.drawImage(buf, 0, 0, w, h, Color.WHITE, null);
+     g2d.dispose();
+     return normal;
+    }
+
     public BufferedImage getBlurredInstance(BufferedImage buf)
     {
     /**
@@ -197,6 +211,8 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
      * provided {@code BufferedImage}.
      *
      */
+
+     buf = getNormalizedInstance(buf);
 
      // kernel for blur op
      float[] matrix = {
