@@ -46,26 +46,26 @@ import org.dspace.utils.DSpace;
 
 /**
  * Workflow state machine
- * 
+ *
  * Notes:
- * 
+ *
  * Determining item status from the database:
- * 
+ *
  * When an item has not been submitted yet, it is in the user's personal
  * workspace (there is a row in PersonalWorkspace pointing to it.)
- * 
+ *
  * When an item is submitted and is somewhere in a workflow, it has a row in the
  * WorkflowItem table pointing to it. The state of the workflow can be
  * determined by looking at WorkflowItem.getState()
- * 
+ *
  * When a submission is complete, the WorkflowItem pointing to the item is
  * destroyed and the archive() method is called, which hooks the item up to the
  * archive.
- * 
+ *
  * Notification: When an item enters a state that requires notification,
  * (WFSTATE_STEP1POOL, WFSTATE_STEP2POOL, WFSTATE_STEP3POOL,) the workflow needs
  * to notify the appropriate groups that they have a pending task to claim.
- * 
+ *
  * Revealing lists of approvers, editors, and reviewers. A method could be added
  * to do this, but it isn't strictly necessary. (say public List
  * getStateEPeople( WorkflowItem wi, int state ) could return people affected by
@@ -138,7 +138,7 @@ public class WorkflowManager
     /**
      * startWorkflow() begins a workflow - in a single transaction do away with
      * the PersonalWorkspace entry and turn it into a WorkflowItem.
-     * 
+     *
      * @param c
      *            Context
      * @param wsi
@@ -176,7 +176,7 @@ public class WorkflowManager
 
         // now get the workflow started
         wfi.setState(WFSTATE_SUBMIT);
-        advance(c, wfi, null); 
+        advance(c, wfi, null);
 
         // Return the workflow item
         return wfi;
@@ -201,7 +201,7 @@ public class WorkflowManager
      * getOwnedTasks() returns a List of WorkflowItems containing the tasks
      * claimed and owned by an EPerson. The GUI displays this info on the
      * MyDSpace page.
-     * 
+     *
      * @param e
      *            The EPerson we want to fetch owned tasks for.
      */
@@ -212,7 +212,7 @@ public class WorkflowManager
 
         String myquery = "SELECT * FROM WorkflowItem WHERE owner= ? ";
 
-        TableRowIterator tri = DatabaseManager.queryTable(c, 
+        TableRowIterator tri = DatabaseManager.queryTable(c,
         		"workflowitem", myquery,e.getID());
 
         try
@@ -236,7 +236,7 @@ public class WorkflowManager
     /**
      * getPooledTasks() returns a List of WorkflowItems an EPerson could claim
      * (as a reviewer, etc.) for display on a user's MyDSpace page.
-     * 
+     *
      * @param e
      *            The Eperson we want to fetch the pooled tasks for.
      */
@@ -265,13 +265,13 @@ public class WorkflowManager
                 tri.close();
             }
         }
-        
+
         return mylist;
     }
 
     /**
      * claim() claims a workflow task for an EPerson
-     * 
+     *
      * @param wi
      *            WorkflowItem to do the claim on
      * @param e
@@ -322,7 +322,7 @@ public class WorkflowManager
      * the item arrives at the submit state, then remove the WorkflowItem and
      * call the archive() method to put it in the archive, and email notify the
      * submitter of a successful submission
-     * 
+     *
      * @param c
      *            Context
      * @param wi
@@ -335,26 +335,26 @@ public class WorkflowManager
     {
         advance(c, wi, e, true, true);
     }
-    
+
     /**
      * advance() sends an item forward in the workflow (reviewers,
      * approvers, and editors all do an 'approve' to move the item forward) if
      * the item arrives at the submit state, then remove the WorkflowItem and
      * call the archive() method to put it in the archive, and email notify the
      * submitter of a successful submission
-     * 
+     *
      * @param c
      *            Context
      * @param wi
      *            WorkflowItem do do the approval on
      * @param e
      *            EPerson doing the approval
-     * 
+     *
      * @param curate
      *            boolean indicating whether curation tasks should be done
-     * 
+     *
      * @param record
-     *            boolean indicating whether to record action 
+     *            boolean indicating whether to record action
      */
     public static boolean advance(Context c, WorkflowItem wi, EPerson e,
                                   boolean curate, boolean record)
@@ -362,7 +362,7 @@ public class WorkflowManager
     {
         int taskstate = wi.getState();
         boolean archived = false;
-        
+
         // perform curation tasks if needed
         if (curate && WorkflowCurator.needsCuration(wi))
         {
@@ -381,9 +381,9 @@ public class WorkflowManager
         {
         case WFSTATE_SUBMIT:
             archived = doState(c, wi, WFSTATE_STEP1POOL, e);
-            
+
             break;
-            
+
         case WFSTATE_STEP1:
 
             // authorize DSpaceActions.SUBMIT_REVIEW
@@ -430,7 +430,7 @@ public class WorkflowManager
 
     /**
      * unclaim() returns an owned task/item to the pool
-     * 
+     *
      * @param c
      *            Context
      * @param wi
@@ -481,7 +481,7 @@ public class WorkflowManager
      * abort() aborts a workflow, completely deleting it (administrator do this)
      * (it will basically do a reject from any state - the item ends up back in
      * the user's PersonalWorkspace
-     * 
+     *
      * @param c
      *            Context
      * @param wi
@@ -540,7 +540,7 @@ public class WorkflowManager
             {
                 // get a list of all epeople in group (or any subgroups)
                 EPerson[] epa = Group.allMembers(c, mygroup);
-                
+
                 // there were reviewers, change the state
                 //  and add them to the list
                 createTasks(c, wi, epa);
@@ -582,7 +582,7 @@ public class WorkflowManager
             {
                 //get a list of all epeople in group (or any subgroups)
                 EPerson[] epa = Group.allMembers(c, mygroup);
-                
+
                 // there were approvers, change the state
                 //  timestamp, and add them to the list
                 createTasks(c, wi, epa);
@@ -619,7 +619,7 @@ public class WorkflowManager
             {
                 // get a list of all epeople in group (or any subgroups)
                 EPerson[] epa = Group.allMembers(c, mygroup);
-                
+
                 // there were editors, change the state
                 //  timestamp, and add them to the list
                 createTasks(c, wi, epa);
@@ -707,7 +707,7 @@ public class WorkflowManager
      * Commit the contained item to the main archive. The item is associated
      * with the relevant collection, added to the search index, and any other
      * tasks such as assigning dates are performed.
-     * 
+     *
      * @return the fully archived item.
      */
     private static Item archive(Context c, WorkflowItem wfi)
@@ -742,8 +742,8 @@ public class WorkflowManager
             EPerson ep = i.getSubmitter();
             // Get the Locale
             Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
-            
+            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
+
             // Get the item handle to email to user
             String handle = HandleManager.findHandle(c, i);
 
@@ -780,7 +780,7 @@ public class WorkflowManager
     /**
      * Return the workflow item to the workspace of the submitter. The workflow
      * item is removed, and a workspace item created.
-     * 
+     *
      * @param c
      *            Context
      * @param wfi
@@ -825,7 +825,7 @@ public class WorkflowManager
      * rejects an item - rejection means undoing a submit - WorkspaceItem is
      * created, and the WorkflowItem is removed, user is emailed
      * rejection_message.
-     * 
+     *
      * @param c
      *            Context
      * @param wi
@@ -899,10 +899,10 @@ public class WorkflowManager
     static void deleteTasks(Context c, WorkflowItem wi) throws SQLException
     {
         String myrequest = "DELETE FROM TaskListItem WHERE workflow_id= ? ";
-       
+
         DatabaseManager.updateQuery(c, myrequest, wi.getID());
     }
-    
+
     // send notices of curation activity
     public static void notifyOfCuration(Context c, WorkflowItem wi, EPerson[] epa,
            String taskName, String action, String message) throws SQLException, IOException
@@ -921,7 +921,7 @@ public class WorkflowManager
             for (int i = 0; i < epa.length; i++)
             {
                 Locale supportedLocale = I18nUtil.getEPersonLocale(epa[i]);
-                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale,
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale,
                                                                                   "flowtask_notify"));
                 email.addArgument(title);
                 email.addArgument(coll.getMetadata("name"));
@@ -935,7 +935,7 @@ public class WorkflowManager
         }
         catch (MessagingException e)
         {
-            log.warn(LogManager.getHeader(c, "notifyOfCuration", "cannot email users" + 
+            log.warn(LogManager.getHeader(c, "notifyOfCuration", "cannot email users" +
                                           " of workflow_item_id" + wi.getID()));
         }
     }
@@ -971,7 +971,7 @@ public class WorkflowManager
                 for (int i = 0; i < epa.length; i++)
                 {
                     Locale supportedLocale = I18nUtil.getEPersonLocale(epa[i]);
-                    Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_task"));
+                    Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_task"));
                     email.addArgument(title);
                     email.addArgument(coll.getMetadata("name"));
                     email.addArgument(submitter);
@@ -981,17 +981,17 @@ public class WorkflowManager
                     {
                         case WFSTATE_STEP1POOL:
                             message = messages.getString("org.dspace.workflow.WorkflowManager.step1");
-                            
+
                             break;
-                            
+
                         case WFSTATE_STEP2POOL:
                             message = messages.getString("org.dspace.workflow.WorkflowManager.step2");
-                            
+
                             break;
-                            
+
                         case WFSTATE_STEP3POOL:
                             message = messages.getString("org.dspace.workflow.WorkflowManager.step3");
-                            
+
                             break;
                     }
                     email.addArgument(message);
@@ -1030,7 +1030,7 @@ public class WorkflowManager
             // Get rejector's name
             String rejector = getEPersonName(e);
             Locale supportedLocale = I18nUtil.getEPersonLocale(e);
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale,"submit_reject"));
+            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale,"submit_reject"));
 
             email.addRecipient(getSubmitterEPerson(wi).getEmail());
             email.addArgument(title);
@@ -1072,7 +1072,7 @@ public class WorkflowManager
 
     /**
      * get the title of the item in this workflow
-     * 
+     *
      * @param wi  the workflow item object
      */
     public static String getItemTitle(WorkflowItem wi) throws SQLException
@@ -1093,7 +1093,7 @@ public class WorkflowManager
 
     /**
      * get the name of the eperson who started this workflow
-     * 
+     *
      * @param wi  the workflow item
      */
     public static String getSubmitterName(WorkflowItem wi) throws SQLException
