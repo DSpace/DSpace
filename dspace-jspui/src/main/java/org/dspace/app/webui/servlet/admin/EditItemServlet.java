@@ -84,6 +84,15 @@ public class EditItemServlet extends DSpaceServlet
     /** User confirms the movement of the item */
     public static final int CONFIRM_MOVE_ITEM = 8;
 
+    /** User starts withdrawal of item */
+    public static final int START_PRIVATING = 9;
+
+    /** User confirms withdrawal of item */
+    public static final int CONFIRM_PRIVATING = 10;
+
+    /** User confirms withdrawal of item */
+    public static final int PUBLICIZE = 11;
+
     /** Logger */
     private static Logger log = Logger.getLogger(EditCommunitiesServlet.class);
 
@@ -317,6 +326,32 @@ public class EditItemServlet extends DSpaceServlet
                 }
                 
                 break;
+
+        case START_PRIVATING:
+
+            // Show "withdraw item" confirmation page
+            JSPManager.showJSP(request, response,
+                    "/tools/confirm-privating-item.jsp");
+
+            break;
+
+        case CONFIRM_PRIVATING:
+
+            // Withdraw the item
+            item.setDiscoverable(false);
+            item.withdraw();
+            JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
+            context.complete();
+
+            break;
+
+        case PUBLICIZE:
+            item.setDiscoverable(true);
+            item.reinstate();
+            JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
+            context.complete();
+
+            break;
                 
         default:
 
@@ -496,6 +531,33 @@ public class EditItemServlet extends DSpaceServlet
             catch (AuthorizeException authex)
             {
                 request.setAttribute("reinstate_button", Boolean.FALSE);
+            }
+        }
+
+        if (item.isDiscoverable())
+        {
+            try
+            {
+                // who can Withdraw can also Make It Private
+                AuthorizeUtil.authorizeWithdrawItem(context, item);
+                request.setAttribute("privating_button", Boolean.TRUE);
+            }
+            catch (AuthorizeException authex)
+            {
+                request.setAttribute("privating_button", Boolean.FALSE);
+            }
+        }
+        else
+        {
+            try
+            {
+                // who can Reinstate can also Make It Public
+                AuthorizeUtil.authorizeReinstateItem(context, item);
+                request.setAttribute("publicize_button", Boolean.TRUE);
+            }
+            catch (AuthorizeException authex)
+            {
+                request.setAttribute("publicize_button", Boolean.FALSE);
             }
         }
         

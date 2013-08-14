@@ -55,6 +55,9 @@ public class BrowseItem extends DSpaceObject
     /** is the item withdrawn */
     private boolean withdrawn  = false;
 
+    /** is the item  discoverable*/
+    private boolean discoverable  = true;
+
     /** item handle */
 	private String handle = null;
 
@@ -65,13 +68,15 @@ public class BrowseItem extends DSpaceObject
      * @param id		the database id of the item
      * @param in_archive
      * @param withdrawn
+     * @param discoverable
      */
-	public BrowseItem(Context context, int id, boolean in_archive, boolean withdrawn)
+	public BrowseItem(Context context, int id, boolean in_archive, boolean withdrawn, boolean discoverable)
 	{
 		this.context = context;
 		this.id = id;
         this.in_archive = in_archive;
         this.withdrawn = withdrawn;
+        this.discoverable = discoverable;
     }
 
 	/**
@@ -403,5 +408,10 @@ public class BrowseItem extends DSpaceObject
     public boolean isWithdrawn()
     {
         return withdrawn;
+    }
+
+    public boolean isDiscoverable()
+    {
+        return discoverable;
     }
 }
