@@ -56,10 +56,6 @@
     ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
 
     RecentSubmissions submissions = (RecentSubmissions) request.getAttribute("recent.submissions");
-    Boolean showCommunities = (Boolean) request.getAttribute("show.communities");
-    boolean show_communities = showCommunities != null ? showCommunities.booleanValue() : true;
-    Boolean showRecent = (Boolean) request.getAttribute("show.recent");
-    boolean show_recent = showRecent != null ? showRecent.booleanValue() : false;
 %>
 
 <dspace:layout locbar="nolink" titlekey="jsp.home.title" feedData="<%= feedData %>">
@@ -107,7 +103,7 @@ for (int i = supportedLocales.length-1; i >= 0; i--)
     </form>
 
 <%
-if (show_communities && communities.length != 0)
+if (communities != null && communities.length != 0)
 {
 %>
     <br/>
@@ -150,7 +146,7 @@ if (show_communities && communities.length != 0)
 %>
 
 <%
-if (show_recent && submissions != null && submissions.count() > 0)
+if (submissions != null && submissions.count() > 0)
 {
 %>
     <br/>
