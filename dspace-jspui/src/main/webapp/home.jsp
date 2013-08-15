@@ -12,6 +12,7 @@
   -
   - Attributes:
   -    communities - Community[] all communities in DSpace
+  -    recent.submissions - RecetSubmissions
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -27,10 +28,13 @@
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="org.dspace.core.I18nUtil" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.app.webui.components.RecentSubmissions" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.core.NewsManager" %>
 <%@ page import="org.dspace.browse.ItemCounter" %>
+<%@ page import="org.dspace.content.DCValue" %>
+<%@ page import="org.dspace.content.Item" %>
 
 <%
     Community[] communities = (Community[]) request.getAttribute("communities");
@@ -49,6 +53,8 @@
     }
     
     ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
+
+    RecentSubmissions submissions = (RecentSubmissions) request.getAttribute("recent.submissions");
 %>
 
 <dspace:layout locbar="nolink" titlekey="jsp.home.title" feedData="<%= feedData %>">
@@ -94,6 +100,12 @@ for (int i = supportedLocales.length-1; i >= 0; i--)
             </tr>
         </table>
     </form>
+
+<%
+if (communities != null && communities.length != 0)
+{
+%>
+    <br/>
     <table class="miscTable" width="95%" align="center">
         <tr>
             <td class="oddRowEvenCol">
@@ -101,16 +113,13 @@ for (int i = supportedLocales.length-1; i >= 0; i--)
                 <p><fmt:message key="jsp.home.com2"/></p>
 
 
+                <table border="0" cellpadding="2">
 <%
- if (communities.length != 0)
- {
-%>
-    <table border="0" cellpadding="2">
-<% 	                 
 
     for (int i = 0; i < communities.length; i++)
     {
-%>                  <tr>
+%>
+                    <tr>
                         <td class="standard">
                             <a href="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></a>
 <%
@@ -127,14 +136,49 @@ for (int i = supportedLocales.length-1; i >= 0; i--)
 <%
     }
 %>
-    </table>
-<%                
- }
-%>  
-
+                </table>
             </td>
         </tr>
     </table>
+<%
+}
+%>
+
+<%
+if (submissions != null && submissions.count() > 0)
+{
+%>
+    <br/>
+    <table class="miscTable" width="95%" align="center">
+        <tr>
+            <td class="oddRowEvenCol">
+                <h3><fmt:message key="jsp.collection-home.recentsub"/></h3>
+                <table border="0" cellpadding="2">
+<%
+    for (Item item : submissions.getRecentSubmissions())
+    {
+        DCValue[] dcv = item.getMetadata("dc", "title", null, Item.ANY);
+        String displayTitle = "Untitled";
+        if (dcv != null & dcv.length > 0)
+        {
+            displayTitle = dcv[0].value;
+        }
+%>
+                    <tr>
+                        <td class="standard10">
+                            <a href="<%= request.getContextPath() %>/handle/<%=item.getHandle() %>"><%= displayTitle%> </a>
+                        </td>
+                    </tr>
+<%
+     }
+%>
+                </table>
+             </td>
+         </tr>
+     </table>
+<%
+}
+%>
     <dspace:sidebar>
     <%= sideNews %>
     <%
