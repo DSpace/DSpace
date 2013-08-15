@@ -702,3 +702,12 @@ input.ds-authority-lock.is-locked
   { background-image: url(image/lock24.png); }
 input.ds-authority-lock.is-unlocked
   { background-image: url(image/unlock24.png); }
+
+.standard10 {
+    margin-left: 10px;
+    margin-right: 10px;
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 10pt;
+    padding-left: 10px;
+}
+
