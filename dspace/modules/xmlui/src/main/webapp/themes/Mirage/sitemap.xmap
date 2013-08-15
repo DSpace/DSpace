@@ -12,6 +12,12 @@
         <map:readers>
             <map:reader name="ConcatenationReader" src="org.dspace.app.xmlui.cocoon.ConcatenationReader"/>
         </map:readers>
+        <map:actions>
+            <map:action name="NotModifiedAction" src="org.dspace.app.xmlui.aspect.general.NotModifiedAction"/>
+        </map:actions>
+        <map:selectors>
+            <map:selector name="IfModifiedSinceSelector" src="org.dspace.app.xmlui.aspect.general.IfModifiedSinceSelector"/>
+        </map:selectors>
     </map:components>
 
     <map:pipelines>
@@ -71,6 +77,14 @@
 		-->
 		<map:pipeline>
 			<!-- Never allow the browser to cache dynamic content -->
+            			    <map:select type="IfModifiedSinceSelector">
+            			      <map:when test="true">
+            				    <map:act type="NotModifiedAction"/>
+            				    <map:serialize/>
+            			      </map:when>
+            			    </map:select>
+
+
 			<map:parameter name="expires" value="now"/>
 
 			<!-- Aspect content
