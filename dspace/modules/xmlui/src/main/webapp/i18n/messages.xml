@@ -3400,6 +3400,7 @@
     <message key="xmlui.property.ManageShoppingcartMain.no_results">No result</message>
 
 
+    <message key="xmlui.voucher.ManageVoucherMain.title">Manage Vouchers</message>
     <message key="xmlui.voucher.ManageVoucherMain.search_column1">Id</message>
     <message key="xmlui.voucher.ManageVoucherMain.search_column2">Code</message>
     <message key="xmlui.voucher.ManageVoucherMain.search_column3">Value</message>
