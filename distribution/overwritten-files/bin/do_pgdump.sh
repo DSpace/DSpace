@@ -2,7 +2,7 @@ DBNAME="dspace_sedici"
 DBUSER="root"
 DBHOST="localhost"
 export PGPASSWORD="root"
-FILENAME="$DBNAME-`date +%d-%m-%Y_%H:%M`"
+FILENAME="$DBNAME-`date +%d-%m-%Y_%H%M`"
 DESTFILENAME="`pwd`/$FILENAME.tgz"
 
 echo "Iniciando pg_dump de BD $DBNAME@$DBHOST ..."
