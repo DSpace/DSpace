@@ -19,6 +19,10 @@
   <xsl:variable name="articulo">Articulo</xsl:variable>
   <xsl:variable name="objeto_de_conferencia">Objeto de conferencia</xsl:variable>
   <xsl:variable name="audio">Audio</xsl:variable>
+  <xsl:variable name="libro">Libro</xsl:variable>
+  <xsl:variable name="documento_institucional">Documento institucional</xsl:variable>
+  <xsl:variable name="imagen_fija">Imagen fija</xsl:variable>
+  <xsl:variable name="objeto_fisico">Objeto físico</xsl:variable>
   
 
 </xsl:stylesheet>
