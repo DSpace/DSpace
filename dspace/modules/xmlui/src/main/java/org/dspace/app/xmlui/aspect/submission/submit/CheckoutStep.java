@@ -50,7 +50,9 @@ import java.util.Date;
  * @author Lantian Gai, lantian at atmire.com
  */
 public class CheckoutStep extends AbstractStep {
-    private static final Message T_MAIN_HELP = message("xmlui.Submission.submit.OverviewStep.help");
+    private static final Message T_HEAD = message("xmlui.Submission.submit.Checkout.head");
+    private static final Message T_HELP = message("xmlui.Submission.submit.Checkout.help");
+    private static final Message T_TRAIL = message("xmlui.Submission.submit.Checkout.trail");
     private static final Message T_FINALIZE_BUTTON = message("xmlui.Submission.submit.OverviewStep.button.finalize");
     private static final Logger log = Logger.getLogger(AbstractDSpaceTransformer.class);
     @Override
@@ -58,12 +60,13 @@ public class CheckoutStep extends AbstractStep {
         Collection collection = submission.getCollection();
         String actionURL = contextPath + "/handle/" + collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 
+        body.addDivision("step-link","step-link").addPara(T_TRAIL);
+
+        Division helpDivision = body.addDivision("general-help","general-help");
+        helpDivision.setHead(T_HEAD);
+        helpDivision.addPara(T_HELP);
+
         Division mainDiv = body.addInteractiveDivision("submit-completed-dataset", actionURL, Division.METHOD_POST, "primary submission");
-
-
-        Division helpDivision = mainDiv.addDivision("submit-help");
-        helpDivision.setHead("Checkout");
-        helpDivision.addPara(T_MAIN_HELP);
 
         Request request = ObjectModelHelper.getRequest(objectModel);
         SubmissionInfo submissionInfo=(SubmissionInfo)request.getAttribute("dspace.submission.info");

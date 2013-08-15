@@ -46,9 +46,11 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     private static Logger log = Logger.getLogger(SelectPublicationStep.class);
 
     private static final Message T_HEAD = message("xmlui.submit.select.pub.head");
+    private static final Message T_TRAIL = message("xmlui.submit.select.pub.trail");
+    private static final Message T_HELP = message("xmlui.submit.select.pub.help");
     private static final Message T_FORM_HEAD = message("xmlui.submit.select.pub.form_head");
-    private static final Message T_PUB_HELP = message("xmlui.submit.select.pub.help");
-    private static final Message T_PUB_HELP_NEW = message("xmlui.submit.select.pub.help_new");
+    //private static final Message T_PUB_HELP = message("xmlui.submit.select.pub.help");
+    //private static final Message T_PUB_HELP_NEW = message("xmlui.submit.select.pub.help_new");
     private static final Message T_PUB_SELECT_NEW = message("xmlui.submit.select.pub.form.option.new");
     private static final Message T_PUB_SELECT_EXISTING = message("xmlui.submit.select.pub.form.option.existing");
     private static final Message T_PUB_SELECT_HELP = message("xmlui.submit.select.pub.form.help");
@@ -104,18 +106,24 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         Collection collection = submission.getCollection();
         String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 
+        body.addDivision("step-link","step-link").addPara(T_TRAIL);
+
+        Division helpDivision = body.addDivision("general-help","general-help");
+        helpDivision.setHead(T_HEAD);
+        helpDivision.addPara(T_HELP);
+
         Division div = body.addInteractiveDivision("submit-select-publication", actionURL, Division.METHOD_POST, "primary submission");
         addSubmissionProgressList(div);
-        div.setHead(T_HEAD);
+        //div.setHead(T_FORM_HEAD);
 
         List form = div.addList("submit-create-publication", List.TYPE_FORM);
         //form.setHead(T_FORM_HEAD);
         Item content = form.addItem();
         boolean submitExisting = ConfigurationManager.getBooleanProperty("submit.dataset.existing-datasets", true);
-        if(submitExisting)
-            content.addContent(T_PUB_HELP);
-        else
-            content.addContent(T_PUB_HELP_NEW);
+        //if(submitExisting)
+        //    content.addContent(T_PUB_HELP);
+        //else
+        //    content.addContent(T_PUB_HELP_NEW);
 
 
 
