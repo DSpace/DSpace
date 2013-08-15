@@ -25,12 +25,6 @@ import org.dspace.plugin.PluginException;
  */
 public class RecentSiteSubmissions implements SiteHomeProcessor
 {
-    // Whether show the list of communities on Site home page?
-    private static final boolean showCommunities = ConfigurationManager.getBooleanProperty("webui.sitehome.show.communities", true);
-
-    // Whether shows the recent submission items on site home page?
-    private static final boolean showRecent = ConfigurationManager.getBooleanProperty("webui.sitehome.show.recent-submissions", true);
-
     /**
      * blank constructor - does nothing.
      *
@@ -47,25 +41,16 @@ public class RecentSiteSubmissions implements SiteHomeProcessor
     public void process(Context context, HttpServletRequest request, HttpServletResponse response) 
         throws PluginException, AuthorizeException
     {
-        if (showRecent)
+        try
         {
-            try
-            {
-                RecentSubmissionsManager rsm = new RecentSubmissionsManager(context);
-                RecentSubmissions recent = rsm.getRecentSubmissions(null);
-                request.setAttribute("recent.submissions", recent);
-    
-            }
-            catch (RecentSubmissionsException e)
-            {
-                throw new PluginException(e);
-            }
+            RecentSubmissionsManager rsm = new RecentSubmissionsManager(context);
+            RecentSubmissions recent = rsm.getRecentSubmissions(null);
+            request.setAttribute("recent.submissions", recent);
+
         }
-
-        request.setAttribute("show.recent", Boolean.valueOf(showRecent));
-        request.setAttribute("show.communities", Boolean.valueOf(showCommunities));
+        catch (RecentSubmissionsException e)
+        {
+            throw new PluginException(e);
+        }
     }
-
-    
-
 }
