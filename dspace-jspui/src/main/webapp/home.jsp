@@ -13,8 +13,6 @@
   - Attributes:
   -    communities - Community[] all communities in DSpace
   -    recent.submissions - RecetSubmissions
-  -    show.communities - Whether show the list of communities
-  -    show.recent-submissions - Whether shows the recent submission
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
