@@ -105,7 +105,11 @@ public class DryadJournalSubmissionUtils {
 
         return null;
     }
-    
+
+
+    public static Map<String, String> getPropertiesByJournal(String key){
+        return journalProperties.get(key);
+    }
     /**
      * Replaces invalid filename characters by percent-escaping.  Based on
      * http://stackoverflow.com/questions/1184176/how-can-i-safely-encode-a-string-in-java-to-use-as-a-filename

@@ -5,11 +5,13 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.*;
+import org.dspace.content.Collection;
 import org.dspace.core.*;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.eperson.EPerson;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 import org.dspace.workflow.actions.Action;
 import org.dspace.workflow.actions.ActionResult;
 import org.dspace.workflow.actions.WorkflowActionConfig;
@@ -21,10 +23,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.MissingResourceException;
+import java.util.*;
+
 import org.dspace.curate.WorkflowCurator;
 
 /**
@@ -330,11 +330,9 @@ public class WorkflowManager {
 
 
             email.addRecipient(ep.getEmail());
-            //Get all additional email addresses
-            DCValue[] mailReceps = i.getMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "archive", "mailUsers", Item.ANY);
-            for (DCValue mailRecep : mailReceps) {
-                email.addRecipient(mailRecep.value);
-            }
+
+            addJournalNotifyOnArchive(i, email);
+
 
             email.addArgument(title);
             email.addArgument(datapackageDoi);
@@ -808,5 +806,23 @@ public class WorkflowManager {
         EPerson e = wi.getSubmitter();
 
         return getEPersonName(e);
+    }
+
+
+    private static void addJournalNotifyOnArchive(Item item, Email email)
+    {
+        DCValue[] values=item.getMetadata("prism.publicationName");
+        if(values!=null && values.length> 0){
+            String journal = values[0].value;
+            if(journal!=null){
+                Map<String, String> properties = DryadJournalSubmissionUtils.getPropertiesByJournal(journal);
+                String emails = properties.get(DryadJournalSubmissionUtils.NOTIFY_ON_ARCHIVE);
+                String[] emails_=emails.split(",");
+                for(String emailAddr : emails_){
+                    email.addRecipient(emailAddr);
+                }
+
+            }
+        }
     }
 }
