@@ -2035,6 +2035,8 @@ La vista resumen de la comunidad no está actualmente en uso o implementada. Est
 <message key="xmlui.dri2xhtml.METS-1.0.item-relation-ciclo">Ciclo</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-creator-interprete">Interprete</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-creators-interprete">Interpretes</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-creator-creator">Creador</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-creators-creator">Creadores</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-creators-person">Autores</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-creator-person">Autor</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-availability-local">Descarga directa</message>

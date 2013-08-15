@@ -640,9 +640,20 @@
 	<xsl:template name="show-common-authors">
 				<xsl:choose>
 					<xsl:when test="dim:field[@element='creator']">
+						<!-- Only sedici.creator.person and sedici.creator.corporate can be creators of a physical object. -->
+						<xsl:variable name="general-qualifier">
+							<xsl:choose>
+								<xsl:when test="dim:field[@element='type'] = $objeto_fisico">
+									<xsl:text>creator</xsl:text>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:text>person</xsl:text>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:variable>
 						<xsl:call-template name="render-author-metadata-field">
 							<xsl:with-param name="metadata-fields" select="dim:field[@element='creator'][@qualifier='person' or @qualifier='corporate']"/>
-							<xsl:with-param name="general-qualifier" select="'person'"/>
+							<xsl:with-param name="general-qualifier" select="$general-qualifier"/>
 						</xsl:call-template>
 						<xsl:call-template name="render-author-metadata-field">
 							<xsl:with-param name="metadata-fields" select="dim:field[@element='creator'][@qualifier='interprete']"/>
