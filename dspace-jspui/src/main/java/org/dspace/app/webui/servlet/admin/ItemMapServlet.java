@@ -190,6 +190,9 @@ public class ItemMapServlet extends DSpaceServlet
     		.setAttribute("all_collections", Collection
     				.findAll(context));
     		
+            request.setAttribute("searchIndices",
+                    internalLogic.getSearchIndices());
+            request.setAttribute("prefixKey", internalLogic.getI18NKeyPrefix());
     		// show this page when we're done
     		jspPage = "itemmap-main.jsp";
     		
@@ -296,7 +299,7 @@ public class ItemMapServlet extends DSpaceServlet
     		// show the page
     		JSPManager.showJSP(request, response, jspPage);
     	}
-    	else if (action.equals("Search Authors"))
+    	else if (action.equals("search"))
     	{
             request.setAttribute("collection", myCollection);
             try
@@ -305,6 +308,7 @@ public class ItemMapServlet extends DSpaceServlet
             }
             catch (SearchProcessorException e)
             {
+                log.error(e.getMessage(), e);
                 throw new ServletException(e.getMessage(), e);
             }
         }
