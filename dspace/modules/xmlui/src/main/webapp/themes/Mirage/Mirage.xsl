@@ -1119,7 +1119,7 @@ parameter that is being used (see variable defined above) -->
 
     <!--payment-->
     <xsl:template match="//dri:field[@id='aspect.paymentsystem.ShoppingCartTransformer.field.currency' or @id='aspect.paymentsystem.ShoppingCartTransformer.field.country']">
-        <select onchange="javascrit:updateOrder()">
+        <select onchange="javascript:updateOrder()">
             <xsl:attribute name="name">
                 <xsl:value-of select="@n"/>
             </xsl:attribute>
@@ -1128,7 +1128,7 @@ parameter that is being used (see variable defined above) -->
     </xsl:template>
 
     <xsl:template match="//dri:field[@id='aspect.paymentsystem.ShoppingCartTransformer.field.apply']">
-        <button onclick="javascrit:updateOrder()" class="ds-button-field">
+        <button onclick="javascript:updateOrder()" class="ds-button-field">
             <xsl:attribute name="name">
                 <xsl:value-of select="@n"/>
             </xsl:attribute>
