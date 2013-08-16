@@ -103,7 +103,8 @@ public class EmailServiceImpl
             }
             else
             {
-                session = Session.getInstance(null, this);
+                props.put("mail.smtp.auth", "true");
+                session = Session.getInstance(props, this);
             }
 
             // Set extra configuration properties
