@@ -254,6 +254,18 @@
          -->
     <fieldtype name="ignored" stored="false" indexed="false" class="solr.StrField" />
 
+  <fieldType name="text_autocomplete" class="solr.TextField" positionIncrementGap="100">
+      <analyzer type="index">
+          <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+          <filter class="solr.LowerCaseFilterFactory"/>
+          <filter class="solr.EdgeNGramFilterFactory" minGramSize="1" maxGramSize="25" />
+      </analyzer>
+      <analyzer type="query">
+          <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+          <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+  </fieldType>
+
  </types>
 
 
@@ -284,7 +296,7 @@
      <field name="field" type="string" multiValued="false" indexed="true" stored="true" required="true" />
      <field name="value" type="text" multiValued="false" indexed="true" stored="true" required="true" />
      <field name="display-value" type="string" multiValued="false" indexed="true" stored="true" required="true" />
-     <field name="full-text" type="text" multiValued="false" indexed="true" stored="true" required="true" />
+     <field name="full-text" type="text_autocomplete" multiValued="false" indexed="true" stored="true" required="true" />
 
      <!--Used for matching on all other fields-->
      <dynamicField name="*" type="text" multiValued="true"/>

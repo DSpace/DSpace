@@ -557,31 +557,17 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                 </li>
                             </xsl:when>
                             <xsl:otherwise>
-                                <li id="login-item">
-                                    <a>
-                                        <xsl:attribute name="href">
-                                             <xsl:value-of select="/dri:document/dri:options/dri:list[@n='account']/dri:item/dri:xref/@target"/>
-                                        </xsl:attribute>
-                                        Login
-                                    </a>
-                                </li>
-                                <li id="sign-up-item">
-                                    <a>
-                                        <xsl:attribute name="href">
-                                            <xsl:value-of select="/dri:document/dri:options/dri:list[@n='account']/dri:item/dri:xref/@target"/>
-                                        </xsl:attribute>
-                                        Sign Up
+                                <li class="no-hover-highlight">
+                                    <a href="/login">
+                                        <span id="login-item">Login</span>
+                                        <span class="accessibly-hidden"> or </span>
+                                        <span id="sign-up-item">Sign Up</span>
                                     </a>
                                 </li>
                             </xsl:otherwise>
                         </xsl:choose>
-
-
                     </ul>
-
                 </div>
-
-
             </div>
         </div>
     </xsl:template>
@@ -678,7 +664,10 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 <div id="ds-footer-left" style="color: #999;">
                     <i18n:text>xmlui.dri2xhtml.structural.footer-powered-by</i18n:text>
                     <xsl:text> </xsl:text>
-                    <a class="single-image-link" href="http://www.dspace.org/" target="_blank"><img class="powered-by" src="/themes/Mirage/images/powered-by-dspace.png" alt="DSpace" /></a>
+                    <a class="single-image-link" href="http://www.dspace.org/" target="_blank">
+                      <img class="powered-by" src="/themes/Mirage/images/powered-by-dspace.png" alt="DSpace" />
+                      <span class="accessibly-hidden"> (opens in a new window)</span>
+                    </a>
                 </div>
 
                 <!--Invisible link to HTML sitemap (for search engines) -->

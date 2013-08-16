@@ -551,14 +551,14 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
 
             Para hiddenFrom=jump.addPara("hidden_form_"+field,"hidden_form_by");
 
-            hiddenFrom.addText("field",field+"_hidden_"+field).setValue(field);
+            hiddenFrom.addHidden("field", field+"_hidden_" + field).setValue(field);
             //only add field when the query match the rend field
             if(field.equals(request.getParameter(SearchFilterParam.FACET_FIELD))){
                 // Add all the query parameters as hidden fields on the form
                 for(Map.Entry<String, String> param : params.entrySet()){
                     if(!param.getKey().equals("field"))
                     {
-                        hiddenFrom.addText(param.getKey(),param.getKey()+"_hidden_"+field).setValue(param.getValue());
+                        hiddenFrom.addHidden(param.getKey(),param.getKey()+"_hidden_"+field).setValue(param.getValue());
                     }
                 }
             }
@@ -569,7 +569,7 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
 
             String[] filterQueries = getParameterFilterQueries();
             for (String filterQuery : filterQueries) {
-                jumpForm.addText("fq","fq_hidden_"+field).setValue(filterQuery);
+                jumpForm.addHidden("fq","fq_hidden_"+field).setValue(filterQuery);
             }
             jumpForm.addContent(T_starts_with);
             jumpForm.addText("starts_with","starts_with_"+field);

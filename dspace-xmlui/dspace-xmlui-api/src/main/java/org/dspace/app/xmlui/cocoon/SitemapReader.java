@@ -141,7 +141,7 @@ public class SitemapReader extends AbstractReader implements Recyclable
         // Check for if-modified-since header
         long modSince = this.request.getDateHeader("If-Modified-Since");
 
-        if (modSince != -1 && lastMod < modSince)
+        if (modSince != -1 && lastMod <= modSince)
         {
             // Sitemap file has not been modified since requested date,
             // hence bitstream has not; return 304

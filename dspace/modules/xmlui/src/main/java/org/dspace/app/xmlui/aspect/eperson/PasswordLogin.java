@@ -60,11 +60,12 @@ import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Cell;
+import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.Item;
+import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Table;
+import org.dspace.app.xmlui.wing.element.Password;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.xml.sax.SAXException;
 
@@ -257,44 +258,34 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements
 
 		register.addPara(T_reglogin_head);
 
-		Table regTable = register.addTable("register", 2, 2);
-
-		regTable.setHead(T_head2);
-		Row regRow1 = regTable.addRow();
-		Cell regRow1Cell1 = regRow1.addCell();
-		Cell regRow1Cell2 = regRow1.addCell();
-		regRow1Cell1.addContent(T_email_address);
-		Text regEmail = regRow1Cell2.addText("email");
+                List regList = register.addList("register", List.TYPE_FORM);
+		regList.setHead(T_head2);
+                Item regEmailItem = regList.addItem("regemail-item", "register-row");
+                Text regEmail = regEmailItem.addText("email", "register-email");
 		regEmail.setRequired();
 		regEmail.setLabel(T_email_address);
 		if (previousEmail != null) {
 			regEmail.setValue(previousEmail);
 			regEmail.addError(T_error_bad_login);
 		}
-
-		Row regRow2 = regTable.addRow();
-		Cell regRow2Cell1 = regRow2.addCell();
-		Cell regRow2Cell2 = regRow2.addCell();
-
-		Row regRow3 = regTable.addRow();
-		Cell regRow3Cell1 = regRow3.addCell();
-		Cell regRow3Cell2 = regRow3.addCell();
+                Item emptyItem = regList.addItem("empty-item", "register-row");
 		if (knot != null) {
-			regRow3Cell1.addHidden("eperson-continue").setValue(knot.getId());
+			emptyItem.addHidden("eperson-continue").setValue(knot.getId());
 		}
-		regRow3Cell2.addButton("submit").setValue(T_submit_register);
+                Item submitItem = regList.addItem("submit-item", "register-row");
+                Button submitButton = submitItem.addButton("submit");
+                submitButton.setValue(T_submit_register);
+
+                /* login */
 
 		Division login = body.addInteractiveDivision("login", contextPath
 				+ "/password-login", Division.METHOD_POST, "login-right");
 
-		Table loginTable = login.addTable("login", 3, 2);
-		loginTable.setHead(T_head1);
+		List loginList = login.addList("login", List.TYPE_FORM);
+                loginList.setHead(T_head1);
 
-		Row loginRow1 = loginTable.addRow();
-		Cell loginRow1Cell1 = loginRow1.addCell();
-		Cell loginRow1Cell2 = loginRow1.addCell();
-		loginRow1Cell1.addContent(T_email_address);
-		Text loginEmail = loginRow1Cell2.addText("login_email");
+                Item loginEmailItem = loginList.addItem("loginemail-item", "login-row");
+                Text loginEmail = loginEmailItem.addText("login_email", "login-email");
 		loginEmail.setRequired();
 		loginEmail.setLabel(T_email_address);
 		if (previousEmail != null) {
@@ -302,17 +293,15 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements
 			loginEmail.addError(T_error_bad_login);
 		}
 
-		Row loginRow2 = loginTable.addRow();
-		Cell loginRow2Cell1 = loginRow2.addCell();
-		Cell loginRow2Cell2 = loginRow2.addCell();
-		loginRow2Cell1.addContent(T_password);
-		loginRow2Cell2.addPassword("login_password").setRequired();
+                Item loginPasswordItem = loginList.addItem("loginpassword-item", "login-row");
+		Password loginPassword = loginPasswordItem.addPassword("login_password");
+                loginPassword.setRequired();
+                loginPassword.setLabel(T_password);
 
-		Row loginRow3 = loginTable.addRow();
-		Cell loginRow3Cell1 = loginRow3.addCell();
-		Cell loginRow3Cell2 = loginRow3.addCell();
-		loginRow3Cell2.addButton("submit").setValue(T_submit_login);
-		
+                Item loginSubmitItem = loginList.addItem("loginsubmit-item", "login-row");
+                Button loginSubmitButton = loginSubmitItem.addButton("submit");
+                loginSubmitButton.setValue(T_submit_login);
+
 		login.addPara().addXref("/forgot", T_forgot_link);
 	}
 

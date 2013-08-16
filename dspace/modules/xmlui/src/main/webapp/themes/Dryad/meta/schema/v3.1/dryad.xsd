@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
 	xmlns:dcterms="http://purl.org/dc/terms/" xmlns="http://purl.org/dryad/schema/terms/v3.1"
-	   xmlns:bibo="http://purl.org/ontology/bibo/" targetNamespace="http://purl.org/dryad/schema/terms/v3.1">
+	   xmlns:bibo="http://purl.org/dryad/schema/dryad-bibo/v3.1" targetNamespace="http://purl.org/dryad/schema/terms/v3.1">
 
 	<xs:import namespace="http://purl.org/dc/terms/" schemaLocation="dcterms.xsd"/>
 	<xs:import namespace="http://rs.tdwg.org/dwc/terms/"
 		schemaLocation="http://rs.tdwg.org/dwc/xsd/tdwg_dwcterms.xsd"/>
-	<xs:import namespace="http://purl.org/ontology/bibo/" schemaLocation="bibo.xsd"/> 
+	<xs:import namespace="http://purl.org/dryad/schema/dryad-bibo/v3.1" schemaLocation="bibo.xsd"/> 
 	
 	<!-- For the Dryad data package -->
 	<xs:element name="DryadDataPackage">
@@ -24,7 +24,6 @@
 				<xs:element ref="dcterms:spatial" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="dcterms:temporal" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="external" minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element ref="dcterms:relation" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="dcterms:references"/>
 				<xs:element ref="bibo:pmid" minOccurs="0" />
 				<xs:element ref="bibo:Journal" minOccurs="0" />

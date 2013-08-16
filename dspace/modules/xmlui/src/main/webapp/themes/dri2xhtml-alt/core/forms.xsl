@@ -791,6 +791,18 @@
 		    <xsl:apply-templates select="." mode="normalField"/>
 		  </label>
 		</xsl:when>
+		<xsl:when test="@rend='label-at-left-nobr'">
+		  <!-- render the label text before the component -->
+		  <label class="ds-composite-component">
+		    <xsl:if test="position()=last()">
+		      <xsl:attribute name="class">ds-composite-component last</xsl:attribute>
+		    </xsl:if>
+		    <xsl:if test="dri:label">
+		      <xsl:apply-templates select="dri:label" mode="compositeComponent"/>
+		    </xsl:if>
+		    <xsl:apply-templates select="." mode="normalField"/>
+		  </label>
+		</xsl:when>
                 <xsl:otherwise>
 		  <!-- render the label text after/below the component -->
 		  <label class="ds-composite-component">

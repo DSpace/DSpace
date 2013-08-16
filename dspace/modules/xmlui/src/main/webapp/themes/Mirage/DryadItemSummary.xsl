@@ -1636,6 +1636,23 @@
                          alt="Ecological Monographs cover"/>
                 </a>
             </xsl:when>
+            <xsl:when test='$journal-name = "Ecology Letters"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="string('http://onlinelibrary.wiley.com/journal/10.1111/(ISSN)1461-0248')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/ECOLETScover.gif"
+                         alt="Ecology Letters cover"/>
+                </a>
+            </xsl:when>
             <xsl:when test='$journal-name = "eLife"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
@@ -1650,7 +1667,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/elife-full-color-vertical.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/eLifeCover.png"
                          alt="eLife logo"/>
                 </a>
             </xsl:when>
@@ -1706,7 +1723,7 @@
                          alt="Functional Ecology cover"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "German Medical Science"'>
+            <xsl:when test='$journal-name = "GMS German Medical Science"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
@@ -1722,6 +1739,24 @@
                     </xsl:attribute>
                     <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/gms_ejournal.png"
                          alt="German Medical Science cover"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='$journal-name = "GMS Medizinische Informatik, Biometrie und Epidemiologie"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://www.egms.de/en/journals/mibe/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/GMSMIBEcover.gif"
+                         alt="Cover of GMS Medizinische Informatik, Biometrie und Epidemiologie"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Heredity"'>
@@ -1771,6 +1806,40 @@
                     </xsl:attribute>
                     <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/JAnimalEcol.png"
                          alt="Journal of Animal Ecology cover"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='$journal-name = "Journal of Applied Ecology"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="string('http://www.journalofappliedecology.org/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/JAPPLcover.gif"
+                         alt="Journal of Applied Ecology cover"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='$journal-name = "Journal of Ecology"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="string('http://www.journalofecology.org/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/JECOLcover.gif"
+                         alt="Journal of Ecology cover"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Journal of Evolutionary Biology"'>
@@ -1873,23 +1942,6 @@
                     </xsl:attribute>
                     <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/MEECover.jpg"
                          alt="Methods in Ecology and Evolution cover"/>
-                </a>
-            </xsl:when>
-            <xsl:when test='$journal-name = "Molecular Biology and Evolution"'>
-                <a target="_blank">
-                    <xsl:attribute name="href">
-                        <xsl:choose>
-                            <xsl:when test="contains($article-doi,'doi:')">
-                                <xsl:value-of
-                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="string('http://mbe.oxfordjournals.org/')"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/mbe.png"
-                         alt="Molecular Biology and Evolution cover"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Molecular Ecology"'>

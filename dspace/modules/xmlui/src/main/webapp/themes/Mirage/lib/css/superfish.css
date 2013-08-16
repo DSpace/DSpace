@@ -181,3 +181,12 @@ li.sfHover > a > .sf-sub-indicator {
 .sf-menu ul li.sfHover > a > .sf-sub-indicator {
     background-position: -10px 0; /* arrow hovers for modern browsers*/
 }
+
+.sf-menu li.no-hover-highlight:hover, 
+.sf-menu li.no-hover-highlight.sfHover {
+    background-color: transparent !important;
+    color: inherit !important;
+}
+.sf-menu li.no-hover-highlight a:active {
+    color: inherit !important;
+}

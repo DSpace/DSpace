@@ -498,6 +498,7 @@ function DSpaceUpdateConfidence(doc, confIndicatorID, newValue) {
         if (!found)
             newClasses += "cf-" + newValue + " ";
         confElt.className = newClasses;
+        confElt.alt = (newValue == 'blank') ? '' : newValue; // e.g., 'accepted'
     }
 }
 

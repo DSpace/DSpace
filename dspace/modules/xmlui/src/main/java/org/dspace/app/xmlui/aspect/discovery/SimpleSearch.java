@@ -205,14 +205,14 @@ public class SimpleSearch extends AbstractSearch implements
 			Item item = queryList.addItem("search-filter-list",
 					"search-filter-list");
 			Composite filterComp = item.addComposite("search-filter-controls");
-			filterComp.setLabel(T_FILTER_HEAD);
 			filterComp.setHelp(T_FILTER_HELP);
 
-			Select select = filterComp.addSelect("filtertype");
+			Select select = filterComp.addSelect("filtertype", "label-at-left-nobr");
 			// First of all add a default filter
 			select.addOption("*",
 					message("xmlui.ArtifactBrowser.SimpleSearch.filter.all"));
 			// For each field found (at least one) add options
+                        select.setLabel(T_FILTER_HEAD);
 
 			for (String field : filterFields) {
 				select.addOption(field,
