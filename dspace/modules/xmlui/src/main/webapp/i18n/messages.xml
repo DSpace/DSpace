@@ -2988,6 +2988,7 @@
 		corrupted. After this brief review, your data will be archived in Dryad.</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.delete-datapackage">Delete entire submission</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.edit-datapackage">Edit publication description</message>
+	<message key="xmlui.Submission.submit.CheckoutStep.button.finalize">Finalize submission</message>
 
 	<message key="xmlui.Submission.Submissions.default.reviewStep.reviewAction">Review stage</message>
 	<message key="xmlui.Submission.workflow.DryadReviewActionXMLUI.info1">Actions</message>
@@ -3344,6 +3345,7 @@
     <message key="xmlui.PaymentSystem.shoppingcart.order.total">Your total</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.voucher">Voucher code</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.apply">Apply</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.verified">Your payment informtion has been verified. <br/><strong>You will not be charged until your data is approved for archiving by Dryad curators.</strong></message>
     <message key="xmlui.PaymentSystem.shoppingcart.help"><strong>Need Help?</strong><br/>Email us at <a href="mailto:help@datadryad.org">help@datadryad.org</a> or send a message via our <a href="/feedback">contact form</a>.</message>
 
     <message key="xmlui.Submission.Submissions.step.head.reAuthorizationPaymentStep_claimed">Reauthorize payment : claimed</message>

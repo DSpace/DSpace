@@ -43,6 +43,10 @@ import java.sql.SQLException;
  */
 public class PaypalReturnStep extends AbstractStep {
 
+    private static final Message T_PayPalVerified = message("xmlui.PaymentSystem.shoppingcart.verified");
+    private static final Message T_Finalize = message("xmlui.Submission.submit.CheckoutStep.button.finalize");
+
+    
         private static final Logger log = Logger.getLogger(AbstractDSpaceTransformer.class);
         @Override
         public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
@@ -80,8 +84,8 @@ public class PaypalReturnStep extends AbstractStep {
                                      shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
                                  }
                                 //submitUrl = FlowUtils.processPaypalCheckout(context, request,response,item);
-                                body.addDivision("successful").addPara("Your payment has been processed successfully!");
-                                body.addDivision("show_button").addHidden("show_button").setValue("submit next");
+				 body.addDivision("successful").addPara(T_PayPalVerified);
+				 body.addDivision("show_button").addHidden("show_button").setValue(T_Finalize);
                             }
                             else
                             {
