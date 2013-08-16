@@ -352,7 +352,8 @@ public class PaypalImpl implements PaypalService{
         String secureToken = generateSecureToken(shoppingCart,secureTokenId,Integer.toString(shoppingCart.getItem()),type);
 
         if(secureToken==null){
-            showSkipPaymentButton(maindiv,"Secure token is null");
+            showSkipPaymentButton(maindiv,"Unfortunately, Dryad has encountered a problem communicating with our payment processor. Please continue, and we will contact you regarding payment. Error code: Secure-null");
+	    log.error("PayPal Secure Token is null");
 
         }
         else{

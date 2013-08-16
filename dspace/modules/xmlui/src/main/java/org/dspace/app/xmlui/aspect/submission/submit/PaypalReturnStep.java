@@ -97,7 +97,8 @@ public class PaypalReturnStep extends AbstractStep {
                         {
                             shoppingCart.setStatus(ShoppingCart.STATUS_DENIlED);
                             //error in trasaction
-                            addErrorLink(body,"errors when submit the payment:"+result);
+                            addErrorLink(body,"We're sorry, but Dryad experienced an error in validating your method of payment. Error code:"+result);
+			    log.error("There was an error in PayPal card validation. Code = " + result);
 
                         }
                         shoppingCart.update();
