@@ -20,6 +20,7 @@
   -   count_import      - how many items are 'virtual'
   --%>
   
+<%@page import="java.util.List"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
@@ -45,6 +46,10 @@
     Map collection_counts = (Map)request.getAttribute("collection_counts");
     Collection [] all_collections = (Collection[])
                                     request.getAttribute("all_collections");
+    List<String> searchIndices = (List<String>) request.getAttribute("searchIndices");
+    String prefixKey = (String) request.getAttribute("prefixKey");
+    Boolean searchError = (Boolean) request.getAttribute("searchError");
+    boolean bSearchError = searchError != null?searchError:false;
 %>
 
 <dspace:layout titlekey="jsp.tools.itemmap-main.title">
@@ -117,17 +122,29 @@
     <%-- <h3>Import By Author Match</h3>
     Enter part of an author's name for a list of matching items<br> --%>
 	<h3><fmt:message key="jsp.tools.itemmap-main.info4"/></h3>
-    <fmt:message key="jsp.tools.itemmap-main.info5"/><br/>
+    <p><fmt:message key="jsp.tools.itemmap-main.info5"/></p>
 
-    <form method="post" action="">
+    <form method="post" class="standard10" action="">
         <input type="hidden" name="cid" value="<%=collection.getID()%>"/>
-        <input name="namepart"/>
-        <%-- <input type="submit" name="action" value="Search Authors"/> --%>
-        <input type="hidden" name="action" value="Search Authors"/>
+        <input type="hidden" name="action" value="search"/>
+        <select name="index" id="index">
+					<%
+						for (String index : searchIndices)
+						{
+							String key = prefixKey + index;
+					%>
+							<option value="<%= index %>"><fmt:message key="<%= key %>"/></option>
+					<%
+						}
+					%>
+                  </select>
+        <input id="query" name="query" size="50"/>
 	    <input type="submit" value="<fmt:message key="jsp.tools.itemmap-main.search.button"/>" />
         <br/>
-    </form> 
-
+    </form>
+    <% if (bSearchError) { %>
+	<p class="submitFormWarn"><fmt:message key="jsp.tools.itemmap-main.search-error"/></p>
+	<% } %>
     <%-- <h3>Browse Items Imported From Collections:</h3> --%>
 	<h3><fmt:message key="jsp.tools.itemmap-main.info6"/></h3>
 
