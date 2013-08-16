@@ -63,8 +63,10 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer{
             message("xmlui.PaymentSystem.shoppingcart.order.country");
     protected static final Message T_Voucher=
             message("xmlui.PaymentSystem.shoppingcart.order.voucher");
-    protected static final Message T_Apply=
+   protected static final Message T_Apply=
             message("xmlui.PaymentSystem.shoppingcart.order.apply");
+    protected static final Message T_CartHelp=
+            message("xmlui.PaymentSystem.shoppingcart.help");
 
 
     public void addOptions(Options options) throws SAXException, org.dspace.app.xmlui.wing.WingException,
@@ -111,10 +113,7 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer{
             };
 
             org.dspace.app.xmlui.wing.element.Item help = options.addList("need-help").addItem();
-            help.addContent("Email us at ");
-            help.addXref(ConfigurationManager.getProperty("payment-system", "dryad.paymentsystem.help.email"), ConfigurationManager.getProperty("payment-system", "dryad.paymentsystem.help.email"));
-            help.addContent(" or call us at "+ConfigurationManager.getProperty("payment-system","dryad.paymentsystem.help.call"));
-
+            help.addContent(T_CartHelp);
         }catch (Exception pe)
         {
             log.error("Exception: ShoppingCart:", pe);

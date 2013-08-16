@@ -3344,6 +3344,7 @@
     <message key="xmlui.PaymentSystem.shoppingcart.order.total">Your total</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.voucher">Voucher code</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.apply">Apply</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.help"><strong>Need Help?</strong><br/>Email us at <a href="mailto:help@datadryad.org">help@datadryad.org</a> or send a message via our <a href="/feedback">contact form</a>.</message>
 
     <message key="xmlui.Submission.Submissions.step.head.reAuthorizationPaymentStep_claimed">Reauthorize payment : claimed</message>
     <message key="xmlui.Submission.Submissions.step.head.reAuthorizationPaymentStep_pool">Reauthorize payment : Unclaimed</message>
