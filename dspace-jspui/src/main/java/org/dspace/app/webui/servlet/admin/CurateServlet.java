@@ -185,6 +185,21 @@ public class CurateServlet extends DSpaceServlet
             String handle = request.getParameter("handle");
             if (handle != null)
             {
+                if (handle.endsWith("/0"))
+                {
+                    if (!AuthorizeManager.isAdmin(context))
+                    {
+                        throw new AuthorizeException("Only system admins are allowed to perform curation tasks over the site");
+                    } 
+                }
+                else
+                {
+                    DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+                    if (!AuthorizeManager.isAdmin(context, dso))
+                    {
+                        throw new AuthorizeException("Only object (hdl:"+handle+") admins are allowed to perform curation tasks");
+                    }
+                }
                 if ("submit_main_curate".equals(button))
                 {
                     processCurateObject(context, request, handle);
