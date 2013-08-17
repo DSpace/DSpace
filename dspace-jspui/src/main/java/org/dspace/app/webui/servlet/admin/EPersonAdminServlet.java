@@ -10,6 +10,7 @@ package org.dspace.app.webui.servlet.admin;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +20,7 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.eperson.AccountManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.EPersonDeletionException;
@@ -241,6 +243,34 @@ public class EPersonAdminServlet extends DSpaceServlet
 
             showMain(context, request, response);
             context.complete();
+        }
+        else if (button.equals("submit_resetpassword"))
+        {
+        	EPerson e = EPerson.find(context, UIUtil.getIntParameter(request,
+                    "eperson_id"));
+
+            // Check the EPerson exists
+            if (e == null)
+            {
+            	request.setAttribute("no_eperson_selected", Boolean.TRUE);            	
+            	showMain(context, request, response);
+            }
+            else 
+            {
+            	// Note, this may throw an error is the email is bad.
+				try 
+				{
+					AccountManager
+							.sendForgotPasswordInfo(context, e.getEmail());
+					request.setAttribute("reset_password", Boolean.TRUE);
+					showMain(context, request, response);
+				} 
+				catch (MessagingException e1) 
+				{
+					JSPManager.showJSP(request, response,
+							"/dspace-admin/eperson-resetpassword-error.jsp");
+				}
+            }
         }
         else
         {
