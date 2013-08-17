@@ -539,6 +539,11 @@
     <url-pattern>/dspace-admin/curate</url-pattern>
   </servlet-mapping>
   
+  <servlet-mapping>
+    <servlet-name>curate</servlet-name>
+    <url-pattern>/tools/curate</url-pattern>
+  </servlet-mapping>
+  
  <servlet-mapping>
     <servlet-name>itemmap</servlet-name>
     <url-pattern>/tools/itemmap</url-pattern>

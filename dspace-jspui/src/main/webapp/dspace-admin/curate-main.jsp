@@ -48,7 +48,7 @@
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin">
 
-<%@ include file="/dspace-admin/curate-message.jsp" %>
+<%@ include file="/tools/curate-message.jsp" %>
 
 <form action="<%=request.getContextPath()%>/dspace-admin/curate" method="post">
 
@@ -75,7 +75,7 @@
 %>
     <tr>
       <td class="curate heading">
-        <fmt:message key="jsp.dspace-admin.curate.select-group.tag"/>:
+        <fmt:message key="jsp.tools.curate.select-group.tag"/>:
       </td>
       <td class="curate field">
         <select name="select_curate_group" id="select_curate_group" onchange="this.form.submit();">
@@ -88,7 +88,7 @@
 %>
     <tr>
       <td class="curate heading">
-        <fmt:message key="jsp.dspace-admin.curate.select-task.tag"/>:
+        <fmt:message key="jsp.tools.curate.select-task.tag"/>:
       </td>
       <td class="curate field">
         <select name="curate_task" id="curate_task">
@@ -99,8 +99,8 @@
     <tr>
       <td class="curate button" colspan="2">
           <input type="hidden" name="handle" value="<%= handle %>"/>
-          <input type="submit" name="submit_main_curate" value="<fmt:message key="jsp.dspace-admin.curate.perform.button"/>" />
-          <input type="submit" name="submit_main_queue" value="<fmt:message key="jsp.dspace-admin.curate.queue.button"/>" />
+          <input type="submit" name="submit_main_curate" value="<fmt:message key="jsp.tools.curate.perform.button"/>" />
+          <input type="submit" name="submit_main_queue" value="<fmt:message key="jsp.tools.curate.queue.button"/>" />
           <input type="submit" name="submit_main_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
       </td>
     </tr>

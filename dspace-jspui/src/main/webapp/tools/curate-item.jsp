@@ -14,7 +14,7 @@
   -     curate_group_options - options string of gropu selection. 
   -         "" unless ui.taskgroups is set
   -     curate_task_options - options string of task selection.
-  -     community - the community
+  -     item - the item
   -     task_result - result of the curation task
   --%>
 
@@ -28,42 +28,50 @@
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
 <%@ page import="org.dspace.app.webui.util.CurateTaskResult" %>
-<%@ page import="org.dspace.content.Community" %>
+<%@ page import="org.dspace.content.Item" %>
+<%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%!
     private static final String TASK_QUEUE_NAME = ConfigurationManager.getProperty("curate", "ui.queuename");
 %>
 <%
-    Community community = (Community) request.getAttribute("community");
-    int communityID = (community != null ? community.getID() : -1);
-    String title = (community != null ? community.getMetadata("name") : "Unknown Community");
+    Item item = (Item) request.getAttribute("item");
+    int itemID = (item != null ? item.getID() : -1);
+    String title = "Unknown Item";
+    if (item != null)
+    {
+        DCValue[] dcvs = item.getMetadata("dc.title");
+        if (dcvs != null && dcvs.length > 0)
+        {
+            title = dcvs[0].value;
+        }
+    }
     String groupOptions = (String)request.getAttribute("curate_group_options");
     String taskOptions = (String)request.getAttribute("curate_task_options");
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.curate.community.title"
+<dspace:layout titlekey="jsp.tools.curate.item.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin">
 
-<%@ include file="/dspace-admin/curate-message.jsp" %>
+<%@ include file="/tools/curate-message.jsp" %>
 
-    <h1><fmt:message key="jsp.dspace-admin.curate.community.heading">
+    <h1><fmt:message key="jsp.tools.curate.item.heading">
           <fmt:param value="<%= title %>"/>
         </fmt:message>
     </h1>
 
     <table width="60%">
-      <form action="<%=request.getContextPath()%>/dspace-admin/curate" method="post">
-
+      <form action="<%=request.getContextPath()%>/tools/curate" method="post">
 <%
     if (groupOptions != null && !"".equals(groupOptions))
     {
 %>
       <tr>
         <td class="curate heading">
-          <fmt:message key="jsp.dspace-admin.curate.select-group.tag"/>:
+          <fmt:message key="jsp.tools.curate.select-group.tag"/>:
         </td>
         <td class="curate field">
           <select name="select_curate_group" id="select_curate_group" onchange="this.form.submit();">
@@ -71,12 +79,13 @@
           </select>
         </td>
       </tr>
+    </p>
 <%
     }
 %>
       <tr>
         <td class="curate heading">
-          <fmt:message key="jsp.dspace-admin.curate.select-task.tag"/>:
+          <fmt:message key="jsp.tools.curate.select-task.tag"/>:
         </td>
         <td class="curate field">
           <select name="curate_task" id="curate_task">
@@ -86,18 +95,17 @@
       </tr>
       <tr>
         <td class="curate button" colspan="2">
-          <input type="hidden" name="community_id" value="<%= communityID %>"/>
-          <input type="submit" name="submit_community_curate" value="<fmt:message key="jsp.dspace-admin.curate.perform.button"/>" />
-          <input type="submit" name="submit_community_queue" value="<fmt:message key="jsp.dspace-admin.curate.queue.button"/>" />
+          <input type="hidden" name="item_id" value="<%= itemID %>"/>
+          <input type="submit" name="submit_item_curate" value="<fmt:message key="jsp.tools.curate.perform.button"/>" />
+          <input type="submit" name="submit_item_queue" value="<fmt:message key="jsp.tools.curate.queue.button"/>" />
           </form>
         </td>
       </tr>
       <tr>
         <td class="curate button" colspan="2">
-          <form method="post" action="<%=request.getContextPath()%>/tools/edit-communities">
-            <input type="hidden" name="community_id" value="<%= communityID %>"/>
-            <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_EDIT_COMMUNITY%>""/>
-            <input type="submit" value="<fmt:message key="jsp.dspace-admin.curate.return.community.button"/>" />
+          <form method="get" action="<%=request.getContextPath()%>/tools/edit-item">
+            <input type="hidden" name="item_id" value="<%= itemID %>"/>
+            <input type="submit" value="<fmt:message key="jsp.tools.curate.return.item.button"/>" />
           </form>
         </td>
       </tr>

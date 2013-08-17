@@ -709,6 +709,7 @@ input.ds-authority-lock.is-unlocked
     font-family: "verdana", "Arial", "Helvetica", sans-serif;
     font-size: 10pt;
     padding-left: 10px;
+}
 
 /* for alert messages */
 .notice {

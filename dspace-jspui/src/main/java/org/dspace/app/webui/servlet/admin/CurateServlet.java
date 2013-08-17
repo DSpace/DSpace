@@ -120,6 +120,11 @@ public class CurateServlet extends DSpaceServlet
                 UIUtil.getIntParameter(request, "community_id"));
             request.setAttribute("community", community);
 
+            if (!AuthorizeManager.isAdmin(context, community))
+            {
+                throw new AuthorizeException("Only community admins are allowed to perform curation tasks");
+            }
+
             if ("submit_community_curate".equals(button))
             {
                 processCurateObject(context, request, community.getHandle());
@@ -129,13 +134,18 @@ public class CurateServlet extends DSpaceServlet
                 processQueueObject(context, request, community.getHandle());
             }
 
-            showPage(request, response, "/dspace-admin/curate-community.jsp");
+            showPage(request, response, "/tools/curate-community.jsp");
         }
         else if (button.startsWith("submit_collection_"))
         {
             Collection collection = Collection.find(context, 
                 UIUtil.getIntParameter(request, "collection_id"));
             request.setAttribute("collection", collection);
+
+            if (!AuthorizeManager.isAdmin(context, collection))
+            {
+                throw new AuthorizeException("Only collection admins are allowed to perform curation tasks");
+            }
 
             if ("submit_collection_curate".equals(button))
             {
@@ -146,13 +156,18 @@ public class CurateServlet extends DSpaceServlet
                 processQueueObject(context, request, collection.getHandle());
             }
 
-            showPage(request, response, "/dspace-admin/curate-collection.jsp");
+            showPage(request, response, "/tools/curate-collection.jsp");
         }
         else if (button.startsWith("submit_item_"))
         {
             Item item = Item.find(context, 
                 UIUtil.getIntParameter(request, "item_id"));
             request.setAttribute("item", item);
+
+            if (!AuthorizeManager.isAdmin(context, item))
+            {
+                throw new AuthorizeException("Only item admins are allowed to perform curation tasks");
+            }
 
             if ("submit_item_curate".equals(button))
             {
@@ -163,7 +178,7 @@ public class CurateServlet extends DSpaceServlet
                 processQueueObject(context, request, item.getHandle());
             }
 
-            showPage(request, response, "/dspace-admin/curate-item.jsp");
+            showPage(request, response, "/tools/curate-item.jsp");
         }
         else if (button.startsWith("submit_main_"))
         {

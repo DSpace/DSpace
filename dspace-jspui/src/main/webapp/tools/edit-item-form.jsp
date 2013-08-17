@@ -328,7 +328,7 @@
                 <%-- <td class="submitFormLabel">Item's Curations:</td> --%>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-item-form.form.label1"/></td>
                 <td>
-                    <form method="post" action="<%= request.getContextPath() %>/dspace-admin/curate">
+                    <form method="post" action="<%= request.getContextPath() %>/tools/curate">
                         <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                         <input type="submit" name="submit_item_select" value="<fmt:message key="jsp.tools.edit-item-form.form.button.curate"/>"/>
                     </form>

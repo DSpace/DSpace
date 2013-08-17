@@ -575,7 +575,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             // Forward to policy edit page
             response.sendRedirect(response.encodeRedirectURL(request
                     .getContextPath()
-                    + "/dspace-admin/curate?community_id="
+                    + "/tools/curate?community_id="
                     + community.getID() + "&submit_community_select=1"));
         }
         else if (button.equals("submit_admins_create"))
@@ -818,7 +818,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             // Forward to policy edit page
             response.sendRedirect(response.encodeRedirectURL(request
                     .getContextPath()
-                    + "/dspace-admin/curate?collection_id="
+                    + "/tools/curate?collection_id="
                     + collection.getID() + "&submit_collection_select=1"));
         }
         else if (button.startsWith("submit_wf_edit_"))
