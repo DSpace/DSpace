@@ -14,6 +14,8 @@
   - Attributes:
   -   no_eperson_selected - if a user tries to edit or delete an EPerson without
   -                         first selecting one
+  -   reset_password - if a user tries to reset password of an EPerson and the email with token is
+  -                    send successfull 
   -
   - Returns:
   -   submit_add    - admin wants to add an eperson
@@ -32,6 +34,7 @@
 
 <%
    boolean noEPersonSelected = (request.getAttribute("no_eperson_selected") != null);
+   boolean resetPassword = (request.getAttribute("reset_password") != null);
 %>
 
 <dspace:layout titlekey="jsp.dspace-admin.eperson-main.title"
@@ -59,7 +62,11 @@
 	     <fmt:message key="jsp.dspace-admin.eperson-main.noepersonselected"/>
 	   </strong></p>
 <%  } %>
-    
+<% if (resetPassword)
+	{ %><p><strong>
+	     <fmt:message key="jsp.dspace-admin.eperson-main.ResetPassword.success_notice"/>
+	   </strong></p>
+<%  } %>    
     <form name="epersongroup" method="post" action="">    
 
     <center>
@@ -80,7 +87,7 @@
                 </td>
                 <td>
                 	<%-- then&nbsp;<input type="submit" name="submit_edit" value="Edit..." onclick="javascript:finishEPerson();"> --%>
-                	<fmt:message key="jsp.dspace-admin.eperson-main.then"/>&nbsp;<input type="submit" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" onclick="javascript:finishEPerson();"/>
+                	<fmt:message key="jsp.dspace-admin.eperson-main.then"/>&nbsp;<input type="submit" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" onclick="javascript:finishEPerson();"/>                	
                 </td>
                 <td>
                 	<%-- <input type="submit" name="submit_delete" value="Delete..." onclick="javascript:finishEPerson();"> --%>
