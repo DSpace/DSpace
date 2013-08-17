@@ -315,7 +315,16 @@ public class EditCommunitiesServlet extends DSpaceServlet
         }
         catch (AuthorizeException authex) {
             request.setAttribute("policy_button", Boolean.FALSE);
-        }        
+        }
+        if (AuthorizeManager.isAdmin(context, community))
+        {
+            request.setAttribute("admin_community", Boolean.TRUE);
+        }
+        else
+        {
+            request.setAttribute("admin_community", Boolean.FALSE);
+        }
+
     }
     
     /**
@@ -561,6 +570,14 @@ public class EditCommunitiesServlet extends DSpaceServlet
                     + "/tools/authorize?community_id="
                     + community.getID() + "&submit_community_select=1"));
         }
+        else if (button.equals("submit_curate_community"))
+        {
+            // Forward to policy edit page
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/tools/curate?community_id="
+                    + community.getID() + "&submit_community_select=1"));
+        }
         else if (button.equals("submit_admins_create"))
         {
             // Create new group
@@ -794,6 +811,14 @@ public class EditCommunitiesServlet extends DSpaceServlet
             response.sendRedirect(response.encodeRedirectURL(request
                     .getContextPath()
                     + "/tools/authorize?collection_id="
+                    + collection.getID() + "&submit_collection_select=1"));
+        }
+        else if (button.equals("submit_curate_collection"))
+        {
+            // Forward to policy edit page
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/tools/curate?collection_id="
                     + collection.getID() + "&submit_collection_select=1"));
         }
         else if (button.startsWith("submit_wf_edit_"))

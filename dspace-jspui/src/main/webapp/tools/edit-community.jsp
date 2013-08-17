@@ -48,6 +48,8 @@
     Boolean delete = (Boolean)request.getAttribute("delete_button");
     boolean bDelete = (delete == null ? false : delete.booleanValue());
 
+    Boolean adminCommunity = (Boolean)request.getAttribute("admin_community");
+    boolean bAdminCommunity = (adminCommunity == null ? false : adminCommunity.booleanValue());
     String name = "";
     String shortDesc = "";
     String intro = "";
@@ -212,6 +214,19 @@
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label7"/></td>
                 <td>
                     <input type="submit" name="submit_authorization_edit" value="<fmt:message key="jsp.tools.edit-community.form.button.edit"/>" />
+                </td>
+            </tr>   
+    <% }
+
+    if (bAdminCommunity) {
+%> 
+<%-- ===========================================================
+     Curate Community
+     =========================================================== --%>
+            <tr>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label9"/></td>
+                <td>
+                    <input type="submit" name="submit_curate_community" value="<fmt:message key="jsp.tools.edit-community.form.button.curate"/>" />
                 </td>
             </tr>   
     <% } %>
