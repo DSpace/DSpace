@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.sherpa.submit.SHERPASubmitService;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionInfo;
@@ -36,6 +37,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.submit.step.UploadStep;
+import org.dspace.utils.DSpace;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -512,6 +514,15 @@ public class JSPUploadStep extends JSPStep
             HttpServletResponse response, SubmissionInfo subInfo)
             throws SQLException, ServletException, IOException
     {
+        if (ConfigurationManager.getBooleanProperty(
+                "jspui.submission.sherparomeo-policy-enabled", true))
+        {
+            SHERPASubmitService sherpaSubmitService = new DSpace()
+                    .getSingletonService(SHERPASubmitService.class);
+            request.setAttribute("sherpa", sherpaSubmitService
+                    .hasISSNs(context, subInfo.getSubmissionItem()
+                            .getItem()));
+        }
 
         // set to null the bitstream in subInfo, we need to process a new file
         // we don't need any info about previous files...
