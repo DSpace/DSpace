@@ -264,6 +264,8 @@ public class EPersonAdminServlet extends DSpaceServlet
 							.sendForgotPasswordInfo(context, e.getEmail());
 					request.setAttribute("reset_password", Boolean.TRUE);
 					showMain(context, request, response);
+                    // Context needs completing to write registration data
+                    context.complete();
 				} 
 				catch (MessagingException e1) 
 				{
