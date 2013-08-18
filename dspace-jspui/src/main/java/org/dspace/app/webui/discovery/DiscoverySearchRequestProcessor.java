@@ -25,6 +25,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.app.bulkedit.MetadataExport;
@@ -57,6 +58,8 @@ import org.w3c.dom.Document;
 
 public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
 {
+    private static final int ITEMMAP_RESULT_PAGE_SIZE = 50;
+
     private static String msgKey = "org.dspace.app.webui.servlet.FeedServlet";
 
     /** log4j category */
@@ -65,11 +68,25 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
     // locale-sensitive metadata labels
     private Map<String, Map<String, String>> localeLabels = null;
 
+    private List<String> searchIndices = null;
+    
     public synchronized void init()
     {
         if (localeLabels == null)
         {
             localeLabels = new HashMap<String, Map<String, String>>();
+        }
+        
+        if (searchIndices == null)
+        {
+            searchIndices = new ArrayList<String>();
+            DiscoveryConfiguration discoveryConfiguration = SearchUtils
+                    .getDiscoveryConfiguration();
+            searchIndices.add("any");
+            for (DiscoverySearchFilter sFilter : discoveryConfiguration.getSearchFilters())
+            {
+                searchIndices.add(sFilter.getIndexFieldName());
+            }
         }
     }
 
@@ -490,12 +507,20 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
     public void doItemMapSearch(Context context, HttpServletRequest request,
             HttpServletResponse response) throws SearchProcessorException, ServletException, IOException
     {
-        String name = (String) request.getParameter("namepart");
+        String queryString = (String) request.getParameter("query");
         Collection collection = (Collection) request.getAttribute("collection");
-
+        int page = UIUtil.getIntParameter(request, "page")-1;
+        int offset = page > 0? page * ITEMMAP_RESULT_PAGE_SIZE:0;
+        String idx = (String) request.getParameter("index");
+        if (StringUtils.isNotBlank(idx) && !idx.equalsIgnoreCase("any"))
+        {
+            queryString = idx + ":(" + queryString + ")";
+        }
         DiscoverQuery query = new DiscoverQuery();
-        query.setQuery("author:"+name);
-        query.setMaxResults(Integer.MAX_VALUE);
+        query.setQuery(queryString);
+        query.addFilterQueries("-location:l"+collection.getID());
+        query.setMaxResults(ITEMMAP_RESULT_PAGE_SIZE);
+        query.setStart(offset);
 
         DiscoverResult results = null;
         try
@@ -510,33 +535,35 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         Map<Integer, Item> items = new HashMap<Integer, Item>();
 
         List<DSpaceObject> resultDSOs = results.getDspaceObjects();
-        try
+        for (DSpaceObject dso : resultDSOs)
         {
-            for (DSpaceObject dso : resultDSOs)
+            if (dso != null && dso.getType() == Constants.ITEM)
             {
-                if (dso.getType() == Constants.ITEM)
-                {
-                    Item item = (Item) dso;
-                    if (item.isOwningCollection(collection) || item.isIn(collection))
-                    {
-                        continue;
-                    }
-                    if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.READ))
-                    {
-                        items.put(Integer.valueOf(item.getID()), item);
-                    }
-                }
+                // no authorization check is required as discovery is right aware
+                Item item = (Item) dso;
+                items.put(Integer.valueOf(item.getID()), item);
             }
         }
-        catch (SQLException e)
-        {
-            throw new SearchProcessorException(e.getMessage(), e);
-        }
 
-        request.setAttribute("browsetext", name);
+        request.setAttribute("browsetext", queryString);
         request.setAttribute("items", items);
+        request.setAttribute("more", results.getTotalSearchResults() > offset + ITEMMAP_RESULT_PAGE_SIZE);
         request.setAttribute("browsetype", "Add");
+        request.setAttribute("page", page > 0 ? page + 1 : 1);
         
         JSPManager.showJSP(request, response, "itemmap-browse.jsp");
+    }
+    
+    @Override
+    public String getI18NKeyPrefix()
+    {
+        return "jsp.search.filter.";
+    }
+    
+    @Override
+    public List<String> getSearchIndices()
+    {
+        init();
+        return searchIndices;
     }
 }

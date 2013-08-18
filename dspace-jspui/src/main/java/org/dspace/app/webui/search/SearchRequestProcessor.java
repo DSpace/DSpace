@@ -8,6 +8,7 @@
 package org.dspace.app.webui.search;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -32,5 +33,9 @@ public interface SearchRequestProcessor
     public void doItemMapSearch(Context context, HttpServletRequest request,
             HttpServletResponse response) throws SearchProcessorException,
             IOException, ServletException;
+    
+    public List<String> getSearchIndices();
+    
+    public String getI18NKeyPrefix();
 
 }

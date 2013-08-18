@@ -21,8 +21,24 @@
     </description>
   </context-param>
 
-  <!-- 
-   Listener to initialise DSpace configuration and clean up the application 
+    <!-- new ConfigurationService initialization for dspace.dir -->
+    <context-param>
+        <param-name>dspace.dir</param-name>
+        <param-value>${dspace.dir}</param-value>
+        <description>
+            The location of the main DSpace configuration file
+        </description>
+    </context-param>
+
+
+
+    <!-- kernel start listener (from impl), starts up the kernel for standalong webapps -->
+    <listener>
+        <listener-class>org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener</listener-class>
+    </listener>
+
+  <!--
+   Listener to initialise DSpace configuration and clean up the application
   -->
   <listener>
      <listener-class>
