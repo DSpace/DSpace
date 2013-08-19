@@ -102,7 +102,7 @@ public class EPersonAdminServlet extends DSpaceServlet
 	            context.complete();
             }
         }
-        else if (button.equals("submit_save"))
+        else if (button.equals("submit_save") || button.equals("submit_resetpassword"))
         {
             // Update the metadata for an e-person
             EPerson e = EPerson.find(context, UIUtil.getIntParameter(request,
@@ -159,6 +159,10 @@ public class EPersonAdminServlet extends DSpaceServlet
 
                     e.update();
 
+                    if (button.equals("submit_resetpassword"))
+                    {
+                        resetPassword(context, request, response, e);
+                    }
                     showMain(context, request, response);
                     context.complete();
                 }
@@ -213,9 +217,17 @@ public class EPersonAdminServlet extends DSpaceServlet
 
                 e.update();
 
+                if (button.equals("submit_resetpassword"))
+                {
+                    resetPassword(context, request, response, e);
+                }
+                
                 showMain(context, request, response);
                 context.complete();
             }
+            
+
+
         }
         else if (button.equals("submit_delete"))
         {
@@ -257,36 +269,6 @@ public class EPersonAdminServlet extends DSpaceServlet
 
             showMain(context, request, response);
             context.complete();
-        }
-        else if (button.equals("submit_resetpassword"))
-        {
-        	EPerson e = EPerson.find(context, UIUtil.getIntParameter(request,
-                    "eperson_id"));
-
-            // Check the EPerson exists
-            if (e == null)
-            {
-            	request.setAttribute("no_eperson_selected", Boolean.TRUE);            	
-            	showMain(context, request, response);
-            }
-            else 
-            {
-            	// Note, this may throw an error is the email is bad.
-				try 
-				{
-					AccountManager
-							.sendForgotPasswordInfo(context, e.getEmail());
-					request.setAttribute("reset_password", Boolean.TRUE);
-					showMain(context, request, response);
-                    // Context needs completing to write registration data
-                    context.complete();
-				} 
-				catch (MessagingException e1) 
-				{
-					JSPManager.showJSP(request, response,
-							"/dspace-admin/eperson-resetpassword-error.jsp");
-				}
-            }
         }
         else if (button.equals("submit_login_as"))
         {
@@ -360,6 +342,25 @@ public class EPersonAdminServlet extends DSpaceServlet
         {
             // Cancel etc. pressed - show list again
             showMain(context, request, response);
+        }
+    }
+
+    private void resetPassword(Context context, HttpServletRequest request,
+            HttpServletResponse response, EPerson e) throws SQLException,
+            IOException, AuthorizeException, ServletException
+    {
+        // Note, this may throw an error is the email is bad.
+        try
+        {
+            AccountManager
+                    .sendForgotPasswordInfo(context, e.getEmail());
+            request.setAttribute("reset_password", Boolean.TRUE);
+          
+        }
+        catch (MessagingException e1)
+        {
+            JSPManager.showJSP(request, response,
+                    "/dspace-admin/eperson-resetpassword-error.jsp");
         }
     }
 

@@ -193,7 +193,8 @@
                 <td align="left">
                     <%-- <input type="submit" name="submit_save" value="Save Edits"> --%>
                     <input type="submit" name="submit_save" value="<fmt:message key="jsp.dspace-admin.general.save"/>" />
-                </td>
+                    &nbsp;<input type="submit" name="submit_resetpassword" value="<fmt:message key="jsp.dspace-admin.eperson-main.ResetPassword.submit"/>"/>
+                </td>                
                 <td align="right">
                     <%-- <input type="submit" name="submit_delete" value="Delete EPerson..."> --%>
                     <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
