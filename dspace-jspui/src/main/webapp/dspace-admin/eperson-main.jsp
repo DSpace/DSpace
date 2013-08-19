@@ -87,8 +87,7 @@
                 </td>
                 <td>
                 	<%-- then&nbsp;<input type="submit" name="submit_edit" value="Edit..." onclick="javascript:finishEPerson();"> --%>
-                	<fmt:message key="jsp.dspace-admin.eperson-main.then"/>&nbsp;<input type="submit" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" onclick="javascript:finishEPerson();"/>
-                	&nbsp;<input type="submit" name="submit_resetpassword" value="<fmt:message key="jsp.dspace-admin.eperson-main.ResetPassword.submit"/>" onclick="javascript:finishEPerson();"/>
+                	<fmt:message key="jsp.dspace-admin.eperson-main.then"/>&nbsp;<input type="submit" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" onclick="javascript:finishEPerson();"/>                	
                 </td>
                 <td>
                 	<%-- <input type="submit" name="submit_delete" value="Delete..." onclick="javascript:finishEPerson();"> --%>
