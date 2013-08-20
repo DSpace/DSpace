@@ -291,6 +291,7 @@ public class EPersonAdminServlet extends DSpaceServlet
             }
             else
             {
+                
                 log.info(LogManager.getHeader(context, "login-as",
                         "current_eperson="
                                 + context.getCurrentUser().getFullName()
