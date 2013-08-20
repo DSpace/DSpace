@@ -160,8 +160,18 @@ public class EPersonAdminServlet extends DSpaceServlet
                     e.update();
 
                     if (button.equals("submit_resetpassword"))
-                    {
-                        resetPassword(context, request, response, e);
+                    {                        
+                        try
+                        {
+                            resetPassword(context, request, response, e);
+                        }
+                        catch (MessagingException e1)
+                        {
+                            JSPManager
+                                    .showJSP(request, response,
+                                            "/dspace-admin/eperson-resetpassword-error.jsp");
+                            return;
+                        }
                     }
                     showMain(context, request, response);
                     context.complete();
@@ -219,7 +229,17 @@ public class EPersonAdminServlet extends DSpaceServlet
 
                 if (button.equals("submit_resetpassword"))
                 {
-                    resetPassword(context, request, response, e);
+                    try
+                    {
+                        resetPassword(context, request, response, e);
+                    }
+                    catch (MessagingException e1)
+                    {
+                        JSPManager
+                                .showJSP(request, response,
+                                        "/dspace-admin/eperson-resetpassword-error.jsp");
+                        return;
+                    }                   
                 }
                 
                 showMain(context, request, response);
@@ -348,21 +368,12 @@ public class EPersonAdminServlet extends DSpaceServlet
 
     private void resetPassword(Context context, HttpServletRequest request,
             HttpServletResponse response, EPerson e) throws SQLException,
-            IOException, AuthorizeException, ServletException
+            IOException, AuthorizeException, ServletException,
+            MessagingException
     {
         // Note, this may throw an error is the email is bad.
-        try
-        {
-            AccountManager
-                    .sendForgotPasswordInfo(context, e.getEmail());
-            request.setAttribute("reset_password", Boolean.TRUE);
-          
-        }
-        catch (MessagingException e1)
-        {
-            JSPManager.showJSP(request, response,
-                    "/dspace-admin/eperson-resetpassword-error.jsp");
-        }
+        AccountManager.sendForgotPasswordInfo(context, e.getEmail());
+        request.setAttribute("reset_password", Boolean.TRUE);
     }
 
     private void showMain(Context c, HttpServletRequest request,
