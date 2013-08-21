@@ -199,6 +199,8 @@
                     <map:reader name="ConcatenationReader" src="org.dspace.app.xmlui.cocoon.ConcatenationReader"/>
                     <map:reader name="JQueryLoaderReader" src="org.dspace.app.xmlui.utils.JQueryLoaderReader"/>
                     <map:reader name="JSONControlledVocabularyReader" src="org.dspace.app.xmlui.cocoon.JSONControlledVocabularyReader"/>
+                                        
+                    <map:reader name="HandleResolverReader" src="org.dspace.app.xmlui.aspect.handle.HandleResolverReader"/>
                 </map:readers>
                 <map:actions>
                         <map:action name="locale" src="org.dspace.app.xmlui.cocoon.DSpaceLocaleAction"/>
@@ -645,7 +647,33 @@
                     </map:match>
 
                 </map:pipeline>
+                
+                <!-- pipline to run external handle server -->
+                <map:pipeline type="noncaching">
+                  <map:match pattern="handleresolver/resolve/**">
+                        <map:read type="HandleResolverReader">
+                            <map:parameter name="action" value="resolve"/>
+                            <map:parameter name="handle" value="{1}"/>
+                      </map:read>
+                  </map:match>
 
+                  <!--Redirect /handleresolver/listprefixes/ to the same path but without a trailing slash-->
+                  <map:match pattern="handleresolver/listprefixes/">
+                      <map:redirect-to uri="{request:contextPath}/handleresolver/listprefixes" permanent="yes"/>
+                  </map:match>
+                  <map:match pattern="handleresolver/listprefixes">
+                      <map:read type="HandleResolverReader">
+                            <map:parameter name="action" value="listprefixes"/>
+                      </map:read>
+                  </map:match>
+
+                  <map:match pattern="handleresolver/listhandles/*">
+                      <map:read type="HandleResolverReader">
+                            <map:parameter name="action" value="listhandles"/>
+                            <map:parameter name="prefix" value="{1}"/>
+                      </map:read>
+                  </map:match>
+                </map:pipeline>
                 
                 <map:pipeline>
                         <!--<map:match pattern="**">-->
