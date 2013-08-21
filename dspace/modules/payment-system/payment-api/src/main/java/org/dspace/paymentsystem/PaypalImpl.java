@@ -420,7 +420,7 @@ public class PaypalImpl implements PaypalService{
         PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
         PaymentSystemService payementSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
         PaypalService paypalService = new DSpace().getSingletonService(PaypalService.class);
-        mainDiv.setHead("Checkout");
+        //mainDiv.setHead("Checkout");
         String errorMessage = request.getParameter("encountError");
         try{
             //create new transaction or update transaction id with item
