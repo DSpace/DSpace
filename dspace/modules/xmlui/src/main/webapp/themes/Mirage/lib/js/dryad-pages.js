@@ -2,8 +2,17 @@
 /* JS behaviors for all Dryad pages */
 jQuery(document).ready(function() {
 
+    var modal =jQuery("#aspect_eperson_TermsOfService_div_modal-content").val();
+    if(modal === undefined)
+    {
+
+    }
+    else{
+        initTermsOfService();
+    }
 
     jQuery('.label-mark').tooltip();
+
     jQuery('#aspect_submission_workflow_WorkflowTransformer_field_skip_payment').css('display','none');
     jQuery('#aspect_submission_submit_CheckoutStep_field_skip_payment').css('display','none');
     //if there is error in generate the paypal form or payment is 0 enable the skip button
@@ -432,8 +441,27 @@ jQuery(document).ready(function() {
         $currencySelector.unbind('change').change(function() {
             showPreferredCurrency( $(this).val() );
         });
+
         // show initial values in USD (don't rely on i18n-message text!)
         showPreferredCurrency('USD');
     }
 });
 
+function initTermsOfService() {
+
+    $("#aspect_eperson_TermsOfService_div_background").toggleClass("active");
+    $("#aspect_eperson_TermsOfService_div_modal-content").toggleClass("active");
+
+
+    $("#aspect_eperson_TermsOfService_field_submit").click(function(){
+        $("#aspect_eperson_TermsOfService_div_background").toggleClass("active");
+        $("#aspect_eperson_TermsOfService_div_modal-content").toggleClass("active");
+
+        var popup = document.getElementById("aspect_eperson_TermsOfService_div_modal-content");
+        popup.style.display = 'none';
+
+    });
+
+
+
+}

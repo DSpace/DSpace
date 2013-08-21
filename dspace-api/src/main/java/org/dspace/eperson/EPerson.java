@@ -47,6 +47,14 @@ public class EPerson extends DSpaceObject
 
     /** The e-mail field (for sorting) */
     public static final int LANGUAGE = 5;
+
+    /** The e-mail field (for sorting) */
+    public static final int PHONE = 6;
+
+    /** The e-mail field (for sorting) */
+    public static final int TERMS = 7;
+
+
     
     /** log4j logger */
     private static Logger log = Logger.getLogger(EPerson.class);
@@ -1026,5 +1034,90 @@ public class EPerson extends DSpaceObject
     {
         return getEmail();
     }
+
+    /**
+     * Get the e-person's email address
+     *
+     * @return their email address
+     */
+    public String getPhone()
+    {
+        return myRow.getStringColumn("phone");
+    }
+
+    /**
+     * Set the EPerson's email
+     *
+     * @param s
+     *            the new email
+     */
+    public void setPhone(String s)
+    {
+        if (s != null)
+        {
+            s = s.toLowerCase();
+        }
+
+        myRow.setColumn("phone", s);
+        modified = true;
+    }
+    /**
+     * Find the eperson by their email address.
+     *
+     * @return EPerson, or {@code null} if none such exists.
+     */
+    public static EPerson findByPhone(Context context, String phone)
+            throws SQLException, AuthorizeException
+    {
+        if (phone == null)
+        {
+            return null;
+        }
+        TableRow row = DatabaseManager.findByUnique(context, "eperson",
+                "phone", phone.toLowerCase());
+
+        if (row == null)
+        {
+            return null;
+        }
+        else
+        {
+            // First check the cache
+            EPerson fromCache = (EPerson) context.fromCache(EPerson.class, row
+                    .getIntColumn("eperson_id"));
+
+            if (fromCache != null)
+            {
+                return fromCache;
+            }
+            else
+            {
+                return new EPerson(context, row);
+            }
+        }
+    }
+
+    /**
+     * Get the e-person's Terms agreement
+     *
+     * @return their agreement
+     */
+    public boolean getTerms()
+    {
+        return myRow.getBooleanColumn("terms");
+    }
+
+    /**
+     * Set the Terms
+     *
+     * @param agrees
+     *            agreed to terms
+     */
+    public void setTerms(boolean agrees)
+    {
+        myRow.setColumn("terms", agrees);
+        modified = true;
+    }
+
 
 }

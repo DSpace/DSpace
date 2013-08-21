@@ -390,11 +390,12 @@ function updateInformation(eperson)
     }
 
 
-	// Get the parameters from the form
-	var lastName = cocoon.request.getParameter("last_name");
-	var firstName = cocoon.request.getParameter("first_name");
-	var phone = cocoon.request.getParameter("phone");
-        var language = cocoon.request.getParameter("language");
+    // Get the parameters from the form
+    var lastName = cocoon.request.getParameter("last_name");
+    var firstName = cocoon.request.getParameter("first_name");
+    var phone = cocoon.request.getParameter("phone");
+    var language = cocoon.request.getParameter("language");
+    var terms = (cocoon.request.getParameter("terms") == "true");
 
     // first check that each parameter is filled in before seting anything.	
 	var idx = 0;
@@ -406,23 +407,33 @@ function updateInformation(eperson)
     }
     
     if (lastName == null || lastName.equals(""))
-	{
-	    errors[idx++] = "last_name";
-	}
-	
-	if (idx > 0) 
-	{
-	    // There were errors
-	    return errors;
-	}
-	
-	eperson.setFirstName(firstName);
-	eperson.setLastName(lastName);
-	
-	eperson.setMetadata("phone", phone);
-        eperson.setLanguage(language);
-	eperson.update();
-	
+    {
+        errors[idx++] = "last_name";
+    }
+    if (phone == null || phone.equals(""))
+    {
+        errors[idx++] = "phone";
+    }
+
+    if (terms == false)
+    {
+        errors[idx++] = "terms";
+    }
+
+    if (idx > 0)
+    {
+        // There were errors
+        return errors;
+    }
+
+    eperson.setFirstName(firstName);
+    eperson.setLastName(lastName);
+
+    eperson.setPhone(phone);
+    eperson.setLanguage(language);
+    eperson.setTerms(terms);
+    eperson.update();
+
     return new Array();
 }
   

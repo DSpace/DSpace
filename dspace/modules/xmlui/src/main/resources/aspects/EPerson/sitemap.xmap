@@ -49,7 +49,10 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 	<map:components>
 		
 		<map:transformers>
-			<map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.eperson.Navigation"/>
+
+            <map:transformer name="TermsOfService" src="org.dspace.app.xmlui.aspect.eperson.TermsOfService"/>
+
+            <map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.eperson.Navigation"/>
 			
 			<map:transformer name="StartRegistration" src="org.dspace.app.xmlui.aspect.eperson.PasswordLogin"/>
 			<map:transformer name="VerifyEmail" src="org.dspace.app.xmlui.aspect.eperson.VerifyEmail"/>
@@ -328,7 +331,8 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 
 			</map:match>
 			
-			
+			<map:transform type="TermsOfService"/>
+
 			<map:serialize type="xml"/>
 		</map:pipeline>
 	</map:pipelines>

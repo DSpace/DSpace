@@ -439,6 +439,8 @@
 
         </div>
 
+        <xsl:apply-templates select="dri:div[@id='aspect.eperson.TermsOfService.div.background']"/>
+        <xsl:apply-templates select="dri:div[@id='aspect.eperson.TermsOfService.div.modal-content']"/>
     </xsl:template>
 
 
