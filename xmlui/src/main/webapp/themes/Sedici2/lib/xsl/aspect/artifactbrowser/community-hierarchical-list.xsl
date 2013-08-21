@@ -47,7 +47,7 @@
 	<!-- This template will iterate over each Top Community, located under the main referenceSet tag. -->
 	<xsl:template match="dri:referenceSet[@n='community-browser']/dri:reference" mode="initial">
 		<xsl:param name="currentLevel"><xsl:value-of select="number('1')"/></xsl:param>
-		<xsl:if test="not(contains(@url, '27909'))">
+		<xsl:if test="not(contains(@url, '10915/27909'))">
 		<xsl:variable name="externalMetadataURL">
 			<xsl:text>cocoon:/</xsl:text>
 			<xsl:value-of select="@url" />
