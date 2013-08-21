@@ -47,6 +47,10 @@
             <artifactId>servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+        </dependency>
         <!-- SPECIAL CASE - need JUNIT at build time and testing time -->
         <dependency>
             <groupId>junit</groupId>
