@@ -524,7 +524,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             String recipient = ConfigurationManager
                     .getProperty("alert.recipient");
 
-            if (recipient != null)
+            if (StringUtils.isNotBlank(recipient))
             {
                 Email email = Email
                         .getEmail(I18nUtil.getEmailFilename(

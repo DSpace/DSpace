@@ -843,7 +843,7 @@ public class DSIndexer
 			String recipient = ConfigurationManager
 					.getProperty("alert.recipient");
 
-			if (recipient != null) {
+			if (StringUtils.isNotBlank(recipient)) {
 				Email email = Email.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "internal_error"));
 				email.addRecipient(recipient);
 				email.addArgument(ConfigurationManager

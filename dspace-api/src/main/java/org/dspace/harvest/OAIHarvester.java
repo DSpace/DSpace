@@ -29,6 +29,7 @@ import java.util.TimeZone;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -824,7 +825,7 @@ public class OAIHarvester {
     	try {
 			String recipient = ConfigurationManager.getProperty("alert.recipient");
 
-			if (recipient != null) {
+			if (StringUtils.isNotBlank(recipient)) {
 				Email email = Email.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "harvesting_error"));
 				email.addRecipient(recipient);
 				email.addArgument(targetCollection.getID());
