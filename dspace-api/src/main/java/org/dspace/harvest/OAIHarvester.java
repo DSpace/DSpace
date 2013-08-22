@@ -897,23 +897,21 @@ public class OAIHarvester {
     }
 
     /**
-     * Verify the existance of an OAI server with the specified set and supporting the provided metadata formats.
+     * Verify the existence of an OAI server with the specified set and
+     * supporting the provided metadata formats.
+     *
      * @param oaiSource the address of the OAI-PMH provider
      * @param oaiSetId
      * @param metaPrefix
      * @param testORE whether the method should also check the PMH provider for ORE support
      * @return list of errors encountered during verification. Empty list indicates a "success" condition.
      */
-    public static List<String> verifyOAIharvester(String oaiSource, String oaiSetId, String metaPrefix, boolean testORE)
+    public static List<String> verifyOAIharvester(String oaiSource,
+            String oaiSetId, String metaPrefix, boolean testORE)
     {
     	List<String> errorSet = new ArrayList<String>();
 
-    	// First, make sure the metadata we need is supported by the target server
-    	Namespace ORE_NS = OAIHarvester.getORENamespace();
-    	String OREOAIPrefix = null;
-    	Namespace DMD_NS = OAIHarvester.getDMDNamespace(metaPrefix);
-    	String DMDOAIPrefix = null;
-
+        // First, see if we can contact the target server at all.
     	try {
     		Identify idenTest = new Identify(oaiSource);
     	}
@@ -922,14 +920,28 @@ public class OAIHarvester {
     		return errorSet;
     	}
 
-    	try {
-    		OREOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, ORE_NS.getURI());
-    		DMDOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, DMD_NS.getURI());
+        // Next, make sure the metadata we need is supported by the target server
+        Namespace DMD_NS = OAIHarvester.getDMDNamespace(metaPrefix);
+        if (null == DMD_NS)
+        {
+            errorSet.add(OAI_DMD_ERROR + ":  " + metaPrefix);
+            return errorSet;
+        }
+
+        String OREOAIPrefix = null;
+        String DMDOAIPrefix = null;
+
+        try {
+            OREOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, ORE_NS.getURI());
+            DMDOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, DMD_NS.getURI());
     	}
     	catch (Exception ex) {
-    		errorSet.add(OAI_ADDRESS_ERROR + ": OAI did not respond to ListMetadataFormats query  (" + ORE_NS.getPrefix() + ":" + OREOAIPrefix + " ; " +
-    				DMD_NS.getPrefix() + ":" + DMDOAIPrefix + ")");
-    		return errorSet;
+            errorSet.add(OAI_ADDRESS_ERROR
+                    + ": OAI did not respond to ListMetadataFormats query  ("
+                    + ORE_NS.getPrefix() + ":" + OREOAIPrefix + " ; "
+                    + DMD_NS.getPrefix() + ":" + DMDOAIPrefix + "):  "
+                    + ex.getMessage());
+            return errorSet;
     	}
 
     	if (testORE && OREOAIPrefix == null)
@@ -988,34 +1000,33 @@ public class OAIHarvester {
         return errorSet;
     }
 
+    /**
+     * Start harvest scheduler.
+     */
+    public static synchronized void startNewScheduler() throws SQLException, AuthorizeException {
+        Context c = new Context();
+        HarvestedCollection.exists(c);
+        c.complete();
 
-	/**
-	 * Start harvest scheduler.
-	 */
-	public static synchronized void startNewScheduler() throws SQLException, AuthorizeException {
-		Context c = new Context();
-		HarvestedCollection.exists(c);
-		c.complete();
-
-		if (mainHarvestThread != null && harvester != null) {
-			stopScheduler();
-		}
+        if (mainHarvestThread != null && harvester != null) {
+                stopScheduler();
+            }
     	harvester = new HarvestScheduler();
     	HarvestScheduler.interrupt = HarvestScheduler.HARVESTER_INTERRUPT_NONE;
     	mainHarvestThread = new Thread(harvester);
     	mainHarvestThread.start();
     }
 
-	/**
-	 * Stop an active harvest scheduler.
-	 */
-	public static synchronized void stopScheduler() throws SQLException, AuthorizeException {
-		synchronized(HarvestScheduler.lock) {
-			HarvestScheduler.interrupt = HarvestScheduler.HARVESTER_INTERRUPT_STOP;
-			HarvestScheduler.lock.notify();
-		}
-    	mainHarvestThread = null;
-		harvester = null;
+    /**
+     * Stop an active harvest scheduler.
+     */
+    public static synchronized void stopScheduler() throws SQLException, AuthorizeException {
+        synchronized(HarvestScheduler.lock) {
+                HarvestScheduler.interrupt = HarvestScheduler.HARVESTER_INTERRUPT_STOP;
+                HarvestScheduler.lock.notify();
+        }
+        mainHarvestThread = null;
+                harvester = null;
     }
 
 	/**
