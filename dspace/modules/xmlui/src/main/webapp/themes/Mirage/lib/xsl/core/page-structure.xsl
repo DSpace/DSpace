@@ -635,7 +635,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                         <xsl:attribute name="href">
                             <xsl:value-of
                                     select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                            <xsl:text>/policies</xsl:text>
+                            <xsl:text>/pages/policies</xsl:text>
                         </xsl:attribute>
                         <i18n:text>xmlui.dri2xhtml.structural.footer-terms-of-service</i18n:text>
                     </a>
