@@ -13,7 +13,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.google.gson.Gson;
-import java.util.Iterator;
 import java.util.Map;
 import org.apache.avalon.excalibur.pool.Recyclable;
 import org.apache.avalon.framework.parameters.Parameters;
@@ -85,12 +84,16 @@ public class HandleResolverReader extends AbstractReader implements Recyclable {
                     log.error("Shall resolve a handle but not handle parameter exists?");
                     throw new ProcessingException("Handle to resolve was not specified.");
                 }
-                jsonString = gson.toJson(new Url(HandleManager.resolveToURL(context, handle)));
+                String url = HandleManager.resolveToURL(context, handle);
+                // Only an array or an abject is valid JSON. A simple string
+                // isn't. An object always uses key value pairs, so we use an
+                // array.
+                jsonString = gson.toJson(new String[] {url});
             }
             else if (action.equals("listprefixes"))
             {
                 String[] prefixes = { HandleManager.getPrefix() };
-                jsonString = gson.toJson(new Prefixlist(prefixes));
+                jsonString = gson.toJson(prefixes);
             }
             else if (action.equals("listhandles"))
             {
@@ -102,7 +105,7 @@ public class HandleResolverReader extends AbstractReader implements Recyclable {
 
                 List<String> handlelist = HandleManager.getHandlesForPrefix(context, prefix);
                 String[] handles = handlelist.toArray(new String[handlelist.size()]);
-                jsonString = gson.toJson(new Handlelist(handles));
+                jsonString = gson.toJson(handles);
             }
         } catch (SQLException e) {
             log.error("SQLException: ", e);
@@ -127,31 +130,4 @@ public class HandleResolverReader extends AbstractReader implements Recyclable {
         this.prefix = null;
         super.recycle();
     }
-
-    private class Handlelist
-    {
-        String[] handles;
-        Handlelist(String[] handles) {
-            this.handles = handles;
-        }
-    }
-    
-    private class Prefixlist
-    {
-        String[] prefixes;
-        Prefixlist(String[] prefixes)
-        {
-            this.prefixes = prefixes;
-        }
-    }
-    
-    private class Url
-    {
-        String url;
-        Url(String url)
-        {
-            this.url = url;
-        }
-    }
-    
 }
