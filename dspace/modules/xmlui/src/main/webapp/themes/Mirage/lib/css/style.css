@@ -2243,10 +2243,6 @@ a.feedbackform-user-voice-link {
 
     }
 
-#aspect_paymentsystem_ShoppingCartTransformer_list_Payment{
-    background-color:white;
-
-}
 #aspect_paymentsystem_ShoppingCartTransformer_list_transaction li{
     display: none;
 }
@@ -2262,14 +2258,10 @@ a.feedbackform-user-voice-link {
     display:none;
 }
 #aspect_paymentsystem_ShoppingCartTransformer_list_Payment h1{
+    margin-top:0px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_Payment h1{
     font-size:15px;
-}
-#aspect_paymentsystem_ShoppingCartTransformer_list_Payment ol{
-    padding:15px;
-
-}
-#aspect_paymentsystem_ShoppingCartTransformer_list_Payment{
-    border: 2px solid black;
 }
 #aspect_paymentsystem_ShoppingCartTransformer_list_currency-section{
     list-style-type: none;
@@ -2306,12 +2298,12 @@ a.feedbackform-user-voice-link {
 }
 
 #aspect_paymentsystem_ShoppingCartTransformer_item_payer{
-    border-top:2px solid gray;
-    margin-top: 5px;
+    border-top: 1px solid #aaa;
+    margin-top: 0px;
 }
 #aspect_paymentsystem_ShoppingCartTransformer_item_total{
-    border-top:2px solid gray;
-    border-bottom:2px solid gray;
+    border-top: 1px solid #aaa;
+    border-top: 1px solid #aaa;
 }
 #aspect_paymentsystem_ShoppingCartTransformer_item_country-list label{
     font-size: 13px;
