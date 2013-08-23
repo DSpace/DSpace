@@ -24,7 +24,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
@@ -70,7 +70,7 @@ public class SolrLogger
 {
     private static final Logger log = Logger.getLogger(SolrLogger.class);
 	
-    private static final CommonsHttpSolrServer solr;
+    private static final HttpSolrServer solr;
 
     public static final String DATE_FORMAT_8601 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
@@ -105,13 +105,13 @@ public class SolrLogger
         log.info("solr-statistics.server:" + ConfigurationManager.getProperty("solr-statistics", "server"));
         log.info("usage-statistics.dbfile:" + ConfigurationManager.getProperty("usage-statistics", "dbfile"));
     	
-        CommonsHttpSolrServer server = null;
+        HttpSolrServer server = null;
         
         if (ConfigurationManager.getProperty("solr-statistics", "server") != null)
         {
             try
             {
-                server = new CommonsHttpSolrServer(ConfigurationManager.getProperty("solr-statistics", "server"));
+                server = new HttpSolrServer(ConfigurationManager.getProperty("solr-statistics", "server"));
                 SolrQuery solrQuery = new SolrQuery()
                         .setQuery("type:2 AND id:1");
                 server.query(solrQuery);
@@ -1213,7 +1213,7 @@ public class SolrLogger
 
             //Start by creating a new core
             String coreName = "statistics-" + dcStart.getYear();
-            CommonsHttpSolrServer statisticsYearServer = createCore(solr, coreName);
+            HttpSolrServer statisticsYearServer = createCore(solr, coreName);
 
             System.out.println("Moving: " + totalRecords + " into core " + coreName);
             log.info("Moving: " + totalRecords + " records into core " + coreName);
@@ -1240,7 +1240,7 @@ public class SolrLogger
                 ContentStreamUpdateRequest contentStreamUpdateRequest = new ContentStreamUpdateRequest("/update/csv");
                 contentStreamUpdateRequest.setParam("stream.contentType", "text/plain;charset=utf-8");
                 contentStreamUpdateRequest.setAction(AbstractUpdateRequest.ACTION.COMMIT, true, true);
-                contentStreamUpdateRequest.addFile(tempCsv);
+                contentStreamUpdateRequest.addFile(tempCsv, "text/plain;charset=utf-8");
 
                 statisticsYearServer.request(contentStreamUpdateRequest);
             }
@@ -1257,17 +1257,17 @@ public class SolrLogger
         FileUtils.deleteDirectory(tempDirectory);
     }
 
-    private static CommonsHttpSolrServer createCore(CommonsHttpSolrServer solr, String coreName) throws IOException, SolrServerException {
+    private static HttpSolrServer createCore(HttpSolrServer solr, String coreName) throws IOException, SolrServerException {
         String solrDir = ConfigurationManager.getProperty("dspace.dir") + File.separator + "solr" +File.separator;
         String baseSolrUrl = solr.getBaseURL().replace("statistics", "");
         CoreAdminRequest.Create create = new CoreAdminRequest.Create();
         create.setCoreName(coreName);
         create.setInstanceDir("statistics");
         create.setDataDir(solrDir + coreName + File.separator + "data");
-        CommonsHttpSolrServer solrServer = new CommonsHttpSolrServer(baseSolrUrl);
+        HttpSolrServer solrServer = new HttpSolrServer(baseSolrUrl);
         create.process(solrServer);
         log.info("Created core with name: " + coreName);
-        return new CommonsHttpSolrServer(baseSolrUrl + "/" + coreName);
+        return new HttpSolrServer(baseSolrUrl + "/" + coreName);
     }
 
 
@@ -1378,7 +1378,7 @@ public class SolrLogger
                 ContentStreamUpdateRequest contentStreamUpdateRequest = new ContentStreamUpdateRequest("/update/csv");
                 contentStreamUpdateRequest.setParam("stream.contentType", "text/plain;charset=utf-8");
                 contentStreamUpdateRequest.setAction(AbstractUpdateRequest.ACTION.COMMIT, true, true);
-                contentStreamUpdateRequest.addFile(tempCsv);
+                contentStreamUpdateRequest.addFile(tempCsv, "text/plain;charset=utf-8");
 
                 solr.request(contentStreamUpdateRequest);
             }
