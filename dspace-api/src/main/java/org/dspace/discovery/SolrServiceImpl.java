@@ -1617,6 +1617,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         if(discoveryQuery.getQuery() != null)
         {
         	query = discoveryQuery.getQuery();
+            if (query.contains(": "))
+            {
+                query = StringUtils.replace(query, ": ", "\\: ");
+            }
+            else if (query.endsWith(":"))
+            {
+                query = StringUtils.removeEnd(query, ":") + "\\:";
+            }
 		}
 
         solrQuery.setQuery(query);
