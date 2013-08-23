@@ -22,12 +22,14 @@ import org.dspace.statistics.util.DnsLookup;
 import org.dspace.statistics.util.LocationUtils;
 import org.dspace.statistics.util.SpiderDetector;
 import org.elasticsearch.action.ActionFuture;
-import org.elasticsearch.action.admin.indices.exists.IndicesExistsRequest;
-import org.elasticsearch.action.admin.indices.exists.IndicesExistsResponse;
+
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
+import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.action.admin.indices.mapping.put.PutMappingRequestBuilder;
-import org.elasticsearch.client.action.index.IndexRequestBuilder;
+
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
@@ -242,7 +244,7 @@ public class ElasticSearchLogger {
             putMappingRequestBuilder.setSource(stringMappingJSON);
             PutMappingResponse response = putMappingRequestBuilder.execute().actionGet();
 
-            if(!response.getAcknowledged()) {
+            if(!response.isAcknowledged()) {
                 log.info("Could not define mapping for type ["+indexName+"]/["+indexType+"]");
             } else {
                 log.info("Successfully put mapping for ["+indexName+"]/["+indexType+"]");
