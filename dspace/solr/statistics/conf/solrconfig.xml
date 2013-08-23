@@ -1013,6 +1013,10 @@
          <str name="update.chain">dedupe</str>
        </lst>
        -->
+        <!-- Update chain processor required by DSpace to auto generate the UUID field in solr -->
+        <lst name="defaults">
+            <str name="update.chain">uuid</str>
+        </lst>
   </requestHandler>
 
   <!-- for back compat with clients using /update/json and /update/csv -->  
@@ -1817,8 +1821,7 @@
       <processor class="solr.RunUpdateProcessorFactory" />
     </updateRequestProcessorChain>
   -->
- 
-  <!-- use uuid as uniqueKey update processor chain -->
+    <!-- Required for DSpace to ensure that unique identifiers are added to each solr document -->
   <updateRequestProcessorChain name="uuid">    
     <processor class="solr.UUIDUpdateProcessorFactory">
       <str name="fieldName">uid</str>
