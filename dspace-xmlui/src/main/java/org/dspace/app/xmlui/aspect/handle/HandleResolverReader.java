@@ -10,10 +10,15 @@ package org.dspace.app.xmlui.aspect.handle;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.Gson;
+
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.avalon.excalibur.pool.Recyclable;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
@@ -23,10 +28,11 @@ import org.apache.cocoon.environment.Response;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.reading.AbstractReader;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
-
 import org.dspace.app.xmlui.utils.ContextUtil;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 
@@ -63,8 +69,6 @@ public class HandleResolverReader extends AbstractReader implements Recyclable {
     
     @Override
     public void generate() throws IOException, SAXException, ProcessingException {
-        Request request = ObjectModelHelper.getRequest(objectModel);
-        
         Context context = null;
         try {
             context = ContextUtil.obtainContext(objectModel);
@@ -79,31 +83,56 @@ public class HandleResolverReader extends AbstractReader implements Recyclable {
         try {
             if (action.equals("resolve"))
             {
-                if (null == handle)
+                if (StringUtils.isBlank(handle))
                 {
-                    log.error("Shall resolve a handle but not handle parameter exists?");
-                    throw new ProcessingException("Handle to resolve was not specified.");
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
                 }
                 String url = HandleManager.resolveToURL(context, handle);
                 // Only an array or an abject is valid JSON. A simple string
                 // isn't. An object always uses key value pairs, so we use an
                 // array.
-                jsonString = gson.toJson(new String[] {url});
+                if (url != null)
+                {
+                    jsonString = gson.toJson(new String[] {url});
+                }
+                else
+                {
+                    jsonString = gson.toJson(null);
+                }
             }
             else if (action.equals("listprefixes"))
             {
-                String[] prefixes = { HandleManager.getPrefix() };
+                List<String> prefixes = new ArrayList<String>();
+                prefixes.add(HandleManager.getPrefix());
+                String additionalPrefixes = ConfigurationManager
+                        .getProperty("handle.additional.prefixes");
+                if (StringUtils.isNotBlank(additionalPrefixes))
+                {
+                    for (String apref : additionalPrefixes.split(","))
+                    {
+                        prefixes.add(apref.trim());
+                    }
+                }
                 jsonString = gson.toJson(prefixes);
             }
             else if (action.equals("listhandles"))
             {
-                if (null == prefix || prefix.isEmpty())
+                if (ConfigurationManager.getBooleanProperty(
+                        "handle.hide.listhandles", true))
                 {
-                    log.error("Shall list all handles but not prefix parameter exists?");
-                    throw new ProcessingException("Can't determine prefix.");
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                    return;
+                }
+                
+                if (StringUtils.isBlank(prefix))
+                {
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
                 }
 
-                List<String> handlelist = HandleManager.getHandlesForPrefix(context, prefix);
+                List<String> handlelist = HandleManager.getHandlesForPrefix(
+                        context, prefix);
                 String[] handles = handlelist.toArray(new String[handlelist.size()]);
                 jsonString = gson.toJson(handles);
             }
