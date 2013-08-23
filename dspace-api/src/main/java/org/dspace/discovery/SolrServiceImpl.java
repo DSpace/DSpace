@@ -13,6 +13,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -41,10 +43,15 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -126,10 +133,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     /**
      * Non-Static CommonsHttpSolrServer for processing indexing events.
      */
-    private CommonsHttpSolrServer solr = null;
+    private HttpSolrServer solr = null;
 
 
-    protected CommonsHttpSolrServer getSolr()
+    protected HttpSolrServer getSolr()
     {
         if ( solr == null)
         {
@@ -140,16 +147,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             {
                 try {
                     log.debug("Solr URL: " + solrService);
-                    solr = new CommonsHttpSolrServer(solrService);
+                    solr = new HttpSolrServer(solrService);
 
                     solr.setBaseURL(solrService);
 
                     SolrQuery solrQuery = new SolrQuery()
                             .setQuery("search.resourcetype:2 AND search.resourceid:1");
 
-                    solr.query(solrQuery);
-                } catch (MalformedURLException e) {
-                    log.error("Error while initialinging solr server", e);
+                    solr.query(solrQuery);                
                 } catch (SolrServerException e) {
                     log.error("Error while initialinging solr server", e);
                 }
@@ -1841,14 +1846,21 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         {
             return null;
         }
-        org.apache.commons.httpclient.methods.GetMethod method =
-            new org.apache.commons.httpclient.methods.GetMethod(getSolr().getHttpClient().getHostConfiguration().getHostURL() + "");
+        HttpHost hostURL = (HttpHost)(getSolr().getHttpClient().getParams().getParameter(ClientPNames.DEFAULT_HOST));
+        
+        HttpGet method = new HttpGet(hostURL.toHostString() + "");
+        try
+        {
+            URI uri = new URIBuilder(method.getURI()).addParameter("q",query.toString()).build();
+        }
+        catch (URISyntaxException e)
+        {
+            throw new SearchServiceException(e);
+        }
 
-        method.setQueryString(query.toString());
+        HttpResponse response = getSolr().getHttpClient().execute(method);
 
-        getSolr().getHttpClient().executeMethod(method);
-
-        return method.getResponseBodyAsStream();
+        return response.getEntity().getContent();
     }
 
     public List<DSpaceObject> search(Context context, String query, int offset, int max, String... filterquery)
