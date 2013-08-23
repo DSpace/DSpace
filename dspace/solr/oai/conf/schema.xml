@@ -143,6 +143,7 @@
 
 
  <fields>
+   <field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>
    <!-- Item always present information -->
    <field name="item.id" type="int" indexed="true" stored="true" multiValued="false" />
    <field name="item.public" type="boolean" indexed="true" stored="true" multiValued="false" />
