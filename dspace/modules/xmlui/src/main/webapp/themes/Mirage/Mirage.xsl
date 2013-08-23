@@ -23,6 +23,7 @@
                 xmlns:mods="http://www.loc.gov/mods/v3"
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
                 xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:confman="org.dspace.core.ConfigurationManager"
                 exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
 
     <xsl:import href="../dri2xhtml-alt/dri2xhtml.xsl"/>
@@ -44,7 +45,8 @@
     <xsl:import href="DryadUtils.xsl"/>
     <xsl:import href="DryadSearch.xsl"/>
     <xsl:output indent="yes"/>
-
+    <xsl:variable name="iframe.maxheight" select="confman:getIntProperty('iframe.maxheight', 300)"/>
+    <xsl:variable name="iframe.maxwidth" select="confman:getIntProperty('iframe.maxwidth', 600)"/>
 
     <xsl:template match="dri:body[//dri:meta/dri:pageMeta/dri:metadata[@element='request' and @qualifier='URI'] = '' ]">
         <!-- add special style just for the homepage -->
@@ -1145,13 +1147,19 @@ parameter that is being used (see variable defined above) -->
 
 
     <xsl:template match="//dri:div[@n='paypal-iframe']">
-        <iframe name="paypal-iframe" width="650px"  scrolling="no"  height="300px">
+        <iframe name="paypal-iframe" scrolling="no" id="paypal-iframe">
             <xsl:attribute name="src">
                 <xsl:value-of select="dri:list/dri:item[@n='link']" />
                 <xsl:text disable-output-escaping="yes">?MODE=TEST&amp;SECURETOKENID=</xsl:text>
                 <xsl:value-of select="dri:list/dri:item[@n='secureTokenId']" />
                 <xsl:text disable-output-escaping="yes">&amp;SECURETOKEN=</xsl:text>
                 <xsl:value-of select="dri:list/dri:item[@n='secureToken']" />
+            </xsl:attribute>
+            <xsl:attribute name="width">
+                <xsl:value-of select="$iframe.maxwidth"/>
+            </xsl:attribute>
+            <xsl:attribute name="height">
+                <xsl:value-of select="$iframe.maxheight"/>
             </xsl:attribute>
               error when load payment form
         </iframe>
