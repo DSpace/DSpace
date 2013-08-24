@@ -44,6 +44,10 @@ import org.dspace.eperson.Group;
 public class EPersonAdminServlet extends DSpaceServlet
 {
     
+    private static final String LOG_MESSAGE_LOGIN_AS_OFF = "jsp.dspace-admin.eperson-main.LoginAs.submit";
+    private static final String MESSAGE_LOGIN_AS_NOT_ANOTHER_ADMIN = "jsp.dspace-admin.eperson-main.LoginAs.notAnotherAdmin";
+    private static final String MESSAGE_LOGIN_AS_ONLY_AUTHENTICATED_ADMINS = "jsp.dspace-admin.eperson-main.LoginAs.onlyAuthenticatedAdmins";
+    private static final String MESSAGE_LOGIN_AS_ONLY_ADMINS = "jsp.dspace-admin.eperson-main.LoginAs.onlyAdmins";
     /** Logger */
     private static Logger log = Logger.getLogger(EPersonAdminServlet.class);
     
@@ -292,9 +296,9 @@ public class EPersonAdminServlet extends DSpaceServlet
         }
         else if (button.equals("submit_login_as"))
         {
-            if (!ConfigurationManager.getBooleanProperty("jspui.user.assumelogin", false))
+            if (!ConfigurationManager.getBooleanProperty("webui.user.assumelogin", false))
             {
-                throw new AuthorizeException(I18nUtil.getMessage("jsp.dspace-admin.eperson-main.LoginAs.submit"));                
+                throw new AuthorizeException(I18nUtil.getMessage(LOG_MESSAGE_LOGIN_AS_OFF));                
             }
             EPerson e = EPerson.find(context, UIUtil.getIntParameter(request,
                     "eperson_id"));
@@ -307,7 +311,11 @@ public class EPersonAdminServlet extends DSpaceServlet
             // Only super administrators can login as someone else.
             else if (!AuthorizeManager.isAdmin(context))
             {
-                JSPManager.showAuthorizeError(request, response, new AuthorizeException(I18nUtil.getMessage("jsp.dspace-admin.eperson-main.LoginAs.onlyAdmins")));
+                request.setAttribute("authorize_error_message", MESSAGE_LOGIN_AS_ONLY_ADMINS);
+                log.warn(new AuthorizeException(I18nUtil.getMessage(MESSAGE_LOGIN_AS_ONLY_ADMINS)));
+                JSPManager.showJSP(request, response,
+                        "/dspace-admin/eperson-loginas-error.jsp");
+                return;
             }
             else
             {
@@ -325,14 +333,22 @@ public class EPersonAdminServlet extends DSpaceServlet
                 Integer authenticatedID = (Integer) session.getAttribute("dspace.current.user.id"); 
                 if (context.getCurrentUser().getID() != authenticatedID)
                 {
-                    throw new AuthorizeException(I18nUtil.getMessage("jsp.dspace-admin.eperson-main.LoginAs.onlyAuthenticatedAdmins"));
+                    request.setAttribute("authorize_error_message", MESSAGE_LOGIN_AS_ONLY_AUTHENTICATED_ADMINS);                     
+                    log.warn(new AuthorizeException(I18nUtil.getMessage(MESSAGE_LOGIN_AS_ONLY_AUTHENTICATED_ADMINS)));
+                    JSPManager.showJSP(request, response,
+                            "/dspace-admin/eperson-loginas-error.jsp");                                       
+                    return;
                 }
                 
                 // You may not assume the login of another super administrator
                 Group administrators = Group.find(context,1);
                 if (administrators.isMember(e))
                 {
-                    throw new AuthorizeException(I18nUtil.getMessage("jsp.dspace-admin.eperson-main.LoginAs.notAnotherAdmin"));
+                    request.setAttribute("authorize_error_message", MESSAGE_LOGIN_AS_NOT_ANOTHER_ADMIN);
+                    log.warn(new AuthorizeException(I18nUtil.getMessage(MESSAGE_LOGIN_AS_NOT_ANOTHER_ADMIN)));
+                    JSPManager.showJSP(request, response,
+                            "/dspace-admin/eperson-loginas-error.jsp");
+                    return;
                 }
                                 
                 // Logged in OK.
