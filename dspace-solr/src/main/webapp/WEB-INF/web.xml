@@ -36,7 +36,7 @@
 
   <context-param>
       <param-name>log4j.configuration</param-name>
-      <param-value>file://${dspace.dir}/config/log4j-solr.properties</param-value>
+      <param-value>${dspace.dir}/config/log4j-solr.properties</param-value>
       <description>URL locating a Log4J configuration file (properties or XML).</description>
   </context-param>
    
