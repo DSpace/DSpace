@@ -101,7 +101,7 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer{
             payementSystemService.updateTotal(context,transaction,null);
 
             //add the order summary form (wrapped in div.ds-option-set for proper sidebar style)
-            List info = options.addList("cart-wrapper").addList("Payment",List.TYPE_FORM,"paymentsystem");
+            List info = options.addList("Payment",List.TYPE_FORM,"paymentsystem");
 
             if(request.getRequestURI().contains("submit-checkout")||request.getRequestURI().contains("workflow")||request.getRequestURI().contains("deposit-confirmed")||request.getParameter("submit-voucher")!=null)
             {
