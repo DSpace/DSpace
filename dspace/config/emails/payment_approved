@@ -5,17 +5,13 @@
 # {2}   Link to 'My DSpace' page
 # {3}   Name of the admin
 #
-Subject: DSpace: Payment Rejected
+Subject: Dryad: Payment Processed
 
-You submitted: {0}
+Your payment has been processed for Dryad submission:
+{0}
 
-To collection: {1}
+Your credit card will be charged at this time.
 
-Your payment has been approved
-# by {3}
 
-Your credit card will be charged.
-You can access it from your
-"My DSpace" page: {2}
-
-DSpace
+The Dryad Team                                                                                                                                                           
+datadryad.org 

@@ -3393,6 +3393,7 @@
     <message key="xmlui.PaymentSystem.shoppingcart.verified">Your payment informtion has been verified. <br/><strong>You will not be charged until your data is approved for archiving by Dryad curators.</strong></message>
     <message key="xmlui.PaymentSystem.shoppingcart.help"><strong>Need Help?</strong><br/>Email us at <a href="mailto:help@datadryad.org">help@datadryad.org</a> or send a message via our <a href="/feedback">contact form</a>.</message>
 
+    <message key="xmlui.Submission.Submissions.step.head.reAuthorizationPaymentStep">Reauthorize payment</message>
     <message key="xmlui.Submission.Submissions.step.head.reAuthorizationPaymentStep_claimed">Reauthorize payment : claimed</message>
     <message key="xmlui.Submission.Submissions.step.head.reAuthorizationPaymentStep_pool">Reauthorize payment : Unclaimed</message>
     <message key="xmlui.administrative.Navigation.administrative_access_shoppingcart">Shopping Cart</message>
