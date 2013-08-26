@@ -32,7 +32,7 @@
 			<excludes>
 				<exclude>src</exclude>
 				<exclude>config/dspace.cfg</exclude>
-				<exclude>config/modules/**</exclude>
+				<exclude>config/modules/payment-system.cfg</exclude>
 			</excludes>
 		</fileSet>
 		<!-- Copy over all module configs & filter them -->
@@ -46,6 +46,13 @@
 	</fileSets>
 
 	<files>
+        <!-- Copy over the payment-system.cfg & filter it -->
+        <file>
+            <source>config/modules/payment-system.cfg</source>
+            <outputDirectory>config/modules</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+
 		<file>
 			<source>config/dspace.cfg</source>
 			<outputDirectory>config</outputDirectory>
