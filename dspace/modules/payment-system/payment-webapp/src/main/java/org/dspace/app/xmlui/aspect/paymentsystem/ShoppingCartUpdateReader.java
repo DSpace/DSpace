@@ -86,7 +86,7 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
 
     private void generateJSON(PaymentSystemConfigurationManager paymentSystemConfigurationManager, ShoppingCart shoppingCart, Response response,PaymentSystemService paymentSystemService,Context context,Request request,String errorMessage) throws SQLException,IOException {
         Double total = shoppingCart.getTotal();
-
+        String symbol = PaymentSystemConfigurationManager.getCurrencySymbol(shoppingCart.getCurrency());
         //{ "firstName":"John" , "lastName":"Doe" }
         String journal =request.getParameter("journal");
         Double basicFee =shoppingCart.getBasicFee();
@@ -108,7 +108,7 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
             case ShoppingCart.VOUCHER_WAIVER: waiverMessage = "Voucher has been applied";break;
         }
 
-        String result = "{\"total\":\""+String.valueOf(Double.toString(total))+"\",\"price\":\""+basicFee+"\",\"surcharge\":\""+surcharge+"\",\"noIntegrateFee\":\""+noIntegrateFee+"\",\"voucher\":\""+voucherCode+"\""+",\"errorMessage\":\""+errorMessage+"\",\"waiverMessage\":\""+waiverMessage+"\",\"payer\":\""+payername+"\"}";
+        String result = "{\"total\":\""+symbol+String.valueOf(Double.toString(total))+"\",\"price\":\""+symbol+basicFee+"\",\"surcharge\":\""+symbol+surcharge+"\",\"noIntegrateFee\":\""+symbol+noIntegrateFee+"\",\"voucher\":\""+voucherCode+"\""+",\"errorMessage\":\""+errorMessage+"\",\"waiverMessage\":\""+waiverMessage+"\",\"payer\":\""+payername+"\"}";
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(result.getBytes("UTF-8"));
         byte[] buffer = new byte[8192];
