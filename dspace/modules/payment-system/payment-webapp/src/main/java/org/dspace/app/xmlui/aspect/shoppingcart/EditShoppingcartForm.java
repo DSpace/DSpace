@@ -318,9 +318,10 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
             Select countryField = identity.addItem().addSelect("country");
             countryField.setRequired();
             countryField.setLabel(T_name8);
+            countryField.addOption("","Select Your Country");
             for(String countryTemp: countries.stringPropertyNames())
             {
-                if(country.equals(countryTemp))
+                if(country!=null&&country.length()>0&&country.equals(countryTemp))
                 {
                     countryField.addOption(true, countryTemp, countryTemp);
                 }

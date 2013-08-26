@@ -3386,7 +3386,7 @@
     <message key="xmlui.PaymentSystem.shoppingcart.order.price">Data Publishing Charge</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.surcharge">Excess data storage</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.noIntegrateFee">Non-integrated submission</message>
-    <message key="xmlui.PaymentSystem.shoppingcart.order.country">Country-based waiver</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.country">Select your country</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.total">Your total</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.voucher">Voucher code</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.apply">Apply</message>

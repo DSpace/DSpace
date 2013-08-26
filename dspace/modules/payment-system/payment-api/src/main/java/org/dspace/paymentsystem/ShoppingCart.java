@@ -79,6 +79,12 @@ public class ShoppingCart {
 
     public static final String COUNTRYFREE = "free";
     public static final String COUNTRYNOTFREE = "not_free";
+    public static final int NO_WAIVER =0;
+
+    public static final int COUNTRY_WAIVER =1;
+    public static final int JOUR_WAIVER =2;
+    public static final int VOUCHER_WAIVER =3;
+
     /** log4j logger */
     private static Logger log = Logger.getLogger(ShoppingCart.class);
 

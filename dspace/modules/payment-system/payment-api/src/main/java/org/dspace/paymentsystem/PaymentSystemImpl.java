@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.DryadWorkflowUtils;
@@ -199,7 +200,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
     }
 
     public boolean getJournalSubscription(Context context, ShoppingCart shoppingcart, String journal) throws SQLException {
-        if(journal==null){
+        if(journal==null||journal.length()==0){
             Item item = Item.find(context,shoppingcart.getItem()) ;
             if(item!=null)
             {
@@ -290,16 +291,8 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
     public boolean hasDiscount(Context context,ShoppingCart shoppingcart,String journal)throws SQLException{
         //this method check all the discount: journal,country,voucher
-            PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
-            Properties countryArray = manager.getAllCountryProperty();
             Boolean journalSubscription =  getJournalSubscription(context, shoppingcart, journal);
-            Boolean countryDiscount = false;
-            if(shoppingcart.getCountry()!=null&&shoppingcart.getCurrency().length()>0&&countryArray.get(shoppingcart.getCountry())!=null)
-            {
-                countryDiscount = countryArray.get(shoppingcart.getCountry()).equals(ShoppingCart.COUNTRYFREE);
-            }
-
-
+            Boolean countryDiscount = getCountryWaiver(context,shoppingcart,journal);
             Boolean voucherDiscount = voucherValidate(context,shoppingcart);
 
             if(journalSubscription||countryDiscount||voucherDiscount){
@@ -307,6 +300,35 @@ public class PaymentSystemImpl implements PaymentSystemService {
             }
             return false;
         }
+    public int getWaiver(Context context,ShoppingCart shoppingcart,String journal)throws SQLException{
+        //this method check all the discount: journal,country,voucher
+        Boolean journalSubscription =  getJournalSubscription(context, shoppingcart, journal);
+        Boolean countryDiscount = getCountryWaiver(context,shoppingcart,journal);
+        Boolean voucherDiscount = voucherValidate(context,shoppingcart);
+
+        if(countryDiscount){
+            return ShoppingCart.COUNTRY_WAIVER;
+        }
+        else if(journalSubscription){
+            return ShoppingCart.JOUR_WAIVER;
+        }else if(voucherDiscount){
+            return ShoppingCart.VOUCHER_WAIVER;
+        }
+        return ShoppingCart.NO_WAIVER;
+    }
+    public boolean getCountryWaiver(Context context, ShoppingCart shoppingCart, String journal) throws SQLException{
+        PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
+        Properties countryArray = manager.getAllCountryProperty();
+        if(shoppingCart.getCountry().length()>0)
+        {
+            return countryArray.get(shoppingCart.getCountry()).equals(ShoppingCart.COUNTRYFREE);
+        }
+        else {
+            return false;
+        }
+    }
+
+
 
     public void updateTotal(Context context, ShoppingCart shoppingCart, String journal) throws SQLException{
         Double newPrice = calculateShoppingCartTotal(context,shoppingCart,journal);
@@ -315,5 +337,16 @@ public class PaymentSystemImpl implements PaymentSystemService {
         shoppingCart.update();
         shoppingCart.setModified(false);
     }
-
-}
+    public String getPayer(Context context,ShoppingCart shoppingcart,String journal)throws SQLException{
+        String payerName = "";
+        EPerson e = EPerson.find(context,shoppingcart.getDepositor());
+        switch (getWaiver(context,shoppingcart,""))
+        {
+            case ShoppingCart.COUNTRY_WAIVER:payerName= "Country";break;
+            case ShoppingCart.JOUR_WAIVER: payerName = "Journal";  break;
+            case ShoppingCart.VOUCHER_WAIVER: payerName = "Voucher"; break;
+            case ShoppingCart.NO_WAIVER:payerName = e.getFullName();break;
+        }
+        return payerName;
+    }
+    }
