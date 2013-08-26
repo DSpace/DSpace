@@ -342,64 +342,64 @@ jQuery(document).ready(function() {
                 excessDataStorageFee_per_additional_GB: 'USD$10'
             },
             'EUR': {
-                memberDPC_voucher: '&#128;60',  // €
-                nonMemberDPC_voucher: '&#128;60',
-                memberDPC_deferred: '&#128;60',
-                nonMemberDPC_deferred: '&#128;60',
-                memberDPC_subscription: '&#128;60',
-                nonMemberDPC_subscription: '&#128;60',
+                memberDPC_voucher: '&#128;49',  // €
+                nonMemberDPC_voucher: '&#128;53',
+                memberDPC_deferred: '&#128;53',
+                nonMemberDPC_deferred: '&#128;56',
+                memberDPC_subscription: '&#128;19',
+                nonMemberDPC_subscription: '&#128;23',
                 DPC_pay_on_submission: '&#128;60',
                 notIntegratedJournalFee: '&#128;8',
-                excessDataStorageFee_first_GB: '&#128;?',
-                excessDataStorageFee_per_additional_GB: '&#128;?'
+                excessDataStorageFee_first_GB: '&#128;11',
+                excessDataStorageFee_per_additional_GB: '&#128;8'
             },
             'GBP': {
-                memberDPC_voucher: '&#163;53',  // £
-                nonMemberDPC_voucher: '&#163;53',
-                memberDPC_deferred: '&#163;53',
-                nonMemberDPC_deferred: '&#163;53',
-                memberDPC_subscription: '&#163;53',
-                nonMemberDPC_subscription: '&#163;53',
+                memberDPC_voucher: '&#163;42',  // £
+                nonMemberDPC_voucher: '&#163;45',
+                memberDPC_deferred: '&#163;45',
+                nonMemberDPC_deferred: '&#163;48',
+                memberDPC_subscription: '&#163;16',
+                nonMemberDPC_subscription: '&#163;20',
                 DPC_pay_on_submission: '&#163;53',
                 notIntegratedJournalFee: '&#163;7',
-                excessDataStorageFee_first_GB: '&#163;?',
-                excessDataStorageFee_per_additional_GB: '&#163;?'
+                excessDataStorageFee_first_GB: '&#163;10',
+                excessDataStorageFee_per_additional_GB: '&#163;7'
             },
             'CAD': {
-                memberDPC_voucher: 'CAD$83',
-                nonMemberDPC_voucher: 'CAD$83',
-                memberDPC_deferred: 'CAD$83',
-                nonMemberDPC_deferred: 'CAD$83',
-                memberDPC_subscription: 'CAD$83',
-                nonMemberDPC_subscription: 'CAD$83',
+                memberDPC_voucher: 'CAD$67',
+                nonMemberDPC_voucher: 'CAD$73',
+                memberDPC_deferred: 'CAD$73',
+                nonMemberDPC_deferred: 'CAD$77',
+                memberDPC_subscription: 'CAD$26',
+                nonMemberDPC_subscription: 'CAD$30',
                 DPC_pay_on_submission: 'CAD$83',
                 notIntegratedJournalFee: 'CAD$10',
-                excessDataStorageFee_first_GB: 'CAD$?',
-                excessDataStorageFee_per_additional_GB: 'CAD$?'
+                excessDataStorageFee_first_GB: 'CAD$15',
+                excessDataStorageFee_per_additional_GB: 'CAD$10'
             },
             'JPY': {
-                memberDPC_voucher: '&#165;7,840',  // ¥
-                nonMemberDPC_voucher: '&#165;7,840',
-                memberDPC_deferred: '&#165;7,840',
-                nonMemberDPC_deferred: '&#165;7,840',
-                memberDPC_subscription: '&#165;7,840',
-                nonMemberDPC_subscription: '&#165;7,840',
-                DPC_pay_on_submission: '&#165;7,840',
+                memberDPC_voucher: '&#165;6370',  // ¥
+                nonMemberDPC_voucher: '&#165;6860',
+                memberDPC_deferred: '&#165;6860',
+                nonMemberDPC_deferred: '&#165;7350',
+                memberDPC_subscription: '&#165;2450',
+                nonMemberDPC_subscription: '&#165;2940',
+                DPC_pay_on_submission: '&#165;7840',
                 notIntegratedJournalFee: '&#165;980',
-                excessDataStorageFee_first_GB: '&#165;?',
-                excessDataStorageFee_per_additional_GB: '&#165;?'
+                excessDataStorageFee_first_GB: '&#165;1470',
+                excessDataStorageFee_per_additional_GB: '&#165;980'
             },
             'AUD': {
-                memberDPC_voucher: 'AUD$89',
-                nonMemberDPC_voucher: 'AUD$89',
-                memberDPC_deferred: 'AUD$89',
-                nonMemberDPC_deferred: 'AUD$89',
-                memberDPC_subscription: 'AUD$89',
-                nonMemberDPC_subscription: 'AUD$89',
+                memberDPC_voucher: 'AUD$72',
+                nonMemberDPC_voucher: 'AUD$78',
+                memberDPC_deferred: 'AUD$78',
+                nonMemberDPC_deferred: 'AUD$84',
+                memberDPC_subscription: 'AUD$28',
+                nonMemberDPC_subscription: 'AUD$33',
                 DPC_pay_on_submission: 'AUD$89',
                 notIntegratedJournalFee: 'AUD$11',
-                excessDataStorageFee_first_GB: 'AUD$?',
-                excessDataStorageFee_per_additional_GB: 'AUD$?'
+                excessDataStorageFee_first_GB: 'AUD$17',
+                excessDataStorageFee_per_additional_GB: 'AUD$11'
             }
         };
 
