@@ -456,7 +456,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                   <a href="/pages/integratedJournals">Currently integrated journals</a>
                                 </li>
                                 <li>
-                                    <a href="/pages/policies">Terms of service</a>
+                                    <a href="/pages/policies">Terms of service (2013-08-22)</a>
                                 </li>                            
                             </ul>
                         </li>
@@ -631,6 +631,15 @@ references to stylesheets pulled directly from the pageMeta element. -->
             <div id="ds-footer">
 
                 <div id="ds-footer-right">
+                    <a>
+                        <xsl:attribute name="href">
+                            <xsl:value-of
+                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                            <xsl:text>/pages/policies</xsl:text>
+                        </xsl:attribute>
+                        <i18n:text>xmlui.dri2xhtml.structural.footer-terms-of-service</i18n:text>
+                    </a>
+		     | 
                     <a>
                         <xsl:attribute name="href">
                             <xsl:value-of

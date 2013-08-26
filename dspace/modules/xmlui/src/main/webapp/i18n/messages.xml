@@ -2638,8 +2638,11 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.license-text">The following license files are associated
 		with this item:</message>
 
-	<message key="xmlui.dri2xhtml.METS-1.0.license-cc0">To the extent possible under law, the authors
-		have waived all copyright and related or neighboring rights to this data.</message>
+    <message key="xmlui.dri2xhtml.METS-1.0.license-cc0">Content in the Dryad
+        Digital Repository is offered "as is." By downloading files, you agree
+        to the <a href="/pages/termsOfService" target="_blank">Dryad Terms of Service</a>. 
+        To the extent possible under law, the authors have waived all copyright
+        and related or neighboring rights to this data.</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.collection-not-implemented"> The summaryView of a
 		collection is not currently used or implemented. This can be fixed by overriding the dri2xhtml's
