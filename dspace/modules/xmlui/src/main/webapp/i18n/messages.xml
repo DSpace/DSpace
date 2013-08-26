@@ -348,12 +348,12 @@
 	<message key="xmlui.Site.head">&#160;</message>
 	<message key="xmlui.Site.para1">
 		<p>Dryad is a nonprofit organization and an international repository of data underlying scientific and medical publications.</p>
-		<p>The scientific, educational, and charitable mission of Dryad is to promote the availability of data underlying findings in 
+		<p>The scientific, educational, and charitable mission of Dryad is to promote the availability of data underlying findings in
 			the scientific literature for research and educational reuse. </p>
-		<p>The vision of Dryad is a scholarly communication system in which learned societies, publishers, institutions of research 
-			and education, funding bodies and other stakeholders collaboratively sustain and promote the preservation and reuse of data 
+		<p>The vision of Dryad is a scholarly communication system in which learned societies, publishers, institutions of research
+			and education, funding bodies and other stakeholders collaboratively sustain and promote the preservation and reuse of data
 			underlying the scholarly literature.</p>
-	</message>	
+	</message>
 	<message key="xmlui.Site.stats">As of {0}, Dryad contains <span class="bold">{1} data
 			packages</span> and <span class="bold">{2} data files</span>, associated with articles in <span class="bold"
 			>{3} journals</span>.</message>
@@ -422,7 +422,7 @@
 		the author, this item is embargoed until the associated article is
 		published.</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.head_resource.custom">At the request of
-		the author, this item is embargoed. The journal editor has set a custom 
+		the author, this item is embargoed. The journal editor has set a custom
 	  embargo length. Once the associated article is published, the exact release date of the embargo will be shown here.</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.head_resource.oneyear">At the request of the
 		author, this item is embargoed until one year after the associated article is
@@ -1944,7 +1944,7 @@
 		of this item will always remain public, the embargo will only be applied to the files belonging
 		to this item.</message>
 
-	<!-- org.dspace.app.xmlui.administrative.item.EditItemStatusForm -->    
+	<!-- org.dspace.app.xmlui.administrative.item.EditItemStatusForm -->
 	<message key="xmlui.administrative.item.EditItemStatusForm.title">Item Status</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.trail">Item status</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.para1">Welcome to the item management
@@ -2590,12 +2590,12 @@
 
 	<message key="xmlui.dri2xhtml.structural.link_cc">Creative Commons</message>
 	<message key="xmlui.dri2xhtml.structural.link_original_license">Original License</message>
-	<message key="xmlui.dri2xhtml.structural.footer.static.dryad-license">All text on this page is 
+	<message key="xmlui.dri2xhtml.structural.footer.static.dryad-license">All text on this page is
 		available under a <a href="http://creativecommons.org/licenses/by/3.0">CC-BY 3.0</a> license.</message>
-	<message key="xmlui.dri2xhtml.structural.footer.data.dryad-license"> Most text on this page is 
+	<message key="xmlui.dri2xhtml.structural.footer.data.dryad-license"> Most text on this page is
 		available under a <a href="http://creativecommons.org/publicdomain/zero/1.0/">CC-0</a> license. See <!-- <<terms of service page>> --> for details.
 	</message>
-	
+
 
 	<!-- DS-METS-1.0-MODS.xsl -->
 	<!-- DS-METS-1.0-DIM.xsl -->
@@ -2825,20 +2825,20 @@
 		to this item.</message>
 
 
-	<message key="xmlui.submit.select.pub.head">Submit new content</message>
-	<message key="xmlui.submit.select.pub.help">
-	</message>
-	<message key="xmlui.submit.select.pub.help_new">
-	  Submitting data to Dryad consists of three simple steps:
-	<br/>
-	<ul>
-                <li>1. Describe your publication</li>
-		<li>2. Upload and describe your data files</li>
-                <li>3. Approve data for publication</li>
-		</ul> 
-	</message>
-	<message key="xmlui.submit.select.pub.form_head"></message>
-	<!--<message key="xmlui.submit.select.pub.form_head">Submit new content</message>-->
+	<message key="xmlui.submit.select.pub.head">Select Your Article Status</message>
+    <message key="xmlui.submit.select.pub.trail"><div>
+        <ul class="navigation-link">
+            <li class="selected"><b>1. Describe Publication</b></li>
+            <li>2. Upload Data Files</li>
+            <li>3. Review</li>
+            <li>4. Checkout &amp; Submit</li>
+        </ul>
+    </div>
+    </message>
+    <message key="xmlui.submit.select.pub.help">
+        All data in Dryad must be associated with an article or other publication. Please select the status of your article.
+    </message>
+	<message key="xmlui.submit.select.pub.form_head">Submit new content</message>
 	<message key="xmlui.submit.select.pub.form.help">The dryad identifier of the data package,
 		example: 10255/dryad.11</message>
 	<message key="xmlui.submit.select.pub.form.option.new">Submit new data package</message>
@@ -2865,48 +2865,62 @@
 	<message key="xmlui.submit.publication.journal.manu.label">Manuscript Number</message>
 
 	<message key="xmlui.submit.publication.describe.head">Describe publication</message>
-	<message key="xmlui.submit.publication.describe.help">
-	<div>Submitting data to Dryad consists of three simple steps:
-	<br/>
-	<ul>
-                <li><b>1. Describe your publication</b></li>
-		<li>2. Upload and describe your data files</li>
-                <li>3. Approve data for publication</li>
-		</ul> 
-	  Please describe your publication in as much
-		detail as possible. Providing a detailed description will make it easier for others to find your
-		data in Dryad. Please describe the <strong>publication only</strong>. Do not enter information
-		specific to your data files on this page.<br/><br/>Fields marked with an asterisk (*) are
-		required. For more information on expected contents for a field, hold your mouse over the field
-		in question. 
-	</div>
+	<message key="xmlui.submit.publication.describe.trail">
+        <div>
+            <ul class="navigation-link">
+                <li>1. Describe Publication</li>
+                <li class="selected"><b>2. Upload Data Files</b></li>
+                <li>3. Review</li>
+                <li>4. Checkout &amp; Submit</li>
+            </ul>
+        </div>
+	</message>
+    <message key="xmlui.submit.publication.describe.help">
+        <div>
+            Please select a data file from your computer,
+            and describe the data file in as much detail as possible. Note that a data file will not
+            necessarily have the same authors and keywords as the publication, though for convenience some
+            of this information has been copied from the description of your publication. Providing a
+            detailed description will make it easier for others to find your data in Dryad. <br/>
+            <br/> Only one file may be uploaded and described on this page. Once this data file has been
+            saved, you may add additional files to the data package. If you have a large number of closely
+            related files, they may be submitted in an archive format such as tar or zip. If you have
+            trouble submitting files, please contact us at <a href="mailto:help@datadryad.org"
+                >help@datadryad.org</a>. Note that the total content submitted to Dryad for a given
+            publication must be less than 10GB.<br/>
+            <br/> Fields marked with an asterisk (*) are required. For more information on expected contents
+            for a field, hold your mouse over the field in question.
+        </div>
 	</message>
 	<message key="xmlui.submit.publication.describe.form.help">Publication metadata</message>
 
 	<message key="xmlui.submit.dataset.describe.head">Add and Describe Data File</message>
-	<message key="xmlui.submit.dataset.describe.help"> 
-	<div>  Submitting data to Dryad consists of three simple steps:
-	<br/>
-	<ul>
-                <li>1. Describe your publication</li>
-		<li><b>2. Upload and describe your data files</b></li>
-                <li>3. Approve data for publication</li>
-		</ul> 
-
-	Please select a data file from your computer,
-		and describe the data file in as much detail as possible. Note that a data file will not
-		necessarily have the same authors and keywords as the publication, though for convenience some
-		of this information has been copied from the description of your publication. Providing a
-		detailed description will make it easier for others to find your data in Dryad. <br/>
-		<br/> Only one file may be uploaded and described on this page. Once this data file has been
-		saved, you may add additional files to the data package. If you have a large number of closely
-		related files, they may be submitted in an archive format such as tar or zip. If you have
-		trouble submitting files, please contact us at <a href="mailto:help@datadryad.org"
-			>help@datadryad.org</a>. Note that the total content submitted to Dryad for a given
-		publication must be less than 10GB.<br/>
-		<br/> Fields marked with an asterisk (*) are required. For more information on expected contents
-		for a field, hold your mouse over the field in question. 
-		</div>
+	<message key="xmlui.submit.dataset.describe.trail">
+        <div>
+            <ul class="navigation-link">
+                <li>1. Describe Publication</li>
+                <li class="selected"><b>2. Upload Data Files</b></li>
+                <li>3. Review</li>
+                <li>4. Checkout &amp; Submit</li>
+            </ul>
+        </div>
+	</message>
+    <message key="xmlui.submit.dataset.describe.help">
+        <div>
+            Please select a data file from your computer,
+            and describe the data file in as much detail as possible. Note that a data file will not
+            necessarily have the same authors and keywords as the publication, though for convenience some
+            of this information has been copied from the description of your publication. Providing a
+            detailed description will make it easier for others to find your data in Dryad. <br/>
+            <br/> Only one file may be uploaded and described on this page. Once this data file has been
+            saved, you may add additional files to the data package. If you have a large number of closely
+            related files, they may be submitted in an archive format such as tar or zip. If you have
+            trouble submitting files, please contact us at <a href="mailto:help@datadryad.org"
+                >help@datadryad.org</a>. Note that the total content submitted to Dryad for a given
+            publication must be less than 10GB.<br/>
+            <br/> Fields marked with an asterisk (*) are required. For more information on expected contents
+            for a field, hold your mouse over the field in question.
+        </div>
 	</message>
 	<message key="xmlui.submit.dataset.form.pub.head">Publication</message>
 	<message key="xmlui.submit.dataset.form.file.head">Data file *</message>
@@ -2945,15 +2959,21 @@
 	<message key="xmlui.submit.dataset.complete.head">Data File completed</message>
 	<message key="xmlui.submit.dataset.complete.text">The data file has been submitted; do you wish to
 		submit another data file or finish up the submission?</message>
-	<message key="xmlui.submit.dataset.complete.help"><div>	  Submitting data to Dryad consists of three simple steps:
-	  <br/>
-	  <ul>
-            <li>1. Describe your publication</li>
-	    <li>2. Upload and describe your data files</li>
-            <li><b>3. Approve data for publication</b></li>
-	</ul> 
-	  </div>
-	      </message>
+	<message key="xmlui.submit.dataset.complete.trail">
+        <div>
+            <ul class="navigation-link">
+                <li>1. Describe Publication</li>
+                <li>2. Upload Data Files</li>
+                <li class="selected"><b>3. Review</b></li>
+                <li>4. Checkout &amp; Submit</li>
+            </ul>
+        </div>
+    </message>
+    <message key="xmlui.submit.dataset.complete.help">
+        <div>
+            Select to add a new file or continue on to complete your submission.
+        </div>
+    </message>
 
 	<message key="xmlui.Submission.submit.progressbar.select-publication">Describe publication</message>
 	<message key="xmlui.Submission.submit.progressbar.select-journal">Select journal</message>
@@ -2963,14 +2983,21 @@
 	<message key="xmlui.Submission.general.submission.complete.publication">Save publication description and continue</message>
 
 	<message key="xmlui.Submission.submit.OverviewStep.head">Submission overview</message>
-	<message key="xmlui.Submission.submit.OverviewStep.help"><div>   Submitting data to Dryad consists of three simple steps:                                                                                                                                                                                                 <br/>
-            <ul>
-              <li>1. Describe your publication</li>
-              <li>2. Upload and describe your data files</li> 
-              <li><b>3. Approve data for publication</b></li>
-            </ul> 
-                Press a button to edit the description of
-		your publication, add or modify all attached data files, or finalize the submission.</div>
+	<message key="xmlui.Submission.submit.OverviewStep.trail">
+        <div>                                                                                                                                                                                                 <br/>
+            <ul class="navigation-link">
+                <li>1. Describe Publication</li>
+                <li>2. Upload Data Files</li>
+                <li class="selected"><b>3. Review</b></li>
+                <li>4. Checkout &amp; Submit</li>
+            </ul>
+        </div>
+	</message>
+    <message key="xmlui.Submission.submit.OverviewStep.help">
+        <div>                                                                                                                                                                                                 <br/>
+            Press a button to edit the description of
+            your publication, add or modify all attached data files, or finalize the submission.
+        </div>
 	</message>
 	<message key="xmlui.Submission.submit.OverviewStep.steps.1">Describe publication:</message>
 	<message key="xmlui.Submission.submit.OverviewStep.steps.2">Add and describe data files:</message>
@@ -2992,7 +3019,21 @@
 	<message key="xmlui.Submission.submit.OverviewStep.button.delete-datapackage">Delete entire submission</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.edit-datapackage">Edit publication description</message>
 	<message key="xmlui.Submission.submit.CheckoutStep.button.finalize">Finalize submission</message>
-
+    <message key="xmlui.Submission.submit.Checkout.head">Checkout &amp; Submit</message>
+    <message key="xmlui.Submission.submit.Checkout.trail">
+        <div>                                                                                                                                                                                                 <br/>
+            <ul class="navigation-link">
+                <li>1. Describe Publication</li>
+                <li>2. Upload Data Files</li>
+                <li>3. Review</li>
+                <li class="selected"><b>4. Checkout &amp; Submit</b></li>
+            </ul>
+        </div>
+    </message>
+    <message key="xmlui.Submission.submit.Checkout.help"><div>                                                                                                                                                                                                 <br/>
+        Press a button to edit the description of
+        your publication, add or modify all attached data files, or finalize the submission.</div>
+    </message>
 	<message key="xmlui.Submission.Submissions.default.reviewStep.reviewAction">Review stage</message>
 	<message key="xmlui.Submission.workflow.DryadReviewActionXMLUI.info1">Actions</message>
 	<message key="xmlui.Submission.submit.OverviewStep.help.add-datafile">Click the button to add a new data file, please be aware that if the data file isn't fully submitted when the dataset is approved/rejected that it will be deleted.</message>
@@ -3156,7 +3197,7 @@
     <message key="xmlui.discovery.InternalItemTransformer.workflow.task.perform">Perform task</message>
     <message key="xmlui.discovery.InternalItemTransformer.workflow.task.wait">None (Awaiting task completion)</message>
     <message key="xmlui.discovery.InternalItemTransformer.workflow.task">Task</message>
-    
+
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.Workflowstep">Workflow step</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.Workflowstep_filter">Workflow step</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.SubmitterName_filter">Submitter name</message>
@@ -3179,7 +3220,7 @@
     <message key="xmlui.Discovery.Navigation.workflow-overview">Workflow Overview</message>
 
 
-    <!-- Messages for AME aspect --> 
+    <!-- Messages for AME aspect -->
 
     <!-- org.datadryad.app.xmlui.aspect.ame.AMEForm -->
     <message key="xmlui.aspect.ame.AMENavigation.context">Automatic metadata extraction</message>
@@ -3197,7 +3238,7 @@
     <message key="xmlui.ChoiceLookupTransformer.field.dwc_ScientificName.help">Scientific Name</message>
     <message key="xmlui.ChoiceLookupTransformer.field.dwc_ScientificName.instructions">Below is a list of possible matches from the configured <a href="http://en.wikipedia.org/wiki/Controlled_vocabulary">controlled vocabulary</a>. Select the desired scientific name and then select "Accept." The existing name will be replaced with the selected controlled name and will be linked to the associated controlled vocabulary. Select "Cancel" to keep the current entry.</message>
         <message key="xmlui.ChoiceLookupTransformer.field.dwc_ScientificName.nonauthority">Use local value "@1@" (not in authority)</message>
- 
+
         <!-- Choice Lookup - for Dryad dc.subject -->
     <message key="xmlui.ChoiceLookupTransformer.field.dc_subject.title">Lookup Subject</message>
     <message key="xmlui.ChoiceLookupTransformer.field.dc_subject.help">Subject</message>
@@ -3207,16 +3248,16 @@
     <message key="xmlui.Submission.MyTasks.title">My Tasks</message>
     <message key="xmlui.Submission.MyTasks.trail">My Tasks</message>
     <message key="xmlui.Submission.MyTasks.no-results">You currently have no tasks assigned to you.</message>
-    
+
     <!-- Messages for showing item status in MyTasks after approving/rejecting -->
     <message key="xmlui.Submission.MyTasks.item_status">Item Status:</message>
     <message key="xmlui.Submission.MyTasks.item_title">Title:</message>
     <message key="xmlui.Submission.MyTasks.doi_registration_status">DOI Registration Status:</message>
     <message key="xmlui.Submission.MyTasks.doi">DOI:</message>
-    
+
     <message key="xmlui.Submission.MyTasks.doi_not_registered">Not Registered with EZID</message>
     <message key="xmlui.Submission.MyTasks.doi_registered">Successfully Registered with EZID</message>
-    
+
     <message key="xmlui.Submission.MyTasks.with_identifier"> with identifier: </message>
 
     <message key="xmlui.Submission.MyTasks.archived_status">Archived</message>
@@ -3229,7 +3270,7 @@
     <message key="xmlui.Submission.result-table.head.submitter">Submitter</message>
     <message key="xmlui.Submission.result-table.head.datafiles">Number of data files</message>
     <message key="xmlui.Submission.result-table.head.owner">Task owner</message>
-    
+
     <message key="xmlui.Submission.Submissions.step.head.dryadAcceptEditReject_claimed">In Curation: Claimed</message>
     <message key="xmlui.Submission.Submissions.step.head.dryadAcceptEditReject_pool">In Curation: Unclaimed</message>
     <message key="xmlui.Submission.Submissions.step.head.reviewStep_claimed">In Journal Review: Claimed</message>
@@ -3245,6 +3286,8 @@
     <message key="xmlui.submit.publication.unknown_doi">&#160; This article has been published in the journal I will name, but I do not know the DOI or PubMedID for it.</message>
     <message key="xmlui.submit.publication.article_status"><span class="ds-form-label">Select Your Article Status</span><br/></message>
     <message key="xmlui.submit.publication.article_status_help">All data in Dryad must be associated with an article or other publication. Please select the status of your article.</message>
+
+
     <message key="xmlui.submit.publication.journal.manu.acc.label">&#160; This manuscript has been accepted for publication in the above named journal.</message>
     <message key="xmlui.submit.publication.journal.help_not_yet_submitted">If your journal is not listed, you can't submit data to Dryad at this stage.
         For journals using Dryad to host data in review, you may submit data after receiving a manuscript number from the journal. For most journals,
@@ -3261,7 +3304,7 @@
      <message key="xmlui.submit.publication.journal.manu.label.new">Enter Your Manuscript Number</message>
 
     <message key="xmlui.submit.publication.journal.help_in_review">If your journal is not listed, you must wait until your manuscript has been accepted before submitting data to Dryad.</message>
-    
+
     <!-- Messages for Dryad Membership Application -->
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.title">Dryad Membership</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.heading">Membership Application</message>
@@ -3269,14 +3312,14 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.overview.p2">For more information on membership, please see the <a href="/pages/membershipOverview">membership page</a> or contact <a href="mailto:director@datadryad.org">director@datadryad.org</a>.</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.markedfields"><span id="required-fields-note" class="required-mark">* Marked fields are required</span></message>
-    
+
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_name.label1">1a. Name of member organization <span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_name.label2">The preferred name to be used on official membership lists.</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_name">Organization name is required</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_legalname.label1">1b. Legal name of organization</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_legalname.label2">If different from above.</message>
-    
+
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_type.label1">2. Type of organization <span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_type.label2">Please briefly describe the nature of the organization and its interest in Dryad’s mission.</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_type">Organization type is required</message>
@@ -3284,7 +3327,7 @@
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label1">3. Gross annual revenue <span class="required-mark">*</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label2">Dryad membership fees are based on members' annual revenue. Please specify currency and annual revenue.</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue_currency">Currency selection is required</message>
-    
+
     <!-- Checkbox options for org_annual_revenue -->
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.less_than_10_million"><span id="msg-less_than_10_million">Less than $10 million per year (annual membership fee US$1000)</span></message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.greater_than_10_million"><span id="msg-greater_than_10_million">Greater than $10 million per year (annual membership fee US$5000)</span></message>
@@ -3326,7 +3369,7 @@
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.comments.label1">11. Comments</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.comments.label2">Please add any additional information, comments or questions here.</message>
-    
+
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.submit">Submit</message>
     <message key="xmlui.dri2xhtml.structural.feedback-link">Feed Back</message>
 
@@ -3334,7 +3377,7 @@
     <message key="xmlui.statistics.view.title">Most Viewed Items</message>
     <message key="xmlui.statistics.view.count">Number of Views</message>
     <message key="xmlui.statistics.most.viewed.items">Most Viewed Items</message>
-    
+
     <!--Most Downloaded Bitstreams -->
     <message key="xmlui.statistics.download.title">Most Downloaded Bitstreams</message>
 
@@ -3462,5 +3505,6 @@
     <message key="xmlui.voucher.ManageVoucher.search_head">Search Result</message>
     <message key="xmlui.voucher.ManageVoucherin.actions_head">Manage Voucher</message>
     <message key="xmlui.voucher.ManageVoucherin.main_head">Manage Voucher</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.journal">Fee paid by Journal</message>
 
 </catalogue>

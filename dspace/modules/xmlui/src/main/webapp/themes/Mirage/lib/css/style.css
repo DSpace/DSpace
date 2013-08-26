@@ -2349,3 +2349,48 @@ li#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list div{
     list-style: none;
     padding:10px;
 }
+ul.navigation-link{
+    padding: 5px 0;
+    list-style: none;
+    margin-left: -15px;
+    margin-bottom: 20px;
+}
+ul.navigation-link li{
+    display: inline-block;
+    font-size: 14px;
+    background-color: #87C033;
+    color: #fff;
+    text-decoration: none;
+    margin-right: 18px;
+    padding: 7px 11px 4px;
+    border: 1px solid #AAA;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-bottomright: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    -moz-box-shadow: 3px 3px 4px rgba(33, 33, 33, 0.25);
+    -webkit-box-shadow: 3px 3px 4px rgba(33, 33, 33, 0.25);
+    box-shadow: 3px 3px 4px rgba(33, 33, 33, 0.25);
+}
+
+ul.navigation-link li.selected{
+    border:2px solid black;
+    padding:5px;
+    background-color: #707070;
+    color: #fff;
+    border: 1px solid #555;
+}
+
+div.step-link{
+    border: none;
+    background-color: transparent;
+    box-shadow:none;
+}
