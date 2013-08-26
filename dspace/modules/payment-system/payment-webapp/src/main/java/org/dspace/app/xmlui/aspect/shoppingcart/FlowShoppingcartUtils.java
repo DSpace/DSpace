@@ -101,7 +101,7 @@ public class FlowShoppingcartUtils {
                 shoppingCart.setVoucher(null);
             }
 
-            if (country != null && !countryOriginal.equals(country)) {
+            if (country != null && countryOriginal!=null && countryOriginal.length()>0 && !countryOriginal.equals(country)) {
                 shoppingCart.setCountry(country);
             }
             if (currency != null && !currencyOriginal.equals(currency)) {

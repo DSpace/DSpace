@@ -19,6 +19,7 @@ import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.handle.HandleManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.paymentsystem.PaymentSystemConfigurationManager;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.submit.bean.PublicationBean;
 import org.dspace.submit.model.ModelPublication;
@@ -72,6 +73,8 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     private static final Message T_SELECT_HELP_NOT_YET_SUBMITTED = message("xmlui.submit.publication.journal.help_not_yet_submitted");
     private static final Message T_SELECT_HELP_IN_REVIEW = message("xmlui.submit.publication.journal.help_in_review");
 
+    protected static final Message T_Country=
+            message("xmlui.PaymentSystem.shoppingcart.order.country");
 
 
 
@@ -119,6 +122,8 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         List form = div.addList("submit-create-publication", List.TYPE_FORM);
         //form.setHead(T_FORM_HEAD);
         Item content = form.addItem();
+        generateCountryList(form,request);
+
         boolean submitExisting = ConfigurationManager.getBooleanProperty("submit.dataset.existing-datasets", true);
         //if(submitExisting)
         //    content.addContent(T_PUB_HELP);
@@ -465,5 +470,23 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
             licensebox.addError(T_PUB_LICENSE_ERROR);
     }
 
+    private void generateCountryList(org.dspace.app.xmlui.wing.element.List info,Request request) throws WingException{
+
+        PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
+        Properties countryArray = manager.getAllCountryProperty();
+        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_SELECT_COUNTRY)
+        {
+            info.addItem("error-country","errorMessage").addContent("Please select your country");
+        }
+        info.addLabel(T_Country);
+        Select countryList = info.addItem("country-list", "select-list").addSelect("country");
+        countryList.addOption("","Select Your Country");
+        for(String temp:countryArray.stringPropertyNames()){
+            {
+                countryList.addOption(false,temp,temp);
+            }
+        }
+
+    }
 
 }

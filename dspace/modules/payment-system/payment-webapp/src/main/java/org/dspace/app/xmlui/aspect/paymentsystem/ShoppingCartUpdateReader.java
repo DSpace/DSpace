@@ -20,6 +20,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.paymentsystem.*;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
@@ -58,11 +59,12 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
                 //can't find the transaction
                 return;
             }
-            modifyTransaction(context,payementSystemService,transaction,request,dso);
+            String errorMessage = modifyTransaction(context,payementSystemService,transaction,request,dso);
+
             Response response = ObjectModelHelper.getResponse(objectModel);
 
 
-            generateJSON(paymentSystemConfigurationManager, transaction, response,payementSystemService,context,request);
+            generateJSON(paymentSystemConfigurationManager, transaction, response,payementSystemService,context,request,errorMessage);
 
         }
         catch (SQLException se)
@@ -82,27 +84,31 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
         }
     }
 
-    private void generateJSON(PaymentSystemConfigurationManager paymentSystemConfigurationManager, ShoppingCart transaction, Response response,PaymentSystemService payementSystemService,Context context,Request request) throws SQLException,IOException {
-        Double total = transaction.getTotal();
+    private void generateJSON(PaymentSystemConfigurationManager paymentSystemConfigurationManager, ShoppingCart shoppingCart, Response response,PaymentSystemService paymentSystemService,Context context,Request request,String errorMessage) throws SQLException,IOException {
+        Double total = shoppingCart.getTotal();
+
         //{ "firstName":"John" , "lastName":"Doe" }
         String journal =request.getParameter("journal");
-        Double basicFee =transaction.getBasicFee();
-        Double surcharge = payementSystemService.getSurchargeLargeFileFee(context,transaction);
-        Double noIntegrateFee = payementSystemService.getNoIntegrateFee(context,transaction,journal);
-        Integer voucherId= transaction.getVoucher();
+        Double basicFee =shoppingCart.getBasicFee();
+        Double surcharge = paymentSystemService.getSurchargeLargeFileFee(context,shoppingCart);
+        Double noIntegrateFee = paymentSystemService.getNoIntegrateFee(context,shoppingCart,journal);
+        Integer voucherId= shoppingCart.getVoucher();
         Voucher voucher = Voucher.findById(context,voucherId);
         String voucherCode = "";
         if(voucher!=null)
         {
             voucherCode = voucher.getCode();
         }
-
-
-        String result = "{\"total\":\""+String.valueOf(Double.toString(total))+"\",\"price\":\""+basicFee+"\",\"surcharge\":\""+surcharge+"\",\"noIntegrateFee\":\""+noIntegrateFee+"\",\"voucher\":\""+voucherCode+"\"}";
-
-        if(payementSystemService.hasDiscount(context,transaction,journal))  {
-            result = "{\"total\":\""+String.valueOf(Double.toString(total))+"\",\"price\":\"0.0\",\"surcharge\":\"0.0\",\"noIntegrateFee\":\"0.0\",\"voucher\":\""+voucherCode+"\"}";
+        String waiverMessage = "";
+        String payername = paymentSystemService.getPayer(context,shoppingCart,null);
+        switch (paymentSystemService.getWaiver(context,shoppingCart,""))
+        {
+            case ShoppingCart.COUNTRY_WAIVER:waiverMessage= "Country:"+shoppingCart.getCountry()+" paid the basic fee and no integration fee";payername="Country:"+shoppingCart.getCountry();break;
+            case ShoppingCart.JOUR_WAIVER: waiverMessage = "Journal paid the basic fee and no integration fee";payername="Journal";break;
+            case ShoppingCart.VOUCHER_WAIVER: waiverMessage = "Voucher has been applied";break;
         }
+
+        String result = "{\"total\":\""+String.valueOf(Double.toString(total))+"\",\"price\":\""+basicFee+"\",\"surcharge\":\""+surcharge+"\",\"noIntegrateFee\":\""+noIntegrateFee+"\",\"voucher\":\""+voucherCode+"\""+",\"errorMessage\":\""+errorMessage+"\",\"waiverMessage\":\""+waiverMessage+"\",\"payer\":\""+payername+"\"}";
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(result.getBytes("UTF-8"));
         byte[] buffer = new byte[8192];
@@ -131,8 +137,10 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
         return item;
     }
 
-    private void modifyTransaction(Context context,PaymentSystemService payementSystemService, ShoppingCart transaction, Request request,DSpaceObject dso) throws AuthorizeException, SQLException, PaymentSystemException,IOException {
+    private String modifyTransaction(Context context,PaymentSystemService payementSystemService, ShoppingCart transaction, Request request,DSpaceObject dso) throws AuthorizeException, SQLException, PaymentSystemException,IOException {
         Item item;
+        String errorMessage = "";
+
 
         String itemId = request.getParameter("itemId");
         String journal =request.getParameter("journal");
@@ -141,7 +149,7 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
         if(item == null)
         {
             //cant find the item, the transaction is not associate with any item, which should not happen in the submission procedure
-            return;
+            return "Item not found";
         }
 
 
@@ -161,18 +169,23 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
             String country=request.getParameter("country").toString();
             transaction.setCountry(country);
         }
-        if(request.getParameter("voucher")!=null&&!request.getParameter("voucher").equals("undefined"))
+        if(request.getParameter("voucher")!=null&&request.getParameter("voucher").length()>0&&!request.getParameter("voucher").equals("undefined"))
         {
             String voucherCode=request.getParameter("voucher").toString();
             Voucher voucher = Voucher.findByCode(context,voucherCode);
             VoucherValidationService voucherValidationService =  new DSpace().getSingletonService(VoucherValidationService.class);
-            if(voucher!=null&&!voucherValidationService.voucherUsed(context,voucherCode))
+            if(voucher!=null&&voucherValidationService.validate(context,voucher.getID(),transaction))
             {
                 transaction.setVoucher(voucher.getID());
+                errorMessage = "";
+
             }
             else
             {
                 transaction.setVoucher(null);
+                if(voucherCode.length()>0)
+                    errorMessage = "The voucher code is not valid:can't find the voucher code or the voucher code has been used";
+
             }
 
         }
@@ -181,5 +194,8 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
             transaction.setVoucher(null);
         }
         payementSystemService.updateTotal(context,transaction,journal);
+        return errorMessage;
+
     }
+
 }
