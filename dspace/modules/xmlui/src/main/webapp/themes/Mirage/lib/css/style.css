@@ -2353,7 +2353,7 @@ ul.navigation-link{
     padding: 5px 0;
     list-style: none;
     margin-left: -15px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 ul.navigation-link li{
     display: inline-block;
@@ -2393,4 +2393,6 @@ div.step-link{
     border: none;
     background-color: transparent;
     box-shadow:none;
+    padding-bottom: 0px;
+    padding-top: 0px;
 }

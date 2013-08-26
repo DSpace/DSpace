@@ -2826,14 +2826,13 @@
 
 
 	<message key="xmlui.submit.select.pub.head">Select Your Article Status</message>
-    <message key="xmlui.submit.select.pub.trail"><div>
+    <message key="xmlui.submit.select.pub.trail">
         <ul class="navigation-link">
             <li class="selected"><b>1. Describe Publication</b></li>
             <li>2. Upload Data Files</li>
             <li>3. Review</li>
             <li>4. Checkout &amp; Submit</li>
         </ul>
-    </div>
     </message>
     <message key="xmlui.submit.select.pub.help">
         All data in Dryad must be associated with an article or other publication. Please select the status of your article.
