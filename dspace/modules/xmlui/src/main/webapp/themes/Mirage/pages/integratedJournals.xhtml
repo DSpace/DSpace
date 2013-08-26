@@ -36,6 +36,16 @@
             color: #b22;
             font-style: italic;
         }
+
+        .special-announcement {
+            background-color: #ddeedd;
+            border-radius: 5px 5px 5px 5px;
+            font-size: 17px;
+            margin-bottom: 16px;
+            margin-top: 4px;
+            padding: 10px 16px 10px;
+            text-align: left;
+        }
     </style>
  </head>
  <body>
@@ -43,6 +53,39 @@
 <!-- TODO: This page requires inline STYLE above and contents of #ds-body -->
   <h1 class="ds-div-head">Integrated Journals<a id="journals">&#160;</a></h1>
   <div id="" class="ds-static-div primary" style="">
+
+     <div style="text-align: right;">
+         <span class="field-help" style="display: inline;">Show all amounts in </span>
+         <!-- TODO: refactor this to share code with 'MembershipApplicationForm' -->
+         <select id="displayed-currency" name="displayed-currency" class="ds-select-field">
+             <option value="USD">$ USD</option>
+             <option value="GBP">£ GBP</option>
+             <option value="CAD">C$ CAD</option>
+             <option value="EUR">€ EUR</option>
+             <option value="AUD">$ AUD</option>
+             <option value="JPY">¥ JPY</option>
+         </select>
+     </div> 
+
+       <h2 class="special-announcement">
+           Starting <span style="color: #40841c;">1-Sep-2013</span>, Dryad will
+           introduce a Data Publishing Charge
+           (DPC). The base charge for a single data package is <span class="msg-DPC_pay_on_submission">US$80</span>,
+           independent of the number of files, up to a
+           total volume of 10 Gigabytes. There is no charge for rejected
+           submissions to the review workspace; a charge is applied only when
+           the associated publication is already available or in press. In many
+           cases, the base charge will be paid by a sponsoring organization,
+           such as a journal, that has enrolled in a Dryad payment plan. In the
+           absence of a sponsoring organization, the submitter is required to
+           pay the <abbr title="Data Publishing Charge">DPC</abbr>.  The
+           submitter may be responsible for additional fees
+           if the publication is not in a journal with integrated submission &ndash;
+           see list below &ndash;  (<span class="msg-notIntegratedJournalFee">US$10</span>) and/or the data
+           packages is <a href="/pages/pricing#excess-data-storage">in excess of 10GB</a>
+           (<span class="msg-excessDataStorageFee_first_GB">US$15</span>).
+       </h2>
+
     <!-- TODO: To generate this table dynamically:
         * Add a row for each journal entry in database (first row is alwys default-policies)
         * Each data row should have class 'odd', 'even', 'odd', ...

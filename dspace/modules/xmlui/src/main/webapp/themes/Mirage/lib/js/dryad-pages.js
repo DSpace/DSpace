@@ -138,7 +138,7 @@ jQuery(document).ready(function() {
 
 });
 
-/* Membership Form page only */
+/* JS behavior (currency conversion) for Membership Form only */
 jQuery(document).ready(function() {
     var $currencySelector = jQuery('select[name=org_annual_revenue_currency]');
     if ($currencySelector.length === 1) {
@@ -313,7 +313,6 @@ function updateOrder(){
             xhr.overrideMimeType("text/plain; charset=x-user-defined");
         }
     }).done(function ( data ) {
-
                 obj = jQuery.parseJSON(data);
                 jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_price div').html(obj.price);
                 jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_total div').html(obj.total);
@@ -322,3 +321,108 @@ function updateOrder(){
                 jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').html(obj.voucher);
         });
 }
+
+/* JS behavior (currency conversion) for Pricing and Integrated Journal pages */
+jQuery(document).ready(function() {
+    var $currencySelector = jQuery('select[name=displayed-currency]');
+    // in this case, we just want to update a few displayed values wherever
+    // they appear (look for SPANs with marker classes)
+    if ($currencySelector.length === 1) {
+        var amountsByCurrency = {
+            'USD': {
+                memberDPC_voucher: 'USD$65',
+                nonMemberDPC_voucher: 'USD$70',
+                memberDPC_deferred: 'USD$70',
+                nonMemberDPC_deferred: 'USD$75',
+                memberDPC_subscription: 'USD$25',
+                nonMemberDPC_subscription: 'USD$30',
+                DPC_pay_on_submission: 'USD$80',  // is this the "base charge"?
+                notIntegratedJournalFee: 'USD$10',
+                excessDataStorageFee_first_GB: 'USD$15',
+                excessDataStorageFee_per_additional_GB: 'USD$10'
+            },
+            'EUR': {
+                memberDPC_voucher: '&#128;60',  // €
+                nonMemberDPC_voucher: '&#128;60',
+                memberDPC_deferred: '&#128;60',
+                nonMemberDPC_deferred: '&#128;60',
+                memberDPC_subscription: '&#128;60',
+                nonMemberDPC_subscription: '&#128;60',
+                DPC_pay_on_submission: '&#128;60',
+                notIntegratedJournalFee: '&#128;8',
+                excessDataStorageFee_first_GB: '&#128;?',
+                excessDataStorageFee_per_additional_GB: '&#128;?'
+            },
+            'GBP': {
+                memberDPC_voucher: '&#163;53',  // £
+                nonMemberDPC_voucher: '&#163;53',
+                memberDPC_deferred: '&#163;53',
+                nonMemberDPC_deferred: '&#163;53',
+                memberDPC_subscription: '&#163;53',
+                nonMemberDPC_subscription: '&#163;53',
+                DPC_pay_on_submission: '&#163;53',
+                notIntegratedJournalFee: '&#163;7',
+                excessDataStorageFee_first_GB: '&#163;?',
+                excessDataStorageFee_per_additional_GB: '&#163;?'
+            },
+            'CAD': {
+                memberDPC_voucher: 'CAD$83',
+                nonMemberDPC_voucher: 'CAD$83',
+                memberDPC_deferred: 'CAD$83',
+                nonMemberDPC_deferred: 'CAD$83',
+                memberDPC_subscription: 'CAD$83',
+                nonMemberDPC_subscription: 'CAD$83',
+                DPC_pay_on_submission: 'CAD$83',
+                notIntegratedJournalFee: 'CAD$10',
+                excessDataStorageFee_first_GB: 'CAD$?',
+                excessDataStorageFee_per_additional_GB: 'CAD$?'
+            },
+            'JPY': {
+                memberDPC_voucher: '&#165;7,840',  // ¥
+                nonMemberDPC_voucher: '&#165;7,840',
+                memberDPC_deferred: '&#165;7,840',
+                nonMemberDPC_deferred: '&#165;7,840',
+                memberDPC_subscription: '&#165;7,840',
+                nonMemberDPC_subscription: '&#165;7,840',
+                DPC_pay_on_submission: '&#165;7,840',
+                notIntegratedJournalFee: '&#165;980',
+                excessDataStorageFee_first_GB: '&#165;?',
+                excessDataStorageFee_per_additional_GB: '&#165;?'
+            },
+            'AUD': {
+                memberDPC_voucher: 'AUD$89',
+                nonMemberDPC_voucher: 'AUD$89',
+                memberDPC_deferred: 'AUD$89',
+                nonMemberDPC_deferred: 'AUD$89',
+                memberDPC_subscription: 'AUD$89',
+                nonMemberDPC_subscription: 'AUD$89',
+                DPC_pay_on_submission: 'AUD$89',
+                notIntegratedJournalFee: 'AUD$11',
+                excessDataStorageFee_first_GB: 'AUD$?',
+                excessDataStorageFee_per_additional_GB: 'AUD$?'
+            }
+        };
+
+        function showPreferredCurrency(currencyCode) {
+            // EXAMPLE: showPreferredCurrency('GBP');
+            jQuery('.msg-memberDPC_voucher').html( amountsByCurrency[currencyCode].memberDPC_voucher );
+            jQuery('.msg-nonMemberDPC_voucher').html( amountsByCurrency[currencyCode].nonMemberDPC_voucher );
+            jQuery('.msg-memberDPC_deferred').html( amountsByCurrency[currencyCode].memberDPC_deferred );
+            jQuery('.msg-nonMemberDPC_deferred').html( amountsByCurrency[currencyCode].nonMemberDPC_deferred );
+            jQuery('.msg-memberDPC_subscription').html( amountsByCurrency[currencyCode].memberDPC_subscription );
+            jQuery('.msg-nonMemberDPC_subscription').html( amountsByCurrency[currencyCode].nonMemberDPC_subscription );
+            jQuery('.msg-DPC_pay_on_submission').html( amountsByCurrency[currencyCode].DPC_pay_on_submission );
+            jQuery('.msg-notIntegratedJournalFee').html( amountsByCurrency[currencyCode].notIntegratedJournalFee );
+            jQuery('.msg-excessDataStorageFee_first_GB').html( amountsByCurrency[currencyCode].excessDataStorageFee_first_GB );
+            jQuery('.msg-excessDataStorageFee_per_additional_GB').html( amountsByCurrency[currencyCode].excessDataStorageFee_per_additional_GB );
+        }
+
+        // choosing a currency should modify the displayed org-revenue threshold and fees
+        $currencySelector.unbind('change').change(function() {
+            showPreferredCurrency( $(this).val() );
+        });
+        // show initial values in USD (don't rely on i18n-message text!)
+        showPreferredCurrency('USD');
+    }
+});
+
