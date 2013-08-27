@@ -903,19 +903,23 @@ public class DSIndexer
 		DocsEnum docs = MultiFields.getTermDocsEnum(ir, liveDocs, t.field(), t.bytes());
 
 		int id;
-		while((id = docs.nextDoc()) != DocsEnum.NO_MORE_DOCS) 
-		{		
-			inIndex = true;			
-			Document doc = ir.document(id);
+        if (docs != null)
+        {
+            while ((id = docs.nextDoc()) != DocsEnum.NO_MORE_DOCS)
+            {
+                inIndex = true;
+                Document doc = ir.document(id);
 
-			IndexableField lastIndexed = doc.getField(LAST_INDEXED_FIELD);
+                IndexableField lastIndexed = doc.getField(LAST_INDEXED_FIELD);
 
-			if (lastIndexed == null || Long.parseLong(lastIndexed.stringValue()) <
-					lastModified.getTime()) {
-				reindexItem = true;
-			}
-		}
-
+                if (lastIndexed == null
+                        || Long.parseLong(lastIndexed.stringValue()) < lastModified
+                                .getTime())
+                {
+                    reindexItem = true;
+                }
+            }
+        }
 		return reindexItem || !inIndex;
 	}
 
