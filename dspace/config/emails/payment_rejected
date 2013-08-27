@@ -6,20 +6,17 @@
 # {3}   Link to 'My DSpace' page
 # {4}   Name of the rejector
 #
-Subject: DSpace: Payment Rejected
+Subject: Dryad: Payment information must be updated
 
-You submitted: {0}
+You submitted the following data package to Dryad: 
+{0}
 
-To collection: {1}
+The payment information that you previously entered is no longer
+valid. Please login to Dryad and provide current payment information.
 
-Your payment authorization has expired
-#been expired by {4}
-with the following explanation:
+You can access the in-progress submission from your "My Submissions"
+page: 
+{3}
 
-{2}
-
-Your submission has not been deleted and need resubmit the payment information.
-You can access it from your
-"My DSpace" page: {3}
-
-DSpace
+The Dryad Team
+datadryad.org
