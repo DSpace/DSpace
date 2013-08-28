@@ -156,13 +156,14 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer{
     }
 
     private void generateCountryList(org.dspace.app.xmlui.wing.element.List info,PaymentSystemConfigurationManager manager,ShoppingCart shoppingCart) throws WingException{
-        Properties countryArray = manager.getAllCountryProperty();
+        java.util.List<String> countryArray = manager.getSortedCountry();
         info.addLabel(T_Country);
         Select countryList = info.addItem("country-list", "select-list").addSelect("country");
         countryList.addOption("","Select Your Country");
-        for(String temp:countryArray.stringPropertyNames()){
+        for(String temp:countryArray){
+            String[] countryTemp = temp.split(":");
             if(shoppingCart.getCountry().length()>0&&shoppingCart.getCountry().equals(temp)) {
-                countryList.addOption(true,temp,temp);
+                countryList.addOption(true,countryTemp[0],countryTemp[0]);
             }
             else
             {

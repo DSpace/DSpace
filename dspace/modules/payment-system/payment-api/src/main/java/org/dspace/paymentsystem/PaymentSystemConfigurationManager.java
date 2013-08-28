@@ -10,6 +10,9 @@ package org.dspace.paymentsystem;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -28,6 +31,8 @@ public class PaymentSystemConfigurationManager {
     private static Properties notIntegratedJournalFee = null;
     private static Properties sizeFileFeeAfter = null;
     private static Properties symbols = null;
+
+    private static List<String> countrySortedList = null;
     private static String maxFileSize = ConfigurationManager.getProperty("payment-system", "dryad.paymentsystem.maxFileSize");
 
     private static String currencyConfig = ConfigurationManager.getProperty("payment-system", "dryad.paymentsystem.currency");
@@ -61,7 +66,10 @@ public class PaymentSystemConfigurationManager {
         String[] notIntegratedJournalFees = notIntegratedJournalFeeList.split(";");
         String[] sizeFileFeeAfterArray = sizeFileFeeAfterList.split(";");
         String[] currencySymbolArray = currencySymbolList.split(";");
-        for(String countryTemp:countryArray)
+        countrySortedList = Arrays.asList(countryArray);
+
+        Collections.sort(countrySortedList, String.CASE_INSENSITIVE_ORDER);
+        for(String countryTemp:countrySortedList)
         {
             String[] countryTempArray = countryTemp.split(":");
             country.setProperty(countryTempArray[0],countryTempArray[1]);
@@ -115,7 +123,10 @@ public class PaymentSystemConfigurationManager {
         String value = country.getProperty(property);
         return (value != null) ? value.trim() : null;
     }
-
+    public static List<String> getSortedCountry()
+    {
+        return countrySortedList;
+    }
     public static Double getCurrencyProperty(String property)
     {
         Double value = Double.parseDouble(currency.getProperty(property));

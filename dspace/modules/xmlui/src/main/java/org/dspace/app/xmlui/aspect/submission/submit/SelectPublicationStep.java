@@ -473,7 +473,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     private void generateCountryList(org.dspace.app.xmlui.wing.element.List info,Request request) throws WingException{
 
         PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
-        Properties countryArray = manager.getAllCountryProperty();
+        java.util.List<String> countryArray = manager.getSortedCountry();
         if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_SELECT_COUNTRY)
         {
             info.addItem("error-country","errorMessage").addContent("Please select your country");
@@ -481,9 +481,10 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         info.addLabel(T_Country);
         Select countryList = info.addItem("country-list", "select-list").addSelect("country");
         countryList.addOption("","Select Your Country");
-        for(String temp:countryArray.stringPropertyNames()){
+        for(String temp:countryArray){
             {
-                countryList.addOption(false,temp,temp);
+                String[] countryTemp = temp.split(":");
+                countryList.addOption(false,countryTemp[0],countryTemp[0]);
             }
         }
 
