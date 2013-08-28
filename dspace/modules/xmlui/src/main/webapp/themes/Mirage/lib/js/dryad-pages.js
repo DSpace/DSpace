@@ -3,7 +3,7 @@
 jQuery(document).ready(function() {
 
 
-
+    jQuery('.label-mark').tooltip();
     jQuery('#aspect_submission_workflow_WorkflowTransformer_field_skip_payment').css('display','none');
     jQuery('#aspect_submission_submit_CheckoutStep_field_skip_payment').css('display','none');
     //if there is error in generate the paypal form or payment is 0 enable the skip button

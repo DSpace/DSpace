@@ -191,6 +191,7 @@
     <xsl:template name="pick-label">
         <xsl:choose>
             <xsl:when test="dri:field/dri:label">
+                <xsl:variable name="help" select="dri:field/dri:help/text()"/>
                 <label class="ds-form-label">
                         <xsl:choose>
                                 <xsl:when test="./dri:field/@id">
@@ -201,6 +202,13 @@
                                 <xsl:otherwise></xsl:otherwise>
                         </xsl:choose>
                     <xsl:apply-templates select="dri:field/dri:label" mode="formComposite"/>
+                    <xsl:if test="string-length($help)>0">
+                        <img class="label-mark" src="/themes/Mirage/images/help.jpg">
+                            <xsl:attribute name="title">
+                                <xsl:value-of select="$help"/>
+                            </xsl:attribute>
+                        </img>
+                    </xsl:if>
                 </label>
             </xsl:when>
             <xsl:when test="string-length(string(preceding-sibling::*[1][local-name()='label'])) > 0">
@@ -221,6 +229,7 @@
 
             </xsl:when>
             <xsl:when test="dri:field">
+                <xsl:variable name="help" select="dri:help/text()"/>
                 <xsl:choose>
                         <xsl:when test="preceding-sibling::*[1][local-name()='label']">
                                 <label class="ds-form-label">
@@ -233,6 +242,13 @@
                                                 <xsl:otherwise></xsl:otherwise>
                                         </xsl:choose>
                                     <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>&#160;
+                                    <xsl:if test="string-length($help)>0">
+                                        <img class="label-mark" src="/themes/Mirage/images/help.jpg">
+                                            <xsl:attribute name="title">
+                                                <xsl:value-of select="$help"/>
+                                            </xsl:attribute>
+                                        </img>
+                                    </xsl:if>
                                 </label>
                             </xsl:when>
                             <xsl:otherwise>
@@ -249,6 +265,7 @@
     </xsl:template>
 
     <xsl:template match="dri:list[@type='form']/dri:label" priority="3">
+        <xsl:variable name="help" select="dri:help/text()"/>
                 <xsl:attribute name="class">
                 <xsl:text>ds-form-label</xsl:text>
                <xsl:if test="@rend">
@@ -266,6 +283,13 @@
                 </xsl:otherwise>
         </xsl:choose>
         <xsl:apply-templates />
+        <xsl:if test="string-length($help)>0">
+            <img class="label-mark" src="/themes/Mirage/images/help.jpg">
+                <xsl:attribute name="title">
+                    <xsl:value-of select="$help"/>
+                </xsl:attribute>
+            </img>
+        </xsl:if>
     </xsl:template>
 
 
