@@ -479,8 +479,8 @@ div.bioText {
 #status_other_than_published,
 #aspect_submission_StepTransformer_list_doi > table {
     border: 1px solid #ccc;
-    float: right;
-    margin-right: 180px;
+    float: left;
+    width: 497px;
     display: inline-block;
     padding: 10px;
     position: relative;
