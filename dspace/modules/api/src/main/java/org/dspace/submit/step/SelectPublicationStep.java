@@ -161,13 +161,6 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
             Item item = submissionInfo.getSubmissionItem().getItem();
 
-	    /*            String country = request.getParameter("country");
-            if(country==null||country.length()==0)
-            {
-                return  ERROR_SELECT_COUNTRY;
-            }
-	    */
-
             String journalID = null;
             String articleStatus = request.getParameter("article_status");
             String manuscriptNumber = request.getParameter("manu");
