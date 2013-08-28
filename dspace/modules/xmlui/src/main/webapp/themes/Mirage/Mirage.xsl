@@ -1197,4 +1197,11 @@ parameter that is being used (see variable defined above) -->
         </label>
         <xsl:apply-templates select="." mode="normalField"/>
     </xsl:template>
+    
+    <xsl:template match="dri:div[@id='full-stacktrace']">
+        <xsl:comment>
+            <xsl:value-of select="."/>
+        </xsl:comment>
+    </xsl:template>
+        
 </xsl:stylesheet>

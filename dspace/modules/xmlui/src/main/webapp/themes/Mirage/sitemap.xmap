@@ -168,5 +168,174 @@
 
 			</map:match>
 		</map:pipeline>
+
+        <map:handle-errors>
+            <map:select type="exception">
+
+                <map:when test="not-found">
+
+                    <map:generate type="exception"/>
+
+                    <map:transform src="exception2dri.xslt">
+                        <map:parameter name="contextPath" value="{request:contextPath}"/>
+                        <map:parameter name="pageTitle" value="Resource not found"/>
+                    </map:transform>
+
+                    <!--3 different IncludePageMeta transformers to ensure that the stylesheets end up in the correct order-->
+                    <map:transform type="IncludePageMeta">
+                        <map:parameter name="stylesheet.screen#1" value="lib/css/reset.css"/>
+                        <map:parameter name="stylesheet.screen#2" value="lib/css/base.css"/>
+                        <map:parameter name="stylesheet.screen#3" value="lib/css/helper.css"/>
+                        <map:parameter name="stylesheet.screen#4" value="lib/css/jquery-ui-1.9.1.custom.css"/>
+                        <map:parameter name="stylesheet.screen#5" value="lib/css/style.css"/>
+                        <map:parameter name="stylesheet.screen#6" value="lib/css/authority-control.css"/>
+
+                        <map:parameter name="stylesheet.screen#7" value="lib/css/jquery-ui-1.css"/>
+                        <map:parameter name="stylesheet.screen#8" value="lib/css/jquery.bxslider.css"/>
+                        <map:parameter name="stylesheet.screen#9" value="lib/css/superfish.css"/>
+                    </map:transform>
+
+                    <map:transform type="IncludePageMeta">
+                        <map:parameter name="stylesheet.handheld" value="lib/css/handheld.css"/>
+                        <map:parameter name="stylesheet.print" value="lib/css/print.css"/>
+                    </map:transform>
+
+                    <map:transform type="IncludePageMeta">
+                        <map:parameter name="stylesheet.all" value="lib/css/media.css"/>
+                        <map:parameter name="javascript#1" value="lib/js/jquery-ui-1.9.1.custom.min.js"/>
+                        <map:parameter name="javascript#2" value="lib/js/utils.js"/>
+                        <map:parameter name="theme.path" value="{global:theme-path}"/>
+                        <map:parameter name="theme.name" value="{global:theme-name}"/>
+                    </map:transform>
+
+                    <!-- Debuging output -->
+                    <map:match type="request" pattern="XML">
+                        <map:serialize type="xml"/>
+                    </map:match>
+
+                    <!-- Step 3: Transform to XHTML -->
+                    <map:transform src="{global:theme-name}.xsl"/>
+
+                    <map:act type="locale">
+                        <map:transform type="i18n">
+                            <map:parameter name="locale" value="{locale}"/>
+                        </map:transform>
+                    </map:act>
+
+                    <map:serialize type="xhtml" status-code="404"/>
+
+                </map:when>
+
+                <map:when test="invalid-continuation">
+
+                    <map:generate type="exception"/>
+
+                    <map:transform src="exception2dri.xslt">
+                        <map:parameter name="contextPath" value="{request:contextPath}"/>
+                        <map:parameter name="pageTitle" value="Invalid Continuation"/>
+                    </map:transform>
+
+                    <!--3 different IncludePageMeta transformers to ensure that the stylesheets end up in the correct order-->
+                    <map:transform type="IncludePageMeta">
+                        <map:parameter name="stylesheet.screen#1" value="lib/css/reset.css"/>
+                        <map:parameter name="stylesheet.screen#2" value="lib/css/base.css"/>
+                        <map:parameter name="stylesheet.screen#3" value="lib/css/helper.css"/>
+                        <map:parameter name="stylesheet.screen#4" value="lib/css/jquery-ui-1.9.1.custom.css"/>
+                        <map:parameter name="stylesheet.screen#5" value="lib/css/style.css"/>
+                        <map:parameter name="stylesheet.screen#6" value="lib/css/authority-control.css"/>
+
+                        <map:parameter name="stylesheet.screen#7" value="lib/css/jquery-ui-1.css"/>
+                        <map:parameter name="stylesheet.screen#8" value="lib/css/jquery.bxslider.css"/>
+                        <map:parameter name="stylesheet.screen#9" value="lib/css/superfish.css"/>
+                    </map:transform>
+
+                    <map:transform type="IncludePageMeta">
+                        <map:parameter name="stylesheet.handheld" value="lib/css/handheld.css"/>
+                        <map:parameter name="stylesheet.print" value="lib/css/print.css"/>
+                    </map:transform>
+
+                    <map:transform type="IncludePageMeta">
+                        <map:parameter name="stylesheet.all" value="lib/css/media.css"/>
+                        <map:parameter name="javascript#1" value="lib/js/jquery-ui-1.9.1.custom.min.js"/>
+                        <map:parameter name="javascript#2" value="lib/js/utils.js"/>
+                        <map:parameter name="theme.path" value="{global:theme-path}"/>
+                        <map:parameter name="theme.name" value="{global:theme-name}"/>
+                    </map:transform>
+
+                    <!-- Debuging output -->
+                    <map:match type="request" pattern="XML">
+                        <map:serialize type="xml"/>
+                    </map:match>
+
+                    <!-- Step 3: Transform to XHTML -->
+                    <map:transform src="{global:theme-name}.xsl"/>
+
+                    <map:act type="locale">
+                        <map:transform type="i18n">
+                            <map:parameter name="locale" value="{locale}"/>
+                        </map:transform>
+                    </map:act>
+
+                    <map:serialize type="xhtml" status-code="404"/>
+
+                </map:when>
+
+                <map:otherwise>
+                    <map:generate type="exception"/>
+
+                    <map:transform src="exception2dri.xslt">
+                        <map:parameter name="contextPath" value="{request:contextPath}"/>
+                    </map:transform>
+
+                    <!--3 different IncludePageMeta transformers to ensure that the stylesheets end up in the correct order-->
+                    <map:transform type="IncludePageMeta">
+                        <map:parameter name="stylesheet.screen#1" value="lib/css/reset.css"/>
+                        <map:parameter name="stylesheet.screen#2" value="lib/css/base.css"/>
+                        <map:parameter name="stylesheet.screen#3" value="lib/css/helper.css"/>
+                        <map:parameter name="stylesheet.screen#4" value="lib/css/jquery-ui-1.9.1.custom.css"/>
+                        <map:parameter name="stylesheet.screen#5" value="lib/css/style.css"/>
+                        <map:parameter name="stylesheet.screen#6" value="lib/css/authority-control.css"/>
+
+                        <map:parameter name="stylesheet.screen#7" value="lib/css/jquery-ui-1.css"/>
+                        <map:parameter name="stylesheet.screen#8" value="lib/css/jquery.bxslider.css"/>
+                        <map:parameter name="stylesheet.screen#9" value="lib/css/superfish.css"/>
+                    </map:transform>
+
+                    <map:transform type="IncludePageMeta">
+                        <map:parameter name="stylesheet.handheld" value="lib/css/handheld.css"/>
+                        <map:parameter name="stylesheet.print" value="lib/css/print.css"/>
+                    </map:transform>
+
+                    <map:transform type="IncludePageMeta">
+                        <map:parameter name="stylesheet.all" value="lib/css/media.css"/>
+                        <map:parameter name="javascript#1" value="lib/js/jquery-ui-1.9.1.custom.min.js"/>
+                        <map:parameter name="javascript#2" value="lib/js/utils.js"/>
+                        <map:parameter name="theme.path" value="{global:theme-path}"/>
+                        <map:parameter name="theme.name" value="{global:theme-name}"/>
+                    </map:transform>
+
+                    <!-- Debuging output -->
+                    <map:match type="request" pattern="XML">
+                        <map:serialize type="xml"/>
+                    </map:match>
+
+                    <!-- Step 3: Transform to XHTML -->
+                    <map:transform src="{global:theme-name}.xsl"/>
+
+                    <map:act type="locale">
+                        <map:transform type="i18n">
+                            <map:parameter name="locale" value="{locale}"/>
+                        </map:transform>
+                    </map:act>
+
+                    <map:serialize type="xhtml" status-code="500"/>
+
+                </map:otherwise>
+
+            </map:select>
+
+        </map:handle-errors>
+
 	</map:pipelines>
+
 </map:sitemap>
