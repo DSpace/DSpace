@@ -2389,3 +2389,10 @@ div.step-link{
     padding-bottom: 0px;
     padding-top: 0px;
 }
+
+.errorMessage{
+    color:red;
+}
+.waiver-info{
+    color:green;
+}
