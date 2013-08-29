@@ -453,7 +453,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                   <a href="/pages/faq#using">Use data</a>
                                 </li>
                                 <li>
-                                  <a href="/pages/integratedJournals">Currently integrated journals</a>
+                                  <a href="/pages/integratedJournals">Look up your journal</a>
                                 </li>
                                 <li>
                                     <a href="/pages/policies">Terms of service</a>
