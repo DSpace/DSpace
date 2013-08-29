@@ -316,7 +316,8 @@ public class UploadStep extends AbstractProcessingStep
         // files have been uploaded.
         // ---------------------------------------------------
         //check if a file is required to be uploaded
-        if (fileRequired && !item.hasUploadedFiles())
+        if (fileRequired && !item.hasUploadedFiles()
+                && !buttonPressed.equals(SUBMIT_MORE_BUTTON))
         {
             return STATUS_NO_FILES_ERROR;
         }
