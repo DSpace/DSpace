@@ -232,6 +232,15 @@
                 <div id="dryad-home-carousel" class="ds-static-div primary">
                     <div class="bxslider" style="">
                         <div>
+                            <a href="/pages/pricing">
+                                <img alt="" src="/themes/Mirage/images/watering-can.png" />
+                                <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);"> 
+                                    Coming September first, Data Publishing Charges to help sustain open data at Dryad
+                                </p>
+                                <p style="drop-shadow: 4px 4px; position: absolute; right: 40px; bottom: 80px; font-size: 70%; text-align: right; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Learn More &#187;</p>
+                            </a>
+                        </div>
+                        <div>
                             <p Xid="ds-dryad-is" style="font-size: 88%; line-height: 1.35em;"
                                xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
                                 <span style="color: #595;">DataDryad.org</span>
