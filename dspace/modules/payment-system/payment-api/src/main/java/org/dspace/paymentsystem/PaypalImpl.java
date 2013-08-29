@@ -93,7 +93,7 @@ public class PaypalImpl implements PaypalService{
                 get.addParameter("AMT", "0");
             }
             //TODO:add currency from shopping cart
-            get.addParameter("CURRENCY", "USD");
+            get.addParameter("CURRENCY", shoppingCart.getCurrency());
             switch (new HttpClient().executeMethod(get)) {
                 case 200:
                 case 201:
@@ -237,7 +237,7 @@ public class PaypalImpl implements PaypalService{
 
 
                 //TODO:add currency from shopping cart
-                get.addParameter("CURRENCY", "USD");
+                get.addParameter("CURRENCY", shoppingCart.getCurrency());
                 switch (new HttpClient().executeMethod(get)) {
                     case 200:
                     case 201:
@@ -310,7 +310,7 @@ public class PaypalImpl implements PaypalService{
             get.addParameter("ORIGID", shoppingCart.getTransactionId());
 
             //TODO:add currency from shopping cart
-            get.addParameter("CURRENCY", "USD");
+            get.addParameter("CURRENCY", shoppingCart.getCurrency());
             switch (new HttpClient().executeMethod(get)) {
                 case 200:
                 case 201:
