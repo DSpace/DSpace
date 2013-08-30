@@ -20,6 +20,7 @@ import org.dspace.handle.HandleManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.paymentsystem.PaymentSystemConfigurationManager;
+import org.dspace.paymentsystem.ShoppingCart;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.submit.bean.PublicationBean;
 import org.dspace.submit.model.ModelPublication;
@@ -481,10 +482,18 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         info.addLabel(T_Country);
         Select countryList = info.addItem("country-list", "select-list").addSelect("country");
         countryList.addOption("","Select Your Country");
+        String selectedCountry = request.getParameter("country");
         for(String temp:countryArray){
             {
                 String[] countryTemp = temp.split(":");
-                countryList.addOption(false,countryTemp[0],countryTemp[0]);
+                if(selectedCountry!=null&&selectedCountry.equals(countryTemp[0]))
+                {
+                    countryList.addOption(true,countryTemp[0],countryTemp[0]);
+                }
+                else
+                {
+                    countryList.addOption(false,countryTemp[0],countryTemp[0]);
+                }
             }
         }
 

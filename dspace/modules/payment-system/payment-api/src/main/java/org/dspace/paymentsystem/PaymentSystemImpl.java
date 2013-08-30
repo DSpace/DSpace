@@ -65,7 +65,8 @@ public class PaymentSystemImpl implements PaymentSystemService {
         newShoppingcart.setStatus(status);
         newShoppingcart.setVoucher(null);
         newShoppingcart.setTransactionId(null);
-
+        newShoppingcart.setJournal(null);
+        newShoppingcart.setJournalSub(false);
         newShoppingcart.setBasicFee(PaymentSystemConfigurationManager.getCurrencyProperty(currency));
         newShoppingcart.setNoInteg(PaymentSystemConfigurationManager.getNotIntegratedJournalFeeProperty(currency));
         newShoppingcart.setSurcharge(PaymentSystemConfigurationManager.getSizeFileFeeProperty(currency));
@@ -200,39 +201,31 @@ public class PaymentSystemImpl implements PaymentSystemService {
     }
 
     public boolean getJournalSubscription(Context context, ShoppingCart shoppingcart, String journal) throws SQLException {
-        if(journal==null||journal.length()==0){
-            Item item = Item.find(context,shoppingcart.getItem()) ;
-            if(item!=null)
+            if(!shoppingcart.getStatus().equals(ShoppingCart.STATUS_COMPLETED))
             {
-                try{
-                    //only take the first journal
-                    DCValue[] values = item.getMetadata("prism.publicationName");
-                    if(values!=null && values.length > 0){
-                        journal=values[0].value;
+                if(journal==null||journal.length()==0){
+                    Item item = Item.find(context,shoppingcart.getItem()) ;
+                    if(item!=null)
+                    {
+                        try{
+                            //only take the first journal
+                            DCValue[] values = item.getMetadata("prism.publicationName");
+                            if(values!=null && values.length > 0){
+                                journal=values[0].value;
+                            }
+                        }catch (Exception e)
+                        {
+                            log.error("Exception when get journal in journal subscription:", e);
+                        }
                     }
-                }catch (Exception e)
-                {
-                    log.error("Exception when get journal in journal subscription:", e);
+
+
                 }
+                //update the journal and journal subscribtion
+                updateJournal(shoppingcart,journal);
+
             }
-
-        }
-        if(journal!=null)
-        {
-            try{
-                Map<String, String> properties = DryadJournalSubmissionUtils.journalProperties.get(journal);
-                if(properties==null) return false;
-
-                String subscription = properties.get("subscriptionPaid");
-                if(StringUtils.equals(subscription, ShoppingCart.FREE))
-                    return true;
-
-            }catch(Exception e){
-                log.error("Exception when get journal subscription:", e);
-                return false;
-            }
-        }
-        return false;
+        return shoppingcart.getJournalSub();
     }
 
     public double getNoIntegrateFee(Context context, ShoppingCart shoppingcart, String journal) throws SQLException {
@@ -331,11 +324,13 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
 
     public void updateTotal(Context context, ShoppingCart shoppingCart, String journal) throws SQLException{
-        Double newPrice = calculateShoppingCartTotal(context,shoppingCart,journal);
-        //TODO:only setup the price when the old total price is higher than the price right now
-        shoppingCart.setTotal(newPrice);
-        shoppingCart.update();
-        shoppingCart.setModified(false);
+        if(!shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
+            Double newPrice = calculateShoppingCartTotal(context,shoppingCart,journal);
+            //TODO:only setup the price when the old total price is higher than the price right now
+            shoppingCart.setTotal(newPrice);
+            shoppingCart.update();
+            shoppingCart.setModified(false);
+        }
     }
     public String getPayer(Context context,ShoppingCart shoppingcart,String journal)throws SQLException{
         String payerName = "";
@@ -348,5 +343,25 @@ public class PaymentSystemImpl implements PaymentSystemService {
             case ShoppingCart.NO_WAIVER:payerName = e.getFullName();break;
         }
         return payerName;
+    }
+
+    private void updateJournal(ShoppingCart shoppingCart,String journal){
+        if(!shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED))
+        {
+            if(journal!=null&&journal.length()>0) {
+                //update shoppingcart journal
+                Map<String, String> properties = DryadJournalSubmissionUtils.journalProperties.get(journal);
+                Boolean subscription = false;
+                if(properties!=null){
+                    if(StringUtils.equals(properties.get("subscriptionPaid"), ShoppingCart.FREE))
+                    {
+                        subscription = true;
+                    }
+                }
+                shoppingCart.setJournal(journal);
+                shoppingCart.setJournalSub(subscription);
+            }
+
+        }
     }
     }

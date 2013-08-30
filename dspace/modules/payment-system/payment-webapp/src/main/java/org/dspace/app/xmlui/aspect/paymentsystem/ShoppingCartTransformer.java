@@ -16,20 +16,29 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
-import org.dspace.app.xmlui.cocoon.*;
+import org.dspace.app.util.SubmissionStepConfig;
+import org.dspace.app.xmlui.aspect.submission.FlowUtils;
 
+import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.*;
+import org.dspace.app.xmlui.wing.element.List;
+import org.dspace.app.xmlui.wing.element.Options;
+import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.authorize.AuthorizeException;
 
-import org.dspace.content.*;
+import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.content.crosswalk.StreamIngestionCrosswalk;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.paymentsystem.*;
+import org.dspace.workflow.ClaimedTask;
 import org.dspace.workflow.WorkflowItem;
 import org.xml.sax.SAXException;
 import org.dspace.utils.DSpace;
@@ -42,7 +51,7 @@ import org.dspace.utils.DSpace;
  * @author Fabio Bolognesi, fabio at atmire.com
  * @author Lantian Gai, lantian at atmire.com
  */
-public class ShoppingCartTransformer extends AbstractDSpaceTransformer{
+public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
 
     private static final Logger log = Logger.getLogger(AbstractDSpaceTransformer.class);
 
@@ -67,7 +76,7 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer{
             message("xmlui.PaymentSystem.shoppingcart.order.apply");
     protected static final Message T_CartHelp=
             message("xmlui.PaymentSystem.shoppingcart.help");
-
+    private static final String DSPACE_SUBMISSION_INFO = "dspace.submission.info";
 
     public void addOptions(Options options) throws SAXException, org.dspace.app.xmlui.wing.WingException,
             SQLException, IOException, AuthorizeException {
@@ -135,13 +144,22 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer{
             //add selected currency section
         info.addLabel(T_Header);
         generateCurrencyList(info,manager,transaction);
-        generatePayer(request,info,transaction,paymentSystemService);
+        generatePayer(request,info,transaction,paymentSystemService,item);
 
 
 
             generatePrice(info,manager,transaction,paymentSystemService);
 
-        if(!request.getRequestURI().endsWith("submit"))
+        //if(!request.getRequestURI().endsWith("submit"))
+
+//        WorkspaceItem submission=WorkspaceItem.find(context, item.getID());
+//
+//        SubmissionInfo sinfo = FlowUtils.obtainSubmissionInfo(objectModel, String.valueOf(submission.getID()));
+
+        //Integer step = (Integer)request.get("step");
+        DCValue[] values= item.getMetadata("prism.publicationName");
+        //SubmissionStepConfig cfg = sinfo.getSubmissionConfig().getStep(step);
+        if(values!=null&&values.length>0)
         {
             generateCountryList(info,manager,transaction);
         }
@@ -162,12 +180,12 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer{
         countryList.addOption("","Select Your Country");
         for(String temp:countryArray){
             String[] countryTemp = temp.split(":");
-            if(shoppingCart.getCountry().length()>0&&shoppingCart.getCountry().equals(temp)) {
+            if(shoppingCart.getCountry().length()>0&&shoppingCart.getCountry().equals(countryTemp[0])) {
                 countryList.addOption(true,countryTemp[0],countryTemp[0]);
             }
             else
             {
-                countryList.addOption(false,temp,temp);
+                countryList.addOption(false,countryTemp[0],countryTemp[0]);
             }
         }
 
@@ -252,18 +270,23 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer{
         info.addItem("total","total").addContent(symbol+Double.toString(shoppingCart.getTotal()));
         info.addItem("waiver-info","waiver-info").addContent(waiverMessage);
     }
-    private void generatePayer(Request request,org.dspace.app.xmlui.wing.element.List info,ShoppingCart shoppingCart,PaymentSystemService paymentSystemService) throws WingException,SQLException{
+    private void generatePayer(Request request,org.dspace.app.xmlui.wing.element.List info,ShoppingCart shoppingCart,PaymentSystemService paymentSystemService,Item item) throws WingException,SQLException{
         info.addLabel(T_Payer);
-        String payerName = paymentSystemService.getPayer(context,shoppingCart,null);
-        if(request.getRequestURI().endsWith("submit"))
+        String payerName = paymentSystemService.getPayer(context, shoppingCart, null);
+        //if(request.getRequestURI().endsWith("submit"))
+        DCValue[] values= item.getMetadata("prism.publicationName");
+        //WorkspaceItem submission=WorkspaceItem.find(context,item.getID());
+        if(values!=null&&values.length>0)
         {
             //on the first page don't generate the payer name, wait until user choose country or journal
-            info.addItem("payer","payer").addContent("");
+            info.addItem("payer","payer").addContent(payerName);
         }
         else
         {
-            info.addItem("payer","payer").addContent(payerName);
+            info.addItem("payer","payer").addContent("");
         }
+
+
     }
 
 

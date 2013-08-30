@@ -26,7 +26,9 @@ CREATE TABLE shoppingcart
   securetoken VARCHAR(256),
   basic_fee DOUBLE PRECISION,
   no_integ DOUBLE PRECISION,
-  surcharge DOUBLE PRECISION
+  surcharge DOUBLE PRECISION,
+  journal VARCHAR(256),
+  journal_sub BOOL
 );
 
 CREATE SEQUENCE voucher_seq;
