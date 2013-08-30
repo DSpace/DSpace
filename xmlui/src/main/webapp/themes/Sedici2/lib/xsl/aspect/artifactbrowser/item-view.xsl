@@ -1263,10 +1263,13 @@
 				</xsl:choose>
 				<xsl:text>&#160;</xsl:text>
 			</div>
-			
+						
 			<div class="publisher-date">
-				<!-- date.exposure/date.issued : extraemos el año solamente -->
+				<!-- date.exposure/date.issued/date.created : extraemos el año solamente -->
 				<xsl:choose>
+					<xsl:when test="dim:field[@element='date' and @qualifier='created'] and dim:field [@element='type']=$objeto_fisico">
+							<xsl:value-of select="substring(dim:field[@element='date' and @qualifier='created'],1,4)"/>
+					</xsl:when>
 					<xsl:when test="dim:field[@element='date' and @qualifier='exposure']">
 						<xsl:value-of select="substring(dim:field[@element='date' and @qualifier='exposure'],1,4)"/>
 					</xsl:when>
