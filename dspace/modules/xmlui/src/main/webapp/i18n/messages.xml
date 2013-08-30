@@ -3030,7 +3030,7 @@
 	<message key="xmlui.Submission.Submissions.step.head.Archived">Archived</message>
 	<message key="xmlui.Submission.Submissions.step.head.Withdrawn">Withdrawn</message>
 	<message key="xmlui.Submission.Submissions.step.head.reviewStep">In Journal Review</message>
-	<message key="xmlui.Submission.Submissions.step.head.pendingPublicationStep">In Journal Review</message>
+	<message key="xmlui.Submission.Submissions.step.head.pendingPublicationStep">Publication Blackout</message>
 	<message
 		key="xmlui.Submission.Submissions.default.dryadAcceptEditReject.dryadAcceptEditRejectAction"
 		>Awaiting curator review</message>
