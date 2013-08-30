@@ -3,7 +3,7 @@
 # {0}  Title of submission
 # {1}  Name of collection
 # {2}  Reason for the rejection
-# {3}   Link to 'My DSpace' page
+# {3}   Link to 'My DSpace' page -- NOT WORKING
 # {4}   Name of the rejector
 #
 Subject: Dryad: Payment information must be updated
@@ -16,7 +16,7 @@ valid. Please login to Dryad and provide current payment information.
 
 You can access the in-progress submission from your "My Submissions"
 page: 
-{3}
+http://datadryad.org/submissions
 
 The Dryad Team
 datadryad.org
