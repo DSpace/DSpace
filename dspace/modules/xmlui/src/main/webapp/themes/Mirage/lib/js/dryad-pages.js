@@ -334,17 +334,17 @@ jQuery(document).ready(function() {
     if ($currencySelector.length === 1) {
         var amountsByCurrency = {
             'USD': {
-                memberDPC_voucher: 'USD$65',
-                nonMemberDPC_voucher: 'USD$70',
-                memberDPC_deferred: 'USD$70',
-                nonMemberDPC_deferred: 'USD$75',
-                memberDPC_subscription: 'USD$25',
-                nonMemberDPC_subscription: 'USD$30',
-                DPC_pay_on_submission: 'USD$80',  // is this the "base charge"?
-                notIntegratedJournalFee: 'USD$10',
-                DPC_pay_on_submission_nonintegrated: 'USD$90',  // total of two previous lines
-                excessDataStorageFee_first_GB: 'USD$15',
-                excessDataStorageFee_per_additional_GB: 'USD$10'
+                memberDPC_voucher: '$65',
+                nonMemberDPC_voucher: '$70',
+                memberDPC_deferred: '$70',
+                nonMemberDPC_deferred: '$75',
+                memberDPC_subscription: '$25',
+                nonMemberDPC_subscription: '$30',
+                DPC_pay_on_submission: '$80',  // is this the "base charge"?
+                notIntegratedJournalFee: '$10',
+                DPC_pay_on_submission_nonintegrated: '$90',  // total of two previous lines
+                excessDataStorageFee_first_GB: '$15',
+                excessDataStorageFee_per_additional_GB: '$10'
             },
             'EUR': {
                 memberDPC_voucher: '&#128;49',  // €
@@ -373,17 +373,17 @@ jQuery(document).ready(function() {
                 excessDataStorageFee_per_additional_GB: '&#163;7'
             },
             'CAD': {
-                memberDPC_voucher: 'CAD$67',
-                nonMemberDPC_voucher: 'CAD$73',
-                memberDPC_deferred: 'CAD$73',
-                nonMemberDPC_deferred: 'CAD$77',
-                memberDPC_subscription: 'CAD$26',
-                nonMemberDPC_subscription: 'CAD$30',
-                DPC_pay_on_submission: 'CAD$83',
-                notIntegratedJournalFee: 'CAD$10',
-                DPC_pay_on_submission_nonintegrated: 'CAD$93',  // total of two previous lines
-                excessDataStorageFee_first_GB: 'CAD$15',
-                excessDataStorageFee_per_additional_GB: 'CAD$10'
+                memberDPC_voucher: '$67',
+                nonMemberDPC_voucher: '$73',
+                memberDPC_deferred: '$73',
+                nonMemberDPC_deferred: '$77',
+                memberDPC_subscription: '$26',
+                nonMemberDPC_subscription: '$30',
+                DPC_pay_on_submission: '$83',
+                notIntegratedJournalFee: '$10',
+                DPC_pay_on_submission_nonintegrated: '$93',  // total of two previous lines
+                excessDataStorageFee_first_GB: '$15',
+                excessDataStorageFee_per_additional_GB: '$10'
             },
             'JPY': {
                 memberDPC_voucher: '&#165;6370',  // ¥
@@ -399,17 +399,17 @@ jQuery(document).ready(function() {
                 excessDataStorageFee_per_additional_GB: '&#165;980'
             },
             'AUD': {
-                memberDPC_voucher: 'AUD$72',
-                nonMemberDPC_voucher: 'AUD$78',
-                memberDPC_deferred: 'AUD$78',
-                nonMemberDPC_deferred: 'AUD$84',
-                memberDPC_subscription: 'AUD$28',
-                nonMemberDPC_subscription: 'AUD$33',
-                DPC_pay_on_submission: 'AUD$89',
-                notIntegratedJournalFee: 'AUD$11',
-                DPC_pay_on_submission_nonintegrated: 'AUD$100',  // total of two previous lines
-                excessDataStorageFee_first_GB: 'AUD$17',
-                excessDataStorageFee_per_additional_GB: 'AUD$11'
+                memberDPC_voucher: '$72',
+                nonMemberDPC_voucher: '$78',
+                memberDPC_deferred: '$78',
+                nonMemberDPC_deferred: '$84',
+                memberDPC_subscription: '$28',
+                nonMemberDPC_subscription: '$33',
+                DPC_pay_on_submission: '$89',
+                notIntegratedJournalFee: '$11',
+                DPC_pay_on_submission_nonintegrated: '$100',  // total of two previous lines
+                excessDataStorageFee_first_GB: '$17',
+                excessDataStorageFee_per_additional_GB: '$11'
             }
         };
 
@@ -426,12 +426,6 @@ jQuery(document).ready(function() {
             jQuery('.msg-DPC_pay_on_submission_nonintegrated').html( amountsByCurrency[currencyCode].DPC_pay_on_submission_nonintegrated );
             jQuery('.msg-excessDataStorageFee_first_GB').html( amountsByCurrency[currencyCode].excessDataStorageFee_first_GB );
             jQuery('.msg-excessDataStorageFee_per_additional_GB').html( amountsByCurrency[currencyCode].excessDataStorageFee_per_additional_GB );
-
-            // use simplified symbols if an additional marker class is found, eg. 'USD$20' ==> '$20'
-            jQuery('.simplified_currency_display').each(
-                var $span = jQuery(this);
-                var $span.html( $span.html().replace(/USD|CAD|AUD/,"") );
-            );
         }
 
         // choosing a currency should modify the displayed org-revenue threshold and fees
