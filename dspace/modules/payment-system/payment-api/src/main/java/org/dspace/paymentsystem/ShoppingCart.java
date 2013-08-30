@@ -67,6 +67,9 @@ public class ShoppingCart {
     public static final int NO_INTEG =13;
     public static final int SURCHARGE =14;
 
+    public static final int JOURNAL =15;
+    public static final int JOURNAL_SUB =16;
+
     public static final String STATUS_COMPLETED = "completed";
     public static final String STATUS_OPEN = "open";
     public static final String STATUS_DENIlED = "deniled";
@@ -876,4 +879,52 @@ public class ShoppingCart {
         return myRow.getDoubleColumn("surcharge");
     }
 
+    /**
+     * Set the JOURNAL
+     *
+     * @return text_lang code (or null if the column is an SQL NULL)
+     */
+    public void setJournal(String journal)
+    {
+        if(journal==null)
+        {
+            myRow.setColumnNull("journal");
+        }
+        else{
+            myRow.setColumn("journal",journal);
+        }
+        modified = true;
+    }
+
+    /**
+     * Get the JOURNAL
+     *
+     * @return text_lang code (or null if the column is an SQL NULL)
+     */
+    public String getJournal()
+    {
+        return myRow.getStringColumn("journal");
+    }
+
+
+    /**
+     * Set the JOURNAL
+     *
+     * @return text_lang code (or null if the column is an SQL NULL)
+     */
+    public void setJournalSub(boolean journal_sub)
+    {
+        myRow.setColumn("journal_sub",journal_sub);
+        modified = true;
+    }
+
+    /**
+     * Get the JOURNAL
+     *
+     * @return text_lang code (or null if the column is an SQL NULL)
+     */
+    public Boolean getJournalSub()
+    {
+        return myRow.getBooleanColumn("journal_sub");
+    }
 }

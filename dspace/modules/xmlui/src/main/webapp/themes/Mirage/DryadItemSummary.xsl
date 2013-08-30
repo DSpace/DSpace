@@ -115,7 +115,7 @@
         </div>
         <!-- Data Files in package -->
         <xsl:if test="$datafiles">
-            <div class="ds-static-div primary">
+            <div class="ds-static-div primary">&#160;
                 <xsl:apply-templates select="$embeddedViewReferenceSet"/>
             </div>
         </xsl:if>
