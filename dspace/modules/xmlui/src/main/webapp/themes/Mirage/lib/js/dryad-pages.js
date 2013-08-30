@@ -429,8 +429,7 @@ jQuery(document).ready(function() {
 
             // use simplified symbols if an additional marker class is found, eg. 'USD$20' ==> '$20'
             jQuery('.simplified_currency_display').each(
-                var $span = jQuery(this);
-                var $span.html( $span.html().replace(/USD|CAD|AUD/,"") );
+                jQuery(this).html( $span.html().replace(/USD|CAD|AUD/,"") )
             );
         }
 
