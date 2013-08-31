@@ -702,6 +702,12 @@ input.input.ds-password-field:focus {
     outline:medium none;
 }
 
+
+#aspect_eperson_PasswordLogin_div_register span.error, 
+#aspect_eperson_PasswordLogin_div_login span.error {
+    margin-top: -4px;
+    margin-left: -138px;
+}
 span.error {
     clear: both;
     display: block;
