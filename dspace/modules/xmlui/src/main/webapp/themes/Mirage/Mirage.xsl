@@ -229,7 +229,7 @@
             <div class="home-col-1">
                 <div id="dryad-home-carousel" class="ds-static-div primary">
                     <div class="bxslider" style="">
-                        <div>
+                        <div style="position: relative;">
                             <a href="/pages/pricing">
                                 <img alt="" src="/themes/Mirage/images/watering-can.png" />
                                 <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);"> 
