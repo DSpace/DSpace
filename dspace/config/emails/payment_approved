@@ -1,17 +1,21 @@
+
 # Approved email message
 #
 # {0}  Title of submission
-# {1}  Name of collection
-# {2}   Link to 'My DSpace' page
-# {3}   Name of the admin
+# {1}  Non-zero charges from the shopping cart
+# {2}  Payer value from the shopping cart
+# {3}  Total charge processed 
+# {4}  Shopping cart ID
 #
-Subject: Dryad: Payment Processed
+Subject: Dryad: Payment Receipt
 
-Your payment has been processed for Dryad submission:
-{0}
+This is your receipt for data archiving with Dryad.
 
-Your credit card will be charged at this time.
+Dryad submission: {0}
+Submitter: {1}
+Charges: {2}
+Total: {3]
+Transaction ID: {4}
 
-
-The Dryad Team                                                                                                                                                           
-datadryad.org 
+The Dryad Team
+datadryad.org
