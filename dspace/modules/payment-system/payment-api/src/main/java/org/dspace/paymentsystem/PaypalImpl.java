@@ -393,7 +393,7 @@ public class PaypalImpl implements PaypalService{
         }
         else if(!shoppingCart.getCurrency().equals("USD"))
         {
-            finDiv.addPara("data-label", "bold").addContent("Dryad does not support currency other than USD dollars. Please complete your submission. We will contact you later.");
+            finDiv.addPara("data-label", "bold").addContent("Dryad's payment processing system currently only supports transactions in US dollars. We expect to enable transactions in other currencies within a few days. If you wish to complete your transaction in US dollars, please change the currency setting above. Otherwise, please complete your submission without entering payment information. We will contact you for payment details before your data is published.");
         }
         else
         {
