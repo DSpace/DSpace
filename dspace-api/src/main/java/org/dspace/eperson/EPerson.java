@@ -45,13 +45,13 @@ public class EPerson extends DSpaceObject
     /** The netid field (for sorting) */
     public static final int NETID = 4;
 
-    /** The e-mail field (for sorting) */
+    /** The language field (for sorting) */
     public static final int LANGUAGE = 5;
 
-    /** The e-mail field (for sorting) */
+    /** The phone field (for sorting) */
     public static final int PHONE = 6;
 
-    /** The e-mail field (for sorting) */
+    /** The terms and conditions field (for sorting) */
     public static final int TERMS = 7;
 
 
