@@ -143,10 +143,13 @@ public class EditProfile extends AbstractDSpaceTransformer
         message("xmlui.EPerson.EditProfile.head_security");
 
     private static final Message T_terms =
-            message("xmlui.EPerson.EditProfile.terms");
+	message("xmlui.EPerson.EditProfile.terms");
 
     private static final Message T_terms_help =
             message("xmlui.EPerson.EditProfile.terms_help");
+
+    private static final Message T_terms_checkbox =
+            message("xmlui.EPerson.EditProfile.terms.checkbox");
 
     
     private static Locale[] supportedLocales = getSupportedLocales();
@@ -436,8 +439,7 @@ public class EditProfile extends AbstractDSpaceTransformer
 
        //Terms and condition
        CheckBox termsCheckBox = tl.addItem().addCheckBox("terms");
-       termsCheckBox.setLabel(T_terms);
-       termsCheckBox.addOption(defaultTerms,"true");
+       termsCheckBox.addOption(defaultTerms,"true",T_terms_checkbox);
 
        if (errors.contains("terms"))
        {
