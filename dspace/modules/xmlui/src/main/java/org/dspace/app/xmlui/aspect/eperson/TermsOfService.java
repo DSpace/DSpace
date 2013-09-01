@@ -56,7 +56,7 @@ public class TermsOfService extends AbstractDSpaceTransformer
         Request request = ObjectModelHelper.getRequest(objectModel);
 
 
-        if (eperson != null && !request.getRequestURI().startsWith("/profile"))
+        if (eperson != null && !request.getRequestURI().startsWith("/profile") && !request.getRequestURI().startsWith("/pages/policies")
         {
             // Log that we are viewing a profile
             log.info(LogManager.getHeader(context, "terms_and_condition", ""));
