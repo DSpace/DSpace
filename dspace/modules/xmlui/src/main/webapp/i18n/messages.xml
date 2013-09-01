@@ -535,7 +535,10 @@
 		characters long.</message>
 	<message key="xmlui.EPerson.EditProfile.password">Password</message>
 	<message key="xmlui.EPerson.EditProfile.confirm_password">Retype to confirm</message>
-	<message key="xmlui.EPerson.EditProfile.submit_update">Complete Registration</message>
+    <message key="xmlui.EPerson.EditProfile.terms">Terms and Conditions</message>
+    <message key="xmlui.EPerson.EditProfile.terms_help">Please review the <a href="/pages/policies">Terms and Conditions</a>.</message>
+
+    <message key="xmlui.EPerson.EditProfile.submit_update">Complete Registration</message>
 	<message key="xmlui.EPerson.EditProfile.submit_create">Update Profile</message>
 	<message key="xmlui.EPerson.EditProfile.error_required">This field is required</message>
 	<message key="xmlui.EPerson.EditProfile.error_invalid_password">Choose a password at least 6
@@ -3495,5 +3498,11 @@
     <message key="xmlui.voucher.ManageVoucherin.actions_head">Manage Voucher</message>
     <message key="xmlui.voucher.ManageVoucherin.main_head">Manage Voucher</message>
     <message key="xmlui.PaymentSystem.shoppingcart.journal">Fee paid by Journal</message>
+
+    <message key="xmlui.EPerson.TermsOfService.head">Update Your Dryad Profile</message>
+    <message key="xmlui.EPerson.TermsOfService.telephone">Dryad now requires a phone number as a backup to email for contact purposes.</message>
+    <message key="xmlui.EPerson.TermsOfService.terms">Dryad now requires users to agree to Terms and Conditions found in your profile.</message>
+    <message key="xmlui.EPerson.TermsOfService.help">Please use the button below to update your profile.</message>
+    <message key="xmlui.EPerson.TermsOfService.button">Update Your Dryad Profile</message>
 
 </catalogue>

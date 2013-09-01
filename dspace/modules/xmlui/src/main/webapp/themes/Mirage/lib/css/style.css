@@ -2343,6 +2343,7 @@ li#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list div{
     list-style: none;
     padding:10px;
 }
+
 ul.navigation-link{
     padding: 5px 0;
     list-style: none;
@@ -2402,3 +2403,46 @@ div.step-link{
     width:20px;
     display:inline;
 }
+
+
+
+#aspect_eperson_TermsOfService_div_background{
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    opacity: .80;
+    -webkit-opacity: .80;
+    -moz-opacity: .80;
+    z-index: 1000;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+}
+
+#aspect_eperson_TermsOfService_div_modal-content{
+    background-color: white;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    box-shadow: 0 0 20px 0 #222;
+    -webkit-box-shadow: 0 0 20px 0 #222;
+    -moz-box-shadow: 0 0 20px 0 #222;
+
+    height: 250px;
+    left: 50%;
+    margin: -200px 0 0 -225px;
+    padding: 10px;
+    position: fixed;
+    top: 50%;
+    width: 450px;
+    z-index: 1000;
+}
+
+#aspect_eperson_TermsOfService_div_background.active, #aspect_eperson_TermsOfService_field_submit.active {
+    display: block;
+}
+

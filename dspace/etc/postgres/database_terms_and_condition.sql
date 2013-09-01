@@ -1,0 +1,1 @@
+ALTER TABLE eperson ADD terms BOOL
