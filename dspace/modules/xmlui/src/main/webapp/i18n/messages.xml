@@ -3501,7 +3501,7 @@
 
     <message key="xmlui.EPerson.TermsOfService.head">Update Your Dryad Profile</message>
     <message key="xmlui.EPerson.TermsOfService.telephone">Dryad now requires a phone number as a backup to email for contact purposes.</message>
-    <message key="xmlui.EPerson.TermsOfService.terms">Dryad now requires users to agree to Terms and Conditions found in your profile.</message>
+    <message key="xmlui.EPerson.TermsOfService.terms">Dryad now requires that all users agree to a set of Terms and Conditions.</message>
     <message key="xmlui.EPerson.TermsOfService.help">Please use the button below to update your profile.</message>
     <message key="xmlui.EPerson.TermsOfService.button">Update Your Dryad Profile</message>
 
