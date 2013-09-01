@@ -50,97 +50,17 @@ public class FinalPaymentAction extends ProcessingAction {
 
             PaypalService paypalService = new DSpace().getSingletonService(PaypalService.class);
 
-            boolean approved = paypalService.submitReferenceTransaction(c,wfi,request);
-            if(approved){
-                sendPaymentApprovedEmail(c, wfi.getSubmitter().getEmail(), wfi);
+            if(paypalService.submitReferenceTransaction(c,wfi,request)){
                 return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
             }
-            else
-            {
-                sendPaymentRejectEmail(c, wfi.getSubmitter().getEmail(), wfi);
-            }
-
-            //Send us to the re authorization of paypal payment
-            return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, 1);
 
 
         } catch (Exception e){
-            sendPaymentRejectEmail(c, wfi.getSubmitter().getEmail(), wfi);
-            //return new ActionResult(ActionResult.TYPE.TYPE_ERROR);
-            //Send us to the re authorization of paypal payment
-            return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, 1);
+            log.error(e.getMessage(),e);
         }
+
+        //Send us to the re authorization of paypal payment
+        return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, 1);
+
     }
-
-
-    private void sendPaymentApprovedEmail(Context c, String emailAddress, WorkflowItem wfi) throws IOException, SQLException {
-        Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "payment_approved"));
-
-        email.addRecipient(emailAddress);
-
-
-        email.addArgument(wfi.getItem().getName());
-        try {
-            // Send the email -- Unless the journal is Evolution
-            // TODO: make this configurable for each journal
-            DCValue journals[] = wfi.getItem().getMetadata("prism", "publicationName", null, Item.ANY);
-            String journalName =  (journals.length >= 1) ? journals[0].value : null;
-            email.addArgument(journalName == null ? "" : journalName);
-
-            String contentPatch=ConfigurationManager.getProperty("dspace.url");
-            String link=contentPatch+"reAuthorization?workflowId="+wfi.getID();
-            email.addArgument(link);
-            //may need this if this is approved by admin
-            //email.addArgument(c.getCurrentUser().getFullName());
-
-
-            if(journalName !=null && !journalName.equals("Evolution") && !journalName.equals("Evolution*")) {
-                log.debug("sending payment approved");
-                email.send();
-            } else {
-                log.debug("skipping payment approved; journal is " + journalName);
-            }
-        } catch (MessagingException e) {
-            log.error(LogManager.getHeader(c, "Error while email submitter about payment approved submission", "WorkflowItemId: " + wfi.getID()), e);
-        }
-    }
-
-    private void sendPaymentRejectEmail(Context c, String emailAddress, WorkflowItem wfi) throws IOException, SQLException {
-        Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "payment_rejected"));
-
-        email.addRecipient(emailAddress);
-
-        email.addArgument(wfi.getItem().getName());
-        try {
-            // Send the email -- Unless the journal is Evolution
-            // TODO: make this configurable for each journal
-            //Add collection name
-            DCValue journals[] = wfi.getItem().getMetadata("prism", "publicationName", null, Item.ANY);
-            String journalName =  (journals.length >= 1) ? journals[0].value : null;
-            email.addArgument(journalName == null ? "" : journalName);
-
-
-            String error="Payment Authorization expired";
-            email.addArgument(error);
-            //http://localhost:8080/handle/10255/3/workflow?workflowID=9249&stepID=reAuthorizationPayment&actionID=reAuthorizationPaymentAction
-            String contentPatch=ConfigurationManager.getProperty("dspace.url");
-            //todo: give the reauthorizationpaymentaction link to user or to admin
-            String link = wfi.getItem().getName();
-            //String link=contentPatch+wfi.getItem().getCollections()[0].getHandle()+"/workflow?workflowID="+wfi.getID()+"&stepID=reAuthorizationPayment&actionID=reAuthorizationPaymentAction";
-            email.addArgument(link);
-
-            //May need if the action is excuted bt administrator  :{4}   Name of the rejector
-            // email.addArgument(c.getCurrentUser().getFullName());
-
-            if(journalName !=null && !journalName.equals("Evolution") && !journalName.equals("Evolution*")) {
-                log.debug("sending  payment rejected");
-                email.send();
-            } else {
-                log.debug("skipping  payment rejected; journal is " + journalName);
-            }
-        } catch (MessagingException e) {
-            log.error(LogManager.getHeader(c, "Error while email submitter about  payment rejected", "WorkflowItemId: " + wfi.getID()), e);
-        }
-    }
-
 }

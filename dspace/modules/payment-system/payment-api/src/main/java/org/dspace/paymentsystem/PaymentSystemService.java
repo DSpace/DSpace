@@ -56,4 +56,5 @@ public interface PaymentSystemService
 
     public String getPayer(Context context,ShoppingCart shoppingcart,String journal)throws SQLException;
 
+    public String printShoppingCart(Context c, ShoppingCart shoppingCart);
 }

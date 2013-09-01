@@ -1,15 +1,19 @@
 # Rejection email message
 #
-# {0}  Title of submission
-# {1}  Name of collection
-# {2}  Reason for the rejection
-# {3}   Link to 'My DSpace' page -- NOT WORKING
-# {4}   Name of the rejector
+# Title of submission: {0}
+# Submitter: {1}
+# Shopping cart contents: {2}
 #
-Subject: Dryad: Payment information must be updated
+Subject: Dryad: Your Payment Was Rejected
 
 You submitted the following data package to Dryad: 
 {0}
+
+Submitter: {1}
+
+Shopping Cart Contents
+
+{2}
 
 The payment information that you previously entered is no longer
 valid. Please login to Dryad and provide current payment information.
