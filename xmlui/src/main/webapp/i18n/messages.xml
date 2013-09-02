@@ -737,14 +737,9 @@
 	<message key="xmlui.Submission.submit.UploadStep.checksum">File checksum:</message>
 	<message key="xmlui.Submission.submit.UploadStep.submit_remove">Remove selected files</message>
     <message key="xmlui.Submission.submit.UploadStep.infoEmbargo">
-   <b>Nota:</b> Si precisa que su obra se mantenga oculta temporalmente puede solicitar el embargo de la misma 
-   durante 3, 6, 12, 18 o 24 meses, correderos a partir de la fecha de presentación del trabajo. 
-   La UNLP y el Repositorio SEDICI apoyan fervientemente el acceso abierto a la producción científico-académica y por tanto 
-   <b>RECOMIENDAN NO </b> aplicar esta restricción a no ser que resulte estrictamente necesario por patentes pendientes, 
-   convenios de confidencialidad y casos similares. Tenga en cuenta que el depósito de su tesis en el repositorio
-    no lo inhabilita a realizar publicaciones derivadas con calidad de inédito; una obra derivada NO es la obra original.
-   <br/>A fin de aplicar esta restricción, deberá adjuntar en este paso una nota de solicitud de embargo que justifique 
-   debidamente la solicitud (ver modelo <a href="http://sedici.unlp.edu.ar/blog/wp-content/uploads/2013/04/Modelo-nota-de-embargo.doc">Aqui</a>).
+   <b>Note:</b> If you need that your work keeps temporarily hidden, you may request its embargo by 3, 6, 12, 18 or 24 months starting from the date of presentation of the work.   
+   The UNLP and repository of SEDICI fervently support the open access to the scientific-academic production and therefore <b>RECCOMEND NOT</b> apply this restriction unless it results strictly needed for pending patents, confidenciality conveins and similar situations. Have in mind that the deposit of your thesis into the repository not allow you to do derived publications with quality of inedit; a derived work is NOT the original work.
+   <br/>To apply this restriction, you will must attach over this step a note of embargo request that properly justify the request (see model <a href="http://sedici.unlp.edu.ar/blog/wp-content/uploads/2013/04/Modelo-nota-de-embargo.doc">Here</a>).
    </message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.EditFileStep -->
@@ -2230,7 +2225,7 @@
 <message key="xmlui.dri2xhtml.METS-1.0.item-identifier-uri">External link</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-identifier-doi">DOI</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-identifier-handle">Handle</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-identifier-other">Other</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-identifier-other">Others identifiers</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-identifier-issn">ISSN</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-identifier-isbn">ISBN</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-location">Location</message>
