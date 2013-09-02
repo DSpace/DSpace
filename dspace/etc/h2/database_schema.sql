@@ -501,7 +501,8 @@ CREATE TABLE Doi
   doi_id           INTEGER PRIMARY KEY,
   doi              VARCHAR(256),
   resource_type_id INTEGER,
-  resource_id      INTEGER
+  resource_id      INTEGER,
+  status           VARCHAR(20)
 );
 
 -- index by handle, commonly looked up

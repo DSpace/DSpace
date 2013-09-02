@@ -45,6 +45,7 @@ import org.dspace.services.ConfigurationService;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.Namespace;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
@@ -624,7 +625,7 @@ implements DOIConnector
             // and we'll add it to the DSO after successful registration.
             root = addDOI(doi, root);
         }
-        else if (metadataDOI != doi)
+        else if (!metadataDOI.equals(doi.substring(DOI.SCHEME.length())))
         {
             throw new IdentifierException("DSO with type " + dso.getTypeText()
                     + " and id " + dso.getID() + " already has DOI "
@@ -1122,7 +1123,7 @@ implements DOIConnector
     }
     
     private String extractDOI(Element root) {
-        Element doi = root.getChild("identifier");
+        Element doi = root.getChild("identifier", root.getNamespace());
         return (null == doi) ? null : doi.getTextTrim();
     }
 

@@ -51,6 +51,9 @@ public class DOIIdentifierProvider
     public static final String DOI_ELEMENT = "identifier";
     public static final String DOI_QUALIFIER = null;
     
+    // How many times do we want to try to find a new unique DOI?
+    private static final int THRESHOLD_UNIQUE_DOI = 1000;
+    
     /**
      * Prefix of DOI namespace. Set in dspace.cfg.
      */
@@ -153,42 +156,53 @@ public class DOIIdentifierProvider
     {
         String doi = formatIdentifier(identifier);
 
-        // check if the DOI is already registered for this dso
-        if (connector.isDOIRegistered(context, dso, doi))
-            return;
+        TableRow doiRow = null;
 
-        // check if DOI is registered for another object
-        if (connector.isDOIRegistered(context, doi))
-        {
-            log.warn("Trying to register DOI {}, that is already registered.", doi);
-            throw new IdentifierException("Trying to register a DOI that is "
-                    + "registered for another object.");
-        }
-        
-        // check if doi is reserved for this specific dso
-        if (!connector.isDOIReserved(context, dso, doi))
-        {
-            // check if doi is already reserved for another dso
-            if (connector.isDOIReserved(context, doi))
-            {
-                log.warn("Trying to register DOI {}, that is reserved for "
-                        + "another dso.", doi);
-                throw new IdentifierException("Trying to register a DOI " +
-                        "that is reserved for another object.");
+        String status;
+
+        if (null != doi) {
+            try {
+                // get DOI object from Database
+                // remove DOI.SCHEME before searching in DB.
+                doiRow = DatabaseManager.findByUnique(context, "Doi",
+                        "doi", doi.substring(DOI.SCHEME.length()));
+
+
+                if (null == doiRow) {
+                    try {
+                        createNewIdentifier(context, dso, doi);
+                    }
+                    catch (Exception e)
+                    {
+                        // TODO: better exception handling
+                        throw new RuntimeException(e);
+                    }
+                    log.warn("Trying to register DOI {}, that not exist in DB.", doi);
+                    
+                } else {
+                    
+                    if (doiRow.getIntColumn("resource_id") != dso.getID()
+                            || doiRow.getIntColumn("resource_type_id") != dso.getType()) {
+
+                        throw new IdentifierException("Trying to reserve a DOI "
+                                + "that is reserved for another object.");
+                    }
+                    
+                    if ("isRegistered".equals(doiRow.getStringColumn("status")))
+                    {
+                        return;
+                    }
+
+                    doiRow.setColumn("status", "toBeRegistered");
+                    DatabaseManager.update(context, doiRow);
+                }
+            } catch (SQLException ex) {
+                log.error("Error while trying to change doi status "
+                        + dso.getTypeText() + " with ID " + dso.getID() + ".");
+                throw new RuntimeException("Error while while trying to change doi status "
+                        + "for a DOI  " + dso.getTypeText()
+                        + " with ID " + dso.getID() + ".", ex);
             }
-            
-            
-            if(!connector.reserveDOI(context, dso, doi))
-            {
-                throw new IdentifierException("It was impossible to reserve the DOI "
-                        + doi + ". Take a look into the logs for further details.");
-            }
-        }
-        
-        if (!connector.registerDOI(context, dso, doi))
-        {
-            throw new IdentifierException("It was impossible to register the DOI "
-                + doi + ". Take a look into the logs for further details.");
         }
 
         try {
@@ -231,40 +245,138 @@ public class DOIIdentifierProvider
     {
         String doi = formatIdentifier(identifier);
         
+        TableRow doiRow = null;
+        
+        
         // ensure that the DOI is in our DOI table and is not reserved online
         // for another object than dso
         try {
             createNewIdentifier(context, dso, doi);
-        }
-        catch (IllegalArgumentException ex)
-        {
+
+            doiRow = DatabaseManager.findByUnique(context, "Doi",
+                    "doi", doi.substring(DOI.SCHEME.length()));
+
+            if (null == doiRow) {
+                log.warn("Trying to reserve DOI {}, that not exist in DB.", doi);
+                throw new IdentifierException("Trying to reserve a DOI "
+                        + "that not exist in DB.");
+            } else {
+
+                if (doiRow.getIntColumn("resource_id") != dso.getID()
+                        || doiRow.getIntColumn("resource_type_id") != dso.getType()) {
+
+                    throw new IdentifierException("Trying to reserve a DOI "
+                            + "that is reserved for another object.");
+                }
+
+                if (!doiRow.isColumnNull("status")) {
+                    return;
+                } 
+                
+                doiRow.setColumn("status", "toBeReserved");
+                DatabaseManager.update(context, doiRow);
+
+            }
+        } catch (IllegalArgumentException ex) {
             throw new IdentifierException("DOI is reserved for another object.");
-        }
-        catch (SQLException ex)
-        {
+        } catch (SQLException ex) {
             throw new RuntimeException("Error in database connection: " + ex.getMessage());
         }
+
+    }
+
+    public void reserveDOIOnline(Context context, DSpaceObject dso, String identifier)
+            throws IdentifierException, IllegalArgumentException, SQLException {
         
+        String doi = formatIdentifier(identifier);
+        // ensure that the DOI is in our DOI table and is not reserved online
+        // for another object than dso
+        try {
+            createNewIdentifier(context, dso, doi);
+        } catch (IllegalArgumentException ex) {
+            throw new IdentifierException("DOI is reserved for another object.");
+        } catch (SQLException ex) {
+            throw new RuntimeException("Error in database connection: " + ex.getMessage());
+        }
+
         // check if DOI is reserved at the registration agency for the specific dso
-        if (!connector.isDOIReserved(context, dso, doi))
+        if (connector.isDOIReserved(context, dso, doi)) {
+            // TODO: Send metadata update anyway!
+            return;
+        }
+
+        // check if doi is already reserved for another object
+        if (connector.isDOIReserved(context, doi)) {
+            log.warn("Trying to reserve a DOI {} that is reserved for "
+                    + "another object.", doi);
+            throw new IdentifierException("Trying to reserve a DOI "
+                    + "that is reserved for another object.");
+        }
+        
+        // try to reserve the doi
+        if (!connector.reserveDOI(context, dso, doi)) {
+            throw new IdentifierException("It was impossible to reserve the DOI "
+                    + doi + ". Take a look into the logs for further details.");
+        }
+        else
         {
-            // check if doi is already reserved for another object
-            if (connector.isDOIReserved(context, doi))
-            {
-                log.warn("Trying to reserve a DOI {} that is reserved for "
-                        + "another object.", doi);
-                throw new IdentifierException("Trying to reserve a DOI " +
-                        "that is reserved for another object.");
+            TableRow doiRow = DatabaseManager.findByUnique(context, "Doi",
+                    "doi", doi.substring(DOI.SCHEME.length()));
+            doiRow.setColumn("status", "isReserved");
+            try {
+                DatabaseManager.update(context, doiRow);
+            } catch (SQLException se) { ///muss ich sehenn
+                System.err.println("Caught SQLException: " + se.getMessage());
+                se.printStackTrace(System.err);
+                throw se;   
             }
-            // try to reserve the doi
-            if(!connector.reserveDOI(context, dso, doi))
-            {
+        }
+    }
+
+    public void registeredDOIOnline(Context context, DSpaceObject dso, String identifier)
+            throws IdentifierException, IllegalArgumentException, SQLException {
+        String doi = formatIdentifier(identifier);
+        // check if the DOI is already registered for this dso
+        if (connector.isDOIRegistered(context, dso, doi))
+        {
+            return;
+        }
+
+        // check if DOI is registered for another object
+        if (connector.isDOIRegistered(context, doi)) {
+            log.warn("Trying to register DOI {}, that is already registered.", doi);
+            throw new IdentifierException("Trying to register a DOI that is "
+                    + "registered for another object.");
+        }
+
+        // check if doi is reserved for this specific dso
+        if (!connector.isDOIReserved(context, dso, doi)) {
+            // check if doi is already reserved for another dso
+            if (connector.isDOIReserved(context, doi)) {
+                log.warn("Trying to register DOI {}, that is reserved for "
+                        + "another dso.", doi);
+                throw new IdentifierException("Trying to register a DOI "
+                        + "that is reserved for another object.");
+            }
+
+            if (!connector.reserveDOI(context, dso, doi)) {
                 throw new IdentifierException("It was impossible to reserve the DOI "
                         + doi + ". Take a look into the logs for further details.");
             }
         }
+
+        if (!connector.registerDOI(context, dso, doi)) {
+            throw new IdentifierException("It was impossible to register the DOI "
+                    + doi + ". Take a look into the logs for further details.");
+        } else {
+            TableRow doiRow = DatabaseManager.findByUnique(context, "Doi",
+                    "doi", doi.substring(DOI.SCHEME.length()));
+            doiRow.setColumn("status", "isRegistered");
+            DatabaseManager.update(context, doiRow);
+        }
+        
     }
-    
+
     @Override
     public String mint(Context context, DSpaceObject dso)
             throws IdentifierException
@@ -479,9 +591,9 @@ public class DOIIdentifierProvider
      */
     public static String formatIdentifier(String identifier) throws IdentifierException
     {
-        if (null == identifier) 
+        if (null == identifier)
             throw new IllegalArgumentException("Identifier is null.", new NullPointerException());
-        if (identifier.startsWith("doi:"))
+        if (identifier.startsWith("doi:")) 
             return identifier;
         if (identifier.isEmpty())
             throw new IllegalArgumentException("Cannot format an empty identifier.");
@@ -616,14 +728,37 @@ public class DOIIdentifierProvider
                         "that's not part of our Namespace!");
         }
         else
-            doi = this.getPrefix() + "/" + this.getNamespaceSeparator() + 
+        {
+            // We need to generate a new DOI.
+            // We can register a DOI that was not minted, so we can have DOIs
+            // that have not the suffix of the doi_id column.
+            // Generate a new doi_id and check if we already have a DOI with the
+            // same suffix. Try max. THRESHOLD_UNIQUE_DOI times.
+            int i = 0;
+            for ( ; i < THRESHOLD_UNIQUE_DOI ; ++i)
+            {
+                doi = this.getPrefix() + "/" + this.getNamespaceSeparator() + 
                     doiRow.getIntColumn("doi_id");
-        
+                if (null == DatabaseManager.findByUnique(context, "Doi", "doi", doi))
+                {
+                    break;
+                }
+                doiRow = DatabaseManager.create(context, "Doi");
+            }
+            if (null != DatabaseManager.findByUnique(context, "Doi", "doi", doi))
+            {
+                // We were unable to find a new DOI that does noch already exist.
+                // TODO: throw usefull Exception
+                throw new RuntimeException();
+            }
+        }
+                    
         doiRow.setColumn("doi", doi);
         doiRow.setColumn("resource_type_id", dso.getType());
         doiRow.setColumn("resource_id", dso.getID());
+        doiRow.setColumnNull("status");
         DatabaseManager.update(context, doiRow);
-
+        
         return DOI.SCHEME + doi;
     }
     

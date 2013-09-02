@@ -453,7 +453,8 @@ CREATE TABLE Doi
   doi_id           INTEGER PRIMARY KEY,
   doi              VARCHAR2(256) UNIQUE,
   resource_type_id INTEGER,
-  resource_id      INTEGER
+  resource_id      INTEGER,
+  status           VARCHAR(20)
 );
 
 -- index by resource id and resource type id

@@ -33,7 +33,8 @@
          a DOIConnector that handle all API calls to your DOI registration
          agency. Please configure a DOIConnector as well!-->
     <!-- To mint DOIs with DSpace get an agreement with a DOI registration
-         agency,  take a look into dspace.cfg, and remove this comment
+         agency,  take a look into dspace.cfg, and remove this comment     -->
+
     <bean id="org.dspace.identifier.DOIIdentifierProvider"
         class="org.dspace.identifier.DOIIdentifierProvider"
         scope="singleton">
@@ -42,7 +43,7 @@
         <property name="DOIConnector"
             ref="org.dspace.identifier.doi.DOIConnector" />
     </bean>
-    -->
+    
     <!-- The DOIConnector will handle the API calls to your DOI registration
          agency for the DOIIdentifierProvider. If your registration agency
          tells you to use DataCites API directly you can use the
@@ -52,6 +53,7 @@
          DataCiteConnector won't work if EZID is your registration agency.
     -->
     <!-- Remove this comment to use DataCite API directly as DOIConnector.
+    -->
     <bean id="org.dspace.identifier.doi.DOIConnector"
         class="org.dspace.identifier.doi.DataCiteConnector"
         scope="singleton">
@@ -61,6 +63,5 @@
         <property name='DATACITE_METADATA_PATH' value='/mds/metadata/' />
         <property name='disseminationCrosswalkName' value="DataCite" />
     </bean>
-    -->
     
 </beans>

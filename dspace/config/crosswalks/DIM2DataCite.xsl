@@ -188,7 +188,11 @@
             <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='rights']" />
 
             <!-- Add descriptions. -->
-            <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='description'][not(@qualifier='provenance')]" />
+            <xsl:if test="//dspace:field[@mdschema='dc' and @element='description'][not(@qualifier='provenance')]">
+                <xsl:element name="descriptions">
+                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='description'][not(@qualifier='provenance')]" />
+                </xsl:element>
+            </xsl:if>
 
         </resource>
     </xsl:template>
@@ -196,9 +200,9 @@
 
     <!-- Add doi identifier information. -->
     <xsl:template match="dspace:field[@mdschema='dc' and @element='identifier' and starts-with(., 'doi')]">
-        <Identifier identifierType="DOI">
+        <identifier identifierType="DOI">
             <xsl:value-of select="substring(., 5)"/>
-        </Identifier>
+        </identifier>
     </xsl:template>
     
     <!-- DataCite (2) :: Creator -->
@@ -315,7 +319,7 @@
         <xsl:template match="//dspace:field[@mdschema='dc' and @element='type']">
         <xsl:for-each select=".">
             <!-- Transforming the language flags according to ISO 639-2/B & ISO 639-3 -->
-            <xsl:element name="ResourceType">
+            <xsl:element name="resourceType">
                 <xsl:attribute name="resourceTypeGeneral">
                     <xsl:choose>
                         <xsl:when test="string(text())='Animation'">Image</xsl:when>
