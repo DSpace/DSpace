@@ -70,6 +70,7 @@
 		<xsl:apply-templates select="." mode="ordered">
 			<xsl:with-param name="elements">
 	     		<xsl:copy-of select="dri:list[@id='aspect.submission.StepTransformer.list.submit-progress']"/>
+	     		<i18n:text>xmlui.Submission.submit.UploadStep.infoEmbargo</i18n:text>
 	     		<xsl:copy-of select="dri:table[@id='aspect.submission.StepTransformer.table.submit-upload-summary']"/>
 	     		<xsl:copy-of select="dri:list[@id='aspect.submission.StepTransformer.list.submit-upload-new']"/>
 	     		<xsl:copy-of select="dri:list[@id='aspect.submission.StepTransformer.list.submit-upload-new-part2']"/>

@@ -719,9 +719,19 @@
 <message key="xmlui.Submission.submit.UploadStep.submit_edit">Editar</message>
 <message key="xmlui.Submission.submit.UploadStep.checksum">Verificación de archivos</message>
 <message key="xmlui.Submission.submit.UploadStep.submit_remove">Eliminar los archivos seleccionados</message>
+<message key="xmlui.Submission.submit.UploadStep.infoEmbargo">
+   <b>Nota:</b> Si precisa que su obra se mantenga oculta temporalmente puede solicitar el embargo de la misma 
+   durante 3, 6, 12, 18 o 24 meses, correderos a partir de la fecha de presentación del trabajo. 
+   La UNLP y el Repositorio SEDICI apoyan fervientemente el acceso abierto a la producción científico-académica y por tanto 
+   <b>RECOMIENDAN NO </b> aplicar esta restricción a no ser que resulte estrictamente necesario por patentes pendientes, 
+   convenios de confidencialidad y casos similares. Tenga en cuenta que el depósito de su tesis en el repositorio
+    no lo inhabilita a realizar publicaciones derivadas con calidad de inédito; una obra derivada NO es la obra original.
+   <br/>A fin de aplicar esta restricción, deberá adjuntar en este paso una nota de solicitud de embargo que justifique 
+   debidamente la solicitud (ver modelo <a href="http://sedici.unlp.edu.ar/blog/wp-content/uploads/2013/04/Modelo-nota-de-embargo.doc">Aqui</a>).
+</message>
+
 <message key="xmlui.Submission.submit.UploadStep.virus_error">El archivo no se ha subido, ya que parece contener un virus. Por favor, póngase en contacto con el administrador del sistema.</message>
 <message key="xmlui.Submission.submit.UploadStep.virus_checker_error">Un problema técnico fue encontrado mientras se intentataba escanear el archivo en búsqueda de virus. Por favor, contáctese con el administrador.</message>
-
 
 	<!-- org.dspace.app.xmlui.Submission.submit.EditFileStep -->
 <message key="xmlui.Submission.submit.EditFileStep.head">Editar archivo</message>
