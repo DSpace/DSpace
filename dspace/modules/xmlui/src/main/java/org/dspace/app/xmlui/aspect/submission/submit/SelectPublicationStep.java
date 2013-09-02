@@ -74,8 +74,9 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     private static final Message T_SELECT_HELP_NOT_YET_SUBMITTED = message("xmlui.submit.publication.journal.help_not_yet_submitted");
     private static final Message T_SELECT_HELP_IN_REVIEW = message("xmlui.submit.publication.journal.help_in_review");
 
-    protected static final Message T_Country=
-            message("xmlui.PaymentSystem.shoppingcart.order.country");
+    protected static final Message T_Country= message("xmlui.PaymentSystem.shoppingcart.order.country");
+    protected static final Message T_Country_help= message("xmlui.submit.select.country.help");
+    protected static final Message T_Country_error= message("xmlui.submit.select.country.error");
 
 
 
@@ -118,20 +119,13 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         Division div = body.addInteractiveDivision("submit-select-publication", actionURL, Division.METHOD_POST, "primary submission");
         addSubmissionProgressList(div);
-        //div.setHead(T_FORM_HEAD);
 
         List form = div.addList("submit-create-publication", List.TYPE_FORM);
-        //form.setHead(T_FORM_HEAD);
+
         Item content = form.addItem();
         generateCountryList(form,request);
 
         boolean submitExisting = ConfigurationManager.getBooleanProperty("submit.dataset.existing-datasets", true);
-        //if(submitExisting)
-        //    content.addContent(T_PUB_HELP);
-        //else
-        //    content.addContent(T_PUB_HELP_NEW);
-
-
 
         // retrieve request parameters: journlaID, manuscriptNumber
         String selectedJournalId = request.getParameter("journalID");
@@ -475,13 +469,12 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
         java.util.List<String> countryArray = manager.getSortedCountry();
-        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_SELECT_COUNTRY)
-        {
-            info.addItem("error-country","errorMessage").addContent("Please select your country");
-        }
-        info.addLabel(T_Country);
-        Select countryList = info.addItem("country-list", "select-list").addSelect("country");
-        countryList.addOption("","Select Your Country");
+
+	org.dspace.app.xmlui.wing.element.Item countryItem = info.addItem("country-help","country-help");
+	countryItem.addContent(T_Country_help);
+
+        Select countryList = countryItem.addSelect("country");
+        countryList.addOption("","Select a fee-waiver country");
         String selectedCountry = request.getParameter("country");
         for(String temp:countryArray){
             {
