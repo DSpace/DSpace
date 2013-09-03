@@ -471,7 +471,7 @@ public class PaypalImpl implements PaypalService{
 
             }
 
-            if(shoppingCart.getTotal()==0||shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)||shoppingCart.getCurrency()!="USD")
+            if(shoppingCart.getTotal()==0||shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)||!shoppingCart.getCurrency().equals("USD"))
             {
                 paypalService.generateNoCostForm(mainDiv, shoppingCart,item, manager, payementSystemService);
             }
