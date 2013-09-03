@@ -147,7 +147,7 @@ public class PaypalImpl implements PaypalService{
                 String failedVoucher = ConfigurationManager.getProperty("payment-system","paypal.failed.voucher");
                  if(voucher.getCode().equals(failedVoucher)||voucher.getStatus().equals(Voucher.STATUS_USED))
                  {
-                     log.debug("problem: voucher has been used, rejecting payment");
+                     log.debug("problem: 'payment failed' voucher has been used, rejecting payment");
                      sendPaymentErrorEmail(c, wfi, shoppingCart, "problem: voucher has been used, rejecting payment");
                      return false;
                  }
@@ -168,8 +168,8 @@ public class PaypalImpl implements PaypalService{
 
         }catch (Exception e)
         {
-            sendPaymentErrorEmail(c, wfi, null, "exception when submit reference transaction"+e.getMessage());
-            log.error("exception when submit reference transaction"+e.getMessage());
+            sendPaymentErrorEmail(c, wfi, null, "exception when submitting reference transaction " + e.getMessage());
+            log.error("exception when submiting reference transaction ", e);
         }
         return false;
     }
