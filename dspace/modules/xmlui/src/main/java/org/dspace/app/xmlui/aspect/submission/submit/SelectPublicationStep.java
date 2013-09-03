@@ -122,7 +122,6 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         List form = div.addList("submit-create-publication", List.TYPE_FORM);
 
-        Item content = form.addItem();
         generateCountryList(form,request);
 
         boolean submitExisting = ConfigurationManager.getBooleanProperty("submit.dataset.existing-datasets", true);
@@ -169,7 +168,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         //Start rendering our info
         Item newItem = form.addItem("select_publication_new", submitExisting ? "" : "odd");
-        addRadioIfSubmitExisitng(content, submitExisting, pubIdError, pubColl, newItem);
+        addRadioIfSubmitExisitng(submitExisting, pubIdError, pubColl, newItem);
 
 
         // case B: (radio selected ==> accepted)
@@ -437,7 +436,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
            }
        }
 
-       private void addRadioIfSubmitExisitng(Item content, boolean submitExisting, boolean pubIdError, Collection pubColl, Item newItem) throws WingException, SQLException {
+       private void addRadioIfSubmitExisitng(boolean submitExisting, boolean pubIdError, Collection pubColl, Item newItem) throws WingException, SQLException {
            if(submitExisting){
                //We need to add a radio
                Radio radio = newItem.addRadio("publication_select");
@@ -453,7 +452,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
                }
            }else{
                //We cannot add a new data set so just add a hidden field to indicate that we want to create a new one
-               content.addHidden("publication_select").setValue("create");
+               newItem.addHidden("publication_select").setValue("create");
            }
        }
 
