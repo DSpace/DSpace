@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (c) 2002-2010, DuraSpace.  All rights reserved
+    Copyright (c) 2002-2013, DuraSpace.  All rights reserved
     Licensed under the DuraSpace License.
 
     A copy of the DuraSpace License has been included in this
@@ -16,6 +16,7 @@
            http://www.springframework.org/schema/context
            http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
-
+    <bean id="org.dspace.paymentsystem.PaypalService" class="org.dspace.paymentsystem.PaypalImpl"  autowire="byType"/>
     <bean id="org.dspace.paymentsystem.PaymentSystemService" class="org.dspace.paymentsystem.PaymentSystemImpl"  autowire="byType"/>
+    <bean id="org.dspace.paymentsystem.VoucherValidationService" class="org.dspace.paymentsystem.VoucherValidationImpl"  autowire="byType"/>
 </beans>

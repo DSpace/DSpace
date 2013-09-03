@@ -1636,6 +1636,11 @@ public class DatabaseManager
                         }
                         break;
 
+                    case Types.DOUBLE:{
+                        statement.setDouble(count,row.getDoubleColumn(column));
+                    }
+                    break;
+
                     case Types.NUMERIC:
                     case Types.DECIMAL:
                         statement.setLong(count, row.getLongColumn(column));

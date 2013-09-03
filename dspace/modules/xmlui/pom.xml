@@ -83,7 +83,8 @@
          web.xml etc.
       -->
       <profile>
-         <activation>
+          <id>1</id>
+          <activation>
             <property>
                <name>dspace.config</name>
             </property>
@@ -278,7 +279,7 @@
        <dependency>
           <groupId>org.dspace.modules</groupId>
           <artifactId>versioning-api</artifactId>
-                       <exclusions>
+          <exclusions>
                 <exclusion>
                     <artifactId>ehcache</artifactId>
                     <groupId>net.sf.ehcache</groupId>
@@ -288,6 +289,30 @@
                     <groupId>org.dspace.dependencies.cocoon</groupId>
                 </exclusion>
             </exclusions>
+       </dependency>
+
+       <dependency>
+           <groupId>org.dspace.modules</groupId>
+           <artifactId>payment-api</artifactId>
+       </dependency>
+
+       <dependency>
+           <groupId>org.dspace.modules</groupId>
+           <artifactId>payment-webapp</artifactId>
+           <type>jar</type>
+           <classifier>classes</classifier>
+           <exclusions>
+               <exclusion>
+                   <artifactId>ehcache</artifactId>
+                   <groupId>net.sf.ehcache</groupId>
+               </exclusion>
+           </exclusions>
+       </dependency>
+
+       <dependency>
+           <groupId>org.dspace.modules</groupId>
+           <artifactId>payment-webapp</artifactId>
+           <type>war</type>
        </dependency>
 
        <dependency>

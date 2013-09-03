@@ -1,0 +1,163 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.dspace.modules</groupId>
+    <artifactId>payment-webapp</artifactId>
+    <packaging>war</packaging>
+    <name>DSpace Payment :: WEBAPP</name>
+    <description>DSpace Payment WEBAPP</description>
+
+    <parent>
+        <groupId>org.dspace.modules</groupId>
+        <artifactId>payment-system</artifactId>
+        <version>1.7.3-SNAPSHOT</version>
+    </parent>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<archiveClasses>true</archiveClasses>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <attachClasses>true</attachClasses>
+                    <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
+                    <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
+					<webResources>
+						<resource>
+							<filtering>true</filtering>
+							<directory>${basedir}/src/main/webapp</directory>
+							<includes>
+								<include>WEB-INF/web.xml</include>
+							</includes>
+						</resource>
+					</webResources>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+    <profiles>
+        <!--
+           when activated a dspace.config configuration
+           file location passed on the commandline
+           (-Ddspace.config=...) can be passed through
+           to be used as a filter source by projects for
+           tasks such as updating the ${dspace.dir} in
+           web.xml etc.
+        -->
+
+        <profile>
+            <activation>
+                <property>
+                    <name>dspace.config</name>
+                </property>
+            </activation>
+            <build>
+                <filters>
+                    <filter>${dspace.config}</filter>
+                </filters>
+            </build>
+        </profile>
+    </profiles>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>payment-api</artifactId>
+            <version>1.7.3-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-xmlui-api</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>ehcache</artifactId>
+                    <groupId>net.sf.ehcache</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>dspace-cocoon-servlet-service-impl</artifactId>
+                    <groupId>org.dspace.dependencies.cocoon</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Dryad API -->
+        <dependency>
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- DSpace XMLUI Languages -->
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-xmlui-lang</artifactId>
+            <type>war</type>
+        </dependency>
+        <!-- DSpace XMLUI Webapp -->
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-xmlui-webapp</artifactId>
+            <type>war</type>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-api</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-utils</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-impl</artifactId>
+        </dependency>
+
+        <dependency>
+            <artifactId>dspace-cocoon-servlet-service-impl</artifactId>
+            <groupId>org.dspace.dependencies.cocoon</groupId>
+            <version>1.0.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-impl</artifactId>
+            <version>2.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-api</artifactId>
+            <version>2.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-utils</artifactId>
+            <version>2.0.3</version>
+        </dependency>
+    </dependencies>
+
+</project>

@@ -26,6 +26,7 @@ import java.sql.SQLException;
  */
 public class DescribeDatasetStep extends AbstractSubmissionStep {
     private static final Message T_HEAD = message("xmlui.submit.dataset.describe.head");
+    private static final Message T_TRAIL = message("xmlui.submit.dataset.describe.trail");
     private static final Message T_HELP = message("xmlui.submit.dataset.describe.help");
     private static final Message T_FORM_PUB_HEAD = message("xmlui.submit.dataset.form.pub.head");
     private static final Message T_FORM_FILE_HEAD = message("xmlui.submit.dataset.form.file.head");
@@ -38,7 +39,6 @@ public class DescribeDatasetStep extends AbstractSubmissionStep {
     private static final Message T_FORM_DATA_LICENSE_CONTENT = message("xmlui.submit.dataset.license");
     private static final Message T_FORM_DATA_FILE_REPO_HELP = message("xmlui.submit.dataset.form.dataset.file-url.help");
     private static final Message T_FORM_REPO_NAME_HELP = message("xmlui.submit.dataset.form.dataset.repo-name.help");
-
     private static final Message T_cancel = message("xmlui.general.cancel_delete");
 
 
@@ -58,11 +58,15 @@ public class DescribeDatasetStep extends AbstractSubmissionStep {
         Request request = ObjectModelHelper.getRequest(objectModel);
         String actionURL = contextPath + "/handle/" + collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 
-        Division div = body.addInteractiveDivision("submit-describe-dataset", actionURL, Division.METHOD_MULTIPART, "primary submission");
-        addSubmissionProgressList(div);
-        div.setHead(T_HEAD);
+        body.addDivision("step-link","step-link").addPara(T_TRAIL);
 
-        div.addPara("help", "help").addContent(T_HELP);
+        Division helpDivision = body.addDivision("general-help","general-help");
+        helpDivision.setHead(T_HEAD);
+        helpDivision.addPara(T_HELP);
+
+        Division div = body.addInteractiveDivision("submit-describe-dataset", actionURL, Division.METHOD_MULTIPART, "primary submission");
+        //addSubmissionProgressList(div);
+
 
         List pubList = div.addList("submit-select-publication", List.TYPE_FORM);
         pubList.setHead(T_FORM_PUB_HEAD);

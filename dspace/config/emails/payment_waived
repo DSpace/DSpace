@@ -1,0 +1,19 @@
+# Waived Payment email message
+#
+# {0}  Title of submission
+# {1}  Submitter
+# {2}  Shopping Cart Contents
+#
+Subject: Dryad: Waived Payment Receipt
+
+This is your receipt for data archiving with Dryad.
+
+Dryad submission: {0}
+Submitter: {1}
+
+Shopping Cart Contents
+
+{2}
+
+The Dryad Team
+datadryad.org

@@ -36,6 +36,7 @@ import java.util.UUID;
 public class OverviewStep extends AbstractStep {
     private static final Message T_MAIN_HEAD = message("xmlui.Submission.submit.OverviewStep.head");
     private static final Message T_MAIN_HELP = message("xmlui.Submission.submit.OverviewStep.help");
+    private static final Message T_TRAIL = message("xmlui.Submission.submit.OverviewStep.trail");
     private static final Message T_STEPS_HEAD_1 = message("xmlui.Submission.submit.OverviewStep.steps.1");
     private static final Message T_STEPS_HEAD_2 = message("xmlui.Submission.submit.OverviewStep.steps.2");
     private static final Message T_STEPS_HEAD_3 = message("xmlui.Submission.submit.OverviewStep.steps.3");
@@ -61,11 +62,13 @@ public class OverviewStep extends AbstractStep {
         Collection collection = submission.getCollection();
         String actionURL = contextPath + "/handle/" + collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 
-        Division mainDiv = body.addInteractiveDivision("submit-completed-dataset", actionURL, Division.METHOD_POST, "primary submission");
-
-        Division helpDivision = mainDiv.addDivision("submit-help");
+        body.addDivision("step-link","step-link").addPara(T_TRAIL);
+        Division helpDivision = body.addDivision("general-help","general-help");
         helpDivision.setHead(T_MAIN_HEAD);
         helpDivision.addPara(T_MAIN_HELP);
+
+        Division mainDiv = body.addInteractiveDivision("submit-completed-dataset", actionURL, Division.METHOD_POST, "primary submission");
+
 
 
         Division actionsDiv = mainDiv.addDivision("submit-completed-overview");

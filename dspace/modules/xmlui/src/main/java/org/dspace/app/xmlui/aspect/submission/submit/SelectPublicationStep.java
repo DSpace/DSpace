@@ -19,6 +19,8 @@ import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.handle.HandleManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.paymentsystem.PaymentSystemConfigurationManager;
+import org.dspace.paymentsystem.ShoppingCart;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.submit.bean.PublicationBean;
 import org.dspace.submit.model.ModelPublication;
@@ -46,9 +48,11 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     private static Logger log = Logger.getLogger(SelectPublicationStep.class);
 
     private static final Message T_HEAD = message("xmlui.submit.select.pub.head");
+    private static final Message T_TRAIL = message("xmlui.submit.select.pub.trail");
+    private static final Message T_HELP = message("xmlui.submit.select.pub.help");
     private static final Message T_FORM_HEAD = message("xmlui.submit.select.pub.form_head");
-    private static final Message T_PUB_HELP = message("xmlui.submit.select.pub.help");
-    private static final Message T_PUB_HELP_NEW = message("xmlui.submit.select.pub.help_new");
+    //private static final Message T_PUB_HELP = message("xmlui.submit.select.pub.help");
+    //private static final Message T_PUB_HELP_NEW = message("xmlui.submit.select.pub.help_new");
     private static final Message T_PUB_SELECT_NEW = message("xmlui.submit.select.pub.form.option.new");
     private static final Message T_PUB_SELECT_EXISTING = message("xmlui.submit.select.pub.form.option.existing");
     private static final Message T_PUB_SELECT_HELP = message("xmlui.submit.select.pub.form.help");
@@ -70,6 +74,10 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     private static final Message T_SELECT_HELP_NOT_YET_SUBMITTED = message("xmlui.submit.publication.journal.help_not_yet_submitted");
     private static final Message T_SELECT_HELP_IN_REVIEW = message("xmlui.submit.publication.journal.help_in_review");
 
+    protected static final Message T_Country= message("xmlui.PaymentSystem.shoppingcart.order.country");
+    protected static final Message T_Country_head= message("xmlui.submit.select.country.head");
+    protected static final Message T_Country_help= message("xmlui.submit.select.country.help");
+    protected static final Message T_Country_error= message("xmlui.submit.select.country.error");
 
 
 
@@ -104,20 +112,20 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         Collection collection = submission.getCollection();
         String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 
+        body.addDivision("step-link","step-link").addPara(T_TRAIL);
+
+        Division helpDivision = body.addDivision("general-help","general-help");
+        helpDivision.setHead(T_HEAD);
+        helpDivision.addPara(T_HELP);
+
         Division div = body.addInteractiveDivision("submit-select-publication", actionURL, Division.METHOD_POST, "primary submission");
         addSubmissionProgressList(div);
-        div.setHead(T_HEAD);
 
         List form = div.addList("submit-create-publication", List.TYPE_FORM);
-        //form.setHead(T_FORM_HEAD);
-        Item content = form.addItem();
+
+        generateCountryList(form,request);
+
         boolean submitExisting = ConfigurationManager.getBooleanProperty("submit.dataset.existing-datasets", true);
-        if(submitExisting)
-            content.addContent(T_PUB_HELP);
-        else
-            content.addContent(T_PUB_HELP_NEW);
-
-
 
         // retrieve request parameters: journlaID, manuscriptNumber
         String selectedJournalId = request.getParameter("journalID");
@@ -130,14 +138,21 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         String journalStatus = null;
         String journalName = null;
         if(selectedJournalId!=null){
-            String journalPath = org.dspace.submit.step.SelectPublicationStep.journalDirs.get(org.dspace.submit.step.SelectPublicationStep.journalVals.indexOf(selectedJournalId));
-            pBean = ModelPublication.getDataFromPublisherFile(manuscriptNumber, selectedJournalId, journalPath);
-            journalStatus = pBean.getStatus();
+            String journalPath = "";
+            try{
+                journalPath = org.dspace.submit.step.SelectPublicationStep.journalDirs.get(org.dspace.submit.step.SelectPublicationStep.journalVals.indexOf(selectedJournalId));
+                pBean = ModelPublication.getDataFromPublisherFile(manuscriptNumber, selectedJournalId, journalPath);
+                journalStatus = pBean.getStatus();
+                journalName = pBean.getJournalName();
+                if(journalName!=null && !journalName.equals("")) {
+                    if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(selectedJournalId))
+                        journalName += "*";
+                }
+            }catch (Exception e)
+            {
+                 //invalid journalID
+                this.errorFlag = org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_JOURNAL;
 
-            journalName = pBean.getJournalName();
-            if(journalName!=null && !journalName.equals("")) {
-                if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(selectedJournalId))
-                    journalName += "*";
             }
         }
 
@@ -154,7 +169,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         //Start rendering our info
         Item newItem = form.addItem("select_publication_new", submitExisting ? "" : "odd");
-        addRadioIfSubmitExisitng(content, submitExisting, pubIdError, pubColl, newItem);
+        addRadioIfSubmitExisitng(submitExisting, pubIdError, pubColl, newItem);
 
 
         // case B: (radio selected ==> accepted)
@@ -164,7 +179,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         //addJournalSelectStatusNotYetSubmitted(selectedJournalId, newItem);
 
         // case D: (radio selected ==>  In Review)
-        addJournalSelectStatusInReview(selectedJournalId, newItem, journalStatus, pBean);
+        addJournalSelectStatusInReview(selectedJournalId, newItem, journalStatus, pBean, request);
 
         // Add manuscriptNumber in any case
         addManuscriptNumber(request, newItem, journalStatus, manuscriptNumber, pBean);
@@ -217,12 +232,16 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         if(pBean!=null && (journalStatus==null || journalStatus.equals(PublicationBean.STATUS_ACCEPTED) )){
             accessRadios.setOptionSelected(org.dspace.submit.step.SelectPublicationStep.ARTICLE_STATUS_ACCEPTED);
         }
-        else if(pBean!=null && (journalStatus.equals(PublicationBean.STATUS_IN_REVIEW)
+        else if(pBean!=null && journalStatus!=null && (journalStatus.equals(PublicationBean.STATUS_IN_REVIEW)
                                 || journalStatus.equals(PublicationBean.STATUS_SUBMITTED)
                                  || journalStatus.equals(PublicationBean.STATUS_UNDER_REVIEW)
                                   || journalStatus.equals(PublicationBean.STATUS_REVISION_UNDER_REVIEW)
                                    || journalStatus.equals(PublicationBean.STATUS_REVISION_IN_REVIEW) )){
 
+            accessRadios.setOptionSelected(org.dspace.submit.step.SelectPublicationStep.ARTICLE_STATUS_IN_REVIEW);
+        }
+        else if(request.getParameter("journalID")!=null&&!request.getParameter("journalID").equals(""))
+        {
             accessRadios.setOptionSelected(org.dspace.submit.step.SelectPublicationStep.ARTICLE_STATUS_IN_REVIEW);
         }
         else{
@@ -315,9 +334,10 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     }
 
 
-    private void addJournalSelectStatusInReview(String selectedJournalId, Item newItem, String journalStatus, PublicationBean pBean) throws WingException {
+    private void addJournalSelectStatusInReview(String selectedJournalId, Item newItem, String journalStatus, PublicationBean pBean, Request request) throws WingException {
         Composite optionsList = newItem.addComposite("journalID_status_in_review");
         Select journalID = optionsList.addSelect("journalIDStatusInReview");
+        journalID.addOption("", "Please Select a valid journal");
         java.util.List<String> journalVals = org.dspace.submit.step.SelectPublicationStep.journalVals;
         java.util.List<String> journalNames = org.dspace.submit.step.SelectPublicationStep.journalNames;
 
@@ -336,6 +356,10 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
                                  || journalStatus.equals(PublicationBean.STATUS_UNDER_REVIEW)
                                   || journalStatus.equals(PublicationBean.STATUS_REVISION_UNDER_REVIEW)
                                    || journalStatus.equals(PublicationBean.STATUS_REVISION_IN_REVIEW) ))){
+                    journalID.addOption(val.equals(selectedJournalId), val, name);
+                }
+                else if(request.getParameter("journalIDStatusInReview")!=null&&!request.getParameter("journalIDStatusInReview").equals("")){
+                    selectedJournalId = request.getParameter("journalIDStatusInReview");
                     journalID.addOption(val.equals(selectedJournalId), val, name);
                 }
                 else{
@@ -413,7 +437,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
            }
        }
 
-       private void addRadioIfSubmitExisitng(Item content, boolean submitExisting, boolean pubIdError, Collection pubColl, Item newItem) throws WingException, SQLException {
+       private void addRadioIfSubmitExisitng(boolean submitExisting, boolean pubIdError, Collection pubColl, Item newItem) throws WingException, SQLException {
            if(submitExisting){
                //We need to add a radio
                Radio radio = newItem.addRadio("publication_select");
@@ -429,7 +453,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
                }
            }else{
                //We cannot add a new data set so just add a hidden field to indicate that we want to create a new one
-               content.addHidden("publication_select").setValue("create");
+               newItem.addHidden("publication_select").setValue("create");
            }
        }
 
@@ -441,5 +465,32 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
             licensebox.addError(T_PUB_LICENSE_ERROR);
     }
 
+    private void generateCountryList(org.dspace.app.xmlui.wing.element.List info,Request request) throws WingException{
+
+        PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
+        java.util.List<String> countryArray = manager.getSortedCountry();
+
+	org.dspace.app.xmlui.wing.element.Item countryItem = info.addItem("country-help","country-help");
+	countryItem.addContent(T_Country_head);
+	countryItem.addContent(T_Country_help);
+
+        Select countryList = countryItem.addSelect("country");
+        countryList.addOption("","Select a fee-waiver country");
+        String selectedCountry = request.getParameter("country");
+        for(String temp:countryArray){
+            {
+                String[] countryTemp = temp.split(":");
+                if(selectedCountry!=null&&selectedCountry.equals(countryTemp[0]))
+                {
+                    countryList.addOption(true,countryTemp[0],countryTemp[0]);
+                }
+                else
+                {
+                    countryList.addOption(false,countryTemp[0],countryTemp[0]);
+                }
+            }
+        }
+
+    }
 
 }

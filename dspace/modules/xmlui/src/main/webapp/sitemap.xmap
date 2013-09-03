@@ -378,6 +378,10 @@
                             <map:mount check-reload="no" src="aspects/json-solr.xmap" uri-prefix="JSON/discovery/"/>
                         </map:match>
 
+                        <map:match pattern="JSON/transaction/**">
+                            <map:mount check-reload="no" src="aspects/json-transaction.xmap" uri-prefix="JSON/transaction/"/>
+                        </map:match>
+
                         <map:match pattern="JSON/ame/**">
                             <map:mount check-reload="no" src="aspects/ame.xmap" uri-prefix="JSON/ame/"/>
                         </map:match>

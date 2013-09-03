@@ -28,11 +28,11 @@ import java.io.IOException;
  */
 public class DescribePublicationStep extends AbstractSubmissionStep {
     private static final Message T_HEAD = message("xmlui.submit.publication.describe.head");
+    private static final Message T_TRAIL = message("xmlui.submit.publication.describe.trail");
     private static final Message T_HELP = message("xmlui.submit.publication.describe.help");
     private static final Message T_FORM_HEAD = message("xmlui.submit.publication.describe.form.help");
     private static final Message T_complete_dataset = message("xmlui.Submission.general.submission.complete.datapackage");
     private static final Message T_complete_publication = message("xmlui.Submission.general.submission.complete.publication");
-
 
     public List addReviewSection(List reviewList) throws SAXException, WingException, SQLException, IOException, AuthorizeException {
         //There is no review section.
@@ -54,11 +54,13 @@ public class DescribePublicationStep extends AbstractSubmissionStep {
         Collection collection = submission.getCollection();
         String actionURL = contextPath + "/handle/" + collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 
-        Division div = body.addInteractiveDivision("submit-describe-publication", actionURL, Division.METHOD_MULTIPART, "primary submission");
-        addSubmissionProgressList(div);
-        div.setHead(T_HEAD);
+        body.addDivision("step-link","step-link").addPara(T_TRAIL);
 
-        div.addPara("help", "help").addContent(T_HELP);
+        Division helpDivision = body.addDivision("general-help","general-help");
+        helpDivision.setHead(T_HEAD);
+        helpDivision.addPara(T_HELP);
+
+        Division div = body.addInteractiveDivision("submit-describe-publication", actionURL, Division.METHOD_MULTIPART, "primary submission");
 
         List pubList = div.addList("submit-select-publication", List.TYPE_FORM);
         pubList.setHead(T_FORM_HEAD);

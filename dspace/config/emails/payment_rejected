@@ -1,0 +1,26 @@
+# Rejection email message
+#
+# Title of submission: {0}
+# Submitter: {1}
+# Shopping cart contents: {2}
+#
+Subject: Dryad: Your Payment Was Rejected
+
+You submitted the following data package to Dryad: 
+{0}
+
+Submitter: {1}
+
+Shopping Cart Contents
+
+{2}
+
+The payment information that you previously entered is no longer
+valid. Please login to Dryad and provide current payment information.
+
+You can access the in-progress submission from your "My Submissions"
+page: 
+http://datadryad.org/submissions
+
+The Dryad Team
+datadryad.org

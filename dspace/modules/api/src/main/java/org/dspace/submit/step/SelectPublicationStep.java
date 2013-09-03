@@ -59,6 +59,8 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     public static final int DISPLAY_MANUSCRIPT_NUMBER = 5;
     public static final int DISPLAY_CONFIRM_MANUSCRIPT_ACCEPTANCE = 6;
     public static final int ENTER_MANUSCRIPT_NUMBER = 7;
+    public static final int ERROR_SELECT_COUNTRY = 10;
+
 
 
     private static Map<String, DCValue> journalToMetadata = new HashMap<String, DCValue>();
@@ -159,7 +161,6 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
             Item item = submissionInfo.getSubmissionItem().getItem();
 
-
             String journalID = null;
             String articleStatus = request.getParameter("article_status");
             String manuscriptNumber = request.getParameter("manu");
@@ -211,7 +212,10 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 	    
             // ARTICLE_STATUS_ACCEPTED ||  ARTICLE_STATUS_IN_REVIEW ||  ARTICLE_STATUS_NOT_YET_SUBMITTED
             else{
-                if(!processJournal(journalID, manuscriptNumber, item, context, request, articleStatus)){
+                if(journalID==null||journalID.equals("")){
+                    return ERROR_INVALID_JOURNAL;
+                }
+                else if(!processJournal(journalID, manuscriptNumber, item, context, request, articleStatus)){
 
                     if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) return ENTER_MANUSCRIPT_NUMBER;
 

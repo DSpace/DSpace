@@ -71,6 +71,8 @@
 
             <map:transformer name="OverviewStep" src="org.dspace.app.xmlui.aspect.submission.submit.OverviewStep"/>
 
+            <map:transformer name="checkout" src="org.dspace.app.xmlui.aspect.submission.submit.CheckoutStep"/>
+
             <map:transformer name="depositConfirmedStep" src="org.dspace.app.xmlui.aspect.submission.submit.DepositConfirmedStep"/>
 
 
@@ -145,6 +147,10 @@
 
                     <map:match pattern="submit-overview">
                         <map:call function="doSubmissionOverview"/>
+                    </map:match>
+
+                    <map:match pattern="submit-checkout">
+                        <map:call function="doSubmissionCheckout"/>
                     </map:match>
 
                     <map:match pattern="deposit-confirmed">
@@ -360,6 +366,16 @@
                             </map:transform>
                         </map:match>
 
+                        <!--
+                        This step is used to show information concerning a dataset/publication
+                        the user can perform edit,delete,finish actions on the publication & the datasets
+                        the user is taken here after clicking the link from the submissions page.
+                        -->
+                        <map:match pattern="submit/checkout">
+                            <map:transform type="checkout">
+                                <map:parameter name="id" value="{flow-attribute:id}"/>
+                            </map:transform>
+                        </map:match>
 
                         <!--
                         This step is used to show a feedback to the user, to confirm the

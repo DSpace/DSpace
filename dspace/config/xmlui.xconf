@@ -83,7 +83,9 @@
         <aspect name="StaticPage" path="resource://aspects/StaticPage/"/>
 
         <aspect name="Mailing Lists and Membership" path="resource://aspects/DryadFeedback/"/>
-	    
+
+	    <aspect name="Shopping Cart" path="resource://aspects/PaymentSystem/"/>
+
         <!--
             This aspect tests the various possible DRI features,
             it helps a theme developer create themes
@@ -128,9 +130,9 @@
 
 	<!-- Use the DryadLab theme for anything with "dryadlab" in the URL or anything in 
 	     the DryadLab activities collection. -->
+	    <theme name="Paypal Theme" regex="submit-paypal-checkout" path="Paypal/"/>
         <theme name="Dryad Lab Theme" regex="dryadlab" path="DryadLab/" />
         <theme name="Dryad Lab Theme" handle="10255/dryad.7872" path="DryadLab/" />
-
         <!-- Default theme for all other pages -->
         <theme name="Dryad Theme" regex=".*" path="Mirage/" />
 

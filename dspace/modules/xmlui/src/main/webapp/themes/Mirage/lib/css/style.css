@@ -310,6 +310,7 @@ h1.ds-option-set-head {
 #org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div .ds-interactive-div,
 #aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-static-div,
 #aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-interactive-div,
+#aspect_paymentsystem_ShoppingCartTransformer_list_Payment, 
 #submit-data-feature-box h1,
 .simple-box,
 div.ds-option-set {
@@ -478,12 +479,10 @@ div.bioText {
 #status_other_than_published,
 #aspect_submission_StepTransformer_list_doi > table {
     border: 1px solid #ccc;
-    float: right;
-    margin-right: 180px;
+    float: left;
+    width: 497px;
     display: inline-block;
-    margin-top: -72px;
     padding: 10px;
-    width: 500px;
     position: relative;
     -webkit-border-top-left-radius: 5px;
     -webkit-border-top-right-radius: 5px;
@@ -2124,6 +2123,7 @@ div.page-license {
     border:2px solid grey;
     padding:5px;
     font-weight: 900;
+    display: none;
 
 }
 #aspect_submission_StepTransformer_list_submit-select-publication li.ds-form-item .ds-form-label {
@@ -2242,3 +2242,218 @@ a.feedbackform-user-voice-link {
 #aspect_discovery_MostDownloadedBitstream_table_most-downloaded th h2{
     font-size: 1em;
 }
+
+.choose_browse_by{
+    display: none;
+}
+#aspect_discovery_SearchFilterTransformer_field_starts_with{
+        margin-left: 15px;
+
+    }
+
+#aspect_paymentsystem_ShoppingCartTransformer_list_transaction li{
+    display: none;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_currency-section{
+    text-decoration: none;
+}
+
+.paypal-next-button{
+    display: none;
+}
+
+#aspect_submission_workflow_WorkflowTransformer_field_skip_payment{
+    display:none;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_Payment h1{
+    margin-top:0px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_Payment h1{
+    font-size:15px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_currency-section{
+    list-style-type: none;
+    display: inline;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_currency-section li{
+    width:100px;
+    display: inline;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_Payment li{
+    margin-bottom:10px;
+    width:220px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_Payment li span{
+    font-size: 13px;
+    width:110px;
+    padding: 0px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_item_currency-list label{
+    font-size: 14px;
+    width:120px;
+    font-weight: bold;
+    padding: 0px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_Payment li div{
+    width:100px;
+    display: inline;
+    text-align: left;
+    margin: 0px;
+    padding: 0px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_country-section{
+    list-style-type: none;
+}
+
+#aspect_paymentsystem_ShoppingCartTransformer_item_payer{
+    border-top: 1px solid #aaa;
+    margin-top: 0px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_item_total{
+    border-top: 1px solid #aaa;
+    border-top: 1px solid #aaa;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_item_country-list label{
+    font-size: 13px;
+    width:100%;
+}
+li#aspect_paymentsystem_ShoppingCartTransformer_item_country-list div select{
+    width:220px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list label{
+    font-size:13px;
+    width:100%;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_field_voucher{
+    width:160px;
+    display: inline;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list button{
+    display: inline;
+}
+li#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list div{
+    width:100%;
+    text-align: center;
+}
+#aspect_submission_submit_CheckoutStep_list_payment-method{
+    list-style: none;
+}
+#aspect_submission_workflow_WorkflowTransformer_list_payment-method{
+    list-style: none;
+    }
+#aspect_submission_workflow_WorkflowTransformer_list_paypal-form-buttons{
+    list-style: none;
+    padding:10px;
+}
+#aspect_submission_submit_CheckoutStep_list_paypal-form-buttons{
+    list-style: none;
+    padding:10px;
+}
+
+ul.navigation-link{
+    padding: 5px 0;
+    list-style: none;
+    margin-left: -15px;
+    margin-bottom: 10px;
+}
+ul.navigation-link li{
+    display: inline-block;
+    font-size: 14px;
+    background-color: #87C033;
+    color: #fff;
+    text-decoration: none;
+    margin-right: 18px;
+    padding: 7px 11px 4px;
+    border: 1px solid #AAA;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-bottomright: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    -moz-box-shadow: 3px 3px 4px rgba(33, 33, 33, 0.25);
+    -webkit-box-shadow: 3px 3px 4px rgba(33, 33, 33, 0.25);
+    box-shadow: 3px 3px 4px rgba(33, 33, 33, 0.25);
+}
+
+ul.navigation-link li.selected{
+    border:2px solid black;
+    padding:5px;
+    background-color: #707070;
+    color: #fff;
+    border: 1px solid #555;
+}
+
+div.step-link{
+    border: none;
+    background-color: transparent;
+    box-shadow:none;
+    padding-bottom: 0px;
+    padding-top: 0px;
+}
+
+.errorMessage{
+    color:red;
+}
+.waiver-info{
+    color:green;
+}
+.label-mark{
+
+    width:20px;
+    display:inline;
+}
+
+
+
+#aspect_eperson_TermsOfService_div_background{
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    opacity: .80;
+    -webkit-opacity: .80;
+    -moz-opacity: .80;
+    z-index: 1000;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+}
+
+#aspect_eperson_TermsOfService_div_modal-content{
+    background-color: white;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    box-shadow: 0 0 20px 0 #222;
+    -webkit-box-shadow: 0 0 20px 0 #222;
+    -moz-box-shadow: 0 0 20px 0 #222;
+
+    height: 250px;
+    left: 50%;
+    margin: -200px 0 0 -225px;
+    padding: 10px;
+    position: fixed;
+    top: 50%;
+    width: 450px;
+    z-index: 1000;
+}
+
+#aspect_eperson_TermsOfService_div_background.active, #aspect_eperson_TermsOfService_field_submit.active {
+    display: block;
+}
+
+/* Temporarily hide the currency selector, until we fix the currency switching problems */                                                                                                                                                 
+#aspect_paymentsystem_ShoppingCartTransformer_item_currency-list {                                                                                                                                                                         
+    display:none;
+    visibility:hidden;
+}     
