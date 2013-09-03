@@ -54,8 +54,6 @@ public class PaypalImpl implements PaypalService{
 
     protected Logger log = Logger.getLogger(PaypalService.class);
 
-    protected PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
-
     public String getSecureTokenId(){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSSSSSSSSS");
        return sdf.format(new Date());
@@ -137,7 +135,7 @@ public class PaypalImpl implements PaypalService{
     public boolean submitReferenceTransaction(Context c,WorkflowItem wfi,HttpServletRequest request){
 
         try{
-
+            PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
             ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(c,wfi.getItem().getID());
             Voucher voucher = Voucher.findById(c,shoppingCart.getVoucher());
 
@@ -209,6 +207,7 @@ public class PaypalImpl implements PaypalService{
         try {
             String secureToken=request.getParameter("SECURETOKEN");
             String secureTokenId=request.getParameter("SECURETOKENID");
+            PaymentSystemService paymentSystemService =  new DSpace().getSingletonService(PaymentSystemService.class);
             shoppingCart= paymentSystemService.getShoppingCartByItemId(context,item.getID());
 
 
@@ -533,7 +532,8 @@ public class PaypalImpl implements PaypalService{
             if(shoppingCart != null)
             {
                 /** add details of shopping cart */
-                email.addArgument(this.paymentSystemService.printShoppingCart(c, shoppingCart));
+                PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
+                email.addArgument(paymentSystemService.printShoppingCart(c, shoppingCart));
             }
 
             email.send();
@@ -562,7 +562,8 @@ public class PaypalImpl implements PaypalService{
             if(shoppingCart != null)
             {
                 /** add details of shopping cart */
-                email.addArgument(this.paymentSystemService.printShoppingCart(c, shoppingCart));
+                PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
+                email.addArgument(paymentSystemService.printShoppingCart(c, shoppingCart));
             }
 
             email.send();
@@ -594,7 +595,8 @@ public class PaypalImpl implements PaypalService{
             if(shoppingCart != null)
             {
                 /** add details of shopping cart */
-                email.addArgument(this.paymentSystemService.printShoppingCart(c, shoppingCart));
+                PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
+                email.addArgument(paymentSystemService.printShoppingCart(c, shoppingCart));
             }
 
             email.send();
@@ -625,7 +627,8 @@ public class PaypalImpl implements PaypalService{
             if(shoppingCart != null)
             {
                 /** add details of shopping cart */
-                email.addArgument(this.paymentSystemService.printShoppingCart(c, shoppingCart));
+                PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
+                email.addArgument(paymentSystemService.printShoppingCart(c, shoppingCart));
             }
 
             email.send();
