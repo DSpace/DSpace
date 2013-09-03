@@ -419,11 +419,11 @@ public class PaymentSystemImpl implements PaymentSystemService {
             result += format("Total", symbol+Double.toString(shoppingCart.getTotal()));
 
             switch (getWaiver(c,shoppingCart,""))
-            {
-                case ShoppingCart.COUNTRY_WAIVER: format("Waiver Details", "Country:"+shoppingCart.getCountry()+" paid the basic fee and no integration fee");break;
-                case ShoppingCart.JOUR_WAIVER: format("Waiver Details", "Journal paid the basic fee and no integration fee"); break;
-                case ShoppingCart.VOUCHER_WAIVER: format("Waiver Details", "Voucher Applied"); break;
-            }
+	    {
+		case ShoppingCart.COUNTRY_WAIVER: format("Waiver Details", "Data Publishing Charge has been waived due to submitter's association with " + shoppingCart.getCountry() + ".");break;
+		case ShoppingCart.JOUR_WAIVER: format("Waiver Details", "Data Publishing Charges are covered for all submissions to " + shoppingCart.getJournal() + "."); break;
+	        case ShoppingCart.VOUCHER_WAIVER: format("Waiver Details", "Voucher code applied to Data Publishing Charge."); break;
+	    }
 
             if(shoppingCart.getTransactionId() == null && "".equals(shoppingCart.getTransactionId().trim()))
             {

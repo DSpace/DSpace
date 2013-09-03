@@ -242,10 +242,10 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
         String symbol = PaymentSystemConfigurationManager.getCurrencySymbol(shoppingCart.getCurrency());
         switch (paymentSystemService.getWaiver(context,shoppingCart,""))
         {
-            case ShoppingCart.COUNTRY_WAIVER:waiverMessage= "Country:"+shoppingCart.getCountry()+" paid the basic fee and no integration fee";break;
-            case ShoppingCart.JOUR_WAIVER: waiverMessage = "Journal paid the basic fee and no integration fee"; break;
-            case ShoppingCart.VOUCHER_WAIVER: waiverMessage = "Voucher Applied"; break;
-        }
+	case ShoppingCart.COUNTRY_WAIVER: waiverMessage = "Data Publishing Charge has been waived due to submitter's association with " + shoppingCart.getCountry() + "."; break;
+	case ShoppingCart.JOUR_WAIVER: waiverMessage = "Data Publishing Charges are covered for all submissions to " + shoppingCart.getJournal() + "."; break;
+	case ShoppingCart.VOUCHER_WAIVER: waiverMessage = "Voucher code applied to Data Publishing Charge."; break;
+	}
         info.addLabel(T_Price);
         if(paymentSystemService.hasDiscount(context,shoppingCart,null))
         {
