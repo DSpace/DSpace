@@ -1,3 +1,4 @@
+
 /**
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
@@ -94,6 +95,10 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
             {
                 //it is in workflow
                 String workflowId = request.getParameter("workflowID");
+		if(workflowId==null) {
+		    // item is no longer in submission OR workflow, probably archived, so we don't need shopping cart info
+		    return;
+		}
                 WorkflowItem workflowItem = WorkflowItem.find(context,Integer.parseInt(workflowId));
                 item = workflowItem.getItem();
             }

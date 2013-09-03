@@ -26,7 +26,9 @@ import java.util.Random;
  */
 public class VoucherValidationImpl implements VoucherValidationService
 {
-
+    /**
+       Validates a voucher. Returns true if the voucher is valid to be used in this shopping cart.
+    **/
     public boolean validate(Context context, Integer voucherId,ShoppingCart shoppingCart)
     {
         if (voucherId != null)
@@ -51,6 +53,9 @@ public class VoucherValidationImpl implements VoucherValidationService
         return false;
     }
 
+    /**
+       Checks whether a voucher has been used.
+    **/
     public boolean voucherUsed(Context context, String voucherCode)
     {
         if (voucherCode != null)

@@ -141,6 +141,7 @@ public class PaypalImpl implements PaypalService{
             ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(c,wfi.getItem().getID());
             Voucher voucher = Voucher.findById(c,shoppingCart.getVoucher());
 
+	    // check whether we're using the special voucher that simulates "payment failed"
             if(voucher!=null&&ConfigurationManager.getProperty("payment-system","paypal.failed.voucher")!=null)
             {
                 String failedVoucher = ConfigurationManager.getProperty("payment-system","paypal.failed.voucher");

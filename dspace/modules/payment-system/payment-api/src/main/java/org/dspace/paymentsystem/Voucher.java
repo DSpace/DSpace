@@ -30,9 +30,7 @@ public class Voucher {
     public static final int CODE = 4;
 
     public static final String STATUS_USED = "used";
-    public static final String STATUS_VALID = "valid";
     public static final String STATUS_OPEN = "open";
-    public static final String STATUS_FREE = "free";
     private static Logger log = Logger.getLogger(Voucher.class);
 
     /** Our context */

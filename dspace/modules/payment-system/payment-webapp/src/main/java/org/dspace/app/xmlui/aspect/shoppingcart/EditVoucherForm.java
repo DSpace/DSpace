@@ -149,10 +149,8 @@ public class EditVoucherForm  extends AbstractDSpaceTransformer
 
             Select statusField = identity.addItem().addSelect("status");
             statusField.setLabel(T_name3);
-            statusField.addOption(Voucher.STATUS_FREE,Voucher.STATUS_FREE);
             statusField.addOption(Voucher.STATUS_OPEN,Voucher.STATUS_OPEN);
             statusField.addOption(Voucher.STATUS_USED,Voucher.STATUS_USED);
-            statusField.addOption(Voucher.STATUS_VALID,Voucher.STATUS_VALID);
             statusField.setOptionSelected(status);
 
             identity.addLabel(T_name4);
