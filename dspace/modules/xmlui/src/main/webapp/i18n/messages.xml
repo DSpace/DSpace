@@ -2829,7 +2829,7 @@
 		to this item.</message>
 
 
-	<message key="xmlui.submit.select.pub.head">Select Your Article Status</message>
+	<message key="xmlui.submit.select.pub.head">Initial Information About Your Submission</message>
     <message key="xmlui.submit.select.pub.trail">
         <ul class="navigation-link">
             <li class="selected"><b>1. Describe Publication</b></li>
@@ -2841,8 +2841,9 @@
     <message key="xmlui.submit.select.pub.help">
 Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-term access</strong> to its contents at <strong>no cost</strong> to researchers, educators or students, irrespective of nationality or institutional affiliation. Dryad is able to provide free access to data due to financial support from members and data submitters. Dryad’s Data Publishing Charge (DPC) is designed to sustain its core functions by recovering the basic costs of curating and preserving data. In many cases, this charge is covered by supporting journals, societies, and publishers [link to list of journals covered by payment plans].  In the absence of a sponsoring organization, the submitter is required to pay the DPC.
     </message>
+    <message key="xmlui.submit.select.country.head"><span class="ds-form-label">Country-based Fee Waiver</span><br /><br /></message>
     <message key="xmlui.submit.select.country.help">
-Waivers are granted upon request for submissions by researchers employed by an institution in an Eligible Country or who are independent researcher in residence in an Eligible Country.  Eligible countries are those listed by the World Bank as low-income or lower-middle-income economies. Select a country to request a waiver before you begin your submission. 
+<span class="country-help">Waivers are granted upon request for submissions by researchers employed by an institution in an Eligible Country or who are independent researcher in residence in an Eligible Country. Eligible countries are those listed by the World Bank as low-income or lower-middle-income economies. Select a country to request a waiver before you begin your submission. </span>
     </message>
     <message key="xmlui.submit.select.country.error">Please select a country</message>
 	<message key="xmlui.submit.select.pub.form_head">Submit new content</message>
@@ -3383,7 +3384,7 @@ Waivers are granted upon request for submissions by researchers employed by an i
     <message key="xmlui.PaymentSystem.shoppingcart.order.price">Data Publishing Charge</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.surcharge">Excess data storage</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.noIntegrateFee">Non-integrated submission</message>
-    <message key="xmlui.PaymentSystem.shoppingcart.order.country">Select your country</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.country">Fee-waiver country</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.total">Your total</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.voucher">Voucher code</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.apply">Apply</message>

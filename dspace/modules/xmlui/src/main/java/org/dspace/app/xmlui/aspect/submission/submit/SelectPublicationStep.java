@@ -75,6 +75,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     private static final Message T_SELECT_HELP_IN_REVIEW = message("xmlui.submit.publication.journal.help_in_review");
 
     protected static final Message T_Country= message("xmlui.PaymentSystem.shoppingcart.order.country");
+    protected static final Message T_Country_head= message("xmlui.submit.select.country.head");
     protected static final Message T_Country_help= message("xmlui.submit.select.country.help");
     protected static final Message T_Country_error= message("xmlui.submit.select.country.error");
 
@@ -470,6 +471,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         java.util.List<String> countryArray = manager.getSortedCountry();
 
 	org.dspace.app.xmlui.wing.element.Item countryItem = info.addItem("country-help","country-help");
+	countryItem.addContent(T_Country_head);
 	countryItem.addContent(T_Country_help);
 
         Select countryList = countryItem.addSelect("country");
