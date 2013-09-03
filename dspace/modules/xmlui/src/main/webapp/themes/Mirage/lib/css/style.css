@@ -2446,3 +2446,8 @@ div.step-link{
     display: block;
 }
 
+/* Temporarily hide the currency selector, until we fix the currency switching problems */                                                                                                                                                 
+#aspect_paymentsystem_ShoppingCartTransformer_item_currency-list {                                                                                                                                                                         
+    display:none;
+    visibility:hidden;
+}     
