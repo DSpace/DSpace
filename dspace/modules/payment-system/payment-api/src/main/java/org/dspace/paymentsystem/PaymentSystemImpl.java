@@ -364,4 +364,78 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
         }
     }
+
+    private String format(String label, String value){
+        return label + ": " + value + "\n";
     }
+
+    public String printShoppingCart(Context c, ShoppingCart shoppingCart){
+
+        String result = "";
+
+        try{
+
+            result += format("Payer", getPayer(c, shoppingCart, null));
+
+            String symbol = PaymentSystemConfigurationManager.getCurrencySymbol(shoppingCart.getCurrency());
+
+            if(hasDiscount(c,shoppingCart,null))
+            {
+                result += format("Price",symbol+"0.0");
+            }
+            else
+            {
+                result += format("Price",symbol+Double.toString(shoppingCart.getBasicFee()));
+            }
+
+            Double noIntegrateFee =  getNoIntegrateFee(c,shoppingCart,null);
+
+            //add the no integrate fee if it is not 0
+            if(!hasDiscount(c,shoppingCart,null)&&noIntegrateFee>0&&!hasDiscount(c,shoppingCart,null))
+            {
+                result += format("Non-integrated submission", "" + noIntegrateFee);
+            }
+            else
+            {
+                result += format("Non-integrated submission", symbol+"0.0");
+            }
+
+            //add the large file surcharge section
+            format("Excess data storage", symbol+Double.toString(getSurchargeLargeFileFee(c,shoppingCart)));
+
+            try
+            {
+                Voucher v = Voucher.findById(c, shoppingCart.getVoucher());
+                if(v != null)
+                {
+                    result += format("Voucher Applied", v.getCode());
+                }
+            }catch (Exception e)
+            {
+                log.error(e.getMessage(),e);
+            }
+
+            //add the final total price
+            result += format("Total", symbol+Double.toString(shoppingCart.getTotal()));
+
+            switch (getWaiver(c,shoppingCart,""))
+            {
+                case ShoppingCart.COUNTRY_WAIVER: format("Waiver Details", "Country:"+shoppingCart.getCountry()+" paid the basic fee and no integration fee");break;
+                case ShoppingCart.JOUR_WAIVER: format("Waiver Details", "Journal paid the basic fee and no integration fee"); break;
+                case ShoppingCart.VOUCHER_WAIVER: format("Waiver Details", "Voucher Applied"); break;
+            }
+
+            if(shoppingCart.getTransactionId() == null && "".equals(shoppingCart.getTransactionId().trim()))
+            {
+                format("Transaction ID", shoppingCart.getTransactionId());
+            }
+
+        }catch (Exception e)
+        {
+            result += format("Error", e.getMessage());
+            log.error(e.getMessage(),e);
+        }
+
+        return result;
+    }
+}
