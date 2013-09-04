@@ -91,4 +91,18 @@ public interface DOIConnector {
      */
     public boolean registerDOI(Context context, DSpaceObject dso, String doi)
             throws IdentifierException;
+    
+    /**
+     * Sends a request to the DOI registry to update Metadate for a DOI.
+     * The DOIConnector won't do any tests and throws an IdentifierException 
+     * in case of any problems with the DOI you want to update the metadata.
+     * 
+     * @param context
+     * @param dso
+     * @param doi
+     * @return
+     * @throws IdentifierException 
+     */
+    public boolean updateMetadata(Context context, DSpaceObject dso, String doi)
+            throws IdentifierException;
 }

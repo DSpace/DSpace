@@ -377,6 +377,18 @@ public class DOIIdentifierProvider
         
     }
 
+     public void updateMetadata(Context context, DSpaceObject dso, String identifier ) 
+             throws IdentifierException
+     {
+         
+        String doi = formatIdentifier(identifier);
+        if(connector.updateMetadata(context, dso, doi))
+            return;
+        throw new IdentifierException("it wasn't possible to update metadata for "
+                + "the DOI" + identifier + ". Take a look  into the logs"
+                + " for further details.");
+     }
+    
     @Override
     public String mint(Context context, DSpaceObject dso)
             throws IdentifierException

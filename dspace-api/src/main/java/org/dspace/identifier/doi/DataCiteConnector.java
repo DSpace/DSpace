@@ -730,6 +730,83 @@ implements DOIConnector
         }
     }
     
+    @Override
+    public boolean updateMetadata(Context context, DSpaceObject dso, String doi) 
+            throws IdentifierException
+    { 
+        this.prepareXwalk();
+        
+        if (!this.xwalk.canDisseminate(dso))
+        {
+            log.error("Crosswalk " + this.CROSSWALK_NAME 
+                    + " cannot disseminate DSO with type " + dso.getType() 
+                    + " and ID " + dso.getID() + ". While giving a metadata update"
+                    + " for this DOI " + doi + ".");
+            log.warn("Please fix the crosswalk " + this.CROSSWALK_NAME + ".");
+            return false;
+        }
+        
+        Element root = null;
+        try
+        {
+            root = xwalk.disseminateElement(dso);
+        }
+        catch (AuthorizeException ae)
+        {
+            log.error("Caught an Authorize Exception while disseminating DSO "
+                    + "with type " + dso.getType() + " and ID " + dso.getID()
+                    + ". While giving a metadata update for this DOI " + doi + ".");
+            log.warn("AuthorizeExceptionMessage: " + ae.getMessage());
+            return false;
+        }
+        catch (CrosswalkException ce)
+        {
+            log.error("Caught an CrosswalkException while updating metadata for "
+                    + "a DOI (" + doi + ") for DSO with type " + dso.getType() 
+                    + " and ID " + dso.getID() + ". Won't reserve the doi.");
+            log.warn("Please fix the Crosswalk " + this.CROSSWALK_NAME + "!");
+            return false;
+        }
+        catch (IOException ioe)
+        {
+            throw new RuntimeException(ioe);
+        }
+        catch (SQLException se)
+        {
+            throw new RuntimeException(se);
+        }
+        
+        DataCiteResponse resp = this.sendMetadataPostRequest(doi, root);        
+        
+        switch(resp.statusCode)
+        {
+            // 201 -> created/updated -> okay
+            case (201) :
+            {
+                return true;
+            }
+            // 400 -> wrong domain, wrong prefix, wrong request body
+            case (400) :
+            {
+                log.warn("We send an irregular request to DataCite. While "
+                        + "updating metadata for a DOI they told us: " 
+                        + resp.getContent());
+                throw new IdentifierException("Currently we cannot update "
+                        + "DOIs. Please inform the administrator or take a look "
+                        + " in the DSpace log file.");
+            }
+            // Catch all other http status code in case we forgot one.
+            default :
+            {
+                log.warn("While registration of DOI {}, we got a http status code "
+                        + "{} and the message \"{}\".", new String[]
+                        {doi, Integer.toString(resp.statusCode), resp.getContent()});
+                throw new IdentifierException("Unable to parse an answer from "
+                        + "DataCite API. Please have a look into DSpace logs.");
+            }
+        }
+    }
+    
     /**
      * Purges cached information reserved and registered DOIs.
      * The DataCiteConnector caches information about reserved and registered 

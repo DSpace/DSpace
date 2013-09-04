@@ -79,14 +79,14 @@ public class DOIOrganiser {
         Option registerDoi =  OptionBuilder.withArgName("DOI identifier")
                      .hasArgs(1)
                      .withDescription("Register an identifier online. "
-                     + "An DOI identifier is needed.").create('g');
+                     + "A DOI identifier is needed.").create('g');
         
         options.addOption(registerDoi);
         
         Option reserveDoi = OptionBuilder.withArgName("DOI identifier")
                      .hasArgs(1)
                      .withDescription("Reserve an identifier online."
-                     + " An DOI identifier is needed. ").create('v');
+                     + " A DOI identifier is needed. ").create('v');
         
         options.addOption(reserveDoi);
         
@@ -103,6 +103,14 @@ public class DOIOrganiser {
                      + " An ItemID or a Handle is needed. ").create('i');
         
         options.addOption(reserveByItemOrHandle);
+        
+        Option udate = OptionBuilder.withArgName("DOI identifier or ItemID or Handle")
+                     .hasArgs(1)
+                     .withDescription("Update online an object for a given DOI identifier"
+                     + " or ItemID or Handle. A DOI identifier or an ItemID or a Handle is needed. ")
+                     .create('u');
+        
+        options.addOption(udate);
         
         Context context = null;
         try {
@@ -150,8 +158,8 @@ public class DOIOrganiser {
         if(line.hasOption('g')){
             String identifier = line.getOptionValue('g');
             if(null == identifier){
-                LOG.info("A DOI identifier is needed");
-                throw new IllegalArgumentException("Identifier is null.", new NullPointerException());
+               // LOG.info("A DOI identifier is needed");
+                //throw new IllegalArgumentException("Identifier is null.", new NullPointerException());
             }else{
                 doiRequestByDOI(context, identifier,"toBeRegistered");
             }
@@ -159,8 +167,8 @@ public class DOIOrganiser {
         if(line.hasOption('v')){
              String identifier = line.getOptionValue('v');
             if(null == identifier){
-                LOG.info("A DOI identifier is needed");
-                throw new IllegalArgumentException("Identifier is null.", new NullPointerException());
+               // LOG.info("A DOI identifier is needed");
+                //throw new IllegalArgumentException("Identifier is null.", new NullPointerException());
             }
             else
             {
@@ -170,8 +178,9 @@ public class DOIOrganiser {
         if(line.hasOption('t')){
             String itemID_Hdl = line.getOptionValue('t');
             if(null == itemID_Hdl){
-                LOG.info("A ItemID or a Handle is needed");
-                throw new IllegalArgumentException("ItemID or Handle is null.", new NullPointerException());
+                printHelp(options);
+                //LOG.info("A ItemID or a Handle is needed");
+                //throw new IllegalArgumentException("ItemID or Handle is null.", new NullPointerException());
             }
             else
             {
@@ -181,12 +190,24 @@ public class DOIOrganiser {
         if(line.hasOption('i')){
             String itemID_Hdl = line.getOptionValue('i');
             if(null == itemID_Hdl){
-                LOG.info("A ItemID or a Handle is needed");
-                throw new IllegalArgumentException("ItemID or Handle is null.", new NullPointerException());
+                printHelp(options);
+               // LOG.info("A ItemID or a Handle is needed");
+                //throw new IllegalArgumentException("ItemID or Handle is null.", new NullPointerException());
             }
             else
             {
                 doiRequestByItemID_Handle(context, itemID_Hdl,"toBeReserved");
+            }
+        }
+        
+        if(line.hasOption('u')){
+            String argument = line.getOptionValue('u');
+            if(null == argument){
+                printHelp(options);
+            }
+            else
+            {
+                updateObject(context, argument);
             }
         }
         try {
@@ -272,7 +293,8 @@ public class DOIOrganiser {
     }
     
     private static void  runRequest(Context context, TableRow doiRow, String status){
-            DOIIdentifierProvider doiIdentifierProvider = new DSpace().getSingletonService(DOIIdentifierProvider.class);
+            
+        DOIIdentifierProvider doiIdentifierProvider = new DSpace().getSingletonService(DOIIdentifierProvider.class);
         try {
             DSpaceObject dso = DSpaceObject.find(context,
                                                          doiRow.getIntColumn("resource_type_id"),
@@ -301,6 +323,7 @@ public class DOIOrganiser {
     }
     
     private static void doiRequestByDOI(Context context, String identifier, String status){
+        
         try {
            DOIIdentifierProvider doiIdentifierProvider = new DSpace().getSingletonService(DOIIdentifierProvider.class);
            String doi = doiIdentifierProvider.formatIdentifier(identifier);
@@ -316,6 +339,7 @@ public class DOIOrganiser {
     
     
     private static void doiRequestByItemID_Handle(Context context, String itemID_Hdl, String status) {
+       
         TableRow row = null;
         try
         {
@@ -343,7 +367,7 @@ public class DOIOrganiser {
         }
     }
     
-    private static void runRequestByItemID_Handle(Context context,Integer resource_type_id,Integer resource_id, String status ){
+    private static void runRequestByItemID_Handle(Context context, Integer resource_type_id, Integer resource_id, String status ){
             DSpaceObject dso = null;
             DOIIdentifierProvider doiIdentifierProvider = new DSpace().getSingletonService(DOIIdentifierProvider.class);
         try {
@@ -358,9 +382,69 @@ public class DOIOrganiser {
         }  catch (SQLException ex) {
             LOG.error("It wasn't possible to connect to the Database", ex);
         } catch (IdentifierException ex) {
-            LOG.error("It wasn't possible to reserved or to registered an Identifier for the objact", ex);
+            LOG.error("It wasn't possible to reserved or to registered an DOI Identifier for the objact", ex);
         } catch (AuthorizeException ex) {
-            LOG.error("It wasn't possible to update the dspace objact", ex);
+            LOG.error("It wasn't possible to update the dspace object", ex);
+        }
+    }
+    private static void updateObject(Context context, String argument){
+       
+        TableRow row = null;
+        TableRow doiRow = null;
+        DOIIdentifierProvider doiIdentifierProvider = new DSpace().getSingletonService(DOIIdentifierProvider.class);
+        String sql = "Select * From Doi Where resource_type_id = ? and resource_id = ? ";
+        try {
+            if (argument.matches("\\d*")) {
+                System.err.println("I'm an Item");
+                Integer itemID = Integer.valueOf(argument);
+                row = DatabaseManager.findByUnique(context, "Item", "item_id", itemID);
+                if (null != row) {
+                    System.err.println("I'm not null");
+                    doiRow = DatabaseManager.querySingleTable(context,
+                            "Doi", sql, row.getIntColumn("submitter_id"), row.getIntColumn("item_id"));
+                    if (null != doiRow) {
+                        DSpaceObject dso = DSpaceObject.find(context,
+                                doiRow.getIntColumn("resource_type_id"),
+                                doiRow.getIntColumn("resource_id"));
+                        doiIdentifierProvider.updateMetadata(context, dso, doiRow.getStringColumn("doi"));
+                        return;
+                    } else {
+                        LOG.error("There are no DOI Identifier for this Value : " + argument);
+                    }
+                } else {
+                    LOG.error("This Item : " + argument + "doesn't exist");
+                }
+            }
+            row = DatabaseManager.findByUnique(context, "Handle", "handle", argument);
+            if (null != row) {
+                doiRow = DatabaseManager.querySingleTable(context,
+                        "Doi", sql, row.getIntColumn("resource_type_id"), row.getIntColumn("resource_id"));
+                if (null != doiRow) {
+                    DSpaceObject dso = DSpaceObject.find(context,
+                            doiRow.getIntColumn("resource_type_id"),
+                            doiRow.getIntColumn("resource_id"));
+                    doiIdentifierProvider.updateMetadata(context, dso, doiRow.getStringColumn("doi"));
+                    return;
+                } else {
+                    LOG.error("There are no DOI Identifier for this Value : " + argument);
+                }
+            } else {
+                LOG.error("This Handle: " + argument + "doesn't exist");
+            }
+            String doi = doiIdentifierProvider.formatIdentifier(argument);
+            row = DatabaseManager.findByUnique(context, "Doi", "doi", doi.substring(DOI.SCHEME.length()));
+            if (null != row) {
+                DSpaceObject dso = DSpaceObject.find(context,
+                        row.getIntColumn("resource_type_id"),
+                        row.getIntColumn("resource_id"));
+                doiIdentifierProvider.updateMetadata(context, dso, row.getStringColumn("doi"));
+            } else {
+                LOG.error("This DOI identifier: " + argument + "doesn't exist");
+            }
+        } catch (SQLException ex) {
+            LOG.error(ex);
+        } catch (IdentifierException ex) {
+            LOG.error("It wasn't possible to format the DOI Identifier", ex);
         }
     }
 }
