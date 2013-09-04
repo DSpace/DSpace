@@ -277,7 +277,7 @@ public class PaypalImpl implements PaypalService{
                         }
                         break;
                     default:
-                        log.error("unexpected code getting paypal reference transaction: " + httpStatus + ", " + get.getResponsebodyAsString() );
+                        log.error("unexpected code getting paypal reference transaction: " + httpStatus + ", " + get.getResponseBodyAsString() );
                         return false;
                 }
 
