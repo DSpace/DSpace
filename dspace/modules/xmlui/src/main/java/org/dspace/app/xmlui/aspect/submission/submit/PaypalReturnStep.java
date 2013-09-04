@@ -46,8 +46,7 @@ public class PaypalReturnStep extends AbstractStep {
     private static final Message T_PayPalVerified = message("xmlui.PaymentSystem.shoppingcart.verified");
     private static final Message T_Finalize = message("xmlui.Submission.submit.CheckoutStep.button.finalize");
 
-    
-        private static final Logger log = Logger.getLogger(AbstractDSpaceTransformer.class);
+        private static final Logger log = Logger.getLogger(PaypalReturnStep.class);
         @Override
         public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
 
@@ -70,7 +69,7 @@ public class PaypalReturnStep extends AbstractStep {
                     //find the correct shopping cart based on the secrue token
                     ShoppingCart shoppingCart = ShoppingCart.findBySecureToken(context,secureToken);
                     if(shoppingCart!=null){
-                        if("0".equals(result))
+                        if("0".equals(result) || "4".equals(result))
                         {
                             //successful transaction
                             shoppingCart.setTransactionId(reference);
