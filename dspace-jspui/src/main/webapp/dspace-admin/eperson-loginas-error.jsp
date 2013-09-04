@@ -38,7 +38,7 @@
 
      
     <p align="center">
-        <a href="<%= request.getContextPath() %>"><fmt:message key="jsp.dspace-admin.eperson-main.loginAs.backtohome" /></a>
+        <a href="<%= request.getContextPath() %>/dspace-admin/edit-epeople"><fmt:message key="jsp.dspace-admin.eperson-main.loginAs.backtoeditpeople" /></a>
     </p>
 
 </dspace:layout>
