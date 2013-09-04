@@ -1161,7 +1161,9 @@ parameter that is being used (see variable defined above) -->
         <iframe name="paypal-iframe" scrolling="no" id="paypal-iframe">
             <xsl:attribute name="src">
                 <xsl:value-of select="dri:list/dri:item[@n='link']" />
-                <xsl:text disable-output-escaping="yes">?MODE=TEST&amp;SECURETOKENID=</xsl:text>
+                <xsl:text disable-output-escaping="yes">?MODE=</xsl:text>
+                <xsl:value-of select="dri:list/dri:item[@n='testMode']" />
+                <xsl:text>&amp;SECURETOKENID=</xsl:text>
                 <xsl:value-of select="dri:list/dri:item[@n='secureTokenId']" />
                 <xsl:text disable-output-escaping="yes">&amp;SECURETOKEN=</xsl:text>
                 <xsl:value-of select="dri:list/dri:item[@n='secureToken']" />
