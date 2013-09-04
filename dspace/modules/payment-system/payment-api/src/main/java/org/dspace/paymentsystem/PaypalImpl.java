@@ -246,11 +246,13 @@ public class PaypalImpl implements PaypalService{
                 //TODO:add currency from shopping cart
                 get.addParameter("CURRENCY", shoppingCart.getCurrency());
 		log.debug("paypal transaction url " + get);
-                switch (new HttpClient().executeMethod(get)) {
+		int httpStatus = new HttpClient().executeMethod(get);
+                switch (httpStatus) {
                     case 200:
                     case 201:
                     case 202:
                         String string = get.getResponseBodyAsString();
+			log.debug("paypal response = " + string);
                         String[] results = string.split("&");
                         for(String temp:results)
                         {
@@ -275,7 +277,7 @@ public class PaypalImpl implements PaypalService{
                         }
                         break;
                     default:
-                        log.error("get paypal reference transaction");
+                        log.error("unexpected code getting paypal reference transaction: " + httpStatus + ", " + get.getResponsebodyAsString() );
                         return false;
                 }
 
@@ -287,7 +289,7 @@ public class PaypalImpl implements PaypalService{
             }
         }
         catch (Exception e) {
-            log.error("get paypal reference transaction:"+e);
+            log.error("get paypal reference transaction:", e);
             return false;
         }
         return false;
