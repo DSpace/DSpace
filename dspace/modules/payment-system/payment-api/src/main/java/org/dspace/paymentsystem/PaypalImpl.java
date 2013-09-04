@@ -52,7 +52,7 @@ import org.dspace.app.xmlui.wing.Message;
  */
 public class PaypalImpl implements PaypalService{
 
-    protected Logger log = Logger.getLogger(PaypalService.class);
+    protected Logger log = Logger.getLogger(PaypalImpl.class);
 
     public String getSecureTokenId(){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSSSSSSSSS");

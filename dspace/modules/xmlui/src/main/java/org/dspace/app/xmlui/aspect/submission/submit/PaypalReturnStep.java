@@ -60,6 +60,11 @@ public class PaypalReturnStep extends AbstractStep {
             String reference = request.getParameter("PNREF");
             Response response = ObjectModelHelper.getResponse(objectModel);
 
+	    log.debug("paypal secureToken = " + secureToken);
+	    log.debug("paypal result = " + result);
+	    log.debug("paypal message = " + message);
+	    log.debug("paypal reference = " + reference);
+	    
             if(secureToken!=null){
                 try{
                     //find the correct shopping cart based on the secrue token
