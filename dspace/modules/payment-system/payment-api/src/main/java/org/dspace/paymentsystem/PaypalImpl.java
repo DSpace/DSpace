@@ -94,6 +94,7 @@ public class PaypalImpl implements PaypalService{
             }
             //TODO:add currency from shopping cart
             get.addParameter("CURRENCY", shoppingCart.getCurrency());
+	    log.debug("paypal request URL " + get);
             switch (new HttpClient().executeMethod(get)) {
                 case 200:
                 case 201:
@@ -244,6 +245,7 @@ public class PaypalImpl implements PaypalService{
 
                 //TODO:add currency from shopping cart
                 get.addParameter("CURRENCY", shoppingCart.getCurrency());
+		log.debug("paypal transaction url " + get);
                 switch (new HttpClient().executeMethod(get)) {
                     case 200:
                     case 201:
@@ -320,6 +322,7 @@ public class PaypalImpl implements PaypalService{
 
             //TODO:add currency from shopping cart
             get.addParameter("CURRENCY", shoppingCart.getCurrency());
+	    log.debug("paypal sale transaction url " + get);
             switch (new HttpClient().executeMethod(get)) {
                 case 200:
                 case 201:
