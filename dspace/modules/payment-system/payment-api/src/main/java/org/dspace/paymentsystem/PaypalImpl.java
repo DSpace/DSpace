@@ -90,7 +90,7 @@ public class PaypalImpl implements PaypalService{
             }
             else
             {
-                get.addParameter("AMT", "0");
+                get.addParameter("AMT", "0.00");
             }
             //TODO:add currency from shopping cart
             get.addParameter("CURRENCY", shoppingCart.getCurrency());
@@ -125,7 +125,7 @@ public class PaypalImpl implements PaypalService{
             get.releaseConnection();
         }
         catch (Exception e) {
-            log.error("get paypal secure token error:"+e);
+            log.error("get paypal secure token error:",e);
             return null;
         }
 
@@ -229,7 +229,7 @@ public class PaypalImpl implements PaypalService{
                 get.addParameter("TENDER", "C");
                 get.addParameter("TRXTYPE", "A");
                 get.addParameter("VERBOSITY", ConfigurationManager.getProperty("payment-system","paypal.verbosity"));
-                get.addParameter("AMT", "0");
+                get.addParameter("AMT", "0.00");
                 get.addParameter("CREDITCARD",cardNumber);
                 get.addParameter("CVV2",CVV2);
                 get.addParameter("EXPDATE",expDate);
