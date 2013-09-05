@@ -966,6 +966,8 @@ public class DescribeStepUtils extends AbstractDSpaceTransformer {
                     text.setAuthorityValue("", "blank");
                 else
                     text.setAuthorityValue(dcValues[0].authority, Choices.getConfidenceText(dcValues[0].confidence));
+                if(fieldKey.equalsIgnoreCase("prism_publicationName"))
+                    text.setDisabled(true);
             }
         }
     }
