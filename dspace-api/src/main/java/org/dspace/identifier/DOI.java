@@ -8,6 +8,8 @@
 
 package org.dspace.identifier;
 
+import java.util.Locale;
+
 /**
  * DOI identifiers.
  *
@@ -48,6 +50,33 @@ public class DOI
         if (identifier.startsWith("http://dx.doi.org/10."))
             return identifier;
         
+        throw new IdentifierException(identifier + "does not seem to be a DOI.");
+    }
+
+    /**
+     * Recognize format of DOI and return it with leading doi-Scheme.
+     * @param identifier Identifier to format, following format are accepted:
+     *                   f.e. 10.123/456, doi:10.123/456, http://dx.doi.org/10.123/456.
+     * @return Given Identifier with DOI-Scheme, f.e. doi:10.123/456.
+     * @throws IllegalArgumentException If identifier is empty or null.
+     * @throws IdentifierException If DOI could not be recognized.
+     */
+    public static String formatIdentifier(String identifier) throws IdentifierException {
+        if (null == identifier) {
+            throw new IllegalArgumentException("Identifier is null.", new NullPointerException());
+        }
+        if (identifier.startsWith(DOI.SCHEME)) {
+            return identifier;
+        }
+        if (identifier.isEmpty()) {
+            throw new IllegalArgumentException("Cannot format an empty identifier.");
+        }
+        if (identifier.startsWith("10.") && identifier.contains("/")) {
+            return DOI.SCHEME + identifier;
+        }
+        if (identifier.startsWith("http://dx.doi.org/10.")) {
+            return DOI.SCHEME + identifier.substring(18);
+        }
         throw new IdentifierException(identifier + "does not seem to be a DOI.");
     }
 }

@@ -131,7 +131,7 @@ public class DOIIdentifierProvider
     public boolean supports(String identifier)
     {
         try {
-            formatIdentifier(identifier);
+            DOI.formatIdentifier(identifier);
          } catch (IdentifierException e) {
             return false;
         }
@@ -154,7 +154,7 @@ public class DOIIdentifierProvider
     public void register(Context context, DSpaceObject dso, String identifier)
             throws IdentifierException
     {
-        String doi = formatIdentifier(identifier);
+        String doi = DOI.formatIdentifier(identifier);
 
         TableRow doiRow = null;
 
@@ -243,7 +243,7 @@ public class DOIIdentifierProvider
     private void reserveDOI(Context context, DSpaceObject dso, String identifier)
             throws IdentifierException, IllegalArgumentException
     {
-        String doi = formatIdentifier(identifier);
+        String doi = DOI.formatIdentifier(identifier);
         
         TableRow doiRow = null;
         
@@ -288,7 +288,7 @@ public class DOIIdentifierProvider
     public void reserveDOIOnline(Context context, DSpaceObject dso, String identifier)
             throws IdentifierException, IllegalArgumentException, SQLException {
         
-        String doi = formatIdentifier(identifier);
+        String doi = DOI.formatIdentifier(identifier);
         // ensure that the DOI is in our DOI table and is not reserved online
         // for another object than dso
         try {
@@ -335,7 +335,7 @@ public class DOIIdentifierProvider
 
     public void registeredDOIOnline(Context context, DSpaceObject dso, String identifier)
             throws IdentifierException, IllegalArgumentException, SQLException {
-        String doi = formatIdentifier(identifier);
+        String doi = DOI.formatIdentifier(identifier);
         // check if the DOI is already registered for this dso
         if (connector.isDOIRegistered(context, dso, doi))
         {
@@ -430,7 +430,7 @@ public class DOIIdentifierProvider
     {
         String doi = null;
         try {
-            doi = formatIdentifier(identifier);
+            doi = DOI.formatIdentifier(identifier);
         } catch (IdentifierException e) {
             throw new IdentifierNotResolvableException(e.getMessage());
         }
@@ -509,7 +509,7 @@ public class DOIIdentifierProvider
         throws IdentifierException
     {
         log.debug("delete {} from {}", identifier, dso);
-        String doi = formatIdentifier(identifier);
+        String doi = DOI.formatIdentifier(identifier);
         log.debug("formated identifier as {}", doi);
         
         // look for doi in DB
@@ -591,37 +591,13 @@ public class DOIIdentifierProvider
         }
         log.info("Deleted {}", doi);
     }
-
-    
-    /**
-     * Recognize format of DOI and return it with leading doi-Scheme.
-     * @param identifier Identifier to format, following format are accepted:
-     *                   f.e. 10.123/456, doi:10.123/456, http://dx.doi.org/10.123/456.
-     * @return Given Identifier with DOI-Scheme, f.e. doi:10.123/456.
-     * @throws IllegalArgumentException If identifier is empty or null.
-     * @throws IdentifierException If DOI could not be recognized.
-     */
-    public static String formatIdentifier(String identifier) throws IdentifierException
-    {
-        if (null == identifier)
-            throw new IllegalArgumentException("Identifier is null.", new NullPointerException());
-        if (identifier.startsWith("doi:")) 
-            return identifier;
-        if (identifier.isEmpty())
-            throw new IllegalArgumentException("Cannot format an empty identifier.");
-        if (identifier.startsWith("10.") && identifier.contains("/"))
-            return DOI.SCHEME + identifier;
-        if (identifier.startsWith("http://dx.doi.org/10."))
-            return DOI.SCHEME + identifier.substring(18);
-        throw new IdentifierException(identifier + "does not seem to be a DOI.");
-    }
     
      
     /**
      * Returns a DSpaceObject depending on its DOI.
      * @param context the context
      * @param identifier The DOI in a format that is accepted by
-     *                   {@link formatIdentifier(String)}.
+     *                   {@link DOI.formatIdentifier(String)}.
      * @return Null if the DOI couldn't be found or the associated DSpaceObject.
      * @throws SQLException
      * @throws IdentifierException If {@code identifier} is null or an empty string.
@@ -630,7 +606,7 @@ public class DOIIdentifierProvider
     public static DSpaceObject getObjectByDOI(Context context, String identifier)
             throws SQLException, IdentifierException, IllegalArgumentException
     {
-        String doi = formatIdentifier(identifier);
+        String doi = DOI.formatIdentifier(identifier);
         TableRow doiRow = DatabaseManager.findByUnique(context, "Doi", "doi", doi);
         
         if (null == doiRow)

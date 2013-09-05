@@ -326,7 +326,7 @@ public class DOIOrganiser {
         
         try {
            DOIIdentifierProvider doiIdentifierProvider = new DSpace().getSingletonService(DOIIdentifierProvider.class);
-           String doi = doiIdentifierProvider.formatIdentifier(identifier);
+           String doi = DOI.formatIdentifier(identifier);
            TableRow doiRow = DatabaseManager.findByUnique(context, "Doi", "doi", doi.substring(DOI.SCHEME.length()));
            if(null == doiRow) LOG.error("Identifier: "+ identifier + " is not fund. ");
            runRequest(context, doiRow, status);
