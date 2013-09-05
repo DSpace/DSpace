@@ -381,6 +381,7 @@ public class PaypalImpl implements PaypalService{
             List list= maindiv.addDivision("paypal-iframe").addList("paypal-fields");
             list.addItem("secureTokenId","").addContent(secureTokenId);
             list.addItem("secureToken","").addContent(secureToken);
+            list.addItem("testMode","").addContent(ConfigurationManager.getProperty("payment-system","paypal.mode"));
             list.addItem("link","").addContent(ConfigurationManager.getProperty("payment-system","paypal.link"));
         }
     }
