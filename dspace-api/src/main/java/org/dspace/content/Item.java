@@ -1719,8 +1719,8 @@ public class Item extends DSpaceObject
                                 {
                                     String auth = tr.getStringColumn("authority");
                                     int conf = tr.getIntColumn("confidence");
-                                    if (!((dcv.authority == null && auth == null) ||
-                                      (dcv.authority != null && auth != null && dcv.authority.equals(auth))
+                                    if (!(((dcv.authority == null && auth == null) ||
+                                      (dcv.authority != null && auth != null && dcv.authority.equals(auth)))
                                      && dcv.confidence == conf))
                                     {
                                         matched = false;
