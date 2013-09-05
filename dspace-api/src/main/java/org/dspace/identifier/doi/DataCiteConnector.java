@@ -40,7 +40,6 @@ import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.handle.HandleManager;
 import org.dspace.identifier.DOI;
-import org.dspace.identifier.IdentifierException;
 import org.dspace.services.ConfigurationService;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -264,7 +263,7 @@ implements DOIConnector
 
     
     public boolean isDOIReserved(Context context, String doi)
-            throws IdentifierException
+            throws DOIIdentifierException
     {
         if (!this.checkCache())
         {
@@ -281,7 +280,7 @@ implements DOIConnector
     
     @Override
     public boolean isDOIReserved(Context context, DSpaceObject dso, String doi)
-            throws IdentifierException
+            throws DOIIdentifierException
     {
         // get mds/metadata/<doi>
         
@@ -399,15 +398,16 @@ implements DOIConnector
                             doi, Integer.toString(resp.statusCode),
                             resp.getContent()
                         });
-                throw new IdentifierException("Unable to parse an answer from "
-                        + "DataCite API. Please have a look into DSpace logs.");
+                throw new DOIIdentifierException("Unable to parse an answer from "
+                        + "DataCite API. Please have a look into DSpace logs.",
+                        DOIIdentifierException.BAD_ANSWER);
             }
         }
     }
     
     @Override
     public boolean isDOIRegistered(Context context, String doi)
-            throws IdentifierException
+            throws DOIIdentifierException
     {
         // Do we have information about the DOI in our cache?
         if (!this.checkCache())
@@ -424,7 +424,7 @@ implements DOIConnector
     
     @Override
     public boolean isDOIRegistered(Context context, DSpaceObject dso, String doi)
-            throws IdentifierException
+            throws DOIIdentifierException
     {
         // do we have information about the DOI in our cache?
         if (!this.checkCache())
@@ -461,7 +461,8 @@ implements DOIConnector
                 if (null == url)
                 {
                     log.error("Received a status code 200 without a response content. DOI: {}.", doi);
-                    throw new IdentifierException("Received a http status code 200 without a response content.");
+                    throw new DOIIdentifierException("Received a http status code 200 without a response content.",
+                            DOIIdentifierException.BAD_ANSWER);
                 }
                 
                 String handle = null;
@@ -528,8 +529,9 @@ implements DOIConnector
                 log.warn("While checking if the DOI {} is registered, we got a "
                         + "http status code {} and the message \"{}\".",
                         new String[] {doi, Integer.toString(response.statusCode), response.getContent()});
-                throw new IdentifierException("Unable to parse an answer from "
-                        + "DataCite API. Please have a look into DSpace logs.");
+                throw new DOIIdentifierException("Unable to parse an answer from "
+                        + "DataCite API. Please have a look into DSpace logs.",
+                        DOIIdentifierException.BAD_ANSWER);
             }
         }
     }
@@ -537,7 +539,7 @@ implements DOIConnector
     
     @Override
     public boolean deleteDOI(Context context, String doi)
-            throws IdentifierException
+            throws DOIIdentifierException
     {
         if (!isDOIReserved(context, doi))
             return true;
@@ -564,15 +566,16 @@ implements DOIConnector
                 log.warn("While deleting metadata of DOI {}, we got a "
                         + "http status code {} and the message \"{}\".",
                         new String[] {doi, Integer.toString(resp.statusCode), resp.getContent()});
-                throw new IdentifierException("Unable to parse an answer from "
-                        + "DataCite API. Please have a look into DSpace logs.");
+                throw new DOIIdentifierException("Unable to parse an answer from "
+                        + "DataCite API. Please have a look into DSpace logs.",
+                        DOIIdentifierException.BAD_ANSWER);
             }
         }
     }
 
     @Override
     public boolean reserveDOI(Context context, DSpaceObject dso, String doi)
-            throws IdentifierException
+            throws DOIIdentifierException
     {
         this.prepareXwalk();
         
@@ -627,7 +630,8 @@ implements DOIConnector
         }
         else if (!metadataDOI.equals(doi.substring(DOI.SCHEME.length())))
         {
-            throw new IdentifierException("DSO with type " + dso.getTypeText()
+            // FIXME: that's not an error. If at all, it is worth logging it.
+            throw new DOIIdentifierException("DSO with type " + dso.getTypeText()
                     + " and id " + dso.getID() + " already has DOI "
                     + metadataDOI + ". Won't reserve DOI " + doi + " for it.");
         }
@@ -654,9 +658,9 @@ implements DOIConnector
                 format.setEncoding("UTF-8");
                 XMLOutputter xout = new XMLOutputter(format);
                 log.info("We send the following XML:\n" + xout.outputString(root));
-                throw new IdentifierException("Unable to reserve DOI " + doi 
+                throw new DOIIdentifierException("Unable to reserve DOI " + doi 
                         + ". Please inform your administrator or take a look "
-                        +" into the log files.");
+                        +" into the log files.", DOIIdentifierException.BAD_REQUEST);
             }
             // Catch all other http status code in case we forgot one.
             default :
@@ -664,15 +668,16 @@ implements DOIConnector
                 log.warn("While reserving the DOI {}, we got a http status code "
                         + "{} and the message \"{}\".", new String[]
                         {doi, Integer.toString(resp.statusCode), resp.getContent()});
-                throw new IdentifierException("Unable to parse an answer from "
-                        + "DataCite API. Please have a look into DSpace logs.");
+                throw new DOIIdentifierException("Unable to parse an answer from "
+                        + "DataCite API. Please have a look into DSpace logs.",
+                        DOIIdentifierException.BAD_ANSWER);
             }
         }
     }
     
     @Override
     public boolean registerDOI(Context context, DSpaceObject dso, String doi)
-            throws IdentifierException
+            throws DOIIdentifierException
     {
         log.debug("Want to register DOI {}!", doi);
 
@@ -703,9 +708,10 @@ implements DOIConnector
             {
                 log.warn("We send an irregular request to DataCite. While "
                         + "registering a DOI they told us: " + resp.getContent());
-                throw new IdentifierException("Currently we cannot register "
+                throw new DOIIdentifierException("Currently we cannot register "
                         + "DOIs. Please inform the administrator or take a look "
-                        + " in the DSpace log file.");
+                        + " in the DSpace log file.",
+                        DOIIdentifierException.BAD_REQUEST);
             }
             // 412 Precondition failed: DOI was not reserved before registration!
             case (412) :
@@ -713,10 +719,11 @@ implements DOIConnector
                 log.error("We tried to register a DOI {} that was not reserved "
                         + "before! The registration agency told us: {}.", doi,
                         resp.getContent());
-                throw new IdentifierException("There was an error in handling "
+                throw new DOIIdentifierException("There was an error in handling "
                         + "of DOIs. The DOI we wanted to register had not been "
                         + "reserved in advance. Please contact the administrator "
-                        + "or take a look in DSpace log file.");
+                        + "or take a look in DSpace log file.",
+                        DOIIdentifierException.REGISTER_FIRST);
             }
             // Catch all other http status code in case we forgot one.
             default :
@@ -724,8 +731,9 @@ implements DOIConnector
                 log.warn("While registration of DOI {}, we got a http status code "
                         + "{} and the message \"{}\".", new String[]
                         {doi, Integer.toString(resp.statusCode), resp.getContent()});
-                throw new IdentifierException("Unable to parse an answer from "
-                        + "DataCite API. Please have a look into DSpace logs.");
+                throw new DOIIdentifierException("Unable to parse an answer from "
+                        + "DataCite API. Please have a look into DSpace logs.",
+                        DOIIdentifierException.BAD_ANSWER);
             }
         }
     }
@@ -852,7 +860,7 @@ implements DOIConnector
     }
     
     private DataCiteResponse sendDOIPostRequest(String doi, String url)
-            throws IdentifierException
+            throws DOIIdentifierException
     {
         // post mds/doi/
         // body must contaion "doi=<doi>\nurl=<url>}n"
@@ -902,7 +910,7 @@ implements DOIConnector
     
     
     private DataCiteResponse sendMetadataDeleteRequest(String doi)
-            throws IdentifierException
+            throws DOIIdentifierException
     {
         // delete mds/metadata/<doi>
         URIBuilder uribuilder = new URIBuilder();
@@ -927,19 +935,19 @@ implements DOIConnector
     }
     
     private DataCiteResponse sendDOIGetRequest(String doi)
-            throws IdentifierException
+            throws DOIIdentifierException
     {
         return sendGetRequest(doi, DOI_PATH);
     }
     
     private DataCiteResponse sendMetadataGetRequest(String doi)
-            throws IdentifierException
+            throws DOIIdentifierException
     {
         return sendGetRequest(doi, METADATA_PATH);
     }
     
     private DataCiteResponse sendGetRequest(String doi, String path)
-            throws IdentifierException
+            throws DOIIdentifierException
     {
         URIBuilder uribuilder = new URIBuilder();
         uribuilder.setScheme("https").setHost(HOST).setPath(path
@@ -963,7 +971,7 @@ implements DOIConnector
     }
     
     private DataCiteResponse sendMetadataPostRequest(String doi, Element metadataRoot)
-            throws IdentifierException
+            throws DOIIdentifierException
     {
         Format format = Format.getCompactFormat();
         format.setEncoding("UTF-8");
@@ -972,7 +980,7 @@ implements DOIConnector
     }
     
     private DataCiteResponse sendMetadataPostRequest(String doi, Document metadata)
-            throws IdentifierException
+            throws DOIIdentifierException
     {
         Format format = Format.getCompactFormat();
         format.setEncoding("UTF-8");
@@ -981,7 +989,7 @@ implements DOIConnector
     }
     
     private DataCiteResponse sendMetadataPostRequest(String doi, String metadata)
-            throws IdentifierException
+            throws DOIIdentifierException
     {
         // post mds/metadata/
         // body must contain metadata in DataCite-XML.
@@ -1033,10 +1041,10 @@ implements DOIConnector
      * @param req
      * @param doi
      * @return
-     * @throws IdentifierException 
+     * @throws DOIIdentifierException 
      */
     private DataCiteResponse sendHttpRequest(HttpUriRequest req, String doi)
-            throws IdentifierException
+            throws DOIIdentifierException
     {
         DefaultHttpClient httpclient = new DefaultHttpClient();
         httpclient.getCredentialsProvider().setCredentials(
@@ -1102,9 +1110,10 @@ implements DOIConnector
                 {
                     log.info("We were unable to authenticate against the DOI registry agency.");
                     log.info("The response was: {}", content);
-                    throw new IdentifierException("Cannot authenticate at the "
+                    throw new DOIIdentifierException("Cannot authenticate at the "
                             + "DOI registry agency. Please check if username "
-                            + "and password are set correctly.");
+                            + "and password are set correctly.",
+                            DOIIdentifierException.AUTHENTICATION_ERROR);
                 }
 
                 // We get a 403 Forbidden if we are managing a DOI that belongs to
@@ -1113,8 +1122,9 @@ implements DOIConnector
                 {
                     log.info("Managing a DOI ({}) was prohibited by the DOI "
                             + "registration agency: {}", doi, content);
-                    throw new IdentifierException("We can check, register or "
-                            + "reserve DOIs that belong to us only.");
+                    throw new DOIIdentifierException("We can check, register or "
+                            + "reserve DOIs that belong to us only.",
+                            DOIIdentifierException.FOREIGN_DOI);
                 }
 
 
@@ -1123,9 +1133,10 @@ implements DOIConnector
                 {
                     log.warn("Caught an http status code 500 while managing DOI "
                             +"{}. Message was: " + content);
-                    throw new IdentifierException("DataCite API has an internal error. "
+                    throw new DOIIdentifierException("DataCite API has an internal error. "
                             + "It is temporarily impossible to manage DOIs. "
-                            + "Further information can be found in DSpace log file.");
+                            + "Further information can be found in DSpace log file.",
+                            DOIIdentifierException.INTERNAL_ERROR);
                 }
             }
             
@@ -1156,7 +1167,7 @@ implements DOIConnector
 
     // returns null or handle
     private String extractAlternateIdentifier(Context context, String content)
-    throws SQLException, IdentifierException
+    throws SQLException, DOIIdentifierException
     {
         if (content == null)
         {
@@ -1176,7 +1187,9 @@ implements DOIConnector
         }
         catch (JDOMException jde)
         {
-            throw new IdentifierException("Got a JDOMException while parsing a response from the DataCite API.", jde);
+            throw new DOIIdentifierException("Got a JDOMException while parsing "
+                    + "a response from the DataCite API.", jde,
+                    DOIIdentifierException.BAD_ANSWER);
         }
         
         String handle = null;
