@@ -568,7 +568,17 @@ public class WorkflowManager {
 
         // Get current date
         String now = DCDate.getCurrent().toString();
+        org.dspace.content.Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, myitem);
+        if(dataFiles!=null){
+            for(Item dataFile:dataFiles) {
+                if(dataFile.getMetadata("internal", "workflow", "submitted", Item.ANY).length == 0){
+                    //A newly (re-)submitted publication
+                    dataFile.addMetadata("internal", "workflow", "submitted", null, Boolean.TRUE.toString());
+                    myitem.update();
+                }
+            }
 
+        }
 
         // Here's what happened
         if(action != null){
