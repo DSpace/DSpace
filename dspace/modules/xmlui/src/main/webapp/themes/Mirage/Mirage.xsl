@@ -276,7 +276,7 @@
                             <xsl:attribute name="href">
                                 <xsl:value-of select="/dri:document/dri:options/dri:list[@n='submitNow']/dri:item[@n='submitnowitem']/dri:xref[@rend='submitnowbutton']/@target"/>
                             </xsl:attribute>
-                            Submit data now
+			    <xsl:text>Submit data now</xsl:text>
                         </a>
                     </p>
                     <p style="margin: 14px 0 4px;">
