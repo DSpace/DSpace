@@ -302,13 +302,13 @@ public class DOIOrganiser {
 
                     if (status.equals("toBeRegistered"))
                     {
-                        doiIdentifierProvider.registeredDOIOnline(context,
+                        doiIdentifierProvider.registereOnline(context,
                                                                         dso,
                                                                         doiRow.getStringColumn("doi"));
                     }
                     else
                     {
-                        doiIdentifierProvider.reserveDOIOnline(context,
+                        doiIdentifierProvider.reserveOnline(context,
                                                                      dso, 
                                                                      doiRow.getStringColumn("doi"));
                     }
