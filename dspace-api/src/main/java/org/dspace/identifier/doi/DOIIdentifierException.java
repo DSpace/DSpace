@@ -19,7 +19,7 @@ public class DOIIdentifierException extends IdentifierException {
     /**
      * A specified DOI does not exists.
      */
-    public static final int DOI_DOES_NOT_EXISTS = 1;
+    public static final int DOI_DOES_NOT_EXIST = 1;
     /**
      * A DOI cannot be created, registered, reserved, and so on because it is
      * already used for another object.
@@ -56,6 +56,24 @@ public class DOIIdentifierException extends IdentifierException {
      * DOIConnector.
      */
     public static final int INTERNAL_ERROR = 8;
+    /**
+     * An error arose while metadata conversion.
+     */
+    public static final int CONVERSION_ERROR = 9;
+    /**
+     * A DOI and a provided object does not match. This error occurs if you try
+     * to connect an object with a DOI that is reserved or registered for
+     * another object.
+     */
+    public static final int MISMATCH = 10;
+    /**
+     * An identifier supplied as DOI could not be recognized.
+     */
+    public static final int UNRECOGNIZED = 11;
+    /**
+     * DSpace did not allowed to manipulate the metadata of an DSpaceObject.
+     */
+    public static final int UNAUTHORIZED_METADATA_MANIPULATION = 12;
     
     private int code;
 
@@ -64,8 +82,8 @@ public class DOIIdentifierException extends IdentifierException {
         switch (code) {
             case CODE_NOT_SET:
                 return "CODE_NOT_SET";
-            case DOI_DOES_NOT_EXISTS:
-                return "DOI_DOES_NOT_EXSITS";
+            case DOI_DOES_NOT_EXIST:
+                return "DOI_DOES_NOT_EXSIT";
             case DOI_ALREADY_EXISTS:
                 return "DOI_ALREADY_EXISTS";
             case FOREIGN_DOI:
@@ -78,6 +96,14 @@ public class DOIIdentifierException extends IdentifierException {
                 return "AUTHENTICATION_ERROR";
             case INTERNAL_ERROR:
                 return "INTERNAL_ERROR";
+            case CONVERSION_ERROR:
+                return "CONVERSION_ERROR";
+            case MISMATCH:
+                return "MISMATCH";
+            case UNRECOGNIZED:
+                return "UNRECOGNIZED";
+            case UNAUTHORIZED_METADATA_MANIPULATION:
+                return "UNAUTHORIZED_METADATA_MANIPULATION";
             default:
                 return "UNKOWN";
         }
@@ -121,5 +147,10 @@ public class DOIIdentifierException extends IdentifierException {
     public DOIIdentifierException(Throwable cause, int code) {
         super(cause);
         this.code = code;
+    }
+    
+    public int getCode()
+    {
+        return this.code;
     }
 }
