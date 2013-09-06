@@ -153,4 +153,10 @@ public class XslExtensions {
 	public static String replace(String target, String search, String replacement) {
 		return target.replace(search, replacement);
 	}
+	
+	//replace for a regular expresion
+	public static String replaceRegex(String target, String regex, String replacement) {
+		return target.replaceAll(regex, replacement);
+	}
+	
 }

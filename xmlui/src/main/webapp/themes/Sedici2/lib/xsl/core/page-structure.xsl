@@ -333,7 +333,8 @@
                         <xsl:text>  </xsl:text>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:copy-of select="$page_title/node()" />
+                    	<!-- Regular expresion for delete the html tags in &lt;title&gt; -->
+                        <xsl:copy-of select="java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.replaceRegex($page_title/node(),'&lt;(/|\w)*?&gt;','')" />
                     </xsl:otherwise>
                 </xsl:choose>
             </title>
@@ -400,20 +401,26 @@ placeholders for header images -->
 		                    <a href="http://sedici.unlp.edu.ar/" target="_blank">SEDICI</a>
 		                    &#xA9; 2003-<xsl:value-of select="date:year()"/>
 		                    <br/>
-		                    <a href="http://www.unlp.edu.ar" target="_blank">Universidad Nacional de La Plata</a>
+		                    <a href="http://www.unlp.edu.ar" target="_blank">
+								<i18n:text>xmlui.dri2xhtml.structural.footer.university.name</i18n:text>
+							</a>
 	                    </strong>
 	                    <br/>
-	                    <span id="copyright-info">Todos los derechos reservados conforme a la ley 11.723</span>
+	                    <span id="copyright-info">
+							<i18n:text>xmlui.dri2xhtml.structural.footer.site.copyrights</i18n:text>
+						</span>
 	                </div>
-	            	<a href="http://www.dspace.org" class="dspace_link" target="_blank">Soportado por <strong>DSpace</strong></a>
+	            	<a href="http://www.dspace.org" class="dspace_link" target="_blank">
+						<i18n:text>xmlui.dri2xhtml.structural.footer.site.support</i18n:text>
+					</a>
 	            </div>
 	            <div class="column" id="footercol3">
 	                <div class="datos_sedici">
-	                    Calle 49 y 115 s/n 1er piso - Edificio ex Liceo
+	                    <i18n:text>xmlui.dri2xhtml.structural.footer.developers.address</i18n:text>
 	                    <br/>
-	                    La Plata, Buenos Aires (C.P. 1900)
+	                    <i18n:text>xmlui.dri2xhtml.structural.footer.developers.district</i18n:text>
 	                    <br/>
-	                    Tel 0221 423 6696/6677 (int. 141)
+	                    <i18n:text>xmlui.dri2xhtml.structural.footer.developers.contact-phone</i18n:text>
 	                </div>
                     <div class="footer-icon">
                         <a title="Como llegar a SEDICI">
