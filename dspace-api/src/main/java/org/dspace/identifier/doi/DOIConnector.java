@@ -52,7 +52,7 @@ public interface DOIConnector {
      * @return
      * @throws DOIIdentifierException 
      */
-    public boolean deleteDOI(Context context, String doi)
+    public void deleteDOI(Context context, String doi)
             throws DOIIdentifierException;
     
     /**
@@ -70,7 +70,7 @@ public interface DOIConnector {
      * @return
      * @throws DOIIdentifierException 
      */
-    public boolean reserveDOI(Context context, DSpaceObject dso, String doi)
+    public void reserveDOI(Context context, DSpaceObject dso, String doi)
             throws DOIIdentifierException;
     /**
      * Sends a request to the DOI registry to register a DOI.
@@ -88,6 +88,20 @@ public interface DOIConnector {
      * @return
      * @throws DOIIdentifierException 
      */
-    public boolean registerDOI(Context context, DSpaceObject dso, String doi)
+    public void registerDOI(Context context, DSpaceObject dso, String doi)
+            throws DOIIdentifierException;
+    
+    /**
+     * Sends a request to the DOI registry to update Metadate for a DOI.
+     * The DOIConnector won't do any tests and throws an IdentifierException 
+     * in case of any problems with the DOI you want to update the metadata.
+     * 
+     * @param context
+     * @param dso
+     * @param doi
+     * @return
+     * @throws IdentifierException 
+     */
+    public void updateMetadata(Context context, DSpaceObject dso, String doi)
             throws DOIIdentifierException;
 }

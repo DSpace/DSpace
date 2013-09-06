@@ -538,11 +538,11 @@ implements DOIConnector
 
     
     @Override
-    public boolean deleteDOI(Context context, String doi)
+    public void deleteDOI(Context context, String doi)
             throws DOIIdentifierException
     {
         if (!isDOIReserved(context, doi))
-            return true;
+            return;
         
         // delete mds/metadata/<doi>
         DataCiteResponse resp = this.sendMetadataDeleteRequest(doi);
@@ -551,14 +551,14 @@ implements DOIConnector
             //ok
             case (200) :
             {
-                return true;
+                return;
             }
             // 404 "Not Found" means DOI is neither reserved nor registered.
             case (404) :
             {
                 log.error("DOI {} is at least reserved, but a delete request "
                         + "told us that it is unknown!", doi);
-                return true;
+                return;
             }
             // Catch all other http status code in case we forgot one.
             default :
@@ -574,7 +574,7 @@ implements DOIConnector
     }
 
     @Override
-    public boolean reserveDOI(Context context, DSpaceObject dso, String doi)
+    public void reserveDOI(Context context, DSpaceObject dso, String doi)
             throws DOIIdentifierException
     {
         this.prepareXwalk();
@@ -585,8 +585,10 @@ implements DOIConnector
                     + " cannot disseminate DSO with type " + dso.getType() 
                     + " and ID " + dso.getID() + ". Giving up reserving the DOI "
                     + doi + ".");
-            log.warn("Please fix the crosswalk " + this.CROSSWALK_NAME + ".");
-            return false;
+            throw new DOIIdentifierException("Cannot disseminate "
+                    + dso.getTypeText() + "/" + dso.getID()
+                    + " using crosswalk " + this.CROSSWALK_NAME + ".",
+                    DOIIdentifierException.CONVERSION_ERROR);
         }
         
         Element root = null;
@@ -596,19 +598,23 @@ implements DOIConnector
         }
         catch (AuthorizeException ae)
         {
-            log.error("Caught an Authorize Exception while disseminating DSO "
+            log.error("Caught an AuthorizeException while disseminating DSO "
                     + "with type " + dso.getType() + " and ID " + dso.getID()
-                    + ". Giving up to reserve DOI " + doi + ".");
-            log.warn("AuthorizeExceptionMessage: " + ae.getMessage());
-            return false;
+                    + ". Giving up to reserve DOI " + doi + ".", ae);
+            throw new DOIIdentifierException("AuthorizeException occured while "
+                    + "converting " + dso.getTypeText() + "/" + dso.getID()
+                    + " using crosswalk " + this.CROSSWALK_NAME + ".", ae,
+                    DOIIdentifierException.CONVERSION_ERROR);
         }
         catch (CrosswalkException ce)
         {
             log.error("Caught an CrosswalkException while reserving a DOI ("
                     + doi + ") for DSO with type " + dso.getType() + " and ID " 
-                    + dso.getID() + ". Won't reserve the doi.");
-            log.warn("Please fix the Crosswalk " + this.CROSSWALK_NAME + "!");
-            return false;
+                    + dso.getID() + ". Won't reserve the doi.", ce);
+            throw new DOIIdentifierException("CrosswalkException occured while "
+                    + "converting " + dso.getTypeText() + "/" + dso.getID()
+                    + " using crosswalk " + this.CROSSWALK_NAME + ".", ce,
+                    DOIIdentifierException.CONVERSION_ERROR);
         }
         catch (IOException ioe)
         {
@@ -646,7 +652,7 @@ implements DOIConnector
             {
                 addToCache(doi, true, false, new int[] {dso.getType(), dso.getID()});
                 log.debug("Reserved DOI {}.", doi);
-                return true;
+                return;
             }
             // 400 -> invalid XML
             case (400) :
@@ -676,7 +682,7 @@ implements DOIConnector
     }
     
     @Override
-    public boolean registerDOI(Context context, DSpaceObject dso, String doi)
+    public void registerDOI(Context context, DSpaceObject dso, String doi)
             throws DOIIdentifierException
     {
         log.debug("Want to register DOI {}!", doi);
@@ -701,7 +707,7 @@ implements DOIConnector
             case (201) :
             {
                 addToCache(doi, true, true, new int[] {dso.getType(), dso.getID()});
-                return true;
+                return;
             }
             // 400 -> wrong domain, wrong prefix, wrong request body
             case (400) :
@@ -739,8 +745,8 @@ implements DOIConnector
     }
     
     @Override
-    public boolean updateMetadata(Context context, DSpaceObject dso, String doi) 
-            throws IdentifierException
+    public void updateMetadata(Context context, DSpaceObject dso, String doi) 
+            throws DOIIdentifierException
     { 
         this.prepareXwalk();
         
@@ -750,8 +756,10 @@ implements DOIConnector
                     + " cannot disseminate DSO with type " + dso.getType() 
                     + " and ID " + dso.getID() + ". While giving a metadata update"
                     + " for this DOI " + doi + ".");
-            log.warn("Please fix the crosswalk " + this.CROSSWALK_NAME + ".");
-            return false;
+            throw new DOIIdentifierException("Cannot disseminate "
+                    + dso.getTypeText() + "/" + dso.getID()
+                    + " using crosswalk " + this.CROSSWALK_NAME + ".",
+                    DOIIdentifierException.CONVERSION_ERROR);
         }
         
         Element root = null;
@@ -759,21 +767,25 @@ implements DOIConnector
         {
             root = xwalk.disseminateElement(dso);
         }
-        catch (AuthorizeException ae)
+       catch (AuthorizeException ae)
         {
-            log.error("Caught an Authorize Exception while disseminating DSO "
+            log.error("Caught an AuthorizeException while disseminating DSO "
                     + "with type " + dso.getType() + " and ID " + dso.getID()
-                    + ". While giving a metadata update for this DOI " + doi + ".");
-            log.warn("AuthorizeExceptionMessage: " + ae.getMessage());
-            return false;
+                    + ". While giving a metadata update for this DOI " + doi + ".", ae);
+            throw new DOIIdentifierException("AuthorizeException occured while "
+                    + "converting " + dso.getTypeText() + "/" + dso.getID()
+                    + " using crosswalk " + this.CROSSWALK_NAME + ".", ae,
+                    DOIIdentifierException.CONVERSION_ERROR);
         }
         catch (CrosswalkException ce)
         {
-            log.error("Caught an CrosswalkException while updating metadata for "
-                    + "a DOI (" + doi + ") for DSO with type " + dso.getType() 
-                    + " and ID " + dso.getID() + ". Won't reserve the doi.");
-            log.warn("Please fix the Crosswalk " + this.CROSSWALK_NAME + "!");
-            return false;
+            log.error("Caught an CrosswalkException while updating metadata of "
+                    + dso.getTypeText() + "/" + dso.getID() + " for DOI " + doi
+                    + ".", ce);
+            throw new DOIIdentifierException("CrosswalkException occured while "
+                    + "converting " + dso.getTypeText() + "/" + dso.getID()
+                    + " using crosswalk " + this.CROSSWALK_NAME + ".", ce,
+                    DOIIdentifierException.CONVERSION_ERROR);
         }
         catch (IOException ioe)
         {
@@ -791,7 +803,7 @@ implements DOIConnector
             // 201 -> created/updated -> okay
             case (201) :
             {
-                return true;
+                return;
             }
             // 400 -> wrong domain, wrong prefix, wrong request body
             case (400) :
