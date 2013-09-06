@@ -9,6 +9,7 @@
 package org.dspace.identifier;
 
 import java.util.Locale;
+import org.dspace.identifier.doi.DOIIdentifierException;
 
 /**
  * DOI identifiers.
@@ -59,9 +60,9 @@ public class DOI
      *                   f.e. 10.123/456, doi:10.123/456, http://dx.doi.org/10.123/456.
      * @return Given Identifier with DOI-Scheme, f.e. doi:10.123/456.
      * @throws IllegalArgumentException If identifier is empty or null.
-     * @throws IdentifierException If DOI could not be recognized.
+     * @throws DOIIdentifierException If DOI could not be recognized.
      */
-    public static String formatIdentifier(String identifier) throws IdentifierException {
+    public static String formatIdentifier(String identifier) throws DOIIdentifierException {
         if (null == identifier) {
             throw new IllegalArgumentException("Identifier is null.", new NullPointerException());
         }
@@ -77,6 +78,7 @@ public class DOI
         if (identifier.startsWith("http://dx.doi.org/10.")) {
             return DOI.SCHEME + identifier.substring(18);
         }
-        throw new IdentifierException(identifier + "does not seem to be a DOI.");
+        throw new DOIIdentifierException(identifier + "does not seem to be a DOI.",
+                DOIIdentifierException.UNRECOGNIZED);
     }
 }
