@@ -36,7 +36,7 @@
 <%
    boolean noEPersonSelected = (request.getAttribute("no_eperson_selected") != null);
    boolean resetPassword = (request.getAttribute("reset_password") != null);
-   boolean loginAs = ConfigurationManager.getBooleanProperty("jspui.user.assumelogin", false);
+   boolean loginAs = ConfigurationManager.getBooleanProperty("webui.user.assumelogin", false);
 %>
 
 <dspace:layout titlekey="jsp.dspace-admin.eperson-main.title"
