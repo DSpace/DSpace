@@ -242,8 +242,8 @@ alter table jdyna_containable RENAME COLUMN pdprojectnestedobject_fk to cris_pj_
 alter table jdyna_containable RENAME COLUMN pdrpnestedobject_fk to cris_rp_no_pdef_fk;
 
 alter table jdyna_containable RENAME COLUMN typeounestedobject_fk to cris_ou_no_tp_fk;
-alter table jdyna_containable RENAME COLUMN typerpnestedobject_fk to cris_rp_no_tp_fk;
-alter table jdyna_containable RENAME COLUMN typeprojectnestedobject_fk to cris_pj_no_tp_fk;
+alter table jdyna_containable RENAME COLUMN typerpnestedobject_fk to cris_rp_no_tp;
+alter table jdyna_containable RENAME COLUMN typeprojectnestedobject_fk to cris_pj_no_tp;
 
 ALTER INDEX public.jdyna_values_idx_dtype RENAME TO jdyna_values_dtype_idx;
 
