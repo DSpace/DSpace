@@ -199,7 +199,7 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
         //add the large file surcharge section
         String symbol = PaymentSystemConfigurationManager.getCurrencySymbol(shoppingCart.getCurrency());
         info.addLabel(T_Surcharge);
-        info.addItem("surcharge","surcharge").addContent(symbol+Double.toString(paymentSystemService.getSurchargeLargeFileFee(context,shoppingCart)));
+        info.addItem("surcharge","surcharge").addContent(String.format("%s%.0f", symbol, paymentSystemService.getSurchargeLargeFileFee(context,shoppingCart)));
 
     }
 
@@ -249,11 +249,11 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
         info.addLabel(T_Price);
         if(paymentSystemService.hasDiscount(context,shoppingCart,null))
         {
-            info.addItem("price","price").addContent(symbol+"0.0");
+            info.addItem("price","price").addContent(symbol+"0");
         }
         else
         {
-            info.addItem("price","price").addContent(symbol+Double.toString(shoppingCart.getBasicFee()));
+            info.addItem("price","price").addContent(String.format("%s%.0f", symbol, shoppingCart.getBasicFee()));
         }
         Double noIntegrateFee =  paymentSystemService.getNoIntegrateFee(context,shoppingCart,null);
 
@@ -261,18 +261,18 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
         info.addLabel(T_noInteg);
         if(!paymentSystemService.hasDiscount(context,shoppingCart,null)&&noIntegrateFee>0&&!paymentSystemService.hasDiscount(context,shoppingCart,null))
         {
-            info.addItem("no-integret","no-integret").addContent(symbol+Double.toString(noIntegrateFee));
+            info.addItem("no-integret","no-integret").addContent(String.format("%s%.0f", symbol, noIntegrateFee));
         }
         else
         {
-            info.addItem("no-integret","no-integret").addContent(symbol+"0.0");
+            info.addItem("no-integret","no-integret").addContent(symbol+"0");
         }
         generateSurchargeFeeForm(info,manager,shoppingCart,paymentSystemService);
 
 
         //add the final total price
         info.addLabel(T_Total);
-        info.addItem("total","total").addContent(symbol+Double.toString(shoppingCart.getTotal()));
+        info.addItem("total","total").addContent(String.format("%s%.0f",symbol, shoppingCart.getTotal()));
         info.addItem("waiver-info","waiver-info").addContent(waiverMessage);
     }
     private void generatePayer(Request request,org.dspace.app.xmlui.wing.element.List info,ShoppingCart shoppingCart,PaymentSystemService paymentSystemService,Item item) throws WingException,SQLException{
