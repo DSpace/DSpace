@@ -21,6 +21,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -112,22 +113,34 @@ public class LayoutTag extends TagSupport
     /** Syndication feed "autodiscovery" link data */
     private String feedData;
 
+    private String templatePath;
+    
     public LayoutTag()
     {
         super();
+        String template = ConfigurationManager.getProperty("jspui", "template.name");
+        if (StringUtils.isNotBlank(template)
+                && !"default".equalsIgnoreCase(template))
+        {
+            templatePath = "/layout/" + template + "/";
+        }
+        else
+        {
+            templatePath = "/layout/";
+        }
     }
 
     public int doStartTag() throws JspException
     {
         ServletRequest request = pageContext.getRequest();
-
+       
         // header file
-        String header = "/layout/header-default.jsp";
+        String header = templatePath + "header-default.jsp";
 
         // Choose default style unless one is specified
         if (style != null)
         {
-            header = "/layout/header-" + style.toLowerCase() + ".jsp";
+            header = templatePath + "header-" + style.toLowerCase() + ".jsp";
         }
 
         // Sort out location bar
@@ -246,7 +259,7 @@ public class LayoutTag extends TagSupport
         }
         else
         {
-            request.setAttribute("dspace.layout.navbar", "/layout/navbar-"
+            request.setAttribute("dspace.layout.navbar", templatePath + "navbar-"
                     + navbar + ".jsp");
         }
 
@@ -364,12 +377,12 @@ public class LayoutTag extends TagSupport
     public int doEndTag() throws JspException
     {
         // Footer file to use
-        String footer = "/layout/footer-default.jsp";
+        String footer = templatePath + "footer-default.jsp";
 
         // Choose default flavour unless one is specified
         if (style != null)
         {
-            footer = "/layout/footer-" + style.toLowerCase() + ".jsp";
+            footer = templatePath + "footer-" + style.toLowerCase() + ".jsp";
         }
 
         try
