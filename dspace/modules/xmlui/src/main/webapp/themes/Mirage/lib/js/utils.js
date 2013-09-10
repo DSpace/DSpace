@@ -3,7 +3,6 @@ jQuery(document).ready(function() {
     //initjQueryTooltips();
     initCiteMe();
     initFirstSubmissionForm();
-
 });
 
 
@@ -15,23 +14,39 @@ function initdatasetsubmissionfile() {
     });
 
     jQuery('#aspect_submission_StepTransformer_div_submit-describe-dataset').find(":input[type=file]").bind('change', function() {
+        jQuery('#aspect_submission_StepTransformer_field_dataset-file-error').remove();
         if (this.id == 'aspect_submission_StepTransformer_field_dataset-file') {
             //Make sure the title gets set with the filename
             var fileName = jQuery(this).val().substr(0, jQuery(this).val().lastIndexOf('.'));
             fileName = fileName.substr(fileName.lastIndexOf('\\') + 1, fileName.length);
-
-
             var title_t = jQuery('input#aspect_submission_StepTransformer_field_dc_title').val();
             if (title_t == null || title_t == '')
                 jQuery('input#aspect_submission_StepTransformer_field_dc_title').val(fileName);
         }
-        //Now find our form
-        var form = jQuery(this).closest("form");
-        //Now that we have our, indicate that I want it processed BUT NOT TO CONTINUE, just upload
-        //We do this by adding a param to the form action
-        form.attr('action', form.attr('action') + '?processonly=true');
-        //Now we submit our form
-        form.submit();
+
+        // Check the file size.  If greater than 1.3 GB, display a warning and do not
+        // auto-submit the form
+        var fileSize = getUploadFileSize(this);
+        if(fileSize > 1.3 * 1024 * 1024 * 1024) { // 1.3 GB
+            console.error("File " + fileSize + " is too big");
+            var errorText = jQuery("<span>")
+                .attr("id", "aspect_submission_StepTransformer_field_dataset-file-error")
+                .text("This data file is too large to upload.  For assistance, please visit ")
+                .addClass("error");
+            var helpLink = jQuery("<a></a>")
+                .attr("href", "http://wiki.datadryad.org/Large_File_Transfer")
+                .text("Large file transfer.");
+            errorText.append(helpLink);
+            jQuery(this).after(errorText);
+        } else {
+            //Now find our form
+            var form = jQuery(this).closest("form");
+            //Now that we have our, indicate that I want it processed BUT NOT TO CONTINUE, just upload
+            //We do this by adding a param to the form action
+            form.attr('action', form.attr('action') + '?processonly=true');
+            //Now we submit our form
+            form.submit();
+        }
     });
 
     jQuery("input[type='radio'][name='datafile_type']").change(function() {
@@ -482,6 +497,34 @@ function subscribeMailingList(form) {
         });
     }
     return false;
+}
+
+// Adapted from http://stackoverflow.com/questions/3717793/javascript-file-upload-size-validation
+function getUploadFileSize(fileInputElement) {
+    if (!window.FileReader) {
+        // The FileReader API (http://www.w3.org/TR/FileAPI/) is required to do this
+        // calculation.  If it is not present in the browser, we can't check the file
+        // size locally
+        console.error("Browser does not support FileAPI");
+        return 0;
+    }
+    
+    if (!fileInputElement) {
+        console.error("No file input element provided");
+        return 0;
+    }
+    else if (!fileInputElement.files) {
+        console.error("This browser doesn't seem to support the `files` property of file inputs.");
+        return 0;
+    }
+    else if (!fileInputElement.files[0]) {
+        console.error("No file selected");
+        return 0;
+    }
+    else {
+        file = fileInputElement.files[0];
+        return file.size; // size in bytes
+    }
 }
 
 

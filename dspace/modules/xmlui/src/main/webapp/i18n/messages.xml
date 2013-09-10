@@ -3387,7 +3387,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.PaymentSystem.shoppingcart.order.total">Your total</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.voucher">Voucher code</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.apply">Apply</message>
-    <message key="xmlui.PaymentSystem.shoppingcart.verified">Your payment informtion has been verified. <br/><strong>You will not be charged until your data is approved for archiving by Dryad curators.</strong></message>
+    <message key="xmlui.PaymentSystem.shoppingcart.verified"><span style="font-family: Helvetica, sans-serif; font-size: 15px;">Your payment information has been verified.<br/><br/><strong>You will not be charged until your data is approved for archiving by Dryad curators.</strong><br/><br/>You must click the <strong>Finalize submission</strong> button below.</span></message>
     <message key="xmlui.PaymentSystem.shoppingcart.help"><strong>Need Help?</strong><br/>Email us at <a href="mailto:help@datadryad.org">help@datadryad.org</a> or send a message via our <a href="/feedback">contact form</a>.</message>
 
     <message key="xmlui.Submission.Submissions.step.head.reAuthorizationPaymentStep">Payment information must be reauthorized</message>
