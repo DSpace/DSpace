@@ -235,7 +235,7 @@
                             <a href="/pages/pricing">
                                 <img alt="" src="/themes/Mirage/images/watering-can.png" />
                                 <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);"> 
-                                    Coming September first, Data Publishing Charges to help sustain open data at Dryad
+                                    Data Publishing Charges to help sustain open data at Dryad
                                 </p>
                                 <p style="drop-shadow: 4px 4px; position: absolute; right: 40px; bottom: 80px; font-size: 70%; text-align: right; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Learn More &#187;</p>
                             </a>
