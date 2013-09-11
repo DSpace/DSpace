@@ -81,7 +81,7 @@ public class DryadReviewAction extends ProcessingAction {
                 String[] emails_=emails.split(",");
                 for(String email : emails_){
                     if(!mailsSent.contains(email)){
-			sendReviewerEmail(c, wf.getItem().getSubmitter().getEmail(), wf, uuid.toString());
+			sendReviewerEmail(c, email, wf, uuid.toString());
                         mailsSent.add(email);
                     }
                 }
