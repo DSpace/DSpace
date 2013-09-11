@@ -27,7 +27,7 @@ public class DataFileDisplayTest extends TestCase {
 	@Test
 	public void testDataFileDisplay() throws Exception {
 		driver.get(baseUrl + "/handle/10255/dryad.58");
-		assertEquals("Dryad data file: Morphospace Specimens", driver.getTitle());
+		assertTrue("File title test", driver.getTitle().startsWith("Morphospace Specimens"));
 		assertTrue(isElementPresent(By.cssSelector("h1.ds-div-head")));
 		assertTrue("head contains Morphospace", sectionContains("h1.ds-div-head", "Morphospace"));
 		assertTrue("citation contains publication info", sectionContains("div.citation-view", "(2007) Testing"));
