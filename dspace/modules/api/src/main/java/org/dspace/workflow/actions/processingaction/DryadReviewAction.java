@@ -159,6 +159,7 @@ public class DryadReviewAction extends ProcessingAction {
     }
 
     private void sendReviewerEmail(Context c, String emailAddress, WorkflowItem wf, String key) throws IOException, SQLException {
+	log.debug("sending review email for workflow item " + wf.getID() + " to " + emailAddress);
         String template;
         boolean isDataPackage = DryadWorkflowUtils.isDataPackage(wf);
         if(isDataPackage)
