@@ -57,7 +57,7 @@ public class DryadReviewAction extends ProcessingAction {
                 }
             }
 
-            addJournalNotifyOnReview(wf, mailsSent);
+            sendEmailToJournalNotifyOnReview(c, wf, mailsSent, uuid);
 
             if(!mailsSent.contains(wf.getItem().getSubmitter().getEmail())){
                 sendReviewerEmail(c, wf.getItem().getSubmitter().getEmail(), wf, uuid.toString());
@@ -70,17 +70,18 @@ public class DryadReviewAction extends ProcessingAction {
 
     }
 
-    private void addJournalNotifyOnReview(WorkflowItem wf, List<String> mailsSent)
-    {
+    private void sendEmailToJournalNotifyOnReview(Context c, WorkflowItem wf, List<String> mailsSent, UUID uuid) throws SQLException, IOException, WorkflowException {
         DCValue[] values=wf.getItem().getMetadata("prism.publicationName");
         if(values!=null && values.length> 0){
             String journal = values[0].value;
             if(journal!=null){
                 Map<String, String> properties = DryadJournalSubmissionUtils.getPropertiesByJournal(journal);
                 String emails = properties.get(DryadJournalSubmissionUtils.NOTIFY_ON_REVIEW);
+		log.debug("reviewers for journal " + journal + " are " + emails);
                 String[] emails_=emails.split(",");
                 for(String email : emails_){
                     if(!mailsSent.contains(email)){
+			sendReviewerEmail(c, email, wf, uuid.toString());
                         mailsSent.add(email);
                     }
                 }
@@ -159,6 +160,7 @@ public class DryadReviewAction extends ProcessingAction {
     }
 
     private void sendReviewerEmail(Context c, String emailAddress, WorkflowItem wf, String key) throws IOException, SQLException {
+	log.debug("sending review email for workflow item " + wf.getID() + " to " + emailAddress);
         String template;
         boolean isDataPackage = DryadWorkflowUtils.isDataPackage(wf);
         if(isDataPackage)
