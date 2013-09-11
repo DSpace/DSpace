@@ -26,15 +26,22 @@ public class SearchingTest extends TestCase {
 	}
 
 	@Test
-	public void testSearchDog() {	    
+	public void testSearch() {	    
 		driver.get("http://datadryad.org");
-		driver.findElement(By.id("ds-header-logo")).click();
 		driver.findElement(By.name("query")).clear();
-		driver.findElement(By.name("query")).sendKeys("dog*");
+		driver.findElement(By.name("query")).sendKeys("dog* Barua");
 		driver.findElement(By.name("submit")).click();
-		driver.findElement(By.cssSelector("span.artifact-title")).click();
-		driver.findElement(By.linkText("Show Full Metadata")).click();
-		Assert.assertEquals("Data from: Exploring the mechanisms underlying a heterozygosity-fitness correlation for canine size in the Antarctic fur seal Arctocephalus gazella", driver.getTitle());
+		Assert.assertTrue("find ecomorph package", sectionContains("div.primary","Arabidopsis thaliana"));
+	}
+
+
+	@Test
+	public void testSearchRedirect() {	    
+		driver.get("http://datadryad.org");
+		driver.findElement(By.name("query")).clear();
+		driver.findElement(By.name("query")).sendKeys("dog ecomorph");
+		driver.findElement(By.name("submit")).click();
+		Assert.assertTrue("basic search: dog* Barua", driver.getTitle().startsWith("Data from: Do convergent ecomorphs"));
 	}
 
 	@After
@@ -55,8 +62,14 @@ public class SearchingTest extends TestCase {
 		}
 	}
 
+	private boolean sectionContains(String section, String targetText) {
+	    return driver.findElement(By.cssSelector(section)).getText().contains(targetText);
+	}
+
+
     	public static void main(String... args) {
-		new SearchingTest().testSearchDog();
+		new SearchingTest().testSearch();
+		new SearchingTest().testSearchRedirect();
 	}
 
 }
