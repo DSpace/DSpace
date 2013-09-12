@@ -1266,4 +1266,16 @@ parameter that is being used (see variable defined above) -->
         </a>
     </xsl:template>
 
+
+
+    <!-- remove country link -->
+    <xsl:template match="//dri:item[@id='aspect.paymentsystem.ShoppingCartTransformer.item.remove-country']/dri:xref">
+        <a id="remove-country" href="#">
+            <xsl:attribute name="onclick">
+                <xsl:text>javascript:removeCountry()</xsl:text>
+            </xsl:attribute>
+            <xsl:value-of select="."/>
+        </a>
+    </xsl:template>
+
 </xsl:stylesheet>

@@ -163,12 +163,7 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
 //        SubmissionInfo sinfo = FlowUtils.obtainSubmissionInfo(objectModel, String.valueOf(submission.getID()));
 
         //Integer step = (Integer)request.get("step");
-        DCValue[] values= item.getMetadata("prism.publicationName");
-        //SubmissionStepConfig cfg = sinfo.getSubmissionConfig().getStep(step);
-        if(values!=null&&values.length>0)
-        {
-            generateCountryList(info,manager,transaction);
-        }
+        generateCountryList(info,manager,transaction,item);
 
         generateVoucherForm(info,manager,transaction);
         }catch (Exception e)
@@ -179,20 +174,34 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
 
     }
 
-    private void generateCountryList(org.dspace.app.xmlui.wing.element.List info,PaymentSystemConfigurationManager manager,ShoppingCart shoppingCart) throws WingException{
-        java.util.List<String> countryArray = manager.getSortedCountry();
-        info.addLabel(T_Country);
-        Select countryList = info.addItem("country-list", "select-list").addSelect("country");
-        countryList.addOption("","Select Your Country");
-        for(String temp:countryArray){
-            String[] countryTemp = temp.split(":");
-            if(shoppingCart.getCountry().length()>0&&shoppingCart.getCountry().equals(countryTemp[0])) {
-                countryList.addOption(true,countryTemp[0],countryTemp[0]);
+    private void generateCountryList(org.dspace.app.xmlui.wing.element.List info,PaymentSystemConfigurationManager manager,ShoppingCart shoppingCart,Item item) throws WingException{
+        DCValue[] values= item.getMetadata("prism.publicationName");
+        //SubmissionStepConfig cfg = sinfo.getSubmissionConfig().getStep(step);
+        if(values!=null&&values.length>0)
+        {
+            java.util.List<String> countryArray = manager.getSortedCountry();
+            info.addLabel(T_Country);
+            Select countryList = info.addItem("country-list", "select-list").addSelect("country");
+            countryList.addOption("","Select Your Country");
+            for(String temp:countryArray){
+                String[] countryTemp = temp.split(":");
+                if(shoppingCart.getCountry().length()>0&&shoppingCart.getCountry().equals(countryTemp[0])) {
+                    countryList.addOption(true,countryTemp[0],countryTemp[0]);
+                }
+                else
+                {
+                    countryList.addOption(false,countryTemp[0],countryTemp[0]);
+                }
             }
-            else
-            {
-                countryList.addOption(false,countryTemp[0],countryTemp[0]);
-            }
+        }
+
+        if(shoppingCart.getCountry().length()>0)
+        {
+            info.addItem("remove-country","remove-country").addXref("#","Remove Country : "+shoppingCart.getCountry());
+        }
+        else
+        {
+            info.addItem("remove-country","remove-country").addXref("#","Remove Country : ");
         }
 
     }
