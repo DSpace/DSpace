@@ -2473,3 +2473,8 @@ table#aspect_submission_workflow_WorkflowTransformer_table_workflow-actions tr.a
 .voucher-error{
     color:red
 }
+
+#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country div,#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher div,#aspect_paymentsystem_ShoppingCartTransformer_item_waiver-info div {
+    width:100% !important;
+}
+
