@@ -105,7 +105,7 @@
 		    }
 		    if (currFp > 0 || idx > limit)
 		    {
-		        %><li class="list-group-item facet-previous"><span style="visibility: hidden;">.</span>
+		        %><li class="list-group-item"><span style="visibility: hidden;">.</span>
 		        <% if (currFp > 0) { %>
 		        <a class="pull-left" href="<%= request.getContextPath()
 		                + searchScope
