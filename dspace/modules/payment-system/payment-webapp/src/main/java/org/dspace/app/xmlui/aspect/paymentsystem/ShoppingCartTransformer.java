@@ -29,6 +29,7 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.Select;
+import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
 
 import org.dspace.content.DCValue;
@@ -227,13 +228,18 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
         info.addItem("errorMessage","errorMessage").addContent("");
         info.addLabel(T_Voucher);
         org.dspace.app.xmlui.wing.element.Item voucher = info.addItem("voucher-list","voucher-list");
-        if(voucher1==null){
-            voucher.addText("voucher","voucher");
-        }
-        else{
-            voucher.addText("voucher","voucher").setValue(voucher1.getCode());
-        }
-        voucher.addButton("apply","apply");
+
+            Text voucherText = voucher.addText("voucher","voucher");
+            voucher.addButton("apply","apply");
+            if(voucher1!=null){
+                voucherText.setValue(voucher1.getCode());
+                info.addItem("remove-voucher","remove-voucher").addXref("#","Remove Voucher : "+voucher1.getCode());
+            }
+            else{
+                info.addItem("remove-voucher","remove-voucher").addXref("#","Remove Voucher : ");
+            }
+
+
 
     }
 
