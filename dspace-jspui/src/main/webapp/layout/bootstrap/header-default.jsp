@@ -164,5 +164,7 @@
 
         <%-- Page contents --%>
 <div class="container">
-        
-
+<% if (request.getAttribute("dspace.layout.sidebar") != null) { %>
+	<div class="row">
+		<div class="col-md-9">
+<% } %>		

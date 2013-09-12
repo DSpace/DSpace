@@ -20,11 +20,6 @@
 
 <%
     String sidebar = (String) request.getAttribute("dspace.layout.sidebar");
-    int overallColSpan = 3;
-    if (sidebar == null)
-    {
-        overallColSpan = 2;
-    }
 %>
 
             <%-- Right-hand side bar if appropriate --%>
@@ -32,7 +27,11 @@
     if (sidebar != null)
     {
 %>
+	</div>
+	<div class="col-md-3">
                     <%= sidebar %>
+    </div>
+    </div>       
 <%
     }
 %>
