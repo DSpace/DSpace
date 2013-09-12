@@ -19,14 +19,14 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
-import javax.servlet.jsp.tagext.TagSupport;
+import javax.servlet.jsp.tagext.BodyTagSupport;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.webui.servlet.FeedServlet;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.app.webui.servlet.FeedServlet;
 
 /**
  * Tag for HTML page layout ("skin").
@@ -75,7 +75,7 @@ import org.dspace.app.webui.servlet.FeedServlet;
  * @author Robert Tansley
  * @version $Revision$
  */
-public class LayoutTag extends TagSupport
+public class LayoutTag extends BodyTagSupport
 {
     /** log4j logger */
     private static Logger log = Logger.getLogger(LayoutTag.class);
@@ -134,15 +134,6 @@ public class LayoutTag extends TagSupport
     {
         ServletRequest request = pageContext.getRequest();
        
-        // header file
-        String header = templatePath + "header-default.jsp";
-
-        // Choose default style unless one is specified
-        if (style != null)
-        {
-            header = templatePath + "header-" + style.toLowerCase() + ".jsp";
-        }
-
         // Sort out location bar
         if (locbar == null)
         {
@@ -336,12 +327,34 @@ public class LayoutTag extends TagSupport
         	request.setAttribute("dspace.layout.feedref", "NONE" );
         }
 
+        return EVAL_BODY_BUFFERED;
+    }
+    
+    public int doEndTag() throws JspException
+    {
+        // Context objects
+        ServletRequest request = pageContext.getRequest();
+        HttpServletResponse response = (HttpServletResponse) pageContext
+                .getResponse();
+        ServletConfig config = pageContext.getServletConfig();
+        
+        // header file
+        String header = templatePath + "header-default.jsp";
+
+        // Choose default style unless one is specified
+        if (style != null)
+        {
+            header = templatePath + "header-" + style.toLowerCase() + ".jsp";
+        }
+
+        if (sidebar != null)
+        {
+            request.setAttribute("dspace.layout.sidebar", sidebar);
+        }
+        
         // Now include the header
         try
         {
-            HttpServletResponse response = (HttpServletResponse) pageContext
-                    .getResponse();
-
             // Set headers to prevent browser caching, if appropriate
             if ((noCache != null) && noCache.equalsIgnoreCase("true"))
             {
@@ -354,12 +367,13 @@ public class LayoutTag extends TagSupport
             // in the response.
             response.setContentType("text/html; charset=UTF-8");
 
-            ServletConfig config = pageContext.getServletConfig();
-
             RequestDispatcher rd = config.getServletContext()
                     .getRequestDispatcher(header);
 
             rd.include(request, response);
+            
+            //pageContext.getOut().write(getBodyContent().getString());
+            getBodyContent().writeOut(pageContext.getOut());
         }
         catch (IOException ioe)
         {
@@ -370,12 +384,7 @@ public class LayoutTag extends TagSupport
             log.warn("Exception", se.getRootCause());
             throw new JspException("Got ServletException: " + se);
         }
-
-        return EVAL_BODY_INCLUDE;
-    }
-
-    public int doEndTag() throws JspException
-    {
+        
         // Footer file to use
         String footer = templatePath + "footer-default.jsp";
 
@@ -389,16 +398,6 @@ public class LayoutTag extends TagSupport
         {
             // Ensure body is included before footer
             pageContext.getOut().flush();
-
-            // Context objects
-            ServletRequest request = pageContext.getRequest();
-            ServletResponse response = pageContext.getResponse();
-            ServletConfig config = pageContext.getServletConfig();
-
-            if (sidebar != null)
-            {
-                request.setAttribute("dspace.layout.sidebar", sidebar);
-            }
 
             RequestDispatcher rd = config.getServletContext()
                     .getRequestDispatcher(footer);
