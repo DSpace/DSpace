@@ -79,12 +79,16 @@ public class FileIndexer implements IndexerInterface, SolrDocumentFields {
         if(integratedJournal!=null && integratedJournal.equals("true"))
             value+="*";
 
-        values.put(DOC_ID, Utils.getMD5(value));
-        values.put(DOC_SOURCE, SOURCE);
-        values.put(DOC_FIELD, "prism.publicationName");
-        values.put(DOC_DISPLAY_VALUE, value);
-        values.put(DOC_VALUE, value);
-        values.put(DOC_FULL_TEXT, value);
+	try {
+	    values.put(DOC_ID, Utils.getMD5(value));
+	    values.put(DOC_SOURCE, SOURCE);
+	    values.put(DOC_FIELD, "prism.publicationName");
+	    values.put(DOC_DISPLAY_VALUE, value);
+	    values.put(DOC_VALUE, value);
+	    values.put(DOC_FULL_TEXT, value);
+	} catch (Exception e) {
+	    throw new RuntimeException("unable to process journal " + value, e);
+	}
         return values;
     }
 
