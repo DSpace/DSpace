@@ -2,6 +2,7 @@ package org.dspace.app.xmlui.aspect.submission.submit;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.Message;
@@ -24,6 +25,7 @@ import org.dspace.paymentsystem.ShoppingCart;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.submit.bean.PublicationBean;
 import org.dspace.submit.model.ModelPublication;
+import org.dspace.workflow.WorkflowItem;
 import org.xml.sax.SAXException;
 import org.apache.log4j.Logger;
 
@@ -481,6 +483,34 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         Select countryList = countryItem.addSelect("country");
         countryList.addOption("","Select a fee-waiver country");
         String selectedCountry = request.getParameter("country");
+        if(selectedCountry==null)
+        {
+            try{
+            SubmissionInfo submissionInfo=(SubmissionInfo)request.getAttribute("dspace.submission.info");
+            org.dspace.content.Item item = null;
+            if(submissionInfo==null)
+            {
+                String workflowId = request.getParameter("workflowID");
+                if(workflowId==null) {
+                    // item is no longer in submission OR workflow, probably archived, so we don't need shopping cart info
+                    return;
+                }
+                WorkflowItem workflowItem = WorkflowItem.find(context,Integer.parseInt(workflowId));
+                item = workflowItem.getItem();
+            }
+            else
+            {
+                item = submissionInfo.getSubmissionItem().getItem();
+            }
+            ShoppingCart shoppingCart = ShoppingCart.findAllByItem(context,item.getID()).get(0);
+            if(shoppingCart!=null){
+                selectedCountry = shoppingCart.getCountry();
+            }
+            }catch (Exception e)
+            {
+
+            }
+        }
         for(String temp:countryArray){
             {
                 String[] countryTemp = temp.split(":");
