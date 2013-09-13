@@ -153,9 +153,9 @@
 
 <h1><fmt:message key="jsp.search.title"/></h1>
 
-<div class="discovery-search-form">
+<div class="discovery-search-form panel panel-default">
     <%-- Controls for a repeat search --%>
-	<div class="discovery-query">
+	<div class="discovery-query panel-heading">
     <form action="simple-search" method="get">
          <label for="tlocation">
          	<fmt:message key="jsp.search.results.searchin"/>
@@ -185,7 +185,7 @@
 %>                                </select><br/>
                                 <label for="query"><fmt:message key="jsp.search.results.searchfor"/></label>
                                 <input type="text" size="50" name="query" value="<%= (query==null ? "" : StringEscapeUtils.escapeHtml(query)) %>"/>
-                                <input type="submit" value="<fmt:message key="jsp.general.go"/>" />
+                                <input type="submit" class="btn btn-primary" value="<fmt:message key="jsp.general.go"/>" />
                                 <input type="hidden" value="<%= rpp %>" name="rpp" />
                                 <input type="hidden" value="<%= sortedBy %>" name="sort_by" />
                                 <input type="hidden" value="<%= order %>" name="order" />
@@ -228,7 +228,7 @@
 				%>
 				</select>
 				<input type="text" id="filter_value_<%=idx %>" name="filter_value_<%=idx %>" value="<%= StringEscapeUtils.escapeHtml(filter[2]) %>" size="45"/>
-				<input type="submit" id="submit_filter_remove_<%=idx %>" name="submit_filter_remove_<%=idx %>" value="X" />
+				<input class="btn btn-default" type="submit" id="submit_filter_remove_<%=idx %>" name="submit_filter_remove_<%=idx %>" value="X" />
 				<br/>
 				<%
 				idx++;
@@ -236,11 +236,13 @@
 		%>
 		</div>
 <% } %>
-<a href="<%= request.getContextPath()+"/simple-search" %>"><fmt:message key="jsp.search.general.new-search" /></a>	
+<a class="btn btn-default" href="<%= request.getContextPath()+"/simple-search" %>"><fmt:message key="jsp.search.general.new-search" /></a>	
 		</form>
 		</div>
 <% if (availableFilters.size() > 0) { %>
-		<div class="discovery-search-filters">
+		<div class="discovery-search-filters panel-body">
+		<h5><fmt:message key="jsp.search.filter.heading" /></h5>
+		<p class="discovery-search-filters-hint"><fmt:message key="jsp.search.filter.hint" /></p>
 		<form action="simple-search" method="get">
 		<input type="hidden" value="<%= StringEscapeUtils.escapeHtml(searchScope) %>" name="location" />
 		<input type="hidden" value="<%= StringEscapeUtils.escapeHtml(query) %>" name="query" />
@@ -257,8 +259,6 @@
 					idx++;
 				}
 		} %>
-		<span class="discovery-search-filters-heading"><fmt:message key="jsp.search.filter.heading" /></span>
-		<span class="discovery-search-filters-hint"><fmt:message key="jsp.search.filter.hint" /></span>
 		<select id="filtername" name="filtername">
 		<%
 			for (DiscoverySearchFilter searchFilter : availableFilters)
@@ -281,12 +281,12 @@
         <input type="hidden" value="<%= rpp %>" name="rpp" />
         <input type="hidden" value="<%= sortedBy %>" name="sort_by" />
         <input type="hidden" value="<%= order %>" name="order" />
-		<input type="submit" value="<fmt:message key="jsp.search.filter.add"/>" />
+		<input class="btn btn-default" type="submit" value="<fmt:message key="jsp.search.filter.add"/>" />
 		</form>
 		</div>        
 <% } %>
         <%-- Include a component for modifying sort by, order, results per page, and et-al limit --%>
-   <div class="discovery-pagination-controls">
+   <div class="discovery-pagination-controls panel-footer">
    <form action="simple-search" method="get">
    <input type="hidden" value="<%= StringEscapeUtils.escapeHtml(searchScope) %>" name="location" />
    <input type="hidden" value="<%= StringEscapeUtils.escapeHtml(query) %>" name="query" />
@@ -382,7 +382,7 @@
                }
 %>
            </select>
-           <input type="submit" name="submit_search" value="<fmt:message key="search.update" />" />
+           <input class="btn btn-default" type="submit" name="submit_search" value="<fmt:message key="search.update" />" />
 
 <%
     if (admin_button)
@@ -450,7 +450,7 @@ else if( qResults != null)
 
 %>
 <hr/>
-<div class="discovery-result-pagination row">
+<div class="discovery-result-pagination row container">
 <%
 	long lastHint = qResults.getStart()+qResults.getMaxResults() <= qResults.getTotalSearchResults()?
 	        qResults.getStart()+qResults.getMaxResults():qResults.getTotalSearchResults();
@@ -544,7 +544,7 @@ else if( qResults != null)
 <%-- if the result page is enought long... --%>
 <% if ((communities.length + collections.length + items.length) > 10) {%>
 <%-- show again the navigation info/links --%>
-<div class="discovery-result-pagination row">
+<div class="discovery-result-pagination row container">
     <%-- <p align="center">Results <//%=qResults.getStart()+1%>-<//%=qResults.getStart()+qResults.getHitHandles().size()%> of --%>
 	<div class="alert alert-info"><fmt:message key="jsp.search.results.results">
         <fmt:param><%=qResults.getStart()+1%></fmt:param>
