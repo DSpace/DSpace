@@ -111,6 +111,17 @@
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>subtype</dc-element>
+					<label>Especifique el tipo de Objeto de Aprendizaje (*)</label>
+					<input-type value-pairs-name="common_subtypes_objeto_de_aprendizaje">dropdown</input-type>
+					<hint>Seleccione el tipo de objeto de aprendizaje que desea cargar</hint>
+					<required>Debe seleccionar un subtipo de objeto de aprendizaje</required>
+					<visibility>workflow</visibility>
+					<type-bind>Objeto de aprendizaje</type-bind>
+				</field>
+				
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subtype</dc-element>
 					<label>Especifique el tipo de Objeto de Conferencia (*)</label>
 					<input-type value-pairs-name="common_subtypes_objeto_conferencia">dropdown</input-type>
 					<hint>Seleccione el tipo de objeto de conferencia que desea cargar</hint>
@@ -379,7 +390,6 @@
 					<input-type>onebox</input-type>
 					<hint>Institución donde el documento fue creado</hint>
 					<required>Debe seleccionar la institución de origen del documento</required>
-					<visibility>workflow</visibility>
 				</field>
 			<!-- Abstract -->
 				<field>
@@ -981,6 +991,10 @@
 				<stored-value>Objeto Fisico</stored-value>
 			</pair>
 			<pair>
+				<displayed-value>Objeto de aprendizaje</displayed-value>
+				<stored-value>Objeto de aprendizaje</stored-value>
+			</pair>
+			<pair>
 				<displayed-value>Objeto de conferencia</displayed-value>
 				<stored-value>Objeto de conferencia</stored-value>
 			</pair>
@@ -1083,6 +1097,17 @@
 			<pair>
 				<displayed-value>Instrumento musical</displayed-value>
 				<stored-value>Instrumento musical</stored-value>
+			</pair>
+		</value-pairs>
+		
+		<value-pairs value-pairs-name="common_subtypes_objeto_de_aprendizaje" dc-term="type">
+			<pair>
+				<displayed-value>- Seleccione un subtipo -</displayed-value>
+				<stored-value></stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Objeto de aprendizaje</displayed-value>
+				<stored-value>Objeto de aprendizaje</stored-value>
 			</pair>
 		</value-pairs>
 

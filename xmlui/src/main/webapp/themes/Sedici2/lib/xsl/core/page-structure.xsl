@@ -333,8 +333,7 @@
                         <xsl:text>  </xsl:text>
                     </xsl:when>
                     <xsl:otherwise>
-                    	<!-- Regular expresion for delete the html tags in &lt;title&gt; -->
-                        <xsl:copy-of select="java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.replaceRegex($page_title/node(),'&lt;(/|\w)*?&gt;','')" />
+                    	<xsl:copy-of select="$page_title/node()"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </title>
