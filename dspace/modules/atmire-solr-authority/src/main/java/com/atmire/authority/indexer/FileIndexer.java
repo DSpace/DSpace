@@ -35,9 +35,14 @@ public class FileIndexer implements IndexerInterface, SolrDocumentFields {
         Map<String, Map<String, String>> journalProperties = DryadJournalSubmissionUtils.journalProperties;
         Set<String> keys = journalProperties.keySet();
         for(String key :keys){
-            Map<String, String> props = journalProperties.get(key);
-
-            authorities.push(createHashMap(props));
+	    try {
+		if(key != null) {
+		    Map<String, String> props = journalProperties.get(key);
+		    authorities.push(createHashMap(props));
+		}
+	    } catch (Exception e) {
+		throw new RuntimeException("unable to process index for journal " + key, e);
+	    }
         }
 
     }
@@ -69,7 +74,7 @@ public class FileIndexer implements IndexerInterface, SolrDocumentFields {
     }
 
 
-    private Map<String, String> createHashMap(Map<String, String> props){
+    private Map<String, String> createHashMap(Map<String, String> props) throws Exception {
         Map<String, String> values = new HashMap <String, String>();
 
 
@@ -79,12 +84,12 @@ public class FileIndexer implements IndexerInterface, SolrDocumentFields {
         if(integratedJournal!=null && integratedJournal.equals("true"))
             value+="*";
 
-        values.put(DOC_ID, Utils.getMD5(value));
-        values.put(DOC_SOURCE, SOURCE);
-        values.put(DOC_FIELD, "prism.publicationName");
-        values.put(DOC_DISPLAY_VALUE, value);
-        values.put(DOC_VALUE, value);
-        values.put(DOC_FULL_TEXT, value);
+	    values.put(DOC_ID, Utils.getMD5(value));
+	    values.put(DOC_SOURCE, SOURCE);
+	    values.put(DOC_FIELD, "prism.publicationName");
+	    values.put(DOC_DISPLAY_VALUE, value);
+	    values.put(DOC_VALUE, value);
+	    values.put(DOC_FULL_TEXT, value);
         return values;
     }
 

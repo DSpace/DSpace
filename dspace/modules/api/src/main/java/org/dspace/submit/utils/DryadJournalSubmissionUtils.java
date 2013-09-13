@@ -63,7 +63,11 @@ public class DryadJournalSubmissionUtils {
                 map.put(SUBSCRIPTION_PAID, properties.getProperty(str + SUBSCRIPTION_PAID));
 
                 String key = properties.getProperty(str + FULLNAME);
-                journalProperties.put(key, map);
+		if(key == null) {
+		    log.error("Unable to find fullname property for journal " + str);
+		} else {
+		    journalProperties.put(key, map);
+		}
             }
 
         }catch (IOException e) {
