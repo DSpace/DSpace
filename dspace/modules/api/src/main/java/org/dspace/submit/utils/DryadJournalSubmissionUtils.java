@@ -63,7 +63,9 @@ public class DryadJournalSubmissionUtils {
                 map.put(SUBSCRIPTION_PAID, properties.getProperty(str + SUBSCRIPTION_PAID));
 
                 String key = properties.getProperty(str + FULLNAME);
+                if(key!=null&&key.length()>0){
                 journalProperties.put(key, map);
+                }
             }
 
         }catch (IOException e) {
