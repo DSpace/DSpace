@@ -328,12 +328,29 @@ function initFirstSubmissionForm() {
                 var journal = jQuery("#aspect_submission_StepTransformer_field_prism_publicationName").val();
 
 
+                var journal_integrated_length = jQuery("#aspect_submission_StepTransformer_field_journalIDStatusIntegrated option").length;
+                // alert(journal_integrated_length);
+                var integrated = false;
+
+                for (var i=0; i<journal_integrated_length; i++)
+                {
+                    var integrated = document.getElementById('aspect_submission_StepTransformer_field_journalIDStatusIntegrated').options[i].value;
+                    //alert(integrated);
+
+                    if(integrated == journal)
+                    {
+                        //alert('found');
+                        integrated = true;
+                        break;
+                    }
+                }
 
                 if(journal==""){
                     jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
                     jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
                 }
-                else if (journal.indexOf('*') != -1) {
+                //else if (journal.indexOf('*') != -1) {
+                else if(integrated == true){
                     jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").show();
                     jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
                 }

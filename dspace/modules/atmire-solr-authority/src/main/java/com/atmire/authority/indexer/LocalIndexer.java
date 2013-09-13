@@ -120,6 +120,8 @@ public class LocalIndexer implements com.atmire.authority.indexer.IndexerInterfa
     public Map<String, String> createHashMap(String fieldName, String value){
         Map<String, String> values = new HashMap <String, String>();
 
+        String no_asterisk_value = value;
+
         if(haveToAddAsterisk(value)){
             value+="*";
         }
@@ -127,8 +129,8 @@ public class LocalIndexer implements com.atmire.authority.indexer.IndexerInterfa
         values.put(DOC_ID, Utils.getMD5(value));
         values.put(DOC_SOURCE, SOURCE);
         values.put(DOC_FIELD, fieldName);
-        values.put(DOC_DISPLAY_VALUE, value);
-        values.put(DOC_VALUE, value);
+        values.put(DOC_DISPLAY_VALUE, no_asterisk_value);
+        values.put(DOC_VALUE, no_asterisk_value);
         values.put(DOC_FULL_TEXT, value);
         return values;
     }
