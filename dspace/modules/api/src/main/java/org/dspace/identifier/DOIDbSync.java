@@ -121,7 +121,12 @@ public class DOIDbSync {
 
     private static boolean resolve(Context context, Item item, DOIIdentifierProvider dis, PrintStream ps, String dc_identifier) throws IOException, IdentifierNotFoundException, IdentifierNotResolvableException {
 
-        DSpaceObject dso = dis.resolve(context, dc_identifier);
+        DSpaceObject dso = null;
+        try {
+            dso = dis.resolve(context, dc_identifier);
+        } catch (Exception ex) {
+            // Not found
+        }
         if(dso!=null){
             ps.print("Item: " + item.getID() + "  " + dc_identifier + "  " + item.getHandle() + " Resolved.");
             ps.println();
@@ -152,7 +157,12 @@ public class DOIDbSync {
 
         if(item.getHandle()!=null){
             String url= HandleManager.resolveToURL(context, item.getHandle()).toString();
-            String doi_id = dis.lookupByURL(url);
+            String doi_id = null;
+            try {
+                doi_id = dis.lookupByURL(url);
+            } catch (RuntimeException ex) {
+
+            }
             if(doi_id!=null && !"".equals(doi_id)){
                 ps.print("ATTENTION! For this handle we have registered the following DOI: " + doi_id);
                 ps.println();
