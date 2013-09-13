@@ -83,7 +83,11 @@ public class PaypalReturnStep extends AbstractStep {
                                      //authorization
                                     shoppingCart.setStatus(ShoppingCart.STATUS_VERIFIED);
                                  }
-                                else
+				 else if ("4".equals(result)) {
+				     //authorization, but paypal isn't supporting our zero-dollar transaction
+                                    shoppingCart.setStatus(ShoppingCart.STATUS_VERIFIED);
+				 }
+				 else
                                  {
                                      shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
                                  }
