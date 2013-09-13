@@ -137,8 +137,8 @@
 </header>
 
 <main id="content" role="main" style="padding-bottom:50px;">
-<div class="row banner">
-	<div class="container">
+<div class="container banner">
+	<div class="row">
 		<div class="col-md-9 brand">
 		<h1>DSpace <small>JSPUI</small></h1>
         <h4>DSpace preserves and enables easy and open access to all types of digital content including text, images, moving images, mpegs and data sets</h4>
