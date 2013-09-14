@@ -74,10 +74,9 @@
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
 <dspace:layout locbar="commLink" title="<%= name %>" feedData="<%= feedData %>">
-
-  <table border="0" cellpadding="5" width="100%">
-    <tr>
-      <td width="100%">
+  <div class="container">
+	<div class="row">
+	<div class="col-md-9">
         <h1><%= name %>
         <%
             if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
@@ -89,24 +88,18 @@
 %>
         </h1>
 		<h3><fmt:message key="jsp.community-home.heading1"/></h3>
-      </td>
-      <td valign="top">
+	</div>
 <%  if (logo != null) { %>
-        <img alt="Logo" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" /> 
-<% } %></td>
-    </tr>
-  </table>
+        <div class="col-md-3">
+        	<img style="max-width: 100%;" alt="Logo" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" />
+        </div> 
+<% } %>
+	</div>
+  </div>
 
 
   <%-- Search/Browse --%>
-  
-    <table class="miscTable" align="center" summary="This table allows you to search through all communities held in the repository">
-      <tr>
-        <td class="evenRowEvenCol" colspan="2">
         <form method="get" action="">
-          <table>
-            <tr>
-              <td class="standard" align="center">
                 <small><label for="tlocation"><strong><fmt:message key="jsp.general.location"/></strong></label></small>&nbsp;<select name="location" id="tlocation"> 
 				 <option value="/"><fmt:message key="jsp.general.genericScope"/></option>
                  <option selected="selected" value="<%= community.getHandle() %>"><%= name %></option>
@@ -126,20 +119,8 @@
 <%
     }
 %>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td class="standard" align="center">
                 <small><label for="tquery"><strong><fmt:message key="jsp.general.searchfor"/>&nbsp;</strong></label></small><input type="text" name="query" id="tquery" />&nbsp;<input type="submit" name="submit_search" value="<fmt:message key="jsp.general.go"/>" /> 
-			  </td>
-            </tr>
-            </table>
             </form>
-            </td>
-            </tr>
-            <tr>
-              <td align="center" class="standard" valign="middle">
                 <small><fmt:message key="jsp.general.orbrowse"/>&nbsp;</small>
    				<%-- Insert the dynamic list of browse options --%>
 <%
@@ -157,12 +138,9 @@
 <%	
 	}
 %>
-			  </td>
-            </tr>
-          </table>
-    
-  <%= intro %>
-
+<% if (StringUtils.isNotBlank(intro)) { %>
+  <div class="jumbotron"><%= intro %></div>
+<% } %>
 <%
     if (collections.length != 0)
     {
