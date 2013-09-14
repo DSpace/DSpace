@@ -663,7 +663,7 @@ input.ds-password-field {
 .submission .ds-form-list input.ds-text-field,
 .administrative .ds-form-list input.ds-text-field,
 textarea.ds-textarea-field {
-    width: 500px;
+    width: 400px;
 }
 
 table textarea.ds-textarea-field {

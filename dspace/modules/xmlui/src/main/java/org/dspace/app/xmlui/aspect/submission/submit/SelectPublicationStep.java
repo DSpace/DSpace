@@ -348,8 +348,8 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         for (int i = 0; i < journalVals.size(); i++){
             String val =  journalVals.get(i);
             String name =  journalNames.get(i);
-            if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(val))
-                name += "*";
+//            if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(val))
+//                name += "*";
 
             // add only journal with allowReviewWorkflow=true;
             if(org.dspace.submit.step.SelectPublicationStep.allowReviewWorkflowJournals.contains(val))
