@@ -89,7 +89,7 @@
              <ul class="dropdown-menu">
                <li><a href="<%= request.getContextPath() %>/community-list"><fmt:message key="jsp.layout.navbar-default.communities-collections"/></a></li>
 				<li class="divider"></li>
-				<li class="dropdown-header">Nav header</li>
+				<li class="dropdown-header">Browse Items by:</li>
 				<%-- Insert the dynamic browse indices here --%>
 				
 				<%
