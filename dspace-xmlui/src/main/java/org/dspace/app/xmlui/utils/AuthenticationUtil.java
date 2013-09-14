@@ -306,7 +306,7 @@ public class AuthenticationUtil
     throws SQLException, AuthorizeException
     {
     	// Only allow loginAs if the administrator has allowed it.
-    	if (!ConfigurationManager.getBooleanProperty("xmlui.user.assumelogin", false))
+    	if (!ConfigurationManager.getBooleanProperty("webui.user.assumelogin", false))
         {
             return;
         }
