@@ -132,7 +132,29 @@ jQuery(document).ready(function() {
 
 /* JS behaviors for Home page only */
 jQuery(document).ready(function() {
-    // main carousel at top of homepage
+    // Show any slides that should be public, based on the publication date for each.
+    // By default, this is based on today's date. Upcoming slides can be previewed using the browser's query-string:
+    //   EXAMPLE: http://www.datadryad.org/?date=2013-06-02
+    // NOTE that the date is in the format YEAR-MONTH-DAY, to the date above is June 2, 2013
+    var displayDate = $.datepicker.formatDate('yy-mm-dd', new Date());   // "2013-09-13"
+        // this default behavior depends on jQuery UI's datepicker script
+    var qsTest = window.location.search.split('?');
+    if ((qsTest.length === 2) && (qsTest[1].indexOf('date=') === 0)) {
+        // replace today's date with the one specified
+        displayDate = qsTest[1].split('=')[1];
+    }
+    // show any slides that have a publication date of today or earlier
+    jQuery('#dryad-home-carousel div.bxslider div').each( function() {
+        var $slide = jQuery(this);
+        var itsPubDate = $slide.find('.publication-date').text();
+        if ((itsPubDate !== '') && (displayDate >= itsPubDate)) {
+            $slide.show();
+        } else {
+            $slide.remove();
+        }
+    });
+
+    // activate main carousel at top of homepage
     jQuery('#dryad-home-carousel .bxslider').bxSlider({
         auto: true,
         autoHover: true,

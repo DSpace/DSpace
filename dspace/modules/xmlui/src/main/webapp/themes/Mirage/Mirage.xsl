@@ -163,6 +163,8 @@
                 height: 190px;
                 padding: 0;
                 margin: 0;
+                position: relative;
+                display: none;
             }
 
             #dryad-home-carousel div.bxslider div > a > img,
@@ -170,6 +172,10 @@
                 display: block;
                 height: 194px;
                 width: 627px;
+            }
+
+            #dryad-home-carousel div.bxslider div .publication-date {
+                display: none;
             }
 
             #dryad-home-carousel div.bxslider div p {
@@ -230,8 +236,9 @@
             <!-- CAROUSEL -->
             <div class="home-col-1">
                 <div id="dryad-home-carousel" class="ds-static-div primary">
+                    <!-- REMINDER: slide publication dates are in the format YEAR-MONTH-DAY, eg, 2013-12-28 -->
                     <div class="bxslider" style="">
-                        <div style="position: relative;">
+                        <div><span class="publication-date">2013-03-01</span>
                             <a href="/pages/pricing">
                                 <img alt="" src="/themes/Mirage/images/watering-can.png" />
                                 <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);"> 
@@ -240,7 +247,7 @@
                                 <p style="drop-shadow: 4px 4px; position: absolute; right: 40px; bottom: 80px; font-size: 70%; text-align: right; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Learn More &#187;</p>
                             </a>
                         </div>
-                        <div>
+                        <div><span class="publication-date">2013-02-01</span>
                             <p Xid="ds-dryad-is" style="font-size: 88%; line-height: 1.35em;"
                                xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
                                 <span style="color: #595;">DataDryad.org</span>
@@ -253,7 +260,7 @@
                                 for a growing list of journals; submission of data from other publications is also welcome.
                             </p>
                         </div>
-                        <div>
+                        <div><span class="publication-date">2013-01-01</span>
                             <a href="/pages/repository#keyFeatures">
                                 <img src="/themes/Mirage/images/bookmarkSubmissionProcess.png" alt="Desosit data. Get permanent identifier. Watch your citations grow! Relax, your data are discoverable and secure." />
                            </a>
