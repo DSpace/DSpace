@@ -336,7 +336,10 @@ public class EPersonAdminServlet extends DSpaceServlet
                             "/dspace-admin/eperson-loginas-error.jsp");
                     return;
                 }
-                                
+                               
+                // store a reference to the authenticated admin
+                session.setAttribute("dspace.previous.user.id", authenticatedID);
+                
                 // Logged in OK.
                 Authenticate.loggedIn(context, request, e);
 
