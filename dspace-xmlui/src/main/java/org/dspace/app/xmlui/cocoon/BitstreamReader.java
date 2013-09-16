@@ -570,7 +570,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 {
                         // do nothing
                 }
-                response.setHeader("Content-Disposition", "attachment;filename=" + name);
+                response.setHeader("Content-Disposition", "attachment;filename=" + '"' + name + '"');
         }
 
         ByteRange byteRange = null;
