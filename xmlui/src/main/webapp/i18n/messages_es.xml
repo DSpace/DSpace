@@ -388,7 +388,7 @@
 <message key="xmlui.EPerson.EditProfile.update_password_instructions">Opcionalmente, puede elegir una contraseña nueva tecleándola en la casilla superior y verificarla en la segunda casilla. Debería tener al menos seis caracteres.</message>
 <message key="xmlui.EPerson.EditProfile.create_password_instructions">Por favor, elija una clave y tecléela en la casilla superior. Confírmela volviendo a teclearla en la segunda caja. Debería tener al menos seis caracteres.</message>
 <message key="xmlui.EPerson.EditProfile.password">Contraseña</message>
-<message key="xmlui.EPerson.EditProfile.confirm_password">Confirmación</message>
+<message key="xmlui.EPerson.EditProfile.confirm_password">Confirmar contraseña</message>
 <message key="xmlui.EPerson.EditProfile.submit_update">Registro completo</message>
 <message key="xmlui.EPerson.EditProfile.submit_create">Modificar perfil</message>
 <message key="xmlui.EPerson.EditProfile.error_required">Este campo es obligatorio</message>
