@@ -1,19 +1,15 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.dspace.curate;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 
+
 /**
  *
- * @author dan
+ * @author Dan Leehr (dan.leehr@nescent.org)
+ *
  */
 public class DataPackagesWithInsufficientMetadata extends ItemsWithInsufficientMetadata {
 
