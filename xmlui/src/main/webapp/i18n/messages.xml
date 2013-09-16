@@ -2185,6 +2185,11 @@
 <message key="xmlui.dri2xhtml.METS-1.0.item-lang-es">In Spanish</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-lang-en">In English</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-lang-pt">In Portuguese</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-lang-de">In German</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-lang-it">In Italian</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-lang-fr">In French</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-lang-other">Another language</message>
+
 <message key="xmlui.dri2xhtml.METS-1.0.embargoed-document">Embargoed document</message>
 <message key="xmlui.dri2xhtml.METS-1.0.embargoed-document-description">This document can not be accesioned because it has embargo until:</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-is-peer-review">Peer reviewed document</message>
