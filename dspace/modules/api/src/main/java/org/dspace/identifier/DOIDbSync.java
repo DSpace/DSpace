@@ -13,6 +13,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
+import org.dspace.doi.DOIDatabase;
+import org.dspace.doi.Minter;
 
 /**
  * Created by IntelliJ IDEA.
@@ -207,13 +209,11 @@ public class DOIDbSync {
         }
 
         if(doi_!=null && !isTest){
-            String urlString = ConfigurationManager.getProperty("doi.service.url") + "?item=" + doi_.getTargetURL().toString() + "&doi=" + doi_.toString();
-            ps.println("Servlet invocation: " + urlString);
-            if(ps!=null){
-                ps.println("Servlet response: " + getUrlResponse(urlString));
-                ps.println();
-            }
+            Minter myMinter = new Minter();
+            myMinter.setMyLocalDatabase(DOIDatabase.getInstance());
+            myMinter.mintDOI(doi_);
         }
+
         return doi_;
     }
 
