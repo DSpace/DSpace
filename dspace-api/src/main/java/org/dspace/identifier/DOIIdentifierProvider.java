@@ -335,7 +335,7 @@ public class DOIIdentifierProvider
         TableRow doiRow = null;
         try
         {
-            doiRow = DatabaseManager.findByUnique(context, "Doi", "doi", doi);
+            doiRow = DatabaseManager.findByUnique(context, "Doi", "doi", doi.substring(DOI.SCHEME.length()));
         }
         catch (SQLException sqle)
         {
@@ -492,7 +492,7 @@ public class DOIIdentifierProvider
         
         try
         {
-            doiRow = DatabaseManager.findByUnique(context, "Doi", "doi", doi);
+            doiRow = DatabaseManager.findByUnique(context, "Doi", "doi", doi.substring(DOI.SCHEME.length()));
         }
         catch (SQLException sqle)
         {

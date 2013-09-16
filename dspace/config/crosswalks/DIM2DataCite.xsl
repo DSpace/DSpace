@@ -248,14 +248,14 @@
         Adds contributor and contributorType information
     -->
     <xsl:template match="//dspace:field[@mdschema='dc' and @element='contributor'][not(@qualifier='author')]">
-        <xsl:element name="contributor">
-            <xsl:if test="@qualifier='editor'">
+        <xsl:if test="@qualifier='editor'"> 
+            <xsl:element name="contributor">
                 <xsl:attribute name="contributorType">Editor</xsl:attribute>
-            </xsl:if>
-            <contributorName>
-                <xsl:value-of select="." />
-            </contributorName>
-        </xsl:element>
+                <contributorName>
+                    <xsl:value-of select="." />
+                </contributorName>
+            </xsl:element>
+        </xsl:if>
     </xsl:template>
 
     <!-- 
