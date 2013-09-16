@@ -118,7 +118,7 @@ public class AccessStep extends AbstractSubmissionStep
         asu.addReason(request.getParameter("reason"), form, errorFlag);
 
         // Add Policy Button
-        boolean isAdvancedFormEnabled=ConfigurationManager.getBooleanProperty("xmlui.submission.restrictstep.enableAdvancedForm", false);
+        boolean isAdvancedFormEnabled=ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
         if(isAdvancedFormEnabled){
             Button addPolicy = form.addItem().addButton(org.dspace.submit.step.AccessStep.FORM_ACCESS_BUTTON_ADD);
             addPolicy.setValue(T_submit_add_policy);

@@ -42,7 +42,7 @@ public class JSPAccessStep extends JSPStep
     private static final String EDIT_POLICY_JSP = "/submit/edit-policy.jsp";
 
     /** is AdvancedEmbargo enabled? */
-    private static final boolean advanced = ConfigurationManager.getBooleanProperty("xmlui.submission.restrictstep.enableAdvancedForm", false);
+    private static final boolean advanced = ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
     
     /**
      * Do any pre-processing to determine which JSP (if any) is used to generate

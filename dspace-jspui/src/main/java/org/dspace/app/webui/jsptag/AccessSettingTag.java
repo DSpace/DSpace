@@ -40,10 +40,10 @@ public class AccessSettingTag extends TagSupport
     private static Logger log = Logger.getLogger(AccessSettingTag.class);
 
     /** is advanced form enabled? */
-    private static final boolean advanced = ConfigurationManager.getBooleanProperty("xmlui.submission.restrictstep.enableAdvancedForm", false);
+    private static final boolean advanced = ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
 
     /** Name of the restricted group */
-    private static final String restrictedGroup = ConfigurationManager.getProperty("xmlui.submission.restrictstep.groups");
+    private static final String restrictedGroup = ConfigurationManager.getProperty("webui.submission.restrictstep.groups");
 
     /** the SubmittionInfo */
     private transient SubmissionInfo subInfo = null;
