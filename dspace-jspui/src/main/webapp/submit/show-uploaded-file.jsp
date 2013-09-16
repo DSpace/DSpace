@@ -26,13 +26,19 @@
     
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
+<%@ page import="java.util.List" %>
+<%@ page import="org.apache.commons.lang.time.DateFormatUtils" %>
+<%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
+<%@ page import="org.dspace.authorize.AuthorizeManager" %>
+<%@ page import="org.dspace.authorize.ResourcePolicy" %>
 <%@ page import="org.dspace.submit.AbstractProcessingStep" %>
 <%@ page import="org.dspace.app.util.SubmissionInfo" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.BitstreamFormat" %>
+<%@ page import="org.dspace.content.Item" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -52,6 +58,8 @@
     Bitstream[] all = subInfo.getSubmissionItem().getItem().getNonInternalBitstreams();
     Bitstream bitstream = all[0];
     BitstreamFormat format = bitstream.getFormat();
+
+    boolean withEmbargo = ((Boolean)request.getAttribute("with_embargo")).booleanValue();
 %>
 
 
@@ -145,12 +153,24 @@
         </table>
 
         <center>
-
             <p>
                <%--  <input type="submit" name="submit_format_<%= bitstream.getID() %>" value="Click here if this is the wrong format" /> --%>
 			    <input type="submit" name="submit_format_<%= bitstream.getID() %>" value="<fmt:message key="jsp.submit.show-uploaded-file.click1.button"/>" />
             </p>
         </center>
+
+<%
+    if (withEmbargo)
+    {
+%>
+        <center>
+            <p>
+                <input type="submit" name="submit_editPolicy_<%= bitstream.getID() %>" value="<fmt:message key="jsp.submit.show-uploaded-file.click3.button"/>" />
+            </p>
+        </center>
+<%
+    }
+%>
 
         <center>
             <p>
