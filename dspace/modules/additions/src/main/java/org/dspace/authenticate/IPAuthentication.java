@@ -192,7 +192,7 @@ public class IPAuthentication implements AuthenticationMethod
 	            {
 	            	
 	            	log.warn("Xforwrded entry " + xfip);
-	                if(!xfip.equals("10.0.0.65") && !request.getHeader("X-Forwarded-For").contains(addr))
+	                if(!xfip.equals("10.0.1.11") && !request.getHeader("X-Forwarded-For").contains(addr))
 	                {
 	                    addr = xfip.trim();
 	                    log.warn("Xforwrded addres " + addr);
