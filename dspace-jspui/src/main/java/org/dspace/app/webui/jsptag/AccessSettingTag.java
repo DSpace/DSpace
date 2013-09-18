@@ -51,7 +51,7 @@ public class AccessSettingTag extends TagSupport
     /** the target DSpaceObject */
     private transient DSpaceObject dso = null;
 
-    /** the target DSpaceObject */
+    /** the target ResourcePolicy */
     private transient ResourcePolicy rp = null;
 
     /** disable the radio button for open/embargo access */
@@ -92,7 +92,7 @@ public class AccessSettingTag extends TagSupport
     
             // get startDate and reason of the resource policy of the target DSpaceObject
             List<ResourcePolicy> policies = null;
-            if (dso != null)
+            if (!advanced && dso != null)
             {
                 policies = AuthorizeManager.findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM);
             }
