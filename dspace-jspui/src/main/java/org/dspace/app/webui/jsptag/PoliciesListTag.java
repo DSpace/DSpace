@@ -7,25 +7,21 @@
  */
 package org.dspace.app.webui.jsptag;
 
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.log4j.Logger;
-import org.dspace.app.webui.util.UIUtil;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.eperson.Group;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
+
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.log4j.Logger;
+import org.dspace.app.webui.util.UIUtil;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.core.Context;
 
 /**
  * Tag to display embargo settings
@@ -70,7 +66,7 @@ public class PoliciesListTag extends TagSupport
             sb.append("<th class=\"accessHeadEven\">").append(label_action).append("</th>\n");
             sb.append("<th class=\"accessHeadOdd\">").append(label_group).append("</th>\n");
             sb.append("<th class=\"accessHeadEven\">").append(label_sdate).append("</th>\n");
-            sb.append("<th class=\"accessHeadOdd\">").append(label_sdate).append("</th>\n");
+            sb.append("<th class=\"accessHeadOdd\">").append(label_edate).append("</th>\n");
             sb.append("<th class=\"accessButton\">&nbsp;</th>\n");
             sb.append("</tr>\n");
 
