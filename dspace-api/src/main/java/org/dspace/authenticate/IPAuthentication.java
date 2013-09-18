@@ -165,7 +165,7 @@ public class IPAuthentication implements AuthenticationMethod
         return true;
     }
 
-    public int[] getSpecialGroups(Context context, HttpServletRequest request)
+	public int[] getSpecialGroups(Context context, HttpServletRequest request)
             throws SQLException
     {
         if (request == null)
@@ -181,14 +181,26 @@ public class IPAuthentication implements AuthenticationMethod
         }
         if (useProxies && request.getHeader("X-Forwarded-For") != null)
         {
-            /* This header is a comma delimited list */
-            for(String xfip : request.getHeader("X-Forwarded-For").split(","))
-            {
-                if(!request.getHeader("X-Forwarded-For").contains(addr))
-                {
-                    addr = xfip.trim();
-                }
-            }
+            
+        	// DS-1654 : check proxy X-Forwarded-For list
+        	Enumeration<String> e=request.getHeaders("X-Forwarded-For");
+        	
+        	/* header is a comma delimited list: NO!?  */
+        	while(e.hasMoreElements()) {
+        		String xf=e.nextElement();
+        		for(String xfip : xf.split(","))
+	            {
+	            	
+	            	log.warn("Xforwrded entry " + xfip);
+	                if(!xfip.equals( ConfigurationManager.getProperty("authentication-ip","load-balancer") ) && !request.getHeader("X-Forwarded-For").contains(addr))
+	                {
+	                    addr = xfip.trim();
+	                    log.warn("Xforwrded addres " + addr);
+	                }
+	            }
+        	}
+            
+        	// DS-1654 : END
         }
 
         for (IPMatcher ipm : ipMatchers)
