@@ -1,5 +1,6 @@
 package org.dspace.rest;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -14,6 +15,7 @@ http://localhost:8080/<webapp>/helloworld
  */
 @Path("/")
 public class RestIndex {
+    @javax.ws.rs.core.Context ServletContext servletContext;
 
     /*
     The "GET" annotation indicates this method will respond to HTTP Get requests.
@@ -25,8 +27,8 @@ public class RestIndex {
         return "<html><title>DSpace REST</title>" +
                 "<body><h1>DSpace REST API</h1>" +
                 "<ul>" +
-                "<li>/collections</li>" +
-                "<li>/communities</li>" +
+                "<li><a href='" + servletContext.getContextPath() + "/collections'>/collections</a></li>" +
+                "<li><a href='" + servletContext.getContextPath() + "/communities'>/communities</a></li>" +
                 "</ul>" +
                 "</body></html> ";
     }

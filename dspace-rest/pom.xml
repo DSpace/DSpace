@@ -44,6 +44,11 @@
             <artifactId>postgresql</artifactId>
             <version>9.0-801.jdbc3</version>
         </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
