@@ -71,7 +71,7 @@ public class DCInput
     
     // DS-XXXX: added for new Attributes :MaxLength
     private Map<String, String> fieldMap = null;
-    // DS-XXXX: added for new Attributes :MaxLength -END
+    // DS-XXXX: added for new Attributes :MaxLength - END
     
 
     /** 
