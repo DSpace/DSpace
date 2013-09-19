@@ -5,6 +5,7 @@ import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.Context;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +18,7 @@ import java.util.List;
  * Time: 9:41 AM
  * To change this template use File | Settings | File Templates.
  */
-@XmlRootElement
+@XmlRootElement(name = "collection")
 public class Collection {
     //Internal value
     private Integer collectionID;
@@ -33,10 +34,9 @@ public class Collection {
 
     private List<String> expand = new ArrayList<String>();
 
-    //Internal metadata
-    private String name;
-    private String handle;
-    private String license;
+    @XmlElement(name = "metadata", required = true)
+    private CollectionMetadata metadata;
+
 
     //Calculated
     private Integer numberItems;
@@ -59,7 +59,8 @@ public class Collection {
             setup(collection, expand);
 
         } catch (Exception e) {
-            this.setName(e.getMessage());
+            //TODO Handle exceptions
+            //throw e;
 
         }
     }
@@ -70,11 +71,12 @@ public class Collection {
             expandFields = Arrays.asList(expand.split(","));
         }
 
+        metadata = new CollectionMetadata();
 
         try {
             this.setCollectionID(collection.getID());
-            this.setName(collection.getName());
-            this.setHandle(collection.getHandle());
+            metadata.setName(collection.getName());
+            metadata.setHandle(collection.getHandle());
 
             if(expandFields.contains("parentCommunityIDList")) {
                 Community[] parentCommunities = collection.getCommunities();
@@ -102,11 +104,16 @@ public class Collection {
                 this.addExpand("itemIDList");
             }
 
+            if(expandFields.contains("license")) {
+                metadata.setLicense(collection.getLicense());
+            } else {
+                this.addExpand("license");
+            }
+
             if(collection.getLogo() != null) {
                 this.setLogoID(collection.getLogo().getID());
             }
 
-            this.setLicense(collection.getLicense());
             this.setNumberItems(collection.countItems());
             //collection.getMetadata()
         } catch (Exception e) {
@@ -114,13 +121,6 @@ public class Collection {
         }
 
     }
-
-    //metadata                                                                         s
-    //String provenance_description;
-    //String short_description;
-    //String introductory_text;
-    //String copyright_text;
-    //String side_bar_text;
 
     public Integer getCollectionID() {
         return collectionID;
@@ -130,36 +130,12 @@ public class Collection {
         this.collectionID = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getHandle() {
-        return handle;
-    }
-
-    public void setHandle(String handle) {
-        this.handle = handle;
-    }
-
     public Integer getLogoID() {
         return logoID;
     }
 
     public void setLogoID(Integer logoID) {
         this.logoID = logoID;
-    }
-
-    public String getLicense() {
-        return license;
-    }
-
-    public void setLicense(String license) {
-        this.license = license;
     }
 
     public Integer getNumberItems() {
@@ -214,4 +190,6 @@ public class Collection {
     public void addExpand(String expandableAttribute) {
         this.expand.add(expandableAttribute);
     }
+
+
 }
