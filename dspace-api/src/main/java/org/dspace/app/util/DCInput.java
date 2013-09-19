@@ -69,9 +69,9 @@ public class DCInput
     private List<String> typeBind = null;
     
     
-    // DS-XXXX: added for new Attributes :MaxLength
+    // DS-XXXX: added for new Attributes : MaxLength
     private Map<String, String> fieldMap = null;
-    // DS-XXXX: added for new Attributes :MaxLength - END
+    // DS-XXXX: added for new Attributes : MaxLength - END
     
 
     /** 

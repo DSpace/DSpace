@@ -52,6 +52,7 @@
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.core.Utils" %>
 
+
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%
@@ -584,7 +585,7 @@
 
     void doTextArea(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean readonly,
-      int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary, int collectionID)
+      int fieldCountIncr, String maxSize, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary, int collectionID)
       throws java.io.IOException
     {
 
@@ -617,13 +618,26 @@
            val = "";
             auth = "";
          }
+         
+      
+         
+         
          sb.append("<td colspan=\"2\">\n");
          String fieldNameIdx = fieldName + ((repeatable && i != fieldCount-1)?"_" + (i+1):"");
          StringBuffer inputBlock = new StringBuffer().append("<textarea name=\"").append(fieldNameIdx)
            .append("\" rows=\"4\" cols=\"45\" id=\"")
            .append(fieldNameIdx).append("_id\" ")
-           .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" disabled=\"disabled\" ":"")
-           .append(">")
+           .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" disabled=\"disabled\" ":"");
+        
+      // DS-1656: set maxlength 
+        if(maxSize!=null) {
+      	 inputBlock.append (" maxlength=\"")
+     	   .append(maxSize).append ("\" ");
+        	        
+        }
+      // DS-1656: set maxlength -  END
+       
+         inputBlock.append(">")
            .append(val)
            .append("</textarea>\n")
            .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly));
@@ -664,9 +678,78 @@
       out.write(sb.toString());
     }
 
-    void doOneBox(javax.servlet.jsp.JspWriter out, Item item,
+// DS-1656: add Constant
+   
+     
+
+
+ void doConstant(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean readonly,
       int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary, int collectionID)
+      throws java.io.IOException
+    {
+
+      DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
+      int fieldCount = defaults.length + fieldCountIncr;
+      StringBuffer sb = new StringBuffer();
+      String val, auth;
+      int conf= 0;
+
+      if (fieldCount == 0)
+         fieldCount = 1;
+
+        for (int i = 0; i < fieldCount; i++)
+        {
+           if (i == 0)
+              sb.append("<tr><td class=\"submitFormLabel\">")
+                .append(label)
+                .append("</td>");
+           else
+              sb.append("<tr><td>&nbsp;</td>");
+         
+           if (i < defaults.length)
+           {
+             val = defaults[i].value.replaceAll("\"", "&quot;");
+             auth = defaults[i].authority;
+             conf = defaults[i].confidence;
+           }
+           else
+           {
+             val = "";
+             auth = "";
+             conf= unknownConfidence;
+           }
+
+           sb.append("<td colspan=\"2\">");
+           String fieldNameIdx = fieldName + ((repeatable && i != fieldCount-1)?"_" + (i+1):"");
+           StringBuffer inputBlock = new StringBuffer("<input readonly type=\"text\" name=\"")
+             .append(fieldNameIdx)
+             .append("\" id=\"")
+             .append(fieldNameIdx).append("\" size=\"50\" value=\"")
+             .append(val +"\"")
+             .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
+             .append("/>")
+             .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly))
+             .append("\n");
+           sb.append(doAuthority(pageContext, fieldName, i,  fieldCount,
+                              fieldName, auth, conf, false, repeatable,
+                              defaults, inputBlock, collectionID))
+             .append("</td>\n");
+
+        }
+
+      out.write(sb.toString());
+    }
+       
+ // DS-1656: add costant - END
+
+
+
+
+
+    void doOneBox(javax.servlet.jsp.JspWriter out, Item item,
+      String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean readonly,
+      int fieldCountIncr, String maxSize, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary, int collectionID)
       throws java.io.IOException
     {
 
@@ -708,8 +791,17 @@
              .append("\" id=\"")
              .append(fieldNameIdx).append("\" size=\"50\" value=\"")
              .append(val +"\"")
-             .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
-             .append("/>")
+             .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"");
+             
+       // DS-1656: set maxlength 
+        if(maxSize!=null) {
+      	 inputBlock.append (" maxlength=\"")
+     	   .append(maxSize).append ("\" ");
+        	        
+        }
+       // DS-1656: set maxlength - END
+             
+             inputBlock.append("/>")
              .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly))
              .append("\n");
            sb.append(doAuthority(pageContext, fieldName, i,  fieldCount,
@@ -1285,6 +1377,7 @@
        String dcQualifier = inputs[z].getQualifier();
        String dcSchema = inputs[z].getSchema();
        
+       
        String fieldName;
        int fieldCountIncr;
        boolean repeatable;
@@ -1367,9 +1460,14 @@
        }
        else if (inputType.equals("textarea"))
        {
+    	    //DS-1656: for maxlength
+    	   String maxSize = inputs[z].getFieldMap().get("max-length");
+    	 
                    doTextArea(out, item, fieldName, dcSchema, dcElement, dcQualifier,
-                                  repeatable, readonly, fieldCountIncr, label, pageContext, vocabulary,
+                                  repeatable, readonly, fieldCountIncr, maxSize, label, pageContext, vocabulary,
                                   closedVocabulary, collectionID);
+       
+       
        }
        else if (inputType.equals("dropdown"))
        {
@@ -1387,10 +1485,23 @@
           doList(out, item, fieldName, dcSchema, dcElement, dcQualifier,
                         repeatable, readonly, inputs[z].getPairs(), label);
        }
+      
+       // DS-1656: for constant
+       
+       else if (inputType.equals("constant"))
+       {
+                      doConstant(out, item, fieldName, dcSchema, dcElement, dcQualifier,
+                                 repeatable, readonly, fieldCountIncr, label, pageContext, vocabulary,
+                                 closedVocabulary, collectionID);
+       }
+      // DS-1656: for constant - end
        else
        {
+    	   //DS-1656: for MaxLength
+    	   String maxSize = inputs[z].getFieldMap().get("max-length");
+    	   
                         doOneBox(out, item, fieldName, dcSchema, dcElement, dcQualifier,
-                                 repeatable, readonly, fieldCountIncr, label, pageContext, vocabulary,
+                                 repeatable, readonly, fieldCountIncr, maxSize, label, pageContext, vocabulary,
                                  closedVocabulary, collectionID);
        }
        
