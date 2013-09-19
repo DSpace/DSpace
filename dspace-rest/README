@@ -2,15 +2,31 @@ A RESTful web services API for DSpace.
 
 Built on JERSEY
 
+A work in progress by Peter Dietz.
+
 mvn clean package
-Deploy /target/rest.war to tomcat.
+#If you run into an issue with Maven, try manually importing the Jar/War.
+mvn install:install-file -DgroupId=org.dspace -DartifactId=dspace-rest -Dversion=4.0-SNAPSHOT -Dclassifier=classes -Dpackaging=jar -Dfile=dspace-rest/target/dspace-rest.war
+mvn clean package
+ant update
+
+
+Configure tomcat to know about the rest webapp.
+ /path/to/tomcat/conf/server.xml
+ <Context path="/rest"  docBase="/dspace/webapps/rest"  allowLinking="true"/>
+
+or
+
+Deploy [dspace-source]/dspace-rest/target/dspace-rest.war to tomcat.
+
+
 
 Endpoints:
-- http://localhost:8080/dspace-rest/collections
--- http://localhost:8080/dspace-rest/collections/{collectionID}
--- http://localhost:8080/dspace-rest/collections/{collectionID}?expand=parentCommunityID,parentCommunityIDList,itemIDList
--- http://localhost:8080/dspace-rest/collections/123
+- http://localhost:8080/rest/collections
+-- http://localhost:8080/rest/collections/{collectionID}
+-- http://localhost:8080/rest/collections/{collectionID}?expand=parentCommunityID,parentCommunityIDList,itemIDList
+-- http://localhost:8080/rest/collections/123
 
-- http://localhost:8080/dspace-rest/communities
+- http://localhost:8080/rest/communities
 
 There is an ?expand= query parameter for expensive operations. You can tack it on the end of /collections endpoints. It is optional, all, some or none.
