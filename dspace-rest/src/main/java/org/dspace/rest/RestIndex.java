@@ -12,8 +12,8 @@ in the web.xml servlet mapping section, then the web service will be available a
 
 http://localhost:8080/<webapp>/helloworld
  */
-@Path("/helloworld")
-public class HelloWorld {
+@Path("/")
+public class RestIndex {
 
     /*
     The "GET" annotation indicates this method will respond to HTTP Get requests.
@@ -22,6 +22,12 @@ public class HelloWorld {
     @GET
     @Produces(MediaType.TEXT_HTML)
     public String sayHtmlHello() {
-        return "<html><title>Hello!</title><body>Hello, world.</body></html> ";
+        return "<html><title>DSpace REST</title>" +
+                "<body><h1>DSpace REST API</h1>" +
+                "<ul>" +
+                "<li>/collections</li>" +
+                "<li>/communities</li>" +
+                "</ul>" +
+                "</body></html> ";
     }
 }
