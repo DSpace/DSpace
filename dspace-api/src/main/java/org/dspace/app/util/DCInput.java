@@ -67,6 +67,12 @@ public class DCInput
 
     /** allowed document types */
     private List<String> typeBind = null;
+    
+    
+    // DS-XXXX: added for new Attributes :MaxLength
+    private Map<String, String> fieldMap = null;
+    // DS-XXXX: added for new Attributes :MaxLength -END
+    
 
     /** 
      * The scope of the input sets, this restricts hidden metadata fields from 
@@ -90,6 +96,10 @@ public class DCInput
      */
     public DCInput(Map<String, String> fieldMap, Map<String, List<String>> listMap)
     {
+    	// DS-XXXX added for new Attributes :MaxLength
+    	this.fieldMap=fieldMap;
+    	// DS-XXXX: added for new Attributes :MaxLength -END
+    	
         dcElement = fieldMap.get("dc-element");
         dcQualifier = fieldMap.get("dc-qualifier");
 
@@ -401,5 +411,10 @@ public class DCInput
 		
 		return typeBind.contains(typeName);
 	}
+
+	public Map<String, String> getFieldMap() {
+		return fieldMap;
+	}
+
 	
 }
