@@ -69,9 +69,9 @@ public class DCInput
     private List<String> typeBind = null;
     
     
-    // DS-XXXX: added for new Attributes : MaxLength
+    // DS-1656: added for new Attributes : MaxLength
     private Map<String, String> fieldMap = null;
-    // DS-XXXX: added for new Attributes : MaxLength - END
+    // DS-1656: added for new Attributes : MaxLength - END
     
 
     /** 
@@ -96,9 +96,9 @@ public class DCInput
      */
     public DCInput(Map<String, String> fieldMap, Map<String, List<String>> listMap)
     {
-    	// DS-XXXX added for new Attributes :MaxLength
+    	// DS-1656 added for new Attributes :MaxLength
     	this.fieldMap=fieldMap;
-    	// DS-XXXX: added for new Attributes :MaxLength -END
+    	// DS-1656 added for new Attributes :MaxLength -END
     	
         dcElement = fieldMap.get("dc-element");
         dcQualifier = fieldMap.get("dc-qualifier");
