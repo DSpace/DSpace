@@ -807,8 +807,8 @@
         	</div>
         </xsl:if>
         
-        <xsl:if test="string-length(dim:field[@element='rights'][not(@qualifier)])&gt;0 or string-length(dim:field[@element='rights'][@qualifier='license'])&gt;0">
-        	<div class="detail-view-rights-and-license">
+        <xsl:if test="string-length(dim:field[@element='rights'][not(@qualifier)])&gt;0">
+        	<div class="detail-view-rights">
 		        <xsl:if test="string-length(dim:field[@element='rights'][not(@qualifier)])&gt;0">
 		            <p class="copyright-text">
 		                <xsl:copy-of select="dim:field[@element='rights'][not(@qualifier)]/node()"/>
