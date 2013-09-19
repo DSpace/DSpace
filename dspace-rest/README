@@ -1,0 +1,16 @@
+A RESTful web services API for DSpace.
+
+Built on JERSEY
+
+mvn clean package
+Deploy /target/rest.war to tomcat.
+
+Endpoints:
+- http://localhost:8080/dspace-rest/collections
+-- http://localhost:8080/dspace-rest/collections/{collectionID}
+-- http://localhost:8080/dspace-rest/collections/{collectionID}?expand=parentCommunityID,parentCommunityIDList,itemIDList
+-- http://localhost:8080/dspace-rest/collections/123
+
+- http://localhost:8080/dspace-rest/communities
+
+There is an ?expand= query parameter for expensive operations. You can tack it on the end of /collections endpoints. It is optional, all, some or none.
