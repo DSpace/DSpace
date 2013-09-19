@@ -20,9 +20,7 @@ import org.dspace.statistics.content.filter.StatisticsFilter;
  * Class that will hold the data needed to show
  * statistics in the browse and search pages.
  * 
- * User: @author kevinvandevelde at atmire.com (kevin at atmire.com)
- * Date: 20-mei-2009
- * Time: 16:44:29
+ * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 
 public class StatisticsBSAdapter {

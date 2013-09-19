@@ -38,6 +38,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
@@ -54,6 +55,8 @@ import org.w3c.dom.Document;
 
 public class LuceneSearchRequestProcessor implements SearchRequestProcessor
 {
+    private static final int ITEMMAP_RESULT_PAGE_SIZE = 50;
+
     /** log4j category */
     private static Logger log = Logger.getLogger(SimpleSearchServlet.class);
     
@@ -62,11 +65,41 @@ public class LuceneSearchRequestProcessor implements SearchRequestProcessor
     
     private static String msgKey = "org.dspace.app.webui.servlet.FeedServlet";
     
+    private List<String> searchIndices = null;
+    
     public synchronized void init()
     {
         if (localeLabels == null)
         {
             localeLabels = new HashMap<String, Map<String, String>>();
+        }
+        
+        if (searchIndices == null)
+        {
+            searchIndices = new ArrayList<String>();
+            String definition;
+           
+            int idx = 1;
+            
+            while ( ((definition = ConfigurationManager.getProperty("jspui.search.index.display." + idx))) != null){
+                String index = definition;
+                searchIndices.add(index);
+                idx++;
+             }
+            
+            // backward compatibility
+            if (searchIndices.size() == 0)
+            {
+                searchIndices.add("ANY");
+                searchIndices.add("author");
+                searchIndices.add("title");
+                searchIndices.add("keyword");
+                searchIndices.add("abstract");
+                searchIndices.add("series");
+                searchIndices.add("sponsor");
+                searchIndices.add("identifier");
+                searchIndices.add("language");
+            }
         }
     }
     
@@ -668,6 +701,62 @@ public class LuceneSearchRequestProcessor implements SearchRequestProcessor
     }
 
     /**
+     * Method for searching authors in item map
+     * 
+     * author: gam
+     */
+    @Override
+    public void doItemMapSearch(Context context, HttpServletRequest request,
+            HttpServletResponse response) throws SearchProcessorException, ServletException, IOException
+    {
+        String query = (String) request.getParameter("query");
+        int page = UIUtil.getIntParameter(request, "page")-1;
+        int offset = page > 0? page * ITEMMAP_RESULT_PAGE_SIZE:0;
+        Collection collection = (Collection) request.getAttribute("collection");
+        String idx = (String) request.getParameter("index");
+        if (StringUtils.isNotBlank(idx) && !idx.equalsIgnoreCase("any"))
+        {
+            query = idx + ":(" + query + ")";
+        }
+        QueryArgs queryArgs = new QueryArgs();
+        queryArgs.setQuery(query + " -location:l" + collection.getID());
+        queryArgs.setPageSize(ITEMMAP_RESULT_PAGE_SIZE);
+        queryArgs.setStart(offset);
+        QueryResults results = DSQuery.doQuery(context, queryArgs);
+
+        Map<Integer, Item> items = new HashMap<Integer, Item>();
+        List<String> handles = results.getHitHandles();
+        try
+        {
+            for (String handle : handles)
+            {
+                DSpaceObject resultDSO = HandleManager.resolveToObject(context, handle);
+    
+                if (resultDSO.getType() == Constants.ITEM)
+                {
+                    Item item = (Item) resultDSO;
+                    if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.READ))
+                    {
+                        items.put(Integer.valueOf(item.getID()), item);
+                    }
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new SearchProcessorException(e.getMessage(), e);
+        }
+
+        request.setAttribute("browsetext", query);
+        request.setAttribute("items", items);
+        request.setAttribute("more", results.getHitCount() > offset + ITEMMAP_RESULT_PAGE_SIZE);
+        request.setAttribute("browsetype", "Add");
+        request.setAttribute("page", page > 0 ? page + 1 : 1);
+        
+        JSPManager.showJSP(request, response, "itemmap-browse.jsp");
+    }
+
+    /**
      * Export the search results as a csv file
      *
      * @param context The DSpace context
@@ -730,5 +819,18 @@ public class LuceneSearchRequestProcessor implements SearchRequestProcessor
             labelMap.put("metadata." + selector, I18nUtil.getMessage(SyndicationFeed.MSG_METADATA + selector, locale));
         }
         return labelMap;
+    }
+    
+    @Override
+    public String getI18NKeyPrefix()
+    {
+        return "jsp.search.advanced.type.";
+    }
+    
+    @Override
+    public List<String> getSearchIndices()
+    {
+        init();
+        return searchIndices;
     }
 }

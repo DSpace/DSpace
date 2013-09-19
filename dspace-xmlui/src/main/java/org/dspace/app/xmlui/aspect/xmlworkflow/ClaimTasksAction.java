@@ -26,9 +26,7 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import java.util.Map;
 
 /**
- * User: kevin (kevin at atmire.com)
- * Date: 7-sep-2011
- * Time: 14:23:34
+ * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class ClaimTasksAction extends AbstractAction {
     @Override

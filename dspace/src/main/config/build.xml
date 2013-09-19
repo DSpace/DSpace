@@ -358,6 +358,7 @@ Common usage:
                 <expandproperties />
             </filterchain>
         </copy>
+        <echo file='config-temp/ant.properties' message='ant.version = ${ant.version}'/>
 
     </target>
 
@@ -766,6 +767,8 @@ Common usage:
         </copy>
 
         <copy file="${config}" tofile="${dspace.dir}/config/dspace.cfg" preservelastmodified="true" />
+
+        <echo file='${dspace.dir}/config/ant.properties' message='ant.version = ${ant.version}'/>
 
 
     </target>

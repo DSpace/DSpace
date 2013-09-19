@@ -109,7 +109,7 @@ public class FeedbackServlet extends DSpaceServlet
             // All data is there, send the email
             try
             {
-                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "feedback"));
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "feedback"));
                 email.addRecipient(ConfigurationManager
                         .getProperty("feedback.recipient"));
 

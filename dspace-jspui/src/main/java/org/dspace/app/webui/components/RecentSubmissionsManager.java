@@ -52,7 +52,7 @@ public class RecentSubmissionsManager
 	 * If the object you pass in is not a Community or Collection (e.g. an Item
 	 * is a DSpaceObject which cannot be used here), an exception will be thrown
 	 * 
-	 * @param dso	DSpaceObject: Community or Collection
+	 * @param dso	DSpaceObject: Community, Collection or null for SITE
 	 * @return		The recently submitted items
 	 * @throws RecentSubmissionsException
 	 */
@@ -74,7 +74,10 @@ public class RecentSubmissionsManager
 			bs.setBrowseIndex(bi);
 			bs.setOrder(SortOption.DESCENDING);
 			bs.setResultsPerPage(Integer.parseInt(count));
-			bs.setBrowseContainer(dso);
+            if (dso != null)
+            {
+                bs.setBrowseContainer(dso);
+            }
             for (SortOption so : SortOption.getSortOptions())
             {
                 if (so.getName().equals(source))

@@ -22,7 +22,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.5.6</version>
         </dependency>
         <!-- spring service manager -->
         <dependency>
@@ -47,6 +46,10 @@
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
         </dependency>
         <!-- SPECIAL CASE - need JUNIT at build time and testing time -->
         <dependency>
@@ -75,7 +78,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.5.6</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>

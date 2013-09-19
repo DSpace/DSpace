@@ -50,6 +50,7 @@
 <%@ page import="org.dspace.content.authority.ChoiceAuthorityManager" %>
 <%@ page import="org.dspace.content.authority.Choices" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -325,9 +326,9 @@
          if (repeatable && !readonly && i < defaults.length)
          {
             name.setLength(0);
-            name.append(dpn.getLastName())
+            name.append(Utils.addEntities(dpn.getLastName()))
                 .append(' ')
-                .append(dpn.getFirstNames());
+                .append(Utils.addEntities(dpn.getFirstNames()));
             // put a remove button next to filled in values
             sb.append("<td><input type=\"submit\" name=\"submit_")
               .append(fieldName)

@@ -20,6 +20,7 @@
   -   browsetype     - "Add" or "Remove"
   --%>
   
+<%@page import="org.dspace.app.webui.util.UIUtil"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
@@ -37,9 +38,15 @@
     Collection collection  = (Collection)request.getAttribute("collection");
     Map items              = (Map)request.getAttribute("items");
     Map collections        = (Map)request.getAttribute("collections");
+    String index = request.getParameter("index");
+    String query = request.getParameter("query");
     String browsetext      = (String)request.getAttribute("browsetext");
     Boolean showcollection = new Boolean(false);
     String browsetype      = (String)request.getAttribute("browsetype");    // Only "Add" and "Remove" are handled properly
+    Boolean more = (Boolean) request.getAttribute("more");
+    boolean bMore = more != null?more:false;
+    int pageResult = (Integer) request.getAttribute("page") != null ? (Integer) request
+            .getAttribute("page") : 1;
 %>
 
 <dspace:layout titlekey="jsp.tools.itemmap-browse.title">
@@ -47,7 +54,7 @@
     <%-- <h2>Browse <%=browsetext%></h2> --%>
     <h2>
         <% if (browsetype.equals("Add")) { %>
-            <fmt:message key="jsp.tools.itemmap-browse.heading-authors">
+            <fmt:message key="jsp.tools.itemmap-browse.heading-search">
                 <fmt:param><%= browsetext %></fmt:param>
             </fmt:message>
         <% } else if (browsetype.equals("Remove")) { %>
@@ -198,4 +205,37 @@
 
     </form>
 
+<% if (bMore || pageResult > 1) { %>
+        <table>     
+          <tr>
+            <td>
+<p><fmt:message key="jsp.tools.itemmap-browse.info.change-page"/></p>
+			</td>
+<% if (pageResult > 1) { %>			
+			<td>
+	<form method="post" class="standard10" action="">
+        <input type="hidden" name="cid" value="<%=collection.getID()%>"/>
+        <input type="hidden" name="action" value="search"/>
+        <input type="hidden" name="index" id="index" value="<%= index %>"/>
+        <input type="hidden" name="query" id="query" value="<%= query %>"/>
+        <input type="hidden" name="page" id="page" value="<%= pageResult -1 %>"/>
+        <input type="submit" value="<fmt:message key="jsp.tools.itemmap-browse.previous.button"/>"/> 
+    </form>
+    		</td>
+<% 	}
+	if (bMore) { %>    		
+    		<td>
+	<form method="post" class="standard10" action="">
+        <input type="hidden" name="cid" value="<%=collection.getID()%>"/>
+        <input type="hidden" name="action" value="search"/>
+        <input type="hidden" name="index" id="index" value="<%= index %>"/>
+        <input type="hidden" name="query" id="query" value="<%= query %>"/>
+        <input type="hidden" name="page" id="page" value="<%= pageResult +1 %>"/>
+        <input type="submit" value="<fmt:message key="jsp.tools.itemmap-browse.next.button"/>"/> 
+    </form>
+    		</td>
+    
+<% 	} 
+}
+%>
 </dspace:layout>

@@ -7,16 +7,11 @@
  */
 package org.dspace.core;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -30,8 +25,7 @@ import org.apache.log4j.helpers.OptionConverter;
 
 /**
  * Class for reading the DSpace system configuration. The main configuration is
- * read in as properties from a standard properties file. Email templates and
- * configuration files for other tools are also be accessed via this class.
+ * read in as properties from a standard properties file.
  * <P>
  * The main configuration is by default read from the <em>resource</em>
  * <code>/dspace.cfg</code>.
@@ -43,7 +37,7 @@ import org.apache.log4j.helpers.OptionConverter;
  * of the DSpace installation directory (specified as the property
  * <code>dspace.dir</code> in the main configuration file.)
  *
- * 
+ *
  * @author Robert Tansley
  * @author Larry Stone - Interpolated values.
  * @author Mark Diggory - General Improvements to detection, logging and loading.
@@ -56,12 +50,9 @@ public class ConfigurationManager
 
     /** The configuration properties */
     private static Properties properties = null;
-    
+
     /** module configuration properties */
     private static Map<String, Properties> moduleProps = new HashMap<String, Properties>();
-
-    /** The default license */
-    private static String license;
 
     // limit of recursive depth of property variable interpolation in
     // configuration; anything greater than this is very likely to be a loop.
@@ -69,7 +60,7 @@ public class ConfigurationManager
 
     protected ConfigurationManager()
     {
-        
+
     }
 
     /**
@@ -80,7 +71,7 @@ public class ConfigurationManager
     {
         return properties != null;
     }
-    
+
     public static boolean isConfigured(String module)
     {
         return moduleProps.get(module) != null;
@@ -97,24 +88,24 @@ public class ConfigurationManager
 //    {
 //        properties = null;
 //    }
-    
+
     /**
      * REMOVED - Flushing the properties could be dangerous in the current DSpace state
      * Need to consider how it will affect in-flight processes
      *
      * Discard properties for a module -  will force a reload from disk
      * when any of module's properties are requested
-     * 
+     *
      * @param module the module name
      */
 //    public static void flush(String module)
 //    {
 //        moduleProps.remove(module);
 //    }
-    
+
     /**
      * Returns all properties in main configuration
-     * 
+     *
      * @return properties - all non-modular properties
      */
     public static Properties getProperties()
@@ -135,7 +126,7 @@ public class ConfigurationManager
 
     /**
      * Returns all properties for a given module
-     * 
+     *
      * @param module
      *        the name of the module
      * @return properties - all module's properties
@@ -163,10 +154,10 @@ public class ConfigurationManager
 
     /**
      * Get a configuration property
-     * 
+     *
      * @param property
      *            the name of the property
-     * 
+     *
      * @return the value of the property, or <code>null</code> if the property
      *         does not exist.
      */
@@ -176,11 +167,11 @@ public class ConfigurationManager
         String value = props == null ? null : props.getProperty(property);
         return (value != null) ? value.trim() : null;
     }
-    
+
     /**
      * Get a module configuration property value.
-     * 
-     * @param module 
+     *
+     * @param module
      *      the name of the module, or <code>null</code> for regular configuration
      *      property
      * @param property
@@ -195,7 +186,7 @@ public class ConfigurationManager
         {
             return getProperty(property);
         }
-        
+
         String value = null;
         Properties modProps = getMutableProperties(module);
 
@@ -215,10 +206,10 @@ public class ConfigurationManager
 
     /**
      * Get a configuration property as an integer
-     * 
+     *
      * @param property
      *            the name of the property
-     * 
+     *
      * @return the value of the property. <code>0</code> is returned if the
      *         property does not exist. To differentiate between this case and
      *         when the property actually is zero, use <code>getProperty</code>.
@@ -227,16 +218,16 @@ public class ConfigurationManager
     {
         return getIntProperty(property, 0);
     }
-    
+
     /**
      * Get a module configuration property as an integer
      *
      * @param module
      *         the name of the module
-     * 
+     *
      * @param property
      *            the name of the property
-     * 
+     *
      * @return the value of the property. <code>0</code> is returned if the
      *         property does not exist. To differentiate between this case and
      *         when the property actually is zero, use <code>getProperty</code>.
@@ -248,10 +239,10 @@ public class ConfigurationManager
 
     /**
      * Get a configuration property as an integer, with default
-     * 
+     *
      * @param property
      *            the name of the property
-     *            
+     *
      * @param defaultValue
      *            value to return if property is not found or is not an Integer.
      *
@@ -264,16 +255,16 @@ public class ConfigurationManager
     {
         return getIntProperty(null, property, defaultValue);
     }
-    
+
     /**
      * Get a module configuration property as an integer, with default
-     * 
+     *
      * @param module
      *         the name of the module
-     * 
+     *
      * @param property
      *            the name of the property
-     *            
+     *
      * @param defaultValue
      *            value to return if property is not found or is not an Integer.
      *
@@ -316,12 +307,12 @@ public class ConfigurationManager
     {
         return getLongProperty(property, 0);
     }
-    
+
     /**
      * Get a module configuration property as a long
      *
      * @param module
-     *         the name of the module    
+     *         the name of the module
      * @param property
      *            the name of the property
      *
@@ -333,10 +324,10 @@ public class ConfigurationManager
     {
         return getLongProperty(module, property, 0);
     }
-     
+
    /**
      * Get a configuration property as an long, with default
-     * 
+     *
      *
      * @param property
      *            the name of the property
@@ -356,7 +347,7 @@ public class ConfigurationManager
 
     /**
      * Get a configuration property as an long, with default
-     * 
+     *
      * @param module  the module, or <code>null</code> for regular property
      *
      * @param property
@@ -391,77 +382,13 @@ public class ConfigurationManager
     }
 
     /**
-     * Get the License
-     * 
-     * @param
-     *         licenseFile   file name
-     *  
-     *  @return
-     *         license text
-     * 
-     */
-    public static String getLicenseText(String licenseFile)
-    {
-    // Load in default license
-
-        FileReader fr = null;
-        BufferedReader br = null;
-        try
-        {
-            fr = new FileReader(licenseFile);
-            br = new BufferedReader(fr);
-            String lineIn;
-            license = "";
-            while ((lineIn = br.readLine()) != null)
-            {
-                license = license + lineIn + '\n';
-            }
-        }
-        catch (IOException e)
-        {
-            fatal("Can't load configuration", e);
-
-            // FIXME: Maybe something more graceful here, but with the
-            // configuration we can't do anything
-            throw new IllegalStateException("Failed to read default license.", e);
-        }
-        finally
-        {
-            if (br != null)
-            {
-                try
-                { 
-                    br.close();
-                }
-                catch (IOException ioe)
-                {
-                }
-            }
-
-            if (fr != null)
-            {
-                try
-                { 
-                    fr.close();
-                }
-                catch (IOException ioe)
-                {
-                    
-                }
-            }
-        }
-
-        return license;
-    }
-     
-    /**
      * Get a configuration property as a boolean. True is indicated if the value
      * of the property is <code>TRUE</code> or <code>YES</code> (case
      * insensitive.)
-     * 
+     *
      * @param property
      *            the name of the property
-     * 
+     *
      * @return the value of the property. <code>false</code> is returned if
      *         the property does not exist. To differentiate between this case
      *         and when the property actually is false, use
@@ -471,17 +398,17 @@ public class ConfigurationManager
     {
         return getBooleanProperty(property, false);
     }
-    
+
     /**
-     * Get a module configuration property as a boolean. True is indicated if 
+     * Get a module configuration property as a boolean. True is indicated if
      * the value of the property is <code>TRUE</code> or <code>YES</code> (case
      * insensitive.)
-     * 
-     * @param module the module, or <code>null</code> for regular property   
-     * 
+     *
+     * @param module the module, or <code>null</code> for regular property
+     *
      * @param property
      *            the name of the property
-     * 
+     *
      * @return the value of the property. <code>false</code> is returned if
      *         the property does not exist. To differentiate between this case
      *         and when the property actually is false, use
@@ -491,7 +418,7 @@ public class ConfigurationManager
     {
         return getBooleanProperty(module, property, false);
     }
-    
+
    /**
      * Get a configuration property as a boolean, with default.
      * True is indicated if the value
@@ -519,8 +446,8 @@ public class ConfigurationManager
      * True is indicated if the value
      * of the property is <code>TRUE</code> or <code>YES</code> (case
      * insensitive.)
-     * 
-     * @param module     module, or <code>null</code> for regular property   
+     *
+     * @param module     module, or <code>null</code> for regular property
      *
      * @param property
      *            the name of the property
@@ -551,19 +478,19 @@ public class ConfigurationManager
 
     /**
      * Returns an enumeration of all the keys in the DSpace configuration
-     * 
+     *
      * @return an enumeration of all the keys in the DSpace configuration
      */
     public static Enumeration<?> propertyNames()
     {
         return propertyNames(null);
     }
-    
+
     /**
      * Returns an enumeration of all the keys in a module configuration
-     * 
-     * @param  module    module, or <code>null</code> for regular property  
-     * 
+     *
+     * @param  module    module, or <code>null</code> for regular property
+     *
      * @return an enumeration of all the keys in the module configuration,
      *         or <code>null</code> if the module does not exist.
      */
@@ -573,211 +500,14 @@ public class ConfigurationManager
         return props == null ? null : props.propertyNames();
     }
 
-    /**
-     * Get the template for an email message. The message is suitable for
-     * inserting values using <code>java.text.MessageFormat</code>.
-     * 
-     * @param emailFile
-     *            full name for the email template, for example "/dspace/config/emails/register".
-     * 
-     * @return the email object, with the content and subject filled out from
-     *         the template
-     * 
-     * @throws IOException
-     *             if the template couldn't be found, or there was some other
-     *             error reading the template
-     */
-    public static Email getEmail(String emailFile) throws IOException
-    {
-        String charset = null;
-        String subject = "";
-        StringBuffer contentBuffer = new StringBuffer();
-
-        // Read in template
-        BufferedReader reader = null;
-        try
-        {
-            reader = new BufferedReader(new FileReader(emailFile));
-
-            boolean more = true;
-
-            while (more)
-            {
-                String line = reader.readLine();
-
-                if (line == null)
-                {
-                    more = false;
-                }
-                else if (line.toLowerCase().startsWith("subject:"))
-                {
-                    // Extract the first subject line - everything to the right
-                    // of the colon, trimmed of whitespace
-                    subject = line.substring(8).trim();
-                }
-                else if (line.toLowerCase().startsWith("charset:"))
-                {
-                    // Extract the character set from the email
-                    charset = line.substring(8).trim();
-                }
-                else if (!line.startsWith("#"))
-                {
-                    // Add non-comment lines to the content
-                    contentBuffer.append(line);
-                    contentBuffer.append("\n");
-                }
-            }
-        }
-        finally
-        {
-            if (reader != null)
-            {
-                reader.close();
-            }
-        }
-        // Create an email
-        Email email = new Email();
-        email.setSubject(subject);
-        email.setContent(contentBuffer.toString());
-
-        if (charset != null)
-        {
-            email.setCharset(charset);
-        }
-
-        return email;
-    }
-
-    /**
-     * Get the site-wide default license that submitters need to grant
-     * 
-     * @return the default license
-     */
-    public static String getDefaultSubmissionLicense()
-    {
-        if (properties == null)
-        {
-            loadConfig(null);
-        }
-
-        return license;
-    }
-
-    /**
-     * Get the path for the news files.
-     * 
-     */
-    public static String getNewsFilePath()
-    {
-        String filePath = ConfigurationManager.getProperty("dspace.dir")
-                + File.separator + "config" + File.separator;
-
-        return filePath;
-    }
-
-    /**
-     * Reads news from a text file.
-     * 
-     * @param newsFile
-     *        name of the news file to read in, relative to the news file path.
-     */
-    public static String readNewsFile(String newsFile)
-    {
-        String fileName = getNewsFilePath();
-        
-        fileName += newsFile;
-        
-        StringBuilder text = new StringBuilder();
-
-        try
-        {
-            // retrieve existing news from file
-            FileInputStream fir = new FileInputStream(fileName);
-            InputStreamReader ir = new InputStreamReader(fir, "UTF-8");
-            BufferedReader br = new BufferedReader(ir);
-
-            String lineIn;
-
-            while ((lineIn = br.readLine()) != null)
-            {
-                text.append(lineIn);
-            }
-
-            br.close();
-        }
-        catch (IOException e)
-        {
-            warn("news_read: " + e.getLocalizedMessage());
-        }
-
-        return text.toString();
-    }
-
-    /**
-     * Writes news to a text file.
-     * 
-     * @param newsFile
-     *        name of the news file to read in, relative to the news file path.
-     * @param news
-     *            the text to be written to the file.
-     */
-    public static String writeNewsFile(String newsFile, String news)
-    {
-        String fileName = getNewsFilePath();
-
-        fileName += newsFile;
-
-        try
-        {
-            // write the news out to the appropriate file
-            FileOutputStream fos = new FileOutputStream(fileName);
-            OutputStreamWriter osr = new OutputStreamWriter(fos, "UTF-8");
-            PrintWriter out = new PrintWriter(osr);
-            out.print(news);
-            out.close();
-        }
-        catch (IOException e)
-        {
-            warn("news_write: " + e.getLocalizedMessage());
-        }
-
-        return news;
-    }
-
-    /**
-     * Writes license to a text file.
-     * 
-     * @param licenseFile
-     *            name for the file int which license will be written, 
-     *            relative to the current directory.
-     */
-    public static void writeLicenseFile(String licenseFile, String newLicense)
-    {
-        try
-        {
-            // write the news out to the appropriate file
-            FileOutputStream fos = new FileOutputStream(licenseFile);
-            OutputStreamWriter osr = new OutputStreamWriter(fos, "UTF-8");
-            PrintWriter out = new PrintWriter(osr);
-            out.print(newLicense);
-            out.close();
-        }
-        catch (IOException e)
-        {
-            warn("license_write: " + e.getLocalizedMessage());
-        }
-
-        license = newLicense;
-     }
-
+    /** The configuration that was loaded. */
     private static File loadedFile = null;
 
     /**
-     * Return the file that configuration was actually loaded from. Only returns
-     * a valid File after configuration has been loaded.
-     * 
+     * Return the file that configuration was actually loaded from.
+     *
      * @deprecated Please remove all direct usage of the configuration file.
-     * @return File naming configuration data file, or null if not loaded yet.
+     * @return File naming configuration data file.
      */
     protected static File getConfigurationFile()
     {
@@ -805,13 +535,20 @@ public class ConfigurationManager
             {
                 Properties modProps = new Properties();
                 InputStream modIS = null;
+                InputStreamReader modIR = null;
                 try
                 {
                     modIS = new FileInputStream(modFile);
-                    modProps.load(modIS);
+                    modIR = new InputStreamReader(modIS, "UTF-8");
+                    modProps.load(modIR);
                 }
                 finally
                 {
+                    if (modIR != null)
+                    {
+                        modIR.close();
+                    }
+
                     if (modIS != null)
                     {
                         modIS.close();
@@ -837,17 +574,16 @@ public class ConfigurationManager
         }
         catch (IOException ioE)
         {
-            fatal("Can't load configuration: " + (modFile == null ? "<unknown>" : modFile.getAbsolutePath()), ioE);
+            fatal("Can't load configuration: " +
+                    (modFile == null ? "<unknown>" : modFile.getAbsolutePath()), ioE);
         }
-
-        return;
     }
 
     /**
      * Load the DSpace configuration properties. Only does anything if
      * properties are not already loaded. Properties are loaded in from the
      * specified file, or default locations.
-     * 
+     *
      * @param configFile
      *            The <code>dspace.cfg</code> configuration file to use, or
      *            <code>null</code> to try default locations
@@ -860,8 +596,9 @@ public class ConfigurationManager
         }
 
         URL url = null;
-        
+
         InputStream is = null;
+        InputStreamReader reader = null;
         try
         {
             String configProperty = null;
@@ -875,27 +612,27 @@ public class ConfigurationManager
                 // This isn't really a fatal error though, so catch and ignore
                 log.warn("Unable to access system properties, ignoring.", se);
             }
-            
+
             // should only occur after a flush()
             if (loadedFile != null)
             {
                 info("Reloading current config file: " + loadedFile.getAbsolutePath());
-                
+
                 url = loadedFile.toURI().toURL();
             }
             else if (configFile != null)
             {
                 info("Loading provided config file: " + configFile);
-                
+
                 loadedFile = new File(configFile);
                 url = loadedFile.toURI().toURL();
-                
+
             }
             // Has the default configuration location been overridden?
             else if (configProperty != null)
             {
                 info("Loading system provided config property (-Ddspace.configuration): " + configProperty);
-                
+
                 // Load the overriding configuration
                 loadedFile = new File(configProperty);
                 url = loadedFile.toURI().toURL();
@@ -907,11 +644,11 @@ public class ConfigurationManager
                 if (url != null)
                 {
                     info("Loading from classloader: " + url);
-                    
+
                     loadedFile = new File(url.getPath());
                 }
             }
-            
+
             if (url == null)
             {
                 fatal("Cannot find dspace.cfg");
@@ -921,7 +658,8 @@ public class ConfigurationManager
             {
                 properties = new Properties();
                 is = url.openStream();
-                properties.load(is);
+                reader = new InputStreamReader(is, "UTF-8");
+                properties.load(reader);
 
                 // walk values, interpolating any embedded references.
                 for (Enumeration<?> pe = properties.propertyNames(); pe.hasMoreElements(); )
@@ -940,140 +678,79 @@ public class ConfigurationManager
         {
             fatal("Can't load configuration: " + url, e);
 
-            // FIXME: Maybe something more graceful here, but with the
-            // configuration we can't do anything
+            // FIXME: Maybe something more graceful here, but without a
+            // configuration we can't do anything.
             throw new IllegalStateException("Cannot load configuration: " + url, e);
         }
         finally
         {
+            if (reader != null)
+            {
+                try {
+                    reader.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
             if (is != null)
             {
                 try
-                { 
+                {
                     is.close();
                 }
                 catch (IOException ioe)
-                {                   
-                }
-            }
-        }
-
-        // Load in default license
-        File licenseFile = new File(getProperty("dspace.dir") + File.separator
-                + "config" + File.separator + "default.license");
-
-        FileInputStream  fir = null;
-        InputStreamReader ir = null;
-        BufferedReader br = null;
-        try
-        {
-            
-            fir = new FileInputStream(licenseFile);
-            ir = new InputStreamReader(fir, "UTF-8");
-            br = new BufferedReader(ir);
-            String lineIn;
-            license = "";
-
-            while ((lineIn = br.readLine()) != null)
-            {
-                license = license + lineIn + '\n';
-            }
-
-            br.close();
-            
-        }
-        catch (IOException e)
-        {
-            fatal("Can't load license: " + licenseFile.toString() , e);
-
-            // FIXME: Maybe something more graceful here, but with the
-            // configuration we can't do anything
-            throw new IllegalStateException("Cannot load license: " + licenseFile.toString(),e);
-        }
-        finally
-        {
-            if (br != null)
-            {
-                try
                 {
-                    br.close();
-                } 
-                catch (IOException ioe)
-                {                  
-                }
-            }
-
-            if (ir != null)
-            {
-                try
-                { 
-                    ir.close();
-                } 
-                catch (IOException ioe)
-                {             
-                }
-            }
-
-            if (fir != null)
-            {
-                try
-                {
-                    fir.close();
-                }
-                catch (IOException ioe)
-                {                
                 }
             }
         }
 
-        
-        
         try
         {
             /*
              * Initialize Logging once ConfigurationManager is initialized.
-             * 
-             * This is selection from a property in dspace.cfg, if the property
+             *
+             * This is controlled by a property in dspace.cfg.  If the property
              * is absent then nothing will be configured and the application
-             * will use the defaults provided by log4j. 
-             * 
+             * will use the defaults provided by log4j.
+             *
              * Property format is:
-             * 
+             *
              * log.init.config = ${dspace.dir}/config/log4j.properties
              * or
              * log.init.config = ${dspace.dir}/config/log4j.xml
-             * 
+             *
              * See default log4j initialization documentation here:
              * http://logging.apache.org/log4j/docs/manual.html
-             * 
+             *
              * If there is a problem with the file referred to in
-             * "log.configuration" it needs to be sent to System.err
+             * "log.configuration", it needs to be sent to System.err
              * so do not instantiate another Logging configuration.
              *
              */
             String dsLogConfiguration = ConfigurationManager.getProperty("log.init.config");
 
-            if (dsLogConfiguration == null ||  System.getProperty("dspace.log.init.disable") != null)
+            if (dsLogConfiguration == null || System.getProperty("dspace.log.init.disable") != null)
             {
-                /* 
-                 * Do nothing if log config not set in dspace.cfg or "dspace.log.init.disable" 
-                 * system property set.  Leave it upto log4j to properly init its logging 
+                /*
+                 * Do nothing if log config not set in dspace.cfg or "dspace.log.init.disable"
+                 * system property set.  Leave it upto log4j to properly init its logging
                  * via classpath or system properties.
                  */
-                info("Using default log4j provided log configuration," +
-                        "if unintended, check your dspace.cfg for (log.init.config)");
+                info("Using default log4j provided log configuration." +
+                        "  If unintended, check your dspace.cfg for (log.init.config)");
             }
             else
             {
                 info("Using dspace provided log configuration (log.init.config)");
-                
-                
+
+
                 File logConfigFile = new File(dsLogConfiguration);
-                
+
                 if(logConfigFile.exists())
                 {
                     info("Loading: " + dsLogConfiguration);
-                    
+
                     OptionConverter.selectAndConfigure(logConfigFile.toURI()
                             .toURL(), null, org.apache.log4j.LogManager
                             .getLoggerRepository());
@@ -1090,7 +767,61 @@ public class ConfigurationManager
             fatal("Can't load dspace provided log4j configuration", e);
             throw new IllegalStateException("Cannot load dspace provided log4j configuration",e);
         }
-        
+
+    }
+
+    /**
+     * Wrapper for {@link NewsManager#getNewsFilePath()}.
+     * @deprecated since 4.0
+     */
+    public static String getNewsFilePath()
+    {
+        return NewsManager.getNewsFilePath();
+    }
+
+    /**
+     * Wrapper for {@link NewsManager#readNewsFile(java.lang.String)}.
+     * @deprecated since 4.0
+     */
+    public static String readNewsFile(String name)
+    {
+        return NewsManager.readNewsFile(name);
+    }
+
+    /**
+     * Wrapper for {@link NewsManager#writeNewsFile(java.lang.String, java.lang.String)}.
+     * @deprecated since 4.0
+     */
+    public static String writeNewsFile(String file, String news)
+    {
+        return NewsManager.writeNewsFile(file, news);
+    }
+
+    /**
+     * Wrapper for {@link LicenseManager#getLicenseText(java.lang.String)}.
+     * @deprecated since 4.0
+     */
+    public static String getLicenseText(String licenseFile)
+    {
+        return LicenseManager.getLicenseText(licenseFile);
+    }
+
+    /**
+     * Wrapper for {@link LicenseManager#getDefaultSubmissionLicense()}.
+     * @deprecated since 4.0
+     */
+    public static String getDefaultSubmissionLicense()
+    {
+        return LicenseManager.getDefaultSubmissionLicense();
+    }
+
+    /**
+     * Wrapper for {@link LicenseManager#writeLicenseFile(java.lang.String, java.lang.String)}.
+     * @deprecated since 4.0
+     */
+    public static void writeLicenseFile(String licenseFile, String newLicense)
+    {
+        LicenseManager.writeLicenseFile(licenseFile, newLicense);
     }
 
     /**
@@ -1167,7 +898,7 @@ public class ConfigurationManager
      * <code>name</code> from <code>dspace.cfg</code> to the standard
      * output. If the property does not exist, nothing is written.</li>
      * </ul>
-     * 
+     *
      * @param argv
      *            command-line arguments
      */
@@ -1189,7 +920,7 @@ public class ConfigurationManager
             System.exit(0);
         }
         else if ((argv.length == 4) && argv[0].equals("-module") &&
-                                        argv[2].equals("-property")) 
+                                        argv[2].equals("-property"))
         {
             String val = getProperty(argv[1], argv[3]);
 
@@ -1212,7 +943,7 @@ public class ConfigurationManager
 
         System.exit(1);
     }
-    
+
     private static void info(String string)
     {
         if (!isLog4jConfigured())
@@ -1263,8 +994,8 @@ public class ConfigurationManager
     }
 
     /*
-     * Only current solution available to detect 
-     * if log4j is truly configured. 
+     * Only current solution available to detect
+     * if log4j is truly configured.
      */
     private static boolean isLog4jConfigured()
     {

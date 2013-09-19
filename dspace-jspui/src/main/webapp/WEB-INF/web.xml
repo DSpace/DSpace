@@ -74,9 +74,6 @@
   <filter-mapping>
         <filter-name>dspace.request</filter-name>
         <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>FORWARD</dispatcher>
-        <dispatcher>INCLUDE</dispatcher>
   </filter-mapping>
     
   <filter-mapping>
@@ -230,6 +227,11 @@
   <servlet>
     <servlet-name>group-select-list</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.GroupListServlet</servlet-class>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>curate</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.CurateServlet</servlet-class>
   </servlet>
   
   <servlet>
@@ -530,6 +532,16 @@
   <servlet-mapping>
     <servlet-name>group-select-list</servlet-name>
     <url-pattern>/tools/group-select-list</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>curate</servlet-name>
+    <url-pattern>/dspace-admin/curate</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>curate</servlet-name>
+    <url-pattern>/tools/curate</url-pattern>
   </servlet-mapping>
   
  <servlet-mapping>

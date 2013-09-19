@@ -74,7 +74,7 @@ import org.dspace.handle.HandleManager;
  * <P>
  * Modified by David Little, UCSD Libraries 12/21/04 to allow the registration
  * of files (bitstreams) into DSpace.
- * 
+ *
  * @author David Little
  * @author Jay Paz
  */
@@ -86,12 +86,12 @@ public class ItemExport
      * used for export download
      */
     public static final String COMPRESSED_EXPORT_MIME_TYPE = "application/zip";
-    
+
      /** log4j logger */
      private static Logger log = Logger.getLogger(ItemExport.class);
 
     /*
-	 * 
+	 *
 	 */
     public static void main(String[] argv) throws Exception
     {
@@ -390,7 +390,7 @@ public class ItemExport
     /**
      * Discover the different schemas in use and output a separate metadata XML
      * file for each schema.
-     * 
+     *
      * @param c
      * @param i
      * @param destDir
@@ -561,7 +561,7 @@ public class ItemExport
      * were originally registered will be marked in the contents file as such.
      * However, the export directory will contain actual copies of the content
      * files being exported.
-     * 
+     *
      * @param c
      *            the DSpace context
      * @param i
@@ -720,7 +720,7 @@ public class ItemExport
     /**
      * Convenience methot to create export a single Community, Collection, or
      * Item
-     * 
+     *
      * @param dso
      *            - the dspace object to export
      * @param context
@@ -740,7 +740,7 @@ public class ItemExport
     /**
      * Convenience method to export a List of dspace objects (Community,
      * Collection or Item)
-     * 
+     *
      * @param dsObjects
      *            - List containing dspace objects
      * @param context
@@ -758,7 +758,7 @@ public class ItemExport
     /**
      * Convenience methot to create export a single Community, Collection, or
      * Item
-     * 
+     *
      * @param dso
      *            - the dspace object to export
      * @param context
@@ -778,7 +778,7 @@ public class ItemExport
     /**
      * Convenience method to export a List of dspace objects (Community,
      * Collection or Item)
-     * 
+     *
      * @param dsObjects
      *            - List containing dspace objects
      * @param context
@@ -797,7 +797,7 @@ public class ItemExport
      * Does the work creating a List with all the Items in the Community or
      * Collection It then kicks off a new Thread to export the items, zip the
      * export directory and send confirmation email
-     * 
+     *
      * @param dsObjects
      *            - List of dspace objects to process
      * @param context
@@ -1008,7 +1008,7 @@ public class ItemExport
                         {
                             iitems.close();
                         }
-                        
+
                         // Make sure the database connection gets closed in all conditions.
                     	try {
 							context.complete();
@@ -1027,7 +1027,7 @@ public class ItemExport
 
     /**
      * Create a file name based on the date and eperson
-     * 
+     *
      * @param eperson
      *            - eperson who requested export and will be able to download it
      * @param date
@@ -1061,7 +1061,7 @@ public class ItemExport
     /**
      * Use config file entry for org.dspace.app.itemexport.download.dir and id
      * of the eperson to create a download directory name
-     * 
+     *
      * @param ePersonID
      *            - id of the eperson who requested export archive
      * @return String representing a directory in the form of
@@ -1085,7 +1085,7 @@ public class ItemExport
 
     /**
      * Returns config file entry for org.dspace.app.itemexport.work.dir
-     * 
+     *
      * @return String representing config file entry for
      *         org.dspace.app.itemexport.work.dir
      * @throws Exception
@@ -1104,7 +1104,7 @@ public class ItemExport
 
     /**
      * Used to read the export archived. Inteded for download.
-     * 
+     *
      * @param fileName
      *            the name of the file to download
      * @param eperson
@@ -1129,7 +1129,7 @@ public class ItemExport
 
     /**
      * Get the file size of the export archive represented by the file name.
-     * 
+     *
      * @param fileName
      *            name of the file to get the size.
      * @throws Exception
@@ -1175,7 +1175,7 @@ public class ItemExport
      * The file name of the export archive contains the eperson id of the person
      * who created it When requested for download this method can check if the
      * person requesting it is the same one that created it
-     * 
+     *
      * @param context
      *            dspace context
      * @param fileName
@@ -1208,7 +1208,7 @@ public class ItemExport
     /**
      * Reads the download directory for the eperson to see if any export
      * archives are available
-     * 
+     *
      * @param eperson
      * @return a list of file names representing export archives that have been
      *         processed
@@ -1245,7 +1245,7 @@ public class ItemExport
      * A clean up method that is ran before a new export archive is created. It
      * uses the config file entry 'org.dspace.app.itemexport.life.span.hours' to
      * determine if the current exports are too old and need pruging
-     * 
+     *
      * @param epersonID
      *            - the id of the eperson to clean up
      * @throws Exception
@@ -1328,7 +1328,7 @@ public class ItemExport
      * with calling method about success or failure. We accomplis this
      * communication with email instead. Send a success email once the export
      * archive is complete and ready for download
-     * 
+     *
      * @param context
      *            - the current Context
      * @param eperson
@@ -1344,7 +1344,7 @@ public class ItemExport
         try
         {
             Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "export_success"));
+            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "export_success"));
             email.addRecipient(eperson.getEmail());
             email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/exportdownload/" + fileName);
             email.addArgument(ConfigurationManager.getProperty("org.dspace.app.itemexport.life.span.hours"));
@@ -1362,7 +1362,7 @@ public class ItemExport
      * with calling method about success or failure. We accomplis this
      * communication with email instead. Send an error email if the export
      * archive fails
-     * 
+     *
      * @param eperson
      *            - EPerson to send the error message to
      * @param error
@@ -1376,7 +1376,7 @@ public class ItemExport
         try
         {
             Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "export_error"));
+            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "export_error"));
             email.addRecipient(eperson.getEmail());
             email.addArgument(error);
             email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/feedback");
@@ -1461,7 +1461,7 @@ public class ItemExport
 
                 // byte[] b = new byte[ (int)(cpFile.length()) ];
 
-                cpFileInputStream = new FileInputStream(cpFile);                
+                cpFileInputStream = new FileInputStream(cpFile);
 
                 ZipEntry cpZipEntry = new ZipEntry(strZipEntryName);
                 cpZipOutputStream.putNextEntry(cpZipEntry);

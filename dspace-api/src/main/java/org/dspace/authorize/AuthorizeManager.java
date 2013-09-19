@@ -965,7 +965,7 @@ public class AuthorizeManager
      * @param o
      *         object
      * @param actionID
-     *         ID of action frm <code>org.dspace.core.Constants</code>
+     *         ID of action from <code>org.dspace.core.Constants</code>
      * @return array of <code>Group</code>s that can perform the specified
      *         action on the specified object
      * @throws java.sql.SQLException
@@ -1030,11 +1030,41 @@ public class AuthorizeManager
     }
 
 
+    /**
+     * Is a policy with the specified parameters already in place?
+     *
+     * @param c
+     *         current context
+     * @param o
+     *         object
+     * @param actionID
+     *         ID of action from <code>org.dspace.core.Constants</code>
+     * @param policyID
+     *         ID of an existing policy. If -1 is specified, this parameter will be ignored
+     * @return true if such a policy exists, false otherwise
+     * @throws java.sql.SQLException
+     *         if there's a database problem
+     */
     public static boolean isAnIdenticalPolicyAlreadyInPlace(Context c, DSpaceObject o, int groupID, int action, int policyID) throws SQLException
     {
         return isAnIdenticalPolicyAlreadyInPlace(c, o.getType(), o.getID(), groupID, action, policyID);
     }
 
+    /**
+     * Is a policy with the specified parameters already in place?
+     *
+     * @param c
+     *         current context
+     * @param o
+     *         ID of an object
+     * @param action
+     *         ID of action from <code>org.dspace.core.Constants</code>
+     * @param policyID
+     *         ID of an existing policy. If -1 is specified, this parameter will be ignored
+     * @return true if such a policy exists, false otherwise
+     * @throws java.sql.SQLException
+     *         if there's a database problem
+     */
     public static boolean isAnIdenticalPolicyAlreadyInPlace(Context c, int dsoType, int dsoID, int groupID, int action, int policyID) throws SQLException
     {
 

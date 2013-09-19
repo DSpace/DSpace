@@ -24,9 +24,7 @@ import java.util.HashMap;
 import java.sql.SQLException;
 
 /**
- * User: @author kevinvandevelde (kevin at atmire.com)
- * Date: 19-nov-2009
- * Time: 17:19:56
+ * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements Matcher{
 

@@ -75,6 +75,9 @@ public class CCLicenseStep extends AbstractSubmissionStep
         protected static final Message T_save_changes  = message("xmlui.Submission.submit.CCLicenseStep.save_changes");
         protected static final Message T_ccws_error  = message("xmlui.Submission.submit.CCLicenseStep.ccws_error");
 
+    /** CC specific variables */
+    private String ccLocale;
+
 
 	/**
 	 * Establish our required parameters, abstractStep will enforce these.
@@ -83,6 +86,9 @@ public class CCLicenseStep extends AbstractSubmissionStep
 	{
 	    this.requireSubmission = true;
 	    this.requireStep = true;
+        this.ccLocale = ConfigurationManager.getProperty("cc.license.locale");
+        /** Default locale to 'en' */
+        this.ccLocale = (this.ccLocale != null) ? this.ccLocale : "en";
 	}
 	
 	
@@ -118,7 +124,7 @@ public class CCLicenseStep extends AbstractSubmissionStep
 	    Select selectList = list.addItem().addSelect("licenseclass_chooser");
 	    selectList.setLabel(T_license);
 	    selectList.setEvtBehavior("submitOnChange");
-	    Iterator<CCLicense> iterator = cclookup.getLicenses(ConfigurationManager.getProperty("default.locale")).iterator();
+	    Iterator<CCLicense> iterator = cclookup.getLicenses(ccLocale).iterator();
 	    // build select List - first choice always 'choose a license', last always 'No license'
 	    selectList.addOption(T_select_change.getKey(), T_select_change);
 	    while (iterator.hasNext()) {
@@ -132,12 +138,12 @@ public class CCLicenseStep extends AbstractSubmissionStep
 	    selectList.addOption(T_no_license.getKey(), T_no_license);
 	    if (selectedLicense  !=  null) {
 	    	// output the license fields chooser for the license class type
-	    	if (cclookup.getLicenseFields(selectedLicense) == null ) {
+	    	if (cclookup.getLicenseFields(selectedLicense, ccLocale) == null ) {
 	    		// do nothing
 	    	} 
 	    	else 
 	    	{
-		    Iterator outerIterator = cclookup.getLicenseFields(selectedLicense).iterator();
+		    Iterator outerIterator = cclookup.getLicenseFields(selectedLicense, ccLocale).iterator();
 		    while (outerIterator.hasNext()) 
 		    {
 			CCLicenseField cclicensefield = (CCLicenseField)outerIterator.next();

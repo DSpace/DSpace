@@ -39,11 +39,7 @@ import java.util.Random;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
- * Created by IntelliJ IDEA.
- * User: peterdietz
- * Date: 8/15/12
- * Time: 2:46 PM
- * To change this template use File | Settings | File Templates.
+ * @author Peter Dietz (pdietz84@gmail.com)
  */
 public class StatisticsImporterElasticSearch {
     private static final Logger log = Logger.getLogger(StatisticsImporterElasticSearch.class);

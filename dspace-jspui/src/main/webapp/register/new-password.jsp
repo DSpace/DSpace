@@ -29,6 +29,7 @@
 
 <%@ page import="org.dspace.app.webui.servlet.RegisterServlet" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%
     EPerson eperson = (EPerson) request.getAttribute("eperson");
@@ -43,9 +44,9 @@
     <%-- <h1>Enter a New Password</h1> --%>
 	<h1><fmt:message key="jsp.register.new-password.title"/></h1>
     
-    <!-- <p>Hello <%= eperson.getFullName() %>,</p> -->
+    <!-- <p>Hello <%= Utils.addEntities(eperson.getFullName()) %>,</p> -->
 	<p><fmt:message key="jsp.register.new-password.hello">
-        <fmt:param><%= eperson.getFullName() %></fmt:param>
+        <fmt:param><%= Utils.addEntities(eperson.getFullName()) %></fmt:param>
     </fmt:message></p>
     
 <%

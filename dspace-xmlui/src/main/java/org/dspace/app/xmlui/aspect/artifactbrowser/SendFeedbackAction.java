@@ -128,7 +128,7 @@ public class SendFeedbackAction extends AbstractAction
         }
 
         // All data is there, send the email
-        Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "feedback"));
+        Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "feedback"));
         email.addRecipient(ConfigurationManager
                 .getProperty("feedback.recipient"));
 

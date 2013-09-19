@@ -66,10 +66,6 @@
             throw new ServletException(e);
         }
         
-        // Home page shows community list
-        Community[] communities = Community.findAllTop(context);
-        request.setAttribute("communities", communities);
-        
         // Show home page JSP
         JSPManager.showJSP(request, response, "/home.jsp");
     }

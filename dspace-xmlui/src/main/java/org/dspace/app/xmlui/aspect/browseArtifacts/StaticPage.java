@@ -21,11 +21,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: peterdietz
- * Date: 07/12/11
- * Time: 11:39 PM
- * To change this template use File | Settings | File Templates.
+ * Implements a Cocoon transformer for easily defining a static XMLUI page without the need to write any Java code
+ * 
+ * For info on usage, see https://wiki.duraspace.org/display/DSPACE/Manakin+theme+tutorial
+ * 
+ * @author Peter Dietz (pdietz84@gmail.com)
  */
 public class StaticPage extends AbstractDSpaceTransformer {
     @Override
