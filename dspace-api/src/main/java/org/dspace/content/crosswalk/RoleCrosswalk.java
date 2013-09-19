@@ -182,7 +182,8 @@ public class RoleCrosswalk
             }
 
             // Create a temporary file to disseminate into
-            String tempDirectory = ConfigurationManager.getProperty("upload.temp.dir");
+            String tempDirectory = (ConfigurationManager.getProperty("upload.temp.dir") != null)
+                ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir"); 
             File tempFile = File.createTempFile("RoleCrosswalkDisseminate" + dso.hashCode(), null, new File(tempDirectory));
             tempFile.deleteOnExit();
 
@@ -311,7 +312,8 @@ public class RoleCrosswalk
         }
         
         // Create a temporary file to ingest from
-        String tempDirectory = ConfigurationManager.getProperty("upload.temp.dir");
+        String tempDirectory = (ConfigurationManager.getProperty("upload.temp.dir") != null)
+            ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir"); 
         File tempFile = File.createTempFile("RoleCrosswalkIngest" + dso.hashCode(), null, new File(tempDirectory));
         tempFile.deleteOnExit();
         FileOutputStream fileOutStream = null;

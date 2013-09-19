@@ -7,6 +7,8 @@
  */
 package org.dspace.xoai.data;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,6 +16,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
@@ -156,5 +159,37 @@ public class DSpaceIdentify extends AbstractIdentify
         }
         return _name;
     }
+
+	@Override
+	public List<String> getDescription() {
+		List<String> result = new ArrayList<String>();
+		String descriptionFile = ConfigurationManager.getProperty("oai", "description.file");
+		if (descriptionFile == null) {
+			// Try indexed
+			boolean stop = false;
+			List<String> descriptionFiles = new ArrayList<String>();
+			for (int i=0;!stop;i++) {
+				String tmp = ConfigurationManager.getProperty("oai", "description.file."+i);
+				if (tmp == null && i!=0) stop = true;
+				else descriptionFiles.add(tmp);
+			}
+			
+			for (String path : descriptionFiles) {
+				try {
+					result.add(FileUtils.readFileToString(new File(path)));
+				} catch (IOException e) {
+					log.error(e.getMessage(), e);
+				}
+			}
+			
+		} else {
+			try {
+				result.add(FileUtils.readFileToString(new File(descriptionFile)));
+			} catch (IOException e) {
+				log.error(e.getMessage(), e);
+			}
+		}
+		return result;
+	}
 
 }

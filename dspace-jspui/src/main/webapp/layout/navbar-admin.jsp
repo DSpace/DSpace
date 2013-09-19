@@ -156,6 +156,15 @@
     </td>
   </tr>
   
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/curate") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
+    </td>
+    <td nowrap="nowrap" class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/dspace-admin/curate"><fmt:message key="jsp.layout.navbar-admin.curate"/></a>
+    </td>
+  </tr>
+  
   <tr>
      <td colspan="2">&nbsp;</td>
   </tr>

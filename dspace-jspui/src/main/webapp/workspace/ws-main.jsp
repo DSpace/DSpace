@@ -26,6 +26,7 @@
 <%@ page import="org.dspace.content.WorkspaceItem" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%
     // get the workspace item from the request
@@ -73,7 +74,7 @@
 		}
 %>
 
-    <p><strong><a href="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></a></strong></p>
+    <p><strong><a href="mailto:<%= submitter.getEmail() %>"><%= Utils.addEntities(submitter.getFullName()) %></a></strong></p>
 
 	<p><fmt:message key="jsp.workspace.ws-main.submitmsg"/> 
     <%= workspaceItem.getCollection().getMetadata("name") %></p>

@@ -196,7 +196,7 @@ public class ResourcePolicy
     }
 
     /**
-     * Get the e-person's internal identifier
+     * Get the ResourcePolicy's internal identifier
      * 
      * @return the internal identifier
      */

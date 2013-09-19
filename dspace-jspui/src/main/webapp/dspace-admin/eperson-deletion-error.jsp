@@ -28,11 +28,12 @@
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Iterator" %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%
     EPerson eperson = (EPerson) request.getAttribute("eperson");
     List tableList = (List) request.getAttribute("tableList");
-    String fullName = eperson.getFullName();
+    String fullName = Utils.addEntities(eperson.getFullName());
     Iterator tableIt = tableList.iterator();
   
 %>

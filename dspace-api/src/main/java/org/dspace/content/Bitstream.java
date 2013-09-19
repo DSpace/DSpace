@@ -667,7 +667,9 @@ public class Bitstream extends DSpaceObject
     }
     
     /**
-     * Determine if this bitstream is registered
+     * Determine if this bitstream is registered (available elsewhere on
+     * filesystem than in assetstore). More about registered items:
+     * https://wiki.duraspace.org/display/DSDOC3x/Registering+(not+Importing)+Bitstreams+via+Simple+Archive+Format
      * 
      * @return true if the bitstream is registered, false otherwise
      */

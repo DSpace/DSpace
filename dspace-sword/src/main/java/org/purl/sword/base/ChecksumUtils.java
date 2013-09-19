@@ -17,7 +17,8 @@ import org.apache.log4j.Logger;
 /**
  * Utility class that holds Checksum related methods. 
  * 
- * @author Neil Taylor, Stuart Lewis 
+ * @author Neil Taylor
+ * @author Stuart Lewis 
  */
 public class ChecksumUtils
 {

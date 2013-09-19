@@ -7,6 +7,8 @@
  */
 package org.dspace.authenticate;
 
+import org.apache.log4j.Logger;
+
 import java.net.Inet6Address;
 import java.net.UnknownHostException;
 
@@ -30,9 +32,13 @@ import java.net.UnknownHostException;
  * 
  * @version $Revision$
  * @author Robert Tansley
+ * @author  Ben Bosman
+ * @author Roeland Dillen
  */
 public class IPMatcher
 {
+    private static Logger log = Logger.getLogger(IPMatcher.class);
+
     /** Network to match */
     private byte[] network;
 
@@ -139,13 +145,26 @@ public class IPMatcher
                     netmask[1] = (byte) ((fullMask & 0x00FF0000) >>> 16);
                     netmask[2] = (byte) ((fullMask & 0x0000FF00) >>> 8);
                     netmask[3] = (byte) (fullMask & 0x000000FF);
+                    ipToBytes(ipPart, network, mustHave4);
+                    if (log.isDebugEnabled()) {
+                        log.debug("fullMask: "+fullMask);
+                        for (int i = 0; i < network.length; i++) {
+                            log.debug("network[" + i + "]: "+network[i]);
+                }
+                        for (int i = 0; i < netmask.length; i++) {
+                            log.debug("netmask[" + i + "]: "+netmask[i]);
+                        }
+                    }
                 }
                 else
                 {
-                    // full subnet specified
+                    // full netmask specified
+                    ipToBytes(parts[0],network,true);
                     ipToBytes(parts[1], netmask, true);
                 }
     
+                break;
+
             case 1:
                 // Get IP
                 for (int i = 0; i < netmask.length; i++)
@@ -166,6 +185,14 @@ public class IPMatcher
             }
             network = ip4ToIp6(network);
             netmask = ip4MaskToIp6(netmask);
+            if (log.isDebugEnabled()) {
+                for (int i = 0; i < network.length; i++) {
+                    log.debug("network[" + i + "]: "+network[i]);
+        }
+                for (int i = 0; i < netmask.length; i++) {
+                    log.debug("netmask[" + i + "]: "+netmask[i]);
+    }
+            }
         }
     }
 
@@ -236,6 +263,7 @@ public class IPMatcher
      */
     public boolean match(String ipIn) throws IPMatcherException
     {
+        log.debug("ipIn: "+ipIn);
         byte[] candidate;
 
         if (ipIn.indexOf(':') < 0)
@@ -258,6 +286,13 @@ public class IPMatcher
         {
             if ((candidate[i] & netmask[i]) != (network[i] & netmask[i]))
             {
+                if (log.isDebugEnabled()) {
+                    log.debug("candidate[i]: "+candidate[i]);
+                    log.debug("netmask[i]: "+netmask[i]);
+                    log.debug("candidate[i] & netmask[i]: "+(candidate[i] & netmask[i]));
+                    log.debug("network[i]: "+network[i]);
+                    log.debug("network[i] & netmask[i]: "+(network[i] & netmask[i]));
+                }
                 return false;
             }
         }

@@ -351,6 +351,17 @@
             </tr>   
 <%  } %>
 
+<% if(bAdminCollection) { %>
+<%-- ===========================================================
+     Curate collection
+     =========================================================== --%>
+            <tr>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label27"/></td>
+                <td>
+                    <input type="submit" name="submit_curate_collection" value="<fmt:message key="jsp.tools.edit-collection.form.button.curate"/>" />
+                </td>
+            </tr>   
+<%  } %>
 
 
 

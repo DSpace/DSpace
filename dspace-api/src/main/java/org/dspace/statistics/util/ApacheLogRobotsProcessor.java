@@ -80,7 +80,7 @@ public class ApacheLogRobotsProcessor {
 
             if (spiderIpFile.exists())
             {
-                logSpiders = SpiderDetector.readIpAddresses(spiderIpFile);
+                logSpiders = SpiderDetector.readPatterns(spiderIpFile);
             }
             else
             {

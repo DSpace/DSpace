@@ -20,6 +20,7 @@
     prefix="fmt" %>
 
 <%@ page import="org.dspace.eperson.EPerson" %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -32,9 +33,9 @@
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin">
 
-    <%-- <h1>Delete e-person: <%= eperson.getFullName() %> (<%= eperson.getEmail() %>)</h1> --%>
+    <%-- <h1>Delete e-person: <%= Utils.addEntities(eperson.getFullName()) %> (<%= eperson.getEmail() %>)</h1> --%>
     <h1><fmt:message key="jsp.dspace-admin.eperson-confirm-delete.heading">
-        <fmt:param><%= eperson.getFullName() %></fmt:param>
+        <fmt:param><%= Utils.addEntities(eperson.getFullName()) %></fmt:param>
         <fmt:param><%= eperson.getEmail() %></fmt:param>
     </fmt:message></h1>
     

@@ -216,6 +216,14 @@
     </command>
 
     <command>
+        <name>read</name>
+        <description>Execute a stream of 'dspace' commands from a file or pipe</description>
+        <step>
+            <class>org.dspace.app.launcher.CommandRunner</class>
+        </step>
+    </command>
+
+    <command>
         <name>stat-general</name>
         <description>Compile the general statistics</description>
         <step passuserargs="false">
@@ -372,6 +380,14 @@
     </command>
 
     <command>
+        <name>user</name>
+        <description>Manipulate a normal user account</description>
+        <step>
+            <class>org.dspace.eperson.EPerson</class>
+        </step>
+    </command>
+
+    <command>
         <name>migrate-embargo</name>
         <description>Embargo manager tool used to migrate old version of Embargo to the new one included in dspace3</description>
         <step>
@@ -384,6 +400,14 @@
         <description>OAI script manager</description>
         <step>
             <class>org.dspace.xoai.app.XOAI</class>
+        </step>
+    </command>
+
+    <command>
+        <name>version</name>
+        <description>Display the version of DSpace and other troubleshooting information</description>
+        <step>
+            <class>org.dspace.app.util.Version</class>
         </step>
     </command>
 
