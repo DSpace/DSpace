@@ -1,8 +1,8 @@
 package org.dspace.rest;
 
 import org.dspace.content.Collection;
-import org.dspace.core.Context;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.sql.SQLException;
@@ -17,9 +17,9 @@ http://localhost:8080/<webapp>/collections
  */
 @Path("/collections")
 public class CollectionsResource {
-    final String collectionsPath = "/dspace-rest/collections/";
+    @javax.ws.rs.core.Context ServletContext servletContext;
 
-    private static Context context;
+    private static org.dspace.core.Context context;
 
     /*
     The "GET" annotation indicates this method will respond to HTTP Get requests.
@@ -31,11 +31,11 @@ public class CollectionsResource {
     public String listHTML() {
         StringBuilder everything = new StringBuilder();
         try {
-            Context context = new Context();
+            org.dspace.core.Context context = new org.dspace.core.Context();
 
             Collection[] collections = Collection.findAll(context);
             for(Collection collection : collections) {
-                everything.append("<li><a href='" + collectionsPath + collection.getID() + "'>" + collection.getID() + " - " + collection.getName() + "</a></li>\n");
+                everything.append("<li><a href='" + servletContext.getContextPath() + "/collections/" + collection.getID() + "'>" + collection.getID() + " - " + collection.getName() + "</a></li>\n");
             }
 
         } catch (SQLException e) {
@@ -51,7 +51,7 @@ public class CollectionsResource {
     public org.dspace.rest.common.Collection[] list(@QueryParam("expand") String expand) {
         try {
             if(context == null || !context.isValid() ) {
-                context = new Context();
+                context = new org.dspace.core.Context();
             }
 
             Collection[] collections = Collection.findAll(context);
