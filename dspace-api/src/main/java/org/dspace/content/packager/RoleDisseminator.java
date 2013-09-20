@@ -444,9 +444,12 @@ public class RoleDisseminator implements PackageDisseminator
         writer.writeStartElement(EPERSON);
         writer.writeAttribute(ID, String.valueOf(eperson.getID()));
 
-        writer.writeStartElement(EMAIL);
-        writer.writeCharacters(eperson.getEmail());
-        writer.writeEndElement();
+        if (eperson.getEmail()!=null)
+        {
+            writer.writeStartElement(EMAIL);
+            writer.writeCharacters(eperson.getEmail());
+            writer.writeEndElement();
+        }
 
         if(eperson.getNetid()!=null)
         {
