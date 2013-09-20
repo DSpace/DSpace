@@ -81,8 +81,8 @@ public class FileIndexer implements IndexerInterface, SolrDocumentFields {
         String value = props.get(DryadJournalSubmissionUtils.FULLNAME);
 
         String integratedJournal = props.get(DryadJournalSubmissionUtils.INTEGRATED);
-        if(integratedJournal!=null && integratedJournal.equals("true"))
-            value+="*";
+//        if(integratedJournal!=null && integratedJournal.equals("true"))
+//            value+="*";
 
 	    values.put(DOC_ID, Utils.getMD5(value));
 	    values.put(DOC_SOURCE, SOURCE);
