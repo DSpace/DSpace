@@ -53,7 +53,7 @@ def get_objects(mn_object_url, start, count):
 	r = requests.get(mn_object_url, params={'start': start, 'count': count})
 	root = ElementTree.fromstring(r.text)
 	infos = root.findall('.//objectInfo')
-	objects = dict()
+	objects = {DRYAD_REM_FORMAT: [], DRYAD_METADATA_FORMAT: []}
 	for info in infos:
 		formatId = info.find('formatId').text
 		if formatId not in objects:
