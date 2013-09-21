@@ -16,9 +16,11 @@
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
+<%@ page import="java.util.List" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
+<%@ page import="org.dspace.authorize.ResourcePolicy" %>
 <%@ page import="org.dspace.submit.AbstractProcessingStep" %>
 <%@ page import="org.dspace.submit.step.UploadStep" %>
 <%@ page import="org.dspace.app.util.DCInputSet" %>
@@ -35,7 +37,9 @@
 
 	//get submission information object
     SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
-   
+
+    boolean withEmbargo = ((Boolean)request.getAttribute("with_embargo")).booleanValue();
+
  	// Determine whether a file is REQUIRED to be uploaded (default to true)
  	boolean fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);
 %>
@@ -108,7 +112,18 @@
     }
 %>
         </table>
-        
+
+<%
+    if (withEmbargo)
+    {
+%>
+        <br/>
+        <dspace:access-setting subInfo="<%= subInfo %>" dso="<%= subInfo.getSubmissionItem().getItem() %>" hidden="true" />
+        <br/>
+<%
+    }
+%>
+
 		<%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
         <%= SubmissionController.getSubmissionParameters(context, request) %>
     
