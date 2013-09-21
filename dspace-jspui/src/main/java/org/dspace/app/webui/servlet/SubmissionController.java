@@ -229,7 +229,7 @@ public class SubmissionController extends DSpaceServlet
             } catch (FileSizeLimitExceededException e)
             {
                 log.warn("Upload exceeded upload.max");
-                if (ConfigurationManager.getBooleanProperty("webui.submit.upload.ajax", true))
+                if (ConfigurationManager.getBooleanProperty("webui.submit.upload.progressbar", true))
                 {
                     Gson gson = new Gson();
                     // old browser need to see this response as html to work            

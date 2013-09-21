@@ -70,7 +70,7 @@ public class FileUploadRequest extends HttpServletRequestWrapper
 
         HttpSession session = req.getSession();
         
-        if (ConfigurationManager.getBooleanProperty("webui.submit.upload.ajax", true))
+        if (ConfigurationManager.getBooleanProperty("webui.submit.upload.progressbar", true))
         {
             // set file upload progress listener
             FileUploadListener listener = new FileUploadListener();
@@ -122,7 +122,7 @@ public class FileUploadRequest extends HttpServletRequestWrapper
         }
         finally
         {
-            if (ConfigurationManager.getBooleanProperty("webui.submit.upload.ajax", true))
+            if (ConfigurationManager.getBooleanProperty("webui.submit.upload.progressbar", true))
             {
                 session.removeAttribute(FILE_UPLOAD_LISTNER);
             }
