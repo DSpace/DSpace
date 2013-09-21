@@ -22,6 +22,18 @@ public class Item {
 
     String handle;
 
+    String name;
+
+    String isArchived;
+    String isWithdrawn;
+
+    String lastModified;
+
+
+    //TODO: Make optional
+    Integer owningCollectionID;
+    String owningCollectionName;
+
     @XmlElement(name = "metadata", required = true)
     Metadata metadata;
 
@@ -65,6 +77,17 @@ public class Item {
             metadata.setDCValues(Arrays.asList(allMetadata));
 
             this.setHandle(item.getHandle());
+
+            this.setName(item.getName());
+
+            this.setArchived(Boolean.toString(item.isArchived()));
+            this.setWithdrawn(Boolean.toString(item.isWithdrawn()));
+            this.setLastModified(item.getLastModified().toString());
+
+            this.setOwningCollectionID(item.getOwningCollection().getID());
+            this.setOwningCollectionName(item.getOwningCollection().getName());
+
+
         } catch (Exception e) {
 
         }
@@ -87,5 +110,52 @@ public class Item {
         this.handle = handle;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getArchived() {
+        return isArchived;
+    }
+
+    public void setArchived(String archived) {
+        isArchived = archived;
+    }
+
+    public String getWithdrawn() {
+        return isWithdrawn;
+    }
+
+    public void setWithdrawn(String withdrawn) {
+        isWithdrawn = withdrawn;
+    }
+
+    public String getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(String lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    public Integer getOwningCollectionID() {
+        return owningCollectionID;
+    }
+
+    public void setOwningCollectionID(Integer owningCollectionID) {
+        this.owningCollectionID = owningCollectionID;
+    }
+
+    public String getOwningCollectionName() {
+        return owningCollectionName;
+    }
+
+    public void setOwningCollectionName(String owningCollectionName) {
+        this.owningCollectionName = owningCollectionName;
+    }
 
 }
