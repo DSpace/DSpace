@@ -43,17 +43,19 @@
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
 
+    <!-- DSpace Configuration Information -->
     <context-param>
         <param-name>dspace-config</param-name>
-        <param-value>/dspace/config/dspace.cfg</param-value>
+        <param-value>${dspace.dir}/config/dspace.cfg</param-value>
     </context-param>
 
-    <!-- ConfigurationService initialization for dspace.dir -->
+    <!-- new ConfigurationService initialization for dspace.dir -->
     <context-param>
-        <description>The location of the main DSpace configuration file</description>
+        <description>
+            The location of the main DSpace configuration file
+        </description>
         <param-name>dspace.dir</param-name>
-        <!-- param-value>${dspace.dir}</param-value -->
-        <param-value>/dspace</param-value>
+        <param-value>${dspace.dir}</param-value>
     </context-param>
 
     <context-param>
