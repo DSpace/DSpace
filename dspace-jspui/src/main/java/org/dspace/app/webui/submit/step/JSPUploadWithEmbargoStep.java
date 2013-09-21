@@ -19,6 +19,7 @@ import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.webui.submit.JSPStepManager;
+import org.dspace.app.webui.util.JSONUploadResponse;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -34,6 +35,8 @@ import org.dspace.eperson.Group;
 import org.dspace.submit.step.AccessStep;
 import org.dspace.submit.step.UploadStep;
 import org.dspace.submit.step.UploadWithEmbargoStep;
+
+import com.google.gson.Gson;
 
 /**
  * Upload step with the advanced embargo fucntion for DSpace JSP-UI. Handles the pages 
@@ -116,6 +119,33 @@ public class JSPUploadWithEmbargoStep extends JSPUploadStep
 
         // Do we need to skip the upload entirely?
         boolean fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);
+        
+        if (UIUtil.getBoolParameter(request, "ajaxUpload"))
+        {
+            Gson gson = new Gson();
+            // old browser need to see this response as html to work            
+            response.setContentType("text/html");
+            JSONUploadResponse jsonResponse = new JSONUploadResponse();
+            String bitstreamName = null;
+            int bitstreamID = -1;
+            long size = 0;
+            String url = null;
+            if (subInfo.getBitstream() != null)
+            {
+                Bitstream bitstream = subInfo.getBitstream();
+                bitstreamName = bitstream.getName();
+                bitstreamID = bitstream.getID();
+                size = bitstream.getSize();
+                url = request.getContextPath() + "/retrieve/" + bitstreamID
+                        + "/" + UIUtil.encodeBitstreamName(bitstreamName);
+            }
+            jsonResponse.addUploadFileStatus(bitstreamName, bitstreamID, size,
+                    url, status);
+            response.getWriter().print(gson.toJson(jsonResponse));
+            response.flushBuffer();
+            return;
+        }
+        
         if (buttonPressed.equalsIgnoreCase(UploadStep.SUBMIT_SKIP_BUTTON) ||
             (buttonPressed.equalsIgnoreCase(UploadStep.SUBMIT_UPLOAD_BUTTON) && !fileRequired))
         {
