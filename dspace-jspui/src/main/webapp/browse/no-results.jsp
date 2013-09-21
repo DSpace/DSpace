@@ -31,7 +31,7 @@
     request.setAttribute("LanguageSwitch", "hide");
 
 	String layoutNavbar = "default";
-	if (request.getAttribute("browseWithdrawn") != null)
+	if (request.getAttribute("browseWithdrawn") != null || request.getAttribute("browsePrivate") != null)
 	{
 	    layoutNavbar = "admin";
 	}

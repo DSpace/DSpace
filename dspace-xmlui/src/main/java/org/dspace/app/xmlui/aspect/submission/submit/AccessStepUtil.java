@@ -67,7 +67,7 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
     private boolean isAdvancedFormEnabled=false;
 
     public AccessStepUtil(Context c){
-        isAdvancedFormEnabled=ConfigurationManager.getBooleanProperty("xmlui.submission.restrictstep.enableAdvancedForm", false);
+        isAdvancedFormEnabled=ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
         context=c;
     }
 
@@ -106,7 +106,7 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
             Group[] loadedGroups = null;
 
             // retrieve groups
-            String name = ConfigurationManager.getProperty("xmlui.submission.restrictstep.groups");
+            String name = ConfigurationManager.getProperty("webui.submission.restrictstep.groups");
             if(name!=null){
                 Group uiGroup = Group.findByName(context, name);
                 if(uiGroup!=null)

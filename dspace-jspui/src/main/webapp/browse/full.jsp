@@ -33,11 +33,18 @@
     String urlFragment = "browse";
     String layoutNavbar = "default";
     boolean withdrawn = false;
+    boolean privateitems = false;
 	if (request.getAttribute("browseWithdrawn") != null)
 	{
 	    layoutNavbar = "admin";
         urlFragment = "dspace-admin/withdrawn";
         withdrawn = true;
+    }
+	else if (request.getAttribute("browsePrivate") != null)
+	{
+	    layoutNavbar = "admin";
+        urlFragment = "dspace-admin/privateitems";
+        privateitems = true;
     }
 
 	// First, get the browse info object
@@ -419,7 +426,7 @@
 		<input type="submit" name="submit_browse" value="<fmt:message key="jsp.general.update"/>"/>
 
 <%
-    if (admin_button && !withdrawn)
+    if (admin_button && !withdrawn && !privateitems)
     {
         %><input type="submit" name="submit_export_metadata" value="<fmt:message key="jsp.general.metadataexport.button"/>" /><%
     }
@@ -466,7 +473,7 @@
 	<dspace:browselist browseInfo="<%= bi %>" emphcolumn="<%= bix.getMetadata() %>" />
     <%
         }
-        else if (request.getAttribute("browseWithdrawn") != null)
+        else if (withdrawn || privateitems)
         {
     %>
     <dspace:browselist browseInfo="<%= bi %>" emphcolumn="<%= bix.getSortOption().getMetadata() %>" linkToEdit="true" disableCrossLinks="true" />

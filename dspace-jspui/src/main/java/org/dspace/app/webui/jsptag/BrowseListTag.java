@@ -482,8 +482,8 @@ public class BrowseListTag extends TagSupport
                             DCDate dd = new DCDate(metadataArray[0].value);
                             metadata = UIUtil.displayDate(dd, false, false, hrq);
                         }
-                        // format the title field correctly for withdrawn items (ie. don't link)
-                        else if (field.equals(titleField) && items[i].isWithdrawn())
+                        // format the title field correctly for withdrawn and private items (ie. don't link)
+                        else if (field.equals(titleField) && (items[i].isWithdrawn() || !isDiscoverable(hrq, items[i])))
                         {
                             metadata = Utils.addEntities(metadataArray[0].value);
                         }
@@ -885,6 +885,23 @@ public class BrowseListTag extends TagSupport
         catch (UnsupportedEncodingException e)
         {
             throw new JspException("Server does not support DSpace's default encoding. ", e);
+        }
+    }
+
+    /* whether the embedded item of the bitem is discoverable or not? */
+    private boolean isDiscoverable(HttpServletRequest hrq, BrowseItem bitem)
+            throws JspException
+    {
+    	try
+    	{
+            Context c = UIUtil.obtainContext(hrq);
+            Item item = Item.find(c, bitem.getID());
+
+            return item.isDiscoverable();
+        }
+        catch (SQLException sqle)
+        {
+        	throw new JspException(sqle.getMessage(), sqle);
         }
     }
 }

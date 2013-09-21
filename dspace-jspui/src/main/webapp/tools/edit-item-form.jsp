@@ -88,6 +88,12 @@
     Boolean reinstate = (Boolean)request.getAttribute("reinstate_button");
     boolean bReinstate = (reinstate == null ? false : reinstate.booleanValue());
 
+    Boolean privating = (Boolean)request.getAttribute("privating_button");
+    boolean bPrivating = (privating == null ? false : privating.booleanValue());
+    
+    Boolean publicize = (Boolean)request.getAttribute("publicize_button");
+    boolean bPublicize = (publicize == null ? false : publicize.booleanValue());
+
     Boolean reOrderBitstreams = (Boolean)request.getAttribute("reorder_bitstreams_button");
     boolean breOrderBitstreams = (reOrderBitstreams != null && reOrderBitstreams);
 
@@ -249,7 +255,10 @@
                     </form>
 <%
   }
+%>
+                    <br/>
 
+<%
   if (isItemAdmin)
   {
 %>                     <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
@@ -260,6 +269,31 @@
 <%
   }
 %>
+                    <br/>
+
+<%
+    if (item.isDiscoverable() && bPrivating)
+    {
+%>
+                    <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
+                        <input type="hidden" name="item_id" value="<%= item.getID() %>" />
+                        <input type="hidden" name="action" value="<%= EditItemServlet.START_PRIVATING %>" />
+                        <input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.privating-w-confirm.button"/>"/>
+                    </form>
+<%
+    }
+    else if (!item.isDiscoverable() && bPublicize)
+    {
+%>
+                    <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
+                        <input type="hidden" name="item_id" value="<%= item.getID() %>" />
+                        <input type="hidden" name="action" value="<%= EditItemServlet.PUBLICIZE %>" />
+                        <input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.publicize.button"/>"/>
+                    </form>
+<%
+    }
+%>
+
                 </td>
             </tr>
             <tr>
