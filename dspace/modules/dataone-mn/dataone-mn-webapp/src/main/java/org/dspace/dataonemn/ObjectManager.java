@@ -970,7 +970,10 @@ public class ObjectManager implements Constants {
 	    resourceMapId.setValue(doi + "?format=d1rem" + idTimestamp);
 	    // the science metadata id
 	    Identifier dataPackageId = new Identifier();
-	    dataPackageId.setValue(doi + idTimestamp);
+            // idTimestamp is passed in as the second query parameter,
+            // and is prefixed with &.  In the dataPackageId, it is the first
+            // query parameter, so the prefix should be ?
+	    dataPackageId.setValue(doi + idTimestamp.replace('&','?'));
 	    // data file identifiers
 	    List<Identifier> dataIds = new ArrayList<Identifier>();
 	    for(int i=0; i < dataFiles.length; i++) {

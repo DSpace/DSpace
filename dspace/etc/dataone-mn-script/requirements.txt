@@ -1,0 +1,2 @@
+requests==1.2.3
+wsgiref==0.1.2
