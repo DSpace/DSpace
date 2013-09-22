@@ -142,6 +142,7 @@ public class DataFileStats extends AbstractCurationTask {
 	boolean wentThroughReview = false;
 	String dateAccessioned = "\"[unknown]\"";
 
+
 	
 	try {
 	    context = new Context();
@@ -157,6 +158,10 @@ public class DataFileStats extends AbstractCurationTask {
 	} else if (dso.getType() == Constants.ITEM) {
             Item item = (Item)dso;
 
+	    if(!item.isArchived()) {
+		return Curator.CURATE_SKIP;
+	    }
+	    
 	    try {
 		handle = item.getHandle();
 		log.info("handle = " + handle);
