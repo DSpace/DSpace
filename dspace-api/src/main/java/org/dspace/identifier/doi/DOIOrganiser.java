@@ -286,7 +286,7 @@ public class DOIOrganiser {
 
             if (status.equals("toBeRegistered"))
             {
-                provider.registereOnline(context,
+                provider.registerOnline(context,
                         dso,
                         doiRow.getStringColumn("doi"));
             }

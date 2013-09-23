@@ -281,7 +281,7 @@ public class DOIIdentifierProvider
         DatabaseManager.update(context, doiRow);
     }
 
-    public void registereOnline(Context context, DSpaceObject dso, String identifier)
+    public void registerOnline(Context context, DSpaceObject dso, String identifier)
             throws IdentifierException, IllegalArgumentException, SQLException
     {
         String doi = DOI.formatIdentifier(identifier);
