@@ -334,7 +334,8 @@ public class RoleDisseminator implements PackageDisseminator
             {
                 writer.writeEmptyElement(MEMBER);
                 writer.writeAttribute(ID, String.valueOf(member.getID()));
-                writer.writeAttribute(NAME, member.getName());
+                if (null != member.getName())
+                    writer.writeAttribute(NAME, member.getName());
             }
             writer.writeEndElement();
         }
