@@ -333,7 +333,10 @@
                         <xsl:text>  </xsl:text>
                     </xsl:when>
                     <xsl:otherwise>
-                    	<xsl:copy-of select="$page_title/node()"/>
+                    	<!-- If the page has a title, then will proceed to filter any HTML tag that it has. -->
+						<xsl:call-template name="filterHTMLTags">
+                    		<xsl:with-param name="targetNode" select="$page_title"/>
+                    	</xsl:call-template>
                     </xsl:otherwise>
                 </xsl:choose>
             </title>

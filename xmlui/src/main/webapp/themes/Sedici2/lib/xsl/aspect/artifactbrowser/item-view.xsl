@@ -200,10 +200,7 @@
 			<xsl:with-param name="elements" select="dim:field[@element='relation' and @qualifier='ciclo'] "/>
 		</xsl:call-template>
 		<!-- title.alternative row -->
-		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'title-alternative'"/>
-			<xsl:with-param name="elements" select="dim:field[@element='title' and @qualifier='alternative'] "/>
-		</xsl:call-template>
+		<xsl:call-template name="showAlternativeTitles"/>
 
 		<!-- Abstract row -->
 		<xsl:if test="(dim:field[@element='description' and @qualifier='abstract'])">
@@ -1492,6 +1489,15 @@
           	</xsl:if>
           </span>
        </a> 
+    </xsl:template>
+    
+    <xsl:template name="showAlternativeTitles">
+    	<xsl:for-each select="dim:field[@element='title' and @qualifier='alternative']">
+    		<xsl:call-template name="render-normal-field">
+				<xsl:with-param name="name" select="'title-alternative'"/>
+				<xsl:with-param name="elements" select="."/>
+			</xsl:call-template>
+    	</xsl:for-each>
     </xsl:template>
 	
 </xsl:stylesheet>

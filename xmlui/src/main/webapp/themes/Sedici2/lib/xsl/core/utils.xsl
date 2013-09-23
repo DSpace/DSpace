@@ -29,7 +29,8 @@
 	xmlns:exslt="http://exslt.org/common"
 	xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:ex="ar.edu.unlp.sedici.xmlui.xsl.XslExtensions"
-	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc exslt">
+	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc exslt"
+	xmlns:java="http://xml.apache.org/xalan/java">
 
     <xsl:output indent="yes"/>
 
@@ -444,5 +445,30 @@
 	</xsl:template>
 	
 	
+	<xsl:template name="filterHTMLTags">
+		<!-- It is the node that will be processed. -->
+   		<xsl:param name="targetNode"/>
+    	<xsl:choose>
+    		<!-- If there isn't a text node to process, then will proceed to copy the tree of nodes.  -->
+    		<xsl:when test="$targetNode/*">
+    			<xsl:copy-of select="$targetNode/*"/>
+    		</xsl:when>
+    		<!-- Else, there is a text node.-->
+    		<xsl:when test="$targetNode/text()">
+    			<xsl:call-template name="processTextNodes">
+	    			<xsl:with-param name="textNode" select="$targetNode"/>
+	    		</xsl:call-template>
+    		</xsl:when>
+    	</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template name="processTextNodes">
+    	<!-- It is a text node that will be processed -->
+    	<xsl:param name="textNode"/>
+    	<xsl:if test="$textNode">
+    		<!-- Method of a Java class that use a regular expression to replace the HTML tags of a text. -->
+    		<xsl:copy-of select="java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.replace($textNode,'&lt;/?(i|sub|sup)&gt;','')"/>
+    	</xsl:if>
+    </xsl:template>
 	
 </xsl:stylesheet>
