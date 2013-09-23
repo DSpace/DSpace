@@ -8,7 +8,10 @@
 
 package org.dspace.identifier.doi;
 
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
+import java.util.Locale;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -20,8 +23,11 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
 import org.dspace.identifier.DOI;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierException;
@@ -512,4 +518,32 @@ public class DOIOrganiser {
                 LOG.error("It wasn't possible to update The object", ex);
         }
     }
+    
+    private void sendAlertMail(String action, DSpaceObject dso, String doi, String reason) 
+            throws IOException
+    {
+        String recipient = ConfigurationManager.getProperty("alert.recipient");
+
+        try
+        {
+            if (recipient != null)
+            {
+                Email email = Email.getEmail(
+                        I18nUtil.getEmailFilename(Locale.getDefault(), "doi_maintenance_error"));
+                email.addRecipient(recipient);
+                email.addArgument(action);
+                email.addArgument(new Date());
+                email.addArgument(dso.getTypeText());
+                email.addArgument(new Integer(dso.getID()));
+                email.addArgument(doi);
+                email.addArgument(reason);
+                email.send();
+
+            }
+        }
+        catch (Exception e) {
+            LOG.warn("Unable to send email alert", e);
+        }
+    }
+    
 }
