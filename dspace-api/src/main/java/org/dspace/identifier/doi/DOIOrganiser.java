@@ -42,6 +42,7 @@ import org.dspace.utils.DSpace;
 /**
  *
  * @author Marsa Haoua
+ * @author Pascal-Nicolas Becker
  */
 public class DOIOrganiser {
 
@@ -149,7 +150,7 @@ public class DOIOrganiser {
 
         // process options
         // user asks for help
-        if (line.hasOption('h'))
+        if (line.hasOption('h') || 0 == line.getOptions().length)
         {
             helpformater.printHelp("DOI organiser\n", options);
         }

@@ -200,7 +200,7 @@
     </command>
 
       <command>
-        <name>DOI organiser</name>
+        <name>doi-organiser</name>
         <description>Run the DOI organiser</description>
         <step>
             <class>org.dspace.identifier.doi.DOIOrganiser</class>
