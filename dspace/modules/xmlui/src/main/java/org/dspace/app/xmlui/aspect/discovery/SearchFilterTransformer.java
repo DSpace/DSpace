@@ -545,8 +545,7 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
 //            jumpList.addItemXref(generateURL("browse", letterQuery), "0-9");
             for (char c = 'A'; c <= 'Z'; c++)
             {
-                // TODO: Recalculate this based on the field
-                String linkUrl = basicUrl + "&" +  SearchFilterParam.STARTS_WITH +  "=" + Character.toString(c).toLowerCase();
+                String linkUrl = basicUrl + "&" +  SearchFilterParam.STARTS_WITH + field +  "=" + Character.toString(c).toLowerCase();
                 jumpList.addItemXref(linkUrl, Character
                         .toString(c));
             }
@@ -578,7 +577,7 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
             jumpForm.addContent(T_starts_with);
             jumpForm.addText("starts_with_"+field,"starts_with_"+field);
 
-            jumpForm.addButton("submit"+field,"submit_"+field).setValue(T_go);
+            jumpForm.addButton("submit_"+field,"submit_"+field).setValue(T_go);
 
             if(field.equals(request.getParameter(SearchFilterParam.FACET_FIELD)))
             {
@@ -792,7 +791,7 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
 
         /** The browse control params **/
         public static final String OFFSET = "offset";
-        public static final String STARTS_WITH = "starts_with";
+        public static final String STARTS_WITH = "starts_with_";
 
 
         private SearchFilterParam(Request request){
