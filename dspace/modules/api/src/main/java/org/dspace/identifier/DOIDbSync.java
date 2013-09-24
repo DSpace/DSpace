@@ -13,6 +13,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
+import org.dspace.doi.DOIDatabase;
+import org.dspace.doi.Minter;
 
 /**
  * Created by IntelliJ IDEA.
@@ -121,7 +123,12 @@ public class DOIDbSync {
 
     private static boolean resolve(Context context, Item item, DOIIdentifierProvider dis, PrintStream ps, String dc_identifier) throws IOException, IdentifierNotFoundException, IdentifierNotResolvableException {
 
-        DSpaceObject dso = dis.resolve(context, dc_identifier);
+        DSpaceObject dso = null;
+        try {
+            dso = dis.resolve(context, dc_identifier);
+        } catch (Exception ex) {
+            // Not found
+        }
         if(dso!=null){
             ps.print("Item: " + item.getID() + "  " + dc_identifier + "  " + item.getHandle() + " Resolved.");
             ps.println();
@@ -152,7 +159,12 @@ public class DOIDbSync {
 
         if(item.getHandle()!=null){
             String url= HandleManager.resolveToURL(context, item.getHandle()).toString();
-            String doi_id = dis.lookupByURL(url);
+            String doi_id = null;
+            try {
+                doi_id = dis.lookupByURL(url);
+            } catch (RuntimeException ex) {
+
+            }
             if(doi_id!=null && !"".equals(doi_id)){
                 ps.print("ATTENTION! For this handle we have registered the following DOI: " + doi_id);
                 ps.println();
@@ -197,13 +209,11 @@ public class DOIDbSync {
         }
 
         if(doi_!=null && !isTest){
-            String urlString = ConfigurationManager.getProperty("doi.service.url") + "?item=" + doi_.getTargetURL().toString() + "&doi=" + doi_.toString();
-            ps.println("Servlet invocation: " + urlString);
-            if(ps!=null){
-                ps.println("Servlet response: " + getUrlResponse(urlString));
-                ps.println();
-            }
+            Minter myMinter = new Minter();
+            myMinter.setMyLocalDatabase(DOIDatabase.getInstance());
+            myMinter.mintDOI(doi_);
         }
+
         return doi_;
     }
 

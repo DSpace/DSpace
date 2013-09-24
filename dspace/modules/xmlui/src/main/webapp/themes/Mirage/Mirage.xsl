@@ -756,11 +756,11 @@
                         <xsl:variable name="currentId"><xsl:value-of select="@id"/></xsl:variable>
                         <xsl:variable name="currentName"><xsl:value-of select="@n"/></xsl:variable>
 
-                        <!-- MANUSCRIPT NUMBER STATUS ACCEPTED -->
-                        <xsl:if test="$currentName!='manu_accepted-cb'">
+                        <!-- MANUSCRIPT NUMBER STATUS ACCEPTED-->
+                        <xsl:if test="$currentName='manu-number-status-accepted'">
                             <tr id="aspect_submission_StepTransformer_item_manu-number-status-accepted">
                                 <td>
-                                    <label class="ds-form-label-select-publication">
+                                    <label class="ds-form-label-manu-number-status-accepted">
                                         <xsl:attribute name="for">
                                             <xsl:value-of select="translate($currentId,'.','_')"/>
                                         </xsl:attribute>
@@ -769,6 +769,14 @@
                                         </i18n:text>
                                         <xsl:text>: </xsl:text>
                                     </label>
+                                    <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
+                                    <xsl:apply-templates select="../dri:field[@id=$currentId]/dri:error"/>
+                                </td>
+                            </tr>
+                        </xsl:if>
+                        <xsl:if test="$currentName='publication_select'">
+                            <tr id="aspect_submission_StepTransformer_item_manu-number-publication_select">
+                                <td>
                                     <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
                                     <xsl:apply-templates select="../dri:field[@id=$currentId]/dri:error"/>
                                 </td>
@@ -1183,7 +1191,7 @@ parameter that is being used (see variable defined above) -->
     </xsl:template>
     
     <!-- make sure search labels appear -->
-    <xsl:template match="dri:table[@id='aspect.discovery.SimpleSearch.table.search-controls']/dri:row/dri:cell/dri:field[@type='select']">
+    <xsl:template name="search_labels">
         <xsl:variable name="currentId">
           <xsl:value-of select="./@id" />
         </xsl:variable>
@@ -1197,4 +1205,13 @@ parameter that is being used (see variable defined above) -->
         </label>
         <xsl:apply-templates select="." mode="normalField"/>
     </xsl:template>
+
+    <xsl:template match="dri:table[@id='aspect.discovery.SimpleSearch.table.search-controls']/dri:row/dri:cell/dri:field[@type='select']">
+      <xsl:call-template name="search_labels" />
+    </xsl:template>
+
+    <xsl:template match="dri:field[@rend='starts_with' and @type='text']">
+      <xsl:call-template name="search_labels" />
+    </xsl:template>
+
 </xsl:stylesheet>
