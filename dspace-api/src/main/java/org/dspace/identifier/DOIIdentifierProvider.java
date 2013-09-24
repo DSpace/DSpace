@@ -65,11 +65,11 @@ public class DOIIdentifierProvider
     public static final String MD_SCHEMA = "dc";
     public static final String DOI_ELEMENT = "identifier";
     public static final String DOI_QUALIFIER = null;  
-    public static final int TO_BE_REGISTERED = 1;
-    public static final int TO_BE_RESERVERED = 2;
-    public static final int IS_REGISTERED = 3;
-    public static final int IS_RESERVED = 4;
-    public static final int DELETED = 5;
+    public static final Integer TO_BE_REGISTERED = 1;
+    public static final Integer TO_BE_RESERVERED = 2;
+    public static final Integer IS_REGISTERED = 3;
+    public static final Integer IS_RESERVED = 4;
+    public static final Integer DELETED = 5;
     
     /**
      * Prefix of DOI namespace. Set in dspace.cfg.

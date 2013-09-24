@@ -295,7 +295,7 @@ public class DOIOrganiser {
     }
     
 
-    public TableRowIterator getDOIsByStatus(int ... status)
+    public TableRowIterator getDOIsByStatus(Integer ... status)
     {
         try 
         {   
