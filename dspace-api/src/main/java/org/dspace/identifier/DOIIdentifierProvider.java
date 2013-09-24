@@ -64,7 +64,12 @@ public class DOIIdentifierProvider
     // TODO: move these to MetadataSchema or some such?
     public static final String MD_SCHEMA = "dc";
     public static final String DOI_ELEMENT = "identifier";
-    public static final String DOI_QUALIFIER = null;
+    public static final String DOI_QUALIFIER = null;  
+    public static final int TO_BE_REGISTERED = 1;
+    public static final int TO_BE_RESERVERED = 2;
+    public static final int IS_REGISTERED = 3;
+    public static final int IS_RESERVED = 4;
+    public static final int DELETED = 5;
     
     /**
      * Prefix of DOI namespace. Set in dspace.cfg.
@@ -176,13 +181,13 @@ public class DOIIdentifierProvider
         }
 
         // Check status of DOI
-        if ("isRegistered".equals(doiRow.getStringColumn("status")))
+        if (IS_REGISTERED == doiRow.getIntColumn("status"))
         {
             return;
         }
         
         // change status of DOI
-        doiRow.setColumn("status", "toBeRegistered");
+        doiRow.setColumn("status", TO_BE_REGISTERED);
         try {
             DatabaseManager.update(context, doiRow);
         }
@@ -242,7 +247,7 @@ public class DOIIdentifierProvider
             return;
         } 
                 
-        doiRow.setColumn("status", "toBeReserved");
+        doiRow.setColumn("status", TO_BE_RESERVERED);
         try
         {
             DatabaseManager.update(context, doiRow);
@@ -277,7 +282,7 @@ public class DOIIdentifierProvider
             connector.reserveDOI(context, dso, doi);
         }
 
-        doiRow.setColumn("status", "isReserved");
+        doiRow.setColumn("status", IS_RESERVED);
         DatabaseManager.update(context, doiRow);
     }
 
@@ -322,7 +327,7 @@ public class DOIIdentifierProvider
             }
         }
 
-        doiRow.setColumn("status", "isRegistered");
+        doiRow.setColumn("status", IS_REGISTERED);
         DatabaseManager.update(context, doiRow);
     }
 
@@ -533,7 +538,7 @@ public class DOIIdentifierProvider
         // change doi status in db if necessary.
         if (null != doiRow)
         {
-            doiRow.setColumn("status", "deleted");
+            doiRow.setColumn("status", DELETED);
             try {
                 DatabaseManager.update(context, doiRow);
             }

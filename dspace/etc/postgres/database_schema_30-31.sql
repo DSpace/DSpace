@@ -25,4 +25,4 @@
 -- New columns for Doi Table status --
 -------------------------------------------
 
-ALTER TABLE DOI ADD COLUMN  status VARCHAR(20);
+ALTER TABLE DOI ADD COLUMN  status INTEGER;

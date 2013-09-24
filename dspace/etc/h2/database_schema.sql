@@ -502,7 +502,7 @@ CREATE TABLE Doi
   doi              VARCHAR(256),
   resource_type_id INTEGER,
   resource_id      INTEGER,
-  status           VARCHAR(20)
+  status           INTEGER
 );
 
 -- index by handle, commonly looked up
