@@ -18,16 +18,14 @@ import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
 /**
- * This simple component will add a Search Box. It is intended for use on the front page.
+ * This simple component will add feed links. It is intended for use on the front
+ * page.
  *
  * @author Scott Phillips
  */
@@ -38,15 +36,6 @@ public class FrontPageSearch extends AbstractDSpaceTransformer implements Cachea
     public static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
 	
-    private static final Message T_head = 
-        message("xmlui.ArtifactBrowser.FrontPageSearch.head");
-    
-    private static final Message T_para1 =
-        message("xmlui.ArtifactBrowser.FrontPageSearch.para1");
-    
-    private static final Message T_go =
-        message("xmlui.general.go");
-    
     
     /**
      * Generate the unique caching key.
@@ -94,21 +83,5 @@ public class FrontPageSearch extends AbstractDSpaceTransformer implements Cachea
 				pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
 			}
 		}
-    }
-    
-
-    public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
-    {
-        Division search = 
-        	body.addInteractiveDivision("front-page-search",contextPath+"/search",Division.METHOD_GET,"primary");
-        
-        search.setHead(T_head);
-        
-        search.addPara(T_para1);
-        
-        Para fields = search.addPara();
-        fields.addText("query");
-        fields.addButton("submit").setValue(T_go);
     }
 }
