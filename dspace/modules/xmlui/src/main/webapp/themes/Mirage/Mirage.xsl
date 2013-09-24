@@ -1191,7 +1191,7 @@ parameter that is being used (see variable defined above) -->
     </xsl:template>
     
     <!-- make sure search labels appear -->
-    <xsl:template match="dri:table[@id='aspect.discovery.SimpleSearch.table.search-controls']/dri:row/dri:cell/dri:field[@type='select']">
+    <xsl:template name="search_labels">
         <xsl:variable name="currentId">
           <xsl:value-of select="./@id" />
         </xsl:variable>
@@ -1205,4 +1205,13 @@ parameter that is being used (see variable defined above) -->
         </label>
         <xsl:apply-templates select="." mode="normalField"/>
     </xsl:template>
+
+    <xsl:template match="dri:table[@id='aspect.discovery.SimpleSearch.table.search-controls']/dri:row/dri:cell/dri:field[@type='select']">
+      <xsl:call-template name="search_labels" />
+    </xsl:template>
+
+    <xsl:template match="dri:field[@rend='starts_with' and @type='text']">
+      <xsl:call-template name="search_labels" />
+    </xsl:template>
+
 </xsl:stylesheet>
