@@ -29,7 +29,7 @@ import org.xml.sax.SAXException;
  *
  * @author Scott Phillips
  */
-public class FrontPageSearch extends AbstractDSpaceTransformer implements CacheableProcessingComponent
+public class FrontPageFeeds extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
     /** Language Strings */
     
