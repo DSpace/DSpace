@@ -2246,7 +2246,7 @@ a.feedbackform-user-voice-link {
 .choose_browse_by{
     display: none;
 }
-#aspect_discovery_SearchFilterTransformer_field_starts_with{
+input.starts_with {
         margin-left: 15px;
 
     }

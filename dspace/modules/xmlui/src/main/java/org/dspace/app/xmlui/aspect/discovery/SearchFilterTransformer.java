@@ -574,8 +574,8 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
             for (String filterQuery : filterQueries) {
                 jumpForm.addHidden("fq","fq_hidden_"+field).setValue(filterQuery);
             }
-            jumpForm.addContent(T_starts_with);
-            jumpForm.addText("starts_with_"+field,"starts_with_"+field);
+            Text t = jumpForm.addText("starts_with_"+field, "starts_with");
+            t.setLabel(T_starts_with);
 
             jumpForm.addButton("submit_"+field,"submit_"+field).setValue(T_go);
 
