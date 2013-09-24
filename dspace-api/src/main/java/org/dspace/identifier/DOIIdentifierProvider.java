@@ -308,6 +308,21 @@ public class DOIIdentifierProvider
         }
         else
         {
+            // check if doi is reserved for this specific dso
+            if (!connector.isDOIReserved(context, dso, doi))
+            {
+                // check if doi is already reserved for another dso
+                if (connector.isDOIReserved(context, doi))
+                {
+                    log.warn("Trying to register DOI {}, that is reserved for "
+                            + "another dso.", doi);
+                    throw new DOIIdentifierException("Trying to register a DOI "
+                            + "that is reserved for another object.",
+                            DOIIdentifierException.DOI_ALREADY_EXISTS);
+                }
+
+                connector.reserveDOI(context, dso, doi);
+            }
             // register DOI Online
             try {
                 connector.registerDOI(context, dso, doi);
