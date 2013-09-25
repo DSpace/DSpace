@@ -2465,3 +2465,6 @@ div.step-link{
     display:none;
 }
 
+.voucher-error{
+    color:red
+}
