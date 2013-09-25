@@ -57,21 +57,33 @@
                 DataCite (2)
                 Add creator information. 
             -->
-            <xsl:if test="//dspace:field[@mdschema='dc' and @element='contributor' and @qualifier='author']">
-                <creators>
-                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='contributor' and @qualifier='author']" />
-                </creators>
-            </xsl:if>
+            <creators>
+                <xsl:choose>
+                    <xsl:when test="//dspace:field[@mdschema='dc' and @element='contributor' and @qualifier='author']">
+                        <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='contributor' and @qualifier='author']" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <creator>
+                            <creatorName>(:unkn) unknown</creatorName>
+                        </creator>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </creators>
 
             <!-- 
                 DataCite (3)
                 Add Title information. 
             -->
-            <xsl:if test="//dspace:field[@mdschema='dc' and @element='title']">
-                <titles>
-                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='title']" />
-                </titles>
-            </xsl:if>
+            <titles>
+                <xsl:choose>
+                    <xsl:when test="//dspace:field[@mdschema='dc' and @element='title']">
+                        <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='title']" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <title>(:unas) unassigned</title>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </titles>
             
             <!-- 
                 DataCite (4)

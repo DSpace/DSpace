@@ -465,9 +465,6 @@ implements DOIConnector
                     DOIIdentifierException.CONVERSION_ERROR);
         }
         
-        // TODO: Check if all necessary fields are included
-        // if not: set default values
-        
         Element root = null;
         try
         {
