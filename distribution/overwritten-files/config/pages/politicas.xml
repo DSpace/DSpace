@@ -23,16 +23,26 @@
 					de la libre disposición de la información. A continuación se exponen las políticas del 
 					repositorio, las cuales son sometidas regularmente a revisión.
 				</p>
-				<h1>Política de contenidos</h1>
+
+				<ul>
+					<li><a href="pages/politicas#contenidos">Política de contenidos</a></li>
+					<li><a href="pages/politicas#acceso">Política de acceso a datos</a></li>
+					<li><a href="pages/politicas#deposito">Política de depósito</a></li>
+					<li><a href="pages/politicas#preservacion">Política de preservación</a></li>
+					<li><a href="pages/politicas#metadatos">Política de Metadatos</a></li>
+				</ul>
+
+
+				<h1 id="contenidos">Política de contenidos</h1>
 					<p>SEDICI recibe la producción de toda la UNLP en sus actividades de enseñanza, investigación y extensión. 
 						Los materiales a incorporar en el repositorio deben cumplir con al menos uno de los siguientes requisitos:
 					</p>	  
 					<ul>
-							<li>haber pasado un procesos de revisión,</li>
-							<li>ser editados y publicadas en el ámbito de la Universidad,</li>
-							<li>ser generados por docentes y/o investigadores de la Universidad o centros asociados,</li>
-							<li>provenir de otras dependencias de la Universidad, o</li>
-							<li>presentar un valor histórico-cultural que amerita su preservación</li>
+						<li>haber pasado un procesos de revisión,</li>
+						<li>ser editados y publicadas en el ámbito de la Universidad,</li>
+						<li>ser generados por docentes y/o investigadores de la Universidad o centros asociados,</li>
+						<li>provenir de otras dependencias de la Universidad, o</li>
+						<li>presentar un valor histórico-cultural que amerita su preservación</li>
 					</ul>
 					<br/>
 					<p> 
@@ -41,7 +51,7 @@
 					</p>
 					<p>
 						De acuerdo al párrafo precedente algunas de las tipologías aceptadas son:
-						tesis de grado y posgrado, artículos científicos en cualquiera de sus versiones 
+						tesis de grado y posgrado, artículos científicos en cualquiera de sus <a href="pages/politicas#fnVersiones">versiones *</a>
 						y de divulgación, libros y capítulos de libro, presentaciones en congresos, 
 						producciones artísticas, imágenes, grabaciones audiovisuales, publicaciones periódicas,
 						mapas, patentes y reseñas (que hayan pasado por un proceso de evaluación). 
@@ -58,7 +68,7 @@
 					</p>
 
 
-					<h1>Política de acceso a los datos</h1>
+					<h1 id="acceso">Política de acceso a los datos</h1>
 						<p>Las obras alojadas en el repositorio pueden ser visualizadas y descargadas de forma libre y 
 							gratuita, sin necesidad registro o autorización previa, siempre respetando las condiciones 
 							expuestas en sus licencias de uso adosadas a las mismas. 
@@ -79,7 +89,7 @@
 								publicado en una revista científica, y si es así, qué versión del trabajo es susceptible de ser archivada.
 							</p>
 				
-				<h1>Política de depósito</h1>
+				<h1 id="deposito">Política de depósito</h1>
 				
 				<p>
 					<b>El repositorio</b> se sustenta en un modelo distribuido de trabajo mediante el cual pueden existir diferentes vías de depósito:
@@ -121,7 +131,7 @@
 					
 				
 				
-				<h1>Política de preservación digital</h1>
+				<h1 id="preservacion">Política de preservación digital</h1>
 				<p>
 					El propósito fundamental del repositorio SEDICI es asegurar la accesibilidad, legibilidad y preservación 
 					digital a tiempo indefinido de todas las obras que alberga. Para poder cumplir con esta misión el autor concede 
@@ -151,7 +161,7 @@
 				</p>
 		
 
-				<h1>Política de metadatos</h1>
+				<h1 id="metadatos">Política de metadatos</h1>
 				<p>
 				   Los metadatos son la información descriptiva que se aplica sobre un recurso para facilitar su organización,
 				   recuperación, preservación e interoperabilidad. Para catalogar una obra, rel repositorio utiliza un perfil 
@@ -195,8 +205,9 @@
 				</ul>
 				</p>
 				
-				<p>
-					 Artículos preprints y postprints. Los preprints son las versiones enviadas por los autores para
+				<h1>Aclaraciones: </h1>
+				<p style="font-size:11px;">
+					 <b id="fnVersiones">Artículos preprints y postprints</b>. Los preprints son las versiones enviadas por los autores para
 					 ser evaluadas por un comité de pares de una revista científica. Los postprints pueden ser de  autor o
 					 de editor y hacen referencia a los artículos que han pasado la evaluación de los pares. Los postprints 
 					 de autor son las versiones aceptadas de los artículos en que el autor ha incorporado las sugerencias del
@@ -204,15 +215,6 @@
 					 publicadas que suelen incluir el logo del editor, cambios de formato y de maquetación. Mas información en 
 					 sherpa.ac.uk/romeo/definitions.php#prepostprints 
 				</p>
-				<br/>
-				<p>
-					Versiones de artículos. La versión pre-print o enviada es el documento aún no subido o que se subió por primera vez, 
-					que aún no ha sufrido ningún tipo de revisión por pares o evaluación editorial. La versión post-print o aceptada 
-					es el documento aprobado por el editor, que pasó el proceso de revisión por pares e incluye los cambios del autor 
-					luego de la revisión. La versión final o publicada contiene el mismo contenido que la versión post-print, pero difiere 
-					en término de apariencia porque suele tener cambios de maquetado, formato, e imágenes (como el logo del editor o de 
-					la revista). Mas info en http://sherpa.ac.uk/romeo/definitions.php#prepostprints 
-				</p> 
 			</div>
 		</div>
 	</body>
