@@ -28,17 +28,15 @@ public class DataPackageDisplayTest extends TestCase {
     @Test
     public void testDataPackageDisplay() throws Exception {
 	driver.get(baseUrl + "/handle/10255/dryad.20");
-	assertEquals("Data from: Testing for unequal rates of morphological diversification in the absence of a detailed phylogeny: a case study from characiform fishes", driver.getTitle());
 	assertTrue(isElementPresent(By.cssSelector("h1.ds-div-head")));
-	assertTrue("head contains title", sectionContains("h1.ds-div-head", "Data from: Testing"));
-	assertTrue("citation contains publication info", sectionContains("div.citation-view", "(2007) Testing"));
-	assertTrue("citation contains package info", sectionContains("div.citation-view", "(2007) Data from: Testing"));
+	assertTrue("citation contains publication info", sectionContains("div.primary", "(2007) Testing"));
+	assertTrue("citation contains package info", sectionContains("div.primary", "(2007) Data from: Testing"));
 	assertTrue("spatial coverage", sectionContains("div.primary","South America"));
 	assertTrue("data file description", sectionContains("div.primary","Relative Warps"));
 	assertTrue("data file size", sectionContains("div.primary","131.5Kb"));
-	assertTrue("file download link", isElementPresent(By.linkText("Sidlauskas 2007 Data.xls")));
+	assertTrue("file download link", isElementPresent(By.linkText("Sidlauskas 2007 Data.xls (131.5Kb)")));
     }
-    
+
     @After
     public void tearDown() throws Exception {
 	driver.quit();
