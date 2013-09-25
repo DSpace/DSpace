@@ -289,9 +289,12 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
         } else {
             //only set the start_with when the search query equals current rendering facet
             if(field.equals(request.getParameter(SearchFilterParam.FACET_FIELD))){
-                if(request.getParameter(SearchFilterParam.STARTS_WITH) != null)
-                {
-                    queryArgs.setFacetPrefix(facetField, request.getParameter(SearchFilterParam.STARTS_WITH).toLowerCase());
+                Enumeration<String> parameterNames = request.getParameterNames();
+                while(parameterNames.hasMoreElements()) {
+                    String paramName = parameterNames.nextElement();
+                    if(paramName.startsWith(SearchFilterParam.STARTS_WITH) && request.getParameter(paramName) != null) {
+                        queryArgs.setFacetPrefix(facetField, request.getParameter(paramName).toLowerCase());
+                    }
                 }
             }
             queryArgs.addFacetField(facetField);
@@ -542,7 +545,7 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
 //            jumpList.addItemXref(generateURL("browse", letterQuery), "0-9");
             for (char c = 'A'; c <= 'Z'; c++)
             {
-                String linkUrl = basicUrl + "&" +  SearchFilterParam.STARTS_WITH +  "=" + Character.toString(c).toLowerCase();
+                String linkUrl = basicUrl + "&" +  SearchFilterParam.STARTS_WITH + field +  "=" + Character.toString(c).toLowerCase();
                 jumpList.addItemXref(linkUrl, Character
                         .toString(c));
             }
@@ -571,10 +574,10 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
             for (String filterQuery : filterQueries) {
                 jumpForm.addHidden("fq","fq_hidden_"+field).setValue(filterQuery);
             }
-            jumpForm.addContent(T_starts_with);
-            jumpForm.addText("starts_with","starts_with_"+field);
+            Text t = jumpForm.addText("starts_with_"+field, "starts_with");
+            t.setLabel(T_starts_with);
 
-            jumpForm.addButton("submit","submit_"+field).setValue(T_go);
+            jumpForm.addButton("submit_"+field,"submit_"+field).setValue(T_go);
 
             if(field.equals(request.getParameter(SearchFilterParam.FACET_FIELD)))
             {
@@ -707,14 +710,14 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
         if(field.equals(request.getParameter(SearchFilterParam.FACET_FIELD))){
         if(request.getParameterValues("fq") != null)
         {
-            fqs.addAll(Arrays.asList(request.getParameterValues("fq")));
-        }
+                fqs.addAll(Arrays.asList(request.getParameterValues("fq")));
+            }
 
-        //Have we added a filter using the UI
+            //Have we added a filter using the UI
         if(request.getParameter("filter") != null && !"".equals(request.getParameter("filter")))
         {
-            fqs.add((request.getParameter("filtertype").equals("*") ? "" : request.getParameter("filtertype") + ":") + request.getParameter("filter"));
-        }
+                fqs.add((request.getParameter("filtertype").equals("*") ? "" : request.getParameter("filtertype") + ":") + request.getParameter("filter"));
+            }
         }
         return fqs.toArray(new String[fqs.size()]);
     }
@@ -788,7 +791,7 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
 
         /** The browse control params **/
         public static final String OFFSET = "offset";
-        public static final String STARTS_WITH = "starts_with";
+        public static final String STARTS_WITH = "starts_with_";
 
 
         private SearchFilterParam(Request request){
@@ -812,11 +815,14 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
         public Map<String, String> getControlParameters(){
             Map<String, String> paramMap = new HashMap<String, String>();
             if(this.request!=null){
-            paramMap.put(OFFSET, request.getParameter(OFFSET));
-            if(request.getParameter(STARTS_WITH) != null)
-            {
-                paramMap.put(STARTS_WITH, request.getParameter(STARTS_WITH));
-            }
+                paramMap.put(OFFSET, request.getParameter(OFFSET));
+                Enumeration<String> parameterNames = request.getParameterNames();
+                while(parameterNames.hasMoreElements()) {
+                    String paramName = parameterNames.nextElement();
+                    if(paramName.startsWith(SearchFilterParam.STARTS_WITH) && request.getParameter(paramName) != null) {
+                        paramMap.put(paramName, request.getParameter(paramName));
+                    }
+                }
             }
             return paramMap;
         }

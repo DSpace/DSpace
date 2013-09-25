@@ -1,0 +1,13 @@
+=======================
+ dataone-mn-script
+ dan.leehr@nescent.org
+ 2013-09-20
+=======================
+
+This directory contains a python script for validating Dryad metadata documents exposed by the DataONE MN API.
+
+Dependencies are listed in the requirements.txt file, which is the standard format for installing python packages with pip.
+
+The script also uses the xmllint command-line tool, and assumes it is located at /usr/bin/xmllint
+
+The script is configured to scrape http://dev.datadryad.org/mn/ for objects and output the validation results to validation.csv
