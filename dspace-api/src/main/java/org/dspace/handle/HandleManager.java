@@ -86,8 +86,7 @@ public class HandleManager
     }
     
     /**
-     * Return the handle for a local URL, if it was associated with a handle
-     * before.
+     * Try to detect a handle in a URL.
      * @param context DSpace context
      * @param url The URL
      * @return The handle or null if the handle couldn't be extracted of a URL
@@ -99,20 +98,33 @@ public class HandleManager
     {
         String dspaceUrl = ConfigurationManager.getProperty("dspace.url")
                 + "/handle/";
+        String handleResolver = ConfigurationManager.getProperty("handle.canonical.prefix");
         
-        if (!url.startsWith(dspaceUrl))
+        String handle = null;
+        
+        if (url.startsWith(dspaceUrl))
+        {
+            handle = url.substring(dspaceUrl.length());
+        }
+        
+        if (url.startsWith(handleResolver))
+        {
+            handle = url.substring(handleResolver.length());
+        }
+        
+        if (null == handle)
+        {
             return null;
+        }
         
-        String handle = url.substring(dspaceUrl.length());
-        
-        if (!handle.startsWith(getPrefix()))
-            return null;
-        
+        // remove trainling slashes
+        while (handle.startsWith("/"))
+        {
+            handle = handle.substring(1);
+        }
         TableRow dbhandle = findHandleInternal(context, handle);
-        if (null == dbhandle)
-            return null;
         
-        return handle;
+        return (null == dbhandle) ? null : handle;
     }
 
     /**

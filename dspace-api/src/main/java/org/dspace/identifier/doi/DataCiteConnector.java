@@ -281,7 +281,7 @@ implements DOIConnector
                 {
                     return false;
                 }
-                return (dsoHandle == doiHandle);
+                return dsoHandle.equals(doiHandle);
             }
                 
             // 404 "Not Found" means DOI is neither reserved nor registered.
@@ -954,7 +954,7 @@ implements DOIConnector
         
         String handle = null;
         
-        Iterator<Element> it = doc.getDescendants(new ElementFilter("alternativeIdentifier"));
+        Iterator<Element> it = doc.getDescendants(new ElementFilter("alternateIdentifier"));
         while (handle == null && it.hasNext())
         {
             Element alternateIdentifier = it.next();
