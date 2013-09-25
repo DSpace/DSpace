@@ -1221,4 +1221,10 @@ parameter that is being used (see variable defined above) -->
       <xsl:call-template name="search_labels" />
     </xsl:template>
 
+    <xsl:template match="dri:div[@id='full-stacktrace']">
+        <xsl:comment>
+            <xsl:value-of select="."/>
+        </xsl:comment>
+    </xsl:template>
+        
 </xsl:stylesheet>
