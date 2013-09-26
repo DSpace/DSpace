@@ -14,6 +14,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
 
+ <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+    
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
@@ -46,10 +48,29 @@
  	boolean fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);
     boolean ajaxProgress = ConfigurationManager.getBooleanProperty("webui.submit.upload.ajax", true);
 
-    if (ajaxProgress)
+ 	Boolean sherpa = (Boolean) request.getAttribute("sherpa");
+    boolean bSherpa = sherpa != null?sherpa:false;
+
+    if (ajaxProgress || bSherpa)
     {
- %>
+%>
 <c:set var="dspace.layout.head.last" scope="request">
+<%        
+     if (bSherpa) { %>
+
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/sherpa/css/sherpa.css" type="text/css" />
+	<script type="text/javascript">
+		jQuery(document).ready(function(html){
+			jQuery.ajax({
+				url: '<%= request.getContextPath() + "/tools/sherpaPolicy" %>', 
+				data: {item_id: <%= subInfo.getSubmissionItem().getItem().getID() %>}})
+					.done(function(html) {
+						jQuery('#sherpaContent').html(html);
+			});
+		});
+	</script>
+	<% } 
+	if (ajaxProgress) { %>
 	<link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/jquery.fileupload-ui.css">
 	<!-- CSS adjustments for browsers with JavaScript disabled -->
 	<noscript><link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/jquery.fileupload-ui-noscript.css"></noscript>
@@ -253,9 +274,9 @@
 		}});
 	});
     </script>
+    <% } %>
 </c:set>
 <%  } %>
-
 
 <dspace:layout locbar="off"
                navbar="off"
@@ -286,9 +307,12 @@
     </form>
     <iframe id="uploadFormIFrame" name="uploadFormIFrame" style="display: none"> </iframe>
 <% } %>
-    <form id="uploadForm" method="post" action="<%= request.getContextPath() %>/submit" enctype="multipart/form-data" onkeydown="return disableEnterKey(event);">
-		
+    <form id="uploadForm" <%= bSherpa?"class=\"sherpa\"":"" %> method="post" 
+    	action="<%= request.getContextPath() %>/submit" enctype="multipart/form-data" 
+    	onkeydown="return disableEnterKey(event);">
+
 		<jsp:include page="/submit/progressbar.jsp"/>
+		
 		<%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
         <%= SubmissionController.getSubmissionParameters(context, request) %>
 
@@ -420,5 +444,21 @@
             </table>
         </center>  
     </form>
-
+<%
+  if (bSherpa)
+      {
+%>
+  <div id="sherpaBox" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front">
+  	  <div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
+  		  <span id="ui-id-1" class="ui-dialog-title"><fmt:message key="jsp.sherpa.title" /></span>
+  	  </div>
+	  <div id="sherpaContent" class="ui-dialog-content ui-widget-content">
+	  <fmt:message key="jsp.sherpa.loading">
+			<fmt:param value="<%=request.getContextPath()%>" />
+	  </fmt:message>  
+	  </div>
+  </div>
+<%
+    }
+%>
 </dspace:layout>
