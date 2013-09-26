@@ -515,7 +515,7 @@ public class JSPUploadStep extends JSPStep
             throws SQLException, ServletException, IOException
     {
         if (ConfigurationManager.getBooleanProperty(
-                "jspui.submission.sherparomeo-policy-enabled", true))
+                "webui.submission.sherparomeo-policy-enabled", true))
         {
             SHERPASubmitService sherpaSubmitService = new DSpace()
                     .getSingletonService(SHERPASubmitService.class);
