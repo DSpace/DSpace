@@ -1,47 +1,14 @@
-/*
- * JSPSelectCollectionStep.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision$
- *
- * Date: $Date$
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -50,7 +17,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.webui.submit.JSPStep;
@@ -58,10 +24,8 @@ import org.dspace.app.webui.submit.JSPStepManager;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.submit.lookup.SubmissionLookupProvider;
@@ -150,17 +114,19 @@ public class JSPStartSubmissionLookupStep extends JSPStep
          * Possible parameters from JSP:
          * 
          * collection= <collection_id> - a collection that has already been
-         * selected!
+         * selected (to use as preference! it is not the final choice!!!)
+         * 
+         * collectionid = the FINAL chosed collection!!!
          * 
          * With no parameters, this servlet prepares for display of the Select
          * Collection JSP.
          */
-        String collectionID = request.getParameter("collection");
+        int collectionID = UIUtil.getIntParameter(request, "collection");
         Collection col = null;
 
-        if (collectionID != null)
+        if (collectionID != -1)
         {
-            col = Collection.find(context, Integer.parseInt(collectionID));
+            col = Collection.find(context, collectionID);
         }
 
         // if we already have a valid collection, then we can forward directly
@@ -193,7 +159,7 @@ public class JSPStartSubmissionLookupStep extends JSPStep
             // This is a special case, where the user came back to this
             // page after not selecting a collection. This will display
             // the "Please select a collection" message to the user
-            if (collectionID != null && Integer.parseInt(collectionID) == -1)
+            if (collectionID == -1)
             {
                 // specify "no collection" error message should be displayed
                 request.setAttribute("no.collection", Boolean.TRUE);
@@ -201,9 +167,8 @@ public class JSPStartSubmissionLookupStep extends JSPStep
 
             // save collections to request for JSP
             request.setAttribute("collections", collections);
-
-            List<String> identifiers = slService.getIdentifiers();
-
+            request.setAttribute("collectionID", collectionID);
+            
             Map<String, List<SubmissionLookupProvider>> identifiers2providers = slService
                     .getProvidersIdentifiersMap();
             List<SubmissionLookupProvider> searchProviders = slService

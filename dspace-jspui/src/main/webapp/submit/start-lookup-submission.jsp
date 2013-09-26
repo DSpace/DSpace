@@ -1,4 +1,13 @@
 <%--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+--%>
+<%--
   - UI page for start of a submission with lookup on external sources.
   -
   - Required attributes:
@@ -24,7 +33,6 @@
     prefix="fmt" %>
 	
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
-<%@ taglib uri="http://ajaxtags.org/tags/ajax" prefix="ajax"%>
 
 <%
     String contextPath = "/dspace-jspui";
@@ -47,8 +55,9 @@
     List<String> identifiers = (List<String>) request.getAttribute("identifiers");
     String uuid = (String) request.getAttribute("s_uuid");
 %>
-<c:set var="dspace.layout.head" scope="request">
-	<script type="text/javascript" src="<%= request.getContextPath() %>/js/submission-lookup.js"></script>	
+<c:set var="dspace.layout.head.last" scope="request">
+	<script type='text/javascript'>var j = jQuery.noConflict(); dspaceContextPath = "<%=request.getContextPath()%>";</script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/submission-lookup.js"></script>	
 </c:set>
 
 <dspace:layout locbar="off"
@@ -57,6 +66,7 @@
                nocache="true">
 
     <h1><fmt:message key="jsp.submit.start-lookup-submission.heading"/></h1>
+    <div id="jserrormessage" style="display: none"><fmt:message key="jsp.submit.start-lookup-submission.js.errormessage"/></div>
 <%  if (collections.length > 0)
     {
 		//if no collection was selected, display an error
@@ -175,18 +185,18 @@
 
 	<div id="tabs-result">
 		<div id="empty-result">
-			<p>Nessun risultato disponibile</p>
+			<p><fmt:message key="jsp.submit.start-lookup-submission.noresult"/></p>
 		</div>
 		<div id="result-list"></div>
 		<div id="manual-submission">
-			Seleziona la tipologia della pubblicazione:
+			<fmt:message key="jsp.submit.start-lookup-submission.select.collection.label"/>
 			<select id="select-collection-manual">
-				<option value="-1">Seleziona</option>
+				<option value="-1"><fmt:message key="jsp.submit.start-lookup-submission.select.collection.defaultoption"/></option>
 				<% for (Collection c : collections) { %>
 				<option value="<%= c.getID() %>"><%= c.getName() %></option>
 				<% }  %>
 			</select>
-			<button id="manual-submission-button" type="button">Inserisci manualmente</button>
+			<button id="manual-submission-button" type="button"><fmt:message key="jsp.submit.start-lookup-submission.button.manual-submission"/> </button>
 		</div>	
 	</div>
 </div>
@@ -211,9 +221,7 @@
 <%  } else { %>
 	<p class="submitFormWarn"><fmt:message key="jsp.submit.select-collection.none-authorized"/></p>
 <%  } %>
-<div>
-  In alternativa &egrave; possibile utilizzare l'import automatico da file bibliografico (BibTeX, ISI): <button id="fileimport"><fmt:message key="jsp.mydspace.main.import.button"/></button>
-</div>	
+
 	   <p><fmt:message key="jsp.general.goto"/><br />
 	   <a href="<%= request.getContextPath() %>"><fmt:message key="jsp.general.home"/></a><br />
 	   <a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.general.mydspace" /></a>
@@ -266,10 +274,6 @@
     	j('button.exit').click(function(event){
     		event.preventDefault();
     		window.location = "<%= request.getContextPath() %>/mydspace";
-    	});
-    	j('#fileimport').click(function(event){
-    		event.preventDefault();
-    		window.location = "<%= request.getContextPath() %>/tools/import";
     	});
     	j('#loading-search-result').dialog({
     		autoOpen: false,
