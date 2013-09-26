@@ -121,7 +121,7 @@ public class JSPStartSubmissionLookupStep extends JSPStep
          * With no parameters, this servlet prepares for display of the Select
          * Collection JSP.
          */
-        int collectionID = UIUtil.getIntParameter(request, "collection");
+        int collectionID = UIUtil.getIntParameter(request, "collectionid");
         Collection col = null;
 
         if (collectionID != -1)

@@ -55,8 +55,10 @@
     List<String> identifiers = (List<String>) request.getAttribute("identifiers");
     String uuid = (String) request.getAttribute("s_uuid");
 %>
-<c:set var="dspace.layout.head.last" scope="request">
-	<script type='text/javascript'>var j = jQuery.noConflict(); dspaceContextPath = "<%=request.getContextPath()%>";</script>
+<c:set var="dspace.layout.head" scope="request">	
+	<script type='text/javascript'>var dspaceContextPath = "<%=request.getContextPath()%>";</script>		
+</c:set>
+<c:set var="dspace.layout.head.last" scope="request">		
 	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/submission-lookup.js"></script>	
 </c:set>
 
@@ -67,6 +69,7 @@
 
     <h1><fmt:message key="jsp.submit.start-lookup-submission.heading"/></h1>
     <div id="jserrormessage" style="display: none"><fmt:message key="jsp.submit.start-lookup-submission.js.errormessage"/></div>
+    <div id="jsseedetailsbuttonmessage" style="display: none"><fmt:message key="jsp.submit.start-lookup-submission.js.detailsbuttonmessage"/></div>
 <%  if (collections.length > 0)
     {
 		//if no collection was selected, display an error
@@ -108,6 +111,7 @@
 		<input type="hidden" id="suuid" name="suuid" value="<%= uuid %>"/>
 		<input type="hidden" id="iuuid" name="iuuid" value=""/>
 		<input type="hidden" id="collectionid" name="collectionid" value=""/>
+		
 		<div id="tabs-search-accordion">
 <%		
 	if (searchProviders != null && searchProviders.size() > 0) {
@@ -226,13 +230,13 @@
 	   <a href="<%= request.getContextPath() %>"><fmt:message key="jsp.general.home"/></a><br />
 	   <a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.general.mydspace" /></a>
 	   </p>
-	       <script type="text/javascript"><!--
+	<script type="text/javascript"><!--
     	var j = jQuery.noConflict();
-    	j('#tabs').tabs({
-    		select: function( event, ui ) {
-    			if ('tabs-result' == j(ui.panel).attr('id'))
+    	j("#tabs").tabs({
+    		beforeActivate: function( event, ui ) {
+    			if ('tabs-result' == j(ui.newPanel).attr('id'))
    				{
-    				j('#manual-submission').appendTo(j(ui.panel)); 
+    				j('#manual-submission').appendTo(j(ui.newPanel)); 
     			}
     			else
    				{
@@ -241,10 +245,10 @@
     		}
     	});
     	j('#tabs-search-accordion').accordion({ 
-    			change: function( event, ui ) {
-    				if ('manual-accordion' == ui.newContent.attr('id'))
+    			beforeActivate: function( event, ui ) {
+    				if ('manual-accordion' == ui.newPanel.attr('id'))
    					{
-    					j('#manual-submission').appendTo(ui.newContent);	
+    					j('#manual-submission').appendTo(ui.newPanel);	
    					}
     			}
     	});
