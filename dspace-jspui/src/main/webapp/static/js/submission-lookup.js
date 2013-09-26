@@ -130,7 +130,7 @@ submissionLookupShowResult = function(info){
 }
 
 submissionLookupShowDetails = function(info){
-	var popup = j('<div title="Dettaglio della pubblicazione">');
+	var popup = j('<div title="'+j('#jstitlepopupmessage').text()+'">');
 	var divImg = j('<div class="submission-lookup-providers">');
 	popup.append(divImg);
 	for (var k=0;k<info.providers.length;k++)
@@ -164,7 +164,7 @@ submissionLookupShowDetails = function(info){
 	popup.append(j('#select-collection-div'));
 	j('#select-collection').val(info.collection);	
 	var start = j('<button type="button">');
-	start.append('Inserisci in archivio');
+	start.append(j('#jsfilldatabuttonmessage').text());
 	start.button();
 	start.click(function(){
 		j('#collectionid').val(j('#select-collection').val());
