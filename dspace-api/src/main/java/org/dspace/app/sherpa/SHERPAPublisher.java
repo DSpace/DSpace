@@ -31,6 +31,10 @@ public class SHERPAPublisher
 
     private List<String> postrestriction;
 
+    private String pubarchiving;
+
+    private List<String> pubrestriction;
+    
     private List<String> condition;
 
     private String paidaccessurl;
@@ -50,6 +54,7 @@ public class SHERPAPublisher
     public SHERPAPublisher(String name, String alias, String homeurl,
             String prearchiving, List<String> prerestriction,
             String postarchiving, List<String> postrestriction,
+            String pubarchiving, List<String> pubrestriction,
             List<String> condition, String paidaccessurl,
             String paidaccessname, String paidaccessnotes,
             List<String[]> copyright, String romeocolour, String datedded,
@@ -68,6 +73,10 @@ public class SHERPAPublisher
         this.postarchiving = postarchiving;
 
         this.postrestriction = postrestriction;
+
+        this.pubarchiving = pubarchiving;
+
+        this.pubrestriction = pubrestriction;
 
         this.condition = condition;
 
@@ -121,6 +130,16 @@ public class SHERPAPublisher
         return postrestriction;
     }
 
+    public String getPubarchiving()
+    {
+        return pubarchiving;
+    }
+    
+    public List<String> getPubrestriction()
+    {
+        return pubrestriction;
+    }
+    
     public List<String> getCondition()
     {
         return condition;

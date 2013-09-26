@@ -85,6 +85,15 @@
 								</c:if>
 							</div>
 							
+							<div class="sherpaPub">
+								<fmt:message key="jsp.sherpa.publisher-version.${r[1].pubarchiving}">
+									<fmt:param value="<%=request.getContextPath()%>" />
+								</fmt:message>
+								<c:if test="${r[1].pubarchiving eq 'restricted'}">
+								<ul><c:forEach var="cond" items="${r[1].pubrestriction}"><li>${cond}</li></c:forEach></ul>
+								</c:if>
+							</div>
+							
 							<div class="sherpaConditions">
 								<fmt:message key="jsp.sherpa.generalconditions" />
 								<ul><c:forEach var="cond" items="${r[1].condition}"><li>${cond}</li></c:forEach></ul>

@@ -111,6 +111,12 @@ public class SHERPAResponse
                             .getSingleElement(publisherElement,
                                     "postrestrictions");
 
+                    Element pdfversionElement = XMLUtils.getSingleElement(
+                            publisherElement, "pdfversion");
+                    Element pdfversionRestrictionElement = XMLUtils
+                            .getSingleElement(publisherElement,
+                                    "pdfrestrictions");
+                    
                     Element conditionsElement = XMLUtils.getSingleElement(
                             publisherElement, "conditions");
                     Element paidaccessElement = XMLUtils.getSingleElement(
@@ -125,16 +131,26 @@ public class SHERPAResponse
                                     XMLUtils.getElementValue(publisherElement,
                                             "alias"), XMLUtils.getElementValue(
                                             publisherElement, "homeurl"),
+                                            
                                     XMLUtils.getElementValue(preprintsElement,
                                             "prearchiving"),
                                     XMLUtils.getElementValueList(
                                             preprintsRestrictionElement,
-                                            "prerestriction"), XMLUtils
-                                            .getElementValue(postprintsElement,
-                                                    "postarchiving"),
+                                            "prerestriction"),
+                                            
+                                    XMLUtils.getElementValue(postprintsElement,
+                                            "postarchiving"),
                                     XMLUtils.getElementValueList(
                                             postprintsRestrictionElement,
-                                            "postrestriction"), XMLUtils
+                                            "postrestriction"),
+                                            
+                                    XMLUtils.getElementValue(pdfversionElement,
+                                            "pdfarchiving"),
+                                    XMLUtils.getElementValueList(
+                                            pdfversionRestrictionElement,
+                                            "pdfrestriction"), 
+                                    
+                                    XMLUtils
                                             .getElementValueList(
                                                     conditionsElement,
                                                     "condition"), XMLUtils

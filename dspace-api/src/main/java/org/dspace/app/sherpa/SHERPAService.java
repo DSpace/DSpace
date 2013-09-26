@@ -28,15 +28,16 @@ public class SHERPAService
             method = new GetMethod(endpoint);
 
             NameValuePair id = new NameValuePair("issn", query);
+            NameValuePair versions = new NameValuePair("versions", "all");
             NameValuePair[] params = null;
             if (StringUtils.isNotBlank(apiKey))
             {
                 NameValuePair ak = new NameValuePair("ak", apiKey);
-                params = new NameValuePair[] { id, ak };
+                params = new NameValuePair[] { id, versions, ak };
             }
             else
             {
-                params = new NameValuePair[] { id };
+                params = new NameValuePair[] { id, versions };
             }
             method.setQueryString(params);
             // Execute the method.
