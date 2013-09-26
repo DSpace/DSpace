@@ -92,7 +92,7 @@
 	 <!-- <step id="collection">
        <heading></heading> can specify heading, if you want it to appear in Progress Bar
 	   <processing-class>org.dspace.submit.step.StartSubmissionLookupStep</processing-class>
-       <jspui-binding>org.dspace.submit.step.JSPStartSubmissionLookupStep</jspui-binding>
+       <jspui-binding>org.dspace.app.webui.submit.step.JSPStartSubmissionLookupStep</jspui-binding>
        <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.SelectCollectionStep</xmlui-binding>
        <workflow-editable>false</workflow-editable>
      </step> -->
