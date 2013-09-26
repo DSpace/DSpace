@@ -431,6 +431,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>sherpapolicy</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.SHERPAPublisherPolicyServlet</servlet-class>
+  </servlet>  
+
+  <servlet>
       <servlet-name>SearchResultLogServlet</servlet-name>
       <servlet-class>org.dspace.app.webui.servlet.SearchResultLogServlet</servlet-class>
   </servlet>
@@ -737,7 +742,12 @@
       <servlet-name>AuthorityChooseServlet</servlet-name>
       <url-pattern>/choices/*</url-pattern>
   </servlet-mapping>
-  
+
+  <servlet-mapping>
+    <servlet-name>sherpapolicy</servlet-name>
+    <url-pattern>/tools/sherpaPolicy</url-pattern>
+  </servlet-mapping>
+    
   <servlet-mapping>
   	<servlet-name>json</servlet-name>
   	<url-pattern>/json/*</url-pattern>
