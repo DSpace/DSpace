@@ -106,7 +106,7 @@ submissionLookupShowResult = function(info){
 	j('#result-list').html(" ");
 	for (var i=0;i<info.result.length;i++)
 	{
-		var bt = j('<button type="button">').append('Vedi il dettaglio');
+		var bt = j('<button type="button">').append(j('#jsseedetailsbuttonmessage').text());
 		var par = j('<p class="sl-result">');
 		var divImg = j('<div class="submission-lookup-providers">');
 		par.append(divImg);
@@ -173,7 +173,7 @@ submissionLookupShowDetails = function(info){
 	});
 	popup.append(start);
 	
-	j(document).append(popup);
+	j('body').append(popup);
 	popup.dialog({modal: true,width:800,height:600,
 		 close: function( event, ui ) {
 			 j('#hidden-area').append(j('#select-collection-div'));
