@@ -15,7 +15,7 @@
 
 		xmlui.<Aspect>.<Java Class>.<name>
 
-		There are a few exceptions to this naming format,
+		There are a few exceptions to this nameing format,
 		1) Some general keys are in the xmlui.general namespace
 		   because they are used very frequently.
 		2) Some general keys which are specific to a particular aspect
@@ -102,5 +102,8 @@
     <message key="xmlui.XMLWorkflow.scoreReview.scoreReviewStep.claimaction">Score review</message>
     <message key="xmlui.XMLWorkflow.scoreReview.scoreReviewStep.scorereviewaction">Score review</message>
     <message key="xmlui.XMLWorkflow.scoreReview.scoreReviewStep">Score review</message>
+
+	<message key="xmlui.XMLWorkflow.Navigation.edit_item_in_workflow">Edit in workflow</message>
+	<message key="xmlui.XMLWorkflow.Navigation.edit_item_workflow_info">Owned by {0}</message>
 
   </catalogue>

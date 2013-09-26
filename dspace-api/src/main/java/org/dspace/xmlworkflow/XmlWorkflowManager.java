@@ -25,7 +25,6 @@ import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.state.actions.*;
 import org.dspace.xmlworkflow.storedcomponents.*;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -87,6 +86,119 @@ public class XmlWorkflowManager {
         return wfi;
     }
 
+    /**
+     *  Creates a XmlWorkflowItem from an archived Item
+     */
+    public static XmlWorkflowItem startEditItemMetadata(Context context, String handle) throws SQLException, IOException, WorkflowConfigurationException, AuthorizeException, WorkflowException {
+    	
+    	// Gets the Item
+    	DSpaceObject object = HandleManager.resolveToObject(context, handle);
+    	if(object.getType() != Constants.ITEM)
+        	return null;
+
+    	Item item = (Item) object;
+    	
+    	// Checks if there is a XmlWorkflowItem for this Item
+    	XmlWorkflowItem wfi;
+    	if( (wfi = getWorkflowItem(context, item)) != null)
+    		return wfi;
+    	
+        Collection collection = item.getOwningCollection();
+        Workflow wf = WorkflowFactory.getWorkflow(collection);
+
+    	// Creates the wrapper
+        wfi = XmlWorkflowItem.create(context);
+        wfi.setItem(item);
+        wfi.setCollection(collection);
+        //FIXME What do we do with these flags?
+        wfi.setMultipleFiles(true);
+        wfi.setMultipleTitles(true);
+        wfi.setPublishedBefore(true);
+        
+        //TODO We need to unpublish this item somehow (maybe the archived flag could help)
+        
+        wfi.update();
+        removeUserItemPolicies(context, item, item.getSubmitter());
+        grantSubmitterReadPolicies(context, item);
+
+        // Shouldn't send the email (this item was archived before)
+		noEMail.put(item.getID(), Boolean.TRUE);
+
+		// Initializes the workflow process
+        context.turnOffAuthorisationSystem();
+        Step firstStep = wf.getFirstStep();
+        if(firstStep.isValidStep(context, wfi)){
+             activateFirstStep(context, wf, firstStep, wfi);
+        } else {
+            //Get our next step, if none is found, archive our item
+            firstStep = wf.getNextStep(context, wfi, firstStep, ActionResult.OUTCOME_COMPLETE);
+            if(firstStep == null){
+                archive(context, wfi);
+            }else{
+                activateFirstStep(context, wf, firstStep, wfi);
+            }
+        }       
+        context.restoreAuthSystemState();
+        return wfi;
+    }
+
+    /**
+     * Returns the XmlWorkflowItem associated with the item or null if there is no XmlWorkflowItem
+     */
+    public static XmlWorkflowItem getWorkflowItem(Context context, Item item) throws SQLException, AuthorizeException, IOException {
+    	// Look for the unique workflowitem entry where 'item_id' referenced by this item
+        TableRow row =  DatabaseManager.findByUnique(context, "cwf_workflowitem", "item_id", item.getID());
+        XmlWorkflowItem workflowItem = null;
+        if (row != null){
+    		workflowItem = XmlWorkflowItem.find(context, row.getIntColumn("workflowitem_id"));
+        }
+        return workflowItem;
+    }
+    
+    /**
+     * Returns the owner of a ClaimedTask when the Item is in the workflow and someone has claimed it. Otherwise,
+     * it returns null (there is no owner to return)
+     */
+    public static EPerson getXmlWorkflowItemOwner(Context context, Item item) throws SQLException, AuthorizeException, IOException {
+    	// Whether this item is already in workflow
+		XmlWorkflowItem workflowItem = XmlWorkflowManager.getWorkflowItem(context, item);
+		
+		if (workflowItem != null) {
+			// It is already in the workflow. Checks who owns it
+			java.util.List<ClaimedTask> claimedTasks = ClaimedTask.find(context, workflowItem);
+			if (claimedTasks.isEmpty()) {
+				// The workflow item is free
+				return null;
+			} else {
+				// Returns the owner
+	            ClaimedTask claimedTask = claimedTasks.get(0);
+				return EPerson.find(context, claimedTask.getOwnerID());
+			}
+		} else {
+			// The item is not in workflow
+			return null;
+		}
+    }
+    
+    /**
+     * Checks if the current user can edit the item using the workflow process
+     */
+    public static boolean canEditItemInWorkflow(Context context, String handle) throws SQLException, AuthorizeException, IOException {
+    	// Gets the Item
+    	DSpaceObject object = HandleManager.resolveToObject(context, handle);
+    	if(object.getType() != Constants.ITEM)
+        	throw new IllegalArgumentException("An Item was expected, but handle "+handle+" points to an object type "+object.getType());
+
+    	Item item = (Item) object;
+    	
+    	// Checks if there is an owner and who is he
+    	EPerson owner = getXmlWorkflowItemOwner(context, item);
+    	if(owner == null)
+    		return item.canEdit();
+    	
+    	return (item.canEdit() && owner.getID() == context.getCurrentUser().getID());
+    }
+    
     //TODO: this is currently not used in our notifications. Look at the code used by the original WorkflowManager
     /**
      * startWithoutNotify() starts the workflow normally, but disables
@@ -107,7 +219,7 @@ public class XmlWorkflowManager {
             // suppress email, and delete key
             noEMail.remove(wfi.getItem().getID());
         } else {
-            Email mail = Email.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), emailTemplate));
+            Email mail = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), emailTemplate));
             for (String argument : arguments) {
                 mail.addArgument(argument);
             }
@@ -370,19 +482,29 @@ public class XmlWorkflowManager {
                 + wfi.getID() + "item_id=" + item.getID() + "collection_id="
                 + collection.getID()));
 
-        InstallItem.installItem(c, wfi);
+        
+     // DS-1234
+     // Whether it is a new item that should be installed or an archived item that was edited
+        if(item.isArchived()) {
+        	//TODO Here the item should be republished
+       		wfi.deleteWrapper();
+        } else {
+	        InstallItem.installItem(c, wfi);
 
-        //Notify
-        notifyOfArchive(c, item, collection);
-
+	        //Notify
+     	
+	        notifyOfArchive(c, item, collection);
+        	// Log the event
+            log.info(LogManager.getHeader(c, "install_item", "workflow_item_id="
+                    + wfi.getID() + ", item_id=" + item.getID() + "handle=FIXME"));
+        }
+        
+        // DS-1234
+        
         //Clear any remaining workflow metadata
         item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, Item.ANY, Item.ANY, Item.ANY);
         item.update();
-
-        // Log the event
-        log.info(LogManager.getHeader(c, "install_item", "workflow_item_id="
-                + wfi.getID() + ", item_id=" + item.getID() + "handle=FIXME"));
-
+       
         return item;
     }
 
@@ -396,7 +518,7 @@ public class XmlWorkflowManager {
             EPerson ep = i.getSubmitter();
             // Get the Locale
             Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
-            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
+            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
 
             // Get the item handle to email to user
             String handle = HandleManager.findHandle(c, i);
@@ -856,7 +978,7 @@ public class XmlWorkflowManager {
             // Get rejector's name
             String rejector = getEPersonName(e);
             Locale supportedLocale = I18nUtil.getEPersonLocale(e);
-            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale,"submit_reject"));
+            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale,"submit_reject"));
 
             email.addRecipient(wi.getSubmitter().getEmail());
             email.addArgument(title);
