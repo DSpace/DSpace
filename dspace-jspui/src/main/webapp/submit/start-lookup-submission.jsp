@@ -70,6 +70,9 @@
     <h1><fmt:message key="jsp.submit.start-lookup-submission.heading"/></h1>
     <div id="jserrormessage" style="display: none"><fmt:message key="jsp.submit.start-lookup-submission.js.errormessage"/></div>
     <div id="jsseedetailsbuttonmessage" style="display: none"><fmt:message key="jsp.submit.start-lookup-submission.js.detailsbuttonmessage"/></div>
+    <div id="jsfilldatabuttonmessage" style="display: none"><fmt:message key="jsp.submit.start-lookup-submission.js.filldataandstartbuttonmessage"/></div>
+    <div id="jstitlepopupmessage" style="display: none"><fmt:message key="jsp.submit.start-lookup-submission.js.titlepopupmessage"/></div>
+    
 <%  if (collections.length > 0)
     {
 		//if no collection was selected, display an error
