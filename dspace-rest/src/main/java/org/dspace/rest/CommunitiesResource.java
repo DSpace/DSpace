@@ -3,11 +3,10 @@ package org.dspace.rest;
 import org.dspace.content.Community;
 import org.dspace.core.Context;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /*
 The "Path" annotation indicates the URI this class will be available at relative to your base URL.  For
@@ -42,5 +41,35 @@ public class CommunitiesResource {
         }
 
         return "<html><title>Hello!</title><body>Communities:<br/>" + everything.toString() + ".</body></html> ";
+    }
+
+    @GET
+    @Path("/")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public org.dspace.rest.common.Community[] list(@QueryParam("expand") String expand) {
+        try {
+            if(context == null || !context.isValid() ) {
+                context = new org.dspace.core.Context();
+            }
+
+            Community[] topCommunities = Community.findAllTop(context);
+            ArrayList<org.dspace.rest.common.Community> communityArrayList = new ArrayList<org.dspace.rest.common.Community>();
+            for(Community community : topCommunities) {
+                org.dspace.rest.common.Community restCommunity = new org.dspace.rest.common.Community(community, expand);
+                communityArrayList.add(restCommunity);
+            }
+
+            return communityArrayList.toArray(new org.dspace.rest.common.Community[0]);
+
+        } catch (SQLException e) {
+            return null;
+        }
+    }
+
+    @GET
+    @Path("/{community_id}")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public org.dspace.rest.common.Community getCommunity(@PathParam("community_id") Integer community_id, @QueryParam("expand") String expand) {
+        return new org.dspace.rest.common.Community(community_id, expand);
     }
 }
