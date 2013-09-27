@@ -55,7 +55,25 @@
     List<String> identifiers = (List<String>) request.getAttribute("identifiers");
     String uuid = (String) request.getAttribute("s_uuid");
 %>
-<c:set var="dspace.layout.head" scope="request">	
+<c:set var="dspace.layout.head" scope="request">
+	<style type="text/css">
+		
+	#link-ricerca-identificatore {cursor: pointer; font-weight: bold; color: #FF6600;}
+	.sl-result {padding: 10px;}
+	.sl-result:HOVER {background-color: #5C9CCC;}
+	.sl-result-title, .sl-result-authors, .sl-result-date {display: block;}
+	.sl-result-title {font-weight: bold;}
+	.sl-result-authors {font-style: italic;}
+	.sl-result-date {margin-bottom: 10px;}
+	div.submission-lookup-details {max-height: 400px; height: 400px; overflow-y: auto;}
+	div.submission-lookup-details table {padding: 10px;margin-bottom:10px;}
+	div.submission-lookup-details table td {vertical-align: top;}
+	div.submission-lookup-details table td.submission-lookup-label {font-weight: bold;margin-right:10px;}
+	.submission-lookup-providers img {vertical-align: middle; margin-right: 10px;}
+	.invalid-value {border: 1px solid #FF6600;}
+	#tabs-search-accordion td.submission-lookup-providers {text-align: left; padding-left: 10px;}
+	
+	</style>	
 	<script type='text/javascript'>var dspaceContextPath = "<%=request.getContextPath()%>";</script>		
 </c:set>
 <c:set var="dspace.layout.head.last" scope="request">		
