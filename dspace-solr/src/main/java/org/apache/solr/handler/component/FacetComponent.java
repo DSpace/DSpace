@@ -8,7 +8,6 @@
 
 package org.apache.solr.handler.component;
 
-import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.util.OpenBitSet;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.params.CommonParams;
@@ -21,6 +20,7 @@ import org.apache.solr.common.util.StrUtils;
 import org.apache.solr.request.SimpleFacets;
 import org.apache.solr.schema.FieldType;
 import org.apache.solr.search.QueryParsing;
+import org.apache.solr.search.SyntaxError;
 
 import java.io.IOException;
 import java.net.URL;
@@ -569,7 +569,7 @@ public class  FacetComponent extends SearchComponent
     return "$Revision: 1152531 $";
   }
 
-  @Override
+  
   public String getSourceId() {
     return "$Id: FacetComponent.java 1152531 2011-07-31 00:43:33Z koji $";
   }
@@ -633,10 +633,14 @@ public class  FacetComponent extends SearchComponent
     public FacetBase(ResponseBuilder rb, String facetType, String facetStr) {
       this.facetType = facetType;
       this.facetStr = facetStr;
-      try {
-        this.localParams = QueryParsing.getLocalParams(facetStr, rb.req.getParams());
-      } catch (ParseException e) {
-        throw new SolrException(SolrException.ErrorCode.BAD_REQUEST, e);
+      try
+      {
+          this.localParams = QueryParsing.getLocalParams(facetStr,
+          rb.req.getParams());
+      }
+      catch (SyntaxError e)
+      {
+          throw new SolrException(SolrException.ErrorCode.BAD_REQUEST, e);
       }
       this.facetOn = facetStr;
       this.key = facetStr;

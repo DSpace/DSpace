@@ -31,6 +31,8 @@
     <packaging>war</packaging>
 
     <properties>
+		<lucene.version>4.4.0</lucene.version>
+		<solr.version>4.4.0</solr.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}/..</root.basedir>
@@ -54,7 +56,7 @@
                             need to take precendence over the solr-core, the solr-core will still be loaded in the solr-core.jar
                             -->
                             <excludes>
-                                <exclude>WEB-INF/lib/apache-solr-core-3.5.0.jar</exclude>
+                                <exclude>WEB-INF/lib/apache-solr-core-${solr.version}.jar</exclude>
                             </excludes>
                         </overlay>
                     </overlays>
@@ -104,24 +106,29 @@
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr</artifactId>
-            <version>3.5.0</version>
-            <type>war</type>
+            <version>${solr.version}</version>
+		    <type>war</type>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
-            <version>3.5.0</version>
+            <version>${solr.version}</version>            
             <type>jar</type>
+			<exclusions>
+				<exclusion>
+					<groupId>jdk.tools</groupId>
+					<artifactId>jdk.tools</artifactId>
+				</exclusion>
+			</exclusions>              
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
-            <version>3.5.0</version>
+            <version>${solr.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
-            <version>3.5.0</version>
         </dependency>
 
         <!-- Replace J.U.L. logging with log4j -->
@@ -148,6 +155,11 @@
             <version>2.5</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+         </dependency>
     </dependencies>
 
 </project>

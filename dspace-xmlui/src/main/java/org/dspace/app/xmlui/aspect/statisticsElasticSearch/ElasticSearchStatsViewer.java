@@ -20,12 +20,14 @@ import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.statistics.DataTermsFacet;
 import org.dspace.statistics.ElasticSearchLogger;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.action.search.SearchRequestBuilder;
+
 import org.elasticsearch.index.query.*;
-import org.elasticsearch.search.facet.AbstractFacetBuilder;
+
+import org.elasticsearch.search.facet.FacetBuilder;
 import org.elasticsearch.search.facet.FacetBuilders;
 import org.elasticsearch.search.facet.datehistogram.DateHistogramFacet;
 import org.elasticsearch.search.facet.terms.TermsFacet;
@@ -56,34 +58,34 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
 
     protected static TermFilterBuilder justOriginals = FilterBuilders.termFilter("bundleName", "ORIGINAL");
 
-    protected static AbstractFacetBuilder facetTopCountries = FacetBuilders.termsFacet("top_countries").field("country.untouched").size(150)
+    protected static FacetBuilder facetTopCountries = FacetBuilders.termsFacet("top_countries").field("country.untouched").size(150)
             .facetFilter(FilterBuilders.andFilter(
                 justOriginals,
                 FilterBuilders.notFilter(FilterBuilders.termFilter("country.untouched", "")))
             );
 
-    protected static AbstractFacetBuilder facetMonthlyDownloads = FacetBuilders.dateHistogramFacet("monthly_downloads").field("time").interval("month")
+    protected static FacetBuilder facetMonthlyDownloads = FacetBuilders.dateHistogramFacet("monthly_downloads").field("time").interval("month")
             .facetFilter(FilterBuilders.andFilter(
                 FilterBuilders.termFilter("type", "BITSTREAM"),
                 justOriginals
             ));
     
-    protected static AbstractFacetBuilder facetTopBitstreamsAllTime = FacetBuilders.termsFacet("top_bitstreams_alltime").field("id")
+    protected static FacetBuilder facetTopBitstreamsAllTime = FacetBuilders.termsFacet("top_bitstreams_alltime").field("id")
             .facetFilter(FilterBuilders.andFilter(
                     FilterBuilders.termFilter("type", "BITSTREAM"),
                     justOriginals
             ));
     
-    protected static AbstractFacetBuilder facetTopUSCities = FacetBuilders.termsFacet("top_US_cities").field("city.untouched").size(50)
+    protected static FacetBuilder facetTopUSCities = FacetBuilders.termsFacet("top_US_cities").field("city.untouched").size(50)
             .facetFilter(FilterBuilders.andFilter(
                 FilterBuilders.termFilter("countryCode", "US"),
                 justOriginals,
                 FilterBuilders.notFilter(FilterBuilders.termFilter("city.untouched", ""))
             ));
     
-    protected static AbstractFacetBuilder facetTopUniqueIP = FacetBuilders.termsFacet("top_unique_ips").field("ip");
+    protected static FacetBuilder facetTopUniqueIP = FacetBuilders.termsFacet("top_unique_ips").field("ip");
     
-    protected static AbstractFacetBuilder facetTopTypes = FacetBuilders.termsFacet("top_types").field("type");
+    protected static FacetBuilder facetTopTypes = FacetBuilders.termsFacet("top_types").field("type");
 
     /** Language strings */
     private static final Message T_dspace_home = message("xmlui.general.dspace_home");
@@ -218,7 +220,7 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
     }
     
     public void showAllReports() throws WingException, SQLException{
-        List<AbstractFacetBuilder> summaryFacets = new ArrayList<AbstractFacetBuilder>();
+        List<FacetBuilder> summaryFacets = new ArrayList<FacetBuilder>();
         summaryFacets.add(facetTopTypes);
         summaryFacets.add(facetTopUniqueIP);
         summaryFacets.add(facetTopCountries);
@@ -239,12 +241,12 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
         List<? extends TermsFacet.Entry> termsFacetEntries = topBitstreamsFacet.getEntries();
         DataTermsFacet termsFacet = new DataTermsFacet();
         for(TermsFacet.Entry entry : termsFacetEntries) {
-            termsFacet.addTermFacet(new DataTermsFacet.TermsFacet(entry.getTerm(), entry.getCount()));
+            termsFacet.addTermFacet(new DataTermsFacet.TermsFacet(entry.getTerm().string(), entry.getCount()));
         }
         division.addHidden("jsonTopDownloads").setValue(termsFacet.toJson());
     }
     
-    public AbstractFacetBuilder facetTopBitstreamsLastMonth() {
+    public FacetBuilder facetTopBitstreamsLastMonth() {
         Calendar calendar = Calendar.getInstance();
 
         // Show Previous Whole Month
@@ -275,23 +277,23 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
         return monthAndYearFormat.format(calendar.getTime());
     }
     
-    public SearchRequestBuilder facetedQueryBuilder(AbstractFacetBuilder facet) throws WingException{
-        List<AbstractFacetBuilder> facetList = new ArrayList<AbstractFacetBuilder>();
+    public SearchRequestBuilder facetedQueryBuilder(FacetBuilder facet) throws WingException{
+        List<FacetBuilder> facetList = new ArrayList<FacetBuilder>();
         facetList.add(facet);
         return facetedQueryBuilder(facetList);
     }
 
-    public SearchRequestBuilder facetedQueryBuilder(AbstractFacetBuilder... facets) throws WingException {
-        List<AbstractFacetBuilder> facetList = new ArrayList<AbstractFacetBuilder>();
+    public SearchRequestBuilder facetedQueryBuilder(FacetBuilder... facets) throws WingException {
+        List<FacetBuilder> facetList = new ArrayList<FacetBuilder>();
 
-        for(AbstractFacetBuilder facet : facets) {
+        for(FacetBuilder facet : facets) {
             facetList.add(facet);
         }
 
         return facetedQueryBuilder(facetList);
     }
     
-    public SearchRequestBuilder facetedQueryBuilder(List<AbstractFacetBuilder> facetList) {
+    public SearchRequestBuilder facetedQueryBuilder(List<FacetBuilder> facetList) {
         TermQueryBuilder termQuery = QueryBuilders.termQuery(getOwningText(dso), dso.getID());
         FilterBuilder rangeFilter = FilterBuilders.rangeFilter("time").from(dateStart).to(dateEnd);
         FilteredQueryBuilder filteredQueryBuilder = QueryBuilders.filteredQuery(termQuery, rangeFilter);
@@ -301,7 +303,7 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
                 .setQuery(filteredQueryBuilder)
                 .setSize(0);
 
-        for(AbstractFacetBuilder facet : facetList) {
+        for(FacetBuilder facet : facetList) {
             searchRequestBuilder.addFacet(facet);
         }
 
@@ -356,16 +358,16 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
             Row row = facetTable.addRow();
 
             if(termName.equalsIgnoreCase("bitstream")) {
-                Bitstream bitstream = Bitstream.find(context, Integer.parseInt(facetEntry.getTerm()));
+                Bitstream bitstream = Bitstream.find(context, Integer.parseInt(facetEntry.getTerm().string()));
                 Item item = (Item) bitstream.getParentObject();
                 row.addCell().addXref(contextPath + "/handle/" + item.getHandle(), item.getName());
                 row.addCellContent(getFirstMetadataValue(item, "dc.creator"));
                 row.addCellContent(getFirstMetadataValue(item, "dc.publisher"));
                 row.addCellContent(getFirstMetadataValue(item, "dc.date.issued"));
             } else if(termName.equalsIgnoreCase("country")) {
-                row.addCell("country", Cell.ROLE_DATA,"country").addContent(new Locale("en", facetEntry.getTerm()).getDisplayCountry());
+                row.addCell("country", Cell.ROLE_DATA,"country").addContent(new Locale("en", facetEntry.getTerm().string()).getDisplayCountry());
             } else {
-                row.addCell().addContent(facetEntry.getTerm());
+                row.addCell().addContent(facetEntry.getTerm().string());
             }
             row.addCell("count", Cell.ROLE_DATA, "count").addContent(facetEntry.getCount());
         }
