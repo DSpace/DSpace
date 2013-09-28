@@ -455,7 +455,12 @@
   	<servlet-name>privateitems</servlet-name>
   	<servlet-class>org.dspace.app.webui.servlet.admin.PrivateItemsServlet</servlet-class>
   </servlet>
-	
+
+  <servlet>
+    <servlet-name>version-item</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.VersionItemServlet</servlet-class>
+  </servlet>
+  	
   <servlet-mapping>
     <servlet-name>shibboleth-login</servlet-name>
     <url-pattern>/shibboleth-login</url-pattern>

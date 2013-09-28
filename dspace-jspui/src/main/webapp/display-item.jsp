@@ -120,6 +120,10 @@
                     <%--<input type="submit" name="submit" value="Edit...">--%>
                     <input type="submit" name="submit" value="<fmt:message key="jsp.general.edit.button"/>" />
                 </form>
+                <form method="get" action="<%= request.getContextPath() %>/tools/version-item">
+                    <input type="hidden" name="item_id" value="<%= item.getID() %>" />                    
+                    <input type="submit" name="submit" value="<fmt:message key="jsp.general.version.button"/>" />
+                </form>
             </td>
 <%      } %>
         </tr>
