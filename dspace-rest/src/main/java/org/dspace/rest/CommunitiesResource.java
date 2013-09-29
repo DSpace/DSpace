@@ -1,6 +1,5 @@
 package org.dspace.rest;
 
-import org.dspace.content.Community;
 import org.dspace.core.Context;
 
 import javax.ws.rs.*;
@@ -31,8 +30,8 @@ public class CommunitiesResource {
             if(context == null || !context.isValid() ) {
                 context = new Context();
             }
-            Community[] communities = Community.findAllTop(context);
-            for(Community community : communities) {
+            org.dspace.content.Community[] communities = org.dspace.content.Community.findAllTop(context);
+            for(org.dspace.content.Community community : communities) {
                 everything.append(community.getName() + "<br/>\n");
             }
 
@@ -52,9 +51,9 @@ public class CommunitiesResource {
                 context = new org.dspace.core.Context();
             }
 
-            Community[] topCommunities = Community.findAllTop(context);
+            org.dspace.content.Community[] topCommunities = org.dspace.content.Community.findAllTop(context);
             ArrayList<org.dspace.rest.common.Community> communityArrayList = new ArrayList<org.dspace.rest.common.Community>();
-            for(Community community : topCommunities) {
+            for(org.dspace.content.Community community : topCommunities) {
                 org.dspace.rest.common.Community restCommunity = new org.dspace.rest.common.Community(community, expand);
                 communityArrayList.add(restCommunity);
             }

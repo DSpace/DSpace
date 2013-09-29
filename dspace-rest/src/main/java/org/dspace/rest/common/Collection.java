@@ -1,7 +1,5 @@
 package org.dspace.rest.common;
 
-import org.dspace.content.Community;
-import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.Context;
 
@@ -26,16 +24,52 @@ public class Collection {
     //Relationships to other objects
     private Integer logoID;
 
+    @XmlElement(name = "type", required = true)
+    final String type = "collection";
+
     //Exandable relationships
     private Integer parentCommunityID;
     private List<Integer> parentCommunityIDList = new ArrayList<Integer>();
     private List<Integer> itemIDList = new ArrayList<Integer>();
 
+    //Internal metadata
+    private String name;
+    private String handle;
+    private String license;
+
+    //unused-metadata
+    //String provenance_description;
+    //String short_description;
+    //String introductory_text;
+    //String copyright_text;
+    //String side_bar_text;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getHandle() {
+        return handle;
+    }
+
+    public void setHandle(String handle) {
+        this.handle = handle;
+    }
+
+    public String getLicense() {
+        return license;
+    }
+
+    public void setLicense(String license) {
+        this.license = license;
+    }
+
 
     private List<String> expand = new ArrayList<String>();
-
-    @XmlElement(name = "metadata", required = true)
-    private CollectionMetadata metadata;
 
 
     //Calculated
@@ -71,16 +105,14 @@ public class Collection {
             expandFields = Arrays.asList(expand.split(","));
         }
 
-        metadata = new CollectionMetadata();
-
         try {
-            this.setCollectionID(collection.getID());
-            metadata.setName(collection.getName());
-            metadata.setHandle(collection.getHandle());
+            setCollectionID(collection.getID());
+            setName(collection.getName());
+            setHandle(collection.getHandle());
 
             if(expandFields.contains("parentCommunityIDList")) {
-                Community[] parentCommunities = collection.getCommunities();
-                for(Community parentCommunity : parentCommunities) {
+                org.dspace.content.Community[] parentCommunities = collection.getCommunities();
+                for(org.dspace.content.Community parentCommunity : parentCommunities) {
                     this.addParentCommunityIDList(parentCommunity.getID());
                 }
             } else {
@@ -88,7 +120,7 @@ public class Collection {
             }
 
             if(expandFields.contains("parentCommunityID")) {
-                Community parentCommunity = (Community) collection.getParentObject();
+                org.dspace.content.Community parentCommunity = (org.dspace.content.Community) collection.getParentObject();
                 this.setParentCommunityID(parentCommunity.getID());
             } else {
                 this.addExpand("parentCommunityID");
@@ -97,7 +129,7 @@ public class Collection {
             if(expandFields.contains("itemIDList")) {
                 ItemIterator childItems = collection.getItems();
                 while(childItems.hasNext()) {
-                    Item item = childItems.next();
+                    org.dspace.content.Item item = childItems.next();
                     this.addItemIDToList(item.getID());
                 }
             } else {
@@ -105,9 +137,13 @@ public class Collection {
             }
 
             if(expandFields.contains("license")) {
-                metadata.setLicense(collection.getLicense());
+                setLicense(collection.getLicense());
             } else {
                 this.addExpand("license");
+            }
+
+            if(!expandFields.contains("all")) {
+                this.addExpand("all");
             }
 
             if(collection.getLogo() != null) {

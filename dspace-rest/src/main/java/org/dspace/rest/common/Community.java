@@ -1,8 +1,9 @@
 package org.dspace.rest.common;
 
-import org.dspace.content.Site;
+import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,16 +18,17 @@ import java.util.List;
  */
 @XmlRootElement(name = "community")
 public class Community {
+    private static Logger log = Logger.getLogger(Community.class);
 
     //Internal value
     private Integer communityID;
 
-    private static final String type = "community";
+    @XmlElement(name = "type", required = true)
+    final String type = "community";
 
     //Exandable relationships
-    private Integer parentCommunityID;
-    private List<Integer> childCollectionIDList = new ArrayList<Integer>();
-    private List<Integer> childCommunityIDList = new ArrayList<Integer>();
+    @XmlElement(name = "parentCommunity")
+    private LiteCommunity parentCommunity;
 
 
     private List<String> expand = new ArrayList<String>();
@@ -38,11 +40,11 @@ public class Community {
     private String copyrightText, introductoryText, shortDescription, sidebarText;
     private Integer countItems;
 
-    //@XmlElement(name = "communities")
-    private List<Community> subCommunities = new ArrayList<Community>();
+    @XmlElement(name = "subcommunities", required = true)
+    private List<LiteCommunity> subCommunities = new ArrayList<LiteCommunity>();
 
-    //@XmlElement(name = "collections")
-    private List<Collection> collections = new ArrayList<Collection>();
+    @XmlElement(name = "collections")
+    private List<LiteCollection> collections = new ArrayList<LiteCollection>();
 
 
 
@@ -64,8 +66,7 @@ public class Community {
             setup(community, expand);
 
         } catch (Exception e) {
-            //TODO Handle exceptions
-            //throw e;
+            log.error(e.getMessage());
 
         }
     }
@@ -76,8 +77,6 @@ public class Community {
             expandFields = Arrays.asList(expand.split(","));
         }
 
-
-
         try {
             this.setCommunityID(community.getID());
             this.setName(community.getName());
@@ -87,62 +86,39 @@ public class Community {
             this.setSidebarText(community.getMetadata("sidebarText"));
             this.setCountItems(community.countItems());
 
-            org.dspace.content.Collection[] collectionArray = community.getCollections();
-            for(org.dspace.content.Collection collection : collectionArray) {
-                collections.add(new Collection(collection, expand));
-            }
-
-            org.dspace.content.Community[] communityArray = community.getSubcommunities();
-            for(org.dspace.content.Community subCommunity : communityArray) {
-                subCommunities.add(new Community(subCommunity, expand));
-            }
-
-            if(expandFields.contains("parentCommunityID")) {
+            if(expandFields.contains("parentCommunityID") || expandFields.contains("all")) {
                 org.dspace.content.Community parentCommunity = community.getParentCommunity();
                 if(parentCommunity != null) {
-                    this.setParentCommunityID(parentCommunity.getID());
-                } else {
-                    this.setParentCommunityID(Site.SITE_ID);
+                    setParentCommunity(new LiteCommunity(parentCommunity));
                 }
-
             } else {
                 this.addExpand("parentCommunityID");
             }
 
-            if(expandFields.contains("subCollections")) {
-                org.dspace.content.Collection[] collections = community.getCollections();
-                this.childCollectionIDList = new ArrayList<Integer>();
-                for(org.dspace.content.Collection collection : collections) {
-                    this.childCollectionIDList.add(collection.getID());
+            if(expandFields.contains("subCollections") || expandFields.contains("all")) {
+                org.dspace.content.Collection[] collectionArray = community.getCollections();
+                collections = new ArrayList<LiteCollection>();
+                for(org.dspace.content.Collection collection : collectionArray) {
+                    collections.add(new LiteCollection(collection));
                 }
             } else {
                 this.addExpand("subCollections");
             }
 
-            if(expandFields.contains("subCommunities")) {
-                org.dspace.content.Community[] subCommunities = community.getSubcommunities();
-                this.childCommunityIDList = new ArrayList<Integer>();
-                for(org.dspace.content.Community subComm : subCommunities) {
-                    this.childCommunityIDList.add(subComm.getID());
+            if(expandFields.contains("subCommunities") || expandFields.contains("all")) {
+                org.dspace.content.Community[] communityArray = community.getSubcommunities();
+                subCommunities = new ArrayList<LiteCommunity>();
+                for(org.dspace.content.Community subCommunity : communityArray) {
+                    subCommunities.add(new LiteCommunity(subCommunity));
                 }
             } else {
                 this.addExpand("subCommunities");
             }
 
-            //collection.getMetadata()
         } catch (Exception e) {
-
+            log.error(e.getMessage());
         }
 
-    }
-
-
-    public Integer getParentCommunityID() {
-        return parentCommunityID;
-    }
-
-    public void setParentCommunityID(Integer parentCommunityID) {
-        this.parentCommunityID = parentCommunityID;
     }
 
     public List<String> getExpand() {
@@ -165,22 +141,6 @@ public class Community {
         this.communityID = communityID;
     }
 
-    public List<Integer> getChildCollectionIDList() {
-        return childCollectionIDList;
-    }
-
-    public void setChildCollectionIDList(List<Integer> childCollectionIDList) {
-        this.childCollectionIDList = childCollectionIDList;
-    }
-
-    public List<Integer> getChildCommunityIDList() {
-        return childCommunityIDList;
-    }
-
-    public void setChildCommunityIDList(List<Integer> childCommunityIDList) {
-        this.childCommunityIDList = childCommunityIDList;
-    }
-
     public String getName() {
         return name;
     }
@@ -197,24 +157,12 @@ public class Community {
         this.handle = handle;
     }
 
-    public static String getType() {
-        return type;
-    }
-
-    public List<Collection> getCollections() {
+    public List<LiteCollection> getCollections() {
         return collections;
     }
 
-    public void setCollections(List<Collection> collections) {
+    public void setCollections(List<LiteCollection> collections) {
         this.collections = collections;
-    }
-
-    public List<Community> getSubCommunities() {
-        return subCommunities;
-    }
-
-    public void setSubCommunities(List<Community> subCommunities) {
-        this.subCommunities = subCommunities;
     }
 
     public Integer getCountItems() {
@@ -255,5 +203,17 @@ public class Community {
 
     public void setCopyrightText(String copyrightText) {
         this.copyrightText = copyrightText;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public LiteCommunity getParentCommunity() {
+        return parentCommunity;
+    }
+
+    public void setParentCommunity(LiteCommunity parentCommunity) {
+        this.parentCommunity = parentCommunity;
     }
 }

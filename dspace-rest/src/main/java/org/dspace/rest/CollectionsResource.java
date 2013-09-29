@@ -1,6 +1,5 @@
 package org.dspace.rest;
 
-import org.dspace.content.Collection;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
@@ -33,8 +32,8 @@ public class CollectionsResource {
         try {
             org.dspace.core.Context context = new org.dspace.core.Context();
 
-            Collection[] collections = Collection.findAll(context);
-            for(Collection collection : collections) {
+            org.dspace.content.Collection[] collections = org.dspace.content.Collection.findAll(context);
+            for(org.dspace.content.Collection collection : collections) {
                 everything.append("<li><a href='" + servletContext.getContextPath() + "/collections/" + collection.getID() + "'>" + collection.getID() + " - " + collection.getName() + "</a></li>\n");
             }
 
@@ -54,9 +53,9 @@ public class CollectionsResource {
                 context = new org.dspace.core.Context();
             }
 
-            Collection[] collections = Collection.findAll(context);
+            org.dspace.content.Collection[] collections = org.dspace.content.Collection.findAll(context);
             ArrayList<org.dspace.rest.common.Collection> collectionArrayList = new ArrayList<org.dspace.rest.common.Collection>();
-            for(Collection collection : collections) {
+            for(org.dspace.content.Collection collection : collections) {
                 org.dspace.rest.common.Collection restCollection = new org.dspace.rest.common.Collection(collection, expand);
                 collectionArrayList.add(restCollection);
             }
