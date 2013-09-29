@@ -26,8 +26,9 @@
 
     <!--Force UTF-8 encoding during build on all platforms-->
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lucene.version>3.5.0</lucene.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>		
+        <lucene.version>4.4.0</lucene.version>
+        <solr.version>4.4.0</solr.version>
         <slf4j.version>1.6.1</slf4j.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
@@ -451,6 +452,7 @@
             <maven.test.skip>true</maven.test.skip>
         </properties>
       </profile>
+    
    </profiles>
 
    <!--
@@ -643,9 +645,14 @@
          </dependency>
          <dependency>
             <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers</artifactId>
+            <artifactId>lucene-analyzers-common</artifactId>
             <version>${lucene.version}</version>
          </dependency>
+         <dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-queryparser</artifactId>
+			<version>${lucene.version}</version>
+		</dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
