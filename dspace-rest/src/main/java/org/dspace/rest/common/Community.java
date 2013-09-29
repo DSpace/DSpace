@@ -81,9 +81,9 @@ public class Community {
             this.setCommunityID(community.getID());
             this.setName(community.getName());
             this.setHandle(community.getHandle());
-            this.setCopyrightText(community.getMetadata("copyrightText"));
-            this.setIntroductoryText(community.getMetadata("shortDescription"));
-            this.setSidebarText(community.getMetadata("sidebarText"));
+            this.setCopyrightText(community.getMetadata(org.dspace.content.Community.COPYRIGHT_TEXT));
+            this.setIntroductoryText(community.getMetadata(org.dspace.content.Community.INTRODUCTORY_TEXT));
+            this.setSidebarText(community.getMetadata(org.dspace.content.Community.SIDEBAR_TEXT));
             this.setCountItems(community.countItems());
 
             if(expandFields.contains("parentCommunityID") || expandFields.contains("all")) {

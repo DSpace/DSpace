@@ -7,13 +7,6 @@
  */
 package org.dspace.content;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.MissingResourceException;
-
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
@@ -21,8 +14,8 @@ import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.browse.ItemCounter;
 import org.dspace.browse.ItemCountException;
+import org.dspace.browse.ItemCounter;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
@@ -33,6 +26,13 @@ import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.MissingResourceException;
 
 /**
  * Class representing a community
@@ -69,6 +69,12 @@ public class Community extends DSpaceObject
 
     /** The default group of administrators */
     private Group admins;
+
+    // Keys for accessing Community metadata
+    public static final String COPYRIGHT_TEXT = "copyright_text";
+    public static final String INTRODUCTORY_TEXT = "introductory_text";
+    public static final String SHORT_DESCRIPTION = "short_description";
+    public static final String SIDEBAR_TEXT = "side_bar_text";
 
     /**
      * Construct a community object from a database row.
