@@ -22,7 +22,7 @@
 
 
 <%
-    String position = (String)request.getAttribute("itemID");
+    String itemID = (String)request.getAttribute("itemID");
 	request.setAttribute("LanguageSwitch", "hide");
 %>
 
@@ -36,7 +36,7 @@
 
  <form action="<%= request.getContextPath() %>/tools/version-item" method="post">
 
-        <p><fmt:message key="jsp.dspace-admin.version-summary.text3"/></p>
+        <p><fmt:message key="jsp.dspace-admin.version-summary.text3"><fmt:param><%= itemID%></fmt:param></fmt:message></p>
         <center>
             <table>
                 <tr>
@@ -47,7 +47,7 @@
                 <tr>
                     <td colspan="2" align="center">                    
                     <%-- <input type="submit" name="submit_save" value="Save"> --%>
-                    <input type="submit" name="submit_version" value="<fmt:message key="jsp.dspace-admin.general.save"/>" />
+                    <input type="submit" name="submit_version" value="<fmt:message key="jsp.version.version-summary.submit_version"/>" />
                     <%-- <input type="submit" name="cancel" value="Cancel"> --%>
                     <input type="submit" name="cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
                     </td>

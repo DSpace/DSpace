@@ -41,8 +41,9 @@ public class VersionItemsServlet extends DSpaceServlet
             AuthorizeException
     {
         Integer itemID = UIUtil.getIntParameter(request,"itemID");
-                
+        Item item = Item.find(context,itemID);        
         if (UIUtil.getSubmitButton(request,"submit")!=null){
+            request.setAttribute("itemID", itemID);
             JSPManager.showJSP(request, response,
                     "/dspace-admin/version-summary.jsp");
             return;
@@ -56,7 +57,7 @@ public class VersionItemsServlet extends DSpaceServlet
         else if (UIUtil.getSubmitButton(request,"submit_update_version")!=null){
             VersionUtil.processUpdateVersion(context, itemID, summary);
         }
-        Item item = Item.find(context,itemID);
+        
         //Send us back to the item page if we cancel !
         response.sendRedirect(request.getContextPath() + "/handle/" + item.getHandle());
         context.complete();
