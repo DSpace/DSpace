@@ -86,19 +86,19 @@
 
        <dependency>
            <groupId>org.apache.lucene</groupId>
-           <artifactId>lucene-icu</artifactId>
+           <artifactId>lucene-analyzers-icu</artifactId>
            <version>${lucene.version}</version>
        </dependency>
 		
        <dependency>
            <groupId>org.apache.lucene</groupId>
-           <artifactId>lucene-smartcn</artifactId>
+           <artifactId>lucene-analyzers-smartcn</artifactId>
            <version>${lucene.version}</version>
        </dependency>
        
        <dependency>
            <groupId>org.apache.lucene</groupId>
-           <artifactId>lucene-stempel</artifactId>
+           <artifactId>lucene-analyzers-stempel</artifactId>
            <version>${lucene.version}</version>
        </dependency>
        
