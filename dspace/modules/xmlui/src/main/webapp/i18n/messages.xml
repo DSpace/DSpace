@@ -1008,9 +1008,13 @@
 	<message key="xmlui.Submission.workflow.PerformTaskStep.leave_help">Leave this task in the pool
 		for another to take.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.leave_submit">Leave task</message>
-	<message key="xmlui.Submission.workflow.PerformTaskStep.approve_help">If you have reviewed the
-		item and it is suitable for inclusion in the collection, select "Approve".</message>
-	<message key="xmlui.Submission.workflow.PerformTaskStep.approve_submit">Approve item</message>
+	<message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.approve_help">If you have reviewed the
+		item and it is suitable for inclusion in the collection, select 'Approve item and archive'.</message>
+	<message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.approve_submit">Approve item and archive</message>
+	<message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.blackout_help">If you have reviewed the
+		item and want to send it to Publication Blackout, select 'Approve item and send to blackout'.  
+		Items in publication blackout can be archived once their related publication has been published.</message>
+	<message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.blackout_submit">Approve item and send to blackout</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.commit_help">Once you've edited the item,
 		use this option to commit the item to the archive.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.commit_submit">Commit to archive</message>
@@ -1026,6 +1030,11 @@
 		so that another user may perform the task.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.return_submit">Return task to
 		pool</message>
+
+	<message key="xmlui.Submission.workflow.AfterPublicationActionXMLUI.after_blackout_help">This item is currently 
+	in Publication Blackout.  Once the associated article has been published, select 'Exit Publication Blackout and Archive' to move the
+	item out of Publication Blackout and into the Archive</message>
+	<message key="xmlui.Submission.workflow.AfterPublicationActionXMLUI.after_blackout_submit">Exit Publication Blackout and Archive</message>
 
 	<!-- org.dspace.app.xmlui.Submission.workflow.RejectTaskStep -->
 	<message key="xmlui.Submission.workflow.RejectTaskStep.info1">Please enter your reason for

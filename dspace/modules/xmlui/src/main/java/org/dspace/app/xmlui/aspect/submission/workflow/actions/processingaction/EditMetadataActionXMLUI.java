@@ -26,6 +26,8 @@ import org.dspace.versioning.VersionHistory;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import org.dspace.doi.DryadDOIRegistrationHelper;
+import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -48,6 +50,10 @@ public class EditMetadataActionXMLUI extends AbstractXMLUIAction {
             message("xmlui.Submission.workflow.EditMetadataActionXMLUI.approve_help");
     protected static final Message T_approve_submit =
             message("xmlui.Submission.workflow.EditMetadataActionXMLUI.approve_submit");
+    protected static final Message T_blackout_help =
+            message("xmlui.Submission.workflow.EditMetadataActionXMLUI.blackout_help");
+    protected static final Message T_blackout_submit =
+            message("xmlui.Submission.workflow.EditMetadataActionXMLUI.blackout_submit");
     protected static final Message T_reject_help =
             message("xmlui.Submission.workflow.EditMetadataActionXMLUI.reject_help");
     protected static final Message T_reject_submit =
@@ -134,9 +140,12 @@ public class EditMetadataActionXMLUI extends AbstractXMLUIAction {
             }
         }
 
+        // Check if this item should enter blackout by default or not
+        Boolean blackoutRecommended = DryadJournalSubmissionUtils.shouldEnterBlackoutByDefault(context, item, collection);
+
         switch (page){
             case EditMetadataAction.MAIN_PAGE:
-                renderMainPage(div);
+                renderMainPage(div, blackoutRecommended);
                 break;
             case AcceptAction.REJECT_PAGE:
                 renderRejectPage(div);
@@ -146,16 +155,20 @@ public class EditMetadataActionXMLUI extends AbstractXMLUIAction {
         div.addHidden("submission-continue").setValue(knot.getId());
     }
 
-    private void renderMainPage(Division div) throws WingException {
+    private void renderMainPage(Division div, Boolean blackoutRecommended) throws WingException {
         Table table = div.addTable("workflow-actions", 1, 1);
         table.setHead(T_info1);
 
-
         //TODO: if we have a last task change button name to archive !
         // Approve task
-        Row row = table.addRow();
+        Row row = table.addRow(null, null, blackoutRecommended ? "" : "recommended");
         row.addCellContent(T_approve_help);
         row.addCell().addButton("submit_approve").setValue(T_approve_submit);
+
+        // Send to blackout
+        row = table.addRow(null, null, blackoutRecommended ? "recommended" : "");
+        row.addCellContent(T_blackout_help);
+        row.addCell().addButton("submit_blackout").setValue(T_blackout_submit);
 
         // Reject item
         row = table.addRow();

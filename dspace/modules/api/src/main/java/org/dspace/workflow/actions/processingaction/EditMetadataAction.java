@@ -38,6 +38,8 @@ public class EditMetadataAction extends ProcessingAction {
     public static final int MAIN_PAGE = 0;
     public static final int REJECT_PAGE = 1;
 
+    public static final int OUTCOME_BLACKOUT = 1;
+
     //TODO: rename to AcceptAndEditMetadataAction
     
     @Override
@@ -67,6 +69,8 @@ public class EditMetadataAction extends ProcessingAction {
 
             // in case the Curator approve the item in pendingPublicationStep
             // if(embargo is "untilArticleAppears"): Remove it!
+            // This was final approval from publication blackout
+            // need to examine this
             if(step.getId().equals("pendingPublicationStep")){
                 Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wfi.getItem());
                 for(Item i : dataFiles){
@@ -82,7 +86,14 @@ public class EditMetadataAction extends ProcessingAction {
 
             }
 
+            // If user selected archive button, outcome is 0
             return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
+        } else if(request.getParameter("submit_blackout") != null){
+            // Add provenance metadata so that registration detects this item is
+            // in publication blackout
+            addBlackoutProvenance(c, wfi);
+            // If user selected blackout button, outcome is 1
+            return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, OUTCOME_BLACKOUT);
         } else if(request.getParameter("submit_reject") != null){
             // Make sure we indicate which page we want to process
             request.setAttribute("page", REJECT_PAGE);
@@ -168,6 +179,27 @@ public class EditMetadataAction extends ProcessingAction {
         // Add to item as a DC field
         wfi.getItem().addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
         wfi.getItem().update();
+    }
+
+    private void addBlackoutProvenance(Context c, WorkflowItem wfi) throws SQLException, AuthorizeException {
+        Item dataPackage = wfi.getItem();
+        //Add the provenance for the blackout action
+        String now = DCDate.getCurrent().toString();
+
+        // Get user's name + email address
+        String usersName = WorkflowManager.getEPersonName(c.getCurrentUser());
+
+        String provDescription = getProvenanceStartId() + " Entered publication blackout by "
+                + usersName + " on " + now + " (GMT) ";
+
+        // Add to item as a DC field
+        dataPackage.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+        dataPackage.update();
+        Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, dataPackage);
+        for(Item dataFile : dataFiles) {
+            dataFile.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+            dataFile.update();
+        }
     }
 
 
