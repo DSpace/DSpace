@@ -65,12 +65,18 @@ public class SeDiCI2003Authors extends SeDiCI2003AuthorityProvider{
 	}
 
 	protected String getSeDiCI2003EntityLabel(String field, String key) {
-		Personas p = Personas.findPersonas(Integer.valueOf(key));
-		if (p == null){
+		try {
+			Personas p = Personas.findPersonas(Integer.valueOf(key));
+			if (p == null){
+				this.reportMissingAuthorityKey(field, key);
+				return key;
+			}else{
+				return p.getApellidoYNombre();
+			}
+		} catch (NumberFormatException e) {
 			this.reportMissingAuthorityKey(field, key);
 			return key;
-		}else{
-			return p.getApellidoYNombre();
-		}
+		} 
+		
 	}
 }
