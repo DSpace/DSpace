@@ -10,6 +10,7 @@ package org.dspace.identifier;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCValue;
@@ -147,6 +148,9 @@ public class DOIIdentifierProvider
         try {
             DOI.formatIdentifier(identifier);
         } catch (IdentifierException e) {
+            return false;
+        } catch (IllegalArgumentException e)
+        {
             return false;
         }
         return true;
@@ -479,26 +483,51 @@ public class DOIIdentifierProvider
     public void delete(Context context, DSpaceObject dso)
             throws IdentifierException
     {
-        String doi = null;
-        try {
-            doi = getDOIByObject(context, dso);
+        // delete all DOIs for this Item from our database.
+        try
+        {
+            String doi = getDOIByObject(context, dso);
+            while (null != doi)
+            {
+                this.delete(context, dso, doi);
+                doi = getDOIByObject(context, dso);
+            }
         }
-        catch (SQLException e)
+        catch (SQLException ex)
         {
             log.error("Error while attemping to retrieve information about a DOI for "
-                    + dso.getTypeText() + " with ID " + dso.getID() + ".", e);
+                    + dso.getTypeText() + " with ID " + dso.getID() + ".", ex);
             throw new RuntimeException("Error while attempting to retrieve " +
                     "information about a DOI for " + dso.getTypeText() + 
-                    " with ID " + dso.getID() + ".", e);
+                    " with ID " + dso.getID() + ".", ex);
         }
-        if (doi == null)
-        {
-            // doi is not in DB. Is it in dso metadata?
-            doi = getDOIOutOfObject(dso);
+        
+        // delete all DOIs of this item out of its metadata
+        try {
+            String doi = getDOIOutOfObject(dso);
+        
+            while (null != doi)
+            {
+                this.removeDOIFromObject(context, dso, doi);
+                doi = getDOIOutOfObject(dso);
+            }
         }
-        if (doi != null)
+        catch (AuthorizeException ex)
         {
-            this.delete(context, dso, doi);
+            log.error("Error while removing a DOI out of the metadata of an "
+                    + dso.getTypeText() + " with ID " + dso.getID() + ".", ex);
+            throw new RuntimeException("Error while removing a DOI out of the "
+                    + "metadata of an " + dso.getTypeText() + " with ID "
+                    + dso.getID() + ".", ex);
+
+        }
+        catch (SQLException ex)
+        {
+            log.error("Error while removing a DOI out of the metadata of an "
+                    + dso.getTypeText() + " with ID " + dso.getID() + ".", ex);
+            throw new RuntimeException("Error while removing a DOI out of the "
+                    + "metadata of an " + dso.getTypeText() + " with ID "
+                    + dso.getID() + ".", ex);
         }
     }
 
@@ -556,6 +585,7 @@ public class DOIIdentifierProvider
             doiRow.setColumn("status", DELETED);
             try {
                 DatabaseManager.update(context, doiRow);
+                context.commit();
             }
             catch (SQLException sqle)
             {
@@ -608,20 +638,21 @@ public class DOIIdentifierProvider
     
     /**
      * Search the database for a DOI, using the type and id of an DSpaceObject.
-     * 
+     *
      * @param context
-     * @param dso DSpaceObject to find doi for.
+     * @param dso DSpaceObject to find doi for. DOIs with status DELETED will be
+     * ignored.
      * @return The DOI as String or null if DOI was not found.
-     * @throws SQLException 
+     * @throws SQLException
      */
     public static String getDOIByObject(Context context, DSpaceObject dso)
             throws SQLException
     {
         String sql = "SELECT * FROM Doi WHERE resource_type_id = ? " +
-                "AND resource_id = ?";
+                "AND resource_id = ? AND status != ?";
 
         TableRow doiRow = DatabaseManager.querySingleTable(context,
-                "Doi", sql, dso.getType(), dso.getID());
+                "Doi", sql, dso.getType(), dso.getID(), DOIIdentifierProvider.DELETED);
         if (null == doiRow)
         {
             return null;
@@ -762,7 +793,6 @@ public class DOIIdentifierProvider
         {
             item.update();
             context.commit();
-            log.info("reserved {}", doi);
         } catch (SQLException ex) {
             throw ex;
         } catch (AuthorizeException ex) {
