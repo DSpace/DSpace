@@ -267,12 +267,12 @@ public class ItemListTag extends TagSupport
                 // If the table width has been specified, we can make this a fixed layout
                 if (!StringUtils.isEmpty(tablewidth))
                 {
-                    out.println("<table style=\"width: " + tablewidth + "; table-layout: fixed;\" align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
+                    out.println("<table style=\"width: " + tablewidth + "; table-layout: fixed;\" align=\"center\" class=\"table\" summary=\"This table browses all dspace content\">");
                 }
                 else
                 {
                     // Otherwise, don't constrain the width
-                    out.println("<table align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
+                    out.println("<table align=\"center\" class=\"table\" summary=\"This table browses all dspace content\">");
                 }
 
                 // Output the known column widths
@@ -299,11 +299,11 @@ public class ItemListTag extends TagSupport
             }
             else if (!StringUtils.isEmpty(tablewidth))
             {
-                out.println("<table width=\"" + tablewidth + "\" align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
+                out.println("<table width=\"" + tablewidth + "\" align=\"center\" class=\"table\" summary=\"This table browses all dspace content\">");
             }
             else
             {
-                out.println("<table align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
+                out.println("<table align=\"center\" class=\"table\" summary=\"This table browses all dspace content\">");
             }
 
             // Output the table headers

@@ -391,7 +391,7 @@ public class ItemTag extends TagSupport
             configLine = defaultFields;
         }
 
-        out.println("<center><table class=\"itemDisplayTable\">");
+        out.println("<center><table class=\"table itemDisplayTable\">");
 
         /*
          * Break down the configuration into fields and display them
@@ -757,7 +757,7 @@ public class ItemTag extends TagSupport
         HttpServletRequest request = (HttpServletRequest) pageContext
                 .getRequest();
 
-        out.print("<table align=\"center\" class=\"miscTable\"><tr>");
+        out.print("<table align=\"center\" class=\"table\"><tr>");
         out.println("<td class=\"evenRowEvenCol\"><p><strong>"
                 + LocaleSupport.getLocalizedMessage(pageContext,
                         "org.dspace.app.webui.jsptag.ItemTag.files")
@@ -824,7 +824,7 @@ public class ItemTag extends TagSupport
         		}
 
         		out
-                    .println("<table cellpadding=\"6\"><tr><th id=\"t1\" class=\"standard\">"
+                    .println("<table cellpadding=\"6\" class=\"table\"><tr><th id=\"t1\" class=\"standard\">"
                             + LocaleSupport.getLocalizedMessage(pageContext,
                                     "org.dspace.app.webui.jsptag.ItemTag.file")
                             + "</th>");
@@ -1032,7 +1032,7 @@ public class ItemTag extends TagSupport
         	throw new IOException(sqle.getMessage(), sqle);
         }
 
-        out.println("<table align=\"center\" class=\"attentionTable\"><tr>");
+        out.println("<table align=\"center\" class=\"table attentionTable\"><tr>");
 
         out.println("<td class=\"attentionCell\"><p><strong>"
                 + LocaleSupport.getLocalizedMessage(pageContext,

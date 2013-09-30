@@ -42,7 +42,7 @@ public class CollectionListTag extends TagSupport
 
         try
         {
-            out.println("<table align=\"center\" class=\"miscTable\" title=\"Collection List\">");
+            out.println("<table align=\"center\" class=\"table\" title=\"Collection List\">");
 
             // Write column headings
             out.print("<tr><th id=\"t4\" class=\"oddRowOddCol\">"
