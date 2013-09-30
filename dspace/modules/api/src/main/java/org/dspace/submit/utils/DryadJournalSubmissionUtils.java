@@ -85,16 +85,27 @@ public class DryadJournalSubmissionUtils {
             journalFullName=journalFullNames[0].value;
         }
 
-	// get journal's blackout setting
         Map<String, String> values = journalProperties.get(journalFullName);
-
+        // Ignore blackout setting if journal is not (yet) integrated
+	// get journal's blackout setting
 	// journal is blacked out if its blackout setting is true or if it has no setting
+        String isIntegrated = null;
         String isBlackedOut = null;
-        if(values!=null && values.size()>0)
+        if(values!=null && values.size()>0) {
+            isIntegrated = values.get(INTEGRATED);
             isBlackedOut = values.get(PUBLICATION_BLACKOUT);
-        if(isBlackedOut==null || isBlackedOut.equals("true"))
+        }
+
+        if(isIntegrated == null || isIntegrated.equals("false")) {
+            // journal is not integrated.  Enter blackout by default
             return true;
-        return false;
+        } else if(isBlackedOut==null || isBlackedOut.equals("true")) {
+            // journal has a blackout setting and it's set to true
+            return true;
+        } else {
+            // journal is integrated but blackout setting is false or missing
+           return false;
+        }
     }
 
 
