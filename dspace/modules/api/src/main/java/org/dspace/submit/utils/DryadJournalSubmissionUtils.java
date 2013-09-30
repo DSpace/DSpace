@@ -74,7 +74,7 @@ public class DryadJournalSubmissionUtils {
     }
 
 
-    public static boolean isJournalBlackedOut(Context context, Item item, Collection collection) throws SQLException {
+    public static boolean shouldEnterBlackoutByDefault(Context context, Item item, Collection collection) throws SQLException {
         // get Journal
         Item dataPackage=item;
         if(!isDataPackage(collection)) 
