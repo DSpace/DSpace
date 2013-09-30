@@ -30,6 +30,7 @@
 					<li><a href="pages/politicas#deposito">Política de depósito</a></li>
 					<li><a href="pages/politicas#preservacion">Política de preservación</a></li>
 					<li><a href="pages/politicas#metadatos">Política de Metadatos</a></li>
+					<li><a href="pages/politicas#servicios">Política de Servicios</a></li>
 				</ul>
 
 
@@ -176,7 +177,7 @@
 				   disponible en el portal http://sedici.unlp.edu.ar. 
 				</p>
  
-				<h1>Política de metadatos</h1>
+				<h1 id="servicios">Política de servicios</h1>
 				<p><b>Servicios para usuarios:</b></p>
 				<ul>
 					<li>Acceso público a contenidos desde el portal a partir de búsqueda y navegación, documentos destacados y 
