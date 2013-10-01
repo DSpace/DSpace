@@ -1031,6 +1031,7 @@
 	<message key="xmlui.Submission.workflow.PerformTaskStep.return_submit">Return task to
 		pool</message>
 
+  <message key="xmlui.Submission.workflow.AfterPublicationActionXMLUI.head">Perform task: Exit Publication Blackout</message>
 	<message key="xmlui.Submission.workflow.AfterPublicationActionXMLUI.after_blackout_help">This item is currently 
 	in Publication Blackout.  Once the associated article has been published, select 'Exit Publication Blackout and Archive' to move the
 	item out of Publication Blackout and into the Archive</message>
