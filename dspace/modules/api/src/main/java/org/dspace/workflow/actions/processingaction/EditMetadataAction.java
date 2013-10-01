@@ -69,8 +69,9 @@ public class EditMetadataAction extends ProcessingAction {
 
             // in case the Curator approve the item in pendingPublicationStep
             // if(embargo is "untilArticleAppears"): Remove it!
-            // This was final approval from publication blackout
-            // need to examine this
+
+            // TODO: dleehr 2013-10-01: This code appears to be for old blackout handling
+            // need to see if it's still relevant
             if(step.getId().equals("pendingPublicationStep")){
                 Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wfi.getItem());
                 for(Item i : dataFiles){
