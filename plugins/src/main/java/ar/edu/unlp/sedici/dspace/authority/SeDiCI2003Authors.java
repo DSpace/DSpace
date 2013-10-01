@@ -74,7 +74,7 @@ public class SeDiCI2003Authors extends SeDiCI2003AuthorityProvider{
 				return p.getApellidoYNombre();
 			}
 		} catch (NumberFormatException e) {
-			this.reportMissingAuthorityKey(field, key);
+			//this.reportMissingAuthorityKey(field, key);
 			return key;
 		} 
 		
