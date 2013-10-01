@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Date;
+
+import java.text.SimpleDateFormat;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
@@ -158,24 +161,6 @@ public class METSRightsCrosswalk
         //For each DSpace policy
         for(ResourcePolicy policy : policies)
         {
-           // As of DSpace 3.0, policies may have an effective date range, check if a policy is effective	
-           Date now = new Date();	
-           if (policy.getStartDate() != null) 
-           {
-        	   if (policy.getStartDate().after(now))
-        	   {
-        		   continue;
-        	   }
-           }
-           
-           if (policy.getEndDate() != null) 
-           {
-        	   if (policy.getEndDate().before(now))
-        	   {
-        		   continue;
-        	   }
-           }
-
            // DSpace Policies can either reference a Group or an Individual, but not both!
            Group group = policy.getGroup();
            EPerson person = policy.getEPerson();
@@ -183,6 +168,27 @@ public class METSRightsCrosswalk
            // Create our <Context> node for this policy
            Element rightsContext = new Element("Context", METSRights_NS);
 
+           // As of DSpace 3.0, policies may have an effective date range, check if a policy is effective
+           rightsContext.setAttribute("in-effect","true");
+           Date now = new Date();   
+           SimpleDateFormat iso8601 = new SimpleDateFormat("yyyy-MM-dd"); 
+           if (policy.getStartDate() != null) 
+           {
+        	   rightsContext.setAttribute("start-date", iso8601.format(policy.getStartDate()));
+               if (policy.getStartDate().after(now))
+               {
+                   rightsContext.setAttribute("in-effect","false");
+               }
+           }
+           
+           if (policy.getEndDate() != null) 
+           {
+        	   rightsContext.setAttribute("end-date", iso8601.format(policy.getEndDate()));
+               if (policy.getEndDate().before(now))
+               {
+                   rightsContext.setAttribute("in-effect","false");
+               }
+           }
   
            //First, handle Group-based policies
            // For Group policies we need to setup a
