@@ -158,6 +158,24 @@ public class METSRightsCrosswalk
         //For each DSpace policy
         for(ResourcePolicy policy : policies)
         {
+           // As of DSpace 3.0, policies may have an effective date range, check if a policy is effective	
+           Date now = new Date();	
+           if (policy.getStartDate() != null) 
+           {
+        	   if (policy.getStartDate().after(now))
+        	   {
+        		   continue;
+        	   }
+           }
+           
+           if (policy.getEndDate() != null) 
+           {
+        	   if (policy.getEndDate().before(now))
+        	   {
+        		   continue;
+        	   }
+           }
+
            // DSpace Policies can either reference a Group or an Individual, but not both!
            Group group = policy.getGroup();
            EPerson person = policy.getEPerson();
