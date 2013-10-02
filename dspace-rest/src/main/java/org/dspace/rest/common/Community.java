@@ -115,6 +115,10 @@ public class Community {
                 this.addExpand("subCommunities");
             }
 
+            if(!expandFields.contains("all")) {
+                this.addExpand("all");
+            }
+
         } catch (Exception e) {
             log.error(e.getMessage());
         }

@@ -32,6 +32,9 @@ public class Collection {
     private List<Integer> parentCommunityIDList = new ArrayList<Integer>();
     private List<Integer> itemIDList = new ArrayList<Integer>();
 
+    @XmlElement(name = "items")
+    private List<LiteItem> items = new ArrayList<LiteItem>();
+
     //Internal metadata
     private String name;
     private String handle;
@@ -110,7 +113,7 @@ public class Collection {
             setName(collection.getName());
             setHandle(collection.getHandle());
 
-            if(expandFields.contains("parentCommunityIDList")) {
+            if(expandFields.contains("parentCommunityIDList") || expandFields.contains("all")) {
                 org.dspace.content.Community[] parentCommunities = collection.getCommunities();
                 for(org.dspace.content.Community parentCommunity : parentCommunities) {
                     this.addParentCommunityIDList(parentCommunity.getID());
@@ -119,24 +122,25 @@ public class Collection {
                 this.addExpand("parentCommunityIDList");
             }
 
-            if(expandFields.contains("parentCommunityID")) {
+            if(expandFields.contains("parentCommunityID") | expandFields.contains("all")) {
                 org.dspace.content.Community parentCommunity = (org.dspace.content.Community) collection.getParentObject();
                 this.setParentCommunityID(parentCommunity.getID());
             } else {
                 this.addExpand("parentCommunityID");
             }
 
-            if(expandFields.contains("itemIDList")) {
+            if(expandFields.contains("items") || expandFields.contains("all")) {
                 ItemIterator childItems = collection.getItems();
+                items = new ArrayList<LiteItem>();
                 while(childItems.hasNext()) {
                     org.dspace.content.Item item = childItems.next();
-                    this.addItemIDToList(item.getID());
+                    items.add(new LiteItem(item));
                 }
             } else {
-                this.addExpand("itemIDList");
+                this.addExpand("items");
             }
 
-            if(expandFields.contains("license")) {
+            if(expandFields.contains("license") || expandFields.contains("all")) {
                 setLicense(collection.getLicense());
             } else {
                 this.addExpand("license");
