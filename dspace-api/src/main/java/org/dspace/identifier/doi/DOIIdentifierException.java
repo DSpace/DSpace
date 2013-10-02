@@ -156,4 +156,14 @@ public class DOIIdentifierException extends IdentifierException {
     {
         return this.code;
     }
+    
+    public String getMessage()
+    {
+        String message = super.getMessage();
+        if ((message == null || message.isEmpty()) && code != CODE_NOT_SET)
+        {
+            return codeToString(code);
+        }
+        return message;
+    }
 }
