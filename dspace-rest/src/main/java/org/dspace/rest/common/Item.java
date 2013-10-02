@@ -39,6 +39,8 @@ public class Item {
 
     List<Collection> parentCollections;
 
+    @XmlElement(name = "link", required = true)
+    private String link;
 
     //Bitstreams
 
@@ -156,6 +158,10 @@ public class Item {
 
     public void setOwningCollectionName(String owningCollectionName) {
         this.owningCollectionName = owningCollectionName;
+    }
+
+    public String getLink() {
+        return link;
     }
 
 }

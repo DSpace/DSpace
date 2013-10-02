@@ -47,6 +47,9 @@ public class Collection {
     //String copyright_text;
     //String side_bar_text;
 
+    @XmlElement(name = "link", required = true)
+    private String link;
+
     public String getName() {
         return name;
     }
@@ -229,6 +232,10 @@ public class Collection {
 
     public void addExpand(String expandableAttribute) {
         this.expand.add(expandableAttribute);
+    }
+
+    public String getLink() {
+        return link;
     }
 
 

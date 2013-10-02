@@ -40,6 +40,9 @@ public class Community {
     private String copyrightText, introductoryText, shortDescription, sidebarText;
     private Integer countItems;
 
+    @XmlElement(name = "link", required = true)
+    private String link;
+
     @XmlElement(name = "subcommunities", required = true)
     private List<LiteCommunity> subCommunities = new ArrayList<LiteCommunity>();
 
@@ -85,6 +88,8 @@ public class Community {
             this.setIntroductoryText(community.getMetadata(org.dspace.content.Community.INTRODUCTORY_TEXT));
             this.setSidebarText(community.getMetadata(org.dspace.content.Community.SIDEBAR_TEXT));
             this.setCountItems(community.countItems());
+
+            this.link = "/communities/" + this.communityID;
 
             if(expandFields.contains("parentCommunityID") || expandFields.contains("all")) {
                 org.dspace.content.Community parentCommunity = community.getParentCommunity();
@@ -219,5 +224,9 @@ public class Community {
 
     public void setParentCommunity(LiteCommunity parentCommunity) {
         this.parentCommunity = parentCommunity;
+    }
+
+    public String getLink() {
+        return link;
     }
 }

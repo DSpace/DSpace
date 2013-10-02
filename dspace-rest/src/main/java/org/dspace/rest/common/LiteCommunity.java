@@ -24,6 +24,9 @@ public class LiteCommunity {
     @XmlElement(name = "name", required = true)
     String name;
 
+    @XmlElement(name = "link", required = true)
+    private String link;
+
 
     public LiteCommunity() {
 
@@ -33,6 +36,7 @@ public class LiteCommunity {
         this.communityID = community.getID();
         this.handle = community.getHandle();
         this.name = community.getName();
+        this.link = "/communities/" + this.communityID;
     }
 
 
@@ -62,5 +66,9 @@ public class LiteCommunity {
 
     void setName(String name) {
         this.name = name;
+    }
+
+    public String getLink() {
+        return link;
     }
 }

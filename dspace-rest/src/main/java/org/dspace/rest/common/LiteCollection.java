@@ -16,6 +16,9 @@ public class LiteCollection {
     @XmlElement(name = "type", required = true)
     final String type = "collection";
 
+    @XmlElement(name = "link", required = true)
+    private String link;
+
     //Internal metadata
     private String name;
     private String handle;
@@ -28,6 +31,8 @@ public class LiteCollection {
         this.collectionID = collection.getID();
         this.name = collection.getName();
         this.handle = collection.getHandle();
+
+        link = "/collections/" + this.collectionID;
     }
 
 
@@ -57,5 +62,9 @@ public class LiteCollection {
 
     public void setHandle(String handle) {
         this.handle = handle;
+    }
+
+    public String getLink() {
+        return link;
     }
 }
