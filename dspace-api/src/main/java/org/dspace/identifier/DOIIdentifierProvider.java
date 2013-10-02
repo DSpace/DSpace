@@ -667,9 +667,12 @@ public class DOIIdentifierProvider
         }
         if (TO_BE_DELETED != doiRow.getIntColumn("status")) 
         {
-            log.error("This identifier: {} couldn't be deleted", 
+            log.error("This identifier: {} couldn't be deleted. "
+                    + "Delete it first from metadata.", 
                     DOI.SCHEME + doiRow.getStringColumn("doi"));
-            return;
+            throw new IllegalArgumentException("Couldn't delete this identifier:"
+                                             + DOI.SCHEME + doiRow.getStringColumn("doi")
+                                             + ". Delete it first from metadata.");
         }
             connector.deleteDOI(context, doi);
             

@@ -356,19 +356,10 @@ public class DOIOrganiser {
             } 
             else {
                 try {
-                    TableRow doiRow = organiser.findTableRow(identifier);
-                    DSpaceObject dso = DSpaceObject.find(
-                            context, 
-                            doiRow.getIntColumn("resource_type_id"), 
-                            doiRow.getIntColumn("resource_id"));
-                    organiser.delete(doiRow, dso);
+                    organiser.delete(identifier);
                 } catch (SQLException ex) {
                     LOG.error(ex);
                 } catch (IllegalArgumentException ex) {
-                    LOG.error(ex);
-                } catch (IllegalStateException ex) {
-                    LOG.error(ex);
-                } catch (IdentifierException ex) {
                     LOG.error(ex);
                 }
             }
@@ -645,50 +636,55 @@ public class DOIOrganiser {
         }
     }
     
-    public void delete(TableRow doiRow, DSpaceObject dso)
+    public void delete(String identifier) 
+            throws SQLException
     {
-        if(null == doiRow) 
-        {
-            if (!quiet) 
-            {
-                System.err.println("The DOI identifier that should be deleted doesn't exist.");
-            }
-                LOG.error("The DOI identifier that should be deleted doesn't exist.");
-                
-                return;
-        }
+        String doi = null;
+        TableRow doiRow = null;
+        
         try 
         {
-            provider.deleteOnline(context, doiRow.getStringColumn("doi"));
+            doi = DOI.formatIdentifier(identifier);
             
-            if(!quiet)
+            // If there's no exception: we found a valid DOI. :)
+            doiRow = DatabaseManager.findByUnique(context, "Doi", "doi",
+                    doi.substring(DOI.SCHEME.length()));
+           
+            if (null == doiRow) 
             {
-                System.out.println("This identifier : " 
-                                 + DOI.SCHEME + doiRow.getStringColumn("doi") 
-                                 + " is successfully delete.");
+                throw new IllegalStateException("You specified a valid DOI,"
+                        + " that is not stored in our database.");
+            }
+            provider.deleteOnline(context, doi);
+             
+            if (!quiet) 
+            {
+                System.err.println("It was possible to delete this identifier: "
+                        + DOI.SCHEME + doiRow.getStringColumn("doi")
+                        + " online.");
             }
         } 
         catch (DOIIdentifierException ex) 
         {
-            try 
-            {
-                sendAlertMail("Delete", dso,
-                              DOI.SCHEME + doiRow.getStringColumn("doi"),
-                              ex.codeToString(ex.getCode()));
-            } 
-            catch (IOException ioe) 
-            {
-                LOG.error("Couldn't send mail", ioe);
-            }
-
-            LOG.error("It wasn't possible to delete the identifier online. "
-                    + " Exceptions code:  " 
+            // Identifier was not recognized as DOI.
+            LOG.error("It wasn't possible to detect this identifier:  "
+                    + identifier
+                    + " Exceptions code:  "
                     + ex.codeToString(ex.getCode()), ex);
-            
-            if(!quiet)
+
+            if (!quiet) 
             {
-                System.err.println("It wasn't possible to delete this identifier: " 
-                                 + DOI.SCHEME + doiRow.getStringColumn("doi"));
+                System.err.println("It wasn't possible to detect this identifier: "
+                        + identifier);
+            }
+        } 
+        catch (IllegalArgumentException ex) 
+        {
+            if (!quiet) 
+            {
+                System.err.println("It wasn't possible to delete this identifier: "
+                        + DOI.SCHEME + doiRow.getStringColumn("doi")
+                        + " online. Take a look in log datei.");
             }
         }
     }
