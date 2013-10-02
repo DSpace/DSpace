@@ -9,12 +9,14 @@
 package org.dspace.identifier;
 
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.dspace.identifier.doi.DOIIdentifierException;
 
 /**
  * DOI identifiers.
  *
- * @author Mark H. Wood
+ * @author Pascal-Nicolas Becker
  */
 public class DOI
         implements Identifier
@@ -53,6 +55,20 @@ public class DOI
         
         throw new IdentifierException(identifier + "does not seem to be a DOI.");
     }
+    
+    public static String DOIFromExternalFormat(String identifier)
+            throws DOIIdentifierException
+    {
+        Pattern pattern = Pattern.compile("^http://dx.doi.org/+(10\\..*)$");
+        Matcher matcher = pattern.matcher(identifier);
+        if (matcher.find())
+        {
+            return SCHEME + matcher.group(1);
+        }
+
+        throw new DOIIdentifierException("Cannot recognize DOI!",
+                DOIIdentifierException.UNRECOGNIZED);
+    }
 
     /**
      * Recognize format of DOI and return it with leading doi-Scheme.
@@ -62,7 +78,9 @@ public class DOI
      * @throws IllegalArgumentException If identifier is empty or null.
      * @throws DOIIdentifierException If DOI could not be recognized.
      */
-    public static String formatIdentifier(String identifier) throws DOIIdentifierException {
+    public static String formatIdentifier(String identifier)
+            throws DOIIdentifierException
+    {
         if (null == identifier) {
             throw new IllegalArgumentException("Identifier is null.", new NullPointerException());
         }
