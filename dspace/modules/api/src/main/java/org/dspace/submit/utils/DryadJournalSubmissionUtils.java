@@ -37,7 +37,11 @@ public class DryadJournalSubmissionUtils {
     public static final String JOURNAL_ID = "journalID";
     public static final String SUBSCRIPTION_PAID = "subscriptionPaid";
 
-
+    public enum RecommendedBlackoutAction {
+          BLACKOUT_TRUE
+        , BLACKOUT_FALSE
+        , JOURNAL_NOT_INTEGRATED
+    }
 
     public static final java.util.Map<String, Map<String, String>> journalProperties = new HashMap<String, Map<String, String>>();
     static{
@@ -73,8 +77,13 @@ public class DryadJournalSubmissionUtils {
         }
     }
 
+    public static Boolean shouldEnterBlackoutByDefault(Context context, Item item, Collection collection) throws SQLException {
+        RecommendedBlackoutAction action = recommendedBlackoutAction(context, item, collection);
+        return (action == RecommendedBlackoutAction.BLACKOUT_TRUE ||
+                action == RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED);
+    }
 
-    public static boolean shouldEnterBlackoutByDefault(Context context, Item item, Collection collection) throws SQLException {
+    public static RecommendedBlackoutAction recommendedBlackoutAction(Context context, Item item, Collection collection) throws SQLException {
         // get Journal
         Item dataPackage=item;
         if(!isDataPackage(collection)) 
@@ -98,13 +107,13 @@ public class DryadJournalSubmissionUtils {
 
         if(isIntegrated == null || isIntegrated.equals("false")) {
             // journal is not integrated.  Enter blackout by default
-            return true;
+            return RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED;
         } else if(isBlackedOut==null || isBlackedOut.equals("true")) {
             // journal has a blackout setting and it's set to true
-            return true;
+            return RecommendedBlackoutAction.BLACKOUT_TRUE;
         } else {
             // journal is integrated but blackout setting is false or missing
-           return false;
+           return RecommendedBlackoutAction.BLACKOUT_FALSE;
         }
     }
 

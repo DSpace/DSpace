@@ -1009,12 +1009,21 @@
 		for another to take.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.leave_submit">Leave task</message>
 	<message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.approve_help">If you have reviewed the
-		item and it is suitable for inclusion in the collection, select 'Approve item and archive'.</message>
-	<message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.approve_submit">Approve item and archive</message>
+		item and it is suitable for archival, select 'Approve'.</message>
+	<message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.approve_submit">Approve</message>
 	<message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.blackout_help">If you have reviewed the
-		item and want to send it to Publication Blackout, select 'Approve item and send to blackout'.  
-		Items in publication blackout can be archived once their related publication has been published.</message>
-	<message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.blackout_submit">Approve item and send to blackout</message>
+		item and it should be archived when the related publication becomes published, select 'Approve with Blackout'
+		</message>
+	<message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.blackout_submit">Approve with Blackout</message>
+  <!-- Reasons for publication blackout suggestions -->
+	<message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.blackout_reason_blackout_true">
+	  <br/><strong>Recommended</strong>: This integrated journal's configuration has publication
+  	blackout enabled.</message>
+	<message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.blackout_reason_journal_not_integrated">
+	  <br/><strong>Recommended</strong>: This journal is not integrated.</message>
+	<message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.archive_reason_blackout_false">
+	  <br/><strong>Recommended</strong>: This integrated journal's configuration has publication
+  	blackout disabled.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.commit_help">Once you've edited the item,
 		use this option to commit the item to the archive.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.commit_submit">Commit to archive</message>
