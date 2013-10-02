@@ -738,7 +738,7 @@ public class DOIIdentifierProvider
             throws SQLException
     {
         String sql = "SELECT * FROM Doi WHERE resource_type_id = ? " +
-                "AND resource_id = ? AND (status != ? OR status != ?)";
+                "AND resource_id = ? AND ((status != ? AND status != ?) OR status IS NULL)";
 
         TableRow doiRow = DatabaseManager.querySingleTable(context, "Doi", sql,
                 dso.getType(), dso.getID(), DOIIdentifierProvider.TO_BE_DELETED,
