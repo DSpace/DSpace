@@ -65,7 +65,8 @@ public class DOIIdentifierProvider
     // TODO: move these to MetadataSchema or some such?
     public static final String MD_SCHEMA = "dc";
     public static final String DOI_ELEMENT = "identifier";
-    public static final String DOI_QUALIFIER = null;  
+    public static final String DOI_QUALIFIER = "uri";
+    
     public static final Integer TO_BE_REGISTERED = 1;
     public static final Integer TO_BE_RESERVERED = 2;
     public static final Integer IS_REGISTERED = 3;
@@ -837,7 +838,8 @@ public class DOIIdentifierProvider
      * @param dso
      * @return The DOI or null if no DOI was found.
      */
-    public static String getDOIOutOfObject(DSpaceObject dso) {
+    public static String getDOIOutOfObject(DSpaceObject dso)
+            throws DOIIdentifierException {
         // FIXME
         if (!(dso instanceof Item))
         {
@@ -849,9 +851,9 @@ public class DOIIdentifierProvider
         DCValue[] metadata = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
         for (DCValue id : metadata)
         {
-            if (id.value.startsWith(DOI.SCHEME))
+            if (id.value.startsWith("http://dx.doi.org/10."))
             {
-                return id.value;
+                return DOI.DOIFromExternalFormat(id.value);
             }
         }
         return null;
@@ -867,7 +869,7 @@ public class DOIIdentifierProvider
      * @throws AuthorizeException 
      */
     protected void saveDOIToObject(Context context, DSpaceObject dso, String doi)
-            throws SQLException, AuthorizeException
+            throws SQLException, AuthorizeException, IdentifierException
     {
         // FIXME
         if (!(dso instanceof Item))
@@ -877,7 +879,7 @@ public class DOIIdentifierProvider
         }
         Item item = (Item) dso;
 
-        item.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, doi);
+        item.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, DOI.DOIToExternalForm(doi));
         try
         {
             item.update();
@@ -899,7 +901,7 @@ public class DOIIdentifierProvider
      * @throws SQLException 
      */
     protected void removeDOIFromObject(Context context, DSpaceObject dso, String doi)
-            throws AuthorizeException, SQLException
+            throws AuthorizeException, SQLException, IdentifierException
     {
         // FIXME
         if (!(dso instanceof Item))
@@ -914,7 +916,7 @@ public class DOIIdentifierProvider
 
         for (DCValue id : metadata)
         {
-            if (!id.value.equals(doi))
+            if (!id.value.equals(DOI.DOIToExternalForm(doi)))
             {
                 remainder.add(id.value);
             }
