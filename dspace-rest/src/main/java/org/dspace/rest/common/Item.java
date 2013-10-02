@@ -1,5 +1,6 @@
 package org.dspace.rest.common;
 
+import org.dspace.content.Bundle;
 import org.dspace.content.DCValue;
 import org.dspace.core.Context;
 
@@ -36,6 +37,9 @@ public class Item {
 
     @XmlElement(name = "metadata", required = true)
     Metadata metadata;
+
+    @XmlElement(name = "bitstreams")
+    List<Bitstream> bitstreams;
 
     List<Collection> parentCollections;
 
@@ -88,6 +92,17 @@ public class Item {
 
             this.setOwningCollectionID(item.getOwningCollection().getID());
             this.setOwningCollectionName(item.getOwningCollection().getName());
+
+            //Should be optional...
+            bitstreams = new ArrayList<Bitstream>();
+            Bundle[] bundles = item.getBundles();
+            for(Bundle bundle : bundles) {
+                org.dspace.content.Bitstream[] itemBitstreams = bundle.getBitstreams();
+                for(org.dspace.content.Bitstream itemBitstream : itemBitstreams) {
+                    bitstreams.add(new Bitstream(itemBitstream));
+                }
+
+            }
 
 
         } catch (Exception e) {
