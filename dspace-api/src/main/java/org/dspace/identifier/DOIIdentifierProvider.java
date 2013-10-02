@@ -70,7 +70,10 @@ public class DOIIdentifierProvider
     public static final Integer TO_BE_RESERVERED = 2;
     public static final Integer IS_REGISTERED = 3;
     public static final Integer IS_RESERVED = 4;
-    public static final Integer DELETED = 5;
+    public static final Integer UPDATE_RESERVERED = 5;
+    public static final Integer UPDATE_REGISTERED = 6;
+    public static final Integer UPDATE_BEFORE_REGISTERATION = 7;
+    public static final Integer DELETED = 8;
     
     /**
      * Prefix of DOI namespace. Set in dspace.cfg.
@@ -349,9 +352,35 @@ public class DOIIdentifierProvider
         doiRow.setColumn("status", IS_REGISTERED);
         DatabaseManager.update(context, doiRow);
     }
-
+    
     public void updateMetadata(Context context, DSpaceObject dso, String identifier)
-            throws IdentifierException
+            throws IdentifierException, IllegalArgumentException, SQLException 
+    {
+        String doi = DOI.formatIdentifier(identifier);
+        TableRow doiRow = null;
+        
+        doiRow = loadOrCreateDOI(context, dso, doi);
+        
+        if (IS_REGISTERED == doiRow.getIntColumn("status")) 
+        {
+            doiRow.setColumn("status", UPDATE_REGISTERED);
+        }
+        else if (TO_BE_REGISTERED == doiRow.getIntColumn("status")) 
+        {
+            doiRow.setColumn("status", UPDATE_BEFORE_REGISTERATION);
+        }
+        else if (IS_RESERVED == doiRow.getIntColumn("status")) 
+        {
+            doiRow.setColumn("status", UPDATE_RESERVERED);
+        }
+        else
+            return;
+
+        DatabaseManager.update(context, doiRow);
+    }
+    
+    public void updateMetadataOnline(Context context, DSpaceObject dso, String identifier)
+            throws IdentifierException, SQLException
     {
         String doi = DOI.formatIdentifier(identifier);
 
@@ -386,6 +415,21 @@ public class DOIIdentifierProvider
         }
         
         connector.updateMetadata(context, dso, doi);
+        
+        if (UPDATE_REGISTERED == doiRow.getIntColumn("status")) 
+        {
+            doiRow.setColumn("status", IS_REGISTERED);
+        }
+        else if (UPDATE_BEFORE_REGISTERATION == doiRow.getIntColumn("status")) 
+        {
+            doiRow.setColumn("status", TO_BE_REGISTERED);
+        }
+        else if (UPDATE_RESERVERED == doiRow.getIntColumn("status")) 
+        {
+            doiRow.setColumn("status", IS_RESERVED);
+        }
+        
+        DatabaseManager.update(context, doiRow);
     }
     
     @Override

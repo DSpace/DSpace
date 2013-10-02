@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Locale;
-import java.util.logging.Level;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -275,6 +274,8 @@ public class DOIOrganiser {
                 catch (IllegalStateException ex) 
                 {
                     LOG.error(ex);
+                } catch (IdentifierException ex) {
+                    LOG.error(ex);
                 }
             }
         }
@@ -293,7 +294,7 @@ public class DOIOrganiser {
                     TableRow doiRow = organiser.findTableRow(identifier);
                     DSpaceObject dso = DSpaceObject.find(
                             context, 
-                            doiRow.getIntColumn("resource_type_id"), 
+                            doiRow.getIntColumn("resource_type_id"),
                             doiRow.getIntColumn("resource_id"));
                     organiser.register(doiRow, dso);
                 } catch (SQLException ex) {
@@ -301,6 +302,8 @@ public class DOIOrganiser {
                 } catch (IllegalArgumentException ex) {
                     LOG.error(ex);
                 } catch (IllegalStateException ex) {
+                    LOG.error(ex);
+                } catch (IdentifierException ex) {
                     LOG.error(ex);
                 }
             }
@@ -328,6 +331,8 @@ public class DOIOrganiser {
                 } catch (IllegalArgumentException ex) {
                     LOG.error(ex);
                 } catch (IllegalStateException ex) {
+                    LOG.error(ex);
+                } catch (IdentifierException ex) {
                     LOG.error(ex);
                 }
             }
@@ -538,7 +543,7 @@ public class DOIOrganiser {
         
         try 
         {
-            provider.updateMetadata(context, dso,
+            provider.updateMetadataOnline(context, dso,
                     DOI.SCHEME + doiRow.getStringColumn("doi"));
             
             if(!quiet)
@@ -596,6 +601,10 @@ public class DOIOrganiser {
             throw new IllegalStateException("Database table DOI contains a DOI "
                     + " that is not valid: "
                     + DOI.SCHEME + doiRow.getStringColumn("doi") + "!", ex);
+        } 
+        catch (SQLException ex) 
+        {
+            LOG.error("It wasn't possible to connect to the Database!", ex);
         }
     }
     
@@ -616,7 +625,7 @@ public class DOIOrganiser {
      * DSpaceObject.
      */
     public TableRow findTableRow(String identifier)
-            throws SQLException, IllegalArgumentException, IllegalStateException
+            throws SQLException, IllegalArgumentException, IllegalStateException, IdentifierException
     {
         if (null == identifier || identifier.isEmpty()) 
         {
@@ -624,7 +633,9 @@ public class DOIOrganiser {
         }
 
         String sql = "SELECT * FROM Doi WHERE resource_type_id = ? AND resource_id = ? ";
-
+        TableRow doiRow = null;
+        String doi = null;
+        
         // detect it identifer is ItemID, handle or DOI.
         // try to detect ItemID
         if (identifier.matches("\\d*")) 
@@ -632,11 +643,23 @@ public class DOIOrganiser {
             Integer itemID = Integer.valueOf(identifier);
             DSpaceObject dso = Item.find(context, itemID);
 
-
-            if (null != dso) {
-                return DatabaseManager.querySingleTable(context, "Doi",
+            if (null != dso) 
+            {
+                doiRow = DatabaseManager.querySingleTable(context, "Doi",
                         sql, Constants.ITEM, dso.getID());
-            } else {
+                
+                //Check if this Item has an Identifier, mint one if it doesn't
+                if (null == doiRow) 
+                {
+                    doi = provider.mint(context, dso);
+                    doiRow = DatabaseManager.findByUnique(context, "Doi", "doi",
+                    doi.substring(DOI.SCHEME.length()));
+                    return doiRow;
+                }
+                return doiRow;
+            } 
+            else 
+            {
                 throw new IllegalStateException("You specified an ItemID, "
                         + "that is not stored in our database.");
             }
@@ -644,9 +667,9 @@ public class DOIOrganiser {
 
         // detect DOI
         try {
-            String doi = DOI.formatIdentifier(identifier);
+            doi = DOI.formatIdentifier(identifier);
             // If there's no exception: we found a valid DOI. :)
-            TableRow doiRow = DatabaseManager.findByUnique(context, "Doi", "doi",
+            doiRow = DatabaseManager.findByUnique(context, "Doi", "doi",
                     doi.substring(DOI.SCHEME.length()));
             if (null == doiRow)
             {
@@ -659,20 +682,31 @@ public class DOIOrganiser {
         {
             // Identifier was not recognized as DOI => must be a handle.
             // Will check for handle outside try-catch-block...
-        }
+            }
 
         // detect handle
         DSpaceObject dso = HandleManager.resolveToObject(context, identifier);
-        if (dso.getType() != Constants.ITEM) {
+        
+        if (dso.getType() != Constants.ITEM) 
+        {
             throw new IllegalArgumentException(
                     "Currently DSpace supports DOIs for Items only. "
-                    + "Cannot process specified handle as it does not identify an Item.");
+                  + "Cannot process specified handle as it does not identify an Item.");
         }
-
-        return DatabaseManager.querySingleTable(context, "Doi",
-                    sql, Constants.ITEM, dso.getID());
-    }
-
+        doiRow = DatabaseManager.querySingleTable(context, "Doi", sql,
+                Constants.ITEM, dso.getID());
+        
+        if (null == doiRow) 
+        {
+            doi = provider.mint(context, dso);
+            doiRow = DatabaseManager.findByUnique(context, "Doi", "doi",
+                    doi.substring(DOI.SCHEME.length()));
+            
+            return doiRow;
+        }
+        return doiRow;
+        }
+            
     private void sendAlertMail(String action, DSpaceObject dso, String doi, String reason) 
             throws IOException
     {
