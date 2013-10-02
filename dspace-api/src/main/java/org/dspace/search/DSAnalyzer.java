@@ -10,10 +10,12 @@ package org.dspace.search;
 import java.io.Reader;
 import java.util.Set;
 
-import org.apache.lucene.analysis.LowerCaseFilter;
-import org.apache.lucene.analysis.PorterStemFilter;
-import org.apache.lucene.analysis.StopFilter;
-import org.apache.lucene.analysis.StopwordAnalyzerBase;
+
+import org.apache.lucene.analysis.core.LowerCaseFilter;
+import org.apache.lucene.analysis.en.PorterStemFilter;
+import org.apache.lucene.analysis.core.StopFilter;
+import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
+import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardFilter;
@@ -50,7 +52,7 @@ public class DSAnalyzer extends StopwordAnalyzerBase
     /*
      * Stop table
      */
-    protected final Set stopSet;
+    protected final CharArraySet stopSet;
 
     /**
      * Builds an analyzer
