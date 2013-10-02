@@ -135,6 +135,14 @@ public class DOIOrganiser {
 
         options.addOption(update);
         
+        Option delete = OptionBuilder.withArgName("DOI identifier")
+                .withLongOpt("delete")
+                .hasArgs(1)
+                .withDescription("Delete a specified identifier.")
+                .create('d');
+
+        options.addOption(delete);
+        
 
         // initialize parser
         CommandLineParser parser = new PosixParser();
@@ -337,6 +345,35 @@ public class DOIOrganiser {
                 }
             }
         }
+        
+        if(line.hasOption('d'))
+        {
+            String identifier = line.getOptionValue('d');
+
+            if (null == identifier) 
+            {
+                helpformater.printHelp("\nDOI organiser\n", options);
+            } 
+            else {
+                try {
+                    TableRow doiRow = organiser.findTableRow(identifier);
+                    DSpaceObject dso = DSpaceObject.find(
+                            context, 
+                            doiRow.getIntColumn("resource_type_id"), 
+                            doiRow.getIntColumn("resource_id"));
+                    organiser.delete(doiRow, dso);
+                } catch (SQLException ex) {
+                    LOG.error(ex);
+                } catch (IllegalArgumentException ex) {
+                    LOG.error(ex);
+                } catch (IllegalStateException ex) {
+                    LOG.error(ex);
+                } catch (IdentifierException ex) {
+                    LOG.error(ex);
+                }
+            }
+        }
+
     }
     
 
@@ -608,6 +645,54 @@ public class DOIOrganiser {
         }
     }
     
+    public void delete(TableRow doiRow, DSpaceObject dso)
+    {
+        if(null == doiRow) 
+        {
+            if (!quiet) 
+            {
+                System.err.println("The DOI identifier that should be deleted doesn't exist.");
+            }
+                LOG.error("The DOI identifier that should be deleted doesn't exist.");
+                
+                return;
+        }
+        try 
+        {
+            provider.deleteOnline(context, doiRow.getStringColumn("doi"));
+            
+            if(!quiet)
+            {
+                System.out.println("This identifier : " 
+                                 + DOI.SCHEME + doiRow.getStringColumn("doi") 
+                                 + " is successfully delete.");
+            }
+        } 
+        catch (DOIIdentifierException ex) 
+        {
+            try 
+            {
+                sendAlertMail("Delete", dso,
+                              DOI.SCHEME + doiRow.getStringColumn("doi"),
+                              ex.codeToString(ex.getCode()));
+            } 
+            catch (IOException ioe) 
+            {
+                LOG.error("Couldn't send mail", ioe);
+            }
+
+            LOG.error("It wasn't possible to delete the identifier online. "
+                    + " Exceptions code:  " 
+                    + ex.codeToString(ex.getCode()), ex);
+            
+            if(!quiet)
+            {
+                System.err.println("It wasn't possible to delete this identifier: " 
+                                 + DOI.SCHEME + doiRow.getStringColumn("doi"));
+            }
+        }
+    }
+    
     /**
      * Finds the TableRow in the Doi table that belongs to the specified
      * DspaceObject.
@@ -665,6 +750,29 @@ public class DOIOrganiser {
             }
         }
 
+        // detect handle
+        DSpaceObject dso = HandleManager.resolveToObject(context, identifier);
+
+        if (null != dso) 
+        {
+            if (dso.getType() != Constants.ITEM) 
+            {
+                throw new IllegalArgumentException(
+                        "Currently DSpace supports DOIs for Items only. "
+                        + "Cannot process specified handle as it does not identify an Item.");
+            }
+            
+            doiRow = DatabaseManager.querySingleTable(context, "Doi", sql,
+                    Constants.ITEM, dso.getID());
+
+            if (null == doiRow) 
+            {
+                doi = provider.mint(context, dso);
+                doiRow = DatabaseManager.findByUnique(context, "Doi", "doi",
+                        doi.substring(DOI.SCHEME.length()));
+            }
+            return doiRow;
+        }
         // detect DOI
         try {
             doi = DOI.formatIdentifier(identifier);
@@ -676,37 +784,25 @@ public class DOIOrganiser {
                 throw new IllegalStateException("You specified a valid DOI,"
                         + " that is not stored in our database.");
             }
-            return doiRow;
         }
         catch (DOIIdentifierException ex) 
         {
-            // Identifier was not recognized as DOI => must be a handle.
-            // Will check for handle outside try-catch-block...
+            // Identifier was not recognized as DOI.
+            LOG.error("It wasn't possible to detect this identifier:  " 
+                    + identifier
+                    + " Exceptions code:  " 
+                    + ex.codeToString(ex.getCode()), ex);
+            
+            if(!quiet)
+            {
+                System.err.println("It wasn't possible to detect this identifier: " 
+                                 + DOI.SCHEME + doiRow.getStringColumn("doi"));
             }
+        }
 
-        // detect handle
-        DSpaceObject dso = HandleManager.resolveToObject(context, identifier);
-        
-        if (dso.getType() != Constants.ITEM) 
-        {
-            throw new IllegalArgumentException(
-                    "Currently DSpace supports DOIs for Items only. "
-                  + "Cannot process specified handle as it does not identify an Item.");
-        }
-        doiRow = DatabaseManager.querySingleTable(context, "Doi", sql,
-                Constants.ITEM, dso.getID());
-        
-        if (null == doiRow) 
-        {
-            doi = provider.mint(context, dso);
-            doiRow = DatabaseManager.findByUnique(context, "Doi", "doi",
-                    doi.substring(DOI.SCHEME.length()));
-            
-            return doiRow;
-        }
         return doiRow;
-        }
-            
+    }
+
     private void sendAlertMail(String action, DSpaceObject dso, String doi, String reason) 
             throws IOException
     {

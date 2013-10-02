@@ -73,7 +73,8 @@ public class DOIIdentifierProvider
     public static final Integer UPDATE_RESERVERED = 5;
     public static final Integer UPDATE_REGISTERED = 6;
     public static final Integer UPDATE_BEFORE_REGISTERATION = 7;
-    public static final Integer DELETED = 8;
+    public static final Integer TO_BE_DELETED = 8;
+    public static final Integer DELETED = 9;
     
     /**
      * Prefix of DOI namespace. Set in dspace.cfg.
@@ -197,6 +198,7 @@ public class DOIIdentifierProvider
         doiRow.setColumn("status", TO_BE_REGISTERED);
         try {
             DatabaseManager.update(context, doiRow);
+            context.commit();
         }
         catch (SQLException sqle)
         {
@@ -581,11 +583,11 @@ public class DOIIdentifierProvider
     {
         String doi = DOI.formatIdentifier(identifier);
         TableRow doiRow = null;
-        String oldStatus = null;
         
         try
         {
-            doiRow = DatabaseManager.findByUnique(context, "Doi", "doi", doi.substring(DOI.SCHEME.length()));
+            doiRow = DatabaseManager.findByUnique(context, "Doi", "doi",
+                                            doi.substring(DOI.SCHEME.length()));
         }
         catch (SQLException sqle)
         {
@@ -626,6 +628,51 @@ public class DOIIdentifierProvider
         // change doi status in db if necessary.
         if (null != doiRow)
         {
+            doiRow.setColumn("status", TO_BE_DELETED);
+            try {
+                DatabaseManager.update(context, doiRow);
+                context.commit();
+            }
+            catch (SQLException sqle)
+            {
+                log.warn("SQLException while changing status of DOI {} to be deleted.", doi);
+                throw new RuntimeException(sqle);
+            }
+         }
+
+        // DOI is a permanent identifier. DataCite for example does not delete
+        // DOIS. But it is possible to mark a DOI as "inactive".
+    }
+    
+    public void deleteOnline(Context context, String identifier) 
+            throws DOIIdentifierException
+    {
+        String doi = DOI.formatIdentifier(identifier);
+        TableRow doiRow = null;
+        
+        try 
+        {
+            doiRow = DatabaseManager.findByUnique(context, "Doi", "doi",
+                                            doi.substring(DOI.SCHEME.length()));
+        } 
+        catch (SQLException sqle) 
+        {
+            throw new RuntimeException(sqle);
+        }
+        if(null == doiRow)
+        {
+            throw new DOIIdentifierException("This identifier: " + identifier
+                    + " isn't in our database",
+                    DOIIdentifierException.DOI_DOES_NOT_EXIST);
+        }
+        if (TO_BE_DELETED != doiRow.getIntColumn("status")) 
+        {
+            log.error("This identifier: {} couldn't be deleted", 
+                    DOI.SCHEME + doiRow.getStringColumn("doi"));
+            return;
+        }
+            connector.deleteDOI(context, doi);
+            
             doiRow.setColumn("status", DELETED);
             try {
                 DatabaseManager.update(context, doiRow);
@@ -633,16 +680,10 @@ public class DOIIdentifierProvider
             }
             catch (SQLException sqle)
             {
-                log.warn("SQLException while changing status of DOI {} to be registered.", doi);
+                log.warn("SQLException while changing status of DOI {} deleted.", doi);
                 throw new RuntimeException(sqle);
             }
-         }
-
-        // DOI is a permanent identifier. DataCite for example does not delete
-        // DOIS. But it is possible to mark a DOI as "inactive".
-        connector.deleteDOI(context, doi);
     }
-    
      
     /**
      * Returns a DSpaceObject depending on its DOI.
@@ -684,7 +725,7 @@ public class DOIIdentifierProvider
      * Search the database for a DOI, using the type and id of an DSpaceObject.
      *
      * @param context
-     * @param dso DSpaceObject to find doi for. DOIs with status DELETED will be
+     * @param dso DSpaceObject to find doi for. DOIs with status TO_BE_DELETED will be
      * ignored.
      * @return The DOI as String or null if DOI was not found.
      * @throws SQLException
@@ -693,10 +734,11 @@ public class DOIIdentifierProvider
             throws SQLException
     {
         String sql = "SELECT * FROM Doi WHERE resource_type_id = ? " +
-                "AND resource_id = ? AND status != ?";
+                "AND resource_id = ? AND (status != ? OR status != ?)";
 
-        TableRow doiRow = DatabaseManager.querySingleTable(context,
-                "Doi", sql, dso.getType(), dso.getID(), DOIIdentifierProvider.DELETED);
+        TableRow doiRow = DatabaseManager.querySingleTable(context, "Doi", sql,
+                dso.getType(), dso.getID(), DOIIdentifierProvider.TO_BE_DELETED,
+                DOIIdentifierProvider.DELETED);
         if (null == doiRow)
         {
             return null;
