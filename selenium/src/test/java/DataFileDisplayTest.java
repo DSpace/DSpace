@@ -27,12 +27,11 @@ public class DataFileDisplayTest extends TestCase {
 	@Test
 	public void testDataFileDisplay() throws Exception {
 		driver.get(baseUrl + "/handle/10255/dryad.58");
-		assertEquals("Dryad data file: Morphospace Specimens", driver.getTitle());
+		assertTrue("File title test", driver.getTitle().startsWith("Morphospace Specimens"));
 		assertTrue(isElementPresent(By.cssSelector("h1.ds-div-head")));
-		assertTrue("head contains Morphospace", sectionContains("h1.ds-div-head", "Morphospace"));
-		assertTrue("citation contains publication info", sectionContains("div.citation-view", "(2007) Testing"));
-		assertTrue("citation contains package info", sectionContains("div.citation-view", "(2007) Data from: Testing"));
-		assertTrue("bitstream present", isElementPresent(By.linkText("Evo_22_Table S1.doc")));
+		assertTrue("header contains Morphospace", sectionContains("p.pub-title", "Morphospace"));
+		assertTrue("citation contains publication info", sectionContains("div.citation-sample", "(2007) Testing"));
+		assertTrue("bitstream present", isElementPresent(By.linkText("View/Open")));
 		assertTrue("bitstream format present", sectionContains("div.primary","Microsoft Word"));
 	}
 
