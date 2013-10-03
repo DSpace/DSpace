@@ -216,6 +216,10 @@ if (communities != null && communities.length != 0)
 <%
 }
 %>
+	<%
+    	int discovery_panel_cols = 8;
+    	int discovery_facet_cols = 4;
+    %>
 	<%@ include file="discovery/static-sidebar-facet.jsp" %>
 </div>
 </dspace:layout>
