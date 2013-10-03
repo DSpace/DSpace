@@ -1940,7 +1940,7 @@
 	
 	<message key="xmlui.dri2xht1ml.METS-1.0.item-record-source">Os dados deste registro foram obtidos de</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-note">Notas</message>
-	<message key="xmlui.dri2xhtml.METS-1.0.cc-license-text">Salvo no caso que for mencionado, este item é publicado com a seguinte licença </message>
+	<message key="xmlui.dri2xhtml.METS-1.0.cc-license-text">Exceto quando indicado o contrário, este item é publicado com a seguinte licença </message>
 	<message key="xmlui.dri2xhtml.METS-1.0.code-value-de">Alemão</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.code-value-en">Inglês</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.code-value-es">Espanhol</message>
@@ -1955,7 +1955,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-authors">Autores</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-linked">Link externo</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-linked-help">Um link para um site externo está disponível</message>
-	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-local">Descarga Direita</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-local">Descarga direta</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-local-help">Você pode descarregar este documento de SeDiCI</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-contributor-codirector">Co-diretor de tese</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-contributor-colaborator">Colaborador</message>
@@ -1981,7 +1981,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-date-created">Data de criação</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-date-exposure">Data de exposição</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-date-issued">Data de publicação</message>
-	<message key="xmlui.dri2xhtml.METS-1.0.item-degree-grantor">Cedente</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-degree-grantor">Doador</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-degree-name">Grau</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-embargo-liftDate">Data de final de embargo</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-false-fulltext">Documento sem texto completo</message>
@@ -2008,7 +2008,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-book-title">Pertence a um livro</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-dossier">Dossiê</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-event">Evento</message>
-	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-isPartOfSeries">Series</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-isPartOfSeries">Série</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-journal">Revista</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-related-with">Documentos relacionados</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-review-of">E revisão de</message>
@@ -2163,7 +2163,7 @@
 <message key="sedici.EPerson.string-too-long">Campo {0} excedeu o tamanho máximo ({1} caracteres) e foi cortado</message>
 <message key="sedici.errorDescription.badRequest">A solicitação parece ser incorreta. Provavelmente trata-se dum erro de parâmetro.</message>
 <message key="sedici.errorDescription.generalNote">Se você considerar que ocorreu um problema ou quiser fazer uma sugestão, por favor, escreva para nós no seguinte email:</message>
-<message key="sedici.errorDescription.internalError">Desculpe, ocorreu um erro. Este incidente será reportado para ser consertado assim que pudermos.</message>
+<message key="sedici.errorDescription.internalError">Desculpe, ocorreu um erro. Este incidente será reportado para ser consertado assim que possível.</message>
 <message key="sedici.errorDescription.invalidContinuation">As vezes isto acontece quando o sistema não percebe atividade no seu computador. Por favor, entre novamente.</message>
 <message key="sedici.errorDescription.notAuthorize">Você não tem as permissões requeridas para ter acesso ao site. Se você tiver, por favor, digite os dados corretos de usuário.</message>
 <message key="sedici.errorDescription.resourceNotFound">O recurso não existe ou não está disponível no momento</message>
@@ -2173,12 +2173,12 @@
 <message key="sedici.errorTitle.notAuthorize">Site não autorizado</message>
 <message key="sedici.errorTitle.resourceNotFound">Recurso não encontrado</message>
 <message key="sedici.home.buscar_material.info_post"> recursos disponíveis no repositório</message>
-<message key="sedici.home.buscar_material.info_pre">Procure nos mais de </message>
+<message key="sedici.home.buscar_material.info_pre">Pesquise entre mais do que </message>
 <message key="sedici.home.buscar_material.title">Procurar recursos</message>
 <message key="sedici.home.slide_digital_preservation.info">Segure o acesso prolongado de seu trabalho apesar das mudanças de tecnologias</message>
 <message key="sedici.home.slide_digital_preservation.title">Preservação digital</message>
 <message key="sedici.home.slide_pairs_contact.info">Entre em contato com pesquisadores que trabalham atualmente em áreas relacionadas à sua.</message>
-<message key="sedici.home.slide_pairs_contact.title">Entre em contato com pares</message>
+<message key="sedici.home.slide_pairs_contact.title">Contate seus pares</message>
 <message key="sedici.home.slide_resources.info">Tenha acesso a mais de 25.000 recursos científicos e acadêmicos desenvolvidos na UNLP</message>
 <message key="sedici.home.slide_resources.title">Recursos da sua pesquisa</message>
 <message key="sedici.home.slide_work_visibility.info">Por ter publicado seus trabalhos em SeDiCI você vai melhorar a sua visibilidade e impacto</message>
@@ -2244,9 +2244,9 @@
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dateIssued">Data de Publicação</message>
 	<message key="xmlui.Submission.workflow.DeleteTaskStep.info1">Esta seguro?</message>
 	<message key="xmlui.Submission.workflow.DeleteTaskStep.submit_delete">Eliminar</message>
-	<message key="xmlui.utils.AuthenticationUtil.notAnotherAdmin">Você não pode assumir a identificação como outro usuário.</message>
-	<message key="xmlui.utils.AuthenticationUtil.onlyAdmins">Só administradores do site podem assumir a identificação de outro usuário.</message>
-	<message key="xmlui.utils.AuthenticationUtil.onlyAuthenticatedAdmins">Só usuários autenticados que são administradores podem assumir a identificação de outro usuário.</message>
+	<message key="xmlui.utils.AuthenticationUtil.notAnotherAdmin">Você não pode assumir a identificação de outro administrador.</message>
+	<message key="xmlui.utils.AuthenticationUtil.onlyAdmins">Somente os administradores do site podem assumir a identificação de outro usuário.</message>
+	<message key="xmlui.utils.AuthenticationUtil.onlyAuthenticatedAdmins">Somente usuários autenticados, que são administradores, podem assumir a identificação de outro usuário.</message>
 	<message key="sedici.XMLWorkflow.workflow.selectCollectionAction.complete">Instalar documento</message>
 	<message key="sedici.XMLWorkflow.workflow.selectCollectionAction.head">Fazer tarefa: selecionar coleção</message>
 	<message key="sedici.XMLWorkflow.workflowitem.notfound">O item requerido no fluxo de trabalho não existe</message>
