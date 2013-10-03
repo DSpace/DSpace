@@ -105,8 +105,8 @@
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
 <dspace:layout locbar="commLink" title="<%= name %>" feedData="<%= feedData %>">
-
-        <h1><%= name %>
+    <div class="well">
+    <div class="row"><div class="col-md-8"><h2><%= name %>
 <%
             if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
             {
@@ -115,14 +115,20 @@
 <%
             }
 %>
-		<small><fmt:message key="jsp.collection-home.heading1"/></small></h1>
+		<small><fmt:message key="jsp.collection-home.heading1"/></small>
+      <a class="statisticsLink btn btn-info" href="<%= request.getContextPath() %>/handle/<%= collection.getHandle() %>/statistics"><fmt:message key="jsp.collection-home.display-statistics"/></a>
+      </h2></div>
 <%  if (logo != null) { %>
-        <img class="pull-right" alt="Logo" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" />
-<% 	}
-	if (StringUtils.isNotBlank(intro)) { %>
-	<div class="well"><%= intro %></div>
+        <div class="col-md-4">
+        	<img class="img-responsive pull-right" alt="Logo" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" />
+        </div>
 <% 	} %>
-  
+	</div>
+<%
+	if (StringUtils.isNotBlank(intro)) { %>
+	<%= intro %>
+<% 	} %>
+  </div>
   <p class="copyrightText"><%= copyright %></p>
   
   <%-- Browse --%>
@@ -302,10 +308,6 @@
 <%
    } // end of if (show_title)
 %>
-
-    <div align="center">
-      <a class="statisticsLink" href="<%= request.getContextPath() %>/handle/<%= collection.getHandle() %>/statistics"><fmt:message key="jsp.collection-home.display-statistics"/></a>
-    </div>
 
   <dspace:sidebar>
 <% if(admin_button || editor_button ) { %>
