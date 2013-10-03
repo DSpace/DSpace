@@ -144,7 +144,7 @@
         <h4>DSpace preserves and enables easy and open access to all types of digital content including text, images, moving images, mpegs and data sets</h4>
         <a href="http://www.dspace.org"><button class="btn btn-primary">Learn More</button></a> 
         </div>
-        <div class="col-md-3"><img class="pull-right" src="http://www.dspace.org/templates/dspace_home/images/logo.gif">
+        <div class="col-md-3"><img class="pull-right" src="<%= request.getContextPath() %>/image/logo.gif">
         </div>
 	</div>
 </div>	
