@@ -66,27 +66,6 @@ public class EditMetadataAction extends ProcessingAction {
         if(request.getParameter("submit_approve") != null){
             //Delete the tasks
             addApprovedProvenance(c, wfi);
-
-            // in case the Curator approve the item in pendingPublicationStep
-            // if(embargo is "untilArticleAppears"): Remove it!
-
-            // TODO: dleehr 2013-10-01: This code appears to be for old blackout handling
-            // need to see if it's still relevant
-            if(step.getId().equals("pendingPublicationStep")){
-                Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wfi.getItem());
-                for(Item i : dataFiles){
-                    DCValue[] values = i.getMetadata("dc.type.embargo");
-                    if(values!=null && values.length > 0){
-                        if(values[0].value.equals("untilArticleAppears")){
-                            i.clearMetadata("dc", "type", "embargo", Item.ANY);
-                            i.addMetadata("dc", "type", "embargo", "en", "none");
-                        }
-                    }
-                    i.update();
-                }
-
-            }
-
             // If user selected archive button, outcome is 0
             return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
         } else if(request.getParameter("submit_blackout") != null){
