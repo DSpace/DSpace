@@ -324,7 +324,9 @@
                         <xsl:text>/</xsl:text>
                     </xsl:attribute>
                     <span id="ds-header-logo">&#160;</span>
-                    <span id="ds-header-logo-text">mirage</span>
+                    <span id="ds-header-logo-text">
+                       <i18n:text>xmlui.dri2xhtml.structural.head-subtitle</i18n:text>
+                    </span>
                 </a>
                 <h1 class="pagetitle visuallyhidden">
                     <xsl:choose>
@@ -339,10 +341,6 @@
                     </xsl:choose>
 
                 </h1>
-                <h2 class="static-pagetitle visuallyhidden">
-                    <i18n:text>xmlui.dri2xhtml.structural.head-subtitle</i18n:text>
-                </h2>
-
 
                 <xsl:choose>
                     <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
