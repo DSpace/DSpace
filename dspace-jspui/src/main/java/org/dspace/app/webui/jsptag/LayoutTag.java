@@ -413,6 +413,15 @@ public class LayoutTag extends BodyTagSupport
             throw new JspException("Got IOException: " + ioe);
         }
 
+        style = null;
+        title = null;
+        sidebar = null;
+        navbar = null;
+        locbar = null;
+        parentTitle = null;
+        parentLink = null;
+        noCache = null;
+        feedData = null;
         return EVAL_PAGE;
     }
 
@@ -639,18 +648,5 @@ public class LayoutTag extends BodyTagSupport
     public void setFeedData(String v)
     {
         this.feedData = v;
-    }
-
-    public void release()
-    {
-        style = null;
-        title = null;
-        sidebar = null;
-        navbar = null;
-        locbar = null;
-        parentTitle = null;
-        parentLink = null;
-        noCache = null;
-        feedData = null;
     }
 }
