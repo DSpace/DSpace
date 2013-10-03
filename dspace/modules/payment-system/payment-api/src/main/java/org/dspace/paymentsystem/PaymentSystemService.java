@@ -7,8 +7,11 @@
  */
 package org.dspace.paymentsystem;
 
+import org.apache.cocoon.environment.Request;
+import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 
 import java.io.IOException;
@@ -57,4 +60,8 @@ public interface PaymentSystemService
     public String getPayer(Context context,ShoppingCart shoppingcart,String journal)throws SQLException;
 
     public String printShoppingCart(Context c, ShoppingCart shoppingCart);
+
+    public void generateShoppingCart(Context context,Request request,org.dspace.app.xmlui.wing.element.List info,ShoppingCart transaction,PaymentSystemConfigurationManager manager,String baseUrl,boolean selectCountry) throws WingException,SQLException;
+
+    public ShoppingCart getTransaction(Context context,Item item) throws AuthorizeException, SQLException, PaymentSystemException, IOException;
 }
