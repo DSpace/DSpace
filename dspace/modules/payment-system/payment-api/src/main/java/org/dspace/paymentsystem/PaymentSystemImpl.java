@@ -342,7 +342,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
     public boolean getCountryWaiver(Context context, ShoppingCart shoppingCart, String journal) throws SQLException{
         PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
         Properties countryArray = manager.getAllCountryProperty();
-        if(shoppingCart.getCountry().length()>0)
+        if(shoppingCart.getCountry()!=null&&shoppingCart.getCountry().length()>0)
         {
             return countryArray.get(shoppingCart.getCountry()).equals(ShoppingCart.COUNTRYFREE);
         }
@@ -469,7 +469,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
         return result;
     }
 
-    public void generateShoppingCart(Context context, Request request,org.dspace.app.xmlui.wing.element.List info,ShoppingCart transaction,PaymentSystemConfigurationManager manager,String baseUrl,boolean selectCountry) throws WingException,SQLException{
+    public void generateShoppingCart(Context context,org.dspace.app.xmlui.wing.element.List info,ShoppingCart transaction,PaymentSystemConfigurationManager manager,String baseUrl,boolean selectCountry,Map<String,String> messages) throws WingException,SQLException{
         Item item = Item.find(context,transaction.getItem());
         Long totalSize = new Long(0);
         String symbol = PaymentSystemConfigurationManager.getCurrencySymbol(transaction.getCurrency());
@@ -483,7 +483,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
             //add selected currency section
             info.addLabel(T_Header);
             generateCurrencyList(info,manager,transaction);
-            generatePayer(context,request,info,transaction,item);
+            generatePayer(context,info,transaction,item);
 
 
 
@@ -491,7 +491,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
             if(selectCountry){
             generateCountryList(info,manager,transaction);
             }
-            generateVoucherForm(context,info,manager,transaction);
+            generateVoucherForm(context,info,transaction,messages);
         }catch (Exception e)
         {
 
@@ -508,7 +508,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
         countryList.addOption("","Select Your Country");
         for(String temp:countryArray){
             String[] countryTemp = temp.split(":");
-            if(shoppingCart.getCountry().length()>0&&shoppingCart.getCountry().equals(countryTemp[0])) {
+            if(shoppingCart.getCountry()!=null&&shoppingCart.getCountry().length()>0&&shoppingCart.getCountry().equals(countryTemp[0])) {
                 countryList.addOption(true,countryTemp[0],countryTemp[0]);
             }
             else
@@ -545,9 +545,17 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
     }
 
-    private void generateVoucherForm(Context context,org.dspace.app.xmlui.wing.element.List info,PaymentSystemConfigurationManager manager,ShoppingCart shoppingCart) throws WingException,SQLException{
+    private void generateVoucherForm(Context context,org.dspace.app.xmlui.wing.element.List info,ShoppingCart shoppingCart,Map<String,String> messages) throws WingException,SQLException{
         Voucher voucher1 = Voucher.findById(context,shoppingCart.getVoucher());
-        info.addItem("errorMessage","errorMessage").addContent("");
+        if(messages.get("voucher")!=null)
+        {
+            info.addItem("errorMessage","errorMessage").addContent(messages.get("voucher"));
+        }
+        else
+        {
+            info.addItem("errorMessage","errorMessage").addContent("");
+        }
+
         info.addLabel(T_Voucher);
         org.dspace.app.xmlui.wing.element.Item voucher = info.addItem("voucher-list","voucher-list");
         if(voucher1==null){
@@ -598,12 +606,10 @@ public class PaymentSystemImpl implements PaymentSystemService {
         info.addItem("total","total").addContent(String.format("%s%.0f",symbol, shoppingCart.getTotal()));
         info.addItem("waiver-info","waiver-info").addContent(waiverMessage);
     }
-    private void generatePayer(Context context,Request request,org.dspace.app.xmlui.wing.element.List info,ShoppingCart shoppingCart,Item item) throws WingException,SQLException{
+    private void generatePayer(Context context,org.dspace.app.xmlui.wing.element.List info,ShoppingCart shoppingCart,Item item) throws WingException,SQLException{
         info.addLabel(T_Payer);
         String payerName = this.getPayer(context, shoppingCart, null);
-        //if(request.getRequestURI().endsWith("submit"))
         DCValue[] values= item.getMetadata("prism.publicationName");
-        //WorkspaceItem submission=WorkspaceItem.find(context,item.getID());
         if(values!=null&&values.length>0)
         {
             //on the first page don't generate the payer name, wait until user choose country or journal
@@ -617,12 +623,4 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
     }
 
-
-    public ShoppingCart getTransaction(Context context,Item item) throws AuthorizeException, SQLException, PaymentSystemException, IOException {
-        ShoppingCart shoppingCart=null;
-        if(item!=null){
-            shoppingCart = this.getShoppingCartByItemId(context,item.getID());
-        }
-        return shoppingCart;
-    }
 }

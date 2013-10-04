@@ -16,6 +16,7 @@ import org.dspace.core.Context;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * PaymentService provides an interface for the DSpace application to
@@ -61,7 +62,7 @@ public interface PaymentSystemService
 
     public String printShoppingCart(Context c, ShoppingCart shoppingCart);
 
-    public void generateShoppingCart(Context context,Request request,org.dspace.app.xmlui.wing.element.List info,ShoppingCart transaction,PaymentSystemConfigurationManager manager,String baseUrl,boolean selectCountry) throws WingException,SQLException;
+    public void generateShoppingCart(Context context,org.dspace.app.xmlui.wing.element.List info,ShoppingCart transaction,PaymentSystemConfigurationManager manager,String baseUrl,boolean selectCountry,Map<String,String> messages) throws WingException,SQLException;
 
-    public ShoppingCart getTransaction(Context context,Item item) throws AuthorizeException, SQLException, PaymentSystemException, IOException;
+
 }

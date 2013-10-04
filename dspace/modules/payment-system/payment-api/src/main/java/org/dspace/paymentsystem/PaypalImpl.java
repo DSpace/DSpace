@@ -19,6 +19,7 @@ import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
+import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.Item;
@@ -37,9 +38,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Random;
+import java.util.*;
 
 import org.dspace.app.xmlui.wing.Message;
 
@@ -441,7 +440,8 @@ public class PaypalImpl implements PaypalService{
     }
 
     //this methord should genearte a secure token from paypal and then generate a user crsedit card form
-    public void generateUserForm(Context context,Division mainDiv,String actionURL,String knotId,String type,Request request, Item item, DSpaceObject dso) throws WingException, SQLException{
+    public void generateUserForm(Context context,Division mainDiv,String actionURL,String knotId,String type,Request request, Item item, DSpaceObject dso,Map<String,String> messages) throws WingException, SQLException{
+
         PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
         PaymentSystemService payementSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
         PaypalService paypalService = new DSpace().getSingletonService(PaypalService.class);
@@ -452,31 +452,8 @@ public class PaypalImpl implements PaypalService{
             String previous_email = request.getParameter("login_email");
             EPerson eperson = EPerson.findByEmail(context,previous_email);
             ShoppingCart shoppingCart = payementSystemService.getShoppingCartByItemId(context,item.getID());
-//            VoucherValidationService voucherValidationService = new DSpace().getSingletonService(VoucherValidationService.class);
-//            String voucherCode = "";
-//            if(request.getParameter("submit-voucher")!=null)
-//            {    //user is using the voucher code
-//                voucherCode = request.getParameter("voucher");
-//                if(voucherCode!=null&&voucherCode.length()>0){
-//                    if(!voucherValidationService.voucherUsed(context,voucherCode)) {
-//                        Voucher voucher = Voucher.findByCode(context,voucherCode);
-//                        shoppingCart.setVoucher(voucher.getID());
-//                        payementSystemService.updateTotal(context,shoppingCart,null);
-//                    }
-//                    else
-//                    {
-//                        errorMessage = "The voucher code is not valid:can't find the voucher code or the voucher code has been used";
-//                    }
-//                }
-//                else
-//                {
-//                    shoppingCart.setVoucher(null);
-//                    payementSystemService.updateTotal(context,shoppingCart,null);
-//                }
-//
-//            }
             List info = mainDiv.addList("Payment",List.TYPE_FORM,"paymentsystem");
-            payementSystemService.generateShoppingCart(context,request,info,shoppingCart,manager,"",true);
+            payementSystemService.generateShoppingCart(context,info,shoppingCart,manager,"",true,messages);
 
             if(shoppingCart.getTotal()==0||shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)||!shoppingCart.getCurrency().equals("USD"))
             {
@@ -484,23 +461,6 @@ public class PaypalImpl implements PaypalService{
             }
             else
             {
-
-//                Division voucher = mainDiv.addDivision("voucher");
-//                if(errorMessage!=null&&errorMessage.length()>0) {
-//                    voucher.addPara("voucher-error","voucher-error").addHighlight("bold").addContent("Your card will not be charged untill your submission is approved by Dyrad. Your card information will NOT be stored By Dryad."+errorMessage);
-//
-//                }
-
-//                Voucher voucher1 = Voucher.findById(context,shoppingCart.getVoucher());
-//                if(voucher1!=null){
-//                    paypalService.generateVoucherForm(voucher,voucher1.getCode(),actionURL,knotId);
-//                }
-//                else if(voucherCode!=null&&voucherCode.length()>0){
-//                    paypalService.generateVoucherForm(voucher,voucherCode,actionURL,knotId);
-//                }
-//                else{
-//                    paypalService.generateVoucherForm(voucher,null,actionURL,knotId);
-//                }
                 Division creditcard = mainDiv.addDivision("creditcard");
                 paypalService.generatePaypalForm(creditcard,shoppingCart,actionURL,type);
 

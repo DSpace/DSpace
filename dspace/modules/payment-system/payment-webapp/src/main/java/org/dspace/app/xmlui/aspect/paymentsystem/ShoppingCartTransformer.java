@@ -11,6 +11,8 @@ package org.dspace.app.xmlui.aspect.paymentsystem;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -64,7 +66,10 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
             SQLException, IOException, AuthorizeException {
 
         Request request = ObjectModelHelper.getRequest(objectModel);
-
+        String shoppingCartExist =  request.getParameter("shopping-cart-exist");
+        if(shoppingCartExist==null||!shoppingCartExist.equals("true")){
+            Map<String,String> messages = new HashMap<String,String>();
+            //shoppingcart doesn't exist then add one in the option section
         PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
         Enumeration s = request.getParameterNames();
         Enumeration v = request.getAttributeNames();
@@ -92,7 +97,7 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
             PaymentSystemService payementSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
             ShoppingCart shoppingCart = null;
             //create new transaction or update transaction id with item
-            shoppingCart = payementSystemService.getTransaction(context,item);
+            shoppingCart = payementSystemService.getShoppingCartByItemId(context,item.getID());
             payementSystemService.updateTotal(context,shoppingCart,null);
 
             //add the order summary form (wrapped in div.ds-option-set for proper sidebar style)
@@ -104,13 +109,14 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
             {
              selectCountry = true;
             }
-            payementSystemService.generateShoppingCart(context,request,info,shoppingCart,manager,request.getContextPath(),selectCountry);
+            payementSystemService.generateShoppingCart(context,info,shoppingCart,manager,request.getContextPath(),selectCountry,messages);
 
             org.dspace.app.xmlui.wing.element.Item help = options.addList("need-help").addItem();
             help.addContent(T_CartHelp);
         }catch (Exception pe)
         {
             log.error("Exception: ShoppingCart:", pe);
+        }
         }
     }
 

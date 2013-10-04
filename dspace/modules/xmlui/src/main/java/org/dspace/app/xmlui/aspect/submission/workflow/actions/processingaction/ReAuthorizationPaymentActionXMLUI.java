@@ -35,6 +35,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -52,6 +54,7 @@ public class ReAuthorizationPaymentActionXMLUI extends AbstractXMLUIAction {
         String workflowID = request.getParameter("workflowID");
         String stepID = request.getParameter("stepID");
         String actionID = request.getParameter("actionID");
+        Map<String,String> messages = new HashMap<String,String>();
 
         Item item = workflowItem.getItem();
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
@@ -60,7 +63,7 @@ public class ReAuthorizationPaymentActionXMLUI extends AbstractXMLUIAction {
         String actionURL = contextPath + "/handle/"+collection.getHandle() + "/workflow_new";
         Division mainDiv = body.addInteractiveDivision("submit-completed-dataset", actionURL, Division.METHOD_POST, "primary submission");
         //generate form
-        paypalService.generateUserForm(context,mainDiv,actionURL,knot.getId(),"S",request,item,dso);
+        paypalService.generateUserForm(context,mainDiv,actionURL,knot.getId(),"S",request,item,dso,messages);
 
     }
 
