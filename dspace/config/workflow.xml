@@ -25,28 +25,38 @@
             <action id="reviewAction"/>
         </step>
 
-        <!-- The default nextStep after dryadAcceptEditReject is null, which ends the workflow -->
+        <!-- Editor has the option of sending item to blackout.  Item will still go through finalPaymentAction -->
+              
         <step id="dryadAcceptEditReject" nextStep="finalPaymentStep" userSelectionMethod="claimAction" role="editors">
             <action id="dryadAcceptEditRejectAction"/>
+            <alternativeOutcome>
+                <!-- if outcome of dryadAcceptEditRejectAction is 1, curator has selected blackout -->
+                <step status="1">pendingPublicationFinalPaymentStep</step>
+            </alternativeOutcome>
         </step>
 
-        <step id="finalPaymentStep" nextStep="prePendingPublicationStep" userSelectionMethod="noUserSelectionAction">
+        <!-- Approve and archive selected -->
+        <step id="finalPaymentStep" userSelectionMethod="noUserSelectionAction">
             <action id="finalPaymentAction"/>
             <alternativeOutcome>
                 <step status="1">reAuthorizationPaymentStep</step>
             </alternativeOutcome>
         </step>
-
-        <step id="reAuthorizationPaymentStep" nextStep="prePendingPublicationStep" userSelectionMethod="claimAction" role="curator">
+        
+        <step id="reAuthorizationPaymentStep" userSelectionMethod="claimAction" role="curator">
             <action id="reAuthorizationPaymentAction"/>
         </step>
-
-        <step id="prePendingPublicationStep" userSelectionMethod="noUserSelectionAction">
-            <action id="pendingPublicationAction"/>
+        
+        <!-- Blackout selected.  Use the same payment auth actions but different steps for blackout -->
+        <step id="pendingPublicationFinalPaymentStep" nextStep="registerPendingPublicationStep" userSelectionMethod="noUserSelectionAction">
+            <action id="finalPaymentAction"/>
             <alternativeOutcome>
-                <!-- If result of pendingPublicationAction is 1, publication uses blackout.  Next step is registerPendingPublicationStep -->
-                <step status="1">registerPendingPublicationStep</step>
+                <step status="1">pendingPublicationReAuthorizationPaymentStep</step>
             </alternativeOutcome>
+        </step>
+
+        <step id="pendingPublicationReAuthorizationPaymentStep" nextStep="registerPendingPublicationStep" userSelectionMethod="claimAction" role="curator">
+            <action id="reAuthorizationPaymentAction"/>
         </step>
 
         <!-- Register an identifier and then send to pendingPublicationStep -->
@@ -56,7 +66,7 @@
         
         <!-- Parked after registration, waiting for a curator to claim -->
         <step id="pendingPublicationStep" userSelectionMethod="claimAction" role="curator">
-            <action id="dryadAcceptEditRejectAction"/>
+            <action id="afterPublicationAction"/>
         </step>
 
 
