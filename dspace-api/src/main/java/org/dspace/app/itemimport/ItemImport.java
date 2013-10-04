@@ -7,13 +7,12 @@
  */
 package org.dspace.app.itemimport;
 
-import gr.ekt.transformationengine.core.DataLoader;
-import gr.ekt.transformationengine.core.TransformationEngine;
-import gr.ekt.transformationengine.exceptions.UnimplementedAbstractMethod;
-import gr.ekt.transformationengine.exceptions.UnknownClassifierException;
-import gr.ekt.transformationengine.exceptions.UnknownInputFileType;
-import gr.ekt.transformationengine.exceptions.UnsupportedComparatorMode;
-import gr.ekt.transformationengine.exceptions.UnsupportedCriterion;
+import gr.ekt.bte.core.DataLoader;
+import gr.ekt.bte.core.TransformationEngine;
+import gr.ekt.bte.core.TransformationResult;
+import gr.ekt.bte.core.TransformationSpec;
+import gr.ekt.bte.dataloader.FileDataLoader;
+import gr.ekt.bteio.generators.DSpaceOutputGenerator;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -54,6 +53,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.DSIndexer;
+import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowManager;
 import org.dspace.xmlworkflow.XmlWorkflowManager;
 import org.w3c.dom.Document;
@@ -62,7 +62,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import org.dspace.utils.DSpace;
 
 /**
  * Import items into DSpace. The conventional use is upload files by copying
@@ -206,7 +205,7 @@ public class ItemImport
             
             if (line.hasOption('i'))
             {
-                bteInputType = line.getOptionValue('i');;
+                bteInputType = line.getOptionValue('i');
             }
 
             if (line.hasOption('w'))
@@ -314,13 +313,7 @@ public class ItemImport
             }
             else if ("add-bte".equals(command))
             {
-            	if (sourcedir == null)
-                {
-                    System.out
-                            .println("Error - a source file containing items must be set");
-                    System.out.println(" (run with -h flag for details)");
-                    System.exit(1);
-                }
+            	//Source dir can be null, the user can specify the parameters for his loader in the Spring XML configuration file
             	
                 if (mapfile == null)
                 {
@@ -638,36 +631,51 @@ public class ItemImport
 
         DataLoaderService dls  = new DSpace().getSingletonService(DataLoaderService.class);
         DataLoader dataLoader = dls.getDataLoaders().get(inputType);
+        Map<String, String> outputMap = dls.getOutputMap();
 
-        if (dataLoader!=null){
-            System.out.println("INFO: Dataloader " + dataLoader.toString()+" will be used for the import!");
-            
-            dataLoader.setFileName(sourceDir);
-            te.setDataLoader(dataLoader);
-
-            try {
-                te.transform();
-            } catch (UnknownClassifierException e) {
-                e.printStackTrace();
-            } catch (UnknownInputFileType e) {
-                e.printStackTrace();
-            } catch (UnimplementedAbstractMethod e) {
-                e.printStackTrace();
-            } catch (UnsupportedComparatorMode e) {
-                e.printStackTrace();
-            } catch (UnsupportedCriterion e) {
-                e.printStackTrace();
-            }
-
-            ItemImport myloader = new ItemImport();
-            myloader.addItems(c, mycollections, "./bte_output_dspace", mapFile, template);
-
-            //remove files from output generator
-            deleteDirectory(new File("./bte_output_dspace"));
+        if (dataLoader==null){
+        	System.out.println("ERROR: The key used in -i parameter must match a valid DataLoader in the BTE Spring XML configuration file!");
+        	return;
         }
-        else {
-            System.out.println("Error: The key used in -i parameter must match a valid DataLoader in the BTE Spring XML configuration file!");
-            return;
+        
+        if (outputMap==null){
+        	System.out.println("ERROR: The key used in -i parameter must match a valid outputMapping in the BTE Spring XML configuration file!");
+        	return;
+        }
+        
+        if (dataLoader instanceof FileDataLoader){
+        	FileDataLoader fdl = (FileDataLoader) dataLoader;
+        	if (!"".equals(sourceDir)){
+        		System.out.println("INFO: Dataloader will load data from the file specified in the command prompt (and not from the Spring XML configuration file)");
+        		fdl.setFilename(sourceDir);
+        	}
+        }
+        
+        if (dataLoader!=null){
+        	System.out.println("INFO: Dataloader " + dataLoader.toString()+" will be used for the import!");
+
+        	te.setDataLoader(dataLoader);
+        	
+        	DSpaceOutputGenerator outputGenerator = new DSpaceOutputGenerator(outputMap);
+        	outputGenerator.setOutputDirectory("./.bte_output_dspace");
+        	
+        	te.setOutputGenerator(outputGenerator);
+
+
+        	try {
+        		TransformationResult res = te.transform(new TransformationSpec());
+        		List<String> output = res.getOutput();
+        		outputGenerator.writeOutput(output);
+        	} catch (Exception e) {
+        		System.err.println("Exception");
+        		e.printStackTrace();
+        	}
+
+        	ItemImport myloader = new ItemImport();
+        	myloader.addItems(c, mycollections, "./.bte_output_dspace", mapFile, template);
+
+        	//remove files from output generator
+        	deleteDirectory(new File("./.bte_output_dspace"));
         }
     }
 
@@ -1546,7 +1554,7 @@ public class ItemImport
         	// find the bundle
 	        Bundle[] bundles = i.getBundles(newBundleName);
 	        Bundle targetBundle = null;
-	            
+
 	        if( bundles.length < 1 )
 	        {
 	            // not found, create a new one
@@ -1557,19 +1565,19 @@ public class ItemImport
 	            // put bitstreams into first bundle
 	            targetBundle = bundles[0];
 	        }
-	
+
 	        // now add the bitstream
 	        bs = targetBundle.registerBitstream(assetstore, bitstreamPath);
-	
+
 	        // set the name to just the filename
 	        int iLastSlash = bitstreamPath.lastIndexOf('/');
 	        bs.setName(bitstreamPath.substring(iLastSlash + 1));
-	
+
 	        // Identify the format
 	        // FIXME - guessing format guesses license.txt incorrectly as a text file format!
 	        BitstreamFormat bf = FormatIdentifier.guessFormat(c, bs);
 	        bs.setFormat(bf);
-	
+
 	        bs.update();
         }
     }
