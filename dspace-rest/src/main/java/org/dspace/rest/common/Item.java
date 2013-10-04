@@ -99,7 +99,7 @@ public class Item {
             for(Bundle bundle : bundles) {
                 org.dspace.content.Bitstream[] itemBitstreams = bundle.getBitstreams();
                 for(org.dspace.content.Bitstream itemBitstream : itemBitstreams) {
-                    bitstreams.add(new Bitstream(itemBitstream));
+                    bitstreams.add(new Bitstream(itemBitstream, expand));
                 }
 
             }
