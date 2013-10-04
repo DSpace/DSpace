@@ -851,7 +851,7 @@ public class DOIIdentifierProvider
         DCValue[] metadata = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
         for (DCValue id : metadata)
         {
-            if (id.value.startsWith("http://dx.doi.org/10."))
+            if (id.value.startsWith(DOI.RESOLVER + "/10."))
             {
                 return DOI.DOIFromExternalFormat(id.value);
             }

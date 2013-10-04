@@ -22,6 +22,7 @@ public class DOI
         implements Identifier
 {
     public static final String SCHEME = "doi:";
+    public static final String RESOLVER = "http://dx.doi.org";
     
     
     /**
@@ -47,10 +48,10 @@ public class DOI
         if (identifier.isEmpty())
             throw new IllegalArgumentException("Cannot format an empty identifier.");
         if (identifier.startsWith(SCHEME))
-            return "http://dx.doi.org/" + identifier.substring(SCHEME.length());
+            return RESOLVER + "/" + identifier.substring(SCHEME.length());
         if (identifier.startsWith("10.") && identifier.contains("/"))
-            return "http://dx.doi.org/" + identifier;
-        if (identifier.startsWith("http://dx.doi.org/10."))
+            return RESOLVER + "/" + identifier;
+        if (identifier.startsWith(RESOLVER + "/10."))
             return identifier;
         
         throw new IdentifierException(identifier + "does not seem to be a DOI.");
@@ -59,7 +60,7 @@ public class DOI
     public static String DOIFromExternalFormat(String identifier)
             throws DOIIdentifierException
     {
-        Pattern pattern = Pattern.compile("^http://dx.doi.org/+(10\\..*)$");
+        Pattern pattern = Pattern.compile("^" + RESOLVER + "/+(10\\..*)$");
         Matcher matcher = pattern.matcher(identifier);
         if (matcher.find())
         {
@@ -93,7 +94,7 @@ public class DOI
         if (identifier.startsWith("10.") && identifier.contains("/")) {
             return DOI.SCHEME + identifier;
         }
-        if (identifier.startsWith("http://dx.doi.org/10.")) {
+        if (identifier.startsWith(RESOLVER + "/10.")) {
             return DOI.SCHEME + identifier.substring(18);
         }
         throw new DOIIdentifierException(identifier + "does not seem to be a DOI.",

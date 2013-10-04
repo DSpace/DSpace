@@ -106,7 +106,7 @@ public class DOIIdentifierProviderTest
 
         for (DCValue id : metadata)
         {
-            if (!id.value.startsWith("http://dx.doi.org/"))
+            if (!id.value.startsWith(DOI.RESOLVER))
             {
                 remainder.add(id.value);
             }
@@ -262,7 +262,8 @@ public class DOIIdentifierProviderTest
             "10.5072/123abc-lkj/kljl",
             PREFIX + "/" + NAMESPACE_SEPARATOR + "lkjljasd1234",
             DOI.SCHEME + "10.5072/123abc-lkj/kljl",
-            "http://dx.doi.org/10.5072/123abc-lkj/kljl"
+            "http://dx.doi.org/10.5072/123abc-lkj/kljl",
+            DOI.RESOLVER + "/10.5072/123abc-lkj/kljl"
         };
         
         for (String doi : validDOIs)
