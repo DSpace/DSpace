@@ -684,7 +684,7 @@ public class DOIOrganiser {
             {
                 System.err.println("It wasn't possible to delete this identifier: "
                         + DOI.SCHEME + doiRow.getStringColumn("doi")
-                        + " online. Take a look in log datei.");
+                        + " online. Take a look in log file.");
             }
         }
     }

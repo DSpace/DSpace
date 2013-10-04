@@ -117,7 +117,7 @@ public class HandleManager
             return null;
         }
         
-        // remove trainling slashes
+        // remove trailing slashes
         while (handle.startsWith("/"))
         {
             handle = handle.substring(1);
