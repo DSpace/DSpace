@@ -831,11 +831,13 @@ public class WorkflowManager {
             String journal = values[0].value;
             if(journal!=null){
                 Map<String, String> properties = DryadJournalSubmissionUtils.getPropertiesByJournal(journal);
-                String emails = properties.get(DryadJournalSubmissionUtils.NOTIFY_ON_ARCHIVE);
-                if(emails != null) {
-                    String[] emails_=emails.split(",");
-                    for(String emailAddr : emails_){
-                        email.addRecipient(emailAddr);
+                if(properties != null) {
+                    String emails = properties.get(DryadJournalSubmissionUtils.NOTIFY_ON_ARCHIVE);
+                    if(emails != null) {
+                        String[] emails_=emails.split(",");
+                        for(String emailAddr : emails_){
+                            email.addRecipient(emailAddr);
+                        }
                     }
                 }
 
