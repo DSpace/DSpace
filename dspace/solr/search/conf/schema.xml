@@ -455,6 +455,31 @@
             <filter class="solr.TrimFilterFactory" />
         </analyzer>
     </fieldType>
+
+      <!--
+       SpellCheck analysis config based off of http://wiki.apache.org/solr/
+       SpellCheckingAnalysis
+       -->
+      <fieldType name="textSpell" class="solr.TextField"
+                 positionIncrementGap="100" stored="false" multiValued="true">
+          <analyzer type="index">
+              <tokenizer class="solr.StandardTokenizerFactory"/>
+              <filter class="solr.LowerCaseFilterFactory"/>
+              <filter class="solr.SynonymFilterFactory"
+                      synonyms="synonyms.txt" ignoreCase="true"
+                      expand="true"/>
+              <filter class="solr.StopFilterFactory" ignoreCase="true"
+                      words="stopwords.txt"/>
+              <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+          </analyzer>
+          <analyzer type="query">
+              <tokenizer class="solr.StandardTokenizerFactory"/>
+              <filter class="solr.LowerCaseFilterFactory"/>
+              <filter class="solr.StopFilterFactory" ignoreCase="true"
+                      words="stopwords.txt"/>
+              <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+              ￼￼￼￼￼  </analyzer>
+      </fieldType>
  </types>
 
 
@@ -516,6 +541,9 @@
    <field name="location" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
     <field name="location.comm" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
     <field name="location.coll" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
+
+    <field name="a_spell" type="textSpell" />
+    <copyField source="fulltext" dest="a_spell" />
 
     <!-- used by the DSpace Discovery Solr Indexer to track the last time a document was indexed -->
    <field name="SolrIndexer.lastIndexed" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
