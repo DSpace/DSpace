@@ -119,7 +119,7 @@
         <div class="artifact-title">
             <a href="{$metsDoc/mets:METS/@OBJID}">
                 <xsl:choose>
-                    <xsl:when test="dri:list[@n=(concat($handle, ':dc.title'))]">
+                    <xsl:when test="dri:list[@n=(concat($handle, ':dc.title')) and descendant::text()]">
                         <xsl:apply-templates select="dri:list[@n=(concat($handle, ':dc.title'))]/dri:item"/>
                     </xsl:when>
                     <xsl:otherwise>
@@ -146,7 +146,7 @@
         <div class="artifact-title">
             <a href="{$metsDoc/mets:METS/@OBJID}">
                 <xsl:choose>
-                    <xsl:when test="dri:list[@n=(concat($handle, ':dc.title'))]">
+                    <xsl:when test="dri:list[@n=(concat($handle, ':dc.title')) and descendant::text()]">
                         <xsl:apply-templates select="dri:list[@n=(concat($handle, ':dc.title'))]/dri:item"/>
                     </xsl:when>
                     <xsl:otherwise>
@@ -191,7 +191,7 @@
                         </xsl:choose>
                     </xsl:attribute>
                     <xsl:choose>
-                        <xsl:when test="dri:list[@n=(concat($handle, ':dc.title'))]">
+                        <xsl:when test="dri:list[@n=(concat($handle, ':dc.title')) and descendant::text()]">
                             <xsl:apply-templates select="dri:list[@n=(concat($handle, ':dc.title'))]/dri:item"/>
                         </xsl:when>
                         <xsl:otherwise>
