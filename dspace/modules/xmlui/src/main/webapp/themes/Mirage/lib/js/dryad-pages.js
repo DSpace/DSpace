@@ -136,7 +136,7 @@ jQuery(document).ready(function() {
     // By default, this is based on today's date. Upcoming slides can be previewed using the browser's query-string:
     //   EXAMPLE: http://www.datadryad.org/?date=2013-06-02
     // NOTE that the date is in the format YEAR-MONTH-DAY, to the date above is June 2, 2013
-    var displayDate = $.datepicker.formatDate('yy-mm-dd', new Date());   // "2013-09-13"
+    var displayDate = jQuery.datepicker.formatDate('yy-mm-dd', new Date());   // "2013-09-13"
         // this default behavior depends on jQuery UI's datepicker script
     var qsTest = window.location.search.split('?');
     if ((qsTest.length === 2) && (qsTest[1].indexOf('date=') === 0)) {
