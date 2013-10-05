@@ -156,6 +156,15 @@
   
   <tr class="navigationBarItem">
     <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/batchmetadataimport") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
+    </td>
+    <td nowrap="nowrap" class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/dspace-admin/batchmetadataimport"><fmt:message key="jsp.layout.navbar-admin.batchmetadataimport"/></a>
+    </td>
+  </tr>
+  
+  <tr class="navigationBarItem">
+    <td>
       <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/curate") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
     </td>
     <td nowrap="nowrap" class="navigationBarItem">
