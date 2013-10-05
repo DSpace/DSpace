@@ -186,7 +186,7 @@
             // put up a SELECT element containing all choices
             else if (isSelect)
             {
-                sb.append("<select id=\"").append(fieldInput)
+                sb.append("<select class=\"form-control\" id=\"").append(fieldInput)
                    .append("_id\" name=\"").append(fieldInput)
                    .append("\" size=\"").append(String.valueOf(repeatable ? 6 : 1))
                    .append(repeatable ? "\" multiple>\n" :"\">\n");
@@ -216,7 +216,7 @@
             {
                 if (inputBlock != null)
                     sb.insert(0, inputBlock);
-                sb.append("<input type=\"image\" name=\"").append(fieldInput).append("_lookup\" ")
+                sb.append("<button name=\"").append(fieldInput).append("_lookup\" ")
                   .append("onclick=\"javascript: return DSpaceChoiceLookup('")
                   .append(contextPath).append("/tools/lookup.jsp','")
                   .append(fieldName).append("','edit_metadata','")
@@ -226,7 +226,7 @@
                   .append(String.valueOf(isName)).append(",false);\"")
                   .append(" title=\"")
                   .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.lookup.lookup"))
-                  .append("\" width=\"16px\" height=\"16px\" src=\""+contextPath+"/image/authority/zoom.png\" />");
+                  .append(" src=\""+contextPath+"/image/authority/zoom.png\"><span class=\".glyphicon .glyphicon-search\"></span>");
             }
         }
         else if (inputBlock != null)
@@ -254,23 +254,11 @@
       if (fieldCount == 0)
          fieldCount = 1;
 
-      //Width hints used here to affect whole table
-      headers.append("<tr><td width=\"40%\">&nbsp;</td>")
-             .append("<td class=\"submitFormDateLabel\" width=\"5%\">")
-//             .append("Last name<br>e.g. <strong>Smith</strong></td>")
-                         .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.lastname"))
-                         .append("</td>")
-             .append("<td class=\"submitFormDateLabel\" width=\"5%\">")
-//             .append("First name(s) + \"Jr\"<br> e.g. <strong>Donald Jr</strong></td>")
-                         .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.firstname"))
-                         .append("</td>")
-             .append("<td width=\"40%\">&nbsp;</td>")
-             .append("</tr>");
-      out.write(headers.toString());
-
-
+      sb.append("<div class=\"row\"><label class=\"col-md-2\">").append(label).append("</label>");
+	  sb.append("<div class=\"col-md-10\">");     
       for (int i = 0; i < fieldCount; i++)
       {
+    	 sb.append("<div class=\"row col-md-12\">");
          first.setLength(0);
          first.append(fieldName).append("_first");
          if (repeatable && i != fieldCount-1)
@@ -280,13 +268,6 @@
          last.append(fieldName).append("_last");
          if (repeatable && i != fieldCount-1)
             last.append('_').append(i+1);
-            
-         if (i == 0)
-            sb.append("<tr><td class=\"submitFormLabel\">")
-              .append(label)
-              .append("</td>");
-         else
-            sb.append("<tr><td>&nbsp;</td>");
 
          if (i < defaults.length)
          {
@@ -301,7 +282,9 @@
             conf = unknownConfidence;
          }
          
-         sb.append("<td><input type=\"text\" name=\"")
+         sb.append("<span class=\"col-md-5\"><input placeholder=\"")
+           .append(Utils.addEntities(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.lastname")))
+           .append("\" class=\"form-control\" type=\"text\" name=\"")
            .append(last.toString())
            .append("\" size=\"23\" ");
          if (readonly)
@@ -310,7 +293,9 @@
          }
          sb.append("value=\"")
            .append(dpn.getLastName().replaceAll("\"", "&quot;")) // Encode "
-                   .append("\"/></td>\n<td nowrap=\"nowrap\"><input type=\"text\" name=\"")
+                   .append("\"/></span><span class=\"col-md-5\"><input placeholder=\"")
+                   .append(Utils.addEntities(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.firstname")))
+                   .append("\" class=\"form-control\" type=\"text\" name=\"")
                    .append(first.toString())
            .append("\" size=\"23\" ");
          if (readonly)
@@ -318,10 +303,9 @@
              sb.append("disabled=\"disabled\" ");
          }
          sb.append("value=\"")
-         .append(dpn.getFirstNames()).append("\"/>")
+           .append(dpn.getFirstNames()).append("\"/></span>")
            .append(doAuthority(pageContext, fieldName, i, fieldCount, fieldName,
-                auth, conf, true, repeatable, defaults, null, collectionID))
-           .append("</td>\n");
+                auth, conf, true, repeatable, defaults, null, collectionID));
 
          if (repeatable && !readonly && i < defaults.length)
          {
@@ -330,32 +314,26 @@
                 .append(' ')
                 .append(Utils.addEntities(dpn.getFirstNames()));
             // put a remove button next to filled in values
-            sb.append("<td><input type=\"submit\" name=\"submit_")
+            sb.append("<input class=\"btn btn-danger col-md-2\" type=\"submit\" name=\"submit_")
               .append(fieldName)
               .append("_remove_")
               .append(i)
-//            .append("\" value=\"Remove This Entry\"/> </td></tr>")
-                  .append("\" value=\"")
-                  .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-                  .append("\"/> </td></tr>");
+              .append("\" value=\"")
+              .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
+              .append("\"/>");
          }
          else if (repeatable && !readonly && i == fieldCount - 1)
          {
             // put a 'more' button next to the last space
-            sb.append("<td><input type=\"submit\" name=\"submit_")
+            sb.append("<input class=\"btn btn-default col-md-2\" type=\"submit\" name=\"submit_")
               .append(fieldName)
-//            .append("_add\" value=\"Add More\"/> </td></tr>");
               .append("_add\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-              .append("\"/> </td></tr>");
+              .append("\"/>");
          }
-         else
-         {
-            // put a blank if nothing else
-            sb.append("<td>&nbsp;</td></tr>");
-         }
+         sb.append("</div>");
       }
-
+	  sb.append("</div></div><br/>");
       out.write(sb.toString());
     }
 
@@ -373,24 +351,21 @@
       if (fieldCount == 0)
          fieldCount = 1;
 
+      sb.append("<div class=\"row\"><label class=\"col-md-2\">")
+        .append(label)
+        .append("</label><div class=\"col-md-10\">");
+      
       for (int i = 0; i < fieldCount; i++)
       {
-         if (i == 0)
-            sb.append("<tr><td class=\"submitFormLabel\">")
-              .append(label)
-              .append("</td>");
-         else
-            sb.append("<tr><td>&nbsp;</td>");
-
          if (i < defaults.length)
             dateIssued = new org.dspace.content.DCDate(defaults[i].value);
          else
             dateIssued = new org.dspace.content.DCDate("");
     
-         sb.append("<td colspan=\"2\" nowrap=\"nowrap\" class=\"submitFormDateLabel\">")
-//          .append("Month:<select name=\"")
-                .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.month"))
-            .append("<select name=\"")
+         sb.append("<div class=\"row col-md-12\"><div class=\"input-group col-md-10\"><div class=\"row\">")
+			.append("<span class=\"input-group col-md-6\"><span class=\"input-group-addon\">")
+         	.append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.month"))
+            .append("</span><select class=\"form-control\" name=\"")
             .append(fieldName)
             .append("_month");
          if (repeatable && i>0)
@@ -418,10 +393,10 @@
               .append("</option>");
          }
     
-         sb.append("</select>")
-//            .append("Day:<input type=text name=\"")
+         sb.append("</select></span>")
+	            .append("<span class=\"input-group col-md-2\"><span class=\"input-group-addon\">")
                 .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.day"))
-                .append("<input type=\"text\" name=\"")
+                .append("</span><input class=\"form-control\" type=\"text\" name=\"")
             .append(fieldName)
             .append("_day");
          if (repeatable && i>0)
@@ -433,10 +408,9 @@
          sb.append("\" size=\"2\" maxlength=\"2\" value=\"")
             .append((dateIssued.getDay() > 0 ?
                      String.valueOf(dateIssued.getDay()) : "" ))
-//          .append("\"/>Year:<input type=text name=\"")
-                .append("\"/>")
+                .append("\"/></span><span class=\"input-group col-md-4\"><span class=\"input-group-addon\">")
                 .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.year"))
-                .append("<input type=\"text\" name=\"")
+                .append("</span><input class=\"form-control\" type=\"text\" name=\"")
             .append(fieldName)
             .append("_year");
          if (repeatable && i>0)
@@ -448,37 +422,32 @@
          sb.append("\" size=\"4\" maxlength=\"4\" value=\"")
             .append((dateIssued.getYear() > 0 ?
                  String.valueOf(dateIssued.getYear()) : "" ))
-            .append("\"/></td>\n");
+            .append("\"/></span></div></div>\n");
     
          if (repeatable && !readonly && i < defaults.length)
          {
             // put a remove button next to filled in values
-            sb.append("<td><input type=\"submit\" name=\"submit_")
+            sb.append("<input class=\"btn btn-danger col-md-2\" type=\"submit\" name=\"submit_")
               .append(fieldName)
               .append("_remove_")
               .append(i)
-//            .append("\" value=\"Remove This Entry\"/> </td></tr>");
-                  .append("\" value=\"")
-                  .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-                  .append("\"/> </td></tr>");
+              .append("\" value=\"")
+              .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
+              .append("\"/>");
          }
          else if (repeatable && !readonly && i == fieldCount - 1)
          {
             // put a 'more' button next to the last space
-            sb.append("<td><input type=\"submit\" name=\"submit_")
+            sb.append("<input class=\"btn btn-default col-md-2\" type=\"submit\" name=\"submit_")
               .append(fieldName)
-//            .append("_add\" value=\"Add More\"/> </td></tr>");
               .append("_add\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-              .append("\"/> </td></tr>");
+              .append("\"/>");
          }
-         else
-         {
-            // put a blank if nothing else
-            sb.append("<td>&nbsp;</td></tr>");
-         }
+         // put a blank if nothing else
+         sb.append("</div>");
       }
-
+      sb.append("</div></div><br/>");
       out.write(sb.toString());
     }
 
@@ -494,39 +463,21 @@
       org.dspace.content.DCSeriesNumber sn;
       StringBuffer headers = new StringBuffer();
 
-      //Width hints used here to affect whole table
-      headers.append("<tr><td width=\"40%\">&nbsp;</td>")
-          .append("<td class=\"submitFormDateLabel\" width=\"5%\">")
-//          .append("Series Name</td>")
-                         .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.seriesname"))
-          .append("</td>")
-          .append("<td class=\"submitFormDateLabel\" width=\"5%\">")
-//          .append("Report or Paper No.</td>")
-                         .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.paperno"))
-          .append("</td>")
-          .append("<td width=\"40%\">&nbsp;</td>")
-          .append("</tr>");
-      out.write(headers.toString());
-      
-      
       if (fieldCount == 0)
          fieldCount = 1;
 
+      sb.append("<div class=\"row\"><label class=\"col-md-2\">")
+      	.append(label)
+      	.append("</label><div class=\"col-md-10\">");
+      
       for (int i = 0; i < fieldCount; i++)
       {
-         if (i == 0)
-            sb.append("<tr><td class=\"submitFormLabel\">")
-              .append(label)
-              .append("</td>");
-         else
-            sb.append("<tr><td>&nbsp;</td>");
-
          if (i < defaults.length)
            sn = new org.dspace.content.DCSeriesNumber(defaults[i].value);
          else
            sn = new org.dspace.content.DCSeriesNumber();
 
-         sb.append("<td><input type=\"text\" name=\"")
+         sb.append("<div class=\"row col-md-12\"><span class=\"col-md-5\"><input class=\"form-control\" type=\"text\" name=\"")
            .append(fieldName)
            .append("_series");
          if (repeatable && i!= fieldCount)
@@ -535,9 +486,11 @@
          {
              sb.append("\" disabled=\"disabled");
          }
+         sb.append("\" placeholder=\"")
+           .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.seriesname").replaceAll("\"", "&quot;"));
          sb.append("\" size=\"23\" value=\"")
            .append(sn.getSeries().replaceAll("\"", "&quot;"))
-           .append("\"/></td>\n<td><input type=\"text\" name=\"")
+           .append("\"/></span><span class=\"col-md-5\"><input class=\"form-control\" type=\"text\" name=\"")
            .append(fieldName)
            .append("_number");
          if (repeatable && i!= fieldCount)
@@ -546,39 +499,38 @@
          {
              sb.append("\" disabled=\"disabled");
          }
+         sb.append("\" placeholder=\"")
+           .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.paperno").replaceAll("\"", "&quot;"));
          sb.append("\" size=\"23\" value=\"")
            .append(sn.getNumber().replaceAll("\"", "&quot;"))
-           .append("\"/></td>\n");
+           .append("\"/></span>\n");
 
          if (repeatable && !readonly && i < defaults.length)
          {
             // put a remove button next to filled in values
-            sb.append("<td><input type=\"submit\" name=\"submit_")
+            sb.append("<input class=\"btn btn-danger col-md-2\" type=\"submit\" name=\"submit_")
               .append(fieldName)
               .append("_remove_")
               .append(i)
-//            .append("\" value=\"Remove This Entry\"/> </td></tr>");
               .append("\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-              .append("\"/> </td></tr>");
+              .append("\"/>");
          }
          else if (repeatable && !readonly && i == fieldCount - 1)
          {
             // put a 'more' button next to the last space
-            sb.append("<td><input type=\"submit\" name=\"submit_")
+            sb.append("<input class=\"btn btn-default col-md-2\" type=\"submit\" name=\"submit_")
               .append(fieldName)
-//            .append("_add\" value=\"Add More\"/> </td></tr>");
               .append("_add\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-              .append("\"/> </td></tr>");
+              .append("\"/>");
          }
-         else
-         {
-            // put a blank if nothing else
-            sb.append("<td>&nbsp;</td></tr>");
-         }
-      }
 
+         // put a blank if nothing else
+         sb.append("</div>");
+      }
+      sb.append("</div></div><br/>");
+      
       out.write(sb.toString());
     }
 
@@ -597,15 +549,12 @@
       if (fieldCount == 0)
          fieldCount = 1;
 
+      sb.append("<div class=\"row\"><label class=\"col-md-2\">")
+      	.append(label)
+      	.append("</label><div class=\"col-md-10\">");
+      
       for (int i = 0; i < fieldCount; i++)
       {
-         if (i == 0)
-            sb.append("<tr><td class=\"submitFormLabel\">")
-              .append(label)
-              .append("</td>");
-         else
-            sb.append("<tr><td>&nbsp;</td>");
-
          if (i < defaults.length)
          {
            val = defaults[i].value;
@@ -617,50 +566,46 @@
            val = "";
             auth = "";
          }
-         sb.append("<td colspan=\"2\">\n");
+         sb.append("<div class=\"row col-md-12\">\n");
          String fieldNameIdx = fieldName + ((repeatable && i != fieldCount-1)?"_" + (i+1):"");
-         StringBuffer inputBlock = new StringBuffer().append("<textarea name=\"").append(fieldNameIdx)
+         StringBuffer inputBlock = new StringBuffer().append("<span class=\"col-md-10\"><textarea class=\"form-control\" name=\"").append(fieldNameIdx)
            .append("\" rows=\"4\" cols=\"45\" id=\"")
            .append(fieldNameIdx).append("_id\" ")
            .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" disabled=\"disabled\" ":"")
            .append(">")
            .append(val)
-           .append("</textarea>\n")
+           .append("</textarea></span>\n")
            .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly));
          sb.append(doAuthority(pageContext, fieldName, i, fieldCount, fieldName,
                             auth, conf, false, repeatable,
-                            defaults, inputBlock, collectionID))
-           .append("</td>\n");
+                            defaults, inputBlock, collectionID));
 
          if (repeatable && !readonly && i < defaults.length)
          {
             // put a remove button next to filled in values
-            sb.append("<td><input type=\"submit\" name=\"submit_")
+            sb.append("<input class=\"btn btn-danger col-md-2\" type=\"submit\" name=\"submit_")
               .append(fieldName)
               .append("_remove_")
               .append(i)
-//            .append("\" value=\"Remove This Entry\"/> </td></tr>");
               .append("\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-              .append("\"/> </td></tr>");
+              .append("\"/>");
          }
          else if (repeatable && !readonly && i == fieldCount - 1)
          {
             // put a 'more' button next to the last space
-            sb.append("<td><input type=\"submit\" name=\"submit_")
+            sb.append("<input class=\"btn btn-default col-md-2\" type=\"submit\" name=\"submit_")
               .append(fieldName)
-//            .append("_add\" value=\"Add More\"/> </td></tr>");
               .append("_add\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-              .append("\"/> </td></tr>");
+              .append("\"/>");
          }
-         else
-         {
-            // put a blank if nothing else
-            sb.append("<td>&nbsp;</td></tr>");
-         }
-      }
 
+         // put a blank if nothing else
+         sb.append("</div>");
+      }
+      sb.append("</div></div><br/>");
+      
       out.write(sb.toString());
     }
 
@@ -679,15 +624,12 @@
       if (fieldCount == 0)
          fieldCount = 1;
 
-        for (int i = 0; i < fieldCount; i++)
-        {
-           if (i == 0)
-              sb.append("<tr><td class=\"submitFormLabel\">")
-                .append(label)
-                .append("</td>");
-           else
-              sb.append("<tr><td>&nbsp;</td>");
-         
+      sb.append("<div class=\"row\"><label class=\"col-md-2\">")
+        .append(label)
+        .append("</label>");
+      sb.append("<div class=\"col-md-10\">");  
+      for (int i = 0; i < fieldCount; i++)
+      {
            if (i < defaults.length)
            {
              val = defaults[i].value.replaceAll("\"", "&quot;");
@@ -701,51 +643,45 @@
              conf= unknownConfidence;
            }
 
-           sb.append("<td colspan=\"2\">");
+           sb.append("<div class=\"row col-md-12\">");
            String fieldNameIdx = fieldName + ((repeatable && i != fieldCount-1)?"_" + (i+1):"");
-           StringBuffer inputBlock = new StringBuffer("<input type=\"text\" name=\"")
+           StringBuffer inputBlock = new StringBuffer("<span class=\"col-md-10\"><input class=\"form-control\" type=\"text\" name=\"")
              .append(fieldNameIdx)
              .append("\" id=\"")
              .append(fieldNameIdx).append("\" size=\"50\" value=\"")
              .append(val +"\"")
              .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
-             .append("/>")
+             .append("/></span>")
              .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly))
              .append("\n");
            sb.append(doAuthority(pageContext, fieldName, i,  fieldCount,
                               fieldName, auth, conf, false, repeatable,
                               defaults, inputBlock, collectionID))
-             .append("</td>\n");
+             .append("</div>\n");
 
           if (repeatable && !readonly && i < defaults.length)
           {
              // put a remove button next to filled in values
-             sb.append("<td><input type=\"submit\" name=\"submit_")
+             sb.append("<input class=\"btn btn-danger col-md-2\" type=\"submit\" name=\"submit_")
                .append(fieldName)
                .append("_remove_")
                .append(i)
-//             .append("\" value=\"Remove This Entry\"/> </td></tr>");
                .append("\" value=\"")
                .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-               .append("\"/> </td></tr>");
+               .append("\"/>");
           }
           else if (repeatable && !readonly && i == fieldCount - 1)
           {
              // put a 'more' button next to the last space
-             sb.append("<td><input type=\"submit\" name=\"submit_")
+             sb.append("<input class=\"btn btn-default col-md-2\" type=\"submit\" name=\"submit_")
                .append(fieldName)
-//             .append("_add\" value=\"Add More\"/> </td></tr>");
                .append("_add\" value=\"")
                .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-               .append("\"/> </td></tr>");
+               .append("\"/>");
           }
-          else
-          {
-             // put a blank if nothing else
-             sb.append("<td>&nbsp;</td></tr>");
-          }
+          sb.append("</div>");
         }
-
+	  sb.append("</div><br/>");
       out.write(sb.toString());
     }
 
@@ -760,83 +696,63 @@
       StringBuffer headers = new StringBuffer();
 
       String fieldParam = "";
-      
-      if (element.equals("relation") && qualifier.equals("ispartofseries"))
-      {
-         //Width hints used here to affect whole table
-         headers.append("<tr><td width=\"40%\">&nbsp;</td>")
-             .append("<td class=\"submitFormDateLabel\" width=\"5%\">")
-//             .append("Series Name</td>")
-                         .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.seriesname"))
-             .append("</td>")
-             .append("<td class=\"submitFormDateLabel\" width=\"5%\">")
-//             .append("Report or Paper No.</td>")
-                         .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.paperno"))
-             .append("</td>")
-             .append("<td width=\"40%\">&nbsp;</td>")
-             .append("</tr>");
-         out.write(headers.toString());
-      }
 
       if (fieldCount == 0)
          fieldCount = 1;
 
+      sb.append("<div class=\"row\"><label class=\"col-md-2\">")
+        .append(label)
+        .append("</label>");
+      sb.append("<div class=\"col-md-10\">");
       for (int i = 0; i < fieldCount; i++)
       {
-                 if (i == 0)
-                 {
-                    sb.append("<tr><td class=\"submitFormLabel\">")
-                      .append(label)
-                      .append("</td>");
-                 }
-                 else
-                 {
-                    sb.append("<tr><td>&nbsp;</td>");
-                 }
-                 
-                 if(i != fieldCount)
-                 {
-                         //param is field name and index, starting from 1 (e.g. myfield_2)
-                     fieldParam = fieldName + "_" + (i+1);
-                 }
-                 else
-                 {
-                         //param is just the field name
-                         fieldParam = fieldName;
-                 }
+    	 if (i % 2 == 0)
+     	 {
+       	   sb.append("<div class=\"row col-md-12\">");
+      	 }
+    	  
+         if(i != fieldCount)
+         {
+             //param is field name and index, starting from 1 (e.g. myfield_2)
+             fieldParam = fieldName + "_" + (i+1);
+         }
+         else
+         {
+             //param is just the field name
+             fieldParam = fieldName;
+         }
                  
          if (i < defaults.length)
          {
-           sb.append("<td align=\"left\"><input type=\"text\" name=\"")
+           sb.append("<span class=\"col-md-4\"><input class=\"form-control\" type=\"text\" name=\"")
              .append(fieldParam)
              .append("\" size=\"15\" value=\"")
              .append(defaults[i].value.replaceAll("\"", "&quot;"))
              .append("\"")
              .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
-             .append("/>");
+             .append("\" /></span>");
           if (!readonly)
           {
-                       sb.append("&nbsp;<input type=\"submit\" name=\"submit_")
+                       sb.append("<input class=\"btn btn-danger col-md-2\" type=\"submit\" name=\"submit_")
                              .append(fieldName)
                              .append("_remove_")
                              .append(i)
                              .append("\" value=\"")
                              .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
-                             .append("\"/>");
+                             .append("\" />");
           }
-          sb.append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly))
-                .append("</td>\n");
+          sb.append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly));
          }
          else
-                 {
-           sb.append("<td align=\"left\"><input type=\"text\" name=\"")
+         {
+           sb.append("<span class=\"col-md-4\"><input class=\"form-control\" type=\"text\" name=\"")
              .append(fieldParam)
              .append("\" size=\"15\"")
              .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
              .append("/>")
-             .append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly))
-             .append("</td>\n");
-                }
+             .append("</span>\n")
+             .append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly));
+         }
          
          i++;
 
@@ -853,16 +769,16 @@
         
                  if (i < defaults.length)
                  {
-                   sb.append("<td align=\"left\"><input type=\"text\" name=\"")
+                   sb.append("<span class=\"col-md-4\"><input class=\"form-control\" type=\"text\" name=\"")
                      .append(fieldParam)
                      .append("\" size=\"15\" value=\"")
                      .append(defaults[i].value.replaceAll("\"", "&quot;"))
                          .append("\"")
                          .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
-                         .append("/>");
+                         .append("/></span>");
                    if (!readonly)
                    {
-                               sb.append("&nbsp;<input type=\"submit\" name=\"submit_")
+                               sb.append(" <input class=\"btn btn-danger col-md-2\" type=\"submit\" name=\"submit_")
                                      .append(fieldName)
                                      .append("_remove_")
                                      .append(i)
@@ -872,35 +788,33 @@
                    }
                         
                    sb.append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly))
-                         .append("</td></tr>\n");
+                         .append("</div>\n");
                  }
                  else
                  {
-                   sb.append("<td align=\"left\"><input type=\"text\" name=\"")
+                   sb.append("<span class=\"col-md-4 col-md-offset-2\"><input class=\"form-control\" type=\"text\" name=\"")
                      .append(fieldParam)
-                     //.append("\" size=\"15\"/></td>");
                      .append("\" size=\"15\"")
                      .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" disabled=\"disabled\" ":"")
-                     .append("/>")
-                     .append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly))
-                     .append("</td>\n");
+                     .append("/></span>\n")
+                     .append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly));
         
                    if (i+1 >= fieldCount && !readonly)
                    {
-                     sb.append("<td><input type=\"submit\" name=\"submit_")
+                     sb.append(" <input class=\"btn btn-default col-md-2\" type=\"submit\" name=\"submit_")
                        .append(fieldName)
                        .append("_add\" value=\"")
                        .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-                       .append("\"/></td>\n");
+                       .append("\"/>\n");
                    }
-                   else
-                   {
-                     sb.append("</td>");
-                   }
-                   sb.append("<td>&nbsp;</td></tr>");
+                   
+                   if (i % 2 == 0)
+               	   {
+                	   sb.append("</div>");
+               	   }
                  }
       }
-
+      sb.append("</div></div></div><br/>");
       out.write(sb.toString());
     }
     
@@ -911,22 +825,22 @@
       boolean readonly, int fieldCountIncr, List qualMap, String label, PageContext pageContext)
       throws java.io.IOException
     {
-                DCValue[] unfiltered = item.getMetadata(schema, element, Item.ANY, Item.ANY);
-                // filter out both unqualified and qualified values occurring elsewhere in inputs
-                List<DCValue> filtered = new ArrayList<DCValue>();
-                for (int i = 0; i < unfiltered.length; i++)
-                {
-                    String unfilteredFieldName = unfiltered[i].element;
-                    if(unfiltered[i].qualifier != null && unfiltered[i].qualifier.length()>0)
-                        unfilteredFieldName += "." + unfiltered[i].qualifier;
-                        
-                        if ( ! inputs.isFieldPresent(unfilteredFieldName) )
-                        {
-                                filtered.add( unfiltered[i] );
-                        }
-                }
-                DCValue[] defaults = filtered.toArray(new DCValue[0]);
-      //DCValue[] defaults = item.getMetadata(element, Item.ANY, Item.ANY);
+      DCValue[] unfiltered = item.getMetadata(schema, element, Item.ANY, Item.ANY);
+      // filter out both unqualified and qualified values occurring elsewhere in inputs
+      List<DCValue> filtered = new ArrayList<DCValue>();
+      for (int i = 0; i < unfiltered.length; i++)
+      {
+          String unfilteredFieldName = unfiltered[i].element;
+          if(unfiltered[i].qualifier != null && unfiltered[i].qualifier.length()>0)
+              unfilteredFieldName += "." + unfiltered[i].qualifier;
+              
+              if ( ! inputs.isFieldPresent(unfilteredFieldName) )
+              {
+                      filtered.add( unfiltered[i] );
+              }
+      }
+      DCValue[] defaults = filtered.toArray(new DCValue[0]);
+
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
       String   q, v, currentQual, currentVal;
@@ -934,6 +848,10 @@
       if (fieldCount == 0)
          fieldCount = 1;
 
+      sb.append("<div class=\"row\"><label class=\"col-md-2\">")
+      	.append(label)
+      	.append("</label>");
+      sb.append("<div class=\"col-md-10\">");
       for (int j = 0; j < fieldCount; j++)
       {
 
@@ -949,15 +867,8 @@
             currentVal = "";
          }
 
-         if (j == 0)
-            sb.append("<tr><td class=\"submitFormLabel\">")
-              .append(label)
-              .append("</td>");
-         else
-            sb.append("<tr><td>&nbsp;</td>");
-
          // do the dropdown box
-         sb.append("<td colspan=\"2\"><select name=\"")
+         sb.append("<div class=\"row col-md-12\"><span class=\"input-group col-md-10\"><span class=\"input-group-addon\"><select name=\"")
            .append(fieldName)
            .append("_qualifier");
          if (repeatable && j!= fieldCount-1)
@@ -981,7 +892,7 @@
          }
       
          // do the input box
-         sb.append("</select>&nbsp;<input type=\"text\" name=\"")
+         sb.append("</select></span><input class=\"form-control\" type=\"text\" name=\"")
            .append(fieldName)
            .append("_value");
          if (repeatable && j!= fieldCount-1)
@@ -992,37 +903,34 @@
          }
          sb.append("\" size=\"34\" value=\"")
            .append(currentVal.replaceAll("\"", "&quot;"))
-           .append("\"/></td>\n");
+           .append("\"/></span>\n");
 
          if (repeatable && !readonly && j < defaults.length)
          {
             // put a remove button next to filled in values
-            sb.append("<td><input type=\"submit\" name=\"submit_")
+            sb.append("<input class=\"btn btn-danger col-md-2\" type=\"submit\" name=\"submit_")
               .append(fieldName)
               .append("_remove_")
               .append(j)
-//            .append("\" value=\"Remove This Entry\"/> </td></tr>");
               .append("\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-              .append("\"/> </td></tr>");
+              .append("\"/>");
          }
          else if (repeatable && !readonly && j == fieldCount - 1)
          {
             // put a 'more' button next to the last space
-            sb.append("<td><input type=\"submit\" name=\"submit_")
+            sb.append("<input class=\"btn btn-default col-md-2\" type=\"submit\" name=\"submit_")
               .append(fieldName)
 //            .append("_add\" value=\"Add More\"/> </td></tr>");
               .append("_add\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-              .append("\"/> </td></tr>");
+              .append("\"/>");
          }
-         else
-         {
-            // put a blank if nothing else
-            sb.append("<td>&nbsp;</td></tr>");
-         }
-      }
 
+         // put a blank if nothing else
+       	 sb.append("</div>");
+      }
+      sb.append("</div></div><br/>");
       out.write(sb.toString());
     }
 
@@ -1037,12 +945,12 @@
       String display, value;
       int j;
 
-      sb.append("<tr><td class=\"submitFormLabel\">")
+      sb.append("<div class=\"row\"><label class=\"col-md-2\">")
         .append(label)
-        .append("</td>");
+        .append("</label>");
 
-      sb.append("<td colspan=\"2\">")
-        .append("<select name=\"")
+      sb.append("<span class=\"col-md-8\">")
+        .append("<select class=\"form-control\" name=\"")
         .append(fieldName)
         .append("\"");
       if (repeatable)
@@ -1071,7 +979,7 @@
            .append("</option>");
       }
 
-      sb.append("</select></td></tr>");
+      sb.append("</select></span></div><br/>");
       out.write(sb.toString());
     }
     
@@ -1218,7 +1126,7 @@
     }
 %>
 
-<dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.edit-metadata.title">
+<dspace:layout style="submission" locbar="off" navbar="off" titlekey="jsp.submit.edit-metadata.title">
 
 <%
         contextPath = request.getContextPath();
@@ -1230,33 +1138,41 @@
 
         <jsp:include page="/submit/progressbar.jsp"></jsp:include>
 
-    <h1><fmt:message key="jsp.submit.edit-metadata.heading"/></h1>
+    <h1><fmt:message key="jsp.submit.edit-metadata.heading"/>
+<%
+     //figure out which help page to display
+     if (pageNum <= 1)
+     {
+%>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#describe2\"%>"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup>
+<%
+     }
+     else
+     {
+%>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#describe3\"%>"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup>
+<%
+     }
+%>
+    </h1>
 
 <%
      //figure out which help page to display
      if (pageNum <= 1)
      {
 %>
-        <div><fmt:message key="jsp.submit.edit-metadata.info1"/>
-        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#describe2\"%>"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></div>
+        <p><fmt:message key="jsp.submit.edit-metadata.info1"/></p>
 <%
      }
      else
      {
 %>
-        <div><fmt:message key="jsp.submit.edit-metadata.info2"/>
-        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#describe3\"%>"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></div>
+        <p><fmt:message key="jsp.submit.edit-metadata.info2"/></p>
     
 <%
      }
-%>
-
-     <%-- HACK: a <center> tag seems to be the only way to convince certain --%>
-     <%--       browsers to center the table. --%>
-     <center>
-     <table>
-<%
-         int pageIdx = pageNum - 1;
+ 
+	 int pageIdx = pageNum - 1;
      DCInput[] inputs = inputSet.getPageRows(pageIdx, si.getSubmissionItem().hasMultipleTitles(),
                                                 si.getSubmissionItem().isPublishedBefore() );
      for (int z = 0; z < inputs.length; z++)
@@ -1306,20 +1222,20 @@
                    if(si.getJumpToField()==null || si.getJumpToField().length()==0)
                                 si.setJumpToField(fieldName);
 
-                   String req = "<tr><td colspan=\"4\" class=\"submitFormWarn\">" +
+                   String req = "<div class=\"alert alert-warning\">" +
                                                         inputs[z].getWarning() +
-                                                        "<a name=\""+fieldName+"\"></a></td></tr>";
+                                                        "<a name=\""+fieldName+"\"></a></div>";
                    out.write(req);
-                }
+           }
        }
        else
        {
                         //print out hints, if not null
            if(inputs[z].getHints() != null)
            {
-                        String hints = "<tr><td colspan=\"4\" class=\"submitFormHelp\">" +
+                        String hints = "<div class=\"alert alert-info\">" +
                                                         inputs[z].getHints() +
-                                                        "</td></tr>";
+                                                        "</div>";
 
                 out.write(hints);
                 }
@@ -1397,57 +1313,30 @@
        if (hasVocabulary(vocabulary) &&  !readonly)
        {
 %>
-
-                <tr>
-                        <td>&nbsp;</td>
-                        <td colspan="3" class="submitFormHelpControlledVocabularies">
+						<span class="alert alert-info">
                                 <dspace:popup page="/help/index.html#controlledvocabulary"><fmt:message key="jsp.controlledvocabulary.controlledvocabulary.help-link"/></dspace:popup>
-                        </td>
-                </tr>
-
+						</span>
 <%
                 }
-%>
-<%-- HACK: Using this line to give the browser hints as to the widths of cells --%>
-       <tr>
-         <td width="40%">&nbsp;</td>
-         <td colspan="2" width="5%">&nbsp;</td>
-         <td width="40%">&nbsp;</td>
-       </tr>
-
-<%
      } // end of 'for rows'
 %>
-            </table>
-        </center>
         
-<%-- HACK:  Need a space - is there a nicer way to do this than <BR> or a --%>
-<%--        blank <P>? --%>
-        <p>&nbsp;</p>
-
 <%-- Hidden fields needed for SubmissionController servlet to know which item to deal with --%>
         <%= SubmissionController.getSubmissionParameters(context, request) %>
-        <center>
-            <table border="0" width="80%">
-                <tr>
-                    <td width="100%">&nbsp;</td>
-                <%  //if not first page & step, show "Previous" button
-                                        if(!(SubmissionController.isFirstStep(request, si) && pageNum<=1))
-                                        { %>
-                    <td>
-                                                <input type="submit" name="<%=AbstractProcessingStep.PREVIOUS_BUTTON%>" value="<fmt:message key="jsp.submit.edit-metadata.previous"/>" />
-                    </td>
-                                <%  } %>
-                    <td>
-                        <input type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.edit-metadata.next"/>"/>
-                    </td>
-                    <td>&nbsp;&nbsp;&nbsp;</td>
-                    <td align="right">
-                        <input type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.edit-metadata.cancelsave"/>"/>
-                    </td>
-                </tr>
-            </table>
-        </center>
+<div class="row">
+<%  //if not first page & step, show "Previous" button
+		if(!(SubmissionController.isFirstStep(request, si) && pageNum<=1))
+		{ %>
+			<div class="col-md-6 pull-right btn-group">
+				<input class="btn btn-default col-md-4" type="submit" name="<%=AbstractProcessingStep.PREVIOUS_BUTTON%>" value="<fmt:message key="jsp.submit.edit-metadata.previous"/>" />
+				<input class="btn btn-default col-md-4" type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.edit-metadata.cancelsave"/>"/>
+				<input class="btn btn-primary col-md-4" type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.edit-metadata.next"/>"/>
+    <%  } else { %>
+    		<div class="col-md-6 pull-right btn-group">
+                <input class="btn btn-default col-md-6" type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.edit-metadata.cancelsave"/>"/>
+				<input class="btn btn-primary col-md-6" type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.edit-metadata.next"/>"/>
+    <%  }  %>
+    		</div><br/>
     </form>
 
 </dspace:layout>
