@@ -458,12 +458,12 @@
 
   <servlet>
     <servlet-name>version-item</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.admin.VersionItemServlet</servlet-class>
+    <servlet-class>org.dspace.app.webui.servlet.VersionItemServlet</servlet-class>
   </servlet>
 
   <servlet>
     <servlet-name>version-history</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.admin.VersionHistoryServlet</servlet-class>
+    <servlet-class>org.dspace.app.webui.servlet.VersionHistoryServlet</servlet-class>
   </servlet>
     	
   <servlet-mapping>

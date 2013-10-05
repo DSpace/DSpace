@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.webui.servlet.admin;
+package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.app.webui.util.VersionUtil;
@@ -24,16 +23,16 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 
 /**
- * 
+ * Servlet to handling the versioning of the item
  * 
  * @author Pascarelli Luigi Andrea
  * @version $Revision$
  */
-public class VersionItemsServlet extends DSpaceServlet
+public class VersionItemServlet extends DSpaceServlet
 {
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(VersionItemsServlet.class);
+    private static Logger log = Logger.getLogger(VersionItemServlet.class);
 
 
     protected void doDSGet(Context context, HttpServletRequest request, HttpServletResponse response)
@@ -41,21 +40,29 @@ public class VersionItemsServlet extends DSpaceServlet
             AuthorizeException
     {
         Integer itemID = UIUtil.getIntParameter(request,"itemID");
-        Item item = Item.find(context,itemID);        
-        if (UIUtil.getSubmitButton(request,"submit")!=null){
+        Item item = Item.find(context,itemID);
+        String submit = UIUtil.getSubmitButton(request,"submit");
+        if (submit!=null && submit.equals("submit")){
             request.setAttribute("itemID", itemID);
             JSPManager.showJSP(request, response,
-                    "/dspace-admin/version-summary.jsp");
+                    "/tools/version-summary.jsp");
             return;
         }
         
         String summary = request.getParameter("summary");
-        if (UIUtil.getSubmitButton(request,"submit_version")!=null){                        
+        if (submit!=null && submit.equals("submit_version")){                        
             Integer wsid = VersionUtil.processCreateNewVersion(context, itemID, summary);            
-            response.sendRedirect(request.getContextPath()+"/submit?workspaceID=" + wsid);         
+            response.sendRedirect(request.getContextPath()+"/submit?resume=" + wsid);
+            context.complete();
+            return;
         }
-        else if (UIUtil.getSubmitButton(request,"submit_update_version")!=null){
-            VersionUtil.processUpdateVersion(context, itemID, summary);
+        else if (submit!=null && submit.equals("submit_update_version")){
+            String versionID = request.getParameter("versionID");
+            request.setAttribute("itemID", itemID);
+            request.setAttribute("versionID", versionID);
+            JSPManager.showJSP(request, response,
+                    "/tools/version-update-summary.jsp");
+            return;
         }
         
         //Send us back to the item page if we cancel !
@@ -71,7 +78,7 @@ public class VersionItemsServlet extends DSpaceServlet
     {
         // If this is not overridden, we invoke the raw HttpServlet "doGet" to
         // indicate that POST is not supported by this servlet.
-        super.doGet(request, response);
+        doDSGet(UIUtil.obtainContext(request), request, response);
     }
 
 }

@@ -22,20 +22,16 @@
 
 
 <%
-    String itemID = (String)request.getAttribute("itemID");
+    Integer itemID = (Integer)request.getAttribute("itemID");	
 	request.setAttribute("LanguageSwitch", "hide");
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.version-summary.title"
-               navbar="admin"
-               locbar="link"
-               parenttitlekey="jsp.administer"
-               parentlink="/dspace-admin">
+<dspace:layout titlekey="jsp.dspace-admin.version-summary.title">
 
     <h1><fmt:message key="jsp.dspace-admin.version-summary.heading"/></h1>
 
- <form action="<%= request.getContextPath() %>/tools/version-item" method="post">
-
+ <form action="<%= request.getContextPath() %>/tools/version" method="post">
+		<input type="hidden" name="itemID" value="<%= itemID %>" />
         <p><fmt:message key="jsp.dspace-admin.version-summary.text3"><fmt:param><%= itemID%></fmt:param></fmt:message></p>
         <center>
             <table>
@@ -49,7 +45,7 @@
                     <%-- <input type="submit" name="submit_save" value="Save"> --%>
                     <input type="submit" name="submit_version" value="<fmt:message key="jsp.version.version-summary.submit_version"/>" />
                     <%-- <input type="submit" name="cancel" value="Cancel"> --%>
-                    <input type="submit" name="cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
+                    <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
                     </td>
                 </tr>
             </table>

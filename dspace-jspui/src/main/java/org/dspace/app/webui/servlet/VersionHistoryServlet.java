@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.webui.servlet.admin;
+package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -15,16 +15,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.app.webui.util.VersionUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.utils.DSpace;
+import org.dspace.versioning.Version;
+import org.dspace.versioning.VersionHistory;
 
 /**
- * 
+ * Servlet for handling the operations in the version history page
  * 
  * @author Pascarelli Luigi Andrea
  * @version $Revision$
@@ -41,38 +44,79 @@ public class VersionHistoryServlet extends DSpaceServlet
     {
         Integer itemID = UIUtil.getIntParameter(request, "itemID");
         String versionID = request.getParameter("versionID");
+
         Item item = Item.find(context, itemID);
 
-        if (UIUtil.getSubmitButton(request, "submit_cancel") != null)
+        if (item == null
+                || !AuthorizeManager.isAdmin(context,
+                        item.getOwningCollection()))
+        {
+            // Check if only administrators can view the item history
+            if (new DSpace().getConfigurationService().getPropertyAsType(
+                    "versioning.item.history.view.admin", true))
+            {
+                throw new AuthorizeException();
+            }
+
+        }
+
+        // manage if versionID is not came by request
+        VersionHistory history = VersionUtil.retrieveVersionHistory(context,
+                item);
+        if (versionID == null || versionID.isEmpty())
+        {
+            Version version = history.getVersion(item);
+            if (version != null)
+            {
+                versionID = String.valueOf(version.getVersionId());
+            }
+        }
+        String submit = UIUtil.getSubmitButton(request, "submit");
+        if (submit != null && submit.equals("submit_cancel"))
         {
             // Pressed the cancel button, redirect us to the item page
             response.sendRedirect(request.getContextPath() + "/handle/"
                     + item.getHandle());
             context.complete();
+            return;
         }
-        else if (UIUtil.getSubmitButton(request, "submit_delete") != null)
+        else if (submit != null && submit.equals("submit_delete"))
         {
             String[] versionIDs = request.getParameterValues("remove");
             Integer result = doDeleteVersions(request, itemID, versionIDs);
             if (result != null)
             {
+                response.sendRedirect(request.getContextPath()
+                        + "/tools/history?delete=true&itemID="+history.getLatestVersion().getItemID());
+            }
+            else
+            {
                 // We have removed everything, redirect us to the home page !
                 response.sendRedirect(request.getContextPath());
-                context.complete();
-                return;
             }
+            context.complete();
+            return;
 
         }
-        else if (UIUtil.getSubmitButton(request, "submit_restore") != null)
+        else if (submit != null && submit.equals("submit_restore"))
         {
 
             doRestoreVersion(request, itemID, versionID);
         }
-        else if (UIUtil.getSubmitButton(request, "submit_update") != null)
+        else if (submit != null && submit.equals("submit_update"))
         {
             doUpdateVersion(request, itemID, versionID);
+            response.sendRedirect(request.getContextPath()
+                    + "/tools/history?itemID=" + itemID + "&versionID="
+                    + versionID);
+            context.complete();
+            return;
         }
 
+        request.setAttribute("item", item);
+        request.setAttribute("itemID", itemID);
+        request.setAttribute("versionID", versionID);
+        JSPManager.showJSP(request, response, "/tools/version-history.jsp");
     }
 
     protected void doDSPost(Context context, HttpServletRequest request,
@@ -81,11 +125,11 @@ public class VersionHistoryServlet extends DSpaceServlet
     {
         // If this is not overridden, we invoke the raw HttpServlet "doGet" to
         // indicate that POST is not supported by this servlet.
-        super.doGet(request, response);
+        doDSGet(UIUtil.obtainContext(request), request, response);
     }
 
     /**
-     * Confirm and delete the given version(s)
+     * Delete the given version(s)
      * 
      * @throws IOException
      * @throws AuthorizeException
@@ -121,7 +165,7 @@ public class VersionHistoryServlet extends DSpaceServlet
     }
 
     /**
-     * Update the given version
+     * Update the summary of the given version
      * 
      * @throws IOException
      * @throws AuthorizeException
