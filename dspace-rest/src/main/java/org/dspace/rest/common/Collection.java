@@ -1,10 +1,14 @@
 package org.dspace.rest.common;
 
+import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.Context;
 
+import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +22,8 @@ import java.util.List;
  */
 @XmlRootElement(name = "collection")
 public class Collection {
+    Logger log = Logger.getLogger(Collection.class);
+
     //Internal value
     private Integer collectionID;
 
@@ -81,88 +87,68 @@ public class Collection {
     //Calculated
     private Integer numberItems;
 
-    private static Context context;
-
     public Collection(){}
 
-    public Collection(org.dspace.content.Collection collection, String expand) {
-       setup(collection, expand);
+    public Collection(org.dspace.content.Collection collection, String expand, Context context) throws SQLException, WebApplicationException{
+        setup(collection, expand, context);
     }
 
-    public Collection(Integer collectionID, String expand) {
-        try {
-            if(context == null || !context.isValid() ) {
-                context = new Context();
-            }
-
-            org.dspace.content.Collection collection = org.dspace.content.Collection.find(context, collectionID);
-            setup(collection, expand);
-
-        } catch (Exception e) {
-            //TODO Handle exceptions
-            //throw e;
-
-        }
-    }
-
-    private void setup(org.dspace.content.Collection collection, String expand) {
+    private void setup(org.dspace.content.Collection collection, String expand, Context context) throws SQLException{
         List<String> expandFields = new ArrayList<String>();
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
         }
 
-        try {
-            setCollectionID(collection.getID());
-            setName(collection.getName());
-            setHandle(collection.getHandle());
+        setCollectionID(collection.getID());
+        setName(collection.getName());
+        setHandle(collection.getHandle());
 
-            if(expandFields.contains("parentCommunityIDList") || expandFields.contains("all")) {
-                org.dspace.content.Community[] parentCommunities = collection.getCommunities();
-                for(org.dspace.content.Community parentCommunity : parentCommunities) {
-                    this.addParentCommunityIDList(parentCommunity.getID());
-                }
-            } else {
-                this.addExpand("parentCommunityIDList");
+        if(expandFields.contains("parentCommunityIDList") || expandFields.contains("all")) {
+            org.dspace.content.Community[] parentCommunities = collection.getCommunities();
+            for(org.dspace.content.Community parentCommunity : parentCommunities) {
+                this.addParentCommunityIDList(parentCommunity.getID());
             }
-
-            if(expandFields.contains("parentCommunityID") | expandFields.contains("all")) {
-                org.dspace.content.Community parentCommunity = (org.dspace.content.Community) collection.getParentObject();
-                this.setParentCommunityID(parentCommunity.getID());
-            } else {
-                this.addExpand("parentCommunityID");
-            }
-
-            if(expandFields.contains("items") || expandFields.contains("all")) {
-                ItemIterator childItems = collection.getItems();
-                items = new ArrayList<LiteItem>();
-                while(childItems.hasNext()) {
-                    org.dspace.content.Item item = childItems.next();
-                    items.add(new LiteItem(item));
-                }
-            } else {
-                this.addExpand("items");
-            }
-
-            if(expandFields.contains("license") || expandFields.contains("all")) {
-                setLicense(collection.getLicense());
-            } else {
-                this.addExpand("license");
-            }
-
-            if(!expandFields.contains("all")) {
-                this.addExpand("all");
-            }
-
-            if(collection.getLogo() != null) {
-                this.setLogoID(collection.getLogo().getID());
-            }
-
-            this.setNumberItems(collection.countItems());
-            //collection.getMetadata()
-        } catch (Exception e) {
-
+        } else {
+            this.addExpand("parentCommunityIDList");
         }
 
+        if(expandFields.contains("parentCommunityID") | expandFields.contains("all")) {
+            org.dspace.content.Community parentCommunity = (org.dspace.content.Community) collection.getParentObject();
+            this.setParentCommunityID(parentCommunity.getID());
+        } else {
+            this.addExpand("parentCommunityID");
+        }
+
+        //TODO: Item paging. limit, offset/page
+        if(expandFields.contains("items") || expandFields.contains("all")) {
+            ItemIterator childItems = collection.getItems();
+            items = new ArrayList<LiteItem>();
+            while(childItems.hasNext()) {
+                org.dspace.content.Item item = childItems.next();
+                if(AuthorizeManager.authorizeActionBoolean(context, item, org.dspace.core.Constants.READ)) {
+                    items.add(new LiteItem(item));
+                }
+            }
+        } else {
+            this.addExpand("items");
+        }
+
+        if(expandFields.contains("license") || expandFields.contains("all")) {
+            setLicense(collection.getLicense());
+        } else {
+            this.addExpand("license");
+        }
+
+        if(!expandFields.contains("all")) {
+            this.addExpand("all");
+        }
+
+        if(collection.getLogo() != null) {
+            this.setLogoID(collection.getLogo().getID());
+        }
+
+        this.setNumberItems(collection.countItems());
+        //collection.getMetadata()
     }
 
     public Integer getCollectionID() {

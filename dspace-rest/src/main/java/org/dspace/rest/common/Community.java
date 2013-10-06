@@ -1,6 +1,8 @@
 package org.dspace.rest.common;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.Context;
 
 import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.annotation.XmlElement;
@@ -52,11 +54,11 @@ public class Community {
 
     public Community(){}
 
-    public Community(org.dspace.content.Community community, String expand) throws SQLException, WebApplicationException{
-        setup(community, expand);
+    public Community(org.dspace.content.Community community, String expand, Context context) throws SQLException, WebApplicationException{
+        setup(community, expand, context);
     }
 
-    private void setup(org.dspace.content.Community community, String expand) throws SQLException{
+    private void setup(org.dspace.content.Community community, String expand, Context context) throws SQLException{
         List<String> expandFields = new ArrayList<String>();
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
@@ -85,7 +87,11 @@ public class Community {
             org.dspace.content.Collection[] collectionArray = community.getCollections();
             collections = new ArrayList<LiteCollection>();
             for(org.dspace.content.Collection collection : collectionArray) {
-                collections.add(new LiteCollection(collection));
+                if(AuthorizeManager.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {
+                    collections.add(new LiteCollection(collection));
+                } else {
+                    log.info("Omitted restricted collection: " + collection.getID() + " _ " + collection.getName());
+                }
             }
         } else {
             this.addExpand("subCollections");
@@ -95,7 +101,11 @@ public class Community {
             org.dspace.content.Community[] communityArray = community.getSubcommunities();
             subCommunities = new ArrayList<LiteCommunity>();
             for(org.dspace.content.Community subCommunity : communityArray) {
-                subCommunities.add(new LiteCommunity(subCommunity));
+                if(AuthorizeManager.authorizeActionBoolean(context, subCommunity, org.dspace.core.Constants.READ)) {
+                    subCommunities.add(new LiteCommunity(subCommunity));
+                } else {
+                    log.info("Omitted restricted subCommunity: " + subCommunity.getID() + " _ " + subCommunity.getName());
+                }
             }
         } else {
             this.addExpand("subCommunities");

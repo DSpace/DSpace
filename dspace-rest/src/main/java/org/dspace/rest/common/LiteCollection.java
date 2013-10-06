@@ -27,7 +27,7 @@ public class LiteCollection {
 
     }
 
-    public LiteCollection(org.dspace.content.Collection collection) {
+    public LiteCollection(org.dspace.content.Collection collection){
         this.collectionID = collection.getID();
         this.name = collection.getName();
         this.handle = collection.getHandle();

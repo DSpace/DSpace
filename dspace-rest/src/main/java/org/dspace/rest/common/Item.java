@@ -1,11 +1,15 @@
 package org.dspace.rest.common;
 
+import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bundle;
 import org.dspace.content.DCValue;
 import org.dspace.core.Context;
 
+import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,6 +23,8 @@ import java.util.List;
  */
 @XmlRootElement(name = "item")
 public class Item {
+    Logger log = Logger.getLogger(Item.class);
+
     Integer itemID;
 
     String handle;
@@ -48,28 +54,13 @@ public class Item {
 
     //Bitstreams
 
-    private static Context context;
-
     public Item(){}
 
-    public Item(org.dspace.content.Item item, String expand) {
-        setup(item, expand);
+    public Item(org.dspace.content.Item item, String expand, Context context) throws SQLException, WebApplicationException{
+        setup(item, expand, context);
     }
 
-    public Item(Integer itemID, String expand) {
-        try {
-            if(context == null || !context.isValid()) {
-                context = new Context();
-            }
-
-            org.dspace.content.Item item = org.dspace.content.Item.find(context, itemID);
-            setup(item, expand);
-        } catch(Exception e) {
-            //TODO
-        }
-    }
-
-    private void setup(org.dspace.content.Item item, String expand) {
+    private void setup(org.dspace.content.Item item, String expand, Context context) throws SQLException{
         List<String> expandFields = new ArrayList<String>();
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
@@ -77,36 +68,34 @@ public class Item {
 
         metadata = new Metadata();
 
-        try {
-            this.setItemID(item.getID());
-            DCValue[] allMetadata = item.getMetadata(org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY);
-            metadata.setDCValues(Arrays.asList(allMetadata));
+        this.setItemID(item.getID());
+        DCValue[] allMetadata = item.getMetadata(org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY);
+        //Check for non-public metadata, i.e. provenance
+        metadata.setDCValues(Arrays.asList(allMetadata));
 
-            this.setHandle(item.getHandle());
+        this.setHandle(item.getHandle());
 
-            this.setName(item.getName());
+        this.setName(item.getName());
 
-            this.setArchived(Boolean.toString(item.isArchived()));
-            this.setWithdrawn(Boolean.toString(item.isWithdrawn()));
-            this.setLastModified(item.getLastModified().toString());
+        this.setArchived(Boolean.toString(item.isArchived()));
+        this.setWithdrawn(Boolean.toString(item.isWithdrawn()));
+        this.setLastModified(item.getLastModified().toString());
 
-            this.setOwningCollectionID(item.getOwningCollection().getID());
-            this.setOwningCollectionName(item.getOwningCollection().getName());
+        this.setOwningCollectionID(item.getOwningCollection().getID());
+        this.setOwningCollectionName(item.getOwningCollection().getName());
 
-            //Should be optional...
-            bitstreams = new ArrayList<Bitstream>();
-            Bundle[] bundles = item.getBundles();
-            for(Bundle bundle : bundles) {
-                org.dspace.content.Bitstream[] itemBitstreams = bundle.getBitstreams();
-                for(org.dspace.content.Bitstream itemBitstream : itemBitstreams) {
+        //Should be optional...
+        //maybe TODO: Limit the number of response bitstreams in case of mega#
+        bitstreams = new ArrayList<Bitstream>();
+        Bundle[] bundles = item.getBundles();
+        for(Bundle bundle : bundles) {
+            //TODO, don't show license...
+            org.dspace.content.Bitstream[] itemBitstreams = bundle.getBitstreams();
+            for(org.dspace.content.Bitstream itemBitstream : itemBitstreams) {
+                if(AuthorizeManager.authorizeActionBoolean(context, itemBitstream, org.dspace.core.Constants.READ)) {
                     bitstreams.add(new Bitstream(itemBitstream, expand));
                 }
-
             }
-
-
-        } catch (Exception e) {
-
         }
     }
 

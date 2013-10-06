@@ -1,12 +1,7 @@
 package org.dspace.rest.common;
 
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -45,6 +40,7 @@ public class Bitstream {
                 context = new Context();
             }
 
+            //TODO Auth check?
             org.dspace.content.Bitstream bitstream = org.dspace.content.Bitstream.find(context, bitstreamID);
             setup(bitstream, expand);
 
@@ -69,10 +65,6 @@ public class Bitstream {
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-    }
-
-    public InputStream retrieve(org.dspace.content.Bitstream bitstream) throws SQLException, IOException, AuthorizeException {
-        return bitstream.retrieve();
     }
 
     public String getBundleName() {

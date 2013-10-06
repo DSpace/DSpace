@@ -60,7 +60,7 @@ public class CommunitiesResource {
             for(org.dspace.content.Community community : topCommunities) {
                 if(AuthorizeManager.authorizeActionBoolean(context, community, org.dspace.core.Constants.READ)) {
                     //Only list communities that this user has access to.
-                    org.dspace.rest.common.Community restCommunity = new org.dspace.rest.common.Community(community, expand);
+                    org.dspace.rest.common.Community restCommunity = new org.dspace.rest.common.Community(community, expand, context);
                     communityArrayList.add(restCommunity);
                 }
             }
@@ -83,7 +83,7 @@ public class CommunitiesResource {
 
             org.dspace.content.Community community = org.dspace.content.Community.find(context, community_id);
             if(AuthorizeManager.authorizeActionBoolean(context, community, org.dspace.core.Constants.READ)) {
-                return new org.dspace.rest.common.Community(community, expand);
+                return new org.dspace.rest.common.Community(community, expand, context);
             } else {
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
