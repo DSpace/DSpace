@@ -1,6 +1,7 @@
 package org.dspace.rest.common;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.MetadataExposure;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bundle;
 import org.dspace.content.DCValue;
@@ -66,12 +67,17 @@ public class Item {
             expandFields = Arrays.asList(expand.split(","));
         }
 
+        this.setItemID(item.getID());
+
+        //Add Item metadata, omit restricted metadata fields (i.e. provenance).
         metadata = new Metadata();
 
-        this.setItemID(item.getID());
-        DCValue[] allMetadata = item.getMetadata(org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY);
-        //Check for non-public metadata, i.e. provenance
-        metadata.setDCValues(Arrays.asList(allMetadata));
+        DCValue[] dcvs = item.getMetadata(org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY);
+        for (DCValue dcv : dcvs) {
+            if (!MetadataExposure.isHidden(context, dcv.schema, dcv.element, dcv.qualifier)) {
+                metadata.addMetadataEntry(new MetadataEntry(dcv.getField(), dcv.value));
+            }
+        }
 
         this.setHandle(item.getHandle());
 

@@ -24,6 +24,14 @@ public class Metadata {
         return fields;
     }
 
+    public void addMetadataEntry(MetadataEntry entry) {
+        if(fields == null) {
+            fields = new ArrayList<MetadataEntry>();
+        }
+
+        fields.add(entry);
+    }
+
     public void setDCValues(List<DCValue> dcValues) {
         fields = new ArrayList<MetadataEntry>();
         for(DCValue dcValue : dcValues) {
