@@ -20,7 +20,7 @@
 
 <% request.setAttribute("LanguageSwitch", "hide"); %>
 
-<dspace:layout titlekey="jsp.submit.license-rejected.title">
+<dspace:layout style="submission" navbar="off" locbar="off" titlekey="jsp.submit.license-rejected.title">
 
     <%-- <h1>Submit: License Rejected</h1> --%>
 	<h1><fmt:message key="jsp.submit.license-rejected.heading"/></h1>

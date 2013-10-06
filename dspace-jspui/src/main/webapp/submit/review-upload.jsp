@@ -51,13 +51,10 @@
 <%-- ====================================================== --%>
 <%--                    UPLOADED_FILES                      --%>
 <%-- ====================================================== --%>
-                    <table width="100%">
-                        <tr>
-                            <td width="100%">
-                                <table>
-                                    <tr>
-                                        <td class="metadataFieldLabel"><%= (subInfo.getSubmissionItem().hasMultipleFiles() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.upload1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.upload2")) %></td>
-                                        <td class="metadataFieldValue">
+<div class="col-md-10">
+                                    <div class="row">
+                                        <span class="metadataFieldLabel col-md-4"><%= (subInfo.getSubmissionItem().hasMultipleFiles() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.upload1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.upload2")) %></span>
+                                        <span class="metadataFieldValue col-md-8">
 <%
     Bitstream[] bitstreams = item.getNonInternalBitstreams();
 
@@ -98,17 +95,16 @@
 <%		
 	}
 %>
-                                        </td>
-                                    </tr>
-                                </table>
-                    </td>
-                            <td valign="middle" align="right">
+                                        </span>
+                                    </div>
+                                </div>    
+                            <div class="col-md-2">
 <%
     // Can't edit files in workflow mode
     if(!subInfo.isInWorkflow())
     {
 %>
-                                    <input type="submit" name="submit_jump_<%=stepJump%>"
+                                    <input class="btn btn-default" type="submit" name="submit_jump_<%=stepJump%>"
                                      value="<%= (subInfo.getSubmissionItem().hasMultipleFiles() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.button.upload1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.button.upload2")) %>" />
 <%
     }
@@ -116,12 +112,9 @@
     {
 %>
 
-                                    <input type="submit" name="submit_jump_<%=stepJump%>"
+                                    <input class="btn btn-default" type="submit" name="submit_jump_<%=stepJump%>"
                                      value="<fmt:message key="jsp.submit.review.button.edit"/>" />
 <%
     }
 %>
-                            </td>
-                  </tr>
-                </table>
-
+                  </div>
