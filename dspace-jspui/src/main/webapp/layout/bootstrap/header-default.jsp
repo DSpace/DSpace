@@ -80,7 +80,7 @@
 %>
         
 	<script type='text/javascript' src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.10.2.min.js"></script>
-	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery-ui-1.10.3.custom.min.js'></script>
+	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.10.3.custom.min.js'></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/bootstrap/bootstrap.min.js'></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/holder.js'></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>
@@ -136,7 +136,7 @@
 %>
 </header>
 
-<main id="content" role="main" style="padding-bottom:50px;">
+<main id="content" role="main" style="padding-bottom:60px;">
 <div class="container banner">
 	<div class="row">
 		<div class="col-md-9 brand">
