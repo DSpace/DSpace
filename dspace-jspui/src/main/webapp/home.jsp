@@ -184,12 +184,12 @@ if (communities != null && communities.length != 0)
 
     for (int i = 0; i < communities.length; i++)
     {
-%><div class="list-group-item  row">
+%><div class="list-group-item row">
 <%  
 		Bitstream logo = communities[i].getLogo();
 		if (logo != null) { %>
 	<div class="col-md-3">
-        <img alt="Logo" style="max-width:100%;" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" /> 
+        <img alt="Logo" class="img-responsive" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" /> 
 	</div>
 	<div class="col-md-9">
 <% } else { %>
