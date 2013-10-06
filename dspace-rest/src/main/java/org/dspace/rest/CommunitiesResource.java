@@ -1,9 +1,11 @@
 package org.dspace.rest;
 
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -42,6 +44,8 @@ public class CommunitiesResource {
         return "<html><title>Hello!</title><body>Communities:<br/>" + everything.toString() + ".</body></html> ";
     }
 
+    //TODO Respond to html for communities/:id
+
     @GET
     @Path("/")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -54,14 +58,17 @@ public class CommunitiesResource {
             org.dspace.content.Community[] topCommunities = org.dspace.content.Community.findAllTop(context);
             ArrayList<org.dspace.rest.common.Community> communityArrayList = new ArrayList<org.dspace.rest.common.Community>();
             for(org.dspace.content.Community community : topCommunities) {
-                org.dspace.rest.common.Community restCommunity = new org.dspace.rest.common.Community(community, expand);
-                communityArrayList.add(restCommunity);
+                if(AuthorizeManager.authorizeActionBoolean(context, community, org.dspace.core.Constants.READ)) {
+                    //Only list communities that this user has access to.
+                    org.dspace.rest.common.Community restCommunity = new org.dspace.rest.common.Community(community, expand);
+                    communityArrayList.add(restCommunity);
+                }
             }
 
             return communityArrayList.toArray(new org.dspace.rest.common.Community[0]);
 
         } catch (SQLException e) {
-            return null;
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -69,6 +76,19 @@ public class CommunitiesResource {
     @Path("/{community_id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public org.dspace.rest.common.Community getCommunity(@PathParam("community_id") Integer community_id, @QueryParam("expand") String expand) {
-        return new org.dspace.rest.common.Community(community_id, expand);
+        try {
+            if(context == null || !context.isValid() ) {
+                context = new org.dspace.core.Context();
+            }
+
+            org.dspace.content.Community community = org.dspace.content.Community.find(context, community_id);
+            if(AuthorizeManager.authorizeActionBoolean(context, community, org.dspace.core.Constants.READ)) {
+                return new org.dspace.rest.common.Community(community, expand);
+            } else {
+                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+            }
+        } catch (SQLException e) {
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
     }
 }
