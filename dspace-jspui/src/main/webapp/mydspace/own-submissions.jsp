@@ -31,7 +31,7 @@
     Item[] items = (Item[]) request.getAttribute("items");
 %>
 
-<dspace:layout locbar="link"
+<dspace:layout style="submission" locbar="link"
                parentlink="/mydspace"
                parenttitlekey="jsp.mydspace"
                titlekey="jsp.mydspace">
