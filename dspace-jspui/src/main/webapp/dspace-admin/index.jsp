@@ -41,12 +41,12 @@
     {
         context = UIUtil.obtainContext(request);
 %>
-<dspace:layout locbar="link" navbar="admin" titlekey="jsp.administer">
+<dspace:layout style="submission" locbar="link" navbar="admin" titlekey="jsp.administer">
 
     <%-- <h1>Administration Tools</h1> --%>
     <h1><fmt:message key="jsp.dspace-admin.index.heading"/></h1>
     
-    <%-- <p>Please select an operation from the navigation bar on the left.</p> --%>
+    <%-- <p>Please select an operation from the main menu bar.</p> --%>
     <p><fmt:message key="jsp.dspace-admin.index.text"/></p>
 </dspace:layout>
 <%
