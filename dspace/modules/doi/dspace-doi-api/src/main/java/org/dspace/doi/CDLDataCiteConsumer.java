@@ -51,8 +51,10 @@ public class CDLDataCiteConsumer implements Consumer {
                             DOI aDOI = new DOI(doi, item);
                             String target = aDOI.getTargetURL().toString();
                             String response = dataCiteService.update(aDOI.toID(), target, metadatalist);
-
-                            if(response.contains("bad request") || response.contains("BAD REQUEST") || response.contains("UNAUTHORIZED")){
+                            if("datacite.notConnected".equals(response)) {
+                                // not connected, silently ignore
+                            }
+                            else if(response.contains("bad request") || response.contains("BAD REQUEST") || response.contains("UNAUTHORIZED")){
                                 dataCiteService.emailException(response, doi, "update");
                             }
                             else if(!response.contains("OK") && !response.contains("success") && !response.contains("SUCCESS")){

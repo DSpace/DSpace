@@ -37,7 +37,11 @@ public class DryadJournalSubmissionUtils {
     public static final String JOURNAL_ID = "journalID";
     public static final String SUBSCRIPTION_PAID = "subscriptionPaid";
 
-
+    public enum RecommendedBlackoutAction {
+          BLACKOUT_TRUE
+        , BLACKOUT_FALSE
+        , JOURNAL_NOT_INTEGRATED
+    }
 
     public static final java.util.Map<String, Map<String, String>> journalProperties = new HashMap<String, Map<String, String>>();
     static{
@@ -73,8 +77,13 @@ public class DryadJournalSubmissionUtils {
         }
     }
 
+    public static Boolean shouldEnterBlackoutByDefault(Context context, Item item, Collection collection) throws SQLException {
+        RecommendedBlackoutAction action = recommendedBlackoutAction(context, item, collection);
+        return (action == RecommendedBlackoutAction.BLACKOUT_TRUE ||
+                action == RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED);
+    }
 
-    public static boolean isJournalBlackedOut(Context context, Item item, Collection collection) throws SQLException {
+    public static RecommendedBlackoutAction recommendedBlackoutAction(Context context, Item item, Collection collection) throws SQLException {
         // get Journal
         Item dataPackage=item;
         if(!isDataPackage(collection)) 
@@ -85,16 +94,27 @@ public class DryadJournalSubmissionUtils {
             journalFullName=journalFullNames[0].value;
         }
 
-	// get journal's blackout setting
         Map<String, String> values = journalProperties.get(journalFullName);
-
+        // Ignore blackout setting if journal is not (yet) integrated
+	// get journal's blackout setting
 	// journal is blacked out if its blackout setting is true or if it has no setting
+        String isIntegrated = null;
         String isBlackedOut = null;
-        if(values!=null && values.size()>0)
+        if(values!=null && values.size()>0) {
+            isIntegrated = values.get(INTEGRATED);
             isBlackedOut = values.get(PUBLICATION_BLACKOUT);
-        if(isBlackedOut==null || isBlackedOut.equals("true"))
-            return true;
-        return false;
+        }
+
+        if(isIntegrated == null || isIntegrated.equals("false")) {
+            // journal is not integrated.  Enter blackout by default
+            return RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED;
+        } else if(isBlackedOut==null || isBlackedOut.equals("true")) {
+            // journal has a blackout setting and it's set to true
+            return RecommendedBlackoutAction.BLACKOUT_TRUE;
+        } else {
+            // journal is integrated but blackout setting is false or missing
+           return RecommendedBlackoutAction.BLACKOUT_FALSE;
+        }
     }
 
 

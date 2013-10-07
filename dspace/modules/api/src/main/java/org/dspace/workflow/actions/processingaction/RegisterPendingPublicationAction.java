@@ -30,29 +30,6 @@ public class RegisterPendingPublicationAction extends ProcessingAction{
     private static final Logger log = Logger.getLogger(RegisterPendingPublicationAction.class);
 
     @Override
-    public void activate(Context c, WorkflowItem wfItem) throws SQLException {
-        try {
-            if(DryadWorkflowUtils.isDataPackage(wfItem)) {
-                Item dataPackage = wfItem.getItem();
-                String usersName = WorkflowManager.getEPersonName(c.getCurrentUser());
-                String now = DCDate.getCurrent().toString();
-                String provDescription = getProvenanceStartId() + " Entered publication blackout by " + usersName + "," +
-                        " on " + now + " (GMT) ";
-                dataPackage.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
-                dataPackage.update();
-                // Also add this provenance to the files
-                Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, dataPackage);
-                for(Item dataFile : dataFiles) {
-                    dataFile.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
-                    dataFile.update();
-                }
-            }
-        } catch (AuthorizeException e) {
-            log.error("Error while activating register pending publication action", e);
-        }
-    }
-
-    @Override
     public ActionResult execute(Context c, WorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException {
         return registerItemInBlackout(c, wfi);
     }

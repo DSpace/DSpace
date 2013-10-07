@@ -290,7 +290,12 @@ public class WorkflowManager {
             EPerson ep = i.getSubmitter();
             // Get the Locale
             Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_datapackage_archive"));
+
+            // If the item went through publication blackout,
+            //   use "submit_datapackage_blackout_archive"
+            // otherwise, use "submit_datapackage_archive"
+            String emailFilename = itemWasBlackedOut(c, i, coll) ? "submit_datapackage_blackout_archive" : "submit_datapackage_archive";
+            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, emailFilename));
 
             // Get the item handle to email to user
 //            String handle = HandleManager.findHandle(c, i);
@@ -826,13 +831,29 @@ public class WorkflowManager {
             String journal = values[0].value;
             if(journal!=null){
                 Map<String, String> properties = DryadJournalSubmissionUtils.getPropertiesByJournal(journal);
-                String emails = properties.get(DryadJournalSubmissionUtils.NOTIFY_ON_ARCHIVE);
-                String[] emails_=emails.split(",");
-                for(String emailAddr : emails_){
-                    email.addRecipient(emailAddr);
+                if(properties != null) {
+                    String emails = properties.get(DryadJournalSubmissionUtils.NOTIFY_ON_ARCHIVE);
+                    if(emails != null) {
+                        String[] emails_=emails.split(",");
+                        for(String emailAddr : emails_){
+                            email.addRecipient(emailAddr);
+                        }
+                    }
                 }
 
             }
         }
+    }
+
+    private static Boolean itemWasBlackedOut(Context c, Item item, Collection coll) {
+        DCValue provenance[] =  item.getMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en");
+        Boolean wasBlackedOut = false;
+        for(DCValue dcValue : provenance) {
+            if(dcValue.value != null)
+                if(dcValue.value.contains("Entered publication blackout")) {
+                    wasBlackedOut = true;
+                }
+            }
+        return wasBlackedOut;
     }
 }
