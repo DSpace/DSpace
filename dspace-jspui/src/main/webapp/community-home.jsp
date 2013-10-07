@@ -338,7 +338,6 @@
 %>
 
 </div>
-</div>
     <% if(editor_button || add_button)  // edit button(s)
     { %>
     <dspace:sidebar>
