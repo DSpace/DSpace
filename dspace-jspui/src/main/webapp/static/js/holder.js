@@ -1,4 +1,11 @@
 /*
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+/*
 
 Holder - 2.0 - client side image placeholders
 (c) 2012-2013 Ivan Malopinsky / http://imsky.co
