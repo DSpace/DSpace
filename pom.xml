@@ -26,7 +26,8 @@
 
     <!--Force UTF-8 encoding during build on all platforms-->
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>		
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.6</java.version> <!-- DSpace requires Java 1.6 or higher -->		
         <lucene.version>4.4.0</lucene.version>
         <solr.version>4.4.0</solr.version>
         <slf4j.version>1.6.1</slf4j.version>
@@ -41,12 +42,11 @@
       <pluginManagement>
           <plugins>
               <plugin>
-                  <!-- DSpace requires Java 1.6 or higher -->
                   <artifactId>maven-compiler-plugin</artifactId>
                   <version>2.3.2</version>
                   <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                   </configuration>
               </plugin>
               <plugin>
@@ -112,6 +112,37 @@
       <!-- These plugin settings only apply to this single POM and are not inherited
            to any submodules. -->
       <plugins>
+         <plugin>
+           <artifactId>maven-antrun-plugin</artifactId>
+           <version>1.7</version>
+           <configuration>
+             <target>
+	       <!-- Run 'native2ascii' to encode UTF-8 characters in properties files. Place the resulting file(s) in /target -->
+               <native2ascii encoding="UTF8" src="${basedir}" dest="${basedir}/target" includes="*.properties" />
+             </target>
+           </configuration>
+           <executions>
+             <execution>
+               <id>native2ascii-utf8</id>
+               <phase>generate-resources</phase>
+               <goals>
+                 <goal>run</goal>
+               </goals>
+             </execution>
+           </executions>
+           <!-- Required dependencies for native2ascii to function -->
+           <dependencies>
+             <dependency>
+               <groupId>com.sun</groupId>
+               <artifactId>tools</artifactId>
+               <version>${java.version}</version>
+               <scope>system</scope>
+               <!-- Path to tools.jar (containing native2ascii tool) is determined by a profile (see below) -->
+               <systemPath>${toolsjar}</systemPath>
+             </dependency>
+           </dependencies>
+         </plugin>
+
          <plugin>
             <artifactId>maven-release-plugin</artifactId>
             <version>2.3.2</version>
@@ -193,7 +224,8 @@
            </activation>
            <properties>
                <!-- 'root.basedir' is the relative path to the [dspace-src] root folder -->
-               <filters.file>${root.basedir}/build.properties</filters.file>
+               <!-- NOTE that we are using the copy in the target dir, which has any Unicode characters encoded (see native2ascii above) -->
+               <filters.file>${root.basedir}/target/build.properties</filters.file>
            </properties>
        </profile>
 
@@ -210,7 +242,8 @@
            </activation>
            <properties>
                 <!-- 'root.basedir' is the relative path to the [dspace-src] root folder -->
-                <filters.file>${root.basedir}/${env}.properties</filters.file>
+                <!-- NOTE that we are using the copy in the target dir, which has any Unicode characters encoded (see native2ascii above) -->
+                <filters.file>${root.basedir}/target/${env}.properties</filters.file>
            </properties>
        </profile>
 
@@ -251,6 +284,33 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <!-- Determine path to Java Tools JAR. This JAR contains the 'native2ascii' tool (required above by maven-antrun-plugin)-->
+        <!-- In most platforms Unix/Windows it's named tools.jar. But, on Mac it's classes.jar (see next profile) -->
+        <profile>
+          <id>default-java-tools</id>
+          <activation>
+            <activeByDefault>true</activeByDefault>
+            <file>
+                <exists>${java.home}/../lib/tools.jar</exists>
+            </file>
+          </activation>
+          <properties>
+            <toolsjar>${java.home}/../lib/tools.jar</toolsjar>
+          </properties>
+        </profile>
+        <profile>
+          <id>mac-java-tools</id>
+          <activation>
+            <activeByDefault>false</activeByDefault>
+            <file>
+                <exists>${java.home}/../Classes/classes.jar</exists>
+            </file>
+          </activation>
+          <properties>
+            <toolsjar>${java.home}/../Classes/classes.jar</toolsjar>
+          </properties>
         </profile>
 
 
