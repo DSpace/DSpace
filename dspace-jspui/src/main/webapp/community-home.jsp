@@ -276,7 +276,7 @@
         }
 %>
    </div>
-</div>   
+</div>
 <%
     }
 %>
@@ -328,15 +328,15 @@
 		</h4>
       <p class="collectionDescription"><%= collections[i].getMetadata("short_description") %></p>
     </div>
+  </div>  
 <%
         }
 %>
   </div>
-</div>  
+</div>
 <%
     }
 %>
-
 </div>
     <% if(editor_button || add_button)  // edit button(s)
     { %>
@@ -387,6 +387,8 @@
                  <input class="btn btn-default col-md-12" type="submit" value="<fmt:message key="jsp.general.metadataexport.button"/>" />
                </form>
 			<% } %>
+			</div>
+		</div>
   </dspace:sidebar>
     <% } %>
 </dspace:layout>
