@@ -14,24 +14,24 @@ import java.util.List;
  * Time: 12:11 PM
  * To change this template use File | Settings | File Templates.
  */
-@XmlRootElement(name = "DSpaceObject")
+@XmlRootElement(name = "dspaceobject")
 public class DSpaceObject {
-    @XmlElement(name = "ID", required = true)
+    @XmlElement()
     public Integer ID;
 
-    @XmlElement(name = "name", required = true)
+    @XmlElement()
     public String name;
 
-    @XmlElement(name = "handle")
+    @XmlElement()
     public String handle;
 
-    @XmlElement(name = "type", required = true)
+    @XmlElement()
     public String type;
 
-    @XmlElement(name = "link", required = true)
+    @XmlElement()
     public String link;
 
-    @XmlElement(name = "expand")
+    @XmlElement()
     public List<String> expand = new ArrayList<String>();
 
     public DSpaceObject() {
