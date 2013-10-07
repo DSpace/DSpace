@@ -51,7 +51,7 @@
                 DataCite (1)
                 Template Call for DOI identifier.
             --> 
-            <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='identifier' and starts-with(., 'doi')]" />
+            <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='identifier' and starts-with(., 'http://dx.doi.org/')]" />
 
             <!-- 
                 DataCite (2)
@@ -169,9 +169,9 @@
                  DSpace object a DOI is reserved for. See below for further 
                  information.
             -->
-            <xsl:if test="//dspace:field[@mdschema='dc' and @element='identifier' and not(starts-with(., 'doi:'))]">
+            <xsl:if test="//dspace:field[@mdschema='dc' and @element='identifier' and not(starts-with(., 'http://dx.doi.org/'))]">
                 <xsl:element name="alternateIdentifiers">
-                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='identifier' and not(starts-with(., 'doi:'))]" />
+                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='identifier' and not(starts-with(., 'http://dx.doi.org/'))]" />
                 </xsl:element>
             </xsl:if>
 
@@ -211,9 +211,9 @@
     
 
     <!-- Add doi identifier information. -->
-    <xsl:template match="dspace:field[@mdschema='dc' and @element='identifier' and starts-with(., 'doi')]">
+    <xsl:template match="dspace:field[@mdschema='dc' and @element='identifier' and starts-with(., 'http://dx.doi.org/')]">
         <identifier identifierType="DOI">
-            <xsl:value-of select="substring(., 5)"/>
+            <xsl:value-of select="substring(., 19)"/>
         </identifier>
     </xsl:template>
     
@@ -377,7 +377,7 @@
         resolveUrlToHandle(context, altId) until one is recognized or all have
         been tested.
     -->
-    <xsl:template match="//dspace:field[@mdschema='dc' and @element='identifier' and not(starts-with(., 'doi:'))]">
+    <xsl:template match="//dspace:field[@mdschema='dc' and @element='identifier' and not(starts-with(., 'http://dx.doi.org/'))]">
         <xsl:element name="alternateIdentifier">
             <xsl:if test="@qualifier">
                 <xsl:attribute name="alternateIdentifierType"><xsl:value-of select="@qualifier" /></xsl:attribute>
