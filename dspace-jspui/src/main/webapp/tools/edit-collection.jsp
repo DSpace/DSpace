@@ -132,7 +132,7 @@
     }
 %>
 
-<dspace:layout titlekey="jsp.tools.edit-collection.title"
+<dspace:layout style="submission" titlekey="jsp.tools.edit-collection.title"
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
@@ -279,8 +279,8 @@
 <%      if (wfGroups[i] == null) { %>
                     <input class="btn btn-success col-md-12" type="submit" name="submit_wf_create_<%= i + 1 %>" value="<fmt:message key="jsp.tools.edit-collection.form.button.create"/>" />
 <%      } else { %>
-                    <input class="btn btn-default" type="submit" name="submit_wf_edit_<%= i + 1 %>" value="<fmt:message key="jsp.tools.edit-collection.form.button.edit"/>" />
-                    <input class="btn btn-danger" type="submit" name="submit_wf_delete_<%= i + 1 %>" value="<fmt:message key="jsp.tools.edit-collection.form.button.delete"/>" />
+                    <input class="btn btn-default col-md-6" type="submit" name="submit_wf_edit_<%= i + 1 %>" value="<fmt:message key="jsp.tools.edit-collection.form.button.edit"/>" />
+                    <input class="btn btn-danger col-md-6" type="submit" name="submit_wf_delete_<%= i + 1 %>" value="<fmt:message key="jsp.tools.edit-collection.form.button.delete"/>" />
 <%      } %>
 				</span>
 			</div><br/>
