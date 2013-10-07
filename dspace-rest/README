@@ -1,9 +1,6 @@
-A RESTful web services API for DSpace.
+A RESTful web services API for DSpace, built using JAX-RS1 JERSEY.
 
-Built on JERSEY
-
-A work in progress by Peter Dietz.
-
+Getting Started
 mvn clean package
 #If you run into an issue with Maven, try manually importing the Jar/War.
 mvn install:install-file -DgroupId=org.dspace -DartifactId=dspace-rest -Dversion=4.0-SNAPSHOT -Dclassifier=classes -Dpackaging=jar -Dfile=dspace-rest/target/dspace-rest.war
@@ -12,21 +9,43 @@ ant update
 
 
 Configure tomcat to know about the rest webapp.
- /path/to/tomcat/conf/server.xml
  <Context path="/rest"  docBase="/dspace/webapps/rest"  allowLinking="true"/>
 
-or
-
-Deploy [dspace-source]/dspace-rest/target/dspace-rest.war to tomcat.
-
-
+At this point, this is a READ ONLY API for DSpace, for the anonymous user. Only Anonymous READ Communities, Collections, Items, and Bitstreams are available.
 
 Endpoints:
-- http://localhost:8080/rest/collections
--- http://localhost:8080/rest/collections/{collectionID}
--- http://localhost:8080/rest/collections/{collectionID}?expand=parentCommunityID,parentCommunityIDList,itemIDList
--- http://localhost:8080/rest/collections/123
-
+View the list of top-level communities
 - http://localhost:8080/rest/communities
 
-There is an ?expand= query parameter for expensive operations. You can tack it on the end of /collections endpoints. It is optional, all, some or none.
+View a specific community
+-- http://localhost:8080/rest/communities/:ID
+
+View a specific community, list its subcommunities, and subcollections
+-- http://localhost:8080/rest/communities/:ID?expand=all
+
+View the list of collections
+- http://localhost:8080/rest/collections
+
+View a specific collection
+-- http://localhost:8080/rest/collections/:ID
+
+View a specific collection, and its items
+-- http://localhost:8080/rest/collections/:ID?expand=all
+
+View an Item, and see its bitstreams
+- http://localhost:8080/rest/items/:ID
+
+View information about a bitstream
+- http://localhost:8080/rest/bitstreams/:ID
+
+View/Download a specific Bitstream
+- http://localhost:8080/rest/bitstreams/:ID/retrieve
+
+There is an ?expand= query parameter for more expensive operations. You can tack it on the end of endpoints.
+It is optional, all, some or none. The response will usually indicate what the available "expand" options are.
+
+HTTP Responses
+- 200 OK            - We have the requested object/objects
+- 401 Unauthorized  - The anonymous user does not have READ access to that object
+- 404 Not Found     - That object doesn't exist
+- 500 Server Error  - Likely a SQLException, IOException, more details in the logs.
