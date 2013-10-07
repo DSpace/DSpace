@@ -77,6 +77,10 @@ public class DOIIdentifierException extends IdentifierException {
      * DSpace did not allowed to manipulate the metadata of an DSpaceObject.
      */
     public static final int UNAUTHORIZED_METADATA_MANIPULATION = 12;
+    /**
+     * You tried to reserve or register a DOI that is marked as DELETED.
+     */
+    public static final int DOI_IS_DELETED = 13;
     
     private int code;
 
@@ -107,6 +111,8 @@ public class DOIIdentifierException extends IdentifierException {
                 return "UNRECOGNIZED";
             case UNAUTHORIZED_METADATA_MANIPULATION:
                 return "UNAUTHORIZED_METADATA_MANIPULATION";
+            case DOI_IS_DELETED:
+                return "DELETED";
             default:
                 return "UNKOWN";
         }

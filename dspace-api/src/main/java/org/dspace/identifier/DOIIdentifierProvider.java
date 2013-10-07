@@ -189,6 +189,13 @@ public class DOIIdentifierProvider
             throw new RuntimeException("Error in database conncetion.", ex);
         }
 
+        if (DELETED == doiRow.getIntColumn("status") ||
+                TO_BE_DELETED == doiRow.getIntColumn("status"))
+        {
+            throw new DOIIdentifierException("You tried to register a DOI that "
+                    + "is marked as DELETED.", DOIIdentifierException.DOI_IS_DELETED);
+        }
+
         // Check status of DOI
         if (IS_REGISTERED == doiRow.getIntColumn("status"))
         {
@@ -204,19 +211,6 @@ public class DOIIdentifierProvider
         catch (SQLException sqle)
         {
             log.warn("SQLException while changing status of DOI {} to be registered.", doi);
-            throw new RuntimeException(sqle);
-        }
-
-        // safe DOI as metadata of the item
-        try {
-            saveDOIToObject(context, dso, doi);
-        }
-        catch (AuthorizeException ae)
-        {
-            throw new IdentifierException("Not authorized to save a DOI as metadata of an dso!", ae);
-        }
-        catch (SQLException sqle)
-        {
             throw new RuntimeException(sqle);
         }
     }
@@ -270,10 +264,17 @@ public class DOIIdentifierProvider
 
     public void reserveOnline(Context context, DSpaceObject dso, String identifier)
             throws IdentifierException, IllegalArgumentException, SQLException
-    {
+    {        
         String doi = DOI.formatIdentifier(identifier);
         // get TableRow and ensure DOI belongs to dso regarding our db
         TableRow doiRow = loadOrCreateDOI(context, dso, doi);
+        
+        if (DELETED == doiRow.getIntColumn("status") ||
+                TO_BE_DELETED == doiRow.getIntColumn("status"))
+        {
+            throw new DOIIdentifierException("You tried to reserve a DOI that "
+                    + "is marked as DELETED.", DOIIdentifierException.DOI_IS_DELETED);
+        }
         
         // check if DOI is reserved at the registration agency
         if (connector.isDOIReserved(context, doi))
@@ -291,7 +292,7 @@ public class DOIIdentifierProvider
         {
             connector.reserveDOI(context, dso, doi);
         }
-
+        
         doiRow.setColumn("status", IS_RESERVED);
         DatabaseManager.update(context, doiRow);
     }
@@ -302,6 +303,13 @@ public class DOIIdentifierProvider
         String doi = DOI.formatIdentifier(identifier);
         // get TableRow and ensure DOI belongs to dso regarding our db
         TableRow doiRow = loadOrCreateDOI(context, dso, doi);
+        
+        if (DELETED == doiRow.getIntColumn("status") ||
+                TO_BE_DELETED == doiRow.getIntColumn("status"))
+        {
+            throw new DOIIdentifierException("You tried to register a DOI that "
+                    + "is marked as DELETED.", DOIIdentifierException.DOI_IS_DELETED);
+        }
         
         // check if the DOI is already registered online
         if (connector.isDOIRegistered(context, doi))
@@ -352,8 +360,22 @@ public class DOIIdentifierProvider
             }
         }
 
+        // safe DOI as metadata of the item
+        try {
+            saveDOIToObject(context, dso, doi);
+        }
+        catch (AuthorizeException ae)
+        {
+            throw new IdentifierException("Not authorized to save a DOI as metadata of an dso!", ae);
+        }
+        catch (SQLException sqle)
+        {
+            throw new RuntimeException(sqle);
+        }
+        
         doiRow.setColumn("status", IS_REGISTERED);
-        DatabaseManager.update(context, doiRow);
+        DatabaseManager.update(context, doiRow);        
+
     }
     
     public void updateMetadata(Context context, DSpaceObject dso, String identifier)
@@ -363,7 +385,14 @@ public class DOIIdentifierProvider
         TableRow doiRow = null;
         
         doiRow = loadOrCreateDOI(context, dso, doi);
-        
+
+        if (DELETED == doiRow.getIntColumn("status") ||
+                TO_BE_DELETED == doiRow.getIntColumn("status"))
+        {
+            throw new DOIIdentifierException("You tried to register a DOI that "
+                    + "is marked as DELETED.", DOIIdentifierException.DOI_IS_DELETED);
+        }
+
         if (IS_REGISTERED == doiRow.getIntColumn("status")) 
         {
             doiRow.setColumn("status", UPDATE_REGISTERED);
@@ -377,7 +406,9 @@ public class DOIIdentifierProvider
             doiRow.setColumn("status", UPDATE_RESERVERED);
         }
         else
+        {
             return;
+        }
 
         DatabaseManager.update(context, doiRow);
     }
@@ -415,6 +446,28 @@ public class DOIIdentifierProvider
             throw new DOIIdentifierException("Cannot update DOI metadata: "
                     + "DOI and DSpaceObject does not match!",
                     DOIIdentifierException.MISMATCH);
+        }
+
+        if (DELETED == doiRow.getIntColumn("status") ||
+                TO_BE_DELETED == doiRow.getIntColumn("status"))
+        {
+            throw new DOIIdentifierException("You tried to register a DOI that "
+                    + "is marked as DELETED.", DOIIdentifierException.DOI_IS_DELETED);
+        }
+        
+
+        // check if doi is reserved for this specific dso
+        if (connector.isDOIReserved(context, identifier))
+        {
+            // check if doi is reserved for this specific dso
+            if (!connector.isDOIReserved(context, dso, doi))
+            {
+                log.warn("Trying to update metadata for DOI {}, that is reserved"
+                        + " for another dso.", doi);
+                throw new DOIIdentifierException("Trying to update metadta for "
+                        + "a DOI that is reserved for another object.",
+                        DOIIdentifierException.DOI_ALREADY_EXISTS);
+            }
         }
         
         connector.updateMetadata(context, dso, doi);
