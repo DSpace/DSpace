@@ -20,41 +20,26 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @XmlRootElement(name = "community")
-public class Community {
+public class Community extends DSpaceObject{
     private static Logger log = Logger.getLogger(Community.class);
-
-    //Internal value
-    private Integer communityID;
-
-    @XmlElement(name = "type", required = true)
-    final String type = "community";
 
     //Exandable relationships
     @XmlElement(name = "parentCommunity")
-    private LiteCommunity parentCommunity;
-
-
-    private List<String> expand = new ArrayList<String>();
-
-    //Metadata
-    private String name;
-    private String handle;
+    private DSpaceObject parentCommunity;
 
     private String copyrightText, introductoryText, shortDescription, sidebarText;
     private Integer countItems;
 
-    @XmlElement(name = "link", required = true)
-    private String link;
-
     @XmlElement(name = "subcommunities", required = true)
-    private List<LiteCommunity> subCommunities = new ArrayList<LiteCommunity>();
+    private List<DSpaceObject> subCommunities = new ArrayList<DSpaceObject>();
 
     @XmlElement(name = "collections")
-    private List<LiteCollection> collections = new ArrayList<LiteCollection>();
+    private List<DSpaceObject> collections = new ArrayList<DSpaceObject>();
 
     public Community(){}
 
     public Community(org.dspace.content.Community community, String expand, Context context) throws SQLException, WebApplicationException{
+        super(community);
         setup(community, expand, context);
     }
 
@@ -64,20 +49,15 @@ public class Community {
             expandFields = Arrays.asList(expand.split(","));
         }
 
-        this.setCommunityID(community.getID());
-        this.setName(community.getName());
-        this.setHandle(community.getHandle());
         this.setCopyrightText(community.getMetadata(org.dspace.content.Community.COPYRIGHT_TEXT));
         this.setIntroductoryText(community.getMetadata(org.dspace.content.Community.INTRODUCTORY_TEXT));
         this.setSidebarText(community.getMetadata(org.dspace.content.Community.SIDEBAR_TEXT));
         this.setCountItems(community.countItems());
 
-        this.link = "/communities/" + this.communityID;
-
         if(expandFields.contains("parentCommunityID") || expandFields.contains("all")) {
             org.dspace.content.Community parentCommunity = community.getParentCommunity();
             if(parentCommunity != null) {
-                setParentCommunity(new LiteCommunity(parentCommunity));
+                setParentCommunity(new DSpaceObject(parentCommunity));
             }
         } else {
             this.addExpand("parentCommunityID");
@@ -85,10 +65,10 @@ public class Community {
 
         if(expandFields.contains("subCollections") || expandFields.contains("all")) {
             org.dspace.content.Collection[] collectionArray = community.getCollections();
-            collections = new ArrayList<LiteCollection>();
+            collections = new ArrayList<DSpaceObject>();
             for(org.dspace.content.Collection collection : collectionArray) {
                 if(AuthorizeManager.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {
-                    collections.add(new LiteCollection(collection));
+                    collections.add(new DSpaceObject(collection));
                 } else {
                     log.info("Omitted restricted collection: " + collection.getID() + " _ " + collection.getName());
                 }
@@ -99,10 +79,10 @@ public class Community {
 
         if(expandFields.contains("subCommunities") || expandFields.contains("all")) {
             org.dspace.content.Community[] communityArray = community.getSubcommunities();
-            subCommunities = new ArrayList<LiteCommunity>();
+            subCommunities = new ArrayList<DSpaceObject>();
             for(org.dspace.content.Community subCommunity : communityArray) {
                 if(AuthorizeManager.authorizeActionBoolean(context, subCommunity, org.dspace.core.Constants.READ)) {
-                    subCommunities.add(new LiteCommunity(subCommunity));
+                    subCommunities.add(new DSpaceObject(subCommunity));
                 } else {
                     log.info("Omitted restricted subCommunity: " + subCommunity.getID() + " _ " + subCommunity.getName());
                 }
@@ -116,47 +96,11 @@ public class Community {
         }
     }
 
-    public List<String> getExpand() {
-        return expand;
-    }
-
-    public void setExpand(List<String> expand) {
-        this.expand = expand;
-    }
-
-    public void addExpand(String expandableAttribute) {
-        this.expand.add(expandableAttribute);
-    }
-
-    public Integer getCommunityID() {
-        return communityID;
-    }
-
-    public void setCommunityID(Integer communityID) {
-        this.communityID = communityID;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getHandle() {
-        return handle;
-    }
-
-    public void setHandle(String handle) {
-        this.handle = handle;
-    }
-
-    public List<LiteCollection> getCollections() {
+    public List<DSpaceObject> getCollections() {
         return collections;
     }
 
-    public void setCollections(List<LiteCollection> collections) {
+    public void setCollections(List<DSpaceObject> collections) {
         this.collections = collections;
     }
 
@@ -200,19 +144,11 @@ public class Community {
         this.copyrightText = copyrightText;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public LiteCommunity getParentCommunity() {
+    public DSpaceObject getParentCommunity() {
         return parentCommunity;
     }
 
-    public void setParentCommunity(LiteCommunity parentCommunity) {
+    public void setParentCommunity(DSpaceObject parentCommunity) {
         this.parentCommunity = parentCommunity;
-    }
-
-    public String getLink() {
-        return link;
     }
 }

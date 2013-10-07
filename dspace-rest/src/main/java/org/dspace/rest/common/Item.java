@@ -23,18 +23,11 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @XmlRootElement(name = "item")
-public class Item {
+public class Item extends DSpaceObject {
     Logger log = Logger.getLogger(Item.class);
-
-    Integer itemID;
-
-    String handle;
-
-    String name;
 
     String isArchived;
     String isWithdrawn;
-
     String lastModified;
 
 
@@ -50,14 +43,12 @@ public class Item {
 
     List<Collection> parentCollections;
 
-    @XmlElement(name = "link", required = true)
-    private String link;
-
     //Bitstreams
 
     public Item(){}
 
     public Item(org.dspace.content.Item item, String expand, Context context) throws SQLException, WebApplicationException{
+        super(item);
         setup(item, expand, context);
     }
 
@@ -66,8 +57,6 @@ public class Item {
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
         }
-
-        this.setItemID(item.getID());
 
         //Add Item metadata, omit restricted metadata fields (i.e. provenance).
         metadata = new Metadata();
@@ -79,14 +68,11 @@ public class Item {
             }
         }
 
-        this.setHandle(item.getHandle());
-
-        this.setName(item.getName());
-
         this.setArchived(Boolean.toString(item.isArchived()));
         this.setWithdrawn(Boolean.toString(item.isWithdrawn()));
         this.setLastModified(item.getLastModified().toString());
 
+        //TODO make optional, and set to object
         this.setOwningCollectionID(item.getOwningCollection().getID());
         this.setOwningCollectionName(item.getOwningCollection().getName());
 
@@ -103,31 +89,6 @@ public class Item {
                 }
             }
         }
-    }
-
-
-    public Integer getItemID() {
-        return itemID;
-    }
-
-    public void setItemID(Integer itemID) {
-        this.itemID = itemID;
-    }
-
-    public String getHandle() {
-        return handle;
-    }
-
-    public void setHandle(String handle) {
-        this.handle = handle;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getArchived() {
@@ -169,9 +130,4 @@ public class Item {
     public void setOwningCollectionName(String owningCollectionName) {
         this.owningCollectionName = owningCollectionName;
     }
-
-    public String getLink() {
-        return link;
-    }
-
 }

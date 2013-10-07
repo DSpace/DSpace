@@ -21,17 +21,11 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @XmlRootElement(name = "collection")
-public class Collection {
+public class Collection extends DSpaceObject {
     Logger log = Logger.getLogger(Collection.class);
-
-    //Internal value
-    private Integer collectionID;
 
     //Relationships to other objects
     private Integer logoID;
-
-    @XmlElement(name = "type", required = true)
-    final String type = "collection";
 
     //Exandable relationships
     private Integer parentCommunityID;
@@ -39,11 +33,8 @@ public class Collection {
     private List<Integer> itemIDList = new ArrayList<Integer>();
 
     @XmlElement(name = "items")
-    private List<LiteItem> items = new ArrayList<LiteItem>();
+    private List<DSpaceObject> items = new ArrayList<DSpaceObject>();
 
-    //Internal metadata
-    private String name;
-    private String handle;
     private String license;
 
     //unused-metadata
@@ -53,25 +44,6 @@ public class Collection {
     //String copyright_text;
     //String side_bar_text;
 
-    @XmlElement(name = "link", required = true)
-    private String link;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getHandle() {
-        return handle;
-    }
-
-    public void setHandle(String handle) {
-        this.handle = handle;
-    }
-
     public String getLicense() {
         return license;
     }
@@ -80,16 +52,13 @@ public class Collection {
         this.license = license;
     }
 
-
-    private List<String> expand = new ArrayList<String>();
-
-
     //Calculated
     private Integer numberItems;
 
     public Collection(){}
 
     public Collection(org.dspace.content.Collection collection, String expand, Context context) throws SQLException, WebApplicationException{
+        super(collection);
         setup(collection, expand, context);
     }
 
@@ -98,10 +67,6 @@ public class Collection {
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
         }
-
-        setCollectionID(collection.getID());
-        setName(collection.getName());
-        setHandle(collection.getHandle());
 
         if(expandFields.contains("parentCommunityIDList") || expandFields.contains("all")) {
             org.dspace.content.Community[] parentCommunities = collection.getCommunities();
@@ -122,11 +87,11 @@ public class Collection {
         //TODO: Item paging. limit, offset/page
         if(expandFields.contains("items") || expandFields.contains("all")) {
             ItemIterator childItems = collection.getItems();
-            items = new ArrayList<LiteItem>();
+            items = new ArrayList<DSpaceObject>();
             while(childItems.hasNext()) {
                 org.dspace.content.Item item = childItems.next();
                 if(AuthorizeManager.authorizeActionBoolean(context, item, org.dspace.core.Constants.READ)) {
-                    items.add(new LiteItem(item));
+                    items.add(new DSpaceObject(item));
                 }
             }
         } else {
@@ -148,15 +113,6 @@ public class Collection {
         }
 
         this.setNumberItems(collection.countItems());
-        //collection.getMetadata()
-    }
-
-    public Integer getCollectionID() {
-        return collectionID;
-    }
-
-    public void setCollectionID(Integer id) {
-        this.collectionID = id;
     }
 
     public Integer getLogoID() {
@@ -195,7 +151,6 @@ public class Collection {
         this.parentCommunityIDList.add(communityParentID);
     }
 
-
     public List<Integer> getItemIDList() {
         return itemIDList;
     }
@@ -207,22 +162,4 @@ public class Collection {
     public void addItemIDToList(Integer itemID) {
         this.itemIDList.add(itemID);
     }
-
-    public List<String> getExpand() {
-        return expand;
-    }
-
-    public void setExpand(List<String> expand) {
-        this.expand = expand;
-    }
-
-    public void addExpand(String expandableAttribute) {
-        this.expand.add(expandableAttribute);
-    }
-
-    public String getLink() {
-        return link;
-    }
-
-
 }

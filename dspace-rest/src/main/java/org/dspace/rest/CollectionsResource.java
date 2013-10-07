@@ -1,6 +1,7 @@
 package org.dspace.rest;
 
 
+import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
 
@@ -20,6 +21,8 @@ http://localhost:8080/<webapp>/collections
  */
 @Path("/collections")
 public class CollectionsResource {
+    private static Logger log = Logger.getLogger(CollectionsResource.class);
+
     @javax.ws.rs.core.Context ServletContext servletContext;
 
     private static org.dspace.core.Context context;
@@ -43,6 +46,7 @@ public class CollectionsResource {
             }
 
         } catch (SQLException e) {
+            log.error(e.getMessage());
             return "ERROR: " + e.getMessage();
         }
 
@@ -70,6 +74,7 @@ public class CollectionsResource {
             return collectionArrayList.toArray(new org.dspace.rest.common.Collection[0]);
 
         } catch (SQLException e) {
+            e.getMessage();
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -90,6 +95,7 @@ public class CollectionsResource {
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }

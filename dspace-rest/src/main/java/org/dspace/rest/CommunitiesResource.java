@@ -1,5 +1,6 @@
 package org.dspace.rest;
 
+import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
 
@@ -18,6 +19,8 @@ http://localhost:8080/<webapp>/communities
  */
 @Path("/communities")
 public class CommunitiesResource {
+    private static Logger log = Logger.getLogger(CommunitiesResource.class);
+
     private static Context context;
 
     /*
@@ -38,6 +41,7 @@ public class CommunitiesResource {
             }
 
         } catch (SQLException e) {
+            log.error(e.getMessage());
             return "ERROR: " + e.getMessage();
         }
 
@@ -68,6 +72,7 @@ public class CommunitiesResource {
             return communityArrayList.toArray(new org.dspace.rest.common.Community[0]);
 
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -88,6 +93,7 @@ public class CommunitiesResource {
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
