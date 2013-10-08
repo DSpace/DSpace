@@ -38,20 +38,16 @@
 </div>
 </main>
             <%-- Page footer --%>
-             <footer class="navbar navbar-inverse navbar-fixed-bottom">
-             <div class="row">
+             <footer class="navbar navbar-inverse navbar-bottom">
              <div class="container text-muted" style="padding:5px;">
-             <div class="col-sd-3 col-md-3">
-             Theme by <a href="http://www.cineca.it"><img
+             <fmt:message key="jsp.layout.footer-default.theme-by"/> <a href="http://www.cineca.it"><img
                                     src="<%= request.getContextPath() %>/image/logo-cineca-small.png"
                                     alt="Logo CINECA" height="45" width="42" style="border:5px solid white;"/></a>
-			</div>
 			<div class="pull-right" style="padding-top:10px;">                                    
                                 <p class="text-muted"><fmt:message key="jsp.layout.footer-default.text"/>&nbsp;-
                                 <a target="_blank" href="<%= request.getContextPath() %>/feedback"><fmt:message key="jsp.layout.footer-default.feedback"/></a>
                                 <a href="<%= request.getContextPath() %>/htmlmap"></a></p>
                                 </div>
-			</div>
 			</div>
     </footer>
     </body>
