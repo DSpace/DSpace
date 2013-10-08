@@ -42,7 +42,7 @@
     <%-- <p><strong>The ID you entered isn't a valid item ID.</strong>  If you're trying to
     edit a community or collection, you need to use the --%>
     <%-- <a href="<%= request.getContextPath() %>/dspace-admin/edit-communities">communities/collections admin page.</a></p> --%>
-	<p><fmt:message key="jsp.tools.get-item-id.info1">
+	<p class="alert alert-warning"><fmt:message key="jsp.tools.get-item-id.info1">
         <fmt:param><%= request.getContextPath() %>/dspace-admin/edit-communities</fmt:param>
     </fmt:message></p>
 <%  } %>

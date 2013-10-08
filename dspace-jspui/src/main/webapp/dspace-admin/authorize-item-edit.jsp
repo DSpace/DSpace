@@ -69,7 +69,7 @@
     Map bitstream_policies = (Map)request.getAttribute("bitstream_policies");
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.authorize-item-edit.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.authorize-item-edit.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"

@@ -65,7 +65,7 @@
     request.setAttribute("LanguageSwitch", "hide");  
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.authorize-policy-edit.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.authorize-policy-edit.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"

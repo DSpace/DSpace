@@ -47,7 +47,7 @@
     request.setAttribute("LanguageSwitch", "hide");
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.authorize-advanced.advanced"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.authorize-advanced.advanced"
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
