@@ -46,7 +46,7 @@
     
     <form method="post" action="">
         <input type="hidden" name="eperson_id" value="<%= eperson.getID() %>"/>
-		<div class="input-group col-md-offset-5">
+		<div class="btn-group col-md-offset-5">
 			<%-- <input type="submit" name="submit_confirm_delete" value="Delete"> --%>
         	<input type="submit" class="btn btn-danger col-md-6" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
         	<%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
