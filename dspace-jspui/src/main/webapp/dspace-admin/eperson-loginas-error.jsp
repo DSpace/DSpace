@@ -19,7 +19,7 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout titlekey="jsp.dspace-admin.eperson-main.loginAs.authorize.title">
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.eperson-main.loginAs.authorize.title">
 
     <%-- <h1>Authorization Required</h1> --%>
     <h1><fmt:message key="jsp.dspace-admin.eperson-main.loginAs.authorize.title"/></h1>

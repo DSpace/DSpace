@@ -40,7 +40,9 @@
     </fmt:message></h1>
     
     <%-- <p>Are you sure this e-person should be deleted?</p> --%>
-    <p><fmt:message key="jsp.dspace-admin.eperson-confirm-delete.confirm"/></p>
+    <div class="row col-md-offset-4">
+    	<span class="col-md-6"><fmt:message key="jsp.dspace-admin.eperson-confirm-delete.confirm"/></span>
+    </div>
     
     <form method="post" action="">
         <input type="hidden" name="eperson_id" value="<%= eperson.getID() %>"/>
@@ -51,5 +53,6 @@
         	<input type="submit" class="btn btn-default col-md-6" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
         </div>
     </form>
+    
 </dspace:layout>
 

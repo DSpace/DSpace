@@ -178,24 +178,27 @@
 			<input class="form-control"  type="checkbox" name="require_certificate" id="trequire_certificate" value="true"<%= eperson.getRequireCertificate() ? " checked=\"checked\"" : "" %> />
 			</div>
 		</div>
-		
-    
-    
-    	<div class="input-group">
+		<br/>
+    	<div class="col-md-4 btn-group">
                     <%-- <input type="submit" name="submit_save" value="Save Edits"> --%>
-                    <input class="btn btn-success col-md-3" type="submit" name="submit_save" value="<fmt:message key="jsp.dspace-admin.general.save"/>" />
-                    <input class="btn btn-default col-md-5" type="submit" name="submit_resetpassword" value="<fmt:message key="jsp.dspace-admin.eperson-main.ResetPassword.submit"/>"/>
+                    <input class="btn btn-default" type="submit" name="submit_save" value="<fmt:message key="jsp.dspace-admin.general.save"/>" />
+                    <input class="btn btn-default" type="submit" name="submit_resetpassword" value="<fmt:message key="jsp.dspace-admin.eperson-main.ResetPassword.submit"/>"/>
                     <%-- <input type="submit" name="submit_delete" value="Delete EPerson..."> --%>
-                    <input class="btn btn-danger col-md-4" type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
+                    <input class="btn btn-danger" type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
          </div>
-
+	
     </form>
 
 <%
   if((groupMemberships != null) && (groupMemberships.length>0))
   {
 %>
-    <h3><fmt:message key="jsp.dspace-admin.eperson-edit.groups"/></h3>
+	<br/>
+	<br/>
+	
+	<h3><fmt:message key="jsp.dspace-admin.eperson-edit.groups"/></h3>
+	
+	<div class="row">    
     <ul>
 	<%  for(int i=0; i<groupMemberships.length; i++)
      	{
@@ -209,6 +212,7 @@
     	<li><%=myLink%></li>
 	<%  } %>
     </ul>
+    </div>
 <% } %>  
 
 </dspace:layout>

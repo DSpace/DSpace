@@ -37,7 +37,7 @@
     Iterator tableIt = tableList.iterator();
   
 %>
-<dspace:layout titlekey="jsp.dspace-admin.eperson-deletion-error.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.eperson-deletion-error.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"

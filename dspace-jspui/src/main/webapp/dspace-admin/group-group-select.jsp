@@ -36,7 +36,7 @@
         (Group []) request.getAttribute("groups");
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.group-group-select.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.group-group-select.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"

@@ -22,7 +22,7 @@
 <%
     Group group = (Group) request.getAttribute("group");
 %>
-<dspace:layout titlekey="jsp.dspace-admin.group-confirm-delete.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.group-confirm-delete.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
