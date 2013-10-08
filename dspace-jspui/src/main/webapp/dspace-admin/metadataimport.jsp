@@ -29,7 +29,7 @@
     }
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.metadataimport.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.metadataimport.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
@@ -43,11 +43,11 @@
         <%= message %>
 
         <p align="center">
-            <input type="file" size="40" name="file"/>
+            <input class="form-control" type="file" size="40" name="file"/>
         </p>
         
         <p align="center">
-            <input type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.general.upload"/>" />
+            <input class="btn btn-default" type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.general.upload"/>" />
         </p>
 
     </form>
