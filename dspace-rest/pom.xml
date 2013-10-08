@@ -25,18 +25,18 @@
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
-            <version>1.8</version>
+            <version>1.17.1</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-servlet</artifactId>
-            <version>1.17</version>
+            <version>1.17.1</version>
         </dependency>
         <!-- JSON serialization, should I use jackson?-->
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-json</artifactId>
-            <version>1.8</version>
+            <version>1.17.1</version>
         </dependency>
 
         <!-- Use DSpace, for now, an older version to minimize spring generated dependency on Discovery -->
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>3.0.1</version>
+            <version>3.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.atteo</groupId>
