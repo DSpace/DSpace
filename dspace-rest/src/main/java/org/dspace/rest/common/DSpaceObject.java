@@ -17,7 +17,7 @@ import java.util.List;
 @XmlRootElement(name = "dspaceobject")
 public class DSpaceObject {
     @XmlElement()
-    public Integer ID;
+    public Integer id;
 
     @XmlElement()
     public String name;
@@ -46,11 +46,11 @@ public class DSpaceObject {
     }
 
     public Integer getID() {
-        return ID;
+        return id;
     }
 
-    public void setID(Integer ID) {
-        this.ID = ID;
+    public void setID(Integer id) {
+        this.id = id;
     }
 
     public String getName(){
