@@ -23,23 +23,18 @@ import java.util.List;
  */
 @XmlRootElement(name = "dspaceobject")
 public class DSpaceObject {
-    @XmlElement()
-    public Integer id;
+    private Integer id;
 
-    @XmlElement()
-    public String name;
+    private String name;
 
-    @XmlElement()
-    public String handle;
+    private String handle;
 
-    @XmlElement()
-    public String type;
+    private String type;
 
-    @XmlElement()
-    public String link;
+    @XmlElement(name = "link", required = true)
+    private String link;
 
-    @XmlElement()
-    public List<String> expand = new ArrayList<String>();
+    private ArrayList<String> expand = new ArrayList<String>();
 
     public DSpaceObject() {
 
@@ -95,7 +90,7 @@ public class DSpaceObject {
         return expand;
     }
 
-    public void setExpand(List<String> expand) {
+    public void setExpand(ArrayList<String> expand) {
         this.expand = expand;
     }
 
