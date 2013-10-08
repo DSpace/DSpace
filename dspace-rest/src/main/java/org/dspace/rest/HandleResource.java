@@ -8,8 +8,13 @@
 package org.dspace.rest;
 
 import org.apache.log4j.Logger;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
+import org.dspace.rest.common.Collection;
+import org.dspace.rest.common.Community;
+import org.dspace.rest.common.DSpaceObject;
+import org.dspace.rest.common.Item;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -31,21 +36,28 @@ public class HandleResource {
     @GET
     @Path("/{prefix}/{suffix}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public org.dspace.rest.common.DSpaceObject getObject(@PathParam("prefix") String prefix, @PathParam("suffix") String suffix) {
+    public org.dspace.rest.common.DSpaceObject getObject(@PathParam("prefix") String prefix, @PathParam("suffix") String suffix, @QueryParam("expand") String expand) {
         try {
             if(context == null || !context.isValid() ) {
                 context = new Context();
             }
 
             org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
-            log.info("DSO Lookup by handle: [" + prefix + "] / [" + suffix + "] got result of: " + dso.getTypeText() + "_" + dso.getID());
-
-            if(dso != null) {
-                return new org.dspace.rest.common.DSpaceObject(dso);
-            } else {
+            if(dso == null) {
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
+            log.info("DSO Lookup by handle: [" + prefix + "] / [" + suffix + "] got result of: " + dso.getTypeText() + "_" + dso.getID());
 
+            switch(dso.getType()) {
+                case Constants.COMMUNITY:
+                    return new Community((org.dspace.content.Community) dso, expand, context);
+                case Constants.COLLECTION:
+                    return new Collection((org.dspace.content.Collection) dso, expand, context);
+                case Constants.ITEM:
+                    return new Item((org.dspace.content.Item) dso, expand, context);
+                default:
+                    return new DSpaceObject(dso);
+            }
         } catch (SQLException e) {
             log.error(e.getMessage());
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
