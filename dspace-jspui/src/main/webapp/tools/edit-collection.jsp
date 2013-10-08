@@ -171,7 +171,7 @@
      Basic metadata
      =========================================================== --%>
      <div class="panel panel-primary">
-     	<div class="panel-heading">Collection's Metadata</div>
+     	<div class="panel-heading"><fmt:message key="jsp.tools.edit-collection.form.basic-metadata" /></div>
      	<div class="panel-body">
         	<div class="row">        
                 <label class="col-md-3" for="name"><fmt:message key="jsp.tools.edit-collection.form.label1"/></label>
@@ -315,7 +315,7 @@
 	</div>
 <% } %>
 <div class="panel panel-default">
-	<div class="panel-heading">Content settings</div>
+	<div class="panel-heading"><fmt:message key="jsp.tools.edit-collection.form.collection-settings" /></div>
 	<div class="panel-body">
 <% if(bTemplateButton) { %>
 			<div class="row">
