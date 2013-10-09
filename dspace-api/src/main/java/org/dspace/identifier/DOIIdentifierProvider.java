@@ -682,7 +682,14 @@ public class DOIIdentifierProvider
         // change doi status in db if necessary.
         if (null != doiRow)
         {
+            if(doiRow.isColumnNull("status"))
+            {
+            doiRow.setColumn("status", DELETED);
+            }
+            else
+            {
             doiRow.setColumn("status", TO_BE_DELETED);
+            }
             try {
                 DatabaseManager.update(context, doiRow);
                 context.commit();
