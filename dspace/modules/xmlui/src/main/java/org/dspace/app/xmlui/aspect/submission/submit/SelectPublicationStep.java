@@ -213,11 +213,15 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
 
         doi.addItem().addContent("OR");
-        CheckBox cb = doi.addItem().addCheckBox("unknown_doi");
-        cb.addOption(String.valueOf(Boolean.TRUE), T_unknown_doi);
+        Text cb = doi.addItem().addText("unknown_doi");
+        cb.setHelp(T_unknown_doi);
+
 
         if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_PUBMED_DOI){
             textArticleDOI.addError("Invalid Identifier.");
+        }
+        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_PUBMED_NAME){
+            textArticleDOI.addError("No journal name.");
         }
 
 

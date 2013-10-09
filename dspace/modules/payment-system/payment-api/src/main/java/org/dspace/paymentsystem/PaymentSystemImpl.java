@@ -489,9 +489,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
 
             generatePrice(context,info,manager,transaction);
-            if(selectCountry){
-            generateCountryList(info,manager,transaction);
-            }
+            generateCountryList(info,manager,transaction,selectCountry);
             generateVoucherForm(context,info,transaction,messages);
         }catch (Exception e)
         {
@@ -503,9 +501,9 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
 
 
-    private void generateCountryList(org.dspace.app.xmlui.wing.element.List info,PaymentSystemConfigurationManager manager,ShoppingCart shoppingCart) throws WingException{
+    private void generateCountryList(org.dspace.app.xmlui.wing.element.List info,PaymentSystemConfigurationManager manager,ShoppingCart shoppingCart,Boolean addCountryList) throws WingException{
         //SubmissionStepConfig cfg = sinfo.getSubmissionConfig().getStep(step);
-
+            if(addCountryList){
             java.util.List<String> countryArray = manager.getSortedCountry();
             info.addLabel(T_Country);
             Select countryList = info.addItem("country-list", "country-list").addSelect("country");
@@ -521,7 +519,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
                 }
             }
 
-
+            }
         if(shoppingCart.getCountry()!=null&&shoppingCart.getCountry().length()>0)
         {
             info.addItem("remove-country","remove-country").addXref("#","Remove Country : "+shoppingCart.getCountry());

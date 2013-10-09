@@ -166,6 +166,7 @@ jQuery.fn.inputHints = function() {
 
 function initFirstSubmissionForm() {
 
+    enableJournalPublished();
     // if I am in the first page
     if (jQuery("#aspect_submission_StepTransformer_div_submit-select-publication").length > 0) {
 
@@ -382,9 +383,6 @@ function initFirstSubmissionForm() {
             enableNextButton();
         });
 
-        jQuery('input[name|="unknown_doi"]').change(function() {
-            enableNextButton();
-        });
 
         jQuery("#aspect_submission_StepTransformer_field_manu-number-status-accepted").blur(function() {
             enableNextButton();
@@ -404,11 +402,47 @@ function initFirstSubmissionForm() {
         jQuery('input[name|="manu_accepted-cb"]').change(function() {
             enableNextButton();
         });
-
+        jQuery('input[name|="unknown_doi"]').keyup(function() {
+            enableJournalPublished();
+        });
+        jQuery('input[name|="article_doi"]').keyup(function() {
+            enableJournalPublished();
+        });
 
     }
 }
 
+function enableJournalPublished(){
+    console.log(jQuery('#unknown-doi-panel span.field-help'));
+    if(jQuery('input[name|="article_doi"]').val()!="")
+    {
+        jQuery('input[name|="unknown_doi"]').attr("disabled", "disabled");
+        jQuery('input[name|="unknown_doi"]').css("background-color","#E3E3E3");
+        jQuery('#unknown-doi-panel span.field-help').attr("style","color:grey");
+        jQuery('label.ds-form-label-select-publication').css("color","");
+    }
+    else
+    {
+        jQuery('input[name|="unknown_doi"]').removeAttr("disabled");
+        jQuery('input[name|="unknown_doi"]').css("background-color","");
+        jQuery('#unknown-doi-panel span.field-help').attr("style","color:black");
+        jQuery('label.ds-form-label-select-publication').css("color","grey");
+    }
+    if(jQuery('input[name|="unknown_doi"]').val()!="")
+    {
+        jQuery('input[name|="article_doi"]').attr("disabled", "disabled");
+        jQuery('input[name|="article_doi"]').css("background-color","#E3E3E3");
+        jQuery('label.ds-form-label-select-publication').css("color","grey");
+        jQuery('#unknown-doi-panel span.field-help').attr("style","color:black");
+    }
+    else
+    {
+        jQuery('input[name|="article_doi"]').removeAttr("disabled");
+        jQuery('input[name|="article_doi"]').css("background-color","");
+        jQuery('label.ds-form-label-select-publication').css("color","");
+        jQuery('#unknown-doi-panel span.field-help').attr("style","color:grey");
+    }
+}
 function enableNextButton() {
 
     // note: JOURNAL_ID is always present because the default value!!
@@ -438,7 +472,8 @@ function enableNextButton() {
         else if (jQuery('input[name|="article_status"]:checked').val()=='0') {
 
             var val = jQuery("#aspect_submission_StepTransformer_field_article_doi").val();
-            if (val != "" || jQuery('input[name|="unknown_doi"]:checked').val()) {
+            var jol =  jQuery('input[name|="journal_name"]').val();
+            if (val != "" || jol != "") {
 
                 //alert("article_doi || unknown_doi ok: enable next!");
 
