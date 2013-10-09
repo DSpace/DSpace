@@ -15,6 +15,7 @@ import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Select;
+import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.core.Context;
@@ -501,20 +502,33 @@ public class PaymentSystemImpl implements PaymentSystemService {
     }
 
 
-    private void generateCountryList(org.dspace.app.xmlui.wing.element.List info,PaymentSystemConfigurationManager manager,ShoppingCart shoppingCart) throws WingException {
-        java.util.List<String> countryArray = manager.getSortedCountry();
-        info.addLabel(T_Country);
-        Select countryList = info.addItem("country-list", "select-list").addSelect("country");
-        countryList.addOption("","Select Your Country");
-        for(String temp:countryArray){
-            String[] countryTemp = temp.split(":");
-            if(shoppingCart.getCountry()!=null&&shoppingCart.getCountry().length()>0&&shoppingCart.getCountry().equals(countryTemp[0])) {
-                countryList.addOption(true,countryTemp[0],countryTemp[0]);
+
+    private void generateCountryList(org.dspace.app.xmlui.wing.element.List info,PaymentSystemConfigurationManager manager,ShoppingCart shoppingCart) throws WingException{
+        //SubmissionStepConfig cfg = sinfo.getSubmissionConfig().getStep(step);
+
+            java.util.List<String> countryArray = manager.getSortedCountry();
+            info.addLabel(T_Country);
+            Select countryList = info.addItem("country-list", "country-list").addSelect("country");
+            countryList.addOption("","Select Your Country");
+            for(String temp:countryArray){
+                String[] countryTemp = temp.split(":");
+                if(shoppingCart.getCountry()!=null&&shoppingCart.getCountry().length()>0&&shoppingCart.getCountry().equals(countryTemp[0])) {
+                    countryList.addOption(true,countryTemp[0],countryTemp[0]);
+                }
+                else
+                {
+                    countryList.addOption(false,countryTemp[0],countryTemp[0]);
+                }
             }
-            else
-            {
-                countryList.addOption(false,countryTemp[0],countryTemp[0]);
-            }
+
+
+        if(shoppingCart.getCountry()!=null&&shoppingCart.getCountry().length()>0)
+        {
+            info.addItem("remove-country","remove-country").addXref("#","Remove Country : "+shoppingCart.getCountry());
+        }
+        else
+        {
+            info.addItem("remove-country","remove-country").addXref("#","Remove Country : ");
         }
 
     }
@@ -558,13 +572,15 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
         info.addLabel(T_Voucher);
         org.dspace.app.xmlui.wing.element.Item voucher = info.addItem("voucher-list","voucher-list");
-        if(voucher1==null){
-            voucher.addText("voucher","voucher");
-        }
-        else{
-            voucher.addText("voucher","voucher").setValue(voucher1.getCode());
-        }
+        Text voucherText = voucher.addText("voucher","voucher");
         voucher.addButton("apply","apply").setValue("Apply");
+        if(voucher1!=null){
+                voucherText.setValue(voucher1.getCode());
+                info.addItem("remove-voucher","remove-voucher").addXref("#","Remove Voucher : "+voucher1.getCode());
+            }
+        else{
+                info.addItem("remove-voucher","remove-voucher").addXref("#","Remove Voucher : ");
+            }
 
     }
 

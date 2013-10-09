@@ -2469,3 +2469,7 @@ div.step-link{
 ul#aspect_submission_submit_CheckoutStep_list_transaction{
     display: none;
 }
+
+#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country div,#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher div,#aspect_paymentsystem_ShoppingCartTransformer_item_waiver-info div {
+    width:100% !important;
+}

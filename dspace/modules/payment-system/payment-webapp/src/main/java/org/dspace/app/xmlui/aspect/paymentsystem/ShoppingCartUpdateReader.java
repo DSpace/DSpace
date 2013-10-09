@@ -108,7 +108,7 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
 	case ShoppingCart.VOUCHER_WAIVER: waiverMessage = "Voucher code applied to Data Publishing Charge."; break;
 	}
 
-        String result = "{\"total\":\""+symbol+String.valueOf(Double.toString(total))+"\",\"price\":\""+symbol+basicFee+"\",\"surcharge\":\""+symbol+surcharge+"\",\"noIntegrateFee\":\""+symbol+noIntegrateFee+"\",\"voucher\":\""+voucherCode+"\""+",\"errorMessage\":\""+errorMessage+"\",\"waiverMessage\":\""+waiverMessage+"\",\"payer\":\""+payername+"\"}";
+        String result = "{\"total\":\""+symbol+String.valueOf(Double.toString(total))+"\",\"country\":\""+shoppingCart.getCountry()+"\",\"price\":\""+symbol+basicFee+"\",\"surcharge\":\""+symbol+surcharge+"\",\"noIntegrateFee\":\""+symbol+noIntegrateFee+"\",\"voucher\":\""+voucherCode+"\""+",\"errorMessage\":\""+errorMessage+"\",\"waiverMessage\":\""+waiverMessage+"\",\"payer\":\""+payername+"\"}";
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(result.getBytes("UTF-8"));
         byte[] buffer = new byte[8192];
