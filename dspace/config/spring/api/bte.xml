@@ -39,7 +39,7 @@
     
     <!-- 
     	The output generator needs a configuration on how to map internal
-    	records to the DSpace metadata fields. The followinf map specifies
+    	records to the DSpace metadata fields. The following map specifies
     	this relationship. The value needs to be the label that the record 
     	internally associates with the specific data and it is specified in
     	the data loader beans. The key is in the format of 
