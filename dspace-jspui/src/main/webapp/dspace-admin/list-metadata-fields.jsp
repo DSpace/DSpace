@@ -126,7 +126,7 @@ if (error!=null) {
       <form method="post" action="">
         <input type="hidden" name="dc_schema_id" value="<%= schema.getSchemaID() %>"/>
         	 <h2><fmt:message key="jsp.dspace-admin.list-metadata-fields.addfield"/></h2>
-              <p><fmt:message key="jsp.dspace-admin.list-metadata-fields.addfieldnote"/><br/><br/>
+              <p class="alert alert-info"><fmt:message key="jsp.dspace-admin.list-metadata-fields.addfieldnote"/></p>
                       
 			<p><fmt:message key="jsp.dspace-admin.list-metadata-fields.element"/>:</p>
                       <input class="form-control" type="text" name="element"/>
@@ -146,12 +146,12 @@ if (error!=null) {
       
       <h2><fmt:message key="jsp.dspace-admin.list-metadata-fields.move"/></h2>
 <% if (schemas.length > 1) { %>
-        <td colspan="2"><p>
+        <p class="alert alert-info">
         <fmt:message key="jsp.dspace-admin.list-metadata-fields.movenote"/></p>
       
       
        <p><fmt:message key="jsp.dspace-admin.list-metadata-fields.element"/>:</p>
-      <select name="dc_field_id" multiple="multiple" size="5">
+      <select class="form-control" name="dc_field_id" multiple="multiple" size="5">
 <%
     for (int i = 0; i < types.length; i++)
     {
@@ -161,7 +161,7 @@ if (error!=null) {
 %>
       </select>
       <p><fmt:message key="jsp.dspace-admin.list-metadata-fields.schema"/>: </p>
-      <select name="dc_dest_schema_id">
+      <select class="form-control" name="dc_dest_schema_id">
 <%
     for (int i = 0; i < schemas.length; i++)
     {
@@ -175,7 +175,7 @@ if (error!=null) {
         <p><input class="btn btn-primary" type="submit" name="submit_move" value="<fmt:message key="jsp.dspace-admin.list-metadata-fields.movesubmit"/>"/></p>
 <% } else { %>
       
-              <p><fmt:message key="jsp.dspace-admin.list-metadata-fields.moveformnote"/><br/><br/>
+              <p class="alert alert-info"><fmt:message key="jsp.dspace-admin.list-metadata-fields.moveformnote"/><br/><br/>
               </p>
       
 <% } %>
