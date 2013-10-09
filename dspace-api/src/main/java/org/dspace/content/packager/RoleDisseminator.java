@@ -334,7 +334,8 @@ public class RoleDisseminator implements PackageDisseminator
             {
                 writer.writeEmptyElement(MEMBER);
                 writer.writeAttribute(ID, String.valueOf(member.getID()));
-                writer.writeAttribute(NAME, member.getName());
+                if (null != member.getName())
+                    writer.writeAttribute(NAME, member.getName());
             }
             writer.writeEndElement();
         }
@@ -444,9 +445,12 @@ public class RoleDisseminator implements PackageDisseminator
         writer.writeStartElement(EPERSON);
         writer.writeAttribute(ID, String.valueOf(eperson.getID()));
 
-        writer.writeStartElement(EMAIL);
-        writer.writeCharacters(eperson.getEmail());
-        writer.writeEndElement();
+        if (eperson.getEmail()!=null)
+        {
+            writer.writeStartElement(EMAIL);
+            writer.writeCharacters(eperson.getEmail());
+            writer.writeEndElement();
+        }
 
         if(eperson.getNetid()!=null)
         {
