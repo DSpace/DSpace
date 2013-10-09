@@ -30,10 +30,10 @@
           <key><value>ris</value></key>
           <ref bean="gr.ekt.bteio.loaders.RISDataLoader"/>
         </entry>
-        <!-- <entry>
+        <entry>
              <key><value>endnote</value></key>
              <ref bean="gr.ekt.bteio.loaders.EndnoteDataLoader"/>
-             </entry> -->
+        </entry>
       </map>
     </property>
     
@@ -174,9 +174,18 @@
     </property>
   </bean>
 
-  <!--<bean id="gr.ekt.bteio.loaders.EndnoteDataLoader"
-      class="gr.ekt.bteio.loaders.EndnoteDataLoader">
-      </bean> -->
+  <bean id="gr.ekt.bteio.loaders.EndnoteDataLoader"
+		class="gr.ekt.bteio.loaders.EndnoteDataLoader">
+	<property name="fieldMap">
+		<map>
+			<entry key="TI" value="Title"/>
+			<entry key="AU" value="Author"/>
+			<entry key="AB" value="Abstract"/>
+			<entry key="PY" value="Date"/>
+			<entry key="SO" value="Source"/>
+		</map>
+    </property>
+  </bean>
 
 
   <!-- Specify here any filters or modifiers to run before the output -->
