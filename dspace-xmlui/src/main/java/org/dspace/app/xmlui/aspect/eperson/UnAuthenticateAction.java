@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.acting.AbstractAction;
@@ -73,6 +74,19 @@ public class UnAuthenticateAction extends AbstractAction
         context.setCurrentUser(eperson);
         
         // Forward the user to the home page.
+	HttpSession session = httpRequest.getSession(false);
+        String loginType=null;
+        if(session!=null){
+           loginType=(String)session.getAttribute("loginType");            
+        }
+        if(loginType!=null && loginType.equals("CAS")){
+           StringBuffer location=new StringBuffer();
+           location.append(ConfigurationManager.getProperty("authentication-cas","cas.logout.url")).append
+                   ("?service=http://").append(httpRequest.getServerName()).append(":").append(
+                   httpRequest.getServerPort()).append(httpRequest.getContextPath());
+           httpResponse.sendRedirect(location.toString());
+        }
+        else{
         if((ConfigurationManager.getBooleanProperty("xmlui.public.logout")) && (httpRequest.isSecure())) {
 				StringBuffer location = new StringBuffer("http://");
 				location.append(ConfigurationManager.getProperty("dspace.hostname")).append(
@@ -80,9 +94,10 @@ public class UnAuthenticateAction extends AbstractAction
 				httpResponse.sendRedirect(location.toString());
 			
 		}
-        else{
-        	httpResponse.sendRedirect(httpRequest.getContextPath());
-        }
+       		 else{
+        		httpResponse.sendRedirect(httpRequest.getContextPath());
+	        }
+	}
         
         return new HashMap();
     }

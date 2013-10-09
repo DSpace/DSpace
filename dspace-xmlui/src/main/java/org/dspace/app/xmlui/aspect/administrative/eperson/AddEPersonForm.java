@@ -25,6 +25,7 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.ConfigurationManager;
 
 /**
  * Present the user with all the eperson metadata fields so that they
@@ -98,7 +99,10 @@ public class AddEPersonForm extends AbstractDSpaceTransformer
     
     private static final Message T_telephone =
         message("xmlui.EPerson.EditProfile.telephone");
-    
+
+    //netid allow to handle automtic single sign on login
+    private static final Message T_netid =
+        message("xmlui.EPerson.EditProfile.netid");
     	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
@@ -128,6 +132,8 @@ public class AddEPersonForm extends AbstractDSpaceTransformer
 		String firstValue = request.getParameter("first_name");
 		String lastValue  = request.getParameter("last_name");
 		String phoneValue = request.getParameter("phone");
+                //netid allow to handle automtic single sign on login
+		String netidValue=request.getParameter("netid"); 
 		boolean canLogInValue    = (request.getParameter("can_log_in") == null)  ? false : true;
 		boolean certificateValue = (request.getParameter("certificate") == null) ? false : true;
 	    		 
@@ -172,6 +178,12 @@ public class AddEPersonForm extends AbstractDSpaceTransformer
         lastName.setValue(lastValue);
         if (errors.contains("last_name")) {
         	lastName.addError(T_error_lname);
+        }
+
+        if("true".equals(ConfigurationManager.getProperty("authentication-cas","webui.cas.enable"))){
+          Text netid = identity.addItem().addText("netid");
+          netid.setLabel(T_netid);
+          netid.setValue(netidValue);
         }
         
         Text phone = identity.addItem().addText("phone");

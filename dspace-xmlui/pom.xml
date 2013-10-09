@@ -228,6 +228,13 @@
             <artifactId>servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
+        <!-- CAS Authentication -->
+        <dependency>
+            <groupId>cas</groupId>
+            <artifactId>casclient</artifactId>
+            <version>2.1.1</version>
+            <scope>runtime</scope>
+        </dependency>
 
     </dependencies>
 
