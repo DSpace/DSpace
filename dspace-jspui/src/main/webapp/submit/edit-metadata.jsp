@@ -145,21 +145,27 @@
 
             String confidenceSymbol = confidenceValue == unknownConfidence ? "blank" : Choices.getConfidenceText(confidenceValue).toLowerCase();
             String confIndID = fieldInput+"_confidence_indicator_id";
+            
             if (authority)
-            {
-                sb.append(" <img id=\""+confIndID+"\" title=\"")
+            { 
+                sb.append("<span class=\"col-md-1\">")
+                  .append(" <img id=\""+confIndID+"\" title=\"")
                   .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.authority.confidence.description."+confidenceSymbol))
-                  .append("\" class=\"ds-authority-confidence cf-")
+                  .append("\" class=\"ds-authority-confidence cf-")                  
                   // set confidence to cf-blank if authority is empty
                   .append(authorityValue==null||authorityValue.length()==0 ? "blank" : confidenceSymbol)
                   .append(" \" src=\"").append(contextPath).append("/image/confidence/invisible.gif\" />")
-                  .append("<input type=\"text\" value=\"").append(authorityValue!=null?authorityValue:"")
+                  .append("</span>");
+                sb.append("<span class=\"col-md-2\">")   
+                  .append("<input class=\"form-control\" type=\"text\" value=\"").append(authorityValue!=null?authorityValue:"")
                   .append("\" id=\"").append(authorityName)
                   .append("\" name=\"").append(authorityName).append("\" class=\"ds-authority-value\"/>")
                   .append("<input type=\"hidden\" value=\"").append(confidenceSymbol)
                   .append("\" id=\"").append(confidenceName)
                   .append("\" name=\"").append(confidenceName)
-                  .append("\" class=\"ds-authority-confidence-input\"/>");
+                  .append("\" class=\"ds-authority-confidence-input\"/>")
+                  .append("</span>");
+                
             }
 
             // suggest is not supported for name input type
@@ -216,7 +222,8 @@
             {
                 if (inputBlock != null)
                     sb.insert(0, inputBlock);
-                sb.append("<button name=\"").append(fieldInput).append("_lookup\" ")
+                sb.append("<span class=\"col-md-1\">")
+                  .append("<button class=\"form-control\" name=\"").append(fieldInput).append("_lookup\" ")
                   .append("onclick=\"javascript: return DSpaceChoiceLookup('")
                   .append(contextPath).append("/tools/lookup.jsp','")
                   .append(fieldName).append("','edit_metadata','")
@@ -226,8 +233,9 @@
                   .append(String.valueOf(isName)).append(",false);\"")
                   .append(" title=\"")
                   .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.lookup.lookup"))
-                  .append(" src=\""+contextPath+"/image/authority/zoom.png\"><span class=\".glyphicon .glyphicon-search\"></span>");
+                  .append("\"><span class=\"glyphicon glyphicon-search\"></span></button></span>");
             }
+            
         }
         else if (inputBlock != null)
             sb = inputBlock;
@@ -282,7 +290,7 @@
             conf = unknownConfidence;
          }
          
-         sb.append("<span class=\"col-md-5\"><input placeholder=\"")
+         sb.append("<span class=\"col-md-4\"><input placeholder=\"")
            .append(Utils.addEntities(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.lastname")))
            .append("\" class=\"form-control\" type=\"text\" name=\"")
            .append(last.toString())
@@ -293,7 +301,7 @@
          }
          sb.append("value=\"")
            .append(dpn.getLastName().replaceAll("\"", "&quot;")) // Encode "
-                   .append("\"/></span><span class=\"col-md-5\"><input placeholder=\"")
+                   .append("\"/></span><span class=\"col-md-4\"><input placeholder=\"")
                    .append(Utils.addEntities(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.firstname")))
                    .append("\" class=\"form-control\" type=\"text\" name=\"")
                    .append(first.toString())
@@ -314,7 +322,7 @@
                 .append(' ')
                 .append(Utils.addEntities(dpn.getFirstNames()));
             // put a remove button next to filled in values
-            sb.append("<input class=\"btn btn-danger col-md-2\" type=\"submit\" name=\"submit_")
+            sb.append("<input class=\"btn btn-danger pull-right col-md-2\" type=\"submit\" name=\"submit_")
               .append(fieldName)
               .append("_remove_")
               .append(i)
@@ -325,7 +333,7 @@
          else if (repeatable && !readonly && i == fieldCount - 1)
          {
             // put a 'more' button next to the last space
-            sb.append("<input class=\"btn btn-default col-md-2\" type=\"submit\" name=\"submit_")
+            sb.append("<input class=\"btn btn-default pull-right col-md-2\" type=\"submit\" name=\"submit_")
               .append(fieldName)
               .append("_add\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
@@ -1126,6 +1134,12 @@
     }
 %>
 
+<c:set var="dspace.layout.head.last" scope="request">
+	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/prototype.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/builder.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/control.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/effects.js"></script>
+</c:set>
 <dspace:layout style="submission" locbar="off" navbar="off" titlekey="jsp.submit.edit-metadata.title">
 
 <%

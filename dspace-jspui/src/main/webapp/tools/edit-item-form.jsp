@@ -121,7 +121,7 @@
             // put up a SELECT element containing all choices
             if ("select".equals(cam.getPresentation(fieldName)))
             {
-                sb.append("<select  id=\"").append(fieldNameIdx)
+                sb.append("<select class=\"form-control\" id=\"").append(fieldNameIdx)
                    .append("\" name=\"").append(fieldNameIdx)
                    .append("\" size=\"1\">");
                 Choices cs = cam.getMatches(fieldName, dcv.value, collectionID, 0, 0, null);
@@ -142,7 +142,7 @@
             else
             {
                 String confidenceIndicator = "indicator_"+confidenceName;
-                sb.append("<textarea id=\"").append(fieldNameIdx).append("\" name=\"").append(fieldNameIdx)
+                sb.append("<textarea class=\"form-control\" id=\"").append(fieldNameIdx).append("\" name=\"").append(fieldNameIdx)
                    .append("\" rows=\"3\" cols=\"50\">")
                    .append(dcv.value).append("</textarea>\n<br/>\n");
 
@@ -153,7 +153,7 @@
                       .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.authority.confidence.description."+confidenceSymbol))
                       .append("\" class=\"ds-authority-confidence cf-"+ confidenceSymbol)
                       .append("\" src=\"").append(contextPath).append("/image/confidence/invisible.gif\" />")
-                      .append("<input  type=\"text\" readonly value=\"")
+                      .append("<input type=\"text\" readonly value=\"")
                       .append(dcv.authority != null ? dcv.authority : "")
                       .append("\" id=\"").append(authorityName)
                       .append("\" onChange=\"javascript: return DSpaceAuthorityOnChange(this, '")
@@ -188,6 +188,10 @@
 %>
 
 <c:set var="dspace.layout.head.last" scope="request">
+	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/prototype.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/builder.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/control.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/effects.js"></script>	
     <script type="text/javascript" src="<%= request.getContextPath() %>/dspace-admin/js/bitstream-ordering.js"></script>
 </c:set>
 
@@ -661,17 +665,14 @@
 %>
         </table>
 	</div>
-        <p>&nbsp;</p>
+        
 
         <%-- <p align="center"><input type="submit" name="submit_addbitstream" value="Add Bitstream"></p> --%>
-        <center>
-            <table  width="70%" align="center">
-                <tr>
-                  <td>
+	<div class="btn-group col-md-12">
                 <%
-                        if (bCreateBits) {
-                %>
-					<input class="btn btn-primary" type="submit" name="submit_addbitstream" value="<fmt:message key="jsp.tools.edit-item-form.addbit.button"/>"/>
+					if (bCreateBits) {
+                %>                
+					<input class="btn btn-primary col-md-2" type="submit" name="submit_addbitstream" value="<fmt:message key="jsp.tools.edit-item-form.addbit.button"/>"/>
                 <%  }
                     if(breOrderBitstreams){
                 %>
@@ -685,26 +686,23 @@
                                 Bundle[] ccBundle = item.getBundles("CC-LICENSE");
                                 s = ccBundle.length > 0 ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-item-form.replacecc.button") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-item-form.addcc.button");
                 %>
-                    <input class="btn btn-primary" type="submit" name="submit_addcc" value="<%= s %>" />
+                    <input class="btn btn-primary col-md-2" type="submit" name="submit_addcc" value="<%= s %>" />
                     <input type="hidden" name="handle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>"/>
                     <input type="hidden" name="item_id" value="<%= item.getID() %>"/>
-       <%
-                        }
-%>
-                  </td>
-                </tr>
-            </table>
-        </center>
+                    
+       			<%
+              		}
+				%>
+	
 
-        <p>&nbsp;</p>
 
         <input type="hidden" name="item_id" value="<%= item.getID() %>"/>
         <input type="hidden" name="action" value="<%= EditItemServlet.UPDATE_ITEM %>"/>
-					<div class="btn-group pull-right col-md-6 col-md-offset-5">
+					
                         <%-- <input type="submit" name="submit" value="Update" /> --%>
-                        <input class="btn btn-success col-md-6" type="submit" name="submit" value="<fmt:message key="jsp.tools.general.update"/>" />
+                        <input class="btn btn-success pull-right col-md-3" type="submit" name="submit" value="<fmt:message key="jsp.tools.general.update"/>" />
                         <%-- <input type="submit" name="submit_cancel" value="Cancel" /> --%>
-						<input class="btn btn-default col-md-6" type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" />
+						<input class="btn btn-default pull-right col-md-3" type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" />
 					</div>
     </form>
 </dspace:layout>
