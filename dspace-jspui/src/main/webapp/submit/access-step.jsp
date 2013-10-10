@@ -53,7 +53,7 @@
 
 %>
 
-<dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.access.title" nocache="true">
+<dspace:layout style="submission" locbar="off" navbar="off" titlekey="jsp.submit.access.title" nocache="true">
 
     <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
 
@@ -72,52 +72,36 @@
     if (advanced)
     {
 %>
-		<h1><fmt:message key="jsp.submit.access.plist.heading"/></h1>
+		<h2 class="alert alert-info"><fmt:message key="jsp.submit.access.plist.heading"/></h2>
 
         <dspace:policieslist policies="<%= policies %>" />
 <%
     }
 %>
 
-		<h1><fmt:message key="jsp.submit.access.access_setting.heading"/></h1>
+		<h2 class="alert alert-info"><fmt:message key="jsp.submit.access.access_setting.heading"/></h2>
 
-        <h2 class="access-setting"><fmt:message key="jsp.submit.access.private_setting.heading"/></h2>
+        <h3 class="access-setting"><fmt:message key="jsp.submit.access.private_setting.heading"/></h3>
 
-        <center>
-            <table class="miscTable" width="80%">
-                <tr id="private_setting">
-                    <th class="accessOdd" align="left" style="padding-right: 10px"><fmt:message key="jsp.submit.access.private_setting.label"/></th>
-                    <td class="accessOdd"><input id="private_option" name="private_option" type="checkbox" value="1" <%= discoverableChecked %>/>&nbsp;<fmt:message key="jsp.submit.access.private_setting.help"/></td>
-                </tr>
-            </table>
-        </center>
+		<div class="form-group">
+			<div class="input-group-addon">
+            	<label for="private_option"><fmt:message key="jsp.submit.access.private_setting.label"/></label>
+				<input class="form-control" id="private_option" name="private_option" type="checkbox" value="1" <%= discoverableChecked %>/><span class="help-block"><fmt:message key="jsp.submit.access.private_setting.help"/></span>
+			</div>
+		</div>
 
-        <h2 class="access-setting"><fmt:message key="jsp.submit.access.embargo_setting.heading"/></h2>
+        <h3 class="access-setting"><fmt:message key="jsp.submit.access.embargo_setting.heading"/></h3>
 
         <dspace:access-setting subInfo="<%= subInfo %>" dso="<%= subInfo.getSubmissionItem().getItem() %>" embargo="<%= advanced ? true : false %>" addpolicy="<%= advanced ? true : false %>" />
 
-        <center>
-            <table class="miscTable">
 
 		<%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
         <%= SubmissionController.getSubmissionParameters(context, request) %>
-        <center>
-            <table border="0" width="80%">
-                <tr>
-					<td width="100%">&nbsp;</td>
-                    <td>
-                        <input type="submit" name="<%=AbstractProcessingStep.PREVIOUS_BUTTON%>" value="<fmt:message key="jsp.submit.general.previous"/>" />
-                    </td>
-                    <td>
-                        <input type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
-                    </td>
-                    <td>&nbsp;&nbsp;&nbsp;</td>
-                    <td align="right">
-                        <input type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>" />
-                    </td>
-                </tr>
-            </table>
-        </center>
+			<div class="btn-group pull-right col-md-offset-5">
+				<input class="btn btn-default" type="submit" name="<%=AbstractProcessingStep.PREVIOUS_BUTTON%>" value="<fmt:message key="jsp.submit.general.previous"/>" />                
+                <input class="btn btn-default" type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>" />
+                <input class="btn btn-success" type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
+			</div>
     </form>
 
     <script type="text/javascript" src="<%= request.getContextPath() %>/submit/access-step.js"></script>
