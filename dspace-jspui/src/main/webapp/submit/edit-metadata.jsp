@@ -802,7 +802,7 @@
                  }
                  else
                  {
-                   sb.append("<span class=\"col-md-4 col-md-offset-2\"><input class=\"form-control\" type=\"text\" name=\"")
+                   sb.append("<span class=\"col-md-4\"><input class=\"form-control\" type=\"text\" name=\"")
                      .append(fieldParam)
                      .append("\" size=\"15\"")
                      .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" disabled=\"disabled\" ":"")
