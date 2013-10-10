@@ -567,44 +567,47 @@ public class LDAPAuthentication
         }
 
         /**
-         * contact the ldap server and attempt to authenticate
+         * Contact the LDAP server and attempt to authenticate.
          */
         protected boolean ldapAuthenticate(String netid, String password,
                         Context context) {
-            if (!password.equals("")) {
+            Hashtable<String, String> env = new Hashtable<String, String>();
+            if (null != password && !password.isEmpty()) {
                 // Set up environment for creating initial context
-                Hashtable<String, String> env = new Hashtable<String, String>();
                 env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY,
-                        "com.sun.jndi.ldap.LdapCtxFactory");
-                env.put(javax.naming.Context.PROVIDER_URL, ldap_provider_url);
+                        "com.sun.jndi.ldap.LdapCtxFactory"); // XXX is this needed?
+                if (null != ldap_provider_url)
+                    env.put(javax.naming.Context.PROVIDER_URL, ldap_provider_url);
 
                 // Authenticate
                 env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "Simple");
                 env.put(javax.naming.Context.SECURITY_PRINCIPAL, netid);
                 env.put(javax.naming.Context.SECURITY_CREDENTIALS, password);
-                env.put(javax.naming.Context.AUTHORITATIVE, "true");
-                env.put(javax.naming.Context.REFERRAL, "follow");
+            }
+            /* Else the LDAP provider may be externally configured in an
+             * application resource file
+             */
 
-                DirContext ctx = null;
-                try {
-                    // Try to bind
-                    ctx = new InitialDirContext(env);
-                } catch (NamingException e) {
-                    log.warn(LogManager.getHeader(context,
-                            "ldap_authentication", "type=failed_auth " + e));
-                    return false;
-                } finally {
-                    // Close the context when we're done
-                    try {
-                        if (ctx != null)
-                        {
-                            ctx.close();
-                        }
-                    } catch (NamingException e) {
-                    }
-                }
-            } else {
+            env.put(javax.naming.Context.AUTHORITATIVE, "true");
+            env.put(javax.naming.Context.REFERRAL, "follow");
+
+            DirContext ctx = null;
+            try {
+                // Try to bind
+                ctx = new InitialDirContext(env);
+            } catch (NamingException e) {
+                log.warn(LogManager.getHeader(context,
+                        "ldap_authentication", "type=failed_auth " + e));
                 return false;
+            } finally {
+                // Close the context when we're done
+                try {
+                    if (ctx != null)
+                    {
+                        ctx.close();
+                    }
+                } catch (NamingException e) {
+                }
             }
 
             return true;
