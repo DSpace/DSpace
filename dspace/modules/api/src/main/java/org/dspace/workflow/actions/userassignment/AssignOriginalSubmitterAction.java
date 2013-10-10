@@ -54,7 +54,7 @@ public class AssignOriginalSubmitterAction extends UserSelectionAction{
             //TODO: stay with processoutcome ?
             WorkflowManager.processOutcome(c, submitter, currentStep.getWorkflow(), currentStep, this.getParent(), new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE), wfi);
         } catch (Exception e) {
-            throw new WorkflowException("There was an error processing the workflow");
+            throw new WorkflowException("There was an error processing the workflow"+e.getMessage());
 
         }
         //It is important that we return to the submission page since we will continue our actions with the submitter
