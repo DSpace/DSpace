@@ -156,7 +156,7 @@
                   .append(authorityValue==null||authorityValue.length()==0 ? "blank" : confidenceSymbol)
                   .append(" \" src=\"").append(contextPath).append("/image/confidence/invisible.gif\" />")
                   .append("</span>");
-                sb.append("<span class=\"col-md-2\">")   
+                sb.append("<span class=\"col-md-5\">")   
                   .append("<input class=\"form-control\" type=\"text\" value=\"").append(authorityValue!=null?authorityValue:"")
                   .append("\" id=\"").append(authorityName)
                   .append("\" name=\"").append(authorityName).append("\" class=\"ds-authority-value\"/>")
@@ -311,7 +311,8 @@
              sb.append("disabled=\"disabled\" ");
          }
          sb.append("value=\"")
-           .append(dpn.getFirstNames()).append("\"/></span>")
+           .append(dpn.getFirstNames()).append("\"/></span>");         
+         sb.append("<div class=\"col-md-4\">")
            .append(doAuthority(pageContext, fieldName, i, fieldCount, fieldName,
                 auth, conf, true, repeatable, defaults, null, collectionID));
 
@@ -322,23 +323,24 @@
                 .append(' ')
                 .append(Utils.addEntities(dpn.getFirstNames()));
             // put a remove button next to filled in values
-            sb.append("<input class=\"btn btn-danger pull-right col-md-2\" type=\"submit\" name=\"submit_")
+            sb.append("<button class=\"btn btn-danger pull-right col-md-2\" name=\"submit_")
               .append(fieldName)
               .append("_remove_")
               .append(i)
               .append("\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-              .append("\"/>");
+              .append("\"><span class=\"glyphicon glyphicon-trash\"></span></button>");
          }
          else if (repeatable && !readonly && i == fieldCount - 1)
          {
             // put a 'more' button next to the last space
-            sb.append("<input class=\"btn btn-default pull-right col-md-2\" type=\"submit\" name=\"submit_")
+            sb.append("<button class=\"btn btn-default pull-right col-md-2\" name=\"submit_")
               .append(fieldName)
               .append("_add\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-              .append("\"/>");
+              .append("\"><span class=\"glyphicon glyphicon-plus\"></span></button>");
          }
+         sb.append("</div>");
          sb.append("</div>");
       }
 	  sb.append("</div></div><br/>");
@@ -435,22 +437,22 @@
          if (repeatable && !readonly && i < defaults.length)
          {
             // put a remove button next to filled in values
-            sb.append("<input class=\"btn btn-danger col-md-2\" type=\"submit\" name=\"submit_")
+            sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
               .append(fieldName)
               .append("_remove_")
               .append(i)
               .append("\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-              .append("\"/>");
+              .append("\"><span class=\"glyphicon glyphicon-trash\"></span></button>");
          }
          else if (repeatable && !readonly && i == fieldCount - 1)
          {
             // put a 'more' button next to the last space
-            sb.append("<input class=\"btn btn-default col-md-2\" type=\"submit\" name=\"submit_")
+            sb.append("<button class=\"btn btn-default col-md-2\" name=\"submit_")
               .append(fieldName)
               .append("_add\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-              .append("\"/>");
+              .append("\"><span class=\"glyphicon glyphicon-plus\"></span></button>");
          }
          // put a blank if nothing else
          sb.append("</div>");
@@ -516,22 +518,22 @@
          if (repeatable && !readonly && i < defaults.length)
          {
             // put a remove button next to filled in values
-            sb.append("<input class=\"btn btn-danger col-md-2\" type=\"submit\" name=\"submit_")
+            sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
               .append(fieldName)
               .append("_remove_")
               .append(i)
               .append("\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-              .append("\"/>");
+              .append("\"><span class=\"glyphicon glyphicon-trash\"></span></button>");
          }
          else if (repeatable && !readonly && i == fieldCount - 1)
          {
             // put a 'more' button next to the last space
-            sb.append("<input class=\"btn btn-default col-md-2\" type=\"submit\" name=\"submit_")
+            sb.append("<button class=\"btn btn-default col-md-2\" name=\"submit_")
               .append(fieldName)
               .append("_add\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-              .append("\"/>");
+              .append("\"><span class=\"glyphicon glyphicon-plus\"></span></button>");
          }
 
          // put a blank if nothing else
@@ -591,22 +593,22 @@
          if (repeatable && !readonly && i < defaults.length)
          {
             // put a remove button next to filled in values
-            sb.append("<input class=\"btn btn-danger col-md-2\" type=\"submit\" name=\"submit_")
+            sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
               .append(fieldName)
               .append("_remove_")
               .append(i)
               .append("\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-              .append("\"/>");
+              .append("\"><span class=\"glyphicon glyphicon-trash\"></span></button>");
          }
          else if (repeatable && !readonly && i == fieldCount - 1)
          {
             // put a 'more' button next to the last space
-            sb.append("<input class=\"btn btn-default col-md-2\" type=\"submit\" name=\"submit_")
+            sb.append("<button class=\"btn btn-default col-md-2\" name=\"submit_")
               .append(fieldName)
               .append("_add\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-              .append("\"/>");
+              .append("\"><span class=\"glyphicon glyphicon-plus\"></span></button>");
          }
 
          // put a blank if nothing else
@@ -670,22 +672,22 @@
           if (repeatable && !readonly && i < defaults.length)
           {
              // put a remove button next to filled in values
-             sb.append("<input class=\"btn btn-danger col-md-2\" type=\"submit\" name=\"submit_")
+             sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
                .append(fieldName)
                .append("_remove_")
                .append(i)
                .append("\" value=\"")
                .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-               .append("\"/>");
+               .append("\"><span class=\"glyphicon glyphicon-trash\"></span></button>");
           }
           else if (repeatable && !readonly && i == fieldCount - 1)
           {
              // put a 'more' button next to the last space
-             sb.append("<input class=\"btn btn-default col-md-2\" type=\"submit\" name=\"submit_")
+             sb.append("<button class=\"btn btn-default col-md-2\" name=\"submit_")
                .append(fieldName)
                .append("_add\" value=\"")
                .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-               .append("\"/>");
+               .append("\"><span class=\"glyphicon glyphicon-plus\"></span></button>");
           }
           sb.append("</div>");
         }
@@ -741,13 +743,13 @@
              .append("\" /></span>");
           if (!readonly)
           {
-                       sb.append("<input class=\"btn btn-danger col-md-2\" type=\"submit\" name=\"submit_")
+                       sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
                              .append(fieldName)
                              .append("_remove_")
                              .append(i)
                              .append("\" value=\"")
                              .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
-                             .append("\" />");
+                             .append("\"><span class=\"glyphicon glyphicon-trash\"></span></button>");
           }
           sb.append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly));
          }
@@ -786,13 +788,13 @@
                          .append("/></span>");
                    if (!readonly)
                    {
-                               sb.append(" <input class=\"btn btn-danger col-md-2\" type=\"submit\" name=\"submit_")
+                               sb.append(" <button class=\"btn btn-danger col-md-2\" name=\"submit_")
                                      .append(fieldName)
                                      .append("_remove_")
                                      .append(i)
                                      .append("\" value=\"")
                                      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
-                                     .append("\"/>");
+                                     .append("\"><span class=\"glyphicon glyphicon-trash\"></span></button>");
                    }
                         
                    sb.append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly))
@@ -809,11 +811,11 @@
         
                    if (i+1 >= fieldCount && !readonly)
                    {
-                     sb.append(" <input class=\"btn btn-default col-md-2\" type=\"submit\" name=\"submit_")
+                     sb.append(" <button class=\"btn btn-default col-md-2\" name=\"submit_")
                        .append(fieldName)
                        .append("_add\" value=\"")
                        .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-                       .append("\"/>\n");
+                       .append("\"><span class=\"glyphicon glyphicon-plus\"></span></button>\n");
                    }
                    
                    if (i % 2 == 0)
@@ -916,23 +918,23 @@
          if (repeatable && !readonly && j < defaults.length)
          {
             // put a remove button next to filled in values
-            sb.append("<input class=\"btn btn-danger col-md-2\" type=\"submit\" name=\"submit_")
+            sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
               .append(fieldName)
               .append("_remove_")
               .append(j)
               .append("\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-              .append("\"/>");
+              .append("\"><span class=\"glyphicon glyphicon-trash\"></span></button>");
          }
          else if (repeatable && !readonly && j == fieldCount - 1)
          {
             // put a 'more' button next to the last space
-            sb.append("<input class=\"btn btn-default col-md-2\" type=\"submit\" name=\"submit_")
+            sb.append("<button class=\"btn btn-default col-md-2\" name=\"submit_")
               .append(fieldName)
 //            .append("_add\" value=\"Add More\"/> </td></tr>");
               .append("_add\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-              .append("\"/>");
+              .append("\"><span class=\"glyphicon glyphicon-plus\"></span></button>");
          }
 
          // put a blank if nothing else
@@ -1137,8 +1139,8 @@
 <c:set var="dspace.layout.head.last" scope="request">
 	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/prototype.js"></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/builder.js"></script>
-	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/control.js"></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/effects.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/controls.js"></script>
 </c:set>
 <dspace:layout style="submission" locbar="off" navbar="off" titlekey="jsp.submit.edit-metadata.title">
 

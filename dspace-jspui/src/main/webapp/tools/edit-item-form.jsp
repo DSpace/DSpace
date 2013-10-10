@@ -149,11 +149,14 @@
                 if (authority)
                 {
                     String confidenceSymbol = Choices.getConfidenceText(dcv.confidence).toLowerCase();
-                    sb.append("<img id=\""+confidenceIndicator+"\"  title=\"")
+                    sb.append("<span class=\"col-md-1\">")
+                      .append("<img id=\""+confidenceIndicator+"\"  title=\"")
                       .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.authority.confidence.description."+confidenceSymbol))
                       .append("\" class=\"ds-authority-confidence cf-"+ confidenceSymbol)
                       .append("\" src=\"").append(contextPath).append("/image/confidence/invisible.gif\" />")
-                      .append("<input type=\"text\" readonly value=\"")
+                      .append("</span>");
+                	sb.append("<span class=\"col-md-5\">")
+                      .append("<input class=\"form-control\" type=\"text\" readonly value=\"")
                       .append(dcv.authority != null ? dcv.authority : "")
                       .append("\" id=\"").append(authorityName)
                       .append("\" onChange=\"javascript: return DSpaceAuthorityOnChange(this, '")
@@ -167,10 +170,12 @@
                       .append("\" >")
                       .append("<input type=\"hidden\" value=\"").append(confidenceSymbol).append("\" id=\"").append(confidenceName)
                       .append("\" name=\"").append(confidenceName)
-                      .append("\" class=\"ds-authority-confidence-input\"/>");
+                      .append("\" class=\"ds-authority-confidence-input\"/>")
+                      .append("</span>");
                 }
                  
-               sb.append("<input type=\"image\" name=\"").append(fieldNameIdx).append("_lookup\" ")
+               sb.append("<span class=\"col-md-1\">")
+               	 .append("<button class=\"form-control\" name=\"").append(fieldNameIdx).append("_lookup\" ")
                  .append("onclick=\"javascript: return DSpaceChoiceLookup('")
                  .append(contextPath).append("/tools/lookup.jsp','")
                  .append(fieldName).append("','edit_metadata','")
@@ -180,7 +185,7 @@
                  .append("false").append(",false);\"")
                  .append(" title=\"")
                  .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.lookup.lookup"))
-                 .append("\" width=\"16px\" height=\"16px\" src=\""+contextPath+"/image/authority/zoom.png\" />");
+                 .append("\"><span class=\"glyphicon glyphicon-search\"></span></button></span>");
             }
         }
         return sb;
@@ -190,8 +195,8 @@
 <c:set var="dspace.layout.head.last" scope="request">
 	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/prototype.js"></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/builder.js"></script>
-	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/control.js"></script>
-	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/effects.js"></script>	
+	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/effects.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/controls.js"></script>		
     <script type="text/javascript" src="<%= request.getContextPath() %>/dspace-admin/js/bitstream-ordering.js"></script>
 </c:set>
 
@@ -493,7 +498,9 @@
                 </td>
                 <td headers="t5" class="<%= row %>RowEvenCol">
                     <%-- <input type="submit" name="submit_remove_<%= key %>_<%= sequenceNumber %>" value="Remove" /> --%>
-                                        <input class="btn btn-danger" type="submit" name="submit_remove_<%= key %>_<%= sequenceNumber %>" value="<fmt:message key="jsp.tools.general.remove"/>"/>
+                    <button class="btn btn-danger" name="submit_remove_<%= key %>_<%= sequenceNumber %>" value="<fmt:message key="jsp.tools.general.remove"/>">
+                    	<span class="glyphicon glyphicon-trash"></span>
+                    </button>
                 </td>
             </tr>
 <%      row = (row.equals("odd") ? "even" : "odd");
@@ -522,7 +529,9 @@
                 </td>
                 <td headers="t5" class="<%= row %>RowOddCol">
                     <%-- <input type="submit" name="submit_addfield" value="Add"> --%>
-                                        <input class="btn btn-success" type="submit" name="submit_addfield" value="<fmt:message key="jsp.tools.general.add"/>"/>
+					<button class="btn btn-success" name="submit_addfield" value="<fmt:message key="jsp.tools.general.add"/>">
+						<span class="glyphicon glyphicon-plus"></span> 
+					</button>
                 </td>
             </tr>
         </table>
@@ -654,7 +663,9 @@
                     <%-- <a target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>">View</a>&nbsp;<input type="submit" name="submit_delete_bitstream_<%= key %>" value="Remove"> --%>
                                         <a target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>"><fmt:message key="jsp.tools.general.view"/></a>&nbsp;
                                         <% if (bRemoveBits) { %>
-                                        <input class="btn btn-danger" type="submit" name="submit_delete_bitstream_<%= key %>" value="<fmt:message key="jsp.tools.general.remove"/>" />
+                                        <button class="btn btn-danger" name="submit_delete_bitstream_<%= key %>" value="<fmt:message key="jsp.tools.general.remove"/>">
+                                        	<span class="glyphicon glyphicon-trash"></span>
+                                        </button>
                                         <% } %>
                 </td>
             </tr>
