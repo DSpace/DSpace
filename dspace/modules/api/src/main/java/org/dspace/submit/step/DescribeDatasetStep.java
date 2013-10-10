@@ -169,12 +169,7 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
                 String[] vals = request.getParameterValues(fieldName);
                 if (vals != null) {
                     for (String val : vals) {
-                            // If journal.TYPE.publicationBlackout=true and val=none There is a problem
-                            // so I force val to be the default one="untilArticleAppears"
-                            if(DryadJournalSubmissionUtils.isJournalBlackedOut(context, item, c) && val.equals("none"))
-                                val="untilArticleAppears";
-
-                            item.addMetadata(schema, element, qualifier, LANGUAGE_QUALIFIER,val);
+                        item.addMetadata(schema, element, qualifier, LANGUAGE_QUALIFIER,val);
                     }
                 }
             } else if (inputType.equals("series")) {
