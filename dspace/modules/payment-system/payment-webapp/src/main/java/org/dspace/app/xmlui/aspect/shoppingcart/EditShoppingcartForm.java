@@ -25,6 +25,7 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 import org.dspace.eperson.EPerson;
 import org.dspace.paymentsystem.*;
+import org.dspace.utils.DSpace;
 
 
 public class EditShoppingcartForm  extends AbstractDSpaceTransformer
@@ -115,7 +116,7 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
 
         Properties countries  = PaymentSystemConfigurationManager.getAllCountryProperty();
         Properties currencies  = PaymentSystemConfigurationManager.getAllCurrencyProperty();
-
+        PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
 
         // Get our parameters;
         int shoppingcartID = parameters.getParameterAsInteger("shoppingcart_id",-1);
