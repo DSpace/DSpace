@@ -64,6 +64,7 @@
           <label for="select_curate_group"><fmt:message key="jsp.tools.curate.select-group.tag"/></label>:
           <select class="form-control" name="select_curate_group" id="select_curate_group" onchange="this.form.submit();">
             <%= groupOptions %>
+          </select>  
 <%
     }
 %>
