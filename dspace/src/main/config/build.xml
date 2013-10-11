@@ -705,6 +705,10 @@ Common usage:
     	<war destfile="${dspace.dir}/webapps/solr.war">
     	            <fileset dir="${dspace.dir}/webapps/solr/" />
     	</war>
+
+        <war destfile="${dspace.dir}/webapps/simplerest.war">
+                    <fileset dir="${dspace.dir}/webapps/simplerest/" />
+        </war>
     </target>
 
 

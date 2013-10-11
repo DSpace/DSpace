@@ -3,14 +3,16 @@
  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                      http://maven.apache.org/maven-v4_0_0.xsd">
  <modelVersion>4.0.0</modelVersion>
- <groupId>fi.helsinki.lib</groupId>
- <artifactId>simplerest</artifactId>
+ <groupId>org.dspace</groupId>
+ <artifactId>dspace-simplerest</artifactId>
  <packaging>war</packaging>
- <version>2.0-SNAPSHOT</version>
- <name>Simple REST</name>
+ <version>4.0-SNAPSHOT</version>
+ <name>SimpleREST</name>
  <url>http://www.kansalliskirjasto.fi/</url>
  <description>A RESTful web service on top of DSpace.</description>
  <inceptionYear>2010</inceptionYear>
+
+
  <dependencies>
   <dependency>
     <groupId>javax.servlet</groupId>
@@ -172,18 +174,6 @@
           <artifactId>exec-maven-plugin</artifactId>
           <groupId>org.codehaus.mojo</groupId>
           <version>1.2.1</version>
-          <executions>
-              <execution>
-                <id>Sources to right dir</id>
-                <phase>package</phase>
-                <goals>
-                    <goal>exec</goal>
-                </goals>
-                <configuration>
-                    <executable>exec.sh</executable>
-                </configuration>
-              </execution>
-          </executions>
       </plugin>
    <plugin>
     <groupId>org.apache.maven.plugins</groupId>

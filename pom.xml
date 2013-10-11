@@ -474,6 +474,19 @@
             </modules>
         </profile>
 
+        <!-- SimpleREST -->
+        <profile>
+          <id>dspace-simplerest</id>
+          <activation>
+              <file>
+                  <exists>dspace-simplerest/pom.xml</exists>
+              </file>
+          </activation>
+          <modules>
+              <module>dspace-simplerest</module>
+          </modules>
+        </profile>
+
 
       <!--
          The 'release' profile is used by the 'maven-release-plugin' (see above)
@@ -494,6 +507,7 @@
             <module>dspace-oai</module>
             <module>dspace-sword</module>
             <module>dspace-swordv2</module>
+            <module>dspace-simplerest</module>
          </modules>
       </profile>
 
