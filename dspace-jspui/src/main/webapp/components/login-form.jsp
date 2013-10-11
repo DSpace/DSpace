@@ -19,13 +19,13 @@
 	  <p><fmt:message key="jsp.components.login-form.enter"/></p>
 		<div class="form-group">
             <label class="col-md-2 control-label" for="tlogin_email"><fmt:message key="jsp.components.login-form.email"/></label>
-            <div class="col-md-6">
+            <div class="col-md-3">
             	<input class="form-control" type="text" name="login_email" id="tlogin_email" tabindex="1" />
             </div>
         </div>
         <div class="form-group">
             <label class="col-md-2 control-label" for="tlogin_password"><fmt:message key="jsp.components.login-form.password"/></label>
-            <div class="col-md-6">
+            <div class="col-md-3">
             	<input class="form-control" type="password" name="login_password" id="tlogin_password" tabindex="2" />
             </div>
         </div>
@@ -34,9 +34,7 @@
         	<input type="submit" class="btn btn-success pull-right" name="login_submit" value="<fmt:message key="jsp.components.login-form.login"/>" tabindex="3" />
         </div>
         </div>
-		<div class="row">
-	  		<p class="col-md-12"><a href="<%= request.getContextPath() %>/forgot"><fmt:message key="jsp.components.login-form.forgot"/></a></p></td>
-	  	</div>
+  		<p><a href="<%= request.getContextPath() %>/forgot"><fmt:message key="jsp.components.login-form.forgot"/></a></p>
       </form>
       <script type="text/javascript">
 		document.loginform.login_email.focus();
