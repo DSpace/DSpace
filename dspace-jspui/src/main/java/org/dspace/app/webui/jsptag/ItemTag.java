@@ -391,7 +391,7 @@ public class ItemTag extends TagSupport
             configLine = defaultFields;
         }
 
-        out.println("<center><table class=\"table itemDisplayTable\">");
+        out.println("<table class=\"table itemDisplayTable\">");
 
         /*
          * Break down the configuration into fields and display them
@@ -623,7 +623,7 @@ public class ItemTag extends TagSupport
 
         listCollections();
 
-        out.println("</table></center><br/>");
+        out.println("</table><br/>");
 
         listBitstreams();
 
@@ -648,12 +648,12 @@ public class ItemTag extends TagSupport
         // Get all the metadata
         DCValue[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 
-        out.println("<p align=\"center\">"
+        out.println("<div class=\"panel panel-info\"><div class=\"panel-heading\">"
                 + LocaleSupport.getLocalizedMessage(pageContext,
-                        "org.dspace.app.webui.jsptag.ItemTag.full") + "</p>");
+                        "org.dspace.app.webui.jsptag.ItemTag.full") + "</div>");
 
         // Three column table - DC field, value, language
-        out.println("<center><table class=\"itemDisplayTable\">");
+        out.println("<table class=\"panel-body table itemDisplayTable\">");
         out.println("<tr><th id=\"s1\" class=\"standard\">"
                 + LocaleSupport.getLocalizedMessage(pageContext,
                         "org.dspace.app.webui.jsptag.ItemTag.dcfield")
@@ -697,7 +697,7 @@ public class ItemTag extends TagSupport
 
         listCollections();
 
-        out.println("</table></center><br/>");
+        out.println("</table></div><br/>");
 
         listBitstreams();
 
