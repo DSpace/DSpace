@@ -148,23 +148,22 @@
             
             if (authority)
             { 
-                sb.append("<span class=\"col-md-1\">")
-                  .append(" <img id=\""+confIndID+"\" title=\"")
+                sb.append(" <img id=\""+confIndID+"\" title=\"")
                   .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.authority.confidence.description."+confidenceSymbol))
                   .append("\" class=\"ds-authority-confidence cf-")                  
                   // set confidence to cf-blank if authority is empty
                   .append(authorityValue==null||authorityValue.length()==0 ? "blank" : confidenceSymbol)
-                  .append(" \" src=\"").append(contextPath).append("/image/confidence/invisible.gif\" />")
-                  .append("</span>");
-                sb.append("<span class=\"col-md-5\">")   
-                  .append("<input class=\"form-control\" type=\"text\" value=\"").append(authorityValue!=null?authorityValue:"")
+                  .append(" \" src=\"").append(contextPath).append("/image/confidence/invisible.gif\" />");
+                  
+                   
+                sb.append("<input type=\"text\" value=\"").append(authorityValue!=null?authorityValue:"")
                   .append("\" id=\"").append(authorityName)
-                  .append("\" name=\"").append(authorityName).append("\" class=\"ds-authority-value\"/>")
+                  .append("\" name=\"").append(authorityName).append("\" class=\"ds-authority-value form-control\"/>")
                   .append("<input type=\"hidden\" value=\"").append(confidenceSymbol)
                   .append("\" id=\"").append(confidenceName)
                   .append("\" name=\"").append(confidenceName)
-                  .append("\" class=\"ds-authority-confidence-input\"/>")
-                  .append("</span>");
+                  .append("\" class=\"ds-authority-confidence-input\"/>");
+                  
                 
             }
 
@@ -222,8 +221,7 @@
             {
                 if (inputBlock != null)
                     sb.insert(0, inputBlock);
-                sb.append("<span class=\"col-md-1\">")
-                  .append("<button class=\"form-control\" name=\"").append(fieldInput).append("_lookup\" ")
+                sb.append("<button class=\"btn\" name=\"").append(fieldInput).append("_lookup\" ")
                   .append("onclick=\"javascript: return DSpaceChoiceLookup('")
                   .append(contextPath).append("/tools/lookup.jsp','")
                   .append(fieldName).append("','edit_metadata','")
@@ -233,7 +231,7 @@
                   .append(String.valueOf(isName)).append(",false);\"")
                   .append(" title=\"")
                   .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.lookup.lookup"))
-                  .append("\"><span class=\"glyphicon glyphicon-search\"></span></button></span>");
+                  .append("\"><span class=\"glyphicon glyphicon-search\"></span></button>");
             }
             
         }
@@ -290,7 +288,7 @@
             conf = unknownConfidence;
          }
          
-         sb.append("<span class=\"col-md-4\"><input placeholder=\"")
+         sb.append("<span class=\"col-md-5\"><input placeholder=\"")
            .append(Utils.addEntities(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.lastname")))
            .append("\" class=\"form-control\" type=\"text\" name=\"")
            .append(last.toString())
@@ -301,7 +299,7 @@
          }
          sb.append("value=\"")
            .append(dpn.getLastName().replaceAll("\"", "&quot;")) // Encode "
-                   .append("\"/></span><span class=\"col-md-4\"><input placeholder=\"")
+                   .append("\"/></span><span class=\"col-md-5\"><input placeholder=\"")
                    .append(Utils.addEntities(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.firstname")))
                    .append("\" class=\"form-control\" type=\"text\" name=\"")
                    .append(first.toString())
@@ -312,8 +310,8 @@
          }
          sb.append("value=\"")
            .append(dpn.getFirstNames()).append("\"/></span>");         
-         sb.append("<div class=\"col-md-4\">")
-           .append(doAuthority(pageContext, fieldName, i, fieldCount, fieldName,
+         
+         sb.append(doAuthority(pageContext, fieldName, i, fieldCount, fieldName,
                 auth, conf, true, repeatable, defaults, null, collectionID));
 
          if (repeatable && !readonly && i < defaults.length)
@@ -323,7 +321,7 @@
                 .append(' ')
                 .append(Utils.addEntities(dpn.getFirstNames()));
             // put a remove button next to filled in values
-            sb.append("<button class=\"btn btn-danger pull-right col-md-2\" name=\"submit_")
+            sb.append("<button class=\"btn btn-danger\" name=\"submit_")
               .append(fieldName)
               .append("_remove_")
               .append(i)
@@ -338,10 +336,9 @@
               .append(fieldName)
               .append("_add\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-              .append("\"><span class=\"glyphicon glyphicon-plus\"></span></button>");
-         }
-         sb.append("</div>");
-         sb.append("</div>");
+              .append("\"><span class=\"glyphicon glyphicon-plus\"></span>"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>");
+         }         
+         sb.append("</div>");   
       }
 	  sb.append("</div></div><br/>");
       out.write(sb.toString());
@@ -437,7 +434,7 @@
          if (repeatable && !readonly && i < defaults.length)
          {
             // put a remove button next to filled in values
-            sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
+            sb.append("<button class=\"btn btn-danger\" name=\"submit_")
               .append(fieldName)
               .append("_remove_")
               .append(i)
@@ -452,7 +449,7 @@
               .append(fieldName)
               .append("_add\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-              .append("\"><span class=\"glyphicon glyphicon-plus\"></span></button>");
+              .append("\"><span class=\"glyphicon glyphicon-plus\"></span>"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>");
          }
          // put a blank if nothing else
          sb.append("</div>");
@@ -518,7 +515,7 @@
          if (repeatable && !readonly && i < defaults.length)
          {
             // put a remove button next to filled in values
-            sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
+            sb.append("<button class=\"btn btn-danger\" name=\"submit_")
               .append(fieldName)
               .append("_remove_")
               .append(i)
@@ -533,7 +530,7 @@
               .append(fieldName)
               .append("_add\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-              .append("\"><span class=\"glyphicon glyphicon-plus\"></span></button>");
+              .append("\"><span class=\"glyphicon glyphicon-plus\"></span>"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>");
          }
 
          // put a blank if nothing else
@@ -593,7 +590,7 @@
          if (repeatable && !readonly && i < defaults.length)
          {
             // put a remove button next to filled in values
-            sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
+            sb.append("<button class=\"btn btn-danger\" name=\"submit_")
               .append(fieldName)
               .append("_remove_")
               .append(i)
@@ -608,7 +605,7 @@
               .append(fieldName)
               .append("_add\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-              .append("\"><span class=\"glyphicon glyphicon-plus\"></span></button>");
+              .append("\"><span class=\"glyphicon glyphicon-plus\"></span>"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>");
          }
 
          // put a blank if nothing else
@@ -661,18 +658,19 @@
              .append(fieldNameIdx).append("\" size=\"50\" value=\"")
              .append(val +"\"")
              .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
-             .append("/></span>")
-             .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly))
+             .append("/></span>");
+           
+           sb.append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly))
              .append("\n");
            sb.append(doAuthority(pageContext, fieldName, i,  fieldCount,
                               fieldName, auth, conf, false, repeatable,
-                              defaults, inputBlock, collectionID))
-             .append("</div>\n");
+                              defaults, inputBlock, collectionID));
+             
 
           if (repeatable && !readonly && i < defaults.length)
           {
              // put a remove button next to filled in values
-             sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
+             sb.append("<button class=\"btn btn-danger\" name=\"submit_")
                .append(fieldName)
                .append("_remove_")
                .append(i)
@@ -687,11 +685,14 @@
                .append(fieldName)
                .append("_add\" value=\"")
                .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-               .append("\"><span class=\"glyphicon glyphicon-plus\"></span></button>");
+               .append("\"><span class=\"glyphicon glyphicon-plus\"></span>"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>");
           }
+
           sb.append("</div>");
         }
-	  sb.append("</div><br/>");
+      sb.append("</div>");
+      sb.append("</div><br/>");
+	  
       out.write(sb.toString());
     }
 
@@ -743,7 +744,7 @@
              .append("\" /></span>");
           if (!readonly)
           {
-                       sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
+                       sb.append("<button class=\"btn btn-danger\" name=\"submit_")
                              .append(fieldName)
                              .append("_remove_")
                              .append(i)
@@ -788,7 +789,7 @@
                          .append("/></span>");
                    if (!readonly)
                    {
-                               sb.append(" <button class=\"btn btn-danger col-md-2\" name=\"submit_")
+                               sb.append(" <button class=\"btn btn-danger\" name=\"submit_")
                                      .append(fieldName)
                                      .append("_remove_")
                                      .append(i)
@@ -918,7 +919,7 @@
          if (repeatable && !readonly && j < defaults.length)
          {
             // put a remove button next to filled in values
-            sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
+            sb.append("<button class=\"btn btn-danger\" name=\"submit_")
               .append(fieldName)
               .append("_remove_")
               .append(j)
@@ -934,7 +935,7 @@
 //            .append("_add\" value=\"Add More\"/> </td></tr>");
               .append("_add\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-              .append("\"><span class=\"glyphicon glyphicon-plus\"></span></button>");
+              .append("\"><span class=\"glyphicon glyphicon-plus\"></span>"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>");
          }
 
          // put a blank if nothing else
@@ -1001,15 +1002,16 @@
       DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
       StringBuffer sb = new StringBuffer();
 
-      sb.append("<tr><td class=\"submitFormLabel\">")
-        .append(label)
-        .append("</td>");
-      sb.append("<td colspan=\"2\">")
+      sb.append("<div class=\"row\"><label class=\"col-md-2\">")
+      .append(label)
+      .append("</label>");
+
+      sb.append("<span class=\"col-md-8\">")
         .append(doAuthority(pageContext, fieldName, 0,  defaults.length,
                               fieldName, null, Choices.CF_UNSET, false, repeatable,
                               defaults, null, collectionID))
 
-        .append("</td></tr>");
+        .append("</span></div><br/>");
       out.write(sb.toString());
     }
 
