@@ -66,7 +66,7 @@
 	</h1>
 
 	<%-- <p>Who has permission to submit new items to this collection? --%>
-	<p class="alert alert-info"><fmt:message key="jsp.dspace-admin.wizard-permissions.text2"/></p>
+	<p><fmt:message key="jsp.dspace-admin.wizard-permissions.text2"/></p>
 <%
 	break;
 
@@ -81,7 +81,7 @@
 	They will be able to accept or reject incoming submissions.  They will not be
 	able to edit the submission's metadata, however.  Only one of the group need perform the step
 	for each submission. --%>
-	<p class="alert alert-info"><fmt:message key="jsp.dspace-admin.wizard-permissions.text3"/></p>
+	<p><fmt:message key="jsp.dspace-admin.wizard-permissions.text3"/></p>
 <%
 	break;
 
@@ -109,7 +109,7 @@
 	<%-- <p>Who is responsible for performing the <strong>edit metadata</strong> step?
 	They will be able to edit the metadata of incoming submissions, but will not
 	be able to reject them.</p>--%>
-	<p class="alert alert-info"><fmt:message key="jsp.dspace-admin.wizard-permissions.text5"/>
+	<p><fmt:message key="jsp.dspace-admin.wizard-permissions.text5"/>
 <%
 	break;
 
@@ -122,7 +122,7 @@
 	<%-- <p>Who are the collection administrators for this collection?  They will be able to decide who can submit items
     to the collection, withdraw items, edit item metadata (after submission), and add (map) existing items from
     other collections to this collection (subject to authorization from that collection).</p>--%>
-	<p class="alert alert-info"><fmt:message key="jsp.dspace-admin.wizard-permissions.text6"/></p>
+	<p><fmt:message key="jsp.dspace-admin.wizard-permissions.text6"/></p>
 <%
 	break;
 	}
@@ -170,7 +170,7 @@
         <input type="hidden" name="permission" value="<%= perm %>" />
 
         <%-- <input type="submit" name="submit_next" value="Next &gt;" onclick="javascript:finishEPerson();finishGroups();"> --%>
-        <div class="row"><input class="btn btn-success pull-right col-md-2" type="submit" name="submit_next" value="<fmt:message key="jsp.dspace-admin.general.next.button"/>" onclick="javascript:finishEPerson();finishGroups();"/></div>
+        <div class="row container"><input class="btn btn-primary pull-right col-md-2" type="submit" name="submit_next" value="<fmt:message key="jsp.dspace-admin.general.next.button"/>" onclick="javascript:finishEPerson();finishGroups();"/></div>
         
     </form>
 
