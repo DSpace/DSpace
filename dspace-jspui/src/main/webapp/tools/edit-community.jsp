@@ -82,8 +82,8 @@
     if (community == null)
     {
 %>
-    <h3 class="col-md-8"><fmt:message key="jsp.tools.edit-community.heading1"/>
-    	<span class="pull-right">
+    <h3 class="col-md-12"><fmt:message key="jsp.tools.edit-community.heading1"/>
+    	<span>
         	<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#editcommunity\"%>"><fmt:message key="jsp.help"/></dspace:popup>
         </span>
     </h3>
@@ -95,7 +95,7 @@
     <h3 class="col-md-8"><fmt:message key="jsp.tools.edit-community.heading2">
         <fmt:param><%= community.getHandle() %></fmt:param>
         </fmt:message>
-        <span class="pull-right">
+        <span>
         	<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#editcommunity\"%>"><fmt:message key="jsp.help"/></dspace:popup>
         </span>	
     </h3>
@@ -113,7 +113,7 @@
   
 <form method="post" action="">  
 <div class="row">
-	<div class="col-md-8">
+	<div class="col-md-<%= community != null?"8":"12" %>">
 	<div class="panel panel-primary">
 		<div class="panel-heading"><fmt:message key="jsp.tools.edit-community.form.basic-metadata"/></div>
     
@@ -169,6 +169,7 @@
         </div>
      </div>
  </div>
+ <% if (community != null) { %>
  <div class="col-md-4">
  	<div class="panel panel-default">
 		<div class="panel-heading"><fmt:message key="jsp.tools.edit-community.form.community-settings" /></div>
@@ -231,6 +232,7 @@
 	</div>
 	</div>
 </div>
+<% } %>
 </div>	
 
 <div class="row">
