@@ -980,10 +980,10 @@ public class ShoppingCart {
     {
         if(note==null)
         {
-            myRow.setColumnNull("note");
+            myRow.setColumnNull("notes");
         }
         else{
-            myRow.setColumn("note",note);
+            myRow.setColumn("notes",note);
         }
         modified = true;
 

@@ -361,6 +361,17 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
             identity.addLabel(T_name11);
             identity.addItem().addContent(surCharge);
         }
+        identity.addLabel("Order date");
+        if(shoppingcart.getOrderDate()!=null)
+            identity.addItem().addContent(shoppingcart.getOrderDate().toString());
+        identity.addLabel("Payment date");
+        if(shoppingcart.getPaymentDate()!=null)
+            identity.addItem().addContent(shoppingcart.getPaymentDate().toString());
+        identity.addLabel("Notes");
+        if(shoppingcart.getNote()!=null)
+            identity.addItem("note","note").addTextArea("note").setValue(shoppingcart.getNote());
+        else
+            identity.addItem("note","note").addTextArea("note");
 
         identity.addLabel(T_name7);
         identity.addItem().addContent(Double.toString(total));
@@ -372,15 +383,6 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
         }
         edit.addHidden("administrative-continue").setValue(knot.getId());
 
-        identity.addLabel("Order date");
-        if(shoppingcart.getOrderDate()!=null)
-        identity.addItem().addContent(shoppingcart.getOrderDate().toString());
-        identity.addLabel("Payment date");
-        if(shoppingcart.getPaymentDate()!=null)
-        identity.addItem().addContent(shoppingcart.getPaymentDate().toString());
-        identity.addLabel("Notes:");
-        if(shoppingcart.getNote()!=null)
-        identity.addItem("note","note").addTextArea("note").setValue(shoppingcart.getNote());
 
 
     }

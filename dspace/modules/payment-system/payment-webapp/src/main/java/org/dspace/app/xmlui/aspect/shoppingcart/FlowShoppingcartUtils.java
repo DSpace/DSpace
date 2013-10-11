@@ -84,6 +84,14 @@ public class FlowShoppingcartUtils {
            }
         }
 
+        String note = request.getParameter("note");
+        if (!StringUtils.isEmpty(note)){
+            shoppingCart.setNote(note);
+        }
+        else
+        {
+            shoppingCart.setNote(null);
+        }
 
         if (result.getErrors() == null) {
 
@@ -148,14 +156,6 @@ public class FlowShoppingcartUtils {
                 if(!transactionId.equals(transactionIdOriginal)) {
                     shoppingCart.setTransactionId(transactionId);
                 }
-            }
-            String note = request.getParameter("note");
-            if (StringUtils.isEmpty(note)){
-                shoppingCart.setNote(note);
-            }
-            else
-            {
-                shoppingCart.setNote(null);
             }
 
 
