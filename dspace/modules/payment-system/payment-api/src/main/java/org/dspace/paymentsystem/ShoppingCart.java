@@ -22,6 +22,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -69,6 +70,10 @@ public class ShoppingCart {
 
     public static final int JOURNAL =15;
     public static final int JOURNAL_SUB =16;
+
+    public static final int ORDER_DATE =17;
+    public static final int PAYMENT_DATE =18;
+    public static final int NOTE =19;
 
     public static final String STATUS_COMPLETED = "completed";
     public static final String STATUS_OPEN = "open";
@@ -927,4 +932,78 @@ public class ShoppingCart {
     {
         return myRow.getBooleanColumn("journal_sub");
     }
+
+
+
+    /**
+     * Set the order date
+     *
+     * @return text_lang code (or null if the column is an SQL NULL)
+     */
+    public void setOrderDate(java.util.Date date)
+    {
+        if(date==null)
+        {
+            myRow.setColumnNull("order_date");
+        }
+        else{
+            myRow.setColumn("order_date",date);
+        }
+        modified = true;
+
+    }
+
+    /**
+     * Set the payment date
+     *
+     * @return text_lang code (or null if the column is an SQL NULL)
+     */
+    public void setPaymentDate(java.util.Date date)
+    {
+        if(date==null)
+        {
+            myRow.setColumnNull("payment_date");
+        }
+        else{
+            myRow.setColumn("payment_date",date);
+        }
+        modified = true;
+
+    }
+
+    /**
+     * Set the Note
+     *
+     * @return text_lang code (or null if the column is an SQL NULL)
+     */
+    public void setNote(String note)
+    {
+        if(note==null)
+        {
+            myRow.setColumnNull("note");
+        }
+        else{
+            myRow.setColumn("note",note);
+        }
+        modified = true;
+
+    }
+
+    public String getNote()
+    {
+        return myRow.getStringColumn("notes");
+
+    }
+
+    public Date getOrderDate()
+    {
+        return myRow.getDateColumn("order_date");
+
+    }
+    public Date getPaymentDate()
+    {
+        return myRow.getDateColumn("payment_date");
+
+    }
+
 }

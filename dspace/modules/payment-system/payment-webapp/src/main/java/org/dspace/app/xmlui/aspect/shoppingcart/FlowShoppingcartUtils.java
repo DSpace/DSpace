@@ -149,6 +149,15 @@ public class FlowShoppingcartUtils {
                     shoppingCart.setTransactionId(transactionId);
                 }
             }
+            String note = request.getParameter("note");
+            if (StringUtils.isEmpty(note)){
+                shoppingCart.setNote(note);
+            }
+            else
+            {
+                shoppingCart.setNote(null);
+            }
+
 
             paymentSystemService.updateTotal(context,shoppingCart,null);
             context.commit();

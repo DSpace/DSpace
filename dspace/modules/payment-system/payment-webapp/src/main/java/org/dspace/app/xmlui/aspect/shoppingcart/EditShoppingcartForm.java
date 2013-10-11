@@ -371,6 +371,18 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
             buttons.addButton("submit_save").setValue(T_submit_save);
         }
         edit.addHidden("administrative-continue").setValue(knot.getId());
+
+        identity.addLabel("Order date");
+        if(shoppingcart.getOrderDate()!=null)
+        identity.addItem().addContent(shoppingcart.getOrderDate().toString());
+        identity.addLabel("Payment date");
+        if(shoppingcart.getPaymentDate()!=null)
+        identity.addItem().addContent(shoppingcart.getPaymentDate().toString());
+        identity.addLabel("Notes:");
+        if(shoppingcart.getNote()!=null)
+        identity.addItem("note","note").addTextArea("note").setValue(shoppingcart.getNote());
+
+
     }
 
 }

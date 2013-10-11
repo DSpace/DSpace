@@ -28,7 +28,10 @@ CREATE TABLE shoppingcart
   no_integ DOUBLE PRECISION,
   surcharge DOUBLE PRECISION,
   journal VARCHAR(256),
-  journal_sub BOOL
+  journal_sub BOOL,
+  order_date date,
+  payment_date date,
+  notes VARCHAR(1024)
 );
 
 CREATE SEQUENCE voucher_seq;

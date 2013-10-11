@@ -7,6 +7,7 @@
  */
 package org.dspace.paymentsystem;
 
+import edu.harvard.hul.ois.mets.helper.DateTime;
 import org.apache.cocoon.environment.Request;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.httpclient.HttpClient;
@@ -339,6 +340,8 @@ public class PaypalImpl implements PaypalService{
                         {
                             //successfull
                             shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
+                            Date date= new Date();
+                            shoppingCart.setPaymentDate(date);
                             shoppingCart.update();
                             sendPaymentApprovedEmail(c, wfi, shoppingCart);
                             return true;
@@ -508,7 +511,7 @@ public class PaypalImpl implements PaypalService{
         }catch (Exception e)
         {
             //TODO: handle the exceptions
-            paypalService.showSkipPaymentButton(mainDiv,"errors in generate the payment form");
+            paypalService.showSkipPaymentButton(mainDiv,"errors in generate the payment form:"+e.getMessage());
             log.error("Exception when entering the checkout step:", e);
         }
 
