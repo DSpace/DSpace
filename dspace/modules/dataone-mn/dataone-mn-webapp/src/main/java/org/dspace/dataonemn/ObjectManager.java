@@ -981,7 +981,7 @@ public class ObjectManager implements Constants {
 		String dataFileTimestamp = "";
 		if(idTimestamp.length() > 0) {
 		    // get the timestamp for this file
-		    Item fileItem = getDSpaceItem(aID);
+		    Item fileItem = getDSpaceItem(dataFileIdString);
 		    Date fileModDate = fileItem.getLastModified();
 		    String fileModString = dateFormatter.format(fileModDate);
 		    dataFileTimestamp = "?ver=" + fileModString;
