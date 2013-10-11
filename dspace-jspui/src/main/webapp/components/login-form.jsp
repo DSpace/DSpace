@@ -14,16 +14,20 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
 	<div class="panel-body">
-     <form name="loginform" class="form" id="loginform" method="post" action="<%= request.getContextPath() %>/password-login">  
+     <form name="loginform" class="form-horizontal" id="loginform" method="post" action="<%= request.getContextPath() %>/password-login">  
       <p><strong><a href="<%= request.getContextPath() %>/register"><fmt:message key="jsp.components.login-form.newuser"/></a></strong></p>
 	  <p><fmt:message key="jsp.components.login-form.enter"/></p>
-		<div class="row">
-            <label class="col-md-2" for="tlogin_email"><fmt:message key="jsp.components.login-form.email"/></label>
-            <input class="col-md-3" type="text" name="login_email" id="tlogin_email" tabindex="1" />
+		<div class="form-group">
+            <label class="col-md-2 control-label" for="tlogin_email"><fmt:message key="jsp.components.login-form.email"/></label>
+            <div class="col-md-6">
+            	<input class="form-control" type="text" name="login_email" id="tlogin_email" tabindex="1" />
+            </div>
         </div>
-        <div class="row">
-            <label class="col-md-2" for="tlogin_password"><fmt:message key="jsp.components.login-form.password"/></label>
-            <input class="col-md-3" type="password" name="login_password" id="tlogin_password" tabindex="2" />
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="tlogin_password"><fmt:message key="jsp.components.login-form.password"/></label>
+            <div class="col-md-6">
+            	<input class="form-control" type="password" name="login_password" id="tlogin_password" tabindex="2" />
+            </div>
         </div>
         <div class="row">
         <div class="col-md-6">
