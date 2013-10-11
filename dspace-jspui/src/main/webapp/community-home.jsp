@@ -240,7 +240,7 @@
 %>
 			<div class="list-group-item row">  
 <%  
-		Bitstream logoCom = collections[j].getLogo();
+		Bitstream logoCom = subcommunities[j].getLogo();
 		if (logoCom != null) { %>
 			<div class="col-md-3">
 		        <img alt="Logo" class="img-responsive" src="<%= request.getContextPath() %>/retrieve/<%= logoCom.getID() %>" /> 

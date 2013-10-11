@@ -76,7 +76,7 @@
 		out.println("<br>");
         // Get the collections in this community
         Collection[] cols = (Collection[]) collectionMap.get(c.getID());
-        if (cols.length > 0)
+        if (cols != null && cols.length > 0)
         {
             out.println("<ul class=\"media-list\">");
             for (int j = 0; j < cols.length; j++)
@@ -108,7 +108,7 @@
 
         // Get the sub-communities in this community
         Community[] comms = (Community[]) subcommunityMap.get(c.getID());
-        if (comms.length > 0)
+        if (comms != null && comms.length > 0)
         {
             out.println("<ul class=\"media-list\">");
             for (int k = 0; k < comms.length; k++)
