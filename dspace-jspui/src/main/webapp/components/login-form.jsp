@@ -18,13 +18,13 @@
       <p><strong><a href="<%= request.getContextPath() %>/register"><fmt:message key="jsp.components.login-form.newuser"/></a></strong></p>
 	  <p><fmt:message key="jsp.components.login-form.enter"/></p>
 		<div class="form-group">
-            <label class="col-md-2 control-label" for="tlogin_email"><fmt:message key="jsp.components.login-form.email"/></label>
+            <label class="col-md-offset-3 col-md-2 control-label" for="tlogin_email"><fmt:message key="jsp.components.login-form.email"/></label>
             <div class="col-md-3">
             	<input class="form-control" type="text" name="login_email" id="tlogin_email" tabindex="1" />
             </div>
         </div>
         <div class="form-group">
-            <label class="col-md-2 control-label" for="tlogin_password"><fmt:message key="jsp.components.login-form.password"/></label>
+            <label class="col-md-offset-3 col-md-2 control-label" for="tlogin_password"><fmt:message key="jsp.components.login-form.password"/></label>
             <div class="col-md-3">
             	<input class="form-control" type="password" name="login_password" id="tlogin_password" tabindex="2" />
             </div>
