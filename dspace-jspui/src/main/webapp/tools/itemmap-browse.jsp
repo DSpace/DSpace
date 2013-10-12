@@ -49,7 +49,7 @@
             .getAttribute("page") : 1;
 %>
 
-<dspace:layout titlekey="jsp.tools.itemmap-browse.title">
+<dspace:layout style="submission" titlekey="jsp.tools.itemmap-browse.title">
 
     <%-- <h2>Browse <%=browsetext%></h2> --%>
     <h2>
@@ -67,14 +67,14 @@
 
     <%-- <p>Check the box next to items you wish to add or remove, and choose 'add' or 'remove'.</p> --%>
     <% if (browsetype.equals("Add")){ %>
-    <p>
+    <p class="alert alert-info">
         <fmt:message key="jsp.tools.itemmap-browse.add">
             <fmt:param><%= collection.getName() %></fmt:param>
         </fmt:message>
     </p>
     <% }%>
     <% if (browsetype.equals("Remove")){ %>
-    <p>
+    <p class="alert alert-warning">
         <fmt:message key="jsp.tools.itemmap-browse.remove">
             <fmt:param><%= collection.getName() %></fmt:param>
         </fmt:message>
@@ -84,22 +84,18 @@
     <%-- %>p><fmt:message key="jsp.tools.itemmap-browse.infomsg"/></p--%>
     <form method="post" action="<%= request.getContextPath() %>/tools/itemmap">
         <input type="hidden" name="cid" value="<%=collection.getID()%>" />
-
-        <table>     
-          <tr>
-            <td><input type="hidden" name="action" value="<%=browsetype%>" />
+	<div class="btn-group">		
+		<input type="hidden" name="action" value="<%=browsetype%>" />
                 <% if (browsetype.equals("Add")) { %>
-                        <input type="submit" value="<fmt:message key="jsp.tools.general.add"/>" />
+                        <input class="btn btn-success" type="submit" value="<fmt:message key="jsp.tools.general.add"/>" />
                 <% } else if (browsetype.equals("Remove")) { %>
-                        <input type="submit" value="<fmt:message key="jsp.tools.general.remove"/>" />
+                        <input class="btn btn-danger" type="submit" value="<fmt:message key="jsp.tools.general.remove"/>" />
                 <% } %>
-            </td>
-            <td><input type="submit" name="cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" /></td>
-          </tr>
-        </table>
-
-
-        <table class="miscTable" align="center">
+        
+        <input class="btn btn-default" type="submit" name="cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" />
+	</div>        
+	<div class="table-responsive">
+        <table class="table">
         <tr>
             <th class="oddRowOddCol"><strong><fmt:message key="jsp.tools.itemmap-browse.th.date"/></strong></th>
             <th class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.itemmap-browse.th.author"/></strong></th>
@@ -110,9 +106,9 @@
             <% } else { %>
                 <th class="oddRowEvenCol">
                 <% if (browsetype.equals("Add")) { %>
-                        <input type="submit" value="<fmt:message key="jsp.tools.general.add"/>" />
+                        <input class="btn btn-success" type="submit" value="<fmt:message key="jsp.tools.general.add"/>" />
                 <% } else if (browsetype.equals("Remove")) { %>
-                        <input type="submit" value="<fmt:message key="jsp.tools.general.remove"/>" />
+                        <input class="btn btn-danger" type="submit" value="<fmt:message key="jsp.tools.general.remove"/>" />
                 <% } %>
                 </th>
             <% } %>     
@@ -189,53 +185,50 @@
 <% } %>
         
         </table>
-
-        <table>     
-          <tr>
-            <td>
+	</div>
+	<div class="btn-group">		
+		<input type="hidden" name="action" value="<%=browsetype%>" />
                 <% if (browsetype.equals("Add")) { %>
-                        <input type="submit" value="<fmt:message key="jsp.tools.general.add"/>" />
+                        <input class="btn btn-success" type="submit" value="<fmt:message key="jsp.tools.general.add"/>" />
                 <% } else if (browsetype.equals("Remove")) { %>
-                        <input type="submit" value="<fmt:message key="jsp.tools.general.remove"/>" />
+                        <input class="btn btn-danger" type="submit" value="<fmt:message key="jsp.tools.general.remove"/>" />
                 <% } %>
-            </td>
-            <td><input type="submit" name="cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" /></td>
-          </tr>
-        </table>
-
+        
+        <input class="btn btn-default" type="submit" name="cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" />
+	</div>
+	
     </form>
 
 <% if (bMore || pageResult > 1) { %>
-        <table>     
-          <tr>
-            <td>
-<p><fmt:message key="jsp.tools.itemmap-browse.info.change-page"/></p>
-			</td>
+
+<p class="alert"><fmt:message key="jsp.tools.itemmap-browse.info.change-page"/></p>
+<div class="col-md-12">
 <% if (pageResult > 1) { %>			
-			<td>
+
 	<form method="post" class="standard10" action="">
         <input type="hidden" name="cid" value="<%=collection.getID()%>"/>
         <input type="hidden" name="action" value="search"/>
         <input type="hidden" name="index" id="index" value="<%= index %>"/>
         <input type="hidden" name="query" id="query" value="<%= query %>"/>
         <input type="hidden" name="page" id="page" value="<%= pageResult -1 %>"/>
-        <input type="submit" value="<fmt:message key="jsp.tools.itemmap-browse.previous.button"/>"/> 
+        <input class="btn btn-default col-md-6" type="submit" value="<fmt:message key="jsp.tools.itemmap-browse.previous.button"/>"/> 
     </form>
-    		</td>
+
 <% 	}
 	if (bMore) { %>    		
-    		<td>
+    		
 	<form method="post" class="standard10" action="">
         <input type="hidden" name="cid" value="<%=collection.getID()%>"/>
         <input type="hidden" name="action" value="search"/>
         <input type="hidden" name="index" id="index" value="<%= index %>"/>
         <input type="hidden" name="query" id="query" value="<%= query %>"/>
         <input type="hidden" name="page" id="page" value="<%= pageResult +1 %>"/>
-        <input type="submit" value="<fmt:message key="jsp.tools.itemmap-browse.next.button"/>"/> 
+        <input class="btn btn-primary col-md-6" type="submit" value="<fmt:message key="jsp.tools.itemmap-browse.next.button"/>"/> 
     </form>
-    		</td>
-    
-<% 	} 
+    		    
+<% 	} %>
+</div>
+<%
 }
 %>
 </dspace:layout>
