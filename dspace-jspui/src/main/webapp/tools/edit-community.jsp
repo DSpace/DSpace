@@ -103,7 +103,7 @@
               <form class="col-md-4" method="post" action="">
                 <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_DELETE_COMMUNITY %>" />
                 <input type="hidden" name="community_id" value="<%= community.getID() %>" />
-                <input class="col-md-12 btn btn-danger" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-community.button.delete"/>" />
+                <input class="col-md-12 btn btn-danger" type="submit" name="submit_delete" value="<fmt:message key="jsp.tools.edit-community.button.delete"/>" />
               </form>
     <% } %>
 <%

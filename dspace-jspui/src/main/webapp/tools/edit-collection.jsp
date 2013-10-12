@@ -150,7 +150,7 @@
         <fmt:param><%= collection.getHandle() %></fmt:param>
     </fmt:message>
 <% } %>    
-	<span class="pull-right">
+	<span>
 		<dspace:popup page="/help/site-admin.html#editcollection"><fmt:message key="jsp.help"/></dspace:popup>
 	</span>
 	</h3>    
@@ -159,7 +159,7 @@
                 <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_DELETE_COLLECTION %>" />
                 <input type="hidden" name="community_id" value="<%= community.getID() %>" />
                 <input type="hidden" name="collection_id" value="<%= collection.getID() %>" />
-                <input class="btn btn-danger col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-collection.button.delete"/>" />
+                <input class="btn btn-danger col-md-12" type="submit" name="submit_delete" value="<fmt:message key="jsp.tools.edit-collection.button.delete"/>" />
               </form>
 <% } %>
 </div>
