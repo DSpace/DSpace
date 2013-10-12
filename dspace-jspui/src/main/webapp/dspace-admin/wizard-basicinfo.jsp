@@ -42,8 +42,6 @@
 
     <form action="<%= request.getContextPath() %>/tools/collection-wizard" method="post" enctype="multipart/form-data">
 
-				<div class="alert alert-info">
-                </div>
 				<div class="form-group"> 
 	           		<label for="short_description"><fmt:message key="jsp.dspace-admin.wizard-basicinfo.name"/></label>
             		<%-- <td><p class="submitFormLabel">Name:</p></td> --%>
