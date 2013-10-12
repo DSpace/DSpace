@@ -182,7 +182,7 @@ public class AccessSettingTag extends TagSupport
             	sb.append("<div class=\"form-group\">");
             	sb.append(label_date).append("\n");                
                 sb.append("<input class=\"form-control\" name=\"embargo_until_date\" id=\"embargo_until_date\" type=\"text\" value=\"").append(startDate).append("\"").append(disabled).append(" />\n");;
-                sb.append("<span class=\"help-block\">"+radio_help+"</span></br>");                
+                sb.append("<span class=\"help-block\">"+radio_help+"</span><br/>");                
                 // Reason                
                 sb.append(label_reason).append("\n");                
                 sb.append("<textarea class=\"form-control\" name=\"reason\" id=\"reason\" cols=\"30\" rows=\"5\"").append(disabled).append(">").append(reason).append("</textarea>\n");
@@ -193,7 +193,7 @@ public class AccessSettingTag extends TagSupport
             if (addpolicy)
             {
                 
-                sb.append("<input class=\"btn btn-primary col-md-offset-5\" name=\"submit_add_policy\" type=\"submit\" value=\"").append(button_confirm).append("\" />\n");
+                sb.append("<input class=\"btn btn-success col-md-offset-5\" name=\"submit_add_policy\" type=\"submit\" value=\"").append(button_confirm).append("\" />\n");
                 
             }
             
