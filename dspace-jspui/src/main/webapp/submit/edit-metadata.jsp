@@ -116,6 +116,20 @@
             "select".equals(cam.getPresentation(fieldKey)));
     }
 
+    // Get the presentation type of the authority if any, null otherwise
+    String getAuthorityType(PageContext pageContext, String fieldName, int collectionID)
+    {
+        MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
+        ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
+        StringBuffer sb = new StringBuffer();
+
+        if (cam.isChoicesConfigured(fieldName))
+        {
+        	return cam.getPresentation(fieldName);
+        }
+        return null;
+    }
+    
     // Render the choice/authority controlled entry, or, if not indicated,
     // returns the given default inputBlock
     StringBuffer doAuthority(PageContext pageContext, String fieldName,
@@ -150,7 +164,7 @@
             { 
                 sb.append(" <img id=\""+confIndID+"\" title=\"")
                   .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.authority.confidence.description."+confidenceSymbol))
-                  .append("\" class=\"ds-authority-confidence cf-")                  
+                  .append("\" class=\"pull-left ds-authority-confidence cf-")                  
                   // set confidence to cf-blank if authority is empty
                   .append(authorityValue==null||authorityValue.length()==0 ? "blank" : confidenceSymbol)
                   .append(" \" src=\"").append(contextPath).append("/image/confidence/invisible.gif\" />");
@@ -221,7 +235,7 @@
             {
                 if (inputBlock != null)
                     sb.insert(0, inputBlock);
-                sb.append("<button class=\"btn\" name=\"").append(fieldInput).append("_lookup\" ")
+                sb.append("<button class=\"btn btn-default col-md-1\" name=\"").append(fieldInput).append("_lookup\" ")
                   .append("onclick=\"javascript: return DSpaceChoiceLookup('")
                   .append(contextPath).append("/tools/lookup.jsp','")
                   .append(fieldName).append("','edit_metadata','")
@@ -245,7 +259,8 @@
       boolean readonly, int fieldCountIncr, String label, PageContext pageContext, int collectionID)
       throws java.io.IOException
     {
-
+   	  String authorityType = getAuthorityType(pageContext, fieldName, collectionID);
+    	
       DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer headers = new StringBuffer();
@@ -265,6 +280,10 @@
       for (int i = 0; i < fieldCount; i++)
       {
     	 sb.append("<div class=\"row col-md-12\">");
+    	 if ("lookup".equalsIgnoreCase(authorityType))
+    	 {
+    	 	sb.append("<div class=\"row col-md-10\">");
+    	 }
          first.setLength(0);
          first.append(fieldName).append("_first");
          if (repeatable && i != fieldCount-1)
@@ -311,8 +330,13 @@
          sb.append("value=\"")
            .append(dpn.getFirstNames()).append("\"/></span>");         
          
-         sb.append(doAuthority(pageContext, fieldName, i, fieldCount, fieldName,
-                auth, conf, true, repeatable, defaults, null, collectionID));
+         if ("lookup".equalsIgnoreCase(authorityType))
+    	 {
+             sb.append(doAuthority(pageContext, fieldName, i, fieldCount, fieldName,
+                     auth, conf, true, repeatable, defaults, null, collectionID));
+             sb.append("</div>");
+    	 }
+         
 
          if (repeatable && !readonly && i < defaults.length)
          {
@@ -321,7 +345,7 @@
                 .append(' ')
                 .append(Utils.addEntities(dpn.getFirstNames()));
             // put a remove button next to filled in values
-            sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
+            sb.append("<button class=\"btn btn-danger pull-right col-md-2\" name=\"submit_")
               .append(fieldName)
               .append("_remove_")
               .append(i)
@@ -546,7 +570,7 @@
       int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary, int collectionID)
       throws java.io.IOException
     {
-
+      String authorityType = getAuthorityType(pageContext, fieldName, collectionID);
       DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
@@ -575,18 +599,31 @@
          }
          sb.append("<div class=\"row col-md-12\">\n");
          String fieldNameIdx = fieldName + ((repeatable && i != fieldCount-1)?"_" + (i+1):"");
-         StringBuffer inputBlock = new StringBuffer().append("<span class=\"col-md-10\"><textarea class=\"form-control\" name=\"").append(fieldNameIdx)
+         sb.append("<div class=\"col-md-10\">");
+         if (authorityType != null)
+         {
+        	 sb.append("<div class=\"col-md-10\">");
+         }
+         sb.append("<textarea class=\"form-control\" name=\"").append(fieldNameIdx)
            .append("\" rows=\"4\" cols=\"45\" id=\"")
            .append(fieldNameIdx).append("_id\" ")
            .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" disabled=\"disabled\" ":"")
            .append(">")
            .append(val)
-           .append("</textarea></span>\n")
-           .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly));
-         sb.append(doAuthority(pageContext, fieldName, i, fieldCount, fieldName,
+           .append("</textarea>");
+         
+         if (authorityType != null)
+         {
+        	 sb.append("</div><div class=\"col-md-2\">");
+	         sb.append(doAuthority(pageContext, fieldName, i, fieldCount, fieldName,
                             auth, conf, false, repeatable,
-                            defaults, inputBlock, collectionID));
+                            defaults, null, collectionID));
+	         sb.append("</div>");
+         }
 
+         sb.append("</div>")
+           .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly));
+         
          if (repeatable && !readonly && i < defaults.length)
          {
             // put a remove button next to filled in values
@@ -621,7 +658,7 @@
       int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary, int collectionID)
       throws java.io.IOException
     {
-
+      String authorityType = getAuthorityType(pageContext, fieldName, collectionID);
       DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
@@ -652,20 +689,30 @@
 
            sb.append("<div class=\"row col-md-12\">");
            String fieldNameIdx = fieldName + ((repeatable && i != fieldCount-1)?"_" + (i+1):"");
-           StringBuffer inputBlock = new StringBuffer("<span class=\"col-md-10\"><input class=\"form-control\" type=\"text\" name=\"")
+           
+           sb.append("<div class=\"col-md-10\">");
+           if (authorityType != null)
+           {
+        	   sb.append("<div class=\"row col-md-10\">");
+           }
+           sb.append("<input class=\"form-control\" type=\"text\" name=\"")
              .append(fieldNameIdx)
              .append("\" id=\"")
              .append(fieldNameIdx).append("\" size=\"50\" value=\"")
              .append(val +"\"")
              .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
-             .append("/></span>");
+             .append("/></div>");
            
            sb.append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly))
              .append("\n");
-           sb.append(doAuthority(pageContext, fieldName, i,  fieldCount,
+           if (authorityType != null)
+           {
+        	   sb.append("<div class=\"col-md-2\">");
+	           sb.append(doAuthority(pageContext, fieldName, i,  fieldCount,
                               fieldName, auth, conf, false, repeatable,
-                              defaults, inputBlock, collectionID));
-             
+                              defaults, null, collectionID));
+           	   sb.append("</div></div>");
+           }             
 
           if (repeatable && !readonly && i < defaults.length)
           {
