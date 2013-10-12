@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<bean class="org.dspace.submit.lookup.SubmissionLookupService"
+		name="org.dspace.submit.lookup.SubmissionLookupService">
+		<property name="providers">
+			<list>
+				<!-- <ref bean="scopusLookupProvider" /> -->
+				<ref bean="pubmedLookupProvider" />
+				<ref bean="crossrefLookupProvider" />
+				<ref bean="arxivLookupProvider" />
+			</list>
+		</property>
+		<property name="extraMetadataToKeep">
+			<list>
+				<value>dc.import.contributorauthor</value>
+				<value>dc.import.contributoreditor</value>
+				<value>dc.import.contributortranslator</value>
+				<!-- <value>dc.description.scopusurl</value>
+				<value>dc.description.scopuscitationcount</value>
+				<value>dc.description.scopuscitationurl</value>-->
+			</list>
+		</property> 
+		<property name="enhancedMetadata">
+			<map>
+				<entry key="allauthors">
+					<bean class="org.dspace.submit.util.RepeatableToSingleValueEnhancer">
+						<property name="separator" value="\n" />
+						<property name="separatorWhitespaceAfter" value="false" />
+						<property name="singleValues">
+						<list>
+							<value>authors</value>
+						</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="allkeywords">
+					<bean class="org.dspace.submit.util.RepeatableToSingleValueEnhancer">
+						<property name="separator" value=";" />
+						<property name="singleValues">
+						<list>
+							<value>keywords</value>
+							<value>mesh</value>
+						</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	
+	<bean class="org.dspace.submit.lookup.PubmedService" name="pubmedService" />
+	<bean class="org.dspace.submit.lookup.PubmedLookupProvider"
+		name="pubmedLookupProvider">
+		<property name="pubmedService" ref="pubmedService" />
+		<property name="searchProvider" value="false" />
+	</bean>
+
+	<bean class="org.dspace.submit.lookup.ArXivService" name="arXivService" />
+	<bean class="org.dspace.submit.lookup.ArXivLookupProvider"
+		name="arxivLookupProvider">
+		<property name="arXivService" ref="arXivService" />
+		<property name="searchProvider" value="false" />
+	</bean>
+	
+	<bean class="org.dspace.submit.lookup.CrossRefService" name="crossrefService" />	
+	<bean class="org.dspace.submit.lookup.CrossRefLookupProvider"
+		name="crossrefLookupProvider">
+		<property name="crossrefService" ref="crossrefService" />
+		<property name="searchProvider" value="false" />
+	</bean>
+		
+</beans>
