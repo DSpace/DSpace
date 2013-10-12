@@ -1034,34 +1034,41 @@
                 numColumns = 2;
 
             //print out the field label
-            sb.append("<tr><td class=\"submitFormLabel\">")
-                  .append(label)
-                  .append("</td>");
-            
+			sb.append("<div class=\"row\"><label class=\"col-md-2\">")
+        	  .append(label)
+        	  .append("</label>");
+     		
+            sb.append("<div class=\"col-md-10\">");
+
             if(numColumns > 1)
-                sb.append("<td valign=\"top\">");
+                sb.append("<div class=\"row col-md-"+(12 / numColumns)+"\">");
             else
-                sb.append("<td valign=\"top\" colspan=\"3\">");
-            
+                sb.append("<div class=\"row col-md-12\">");
+
             //flag that lets us know when we are in Column2
             boolean inColumn2 = false;
             
             //loop through all values
             for (int i = 0; i < valueList.size(); i += 2)
             {
-                           //get display value and actual value
-               display = (String)valueList.get(i);
+                   //get display value and actual value
+	               display = (String)valueList.get(i);
                    value = (String)valueList.get(i+1);
          
+                   boolean checked = false;
                    //check if this value has been selected previously
                    for (j = 0; j < defaults.length; j++)
                    {
                         if (value.equals(defaults[j].value))
-                        break;
-               }
+                        {
+                        	checked = true;
+                        	break;
+                        }
+	               }
            
-                                // print input field
-                       sb.append("<input type=\"");
+                   // print input field
+                   sb.append("<div class=\"input-group\"><span class=\"input-group-addon\">");
+                   sb.append("<input type=\"");
                    
                    //if repeatable, print a Checkbox, otherwise print Radio buttons
                    if(repeatable)
@@ -1079,25 +1086,26 @@
                      .append(" value=\"")
                                  .append(value.replaceAll("\"", "&quot;"))
                                  .append("\">");
+                   sb.append("</span>");
                    
                    //print display name immediately after input
-                   sb.append("&nbsp;")
+                   sb.append("<span class=\"form-control\">")
                      .append(display)
-                     .append("<br/>");
+                     .append("</span></div>");
                    
                            // if we are writing values in two columns,
                            // then start column 2 after half of the values
                    if((numColumns == 2) && (i+2 >= (valueList.size()/2)) && !inColumn2)
                    {
                         //end first column, start second column
-                        sb.append("</td>");
-                        sb.append("<td colspan=\"2\" valign=\"top\">");
+                        sb.append("</div>");
+                        sb.append("<div class=\"row col-md-"+(12 / numColumns)+"\">");
                         inColumn2 = true;
                    }
                    
             }//end for each value
 
-            sb.append("</td></tr>");
+            sb.append("</div></div></div><br/>");
             
             out.write(sb.toString());
           }//end doList
