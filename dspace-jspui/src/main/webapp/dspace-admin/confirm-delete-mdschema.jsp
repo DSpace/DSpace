@@ -27,7 +27,7 @@
     MetadataSchema schema = (MetadataSchema) request.getAttribute("schema");
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.confirm-delete-dcschema.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.confirm-delete-dcschema.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
@@ -40,27 +40,20 @@
     
     <%-- <P>Are you sure the schema <strong><%= schema.getNamespace() %></strong>
     should be deleted?</P> --%> 
-    <P><fmt:message key="jsp.dspace-admin.confirm-delete-mdschema.confirm">
+    <p class="alert alert-info"><fmt:message key="jsp.dspace-admin.confirm-delete-mdschema.confirm">
         <fmt:param><%= schema.getName() %></fmt:param>
     </fmt:message></P>
     
     <%-- <P>This will result in an error if any metadata fields exist within this schema.</P>  --%>
-    <P><fmt:message key="jsp.dspace-admin.confirm-delete-mdschema.warning"/></P>
+    <p class="alert alert-warning"><fmt:message key="jsp.dspace-admin.confirm-delete-mdschema.warning"/></p>
 
     <form method="post">
         <input type="hidden" name="dc_schema_id" value="<%= schema.getSchemaID() %>">
-
-        <center>
-            <table width="70%">
-                <tr>
-                    <td align="left">
-                        <%-- <input type="submit" name="submit_confirm_delete" value="Delete"> --%>
-                        <input type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>">
-                        <%-- <input type="submit" name="submit_cancel" value="Cancel">  --%>
-                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>">
-                    </td>
-                </tr>
-            </table>
-        </center>
+        <div class="btn-group">
+        	<%-- <input type="submit" name="submit_confirm_delete" value="Delete"> --%>
+        	<input class="btn btn-danger" type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>">
+    		<%-- <input type="submit" name="submit_cancel" value="Cancel">  --%>
+			<input class="btn btn-default" type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>">
+		</div>
     </form>
 </dspace:layout>

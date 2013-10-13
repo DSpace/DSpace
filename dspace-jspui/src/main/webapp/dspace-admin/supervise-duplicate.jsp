@@ -20,7 +20,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
     
-<dspace:layout titlekey="jsp.dspace-admin.supervise-duplicate.title"
+<dspace:layout 
+			   style="submission"
+		       titlekey="jsp.dspace-admin.supervise-duplicate.title"
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"

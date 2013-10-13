@@ -44,42 +44,32 @@
                parentlink="/mydspace"
                parenttitlekey="jsp.mydspace"
                titlekey="jsp.workspace.ws-main.title">
-
-    <table width="100%" border="0">
-        <tr>
-            <td align="left">
-                <h1>
-                    <fmt:message key="jsp.workspace.ws-main.wsitem"/>
-                </h1>
-            </td>
-            <td align="right" class="standard">
-                <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#mydspace\"%>"><fmt:message key="jsp.help"/></dspace:popup>
-            </td>
-        </tr>
-    </table>
-
-<%--    <h2><%= title %></h2> --%>
+<div class="container">
+        <h2>
 <%
 		if (titleArray.length > 0)
 		{
 %>
-			<h2><%= titleArray[0].value %></h2>
+			<%= titleArray[0].value %>
 <%
 		}
 		else
 		{
 %>
-			<h2><fmt:message key="jsp.general.untitled"/></h2>
+			<fmt:message key="jsp.general.untitled"/>
 <%
 		}
 %>
+			<small><fmt:message key="jsp.workspace.ws-main.wsitem"/></small>
+	        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#mydspace\"%>"><fmt:message key="jsp.help"/></dspace:popup>
 
-    <p><strong><a href="mailto:<%= submitter.getEmail() %>"><%= Utils.addEntities(submitter.getFullName()) %></a></strong></p>
+		</h2>
+    <p><a href="mailto:<%= submitter.getEmail() %>"><%= Utils.addEntities(submitter.getFullName()) %></a></p>
 
 	<p><fmt:message key="jsp.workspace.ws-main.submitmsg"/> 
     <%= workspaceItem.getCollection().getMetadata("name") %></p>
 
-    <table class="miscTable" align="center">
+    <table class="table">
         <tr>
             <th class="oddRowOddCol"><fmt:message key="jsp.workspace.ws-main.optionheading"/></th>
             <th class="oddRowEvenCol"><fmt:message key="jsp.workspace.ws-main.descheading"/></th>
@@ -90,7 +80,7 @@
                     <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>"/>
                     <input type="hidden" name="workspace_id" value="<%= workspaceItem.getID() %>"/>
                     <input type="hidden" name="resume" value="<%= workspaceItem.getID() %>"/>
-                    <input type="submit" name="submit_resume" value="<fmt:message key="jsp.workspace.ws-main.button.edit"/>"/>
+                    <input class="col-md-2 btn btn-primary btn-group-justified" type="submit" name="submit_resume" value="<fmt:message key="jsp.workspace.ws-main.button.edit"/>"/>
                 </form>
             </td>
             <td class="evenRowEvenCol">
@@ -102,7 +92,7 @@
             <td class="oddRowOddCol" align="center">
                 <form action="<%= request.getContextPath() %>/view-workspaceitem" method="post">
                    <input type="hidden" name="workspace_id" value="<%= workspaceItem.getID() %>"/>
-                   <input type="submit" name="submit_view" value="<fmt:message key="jsp.workspace.ws-main.button.view"/>"/>
+                   <input class="col-md-2 btn btn-default btn-group-justified" type="submit" name="submit_view" value="<fmt:message key="jsp.workspace.ws-main.button.view"/>"/>
                 </form>
             </td>
             <td class="oddRowEvenCol">
@@ -115,7 +105,7 @@
                 <form action="<%= request.getContextPath() %>/mydspace" method="post">
                     <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>"/>
                     <input type="hidden" name="workspace_id" value="<%= workspaceItem.getID() %>"/>
-                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.workspace.ws-main.button.remove"/>"/>
+                    <input class="col-md-2 btn btn-danger btn-group-justified" type="submit" name="submit_delete" value="<fmt:message key="jsp.workspace.ws-main.button.remove"/>"/>
                 </form>
             </td>
             <td class="evenRowEvenCol">
@@ -126,5 +116,5 @@
     </table>
 
 <p><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.general.returnto-mydspace"/></a></p>
-
+</div>
 </dspace:layout>
