@@ -57,7 +57,7 @@
 
     <form action="<%= request.getContextPath() %>/tools/collection-wizard" method="post">
         <%--<p>Please check the boxes next to the statements that apply to the collection. --%>
-        <div class="alert alert-info"><fmt:message key="jsp.dspace-admin.wizard-questions.text"/></div>
+        <div class="help-block"><fmt:message key="jsp.dspace-admin.wizard-questions.text"/></div>
 
 					<div class="input-group">
 							<span class="input-group-addon">

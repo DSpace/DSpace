@@ -54,7 +54,7 @@
     </h1>
 
 	<%-- <p>Who has (by default) permission to read new items submitted to this collection? --%>
-	<p class="alert alert-info"><fmt:message key="jsp.dspace-admin.wizard-permissions.text1"/></p>
+	<p class="help-block"><fmt:message key="jsp.dspace-admin.wizard-permissions.text1"/></p>
 <%
 	break;
 
@@ -66,7 +66,7 @@
 	</h1>
 
 	<%-- <p>Who has permission to submit new items to this collection? --%>
-	<p><fmt:message key="jsp.dspace-admin.wizard-permissions.text2"/></p>
+	<p class="help-block"><fmt:message key="jsp.dspace-admin.wizard-permissions.text2"/></p>
 <%
 	break;
 
@@ -95,7 +95,7 @@
 	<%-- <p>Who is responsible for performing the <strong>accept/reject/edit metadata</strong> step?
 		They will be able to edit the metadata of incoming submissions, and then accept
 		or reject them.  Only one of the group need perform the step for each submission. --%>
-	<p class="alert alert-info"><fmt:message key="jsp.dspace-admin.wizard-permissions.text4"/></p>
+	<p class="help-block"><fmt:message key="jsp.dspace-admin.wizard-permissions.text4"/></p>
 <%
 	break;
 

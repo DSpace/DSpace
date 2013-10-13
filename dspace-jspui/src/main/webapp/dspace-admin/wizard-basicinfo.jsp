@@ -54,7 +54,7 @@
                 <%-- <td colspan="3" class="submitFormHelp">
                  Shown in list on community home page
                 </td> --%>
-				<div class="alert alert-info">
+				<div class="help-block">
 	                <fmt:message key="jsp.dspace-admin.wizard-basicinfo.shown"/>
                 </div>
             	<div class="form-group">            
@@ -64,7 +64,7 @@
                 </div>
            
 
-				<div class="alert alert-info">
+				<div class="help-block">
 	                <%-- HTML, shown in center of collection home page.  Be sure to enclose in &lt;P&gt; &lt;/P&gt; tags! --%>
 	                <fmt:message key="jsp.dspace-admin.wizard-basicinfo.html1"/>
                 </div>
@@ -74,7 +74,7 @@
                 	<textarea class="form-control" name="introductory_text" rows="4" cols="50"></textarea>
 				</div>
 				
-				<div class="alert alert-info">
+				<div class="help-block">
     				<%-- Plain text, shown at bottom of collection home page --%>
 	                <fmt:message key="jsp.dspace-admin.wizard-basicinfo.plain"/>
                 </div>
@@ -84,7 +84,7 @@
         	        <textarea class="form-control" name="copyright_text" rows="3" cols="50"></textarea>
                 </div>
             	     
-            	<div class="alert alert-info">    
+            	<div class="help-block">    
             	     <%-- HTML, shown on right-hand side of collection home page.  Be sure to enclose in &lt;P&gt; &lt;/P&gt; tags! --%>
 	                <fmt:message key="jsp.dspace-admin.wizard-basicinfo.html2"/>
                 </div>
@@ -96,7 +96,7 @@
             	</div>
 
 
-				<div class="alert alert-info">
+				<div class="help-block">
 	                <%-- Licence that submitters must grant.  Leave this blank to use the default license. --%>
 	                <fmt:message key="jsp.dspace-admin.wizard-basicinfo.license1"/>
 				</div>
@@ -106,7 +106,7 @@
                 	<textarea class="form-control" name="license" rows="4" cols="50"></textarea></td>
                 </div>
 
-				<div class="alert alert-info">
+				<div class="help-block">
 	                <%-- Plain text, any provenance information about this collection.  Not shown on collection pages. --%>
 	                <fmt:message key="jsp.dspace-admin.wizard-basicinfo.plain2"/>
 				</div>
@@ -116,7 +116,7 @@
 					<textarea class="form-control" name="provenance_description" rows="4" cols="50"></textarea>
 				</div>
 
-				<div class="alert alert-info">
+				<div class="help-block">
                 	<%-- Choose a JPEG or GIF logo for the collection home page.  Should be quite small. --%>
 	                <fmt:message key="jsp.dspace-admin.wizard-basicinfo.choose"/>
 				</div>
