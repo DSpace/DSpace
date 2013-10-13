@@ -143,7 +143,7 @@
     {
 %>
 <div class="container">
-                <dspace:include page="/layout/bootstrap/location-bar.jsp" />
+                <dspace:include page="/layout/location-bar.jsp" />
 </div>                
 <%
     }
