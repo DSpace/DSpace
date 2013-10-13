@@ -135,7 +135,7 @@
     				$('#spanFile').remove();
     				$('#selectedFile').remove();
     				$('<input type="file" name="file" id="tfile">').appendTo(parent);
-    				$('#tfile').wrap('<span id="spanFile" class="fileinput-button btn btn-success"><span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;<fmt:message key="jsp.submit.choose-file.upload-ajax.button.select-file"/></span>');
+    				$('#tfile').wrap('<span id="spanFile" class="fileinput-button btn btn-success col-md-2"><span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;<fmt:message key="jsp.submit.choose-file.upload-ajax.button.select-file"/></span>');
     		    	$('#tfile').on('change', function(){
     		    		 decorateFileInputChangeEvent($);
     		    	});
@@ -151,7 +151,7 @@
    		progressbarArea.find('p.progressBarProgressMsg').hide();
    		progressbarArea.find('p.progressBarCompleteMsg').hide();
    		progressbarArea.hide();
-    	$('#tfile').wrap('<span id="spanFile" class="fileinput-button btn btn-success"><span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;<fmt:message key="jsp.submit.choose-file.upload-ajax.button.select-file"/></span>');
+    	$('#tfile').wrap('<span id="spanFile" class="fileinput-button btn btn-success col-md-2"><span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;<fmt:message key="jsp.submit.choose-file.upload-ajax.button.select-file"/></span>');
     	$('#tfile').on('change', function(){
     		 decorateFileInputChangeEvent($);
    		});
@@ -308,32 +308,12 @@
     </form>
     <iframe id="uploadFormIFrame" name="uploadFormIFrame" style="display: none"> </iframe>
 <% } %>
-    <form id="uploadForm" <%= bSherpa?"class=\"sherpa\"":"" %> method="post" 
+    <form id="uploadForm" <%= bSherpa?"class=\"sherpa col-md-8\"":"" %> method="post" 
     	action="<%= request.getContextPath() %>/submit" enctype="multipart/form-data" 
     	onkeydown="return disableEnterKey(event);">
 
 		<jsp:include page="/submit/progressbar.jsp"/>
-
-<%
-  if (bSherpa)
-      {
-%>
-<div class="pull-right well col-md-5" style="overflow:hidden; text-align:center;">
-  <div id="sherpaBox" class="panel panel-info">
-  	  <div class="panel-heading">
-  		  <span id="ui-id-1"><fmt:message key="jsp.sherpa.title" /></span>
-  	  </div>
-	  <div id="sherpaContent" class="panel-body">
-	  <fmt:message key="jsp.sherpa.loading">
-			<fmt:param value="<%=request.getContextPath()%>" />
-	  </fmt:message>  
-	  </div>
-  </div>
-</div>
-<div class="col-md-7">
-<%
-    }
-%>		
+		
 		<%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
         <%= SubmissionController.getSubmissionParameters(context, request) %>
 
@@ -360,11 +340,11 @@
 		<div class="submitFormHelp"><fmt:message key="jsp.submit.choose-file.info6"/>
         <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.formats\")%>"><fmt:message key="jsp.submit.choose-file.info7"/></dspace:popup>
         </div>
-
-	   <div class="container">
-    		<div class="row col-md-offset-3">
+		<br/>
+	   <div class="row container">
+    		<div class="row">
                     <%-- Document File: --%>
-					<label class="label label-default" for="tfile"><fmt:message key="jsp.submit.choose-file.document"/></label>
+					<label class="col-md-<%= bSherpa?"3":"2" %>" for="tfile"><fmt:message key="jsp.submit.choose-file.document"/></label>
                     <input type="file" size="40" name="file" id="tfile" />
             </div><br/>
 <% if (ajaxProgress)
@@ -397,8 +377,8 @@
 					<div class="alert alert-info"><fmt:message key="jsp.submit.choose-file.info9"/></div>
                 <%-- <td class="submitFormLabel">File Description:</td> --%>
                 <div class="row">
-					<label for="tdescription" class="col-md-2"><fmt:message key="jsp.submit.choose-file.filedescr"/></label>
-                	<span class="col-md-10 row"><input class="form-control" type="text" name="description" id="tdescription" size="40"/></span>
+					<label for="tdescription" class="col-md-<%= bSherpa?"3":"2" %>"><fmt:message key="jsp.submit.choose-file.filedescr"/></label>
+                	<span class="col-md-<%= bSherpa?"9":"10" %> row"><input class="form-control" type="text" name="description" id="tdescription" size="40"/></span>
                 </div>
 <%
     }
@@ -428,7 +408,7 @@
 				col++;
             }
         %>
-    	<div class="pull-right btn-group col-md-<%= col*2 + 4 %>">
+    	<div class="pull-right btn-group col-md-<%= (bSherpa?2:1) * col*2 + 4 %>">
                	<%  //if not first step, show "Previous" button
 					if(!SubmissionController.isFirstStep(request, subInfo))
 					{ %>
@@ -445,12 +425,25 @@
                         }
                     %>   
                         <input class="btn btn-primary col-md-<%= 12 / (col + 2) %>" type="submit" name="<%=UploadStep.SUBMIT_UPLOAD_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
-        </div>        
-        <%
+        </div>                
+    </form>
+<%
   if (bSherpa)
       {
 %>
- 	</div>
-<% } %>        
-    </form>
+<div class="col-md-4">
+  <div id="sherpaBox" class="panel panel-info">
+  	  <div class="panel-heading">
+  		  <span id="ui-id-1"><fmt:message key="jsp.sherpa.title" /></span>
+  	  </div>
+	  <div id="sherpaContent" class="panel-body">
+	  <fmt:message key="jsp.sherpa.loading">
+			<fmt:param value="<%=request.getContextPath()%>" />
+	  </fmt:message>  
+	  </div>
+  </div>
+</div>
+<%
+    }
+%>
 </dspace:layout>
