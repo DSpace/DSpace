@@ -216,8 +216,9 @@
     <%-- <p><strong>PLEASE NOTE: These changes are not validated in any way.
     You are responsible for entering the data in the correct format.
     If you are not sure what the format is, please do NOT make changes.</strong></p> --%>
-        <p class="alert alert-info"><strong><fmt:message key="jsp.tools.edit-item-form.note"/></strong></p>
-
+     <div class="container">   
+        <p class="alert alert-danger"><strong><fmt:message key="jsp.tools.edit-item-form.note"/></strong></p>
+	 </div>
 
 
 	<div class="col-md-9">
@@ -280,32 +281,27 @@
 		<div class="panel panel-default">
 			<div class="panel-heading"><fmt:message key="jsp.actiontools"/></div>
         	<div class="panel-body">
-        		<div class="btn-group col-md-offset-2">
         	<%
     if (!item.isWithdrawn() && bWithdraw)
     {
 %>
-<div class="row">
                     <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
                         <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                         <input type="hidden" name="action" value="<%= EditItemServlet.START_WITHDRAW %>" />
                         <%-- <input type="submit" name="submit" value="Withdraw..."> --%>
 						<input class="btn btn-warning col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.withdraw-w-confirm.button"/>"/>
                     </form>
-</div>
 <%
     }
     else if (item.isWithdrawn() && bReinstate)
     {
 %>
-<div class="row">
                     <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
                         <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                         <input type="hidden" name="action" value="<%= EditItemServlet.REINSTATE %>" />
                         <%-- <input type="submit" name="submit" value="Reinstate"> --%>
 						<input class="btn btn-warning col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.reinstate.button"/>"/>
                     </form>
-                    </div>
 <%
     }
 %>
@@ -313,14 +309,12 @@
   if (bDelete)
   {
 %>
-<div class="row">
                     <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
                         <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                         <input type="hidden" name="action" value="<%= EditItemServlet.START_DELETE %>" />
                         <%-- <input type="submit" name="submit" value="Delete (Expunge)..."> --%>
                         <input class="btn btn-danger col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.delete-w-confirm.button"/>"/>
                     </form>
-                    </div>
 <%
   }
 %>
@@ -328,13 +322,11 @@
   if (isItemAdmin)
   {
 %>                     
-<div class="row">
 					<form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
                         <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                         <input type="hidden" name="action" value="<%= EditItemServlet.START_MOVE_ITEM %>" />
 						<input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.move-item.button"/>"/>
                     </form>
-                    </div>
 <%
   }
 %>
@@ -342,25 +334,21 @@
     if (item.isDiscoverable() && bPrivating)
     {
 %>
-<div class="row">
                     <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
                         <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                         <input type="hidden" name="action" value="<%= EditItemServlet.START_PRIVATING %>" />
                         <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.privating-w-confirm.button"/>"/>
                     </form>
-                    </div>
 <%
     }
     else if (!item.isDiscoverable() && bPublicize)
     {
 %>
-<div class="row">
                     <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
                         <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                         <input type="hidden" name="action" value="<%= EditItemServlet.PUBLICIZE %>" />
                         <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.publicize.button"/>"/>
                     </form>
-                    </div>
 <%
     }
 %>
@@ -372,7 +360,6 @@
 	<%-- ===========================================================
      Edit item's policies
      =========================================================== --%>
-     <div class="row">
 							<form method="post"
 								action="<%= request.getContextPath() %>/tools/authorize">
 								<input type="hidden" name="handle"
@@ -383,7 +370,6 @@
 									name="submit_item_select"
 									value="<fmt:message key="jsp.tools.edit-item-form.item" />" />
 							</form>
-							</div>
 <%
   }
 %>
@@ -394,7 +380,6 @@
 <%-- ===========================================================
      Curate Item
      =========================================================== --%>
-     <div class="row">
 							<form method="post"
 								action="<%= request.getContextPath() %>/tools/curate">
 								<input type="hidden" name="item_id" value="<%= item.getID() %>" />
@@ -402,11 +387,9 @@
 									name="submit_item_select"
 									value="<fmt:message key="jsp.tools.edit-item-form.form.button.curate"/>" />
 							</form>
-							</div>
 					<%
 						}
 					%>
-        		</div>
     	    </div>
         </div>
 	</div>
