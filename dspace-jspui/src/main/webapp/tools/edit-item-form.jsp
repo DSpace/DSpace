@@ -222,7 +222,7 @@
 
 	<div class="col-md-9">
 		<div class="panel panel-primary">
-			<div class="panel-heading"></div>
+			<div class="panel-heading"><fmt:message key="jsp.tools.edit-item-form.details" /></div>
 
 			<div class="panel-body">
 				<table class="table">
@@ -268,57 +268,6 @@
 						</td>
 					</tr>
 
-					<%
-  if (bPolicy)
-  {
-%>
-					<%-- ===========================================================
-     Edit item's policies
-     =========================================================== --%>
-					<tr>
-						<%-- <td class="submitFormLabel">Item's Authorizations:</td> --%>
-						<td><fmt:message key="jsp.tools.edit-item-form.item" />
-						</td>
-						<td>
-							<form method="post"
-								action="<%= request.getContextPath() %>/tools/authorize">
-								<input type="hidden" name="handle"
-									value="<%= ConfigurationManager.getProperty("handle.prefix") %>" />
-								<input type="hidden" name="item_id" value="<%= item.getID() %>" />
-								<%-- <input type="submit" name="submit_item_select" value="Edit..."> --%>
-								<input class="btn btn-default pull-right col-md-8" type="submit"
-									name="submit_item_select"
-									value="<fmt:message key="jsp.tools.general.edit"/>" />
-							</form></td>
-					</tr>
-					<%
-  }
-%>
-
-
-					<%
-  if (isItemAdmin)
-  {
-%>
-					<%-- ===========================================================
-     Curate Item
-     =========================================================== --%>
-					<tr>
-						<%-- <td class="submitFormLabel">Item's Curations:</td> --%>
-						<td><fmt:message key="jsp.tools.edit-item-form.form.label1" />
-						</td>
-						<td>
-							<form method="post"
-								action="<%= request.getContextPath() %>/tools/curate">
-								<input type="hidden" name="item_id" value="<%= item.getID() %>" />
-								<input class="btn btn-default pull-right col-md-8" type="submit"
-									name="submit_item_select"
-									value="<fmt:message key="jsp.tools.edit-item-form.form.button.curate"/>" />
-							</form></td>
-					</tr>
-					<%
-						}
-					%>
 
 				</table>
 			</div>
@@ -329,30 +278,34 @@
 	<div class="row">
 	<div class="col-md-3">
 		<div class="panel panel-default">
-			<div class="panel-heading"><fmt:message key="jsp.admintools"/></div>
+			<div class="panel-heading"><fmt:message key="jsp.actiontools"/></div>
         	<div class="panel-body">
-        		<span class="col-md-offset-2 btn-group">
+        		<div class="btn-group col-md-offset-2">
         	<%
     if (!item.isWithdrawn() && bWithdraw)
     {
 %>
+<div class="row">
                     <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
                         <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                         <input type="hidden" name="action" value="<%= EditItemServlet.START_WITHDRAW %>" />
                         <%-- <input type="submit" name="submit" value="Withdraw..."> --%>
-						<input class="btn btn-primary" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.withdraw-w-confirm.button"/>"/>
+						<input class="btn btn-warning col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.withdraw-w-confirm.button"/>"/>
                     </form>
+</div>
 <%
     }
     else if (item.isWithdrawn() && bReinstate)
     {
 %>
+<div class="row">
                     <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
                         <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                         <input type="hidden" name="action" value="<%= EditItemServlet.REINSTATE %>" />
                         <%-- <input type="submit" name="submit" value="Reinstate"> --%>
-						<input class="btn btn-primary" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.reinstate.button"/>"/>
+						<input class="btn btn-warning col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.reinstate.button"/>"/>
                     </form>
+                    </div>
 <%
     }
 %>
@@ -360,23 +313,28 @@
   if (bDelete)
   {
 %>
+<div class="row">
                     <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
                         <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                         <input type="hidden" name="action" value="<%= EditItemServlet.START_DELETE %>" />
                         <%-- <input type="submit" name="submit" value="Delete (Expunge)..."> --%>
-                        <input class="btn btn-primary" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.delete-w-confirm.button"/>"/>
+                        <input class="btn btn-danger col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.delete-w-confirm.button"/>"/>
                     </form>
+                    </div>
 <%
   }
 %>
 <%
   if (isItemAdmin)
   {
-%>                     <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
+%>                     
+<div class="row">
+					<form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
                         <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                         <input type="hidden" name="action" value="<%= EditItemServlet.START_MOVE_ITEM %>" />
-						<input class="btn btn-primary" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.move-item.button"/>"/>
+						<input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.move-item.button"/>"/>
                     </form>
+                    </div>
 <%
   }
 %>
@@ -384,25 +342,71 @@
     if (item.isDiscoverable() && bPrivating)
     {
 %>
+<div class="row">
                     <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
                         <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                         <input type="hidden" name="action" value="<%= EditItemServlet.START_PRIVATING %>" />
-                        <input class="btn btn-primary" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.privating-w-confirm.button"/>"/>
+                        <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.privating-w-confirm.button"/>"/>
                     </form>
+                    </div>
 <%
     }
     else if (!item.isDiscoverable() && bPublicize)
     {
 %>
+<div class="row">
                     <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
                         <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                         <input type="hidden" name="action" value="<%= EditItemServlet.PUBLICIZE %>" />
-                        <input class="btn btn-primary" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.publicize.button"/>"/>
+                        <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.publicize.button"/>"/>
                     </form>
+                    </div>
 <%
     }
 %>
-        		</span>
+
+<%
+  if (bPolicy)
+  {
+%>
+	<%-- ===========================================================
+     Edit item's policies
+     =========================================================== --%>
+     <div class="row">
+							<form method="post"
+								action="<%= request.getContextPath() %>/tools/authorize">
+								<input type="hidden" name="handle"
+									value="<%= ConfigurationManager.getProperty("handle.prefix") %>" />
+								<input type="hidden" name="item_id" value="<%= item.getID() %>" />
+								<%-- <input type="submit" name="submit_item_select" value="Edit..."> --%>
+								<input class="btn btn-default col-md-12" type="submit"
+									name="submit_item_select"
+									value="<fmt:message key="jsp.tools.edit-item-form.item" />" />
+							</form>
+							</div>
+<%
+  }
+%>
+<%
+  if (isItemAdmin)
+  {
+%>
+<%-- ===========================================================
+     Curate Item
+     =========================================================== --%>
+     <div class="row">
+							<form method="post"
+								action="<%= request.getContextPath() %>/tools/curate">
+								<input type="hidden" name="item_id" value="<%= item.getID() %>" />
+								<input class="btn btn-default col-md-12" type="submit"
+									name="submit_item_select"
+									value="<fmt:message key="jsp.tools.edit-item-form.form.button.curate"/>" />
+							</form>
+							</div>
+					<%
+						}
+					%>
+        		</div>
     	    </div>
         </div>
 	</div>
@@ -529,7 +533,7 @@
                 </td>
                 <td headers="t5" class="<%= row %>RowOddCol">
                     <%-- <input type="submit" name="submit_addfield" value="Add"> --%>
-					<button class="btn btn-success" name="submit_addfield" value="<fmt:message key="jsp.tools.general.add"/>">
+					<button class="btn btn-default" name="submit_addfield" value="<fmt:message key="jsp.tools.general.add"/>">
 						<span class="glyphicon glyphicon-plus"></span> 
 					</button>
                 </td>
@@ -556,13 +560,13 @@
                 <th class="oddRowOddCol"><strong>Description</strong></th>
                 <th class="oddRowEvenCol"><strong>Format</strong></th>
                 <th class="oddRowOddCol"><strong>User&nbsp;Format&nbsp;Description</strong></th> --%>
-                
-                        <th id="t11" class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem5"/></strong></th>
-                <th id="t12" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem7"/></strong></th>
-                <th id="t13" class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem8"/></strong></th>
-                <th id="t14" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem9"/></strong></th>
-                <th id="t15" class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem10"/></strong></th>
-                <th id="t16" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem11"/></strong></th>
+                <th id="t10" class="oddRowEvenCol">&nbsp;</th>
+                <th id="t11" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem5"/></strong></th>        
+                <th id="t12" class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem7"/></strong></th>
+                <th id="t13" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem8"/></strong></th>
+                <th id="t14" class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem9"/></strong></th>
+                <th id="t15" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem10"/></strong></th>
+                <th id="t16" class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem11"/></strong></th>
                 <th id="t17" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem12"/></strong></th>
                 <th id="t18" class="oddRowEvenCol">&nbsp;</th>
             </tr>
@@ -586,6 +590,10 @@
             BitstreamFormat bf = bitstreams[j].getFormat();
 %>
             <tr id="<%="row_" + bundles[i].getName() + "_" + bitstreams[j].getID()%>">
+            	<td headers="t10" class="<%= row %>RowEvenCol" align="center">
+                	<%-- <a target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>">View</a>&nbsp;<input type="submit" name="submit_delete_bitstream_<%= key %>" value="Remove"> --%>
+					<a target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>"><fmt:message key="jsp.tools.general.view"/></a>&nbsp;
+				</td>
                 <% if (bundles[i].getName().equals("ORIGINAL"))
                    { %>
                      <td headers="t11" class="<%= row %>RowEvenCol" align="center">
@@ -643,10 +651,14 @@
                     <input type="hidden" value="<%=upButtonValue%>" name="<%=bundles[i].getID()%>_<%=bitstreams[j].getID()%>_up_value">
                     <input type="hidden" value="<%=downButtonValue%>" name="<%=bundles[i].getID()%>_<%=bitstreams[j].getID()%>_down_value">
                     <div>
-                        <input class="btn btn-default" name="submit_order_<%=key%>_up" type="submit" value="<fmt:message key="jsp.tools.edit-item-form.move-up"/> " <%=j==0 ? "disabled=\"disabled\"" : ""%>/>
+                        <button class="btn btn-default" name="submit_order_<%=key%>_up" value="<fmt:message key="jsp.tools.edit-item-form.move-up"/> " <%=j==0 ? "disabled=\"disabled\"" : ""%>>
+                        	<span class="glyphicon glyphicon-arrow-up"></span>
+                        </button>
                     </div>
                     <div>
-                        <input class="btn btn-default" name="submit_order_<%=key%>_down" type="submit" value="<fmt:message key="jsp.tools.edit-item-form.move-down"/> " <%=j==(bitstreams.length-1) ? "disabled=\"disabled\"" : ""%>/>
+                        <button class="btn btn-default" name="submit_order_<%=key%>_down" value="<fmt:message key="jsp.tools.edit-item-form.move-down"/> " <%=j==(bitstreams.length-1) ? "disabled=\"disabled\"" : ""%>>
+                        	<span class="glyphicon glyphicon-arrow-down"></span>
+                        </button>
                     </div>
                 </td>
 
@@ -660,8 +672,7 @@
                    }
 %>
                 <td headers="t18" class="<%= row %>RowEvenCol">
-                    <%-- <a target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>">View</a>&nbsp;<input type="submit" name="submit_delete_bitstream_<%= key %>" value="Remove"> --%>
-                                        <a target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>"><fmt:message key="jsp.tools.general.view"/></a>&nbsp;
+
                                         <% if (bRemoveBits) { %>
                                         <button class="btn btn-danger" name="submit_delete_bitstream_<%= key %>" value="<fmt:message key="jsp.tools.general.remove"/>">
                                         	<span class="glyphicon glyphicon-trash"></span>
@@ -683,7 +694,7 @@
                 <%
 					if (bCreateBits) {
                 %>                
-					<input class="btn btn-primary col-md-2" type="submit" name="submit_addbitstream" value="<fmt:message key="jsp.tools.edit-item-form.addbit.button"/>"/>
+					<input class="btn btn-success col-md-2" type="submit" name="submit_addbitstream" value="<fmt:message key="jsp.tools.edit-item-form.addbit.button"/>"/>
                 <%  }
                     if(breOrderBitstreams){
                 %>
@@ -697,7 +708,7 @@
                                 Bundle[] ccBundle = item.getBundles("CC-LICENSE");
                                 s = ccBundle.length > 0 ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-item-form.replacecc.button") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-item-form.addcc.button");
                 %>
-                    <input class="btn btn-primary col-md-2" type="submit" name="submit_addcc" value="<%= s %>" />
+                    <input class="btn btn-success col-md-2" type="submit" name="submit_addcc" value="<%= s %>" />
                     <input type="hidden" name="handle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>"/>
                     <input type="hidden" name="item_id" value="<%= item.getID() %>"/>
                     
@@ -711,7 +722,7 @@
         <input type="hidden" name="action" value="<%= EditItemServlet.UPDATE_ITEM %>"/>
 					
                         <%-- <input type="submit" name="submit" value="Update" /> --%>
-                        <input class="btn btn-success pull-right col-md-3" type="submit" name="submit" value="<fmt:message key="jsp.tools.general.update"/>" />
+                        <input class="btn btn-primary pull-right col-md-3" type="submit" name="submit" value="<fmt:message key="jsp.tools.general.update"/>" />
                         <%-- <input type="submit" name="submit_cancel" value="Cancel" /> --%>
 						<input class="btn btn-default pull-right col-md-3" type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" />
 					</div>
