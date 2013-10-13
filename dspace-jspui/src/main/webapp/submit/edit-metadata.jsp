@@ -82,7 +82,7 @@
                         {
                                 fieldName = fieldName.substring(0, fieldName.length() - 2);
                         }
-                        link = "<br/>" +
+                        link = 
                         "<a href='javascript:void(null);' onclick='javascript:popUp(\"" +
                                 contextPath + "/controlledvocabulary/controlledvocabulary.jsp?ID=" +
                                 fieldName + "&amp;vocabulary=" + vocabulary + "\")'>" +
@@ -610,8 +610,8 @@
            .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" disabled=\"disabled\" ":"")
            .append(">")
            .append(val)
-           .append("</textarea>");
-         
+           .append("</textarea>")
+           .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly));
          if (authorityType != null)
          {
         	 sb.append("</div><div class=\"col-md-2\">");
@@ -621,8 +621,8 @@
 	         sb.append("</div>");
          }
 
-         sb.append("</div>")
-           .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly));
+         sb.append("</div>");
+           
          
          if (repeatable && !readonly && i < defaults.length)
          {
@@ -701,10 +701,10 @@
              .append(fieldNameIdx).append("\" size=\"50\" value=\"")
              .append(val +"\"")
              .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
-             .append("/></div>");
+             .append("/>")
+			 .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly))             
+             .append("</div>");
            
-           sb.append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly))
-             .append("\n");
            if (authorityType != null)
            {
         	   sb.append("<div class=\"col-md-2\">");
@@ -785,7 +785,10 @@
              .append(defaults[i].value.replaceAll("\"", "&quot;"))
              .append("\"")
              .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
-             .append("\" /></span>");
+             .append("\" />");
+          
+           sb.append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly));
+           sb.append("</span>");
           if (!readonly)
           {
                        sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
@@ -799,7 +802,6 @@
           else {
         	  sb.append("<span class=\"col-md-2\">&nbsp;</span>");
           }
-          sb.append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly));
          }
          else
          {
@@ -808,9 +810,9 @@
              .append("\" size=\"15\"")
              .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
              .append("/>")
+             .append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly))
              .append("</span>\n")
-             .append("<span class=\"col-md-2\">&nbsp;</span>")
-             .append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly));
+             .append("<span class=\"col-md-2\">&nbsp;</span>");
          }
          
          i++;
@@ -834,7 +836,9 @@
                      .append(defaults[i].value.replaceAll("\"", "&quot;"))
                          .append("\"")
                          .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
-                         .append("/></span>");
+                         .append("/>");
+                   sb.append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly));      
+                   sb.append("</span>");
                    if (!readonly)
                    {
                                sb.append(" <button class=\"btn btn-danger col-md-2\" name=\"submit_")
@@ -848,7 +852,6 @@
                    else {
                  	  sb.append("<span class=\"col-md-2\">&nbsp;</span>");
                    }              
-                   sb.append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly));
                  }
                  else
                  {
@@ -856,9 +859,9 @@
                      .append(fieldParam)
                      .append("\" size=\"15\"")
                      .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" disabled=\"disabled\" ":"")
-                     .append("/></span>\n")
-                     .append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly));
-        
+                     .append("/>")
+                     .append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly))
+        			 .append("</span>\n");
                    if (i+1 >= fieldCount && !readonly)
                    {
                      sb.append(" <button class=\"btn btn-default col-md-2\" name=\"submit_")
@@ -1304,12 +1307,22 @@
                         //print out hints, if not null
            if(inputs[z].getHints() != null)
            {
-                        String hints = "<div class=\"help-block\">" +
-                                                        inputs[z].getHints() +
-                                                        "</div>";
-
-                out.write(hints);
-                }
+           		%>
+           		<div class="help-block">
+                	<%= inputs[z].getHints() %>
+                <%
+                    if (hasVocabulary(vocabulary) &&  !readonly)
+                    {
+             	%>
+             						<span class="pull-right">
+                                             <dspace:popup page="/help/index.html#controlledvocabulary"><fmt:message key="jsp.controlledvocabulary.controlledvocabulary.help-link"/></dspace:popup>
+             						</span>
+             	<%
+                    }
+				%>
+				</div>
+				<%
+           }
        }
 
        repeatable = inputs[z].getRepeatable();
@@ -1381,14 +1394,6 @@
                                  closedVocabulary, collectionID);
        }
        
-       if (hasVocabulary(vocabulary) &&  !readonly)
-       {
-%>
-						<span class="alert alert-info">
-                                <dspace:popup page="/help/index.html#controlledvocabulary"><fmt:message key="jsp.controlledvocabulary.controlledvocabulary.help-link"/></dspace:popup>
-						</span>
-<%
-                }
      } // end of 'for rows'
 %>
         
