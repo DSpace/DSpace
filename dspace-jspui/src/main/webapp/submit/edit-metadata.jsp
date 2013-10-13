@@ -1304,7 +1304,7 @@
                         //print out hints, if not null
            if(inputs[z].getHints() != null)
            {
-                        String hints = "<div class=\"alert alert-info\">" +
+                        String hints = "<div class=\"help-block\">" +
                                                         inputs[z].getHints() +
                                                         "</div>";
 
