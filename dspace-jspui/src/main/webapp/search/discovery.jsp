@@ -151,7 +151,7 @@
 
     <%-- <h1>Search Results</h1> --%>
 
-<h1><fmt:message key="jsp.search.title"/></h1>
+<h2><fmt:message key="jsp.search.title"/></h2>
 
 <div class="discovery-search-form panel panel-default">
     <%-- Controls for a repeat search --%>
@@ -387,7 +387,7 @@
 <%
     if (admin_button)
     {
-        %><input type="submit" name="submit_export_metadata" value="<fmt:message key="jsp.general.metadataexport.button"/>" /><%
+        %><input type="submit" class="btn btn-default" name="submit_export_metadata" value="<fmt:message key="jsp.general.metadataexport.button"/>" /><%
     }
 %>
 </form>
