@@ -3,22 +3,25 @@
 A RESTful web services API for DSpace, built using JAX-RS1 JERSEY.
 
 ##Getting Started
+This REST API is integrated directly into the DSpace code-base.
 
-```
-mvn clean package
-#If you run into an issue with Maven, try manually importing the Jar/War.
-mvn install:install-file -DgroupId=org.dspace -DartifactId=dspace-rest -Dversion=4.0-SNAPSHOT -Dclassifier=classes -Dpackaging=jar -Dfile=dspace-rest/target/dspace-rest.war
-mvn clean package
-ant update
-```
+ * Rebuild as normal: mvn + ant
+ * Deploy the webapp (i.e to tomcat)
+  * ```<Context path="/rest"  docBase="/dspace/webapps/rest"  allowLinking="true"/>```
 
-
-Configure tomcat to know about the rest webapp.
-    <Context path="/rest"  docBase="/dspace/webapps/rest"  allowLinking="true"/>
 
 At this point, this is a READ ONLY API for DSpace, for the anonymous user. Only Anonymous READ Communities, Collections, Items, and Bitstreams are available.
 
 ##Endpoints
+
+| Resource      |CREATE|READ list|READ single|Edit|Delete|Search|
+| ------------- |------|:-------:|-----------|----|------|------|
+| /communities  |      |   Y     |     Y     |    |      |      |
+| /collections  |      |   Y     |     Y     |    |      |      |
+| /items        |      |         |     Y     |    |      |      |
+| /bitstreams   |      |         |     Y     |    |      |      ||
+
+
 ###Communities
 View the list of top-level communities
 - http://localhost:8080/rest/communities
