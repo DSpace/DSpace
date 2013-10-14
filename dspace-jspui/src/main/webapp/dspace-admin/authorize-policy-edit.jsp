@@ -65,49 +65,45 @@
     request.setAttribute("LanguageSwitch", "hide");  
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.authorize-policy-edit.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.authorize-policy-edit.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin"
                nocache="true">
-  <table width="95%">
-    <tr>
-      <td align="left">
+
         <%-- <h1>Edit Policy for <%= edit_title %>:</h1> --%>
         <h1><fmt:message key="jsp.dspace-admin.authorize-policy-edit.heading">
             <fmt:param><%= edit_title %></fmt:param>
-        </fmt:message></h1>
-      </td>
-      <td align="right" class="standard">
+        </fmt:message>
         <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#authorize\"%>"><fmt:message key="jsp.help"/></dspace:popup>
-      </td>
-    </tr>
-  </table>
-      
+        </h1>
+            
     <form action="<%= request.getContextPath() %>/tools/authorize" method="post">
 
-    <table class="miscTable" align="center" summary="Edit Policy Form">
-        <tr>     
-            <%-- <td>Group:</td> --%>
-            <th id="t1"><label for="tgroup_id"><fmt:message key="jsp.dspace-admin.general.group-colon"/></label></th>
-            <td headers="t1">
-                <select size="15" name="group_id" id="tgroup_id">
+ 		<div class="input-group">
+ 				<span class="col-md-2">
+            	<%-- <td>Group:</td> --%>
+            	<label for="tgroup_id"><fmt:message key="jsp.dspace-admin.general.group-colon"/></label>
+            	</span>
+            	<span class="col-md-10">
+                <select class="form-control" size="15" name="group_id" id="tgroup_id">
                     <%  for(int i = 0; i < groups.length; i++ ) { %>
                             <option value="<%= groups[i].getID() %>" <%= (groups[i].getID() == policy.getGroupID() ? "selected=\"selected\"" : "" ) %> >
                             <%= groups[i].getName()%>
                             </option>
                         <%  } %>
                 </select>
-            </td>
-        </tr>
+                </span>
+           
         <%-- <tr><td>Action:</td> --%>
-        <tr>
-          <th id="t2"><label for="taction_id"><fmt:message key="jsp.dspace-admin.general.action-colon"/></label></th>
-            <td headers="t2">
+        	<span class="col-md-2">
+        		<label for="taction_id"><fmt:message key="jsp.dspace-admin.general.action-colon"/></label>
+        	</span>
+        	<span class="col-md-10">
                 <input type="hidden" name="<%=id_name%>" value="<%=id%>" />
                 <input type="hidden" name="policy_id" value="<%=policy.getID()%>" />
-                <select name="action_id" id="taction_id">
+                <select class="form-control" name="action_id" id="taction_id">
                     <%  for( int i = 0; i < Constants.actionText.length; i++ )
                             {
                                 // only display if action i is relevant
@@ -121,26 +117,16 @@
                     <%          }
                             } %>
                 </select>
-            </td>
-        </tr>
-    </table>
-
+            </span>
+		</div>
     <% if( newpolicy != null ) { %> <input name="newpolicy" type="hidden" value="<%=newpolicy%>"/> <% } %>
     
-    <center>
-        <table width="70%">
-            <tr>
-                <td align="left">
+				<div class="btn-group pull-right col-md-2">
                     <%-- <input type="submit" name="submit_save_policy" value="Save Policy"> --%>
-                    <input type="submit" name="submit_save_policy" value="<fmt:message key="jsp.dspace-admin.general.save"/>" />
-                </td>
-                <td align="right">
-                    <%-- <input type="submit" name="submit_cancel_policy" value="Cancel"> --%>
-                    <input type="submit" name="submit_cancel_policy" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
-                </td>
-            </tr>
-        </table>
-    </center>        
+                    <input class="btn btn-primary" type="submit" name="submit_save_policy" value="<fmt:message key="jsp.dspace-admin.general.save"/>" />
 
+                    <%-- <input type="submit" name="submit_cancel_policy" value="Cancel"> --%>
+                    <input class="btn btn-default" type="submit" name="submit_cancel_policy" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
+				</div>
     </form>
 </dspace:layout>

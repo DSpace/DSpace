@@ -42,7 +42,7 @@
     String taskOptions = (String)request.getAttribute("curate_task_options");
 %>
 
-<dspace:layout titlekey="jsp.tools.curate.collection.title"
+<dspace:layout style="submission" titlekey="jsp.tools.curate.collection.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
@@ -54,55 +54,42 @@
           <fmt:param value="<%= title %>"/>
         </fmt:message>
     </h1>
-
-    <table width="60%">
+	<div class="row container">
       <form action="<%=request.getContextPath()%>/tools/curate" method="post">
 
 <%
     if (groupOptions != null && !"".equals(groupOptions))
     {
 %>
-      <tr>
-        <td class="curate heading">
-          <fmt:message key="jsp.tools.curate.select-group.tag"/>:
-        </td>
-        <td class="curate field">
-          <select name="select_curate_group" id="select_curate_group" onchange="this.form.submit();">
+          <label for="select_curate_group"><fmt:message key="jsp.tools.curate.select-group.tag"/></label>:
+          <select class="form-control" name="select_curate_group" id="select_curate_group" onchange="this.form.submit();">
             <%= groupOptions %>
-          </select>
-        </td>
-      </tr>
+          </select>  
 <%
     }
 %>
-      <tr>
-        <td class="curate heading">
-          <fmt:message key="jsp.tools.curate.select-task.tag"/>:
-        </td>
-        <td class="curate field">
-          <select name="curate_task" id="curate_task">
+		<div class="input-group">
+          <label for="curate_task" class="input-group-addon"><fmt:message key="jsp.tools.curate.select-task.tag"/>:</label>
+          <select class="form-control" name="curate_task" id="curate_task">
             <%= taskOptions %>
           </select>
-        </td>
-      </tr>
-      <tr>
-        <td class="curate button" colspan="2">
           <input type="hidden" name="collection_id" value="<%= collectionID %>"/>
-          <input type="submit" name="submit_collection_curate" value="<fmt:message key="jsp.tools.curate.perform.button"/>" />
-          <input type="submit" name="submit_collection_queue" value="<fmt:message key="jsp.tools.curate.queue.button"/>" />
+		</div>
+		  <br/>
+          <div class="col-md-4 row pull-right">
+          <input class="btn btn-warning col-md-6" type="submit" name="submit_collection_queue" value="<fmt:message key="jsp.tools.curate.queue.button"/>" />
+          <input class="btn btn-primary col-md-6" type="submit" name="submit_collection_curate" value="<fmt:message key="jsp.tools.curate.perform.button"/>" />
+          </div>
         </form>
-        </td>
-      </tr>
-      <tr>
-        <td class="curate button" colspan="2">
+		</div>
+		<br/>
+		<div class="row container">
           <form method="post" action="<%=request.getContextPath()%>/tools/edit-communities">
             <input type="hidden" name="collection_id" value="<%= collectionID %>"/>
             <input type="hidden" name="community_id" value="<%= communityID %>" />
             <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_EDIT_COLLECTION %>" />
-            <input type="submit" value="<fmt:message key="jsp.tools.curate.return.collection.button"/>" />
+            <input class="btn btn-default" type="submit" value="<fmt:message key="jsp.tools.curate.return.collection.button"/>" />
           </form>
-        </td>
-      </tr>
-    </table>
+       </div>
 
 </dspace:layout>

@@ -19,7 +19,7 @@
 
 <taglib>
   <tlibversion>1.0</tlibversion>
-  <jspversion>1.1</jspversion>
+  <jspversion>2.0</jspversion>
   <shortname>dspace</shortname>
   <uri>http://www.dspace.org/dspace-tags.tld</uri>
   <info>DSpace JSP tags</info>

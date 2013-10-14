@@ -36,8 +36,8 @@
 			</c:choose>
 			
 			<c:forEach var="r" items="${result}">			
-				<div class="${r[1].romeocolour}RomeoPublisher">
-				<div class="header">
+				<div class="${r[1].romeocolour}RomeoPublisher row">
+				<div class="header container">
 					<fmt:message key="jsp.sherpa.jornaltitle">
 						<fmt:param value="${r[0].title}" />
 					</fmt:message>
@@ -61,7 +61,7 @@
 						</c:otherwise>
 					</c:choose>
 				</div>
-				<div class="policy">
+				<div class="policy container">
 					<c:choose>
 						<c:when test="${empty r[1]}">
 							<fmt:message key="jsp.sherpa.publisher.nodata" />
@@ -128,8 +128,7 @@
 					</c:choose>
 				</div>
 				<fmt:message key="jsp.sherpa.legend" />
-				</div><br/>
-			
+				</div>
 			</c:forEach>
 		</c:otherwise>
 	</c:choose>

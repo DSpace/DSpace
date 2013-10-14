@@ -63,7 +63,8 @@
 %>
 
 
-<dspace:layout locbar="off"
+<dspace:layout style="submission"
+			   locbar="off"
                navbar="off"
                titlekey="jsp.submit.show-uploaded-file.title"
                nocache="true">
@@ -77,17 +78,20 @@
     {
 %>
         <%-- <h1>Submit: File Uploaded Successfully</h1> --%>
-		<h1><fmt:message key="jsp.submit.show-uploaded-file.heading1"/></h1>
+		<h1><fmt:message key="jsp.submit.show-uploaded-file.heading1"/>
+		<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\")+ \"#uploadedfile\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></h1>
 
         <%-- <p><strong>Your file was successfully uploaded.</strong></p> --%>
-		<p><strong><fmt:message key="jsp.submit.show-uploaded-file.info1"/></strong></p>
+		<div class="alert aler-info"><fmt:message key="jsp.submit.show-uploaded-file.info1"/></div>
 <%
     }
     else
     {
 %>
         <%-- <h1>Submit: Uploaded File</h1> --%>
-		<h1><fmt:message key="jsp.submit.show-uploaded-file.heading2"/></h1>
+		<h1><fmt:message key="jsp.submit.show-uploaded-file.heading2"/>
+		<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\")+ \"#uploadedfile\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup>
+		</h1>
 <%
     }
 %>
@@ -95,10 +99,9 @@
         details before going to the next step.
         &nbsp;&nbsp;&nbsp;<dspace:popup page="/help/index.html#uploadedfile">(More Help...)</dspace:popup></p> --%>
 
-		<div><fmt:message key="jsp.submit.show-uploaded-file.info2"/>
-        &nbsp;&nbsp;&nbsp;<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\")+ \"#uploadedfile\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
+		<div><fmt:message key="jsp.submit.show-uploaded-file.info2"/></div>
 
-        <table class="miscTable" align="center">
+        <table class="table">
             <tr>
                 <%-- <th class="oddRowOddCol">File</th>
                 <th class="oddRowEvenCol">Size</th>
@@ -119,7 +122,11 @@
 %>
             </tr>
             <tr>
-                <td headers="t1" class="evenRowOddCol"><a href="<%= request.getContextPath() %>/retrieve/<%= bitstream.getID() %>/<%= org.dspace.app.webui.util.UIUtil.encodeBitstreamName(bitstream.getName()) %>" target="_blank"><%= bitstream.getName() %></a></td>
+                <td headers="t1" class="evenRowOddCol">
+                	<a href="<%= request.getContextPath() %>/retrieve/<%= bitstream.getID() %>/<%= org.dspace.app.webui.util.UIUtil.encodeBitstreamName(bitstream.getName()) %>" target="_blank"><%= bitstream.getName() %></a>
+                	<%-- <input type="submit" name="submit_remove_<%= bitstream.getID() %>" value="Click here if this is the wrong file"> --%>
+					<input class="btn btn-danger pull-right" type="submit" name="submit_remove_<%= bitstream.getID() %>" value="<fmt:message key="jsp.submit.show-uploaded-file.click2.button"/>" />
+                </td>
                 <td headers="t2" class="evenRowEvenCol"><fmt:message key="jsp.submit.show-uploaded-file.size-in-bytes">
                     <fmt:param><fmt:formatNumber><%= bitstream.getSize() %></fmt:formatNumber></fmt:param>
                 </fmt:message></td>
@@ -138,6 +145,9 @@
     { %>
       <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.formats\") +\"#supported\"%>">(<fmt:message key="jsp.submit.show-uploaded-file.supported"/>)</dspace:popup>
 <%  } %>
+               <%--  <input type="submit" name="submit_format_<%= bitstream.getID() %>" value="Click here if this is the wrong format" /> --%>
+			    <input class="btn btn-default pull-right" type="submit" name="submit_format_<%= bitstream.getID() %>" value="<fmt:message key="jsp.submit.show-uploaded-file.click1.button"/>" />
+
                 </td>
 <%
     if (showChecksums)
@@ -152,33 +162,16 @@
             </tr>
         </table>
 
-        <center>
-            <p>
-               <%--  <input type="submit" name="submit_format_<%= bitstream.getID() %>" value="Click here if this is the wrong format" /> --%>
-			    <input type="submit" name="submit_format_<%= bitstream.getID() %>" value="<fmt:message key="jsp.submit.show-uploaded-file.click1.button"/>" />
-            </p>
-        </center>
-
 <%
     if (withEmbargo)
     {
 %>
-        <center>
-            <p>
-                <input type="submit" name="submit_editPolicy_<%= bitstream.getID() %>" value="<fmt:message key="jsp.submit.show-uploaded-file.click3.button"/>" />
-            </p>
-        </center>
+            <div class="row">
+            	<input class="btn btn-primary col-md-2 col-offset-5" type="submit" name="submit_editPolicy_<%= bitstream.getID() %>" value="<fmt:message key="jsp.submit.show-uploaded-file.click3.button"/>" />
+            </div>
 <%
     }
 %>
-
-        <center>
-            <p>
-                <%-- <input type="submit" name="submit_remove_<%= bitstream.getID() %>" value="Click here if this is the wrong file"> --%>
-				<input type="submit" name="submit_remove_<%= bitstream.getID() %>" value="<fmt:message key="jsp.submit.show-uploaded-file.click2.button"/>" />
-            </p>
-        </center>
-
         <br/>
 
 		<p class="uploadHelp"><fmt:message key="jsp.submit.show-uploaded-file.info3"/></p>
@@ -196,7 +189,8 @@
     {
 %>
   		<li class="uploadHelp"><fmt:message key="jsp.submit.show-uploaded-file.info7"/>
-            <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#checksum\"%>"><fmt:message key="jsp.submit.show-uploaded-file.info8"/></dspace:popup><input type="submit" name="submit_show_checksums" value="<fmt:message key="jsp.submit.show-uploaded-file.show.button"/>" /></li>
+            <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#checksum\"%>"><fmt:message key="jsp.submit.show-uploaded-file.info8"/></dspace:popup>
+            <input class="btn btn-info" type="submit" name="submit_show_checksums" value="<fmt:message key="jsp.submit.show-uploaded-file.show.button"/>" /></li>
 <%
     }
 %>
@@ -207,30 +201,21 @@
         <%= SubmissionController.getSubmissionParameters(context, request) %>
 
 <%-- HACK: Center used to align table; CSS and align="center" ignored by some browsers --%>
-        <center>
-            <table border="0" width="80%">
-                <tr>
-                    <td width="100%">&nbsp;</td>
+
 				<%  //if not first step, show "Previous" button
 					if(!SubmissionController.isFirstStep(request, subInfo))
 					{ %>
-                    <td>
-                        <%-- <input type="submit" name="submit_prev" value="&lt; Previous"> --%>
-						<input type="submit" name="<%=AbstractProcessingStep.PREVIOUS_BUTTON%>" value="<fmt:message key="jsp.submit.general.previous"/>" />
-                    </td>
-				<%  } %>
-                    <td>
-                       <%--  <input type="submit" name="submit_next value="Next &gt;"> --%>
-					    <input type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
-                    </td>
-                    <td>&nbsp;&nbsp;&nbsp;</td>
-                    <td align="right">
-                        <%-- <input type="submit" name="submit_cancel" value="Cancel/Save"> --%>
-						<input type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>" />
-                    </td>
-                </tr>
-            </table>
-        </center>
+					<div class="col-md-6 pull-right btn-group">
+						<input class="btn btn-default col-md-4" type="submit" name="<%=AbstractProcessingStep.PREVIOUS_BUTTON%>" value="<fmt:message key="jsp.submit.general.previous"/>" />
+						<input class="btn btn-default col-md-4" type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>" />
+						<input class="btn btn-primary col-md-4" type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
+						
+				<%  } else { %>
+					<div class="col-md-4 pull-right btn-group">
+						<input class="btn btn-default col-md-6" type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>" />
+					    <input class="btn btn-primary col-md-6" type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
+				<%  }  %>
+					</div>
     </form>
 
 </dspace:layout>
