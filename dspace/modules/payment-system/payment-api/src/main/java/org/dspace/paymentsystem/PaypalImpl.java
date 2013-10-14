@@ -485,7 +485,7 @@ public class PaypalImpl implements PaypalService{
 
                 Division voucher = mainDiv.addDivision("voucher");
                 if(errorMessage!=null&&errorMessage.length()>0) {
-                    voucher.addPara("voucher-error","voucher-error").addHighlight("bold").addContent("Your card will not be charged untill your submission is approved by Dyrad. Your card information will NOT be stored By Dryad."+errorMessage);
+                    voucher.addPara("voucher-error","voucher-error").addHighlight("bold").addContent(errorMessage);
 
                 }
 
