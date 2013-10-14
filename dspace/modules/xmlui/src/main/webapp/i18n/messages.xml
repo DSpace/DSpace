@@ -3301,7 +3301,8 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui_submit_publication_article_status_not_yet_submitted">&#160; Not yet submitted</message>
     <message key="xmlui.submit.publication.unknown_doi">&#160; This article has been published in the journal I will name, but I do not know the DOI or PubMedID for it.</message>
     <message key="xmlui.submit.publication.article_status"><span class="ds-form-label">Select Your Article Status</span><br/></message>
-    <message key="xmlui.submit.publication.article_status_help">All data in Dryad must be associated with an article or other publication. Please select the status of your article.</message>
+    <message key="xmlui.submit.publication.article_status_help">All data in Dryad must be associated with an article or other publication. Please select the status of your article.  
+    <strong>Did you receive an email from your journal with a link to Dryad?  Using this link to initiate your submission will save you time and effort by automatically entering the article metadata and the correct payment type for your journal.</strong></message>
 
 
     <message key="xmlui.submit.publication.journal.manu.acc.label">&#160; This manuscript has been accepted for publication in the above named journal.</message>
