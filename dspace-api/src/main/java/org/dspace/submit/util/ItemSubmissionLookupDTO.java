@@ -7,6 +7,8 @@
  */
 package org.dspace.submit.util;
 
+import gr.ekt.bte.core.Value;
+
 import java.io.Serializable;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -69,14 +71,14 @@ public class ItemSubmissionLookupDTO implements Serializable {
 					}
 					for (String field : p.getFields())
 					{
-						List<String> values = p.getValues(field);
+						List<Value> values = p.getValues(field);
 						if (values != null && values.size() > 0)
 						{
 							if (!pub.getFields().contains(field))
 							{
-								for (String v : values)
+								for (Value v : values)
 								{
-									pub.add(field, v);
+									pub.add(field, v.getAsString());
 								}
 							}
 						}

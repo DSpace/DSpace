@@ -7,10 +7,11 @@
  */
 package org.dspace.submit.lookup;
 
+import gr.ekt.bte.core.Record;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +21,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.httpclient.HttpException;
 import org.dspace.core.Context;
 import org.dspace.submit.importer.crossref.CrossrefItem;
-import org.dspace.submit.util.SubmissionLookupPublication;
 import org.jdom.JDOMException;
 import org.xml.sax.SAXException;
 
@@ -44,12 +44,11 @@ public class CrossRefLookupProvider extends ConfigurableLookupProvider {
 	}
 
 	@Override
-	public List<SubmissionLookupPublication> getByIdentifier(Context context, 
-			Map<String, String> keys) throws HttpException, IOException {
+	public List<Record> getByIdentifier(Context context, 
+			Map<String, Set<String>> keys) throws HttpException, IOException {
 		if (keys != null && keys.containsKey(DOI)) {
-			Set<String> dois = new HashSet<String>();
-			dois.add(keys.get(DOI));
-			List<SubmissionLookupPublication> results = new ArrayList<SubmissionLookupPublication>();
+			Set<String> dois = keys.get(DOI);
+			List<Record> results = new ArrayList<Record>();
 			List<CrossrefItem> items = null;
 			try {
 				items = crossrefService.search(context, dois);
@@ -71,9 +70,9 @@ public class CrossRefLookupProvider extends ConfigurableLookupProvider {
 	}
 
 	@Override
-	public List<SubmissionLookupPublication> search(Context context, String title,
+	public List<Record> search(Context context, String title,
 			String author, int year) throws HttpException, IOException {
-		List<SubmissionLookupPublication> results = new ArrayList<SubmissionLookupPublication>();
+		List<Record> results = new ArrayList<Record>();
 		List<CrossrefItem> items = null;
 		items = crossrefService.search(context, title, author, year, 10);
 		if (items != null) {
@@ -93,30 +92,5 @@ public class CrossRefLookupProvider extends ConfigurableLookupProvider {
 	@Override
 	public String getShortName() {
 		return "crossref";
-	}
-
-	@Override
-	public List<SubmissionLookupPublication> getByDOIs(Context context, Set<String> doiToSearch)
-			throws HttpException, IOException {
-		if (doiToSearch != null) {
-			List<SubmissionLookupPublication> results = new ArrayList<SubmissionLookupPublication>();
-			List<CrossrefItem> items = null;
-			try {
-				items = crossrefService.search(context, doiToSearch);
-			} catch (JDOMException e) {
-				throw new RuntimeException(e.getMessage(), e);
-			} catch (ParserConfigurationException e) {
-				throw new RuntimeException(e.getMessage(), e);
-			} catch (SAXException e) {
-				throw new RuntimeException(e.getMessage(), e);
-			}
-			if (items != null) {
-				for (CrossrefItem p : items) {
-					results.add(convert(p));
-				}
-				return results;
-			}
-		}
-		return null;
 	}
 }
