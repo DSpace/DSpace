@@ -47,6 +47,8 @@ public class SubmissionLookupService {
 
 	public static final String MANUAL_USER_INPUT = "manual";
 
+	public static final String PROVIDER_NAME_FIELD = "provider_name_field";
+	
 	private static Logger log = Logger.getLogger(SubmissionLookupUtils.class);
 
 	// Patter to extract the converter name if any
