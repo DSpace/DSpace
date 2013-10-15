@@ -116,6 +116,7 @@ CREATE SEQUENCE group2group_seq;
 CREATE SEQUENCE group2groupcache_seq;
 CREATE SEQUENCE harvested_collection_seq;
 CREATE SEQUENCE harvested_item_seq;
+CREATE SEQUENCE webapp_seq;
 
 -------------------------------------------------------
 -- BitstreamFormatRegistry table
@@ -807,8 +808,11 @@ CREATE TABLE versionitem
 CREATE SEQUENCE versionitem_seq;
 CREATE SEQUENCE versionhistory_seq;
 
-
-
-
-
-
+CREATE TABLE Webapp
+(
+    webapp_id INTEGER NOT NULL PRIMARY KEY,
+    AppName VARCHAR(32),
+    URL VARCHAR,
+    Started TIMESTAMP,
+    isUI INTEGER
+);
