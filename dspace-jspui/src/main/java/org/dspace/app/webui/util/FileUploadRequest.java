@@ -13,6 +13,7 @@ import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
@@ -31,6 +32,8 @@ import org.dspace.core.ConfigurationManager;
  */
 public class FileUploadRequest extends HttpServletRequestWrapper
 {
+    public static final String FILE_UPLOAD_LISTNER = "file-upload-listner";
+    
     private Map<String, String> parameters = new HashMap<String, String>();
 
     private Map<String, FileItem> fileitems = new HashMap<String, FileItem>();
@@ -54,7 +57,8 @@ public class FileUploadRequest extends HttpServletRequestWrapper
 
         original = req;
 
-        tempDir = ConfigurationManager.getProperty("upload.temp.dir");
+        tempDir = (ConfigurationManager.getProperty("upload.temp.dir") != null)
+            ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir"); 
         long maxSize = ConfigurationManager.getLongProperty("upload.max");
 
         // Create a factory for disk-based file items
@@ -63,6 +67,19 @@ public class FileUploadRequest extends HttpServletRequestWrapper
 
         // Create a new file upload handler
         ServletFileUpload upload = new ServletFileUpload(factory);
+
+        HttpSession session = req.getSession();
+        
+        if (ConfigurationManager.getBooleanProperty("webui.submit.upload.progressbar", true))
+        {
+            // set file upload progress listener
+            FileUploadListener listener = new FileUploadListener();
+    
+            session.setAttribute(FILE_UPLOAD_LISTNER, listener);
+    
+            // upload servlet allows to set upload listener
+            upload.setProgressListener(listener);
+        }
         
         try
         {
@@ -102,6 +119,13 @@ public class FileUploadRequest extends HttpServletRequestWrapper
                 throw new FileSizeLimitExceededException(e.getMessage(), actualSize, maxSize);
             }
             throw new IOException(e.getMessage(), e);
+        }
+        finally
+        {
+            if (ConfigurationManager.getBooleanProperty("webui.submit.upload.progressbar", true))
+            {
+                session.removeAttribute(FILE_UPLOAD_LISTNER);
+            }
         }
     }
 

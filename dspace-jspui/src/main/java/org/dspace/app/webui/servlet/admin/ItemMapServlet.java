@@ -8,6 +8,10 @@
 package org.dspace.app.webui.servlet.admin;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.webui.discovery.DiscoverySearchRequestProcessor;
+import org.dspace.app.webui.search.LuceneSearchRequestProcessor;
+import org.dspace.app.webui.search.SearchProcessorException;
+import org.dspace.app.webui.search.SearchRequestProcessor;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -15,12 +19,15 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.*;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.sort.SortOption;
+import org.dspace.handle.HandleManager;
+import org.dspace.core.PluginConfigurationError;
+import org.dspace.core.PluginManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,9 +45,30 @@ import java.util.Map;
  */
 public class ItemMapServlet extends DSpaceServlet
 {
-	/** Logger */
+    private SearchRequestProcessor internalLogic;
+
+    /** Logger */
     private static Logger log = Logger.getLogger(ItemMapServlet.class);
-	
+
+    public void init()
+    {
+        try
+        {
+            internalLogic = (SearchRequestProcessor) PluginManager
+                    .getSinglePlugin(SearchRequestProcessor.class);
+        }
+        catch (PluginConfigurationError e)
+        {
+            log.warn(
+                    "ItemMapServlet not properly configurated, please configure the SearchRequestProcessor plugin",
+                    e);
+        }
+        if (internalLogic == null)
+        {   // Discovery is the default search provider since DSpace 4.0
+            internalLogic = new DiscoverySearchRequestProcessor();
+        }
+    }
+
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws java.sql.SQLException,
             javax.servlet.ServletException, java.io.IOException,
@@ -162,6 +191,9 @@ public class ItemMapServlet extends DSpaceServlet
     		.setAttribute("all_collections", Collection
     				.findAll(context));
     		
+            request.setAttribute("searchIndices",
+                    internalLogic.getSearchIndices());
+            request.setAttribute("prefixKey", internalLogic.getI18NKeyPrefix());
     		// show this page when we're done
     		jspPage = "itemmap-main.jsp";
     		
@@ -268,79 +300,19 @@ public class ItemMapServlet extends DSpaceServlet
     		// show the page
     		JSPManager.showJSP(request, response, jspPage);
     	}
-    	else if (action.equals("Search Authors"))
+    	else if (action.equals("search"))
     	{
-    		String name = (String) request.getParameter("namepart");
-    		String bidx = ConfigurationManager.getProperty("itemmap.author.index");
-    		if (bidx == null)
-    		{
-    			throw new ServletException("There is no configuration for itemmap.author.index");
-    		}
-    		Map<Integer, Item> items = new HashMap<Integer, Item>();
-    		try
-    		{
-    			BrowserScope bs = new BrowserScope(context);
-    			BrowseIndex bi = BrowseIndex.getBrowseIndex(bidx);
-    			
-    			// set up the browse scope
-    			bs.setBrowseIndex(bi);
-    			bs.setOrder(SortOption.ASCENDING);
-    			bs.setFilterValue(name);
-                bs.setFilterValuePartial(true);
-    			bs.setJumpToValue(null);
-    			bs.setResultsPerPage(10000);	// an arbitrary number (large) for the time being
-    			bs.setBrowseLevel(1);
-    			
-    			BrowseEngine be = new BrowseEngine(context);
-    			BrowseInfo results = be.browse(bs);
-    			Item[] browseItems = results.getItemResults(context);
-    			
-    			// FIXME: oh god this is so annoying - what an API /Richard
-    			// we need to deduplicate against existing items in this collection
-    			ItemIterator itr = myCollection.getItems();
-                try
-                {
-                    ArrayList<Integer> idslist = new ArrayList<Integer>();
-                    while (itr.hasNext())
-                    {
-                        idslist.add(Integer.valueOf(itr.nextID()));
-                    }
-
-                    for (int i = 0; i < browseItems.length; i++)
-                    {
-                        // only if it isn't already in this collection
-                        if (!idslist.contains(Integer.valueOf(browseItems[i].getID())))
-                        {
-                            // only put on list if you can read item
-                            if (AuthorizeManager.authorizeActionBoolean(context, browseItems[i], Constants.READ))
-                            {
-                                items.put(Integer.valueOf(browseItems[i].getID()), browseItems[i]);
-                            }
-                        }
-                    }
-                }
-                finally
-                {
-                    if (itr != null)
-                    {
-                        itr.close();
-                    }
-                }
+            request.setAttribute("collection", myCollection);
+            try
+            {
+                internalLogic.doItemMapSearch(context, request, response);
             }
-    		catch (BrowseException e)
-    		{
-    			log.error("caught exception: ", e);
-    			throw new ServletException(e);
-    		}
-    		
-    		request.setAttribute("collection", myCollection);
-    		request.setAttribute("browsetext", name);
-    		request.setAttribute("items", items);
-    		request.setAttribute("browsetype", "Add");
-    		
-    		jspPage = "itemmap-browse.jsp";
-    		JSPManager.showJSP(request, response, jspPage);
-    	}
+            catch (SearchProcessorException e)
+            {
+                log.error(e.getMessage(), e);
+                throw new ServletException(e.getMessage(), e);
+            }
+        }
     	else if (action.equals("browse"))
     	{
     		// target collection to browse

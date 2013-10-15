@@ -79,7 +79,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
         try {
             if(AuthorizeManager.isAdmin(context)){
                 //Admins always have read access even if no policies are present !
-                resourceQuery.append(" OR (!read[* TO *])");
+                resourceQuery.append(" OR (!read:[* TO *])");
 
             }
         } catch (SQLException e) {

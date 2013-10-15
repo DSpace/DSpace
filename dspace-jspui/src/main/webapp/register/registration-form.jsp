@@ -49,7 +49,7 @@
     boolean setPassword = (attr != null && attr.booleanValue());
 %>
 
-<dspace:layout titlekey="jsp.register.registration-form.title" nocache="true">
+<dspace:layout style="submission" titlekey="jsp.register.registration-form.title" nocache="true">
 
     <%-- <h1>Registration Information</h1> --%>
 	<h1><fmt:message key="jsp.register.registration-form.title"/></h1>
@@ -59,7 +59,7 @@
     {
 %>
     <%-- <p><strong>Please fill out all of the required fields.</strong></p> --%>
-	<p><strong><fmt:message key="jsp.register.registration-form.instruct1"/></strong></p>
+	<p class="alert alert-warning"><strong><fmt:message key="jsp.register.registration-form.instruct1"/></strong></p>
 <%
     }
 
@@ -68,15 +68,15 @@
 %>
     <%-- <p><strong>The passwords you enter below must match, and need to be at
     least 6 characters long.</strong></p> --%>
-	<p><strong><fmt:message key="jsp.register.registration-form.instruct2"/></strong></p>
+	<p class="alert alert-warning"><strong><fmt:message key="jsp.register.registration-form.instruct2"/></strong></p>
 <%
     }
 %>
 
     <%-- <p>Please enter the following information.  The fields marked with a * are
     required.</p> --%>
-	<p><fmt:message key="jsp.register.registration-form.instruct3"/></p>
-    <form action="<%= request.getContextPath() %>/register" method="post">
+	<p class="alert"><fmt:message key="jsp.register.registration-form.instruct3"/></p>
+    <form class="form-horizontal" action="<%= request.getContextPath() %>/register" method="post">
     <% if (netid!=null) { %> <input type="hidden" name="netid" value="<%= netid %>" /> <% } %>
     <% if (email!=null) { %> <input type="hidden" name="email" value="<%= email %>" /> <% } %>
         <dspace:include page="/register/profile-form.jsp" />
@@ -87,26 +87,23 @@
 %>
         <%-- <p>Please choose a password and enter it into the box below, and confirm it by typing it
         again into the second box.  It should be at least six characters long.</p> --%>
-		<p><fmt:message key="jsp.register.registration-form.instruct4"/></p>
-
-        <table class="misc" align="center">
-            <tr>
-                <td class="oddRowEvenCol">
-                    <table border="0" cellpadding="5">
-                        <tr>
-                            <%-- <td align="right" class="standard"><strong>Password:</strong></td> --%>
-							<td align="right" class="standard"><label for="tpassword"><strong><fmt:message key="jsp.register.registration-form.pswd.field"/></strong></label></td>
-                            <td class="standard"><input type="password" name="password" id="tpassword" /></td>
-                        </tr>
-                        <tr>
-                            <%-- <td align="right" class="standard"><strong>Again to Confirm:</strong></td> --%>
-							<td align="right" class="standard"><label for="tpassword_confirm"><strong><fmt:message key="jsp.register.registration-form.confirm.field"/></strong></label></td>
-                            <td class="standard"><input type="password" name="password_confirm" id="tpassword_confirm" /></td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
+		<p class="alert"><fmt:message key="jsp.register.registration-form.instruct4"/></p>
+        
+        <div class="form-group">
+                            <%-- <td align="right" class="standard"><strong>New Password:</strong></td> --%>
+							<label class="col-md-offset-3 col-md-2 control-label" for="tpassword"><fmt:message key="jsp.register.registration-form.pswd.field"/></label>
+							<div class="col-md-3">
+                            	<input class="form-control" type="password" name="password" id="tpassword" />
+                            </div>
+            </div>
+        <div class="form-group">
+	                           <%-- <td align="right" class="standard"><strong>Again to Confirm:</strong></td> --%>
+							<label class="col-md-offset-3 col-md-2 control-label" for="tpassword_confirm"><fmt:message key="jsp.register.registration-form.confirm.field"/></label>
+							<div class="col-md-3">
+                            	<input class="form-control" type="password" name="password_confirm" id="tpassword_confirm" /></td>
+                            </div>
+		</div>
+       
 <%
     }
 %>
@@ -115,6 +112,9 @@
         <input type="hidden" name="token" value="<%= token %>"/>
         
         <%-- <p align="center"><input type="submit" name="submit" value="Complete Registration"></p> --%>
-		<p align="center"><input type="submit" name="submit" value="<fmt:message key="jsp.register.registration-form.complete.button"/>" /></p>
+       	<div class="col-md-offset-5">       
+	   		<input class="btn btn-success col-md-4" type="submit" name="submit" value="<fmt:message key="jsp.register.registration-form.complete.button"/>" />
+	 	</div>
+		
     </form>
 </dspace:layout>

@@ -95,7 +95,7 @@ public class UploadStep extends AbstractProcessingStep
     private static Logger log = Logger.getLogger(UploadStep.class);
 
     /** is the upload required? */
-    private boolean fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);
+    protected boolean fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);
     
     /**
      * Do any processing of the information input by the user, and/or perform
@@ -316,7 +316,8 @@ public class UploadStep extends AbstractProcessingStep
         // files have been uploaded.
         // ---------------------------------------------------
         //check if a file is required to be uploaded
-        if (fileRequired && !item.hasUploadedFiles())
+        if (fileRequired && !item.hasUploadedFiles()
+                && !buttonPressed.equals(SUBMIT_MORE_BUTTON))
         {
             return STATUS_NO_FILES_ERROR;
         }
@@ -470,7 +471,7 @@ public class UploadStep extends AbstractProcessingStep
                 String fileDescription =  (String) request.getAttribute(param + "-description");
                 if(fileDescription==null ||fileDescription.length()==0)
                 {
-                    request.getParameter("description");
+                    fileDescription = request.getParameter("description");
                 }
                 
                 // if information wasn't passed by User Interface, we had a problem
@@ -584,7 +585,7 @@ public class UploadStep extends AbstractProcessingStep
     /*
       If we created a new Bitstream but now realised there is a problem then remove it.
      */
-    private void backoutBitstream(SubmissionInfo subInfo, Bitstream b, Item item) throws SQLException, AuthorizeException, IOException
+    protected void backoutBitstream(SubmissionInfo subInfo, Bitstream b, Item item) throws SQLException, AuthorizeException, IOException
     {
         // remove bitstream from bundle..
         // delete bundle if it's now empty

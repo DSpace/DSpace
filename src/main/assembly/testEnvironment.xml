@@ -13,7 +13,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
     <!--
-		Package DSpace's common testing environment (configuration, etc.)
+        Package DSpace's common testing environment (configuration, etc.)
 	-->
     <id>testEnvironment</id>
     <formats>
@@ -49,9 +49,6 @@
                     <fileSet> <!-- test data -->
                         <directory>src/test/data/dspaceFolder</directory>
                         <outputDirectory />
-                        <includes>
-                            <include>assetstore/**/*</include>
-                        </includes>
                     </fileSet>
                 </fileSets>
             </sources>

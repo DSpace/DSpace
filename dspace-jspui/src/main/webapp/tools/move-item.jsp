@@ -25,28 +25,19 @@
 	Item item = (Item)request.getAttribute("item");
 %>
 
-<dspace:layout titlekey="jsp.tools.move-item.title">
-
-   	<form action="<%=request.getContextPath()%>/tools/edit-item" method="post">
-   		
-	  <table class="miscTable" align="center">
-        <tr>
-          <td class="evenRowEvenCol" colspan="2">
-            <table>
-              <tr>
-                <td class="standard">
-				  <small><strong><fmt:message key="jsp.tools.move-item.item.name.msg"/></strong></small>
-			    </td>
-			    <td class="standard">
-				  <font color="#FF0000"><%=item.getMetadata("dc", "title", null, Item.ANY)[0].value%></font>
-				</td>
-			  </tr>
-			  <tr>
-				<td class="standard">
-					<small><strong><fmt:message key="jsp.tools.move-item.collection.from.msg"/></strong></small>
-				</td>
-				<td class="standard">
-				<select name="collection_from_id">
+<dspace:layout style="submission" titlekey="jsp.tools.move-item.title">
+	<div class="container">
+   	<form class="form-horizontal" action="<%=request.getContextPath()%>/tools/edit-item" method="post">
+			<div class="form-group">   		
+				  <label><fmt:message key="jsp.tools.move-item.item.name.msg"/></label>
+			      <%=item.getMetadata("dc", "title", null, Item.ANY)[0].value%></font>
+			</div>
+		  <div class="form-group">
+		  	<div class="input-group">
+		  	<span class="input-group-addon">
+				<label for="collection_from_id"><fmt:message key="jsp.tools.move-item.collection.from.msg"/></label>
+			</span>
+				<select class="form-control" name="collection_from_id">
 <%
         for (int i = 0; i < linkedCollections.length; i++)
         {
@@ -56,14 +47,14 @@
         }
 %>
 				</select>
-				</td>
-			  </tr>
-			  <tr>
-				<td class="standard">
-					<small><strong><fmt:message key="jsp.tools.move-item.collection.to.msg"/></strong></small>
-				</td>
-				<td class="standard">
-				<select name="collection_to_id">
+				</div>
+		</div>
+		<div class="form-group">
+			<div class="input-group">
+		  	<span class="input-group-addon">
+				<label for="collection_to_id"><fmt:message key="jsp.tools.move-item.collection.to.msg"/></label>
+			</span>
+			<select class="form-control" name="collection_to_id">
 <%
 		//Later on find a away to display in a tree format with the linked one disabled?
         for (int i = 0; i < notLinkedCollections.length; i++)
@@ -74,25 +65,22 @@
         }
 %>
 				</select>
-			</td>
-         </tr>
-         <tr>
-            <td class="standard"><small><strong><fmt:message key="jsp.tools.move-item.inheritpolicies"/></strong></small></td>
-            <td class="standard"><input type="checkbox" name="inheritpolicies" /></td>
-         </tr>
-		 <tr>
-       		<td class="standard"></td>
-       		<td class="standard">
-				<input type="submit" name="submit" value="<fmt:message key="jsp.tools.move-item.button"/>"/>
-			</td>
-         </tr>
-        </table>
-        </td>
-      </tr>
-     </table>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="input-group">
+		  		<span class="input-group-addon">
+            		<input type="checkbox" name="inheritpolicies" />
+            	</span>
+				<span class="form-control"><fmt:message key="jsp.tools.move-item.inheritpolicies"/></span>            	
+            </div>
+         </div>
+		 <div class="col-md-offset-5">
+				<input class="btn btn-success col-md-4" type="submit" name="submit" value="<fmt:message key="jsp.tools.move-item.button"/>"/>
+		</div>
       <input type="hidden" name="action" value="<%=EditItemServlet.CONFIRM_MOVE_ITEM%>" />
       <input type="hidden" name="item_id" value="<%=item.getID() %>"/> 
     </form>
 
-
+</div>
 </dspace:layout>

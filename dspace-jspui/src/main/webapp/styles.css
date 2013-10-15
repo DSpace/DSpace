@@ -702,3 +702,146 @@ input.ds-authority-lock.is-locked
   { background-image: url(image/lock24.png); }
 input.ds-authority-lock.is-unlocked
   { background-image: url(image/unlock24.png); }
+
+.standard10 {
+    margin-left: 10px;
+    margin-right: 10px;
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 10pt;
+    padding-left: 10px;
+}
+
+/* for alert messages */
+.notice {
+    width: 80%;
+    padding: 10px;
+    margin: 10px, 0;
+    border: 1px solid #bfc221;
+    background-color: #fffff2;
+}
+
+.notice.success
+{
+    border-color: #21c221;
+    background-color: #f2fff2;
+}
+
+.notice.failure
+{
+    border-color: #c22121;
+    background-color: #fff2f2;
+}
+
+.curate
+{
+    padding: 20px 10px 0px 10px;
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    color: black;
+    font-size: 10pt;
+}
+.curate.heading
+{
+    font-weight: bold;
+    font-size: 12pt;
+    text-align: right;
+}
+.curate.field
+{
+    font-weight: normal;
+}
+.curate.help
+{
+    padding-top: 0px;
+    font-size: 9pt;
+    font-weight: normal;
+}
+.curate.button
+{
+    padding: 10px 0px;
+    font-size: 10pt;
+    text-align: center;
+}
+
+textarea#reason {
+       font-size: 10pt;
+}
+.access-setting {
+    margin-left: 5%;
+}
+th.accessOdd {
+    width: 20%;
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-align: right;
+    text-decoration: none;
+    background: #eeeeee;
+}
+th.accessEven { 
+    width: 20%;
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-align: right;
+    text-decoration: none;
+    background: #dddddd;
+}
+td.accessOdd{ 
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-decoration: none;
+    background: #ffffff; 
+}
+td.accessEven{ 
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-decoration: none;
+    background: #eeeeee; 
+}
+th.accessHeadOdd {
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-align: center;
+    text-decoration: none;
+    background: #eeeeee;
+}
+th.accessHeadEven { 
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-align: center;
+    text-decoration: none;
+    background: #dddddd;
+}
+
+.accessButton{ 
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-decoration: none;
+    background: #ffffff; 
+}

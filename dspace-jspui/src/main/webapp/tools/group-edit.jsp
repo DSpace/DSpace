@@ -42,44 +42,40 @@
 	request.setAttribute("LanguageSwitch", "hide");
 %>
 
-<dspace:layout titlekey="jsp.tools.group-edit.title"
+<dspace:layout style="submission" titlekey="jsp.tools.group-edit.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin"
                nocache="true">
 
-  <table width="95%">
-    <tr>
-      <td align="left">
-	<h1><fmt:message key="jsp.tools.group-edit.title"/> : <%=group.getName()%> (id: <%=group.getID()%>)</h1>
-      </td>
-      <td align="right" class="standard">
+	<h1><fmt:message key="jsp.tools.group-edit.title"/> : <%=group.getName()%> (id: <%=group.getID()%>)
 	<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.collection-admin\") +\"#groupeditor\"%>"><fmt:message key="jsp.help"/></dspace:popup>
-      </td>
-    </tr>
-  </table>
-
-  <center>
+	</h1>
     <form name="epersongroup" method="post" action="">
-	<p><label for="tgroup_name"><fmt:message key="jsp.tools.group-edit.name"/></label><input name="group_name" id="tgroup_name" value="<%= Utils.addEntities(group.getName()) %>"/></p>
-   	    <h3><fmt:message key="jsp.tools.group-edit.heading"/></h3>
+	<div class="row"><label for="tgroup_name" class="col-md-2">
+		<fmt:message key="jsp.tools.group-edit.name"/></label>
+	<span class="col-md-10">
+		<input class="form-control" name="group_name" id="tgroup_name" value="<%= Utils.addEntities(group.getName()) %>"/>
+	</span>
+	</div>
+	<br/>
+    <div class="alert alert-warning"><fmt:message key="jsp.tools.group-edit.heading"/></div>
 
-        <input type="hidden" name="group_id" value="<%=group.getID()%>"/>
-        <table>
-          <tr>
-            <td align="center"><strong><fmt:message key="jsp.tools.group-edit.eperson"/></strong><br/>
-              <dspace:selecteperson multiple="true" selected="<%= epeople %>"/> 
-            </td>
-            <td align="center"><strong><fmt:message key="jsp.tools.group-edit.group"/></strong><br/>
-              <dspace:selectgroup   multiple="true" selected="<%= groups  %>"/>
-            </td>
-		  </tr>
-        </table>
-
-        <br/>
-
-        <p><input type="submit" name="submit_group_update" value="<fmt:message key="jsp.tools.group-edit.update.button"/>" onclick="javascript:finishEPerson();finishGroups();"/></p>
+    <input type="hidden" name="group_id" value="<%=group.getID()%>"/>
+    
+    <div class="row">
+    <div class="col-md-6"> 
+	    <label for="eperson_id"><fmt:message key="jsp.tools.group-edit.eperson"/></label>
+	    <dspace:selecteperson multiple="true" selected="<%= epeople %>"/> 
+    </div>
+    
+    <div class="col-md-6">
+	    <label for="eperson_id"><fmt:message key="jsp.tools.group-edit.group"/></label>
+	    <dspace:selectgroup   multiple="true" selected="<%= groups  %>"/>
+	</div>
+	</div>
+	<br/>
+    <div class="row"><input class="btn btn-success col-md-2 col-md-offset-5" type="submit" name="submit_group_update" value="<fmt:message key="jsp.tools.group-edit.update.button"/>" onclick="javascript:finishEPerson();finishGroups();"/></div>
    </form>
-  </center>
 </dspace:layout>

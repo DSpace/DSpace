@@ -9,17 +9,22 @@ package org.dspace.app.webui.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.sherpa.submit.SHERPASubmitService;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionInfo;
+import org.dspace.app.webui.servlet.SubmissionController;
 import org.dspace.app.webui.submit.JSPStep;
 import org.dspace.app.webui.submit.JSPStepManager;
+import org.dspace.app.webui.util.JSONUploadResponse;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -32,6 +37,11 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.submit.step.UploadStep;
+import org.dspace.utils.DSpace;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 
 /**
  * Upload step for DSpace JSP-UI. Handles the pages that revolve around uploading files
@@ -82,13 +92,13 @@ public class JSPUploadStep extends JSPStep
     private static final String FILE_FORMAT_JSP = "/submit/get-file-format.jsp";
 
     /** JSP to show any upload errors * */
-    private static final String UPLOAD_ERROR_JSP = "/submit/upload-error.jsp";
+    protected static final String UPLOAD_ERROR_JSP = "/submit/upload-error.jsp";
 
     /** JSP to show any upload errors * */
-    private static final String VIRUS_CHECKER_ERROR_JSP = "/submit/virus-checker-error.jsp";
+    protected static final String VIRUS_CHECKER_ERROR_JSP = "/submit/virus-checker-error.jsp";
 
     /** JSP to show any upload errors * */
-    private static final String VIRUS_ERROR_JSP = "/submit/virus-error.jsp";
+    protected static final String VIRUS_ERROR_JSP = "/submit/virus-error.jsp";
     
     /** JSP to review uploaded files * */
     private static final String REVIEW_JSP = "/submit/review-upload.jsp";
@@ -181,6 +191,34 @@ public class JSPUploadStep extends JSPStep
 
         // Do we need to skip the upload entirely?
         boolean fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);
+        
+        if (UIUtil.getBoolParameter(request, "ajaxUpload"))
+        {
+            Gson gson = new Gson();
+            // old browser need to see this response as html to work            
+            response.setContentType("text/html");
+            JSONUploadResponse jsonResponse = new JSONUploadResponse();
+            String bitstreamName = null;
+            int bitstreamID = -1;
+            long size = 0;
+            String url = null;
+            if (subInfo.getBitstream() != null)
+            {
+                Bitstream bitstream = subInfo.getBitstream();
+                bitstreamName = bitstream.getName();
+                bitstreamID = bitstream.getID();
+                size = bitstream.getSize();
+                url = request.getContextPath() + "/retrieve/" + bitstreamID
+                        + "/" + UIUtil.encodeBitstreamName(bitstreamName);
+            }
+            jsonResponse.addUploadFileStatus(bitstreamName, bitstreamID, size,
+                    url, status);
+            response.getWriter().print(gson.toJson(jsonResponse));
+            response.flushBuffer();
+            return;
+        }
+
+        
         if (buttonPressed.equalsIgnoreCase(UploadStep.SUBMIT_SKIP_BUTTON) ||
             (buttonPressed.equalsIgnoreCase(UploadStep.SUBMIT_UPLOAD_BUTTON) && !fileRequired))
         {
@@ -424,7 +462,7 @@ public class JSPUploadStep extends JSPStep
      * @param justUploaded
      *            true, if the user just finished uploading a file
      */
-    private void showUploadPage(Context context, HttpServletRequest request,
+    protected void showUploadPage(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo,
             boolean justUploaded) throws SQLException, ServletException,
             IOException
@@ -472,15 +510,28 @@ public class JSPUploadStep extends JSPStep
      * @param subInfo
      *            the SubmissionInfo object
      */
-    private void showChooseFile(Context context, HttpServletRequest request,
+    protected void showChooseFile(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
             throws SQLException, ServletException, IOException
     {
+        if (ConfigurationManager.getBooleanProperty(
+                "webui.submission.sherparomeo-policy-enabled", true))
+        {
+            SHERPASubmitService sherpaSubmitService = new DSpace()
+                    .getSingletonService(SHERPASubmitService.class);
+            request.setAttribute("sherpa", sherpaSubmitService
+                    .hasISSNs(context, subInfo.getSubmissionItem()
+                            .getItem()));
+        }
 
         // set to null the bitstream in subInfo, we need to process a new file
         // we don't need any info about previous files...
         subInfo.setBitstream(null);
-        
+
+        // set a flag whether the current step is UploadWithEmbargoStep
+        boolean withEmbargo = SubmissionController.getCurrentStepConfig(request, subInfo).getProcessingClassName().equals("org.dspace.submit.step.UploadWithEmbargoStep") ? true : false;
+        request.setAttribute("with_embargo", Boolean.valueOf(withEmbargo));
+
         // load JSP which allows the user to select a file to upload
         JSPStepManager.showJSP(request, response, subInfo, CHOOSE_FILE_JSP);
     }
@@ -501,7 +552,7 @@ public class JSPUploadStep extends JSPStep
      * @param showChecksums
      *            pass in true if checksums should be displayed
      */
-    private void showUploadFileList(Context context,
+    protected void showUploadFileList(Context context,
             HttpServletRequest request, HttpServletResponse response,
             SubmissionInfo subInfo, boolean justUploaded, boolean showChecksums)
             throws SQLException, ServletException, IOException
@@ -509,6 +560,10 @@ public class JSPUploadStep extends JSPStep
         // Set required attributes
         request.setAttribute("just.uploaded", Boolean.valueOf(justUploaded));
         request.setAttribute("show.checksums", Boolean.valueOf(showChecksums));
+
+        // set a flag whether the current step is UploadWithEmbargoStep
+        boolean withEmbargo = SubmissionController.getCurrentStepConfig(request, subInfo).getProcessingClassName().equals("org.dspace.submit.step.UploadWithEmbargoStep") ? true : false;
+        request.setAttribute("with_embargo", Boolean.valueOf(withEmbargo));
 
         // Always go to advanced view in workflow mode
         if (subInfo.isInWorkflow()
@@ -537,7 +592,7 @@ public class JSPUploadStep extends JSPStep
      * @param subInfo
      *            the SubmissionInfo object
      */
-    private void showGetFileFormat(Context context, HttpServletRequest request,
+    protected void showGetFileFormat(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
             throws SQLException, ServletException, IOException
     {
@@ -577,7 +632,7 @@ public class JSPUploadStep extends JSPStep
      * @param subInfo
      *            the SubmissionInfo object
      */
-    private void showFileDescription(Context context,
+    protected void showFileDescription(Context context,
             HttpServletRequest request, HttpServletResponse response,
             SubmissionInfo subInfo) throws SQLException, ServletException,
             IOException

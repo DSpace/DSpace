@@ -19,7 +19,7 @@
 
 <taglib>
   <tlibversion>1.0</tlibversion>
-  <jspversion>1.1</jspversion>
+  <jspversion>2.0</jspversion>
   <shortname>dspace</shortname>
   <uri>http://www.dspace.org/dspace-tags.tld</uri>
   <info>DSpace JSP tags</info>
@@ -446,5 +446,73 @@
     </attribute>    	  
   </tag>  
 
+  <tag>
+    <name>access-setting</name>
+    <tagclass>org.dspace.app.webui.jsptag.AccessSettingTag</tagclass>
+    <bodycontent>empty</bodycontent>
+    <info>
+        Tag for display access setting elements. The "subInfo" is the SubmissionInfo
+        to get an array of group that can be set as a target of the resource policy. 
+        The "dso" is the DSpaceObject that the access settings target to. The "rp" is
+        the resource policy. If the target is a specific resource policy, you must set
+        "rp", othewise you must set "dso". The resource policy setting fields are are
+        not display if "embargo" is true. The embargo date and reason are set as hidden
+        fields if "hidden" is true. The "confirm and add policy" button is dislay
+        if "addpolicy" is true;
+    </info>
+
+   <attribute>
+      <name>subInfo</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>    
+
+   <attribute>
+      <name>dso</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>    
+
+   <attribute>
+      <name>rp</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>    
+
+
+   <attribute>
+      <name>embargo</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>    	  
+
+   <attribute>
+      <name>hidden</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>    	  
+
+   <attribute>
+      <name>addpolicy</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>    	  
+  </tag>  
+
+  <tag>
+    <name>policieslist</name>
+    <tagclass>org.dspace.app.webui.jsptag.PoliciesListTag</tagclass>
+    <bodycontent>empty</bodycontent>
+    <info>
+        Tag for display policies list. The "policies" is an list of policies. 
+    </info>
+
+   <attribute>
+      <name>policies</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>    
+
+  </tag>  
 
 </taglib>

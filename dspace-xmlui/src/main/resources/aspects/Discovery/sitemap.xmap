@@ -178,16 +178,7 @@ and searching the repository.
                             <map:serialize type="xml"/>
                         </map:match>
                     </map:match>
-
-                    <map:match type="HandleAuthorizedMatcher" pattern="!READ">
-                        <map:transform type="RestrictedItem">
-                            <map:parameter name="header" value="xmlui.ArtifactBrowser.RestrictedItem.auth_header"/>
-                            <map:parameter name="message" value="xmlui.ArtifactBrowser.RestrictedItem.auth_message"/>
-                        </map:transform>
-                        <map:serialize type="xml"/>
-                    </map:match>
                 </map:match>
-
 
             </map:match> <!-- End match handle/*/** -->
 

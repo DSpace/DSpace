@@ -30,11 +30,10 @@ import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.curate.Curator;
 import org.dspace.handle.HandleManager;
-import org.dspace.submit.AbstractProcessingStep;
 
 /**
- * Upload step for DSpace. Processes the actual upload of files
- * for an item being submitted into DSpace.
+ * Upload step with the advanced embargo system for DSpace. Processes the actual 
+ * upload of files for an item being submitted into DSpace.
  * <P>
  * This class performs all the behind-the-scenes processing that
  * this particular step requires.  This class's methods are utilized
@@ -42,57 +41,15 @@ import org.dspace.submit.AbstractProcessingStep;
  *
  * @see org.dspace.app.util.SubmissionConfig
  * @see org.dspace.app.util.SubmissionStepConfig
+ * @see org.dspace.submit.step.UploadStep
  * @see org.dspace.submit.AbstractProcessingStep
  *
  * @author Tim Donohue
+ * @author Keiji Suzuki
  * @version $Revision$
  */
-public class UploadWithEmbargoStep extends AbstractProcessingStep
+public class UploadWithEmbargoStep extends UploadStep
 {
-    /** Button to upload a file * */
-    public static final String SUBMIT_UPLOAD_BUTTON = "submit_upload";
-
-    /** Button to skip uploading a file * */
-    public static final String SUBMIT_SKIP_BUTTON = "submit_skip";
-
-    /** Button to submit more files * */
-    public static final String SUBMIT_MORE_BUTTON = "submit_more";
-
-    /** Button to cancel editing of file info * */
-    public static final String CANCEL_EDIT_BUTTON = "submit_edit_cancel";
-
-    /***************************************************************************
-     * STATUS / ERROR FLAGS (returned by doProcessing() if an error occurs or
-     * additional user interaction may be required)
-     *
-     * (Do NOT use status of 0, since it corresponds to STATUS_COMPLETE flag
-     * defined in the JSPStepManager class)
-     **************************************************************************/
-    // integrity error occurred
-    public static final int STATUS_INTEGRITY_ERROR = 1;
-
-    // error in uploading file
-    public static final int STATUS_UPLOAD_ERROR = 2;
-
-    // error - no files uploaded!
-    public static final int STATUS_NO_FILES_ERROR = 5;
-
-    // format of uploaded file is unknown
-    public static final int STATUS_UNKNOWN_FORMAT = 10;
-
-    // virus checker unavailable ?
-    public static final int STATUS_VIRUS_CHECKER_UNAVAILABLE = 14;
-
-    // file failed virus check
-    public static final int STATUS_CONTAINS_VIRUS = 16;
-
-    // edit file information
-    public static final int STATUS_EDIT_BITSTREAM = 20;
-
-    // return from editing file information
-    public static final int STATUS_EDIT_COMPLETE = 25;
-
-
     public static final int STATUS_EDIT_POLICIES = 30;
 
     public static final int STATUS_EDIT_POLICIES_ERROR_SELECT_GROUP = 31;
@@ -103,10 +60,7 @@ public class UploadWithEmbargoStep extends AbstractProcessingStep
 
 
     /** log4j logger */
-    private static Logger log = Logger.getLogger(UploadStep.class);
-
-    /** is the upload required? */
-    private boolean fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);
+    private static Logger log = Logger.getLogger(UploadWithEmbargoStep.class);
 
     /**
      * Do any processing of the information input by the user, and/or perform
@@ -345,98 +299,6 @@ public class UploadWithEmbargoStep extends AbstractProcessingStep
         return STATUS_COMPLETE;
     }
 
-
-
-    /**
-     * Retrieves the number of pages that this "step" extends over. This method
-     * is used to build the progress bar.
-     * <P>
-     * This method may just return 1 for most steps (since most steps consist of
-     * a single page). But, it should return a number greater than 1 for any
-     * "step" which spans across a number of HTML pages. For example, the
-     * configurable "Describe" step (configured using input-forms.xml) overrides
-     * this method to return the number of pages that are defined by its
-     * configuration file.
-     * <P>
-     * Steps which are non-interactive (i.e. they do not display an interface to
-     * the user) should return a value of 1, so that they are only processed
-     * once!
-     *
-     * @param request
-     *            The HTTP Request
-     * @param subInfo
-     *            The current submission information object
-     *
-     * @return the number of pages in this step
-     */
-    public int getNumberOfPages(HttpServletRequest request,
-                                SubmissionInfo subInfo) throws ServletException
-    {
-        // Despite using many JSPs, this step only appears
-        // ONCE in the Progress Bar, so it's only ONE page
-        return 1;
-    }
-
-    // ****************************************************************
-    // ****************************************************************
-    // METHODS FOR UPLOADING FILES (and associated information)
-    // ****************************************************************
-    // ****************************************************************
-
-    /**
-     * Remove a file from an item
-     *
-     * @param context
-     *            current DSpace context
-     * @param item
-     *            Item where file should be removed from
-     * @param bitstreamID
-     *            The id of bitstream representing the file to remove
-     * @return Status or error flag which will be processed by
-     *         UI-related code! (if STATUS_COMPLETE or 0 is returned,
-     *         no errors occurred!)
-     */
-    protected int processRemoveFile(Context context, Item item, int bitstreamID)
-            throws IOException, SQLException, AuthorizeException
-    {
-        Bitstream bitstream;
-
-        // Try to find bitstream
-        try
-        {
-            bitstream = Bitstream.find(context, bitstreamID);
-        }
-        catch (NumberFormatException nfe)
-        {
-            bitstream = null;
-        }
-
-        if (bitstream == null)
-        {
-            // Invalid or mangled bitstream ID
-            // throw an error and return immediately
-            return STATUS_INTEGRITY_ERROR;
-        }
-
-        // remove bitstream from bundle..
-        // delete bundle if it's now empty
-        Bundle[] bundles = bitstream.getBundles();
-
-        bundles[0].removeBitstream(bitstream);
-
-        Bitstream[] bitstreams = bundles[0].getBitstreams();
-
-        // remove bundle if it's now empty
-        if (bitstreams.length < 1)
-        {
-            item.removeBundle(bundles[0]);
-            item.update();
-        }
-
-        // no errors occurred
-        return STATUS_COMPLETE;
-    }
-
     /**
      * Process the upload of a new file!
      *
@@ -611,7 +473,7 @@ public class UploadWithEmbargoStep extends AbstractProcessingStep
 
     private void processAccessFields(Context context, HttpServletRequest request, SubmissionInfo subInfo, Bitstream b) throws SQLException, AuthorizeException {
         // ResourcePolicy Management
-        boolean isAdvancedFormEnabled= ConfigurationManager.getBooleanProperty("xmlui.submission.restrictstep.enableAdvancedForm", false);
+        boolean isAdvancedFormEnabled= ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
         // if it is a simple form we should create the policy for Anonymous
         // if Anonymous does not have right on this collection, create policies for any other groups with
         // DEFAULT_ITEM_READ specified.
@@ -627,116 +489,6 @@ public class UploadWithEmbargoStep extends AbstractProcessingStep
         }
     }
 
-
-    /*
-      If we created a new Bitstream but now realised there is a problem then remove it.
-     */
-    private void backoutBitstream(SubmissionInfo subInfo, Bitstream b, Item item) throws SQLException, AuthorizeException, IOException
-    {
-        // remove bitstream from bundle..
-        // delete bundle if it's now empty
-        Bundle[] bnd = b.getBundles();
-
-        bnd[0].removeBitstream(b);
-
-        Bitstream[] bitstreams = bnd[0].getBitstreams();
-
-        // remove bundle if it's now empty
-        if (bitstreams.length < 1)
-        {
-            item.removeBundle(bnd[0]);
-            item.update();
-        }
-
-        subInfo.setBitstream(null);
-    }
-
-    /**
-     * Process input from get file type page
-     *
-     * @param context
-     *            current DSpace context
-     * @param request
-     *            current servlet request object
-     * @param response
-     *            current servlet response object
-     * @param subInfo
-     *            submission info object
-     *
-     * @return Status or error flag which will be processed by
-     *         UI-related code! (if STATUS_COMPLETE or 0 is returned,
-     *         no errors occurred!)
-     */
-    protected int processSaveFileFormat(Context context,
-                                        HttpServletRequest request, HttpServletResponse response,
-                                        SubmissionInfo subInfo) throws ServletException, IOException,
-            SQLException, AuthorizeException
-    {
-        if (subInfo.getBitstream() != null)
-        {
-            // Did the user select a format?
-            int typeID = Util.getIntParameter(request, "format");
-
-            BitstreamFormat format = BitstreamFormat.find(context, typeID);
-
-            if (format != null)
-            {
-                subInfo.getBitstream().setFormat(format);
-            }
-            else
-            {
-                String userDesc = request.getParameter("format_description");
-
-                subInfo.getBitstream().setUserFormatDescription(userDesc);
-            }
-
-            // update database
-            subInfo.getBitstream().update();
-        }
-        else
-        {
-            return STATUS_INTEGRITY_ERROR;
-        }
-
-        return STATUS_COMPLETE;
-    }
-
-    /**
-     * Process input from the "change file description" page
-     *
-     * @param context
-     *            current DSpace context
-     * @param request
-     *            current servlet request object
-     * @param response
-     *            current servlet response object
-     * @param subInfo
-     *            submission info object
-     *
-     * @return Status or error flag which will be processed by
-     *         UI-related code! (if STATUS_COMPLETE or 0 is returned,
-     *         no errors occurred!)
-     */
-    protected int processSaveFileDescription(Context context,
-                                             HttpServletRequest request, HttpServletResponse response,
-                                             SubmissionInfo subInfo) throws ServletException, IOException,
-            SQLException, AuthorizeException
-    {
-        if (subInfo.getBitstream() != null)
-        {
-            subInfo.getBitstream().setDescription(
-                    request.getParameter("description"));
-            subInfo.getBitstream().update();
-
-            context.commit();
-        }
-        else
-        {
-            return STATUS_INTEGRITY_ERROR;
-        }
-
-        return STATUS_COMPLETE;
-    }
 
     private int editBitstreamPolicies(HttpServletRequest request, Context context, SubmissionInfo subInfo, String buttonPressed)
             throws SQLException, AuthorizeException {

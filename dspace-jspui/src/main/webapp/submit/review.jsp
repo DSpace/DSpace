@@ -52,24 +52,24 @@
 	Iterator reviewIterator = reviewJSPs.keySet().iterator();
 %>
           
-<dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.review.title" nocache="true">
+<dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.review.title" style="submission" nocache="true">
 
     <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
    
         <jsp:include page="/submit/progressbar.jsp" />
 
-        <h1><fmt:message key="jsp.submit.review.heading"/></h1>
+        <h1><fmt:message key="jsp.submit.review.heading"/>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#verify\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup>
+        </h1>
 
         <p><fmt:message key="jsp.submit.review.info1"/></p>
 
-        <div><fmt:message key="jsp.submit.review.info2"/>
-        &nbsp;&nbsp;<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#verify\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
+        <div class="alert alert-info"><fmt:message key="jsp.submit.review.info2"/></div>
 
         <p><fmt:message key="jsp.submit.review.info3"/></p>
 
         <p><fmt:message key="jsp.submit.review.info4"/></p>
-
-        <table align="center" class="miscTable" width="80%">
+		<div class="container">
 <%
 		//loop through the list of review JSPs
 		while(reviewIterator.hasNext())
@@ -81,43 +81,26 @@
 			//finally get the path to the review JSP (the value)
 			String reviewJSP = (String) reviewJSPs.get(stepAndPage);
 	%>
-		    <tr>
-                <td class="evenRowOddCol">
+		    <div class="well row">
 				<%--Load the review JSP and pass it step & page info--%>
 				<jsp:include page="<%=reviewJSP%>">
 					<jsp:param name="submission.jump" value="<%=stepAndPage%>" />	
 				</jsp:include>
-                                        </td>
-                                    </tr>
+			</div>	
 <%
     }
 
 %>
-                </table>
-                                    
+		</div>
         <%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
         <%= SubmissionController.getSubmissionParameters(context, request) %>
 
-        <p>&nbsp;</p>
     
-        <center>
-            <table border="0" width="80%">
-                <tr>
-                    <td width="100%">&nbsp;</td>
-                    <td>
-                        <input type="submit" name="<%=AbstractProcessingStep.PREVIOUS_BUTTON%>" value="<fmt:message key="jsp.submit.review.button.previous"/>" />
-                    </td>
-                    <td>
-                        <input type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.review.button.next"/>" />
-                    </td>
-                    <td>&nbsp;&nbsp;&nbsp;</td>
-
-                    <td align="right">
-                        <input type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.review.button.cancelsave"/>" />
-                    </td>
-                </tr>
-            </table>
-        </center>
+        <div class="col-md-6 pull-right btn-group">
+			<input class="btn btn-default col-md-4" type="submit" name="<%=AbstractProcessingStep.PREVIOUS_BUTTON%>" value="<fmt:message key="jsp.submit.review.button.previous"/>" />
+          	<input class="btn btn-default col-md-4" type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.review.button.cancelsave"/>" />
+          	<input class="btn btn-primary col-md-4" type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.review.button.next"/>" />
+        </div>
 
     </form>
 

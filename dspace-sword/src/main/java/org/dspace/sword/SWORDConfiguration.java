@@ -457,11 +457,7 @@ public class SWORDConfiguration
 	public String getTempDir()
 			throws DSpaceSWORDException
 	{
-		String tempDir = ConfigurationManager.getProperty("upload.temp.dir");
-		if (tempDir == null || "".equals(tempDir))
-		{
-			throw new DSpaceSWORDException("There is no temporary upload directory specified in configuration: upload.temp.dir");
-		}
-		return tempDir;
+        	return (ConfigurationManager.getProperty("upload.temp.dir") != null)
+                    ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir"); 
 	}
 }

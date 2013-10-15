@@ -14,12 +14,14 @@ import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.eperson.Group;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
@@ -154,9 +156,9 @@ public class WorkflowUtils extends Util{
             String recipient = ConfigurationManager
                     .getProperty("alert.recipient");
 
-            if (recipient != null)
+            if (StringUtils.isNotBlank(recipient))
             {
-                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "internal_error"));
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "internal_error"));
 
                 email.addRecipient(recipient);
                 email.addArgument(ConfigurationManager

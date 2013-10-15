@@ -6,6 +6,9 @@
    <packaging>pom</packaging>
    <version>4.0-SNAPSHOT</version>
    <name>DSpace Parent Project</name>
+   <description>
+   	DSpace open source software is a turnkey institutional repository application.
+   </description>
    <url>https://github.com/dspace/DSpace</url>
 
    <organization>
@@ -18,12 +21,16 @@
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
         <version>7</version>
+        <relativePath/>
     </parent>
 
     <!--Force UTF-8 encoding during build on all platforms-->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lucene.version>3.5.0</lucene.version>
+        <java.version>1.6</java.version> <!-- DSpace requires Java 1.6 or higher -->		
+        <lucene.version>4.4.0</lucene.version>
+        <solr.version>4.4.0</solr.version>
+        <slf4j.version>1.6.1</slf4j.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
@@ -35,12 +42,11 @@
       <pluginManagement>
           <plugins>
               <plugin>
-                  <!-- DSpace requires Java 1.6 or higher -->
                   <artifactId>maven-compiler-plugin</artifactId>
                   <version>2.3.2</version>
                   <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                   </configuration>
               </plugin>
               <plugin>
@@ -106,6 +112,37 @@
       <!-- These plugin settings only apply to this single POM and are not inherited
            to any submodules. -->
       <plugins>
+         <plugin>
+           <artifactId>maven-antrun-plugin</artifactId>
+           <version>1.7</version>
+           <configuration>
+             <target>
+	       <!-- Run 'native2ascii' to encode UTF-8 characters in properties files. Place the resulting file(s) in /target -->
+               <native2ascii encoding="UTF8" src="${basedir}" dest="${basedir}/target" includes="*.properties" />
+             </target>
+           </configuration>
+           <executions>
+             <execution>
+               <id>native2ascii-utf8</id>
+               <phase>generate-resources</phase>
+               <goals>
+                 <goal>run</goal>
+               </goals>
+             </execution>
+           </executions>
+           <!-- Required dependencies for native2ascii to function -->
+           <dependencies>
+             <dependency>
+               <groupId>com.sun</groupId>
+               <artifactId>tools</artifactId>
+               <version>${java.version}</version>
+               <scope>system</scope>
+               <!-- Path to tools.jar (containing native2ascii tool) is determined by a profile (see below) -->
+               <systemPath>${toolsjar}</systemPath>
+             </dependency>
+           </dependencies>
+         </plugin>
+
          <plugin>
             <artifactId>maven-release-plugin</artifactId>
             <version>2.3.2</version>
@@ -187,7 +224,8 @@
            </activation>
            <properties>
                <!-- 'root.basedir' is the relative path to the [dspace-src] root folder -->
-               <filters.file>${root.basedir}/build.properties</filters.file>
+               <!-- NOTE that we are using the copy in the target dir, which has any Unicode characters encoded (see native2ascii above) -->
+               <filters.file>${root.basedir}/target/build.properties</filters.file>
            </properties>
        </profile>
 
@@ -204,7 +242,8 @@
            </activation>
            <properties>
                 <!-- 'root.basedir' is the relative path to the [dspace-src] root folder -->
-                <filters.file>${root.basedir}/${env}.properties</filters.file>
+                <!-- NOTE that we are using the copy in the target dir, which has any Unicode characters encoded (see native2ascii above) -->
+                <filters.file>${root.basedir}/target/${env}.properties</filters.file>
            </properties>
        </profile>
 
@@ -245,6 +284,33 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <!-- Determine path to Java Tools JAR. This JAR contains the 'native2ascii' tool (required above by maven-antrun-plugin)-->
+        <!-- In most platforms Unix/Windows it's named tools.jar. But, on Mac it's classes.jar (see next profile) -->
+        <profile>
+          <id>default-java-tools</id>
+          <activation>
+            <activeByDefault>true</activeByDefault>
+            <file>
+                <exists>${java.home}/../lib/tools.jar</exists>
+            </file>
+          </activation>
+          <properties>
+            <toolsjar>${java.home}/../lib/tools.jar</toolsjar>
+          </properties>
+        </profile>
+        <profile>
+          <id>mac-java-tools</id>
+          <activation>
+            <activeByDefault>false</activeByDefault>
+            <file>
+                <exists>${java.home}/../Classes/classes.jar</exists>
+            </file>
+          </activation>
+          <properties>
+            <toolsjar>${java.home}/../Classes/classes.jar</toolsjar>
+          </properties>
         </profile>
 
 
@@ -346,6 +412,22 @@
             </modules>
         </profile>
 
+
+        <!--
+           Builds SOLR WAR for DSpace
+        -->
+        <profile>
+            <id>dspace-solr</id>
+            <activation>
+                <file>
+                    <exists>dspace-solr/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-solr</module>
+            </modules>
+        </profile>
+
         <!--
            Builds SWORDv2 WAR for DSpace
         -->
@@ -430,6 +512,7 @@
             <maven.test.skip>true</maven.test.skip>
         </properties>
       </profile>
+    
    </profiles>
 
    <!--
@@ -622,9 +705,14 @@
          </dependency>
          <dependency>
             <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers</artifactId>
+            <artifactId>lucene-analyzers-common</artifactId>
             <version>${lucene.version}</version>
          </dependency>
+         <dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-queryparser</artifactId>
+			<version>${lucene.version}</version>
+		</dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
@@ -697,11 +785,11 @@
             <artifactId>commons-pool</artifactId>
             <version>1.4</version>
          </dependency>
-         <dependency>
-            <groupId>commons-validator</groupId>
-            <artifactId>commons-validator</artifactId>
-            <version>1.3.1</version>
-         </dependency>
+          <dependency>
+              <groupId>commons-validator</groupId>
+              <artifactId>commons-validator</artifactId>
+              <version>1.4.0</version>
+          </dependency>
          <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
@@ -871,6 +959,26 @@
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
             <version>3.1</version>
+         </dependency>
+         <dependency>
+             <groupId>org.slf4j</groupId>
+             <artifactId>jcl-over-slf4j</artifactId>
+             <version>${slf4j.version}</version>
+         </dependency>
+         <dependency>
+             <groupId>org.slf4j</groupId>
+             <artifactId>slf4j-api</artifactId>
+             <version>${slf4j.version}</version>
+         </dependency>
+         <dependency>
+             <groupId>org.slf4j</groupId>
+             <artifactId>slf4j-jdk14</artifactId>
+             <version>${slf4j.version}</version>
+         </dependency>
+         <dependency>
+             <groupId>org.slf4j</groupId>
+             <artifactId>slf4j-log4j12</artifactId>
+             <version>${slf4j.version}</version>
          </dependency>
          <dependency>
             <groupId>junit</groupId>

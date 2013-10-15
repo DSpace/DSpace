@@ -69,7 +69,7 @@ public class InstallItem
                 identifierService.register(c, item, suppliedHandle);
             }
         } catch (IdentifierException e) {
-            throw new RuntimeException("Can't create an Identifier!");
+            throw new RuntimeException("Can't create an Identifier!", e);
         }
 
 

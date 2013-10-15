@@ -107,7 +107,7 @@ public class XmlWorkflowManager {
             // suppress email, and delete key
             noEMail.remove(wfi.getItem().getID());
         } else {
-            Email mail = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), emailTemplate));
+            Email mail = Email.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), emailTemplate));
             for (String argument : arguments) {
                 mail.addArgument(argument);
             }
@@ -396,7 +396,7 @@ public class XmlWorkflowManager {
             EPerson ep = i.getSubmitter();
             // Get the Locale
             Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
+            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
 
             // Get the item handle to email to user
             String handle = HandleManager.findHandle(c, i);
@@ -856,7 +856,7 @@ public class XmlWorkflowManager {
             // Get rejector's name
             String rejector = getEPersonName(e);
             Locale supportedLocale = I18nUtil.getEPersonLocale(e);
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale,"submit_reject"));
+            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale,"submit_reject"));
 
             email.addRecipient(wi.getSubmitter().getEmail());
             email.addArgument(title);

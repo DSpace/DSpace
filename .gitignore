@@ -11,6 +11,7 @@ target/
 *.ipr
 *.iws
 .idea/
+overlays/
 
 ## Ignore project files created by NetBeans
 nbproject/private/

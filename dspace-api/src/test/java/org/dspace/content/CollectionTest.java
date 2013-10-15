@@ -20,8 +20,8 @@ import static org.hamcrest.CoreMatchers.*;
 import mockit.*;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.core.LicenseManager;
 
 /**
  * Unit Tests for class Collection
@@ -198,7 +198,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
      */
     @Test
     @Override
-    public void testGetID() 
+    public void testGetID()
     {
         assertTrue("testGetID 0", c.getID() >= 1);
     }
@@ -208,7 +208,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
      */
     @Test
     @Override
-    public void testGetHandle() 
+    public void testGetHandle()
     {
         //default instance has a random handle
         assertTrue("testGetHandle 0", c.getHandle().contains("123456789/"));
@@ -662,17 +662,17 @@ public class CollectionTest extends AbstractDSpaceObjectTest
      * Test of getLicense method, of class Collection.
      */
     @Test
-    public void testGetLicense() 
+    public void testGetLicense()
     {
         assertThat("testGetLicense 0", c.getLicense(), notNullValue());
-        assertThat("testGetLicense 1", c.getLicense(), equalTo(ConfigurationManager.getDefaultSubmissionLicense()));
+        assertThat("testGetLicense 1", c.getLicense(), equalTo(LicenseManager.getDefaultSubmissionLicense()));
     }
 
     /**
      * Test of getLicenseCollection method, of class Collection.
      */
     @Test
-    public void testGetLicenseCollection() 
+    public void testGetLicenseCollection()
     {
         assertThat("testGetLicenseCollection 0", c.getLicenseCollection(), notNullValue());
         assertThat("testGetLicenseCollection 1", c.getLicenseCollection(), equalTo(""));
@@ -682,7 +682,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
      * Test of hasCustomLicense method, of class Collection.
      */
     @Test
-    public void testHasCustomLicense() 
+    public void testHasCustomLicense()
     {
         assertFalse("testHasCustomLicense 0", c.hasCustomLicense());
     }
@@ -691,7 +691,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
      * Test of setLicense method, of class Collection.
      */
     @Test
-    public void testSetLicense() 
+    public void testSetLicense()
     {
         String license = "license for test";
         c.setLicense(license);
@@ -705,7 +705,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
      * Test of getTemplateItem method, of class Collection.
      */
     @Test
-    public void testGetTemplateItem() throws Exception 
+    public void testGetTemplateItem() throws Exception
     {
         assertThat("testGetTemplateItem 0", c.getTemplateItem(), nullValue());
     }
@@ -1336,7 +1336,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
 
         assertFalse("testCanEditBooleanNoAuth_boolean 0",c.canEditBoolean(false));
     }
-   
+
     /**
      * Test of canEditBoolean method, of class Collection.
      */
@@ -1789,7 +1789,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
      */
     @Test
     @Override
-    public void testGetType() 
+    public void testGetType()
     {
         assertThat("testGetType 0", c.getType(), equalTo(Constants.COLLECTION));
     }
@@ -1798,7 +1798,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
      * Test of findAuthorized method, of class Collection.
      */
     @Test
-    public void testFindAuthorized() throws Exception 
+    public void testFindAuthorized() throws Exception
     {
         context.turnOffAuthorisationSystem();
         Community com = Community.create(null, context);
