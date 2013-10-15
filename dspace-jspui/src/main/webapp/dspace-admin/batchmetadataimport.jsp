@@ -30,7 +30,7 @@
     String message = (String)request.getAttribute("message");
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.batchmetadataimport.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.batchmetadataimport.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
@@ -50,12 +50,12 @@
     }
 	else if (hasError && message==null){
 %>
-		<fmt:message key="jsp.dspace-admin.batchmetadataimport.genericerror"/>
+		<div class="alert alert-warning"><fmt:message key="jsp.dspace-admin.batchmetadataimport.genericerror"/></div>
 <%  
 	}
 	else {
 %>
-		<fmt:message key="jsp.dspace-admin.batchmetadataimport.success"/>
+		<div class="alert alert-info"><fmt:message key="jsp.dspace-admin.batchmetadataimport.success"/></div>
 <%  
 	}
 %>
@@ -63,20 +63,13 @@
     <form method="post" enctype="multipart/form-data" action="">
 	
 
-		<p align="center">
-			<fmt:message key="jsp.dspace-admin.batchmetadataimport.selectfile"/>
-		</p>
-		
-        <p align="center">
-            <input type="file" size="40" name="file"/>
-        </p>
-        
-        <p align="center">
-			<fmt:message key="jsp.dspace-admin.batchmetadataimport.selectinputfile"/>
-		</p>
-		
-        <p align="center">
-            <select name="inputType">
+		<div class="form-group">
+			<label for="file"><fmt:message key="jsp.dspace-admin.batchmetadataimport.selectfile"/></label>
+            <input class="form-control" type="file" size="40" name="file"/>
+        </div>
+        <div class="form-group">
+			<label for="inputType"><fmt:message key="jsp.dspace-admin.batchmetadataimport.selectinputfile"/></label>
+            <select class="form-control" name="inputType">
  <% 
  		for (String inputType : inputTypes){
 %> 			
@@ -85,14 +78,10 @@
  		}
  %>           	
             </select>
-        </p>
-        
-        <p align="center">
-			<fmt:message key="jsp.dspace-admin.batchmetadataimport.selectcollection"/>
-		</p>
-        
-        <p align="center">
-            <select name="collection">
+        </div>
+        <div class="form-group">
+			<label for="collection"><fmt:message key="jsp.dspace-admin.batchmetadataimport.selectcollection"/></label>
+            <select class="form-control" name="collection">
  <% 
  		for (Collection collection : collections){
 %> 			
@@ -101,11 +90,9 @@
  		}
  %>           	
             </select>
-        </p>
+        </div>
         
-        <p align="center">
-            <input type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.general.upload"/>" />
-        </p>
+        <input class="btn btn-success" type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.general.upload"/>" />
 
     </form>
     
