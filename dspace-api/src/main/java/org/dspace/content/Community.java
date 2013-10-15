@@ -794,6 +794,48 @@ public class Community extends DSpaceObject
     }
 
     /**
+     * Return an array of collections of this community and its subcommunities
+     * 
+     * @return an array of colections
+     */
+
+    public Collection[] getAllCollections() throws SQLException
+    {
+        List<Collection> collectionList = new ArrayList<Collection>();
+        for (Community subcommunity : getSubcommunities())
+        {
+            addCollectionList(subcommunity, collectionList);
+        }
+
+        for (Collection collection : getCollections())
+        {
+            collectionList.add(collection);
+        }
+
+        // Put them in an array
+        Collection[] collectionArray = new Collection[collectionList.size()];
+        collectionArray = (Collection[]) collectionList.toArray(collectionArray);
+
+        return collectionArray;
+
+    }
+    /**
+     * Internal method to process subcommunities recursively
+     */
+    private void addCollectionList(Community community, List<Collection> collectionList) throws SQLException
+    {
+        for (Community subcommunity : community.getSubcommunities())
+        {
+            addCollectionList(subcommunity, collectionList);
+        }
+
+        for (Collection collection : community.getCollections())
+        {
+            collectionList.add(collection);
+        }
+    }
+
+    /**
      * Create a new collection within this community. The collection is created
      * without any workflow groups or default submitter group.
      * 

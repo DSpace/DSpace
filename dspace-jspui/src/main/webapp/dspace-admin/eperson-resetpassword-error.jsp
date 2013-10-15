@@ -20,7 +20,7 @@
 <%@ page isErrorPage="true" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout titlekey="jsp.dspace-admin.eperson-main.ResetPassword.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.eperson-main.ResetPassword.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"

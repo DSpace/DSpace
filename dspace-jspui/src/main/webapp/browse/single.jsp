@@ -125,7 +125,7 @@
 
 	<%-- Include the main navigation for all the browse pages --%>
 	<%-- This first part is where we render the standard bits required by both possibly navigations --%>
-	<div align="center" id="browse_navigation">
+	<div id="browse_navigation" class="well text-center">
 	<form method="get" action="<%= formaction %>">
 			<input type="hidden" name="type" value="<%= bix.getName() %>"/>
 			<input type="hidden" name="order" value="<%= direction %>"/>
@@ -136,58 +136,40 @@
 	if (bix.isDate())
 	{
 %>
-	<table align="center" border="0" bgcolor="#CCCCCC" cellpadding="0" summary="Browsing by date">
-        <tr>
-            <td>
-                <table border="0" bgcolor="#EEEEEE" cellpadding="2">
-                    <tr>
-                        <td class="browseBar">
-							<span class="browseBarLabel"><fmt:message key="browse.nav.date.jump"/> </span>
-							<select name="year">
-                                <option selected="selected" value="-1"><fmt:message key="browse.nav.year"/></option>
+		<span><fmt:message key="browse.nav.date.jump"/> </span>
+		<select name="year">
+            <option selected="selected" value="-1"><fmt:message key="browse.nav.year"/></option>
 <%
 		int thisYear = DCDate.getCurrent().getYear();
 		for (int i = thisYear; i >= 1990; i--)
 		{
 %>
-                                <option><%= i %></option>
+            <option><%= i %></option>
 <%
 		}
 %>
-                                <option>1985</option>
-                                <option>1980</option>
-                                <option>1975</option>
-                                <option>1970</option>
-                                <option>1960</option>
-                                <option>1950</option>
-                            </select>
-                            <select name="month">
-                                <option selected="selected" value="-1"><fmt:message key="browse.nav.month"/></option>
+            <option>1985</option>
+            <option>1980</option>
+            <option>1975</option>
+            <option>1970</option>
+            <option>1960</option>
+            <option>1950</option>
+        </select>
+        <select name="month">
+            <option selected="selected" value="-1"><fmt:message key="browse.nav.month"/></option>
 <%
 		for (int i = 1; i <= 12; i++)
 		{
 %>
-                                <option value="<%= i %>"><%= DCDate.getMonthName(i, UIUtil.getSessionLocale(request)) %></option>
+            <option value="<%= i %>"><%= DCDate.getMonthName(i, UIUtil.getSessionLocale(request)) %></option>
 <%
 		}
 %>
-                            </select>
-                        </td>
-                        <td class="browseBar" rowspan="2">
-                            <input type="submit" value="<fmt:message key="browse.nav.go"/>" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <%-- HACK:  Shouldn't use align here --%>
-                        <td class="browseBar" align="center">
-                            <span class="browseBarLabel"><fmt:message key="browse.nav.type-year"/></span>
-                            <input type="text" name="starts_with" size="4" maxlength="4"/>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
+        </select>
+        <input type="submit" class="btn btn-default" value="<fmt:message key="browse.nav.go"/>" />
+		<br/>
+        <label for="starts_with"><fmt:message key="browse.nav.type-year"/></label>
+        <input type="text" name="starts_with" size="4" maxlength="4"/>
 <%
 	}
 	
@@ -195,34 +177,20 @@
 	else
 	{
 %>	
-	<table align="center" border="0" bgcolor="#CCCCCC" cellpadding="0" summary="Browse the respository">
-		<tr>
-	    	<td>
-	        	<table border="0" bgcolor="#EEEEEE" cellpadding="2">
-	            	<tr>
-	                	<td class="browseBar">
-	    					<span class="browseBarLabel"><fmt:message key="browse.nav.jump"/></span>
-	                        <a href="<%= sharedLink %>&amp;starts_with=0">0-9</a>
+		<span><fmt:message key="browse.nav.jump"/></span>
+        <a class="label label-default" href="<%= sharedLink %>&amp;starts_with=0">0-9</a>
 <%
 	    for (char c = 'A'; c <= 'Z'; c++)
 	    {
 %>
-	                        <a href="<%= sharedLink %>&amp;starts_with=<%= c %>"><%= c %></a>
+        <a href="<%= sharedLink %>&amp;starts_with=<%= c %>"><%= c %></a>
 <%
 	    }
 %>
-	                    </td>
-	                </tr>
-	                <tr>
-	                	<td class="browseBar" align="center">
-	    					<span class="browseBarLabel"><fmt:message key="browse.nav.enter"/>&nbsp;</span>
-	    					<input type="text" name="starts_with"/>&nbsp;<input type="submit" value="<fmt:message key="browse.nav.go"/>" />
-	                    </td>
-	                </tr>
-	            </table>
-	        </td>
-	    </tr>
-	</table>
+		<br/>
+		<label for="starts_with"><fmt:message key="browse.nav.enter"/></label>
+		<input type="text" name="starts_with"/>
+		<input type="submit" class="btn btn-default" value="<fmt:message key="browse.nav.go"/>" />
 <%
 	}
 %>
@@ -231,7 +199,7 @@
 	<%-- End of Navigation Headers --%>
 
 	<%-- Include a component for modifying sort by, order and results per page --%>
-	<div align="center" id="browse_controls">
+	<div id="browse_controls" class="well text-center">
 	<form method="get" action="<%= formaction %>">
 		<input type="hidden" name="type" value="<%= bix.getName() %>"/>
 		
@@ -243,13 +211,13 @@
 			%><input type="hidden" name="vfocus" value="<%= bi.getFocus() %>"/><%
 		}
 --%>
-		<fmt:message key="browse.single.order"/>
+		<label for="order"><fmt:message key="browse.single.order"/></label>
 		<select name="order">
 			<option value="ASC" <%= ascSelected %>><fmt:message key="browse.order.asc" /></option>
 			<option value="DESC" <%= descSelected %>><fmt:message key="browse.order.desc" /></option>
 		</select>
 		
-		<fmt:message key="browse.single.rpp"/>
+		<label for="rpp"><fmt:message key="browse.single.rpp"/></label>
 		<select name="rpp">
 <%
 	for (int i = 5; i <= 100 ; i += 5)
@@ -261,26 +229,26 @@
 	}
 %>
 		</select>
-		<input type="submit" name="submit_browse" value="<fmt:message key="jsp.general.update"/>"/>
+		<input type="submit" class="btn btn-default" name="submit_browse" value="<fmt:message key="jsp.general.update"/>"/>
 	</form>
 	</div>
 
+<div class="row col-md-offset-3 col-md-6">
 	<%-- give us the top report on what we are looking at --%>
-	<div align="center" class="browse_range">
+	<div class="panel panel-primary">
+	<div class="panel-heading text-center">
 		<fmt:message key="browse.single.range">
 			<fmt:param value="<%= Integer.toString(bi.getStart()) %>"/>
 			<fmt:param value="<%= Integer.toString(bi.getFinish()) %>"/>
 			<fmt:param value="<%= Integer.toString(bi.getTotal()) %>"/>
 		</fmt:message>
-	</div>
-
+	
 	<%--  do the top previous and next page links --%>
-	<div align="center">
 <% 
 	if (bi.hasPrevPage())
 	{
 %>
-	<a href="<%= prev %>"><fmt:message key="browse.single.prev"/></a>&nbsp;
+	<a class="pull-left" href="<%= prev %>"><fmt:message key="browse.single.prev"/></a>&nbsp;
 <%
 	}
 %>
@@ -289,51 +257,41 @@
 	if (bi.hasNextPage())
 	{
 %>
-	&nbsp;<a href="<%= next %>"><fmt:message key="browse.single.next"/></a>
+	&nbsp;<a class="pull-right" href="<%= next %>"><fmt:message key="browse.single.next"/></a>
 <%
 	}
 %>
 	</div>
 
-
-	<%-- THE RESULTS --%>
-    <table align="center" class="miscTable" summary="This table displays a list of results">
+<ul class="list-group">
 <%
-    // Row: toggles between Odd and Even
-    String row = "odd";
     String[][] results = bi.getStringResults();
 
     for (int i = 0; i < results.length; i++)
     {
 %>
-            <tr>
-                <td class="<%= row %>RowOddCol">
+                <li class="list-group-item">
                     <a href="<%= sharedLink %><% if (results[i][1] != null) { %>&amp;authority=<%= URLEncoder.encode(results[i][1], "UTF-8") %>" class="authority <%= bix.getName() %>"><%= Utils.addEntities(results[i][0]) %></a> <% } else { %>&amp;value=<%= URLEncoder.encode(results[i][0], "UTF-8") %>"><%= Utils.addEntities(results[i][0]) %></a> <% } %>
-					<%= StringUtils.isNotBlank(results[i][2])?" ["+results[i][2]+"]":""%>
-                </td>
-            </tr>
+					<%= StringUtils.isNotBlank(results[i][2])?" <span class=\"badge\">"+results[i][2]+"</span>":""%>
+                </li>
 <%
-        row = ( row.equals( "odd" ) ? "even" : "odd" );
     }
 %>
-        </table>
-
+        </ul>
 	<%-- give us the bottom report on what we are looking at --%>
-	<div align="center" class="browse_range">
+	<div class="panel-footer text-center">
 		<fmt:message key="browse.single.range">
 			<fmt:param value="<%= Integer.toString(bi.getStart()) %>"/>
 			<fmt:param value="<%= Integer.toString(bi.getFinish()) %>"/>
 			<fmt:param value="<%= Integer.toString(bi.getTotal()) %>"/>
 		</fmt:message>
-	</div>
 
 	<%--  do the bottom previous and next page links --%>
-	<div align="center">
 <% 
 	if (bi.hasPrevPage())
 	{
 %>
-	<a href="<%= prev %>"><fmt:message key="browse.single.prev"/></a>&nbsp;
+	<a class="pull-left" href="<%= prev %>"><fmt:message key="browse.single.prev"/></a>&nbsp;
 <%
 	}
 %>
@@ -342,12 +300,13 @@
 	if (bi.hasNextPage())
 	{
 %>
-	&nbsp;<a href="<%= next %>"><fmt:message key="browse.single.next"/></a>
+	&nbsp;<a class="pull-right" href="<%= next %>"><fmt:message key="browse.single.next"/></a>
 <%
 	}
 %>
 	</div>
-
+</div>
+</div>
 	<%-- dump the results for debug (uncomment to enable) --%>
 	<%-- 
 	<!-- <%= bi.toString() %> -->

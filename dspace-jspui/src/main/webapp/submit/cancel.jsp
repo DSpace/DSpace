@@ -45,7 +45,8 @@
     SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
 %>
 
-<dspace:layout locbar="off"
+<dspace:layout style="submission"
+			   locbar="off"
                navbar="off"
                titlekey="jsp.submit.cancel.title"
                nocache="true">
@@ -54,7 +55,6 @@
 
         <jsp:include page="/submit/progressbar.jsp"/>
 
-
 		<h1><fmt:message key="jsp.submit.cancel.title"/></h1>
 
 		<p><fmt:message key="jsp.submit.cancel.info"/></p>
@@ -62,21 +62,11 @@
 		<%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
         <%= SubmissionController.getSubmissionParameters(context, request) %>
         <input type="hidden" name="cancellation" value="true" />
-
-        <table align="center" border="0" width="90%">
-            <tr>
-                <td align="left">
-					<input type="submit" name="submit_back" value="<fmt:message key="jsp.submit.cancel.continue.button"/>" />
-                </td>
-                <td align="center">
-					<input type="submit" name="submit_remove" value="<fmt:message key="jsp.submit.cancel.remove.button"/>" />
-                </td>
-                <td align="right">
-					<input type="submit" name="submit_keep" value="<fmt:message key="jsp.submit.cancel.save.button"/>" />
-                </td>
-            </tr>
-        </table>
-        
+		<div class="pull-right">
+			<input class="btn btn-default" type="submit" name="submit_back" value="<fmt:message key="jsp.submit.cancel.continue.button"/>" />
+			<input class="btn btn-danger" type="submit" name="submit_remove" value="<fmt:message key="jsp.submit.cancel.remove.button"/>" />
+			<input class="btn btn-success" type="submit" name="submit_keep" value="<fmt:message key="jsp.submit.cancel.save.button"/>" />
+        </div>
     </form>
 
 </dspace:layout>

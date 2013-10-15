@@ -22,7 +22,7 @@
 <%
     Group group = (Group) request.getAttribute("group");
 %>
-<dspace:layout titlekey="jsp.dspace-admin.group-confirm-delete.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.group-confirm-delete.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
@@ -32,25 +32,14 @@
         <fmt:param><%= group.getName() %></fmt:param>
     </fmt:message></h1>
     
-    <p><fmt:message key="jsp.dspace-admin.group-confirm-delete.confirm"/></p>
-    
-
-        <center>
-            <table width="70%">
-                <tr>
-                    <td align="left">
+    <p class="alert alert-warning"><fmt:message key="jsp.dspace-admin.group-confirm-delete.confirm"/></p>
+				
                     <form method="post" action="">
-                        <input type="hidden" name="group_id" value="<%= group.getID() %>"/>
-                        <input type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
+                      		<div class="btn-group col-md-offset-5">
+								<input type="hidden" name="group_id" value="<%= group.getID() %>"/>
+                    			<input class="btn btn-danger" type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
+                    			<input class="btn btn-default" type="submit" name="submit_cancel_delete" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
+							</div>
                     </form>
-                    </td>
-                    <td align="right">
-                    <form method="post" action="">
-                        <input type="submit" name="submit_cancel_delete" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
-                    </form>
-                    </td>
-                </tr>
-            </table>
-        </center>
 </dspace:layout>
 

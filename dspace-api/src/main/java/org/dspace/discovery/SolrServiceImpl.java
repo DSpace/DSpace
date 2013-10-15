@@ -13,6 +13,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -23,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -41,10 +44,15 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -126,10 +134,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     /**
      * Non-Static CommonsHttpSolrServer for processing indexing events.
      */
-    private CommonsHttpSolrServer solr = null;
+    private HttpSolrServer solr = null;
 
 
-    protected CommonsHttpSolrServer getSolr()
+    protected HttpSolrServer getSolr()
     {
         if ( solr == null)
         {
@@ -140,16 +148,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             {
                 try {
                     log.debug("Solr URL: " + solrService);
-                    solr = new CommonsHttpSolrServer(solrService);
+                    solr = new HttpSolrServer(solrService);
 
                     solr.setBaseURL(solrService);
 
                     SolrQuery solrQuery = new SolrQuery()
                             .setQuery("search.resourcetype:2 AND search.resourceid:1");
 
-                    solr.query(solrQuery);
-                } catch (MalformedURLException e) {
-                    log.error("Error while initialinging solr server", e);
+                    solr.query(solrQuery);                
                 } catch (SolrServerException e) {
                     log.error("Error while initialinging solr server", e);
                 }
@@ -1120,13 +1126,38 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                     if(date != null)
                                     {
                                         String indexField = searchFilter.getIndexFieldName() + ".year";
-                                        doc.addField(searchFilter.getIndexFieldName() + "_keyword", DateFormatUtils.formatUTC(date, "yyyy"));
-                                    	doc.addField(indexField, DateFormatUtils.formatUTC(date, "yyyy"));
+                                        String yearUTC = DateFormatUtils.formatUTC(date, "yyyy");
+										doc.addField(searchFilter.getIndexFieldName() + "_keyword", yearUTC);
+										// add the year to the autocomplete index
+										doc.addField(searchFilter.getIndexFieldName() + "_ac", yearUTC);
+										doc.addField(indexField, yearUTC);
+                                    	
+                                    	if (yearUTC.startsWith("0"))
+                                        {
+        									doc.addField(
+        											searchFilter.getIndexFieldName()
+        													+ "_keyword",
+        													yearUTC.replaceFirst("0*", ""));
+        									// add date without starting zeros for autocomplete e filtering
+        									doc.addField(
+        											searchFilter.getIndexFieldName()
+        													+ "_ac",
+        													yearUTC.replaceFirst("0*", ""));
+        									doc.addField(
+        											searchFilter.getIndexFieldName()
+        													+ "_ac",
+        													value.replaceFirst("0*", ""));
+        									doc.addField(
+        											searchFilter.getIndexFieldName()
+        													+ "_keyword",
+        													value.replaceFirst("0*", ""));
+                                        }
+                                    	
                                     	//Also save a sort value of this year, this is required for determining the upper & lower bound year of our facet
                                         if(doc.getField(indexField + "_sort") == null)
                                         {
                                         	//We can only add one year so take the first one
-                                        	doc.addField(indexField + "_sort", DateFormatUtils.formatUTC(date, "yyyy"));
+                                        	doc.addField(indexField + "_sort", yearUTC);
                                     	}
                                 }
                             }else
@@ -1413,6 +1444,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         // Choose the likely date formats based on string length
         switch (t.length())
         {
+			// case from 1 to 3 go through adding anyone a single 0. Case 4 define
+			// for all the SimpleDateFormat
+        	case 1:
+        		t = "0" + t;
+        	case 2:
+        		t = "0" + t;
+        	case 3:
+        		t = "0" + t;
             case 4:
                 dfArr = new SimpleDateFormat[]{new SimpleDateFormat("yyyy")};
                 break;
@@ -1789,10 +1828,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
             if(solrQueryResponse.getFacetQuery() != null)
             {
-                //TODO: do not sort when not a date, just retrieve the facets in the order they where requested !
-                //At the moment facet queries are only used for dates so we need to sort our results
-                TreeMap<String, Integer> sortedFacetQueries = new TreeMap<String, Integer>(solrQueryResponse.getFacetQuery());
-                for(String facetQuery : sortedFacetQueries.descendingKeySet())
+				// just retrieve the facets in the order they where requested!
+				// also for the date we ask it in proper (reverse) order
+				// At the moment facet queries are only used for dates
+                LinkedHashMap<String, Integer> sortedFacetQueries = new LinkedHashMap<String, Integer>(solrQueryResponse.getFacetQuery());
+                for(String facetQuery : sortedFacetQueries.keySet())
                 {
                     //TODO: do not assume this, people may want to use it for other ends, use a regex to make sure
                     //We have a facet query, the values looks something like: dateissued.year:[1990 TO 2000] AND -2000
@@ -1841,14 +1881,21 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         {
             return null;
         }
-        org.apache.commons.httpclient.methods.GetMethod method =
-            new org.apache.commons.httpclient.methods.GetMethod(getSolr().getHttpClient().getHostConfiguration().getHostURL() + "");
+        HttpHost hostURL = (HttpHost)(getSolr().getHttpClient().getParams().getParameter(ClientPNames.DEFAULT_HOST));
+        
+        HttpGet method = new HttpGet(hostURL.toHostString() + "");
+        try
+        {
+            URI uri = new URIBuilder(method.getURI()).addParameter("q",query.toString()).build();
+        }
+        catch (URISyntaxException e)
+        {
+            throw new SearchServiceException(e);
+        }
 
-        method.setQueryString(query.toString());
+        HttpResponse response = getSolr().getHttpClient().execute(method);
 
-        getSolr().getHttpClient().executeMethod(method);
-
-        return method.getResponseBodyAsStream();
+        return response.getEntity().getContent();
     }
 
     public List<DSpaceObject> search(Context context, String query, int offset, int max, String... filterquery)
@@ -1928,15 +1975,24 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 filterQuery.insert(0, "-");
             }
             filterQuery.append(":");
-            if("equals".equals(operator))
+            if("equals".equals(operator) || "notequals".equals(operator))
             {
                 //DO NOT ESCAPE RANGE QUERIES !
                 if(!value.matches("\\[.*TO.*\\]"))
                 {
                     value = ClientUtils.escapeQueryChars(value);
-
+                    filterQuery.append(value);
                 }
-                filterQuery.append(value);
+                else
+                {
+                	if (value.matches("\\[\\d{1,4} TO \\d{1,4}\\]"))
+                	{
+                		int minRange = Integer.parseInt(value.substring(1, value.length()-1).split(" TO ")[0]);
+                		int maxRange = Integer.parseInt(value.substring(1, value.length()-1).split(" TO ")[1]);
+                		value = "["+String.format("%04d", minRange) + " TO "+ String.format("%04d", maxRange) + "]";
+                	}
+                	filterQuery.append(value);
+                }
             }
             else{
                 //DO NOT ESCAPE RANGE QUERIES !
@@ -1944,7 +2000,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 {
                     value = ClientUtils.escapeQueryChars(value);
                     filterQuery.append("(").append(value).append(")");
-                }else{
+                }
+                else
+                {
                     filterQuery.append(value);
                 }
             }

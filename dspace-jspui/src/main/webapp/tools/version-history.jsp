@@ -58,11 +58,11 @@ j(document).ready(function() {
 });
 </script>
 </c:set>
-<dspace:layout titlekey="jsp.version.history.title">
+<dspace:layout style="submission" titlekey="jsp.version.history.title">
 	
     <h1><fmt:message key="jsp.dspace-admin.version-summary.heading"/></h1>
 		
-	<% if(removeok) { %><fmt:message key="jsp.dspace-admin.version-summary.heading"/><% } %>
+	<% if(removeok) { %><div class="alert alert-success"><fmt:message key="jsp.dspace-admin.version-summary.heading"/></div><% } %>
  <form action="<%= request.getContextPath() %>/tools/history" method="post">
 	<input type="hidden" name="itemID" value="<%= itemID %>" />
 	<input type="hidden" name="versionID" value="<%= versionID %>" />                
@@ -73,10 +73,10 @@ j(document).ready(function() {
 						 
 %>
 	<div id="versionHistory">
-	<h2><fmt:message key="jsp.version.history.head2" /></h2>
+	<h2 class="alert alert-info"><fmt:message key="jsp.version.history.head2" /></h2>
 	
 	
-	<table class="miscTable">
+	<table class="table">
 		<tr>
 			<th id="t0"></th>
 			<th id="t1" class="oddRowEvenCol"><fmt:message key="jsp.version.history.column1"/></th>
@@ -110,11 +110,11 @@ j(document).ready(function() {
 		<% } %>
 		<tr>
 			<td></td>
-			<td colspan="2"><input type="button" id="fake_submit_delete" value="<fmt:message key="jsp.version.history.delete"/>"/> <input type="submit" value="<fmt:message key="jsp.version.history.return"/>" name="submit_cancel"/></td>
+			<td colspan="2"><input class="btn btn-danger" type="button" id="fake_submit_delete" value="<fmt:message key="jsp.version.history.delete"/>"/> <input class="btn btn-default" type="submit" value="<fmt:message key="jsp.version.history.return"/>" name="submit_cancel"/></td>
 			<td colspan="5"></td>
 		</tr>
 	</table>
-	<p><fmt:message key="jsp.version.history.legend"/></p>
+	<p class="alert alert-info"><fmt:message key="jsp.version.history.legend"/></p>
 	</div>
     <div style="display: none">
     	<input type="submit" value="<fmt:message key="jsp.version.history.delete"/>" name="submit_delete" id="submit_delete"/>
