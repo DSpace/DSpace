@@ -190,7 +190,6 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         if (coll != null) {
         	Item item = test.addItem("submitnowitem", "submitnowli");
         	item.addXref(contextPath + "/handle/" + coll.getHandle() + "/submit", "Submit Data Now!", "submitnowbutton");
-        	item.addXref("http://www.youtube.com/watch?v=RP33cl8tL28", "See how to submit");
         }
 
         //Only logged in users can view the submissions link
