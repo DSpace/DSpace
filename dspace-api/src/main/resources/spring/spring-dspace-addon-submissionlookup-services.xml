@@ -33,12 +33,46 @@
 
 	<!-- Specify here any filters or modifiers to run before the output -->
 	<bean name="linearWorkflow" class="gr.ekt.bte.core.LinearWorkflow">
-		<property name="process">
+	    <property name="process">
 			<list>
+			    <ref bean="mapConverter_arxivSubject"/>
+			    <ref bean="mapConverter_pubstatusPubmed"/>
+			    <ref bean="removeLastDot"/>
 			</list>
 		</property>
 	</bean>
 	
+	<bean name="mapConverter_arxivSubject" class="org.dspace.submit.lookup.MapConverterModifier" 
+	    init-method="init">
+	    <constructor-arg value="apConverter_arxivSubject Modifier"/>
+	    <property name="filename" value="mapConverter_arxivSubject.properties"/>
+	    <property name="fieldKeys">
+	        <list>
+	        	<value>arxivCategory</value>
+	        </list>
+	    </property>
+	</bean>
+	
+	<bean name="mapConverter_pubstatusPubmed" class="org.dspace.submit.lookup.MapConverterModifier" 
+	    init-method="init">
+	    <constructor-arg value="mapConverter_pubstatusPubmed Modifier"/>
+	    <property name="filename" value="mapConverter_pubstatusPubmed.properties"/>
+	    <property name="fieldKeys">
+	        <list>
+	        	<value>publicationstatus</value>
+	        </list>
+	    </property>
+	</bean>
+	
+	<bean name="removeLastDot" class="org.dspace.submit.lookup.RemoveLastDotModifier" 
+	    init-method="init">
+	    <constructor-arg value="removeLastDot Modifier"/>
+	    <property name="fieldKeys">
+	        <list>
+	        	<value>title</value>
+	        </list>
+	    </property>
+	</bean>
 	
 	<bean class="org.dspace.submit.lookup.SubmissionLookupService"
 		name="org.dspace.submit.lookup.SubmissionLookupService">
@@ -90,6 +124,7 @@
 
 	
 	<bean class="org.dspace.submit.lookup.PubmedService" name="pubmedService" />
+	
 	<bean class="org.dspace.submit.lookup.PubmedLookupProvider" name="pubmedLookupProvider">
 		<property name="pubmedService" ref="pubmedService" />
 		<property name="searchProvider" value="false" />
@@ -121,6 +156,7 @@
 	</bean>
 
 	<bean class="org.dspace.submit.lookup.ArXivService" name="arXivService" />
+	
 	<bean class="org.dspace.submit.lookup.ArXivLookupProvider"
 		name="arxivLookupProvider">
 		<property name="arXivService" ref="arXivService" />
@@ -144,6 +180,7 @@
 	</bean>
 
 	<bean class="org.dspace.submit.lookup.CrossRefService" name="crossrefService" />	
+	
 	<bean class="org.dspace.submit.lookup.CrossRefLookupProvider"
 		name="crossrefLookupProvider">
 		<property name="crossrefService" ref="crossrefService" />
