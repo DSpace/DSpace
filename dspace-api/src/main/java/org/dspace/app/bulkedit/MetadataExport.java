@@ -143,10 +143,6 @@ public class MetadataExport
         catch (SQLException e)
         {
             log.log(Priority.FATAL, e);
-            return null;
-        }
-        catch(Exception e){
-            log.log(Priority.FATAL, e);
             System.out.println(e.getMessage());
             return null;
         }

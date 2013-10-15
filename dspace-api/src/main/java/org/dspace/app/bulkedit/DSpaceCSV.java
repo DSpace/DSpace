@@ -382,7 +382,7 @@ public class DSpaceCSV implements Serializable
      *
      * @param i The DSpace item
      *
-     * @throws Exception if something goes wrong with adding the Item
+     * @throws SQLException if something goes wrong with adding the Item
      */
     public final void addItem(Item i) throws SQLException
     {
