@@ -41,39 +41,31 @@
 %>
     <%-- <p><strong>The e-mail address you entered was not recognized.  Please
     try again.</strong></p> --%>
-	<p><strong><fmt:message key="jsp.register.forgot-password.info1"/></strong></p>
+	<p class="alert alert-warning"><fmt:message key="jsp.register.forgot-password.info1"/></p>
 <%
     }
 %>
     <%-- <p>Please enter your e-mail
     address in the box below and click "I Forgot My Password".  You'll be sent
     an e-mail which will allow you to set a new password.</p> --%>
-	<p><fmt:message key="jsp.register.forgot-password.info2"/></p>
+	<p class="alert alert-info"><fmt:message key="jsp.register.forgot-password.info2"/></p>
     
-    <form action="<%= request.getContextPath() %>/forgot" method="post">
+    <form class="form-horizontal" action="<%= request.getContextPath() %>/forgot" method="post">
         <input type="hidden" name="step" value="<%= RegisterServlet.ENTER_EMAIL_PAGE %>"/>
 
-        <center>
-            <table class="miscTable">
-                <tr>
-                    <td class="oddRowEvenCol">
-                        <table border="0" cellpadding="5">
-                            <tr>
-                                <%-- <td class="standard"><strong>E-mail Address:</strong></td> --%>
-								<td class="standard"><strong><label for="temail"><fmt:message key="jsp.register.forgot-password.email.field"/></strong></label></td>
-                                <td class="standard"><input type="text" name="email" id="temail" /></td>
-                            </tr>
-                            <tr>
-                                <td align="center" colspan="2">
-                                    <%-- <input type="submit" name="submit" value="I Forgot My Password"> --%>
-									<input type="submit" name="submit" value="<fmt:message key="jsp.register.forgot-password.forgot.button"/>" />
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </center>
+                   	<%-- <td class="standard"><strong>E-mail Address:</strong></td> --%>
+					<div class="form-group">
+            			<label class="col-md-2 control-label" for="temail"><fmt:message key="jsp.register.forgot-password.email.field"/></label>
+            			<div class="col-md-6">
+            				<input class="form-control" type="text" name="email" id="temail" />
+            			</div>
+            		</div>                    
+					<div class="row">
+        				<div class="col-md-6">
+							<%-- <input type="submit" name="submit" value="I Forgot My Password"> --%>
+							<input class="btn btn-success pull-right" type="submit" name="submit" value="<fmt:message key="jsp.register.forgot-password.forgot.button"/>" />
+						</div>
+					</div>
     </form>
     
 </dspace:layout>

@@ -36,7 +36,7 @@
         (Group []) request.getAttribute("groups");
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.group-group-select.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.group-group-select.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
@@ -50,36 +50,25 @@
 
     <form method="post" action="">
 
-    <table class="miscTable" align="center">
-        <tr>
-            <td>
+   
                 <input type="hidden" name="group_id" value="<%=group.getID()%>" />
-                
-                <select size="15" name="groups_id" multiple="multiple">
+   				<div class="row col-md-4 col-md-offset-4">
+                    <select class="form-control" size="15" name="groups_id" multiple="multiple">
                         <%  for (int i = 0; i < groups.length; i++) { %>
                             <option value="<%= groups[i].getID()%>">
                                 <%= groups[i].getName()%>
                             </option>
                         <%  } %>
                 </select>
-            </td>
-        </tr>
-    </table>
-
-    <center>
-        <table width="70%">
-            <tr>
-                <td align="left">
-                    <%--<input type="submit" name="submit_add_group_add" value="Add Group" />--%>
-					<input type="submit" name="submit_add_group_add" value="<fmt:message key="jsp.dspace-admin.group-group-select.add"/>" />
-                </td>
-                <td align="right">
+                </div>
+				<br/>
+				<div class="btn-group pull-right col-md-7">
+                	<%--<input type="submit" name="submit_add_group_add" value="Add Group" />--%>
+					<input class="btn btn-primary" type="submit" name="submit_add_group_add" value="<fmt:message key="jsp.dspace-admin.group-group-select.add"/>" />
+                
                     <%--<input type="submit" name="submit_add_group_cancel" value="Cancel" />--%>
-					<input type="submit" name="submit_add_group_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
-                </td>
-            </tr>
-        </table>
-    </center>        
+					<input class="btn btn-default" type="submit" name="submit_add_group_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
+                </div>     
 
     </form>
 </dspace:layout>

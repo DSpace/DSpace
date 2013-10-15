@@ -36,7 +36,7 @@
     boolean allow = ((Boolean)request.getAttribute("allow")).booleanValue();
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.metadataimport.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.metadataimport.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
@@ -64,7 +64,7 @@
     }
 %>
 
-    <table class="miscTable">
+    <table class="table">
 
         <%
             // Display the changes
@@ -326,17 +326,16 @@
         <p align="center">
             <form method="post" action="">
                 <input type="hidden" name="type" value="confirm" />
-                <input type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.metadataimport.apply"/>" />
+                <input class="btn btn-default" type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.metadataimport.apply"/>" />
             </form>
             <form method="post" action="">
                 <input type="hidden" name="type" value="cancel" />
-                <input type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
+                <input class="btn btn-default" type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
             </form>
         </p>
         <%
             }
         %>
-
-    </form>
+    
     
 </dspace:layout>
