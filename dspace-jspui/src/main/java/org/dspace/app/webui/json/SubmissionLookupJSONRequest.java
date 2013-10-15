@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -26,6 +27,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
+import org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader;
 import org.dspace.submit.lookup.SubmissionLookupService;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
 import org.dspace.submit.util.SubmissionLookupDTO;
@@ -33,6 +35,10 @@ import org.dspace.submit.util.SubmissionLookupPublication;
 import org.dspace.utils.DSpace;
 
 import flexjson.JSONSerializer;
+import gr.ekt.bte.core.TransformationEngine;
+import gr.ekt.bte.core.TransformationSpec;
+import gr.ekt.bte.exceptions.BadTransformationSpec;
+import gr.ekt.bte.exceptions.MalformedSourceException;
 
 public class SubmissionLookupJSONRequest extends JSONRequest {
 
@@ -40,6 +46,10 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 			.getServiceByName(SubmissionLookupService.class.getName(),
 					SubmissionLookupService.class);
 
+	private TransformationEngine bteService = new DSpace().getServiceManager()
+			.getServiceByName(TransformationEngine.class.getName(),
+					TransformationEngine.class);
+	
 	private static Logger log = Logger
 			.getLogger(SubmissionLookupJSONRequest.class);
 
@@ -50,7 +60,7 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 		String suuid = req.getParameter("s_uuid");
 		SubmissionLookupDTO subDTO = service.getSubmissionLookupDTO(req, suuid);
 		if ("identifiers".equalsIgnoreCase(req.getParameter("type"))) {
-			Map<String, String> identifiers = new HashMap<String, String>();
+			Map<String, Set<String>> identifiers = new HashMap<String, Set<String>>();
 			Enumeration e = req.getParameterNames();
 
 			while (e.hasMoreElements()) {
@@ -59,17 +69,32 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 
 				if (parameterName.startsWith("identifier_")
 						&& StringUtils.isNotBlank(parameterValue)) {
+					Set<String> set = new HashSet<String>();
+					set.add(parameterValue);
 					identifiers.put(
 							parameterName.substring("identifier_".length()),
-							parameterValue);
+							set);
 				}
 			}
 
-			List<ItemSubmissionLookupDTO> result = service
+			MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader)bteService.getDataLoader();
+			dataLoader.setIdentifiers(identifiers);
+			
+			try {
+				bteService.transform(new TransformationSpec());
+			} catch (BadTransformationSpec e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (MalformedSourceException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			/*List<ItemSubmissionLookupDTO> result = service
 					.searchByIdentifiers(context, identifiers);
-			subDTO.setItems(result);
+			subDTO.setItems(result);*/
 			service.storeDTOs(req, suuid, subDTO);
-			List<Map<String, Object>> dto = getLightResultList(result);
+			List<Map<String, Object>> dto = null;//getLightResultList(result);
 			JSONSerializer serializer = new JSONSerializer();
 			serializer.rootName("result");
 			serializer.deepSerialize(dto, resp.getWriter());
@@ -78,12 +103,12 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 			String author = req.getParameter("authors");
 			int year = UIUtil.getIntParameter(req, "year");
 
-			List<ItemSubmissionLookupDTO> result = service.searchByTerms(context, title,
+			/*List<ItemSubmissionLookupDTO> result = service.searchByTerms(context, title,
 					author, year);
 
-			subDTO.setItems(result);
+			subDTO.setItems(result);*/
 			service.storeDTOs(req, suuid, subDTO);
-			List<Map<String, Object>> dto = getLightResultList(result);
+			List<Map<String, Object>> dto = null;// getLightResultList(result);
 			JSONSerializer serializer = new JSONSerializer();
 			serializer.rootName("result");
 			serializer.deepSerialize(dto, resp.getWriter());

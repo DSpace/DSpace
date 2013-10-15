@@ -7,19 +7,18 @@
  */
 package org.dspace.submit.lookup;
 
+import gr.ekt.bte.core.Record;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.lang.StringUtils;
 import org.dspace.core.Context;
 import org.dspace.submit.importer.arxiv.ArXivItem;
-import org.dspace.submit.util.SubmissionLookupPublication;
 
 public class ArXivLookupProvider extends ConfigurableLookupProvider {
 	private ArXivService arXivService;
@@ -45,20 +44,20 @@ public class ArXivLookupProvider extends ConfigurableLookupProvider {
 	}
 
 	@Override
-	public List<SubmissionLookupPublication> getByIdentifier(
-			Context context, Map<String, String> keys) throws HttpException, IOException {
-		List<SubmissionLookupPublication> results = new ArrayList<SubmissionLookupPublication>();
+	public List<Record> getByIdentifier(
+			Context context, Map<String, Set<String>> keys) throws HttpException, IOException {
+		List<Record> results = new ArrayList<Record>();
 		if (keys != null) {
-			String doi = keys.get(DOI);
-			String arxivid = keys.get(ARXIV);
+			Set<String> dois = keys.get(DOI);
+			Set<String> arxivids = keys.get(ARXIV);
 			List<ArXivItem> items = new ArrayList<ArXivItem>();
-			if (StringUtils.isNotBlank(doi)) {
-				Set<String> dois = new HashSet<String>();
-				dois.add(doi);
+			if (dois!=null && dois.size()>0) {
 				items.addAll(arXivService.getByDOIs(dois));
 			}
-			if (StringUtils.isNotBlank(arxivid)) {
-				items.add(arXivService.getByArXivIDs(arxivid));
+			if (arxivids!=null && arxivids.size()>0) {
+				for (String arxivid : arxivids){
+					items.add(arXivService.getByArXivIDs(arxivid));
+				}
 			}
 
 			for (ArXivItem item : items) {
@@ -69,9 +68,9 @@ public class ArXivLookupProvider extends ConfigurableLookupProvider {
 	}
 
 	@Override
-	public List<SubmissionLookupPublication> search(Context context, String title,
+	public List<Record> search(Context context, String title,
 			String author, int year) throws HttpException, IOException {
-		List<SubmissionLookupPublication> results = new ArrayList<SubmissionLookupPublication>();
+		List<Record> results = new ArrayList<Record>();
 		List<ArXivItem> items = arXivService.searchByTerm(title, author, year);
 		for (ArXivItem item : items) {
 			results.add(convert(item));
@@ -82,19 +81,5 @@ public class ArXivLookupProvider extends ConfigurableLookupProvider {
 	@Override
 	public String getShortName() {
 		return "arxiv";
-	}
-
-	@Override
-	public List<SubmissionLookupPublication> getByDOIs(Context context, Set<String> doiToSearch)
-			throws HttpException, IOException {
-		List<SubmissionLookupPublication> results = new ArrayList<SubmissionLookupPublication>();
-		if (doiToSearch != null && doiToSearch.size() > 0) {
-			List<ArXivItem> items = arXivService.getByDOIs(doiToSearch);
-
-			for (ArXivItem item : items) {
-				results.add(convert(item));
-			}
-		}
-		return results;
-	}
+	}	
 }

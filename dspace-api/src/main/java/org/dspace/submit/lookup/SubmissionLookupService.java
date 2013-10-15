@@ -39,6 +39,7 @@ import org.dspace.submit.util.SubmissionLookupDTO;
 import org.dspace.submit.util.SubmissionLookupPublication;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
+import gr.ekt.bte.core.Value;
 
 public class SubmissionLookupService {
 
@@ -170,15 +171,15 @@ public class SubmissionLookupService {
 				String[] md = splitMetadata(metadata);
 				if (isValidMetadata(formName, md)) {
 					if (isRepeatableMetadata(formName, md)) {
-						for (String value : itemLookup.getValues(field)) {
-							String[] splitValue = splitValue(value);
+						for (Value value : itemLookup.getValues(field)) {
+							String[] splitValue = splitValue(value.getAsString());
 							if (splitValue[3] != null) {
 								item.addMetadata(md[0], md[1], md[2], md[3],
 										splitValue[0], splitValue[1],
 										Integer.parseInt(splitValue[2]));
 							} else {
 								item.addMetadata(md[0], md[1], md[2], md[3],
-										value);
+										value.getAsString());
 							}
 						}
 					} else {
@@ -214,8 +215,8 @@ public class SubmissionLookupService {
 							makeSureMetadataExist(context, providerName, md[1],
 									md[2]);
 							if (isRepeatableMetadata(formName, md)) {
-								for (String value : pub.getValues(field)) {
-									String[] splitValue = splitValue(value);
+								for (Value value : pub.getValues(field)) {
+									String[] splitValue = splitValue(value.getAsString());
 									item.addMetadata(providerName, md[1],
 											md[2], md[3], splitValue[0],
 											splitValue[1],
@@ -421,7 +422,7 @@ public class SubmissionLookupService {
 		return searchProviders;
 	}
 
-	public List<ItemSubmissionLookupDTO> searchByTerms(Context context,
+	/*public List<ItemSubmissionLookupDTO> searchByTerms(Context context,
 			String title, String author, int year) {
 		List<SubmissionLookupPublication> publications = new ArrayList<SubmissionLookupPublication>();
 		List<String> timeoutProviders = new ArrayList<String>();
@@ -568,7 +569,7 @@ public class SubmissionLookupService {
             }
         }
 		return result;
-	}
+	}*/
 
 	public List<SubmissionLookupProvider> getProviders() {
 		return providers;

@@ -15,6 +15,31 @@
            http://www.springframework.org/schema/context
            http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
+    <bean name="gr.ekt.bte.core.TransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
+	    <property name="dataLoader" ref="multipleDataLoader"/>
+    	<property name="workflow" ref="linearWorkflow"/>
+  	</bean>
+		
+	<bean name="multipleDataLoader" class="org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader">
+	    <property name="providers">
+	        <list>
+				<ref bean="pubmedLookupProvider" />
+				<ref bean="crossrefLookupProvider" />
+				<ref bean="arxivLookupProvider" />
+			</list>
+	    </property>
+	    
+	</bean>
+
+	<!-- Specify here any filters or modifiers to run before the output -->
+	<bean name="linearWorkflow" class="gr.ekt.bte.core.LinearWorkflow">
+		<property name="process">
+			<list>
+			</list>
+		</property>
+	</bean>
+	
+	
 	<bean class="org.dspace.submit.lookup.SubmissionLookupService"
 		name="org.dspace.submit.lookup.SubmissionLookupService">
 		<property name="providers">
@@ -65,10 +90,34 @@
 
 	
 	<bean class="org.dspace.submit.lookup.PubmedService" name="pubmedService" />
-	<bean class="org.dspace.submit.lookup.PubmedLookupProvider"
-		name="pubmedLookupProvider">
+	<bean class="org.dspace.submit.lookup.PubmedLookupProvider" name="pubmedLookupProvider">
 		<property name="pubmedService" ref="pubmedService" />
 		<property name="searchProvider" value="false" />
+		<property name="fieldMap">
+			<map>
+				<entry key="pubmedID" value="pmid" />
+				<entry key="doi" value="doi" />
+				<entry key="issn" value="issn" />
+				<entry key="eissn" value="eissn" />
+				<entry key="journalTitle" value="journal" />
+				<entry key="title" value="title" />
+				<entry key="pubblicationModel" value="" />
+				<entry key="year" value="issued" />
+				<entry key="volume" value="volume" />
+				<entry key="issue" value="issue" />
+				<entry key="language" value="language" />
+				<entry key="type" value="subtype" />
+				<entry key="primaryKeywords" value="keywords" />
+				<entry key="secondaryKeywords" value="keywords" />
+				<entry key="primaryMeshHeadings" value="mesh" />
+				<entry key="secondaryMeshHeadings" value="mesh" />
+				<entry key="startPage" value="firstpage" />
+				<entry key="endPage" value="lastpage" />
+				<entry key="summary" value="abstract" />
+				<entry key="status" value="publicationstatus" />
+				<entry key="authors" value="authors" />
+			</map>
+		</property>
 	</bean>
 
 	<bean class="org.dspace.submit.lookup.ArXivService" name="arXivService" />
@@ -76,13 +125,52 @@
 		name="arxivLookupProvider">
 		<property name="arXivService" ref="arXivService" />
 		<property name="searchProvider" value="false" />
+		<property name="fieldMap">
+			<map>
+				<entry key="journalRef" value="journal" />
+				<entry key="doi" value="doi" />
+				<entry key="authors" value="authors" />
+				<entry key="comment" value="note" />
+				<entry key="year" value="issued" />
+				<entry key="articleTitle" value="title" />
+				<entry key="summary" value="abstract" />
+				<entry key="splashPageUrl" value="url" />
+				<entry key="pdfUrl" value="fulltextUrl" />
+				<entry key="primaryCategory" value="arxivCategory" />
+				<entry key="category" value="arxivCategory" />
+				<entry key="source" value="arxivID" />
+			</map>
+		</property>
 	</bean>
-	
+
 	<bean class="org.dspace.submit.lookup.CrossRefService" name="crossrefService" />	
 	<bean class="org.dspace.submit.lookup.CrossRefLookupProvider"
 		name="crossrefLookupProvider">
 		<property name="crossrefService" ref="crossrefService" />
 		<property name="searchProvider" value="false" />
+		<property name="fieldMap">
+			<map>
+				<entry key="doi" value="doi" />
+				<entry key="itemType" value="" />
+				<entry key="issn" value="jissn" />
+				<entry key="eissn" value="jeissn" />
+				<entry key="isbn" value="isbn" />
+				<entry key="seriesTitle" value="serie" />
+				<entry key="journalTitle" value="journal" />
+				<entry key="volumeTitle" value="book" />
+				<entry key="articleTitle" value="title" />
+				<entry key="authors" value="authors" />
+				<entry key="editors" value="authors" />
+				<entry key="translators" value="translators" />
+				<entry key="chairs" value="chairs" />
+				<entry key="volume" value="volume" />
+				<entry key="issue" value="issue" />
+				<entry key="firstPage" value="firstPage" />
+				<entry key="lastPage" value="lastPage" />
+				<entry key="editionNumber" value="edition" />
+				<entry key="year" value="issued" />
+				<entry key="publicationType" value="subtype" />
+			</map>
+		</property>
 	</bean>
-		
 </beans>

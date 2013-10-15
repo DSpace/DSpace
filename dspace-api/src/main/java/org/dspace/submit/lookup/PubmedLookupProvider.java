@@ -7,6 +7,8 @@
  */
 package org.dspace.submit.lookup;
 
+import gr.ekt.bte.core.Record;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +21,6 @@ import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.submit.importer.pubmed.PubmedItem;
-import org.dspace.submit.util.SubmissionLookupPublication;
 
 public class PubmedLookupProvider extends ConfigurableLookupProvider {
     private boolean searchProvider = true;
@@ -52,27 +53,44 @@ public class PubmedLookupProvider extends ConfigurableLookupProvider {
 	}
 
 	@Override
-	public List<SubmissionLookupPublication> getByIdentifier(Context context, 
-			Map<String, String> keys) throws HttpException, IOException {
-		String pmid = keys != null ? keys.get(PUBMED) : null;
-		String doi = keys != null ? keys.get(DOI) : null;
-		SubmissionLookupPublication publication = null;
-		List<SubmissionLookupPublication> results = new ArrayList<SubmissionLookupPublication>();
-		if (pmid != null && doi == null) {
-			try
-            {
-                publication = convert(pubmedService.getByPubmedID(pmid));
-            }
-            catch (Exception e)
-            {
-                log.error(LogManager.getHeader(context, "getByIdentifier", "pmid="+pmid), e);
-            }
-			if (publication != null)
-				results.add(publication);
+	public List<Record> getByIdentifier(Context context, 
+			Map<String, Set<String>> keys) throws HttpException, IOException {
+		Set<String> pmids = keys != null ? keys.get(PUBMED) : null;
+		Set<String> dois = keys != null ? keys.get(DOI) : null;
+		List<Record> results = new ArrayList<Record>();
+		if (pmids != null && pmids.size()>0 && dois == null) {
+			for (String pmid : pmids){
+				PubmedItem p = null;
+				try
+				{
+					p = pubmedService.getByPubmedID(pmid);
+				}
+				catch (Exception e)
+				{
+					log.error(LogManager.getHeader(context, "getByIdentifier", "pmid="+pmid), e);
+				}
+				if (p != null)
+					results.add(convert(p));
+			}
+		}
+		else if (dois != null && dois.size()>0 && pmids == null) {
+			StringBuffer query = new StringBuffer();
+			for (String d : dois) {
+				if (query.length() > 0) {
+					query.append(" OR ");
+				}
+				query.append(d).append("[AI]");
+			}
+
+			List<PubmedItem> pubmedResults = pubmedService.search(query.toString());
+			for (PubmedItem p : pubmedResults) {
+				results.add(convert(p));
+			}
 		}
 		else
 		{
-			List<PubmedItem> pubmedResults = pubmedService.search(doi, pmid);
+			//EKT:ToDo: support list of dois and pmids in the search method of pubmedService
+			List<PubmedItem> pubmedResults = pubmedService.search(dois.iterator().next(), pmids.iterator().next());
 			if (pubmedResults != null) {
 				for (PubmedItem p : pubmedResults) {
 					results.add(convert(p));
@@ -84,33 +102,11 @@ public class PubmedLookupProvider extends ConfigurableLookupProvider {
 	}
 
 	@Override
-	public List<SubmissionLookupPublication> search(Context context, String title,
+	public List<Record> search(Context context, String title,
 			String author, int year) throws HttpException, IOException {
 		List<PubmedItem> pubmedResults = pubmedService.search(title, author,
 				year);
-		List<SubmissionLookupPublication> results = new ArrayList<SubmissionLookupPublication>();
-		if (pubmedResults != null) {
-			for (PubmedItem p : pubmedResults) {
-				results.add(convert(p));
-			}
-		}
-		return results;
-	}
-
-	@Override
-	public List<SubmissionLookupPublication> getByDOIs(Context context, 
-			Set<String> doiToSearch)
-			throws HttpException, IOException {
-		StringBuffer query = new StringBuffer();
-		for (String d : doiToSearch) {
-			if (query.length() > 0) {
-				query.append(" OR ");
-			}
-			query.append(d).append("[AI]");
-		}
-
-		List<PubmedItem> pubmedResults = pubmedService.search(query.toString());
-		List<SubmissionLookupPublication> results = new ArrayList<SubmissionLookupPublication>();
+		List<Record> results = new ArrayList<Record>();
 		if (pubmedResults != null) {
 			for (PubmedItem p : pubmedResults) {
 				results.add(convert(p));

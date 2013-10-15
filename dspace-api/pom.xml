@@ -444,14 +444,14 @@
             <version>0.82</version>
         </dependency>
         <dependency>
-            <groupId>net.sf.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-            <version>2.3</version>
+            <groupId>gr.ekt.bte</groupId>
+            <artifactId>bte-core</artifactId>
+            <version>0.9.1</version>
         </dependency>
         <dependency>
-            <groupId>org.jbibtex</groupId>
-            <artifactId>jbibtex</artifactId>
-            <version>1.0.0</version>
+            <groupId>gr.ekt.bte</groupId>
+            <artifactId>bte-io</artifactId>
+            <version>0.9.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>

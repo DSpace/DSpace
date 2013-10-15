@@ -7,6 +7,10 @@
  */
 package org.dspace.submit.util;
 
+import gr.ekt.bte.core.MutableRecord;
+import gr.ekt.bte.core.StringValue;
+import gr.ekt.bte.core.Value;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +21,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.submit.lookup.SubmissionLookupProvider;
 
-public class SubmissionLookupPublication implements Serializable {
+public class SubmissionLookupPublication implements MutableRecord, Serializable {
 	private String providerName;
 
 	private Map<String, List<String>> storage = new HashMap<String, List<String>>();
@@ -59,15 +63,118 @@ public class SubmissionLookupPublication implements Serializable {
 		return tmp.get(0);
 	}
 
-	public List<String> getValues(String md) {
-		return storage.get(md);
-	}
-
 	public String getProviderName() {
 		return providerName;
 	}
 
 	public String getType() {
 		return getFirstValue(SubmissionLookupProvider.TYPE);
+	}
+
+	//BTE Record interface methods
+	@Override
+	public boolean hasField(String md) {
+		return storage.containsKey(md);
+	}
+
+	@Override
+	public List<Value> getValues(String md) {
+		List<String> stringValues = storage.get(md);
+		List<Value> values = new ArrayList<Value>();
+		for (String value : stringValues){
+			values.add(new StringValue(value));
+		}
+		return values;
+	}
+
+	@Override
+	public boolean isMutable() {
+		return true;
+	}
+
+	@Override
+	public MutableRecord makeMutable() {
+		return this;
+	}
+
+	@Override
+	public boolean addField(String md, List<Value> values) {
+		if (storage.containsKey(md)){
+			List<String> stringValues = storage.get(md);
+			for (Value value : values){
+				stringValues.add(value.getAsString());
+			}
+		}
+		else {
+			List<String> tmp = new ArrayList<String>();
+			for (Value value : values){
+				tmp.add(value.getAsString());
+			}
+			storage.put(md, tmp);
+		}
+		
+		return true;
+	}
+
+	@Override
+	public boolean addValue(String md, Value value) {
+		if (storage.containsKey(md)){
+			List<String> stringValues = storage.get(md);
+			stringValues.add(value.getAsString());
+		}
+		else {
+			List<String> tmp = new ArrayList<String>();
+			tmp.add(value.getAsString());
+			
+			storage.put(md, tmp);
+		}
+		
+		return true;
+	}
+
+	@Override
+	public boolean removeField(String md) {
+		if (storage.containsKey(md)){
+			storage.remove(md);
+		}
+		return false;
+	}
+
+	@Override
+	public boolean removeValue(String md, Value value) {
+		if (storage.containsKey(md)){
+			List<String> stringValues = storage.get(md);
+			stringValues.remove(value.getAsString());
+		}
+		return true;
+	}
+
+	@Override
+	public boolean updateField(String md, List<Value> values) {
+		List<String> stringValues = new ArrayList<String>();
+		for (Value value : values){
+			stringValues.add(value.getAsString());
+		}
+		storage.put(md, stringValues);
+
+		return true;
+	}
+
+	@Override
+	public boolean updateValue(String md, Value valueOld, Value valueNew) {
+		if (storage.containsKey(md)){
+			List<String> stringValues = storage.get(md);
+			List<String> newStringValues = storage.get(md);
+			for (String s : stringValues){
+				if (s.equals(valueOld.getAsString())){
+					newStringValues.add(valueNew.getAsString());
+				}
+				else {
+					newStringValues.add(s);
+				}
+			}
+			storage.put(md, newStringValues);
+		}
+		return true;
 	}
 }

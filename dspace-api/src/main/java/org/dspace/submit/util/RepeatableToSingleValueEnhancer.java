@@ -7,6 +7,8 @@
  */
 package org.dspace.submit.util;
 
+import gr.ekt.bte.core.Value;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +23,7 @@ public class RepeatableToSingleValueEnhancer implements
 
 	@Override
 	public List<String> getValues(SubmissionLookupPublication publication) {
-		List<String> values = new ArrayList<String>();
+		List<Value> values = new ArrayList<Value>();
 		for (String s : singleValues) {
 			if (publication.getValues(s) != null) {
 				values.addAll(publication.getValues(s));

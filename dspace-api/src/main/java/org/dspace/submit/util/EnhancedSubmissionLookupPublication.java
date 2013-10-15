@@ -7,6 +7,10 @@
  */
 package org.dspace.submit.util;
 
+import gr.ekt.bte.core.StringValue;
+import gr.ekt.bte.core.Value;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -53,28 +57,36 @@ public class EnhancedSubmissionLookupPublication extends SubmissionLookupPublica
 	
 	@Override
 	public String getFirstValue(String md) {
-		List<String> values = getValues(md);
+		List<Value> values = getValues(md);
 		if (values != null && values.size() > 0)
 		{
-			return values.get(0);
+			return values.get(0).getAsString();
 		}
 		return null;
 	}
 	
 	@Override
-	public List<String> getValues(String md) {
+	public List<Value> getValues(String md) {
 		if (enhancedMetadata != null && enhancedMetadata.keySet().contains(md))
 		{
 			if (cacheEnhanched != null && cacheEnhanched.keySet().contains(md))
 			{
-				return cacheEnhanched.get(md);
+				List<Value> values = new ArrayList<Value>();
+				for (String s : cacheEnhanched.get(md)){
+					values.add(new StringValue(s));
+				}
+				return values;
 			}
 			else
 			{
 				EnhancerSubmissionLookup enhancer = enhancedMetadata.get(md);
 				List<String> values = enhancer.getValues(this);
+				List<Value> valuesvalues = new ArrayList<Value>();
+				for (String s : values){
+					valuesvalues.add(new StringValue(s));
+				}
 				cacheEnhanched.put(md, values);
-				return values;
+				return valuesvalues;
 			}
 		}
 		else

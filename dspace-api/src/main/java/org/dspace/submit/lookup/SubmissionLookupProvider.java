@@ -7,6 +7,9 @@
  */
 package org.dspace.submit.lookup;
 
+import gr.ekt.bte.core.DataLoader;
+import gr.ekt.bte.core.Record;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -14,9 +17,8 @@ import java.util.Set;
 
 import org.apache.commons.httpclient.HttpException;
 import org.dspace.core.Context;
-import org.dspace.submit.util.SubmissionLookupPublication;
 
-public interface SubmissionLookupProvider {
+public interface SubmissionLookupProvider extends DataLoader {
 	public final static String DOI = "doi";
 	public final static String PUBMED = "pubmed";
 	public final static String ARXIV = "arxiv";
@@ -30,12 +32,12 @@ public interface SubmissionLookupProvider {
 
 	String getShortName();
 
-	List<SubmissionLookupPublication> search(Context context, String title, String author,
+	List<Record> search(Context context, String title, String author,
 			int year) throws HttpException, IOException;
 
-	List<SubmissionLookupPublication> getByIdentifier(Context context, Map<String, String> keys)
+	List<Record> getByIdentifier(Context context, Map<String, Set<String>> keys)
 			throws HttpException, IOException;
 
-	List<SubmissionLookupPublication> getByDOIs(Context context, Set<String> doiToSearch) throws HttpException, IOException;
+	List<Record> getByDOIs(Context context, Set<String> doiToSearch) throws HttpException, IOException;
 
 }
