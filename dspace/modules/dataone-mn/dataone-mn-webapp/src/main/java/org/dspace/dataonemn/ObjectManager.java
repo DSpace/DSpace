@@ -49,7 +49,12 @@ import org.jdom.input.SAXBuilder;
 public class ObjectManager implements Constants {
     
     private static final Logger log = Logger.getLogger(ObjectManager.class);
-    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZ");
+    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ") {
+        public StringBuffer format(Date date, StringBuffer toAppendTo, java.text.FieldPosition pos) {
+            StringBuffer toFix = super.format(date, toAppendTo, pos);
+            return toFix.insert(toFix.length()-2, ':');
+        }
+    };
     public static final int DEFAULT_START = 0;
     public static final int DEFAULT_COUNT = 20;
     
