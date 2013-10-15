@@ -105,7 +105,7 @@ public class OdinsHamr extends AbstractCurationTask {
 	
 	if (dso.getType() == Constants.COLLECTION) {
 	    // output headers for the CSV file that will be created by processing all items in this collection
-	    report("itemDOI, articleDOI, orcidID, orcidName, dryadORCID, dryadName");
+	    report("itemDOI, articleDOI, orcidID, orcidName, dspaceORCID, dspaceName");
 	} else if (dso.getType() == Constants.ITEM) {
             Item item = (Item)dso;
 
@@ -144,6 +144,35 @@ public class OdinsHamr extends AbstractCurationTask {
 		}
 		log.debug("articleDOI = " + articleDOI);
 
+
+		// DSpace names
+		List<String> dspaceNames = new ArrayList<String>();
+		vals = item.getMetadata("dc.contributor.author");
+		if (vals.length == 0) {
+		    log.error("Object has no dc.contributor.author available in DSpace" + handle);
+		} else {
+		    for(int i = 0; i < vals.length; i++) {
+			dspaceNames.add(vals[i].value);
+		    }
+		}
+		log.debug("DSpace names found = " + dspaceNames.size());
+
+		// ORCID names
+		
+		
+		//TODO: lookup names in ORCID
+		//TODO: reconcile names between DSpace and ORCID
+		//TODO: add processing for article DOIs, not just item DOIs
+		String orcidID = "[no ORCID found]";
+		String orcidName = "none";
+		String dspaceORCID = "[no ORCID in DSpace]";
+
+		for(String dspaceName:dspaceNames) {
+		    report(itemDOI + ", " + articleDOI + ", " + orcidID + ", \"" + orcidName + "\", " +
+		       dspaceORCID + ", \"" + dspaceName + "\"");
+		
+		    setResult("Last processed item = " + handle + " -- " + itemDOI);
+		}
 		
 		log.info(handle + " done.");
 	    } catch (Exception e) {
@@ -161,27 +190,13 @@ public class OdinsHamr extends AbstractCurationTask {
 	    return Curator.CURATE_SKIP;
         }
 
-	setResult("Last processed item = " + handle + " -- " + itemDOI);
-
-
-	//TODO: lookup names in ORCID
-	//TODO: reconcile names between Dryad and ORCID
-	//TODO: add processing for article DOIs, not just item DOIs
-	String orcidID = "";
-	String orcidName = "";
-	String dryadORCID = "";
-	String dryadName = "";
-	
-	report(itemDOI + ", " + articleDOI + ", " + orcidID + ", \"" + orcidName + "\", " +
-	       dryadORCID + ", \"" + dryadName + "\"");
-
-	log.debug("ODIN's Hamr complete");
-
 	try { 
 	    context.complete();
         } catch (SQLException e) {
 	    log.fatal("Unable to close database connection", e);
 	}
+
+	log.info("ODIN's Hamr complete");
 	return Curator.CURATE_SUCCESS;
     }
 
