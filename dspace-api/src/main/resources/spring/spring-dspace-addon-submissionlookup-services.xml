@@ -86,7 +86,7 @@
 	<bean name="mapConverter_arxivSubject" class="org.dspace.submit.lookup.MapConverterModifier" 
 	    init-method="init">
 	    <constructor-arg value="apConverter_arxivSubject Modifier"/>
-	    <property name="filename" value="mapConverter_arxivSubject.properties"/>
+	    <property name="filename" value="mapConverter-arxivSubject.properties"/>
 	    <property name="fieldKeys">
 	        <list>
 	        	<value>arxivCategory</value>
@@ -97,7 +97,7 @@
 	<bean name="mapConverter_pubstatusPubmed" class="org.dspace.submit.lookup.MapConverterModifier" 
 	    init-method="init">
 	    <constructor-arg value="mapConverter_pubstatusPubmed Modifier"/>
-	    <property name="filename" value="mapConverter_pubstatusPubmed.properties"/>
+	    <property name="filename" value="mapConverter-pubstatusPubmed.properties"/>
 	    <property name="fieldKeys">
 	        <list>
 	        	<value>publicationstatus</value>
@@ -105,8 +105,7 @@
 	    </property>
 	</bean>
 	
-	<bean name="removeLastDot" class="org.dspace.submit.lookup.RemoveLastDotModifier" 
-	    init-method="init">
+	<bean name="removeLastDot" class="org.dspace.submit.lookup.RemoveLastDotModifier">
 	    <constructor-arg value="removeLastDot Modifier"/>
 	    <property name="fieldKeys">
 	        <list>

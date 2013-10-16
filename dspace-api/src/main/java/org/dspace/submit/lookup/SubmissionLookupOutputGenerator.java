@@ -54,6 +54,7 @@ public class SubmissionLookupOutputGenerator implements OutputGenerator {
         }
         for(Map.Entry<String, List<Record>> entry : record_sets.entrySet()) {
             ItemSubmissionLookupDTO dto = new ItemSubmissionLookupDTO(entry.getValue());
+            dtoList.add(dto);
         }
         return null;
     }

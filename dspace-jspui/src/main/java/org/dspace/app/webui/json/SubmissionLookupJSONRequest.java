@@ -37,6 +37,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader;
+import org.dspace.submit.lookup.SubmissionLookupOutputGenerator;
 import org.dspace.submit.lookup.SubmissionLookupProvider;
 import org.dspace.submit.lookup.SubmissionLookupService;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
@@ -86,6 +87,9 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 
 				try {
 					transformationEngine.transform(new TransformationSpec());
+					
+					SubmissionLookupOutputGenerator outputGenerator = (SubmissionLookupOutputGenerator)transformationEngine.getOutputGenerator();
+					result = outputGenerator.getDtoList();
 				} catch (BadTransformationSpec e1) {
 					e1.printStackTrace();
 				} catch (MalformedSourceException e1) {
@@ -122,6 +126,8 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 				MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader)transformationEngine.getDataLoader();
 				dataLoader.setSearchTerms(searchTerms);
 
+				SubmissionLookupOutputGenerator outputGenerator = (SubmissionLookupOutputGenerator)transformationEngine.getOutputGenerator();
+				result = outputGenerator.getDtoList();
 				try {
 					transformationEngine.transform(new TransformationSpec());
 				} catch (BadTransformationSpec e1) {
