@@ -13,10 +13,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
+import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Iterator;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -25,6 +29,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 
 import org.dspace.handle.HandleManager;
 import org.dspace.app.util.DCInput;
@@ -34,8 +40,6 @@ import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.Bundle;
-import org.dspace.content.Bitstream;
 import org.dspace.content.crosswalk.MetadataValidationException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -57,6 +61,8 @@ import org.apache.log4j.Logger;
 @Suspendable
 public class OdinsHamr extends AbstractCurationTask {
 
+    private static final String ORCID_QUERY_BASE = "http://pub.orcid.org/search/orcid-bio?q=digital-object-ids:";
+    
     private static Logger log = Logger.getLogger(OdinsHamr.class);
     private IdentifierService identifierService = null;
     DocumentBuilderFactory dbf = null;
@@ -146,30 +152,50 @@ public class OdinsHamr extends AbstractCurationTask {
 
 
 		// DSpace names
-		List<String> dspaceNames = new ArrayList<String>();
+		List<OrcidName> dspaceNames = new ArrayList<OrcidName>();
 		vals = item.getMetadata("dc.contributor.author");
 		if (vals.length == 0) {
 		    log.error("Object has no dc.contributor.author available in DSpace" + handle);
 		} else {
 		    for(int i = 0; i < vals.length; i++) {
-			dspaceNames.add(vals[i].value);
+			dspaceNames.add(new OrcidName("",vals[i].value));
 		    }
 		}
-		log.debug("DSpace names found = " + dspaceNames.size());
 
 		// ORCID names
-		
-		
-		//TODO: lookup names in ORCID
-		//TODO: reconcile names between DSpace and ORCID
-		//TODO: add processing for article DOIs, not just item DOIs
-		String orcidID = "[no ORCID found]";
-		String orcidName = "none";
-		String dspaceORCID = "[no ORCID in DSpace]";
+		List<OrcidName> orcidNamesData = retrieveOrcidNames(itemDOI);
+		for(OrcidName orcidName:orcidNamesData) {
+		    report("orcidNameData: " + orcidName.getName());
+		}
 
-		for(String dspaceName:dspaceNames) {
-		    report(itemDOI + ", " + articleDOI + ", " + orcidID + ", \"" + orcidName + "\", " +
-		       dspaceORCID + ", \"" + dspaceName + "\"");
+		List<OrcidName> orcidNamesArticle = retrieveOrcidNames(articleDOI);
+		for(OrcidName orcidName:orcidNamesArticle) {
+		    report("orcidNameArticle: " + orcidName.getName());
+		}
+		List<OrcidName> orcidNames = new ArrayList<OrcidName>();
+		orcidNames.addAll(orcidNamesData);
+		for(OrcidName orcidName:orcidNamesArticle) {
+		    if(!containsName(orcidNames, orcidName.getName())) {
+			orcidNames.add(orcidName);
+		    }
+		}
+		for(OrcidName orcidName:orcidNames) {
+		    report("orcidName: " + orcidName.getName());
+		}
+		
+		
+		//TODO: reconcile names between DSpace and ORCID
+		HashMap<OrcidName,OrcidName> mappedNames = doHamrMatch(dspaceNames, orcidNames);
+		
+		//TODO: add processing for article DOIs, not just item DOIs
+
+		Iterator nameIt = mappedNames.entrySet().iterator();
+		while(nameIt.hasNext()) {
+		    Map.Entry pairs = (Map.Entry)nameIt.next();
+		    OrcidName mappedOrcidEntry = (OrcidName)pairs.getKey();
+		    OrcidName mappedDSpaceEntry = (OrcidName)pairs.getValue();
+		    report(itemDOI + ", " + articleDOI + ", " + mappedOrcidEntry.getOrcid() + ", \"" + mappedOrcidEntry.getName() + "\", " +
+			   mappedDSpaceEntry.getOrcid() + ", \"" + mappedDSpaceEntry.getName() + "\"");
 		
 		    setResult("Last processed item = " + handle + " -- " + itemDOI);
 		}
@@ -198,8 +224,145 @@ public class OdinsHamr extends AbstractCurationTask {
 
 	log.info("ODIN's Hamr complete");
 	return Curator.CURATE_SUCCESS;
+	}
+
+    /**
+       Computes a minimum between three integers.
+    **/
+    private static int minimum(int a, int b, int c) {
+	return Math.min(Math.min(a, b), c);
     }
 
+    /**
+       Levenshtein distance algorithm, borrowed from
+       http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance
+    **/
+    public static int computeLevenshteinDistance(CharSequence str1,
+						 CharSequence str2) {
+	int[][] distance = new int[str1.length() + 1][str2.length() + 1];
+
+	for (int i = 0; i <= str1.length(); i++)
+	    distance[i][0] = i;
+	for (int j = 1; j <= str2.length(); j++)
+	    distance[0][j] = j;
+
+	for (int i = 1; i <= str1.length(); i++)
+	    for (int j = 1; j <= str2.length(); j++)
+		distance[i][j] = minimum(
+					 distance[i - 1][j] + 1,
+					 distance[i][j - 1] + 1,
+					                                                 distance[i - 1][j - 1]
+					 + ((str1.charAt(i - 1) == str2.charAt(j - 1)) ? 0
+					    : 1));
+
+	return distance[str1.length()][str2.length()];
+    }
+    
+    /**
+       Scores the correspondence between two author names.
+    **/
+    private double hamrScore(OrcidName name1, OrcidName name2) {
+	// if the orcid ID's match, the names are a perfect match
+	if(name1.getOrcid() != null && name1.getOrcid().equals(name2.getOrcid())) {
+	    return 1.0;
+	}
+
+	int maxlen = Math.max(name1.getName().length(), name2.getName().length());
+	int editlen = computeLevenshteinDistance(name1.getName(), name2.getName());
+
+	return (double)editlen/(double)maxlen;	
+    }
+    
+    /**
+       Matches two lists of OrcidNames using the Hamr algorithm.
+    **/
+    private HashMap<OrcidName,OrcidName> doHamrMatch(List<OrcidName>dspaceNames, List<OrcidName>orcidNames) {
+	report("running doHamrMatch, " + dspaceNames.size() + ", " + orcidNames.size() );
+	HashMap<OrcidName,OrcidName> matchedNames = new HashMap<OrcidName,OrcidName>();
+
+	OrcidName placeholder = new OrcidName("007","Bond, James");
+	
+	for(OrcidName aName:dspaceNames) {
+	    report("hamr score " + placeholder + ", " + aName + ", " + hamrScore(placeholder, aName));
+	    matchedNames.put(placeholder, aName);
+	}
+
+	for(OrcidName aName:orcidNames) {
+	    report("hamr score " + placeholder + ", " + aName + ", " + hamrScore(placeholder, aName));
+	    matchedNames.put(aName, placeholder);
+	}
+	
+	return matchedNames;
+    }
+    
+    /**
+       Reports whether a given targetName appears in a list of OrcidNames.
+    **/
+    private boolean containsName(List<OrcidName> theList, String targetName) {
+	if(theList != null) {
+	    for(OrcidName aName:theList) {
+		if(aName.getName().equals(targetName)) {
+		    return true;
+		}
+	    }
+	}
+	return false;
+    }
+
+    /**
+       Retrieve the text of a named sub-element of the given node.
+    **/
+    private String retrieveXMLChild(Node aNode, String elemName) {
+	NodeList subNodes = aNode.getChildNodes();
+	for(int i = 0; i < subNodes.getLength(); i++) {
+	    Node subNode = subNodes.item(i);
+	    String subNodeName = subNode.getNodeName();
+	    if(subNodeName != null && subNodeName.equals(elemName)) {
+		return subNode.getTextContent();
+	    } else {
+		String subResult = retrieveXMLChild(subNode, elemName);
+		if(subResult != null) {
+		    return subResult;
+		}
+		// if subResult is null, the for loop continues to other nodes
+	    }
+	}
+	return null;
+    }
+    
+    /**
+       Retrieve a list of names associated with this DOI in ORCID.
+    **/
+    private List<OrcidName> retrieveOrcidNames(String itemDOI) {
+	List<OrcidName> orcidNames = new ArrayList<OrcidName>();
+
+	if(itemDOI.startsWith("doi:")) {
+	    itemDOI = itemDOI.substring("doi:".length());
+	}
+	try {
+	    URL orcidQuery = new URL(ORCID_QUERY_BASE + "%22" + itemDOI + "%22");
+	    Document orcidDoc = docb.parse(orcidQuery.openStream());
+	    NodeList nl = orcidDoc.getElementsByTagName("orcid-profile");
+	    // for each returned ORCID profile...
+	    for(int i = 0; i < nl.getLength(); i++) {
+		Node profile = nl.item(i);
+		String theOrcid = retrieveXMLChild(profile, "orcid");
+		String givenName = retrieveXMLChild(profile, "given-names");
+		String familyName = retrieveXMLChild(profile, "family-name");
+		orcidNames.add(new OrcidName(theOrcid, familyName +  ", " + givenName));
+	    }
+	} catch (MalformedURLException e) {
+	    log.error("cannot make a valid URL for itemDOI="  + itemDOI, e);
+	} catch (IOException e) {
+	    log.error("IO problem for itemDOI="  + itemDOI, e);
+	} catch (SAXException e) {
+	    log.error("error processing XML for itemDOI="  + itemDOI, e);
+	}
+
+	return orcidNames;
+    }
+
+    
     /**
        An XML utility method that returns the text content of a node.
     **/
@@ -218,6 +381,24 @@ public class OdinsHamr extends AbstractCurationTask {
 	}
 
 	return dspaceItem;
+    }
+
+    class OrcidName extends Object {
+	private String orcid = "";
+	private String name = "";
+	
+	public OrcidName(String orcid, String name) {
+	    this.orcid = orcid;
+	    this.name = name;
+	}
+
+	public String getName() {
+	    return name;
+	}
+
+	public String getOrcid() {
+	    return orcid;
+	}
     }
     
 }
