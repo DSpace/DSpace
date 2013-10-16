@@ -102,6 +102,7 @@ CREATE SEQUENCE collection2item_seq;
 CREATE SEQUENCE resourcepolicy_seq;
 CREATE SEQUENCE epersongroup2eperson_seq;
 CREATE SEQUENCE handle_seq;
+CREATE SEQUENCE doi_seq;
 CREATE SEQUENCE workspaceitem_seq;
 CREATE SEQUENCE workflowitem_seq;
 CREATE SEQUENCE tasklistitem_seq;
@@ -491,6 +492,23 @@ CREATE TABLE Handle
 CREATE INDEX handle_handle_idx ON Handle(handle);
 -- index by resource id and resource type id
 CREATE INDEX handle_resource_id_and_type_idx ON handle(resource_id, resource_type_id);
+
+-------------------------------------------------------
+-- Doi table
+-------------------------------------------------------
+CREATE TABLE Doi
+(
+  doi_id           INTEGER PRIMARY KEY,
+  doi              VARCHAR(256),
+  resource_type_id INTEGER,
+  resource_id      INTEGER,
+  status           INTEGER
+);
+
+-- index by handle, commonly looked up
+CREATE INDEX doi_doi_idx ON Doi(doi);
+-- index by resource id and resource type id
+CREATE INDEX doi_resource_id_and_type_idx ON Doi(resource_id, resource_type_id);
 
 -------------------------------------------------------
 --  WorkspaceItem table
