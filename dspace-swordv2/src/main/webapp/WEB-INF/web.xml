@@ -24,11 +24,11 @@
 
     <!-- new ConfigurationService initialization for dspace.dir -->
     <context-param>
-        <description>
-            The location of the main DSpace configuration file
-        </description>
         <param-name>dspace.dir</param-name>
         <param-value>${dspace.dir}</param-value>
+        <description>
+            The location of the main DSpace directory
+        </description>
     </context-param>
 
 	<!-- Configuration Information -->
