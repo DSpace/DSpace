@@ -47,8 +47,11 @@ public class VersionHistoryServlet extends DSpaceServlet
 
         Item item = Item.find(context, itemID);
 
-        if (item == null
-                || !AuthorizeManager.isAdmin(context,
+        if (item == null) {
+        	throw new IllegalArgumentException("Item is null");
+        }
+        
+        if(!AuthorizeManager.isAdmin(context,
                         item.getOwningCollection()))
         {
             // Check if only administrators can view the item history

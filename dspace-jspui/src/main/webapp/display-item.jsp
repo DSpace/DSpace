@@ -23,10 +23,6 @@
   -                  display any collections.
   -    admin_button - Boolean, show admin 'edit' button
   --%>
-<%@page import="org.dspace.core.Constants"%>
-<%@page import="org.dspace.eperson.EPerson"%>
-<%@page import="org.dspace.versioning.VersionHistory"%>
-<%@page import="org.elasticsearch.common.trove.strategy.HashingStrategy"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -45,6 +41,11 @@
 <%@page import="org.dspace.app.webui.util.VersionUtil"%>
 <%@page import="org.dspace.app.webui.util.UIUtil"%>
 <%@page import="org.dspace.authorize.AuthorizeManager"%>
+<%@page import="java.util.List"%>
+<%@page import="org.dspace.core.Constants"%>
+<%@page import="org.dspace.eperson.EPerson"%>
+<%@page import="org.dspace.versioning.VersionHistory"%>
+<%@page import="org.elasticsearch.common.trove.strategy.HashingStrategy"%>
 <%
     // Attributes
     Boolean displayAllBoolean = (Boolean) request.getAttribute("display.all");
@@ -85,74 +86,23 @@
 		}
 	}
     
-    boolean versioningEnabled = ConfigurationManager
-            .getBooleanProperty("versioning", "enabled");
-    String messageVersionNoticeHead = null;
-    String messageVersionNoticeHelp = null;
-    boolean hasVersionButton = false;
-    boolean hasVersionHistory = false;
-    boolean authorizeToVersion = false;
-    VersionHistory history = null;
-    Context context = null;
-    if (versioningEnabled)
-    {
-
-        context = UIUtil.obtainContext(request);
-        authorizeToVersion = AuthorizeManager.isAdmin(context, item.getOwningCollection());
-        if (authorizeToVersion)
-        {
-
-            if (VersionUtil.isLatest(context, item)
-                    && item.isArchived())
-            {
-                hasVersionButton = true;
-            }
-
-        }
-
-        if (VersionUtil.hasVersionHistory(context, item))
-        {
-            hasVersionHistory = true;
-            history = VersionUtil.retrieveVersionHistory(context, item);
-        }
-        
-        //Check if we have a history for the item
-        Version latestVersion = VersionUtil.checkLatestVersion(context,
-                item);
-
-        if (latestVersion != null)
-        {
-            if (latestVersion != null
-                    && latestVersion.getItemID() != item.getID())
-            {
-                //We have a newer version
-                Item latestVersionItem = latestVersion.getItem();
-                if (latestVersionItem.isArchived())
-                {
-                    //Available, add a link for the user alerting him that a new version is available        
-                    messageVersionNoticeHead = LocaleSupport
-                            .getLocalizedMessage(pageContext,
-                                    "jsp.version.notice.new_version_head");
-                    messageVersionNoticeHelp = LocaleSupport
-                            .getLocalizedMessage(pageContext,
-                                    "jsp.version.notice.new_version_help");
-                    String url = HandleManager.resolveToURL(context, latestVersionItem.getHandle());
-                    messageVersionNoticeHelp += "<a href='"+url+"'>"+latestVersionItem.getHandle()+"</a>";
-                }
-                else
-                {
-                    //We might be dealing with a workflow/workspace item
-                    messageVersionNoticeHead = LocaleSupport
-                            .getLocalizedMessage(pageContext,
-                                    "jsp.version.notice.workflow_version_head");
-                    messageVersionNoticeHelp = LocaleSupport
-                            .getLocalizedMessage(pageContext,
-                                    "jsp.version.notice.workflow_version_help");
-
-                }
-            }
-        }
-    }
+    Boolean versioningEnabledBool = (Boolean)request.getAttribute("versioning.enabled");
+    boolean versioningEnabled = (versioningEnabledBool!=null && versioningEnabledBool.booleanValue());
+    Boolean hasVersionButtonBool = (Boolean)request.getAttribute("versioning.hasversionbutton");
+    Boolean hasVersionHistoryBool = (Boolean)request.getAttribute("versioning.hasversionhistory");
+    boolean hasVersionButton = (hasVersionButtonBool!=null && hasVersionButtonBool.booleanValue());
+    boolean hasVersionHistory = (hasVersionHistoryBool!=null && hasVersionHistoryBool.booleanValue());
+    
+    Boolean newversionavailableBool = (Boolean)request.getAttribute("versioning.newversionavailable");
+    boolean newVersionAvailable = (newversionavailableBool!=null && newversionavailableBool.booleanValue());
+    Boolean showVersionWorkflowAvailableBool = (Boolean)request.getAttribute("versioning.showversionwfavailable");
+    boolean showVersionWorkflowAvailable = (showVersionWorkflowAvailableBool!=null && showVersionWorkflowAvailableBool.booleanValue());
+    
+    String latestVersionHandle = (String)request.getAttribute("versioning.latestversionhandle");
+    String latestVersionURL = (String)request.getAttribute("versioning.latestversionurl");
+    
+    VersionHistory history = (VersionHistory)request.getAttribute("versioning.history");
+    List<Version> historyVersions = (List<Version>)request.getAttribute("versioning.historyversions");
 %>
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
@@ -163,15 +113,27 @@
 %>
 
 		<%		
-		if (messageVersionNoticeHead != null)
+		if (newVersionAvailable)
 		   {
 		%>
-		<div class="alert alert-warning"><b><%=messageVersionNoticeHead%></b>		
-		<%=messageVersionNoticeHelp%>
+		<div class="alert alert-warning"><b><fmt:message key="jsp.version.notice.new_version_head"/></b>		
+		<fmt:message key="jsp.version.notice.new_version_help"/><a href="<%=latestVersionURL %>"><%= latestVersionHandle %></a>
 		</div>
 		<%
 		    }
 		%>
+		
+		<%		
+		if (showVersionWorkflowAvailable)
+		   {
+		%>
+		<div class="alert alert-warning"><b><fmt:message key="jsp.version.notice.workflow_version_head"/></b>		
+		<fmt:message key="jsp.version.notice.workflow_version_help"/>
+		</div>
+		<%
+		    }
+		%>
+		
 
                 <%-- <strong>Please use this identifier to cite or link to this item:
                 <code><%= HandleManager.getCanonicalForm(handle) %></code></strong>--%>
@@ -203,21 +165,19 @@
                     <input type="hidden" name="handle" value="<%= item.getHandle() %>" />
                     <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.metadataexport.button"/>" />
                 </form>
-                <% if(hasVersionButton || hasVersionHistory) { %>
 					<% if(hasVersionButton) { %>       
                 	<form method="get" action="<%= request.getContextPath() %>/tools/version">
                     	<input type="hidden" name="itemID" value="<%= item.getID() %>" />                    
                     	<input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.version.button"/>" />
                 	</form>
                 	<% } %> 
-                	<% if(hasVersionHistory && authorizeToVersion) { %>			                
+                	<% if(hasVersionHistory) { %>			                
                 	<form method="get" action="<%= request.getContextPath() %>/tools/history">
                     	<input type="hidden" name="itemID" value="<%= item.getID() %>" />
                     	<input type="hidden" name="versionID" value="<%= history.getVersion(item)!=null?history.getVersion(item).getVersionId():null %>" />                    
-                    	<input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.version.history.button"/>" />
+                    	<input class="btn btn-info col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.version.history.button"/>" />
                 	</form>         	         	
 					<% } %>
-       			<% } %>
              </div>
           </div>
         </dspace:sidebar>
@@ -318,6 +278,53 @@
 %>
 </div>
 <br/>
+    <%-- Versioning table --%>
+<%
+    if (versioningEnabled && hasVersionHistory)
+    {
+        boolean item_history_view_admin = ConfigurationManager
+                .getBooleanProperty("versioning", "item.history.view.admin");
+        if(!item_history_view_admin || admin_button) {         
+%>
+	<div id="versionHistory" class="panel panel-info">
+	<div class="panel-heading"><fmt:message key="jsp.version.history.head2" /></div>
+	
+	<table class="table panel-body">
+		<tr>
+			<th id="tt1" class="oddRowEvenCol"><fmt:message key="jsp.version.history.column1"/></th>
+			<th 			
+				id="tt2" class="oddRowOddCol"><fmt:message key="jsp.version.history.column2"/></th>
+			<th 
+				 id="tt3" class="oddRowEvenCol"><fmt:message key="jsp.version.history.column3"/></th>
+			<th 
+				
+				id="tt4" class="oddRowOddCol"><fmt:message key="jsp.version.history.column4"/></th>
+			<th 
+				 id="tt5" class="oddRowEvenCol"><fmt:message key="jsp.version.history.column5"/> </th>
+		</tr>
+		
+		<% for(Version versRow : historyVersions) {  
+		
+			EPerson versRowPerson = versRow.getEperson();
+			String[] identifierPath = VersionUtil.addItemIdentifier(item, versRow);
+		%>	
+		<tr>			
+			<td headers="tt1" class="oddRowEvenCol"><%= versRow.getVersionNumber() %></td>
+			<td headers="tt2" class="oddRowOddCol"><a href="<%= request.getContextPath() + identifierPath[0] %>"><%= identifierPath[1] %></a><%= item.getID()==versRow.getItemID()?"<span class=\"glyphicon glyphicon-asterisk\"></span>":""%></td>
+			<td headers="tt3" class="oddRowEvenCol"><% if(admin_button) { %><a
+				href="mailto:<%= versRowPerson.getEmail() %>"><%=versRowPerson.getFullName() %></a><% } else { %><%=versRowPerson.getFullName() %><% } %></td>
+			<td headers="tt4" class="oddRowOddCol"><%= versRow.getVersionDate() %></td>
+			<td headers="tt5" class="oddRowEvenCol"><%= versRow.getSummary() %></td>
+		</tr>
+		<% } %>
+	</table>
+	<div class="panel-footer"><fmt:message key="jsp.version.history.legend"/></div>
+	</div>
+<%
+        }
+    }
+%>
+<br/>
     <%-- Create Commons Link --%>
 <%
     if (cc_url != null)
@@ -330,63 +337,7 @@
     <%= cc_rdf %>
     -->
 <%
-    } else { 
-%>
-    <%-- Versioning table --%>
-<%
-    if (versioningEnabled && hasVersionHistory)
-    {
-        boolean item_history_view_admin = ConfigurationManager
-                .getBooleanProperty("versioning", "item.history.view.admin");
-        if(!item_history_view_admin || authorizeToVersion) {         
-			 
-						 
-%>
-	<div id="versionHistory">
-	<h2 class="help-block"><fmt:message key="jsp.version.history.head2" /></h2>
-	
-	
-	<table class="table">
-		<tr>
-			<th id="t1" class="oddRowEvenCol"><fmt:message key="jsp.version.history.column1"/></th>
-			<th 			
-				id="t2" class="oddRowOddCol"><fmt:message key="jsp.version.history.column2"/></th>
-			<th 
-				 id="t3" class="oddRowEvenCol"><fmt:message key="jsp.version.history.column3"/></th>
-			<th 
-				
-				id="t4" class="oddRowOddCol"><fmt:message key="jsp.version.history.column4"/></th>
-			<th 
-				 id="t5" class="oddRowEvenCol"><fmt:message key="jsp.version.history.column5"/> </th>
-		</tr>
-		
-		<% for(Version versRow : history.getVersions()) {  
-		
-			EPerson versRowPerson = versRow.getEperson();
-			String[] identifierPath = VersionUtil.addItemIdentifier(item, versRow);
-            //Skip items currently in submission
-            if(VersionUtil.isItemInSubmission(context, versRow.getItem()))
-            {
-                continue;
-            }
-		%>	
-		<tr>			
-			<td headers="t1" class="oddRowEvenCol"><%= versRow.getVersionNumber() %></td>
-			<td headers="t2" class="oddRowOddCol"><a href="<%= request.getContextPath() + identifierPath[0] %>"><%= identifierPath[1] %></a><%= item.getID()==versRow.getItemID()?"*":""%></td>
-			<td headers="t3" class="oddRowEvenCol"><% if(authorizeToVersion) { %><a
-				href="mailto:<%= versRowPerson.getEmail() %>"><%=versRowPerson.getFullName() %></a><% } else { %><%=versRowPerson.getFullName() %><% } %></td>
-			<td headers="t4" class="oddRowOddCol"><%= versRow.getVersionDate() %></td>
-			<td headers="t5" class="oddRowEvenCol"><%= versRow.getSummary() %></td>
-		</tr>
-		<% } %>
-	</table>
-	<p><fmt:message key="jsp.version.history.legend"/></p>
-	</div>
-	
-    
-<%
-        }
-    }
+    } else {
 %>
     <p class="submitFormHelp alert alert-info"><fmt:message key="jsp.display-item.copyright"/></p>
 <%
