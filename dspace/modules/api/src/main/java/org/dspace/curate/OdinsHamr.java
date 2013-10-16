@@ -62,6 +62,7 @@ import org.apache.log4j.Logger;
 public class OdinsHamr extends AbstractCurationTask {
 
     private static final String ORCID_QUERY_BASE = "http://pub.orcid.org/search/orcid-bio?q=digital-object-ids:";
+    private static final double MATCH_THRESHHOLD = 0.5;
     
     private static Logger log = Logger.getLogger(OdinsHamr.class);
     private IdentifierService identifierService = null;
@@ -100,8 +101,8 @@ public class OdinsHamr extends AbstractCurationTask {
 
 	String handle = "\"[no handle found]\"";
 	String itemDOI = "\"[no item DOI found]\"";
-	String articleDOI = "\"[no article DOI found]\"";
-		
+	String articleDOI = "";
+	
 	try {
 	    context = new Context();
         } catch (SQLException e) {
@@ -145,6 +146,7 @@ public class OdinsHamr extends AbstractCurationTask {
 		vals = item.getMetadata("dc.relation.isreferencedby");
 		if (vals.length == 0) {
 		    log.debug("Object has no articleDOI (dc.relation.isreferencedby) " + handle);
+		    articleDOI = "";
 		} else {
 		    articleDOI = vals[0].value;
 		}
@@ -163,39 +165,29 @@ public class OdinsHamr extends AbstractCurationTask {
 		}
 
 		// ORCID names
-		List<OrcidName> orcidNamesData = retrieveOrcidNames(itemDOI);
-		for(OrcidName orcidName:orcidNamesData) {
-		    report("orcidNameData: " + orcidName.getName());
-		}
-
-		List<OrcidName> orcidNamesArticle = retrieveOrcidNames(articleDOI);
-		for(OrcidName orcidName:orcidNamesArticle) {
-		    report("orcidNameArticle: " + orcidName.getName());
-		}
 		List<OrcidName> orcidNames = new ArrayList<OrcidName>();
-		orcidNames.addAll(orcidNamesData);
-		for(OrcidName orcidName:orcidNamesArticle) {
-		    if(!containsName(orcidNames, orcidName.getName())) {
-			orcidNames.add(orcidName);
+		orcidNames.addAll(retrieveOrcidNames(itemDOI));
+		
+		if(articleDOI != null && articleDOI.length() > 0) {
+		    List<OrcidName> orcidNamesArticle = retrieveOrcidNames(articleDOI);
+		    for(OrcidName orcidName:orcidNamesArticle) {
+			if(!containsName(orcidNames, orcidName.getName())) {
+			    orcidNames.add(orcidName);
+			}
 		    }
 		}
-		for(OrcidName orcidName:orcidNames) {
-		    report("orcidName: " + orcidName.getName());
-		}
 		
-		
-		//TODO: reconcile names between DSpace and ORCID
+		// reconcile names between DSpace and ORCID
 		HashMap<OrcidName,OrcidName> mappedNames = doHamrMatch(dspaceNames, orcidNames);
 		
-		//TODO: add processing for article DOIs, not just item DOIs
-
+		// output the resultant mappings
 		Iterator nameIt = mappedNames.entrySet().iterator();
 		while(nameIt.hasNext()) {
 		    Map.Entry pairs = (Map.Entry)nameIt.next();
 		    OrcidName mappedOrcidEntry = (OrcidName)pairs.getKey();
 		    OrcidName mappedDSpaceEntry = (OrcidName)pairs.getValue();
 		    report(itemDOI + ", " + articleDOI + ", " + mappedOrcidEntry.getOrcid() + ", \"" + mappedOrcidEntry.getName() + "\", " +
-			   mappedDSpaceEntry.getOrcid() + ", \"" + mappedDSpaceEntry.getName() + "\"");
+			   mappedDSpaceEntry.getOrcid() + ", \"" + mappedDSpaceEntry.getName() + "\", " + hamrScore(mappedDSpaceEntry,mappedOrcidEntry));
 		
 		    setResult("Last processed item = " + handle + " -- " + itemDOI);
 		}
@@ -270,28 +262,32 @@ public class OdinsHamr extends AbstractCurationTask {
 	int maxlen = Math.max(name1.getName().length(), name2.getName().length());
 	int editlen = computeLevenshteinDistance(name1.getName(), name2.getName());
 
-	return (double)editlen/(double)maxlen;	
+	return (double)(maxlen-editlen)/(double)maxlen;	
     }
     
     /**
        Matches two lists of OrcidNames using the Hamr algorithm.
     **/
     private HashMap<OrcidName,OrcidName> doHamrMatch(List<OrcidName>dspaceNames, List<OrcidName>orcidNames) {
-	report("running doHamrMatch, " + dspaceNames.size() + ", " + orcidNames.size() );
 	HashMap<OrcidName,OrcidName> matchedNames = new HashMap<OrcidName,OrcidName>();
 
-	OrcidName placeholder = new OrcidName("007","Bond, James");
-	
-	for(OrcidName aName:dspaceNames) {
-	    report("hamr score " + placeholder + ", " + aName + ", " + hamrScore(placeholder, aName));
-	    matchedNames.put(placeholder, aName);
+	// for each dspaceName, find the best possible match in the orcidName list, provided the score is over the threshhold
+	for(OrcidName dspaceName:dspaceNames) {
+	    double currentScore = 0.0;
+	    OrcidName currentMatch = null;
+	    for(OrcidName orcidName:orcidNames) {
+		double strength = hamrScore(dspaceName, orcidName);
+
+		if(strength > currentScore && strength > MATCH_THRESHHOLD) {
+		    currentScore = strength;
+		    currentMatch = orcidName;
+		}
+	    }
+	    if(currentScore > 0.0) {
+		matchedNames.put(dspaceName, currentMatch);
+	    }
 	}
 
-	for(OrcidName aName:orcidNames) {
-	    report("hamr score " + placeholder + ", " + aName + ", " + hamrScore(placeholder, aName));
-	    matchedNames.put(aName, placeholder);
-	}
-	
 	return matchedNames;
     }
     
@@ -398,6 +394,10 @@ public class OdinsHamr extends AbstractCurationTask {
 
 	public String getOrcid() {
 	    return orcid;
+	}
+
+	public String toString() {
+	    return name;
 	}
     }
     
