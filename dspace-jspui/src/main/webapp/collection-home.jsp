@@ -105,11 +105,8 @@
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
 <dspace:layout locbar="commLink" title="<%= name %>" feedData="<%= feedData %>">
-
-  <table border="0" cellpadding="5" width="100%">
-    <tr>
-      <td width="100%">
-        <h1><%= name %>
+    <div class="well">
+    <div class="row"><div class="col-md-8"><h2><%= name %>
 <%
             if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
             {
@@ -118,108 +115,93 @@
 <%
             }
 %>
-		</h1>
-		<h3><fmt:message key="jsp.collection-home.heading1"/></h3>
-      </td>
-      <td valign="top">
+		<small><fmt:message key="jsp.collection-home.heading1"/></small>
+      <a class="statisticsLink btn btn-info" href="<%= request.getContextPath() %>/handle/<%= collection.getHandle() %>/statistics"><fmt:message key="jsp.collection-home.display-statistics"/></a>
+      </h2></div>
 <%  if (logo != null) { %>
-        <img alt="Logo" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" />
-<% } %></td>
-    </tr>
-  </table>
-
-  <%-- Search/Browse --%>
-    <table class="miscTable" align="center" summary="This table allows you to search through all collections in the repository">
-      <tr>
-        <td class="evenRowEvenCol" colspan="2">
-        <form method="get" action="">
-          <table>
-            <tr>
-              <td class="standard" align="center">
-	        <label for="tlocation"><small><strong><fmt:message key="jsp.general.location"/></strong></small></label>&nbsp;
-                  <select name="location" id="tlocation">
-		    <option value="/"><fmt:message key="jsp.general.genericScope"/></option>
-                    <option selected="selected" value="<%= community.getHandle() %>"><%= communityName %></option>
-                    <option selected="selected" value="<%= collection.getHandle() %>"><%= name %></option>
-                  </select>
-              </td>
-            </tr>
-            <tr>
-              <td class="standard" align="center">
-				<label for="tquery"><small><fmt:message key="jsp.general.searchfor"/>&nbsp;</small></label><input type="text" name="query" id="tquery"/>&nbsp;
-				<input type="submit" name="submit_search" value="<fmt:message key="jsp.general.go"/>" />
-              </td>
-            </tr>
-          </table>
-        </form>
-        </td>
-       </tr>
-            <tr>
-              <td align="center" class="standard" valign="middle">
-                <small><fmt:message key="jsp.general.orbrowse"/>&nbsp;</small>
-				<%-- Insert the dynamic list of browse options --%>
+        <div class="col-md-4">
+        	<img class="img-responsive pull-right" alt="Logo" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" />
+        </div>
+<% 	} %>
+	</div>
+<%
+	if (StringUtils.isNotBlank(intro)) { %>
+	<%= intro %>
+<% 	} %>
+  </div>
+  <p class="copyrightText"><%= copyright %></p>
+  
+  <%-- Browse --%>
+  <div class="panel panel-primary">
+  	<div class="panel-heading">
+        <fmt:message key="jsp.general.browse"/>
+	</div>
+	<div class="panel-body">
+	<%-- Insert the dynamic list of browse options --%>
 <%
 	for (int i = 0; i < bis.length; i++)
 	{
 		String key = "browse.menu." + bis[i].getName();
 %>
-	<div class="browse_buttons">
-	<form method="get" action="<%= request.getContextPath() %>/handle/<%= collection.getHandle() %>/browse">
+	<form method="get" class="btn-group" action="<%= request.getContextPath() %>/handle/<%= collection.getHandle() %>/browse">
 		<input type="hidden" name="type" value="<%= bis[i].getName() %>"/>
 		<%-- <input type="hidden" name="collection" value="<%= collection.getHandle() %>" /> --%>
-		<input type="submit" name="submit_browse" value="<fmt:message key="<%= key %>"/>"/>
+		<input type="submit" class="btn btn-default" name="submit_browse" value="<fmt:message key="<%= key %>"/>"/>
 	</form>
-	</div>
 <%	
 	}
-%>
-	      </td>
-            </tr>
-          </table>
-
-  <table width="100%" align="center" cellspacing="10">
-    <tr>
-      <td>
-<%-- HACK: <center> used for Netscape 4.x, which doesn't accept align="center"
-  for a paragraph with a button in it --%>
+%>	</div>
+</div>
 <%  if (submit_button)
     { %>
-        <center>
-          <form action="<%= request.getContextPath() %>/submit" method="post">
+          <form class="form-group" action="<%= request.getContextPath() %>/submit" method="post">
             <input type="hidden" name="collection" value="<%= collection.getID() %>" />
-			<input type="submit" name="submit" value="<fmt:message key="jsp.collection-home.submit.button"/>" />
+			<input class="btn btn-success col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.collection-home.submit.button"/>" />
           </form>
-        </center>
 <%  } %>
-      </td>
-      <td class="oddRowEvenCol">
-        <form method="get" action="">
-          <table>
-            <tr>
-              <td class="standard">
+        <form class="well" method="get" action="">
 <%  if (loggedIn && subscribed)
     { %>
                 <small><fmt:message key="jsp.collection-home.subscribed"/> <a href="<%= request.getContextPath() %>/subscribe"><fmt:message key="jsp.collection-home.info"/></a></small>
-			  </td>
-              <td class="standard">
-            		<input type="submit" name="submit_unsubscribe" value="<fmt:message key="jsp.collection-home.unsub"/>" />
+           		<input class="btn btn-sm btn-warning" type="submit" name="submit_unsubscribe" value="<fmt:message key="jsp.collection-home.unsub"/>" />
 <%  } else { %>
                 <small>
             		  <fmt:message key="jsp.collection-home.subscribe.msg"/>
                 </small>
-              </td>
-              <td class="standard">
-				<input type="submit" name="submit_subscribe" value="<fmt:message key="jsp.collection-home.subscribe"/>" />
-<%  } %>
-              </td>
-            </tr>
-          </table>
+				<input class="btn btn-sm btn-info" type="submit" name="submit_subscribe" value="<fmt:message key="jsp.collection-home.subscribe"/>" />
+<%  }
+    if(feedEnabled)
+    { %>
+    <span class="pull-right">
+    <%
+    	String[] fmts = feedData.substring(5).split(",");
+    	String icon = null;
+    	int width = 0;
+    	for (int j = 0; j < fmts.length; j++)
+    	{
+    		if ("rss_1.0".equals(fmts[j]))
+    		{
+    		   icon = "rss1.gif";
+    		   width = 80;
+    		}
+    		else if ("rss_2.0".equals(fmts[j]))
+    		{
+    		   icon = "rss2.gif";
+    		   width = 80;
+    		}
+    		else
+    	    {
+    	       icon = "rss.gif";
+    	       width = 36;
+    	    }
+%>
+    <a href="<%= request.getContextPath() %>/feed/<%= fmts[j] %>/<%= collection.getHandle() %>"><img src="<%= request.getContextPath() %>/image/<%= icon %>" alt="RSS Feed" width="<%= width %>" height="15" vspace="3" border="0" /></a>
+<%
+    	} %>
+    	</span><%
+    }
+%>
         </form>
-      </td>
-    </tr>
-  </table>
-
-  <%= intro %>
 
 <% if (show_items)
    {
@@ -327,95 +309,54 @@
    } // end of if (show_title)
 %>
 
-    <div align="center">
-      <a class="statisticsLink" href="<%= request.getContextPath() %>/handle/<%= collection.getHandle() %>/statistics"><fmt:message key="jsp.collection-home.display-statistics"/></a>
-    </div>
-
-  <p class="copyrightText"><%= copyright %></p>
-
   <dspace:sidebar>
 <% if(admin_button || editor_button ) { %>
-    <table class="miscTable" align="center">
-      <tr>
-	    <td class="evenRowEvenCol" colspan="2">
-	     <table>
-            <tr>
-              <th id="t1" class="standard">
-                 <strong><fmt:message key="jsp.admintools"/></strong>                
-              </th>
-            </tr>
-
+                 <div class="panel panel-warning">
+                 <div class="panel-heading"><fmt:message key="jsp.admintools"/>
+                 	<span class="pull-right"><dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.collection-admin\")%>"><fmt:message key="jsp.adminhelp"/></dspace:popup></span>
+                 </div>
+                 <div class="panel-body">              
 <% if( editor_button ) { %>
-            <tr>
-              <td headers="t1" class="standard" align="center">
                 <form method="post" action="<%=request.getContextPath()%>/tools/edit-communities">
                   <input type="hidden" name="collection_id" value="<%= collection.getID() %>" />
                   <input type="hidden" name="community_id" value="<%= community.getID() %>" />
                   <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_EDIT_COLLECTION %>" />
-                  <input type="submit" value="<fmt:message key="jsp.general.edit.button"/>" />
+                  <input class="btn btn-default col-md-12" type="submit" value="<fmt:message key="jsp.general.edit.button"/>" />
                 </form>
-              </td>
-            </tr>
 <% } %>
 
 <% if( admin_button ) { %>
-            <tr>
-              <td headers="t1" class="standard" align="center">
                  <form method="post" action="<%=request.getContextPath()%>/tools/itemmap">
                   <input type="hidden" name="cid" value="<%= collection.getID() %>" />
-				  <input type="submit" value="<fmt:message key="jsp.collection-home.item.button"/>" />                  
+				  <input class="btn btn-default col-md-12" type="submit" value="<fmt:message key="jsp.collection-home.item.button"/>" />                  
                 </form>
-              </td>
-            </tr>
 <% if(submitters != null) { %>
-            <tr>
-	         <td headers="t1" class="standard" align="center">
 		      <form method="get" action="<%=request.getContextPath()%>/tools/group-edit">
 		        <input type="hidden" name="group_id" value="<%=submitters.getID()%>" />
-		        <input type="submit" name="submit_edit" value="<fmt:message key="jsp.collection-home.editsub.button"/>" />
+		        <input class="btn btn-default col-md-12" type="submit" name="submit_edit" value="<fmt:message key="jsp.collection-home.editsub.button"/>" />
 		      </form>
-	         </td>
-           </tr>
 <% } %>
 <% if( editor_button || admin_button) { %>
-            <tr>
-              <td headers="t1" class="standard" align="center">
                 <form method="post" action="<%=request.getContextPath()%>/mydspace">
                   <input type="hidden" name="collection_id" value="<%= collection.getID() %>" />
                   <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_EXPORT_ARCHIVE %>" />
-                  <input type="submit" value="<fmt:message key="jsp.mydspace.request.export.collection"/>" />
+                  <input class="btn btn-default col-md-12" type="submit" value="<fmt:message key="jsp.mydspace.request.export.collection"/>" />
                 </form>
-              </td>
-            </tr>
-            <tr>
-             <td headers="t1" class="standard" align="center">
                <form method="post" action="<%=request.getContextPath()%>/mydspace">
                  <input type="hidden" name="collection_id" value="<%= collection.getID() %>" />
                  <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_MIGRATE_ARCHIVE %>" />
-                 <input type="submit" value="<fmt:message key="jsp.mydspace.request.export.migratecollection"/>" />
+                 <input class="btn btn-default col-md-12" type="submit" value="<fmt:message key="jsp.mydspace.request.export.migratecollection"/>" />
                </form>
-             </td>
-           </tr>
-           <tr>
-             <td headers="t1" class="standard" align="center">
                <form method="post" action="<%=request.getContextPath()%>/dspace-admin/metadataexport">
                  <input type="hidden" name="handle" value="<%= collection.getHandle() %>" />
-                 <input type="submit" value="<fmt:message key="jsp.general.metadataexport.button"/>" />
+                 <input class="btn btn-default col-md-12" type="submit" value="<fmt:message key="jsp.general.metadataexport.button"/>" />
                </form>
-             </td>
-           </tr>
+               </div>
+               </div>
 <% } %>
-            <tr>
-              <td headers="t1" class="standard" align="center">
-                 <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.collection-admin\")%>"><fmt:message key="jsp.adminhelp"/></dspace:popup>
-              </td>
-            </tr>
+                 
 <% } %>
 
-	  </table>
-	</td>
-      </tr>
-    </table>
 <%  } %>
 
 <%
@@ -442,44 +383,11 @@
     <p>&nbsp;</p>
 <%      } %>
 
-<%
-    if(feedEnabled)
-    {
-%>
-    <center>
-    <h4><fmt:message key="jsp.collection-home.feeds"/></h4>
-<%
-    	String[] fmts = feedData.substring(5).split(",");
-    	String icon = null;
-    	int width = 0;
-    	for (int j = 0; j < fmts.length; j++)
-    	{
-    		if ("rss_1.0".equals(fmts[j]))
-    		{
-    		   icon = "rss1.gif";
-    		   width = 80;
-    		}
-    		else if ("rss_2.0".equals(fmts[j]))
-    		{
-    		   icon = "rss2.gif";
-    		   width = 80;
-    		}
-    		else
-    	    {
-    	       icon = "rss.gif";
-    	       width = 36;
-    	    }
-%>
-    <a href="<%= request.getContextPath() %>/feed/<%= fmts[j] %>/<%= collection.getHandle() %>"><img src="<%= request.getContextPath() %>/image/<%= icon %>" alt="RSS Feed" width="<%= width %>" height="15" vspace="3" border="0" /></a>
-<%
-    	}
-%>
-    </center>
-<%
-    }
-%>
     <%= sidebar %>
-    
+    <%
+    	int discovery_panel_cols = 12;
+    	int discovery_facet_cols = 12;
+    %>
     <%@ include file="discovery/static-sidebar-facet.jsp" %>
   </dspace:sidebar>
 

@@ -53,7 +53,7 @@
 
 %>
 
-<dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.edit-bitstream-access.title" nocache="true">
+<dspace:layout style="submission" locbar="off" navbar="off" titlekey="jsp.submit.edit-bitstream-access.title" nocache="true">
 
     <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
 
@@ -72,36 +72,24 @@
     if (advanced)
     {
 %>
-		<h1><fmt:message key="jsp.submit.access.plist.heading"/></h1>
+		<h2 class="alert alert-info"><fmt:message key="jsp.submit.access.plist.heading"/></h2>
 
         <dspace:policieslist policies="<%= policies %>" />
 <%
     }
 %>
 
-		<h1><fmt:message key="jsp.submit.edit-bitstream-access.heading"/></h1>
+		<h2 class="alert alert-info"><fmt:message key="jsp.submit.edit-bitstream-access.heading"/></h2>
         
         <dspace:access-setting subInfo="<%= subInfo %>" dso="<%= subInfo.getBitstream() %>" embargo="<%= advanced ? true : false %>" addpolicy="<%= advanced ? true : false %>" />
 
-        <center>
-            <table class="miscTable">
 
 		<%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
         <%= SubmissionController.getSubmissionParameters(context, request) %>
-        <center>
-            <table border="0" width="80%">
-                <tr>
-					<td width="100%">&nbsp;</td>
-                    <td>
-                        <input type="submit" name="submit_save" value="<fmt:message key="jsp.submit.edit-bitstream-access.save.button"/>" />
-                    </td>
-                    <td>&nbsp;&nbsp;&nbsp;</td>
-                    <td align="right">
-                        <input type="submit" name="submit_edit_cancel" value="<fmt:message key="jsp.submit.general.cancel"/>" />
-                    </td>
-                </tr>
-            </table>
-        </center>
+    		<div class="btn-group pull-right col-md-offset-5">
+    			<input class="btn btn-success" type="submit" name="submit_save" value="<fmt:message key="jsp.submit.edit-bitstream-access.save.button"/>" />
+                <input class="btn btn-default" type="submit" name="submit_edit_cancel" value="<fmt:message key="jsp.submit.general.cancel"/>" />
+			</div>
     </form>
 
     <script type="text/javascript" src="<%= request.getContextPath() %>/submit/access-step.js"></script>

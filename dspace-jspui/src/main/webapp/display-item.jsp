@@ -80,51 +80,45 @@
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
 <dspace:layout title="<%= title %>">
-
 <%
     if (handle != null)
     {
 %>
 
-    <table align="center" class="miscTable">
-        <tr>
-            <td class="evenRowEvenCol" align="center">
                 <%-- <strong>Please use this identifier to cite or link to this item:
                 <code><%= HandleManager.getCanonicalForm(handle) %></code></strong>--%>
-                <strong><fmt:message key="jsp.display-item.identifier"/>
-                <code><%= HandleManager.getCanonicalForm(handle) %></code></strong>
-            </td>
+                <div class="well"><fmt:message key="jsp.display-item.identifier"/>
+                <code><%= HandleManager.getCanonicalForm(handle) %></code></div>
 <%
         if (admin_button)  // admin edit button
         { %>
-            <td class="evenRowEvenCol" align="center">
+        <dspace:sidebar>
+            <div class="panel panel-warning">
+            	<div class="panel-heading"><fmt:message key="jsp.admintools"/></div>
+            	<div class="panel-body">
+                <form method="get" action="<%= request.getContextPath() %>/tools/edit-item">
+                    <input type="hidden" name="item_id" value="<%= item.getID() %>" />
+                    <%--<input type="submit" name="submit" value="Edit...">--%>
+                    <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.edit.button"/>" />
+                </form>
                 <form method="post" action="<%= request.getContextPath() %>/mydspace">
                     <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                     <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_EXPORT_ARCHIVE %>" />
-                    <input type="submit" name="submit" value="<fmt:message key="jsp.mydspace.request.export.item"/>" />
+                    <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.mydspace.request.export.item"/>" />
                 </form>
                 <form method="post" action="<%= request.getContextPath() %>/mydspace">
                     <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                     <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_MIGRATE_ARCHIVE %>" />
-                    <input type="submit" name="submit" value="<fmt:message key="jsp.mydspace.request.export.migrateitem"/>" />
+                    <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.mydspace.request.export.migrateitem"/>" />
                 </form>
                 <form method="post" action="<%= request.getContextPath() %>/dspace-admin/metadataexport">
                     <input type="hidden" name="handle" value="<%= item.getHandle() %>" />
-                    <input type="submit" name="submit" value="<fmt:message key="jsp.general.metadataexport.button"/>" />
+                    <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.metadataexport.button"/>" />
                 </form>
-
-            </td>
-            <td class="evenRowEvenCol" align="center">
-                <form method="get" action="<%= request.getContextPath() %>/tools/edit-item">
-                    <input type="hidden" name="item_id" value="<%= item.getID() %>" />
-                    <%--<input type="submit" name="submit" value="Edit...">--%>
-                    <input type="submit" name="submit" value="<fmt:message key="jsp.general.edit.button"/>" />
-                </form>
-            </td>
+             </div>
+          </div>
+        </dspace:sidebar>
 <%      } %>
-        </tr>
-    </table>
-    <br />
 <%
     }
 
@@ -132,91 +126,77 @@
 %>
     <dspace:item-preview item="<%= item %>" />
     <dspace:item item="<%= item %>" collections="<%= collections %>" style="<%= displayStyle %>" />
-
+<div class="container row">
 <%
     String locationLink = request.getContextPath() + "/handle/" + handle;
 
     if (displayAll)
     {
 %>
-
-    <div align="center">
 <%
         if (workspace_id != null)
         {
 %>
-    <form method="post" action="<%= request.getContextPath() %>/view-workspaceitem">
+    <form class="col-md-2" method="post" action="<%= request.getContextPath() %>/view-workspaceitem">
         <input type="hidden" name="workspace_id" value="<%= workspace_id.intValue() %>" />
-        <input type="submit" name="submit_simple" value="<fmt:message key="jsp.display-item.text1"/>" />
+        <input class="btn btn-default" type="submit" name="submit_simple" value="<fmt:message key="jsp.display-item.text1"/>" />
     </form>
 <%
         }
         else
         {
 %>
-    <form method="get" action="<%=locationLink %>">
-        <input type="hidden" name="mode" value="simple"/>
-        <input type="submit" name="submit_simple" value="<fmt:message key="jsp.display-item.text1"/>" />
-    </form>
+    <a class="btn btn-default" href="<%=locationLink %>?mode=simple">
+        <fmt:message key="jsp.display-item.text1"/>
+    </a>
 <%
         }
 %>
-    </div>
 <%
     }
     else
     {
 %>
-    <div align="center">
 <%
         if (workspace_id != null)
         {
 %>
-    <form method="post" action="<%= request.getContextPath() %>/view-workspaceitem">
+    <form class="col-md-2" method="post" action="<%= request.getContextPath() %>/view-workspaceitem">
         <input type="hidden" name="workspace_id" value="<%= workspace_id.intValue() %>" />
-        <input type="submit" name="submit_full" value="<fmt:message key="jsp.display-item.text2"/>" />
+        <input class="btn btn-default" type="submit" name="submit_full" value="<fmt:message key="jsp.display-item.text2"/>" />
     </form>
 <%
         }
         else
         {
 %>
-    <form method="get" action="<%=locationLink %>">
-        <input type="hidden" name="mode" value="full"/>
-        <input type="submit" name="submit_simple" value="<fmt:message key="jsp.display-item.text2"/>" />
-    </form>
+    <a class="btn btn-default" href="<%=locationLink %>?mode=full">
+        <fmt:message key="jsp.display-item.text2"/>
+    </a>
 <%
         }
-        if (suggestLink)
+    }
+
+    if (workspace_id != null)
+    {
+%>
+   <form class="col-md-2" method="post" action="<%= request.getContextPath() %>/workspace">
+        <input type="hidden" name="workspace_id" value="<%= workspace_id.intValue() %>"/>
+        <input class="btn btn-primary" type="submit" name="submit_open" value="<fmt:message key="jsp.display-item.back_to_workspace"/>"/>
+    </form>
+<%
+    } else {
+
+		if (suggestLink)
         {
 %>
-    <a href="<%= request.getContextPath() %>/suggest?handle=<%= handle %>" target="new_window">
+    <a class="btn btn-success" href="<%= request.getContextPath() %>/suggest?handle=<%= handle %>" target="new_window">
        <fmt:message key="jsp.display-item.suggest"/></a>
 <%
         }
 %>
-    </div>
-<%
-    }
-%>
+    <a class="statisticsLink  btn btn-primary" href="<%= request.getContextPath() %>/handle/<%= handle %>/statistics"><fmt:message key="jsp.display-item.display-statistics"/></a>
 
-<div align="center">
-    <a class="statisticsLink" href="<%= request.getContextPath() %>/handle/<%= handle %>/statistics"><fmt:message key="jsp.display-item.display-statistics"/></a>
-</div>
-
-<%
-    if (workspace_id != null)
-    {
-%>
-<div align="center">
-   <form method="post" action="<%= request.getContextPath() %>/workspace">
-        <input type="hidden" name="workspace_id" value="<%= workspace_id.intValue() %>"/>
-        <input type="submit" name="submit_open" value="<fmt:message key="jsp.display-item.back_to_workspace"/>"/>
-    </form>
-</div>
-<%
-    }
-%>
     <%-- SFX Link --%>
 <%
     if (ConfigurationManager.getProperty("sfx.server.url") != null)
@@ -227,25 +207,29 @@
             sfximage = request.getContextPath() + "/image/sfx-link.gif";
         }
 %>
-    <p align="center">
-        <a href="<dspace:sfxlink item="<%= item %>"/>" /><img src="<%= sfximage %>" border="0" alt="SFX Query" /></a>
-    </p>
+        <a class="btn btn-default" href="<dspace:sfxlink item="<%= item %>"/>" /><img src="<%= sfximage %>" border="0" alt="SFX Query" /></a>
 <%
     }
+    }
 %>
+</div>
+<br/>
     <%-- Create Commons Link --%>
 <%
     if (cc_url != null)
     {
 %>
-    <p class="submitFormHelp"><fmt:message key="jsp.display-item.text3"/> <a href="<%= cc_url %>"><fmt:message key="jsp.display-item.license"/></a><br/>
-    <a href="<%= cc_url %>"><img src="<%= request.getContextPath() %>/image/cc-somerights.gif" border="0" alt="Creative Commons" /></a>
+    <p class="submitFormHelp alert alert-info"><fmt:message key="jsp.display-item.text3"/> <a href="<%= cc_url %>"><fmt:message key="jsp.display-item.license"/></a>
+    <a href="<%= cc_url %>"><img src="<%= request.getContextPath() %>/image/cc-somerights.gif" border="0" alt="Creative Commons" style="margin-top: -5px;" class="pull-right"/></a>
     </p>
     <!--
     <%= cc_rdf %>
     -->
 <%
-    }
+    } else { 
 %>
-    <p class="submitFormHelp"><fmt:message key="jsp.display-item.copyright"/></p>
+    <p class="submitFormHelp alert alert-info"><fmt:message key="jsp.display-item.copyright"/></p>
+<%
+    } 
+%>    
 </dspace:layout>

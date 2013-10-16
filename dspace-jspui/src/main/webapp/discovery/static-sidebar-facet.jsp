@@ -60,8 +60,9 @@
 	}
 	if (brefine) {
 %>
+<div class="col-md-<%= discovery_panel_cols %>">
 <h3 class="facets"><fmt:message key="jsp.search.facet.refine" /></h3>
-<div id="facets" class="facetsBox">
+<div id="facets" class="facetsBox row panel">
 <%
 	for (DiscoverySearchFilterFacet facetConf : facetsConf)
 	{
@@ -77,47 +78,50 @@
  	    }
 	    String fkey = "jsp.search.facet.refine."+f;
 	    int limit = facetConf.getFacetLimit()+1;
-	    %><div id="facet_<%= f %>" class="facet">
+	    %><div id="facet_<%= f %>" class="facet col-md-<%= discovery_facet_cols %>">
 	    <span class="facetName"><fmt:message key="<%= fkey %>" /></span>
-	    <ul><%
+	    <ul class="list-group"><%
 	    int idx = 1;
 	    int currFp = UIUtil.getIntParameter(request, f+"_page");
 	    if (currFp < 0)
 	    {
 	        currFp = 0;
 	    }
-	    if (currFp > 0)
-	    {
-	        %><li class="facet-previous"><a href="<%= request.getContextPath()
-	                + searchScope
-	                + "?"+f+"_page="+(currFp-1) %>"><fmt:message key="jsp.search.facet.refine.previous" /></a></li>
-            <%
-	    }
 	    if (facet != null)
 	    {
 		    for (FacetResult fvalue : facet)
 		    { 
-		        if (idx == limit)
+		        if (idx != limit)
 		        {
-		            %><li class="facet-next"><a href="<%= request.getContextPath()
-		            + searchScope
-	                + "?"+f+"_page="+(currFp+1) %>"><fmt:message key="jsp.search.facet.refine.next" /></a></li>
-		            <%
-		        }
-		        else
-		        {
-		        %><li><a href="<%= request.getContextPath()
+		        %><li class="list-group-item"><a href="<%= request.getContextPath()
 		            + searchScope
 	                + "/simple-search?filterquery="+URLEncoder.encode(fvalue.getAsFilterQuery(),"UTF-8")
 	                + "&amp;filtername="+URLEncoder.encode(f,"UTF-8")
 	                + "&amp;filtertype="+URLEncoder.encode(fvalue.getFilterType(),"UTF-8") %>"
 	                title="<fmt:message key="jsp.search.facet.narrow"><fmt:param><%=fvalue.getDisplayedValue() %></fmt:param></fmt:message>">
-	                <%= StringUtils.abbreviate(fvalue.getDisplayedValue(),32) + " (" + fvalue.getCount()+")" %></a></li><%
+	                <%= StringUtils.abbreviate(fvalue.getDisplayedValue(),32) %></a><span class="badge"><%= fvalue.getCount() %></span></li><%
 		        }
 		        idx++;
+		    }
+		    if (currFp > 0 || idx > limit)
+		    {
+		        %><li class="list-group-item"><span style="visibility: hidden;">.</span>
+		        <% if (currFp > 0) { %>
+		        <a class="pull-left" href="<%= request.getContextPath()
+		                + searchScope
+		                + "?"+f+"_page="+(currFp-1) %>"><fmt:message key="jsp.search.facet.refine.previous" /></a>
+	            <% } %>
+	            <% if (idx > limit) { %>
+	            <a href="<%= request.getContextPath()
+		            + searchScope
+	                + "?"+f+"_page="+(currFp+1) %>"><span class="pull-right"><fmt:message key="jsp.search.facet.refine.next" /></span></a>
+	            <%
+	            }
+	            %></li><%
 		    }
 	    }
 	    %></ul></div><%
 	}
+%></div></div><%
 	}
 %>

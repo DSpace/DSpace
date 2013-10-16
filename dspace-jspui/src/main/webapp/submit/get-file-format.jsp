@@ -53,14 +53,16 @@
     Item item = subInfo.getSubmissionItem().getItem();
 %>
 
-<dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.get-file-format.title" nocache="true">
+<dspace:layout style="submission" locbar="off" navbar="off" titlekey="jsp.submit.get-file-format.title" nocache="true">
 
     <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
 
         <jsp:include page="/submit/progressbar.jsp"/>
 
         <%-- <h1>Submit: Select File Format</h1> --%>
-		<h1><fmt:message key="jsp.submit.get-file-format.heading"/></h1>
+		<h1><fmt:message key="jsp.submit.get-file-format.heading"/>
+		<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#formats\" %>"><fmt:message key="jsp.morehelp"/></dspace:popup>
+		</h1>
 
         <%-- <p>Uploaded file: <code><%= si.bitstream.getName() %></code> (<%= si.bitstream.getSize() %> bytes)</p> --%>
 		<p><fmt:message key="jsp.submit.get-file-format.info1">
@@ -73,7 +75,7 @@
     {
 %>
         <%-- <p>DSpace could not identify the format of this file.</p> --%>
-		<p><fmt:message key="jsp.submit.get-file-format.info2"/></p>
+		<p class="alert alert-info"><fmt:message key="jsp.submit.get-file-format.info2"/></p>
 <%
     }
     else
@@ -81,7 +83,7 @@
 %>
         <%-- <p>DSpace recognized the file format as <%= guess.getShortDescription() %>.
         <strong>Please be sure before you change this!</strong></p> --%>
-		<p><fmt:message key="jsp.submit.get-file-format.info3">
+		<p class="alert alert-info"><fmt:message key="jsp.submit.get-file-format.info3">
             <fmt:param><%= guess.getShortDescription() %></fmt:param>
         </fmt:message></p>   
         <input type="hidden" name="format" value="<%= guess.getID() %>" />
@@ -101,14 +103,12 @@
 
         <%-- <p>Select the format of the file from the list below, for example "Adobe
         PDF" or "Microsoft Word", <strong>OR</strong> if the format is not in the list, please describe
-        the format file in the input box below the list.
-        <dspace:popup page="/help/index.html#formats">(More Help...)</dspace:popup></p> --%>
+        the format file in the input box below the list.</p> --%>
 
-		<div><fmt:message key="jsp.submit.get-file-format.info5"/>
-        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#formats\" %>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
-    
-        <center>
-            <select name="format" size="8">
+		<div><fmt:message key="jsp.submit.get-file-format.info5"/></div>
+    	<div class="row">
+    	<span class="col-md-6">
+            <select class="form-control" name="format" size="8">
                 <option value="-1" <%= subInfo.getBitstream().getFormat().getShortDescription().equals("Unknown") ? "selected=\"selected\"" : "" %>>
                     <%-- Format Not in List --%>
 					<fmt:message key="jsp.submit.get-file-format.info6"/>
@@ -134,21 +134,16 @@
     }
 %>
             </select>
-        </center>
-    
+    </span>
        <%--  <p class=submitFormHelp><strong>If the format is not in the above list</strong>, describe
         it in the format below.  Enter the name of the application you used to create
         the file, and the version number of the application (for example,
         "ACMESoft SuperApp version 1.5").</p> --%>
-		 <p class="submitFormHelp"><fmt:message key="jsp.submit.get-file-format.info7"/></p>
+		 <div class="col-md-6"><p class="submitFormHelp alert alert-warning"><fmt:message key="jsp.submit.get-file-format.info7"/></p>
 
-        <table border="0" align="center">
-            <tr>
-                <td class="submitFormLabel">
+		
                     <%-- File Format: --%>
-					<label for="tformat_description"><fmt:message key="jsp.submit.get-file-format.format"/></label>
-                </td>
-                <td>
+					<label for="tformat_description" class="col-md-3"><fmt:message key="jsp.submit.get-file-format.format"/></label>
 <%
     String desc = subInfo.getBitstream().getUserFormatDescription();
     if (desc == null)
@@ -156,15 +151,13 @@
         desc = "";
     }
 %>
-                   <input type="text" name="format_description" id="tformat_description" size="40" value="<%= desc %>" />
-                </td>
-            </tr>
-        </table>
-
+                   <span class="col-md-9"><input class="form-control" type="text" name="format_description" id="tformat_description" size="40" value="<%= desc %>" /></span>
+		</div>
+	</div><br/>
         <%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
         <%= SubmissionController.getSubmissionParameters(context, request) %>
 
         <%-- <center><p><input type="submit" name="submit" value="Set File Format"></p></center> --%>
-		<center><p><input type="submit" name="submit" value="<fmt:message key="jsp.submit.general.submit"/>" /></p></center>
+		<input class="btn btn-primary col-md-2 col-md-offset-5" type="submit" name="submit" value="<fmt:message key="jsp.submit.general.submit"/>" />
     </form>
 </dspace:layout>

@@ -27,7 +27,7 @@
 <%
     EPerson eperson = (EPerson) request.getAttribute("eperson");
 %>
-<dspace:layout titlekey="jsp.dspace-admin.eperson-confirm-delete.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.eperson-confirm-delete.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
@@ -40,25 +40,19 @@
     </fmt:message></h1>
     
     <%-- <p>Are you sure this e-person should be deleted?</p> --%>
-    <p><fmt:message key="jsp.dspace-admin.eperson-confirm-delete.confirm"/></p>
+    <div class="row col-md-offset-4">
+    	<span class="col-md-6"><fmt:message key="jsp.dspace-admin.eperson-confirm-delete.confirm"/></span>
+    </div>
     
     <form method="post" action="">
         <input type="hidden" name="eperson_id" value="<%= eperson.getID() %>"/>
-
-        <center>
-            <table width="70%">
-                <tr>
-                    <td align="left">
-                        <%-- <input type="submit" name="submit_confirm_delete" value="Delete"> --%>
-                        <input type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
-                    </td>
-                    <td align="right">
-                        <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
-                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
-                    </td>
-                </tr>
-            </table>
-        </center>
+		<div class="btn-group col-md-offset-5">
+			<%-- <input type="submit" name="submit_confirm_delete" value="Delete"> --%>
+        	<input type="submit" class="btn btn-danger col-md-6" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
+        	<%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
+        	<input type="submit" class="btn btn-default col-md-6" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
+        </div>
     </form>
+    
 </dspace:layout>
 
