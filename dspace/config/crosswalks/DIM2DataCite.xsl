@@ -158,7 +158,7 @@
             </xsl:if>
 
             <!-- Add language(s). -->
-            <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='language' and @qualifier='iso']" />
+            <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='language' and (@qualifier='iso' or @qualifier='rfc3066')]" />
 
             <!-- Add resource type. -->
             <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='type']" />
@@ -311,14 +311,16 @@
         Adds Language information
         Transforming the language flags according to ISO 639-2/B & ISO 639-3
     -->
-    <xsl:template match="//dspace:field[@mdschema='dc' and @element='language' and @qualifier='iso']">
+    <xsl:template match="//dspace:field[@mdschema='dc' and @element='language' and (@qualifier='iso' or @qualifier='rfc3066')]">
         <xsl:for-each select=".">
             <xsl:element name="language">
                 <xsl:choose>
-                    <xsl:when test="string(text())='en'">eng</xsl:when>
-                    <xsl:when test="string(text())='de'">ger</xsl:when>
-                    <xsl:when test="string(text())='fr'">fre</xsl:when>
-                    <xsl:otherwise><xsl:value-of select="." /></xsl:otherwise>
+                    <xsl:when test="contains(string(text()), '_')">
+                        <xsl:value-of select="translate(string(text()), '_', '-')"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="string(text())"/>
+                    </xsl:otherwise>
                 </xsl:choose>
             </xsl:element>
         </xsl:for-each>
