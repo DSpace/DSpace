@@ -138,6 +138,10 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader {
 	public void setProviders(List<ConfigurableLookupProvider> providers) {
 		this.providers = providers;
 	}
+	
+	public List<ConfigurableLookupProvider> getProviders() {
+		return providers;
+	}
 
 	public void setIdentifiers(Map<String, Set<String>> identifiers) {
 		this.identifiers = identifiers;

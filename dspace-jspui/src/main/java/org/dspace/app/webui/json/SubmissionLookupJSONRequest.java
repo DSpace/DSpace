@@ -46,10 +46,6 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 			.getServiceByName(SubmissionLookupService.class.getName(),
 					SubmissionLookupService.class);
 
-	private TransformationEngine bteService = new DSpace().getServiceManager()
-			.getServiceByName(TransformationEngine.class.getName(),
-					TransformationEngine.class);
-	
 	private static Logger log = Logger
 			.getLogger(SubmissionLookupJSONRequest.class);
 
@@ -77,24 +73,25 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 				}
 			}
 
-			MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader)bteService.getDataLoader();
-			dataLoader.setIdentifiers(identifiers);
-			
-			try {
-				bteService.transform(new TransformationSpec());
-			} catch (BadTransformationSpec e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (MalformedSourceException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			List<ItemSubmissionLookupDTO> result = new ArrayList<ItemSubmissionLookupDTO>();
+
+			TransformationEngine transformationEngine = service.getTransformationEngine();
+			if (transformationEngine != null){
+				MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader)transformationEngine.getDataLoader();
+				dataLoader.setIdentifiers(identifiers);
+
+				try {
+					transformationEngine.transform(new TransformationSpec());
+				} catch (BadTransformationSpec e1) {
+					e1.printStackTrace();
+				} catch (MalformedSourceException e1) {
+					e1.printStackTrace();
+				}
 			}
-			
-			/*List<ItemSubmissionLookupDTO> result = service
-					.searchByIdentifiers(context, identifiers);
-			subDTO.setItems(result);*/
+
+			subDTO.setItems(result);
 			service.storeDTOs(req, suuid, subDTO);
-			List<Map<String, Object>> dto = null;//getLightResultList(result);
+			List<Map<String, Object>> dto = getLightResultList(result);
 			JSONSerializer serializer = new JSONSerializer();
 			serializer.rootName("result");
 			serializer.deepSerialize(dto, resp.getWriter());
@@ -103,12 +100,36 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 			String author = req.getParameter("authors");
 			int year = UIUtil.getIntParameter(req, "year");
 
-			/*List<ItemSubmissionLookupDTO> result = service.searchByTerms(context, title,
-					author, year);
+			Map<String, Set<String>> searchTerms = new HashMap<String, Set<String>>();
+			Set<String> tmp1 = new HashSet<String>();
+			tmp1.add(title);
+			Set<String> tmp2 = new HashSet<String>();
+			tmp2.add(author);
+			Set<String> tmp3 = new HashSet<String>();
+			tmp3.add(String.valueOf(year));
+			searchTerms.put("title", tmp1);
+			searchTerms.put("authors", tmp2);
+			searchTerms.put("year", tmp3);
+			
+			List<ItemSubmissionLookupDTO> result = new ArrayList<ItemSubmissionLookupDTO>();
 
-			subDTO.setItems(result);*/
+			TransformationEngine transformationEngine = service.getTransformationEngine();
+			if (transformationEngine != null){
+				MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader)transformationEngine.getDataLoader();
+				dataLoader.setSearchTerms(searchTerms);
+
+				try {
+					transformationEngine.transform(new TransformationSpec());
+				} catch (BadTransformationSpec e1) {
+					e1.printStackTrace();
+				} catch (MalformedSourceException e1) {
+					e1.printStackTrace();
+				}
+			}
+
+			subDTO.setItems(result);
 			service.storeDTOs(req, suuid, subDTO);
-			List<Map<String, Object>> dto = null;// getLightResultList(result);
+			List<Map<String, Object>> dto = getLightResultList(result);
 			JSONSerializer serializer = new JSONSerializer();
 			serializer.rootName("result");
 			serializer.deepSerialize(dto, resp.getWriter());
