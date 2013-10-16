@@ -1210,7 +1210,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 {
                     text.enableDeleteOperation();
                 }
-                
+             
                 // Setup MaxLength
                 String sz=dcInput.getFieldMap().get("max-length");
                 if(sz!=null) {

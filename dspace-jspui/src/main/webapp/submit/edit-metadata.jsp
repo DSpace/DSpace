@@ -52,7 +52,6 @@
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.core.Utils" %>
 
-
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%
@@ -618,10 +617,6 @@
            val = "";
             auth = "";
          }
-         
-      
-         
-         
          sb.append("<td colspan=\"2\">\n");
          String fieldNameIdx = fieldName + ((repeatable && i != fieldCount-1)?"_" + (i+1):"");
          StringBuffer inputBlock = new StringBuffer().append("<textarea name=\"").append(fieldNameIdx)
@@ -629,10 +624,10 @@
            .append(fieldNameIdx).append("_id\" ")
            .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" disabled=\"disabled\" ":"");
         
-        if(maxSize!=null) {
-      	 inputBlock.append (" maxlength=\"")
+         if(maxSize!=null) {
+      	  inputBlock.append (" maxlength=\"")
      	   .append(maxSize).append ("\" ");
-        }
+         }
        
          inputBlock.append(">")
            .append(val)
@@ -674,7 +669,6 @@
 
       out.write(sb.toString());
     }
-
 
     void doOneBox(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean readonly,
@@ -1303,7 +1297,6 @@
        String dcQualifier = inputs[z].getQualifier();
        String dcSchema = inputs[z].getSchema();
        
-       
        String fieldName;
        int fieldCountIncr;
        boolean repeatable;
@@ -1387,12 +1380,9 @@
        else if (inputType.equals("textarea"))
        {
     	   String maxSize = inputs[z].getFieldMap().get("max-length");
-    	 
                    doTextArea(out, item, fieldName, dcSchema, dcElement, dcQualifier,
                                   repeatable, readonly, fieldCountIncr, maxSize, label, pageContext, vocabulary,
                                   closedVocabulary, collectionID);
-       
-       
        }
        else if (inputType.equals("dropdown"))
        {
@@ -1410,11 +1400,9 @@
           doList(out, item, fieldName, dcSchema, dcElement, dcQualifier,
                         repeatable, readonly, inputs[z].getPairs(), label);
        }
-      
        else
        {
     	   String maxSize = inputs[z].getFieldMap().get("max-length");
-    	   
                         doOneBox(out, item, fieldName, dcSchema, dcElement, dcQualifier,
                                  repeatable, readonly, fieldCountIncr, maxSize, label, pageContext, vocabulary,
                                  closedVocabulary, collectionID);
