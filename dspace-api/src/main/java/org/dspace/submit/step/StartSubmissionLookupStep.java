@@ -7,6 +7,8 @@
  */
 package org.dspace.submit.step;
 
+import gr.ekt.bte.core.Record;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -185,7 +187,7 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
     							parameterValue);
     				}
     			}
-    			List<SubmissionLookupPublication> publications = new ArrayList<SubmissionLookupPublication>();
+			List<Record> publications = new ArrayList<Record>();
     			publications.add(manualPub);
     			ItemSubmissionLookupDTO dto = new ItemSubmissionLookupDTO(publications);
             	slService.merge(inputSet.getFormName(), wi.getItem(), dto);

@@ -7,6 +7,15 @@
  */
 package org.dspace.app.webui.json;
 
+import flexjson.JSONSerializer;
+
+import gr.ekt.bte.core.Record;
+import gr.ekt.bte.core.TransformationEngine;
+import gr.ekt.bte.core.TransformationSpec;
+import gr.ekt.bte.core.Value;
+import gr.ekt.bte.exceptions.BadTransformationSpec;
+import gr.ekt.bte.exceptions.MalformedSourceException;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -28,17 +37,12 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader;
+import org.dspace.submit.lookup.SubmissionLookupProvider;
 import org.dspace.submit.lookup.SubmissionLookupService;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
 import org.dspace.submit.util.SubmissionLookupDTO;
 import org.dspace.submit.util.SubmissionLookupPublication;
 import org.dspace.utils.DSpace;
-
-import flexjson.JSONSerializer;
-import gr.ekt.bte.core.TransformationEngine;
-import gr.ekt.bte.core.TransformationSpec;
-import gr.ekt.bte.exceptions.BadTransformationSpec;
-import gr.ekt.bte.exceptions.MalformedSourceException;
 
 public class SubmissionLookupJSONRequest extends JSONRequest {
 
@@ -146,7 +150,7 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 	private Map<String, Object> getDetails(ItemSubmissionLookupDTO item,
 			Context context) {
 		List<String> fieldOrder = getFieldOrderFromConfiguration();
-		SubmissionLookupPublication totalData = item.getTotalPublication(service.getProviders());
+        Record totalData = item.getTotalPublication(service.getProviders());
 		Set<String> availableFields = totalData.getFields();
 		List<String[]> fieldsLabels = new ArrayList<String[]>();
 		for (String f : fieldOrder) {
@@ -163,7 +167,7 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 		}
 		Map<String, Object> data = new HashMap<String, Object>();
 		String uuid = item.getUUID();
-		SubmissionLookupPublication pub = item.getTotalPublication(service.getProviders());
+        Record pub = item.getTotalPublication(service.getProviders());
 		data.put("uuid", uuid);
 		data.put("providers", item.getProviders());
 		data.put("publication", pub);
@@ -192,14 +196,14 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 		List<Map<String, Object>> publications = new ArrayList<Map<String, Object>>();
 		for (ItemSubmissionLookupDTO item : result) {
 			String uuid = item.getUUID();
-			SubmissionLookupPublication pub = item.getTotalPublication(service.getProviders());
+            Record pub = item.getTotalPublication(service.getProviders());
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("uuid", uuid);
 			data.put("providers", item.getProviders());
-			data.put("title", pub.getFirstValue("title"));
+            data.put("title", SubmissionLookupService.getFirstValue(pub, "title"));
 			data.put("authors",pub.getValues("authors")!=null?
 					StringUtils.join(pub.getValues("authors").iterator(), ", "):"");
-			data.put("issued", pub.getFirstValue("issued"));
+            data.put("issued", SubmissionLookupService.getFirstValue(pub, "issued"));
 			publications.add(data);
 		}
 		return publications;
