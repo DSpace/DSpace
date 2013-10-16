@@ -434,6 +434,11 @@
             <version>1.0</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.2.1</version>
+        </dependency>
+        <dependency>
             <groupId>gr.ekt</groupId>
             <artifactId>biblio-transformation-engine</artifactId>
             <version>0.82</version>

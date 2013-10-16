@@ -22,6 +22,23 @@
 --
 
 -------------------------------------------
+-- Add support for DOIs (table and seq.) --
+-------------------------------------------
+CREATE SEQUENCE doi_seq;
+
+CREATE TABLE Doi
+(
+  doi_id           INTEGER PRIMARY KEY,
+  doi              VARCHAR2(256) UNIQUE,
+  resource_type_id INTEGER,
+  resource_id      INTEGER,
+  status           INTEGER
+);
+
+-- index by resource id and resource type id
+CREATE INDEX doi_resource_id_type_idx ON doi(resource_id, resource_type_id);
+
+-------------------------------------------
 -- Table of running web applications for 'dspace version' --
 -------------------------------------------
 
