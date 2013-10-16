@@ -7,10 +7,14 @@
  */
 package org.dspace.submit.lookup;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
+
+import gr.ekt.bte.core.Record;
+import gr.ekt.bte.core.Value;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -167,10 +171,8 @@ public class SubmissionLookupService {
 
 	public void merge(String formName, Item item, ItemSubmissionLookupDTO dto) {
 		init();
-		SubmissionLookupPublication lookupPub = dto
-				.getTotalPublication(providers);
-		EnhancedSubmissionLookupPublication itemLookup = new EnhancedSubmissionLookupPublication(
-				enhancedMetadata, lookupPub);
+        Record lookupPub = dto.getTotalPublication(providers);
+        EnhancedSubmissionLookupPublication itemLookup = new EnhancedSubmissionLookupPublication(enhancedMetadata, lookupPub);
 		Set<String> addedMetadata = new HashSet<String>();
 		for (String field : itemLookup.getFields()) {
 			String metadata = getMetadata(formName, itemLookup, field);
@@ -213,8 +215,8 @@ public class SubmissionLookupService {
 		Context context = null;
 		try {
 			context = new Context();
-			for (SubmissionLookupPublication pub : dto.getPublications()) {
-				String providerName = pub.getProviderName();
+            for (Record pub : dto.getPublications()) {
+                String providerName = getProviderName(pub);
 				if (providerName != MANUAL_USER_INPUT) {
 					for (String field : pub.getFields()) {
 						String metadata = getMetadata(formName, pub, field);
@@ -235,8 +237,7 @@ public class SubmissionLookupService {
 											Integer.parseInt(splitValue[2]));
 								}
 							} else {
-								String[] splitValue = splitValue(pub
-										.getFirstValue(field));
+								String[] splitValue = splitValue(getFirstValue(pub, field));
 								item.addMetadata(providerName, md[1], md[2],
 										md[3], splitValue[0], splitValue[1],
 										Integer.parseInt(splitValue[2]));
@@ -389,8 +390,8 @@ public class SubmissionLookupService {
 	}
 
 	private String getMetadata(String formName,
-			SubmissionLookupPublication itemLookup, String name) {
-		String type = itemLookup.getType();
+                               Record itemLookup, String name) {
+		String type = getType(itemLookup);
 		String md = configuration.getProperty(
 				type + "." + name,
 				configuration.getProperty(formName + "." + name,
@@ -437,4 +438,21 @@ public class SubmissionLookupService {
 	public List<SubmissionLookupProvider> getProviders() {
 		return providers;
 	}
+
+    public static String getFirstValue(Record rec, String field) {
+        List<Value> values = rec.getValues(field);
+        String provider_name = null;
+        if (values != null && values.size() > 0) {
+            provider_name = values.get(0).getAsString();
+        }
+        return provider_name;
+    }
+
+    public static String getProviderName(Record rec) {
+        return getFirstValue(rec, SubmissionLookupService.PROVIDER_NAME_FIELD);
+    }
+
+    public static String getType(Record rec) {
+        return getFirstValue(rec, SubmissionLookupProvider.TYPE);
+    }
 }

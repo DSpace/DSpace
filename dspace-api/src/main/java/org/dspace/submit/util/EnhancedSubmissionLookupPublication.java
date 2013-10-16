@@ -7,6 +7,7 @@
  */
 package org.dspace.submit.util;
 
+import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.StringValue;
 import gr.ekt.bte.core.Value;
 
@@ -18,15 +19,16 @@ import java.util.Map;
 import java.util.Set;
 
 import org.dspace.submit.lookup.EnhancerSubmissionLookup;
+import org.dspace.submit.lookup.SubmissionLookupService;
 
 public class EnhancedSubmissionLookupPublication extends SubmissionLookupPublication {
-	private SubmissionLookupPublication lookupPublication;
+    private Record lookupPublication;
 	private Map<String, EnhancerSubmissionLookup> enhancedMetadata;
 	
 	private Map<String, List<String>> cacheEnhanched = new HashMap<String, List<String>>();
 
-	public EnhancedSubmissionLookupPublication(Map<String, EnhancerSubmissionLookup> enhancedMetadata, SubmissionLookupPublication pub) {
-		super(pub.getProviderName());
+    public EnhancedSubmissionLookupPublication(Map<String, EnhancerSubmissionLookup> enhancedMetadata, Record pub) {
+		super(SubmissionLookupService.getProviderName(pub));
 		this.lookupPublication = pub;
 		this.enhancedMetadata = enhancedMetadata;
 	}	

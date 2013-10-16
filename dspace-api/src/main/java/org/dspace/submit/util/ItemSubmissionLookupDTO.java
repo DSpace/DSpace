@@ -7,38 +7,42 @@
  */
 package org.dspace.submit.util;
 
+import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.Value;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import org.dspace.submit.lookup.SubmissionLookupProvider;
+import org.dspace.submit.lookup.SubmissionLookupService;
 
 public class ItemSubmissionLookupDTO implements Serializable {
 	private static final long serialVersionUID = 1;
 
 	private static final String MERGED_PUBLICATION_PROVIDER = "merged";
+    private static final String UNKNOWN_PROVIDER_STRING = "UNKNOWN-PROVIDER";
 	
-	private List<SubmissionLookupPublication> publications;
+    private List<Record> publications;
 	private String uuid;
 
-	public ItemSubmissionLookupDTO(List<SubmissionLookupPublication> publications) {
+    public ItemSubmissionLookupDTO(List<Record> publications) {
 		this.uuid = UUID.randomUUID().toString();
 		this.publications = publications;
 	}
 
-	public List<SubmissionLookupPublication> getPublications() {
+    public List<Record> getPublications() {
 		return publications;
 	}
 	
 	public Set<String> getProviders() {
 		Set<String> orderedProviders = new LinkedHashSet<String>();
-		for (SubmissionLookupPublication p : publications)
+        for (Record p : publications)
 		{
-			orderedProviders.add(p.getProviderName());
+            orderedProviders.add(SubmissionLookupService.getProviderName(p));
 		}
 		return orderedProviders;
 	}
@@ -47,8 +51,7 @@ public class ItemSubmissionLookupDTO implements Serializable {
 		return uuid;
 	}
 
-	public SubmissionLookupPublication getTotalPublication(
-			List<SubmissionLookupProvider> providers) {
+    public Record getTotalPublication(List<SubmissionLookupProvider> providers) {
 		if (publications == null)
 		{
 			return null;
@@ -59,13 +62,12 @@ public class ItemSubmissionLookupDTO implements Serializable {
 		}
 		else
 		{
-			SubmissionLookupPublication pub = new SubmissionLookupPublication(
-					MERGED_PUBLICATION_PROVIDER);
+            SubmissionLookupPublication pub = new SubmissionLookupPublication(MERGED_PUBLICATION_PROVIDER);
 			for (SubmissionLookupProvider prov : providers)
 			{				
-				for (SubmissionLookupPublication p : publications)
+                for (Record p : publications)
 				{
-					if (!p.getProviderName().equals(prov.getShortName()))
+                    if (!SubmissionLookupService.getProviderName(p).equals(prov.getShortName()))
 					{
 						continue;
 					}
