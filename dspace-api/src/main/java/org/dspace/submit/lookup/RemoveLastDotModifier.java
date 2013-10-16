@@ -15,8 +15,11 @@ import gr.ekt.bte.core.StringValue;
 import gr.ekt.bte.core.Value;
 
 /**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- *
+ * http://www.dspace.org/license/
  */
 public class RemoveLastDotModifier extends AbstractModifier {
 
