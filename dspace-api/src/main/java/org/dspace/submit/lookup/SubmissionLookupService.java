@@ -39,6 +39,7 @@ import org.dspace.submit.util.SubmissionLookupDTO;
 import org.dspace.submit.util.SubmissionLookupPublication;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
+import gr.ekt.bte.core.TransformationEngine;
 import gr.ekt.bte.core.Value;
 
 public class SubmissionLookupService {
@@ -49,16 +50,10 @@ public class SubmissionLookupService {
 
 	public static final String PROVIDER_NAME_FIELD = "provider_name_field";
 	
-	private static Logger log = Logger.getLogger(SubmissionLookupUtils.class);
-
-	// Patter to extract the converter name if any
-	private static final Pattern converterPattern = Pattern
-			.compile(".*\\((.*)\\)");
+	private static Logger log = Logger.getLogger(SubmissionLookupService.class);
 
 	// attenzione inizializzato dal metodo init
 	private Properties configuration;
-
-	private static final String NOT_FOUND_DOI = "NOT-FOUND-DOI";
 
 	public static final String SEPARATOR_VALUE = "#######";
 
@@ -74,6 +69,8 @@ public class SubmissionLookupService {
 
 	private List<SubmissionLookupProvider> searchProviders;
 
+	private TransformationEngine transformationEngine;
+	
 	private synchronized void init() {
 		if (configuration != null)
 			return;
@@ -117,13 +114,21 @@ public class SubmissionLookupService {
 		return enhancedMetadata;
 	}
 
-	public void setProviders(List<SubmissionLookupProvider> providers) {
-		this.providers = providers;
+	public void setTransformationEngine(TransformationEngine transformationEngine) {
+		this.transformationEngine = transformationEngine;
+		
+		MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader)transformationEngine.getDataLoader();
+		
 		this.idents2provs = new HashMap<String, List<SubmissionLookupProvider>>();
 		this.searchProviders = new ArrayList<SubmissionLookupProvider>();
 
 		if (providers != null) {
-			for (SubmissionLookupProvider p : providers) {
+			this.providers = new ArrayList<SubmissionLookupProvider>();
+			
+			for (SubmissionLookupProvider p : dataLoader.getProviders()) {
+				
+				this.providers.add(p);
+				
 				if (p.isSearchProvider()) {
 					searchProviders.add(p);
 				}
@@ -143,6 +148,11 @@ public class SubmissionLookupService {
 		}
 	}
 
+	public TransformationEngine getTransformationEngine() {
+		return transformationEngine;
+	}
+
+	//KSTA:ToDo: Replace with something more dynamic
 	public List<String> getIdentifiers() {
 		List<String> identifiers = new ArrayList<String>();
 		identifiers.add("doi");
@@ -423,155 +433,6 @@ public class SubmissionLookupService {
 	public List<SubmissionLookupProvider> getSearchProviders() {
 		return searchProviders;
 	}
-
-	/*public List<ItemSubmissionLookupDTO> searchByTerms(Context context,
-			String title, String author, int year) {
-		List<SubmissionLookupPublication> publications = new ArrayList<SubmissionLookupPublication>();
-		List<String> timeoutProviders = new ArrayList<String>();
-		for (SubmissionLookupProvider provider : searchProviders) {
-			List<SubmissionLookupPublication> pPublications = null;
-			try {
-				pPublications = provider.search(context, title, author, year);
-			} catch (SocketTimeoutException st) {
-				timeoutProviders.add(provider.getShortName());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			if (pPublications != null) {
-				publications.addAll(pPublications);
-			}
-		}
-		return buildItemSubmissionLookupDTO(context, publications, true,
-				timeoutProviders);
-	}
-
-	public List<ItemSubmissionLookupDTO> searchByIdentifiers(Context context,
-			Map<String, String> keys) {
-		Set<String> ids = keys.keySet();
-		List<SubmissionLookupPublication> publications = new ArrayList<SubmissionLookupPublication>();
-		List<String> timeoutProviders = new ArrayList<String>();
-		for (SubmissionLookupProvider provider : providers) {
-			for (String id : ids) {
-				if (provider.getSupportedIdentifiers().contains(id)) {
-					List<SubmissionLookupPublication> pPublications = null;
-					try {
-						pPublications = provider.getByIdentifier(context, keys);
-					} catch (SocketTimeoutException st) {
-						timeoutProviders.add(provider.getShortName());
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					if (pPublications != null) {
-						publications.addAll(pPublications);
-					}
-					break;
-				}
-			}
-		}
-		return buildItemSubmissionLookupDTO(context, publications,
-				!ids.contains(SubmissionLookupProvider.DOI), timeoutProviders);
-	}
-
-	private List<ItemSubmissionLookupDTO> buildItemSubmissionLookupDTO(
-			Context context, List<SubmissionLookupPublication> publications,
-			boolean extend, List<String> evictProviders) {
-		Map<String, List<SubmissionLookupPublication>> doi2publications = new HashMap<String, List<SubmissionLookupPublication>>();
-		Map<String, Set<String>> provider2foundDOIs = new HashMap<String, Set<String>>();
-		List<String> foundDOIs = new ArrayList<String>();
-		List<SubmissionLookupPublication> allPublications = new ArrayList<SubmissionLookupPublication>();
-		allPublications.addAll(publications);
-
-		for (SubmissionLookupPublication publication : publications) {
-			String doi = publication
-					.getFirstValue(SubmissionLookupProvider.DOI);
-			if (doi == null) {
-				doi = NOT_FOUND_DOI;
-			} else {
-				doi = SubmissionLookupUtils.normalizeDOI(doi);
-				if (!foundDOIs.contains(doi))
-				{
-				    foundDOIs.add(doi);
-				}
-				Set<String> tmp = provider2foundDOIs.get(publication
-						.getProviderName());
-				if (tmp == null) {
-					tmp = new HashSet<String>();
-					provider2foundDOIs.put(publication.getProviderName(), tmp);
-				}
-				tmp.add(doi);
-			}
-
-			List<SubmissionLookupPublication> tmp = doi2publications.get(doi);
-			if (tmp == null) {
-				tmp = new ArrayList<SubmissionLookupPublication>();
-				doi2publications.put(doi, tmp);
-			}
-			tmp.add(publication);
-		}
-
-		if (extend) {
-			for (SubmissionLookupProvider provider : idents2provs
-					.get(SubmissionLookupProvider.DOI)) {
-				if (evictProviders != null
-						&& evictProviders.contains(provider.getShortName())) {
-					continue;
-				}
-				Set<String> doiToSearch = new HashSet<String>();
-				Set<String> alreadyFoundDOIs = provider2foundDOIs.get(provider
-						.getShortName());
-				for (String doi : foundDOIs) {
-					if (alreadyFoundDOIs == null
-							|| !alreadyFoundDOIs.contains(doi)) {
-						doiToSearch.add(doi);
-					}
-				}
-				List<SubmissionLookupPublication> pPublications = null;
-				try {
-					if (doiToSearch.size() > 0) {
-						pPublications = provider
-								.getByDOIs(context, doiToSearch);
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				if (pPublications != null) {
-					allPublications.addAll(pPublications);
-					for (SubmissionLookupPublication publication : pPublications) {
-						String doi = publication
-								.getFirstValue(SubmissionLookupProvider.DOI);
-						List<SubmissionLookupPublication> tmp = doi2publications
-								.get(doi);
-						if (tmp == null) {
-							tmp = new ArrayList<SubmissionLookupPublication>();
-							doi2publications.put(doi, tmp);
-						}
-						tmp.add(publication);
-					}
-				}
-			}
-		}
-
-		List<ItemSubmissionLookupDTO> result = new ArrayList<ItemSubmissionLookupDTO>();
-
-		for (String doi : foundDOIs) {
-			ItemSubmissionLookupDTO dto = new ItemSubmissionLookupDTO(
-					doi2publications.get(doi));
-			result.add(dto);
-		}
-		
-		List<SubmissionLookupPublication> noDOIs = doi2publications
-                .get(NOT_FOUND_DOI);
-        if (noDOIs != null) {
-            for (SubmissionLookupPublication p : noDOIs) {
-                List<SubmissionLookupPublication> single = new ArrayList<SubmissionLookupPublication>();
-                single.add(p);
-                ItemSubmissionLookupDTO dto = new ItemSubmissionLookupDTO(
-                        single);
-                result.add(dto);
-            }
-        }
-		return result;
-	}*/
 
 	public List<SubmissionLookupProvider> getProviders() {
 		return providers;

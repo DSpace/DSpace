@@ -15,7 +15,48 @@
            http://www.springframework.org/schema/context
            http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
-    <bean name="gr.ekt.bte.core.TransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
+    <bean class="org.dspace.submit.lookup.SubmissionLookupService"
+		name="org.dspace.submit.lookup.SubmissionLookupService">
+		<property name="transformationEngine" ref="transformationEngine"/>
+		<property name="extraMetadataToKeep">
+			<list>
+				<value>dc.import.contributorauthor</value>
+				<value>dc.import.contributoreditor</value>
+				<value>dc.import.contributortranslator</value>
+				<!-- <value>dc.description.scopusurl</value>
+				<value>dc.description.scopuscitationcount</value>
+				<value>dc.description.scopuscitationurl</value>-->
+			</list>
+		</property> 
+		<property name="enhancedMetadata">
+			<map>
+				<entry key="allauthors">
+					<bean class="org.dspace.submit.util.RepeatableToSingleValueEnhancer">
+						<property name="separator" value="\n" />
+						<property name="separatorWhitespaceAfter" value="false" />
+						<property name="singleValues">
+						<list>
+							<value>authors</value>
+						</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="allkeywords">
+					<bean class="org.dspace.submit.util.RepeatableToSingleValueEnhancer">
+						<property name="separator" value=";" />
+						<property name="singleValues">
+						<list>
+							<value>keywords</value>
+							<value>mesh</value>
+						</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean name="transformationEngine" class="gr.ekt.bte.core.TransformationEngine">
 	    <property name="dataLoader" ref="multipleDataLoader"/>
     	<property name="workflow" ref="linearWorkflow"/>
   	</bean>
@@ -73,55 +114,6 @@
 	        </list>
 	    </property>
 	</bean>
-	
-	<bean class="org.dspace.submit.lookup.SubmissionLookupService"
-		name="org.dspace.submit.lookup.SubmissionLookupService">
-		<property name="providers">
-			<list>
-				<!-- <ref bean="scopusLookupProvider" /> -->
-				<ref bean="pubmedLookupProvider" />
-				<ref bean="crossrefLookupProvider" />
-				<ref bean="arxivLookupProvider" />
-			</list>
-		</property>
-		<property name="extraMetadataToKeep">
-			<list>
-				<value>dc.import.contributorauthor</value>
-				<value>dc.import.contributoreditor</value>
-				<value>dc.import.contributortranslator</value>
-				<!-- <value>dc.description.scopusurl</value>
-				<value>dc.description.scopuscitationcount</value>
-				<value>dc.description.scopuscitationurl</value>-->
-			</list>
-		</property> 
-		<property name="enhancedMetadata">
-			<map>
-				<entry key="allauthors">
-					<bean class="org.dspace.submit.util.RepeatableToSingleValueEnhancer">
-						<property name="separator" value="\n" />
-						<property name="separatorWhitespaceAfter" value="false" />
-						<property name="singleValues">
-						<list>
-							<value>authors</value>
-						</list>
-						</property>
-					</bean>
-				</entry>
-				<entry key="allkeywords">
-					<bean class="org.dspace.submit.util.RepeatableToSingleValueEnhancer">
-						<property name="separator" value=";" />
-						<property name="singleValues">
-						<list>
-							<value>keywords</value>
-							<value>mesh</value>
-						</list>
-						</property>
-					</bean>
-				</entry>
-			</map>
-		</property>
-	</bean>
-
 	
 	<bean class="org.dspace.submit.lookup.PubmedService" name="pubmedService" />
 	
