@@ -860,7 +860,7 @@ public class DescribeStep extends AbstractSubmissionStep
                     textArea.setDisabled();
                 }
                 
-             // DS-1656: added max-length 
+                // Setup the MaxLength
                 String sz=dcInput.getFieldMap().get("max-length");
                 if(sz!=null) {
                 	try {
@@ -870,7 +870,6 @@ public class DescribeStep extends AbstractSubmissionStep
                 		sze.printStackTrace();
                 	}
                 }
-                // DS-1656: added max-length - END
                 
                 // Setup the field's values
                 if (dcInput.isRepeatable() || dcValues.length > 1)
@@ -1212,7 +1211,7 @@ public class DescribeStep extends AbstractSubmissionStep
                     text.enableDeleteOperation();
                 }
                 
-                // DS-1656: added max-length
+                // Setup MaxLength
                 String sz=dcInput.getFieldMap().get("max-length");
                 if(sz!=null) {
                 	try {
@@ -1220,8 +1219,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 	}
                 	catch(Exception sze) {}
                 }
-                // DS-1656: added max-length -END
-
+               
                 if (readonly)
                 {
                     text.setDisabled();
