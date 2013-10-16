@@ -217,7 +217,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
     protected void buildSearchResultsDivision(Division search)
             throws IOException, SQLException, WingException
     {
-        if (getQuery().length() > 0)
+        if ((getQuery().length() > 0) || (getSpatialQuery().length()>0))
         {
 
             // Perform the actual search
@@ -406,6 +406,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         
         Context context = ContextUtil.obtainContext(objectModel);
         String query = getQuery();
+        String spatialQuery=getSpatialQuery();
         DSpaceObject scope = getScope();
         int page = getParameterPage();
 
@@ -434,15 +435,15 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         QueryResults qResults = null;
         if (scope instanceof Community)
         {
-            qResults = DSQuery.doQuery(context, queryArgs, (Community) scope);
+            qResults = DSQuery.doQuery(context, queryArgs, (Community) scope, spatialQuery, "intersect");
         }
         else if (scope instanceof Collection)
         {
-            qResults = DSQuery.doQuery(context, queryArgs, (Collection) scope);
+            qResults = DSQuery.doQuery(context, queryArgs, (Collection) scope, spatialQuery, "intesect");
         }
         else
         {
-            qResults = DSQuery.doQuery(context, queryArgs);
+            qResults = DSQuery.doQuery(context, queryArgs, spatialQuery, "intersect");
         }
 
         this.queryResults = qResults;
@@ -555,6 +556,14 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
      * @return The query string.
      */
     protected abstract String getQuery() throws UIException;
+    
+     /**
+     * Extract the spatial query string. Under most implementations this will be derived
+     * from the url parameters.
+     * 
+     * @return The spatial query string.
+     */
+    protected abstract String getSpatialQuery() throws UIException;
 
     /**
      * Generate a url to the given search implementation with the associated
