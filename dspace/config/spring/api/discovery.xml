@@ -23,6 +23,7 @@
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
     <bean id="solrServiceResourceIndexPlugin" class="org.dspace.discovery.SolrServiceResourceRestrictionPlugin" scope="prototype"/>
+    <bean id="SolrServiceSpellIndexingPlugin" class="org.dspace.discovery.SolrServiceSpellIndexingPlugin" scope="prototype"/>
 
     <alias name="solrServiceResourceIndexPlugin" alias="org.dspace.discovery.SolrServiceResourceRestrictionPlugin"/>
 
@@ -170,21 +171,23 @@
                 <!--When altering this list also alter the "xmlui.Discovery.RelatedItems.help" key as it describes
                 the metadata fields below-->
                 <property name="similarityMetadataFields">
-            <list>
+                    <list>
                         <value>dc.title</value>
-                <value>dc.contributor.author</value>
-                <value>dc.creator</value>
+                        <value>dc.contributor.author</value>
+                        <value>dc.creator</value>
                         <value>dc.subject</value>
-            </list>
-        </property>
+                    </list>
+                </property>
                 <!--The minimum number of matching terms across the metadata fields above before an item is found as related -->
                 <property name="minTermFrequency" value="5"/>
                 <!--The maximum number of related items displayed-->
                 <property name="max" value="3"/>
                 <!--The minimum word length below which words will be ignored-->
                 <property name="minWordLength" value="5"/>
-    </bean>
+            </bean>
         </property>
+        <!-- When true a "did you mean" example will be displayed, value can be true or false -->
+        <property name="spellCheckEnabled" value="true"/>
     </bean>
 
 
