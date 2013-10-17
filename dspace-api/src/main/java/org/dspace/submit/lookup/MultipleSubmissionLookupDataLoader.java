@@ -129,9 +129,12 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader {
 	 * @see gr.ekt.bte.core.DataLoader#getRecords(gr.ekt.bte.core.DataLoadingSpec)
 	 */
 	@Override
-	public RecordSet getRecords(DataLoadingSpec arg0)
+	public RecordSet getRecords(DataLoadingSpec loadingSpec)
 			throws MalformedSourceException {
 
+		if (loadingSpec.getOffset()>0) //Identify the end of loading
+			return new RecordSet();
+		
 		return getRecords();
 	}
 

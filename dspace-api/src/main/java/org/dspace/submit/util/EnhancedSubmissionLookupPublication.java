@@ -83,13 +83,16 @@ public class EnhancedSubmissionLookupPublication extends SubmissionLookupPublica
 			{
 				EnhancerSubmissionLookup enhancer = enhancedMetadata.get(md);
 				List<String> values = enhancer.getValues(this);
-				List<Value> valuesvalues = new ArrayList<Value>();
-				for (String s : values){
-					valuesvalues.add(new StringValue(s));
+				if (values != null && values.size()>0) {
+					List<Value> valuesvalues = new ArrayList<Value>();
+					for (String s : values){
+						valuesvalues.add(new StringValue(s));
+					}
+					cacheEnhanched.put(md, values);
+					return valuesvalues;
 				}
-				cacheEnhanched.put(md, values);
-				return valuesvalues;
 			}
+			return null;
 		}
 		else
 		{

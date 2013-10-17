@@ -59,6 +59,7 @@
 	<bean name="transformationEngine" class="gr.ekt.bte.core.TransformationEngine">
 	    <property name="dataLoader" ref="multipleDataLoader"/>
     	<property name="workflow" ref="linearWorkflow"/>
+    	<property name="outputGenerator" ref="org.dspace.submit.lookup.SubmissionLookupOutputGenerator"/>
   	</bean>
 		
 	<bean name="multipleDataLoader" class="org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader">
@@ -72,6 +73,8 @@
 	    
 	</bean>
 
+	<bean name="org.dspace.submit.lookup.SubmissionLookupOutputGenerator" class="org.dspace.submit.lookup.SubmissionLookupOutputGenerator"/>
+	
 	<!-- Specify here any filters or modifiers to run before the output -->
 	<bean name="linearWorkflow" class="gr.ekt.bte.core.LinearWorkflow">
 	    <property name="process">
@@ -83,8 +86,7 @@
 		</property>
 	</bean>
 	
-	<bean name="mapConverter_arxivSubject" class="org.dspace.submit.lookup.MapConverterModifier" 
-	    init-method="init">
+	<bean name="mapConverter_arxivSubject" class="org.dspace.submit.lookup.MapConverterModifier">
 	    <constructor-arg value="apConverter_arxivSubject Modifier"/>
 	    <property name="filename" value="mapConverter-arxivSubject.properties"/>
 	    <property name="fieldKeys">
@@ -94,8 +96,7 @@
 	    </property>
 	</bean>
 	
-	<bean name="mapConverter_pubstatusPubmed" class="org.dspace.submit.lookup.MapConverterModifier" 
-	    init-method="init">
+	<bean name="mapConverter_pubstatusPubmed" class="org.dspace.submit.lookup.MapConverterModifier">
 	    <constructor-arg value="mapConverter_pubstatusPubmed Modifier"/>
 	    <property name="filename" value="mapConverter-pubstatusPubmed.properties"/>
 	    <property name="fieldKeys">

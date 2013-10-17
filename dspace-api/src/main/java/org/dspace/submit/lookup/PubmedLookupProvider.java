@@ -58,7 +58,7 @@ public class PubmedLookupProvider extends ConfigurableLookupProvider {
 		Set<String> pmids = keys != null ? keys.get(PUBMED) : null;
 		Set<String> dois = keys != null ? keys.get(DOI) : null;
 		List<Record> results = new ArrayList<Record>();
-		if (pmids != null && pmids.size()>0 && dois == null) {
+		if (pmids != null && pmids.size()>0 && (dois == null || dois.size()==0)) {
 			for (String pmid : pmids){
 				PubmedItem p = null;
 				try
@@ -73,7 +73,7 @@ public class PubmedLookupProvider extends ConfigurableLookupProvider {
 					results.add(convert(p));
 			}
 		}
-		else if (dois != null && dois.size()>0 && pmids == null) {
+		else if (dois != null && dois.size()>0 && (pmids == null || pmids.size()==0)) {
 			StringBuffer query = new StringBuffer();
 			for (String d : dois) {
 				if (query.length() > 0) {
@@ -87,7 +87,7 @@ public class PubmedLookupProvider extends ConfigurableLookupProvider {
 				results.add(convert(p));
 			}
 		}
-		else
+		else if (dois != null && dois.size()>0 && pmids != null && pmids.size()>0)
 		{
 			//EKT:ToDo: support list of dois and pmids in the search method of pubmedService
 			List<PubmedItem> pubmedResults = pubmedService.search(dois.iterator().next(), pmids.iterator().next());

@@ -18,6 +18,7 @@ import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.utils.DSpace;
 
 import gr.ekt.bte.core.AbstractModifier;
 import gr.ekt.bte.core.MutableRecord;

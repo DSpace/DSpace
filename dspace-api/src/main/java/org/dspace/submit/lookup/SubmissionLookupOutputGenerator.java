@@ -56,7 +56,7 @@ public class SubmissionLookupOutputGenerator implements OutputGenerator {
             ItemSubmissionLookupDTO dto = new ItemSubmissionLookupDTO(entry.getValue());
             dtoList.add(dto);
         }
-        return null;
+        return new ArrayList<String>();
     }
 
     @Override

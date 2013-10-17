@@ -80,6 +80,9 @@ public class SubmissionLookupPublication implements MutableRecord, Serializable 
 	@Override
 	public List<Value> getValues(String md) {
 		List<String> stringValues = storage.get(md);
+		if (stringValues == null){
+			return null;
+		}
 		List<Value> values = new ArrayList<Value>();
 		for (String value : stringValues){
 			values.add(new StringValue(value));

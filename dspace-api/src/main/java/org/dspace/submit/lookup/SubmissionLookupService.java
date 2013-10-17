@@ -126,7 +126,7 @@ public class SubmissionLookupService {
 		this.idents2provs = new HashMap<String, List<SubmissionLookupProvider>>();
 		this.searchProviders = new ArrayList<SubmissionLookupProvider>();
 
-		if (providers != null) {
+		if (providers == null) {
 			this.providers = new ArrayList<SubmissionLookupProvider>();
 			
 			for (SubmissionLookupProvider p : dataLoader.getProviders()) {
