@@ -31,21 +31,25 @@
           <ref bean="gr.ekt.bteio.loaders.RISDataLoader"/>
         </entry>
         <entry>
-             <key><value>endnote</value></key>
-             <ref bean="gr.ekt.bteio.loaders.EndnoteDataLoader"/>
+          <key><value>endnote</value></key>
+          <ref bean="gr.ekt.bteio.loaders.EndnoteDataLoader"/>
+        </entry>
+        <entry>
+          <key><value>oai</value></key>
+          <ref bean="gr.ekt.bteio.loaders.OAIPMHDataLoader"/>
         </entry>
       </map>
     </property>
-    
-    <!-- 
-    	The output generator needs a configuration on how to map internal
-    	records to the DSpace metadata fields. The following map specifies
-    	this relationship. The value needs to be the label that the record 
-    	internally associates with the specific data and it is specified in
-    	the data loader beans. The key is in the format of 
-    	<schema>.<element>[.<qualifier>] and specified the dspace metadata
-    	field that the value will map to.
-     -->
+
+    <!--
+         The output generator needs a configuration on how to map internal
+         records to the DSpace metadata fields. The following map specifies
+         this relationship. The value needs to be the label that the record
+         internally associates with the specific data and it is specified in
+         the data loader beans. The key is in the format of
+         <schema>.<element>[.<qualifier>] and specified the dspace metadata
+         field that the value will map to.
+    -->
     <property name="outputMap">
       <map>
         <entry value="Title" key="dc.title"/>
@@ -72,7 +76,7 @@
 
   <!--
       The key of the map is just the BibTeX label (e.g. author, date,
-      pages etc). The value the label that the record internally associates 
+      pages etc). The value the label that the record internally associates
       with the specific data.
   -->
   <bean id="gr.ekt.bteio.loaders.BibTeXDataLoader"
@@ -175,18 +179,32 @@
   </bean>
 
   <bean id="gr.ekt.bteio.loaders.EndnoteDataLoader"
-		class="gr.ekt.bteio.loaders.EndnoteDataLoader">
-	<property name="fieldMap">
-		<map>
-			<entry key="TI" value="Title"/>
-			<entry key="AU" value="Author"/>
-			<entry key="AB" value="Abstract"/>
-			<entry key="PY" value="Date"/>
-			<entry key="SO" value="Source"/>
-		</map>
+        class="gr.ekt.bteio.loaders.EndnoteDataLoader">
+    <property name="fieldMap">
+      <map>
+        <entry key="TI" value="Title"/>
+        <entry key="AU" value="Author"/>
+        <entry key="AB" value="Abstract"/>
+        <entry key="PY" value="Date"/>
+        <entry key="SO" value="Source"/>
+      </map>
     </property>
   </bean>
 
+  <bean id="gr.ekt.bteio.loaders.OAIPMHDataLoader"
+        class="gr.ekt.bteio.loaders.OAIPMHDataLoader">
+    <property name="fieldMap">
+      <map>
+        <entry key="title"       value="Title"/>
+        <entry key="creator"     value="Author"/>
+        <entry key="description" value="Abstract"/>
+        <entry key="date"        value="Date"/>
+        <entry key="type"        value="Type"/>
+      </map>
+    </property>
+    <property name="prefix" value="oai_dc"/>
+    <property name="serverAddress" value="http://ebooks.serrelib.gr/serrelib-oai/request"/>
+  </bean>
 
   <!-- Specify here any filters or modifiers to run before the output -->
   <bean id="linearWorkflow"

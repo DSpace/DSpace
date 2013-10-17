@@ -13,6 +13,7 @@ import gr.ekt.bte.core.TransformationResult;
 import gr.ekt.bte.core.TransformationSpec;
 import gr.ekt.bte.dataloader.FileDataLoader;
 import gr.ekt.bteio.generators.DSpaceOutputGenerator;
+import gr.ekt.bteio.loaders.OAIPMHDataLoader;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -650,7 +651,13 @@ public class ItemImport
         		fdl.setFilename(sourceDir);
         	}
         }
-        
+        if (dataLoader instanceof OAIPMHDataLoader){
+        	OAIPMHDataLoader fdl = (OAIPMHDataLoader) dataLoader;
+        	if (!"".equals(sourceDir)){
+        		System.out.println("INFO: Dataloader will load data from the address specified in the command prompt (and not from the Spring XML configuration file)");
+        		fdl.setServerAddress(sourceDir);
+        	}
+        }
         if (dataLoader!=null){
         	System.out.println("INFO: Dataloader " + dataLoader.toString()+" will be used for the import!");
 
