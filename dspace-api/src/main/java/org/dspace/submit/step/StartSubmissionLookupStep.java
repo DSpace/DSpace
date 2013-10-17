@@ -36,9 +36,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator;
-import org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader;
 import org.dspace.submit.lookup.SubmissionItemDataLoader;
-import org.dspace.submit.lookup.SubmissionLookupOutputGenerator;
 import org.dspace.submit.lookup.SubmissionLookupService;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
 import org.dspace.submit.util.SubmissionLookupDTO;
@@ -212,9 +210,14 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
 				dataLoader.setDtoList(Arrays.asList(new ItemSubmissionLookupDTO[]{dto}));
 
 				DSpaceWorkspaceItemOutputGenerator outputGenerator = (DSpaceWorkspaceItemOutputGenerator)transformationEngine.getOutputGenerator();
-				result = outputGenerator.getWitems();
+				outputGenerator.setCollection(col);
+				outputGenerator.setContext(context);
+				outputGenerator.setFormName(inputSet.getFormName());
+				outputGenerator.setDto(dto);
+				
 				try {
 					transformationEngine.transform(new TransformationSpec());
+					result = outputGenerator.getWitems();
 				} catch (BadTransformationSpec e1) {
 					e1.printStackTrace();
 				} catch (MalformedSourceException e1) {

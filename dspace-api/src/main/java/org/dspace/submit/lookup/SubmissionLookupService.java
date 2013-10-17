@@ -12,39 +12,17 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.Value;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.util.DCInput;
-import org.dspace.app.util.DCInputSet;
-import org.dspace.app.util.DCInputsReader;
-import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.submit.util.EnhancedSubmissionLookupPublication;
-import org.dspace.submit.util.ItemSubmissionLookupDTO;
 import org.dspace.submit.util.SubmissionLookupDTO;
-import org.dspace.submit.util.SubmissionLookupPublication;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 import gr.ekt.bte.core.TransformationEngine;
-import gr.ekt.bte.core.Value;
 
 public class SubmissionLookupService {
 
@@ -60,8 +38,6 @@ public class SubmissionLookupService {
 
 	public static final String SEPARATOR_VALUE_REGEX = SEPARATOR_VALUE;
 
-	private List<String> extraMetadataToKeep;
-
 	private Map<String, EnhancerSubmissionLookup> enhancedMetadata;
 
 	private List<SubmissionLookupProvider> providers;
@@ -73,14 +49,6 @@ public class SubmissionLookupService {
 	private TransformationEngine phase1TransformationEngine;
 	private TransformationEngine phase2TransformationEngine;
 	
-	public void setExtraMetadataToKeep(List<String> extraMetadataToKeep) {
-		this.extraMetadataToKeep = extraMetadataToKeep;
-	}
-
-	public List<String> getExtraMetadataToKeep() {
-		return extraMetadataToKeep;
-	}
-
 	public void setEnhancedMetadata(
 			Map<String, EnhancerSubmissionLookup> enhancedMetadata) {
 		this.enhancedMetadata = enhancedMetadata;

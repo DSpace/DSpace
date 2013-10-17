@@ -24,16 +24,20 @@ public class FieldMergeModifier extends AbstractModifier {
 
     @Override
     public Record modify(MutableRecord rec) {
-        for (String target_field : merge_field_map.keySet()) {
-            List<String> source_fields = merge_field_map.get(target_field);
-            for (String source_field : source_fields) {
-                List<Value> values = rec.getValues(source_field);
-                for (Value value : values) {
-                    rec.addValue(target_field, value);
-                }
-                rec.removeField(source_field);
-            }
-        }
+    	if (merge_field_map!=null){
+    		for (String target_field : merge_field_map.keySet()) {
+    			List<String> source_fields = merge_field_map.get(target_field);
+    			for (String source_field : source_fields) {
+    				List<Value> values = rec.getValues(source_field);
+    				if (values != null && values.size() > 0) {
+    					for (Value value : values) {
+    						rec.addValue(target_field, value);
+    					}
+    				}
+    				rec.removeField(source_field);
+    			}
+    		}
+    	}
         return rec;
     }
 

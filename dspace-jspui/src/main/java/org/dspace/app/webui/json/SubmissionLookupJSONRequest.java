@@ -12,7 +12,6 @@ import flexjson.JSONSerializer;
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.TransformationEngine;
 import gr.ekt.bte.core.TransformationSpec;
-import gr.ekt.bte.core.Value;
 import gr.ekt.bte.exceptions.BadTransformationSpec;
 import gr.ekt.bte.exceptions.MalformedSourceException;
 
@@ -38,11 +37,9 @@ import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader;
 import org.dspace.submit.lookup.SubmissionLookupOutputGenerator;
-import org.dspace.submit.lookup.SubmissionLookupProvider;
 import org.dspace.submit.lookup.SubmissionLookupService;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
 import org.dspace.submit.util.SubmissionLookupDTO;
-import org.dspace.submit.util.SubmissionLookupPublication;
 import org.dspace.utils.DSpace;
 
 public class SubmissionLookupJSONRequest extends JSONRequest {

@@ -19,42 +19,6 @@
 		name="org.dspace.submit.lookup.SubmissionLookupService">
 		<property name="phase1TransformationEngine" ref="phase1TransformationEngine"/>
 		<property name="phase2TransformationEngine" ref="phase2TransformationEngine"/>
-		<property name="extraMetadataToKeep">
-			<list>
-				<value>dc.import.contributorauthor</value>
-				<value>dc.import.contributoreditor</value>
-				<value>dc.import.contributortranslator</value>
-				<!-- <value>dc.description.scopusurl</value>
-				<value>dc.description.scopuscitationcount</value>
-				<value>dc.description.scopuscitationurl</value>-->
-			</list>
-		</property> 
-		<property name="enhancedMetadata">
-			<map>
-				<entry key="allauthors">
-					<bean class="org.dspace.submit.util.RepeatableToSingleValueEnhancer">
-						<property name="separator" value="\n" />
-						<property name="separatorWhitespaceAfter" value="false" />
-						<property name="singleValues">
-						<list>
-							<value>authors</value>
-						</list>
-						</property>
-					</bean>
-				</entry>
-				<entry key="allkeywords">
-					<bean class="org.dspace.submit.util.RepeatableToSingleValueEnhancer">
-						<property name="separator" value=";" />
-						<property name="singleValues">
-						<list>
-							<value>keywords</value>
-							<value>mesh</value>
-						</list>
-						</property>
-					</bean>
-				</entry>
-			</map>
-		</property>
 	</bean>
 
 	<bean name="phase1TransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
@@ -388,8 +352,41 @@
 	    <property name="outputMap">
 	        <map>
 	            <entry key="pmid" value="dc.identifier.pmid"/>
+	            <entry key="doi" value="dc.identifier.doi"/>
+	            <entry key="jissn" value="dc.relation.issn"/>
+	            <entry key="jeissn" value="dc.relation.eissn"/>
+	            <entry key="journal" value="dc.relation.ispartofjournal"/>
+	            <entry key="title" value="dc.title"/>
+	            <entry key="issued" value="dc.date.issued"/>
+	            <entry key="volume" value="dc.relation.volume"/>
+	            <entry key="issue" value="dc.relation.issue"/>
+	            <entry key="language" value="dc.language.iso"/>
+	            <entry key="subtype" value="dc.type.contribution"/>
+	            <!-- <entry key="keywords" value="dc.subject"/> -->
+	            <entry key="mesh" value="dc.subject"/>
+	            <entry key="firstpage" value="dc.relation.firstpage"/>
+	            <entry key="lastpage" value="dc.relation.lastpage"/>
+	            <entry key="abstract" value="dc.description.abstract"/>
+	            <entry key="publicationstatus" value="dc.type.publicationstatus"/>
+	            <!-- <entry key="authorsWithAffiliations" value="dc.contributor.author"/> -->
+	            <!-- <entry key="authors" value="dc.contributor.author|authorsWithAffiliations"/> -->
+	            <entry key="authorsWithAffiliations" value=""/>
+	            <entry key="authors" value=""/>
+	            <entry key="articleNumber" value="dc.relation.article"/>
+	            <entry key="firstpage" value="dc.relation.firstpage"/>
+	            <entry key="firstpage" value="dc.relation.firstpage"/>
 	        </map>
 	    </property>
+	    <property name="extraMetadataToKeep">
+			<list>
+				<value>dc.import.contributorauthor</value>
+				<value>dc.import.contributoreditor</value>
+				<value>dc.import.contributortranslator</value>
+				<!-- <value>dc.description.scopusurl</value>
+				<value>dc.description.scopuscitationcount</value>
+				<value>dc.description.scopuscitationurl</value>-->
+			</list>
+		</property> 
 	</bean>
 	
 </beans>

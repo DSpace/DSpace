@@ -16,6 +16,7 @@ import gr.ekt.bte.core.Value;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -48,6 +49,8 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
 	private ItemSubmissionLookupDTO dto;
 	private Collection collection;
 	Map<String, String> outputMap;
+	
+	private List<String> extraMetadataToKeep;
 	
     public DSpaceWorkspaceItemOutputGenerator() {
         
@@ -111,12 +114,13 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
 		this.collection = collection;
 	}
 
+	public void setExtraMetadataToKeep(List<String> extraMetadataToKeep) {
+		this.extraMetadataToKeep = extraMetadataToKeep;
+	}
+
 	//Methods
 	public void merge(String formName, Item item, Record record) {
 
-		//KSTA:ToDo
-       // EnhancedSubmissionLookupPublication itemLookup = new EnhancedSubmissionLookupPublication(enhancedMetadata, lookupPub);
-		
         Record itemLookup = record;
         
         Set<String> addedMetadata = new HashSet<String>();
@@ -208,12 +212,13 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
 			Record itemLookup, String name) {
 		String type = SubmissionLookupService.getType(itemLookup);
 		
-		//KSTA:ToDo
-		/*String md = configuration.getProperty(
-				type + "." + name,
-				configuration.getProperty(formName + "." + name,
-						configuration.getProperty(name)));*/
-		String md = outputMap.get(name);
+		String md = outputMap.get(type + "." + name);
+		if (StringUtils.isBlank(md)){
+			md = outputMap.get(formName + "." + name);
+			if (StringUtils.isBlank(md)){
+				md = outputMap.get(name);
+			}
+		}
 		
 		if (md != null && md.contains("|")) {
 			String[] cond = md.trim().split("\\|");
@@ -257,12 +262,11 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
 	
 	private boolean isValidMetadata(String formName, String[] md) {
 		try {
-			//KSTA:ToDo
-			/*if (extraMetadataToKeep != null
+			if (extraMetadataToKeep != null
 					&& extraMetadataToKeep.contains(StringUtils.join(
 							Arrays.copyOfRange(md, 0, 3), "."))) {
 				return true;
-			}*/
+			}
             return getDCInput(formName, md[0], md[1], md[2])!=null;
 		} catch (Exception e) {
 			e.printStackTrace();
