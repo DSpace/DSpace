@@ -7,6 +7,7 @@
  */
 package org.dspace.submit.util;
 
+import gr.ekt.bte.core.MutableRecord;
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.Value;
 
@@ -62,7 +63,7 @@ public class ItemSubmissionLookupDTO implements Serializable {
 		}
 		else
 		{
-            SubmissionLookupPublication pub = new SubmissionLookupPublication(MERGED_PUBLICATION_PROVIDER);
+            MutableRecord pub = new SubmissionLookupPublication(MERGED_PUBLICATION_PROVIDER);
 			for (SubmissionLookupProvider prov : providers)
 			{				
                 for (Record p : publications)
@@ -80,7 +81,7 @@ public class ItemSubmissionLookupDTO implements Serializable {
 							{
 								for (Value v : values)
 								{
-									pub.add(field, v.getAsString());
+									pub.addValue(field, v);
 								}
 							}
 						}

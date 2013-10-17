@@ -68,7 +68,7 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader {
 			List<String> foundDOIs = new ArrayList<String>();
 
 			for (Record publication : recordSet.getRecords()) {
-				String providerName = publication.getValues(SubmissionLookupService.PROVIDER_NAME_FIELD).get(0).getAsString();
+				String providerName = SubmissionLookupService.getFirstValue(publication, SubmissionLookupService.PROVIDER_NAME_FIELD);
 
 				String doi = null;
 

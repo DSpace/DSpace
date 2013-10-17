@@ -38,8 +38,6 @@ public class SubmissionLookupService {
 
 	public static final String SEPARATOR_VALUE_REGEX = SEPARATOR_VALUE;
 
-	private Map<String, EnhancerSubmissionLookup> enhancedMetadata;
-
 	private List<SubmissionLookupProvider> providers;
 
 	private Map<String, List<SubmissionLookupProvider>> idents2provs;
@@ -48,15 +46,7 @@ public class SubmissionLookupService {
 
 	private TransformationEngine phase1TransformationEngine;
 	private TransformationEngine phase2TransformationEngine;
-	
-	public void setEnhancedMetadata(
-			Map<String, EnhancerSubmissionLookup> enhancedMetadata) {
-		this.enhancedMetadata = enhancedMetadata;
-	}
 
-	public Map<String, EnhancerSubmissionLookup> getEnhancedMetadata() {
-		return enhancedMetadata;
-	}
 
 	public void setPhase2TransformationEngine(TransformationEngine phase2TransformationEngine) {
 		this.phase2TransformationEngine = phase2TransformationEngine;

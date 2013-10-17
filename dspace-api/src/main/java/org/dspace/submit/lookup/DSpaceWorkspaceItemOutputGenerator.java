@@ -133,22 +133,22 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
 					|| addedMetadata.contains(metadata)) {
 				addedMetadata.add(metadata);
 				String[] md = splitMetadata(metadata);
-				if (isValidMetadata(formName, md)) {
-					if (isRepeatableMetadata(formName, md)) {
-						for (Value value : itemLookup.getValues(field)) {
-							String[] splitValue = splitValue(value.getAsString());
-							if (splitValue[3] != null) {
-								item.addMetadata(md[0], md[1], md[2], md[3],
-										splitValue[0], splitValue[1],
-										Integer.parseInt(splitValue[2]));
-							} else {
-								item.addMetadata(md[0], md[1], md[2], md[3],
-										value.getAsString());
+				if (isValidMetadata(formName, md)) { //if in extra metadata or in the spefific form
+					List<Value> values = itemLookup.getValues(field);
+					if (values != null && values.size()>0){
+						if (isRepeatableMetadata(formName, md)) { //if metadata is repeatable in form
+							for (Value value : values) {
+								String[] splitValue = splitValue(value.getAsString());
+								if (splitValue[3] != null) {
+									item.addMetadata(md[0], md[1], md[2], md[3],
+											splitValue[0], splitValue[1],
+											Integer.parseInt(splitValue[2]));
+								} else {
+									item.addMetadata(md[0], md[1], md[2], md[3],
+											value.getAsString());
+								}
 							}
-						}
-					} else {
-						List<Value> values = itemLookup.getValues(field);
-						if (values != null && values.size()>0){
+						} else {
 							String value = values.iterator().next().getAsString();
 							String[] splitValue = splitValue(value);
 							if (splitValue[3] != null) {
@@ -220,6 +220,7 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
 			}
 		}
 		
+		//KSTA:ToDo: Make this a modifier
 		if (md != null && md.contains("|")) {
 			String[] cond = md.trim().split("\\|");
 			for (int idx = 1; idx < cond.length; idx++) {
