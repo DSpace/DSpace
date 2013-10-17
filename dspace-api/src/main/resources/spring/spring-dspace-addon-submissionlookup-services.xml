@@ -17,7 +17,8 @@
 
     <bean class="org.dspace.submit.lookup.SubmissionLookupService"
 		name="org.dspace.submit.lookup.SubmissionLookupService">
-		<property name="transformationEngine" ref="transformationEngine"/>
+		<property name="phase1TransformationEngine" ref="phase1TransformationEngine"/>
+		<property name="phase2TransformationEngine" ref="phase2TransformationEngine"/>
 		<property name="extraMetadataToKeep">
 			<list>
 				<value>dc.import.contributorauthor</value>
@@ -56,7 +57,7 @@
 		</property>
 	</bean>
 
-	<bean name="transformationEngine" class="gr.ekt.bte.core.TransformationEngine">
+	<bean name="phase1TransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
 	    <property name="dataLoader" ref="multipleDataLoader"/>
     	<property name="workflow" ref="linearWorkflow"/>
     	<property name="outputGenerator" ref="org.dspace.submit.lookup.SubmissionLookupOutputGenerator"/>
@@ -338,4 +339,57 @@
 			</map>
 		</property>
 	</bean>
+	
+	
+	<!-- Phase2 transformation engine -->
+	<bean name="phase2TransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
+	    <property name="dataLoader" ref="submissionItemDataLoader"/>
+    	<property name="workflow" ref="phase2linearWorkflow"/>
+    	<property name="outputGenerator" ref="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator"/>
+  	</bean>
+  	
+	<bean name="submissionItemDataLoader" class="org.dspace.submit.lookup.SubmissionItemDataLoader"/>
+	
+	<!-- Specify here any filters or modifiers to run before the output -->
+	<bean name="phase2linearWorkflow" class="gr.ekt.bte.core.LinearWorkflow">
+	    <property name="process">
+			<list>
+			    <ref bean="fieldMergeModifier"/>
+			    <ref bean="valueConcatenationModifier"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean name="fieldMergeModifier" class="org.dspace.submit.lookup.FieldMergeModifier">
+	    <property name="mergeFieldMap">
+	        <map>
+	            <entry key="allauthors">
+	                <list>
+						<value>authors</value>
+					</list>
+	            </entry>
+	            <entry key="allkeywords">
+	                <list>
+						<value>keywords</value>
+						<value>mesh</value>
+					</list>
+	            </entry>
+	        </map>
+	    </property>
+	</bean>
+	
+	<bean name="valueConcatenationModifier" class="org.dspace.submit.lookup.ValueConcatenationModifier">
+	    <property name="field" value="allkeywords"/>
+	    <property name="separator" value=";" />
+	    <property name="whitespaceAfter" value="true" />
+	</bean>
+
+	<bean name="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator" class="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator">
+	    <property name="outputMap">
+	        <map>
+	            <entry key="pmid" value="dc.identifier.pmid"/>
+	        </map>
+	    </property>
+	</bean>
+	
 </beans>

@@ -14,7 +14,7 @@ import org.apache.commons.lang.StringUtils;
 
 public class ValueConcatenationModifier extends AbstractModifier {
     private String field;
-    private String separator;
+    private String separator = ",";
     private boolean whitespaceAfter = true;
 
     public ValueConcatenationModifier() {

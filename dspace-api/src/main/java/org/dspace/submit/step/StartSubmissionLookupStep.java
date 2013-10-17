@@ -7,7 +7,12 @@
  */
 package org.dspace.submit.step;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import gr.ekt.bte.core.Record;
+import gr.ekt.bte.core.TransformationEngine;
+import gr.ekt.bte.core.TransformationSpec;
+import gr.ekt.bte.exceptions.BadTransformationSpec;
+import gr.ekt.bte.exceptions.MalformedSourceException;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -30,6 +35,10 @@ import org.dspace.content.Collection;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.submit.AbstractProcessingStep;
+import org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator;
+import org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader;
+import org.dspace.submit.lookup.SubmissionItemDataLoader;
+import org.dspace.submit.lookup.SubmissionLookupOutputGenerator;
 import org.dspace.submit.lookup.SubmissionLookupService;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
 import org.dspace.submit.util.SubmissionLookupDTO;
@@ -154,17 +163,19 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
         else
         {
             // create our new Workspace Item
-            WorkspaceItem wi = WorkspaceItem.create(context, col, true);
             DCInputSet inputSet = null;
 			try {
 				inputSet = new DCInputsReader().getInputs(col.getHandle());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			
+			ItemSubmissionLookupDTO dto = null;
+			
             if (itemLookup != null)
             {
-				slService.merge(inputSet.getFormName(), wi.getItem(),
-						itemLookup);
+            	dto = itemLookup;
+				
             }
             else
             {
@@ -187,14 +198,34 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
     							parameterValue);
     				}
     			}
-			List<Record> publications = new ArrayList<Record>();
+    			List<Record> publications = new ArrayList<Record>();
     			publications.add(manualPub);
-    			ItemSubmissionLookupDTO dto = new ItemSubmissionLookupDTO(publications);
-            	slService.merge(inputSet.getFormName(), wi.getItem(), dto);
+    			dto = new ItemSubmissionLookupDTO(publications);
+            	
             }
             
-            // update Submission Information with this Workspace Item
-            subInfo.setSubmissionItem(wi);
+            List<WorkspaceItem> result = null;
+            
+            TransformationEngine transformationEngine = slService.getPhase2TransformationEngine();
+			if (transformationEngine != null){
+				SubmissionItemDataLoader dataLoader = (SubmissionItemDataLoader)transformationEngine.getDataLoader();
+				dataLoader.setDtoList(Arrays.asList(new ItemSubmissionLookupDTO[]{dto}));
+
+				DSpaceWorkspaceItemOutputGenerator outputGenerator = (DSpaceWorkspaceItemOutputGenerator)transformationEngine.getOutputGenerator();
+				result = outputGenerator.getWitems();
+				try {
+					transformationEngine.transform(new TransformationSpec());
+				} catch (BadTransformationSpec e1) {
+					e1.printStackTrace();
+				} catch (MalformedSourceException e1) {
+					e1.printStackTrace();
+				}
+			}
+			
+			if (result != null && result.size()>0) {
+				// update Submission Information with this Workspace Item
+				subInfo.setSubmissionItem(result.iterator().next());
+			}
 
             // commit changes to database
             context.commit();

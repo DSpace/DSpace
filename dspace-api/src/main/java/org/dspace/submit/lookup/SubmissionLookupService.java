@@ -56,12 +56,9 @@ public class SubmissionLookupService {
 	
 	private static Logger log = Logger.getLogger(SubmissionLookupService.class);
 
-	// attenzione inizializzato dal metodo init
-	private Properties configuration;
-
 	public static final String SEPARATOR_VALUE = "#######";
 
-	private static final String SEPARATOR_VALUE_REGEX = SEPARATOR_VALUE;
+	public static final String SEPARATOR_VALUE_REGEX = SEPARATOR_VALUE;
 
 	private List<String> extraMetadataToKeep;
 
@@ -73,34 +70,9 @@ public class SubmissionLookupService {
 
 	private List<SubmissionLookupProvider> searchProviders;
 
-	private TransformationEngine transformationEngine;
+	private TransformationEngine phase1TransformationEngine;
+	private TransformationEngine phase2TransformationEngine;
 	
-	private synchronized void init() {
-		if (configuration != null)
-			return;
-		String configFilePath = ConfigurationManager.getProperty("dspace.dir")
-				+ File.separator + "config" + File.separator + "crosswalks"
-				+ File.separator + "submission-lookup-mapping.properties";
-		configuration = new Properties();
-		FileInputStream fis = null;
-		try {
-			fis = new FileInputStream(configFilePath);
-			configuration.load(fis);
-		} catch (Exception notfound) {
-			throw new IllegalArgumentException(
-					"Impossibile leggere la configurazione per il SubmissionLookupService (database esterno -> SURplus)",
-					notfound);
-		} finally {
-			if (fis != null) {
-				try {
-					fis.close();
-				} catch (IOException ioe) {
-					log.error(ioe.getMessage(), ioe);
-				}
-			}
-		}
-	}
-
 	public void setExtraMetadataToKeep(List<String> extraMetadataToKeep) {
 		this.extraMetadataToKeep = extraMetadataToKeep;
 	}
@@ -118,10 +90,14 @@ public class SubmissionLookupService {
 		return enhancedMetadata;
 	}
 
-	public void setTransformationEngine(TransformationEngine transformationEngine) {
-		this.transformationEngine = transformationEngine;
+	public void setPhase2TransformationEngine(TransformationEngine phase2TransformationEngine) {
+		this.phase2TransformationEngine = phase2TransformationEngine;
+	}
+	
+	public void setPhase1TransformationEngine(TransformationEngine phase1TransformationEngine) {
+		this.phase1TransformationEngine = phase1TransformationEngine;
 		
-		MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader)transformationEngine.getDataLoader();
+		MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader)phase1TransformationEngine.getDataLoader();
 		
 		this.idents2provs = new HashMap<String, List<SubmissionLookupProvider>>();
 		this.searchProviders = new ArrayList<SubmissionLookupProvider>();
@@ -152,10 +128,14 @@ public class SubmissionLookupService {
 		}
 	}
 
-	public TransformationEngine getTransformationEngine() {
-		return transformationEngine;
+	public TransformationEngine getPhase1TransformationEngine() {
+		return phase1TransformationEngine;
 	}
 
+	public TransformationEngine getPhase2TransformationEngine() {
+		return phase2TransformationEngine;
+	}
+	
 	//KSTA:ToDo: Replace with something more dynamic
 	public List<String> getIdentifiers() {
 		List<String> identifiers = new ArrayList<String>();
@@ -167,246 +147,6 @@ public class SubmissionLookupService {
 
 	public Map<String, List<SubmissionLookupProvider>> getProvidersIdentifiersMap() {
 		return idents2provs;
-	}
-
-	public void merge(String formName, Item item, ItemSubmissionLookupDTO dto) {
-		init();
-        Record lookupPub = dto.getTotalPublication(providers);
-        EnhancedSubmissionLookupPublication itemLookup = new EnhancedSubmissionLookupPublication(enhancedMetadata, lookupPub);
-		Set<String> addedMetadata = new HashSet<String>();
-		for (String field : itemLookup.getFields()) {
-			String metadata = getMetadata(formName, itemLookup, field);
-			if (StringUtils.isBlank(metadata)) {
-				continue;
-			}
-			if (item.getMetadata(metadata).length == 0
-					|| addedMetadata.contains(metadata)) {
-				addedMetadata.add(metadata);
-				String[] md = splitMetadata(metadata);
-				if (isValidMetadata(formName, md)) {
-					if (isRepeatableMetadata(formName, md)) {
-						for (Value value : itemLookup.getValues(field)) {
-							String[] splitValue = splitValue(value.getAsString());
-							if (splitValue[3] != null) {
-								item.addMetadata(md[0], md[1], md[2], md[3],
-										splitValue[0], splitValue[1],
-										Integer.parseInt(splitValue[2]));
-							} else {
-								item.addMetadata(md[0], md[1], md[2], md[3],
-										value.getAsString());
-							}
-						}
-					} else {
-						String value = itemLookup.getFirstValue(field);
-						String[] splitValue = splitValue(value);
-						if (splitValue[3] != null) {
-							item.addMetadata(md[0], md[1], md[2], md[3],
-									splitValue[0], splitValue[1],
-									Integer.parseInt(splitValue[2]));
-						} else {
-							item.addMetadata(md[0], md[1], md[2], md[3], value);
-						}
-					}
-				}
-			}
-		}
-
-		// creo un nuovo context per il check di esistenza dei metadata di cache
-		Context context = null;
-		try {
-			context = new Context();
-            for (Record pub : dto.getPublications()) {
-                String providerName = getProviderName(pub);
-				if (providerName != MANUAL_USER_INPUT) {
-					for (String field : pub.getFields()) {
-						String metadata = getMetadata(formName, pub, field);
-						if (StringUtils.isBlank(metadata)) {
-							continue;
-						}
-
-						String[] md = splitMetadata(metadata);
-						if (isValidMetadata(formName, md)) {
-							makeSureMetadataExist(context, providerName, md[1],
-									md[2]);
-							if (isRepeatableMetadata(formName, md)) {
-								for (Value value : pub.getValues(field)) {
-									String[] splitValue = splitValue(value.getAsString());
-									item.addMetadata(providerName, md[1],
-											md[2], md[3], splitValue[0],
-											splitValue[1],
-											Integer.parseInt(splitValue[2]));
-								}
-							} else {
-								String[] splitValue = splitValue(getFirstValue(pub, field));
-								item.addMetadata(providerName, md[1], md[2],
-										md[3], splitValue[0], splitValue[1],
-										Integer.parseInt(splitValue[2]));
-							}
-						}
-					}
-				}
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage(), e);
-		} finally {
-			if (context != null && context.isValid()) {
-				context.abort();
-			}
-		}
-	}
-
-	private void makeSureMetadataExist(Context context, String schema,
-			String element, String qualifier) {
-		try {
-			context.turnOffAuthorisationSystem();
-			boolean create = false;
-			MetadataSchema mdschema = MetadataSchema.find(context, schema);
-			MetadataField mdfield = null;
-			if (mdschema == null) {
-				mdschema = new MetadataSchema(SL_NAMESPACE_PREFIX + schema,
-						schema);
-				mdschema.create(context);
-				create = true;
-			} else {
-				mdfield = MetadataField.findByElement(context,
-						mdschema.getSchemaID(), element, qualifier);
-			}
-
-			if (mdfield == null) {
-				mdfield = new MetadataField(mdschema, element, qualifier,
-						"Campo utilizzato per la cache del provider submission-lookup: "
-								+ schema);
-				mdfield.create(context);
-				create = true;
-			}
-			if (create) {
-				context.commit();
-			}
-			context.restoreAuthSystemState();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private boolean isRepeatableMetadata(String formName, String[] md) {
-		try {
-			DCInput dcinput = getDCInput(formName, md[0], md[1], md[2]);
-			if (dcinput != null) {
-				return dcinput.isRepeatable();
-			}
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
-
-	private boolean isValidMetadata(String formName, String[] md) {
-		try {
-			if (extraMetadataToKeep != null
-					&& extraMetadataToKeep.contains(StringUtils.join(
-							Arrays.copyOfRange(md, 0, 3), "."))) {
-				return true;
-			}
-            return getDCInput(formName, md[0], md[1], md[2])!=null;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
-
-    private DCInput getDCInput(String formName, String schema,
-            String element, String qualifier) throws DCInputsReaderException
-    {
-        DCInputSet dcinputset = new DCInputsReader().getInputs(formName);
-        for (int idx = 0; idx < dcinputset.getNumberPages(); idx++)
-        {
-            for (DCInput dcinput : dcinputset.getPageRows(idx, true, true))
-            {
-                if (dcinput.getSchema().equals(schema)
-                        && dcinput.getElement().equals(element)
-                        && (dcinput.getQualifier() != null && dcinput
-                                .getQualifier().equals(qualifier))
-                        || (dcinput.getQualifier() == null && qualifier == null))
-                {
-                    return dcinput;
-                }
-            }
-        }
-        return null;
-    }
-
-	private String[] splitValue(String value) {
-		String[] splitted = value.split(SEPARATOR_VALUE_REGEX);
-		String[] result = new String[6];
-		result[0] = splitted[0];
-		result[2] = "-1";
-		result[3] = "-1";
-		result[4] = "-1";
-		if (splitted.length > 1) {
-			result[5] = "splitted";
-			if (StringUtils.isNotBlank(splitted[1])) {
-				result[1] = splitted[1];
-			}
-			if (splitted.length > 2) {
-				result[2] = String.valueOf(Integer.parseInt(splitted[2]));
-				if (splitted.length > 3) {
-					result[3] = String.valueOf(Integer.parseInt(splitted[3]));
-					if (splitted.length > 4) {
-						result[4] = String.valueOf(Integer
-								.parseInt(splitted[4]));
-					}
-				}
-			}
-		}
-		return result;
-	}
-
-	private String[] splitMetadata(String metadata) {
-		String[] mdSplit = new String[3];
-		if (StringUtils.isNotBlank(metadata)) {
-			String tmpSplit[] = metadata.split("\\.");
-			if (tmpSplit.length == 4) {
-				mdSplit = new String[4];
-				mdSplit[0] = tmpSplit[0];
-				mdSplit[1] = tmpSplit[1];
-				mdSplit[2] = tmpSplit[2];
-				mdSplit[3] = tmpSplit[3];
-			} else if (tmpSplit.length == 3) {
-				mdSplit = new String[4];
-				mdSplit[0] = tmpSplit[0];
-				mdSplit[1] = tmpSplit[1];
-				mdSplit[2] = tmpSplit[2];
-				mdSplit[3] = null;
-			} else if (tmpSplit.length == 2) {
-				mdSplit = new String[4];
-				mdSplit[0] = tmpSplit[0];
-				mdSplit[1] = tmpSplit[1];
-				mdSplit[2] = null;
-				mdSplit[3] = null;
-			}
-		}
-		return mdSplit;
-	}
-
-	private String getMetadata(String formName,
-                               Record itemLookup, String name) {
-		String type = getType(itemLookup);
-		String md = configuration.getProperty(
-				type + "." + name,
-				configuration.getProperty(formName + "." + name,
-						configuration.getProperty(name)));
-		if (md != null && md.contains("|")) {
-			String[] cond = md.trim().split("\\|");
-			for (int idx = 1; idx < cond.length; idx++) {
-				boolean temp = itemLookup.getFields().contains(cond[idx]);
-				if (temp) {
-					return null;
-				}
-			}
-			return cond[0];
-		}
-		return md;
 	}
 
 	public SubmissionLookupDTO getSubmissionLookupDTO(

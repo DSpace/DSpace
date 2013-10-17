@@ -80,7 +80,7 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 
 			List<ItemSubmissionLookupDTO> result = new ArrayList<ItemSubmissionLookupDTO>();
 
-			TransformationEngine transformationEngine = service.getTransformationEngine();
+			TransformationEngine transformationEngine = service.getPhase1TransformationEngine();
 			if (transformationEngine != null){
 				MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader)transformationEngine.getDataLoader();
 				dataLoader.setIdentifiers(identifiers);
@@ -121,7 +121,7 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 			
 			List<ItemSubmissionLookupDTO> result = new ArrayList<ItemSubmissionLookupDTO>();
 
-			TransformationEngine transformationEngine = service.getTransformationEngine();
+			TransformationEngine transformationEngine = service.getPhase1TransformationEngine();
 			if (transformationEngine != null){
 				MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader)transformationEngine.getDataLoader();
 				dataLoader.setSearchTerms(searchTerms);
