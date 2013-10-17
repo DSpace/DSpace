@@ -77,6 +77,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     private static final Message T_filter_notequals = message("xmlui.Discovery.SimpleSearch.filter.notequals");
     private static final Message T_filter_authority = message("xmlui.Discovery.SimpleSearch.filter.authority");
     private static final Message T_filter_notauthority = message("xmlui.Discovery.SimpleSearch.filter.notauthority");
+    private static final Message T_did_you_mean = message("xmlui.Discovery.SimpleSearch.did_you_mean");
 
     private SearchService searchService = null;
 
@@ -145,6 +146,12 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         Text text = searchBoxItem.addText("query");
         text.setValue(queryString);
         searchBoxItem.addButton("submit", "search-icon").setValue(T_go);
+        if(queryResults != null && StringUtils.isNotBlank(queryResults.getSpellCheckQuery()))
+        {
+            Item didYouMeanItem = searchList.addItem("did-you-mean", "didYouMean");
+            didYouMeanItem.addContent(T_did_you_mean);
+            didYouMeanItem.addXref(getSuggestUrl(queryResults.getSpellCheckQuery()), queryResults.getSpellCheckQuery(), "didYouMean");
+        }
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(dso);
@@ -295,7 +302,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     protected String generateURL(Map<String, String> parameters)
             throws UIException {
         String query = getQuery();
-        if (!"".equals(query))
+        if (!"".equals(query) && parameters.get("query") == null)
         {
             parameters.put("query", encodeForURL(query));
         }
@@ -381,5 +388,11 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
                 division.addHidden("order").setValue(request.getParameter("order"));
             }
         }
+    }
+
+    protected String getSuggestUrl(String newQuery) throws UIException {
+        Map parameters = new HashMap();
+        parameters.put("query", newQuery);
+        return addFilterQueriesToUrl(generateURL(parameters));
     }
 }
