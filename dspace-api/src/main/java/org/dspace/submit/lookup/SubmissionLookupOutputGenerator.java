@@ -30,11 +30,13 @@ public class SubmissionLookupOutputGenerator implements OutputGenerator {
     private static final String NOT_FOUND_DOI = "NOT-FOUND-DOI";
 
     public SubmissionLookupOutputGenerator() {
-        dtoList = new ArrayList<ItemSubmissionLookupDTO>();
+        
     }
 
     @Override
     public List<String> generateOutput(RecordSet records) {
+    	dtoList = new ArrayList<ItemSubmissionLookupDTO>();
+    	
         Map<String, List<Record>> record_sets = new HashMap<String, List<Record>>();
         for(Record rec : records) {
             String current_doi = NOT_FOUND_DOI;
