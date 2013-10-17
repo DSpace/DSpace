@@ -71,6 +71,36 @@
            <type>jar</type>
        </dependency>
 
+       <!-- add dependencies for support of ICU extra analyzer -->
+       <dependency>
+           <groupId>org.apache.solr</groupId>
+           <artifactId>solr-analysis-extras</artifactId>
+           <version>${lucene.version}</version>
+       </dependency>
+
+       <dependency>
+           <groupId>com.ibm.icu</groupId>
+           <artifactId>icu4j</artifactId>
+       </dependency>
+
+       <dependency>
+           <groupId>org.apache.lucene</groupId>
+           <artifactId>lucene-analyzers-icu</artifactId>
+           <version>${lucene.version}</version>
+       </dependency>
+		
+       <dependency>
+           <groupId>org.apache.lucene</groupId>
+           <artifactId>lucene-analyzers-smartcn</artifactId>
+           <version>${lucene.version}</version>
+       </dependency>
+       
+       <dependency>
+           <groupId>org.apache.lucene</groupId>
+           <artifactId>lucene-analyzers-stempel</artifactId>
+           <version>${lucene.version}</version>
+       </dependency>
+       
        <!-- support odd cases where JAXP cannot be found in JVM -->
        <dependency>
            <groupId>xalan</groupId>
