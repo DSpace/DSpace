@@ -62,6 +62,20 @@
                     <groupId>com.atmire</groupId>
                     <artifactId>atmire-responselogging-api</artifactId>
                     <version>1.10.0</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.dspace</groupId>
+                            <artifactId>dspace-api</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.apache.solr</groupId>
+                            <artifactId>solr-core</artifactId>
+                        </exclusion>
+                        <exclusion>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>servlet-api</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
             </dependencies>
         </profile>
