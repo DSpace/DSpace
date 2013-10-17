@@ -61,10 +61,10 @@ public class EZIDIdentifierProviderTest
 
     /**
      * Create a fresh Item, installed in the repository.
-     * 
+     *
      * @throws SQLException
      * @throws AuthorizeException
-     * @throws IOException 
+     * @throws IOException
      */
     private Item newItem(Context ctx)
             throws SQLException, AuthorizeException, IOException
@@ -132,14 +132,14 @@ public class EZIDIdentifierProviderTest
         Context ctx = new Context();
         dumpMetadata(Item.find(ctx, itemID));
     }
-    
+
     @Before
     public void setUp()
     {
         context.setCurrentUser(eperson);
         context.turnOffAuthorisationSystem();
     }
-    
+
     @After
     public void tearDown()
     {
@@ -277,7 +277,7 @@ public class EZIDIdentifierProviderTest
         DSpaceObject result = instance.resolve(context, identifier, attributes);
         assertEquals(expResult, result);
     }
-    
+
     /**
      * Test of lookup method, of class DataCiteIdentifierProvider.
      */
