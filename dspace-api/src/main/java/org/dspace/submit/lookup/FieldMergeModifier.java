@@ -34,7 +34,7 @@ public class FieldMergeModifier extends AbstractModifier {
     						rec.addValue(target_field, value);
     					}
     				}
-    				rec.removeField(source_field);
+    				//rec.removeField(source_field);
     			}
     		}
     	}

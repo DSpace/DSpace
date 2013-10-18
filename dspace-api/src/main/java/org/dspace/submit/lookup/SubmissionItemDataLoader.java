@@ -16,6 +16,7 @@ import gr.ekt.bte.exceptions.MalformedSourceException;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
 
 
@@ -26,7 +27,8 @@ public class SubmissionItemDataLoader implements DataLoader {
     private List<ItemSubmissionLookupDTO> dtoList;
     List<SubmissionLookupProvider> providers;
 
-
+    private static Logger log = Logger.getLogger(SubmissionItemDataLoader.class);
+    
     public SubmissionItemDataLoader() {
         dtoList = null;
         providers = null;
@@ -44,6 +46,15 @@ public class SubmissionItemDataLoader implements DataLoader {
             ret.addRecord(rec);
         }
 
+        log.info("BTE DataLoader finished. Items loaded: " + ret.getRecords().size());
+		
+		//Printing debug message
+		String totalString = "";
+		for (Record record : ret.getRecords()){
+			totalString += SubmissionLookupUtils.getPrintableString(record)+"\n";
+		}
+		log.debug("Records loaded:\n"+totalString);
+		
         return ret;
     }
 

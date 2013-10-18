@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
@@ -43,6 +44,8 @@ import org.dspace.submit.util.ItemSubmissionLookupDTO;
  */
 public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
     
+	private static Logger log = Logger.getLogger(DSpaceWorkspaceItemOutputGenerator.class);
+	
 	private Context context;
 	private String formName;
 	private List<WorkspaceItem> witems;
@@ -57,12 +60,21 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
     }
 
     @Override
-    public List<String> generateOutput(RecordSet records) {
+    public List<String> generateOutput(RecordSet recordSet) {
     	
+    	log.info("BTE OutputGenerator started. Records to output: " + recordSet.getRecords().size());
+		
+		//Printing debug message
+		String totalString = "";
+		for (Record record : recordSet.getRecords()){
+			totalString += SubmissionLookupUtils.getPrintableString(record)+"\n";
+		}
+		log.debug("Records to output:\n"+totalString);
+    	
+		
     	witems = new ArrayList<WorkspaceItem>();
     	
-        Map<String, List<Record>> record_sets = new HashMap<String, List<Record>>();
-        for(Record rec : records) {
+        for(Record rec : recordSet.getRecords()) {
         	 try {
 				WorkspaceItem wi = WorkspaceItem.create(context, collection, true);
 				merge(formName, wi.getItem(), rec);

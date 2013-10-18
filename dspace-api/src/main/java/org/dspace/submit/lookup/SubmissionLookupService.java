@@ -18,6 +18,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.dspace.identifier.DOI;
 import org.dspace.submit.util.SubmissionLookupDTO;
 
 import gr.ekt.bte.core.TransformationEngine;
@@ -92,13 +93,19 @@ public class SubmissionLookupService {
 		return phase2TransformationEngine;
 	}
 	
-	//KSTA:ToDo: Replace with something more dynamic
 	public List<String> getIdentifiers() {
-		List<String> identifiers = new ArrayList<String>();
-		identifiers.add("doi");
-		identifiers.add("pubmed");
-		identifiers.add("arxiv");
-		return identifiers;
+		
+		List<String> allSupportedIdentifiers = new ArrayList<String>();
+		MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader)phase1TransformationEngine.getDataLoader();
+		for (SubmissionLookupProvider provider : dataLoader.getProviders()){
+			for (String identifier : provider.getSupportedIdentifiers()){
+				if (!allSupportedIdentifiers.contains(identifier)){
+					allSupportedIdentifiers.add(identifier);
+				}
+			}
+		}
+
+		return allSupportedIdentifiers;
 	}
 
 	public Map<String, List<SubmissionLookupProvider>> getProvidersIdentifiersMap() {

@@ -126,11 +126,29 @@ public class SubmissionLookupUtils {
 	public static List<String> getValues(Record rec, String field) {
 		List<String> result = new ArrayList<String>();
 	    List<Value> values = rec.getValues(field);
-	    String value = null;
 	    if (values != null && values.size() > 0) {
-	        value = values.get(0).getAsString();
-	        result.add(value);
+	    	for (Value value : values){
+		        result.add( value.getAsString());
+	    	}	    	
 	    }
 	    return result;
+	}
+
+	public static String getPrintableString(Record record){
+		StringBuilder result = new StringBuilder();
+		
+		result.append("\nPublication {\n");
+		
+		for (String field: record.getFields()){
+			result.append("--"+field + ":\n");
+			List<Value> values = record.getValues(field);
+			for (Value value : values){
+				result.append("\t"+value.getAsString()+"\n");
+			}
+		}
+		
+		result.append("}\n");
+		
+		return result.toString();
 	}
 }
