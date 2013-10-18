@@ -72,7 +72,7 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader {
 			List<String> foundDOIs = new ArrayList<String>();
 
 			for (Record publication : recordSet.getRecords()) {
-				String providerName = SubmissionLookupService.getFirstValue(publication, SubmissionLookupService.PROVIDER_NAME_FIELD);
+				String providerName = SubmissionLookupUtils.getFirstValue(publication, SubmissionLookupService.PROVIDER_NAME_FIELD);
 
 				String doi = null;
 
@@ -137,7 +137,7 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader {
 		//Printing debug message
 		String totalString = "";
 		for (Record record : recordSet.getRecords()){
-			totalString += SubmissionLookupService.getPrintableString(record)+"\n";
+			totalString += SubmissionLookupUtils.getPrintableString(record)+"\n";
 		}
 		log.debug("Records loaded:\n"+totalString);
 		

@@ -51,7 +51,7 @@ public class SubmissionItemDataLoader implements DataLoader {
 		//Printing debug message
 		String totalString = "";
 		for (Record record : ret.getRecords()){
-			totalString += SubmissionLookupService.getPrintableString(record)+"\n";
+			totalString += SubmissionLookupUtils.getPrintableString(record)+"\n";
 		}
 		log.debug("Records loaded:\n"+totalString);
 		

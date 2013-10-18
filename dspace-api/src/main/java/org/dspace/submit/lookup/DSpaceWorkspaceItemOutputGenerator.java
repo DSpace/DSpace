@@ -67,7 +67,7 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
 		//Printing debug message
 		String totalString = "";
 		for (Record record : recordSet.getRecords()){
-			totalString += SubmissionLookupService.getPrintableString(record)+"\n";
+			totalString += SubmissionLookupUtils.getPrintableString(record)+"\n";
 		}
 		log.debug("Records to output:\n"+totalString);
     	
@@ -202,7 +202,7 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
 											Integer.parseInt(splitValue[2]));
 								}
 							} else {
-								String[] splitValue = splitValue(SubmissionLookupService.getFirstValue(pub, field));
+								String[] splitValue = splitValue(SubmissionLookupUtils.getFirstValue(pub, field));
 								item.addMetadata(providerName, md[1], md[2],
 										md[3], splitValue[0], splitValue[1],
 										Integer.parseInt(splitValue[2]));

@@ -65,14 +65,7 @@
 	.sl-result-title {font-weight: bold;}
 	.sl-result-authors {font-style: italic;}
 	.sl-result-date {margin-bottom: 10px;}
-	div.submission-lookup-details {max-height: 400px; height: 400px; overflow-y: auto;}
-	div.submission-lookup-details table {padding: 10px;margin-bottom:10px;}
-	div.submission-lookup-details table td {vertical-align: top;}
-	div.submission-lookup-details table td.submission-lookup-label {font-weight: bold;margin-right:10px;}
-	.submission-lookup-providers img {vertical-align: middle; margin-right: 10px;}
 	.invalid-value {border: 1px solid #FF6600;}
-	#tabs-search-accordion td.submission-lookup-providers {text-align: left; padding-left: 10px;}
-	
 	</style>	
 	<script type='text/javascript'>var dspaceContextPath = "<%=request.getContextPath()%>";</script>		
 </c:set>
@@ -80,7 +73,7 @@
 	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/submission-lookup.js"></script>	
 </c:set>
 
-<dspace:layout locbar="off"
+<dspace:layout style="submission" locbar="off"
                navbar="off"
                titlekey="jsp.submit.start-lookup-submission.title"
                nocache="true">
@@ -89,7 +82,6 @@
     <div id="jserrormessage" style="display: none"><fmt:message key="jsp.submit.start-lookup-submission.js.errormessage"/></div>
     <div id="jsseedetailsbuttonmessage" style="display: none"><fmt:message key="jsp.submit.start-lookup-submission.js.detailsbuttonmessage"/></div>
     <div id="jsfilldatabuttonmessage" style="display: none"><fmt:message key="jsp.submit.start-lookup-submission.js.filldataandstartbuttonmessage"/></div>
-    <div id="jstitlepopupmessage" style="display: none"><fmt:message key="jsp.submit.start-lookup-submission.js.titlepopupmessage"/></div>
     
 <%  if (collections.length > 0)
     {
@@ -97,7 +89,7 @@
 		if((noCollection != null) && (noCollection.booleanValue()==true))
 		{
 %>
-                <div class="error-message">
+                <div class="alert alert-warning">
 					<p><fmt:message key="jsp.submit.start-lookup-submission.no-collection"/></p>
 				</div>
 <%
@@ -106,7 +98,7 @@
 		if((nosuuid != null) && (nosuuid.booleanValue()==true))
 		{
 %>
-                <div class="error-message">
+                <div class="alert alert-warning">
 					<p><fmt:message key="jsp.submit.start-lookup-submission.nosuuid"/></p>
 				</div>
 <%
@@ -115,7 +107,7 @@
 		if((expired != null) && (expired.booleanValue()==true))
 		{
 %>
-                <div class="error-message">
+                <div class="alert alert-warning">
 					<p><fmt:message key="jsp.submit.start-lookup-submission.expired"/></p>
 				</div>
 <%
@@ -123,12 +115,13 @@
 %>            
 
 <div id="tabs">
-	<ul>
-		<li><a href="#tabs-search"><fmt:message key="jsp.submit.start-lookup-submission.tabs.search" /></a></li>
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="#tabs-search"><fmt:message key="jsp.submit.start-lookup-submission.tabs.search" /></a></li>
 		<li><a href="#tabs-result"><fmt:message key="jsp.submit.start-lookup-submission.tabs.result" /></a></li>
 	</ul>
-	<div id="tabs-search">
-	<form id="form-submission" action="" method="post">
+	<div class="tab-content">
+	<div class="tab-pane" id="tabs-search">
+	<form class="form-horizontal" id="form-submission" action="" method="post">
 		<input type="hidden" id="suuid" name="suuid" value="<%= uuid %>"/>
 		<input type="hidden" id="iuuid" name="iuuid" value=""/>
 		<input type="hidden" id="collectionid" name="collectionid" value=""/>
@@ -144,30 +137,29 @@
 		for (SubmissionLookupProvider provider : searchProviders)
 		{			
 %>
-		<img style="vertical-align: middle;" src="<%= request.getContextPath() %>/image/submission-lookup-small-<%= provider.getShortName() %>.jpg" />
+		<img class="img-thumbnail" src="<%= request.getContextPath() %>/image/submission-lookup-small-<%= provider.getShortName() %>.jpg" />
 <% 
 		}
 	%>
-	<p><fmt:message key="jsp.submit.start-lookup-submission.search.hints"/></p>
-		<br/><br/><table>
-		<tr><td style="vertical-align: top;"><span><fmt:message key="jsp.submit.start-lookup-submission.search.title"/>:</span></td><td> 
-		<textarea class="submission-lookup-search" name="search_title" id="search_title" cols="50" row="4"></textarea>
-		<br/>&nbsp;</td><td>&nbsp;</td></tr>
-
-		<tr><td><span><fmt:message key="jsp.submit.start-lookup-submission.search.year"/>:</span></td><td> 
-		<input class="submission-lookup-search" type="text" size="7" name="search_year" id="search_year" />
-		<br/>&nbsp;</td><td>&nbsp;</td></tr>
+		<p class="help-block"><fmt:message key="jsp.submit.start-lookup-submission.search.hints"/></p>
+		<div class="form-group">
+			<label for="search_title"><fmt:message key="jsp.submit.start-lookup-submission.search.title"/>:</label> 
+			<textarea class="form-control submission-lookup-search" name="search_title" id="search_title" cols="50" row="4"></textarea>
+		</div>
+		<div class="form-group">
+			<label for="search_year"><fmt:message key="jsp.submit.start-lookup-submission.search.year"/>:</label> 
+			<input class="form-control submission-lookup-search" type="text" size="7" name="search_year" id="search_year" />
+		</div>
 		
-		<tr><td><span><fmt:message key="jsp.submit.start-lookup-submission.search.authors"/>:</span></td><td> 
-		<textarea class="submission-lookup-search" name="search_authors" id="search_authors"cols="50" row="4"></textarea>
-		<br/>&nbsp;</td><td>&nbsp;</td></tr>
+		<div class="form-group">
+			<label for="search_authors"><fmt:message key="jsp.submit.start-lookup-submission.search.authors"/>:</label> 
+			<textarea class="form-control submission-lookup-search" name="search_authors" id="search_authors"cols="50" row="4"></textarea>
+		</div>
 		
-		<tr><td>&nbsp;</td><td>&nbsp;</td>
-		<td align="right">
-			<button type="button" id="search_go"><fmt:message key="jsp.submit.start-lookup-submission.search-go"/></button>
-			<button type="button" class="exit"><fmt:message key="jsp.submit.start-lookup-submission.exit"/></button>
-		<br/>&nbsp;</td></tr>
-		</table>
+		<div class="btn-group col-md-offset-5">			
+			<button type="button" class="btn btn-primary" id="search_go"><fmt:message key="jsp.submit.start-lookup-submission.search-go"/></button>
+			<button type="button" class="btn btn-default exit"><fmt:message key="jsp.submit.start-lookup-submission.exit"/></button>
+		</div>
 	</div>
 <% } %>	
 	<h3><a href="#"><fmt:message key="jsp.submit.start-lookup-submission.identifiers"/></a></h3>
@@ -175,29 +167,35 @@
 <% if (identifiers != null && identifiers.size()>0) {
 	%>
 		
-		<p><fmt:message key="jsp.submit.start-lookup-submission.identifiers.hints"/></p>
-		<br/><br/><table>
+		<p class="help-block"><fmt:message key="jsp.submit.start-lookup-submission.identifiers.hints"/></p>
 <%	
 		for (String identifier : identifiers)
 		{			
 %>
 <c:set var="identifier"><%= identifier %></c:set>
-		<tr><td><span class="submission-lookup-label"><fmt:message key="jsp.submit.start-lookup-submission.identifier-${identifier}"/>:</span></td><td> 
-		<span class="submission-lookup-hint"><fmt:message key="jsp.submit.start-lookup-submission.identifier-${identifier}.hint"/></span><br/>
-		<input class="submission-lookup-identifier" type="text" size="50" name="identifier_<%= identifier%>" id="identifier_<%= identifier%>" /><br/>&nbsp;</td><td class="submission-lookup-providers">
+	<div class="form-group">
+		<label class="col-md-3" for="identifier_<%= identifier%>"><span class="submission-lookup-label"><fmt:message key="jsp.submit.start-lookup-submission.identifier-${identifier}"/>:</span> 
+		<span class="help-block submission-lookup-hint"><fmt:message key="jsp.submit.start-lookup-submission.identifier-${identifier}.hint"/></span></label>
+		<div class="col-md-9">
+		<div class="col-md-4">
+		<input class="form-control  submission-lookup-identifier" type="text" name="identifier_<%= identifier%>" id="identifier_<%= identifier%>" />
+		</div>
+		<div class="col-md-7">
 <%	
 			for (SubmissionLookupProvider provider : identifiers2providers.get(identifier))
 			{			
 %>
-		<img src="<%= request.getContextPath() %>/image/submission-lookup-small-<%= provider.getShortName() %>.jpg" />&nbsp;
+		
+			<img class="img-thumbnail" src="<%= request.getContextPath() %>/image/submission-lookup-small-<%= provider.getShortName() %>.jpg" />
+		
 <% 
 			}
-%></td></tr><%
+%></div></div></div><%
 		} %>				
-		<tr><td>&nbsp;</td><td>&nbsp;</td><td><br/>
-		<button type="button" id="lookup_idenfifiers"><fmt:message key="jsp.submit.start-lookup-submission.identifier.lookup"/></button>
-		<button type="button" class="exit"><fmt:message key="jsp.submit.start-lookup-submission.exit"/></button></td></tr>
-	</table>
+	<div class="btn-group col-md-offset-5">	
+		<button class="btn btn-primary" type="button" id="lookup_idenfifiers"><fmt:message key="jsp.submit.start-lookup-submission.identifier.lookup"/></button>
+		<button type="button" class="btn btn-default exit"><fmt:message key="jsp.submit.start-lookup-submission.exit"/></button></td></tr>
+	</div>
 	</div>
 <% 
 		
@@ -208,40 +206,91 @@
 	</div>
 </div>
 
-	<div id="tabs-result">
+	<div class="tab-pane" id="tabs-result">
 		<div id="empty-result">
-			<p><fmt:message key="jsp.submit.start-lookup-submission.noresult"/></p>
+			<p class="alert alert-warning"><fmt:message key="jsp.submit.start-lookup-submission.noresult"/></p>
 		</div>
 		<div id="result-list"></div>
 		<div id="manual-submission">
-			<fmt:message key="jsp.submit.start-lookup-submission.select.collection.label"/>
-			<select id="select-collection-manual">
+			<div class="form-group">
+			<div class="col-md-3">
+			<label for="select-collection-manual"><fmt:message key="jsp.submit.start-lookup-submission.select.collection.label"/></label>
+			</div>
+			<div class="col-md-7">
+			<select class="form-control" id="select-collection-manual">
 				<option value="-1"><fmt:message key="jsp.submit.start-lookup-submission.select.collection.defaultoption"/></option>
 				<% for (Collection c : collections) { %>
 				<option value="<%= c.getID() %>"><%= c.getName() %></option>
 				<% }  %>
 			</select>
-			<button id="manual-submission-button" type="button"><fmt:message key="jsp.submit.start-lookup-submission.button.manual-submission"/> </button>
+			</div>
+			</div>
+			<div class="btn-group">
+				<button class="btn btn-success col-md-offset-5" id="manual-submission-button" type="button"><fmt:message key="jsp.submit.start-lookup-submission.button.manual-submission"/> </button>
+			</div>
 		</div>	
 	</div>
 </div>
-
+</div>
 		<div id="hidden-area" style="display: none;">
 			<div id="select-collection-div">
-				<select id="select-collection">
+				<select class="form-control" id="select-collection">
 					<% for (Collection c : collections) { %>
 					<option value="<%= c.getID() %>"><%= c.getName() %></option>
 					<% }  %>
 				</select>
 			</div>
 		</div>
-<div id="no-collection-warn" title="<fmt:message key="jsp.submit.start-lookup-submission.no-collection-warn.title" />">
-<p><fmt:message key="jsp.submit.start-lookup-submission.no-collection-warn.hint" /></p>
-</div>
-<div id="loading-search-result" title="<fmt:message key="jsp.submit.start-lookup-submission.search-loading.title" />">
-<p><fmt:message key="jsp.submit.start-lookup-submission.search-loading.hint" /></p>
-<center><img src="<%= request.getContextPath()  %>/sherpa/image/ajax-loader-big.gif"/></center>
-</div>
+<div id="no-collection-warn" class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><fmt:message key="jsp.submit.start-lookup-submission.no-collection-warn.title" /></h4>
+      </div>
+      <div class="modal-body">
+       		<p class="alert alert-warning"><fmt:message key="jsp.submit.start-lookup-submission.no-collection-warn.hint" /></p>
+      </div>
+      <div class="modal-footer">
+      		<button type="button" class="btn btn-default" data-dismiss="modal"><fmt:message key="jsp.submit.start-lookup-submission.no-collection.dialog.return" /></button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div id="loading-search-result" class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><fmt:message key="jsp.submit.start-lookup-submission.search-loading.title" /></h4>
+      </div>
+      <div class="modal-body">
+       		<p class="help-block"><fmt:message key="jsp.submit.start-lookup-submission.search-loading.hint" /></p>
+      </div>
+      <div class="modal-footer">
+        <img src="<%= request.getContextPath()  %>/sherpa/image/ajax-loader-big.gif"/>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div id="loading-details" class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><fmt:message key="jsp.submit.start-lookup-submission.js.titlepopupmessage" /></h4>
+      </div>
+      <div class="modal-body">
+       		
+      </div>
+      <div class="modal-footer">
+        
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
       
 <%  } else { %>
 	<p class="submitFormWarn"><fmt:message key="jsp.submit.select-collection.none-authorized"/></p>
@@ -286,10 +335,9 @@
     		}
     		else
    			{
-    			j('#no-collection-warn').dialog("open");
+    			j('#no-collection-warn').modal('show');
    			}
     	});
-    	j('#no-collection-warn').dialog({autoOpen: false,modal: true});
     	j('#lookup_idenfifiers').click(function(){
     		submissionLookupIdentifiers(j('input.submission-lookup-identifier'));
     	});
@@ -300,14 +348,14 @@
     		event.preventDefault();
     		window.location = "<%= request.getContextPath() %>/mydspace";
     	});
-    	j('#loading-search-result').dialog({
-    		autoOpen: false,
-    		modal: true,
-    		onClose: function(){
-    			j(this).data('ajaxCall').abort();
-    		},
-    		width: 600
+    	j('#loading-search-result').on('hide.bs.modal', function () {
+    		j(this).data('ajaxCall').abort();
     	});
+    	j('#loading-details').on('hidden.bs.modal', function () {
+  			 j('#hidden-area').append(j('#select-collection-div'));
+  			 j('#loading-details .modal-body').empty();
+  			 j('#loading-details .modal-footer').empty();
+   		});
     --></script>
 	   
 </dspace:layout>
