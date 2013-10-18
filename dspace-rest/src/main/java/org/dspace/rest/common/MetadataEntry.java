@@ -7,10 +7,7 @@
  */
 package org.dspace.rest.common;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,13 +16,9 @@ import javax.xml.bind.annotation.XmlType;
  * Time: 5:51 PM
  * To change this template use File | Settings | File Templates.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "entry")
+@XmlRootElement(name = "metadataentry")
 public class MetadataEntry {
-
-    @XmlAttribute
     String key;
-
     String value;
 
     public MetadataEntry() {}
