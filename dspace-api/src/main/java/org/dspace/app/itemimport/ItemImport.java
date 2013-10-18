@@ -635,58 +635,57 @@ public class ItemImport
         Map<String, String> outputMap = dls.getOutputMap();
 
         if (dataLoader==null){
-        	System.out.println("ERROR: The key used in -i parameter must match a valid DataLoader in the BTE Spring XML configuration file!");
-        	return;
+            System.out.println("ERROR: The key used in -i parameter must match a valid DataLoader in the BTE Spring XML configuration file!");
+            return;
         }
-        
+
         if (outputMap==null){
-        	System.out.println("ERROR: The key used in -i parameter must match a valid outputMapping in the BTE Spring XML configuration file!");
-        	return;
+            System.out.println("ERROR: The key used in -i parameter must match a valid outputMapping in the BTE Spring XML configuration file!");
+            return;
         }
-        
+
         if (dataLoader instanceof FileDataLoader){
-        	FileDataLoader fdl = (FileDataLoader) dataLoader;
-        	if (!"".equals(sourceDir)){
-        		System.out.println("INFO: Dataloader will load data from the file specified in the command prompt (and not from the Spring XML configuration file)");
-        		fdl.setFilename(sourceDir);
-        	}
+            FileDataLoader fdl = (FileDataLoader) dataLoader;
+            if (!StringUtils.isBlank(sourceDir)) {
+                System.out.println("INFO: Dataloader will load data from the file specified in the command prompt (and not from the Spring XML configuration file)");
+                fdl.setFilename(sourceDir);
+            }
         }
-        if (dataLoader instanceof OAIPMHDataLoader){
-        	OAIPMHDataLoader fdl = (OAIPMHDataLoader) dataLoader;
-        	if (!"".equals(sourceDir)){
-        		System.out.println("INFO: Dataloader will load data from the address specified in the command prompt (and not from the Spring XML configuration file)");
-        		fdl.setServerAddress(sourceDir);
-        	}
+        else if (dataLoader instanceof OAIPMHDataLoader){
+            OAIPMHDataLoader fdl = (OAIPMHDataLoader) dataLoader;
+            System.out.println(sourceDir);
+            if (!StringUtils.isBlank(sourceDir)){
+                System.out.println("INFO: Dataloader will load data from the address specified in the command prompt (and not from the Spring XML configuration file)");
+                fdl.setServerAddress(sourceDir);
+            }
         }
         if (dataLoader!=null){
-        	System.out.println("INFO: Dataloader " + dataLoader.toString()+" will be used for the import!");
+            System.out.println("INFO: Dataloader " + dataLoader.toString()+" will be used for the import!");
 
-        	te.setDataLoader(dataLoader);
-        	
-        	DSpaceOutputGenerator outputGenerator = new DSpaceOutputGenerator(outputMap);
-        	outputGenerator.setOutputDirectory("./.bte_output_dspace");
-        	
-        	te.setOutputGenerator(outputGenerator);
+            te.setDataLoader(dataLoader);
+
+            DSpaceOutputGenerator outputGenerator = new DSpaceOutputGenerator(outputMap);
+            outputGenerator.setOutputDirectory("./.bte_output_dspace");
+            te.setOutputGenerator(outputGenerator);
 
 
-        	try {
-        		TransformationResult res = te.transform(new TransformationSpec());
-        		List<String> output = res.getOutput();
-        		outputGenerator.writeOutput(output);
-        	} catch (Exception e) {
-        		System.err.println("Exception");
-        		e.printStackTrace();
-        	}
+            try {
+                TransformationResult res = te.transform(new TransformationSpec());
+                List<String> output = res.getOutput();
+                outputGenerator.writeOutput(output);
+            } catch (Exception e) {
+                System.err.println("Exception");
+                e.printStackTrace();
+            }
 
-        	ItemImport myloader = new ItemImport();
-        	myloader.addItems(c, mycollections, "./.bte_output_dspace", mapFile, template);
+            ItemImport myloader = new ItemImport();
+            myloader.addItems(c, mycollections, "./.bte_output_dspace", mapFile, template);
 
-        	//remove files from output generator
-        	deleteDirectory(new File("./.bte_output_dspace"));
+            //remove files from output generator
+            deleteDirectory(new File("./.bte_output_dspace"));
         }
     }
 
-    
     private void addItems(Context c, Collection[] mycollections,
             String sourceDir, String mapFile, boolean template) throws Exception
     {
