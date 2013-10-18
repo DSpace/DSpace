@@ -67,6 +67,8 @@ public class CollectionsResource {
         try {
             if(context == null || !context.isValid() ) {
                 context = new org.dspace.core.Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
             }
 
             org.dspace.content.Collection[] collections = org.dspace.content.Collection.findAll(context);
@@ -81,7 +83,7 @@ public class CollectionsResource {
             return collectionArrayList.toArray(new org.dspace.rest.common.Collection[0]);
 
         } catch (SQLException e) {
-            e.getMessage();
+            log.error(e.getMessage());
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -93,6 +95,8 @@ public class CollectionsResource {
         try {
             if(context == null || !context.isValid() ) {
                 context = new Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
             }
 
             org.dspace.content.Collection collection = org.dspace.content.Collection.find(context, collection_id);

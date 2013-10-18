@@ -64,6 +64,8 @@ public class CommunitiesResource {
         try {
             if(context == null || !context.isValid() ) {
                 context = new org.dspace.core.Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
             }
 
             org.dspace.content.Community[] topCommunities = org.dspace.content.Community.findAllTop(context);
@@ -91,6 +93,8 @@ public class CommunitiesResource {
         try {
             if(context == null || !context.isValid() ) {
                 context = new org.dspace.core.Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
             }
 
             org.dspace.content.Community community = org.dspace.content.Community.find(context, community_id);

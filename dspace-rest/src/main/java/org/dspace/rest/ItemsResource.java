@@ -37,6 +37,8 @@ public class ItemsResource {
         try {
             if(context == null || !context.isValid()) {
                 context = new Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
             }
 
             org.dspace.content.Item item = org.dspace.content.Item.find(context, item_id);

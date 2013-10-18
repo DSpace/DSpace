@@ -40,6 +40,8 @@ public class BitstreamResource {
         try {
             if(context == null || !context.isValid()) {
                 context = new Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
             }
 
             org.dspace.content.Bitstream bitstream = org.dspace.content.Bitstream.find(context, bitstream_id);
@@ -62,6 +64,8 @@ public class BitstreamResource {
         try {
             if(context == null || !context.isValid() ) {
                 context = new org.dspace.core.Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
             }
 
             org.dspace.content.Bitstream bitstream = org.dspace.content.Bitstream.find(context, bitstream_id);

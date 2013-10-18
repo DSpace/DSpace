@@ -40,6 +40,8 @@ public class HandleResource {
         try {
             if(context == null || !context.isValid() ) {
                 context = new Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
             }
 
             org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
