@@ -32,7 +32,7 @@ public class Collection extends DSpaceObject {
     Logger log = Logger.getLogger(Collection.class);
 
     //Relationships
-    Bitstream logo;
+    private Bitstream logo;
     private Community parentCommunity;
     private List<Community> parentCommunityList = new ArrayList<Community>();
 
@@ -46,14 +46,6 @@ public class Collection extends DSpaceObject {
     //String introductory_text;
     //String copyright_text;
     //String side_bar_text;
-
-    public String getLicense() {
-        return license;
-    }
-
-    public void setLicense(String license) {
-        this.license = license;
-    }
 
     //Calculated
     private Integer numberItems;
@@ -152,5 +144,13 @@ public class Collection extends DSpaceObject {
 
     public void addParentCommunityList(Community parentCommunity) {
         this.parentCommunityList.add(parentCommunity);
+    }
+
+    public String getLicense() {
+        return license;
+    }
+
+    public void setLicense(String license) {
+        this.license = license;
     }
 }

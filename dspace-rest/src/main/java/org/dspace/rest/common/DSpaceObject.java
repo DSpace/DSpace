@@ -72,8 +72,7 @@ public class DSpaceObject {
     }
 
     public String getLink() {
-        //TODO, I'm not 100% sure this pluralizer will work...
-        //How to get actual contextPath of /rest/
+        //TODO, get actual contextPath of /rest/
         return "/rest/" + English.plural(getType()) + "/" + getID();
     }
 

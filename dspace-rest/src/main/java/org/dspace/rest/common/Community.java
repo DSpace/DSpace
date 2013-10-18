@@ -31,7 +31,7 @@ public class Community extends DSpaceObject{
     private static Logger log = Logger.getLogger(Community.class);
 
     //Exandable relationships
-    Bitstream logo;
+    private Bitstream logo;
 
     @XmlElement(name = "parentCommunity")
     private Community parentCommunity;
