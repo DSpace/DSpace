@@ -1930,7 +1930,6 @@ public class ItemImport
         boolean pathDeleted = path.delete();
         return (pathDeleted);
     }
-<<<<<<< HEAD
     
     /**
      * Generate a random filename based on current time
@@ -2120,6 +2119,3 @@ public class ItemImport
         }
     }
 }
-=======
-}
->>>>>>> DS-1686
