@@ -128,44 +128,48 @@ public abstract class ConfigurableLookupProvider implements SubmissionLookupProv
 				shortName);
 		Field[] fields = bean.getClass().getDeclaredFields();
 		for (Field field : fields) {
-			if (field.getType() == String.class) {
-				Method getter = bean.getClass().getMethod(
-						"get" + field.getName().substring(0, 1).toUpperCase()
-								+ field.getName().substring(1));
+            if (field.getType() == String.class) {
+                    Method getter = bean.getClass().getMethod(
+                                    "get" + field.getName().substring(0, 1).toUpperCase()
+                                                    + field.getName().substring(1));
 
-				String value = (String) getter.invoke(bean);
+                    String value = (String) getter.invoke(bean);
 
-				addMetadata(shortName, publication, field.getName(), value);
+                    addMetadata(shortName, publication, field.getName(), value);
 
-			} else if (field.getType() == List.class) {
-				ParameterizedType pt = (ParameterizedType) field
-						.getGenericType();
+            } else if (field.getType() == List.class) {
+                    ParameterizedType pt = (ParameterizedType) field
+                                    .getGenericType();
 
-				Method getter = bean.getClass().getMethod(
-						"get" + field.getName().substring(0, 1).toUpperCase()
-								+ field.getName().substring(1));
+                    Method getter = bean.getClass().getMethod(
+                                    "get" + field.getName().substring(0, 1).toUpperCase()
+                                                    + field.getName().substring(1));
 
-				if (pt.getActualTypeArguments()[0] instanceof GenericArrayType) { // nomi
-																					// di
-																					// persone
-					List<String[]> values = (List<String[]>) getter.invoke(bean);
-					if (values != null) {
-						for (String[] nvalue : values) {
-							String value = nvalue[1] + ", " + nvalue[0];
-							addMetadata(shortName, publication,
-									field.getName(), value);
-						}
-					}
-				} else { // metadati ripetibili
-					List<String> values = (List<String>) getter.invoke(bean);
-					if (values != null) {
-						for (String value : values) {
-							addMetadata(shortName, publication,
-									field.getName(), value);
-						}
-					}
-				}
-			}
+                    ParameterizedType stringListType = (ParameterizedType) field.getGenericType();
+            Class<?> stringListClass = (Class<?>) stringListType.getActualTypeArguments()[0];
+            
+                    if (String.class.isAssignableFrom(stringListClass)) { //repeatable metadata
+                            List<String> values = (List<String>) getter.invoke(bean);
+                            if (values != null) {
+                                    for (String value : values) {
+                                            addMetadata(shortName, publication,
+                                                            field.getName(), value);
+                                    }
+                            }
+                    } else {
+                            //authors
+                            List<String[]> values = (List<String[]>) getter
+                                            .invoke(bean);
+                            if (values != null) {
+                                    for (String[] nvalue : values) {
+                                            String value = nvalue[1] + ", " + nvalue[0];
+                                            addMetadata(shortName, publication,
+                                                            field.getName(), value);
+                                    }
+                            }
+                    }
+
+            }
 		}
 		return publication;
 	}

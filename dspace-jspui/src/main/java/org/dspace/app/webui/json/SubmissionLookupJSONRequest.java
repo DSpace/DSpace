@@ -197,17 +197,19 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 	private List<Map<String, Object>> getLightResultList(
 			List<ItemSubmissionLookupDTO> result) {
 		List<Map<String, Object>> publications = new ArrayList<Map<String, Object>>();
-		for (ItemSubmissionLookupDTO item : result) {
-			String uuid = item.getUUID();
-            Record pub = item.getTotalPublication(service.getProviders());
-			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("uuid", uuid);
-			data.put("providers", item.getProviders());
-            data.put("title", SubmissionLookupService.getFirstValue(pub, "title"));
-			data.put("authors",pub.getValues("authors")!=null?
-					StringUtils.join(pub.getValues("authors").iterator(), ", "):"");
-            data.put("issued", SubmissionLookupService.getFirstValue(pub, "issued"));
-			publications.add(data);
+		if (result != null && result.size()>0) {
+			for (ItemSubmissionLookupDTO item : result) {
+				String uuid = item.getUUID();
+				Record pub = item.getTotalPublication(service.getProviders());
+				Map<String, Object> data = new HashMap<String, Object>();
+				data.put("uuid", uuid);
+				data.put("providers", item.getProviders());
+				data.put("title", SubmissionLookupService.getFirstValue(pub, "title"));
+				data.put("authors",pub.getValues("authors")!=null?
+						StringUtils.join(pub.getValues("authors").iterator(), ", "):"");
+				data.put("issued", SubmissionLookupService.getFirstValue(pub, "issued"));
+				publications.add(data);
+			}
 		}
 		return publications;
 	}
