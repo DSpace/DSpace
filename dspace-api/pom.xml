@@ -434,24 +434,19 @@
             <version>1.0</version>
         </dependency>
         <dependency>
+            <groupId>gr.ekt.bte</groupId>
+            <artifactId>bte-core</artifactId>
+            <version>0.9.2.2</version>
+		</dependency>
+		<dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.2.1</version>
         </dependency>
         <dependency>
-            <groupId>gr.ekt</groupId>
-            <artifactId>biblio-transformation-engine</artifactId>
-            <version>0.82</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-            <version>2.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jbibtex</groupId>
-            <artifactId>jbibtex</artifactId>
-            <version>1.0.0</version>
+            <groupId>gr.ekt.bte</groupId>
+            <artifactId>bte-io</artifactId>
+            <version>0.9.2.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>

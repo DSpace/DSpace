@@ -7,10 +7,10 @@
  */
 package org.dspace.app.itemimport;
 
+import gr.ekt.bte.core.DataLoader;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import gr.ekt.transformationengine.core.DataLoader;
 
 
 
@@ -22,6 +22,7 @@ public class DataLoaderService
 {
 
     Map<String, DataLoader> dataLoaders = new HashMap<String, DataLoader>();
+    Map<String, String> outputMap = new HashMap<String,String>();
     
     /**
      * Default constructor
@@ -48,5 +49,21 @@ public class DataLoaderService
     {
         return dataLoaders;
     }
-    
+
+    /**
+     * 
+     * @return the outputMapping
+     */
+	public Map<String, String> getOutputMap() {
+		return outputMap;
+	}
+
+	/**
+	 * Setter method for the outputMapping
+	 * @param outputMapping
+	 */
+	public void setOutputMap(Map<String, String> outputMap) {
+		this.outputMap = outputMap;
+	}
+  
 }
