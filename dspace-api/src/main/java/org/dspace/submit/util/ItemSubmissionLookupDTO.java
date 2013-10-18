@@ -64,14 +64,14 @@ public class ItemSubmissionLookupDTO implements Serializable {
 		else
 		{
             MutableRecord pub = new SubmissionLookupPublication(MERGED_PUBLICATION_PROVIDER);
-			for (SubmissionLookupProvider prov : providers)
-			{				
+			//for (SubmissionLookupProvider prov : providers)
+			//{				
                 for (Record p : publications)
 				{
-                    if (!SubmissionLookupService.getProviderName(p).equals(prov.getShortName()))
-					{
-						continue;
-					}
+                    //if (!SubmissionLookupService.getProviderName(p).equals(prov.getShortName()))
+					//{
+					//	continue;
+					//}
 					for (String field : p.getFields())
 					{
 						List<Value> values = p.getValues(field);
@@ -87,7 +87,7 @@ public class ItemSubmissionLookupDTO implements Serializable {
 						}
 					}
 				}
-			}
+			//}
 			return pub;
 		}
 	}

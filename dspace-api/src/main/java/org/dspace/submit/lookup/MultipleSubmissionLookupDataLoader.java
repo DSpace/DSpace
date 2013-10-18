@@ -14,12 +14,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 
 import gr.ekt.bte.core.DataLoader;
 import gr.ekt.bte.core.DataLoadingSpec;
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.RecordSet;
 import gr.ekt.bte.core.StringValue;
+import gr.ekt.bte.core.Value;
 import gr.ekt.bte.exceptions.MalformedSourceException;
 
 /**
@@ -28,6 +30,8 @@ import gr.ekt.bte.exceptions.MalformedSourceException;
  */
 public class MultipleSubmissionLookupDataLoader implements DataLoader {
 
+	private static Logger log = Logger.getLogger(MultipleSubmissionLookupDataLoader.class);
+	
 	private static final String NOT_FOUND_DOI = "NOT-FOUND-DOI";
 
 	List<ConfigurableLookupProvider> providers;
@@ -91,8 +95,13 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader {
 				}
 			}
 
-			//KSTA:ToDo: providers must only be the ones that support DOI search!
 			for (SubmissionLookupProvider provider : providers) {
+				
+				//Provider must support DOI
+				if (provider.getSupportedIdentifiers().contains(SubmissionLookupProvider.DOI)){
+					continue;
+				}
+				
 				//if (evictProviders != null
 						//		&& evictProviders.contains(provider.getShortName())) {
 				//	continue;
@@ -122,6 +131,16 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader {
 			}
 		}
 
+		
+		log.info("BTE DataLoader finished. Items loaded: " + recordSet.getRecords().size());
+		
+		//Printing debug message
+		String totalString = "";
+		for (Record record : recordSet.getRecords()){
+			totalString += SubmissionLookupService.getPrintableString(record)+"\n";
+		}
+		log.debug("Records loaded:\n"+totalString);
+		
 		return recordSet;
 	}
 

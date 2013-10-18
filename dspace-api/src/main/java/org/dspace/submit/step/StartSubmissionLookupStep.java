@@ -208,6 +208,7 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
 			if (transformationEngine != null){
 				SubmissionItemDataLoader dataLoader = (SubmissionItemDataLoader)transformationEngine.getDataLoader();
 				dataLoader.setDtoList(Arrays.asList(new ItemSubmissionLookupDTO[]{dto}));
+				//dataLoader.setProviders()
 
 				DSpaceWorkspaceItemOutputGenerator outputGenerator = (DSpaceWorkspaceItemOutputGenerator)transformationEngine.getOutputGenerator();
 				outputGenerator.setCollection(col);

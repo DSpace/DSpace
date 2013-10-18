@@ -83,7 +83,9 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 				dataLoader.setIdentifiers(identifiers);
 
 				try {
+					log.debug("BTE transformation is about to start!");
 					transformationEngine.transform(new TransformationSpec());
+					log.debug("BTE transformation finished!");
 					
 					SubmissionLookupOutputGenerator outputGenerator = (SubmissionLookupOutputGenerator)transformationEngine.getOutputGenerator();
 					result = outputGenerator.getDtoList();
@@ -205,8 +207,9 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 				data.put("uuid", uuid);
 				data.put("providers", item.getProviders());
 				data.put("title", SubmissionLookupService.getFirstValue(pub, "title"));
-				data.put("authors",pub.getValues("authors")!=null?
-						StringUtils.join(pub.getValues("authors").iterator(), ", "):"");
+				List<String> authors = SubmissionLookupService.getStringValuesFromValues(pub, "authors");
+				data.put("authors",authors!=null?
+						StringUtils.join(authors.iterator(), ", "):"");
 				data.put("issued", SubmissionLookupService.getFirstValue(pub, "issued"));
 				publications.add(data);
 			}
