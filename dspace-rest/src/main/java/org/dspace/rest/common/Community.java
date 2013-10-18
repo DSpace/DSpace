@@ -31,17 +31,19 @@ public class Community extends DSpaceObject{
     private static Logger log = Logger.getLogger(Community.class);
 
     //Exandable relationships
+    Bitstream logo;
+
     @XmlElement(name = "parentCommunity")
-    private DSpaceObject parentCommunity;
+    private Community parentCommunity;
 
     private String copyrightText, introductoryText, shortDescription, sidebarText;
     private Integer countItems;
 
     @XmlElement(name = "subcommunities", required = true)
-    private List<DSpaceObject> subCommunities = new ArrayList<DSpaceObject>();
+    private List<Community> subCommunities = new ArrayList<Community>();
 
     @XmlElement(name = "collections")
-    private List<DSpaceObject> collections = new ArrayList<DSpaceObject>();
+    private List<Collection> collections = new ArrayList<Collection>();
 
     public Community(){}
 
@@ -61,35 +63,35 @@ public class Community extends DSpaceObject{
         this.setSidebarText(community.getMetadata(org.dspace.content.Community.SIDEBAR_TEXT));
         this.setCountItems(community.countItems());
 
-        if(expandFields.contains("parentCommunityID") || expandFields.contains("all")) {
+        if(expandFields.contains("parentCommunity") || expandFields.contains("all")) {
             org.dspace.content.Community parentCommunity = community.getParentCommunity();
             if(parentCommunity != null) {
-                setParentCommunity(new DSpaceObject(parentCommunity));
+                setParentCommunity(new Community(parentCommunity, null, context));
             }
         } else {
-            this.addExpand("parentCommunityID");
+            this.addExpand("parentCommunity");
         }
 
-        if(expandFields.contains("subCollections") || expandFields.contains("all")) {
+        if(expandFields.contains("collections") || expandFields.contains("all")) {
             org.dspace.content.Collection[] collectionArray = community.getCollections();
-            collections = new ArrayList<DSpaceObject>();
+            collections = new ArrayList<Collection>();
             for(org.dspace.content.Collection collection : collectionArray) {
                 if(AuthorizeManager.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {
-                    collections.add(new DSpaceObject(collection));
+                    collections.add(new Collection(collection, null, context, null, null));
                 } else {
                     log.info("Omitted restricted collection: " + collection.getID() + " _ " + collection.getName());
                 }
             }
         } else {
-            this.addExpand("subCollections");
+            this.addExpand("collections");
         }
 
         if(expandFields.contains("subCommunities") || expandFields.contains("all")) {
             org.dspace.content.Community[] communityArray = community.getSubcommunities();
-            subCommunities = new ArrayList<DSpaceObject>();
+            subCommunities = new ArrayList<Community>();
             for(org.dspace.content.Community subCommunity : communityArray) {
                 if(AuthorizeManager.authorizeActionBoolean(context, subCommunity, org.dspace.core.Constants.READ)) {
-                    subCommunities.add(new DSpaceObject(subCommunity));
+                    subCommunities.add(new Community(subCommunity, null, context));
                 } else {
                     log.info("Omitted restricted subCommunity: " + subCommunity.getID() + " _ " + subCommunity.getName());
                 }
@@ -98,16 +100,24 @@ public class Community extends DSpaceObject{
             this.addExpand("subCommunities");
         }
 
+        if(expandFields.contains("logo") || expandFields.contains("all")) {
+            if(community.getLogo() != null) {
+                logo = new Bitstream(community.getLogo(), null);
+            }
+        } else {
+            this.addExpand("logo");
+        }
+
         if(!expandFields.contains("all")) {
             this.addExpand("all");
         }
     }
 
-    public List<DSpaceObject> getCollections() {
+    public List<Collection> getCollections() {
         return collections;
     }
 
-    public void setCollections(List<DSpaceObject> collections) {
+    public void setCollections(List<Collection> collections) {
         this.collections = collections;
     }
 
@@ -151,11 +161,11 @@ public class Community extends DSpaceObject{
         this.copyrightText = copyrightText;
     }
 
-    public DSpaceObject getParentCommunity() {
+    public Community getParentCommunity() {
         return parentCommunity;
     }
 
-    public void setParentCommunity(DSpaceObject parentCommunity) {
+    public void setParentCommunity(Community parentCommunity) {
         this.parentCommunity = parentCommunity;
     }
 }

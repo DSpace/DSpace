@@ -31,20 +31,16 @@ import java.util.List;
 public class Collection extends DSpaceObject {
     Logger log = Logger.getLogger(Collection.class);
 
-    //Relationships to other objects
-    private Integer logoID;
-
-    //Exandable relationships
-    private Integer parentCommunityID;
-    private List<Integer> parentCommunityIDList = new ArrayList<Integer>();
-    private List<Integer> itemIDList = new ArrayList<Integer>();
+    //Relationships
+    Bitstream logo;
+    private Community parentCommunity;
+    private List<Community> parentCommunityList = new ArrayList<Community>();
 
     @XmlElement(name = "items")
-    private List<DSpaceObject> items = new ArrayList<DSpaceObject>();
+    private List<Item> items = new ArrayList<Item>();
 
+    //Collection-Metadata
     private String license;
-
-    //unused-metadata
     //String provenance_description;
     //String short_description;
     //String introductory_text;
@@ -75,20 +71,20 @@ public class Collection extends DSpaceObject {
             expandFields = Arrays.asList(expand.split(","));
         }
 
-        if(expandFields.contains("parentCommunityIDList") || expandFields.contains("all")) {
+        if(expandFields.contains("parentCommunityList") || expandFields.contains("all")) {
             org.dspace.content.Community[] parentCommunities = collection.getCommunities();
             for(org.dspace.content.Community parentCommunity : parentCommunities) {
-                this.addParentCommunityIDList(parentCommunity.getID());
+                this.addParentCommunityList(new Community(parentCommunity, null, context));
             }
         } else {
-            this.addExpand("parentCommunityIDList");
+            this.addExpand("parentCommunityList");
         }
 
-        if(expandFields.contains("parentCommunityID") | expandFields.contains("all")) {
+        if(expandFields.contains("parentCommunity") | expandFields.contains("all")) {
             org.dspace.content.Community parentCommunity = (org.dspace.content.Community) collection.getParentObject();
-            this.setParentCommunityID(parentCommunity.getID());
+            this.setParentCommunity(new Community(parentCommunity, null, context));
         } else {
-            this.addExpand("parentCommunityID");
+            this.addExpand("parentCommunity");
         }
 
         //TODO: Item paging. limit, offset/page
@@ -100,11 +96,11 @@ public class Collection extends DSpaceObject {
                 childItems = collection.getItems();
             }
 
-            items = new ArrayList<DSpaceObject>();
+            items = new ArrayList<Item>();
             while(childItems.hasNext()) {
                 org.dspace.content.Item item = childItems.next();
                 if(AuthorizeManager.authorizeActionBoolean(context, item, org.dspace.core.Constants.READ)) {
-                    items.add(new DSpaceObject(item));
+                    items.add(new Item(item, null, context));
                 }
             }
         } else {
@@ -117,23 +113,21 @@ public class Collection extends DSpaceObject {
             this.addExpand("license");
         }
 
-        if(!expandFields.contains("all")) {
-            this.addExpand("all");
+        if(expandFields.contains("logo") || expandFields.contains("all")) {
+            if(collection.getLogo() != null) {
+                this.logo = new Bitstream(collection.getLogo(), null);
+            }
         }
 
-        if(collection.getLogo() != null) {
-            this.setLogoID(collection.getLogo().getID());
+        if(!expandFields.contains("all")) {
+            this.addExpand("all");
         }
 
         this.setNumberItems(collection.countItems());
     }
 
-    public Integer getLogoID() {
-        return logoID;
-    }
-
-    public void setLogoID(Integer logoID) {
-        this.logoID = logoID;
+    public Bitstream getLogo() {
+        return logo;
     }
 
     public Integer getNumberItems() {
@@ -144,35 +138,19 @@ public class Collection extends DSpaceObject {
         this.numberItems = numberItems;
     }
 
-    public Integer getParentCommunityID() {
-        return parentCommunityID;
+    public Community getParentCommunity() {
+        return parentCommunity;
     }
 
-    public void setParentCommunityID(Integer parentCommunityID) {
-        this.parentCommunityID = parentCommunityID;
+    public void setParentCommunity(Community parentCommunity) {
+        this.parentCommunity = parentCommunity;
     }
 
-    public List<Integer> getParentCommunityIDList() {
-        return parentCommunityIDList;
+    public List<Community> getParentCommunityList() {
+        return parentCommunityList;
     }
 
-    public void setParentCommunityIDList(List<Integer> parentCommunityIDList) {
-        this.parentCommunityIDList = parentCommunityIDList;
-    }
-
-    public void addParentCommunityIDList(Integer communityParentID) {
-        this.parentCommunityIDList.add(communityParentID);
-    }
-
-    public List<Integer> getItemIDList() {
-        return itemIDList;
-    }
-
-    public void setItemIDList(List<Integer> itemIDList) {
-        this.itemIDList = itemIDList;
-    }
-
-    public void addItemIDToList(Integer itemID) {
-        this.itemIDList.add(itemID);
+    public void addParentCommunityList(Community parentCommunity) {
+        this.parentCommunityList.add(parentCommunity);
     }
 }

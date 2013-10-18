@@ -37,20 +37,16 @@ public class Item extends DSpaceObject {
     String isWithdrawn;
     String lastModified;
 
+    Collection parentCollection;
+    List<Collection> parentCollectionList;
 
-    //TODO: Make optional
-    Integer owningCollectionID;
-    String owningCollectionName;
+    List<Community> parentCommunityList;
 
     @XmlElement(name = "metadata", required = true)
-    Metadata metadata;
+    List<MetadataEntry> metadata;
 
     @XmlElement(name = "bitstreams")
     List<Bitstream> bitstreams;
-
-    List<Collection> parentCollections;
-
-    //Bitstreams
 
     public Item(){}
 
@@ -65,36 +61,66 @@ public class Item extends DSpaceObject {
             expandFields = Arrays.asList(expand.split(","));
         }
 
-        //Add Item metadata, omit restricted metadata fields (i.e. provenance).
-        metadata = new Metadata();
-
-        DCValue[] dcvs = item.getMetadata(org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY);
-        for (DCValue dcv : dcvs) {
-            if (!MetadataExposure.isHidden(context, dcv.schema, dcv.element, dcv.qualifier)) {
-                metadata.addMetadataEntry(new MetadataEntry(dcv.getField(), dcv.value));
+        if(expandFields.contains("metadata") || expandFields.contains("all")) {
+            metadata = new ArrayList<MetadataEntry>();
+            DCValue[] dcvs = item.getMetadata(org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY);
+            for (DCValue dcv : dcvs) {
+                if (!MetadataExposure.isHidden(context, dcv.schema, dcv.element, dcv.qualifier)) {
+                    metadata.add(new MetadataEntry(dcv.getField(), dcv.value));
+                }
             }
+        } else {
+            this.addExpand("metadata");
         }
 
         this.setArchived(Boolean.toString(item.isArchived()));
         this.setWithdrawn(Boolean.toString(item.isWithdrawn()));
         this.setLastModified(item.getLastModified().toString());
 
-        //TODO make optional, and set to object
-        this.setOwningCollectionID(item.getOwningCollection().getID());
-        this.setOwningCollectionName(item.getOwningCollection().getName());
+        if(expandFields.contains("parentCollection") || expandFields.contains("all")) {
+            this.parentCollection = new Collection(item.getOwningCollection(), null, context, null, null);
+        } else {
+            this.addExpand("parentCollection");
+        }
 
-        //Should be optional...
-        //maybe TODO: Limit the number of response bitstreams in case of mega#
-        bitstreams = new ArrayList<Bitstream>();
-        Bundle[] bundles = item.getBundles();
-        for(Bundle bundle : bundles) {
-            //TODO, don't show license...
-            org.dspace.content.Bitstream[] itemBitstreams = bundle.getBitstreams();
-            for(org.dspace.content.Bitstream itemBitstream : itemBitstreams) {
-                if(AuthorizeManager.authorizeActionBoolean(context, itemBitstream, org.dspace.core.Constants.READ)) {
-                    bitstreams.add(new Bitstream(itemBitstream, expand));
+        if(expandFields.contains("parentCollectionList") || expandFields.contains("all")) {
+            this.parentCollectionList = new ArrayList<Collection>();
+            org.dspace.content.Collection[] collections = item.getCollections();
+            for(org.dspace.content.Collection collection : collections) {
+                this.parentCollectionList.add(new Collection(collection, null, context, null, null));
+            }
+        } else {
+            this.addExpand("parentCollectionList");
+        }
+
+        if(expandFields.contains("parentCommunityList") || expandFields.contains("all")) {
+            this.parentCommunityList = new ArrayList<Community>();
+            org.dspace.content.Community[] communities = item.getCommunities();
+            for(org.dspace.content.Community community : communities) {
+                this.parentCommunityList.add(new Community(community, null, context));
+            }
+        } else {
+            this.addExpand("parentCommunityList");
+        }
+
+        //TODO: paging - offset, limit
+        if(expandFields.contains("bitstreams") || expandFields.contains("all")) {
+            bitstreams = new ArrayList<Bitstream>();
+            Bundle[] bundles = item.getBundles();
+            for(Bundle bundle : bundles) {
+                org.dspace.content.Bitstream[] itemBitstreams = bundle.getBitstreams();
+                for(org.dspace.content.Bitstream itemBitstream : itemBitstreams) {
+                    if(AuthorizeManager.authorizeActionBoolean(context, itemBitstream, org.dspace.core.Constants.READ)) {
+                        bitstreams.add(new Bitstream(itemBitstream, expand));
+                    }
                 }
             }
+        } else {
+            this.addExpand("bitstreams");
+        }
+
+        if(!expandFields.contains("all")) {
+            this.addExpand("all");
         }
     }
 
@@ -122,19 +148,23 @@ public class Item extends DSpaceObject {
         this.lastModified = lastModified;
     }
 
-    public Integer getOwningCollectionID() {
-        return owningCollectionID;
+    public Collection getParentCollection() {
+        return parentCollection;
     }
 
-    public void setOwningCollectionID(Integer owningCollectionID) {
-        this.owningCollectionID = owningCollectionID;
+    public List<Collection> getParentCollectionList() {
+        return parentCollectionList;
     }
 
-    public String getOwningCollectionName() {
-        return owningCollectionName;
+    public List<MetadataEntry> getMetadata() {
+        return metadata;
     }
 
-    public void setOwningCollectionName(String owningCollectionName) {
-        this.owningCollectionName = owningCollectionName;
+    public List<Bitstream> getBitstreams() {
+        return bitstreams;
+    }
+
+    public List<Community> getParentCommunityList() {
+        return parentCommunityList;
     }
 }
