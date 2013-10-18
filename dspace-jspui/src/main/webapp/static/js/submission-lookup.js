@@ -20,7 +20,7 @@ submissionLookupIdentifiers = function(identInputs){
 		contentType: "application/x-www-form-urlencoded;charset=UTF-8", 
 		data: mydata, 
 		error: function(info){
-			j('#loading-search-result').dialog("close");
+			j('#loading-search-result').modal("hide");
 			var message = j('#jserrormessage').text();
 			alert(message);
 		},
@@ -34,12 +34,12 @@ submissionLookupIdentifiers = function(identInputs){
 			{
 				submissionLookupShowResult(info);
 			}
-			j('#loading-search-result').dialog("close");
+			j('#loading-search-result').modal("hide");
 			j('#tabs').find('a[href="#tabs-result"]').click();
 		}
 	});
 	j('#loading-search-result').data('ajaxCall', ajaxCall);
-	j('#loading-search-result').dialog("open");
+	j('#loading-search-result').modal("show");
 }
 
 submissionLookupSearch = function(){
@@ -56,7 +56,7 @@ submissionLookupSearch = function(){
 		contentType: "application/x-www-form-urlencoded;charset=UTF-8", 
 		data: mydata, 
 		error: function(info){
-			j('#loading-search-result').dialog("close");
+			j('#loading-search-result').modal('hide');
 			var message = j('#jserrormessage').text();
 			alert(message);
 		},
@@ -70,12 +70,12 @@ submissionLookupSearch = function(){
 			{
 				submissionLookupShowResult(info);
 			}
-			j('#loading-search-result').dialog("close");
+			j('#loading-search-result').modal('hide');
 			j('#tabs').find('a[href="#tabs-result"]').click();
 		}
 	});
 	j('#loading-search-result').data('ajaxCall', ajaxCall);
-	j('#loading-search-result').dialog("open");
+	j('#loading-search-result').modal('show');
 }
 
 submissionLookupDetails = function(button){
@@ -113,7 +113,7 @@ submissionLookupShowResult = function(info){
 	j('#result-list').html(" ");
 	for (var i=0;i<info.result.length;i++)
 	{
-		var bt = j('<button type="button">').append(j('#jsseedetailsbuttonmessage').text());
+		var bt = j('<button class="btn btn-info" type="button">').append(j('#jsseedetailsbuttonmessage').text());
 		var par = j('<p class="sl-result">');
 		var divImg = j('<div class="submission-lookup-providers">');
 		par.append(divImg);
@@ -137,18 +137,20 @@ submissionLookupShowResult = function(info){
 }
 
 submissionLookupShowDetails = function(info){
-	var popup = j('<div title="'+j('#jstitlepopupmessage').text()+'">');
+	
+	var modalbody = j('#loading-details .modal-body');
 	var divImg = j('<div class="submission-lookup-providers">');
-	popup.append(divImg);
+	
 	for (var k=0;k<info.providers.length;k++)
 	{
 		var prov = info.providers[k];
-		divImg.append(j('<img src="'+dspaceContextPath+'/image/submission-lookup-small-'+prov+'.jpg">'));
+		divImg.append(j('<img class="img-thumbnail" src="'+dspaceContextPath+'/image/submission-lookup-small-'+prov+'.jpg">'));
 	}
+	modalbody.append(divImg);
 	var detailsDiv = j('<div class="submission-lookup-details">');
-	var details = j('<table>');
+	var details = j('<table class="table">');
 	detailsDiv.append(details);
-	popup.append(detailsDiv);
+	
 	for (var i=0;i<info.fieldsLabels.length;i++)
 	{
 		var fieldName = info.fieldsLabels[i][0];
@@ -168,9 +170,13 @@ submissionLookupShowDetails = function(info){
 		}
 		details.append(tr);
 	}
-	popup.append(j('#select-collection-div'));
-	j('#select-collection').val(info.collection);	
-	var start = j('<button type="button">');
+	modalbody.append(detailsDiv);
+	
+	modalbody.append(j('#select-collection-div'));
+	j('#select-collection').val(info.collection);
+
+	var modalfooter = j('#loading-details .modal-footer');
+	var start = j('<button class="btn btn-success" type="button">');
 	start.append(j('#jsfilldatabuttonmessage').text());
 	start.button();
 	start.click(function(){
@@ -178,13 +184,6 @@ submissionLookupShowDetails = function(info){
 		j('#iuuid').val(info.uuid);
 		j('#form-submission').submit();
 	});
-	popup.append(start);
-	
-	j('body').append(popup);
-	popup.dialog({modal: true,width:800,height:600,
-		 close: function( event, ui ) {
-			 j('#hidden-area').append(j('#select-collection-div'));
-			 j(this).dialog('destroy').remove();
-		 }
-	});
+	modalfooter.append(start);
+	j('#loading-details').modal('show');
 }

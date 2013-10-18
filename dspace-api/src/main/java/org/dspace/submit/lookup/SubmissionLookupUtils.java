@@ -7,6 +7,9 @@
  */
 package org.dspace.submit.lookup;
 
+import gr.ekt.bte.core.Record;
+import gr.ekt.bte.core.Value;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,6 +18,7 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,5 +112,25 @@ public class SubmissionLookupUtils {
 		}
 		return null;
 		
+	}
+
+	public static String getFirstValue(Record rec, String field) {
+	    List<Value> values = rec.getValues(field);
+	    String value = null;
+	    if (values != null && values.size() > 0) {
+	        value = values.get(0).getAsString();
+	    }
+	    return value;
+	}
+
+	public static List<String> getValues(Record rec, String field) {
+		List<String> result = new ArrayList<String>();
+	    List<Value> values = rec.getValues(field);
+	    String value = null;
+	    if (values != null && values.size() > 0) {
+	        value = values.get(0).getAsString();
+	        result.add(value);
+	    }
+	    return result;
 	}
 }

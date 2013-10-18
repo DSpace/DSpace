@@ -8,9 +8,7 @@
 package org.dspace.submit.lookup;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
-
 import gr.ekt.bte.core.Record;
-import gr.ekt.bte.core.Value;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -137,20 +135,11 @@ public class SubmissionLookupService {
 		return providers;
 	}
 
-    public static String getFirstValue(Record rec, String field) {
-        List<Value> values = rec.getValues(field);
-        String provider_name = null;
-        if (values != null && values.size() > 0) {
-            provider_name = values.get(0).getAsString();
-        }
-        return provider_name;
-    }
-
     public static String getProviderName(Record rec) {
-        return getFirstValue(rec, SubmissionLookupService.PROVIDER_NAME_FIELD);
+        return SubmissionLookupUtils.getFirstValue(rec, SubmissionLookupService.PROVIDER_NAME_FIELD);
     }
 
     public static String getType(Record rec) {
-        return getFirstValue(rec, SubmissionLookupProvider.TYPE);
+        return SubmissionLookupUtils.getFirstValue(rec, SubmissionLookupProvider.TYPE);
     }
 }

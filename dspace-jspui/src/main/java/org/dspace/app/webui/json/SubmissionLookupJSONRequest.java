@@ -8,7 +8,6 @@
 package org.dspace.app.webui.json;
 
 import flexjson.JSONSerializer;
-
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.TransformationEngine;
 import gr.ekt.bte.core.TransformationSpec;
@@ -38,6 +37,7 @@ import org.dspace.core.I18nUtil;
 import org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader;
 import org.dspace.submit.lookup.SubmissionLookupOutputGenerator;
 import org.dspace.submit.lookup.SubmissionLookupService;
+import org.dspace.submit.lookup.SubmissionLookupUtils;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
 import org.dspace.submit.util.SubmissionLookupDTO;
 import org.dspace.utils.DSpace;
@@ -204,10 +204,10 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 				Map<String, Object> data = new HashMap<String, Object>();
 				data.put("uuid", uuid);
 				data.put("providers", item.getProviders());
-				data.put("title", SubmissionLookupService.getFirstValue(pub, "title"));
+				data.put("title", SubmissionLookupUtils.getFirstValue(pub, "title"));
 				data.put("authors",pub.getValues("authors")!=null?
-						StringUtils.join(pub.getValues("authors").iterator(), ", "):"");
-				data.put("issued", SubmissionLookupService.getFirstValue(pub, "issued"));
+						StringUtils.join(SubmissionLookupUtils.getValues(pub, "authors").iterator(), ", "):"");
+				data.put("issued", SubmissionLookupUtils.getFirstValue(pub, "issued"));
 				publications.add(data);
 			}
 		}
