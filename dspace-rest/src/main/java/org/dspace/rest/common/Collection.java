@@ -64,12 +64,12 @@ public class Collection extends DSpaceObject {
 
     public Collection(){}
 
-    public Collection(org.dspace.content.Collection collection, String expand, Context context) throws SQLException, WebApplicationException{
+    public Collection(org.dspace.content.Collection collection, String expand, Context context, Integer limit, Integer offset) throws SQLException, WebApplicationException{
         super(collection);
-        setup(collection, expand, context);
+        setup(collection, expand, context, limit, offset);
     }
 
-    private void setup(org.dspace.content.Collection collection, String expand, Context context) throws SQLException{
+    private void setup(org.dspace.content.Collection collection, String expand, Context context, Integer limit, Integer offset) throws SQLException{
         List<String> expandFields = new ArrayList<String>();
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
@@ -93,7 +93,13 @@ public class Collection extends DSpaceObject {
 
         //TODO: Item paging. limit, offset/page
         if(expandFields.contains("items") || expandFields.contains("all")) {
-            ItemIterator childItems = collection.getItems();
+            ItemIterator childItems;
+            if(limit != null && limit >= 0 && offset != null && offset >= 0) {
+                childItems = collection.getItems(limit, offset);
+            } else {
+                childItems = collection.getItems();
+            }
+
             items = new ArrayList<DSpaceObject>();
             while(childItems.hasNext()) {
                 org.dspace.content.Item item = childItems.next();

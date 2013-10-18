@@ -54,7 +54,7 @@ public class HandleResource {
                 case Constants.COMMUNITY:
                     return new Community((org.dspace.content.Community) dso, expand, context);
                 case Constants.COLLECTION:
-                    return new Collection((org.dspace.content.Collection) dso, expand, context);
+                    return new Collection((org.dspace.content.Collection) dso, expand, context, null, null);
                 case Constants.ITEM:
                     return new Item((org.dspace.content.Item) dso, expand, context);
                 default:

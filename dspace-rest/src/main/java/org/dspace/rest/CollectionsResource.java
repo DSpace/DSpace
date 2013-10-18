@@ -63,7 +63,7 @@ public class CollectionsResource {
     @GET
     @Path("/")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public org.dspace.rest.common.Collection[] list(@QueryParam("expand") String expand) {
+    public org.dspace.rest.common.Collection[] list(@QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("100") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset) {
         try {
             if(context == null || !context.isValid() ) {
                 context = new org.dspace.core.Context();
@@ -71,11 +71,19 @@ public class CollectionsResource {
                 context.getDBConnection().setAutoCommit(true);
             }
 
-            org.dspace.content.Collection[] collections = org.dspace.content.Collection.findAll(context);
+            org.dspace.content.Collection[] collections;
+
+            //Only support paging if limit/offset are 0 or positive values.
+            if(limit != null && limit >= 0 && offset != null && offset != 0) {
+                collections = org.dspace.content.Collection.findAll(context, limit, offset);
+            } else {
+                collections = org.dspace.content.Collection.findAll(context);
+            }
+
             ArrayList<org.dspace.rest.common.Collection> collectionArrayList = new ArrayList<org.dspace.rest.common.Collection>();
             for(org.dspace.content.Collection collection : collections) {
                 if(AuthorizeManager.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {
-                    org.dspace.rest.common.Collection restCollection = new org.dspace.rest.common.Collection(collection, expand, context);
+                    org.dspace.rest.common.Collection restCollection = new org.dspace.rest.common.Collection(collection, expand, context, limit, offset);
                     collectionArrayList.add(restCollection);
                 } // Not showing restricted-access collections
             }
@@ -91,7 +99,7 @@ public class CollectionsResource {
     @GET
     @Path("/{collection_id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public org.dspace.rest.common.Collection getCollection(@PathParam("collection_id") Integer collection_id, @QueryParam("expand") String expand) {
+    public org.dspace.rest.common.Collection getCollection(@PathParam("collection_id") Integer collection_id, @QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("100") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset) {
         try {
             if(context == null || !context.isValid() ) {
                 context = new Context();
@@ -101,7 +109,7 @@ public class CollectionsResource {
 
             org.dspace.content.Collection collection = org.dspace.content.Collection.find(context, collection_id);
             if(AuthorizeManager.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {
-                return new org.dspace.rest.common.Collection(collection, expand, context);
+                return new org.dspace.rest.common.Collection(collection, expand, context, limit, offset);
             } else {
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
