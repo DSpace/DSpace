@@ -13,6 +13,7 @@ import gr.ekt.bte.core.TransformationResult;
 import gr.ekt.bte.core.TransformationSpec;
 import gr.ekt.bte.dataloader.FileDataLoader;
 import gr.ekt.bteio.generators.DSpaceOutputGenerator;
+import gr.ekt.bteio.loaders.OAIPMHDataLoader;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -674,25 +675,32 @@ public class ItemImport
         Map<String, String> outputMap = dls.getOutputMap();
 
         if (dataLoader==null){
-        	System.out.println("ERROR: The key used in -i parameter must match a valid DataLoader in the BTE Spring XML configuration file!");
-        	return;
+            System.out.println("ERROR: The key used in -i parameter must match a valid DataLoader in the BTE Spring XML configuration file!");
+            return;
         }
-        
+
         if (outputMap==null){
-        	System.out.println("ERROR: The key used in -i parameter must match a valid outputMapping in the BTE Spring XML configuration file!");
-        	return;
+            System.out.println("ERROR: The key used in -i parameter must match a valid outputMapping in the BTE Spring XML configuration file!");
+            return;
         }
-        
+
         if (dataLoader instanceof FileDataLoader){
-        	FileDataLoader fdl = (FileDataLoader) dataLoader;
-        	if (!"".equals(sourceDir)){
-        		System.out.println("INFO: Dataloader will load data from the file specified in the command prompt (and not from the Spring XML configuration file)");
-        		fdl.setFilename(sourceDir);
-        	}
+            FileDataLoader fdl = (FileDataLoader) dataLoader;
+            if (!StringUtils.isBlank(sourceDir)) {
+                System.out.println("INFO: Dataloader will load data from the file specified in the command prompt (and not from the Spring XML configuration file)");
+                fdl.setFilename(sourceDir);
+            }
         }
-        
+        else if (dataLoader instanceof OAIPMHDataLoader){
+            OAIPMHDataLoader fdl = (OAIPMHDataLoader) dataLoader;
+            System.out.println(sourceDir);
+            if (!StringUtils.isBlank(sourceDir)){
+                System.out.println("INFO: Dataloader will load data from the address specified in the command prompt (and not from the Spring XML configuration file)");
+                fdl.setServerAddress(sourceDir);
+            }
+        }
         if (dataLoader!=null){
-        	System.out.println("INFO: Dataloader " + dataLoader.toString()+" will be used for the import!");
+            System.out.println("INFO: Dataloader " + dataLoader.toString()+" will be used for the import!");
 
         	te.setDataLoader(dataLoader);
         	
@@ -718,7 +726,6 @@ public class ItemImport
         }
     }
 
-    
     private void addItems(Context c, Collection[] mycollections,
             String sourceDir, String mapFile, boolean template) throws Exception
     {
@@ -1923,6 +1930,7 @@ public class ItemImport
         boolean pathDeleted = path.delete();
         return (pathDeleted);
     }
+<<<<<<< HEAD
     
     /**
      * Generate a random filename based on current time
@@ -2112,3 +2120,6 @@ public class ItemImport
         }
     }
 }
+=======
+}
+>>>>>>> DS-1686
