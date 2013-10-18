@@ -8,6 +8,7 @@
 package org.dspace.rest;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
@@ -50,15 +51,19 @@ public class HandleResource {
             }
             log.info("DSO Lookup by handle: [" + prefix + "] / [" + suffix + "] got result of: " + dso.getTypeText() + "_" + dso.getID());
 
-            switch(dso.getType()) {
-                case Constants.COMMUNITY:
-                    return new Community((org.dspace.content.Community) dso, expand, context);
-                case Constants.COLLECTION:
-                    return new Collection((org.dspace.content.Collection) dso, expand, context, null, null);
-                case Constants.ITEM:
-                    return new Item((org.dspace.content.Item) dso, expand, context);
-                default:
-                    return new DSpaceObject(dso);
+            if(AuthorizeManager.authorizeActionBoolean(context, dso, org.dspace.core.Constants.READ)) {
+                switch(dso.getType()) {
+                    case Constants.COMMUNITY:
+                        return new Community((org.dspace.content.Community) dso, expand, context);
+                    case Constants.COLLECTION:
+                        return new Collection((org.dspace.content.Collection) dso, expand, context, null, null);
+                    case Constants.ITEM:
+                        return new Item((org.dspace.content.Item) dso, expand, context);
+                    default:
+                        return new DSpaceObject(dso);
+                }
+            } else {
+                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
         } catch (SQLException e) {
             log.error(e.getMessage());
