@@ -195,19 +195,20 @@ if (communities != null && communities.length != 0)
 <% } else { %>
 	<div class="col-md-12">
 <% }  %>		
-		<h4 class="list-group-item-heading"><a href="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></a></h4>
-		<p><%= communities[i].getMetadata("short_description") %></p>
-    </div>
-</div>                            
+		<h4 class="list-group-item-heading"><a href="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></a>
 <%
         if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
         {
 %>
-            [<%= ic.getCount(communities[i]) %>]
+		<span class="badge pull-right"><%= ic.getCount(communities[i]) %></span>
 <%
         }
 
 %>
+		</h4>
+		<p><%= communities[i].getMetadata("short_description") %></p>
+    </div>
+</div>                            
 <%
     }
 %>
