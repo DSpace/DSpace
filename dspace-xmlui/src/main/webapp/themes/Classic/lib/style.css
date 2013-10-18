@@ -1003,3 +1003,11 @@ div#aspect_discovery_SimpleSearch_div_search a.previous-page-link {
 }
 
 /* End discovery layout DSpace 3.x*/
+
+.didYouMean{
+    font-size: 18px;
+}
+
+.didYouMean a{
+    font-weight: bold;
+}

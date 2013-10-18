@@ -35,23 +35,15 @@
         ((Boolean) request.getAttribute("updated")).booleanValue();
 %>
 
-<dspace:layout locbar="link"
+<dspace:layout style="submission" locbar="link"
                parentlink="/mydspace"
                parenttitlekey="jsp.mydspace"
                titlekey="jsp.mydspace.subscriptions.title">
 
-    <table width="100%" border="0">
-        <tr>
-            <td align="left">
                 <%-- <h1>Your Subscriptions</h1> --%>
-				<h1><fmt:message key="jsp.mydspace.subscriptions.title"/></h1>
-            </td>
-            <td align="right" class="standard">
-		<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") +\"#subscribe\" %>"><fmt:message key="jsp.help"/></dspace:popup>
-            </td>
-        </tr>
-    </table>
- 
+<h1><fmt:message key="jsp.mydspace.subscriptions.title"/>
+	<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") +\"#subscribe\" %>"><fmt:message key="jsp.help"/></dspace:popup>
+</h1>
 <%
     if (updated)
     {
@@ -67,8 +59,7 @@
 %>
 	<p><fmt:message key="jsp.mydspace.subscriptions.info3"/></p>
     
-    <center>
-        <table class="miscTable" summary="Table displaying your subscriptions">
+        <table class="table" summary="Table displaying your subscriptions">
 <%
         String row = "odd";
 
@@ -87,7 +78,7 @@
                  <td class="<%= row %>RowEvenCol">
                     <form method="post" action=""> 
                         <input type="hidden" name="collection" value="<%= subscriptions[i].getID() %>" />
-			<input type="submit" name="submit_unsubscribe" value="<fmt:message key="jsp.mydspace.subscriptions.unsub.button"/>" />
+			<input class="btn btn-warning" type="submit" name="submit_unsubscribe" value="<fmt:message key="jsp.mydspace.subscriptions.unsub.button"/>" />
                     </form>
                  </td>
             </tr>
@@ -96,15 +87,12 @@
         }
 %>
         </table>
-    </center>
 
     <br/>
 
-    <center>
         <form method="post" action="">
-    	    <input type="submit" name="submit_clear" value="<fmt:message key="jsp.mydspace.subscriptions.remove.button"/>" />
+    	    <input class="btn btn-danger" type="submit" name="submit_clear" value="<fmt:message key="jsp.mydspace.subscriptions.remove.button"/>" />
         </form>
-    </center>
 <%
     }
     else

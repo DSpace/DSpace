@@ -33,7 +33,7 @@
     SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
 %>
 
-<dspace:layout locbar="off"
+<dspace:layout style="submission" locbar="off"
                navbar="off"
                titlekey="jsp.submit.change-file-description.title"
                nocache="true">
@@ -43,14 +43,14 @@
         <jsp:include page="/submit/progressbar.jsp"/>
 
         <%-- <h1>Submit: Change File Description</h1> --%>
-		<h1><fmt:message key="jsp.submit.change-file-description.heading"/></h1>
+		<h1><fmt:message key="jsp.submit.change-file-description.heading"/>
+		<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#filedescription\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup>
+		</h1>
 
-        <%-- <p>Here are the details of the file.  
-        <dspace:popup page="/help/index.html#filedescription">(More Help...)</dspace:popup></p> --%>
-		<div><fmt:message key="jsp.submit.change-file-description.info1"/> 
-          <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#filedescription\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
+        <%-- <p>Here are the details of the file.  </p> --%>
+		<div><fmt:message key="jsp.submit.change-file-description.info1"/></div>
 
-        <table class="miscTable" align="center" summary="Change file descripton details">
+        <table class="table" align="center" summary="Change file descripton details">
             <tr>
            <%-- <th class="oddRowOddCol">File</th>
                 <th class="oddRowEvenCol">Size</th>
@@ -66,7 +66,7 @@
             </tr>
         </table>
 
-        <p><fmt:message key="jsp.submit.change-file-description.info2"/></p>
+        <p class="alert alert-info"><fmt:message key="jsp.submit.change-file-description.info2"/></p>
 <%
     String currentDesc = subInfo.getBitstream().getDescription();
     if (currentDesc == null)
@@ -74,19 +74,15 @@
         currentDesc="";
     }
 %>
-        <center>
-            <table>
-                <tr>
-					<td class="submitFormLabel"><label for="tdescription"><fmt:message key="jsp.submit.change-file-description.filedescr"/></label></td>
-                    <td><input type="text" name="description" id="tdescription" size="50" value="<%= currentDesc %>" /></td>
-                </tr>
-            </table>
-        </center>
+		<div class="row">
+			<label for="tdescription" class="col-md-2"><fmt:message key="jsp.submit.change-file-description.filedescr"/></label>
+            <span class="col-md-10"><input class="form-control" type="text" name="description" id="tdescription" size="50" value="<%= currentDesc %>" /></span>
+		</div><br/>
 
         <%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
         <%= SubmissionController.getSubmissionParameters(context, request) %>
      
-		<center><p><input type="submit" name="submit" value="<fmt:message key="jsp.submit.general.submit"/>" /></p></center>
+		<input class="btn btn-primary col-md-2 col-md-offset-5" type="submit" name="submit" value="<fmt:message key="jsp.submit.general.submit"/>" />
     </form>
 
 </dspace:layout>

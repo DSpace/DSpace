@@ -50,7 +50,7 @@
     request.setAttribute("LanguageSwitch", "hide");
 %>
 
-<dspace:layout locbar="off"
+<dspace:layout style="submission" locbar="off"
                navbar="off"
                titlekey="jsp.submit.verify-prune.title"
                nocache="true">
@@ -119,17 +119,8 @@
 
 <%-- Note: These submit buttons' names don't start with "submit", so the
   -- Previously passed in button will be picked up --%>
-        <center>
-            <table border="0" width="70%">
-                <tr>
-                    <td align="left">
-                        <input type="submit" name="prune" value="<fmt:message key="jsp.submit.verify-prune.proceed.button"/>" />
-                    </td>
-                    <td align="right">
-                        <input type="submit" name="do_not_prune" value="<fmt:message key="jsp.submit.verify-prune.notproceed.button"/>" />
-                    </td>
-                </tr>
-            </table>
-        </center>
+        
+        <input class="btn btn-warning col-md-6" type="submit" name="prune" value="<fmt:message key="jsp.submit.verify-prune.proceed.button"/>" />
+		<input class="btn btn-default col-md-6" type="submit" name="do_not_prune" value="<fmt:message key="jsp.submit.verify-prune.notproceed.button"/>" />
     </form>
 </dspace:layout>

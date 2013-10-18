@@ -128,19 +128,19 @@ public class AccessSettingTag extends TagSupport
             if (!advanced) {
                 disabled = "";
             }
-
-            sb.append("<center>\n");
-            sb.append("<table class=\"miscTable\" width=\"80%\">\n");
+                        
             if (embargo)
             {
                 // Name
-                sb.append("<tr><th class=\"accessOdd\">").append(label_name).append("</th>\n");
-                sb.append("<td class=\"accessOdd\">");
-                sb.append("<input name=\"name\" id=\"policy_name\" type=\"text\" value=\"").append(name).append("\" />\n");
-                sb.append("</td></tr>\n");
+            	sb.append("<div class=\"form-group\">");
+                sb.append(label_name).append("\n");                
+                sb.append("<input class=\"form-control\" name=\"name\" id=\"policy_name\" type=\"text\" value=\"").append(name).append("\" />\n");
+                sb.append("</div>"); 
+                		
                 // Group
-                sb.append("<tr><th class=\"accessEven\">").append(label_group).append("</th>\n");
-                sb.append("<td class=\"accessEven\"><select name=\"group_id\" id=\"select_group\">\n");
+                sb.append("<div class=\"form-group\">");
+                sb.append(label_group).append("\n");
+                sb.append("<select class=\"form-control\" name=\"group_id\" id=\"select_group\">\n");
 
                 Group[] groups = getGroups(context, hrq, subInfo);
                 if (groups != null)
@@ -159,12 +159,16 @@ public class AccessSettingTag extends TagSupport
                     sb.append("<option value=\"0\" selected=\"selected\">Anonymous</option>\n");
                 }
                 sb.append("</select>\n");
-                sb.append("</td></tr>\n");
+                sb.append("</div>"); 
                 // Select open or embargo
-                sb.append("<tr><th class=\"accessOdd\">").append(label_embargo).append("</th>\n");
-                sb.append("<td class=\"accessOdd\"><label><input name=\"open_access_radios\" type=\"radio\" value=\"0\"").append(radio0Checked).append(" />").append(radio0).append("</label>\n");
+                sb.append(label_embargo).append("\n");
+                sb.append("<div class=\"radio\">");                
+                sb.append("<label><input name=\"open_access_radios\" type=\"radio\" value=\"0\"").append(radio0Checked).append(" />").append(radio0).append("</label>\n");
+                sb.append("</div>");
+                sb.append("<div class=\"radio\">");  
                 sb.append("<label><input name=\"open_access_radios\" type=\"radio\" value=\"1\"").append(radio1Checked).append(" />").append(radio1).append("</label>\n");
-                sb.append("</td></tr>\n");
+                sb.append("</div>");
+                 
             }
 
             // Embargo Date
@@ -175,26 +179,24 @@ public class AccessSettingTag extends TagSupport
             }
             else
             {
-                sb.append("<tr><th class=\"accessEven\">").append(label_date).append("</th>\n");
-                sb.append("<td class=\"accessEven\">\n");
-                sb.append("<input name=\"embargo_until_date\" id=\"embargo_until_date\" type=\"text\" value=\"").append(startDate).append("\"").append(disabled).append(" />\n");;
-                sb.append(radio_help);
-                sb.append("</td></tr>\n");
-                // Reason
-                sb.append("<tr>\n");
-                sb.append("<th class=\"accessOdd\">").append(label_reason).append("</th>\n");
-                sb.append("<td class=\"accessOdd\"><textarea name=\"reason\" id=\"reason\" cols=\"30\" rows=\"5\"").append(disabled).append(">").append(reason).append("</textarea>\n");
-                sb.append("</td></tr>\n");
+            	sb.append("<div class=\"form-group\">");
+            	sb.append(label_date).append("\n");                
+                sb.append("<input class=\"form-control\" name=\"embargo_until_date\" id=\"embargo_until_date\" type=\"text\" value=\"").append(startDate).append("\"").append(disabled).append(" />\n");;
+                sb.append("<span class=\"help-block\">"+radio_help+"</span><br/>");                
+                // Reason                
+                sb.append(label_reason).append("\n");                
+                sb.append("<textarea class=\"form-control\" name=\"reason\" id=\"reason\" cols=\"30\" rows=\"5\"").append(disabled).append(">").append(reason).append("</textarea>\n");
+                sb.append("</div>");
             }
 
             // Add policy button
             if (addpolicy)
             {
-                sb.append("<tr>\n");
-                sb.append("<td class=\"accessOdd\" colspan=\"2\" align=\"center\"><input name=\"submit_add_policy\" type=\"submit\" value=\"").append(button_confirm).append("\" />\n");
-                sb.append("</</td></tr>\n");
+                
+                sb.append("<input class=\"btn btn-success col-md-offset-5\" name=\"submit_add_policy\" type=\"submit\" value=\"").append(button_confirm).append("\" />\n");
+                
             }
-            sb.append("</table></center>\n");
+            
 
             out.println(sb.toString());
         }

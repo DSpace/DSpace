@@ -59,10 +59,7 @@ import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.params.CommonParams;
-import org.apache.solr.common.params.FacetParams;
-import org.apache.solr.common.params.HighlightParams;
-import org.apache.solr.common.params.MoreLikeThisParams;
+import org.apache.solr.common.params.*;
 import org.apache.solr.common.util.NamedList;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -1574,6 +1571,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 		}
 
         solrQuery.setQuery(query);
+        if(discoveryQuery.isSpellCheck())
+        {
+            solrQuery.setParam(SpellingParams.SPELLCHECK_Q, query);
+            solrQuery.setParam(SpellingParams.SPELLCHECK_COLLATE, Boolean.TRUE);
+            solrQuery.setParam("spellcheck", Boolean.TRUE);
+        }
 
         if (!includeWithdrawn)
         {
@@ -1850,6 +1853,15 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     {
                         result.addFacetResult(facetField, new DiscoverResult.FacetResult(filter, name, null, name, count));
                     }
+                }
+            }
+
+            if(solrQueryResponse.getSpellCheckResponse() != null)
+            {
+                String recommendedQuery = solrQueryResponse.getSpellCheckResponse().getCollatedResult();
+                if(StringUtils.isNotBlank(recommendedQuery))
+                {
+                    result.setSpellCheckQuery(recommendedQuery);
                 }
             }
         }

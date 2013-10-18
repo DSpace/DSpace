@@ -330,24 +330,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             Map<String, String> parameters = new HashMap<String, String>();
             parameters.put("page", "{pageNum}");
             String pageURLMask = generateURL(parameters);
-            Map<String, String[]> filterQueryParams = getParameterFilterQueries();
-            if(filterQueryParams != null)
-            {
-                StringBuilder maskBuilder = new StringBuilder(pageURLMask);
-                for (String filterQueryParam : filterQueryParams.keySet())
-                {
-                    String[] filterQueryValues = filterQueryParams.get(filterQueryParam);
-                    if(filterQueryValues != null)
-                    {
-                        for (String filterQueryValue : filterQueryValues)
-                        {
-                            maskBuilder.append("&").append(filterQueryParam).append("=").append(filterQueryValue);
-                        }
-                    }
-                }
-
-                pageURLMask = maskBuilder.toString();
-            }
+            pageURLMask = addFilterQueriesToUrl(pageURLMask);
 
             results.setMaskedPagination(itemsTotal, firstItemIndex,
                     lastItemIndex, currentPage, pagesTotal, pageURLMask);
@@ -416,6 +399,28 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             results.addPara(T_no_results);
         }
         //}// Empty query
+    }
+
+    protected String addFilterQueriesToUrl(String pageURLMask) {
+        Map<String, String[]> filterQueryParams = getParameterFilterQueries();
+        if(filterQueryParams != null)
+        {
+            StringBuilder maskBuilder = new StringBuilder(pageURLMask);
+            for (String filterQueryParam : filterQueryParams.keySet())
+            {
+                String[] filterQueryValues = filterQueryParams.get(filterQueryParam);
+                if(filterQueryValues != null)
+                {
+                    for (String filterQueryValue : filterQueryValues)
+                    {
+                        maskBuilder.append("&").append(filterQueryParam).append("=").append(filterQueryValue);
+                    }
+                }
+            }
+
+            pageURLMask = maskBuilder.toString();
+        }
+        return pageURLMask;
     }
 
     /**
@@ -817,6 +822,8 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                 queryArgs.addHitHighlightingField(new DiscoverHitHighlightingField(fieldConfiguration.getField(), fieldConfiguration.getMaxSize(), fieldConfiguration.getSnippets()));
             }
         }
+
+        queryArgs.setSpellCheck(discoveryConfiguration.isSpellCheckEnabled());
 
         this.queryResults = SearchUtils.getSearchService().search(context, scope, queryArgs);
     }

@@ -1373,3 +1373,11 @@ table.discovery-filters th.new-filter-header
 .searchTime{
     color: #999999;
 }
+
+.didYouMean{
+    font-size: 18px;
+}
+
+.didYouMean a{
+    font-weight: bold;
+}

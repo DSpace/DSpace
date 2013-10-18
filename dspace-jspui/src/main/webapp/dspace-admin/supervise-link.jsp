@@ -29,6 +29,7 @@
 <%@ page import="org.dspace.eperson.Group" %>
 <%@ page import="org.dspace.eperson.Supervisor" %>
 <%@ page import="org.dspace.core.Utils" %>
+<%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 
 <%
     // get objects from request
@@ -37,24 +38,26 @@
     request.setAttribute("LanguageSwitch", "hide");
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.supervise-link.title"
+<dspace:layout style="submission"
+			   titlekey="jsp.dspace-admin.supervise-link.title"
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
                parenttitlekey="jsp.administer">
 
-<h1><fmt:message key="jsp.dspace-admin.supervise-link.heading"/></h1>
+<h1><fmt:message key="jsp.dspace-admin.supervise-link.heading"/>
+<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#supervision\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup>
+</h1>
 
 <h3><fmt:message key="jsp.dspace-admin.supervise-link.choose"/></h3>
 
 <form method="post" action="">
 
-<table>
+<div class="input-group">
 <%-- Select the group to supervise --%>
-    <tr>
-        <td>
-            <b><fmt:message key="jsp.dspace-admin.supervise-link.group"/></b> 
-            <select name="TargetGroup">
+    
+            <label class="input-group-addon"><fmt:message key="jsp.dspace-admin.supervise-link.group"/></label> 
+            <select class="form-control" name="TargetGroup">
 <%
     for (int i = 0; i < groups.length; i++)
     {
@@ -64,30 +67,24 @@
     }
 %>
             </select>
-            <br/><br/>
-        </td>
-    </tr>
+
 
 <%-- Select the defaul policy type --%>
-    <tr>
-        <td>
-            <b><fmt:message key="jsp.dspace-admin.supervise-link.policy"/></b>
-            <select name="PolicyType">
+
+            <label class="input-group-addon"><fmt:message key="jsp.dspace-admin.supervise-link.policy"/></label>
+            <select class="form-control" name="PolicyType">
                 <option value="<%= Supervisor.POLICY_NONE %>" selected="selected"><fmt:message key="jsp.dspace-admin.supervise-link.policynone"/></option>
                 <option value="<%= Supervisor.POLICY_EDITOR %>"><fmt:message key="jsp.dspace-admin.supervise-link.policyeditor"/></option>
                 <option value="<%= Supervisor.POLICY_OBSERVER %>"><fmt:message key="jsp.dspace-admin.supervise-link.policyobserver"/></option>
             </select>
-            <br/><br/>
-        </td>
-    </tr>
-
+</div>
 <%-- Select the workspace item to be supervised --%>
     <tr>
         <td>
             <b><fmt:message key="jsp.dspace-admin.supervise-link.workspace"/></b>
-            <br/><br/>
+            
             <div align="left">
-            <table class="miscTable">
+            <table class="table">
                 <tr>
                     <th class="odRowOddCol"><fmt:message key="jsp.dspace-admin.supervise-link.id"/></th>
                     <th class="oddRowEvenCol"><fmt:message key="jsp.dspace-admin.supervise-link.submittedby"/></th>
@@ -141,16 +138,10 @@
 %>
             </table>
             </div>
-            <br/><br/>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <input type="submit" name="submit_link" value="<fmt:message key="jsp.dspace-admin.supervise-link.submit.button"/>"/>
-            <input type="submit" name="submit_base" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>"/>
-        </td>
-    </tr>
-</table>
+
+            <input class="btn btn-default" type="submit" name="submit_link" value="<fmt:message key="jsp.dspace-admin.supervise-link.submit.button"/>"/>
+            <input class="btn btn-default" type="submit" name="submit_base" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>"/>
+
 
 </form>
 

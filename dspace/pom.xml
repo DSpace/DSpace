@@ -29,36 +29,6 @@
             <!-- Filter using the properties file defined by dspace-parent POM -->
             <filter>${filters.file}</filter>
         </filters>
-         <resources>
-            <!-- Enumerate filtered files explicitly to avoid issues with other config tech. -->
-            <resource>
-                <directory>${basedir}</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>config/default.context.xml</include>
-                    <include>config/dspace.cfg</include>
-                    <include>config/log4j-handle-plugin.properties</include>
-                    <include>config/log4j.properties</include>
-                    <include>config/modules/curate.cfg</include>
-                    <include>config/modules/oai.cfg</include>
-                    <include>config/modules/solr-statistics.cfg</include>
-                </includes>
-            </resource>
-            <!-- Declare a mutually exclusive resource set for non-filtered files. -->
-            <resource>
-                <directory>${basedir}</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>config/default.context.xml</exclude>
-                    <exclude>config/dspace.cfg</exclude>
-                    <exclude>config/log4j-handle-plugin.properties</exclude>
-                    <exclude>config/log4j.properties</exclude>
-                    <exclude>config/modules/curate.cfg</exclude>
-                    <exclude>config/modules/oai.cfg</exclude>
-                    <exclude>config/modules/solr-statistics.cfg</exclude>
-                </excludes>
-            </resource>
-        </resources>
     
         <plugins>
             <!--  Default project assembly. Calls 'assembly.xml', which

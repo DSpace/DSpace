@@ -5,40 +5,13 @@
  *
  * http://www.dspace.org/license/
  */
-form.sherpa {
-	width: 70%;
-	float: left;
-}
-#sherpaBox {
-	width: 27%;
-	margin-left: 1%;
-	float: right;
-	border: 1px dashed #4770AD;
-	position: relative;
-}
-#sherpaBox div {margin-left: 0px; margin-right: 0px; margin-bottom: 0px; margin-top: 0px;}
 .sherpaDisclaimer {font-size: 80%; color: #4770AD; }
 p.sherpaDisclaimer img {margin: 15px;}
-div.sherpaBox, div.sherpaBox div, div.sherpaBox p {
-	margin-left: 0px;
-	margin-right: 0px;
-}
 
 .sherpaTools {
 	display: none;	
 }
-
-.sherpaTitle {
-	background-color: #4770AD;
-	color: #FFFFFF;
-	margin: 1px;
-	font-size: 1.2em;
-}
-
-.sherpaContent {
-	padding: 5px;
-}
-
+div.policy div p img {margin: 10px;display: inline-block;}
 .greenRomeoPublisher {background-color: #D0F9D2; }
 .blueRomeoPublisher {background-color: #D3ECFA;}
 .yellowRomeoPublisher {background-color: #FFFFDF;}
@@ -63,8 +36,5 @@ div.sherpaBox, div.sherpaBox div, div.sherpaBox p {
 }
 
 table.romeoColour {
-	background-color: #FFFFFF;
 	padding: 5px;
-	margin: 10px;
-	border: 1px solid;
 }
