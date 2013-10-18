@@ -199,6 +199,14 @@
         </step>
     </command>
 
+      <command>
+        <name>doi-organiser</name>
+        <description>Run the DOI organiser</description>
+        <step>
+            <class>org.dspace.identifier.doi.DOIOrganiser</class>
+        </step>
+    </command>
+
     <command>
         <name>packager</name>
         <description>Execute a packager</description>

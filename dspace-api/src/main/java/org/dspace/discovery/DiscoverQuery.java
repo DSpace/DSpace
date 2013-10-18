@@ -22,6 +22,7 @@ public class DiscoverQuery {
     private List<String> filterQueries;
     private int DSpaceObjectFilter = -1;
     private List<String> fieldPresentQueries;
+    private boolean spellCheck;
 
     private int start = 0;
     private int maxResults = -1;
@@ -263,5 +264,13 @@ public class DiscoverQuery {
     public void addHitHighlightingField(DiscoverHitHighlightingField hitHighlighting)
     {
         this.hitHighlighting.put(hitHighlighting.getField(), hitHighlighting);
+    }
+
+    public boolean isSpellCheck() {
+        return spellCheck;
+    }
+
+    public void setSpellCheck(boolean spellCheck) {
+        this.spellCheck = spellCheck;
     }
 }
