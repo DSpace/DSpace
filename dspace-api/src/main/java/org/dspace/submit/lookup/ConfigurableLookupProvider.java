@@ -68,9 +68,9 @@ public abstract class ConfigurableLookupProvider implements SubmissionLookupProv
 				results = getByIdentifier(null, getIdentifiers());
 			}
 			else {
-				String title = getIdentifiers().get("title")!=null?getIdentifiers().get("title").iterator().next():null;
-				String authors = getIdentifiers().get("authors")!=null?getIdentifiers().get("authors").iterator().next():null;
-				String year = getIdentifiers().get("year")!=null?getIdentifiers().get("year").iterator().next():null;
+				String title = getSearchTerms().get("title")!=null?getSearchTerms().get("title").iterator().next():null;
+				String authors = getSearchTerms().get("authors")!=null?getSearchTerms().get("authors").iterator().next():null;
+				String year = getSearchTerms().get("year")!=null?getSearchTerms().get("year").iterator().next():null;
 				int yearInt = Integer.parseInt(year);
 				results = search(null, title, authors, yearInt);
 			}
