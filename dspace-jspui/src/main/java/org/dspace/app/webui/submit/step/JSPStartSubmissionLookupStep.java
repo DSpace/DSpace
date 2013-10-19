@@ -170,9 +170,9 @@ public class JSPStartSubmissionLookupStep extends JSPStep
             request.setAttribute("collections", collections);
             request.setAttribute("collectionID", collectionID);
             
-            Map<String, List<SubmissionLookupProvider>> identifiers2providers = slService
+            Map<String, List<String>> identifiers2providers = slService
                     .getProvidersIdentifiersMap();
-            List<SubmissionLookupProvider> searchProviders = slService
+            List<String> searchProviders = slService
                     .getSearchProviders();
             List<String> fileProviders = slService
                     .getFileProviders();

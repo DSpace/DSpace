@@ -11,31 +11,16 @@ import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.Value;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
-import org.dspace.content.crosswalk.IConverter;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
-import org.dspace.submit.util.SubmissionLookupPublication;
 
 public class SubmissionLookupUtils {
 	private static Logger log = Logger.getLogger(SubmissionLookupUtils.class);

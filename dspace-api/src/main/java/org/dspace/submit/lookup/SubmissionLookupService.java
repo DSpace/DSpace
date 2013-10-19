@@ -7,8 +7,10 @@
  */
 package org.dspace.submit.lookup;
 
+import gr.ekt.bte.core.DataLoader;
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.TransformationEngine;
+import gr.ekt.bte.dataloader.FileDataLoader;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,11 +36,12 @@ public class SubmissionLookupService {
 
 	public static final String SEPARATOR_VALUE_REGEX = SEPARATOR_VALUE;
 
-	private List<SubmissionLookupProvider> providers;
+	private List<DataLoader> providers;
 
-	private Map<String, List<SubmissionLookupProvider>> idents2provs;
+	private Map<String, List<String>> idents2provs;
 
-	private List<SubmissionLookupProvider> searchProviders;
+	private List<String> searchProviders;
+	private List<String> fileProviders;
 
 	private TransformationEngine phase1TransformationEngine;
 	private TransformationEngine phase2TransformationEngine;
@@ -53,29 +56,42 @@ public class SubmissionLookupService {
 		
 		MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader)phase1TransformationEngine.getDataLoader();
 		
-		this.idents2provs = new HashMap<String, List<SubmissionLookupProvider>>();
-		this.searchProviders = new ArrayList<SubmissionLookupProvider>();
+		this.idents2provs = new HashMap<String, List<String>>();
+		this.searchProviders = new ArrayList<String>();
+		this.fileProviders = new ArrayList<String>();
 
 		if (providers == null) {
-			this.providers = new ArrayList<SubmissionLookupProvider>();
+			this.providers = new ArrayList<DataLoader>();
 			
-			for (SubmissionLookupProvider p : dataLoader.getProviders()) {
+			for (String providerName : dataLoader.getProvidersMap().keySet()) {
+				DataLoader p = dataLoader.getProvidersMap().get(providerName);
 				
 				this.providers.add(p);
 				
-				if (p.isSearchProvider()) {
-					searchProviders.add(p);
+				//Do not do that for file providers
+				if (p instanceof FileDataLoader){
+					this.fileProviders.add(providerName);
 				}
-				List<String> suppIdentifiers = p.getSupportedIdentifiers();
-				if (suppIdentifiers != null) {
-					for (String ident : suppIdentifiers) {
-						List<SubmissionLookupProvider> tmp = idents2provs
-								.get(ident);
-						if (tmp == null) {
-							tmp = new ArrayList<SubmissionLookupProvider>();
-							idents2provs.put(ident, tmp);
+				else if (p instanceof ConfigurableLookupProvider){
+				
+					ConfigurableLookupProvider p2 = (ConfigurableLookupProvider)p;
+
+					p2.setProviderName(providerName);
+					
+					if (p2.isSearchProvider()) {
+						searchProviders.add(providerName);
+					}
+					List<String> suppIdentifiers = p2.getSupportedIdentifiers();
+					if (suppIdentifiers != null) {
+						for (String ident : suppIdentifiers) {
+							List<String> tmp = idents2provs
+									.get(ident);
+							if (tmp == null) {
+								tmp = new ArrayList<String>();
+								idents2provs.put(ident, tmp);
+							}
+							tmp.add(providerName);
 						}
-						tmp.add(p);
 					}
 				}
 			}
@@ -94,10 +110,13 @@ public class SubmissionLookupService {
 		
 		List<String> allSupportedIdentifiers = new ArrayList<String>();
 		MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader)phase1TransformationEngine.getDataLoader();
-		for (SubmissionLookupProvider provider : dataLoader.getProviders()){
-			for (String identifier : provider.getSupportedIdentifiers()){
-				if (!allSupportedIdentifiers.contains(identifier)){
-					allSupportedIdentifiers.add(identifier);
+		for (String providerName : dataLoader.getProvidersMap().keySet()) {
+			DataLoader provider = dataLoader.getProvidersMap().get(providerName);
+			if (provider instanceof SubmissionLookupProvider){
+				for (String identifier : ((SubmissionLookupProvider)provider).getSupportedIdentifiers()){
+					if (!allSupportedIdentifiers.contains(identifier)){
+						allSupportedIdentifiers.add(identifier);
+					}
 				}
 			}
 		}
@@ -105,7 +124,7 @@ public class SubmissionLookupService {
 		return allSupportedIdentifiers;
 	}
 
-	public Map<String, List<SubmissionLookupProvider>> getProvidersIdentifiersMap() {
+	public Map<String, List<String>> getProvidersIdentifiersMap() {
 		return idents2provs;
 	}
 
@@ -131,11 +150,11 @@ public class SubmissionLookupService {
 				"submission_lookup_" + uuidSubmission, dto);
 	}
 
-	public List<SubmissionLookupProvider> getSearchProviders() {
+	public List<String> getSearchProviders() {
 		return searchProviders;
 	}
 
-	public List<SubmissionLookupProvider> getProviders() {
+	public List<DataLoader> getProviders() {
 		return providers;
 	}
 
@@ -148,7 +167,6 @@ public class SubmissionLookupService {
     }
 
 	public List<String> getFileProviders() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.fileProviders;
 	}
 }

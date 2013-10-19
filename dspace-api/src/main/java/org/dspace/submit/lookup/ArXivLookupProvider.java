@@ -76,10 +76,5 @@ public class ArXivLookupProvider extends ConfigurableLookupProvider {
 			results.add(convert(item));
 		}
 		return results;
-	}
-
-	@Override
-	public String getShortName() {
-		return "arxiv";
 	}	
 }

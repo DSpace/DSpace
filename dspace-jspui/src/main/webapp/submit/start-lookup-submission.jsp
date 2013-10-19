@@ -22,7 +22,6 @@
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ page import="org.dspace.content.Collection" %>
-<%@ page import="org.dspace.submit.lookup.SubmissionLookupProvider" %>
 <%@ page import="java.lang.Boolean" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
@@ -50,8 +49,8 @@
     Boolean nosuuid = (Boolean) request.getAttribute("nouuid");
     Boolean expired = (Boolean) request.getAttribute("expired");
     
-    Map<String, List<SubmissionLookupProvider>> identifiers2providers = (Map<String, List<SubmissionLookupProvider>>) request.getAttribute("identifiers2providers");
-    List<SubmissionLookupProvider> searchProviders = (List<SubmissionLookupProvider>) request.getAttribute("searchProviders");
+    Map<String, List<String>> identifiers2providers = (Map<String, List<String>>) request.getAttribute("identifiers2providers");
+    List<String> searchProviders = (List<String>) request.getAttribute("searchProviders");
     List<String> fileLoaders = (List<String>) request.getAttribute("fileLoaders");
     List<String> identifiers = (List<String>) request.getAttribute("identifiers");
     String uuid = (String) request.getAttribute("s_uuid");
@@ -135,10 +134,10 @@
 		<div>
 		
 <%	
-		for (SubmissionLookupProvider provider : searchProviders)
+		for (String provider : searchProviders)
 		{			
 %>
-		<img class="img-thumbnail" src="<%= request.getContextPath() %>/image/submission-lookup-small-<%= provider.getShortName() %>.jpg" />
+		<img class="img-thumbnail" src="<%= request.getContextPath() %>/image/submission-lookup-small-<%= provider %>.jpg" />
 <% 
 		}
 	%>
@@ -184,11 +183,11 @@
 		</div>
 		<div class="col-md-7">
 <%	
-			for (SubmissionLookupProvider provider : identifiers2providers.get(identifier))
+			for (String provider : identifiers2providers.get(identifier))
 			{			
 %>
 		
-			<img class="img-thumbnail" src="<%= request.getContextPath() %>/image/submission-lookup-small-<%= provider.getShortName() %>.jpg" />
+			<img class="img-thumbnail" src="<%= request.getContextPath() %>/image/submission-lookup-small-<%= provider %>.jpg" />
 		
 <% 
 			}

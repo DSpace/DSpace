@@ -25,7 +25,7 @@ import org.dspace.submit.util.ItemSubmissionLookupDTO;
  */
 public class SubmissionItemDataLoader implements DataLoader {
     private List<ItemSubmissionLookupDTO> dtoList;
-    List<SubmissionLookupProvider> providers;
+    List<DataLoader> providers;
 
     private static Logger log = Logger.getLogger(SubmissionItemDataLoader.class);
     
@@ -84,14 +84,14 @@ public class SubmissionItemDataLoader implements DataLoader {
     /**
      * @return the providers
      */
-    public List<SubmissionLookupProvider> getProviders() {
+    public List<DataLoader> getProviders() {
         return providers;
     }
 
     /**
      * @param providers the providers to set
      */
-    public void setProviders(List<SubmissionLookupProvider> providers) {
+    public void setProviders(List<DataLoader> providers) {
         this.providers = providers;
     }
 }

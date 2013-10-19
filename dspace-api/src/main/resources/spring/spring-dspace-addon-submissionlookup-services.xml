@@ -28,12 +28,13 @@
   	</bean>
 		
 	<bean name="multipleDataLoader" class="org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader">
-	    <property name="providers">
-	        <list>
-				<ref bean="pubmedLookupProvider" />
-				<ref bean="crossrefLookupProvider" />
-				<ref bean="arxivLookupProvider" />
-			</list>
+	    <property name="providersMap">
+	        <map>
+	            <entry key="pubmed" value-ref="pubmedLookupProvider"/>
+	            <entry key="crossref" value-ref="crossrefLookupProvider"/>
+	            <entry key="arxiv" value-ref="arxivLookupProvider"/>
+	            <entry key="bibtex" value-ref="bibtexProvider"/>
+			</map>
 	    </property>
 	    
 	</bean>
@@ -389,4 +390,17 @@
 		</property> 
 	</bean>
 	
+	<bean id="bibtexProvider"
+        class="gr.ekt.bteio.loaders.BibTeXDataLoader">
+    <property name="fieldMap">
+      <map>
+        <entry key="title" value="Title"/>
+        <entry key="author" value="Author"/>
+        <entry key="journal" value="Journal"/>
+        <entry key="year" value="Year"/>
+        <entry key="ISSN" value="ISSN"/>
+      </map>
+    </property>
+  </bean>
+  
 </beans>

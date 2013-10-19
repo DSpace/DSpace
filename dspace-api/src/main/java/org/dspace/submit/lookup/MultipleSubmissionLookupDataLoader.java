@@ -7,9 +7,7 @@
  */
 package org.dspace.submit.lookup;
 
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,7 +22,8 @@ import gr.ekt.bte.core.DataLoadingSpec;
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.RecordSet;
 import gr.ekt.bte.core.StringValue;
-import gr.ekt.bte.core.Value;
+import gr.ekt.bte.dataloader.FileDataLoader;
+
 import gr.ekt.bte.exceptions.MalformedSourceException;
 
 /**
@@ -36,12 +35,15 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader {
 	private static Logger log = Logger.getLogger(MultipleSubmissionLookupDataLoader.class);
 	
 	private static final String NOT_FOUND_DOI = "NOT-FOUND-DOI";
+	
 
-	List<ConfigurableLookupProvider> providers;
+	Map<String, DataLoader> providersMap;
 
-	Map<String, Set<String>> identifiers; //Searching by identifiers (DOI ...)
-	Map<String, Set<String>> searchTerms; //Searching by author, title, date
-
+	//Depending on these values, the multiple data loader loads data from the appropriate providers
+	Map<String, Set<String>> identifiers = null; //Searching by identifiers (DOI ...)
+	Map<String, Set<String>> searchTerms = null; //Searching by author, title, date
+	String filename = null; //Uploading file
+	
 	/**
 	 * Default constructor
 	 */
@@ -58,17 +60,19 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader {
 
 		//KSTA:ToDo: Support timeout (problematic) providers
 		//List<String> timeoutProviders = new ArrayList<String>();
-		for (ConfigurableLookupProvider provider : providers) {
+		for (String providerName : filterProviders().keySet()) {
+			DataLoader provider = providersMap.get(providerName);
 			RecordSet subRecordSet = provider.getRecords();
 			recordSet.addAll(subRecordSet);
 			//Add in each record the provider name... a new provider doesn't need to know about it!
 			for (Record record: subRecordSet.getRecords()){
 				if (record.isMutable()){
-					record.makeMutable().addValue(SubmissionLookupService.PROVIDER_NAME_FIELD, new StringValue(provider.getShortName()));
+					record.makeMutable().addValue(SubmissionLookupService.PROVIDER_NAME_FIELD, new StringValue(providerName));
 				}
 			}
 		}
 
+		//Question: Do we want that in case of file data loader?
 		//for each publication in the record set, if it has a DOI, try to find extra pubs from the other providers
 		if (searchTerms!=null || (identifiers!=null && !identifiers.containsKey(SubmissionLookupProvider.DOI))){ //Extend
 			Map<String, Set<String>> provider2foundDOIs = new HashMap<String, Set<String>>();
@@ -98,7 +102,14 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader {
 				}
 			}
 
-			for (SubmissionLookupProvider provider : providers) {
+			for (String providerName : providersMap.keySet()) {
+				DataLoader genProvider = providersMap.get(providerName);
+				
+				if (! (genProvider instanceof SubmissionLookupProvider)){
+					continue;
+				}
+				
+				SubmissionLookupProvider provider = (SubmissionLookupProvider)genProvider;
 				
 				//Provider must support DOI
 				if (provider.getSupportedIdentifiers().contains(SubmissionLookupProvider.DOI)){
@@ -110,7 +121,7 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader {
 				//	continue;
 				//}
 				Set<String> doiToSearch = new HashSet<String>();
-				Set<String> alreadyFoundDOIs = provider2foundDOIs.get(provider.getShortName());
+				Set<String> alreadyFoundDOIs = provider2foundDOIs.get(providerName);
 				for (String doi : foundDOIs) {
 					if (alreadyFoundDOIs == null
 							|| !alreadyFoundDOIs.contains(doi)) {
@@ -160,20 +171,24 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader {
 		return getRecords();
 	}
 
-	public void setProviders(List<ConfigurableLookupProvider> providers) {
-		this.providers = providers;
+	public Map<String, DataLoader> getProvidersMap() {
+		return providersMap;
 	}
-	
-	public List<ConfigurableLookupProvider> getProviders() {
-		return providers;
+
+	public void setProvidersMap(Map<String, DataLoader> providersMap) {
+		this.providersMap = providersMap;
 	}
 
 	public void setIdentifiers(Map<String, Set<String>> identifiers) {
 		this.identifiers = identifiers;
 
-		if (providers!=null){
-			for (ConfigurableLookupProvider provider : providers){
-				provider.setIdentifiers(identifiers);	
+		if (providersMap!=null){
+			for (String providerName : providersMap.keySet()) {
+				DataLoader provider = providersMap.get(providerName);
+				if (provider instanceof ConfigurableLookupProvider){
+					((ConfigurableLookupProvider)provider).setIdentifiers(identifiers);
+				}
+					
 			}
 		}
 	}
@@ -181,9 +196,12 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader {
 	public void setSearchTerms(Map<String, Set<String>> searchTerms) {
 		this.searchTerms = searchTerms;
 
-		if (providers!=null){
-			for (ConfigurableLookupProvider provider : providers){
-				provider.setSearchTerms(searchTerms);	
+		if (providersMap!=null){
+			for (String providerName : providersMap.keySet()) {
+				DataLoader provider = providersMap.get(providerName);
+				if (provider instanceof ConfigurableLookupProvider){
+					((ConfigurableLookupProvider)provider).setSearchTerms(searchTerms);
+				}
 			}
 		}
 	}
@@ -191,5 +209,30 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader {
 	public void setFile(InputStream inputStream) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public Map<String, DataLoader> filterProviders(){
+		Map<String, DataLoader> result = new HashMap<String, DataLoader>();
+		for (String providerName : providersMap.keySet()) {
+			DataLoader dataLoader = providersMap.get(providerName);
+			if (searchTerms != null && identifiers == null && filename == null){
+				if (dataLoader instanceof SubmissionLookupProvider && 
+						((SubmissionLookupProvider)dataLoader).isSearchProvider()){
+					result.put(providerName, dataLoader);
+				}
+			}
+			else if (searchTerms == null && identifiers != null && filename == null){
+				if (dataLoader instanceof SubmissionLookupProvider){
+					result.put(providerName, dataLoader);
+				}
+			}
+			else if (searchTerms == null && identifiers == null && filename != null){
+				if (dataLoader instanceof FileDataLoader){
+					result.put(providerName, dataLoader);
+				}
+			}
+		}
+		
+		return result;
 	}
 }

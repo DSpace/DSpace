@@ -48,11 +48,6 @@ public class PubmedLookupProvider extends ConfigurableLookupProvider {
 	}
 
 	@Override
-	public String getShortName() {
-		return "pubmed";
-	}
-
-	@Override
 	public List<Record> getByIdentifier(Context context, 
 			Map<String, Set<String>> keys) throws HttpException, IOException {
 		Set<String> pmids = keys != null ? keys.get(PUBMED) : null;

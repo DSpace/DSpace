@@ -37,9 +37,11 @@ public abstract class ConfigurableLookupProvider implements SubmissionLookupProv
 	
 	Map<String, String> fieldMap; //mapping between service fields and local intermediate fields
 	
+	String providerName;
+	
 	protected Record convert(Object bean) {
 		try {
-			return convert(getShortName(), bean);
+			return convert(providerName, bean);
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
@@ -118,6 +120,10 @@ public abstract class ConfigurableLookupProvider implements SubmissionLookupProv
 
 	public void setFieldMap(Map<String, String> fieldMap) {
 		this.fieldMap = fieldMap;
+	}
+
+	public void setProviderName(String providerName) {
+		this.providerName = providerName;
 	}
 
 	public Record convert(String shortName,

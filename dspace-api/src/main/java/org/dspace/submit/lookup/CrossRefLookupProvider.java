@@ -88,9 +88,4 @@ public class CrossRefLookupProvider extends ConfigurableLookupProvider {
 	public boolean isSearchProvider() {
 		return searchProvider;
 	}
-
-	@Override
-	public String getShortName() {
-		return "crossref";
-	}
 }

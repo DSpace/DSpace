@@ -7,6 +7,7 @@
  */
 package org.dspace.submit.util;
 
+import gr.ekt.bte.core.DataLoader;
 import gr.ekt.bte.core.MutableRecord;
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.Value;
@@ -52,7 +53,7 @@ public class ItemSubmissionLookupDTO implements Serializable {
 		return uuid;
 	}
 
-    public Record getTotalPublication(List<SubmissionLookupProvider> providers) {
+    public Record getTotalPublication(List<DataLoader> providers) {
 		if (publications == null)
 		{
 			return null;
