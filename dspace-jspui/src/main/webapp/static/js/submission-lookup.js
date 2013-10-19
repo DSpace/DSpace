@@ -113,14 +113,6 @@ submissionLookupShowResult = function(info){
 	j('#result-list').html(" ");
 	for (var i=0;i<info.result.length;i++)
 	{
-		if(info.result[i].skip==true) {
-			//skip details
-			j('#collectionid').val(info.result[i].collectionid);
-			j('#suuid').val(info.result[i].uuid);
-			j('#form-submission').submit();
-			return false;
-		}
-		
 		var bt = j('<button class="btn btn-info" type="button">').append(j('#jsseedetailsbuttonmessage').text());
 		var par = j('<p class="sl-result">');
 		var divImg = j('<div class="submission-lookup-providers">');
@@ -194,9 +186,10 @@ submissionLookupShowDetails = function(info){
 	});
 	modalfooter.append(start);
 	j('#loading-details').modal('show');
-}
+};
 
-submissionLookupPreview = function(){
+submissionLookupFile = function(form){
+	
 	
 	var suuidVal = j('#suuid').val();
 	var suuid = j('<input type="hidden" name="s_uuid" value="'+suuidVal+'">');
@@ -213,39 +206,86 @@ submissionLookupPreview = function(){
 	var provider_loaderVal = j('#provider_loader').val();
 	var provider_loader = j('<input type="hidden" name="provider_loader" value="'+provider_loaderVal+'">');
 	
-         var iframe = j('<iframe name="postiframe" id="postiframe" style="display: none" />');
-
-         j("body").append(iframe);
-
-         var form = j('#form-loader');
-         form.attr("action", dspaceContextPath+"/json/submissionLookup");
-         form.attr("method", "post");
-         form.attr("enctype", "multipart/form-data");
-         form.attr("encoding", "multipart/form-data");
-         form.attr("target", "postiframe");
-         form.attr("file", j('#file_upload').val());
-         j(form).append(suuid);
-         j(form).append(collectionid);
-         j(form).append(preview_loader);
-         j(form).append(provider_loader);
-         form.submit();
-
-         j("#postiframe").load(function () {
-             var iframeContents = j("#postiframe")[0].contentWindow.document.body.innerHTML;
-             j('#iframecontent').html(iframeContents);
-             var json = j.parseJSON(j("#iframecontent").text());
-            	 if (json == null || json.result == null || json.result.length == 0)
-       			{
-       				j('#result-list').hide();
-       				j('#empty-result').show();
-       			}
-       			else
-       			{
-       				submissionLookupShowResult(json);
-       			}
-            	 j('#loading-file-result').modal("hide");	 
- 			j('#tabs').find('a[href="#tabs-result"]').click();
-         });
-         j('#loading-file-result').modal("show");
+	    // Create the iframe...
+	    var iframe = j('<iframe name="upload_iframe" id="upload_iframe" style="display: none" />');
+	    // Add to document...
+	    j("body").append(iframe);
+	    window.frames['upload_iframe'].name = "upload_iframe";
 	 
-}
+	    iframeId = document.getElementById("upload_iframe");
+	 
+	    // Add event...
+	    var eventHandler = function () {
+	 
+	            if (iframeId.detachEvent) iframeId.detachEvent("onload", eventHandler);
+	            else iframeId.removeEventListener("load", eventHandler, false);
+	 
+	            // Message from server...
+	            if (iframeId.contentDocument) {
+	                content = iframeId.contentDocument.body.innerHTML;
+	            } else if (iframeId.contentWindow) {
+	                content = iframeId.contentWindow.document.body.innerHTML;
+	            } else if (iframeId.document) {
+	                content = iframeId.document.body.innerHTML;
+	            }
+	             j('#iframecontent').html(content);
+	             var clickResultTab = true;
+	             var index = 0;
+	             var iindex = new Array();
+	             var json = j.parseJSON(j("#iframecontent").text());
+	            	 if (json == null || json.result == null || json.result.length == 0)
+	       			{
+	       				j('#result-list').hide();
+	       				j('#empty-result').show();
+	       			}
+	       			else
+	       			{
+						for (var i = 0; i < json.result.length; i++) {
+							if (json.result[i].skip == true) {
+								clickResultTab = false;
+								index = i;
+								break;
+							}
+							iindex[i] = json.result[i].uuid;
+						}
+	       			}	            	
+					if (clickResultTab) {
+						submissionLookupShowResult(json);
+						j('#loading-file-result').modal("hide");
+						j('#tabs').find('a[href="#tabs-result"]').click();
+					} else {
+						// skip details
+						j('#collectionid').val(json.result[index].collectionid);
+						j('#suuid').val(json.result[index].uuid);
+						j('#fuuid').val(iindex);
+						j('#form-submission').submit();
+						return false;
+					}
+	 			// Del the iframe...
+		        j('upload_iframe').empty();
+	        };
+	 
+	    if (iframeId.addEventListener) iframeId.addEventListener("load", eventHandler, true);
+	    if (iframeId.attachEvent) iframeId.attachEvent("onload", eventHandler);
+	 
+	    // Set properties of form...
+	    form.attr("target", "upload_iframe");
+	    form.attr("action", dspaceContextPath+"/json/submissionLookup");
+	    form.attr("method", "post");
+	    form.attr("enctype", "multipart/form-data");
+	    form.attr("encoding", "multipart/form-data");
+	    form.attr("target", "upload_iframe");
+	    form.attr("file", j('#file_upload').val());
+	    j(form).append(suuid);
+        j(form).append(collectionid);
+        j(form).append(preview_loader);
+        j(form).append(provider_loader);
+	    // Submit the form...
+	    form.submit();
+	 
+	    j('#loading-file-result').modal("show");
+	    
+	 
+};
+
+

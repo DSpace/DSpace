@@ -124,6 +124,7 @@
 	<form class="form-horizontal" id="form-submission" action="" method="post">
 		<input type="hidden" id="suuid" name="suuid" value="<%= uuid %>"/>
 		<input type="hidden" id="iuuid" name="iuuid" value=""/>
+		<input type="hidden" id="fuuid" name="fuuid" value=""/>
 		<input type="hidden" id="collectionid" name="collectionid" value=""/>
 		
 		<div id="tabs-search-accordion">
@@ -259,6 +260,9 @@
 	<div id="manual-accordion">&nbsp;</div>
 	</div>
 	</form>
+	<form id="form-loader" action="" method="post">
+	</form>
+	<div id="iframecontent" style="display: none"></div>
 </div>
 
 	<div class="tab-pane" id="tabs-result">
@@ -297,9 +301,7 @@
 			</div>
 		</div>
 		
-		<form id="form-loader" action="" method="post">
-		</form>
-		<div id="iframecontent" style="display: none"></div>
+
 <div id="no-collection-warn" class="modal">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -421,7 +423,7 @@
     		submissionLookupSearch(j('.submission-lookup-search'));
     	});
     	j('#loadfile_go').click(function(){
-    		submissionLookupPreview(j('.submission-file-loader'));
+    		submissionLookupFile(j('#form-loader'));
     	});
     	j('button.exit').click(function(event){
     		event.preventDefault();

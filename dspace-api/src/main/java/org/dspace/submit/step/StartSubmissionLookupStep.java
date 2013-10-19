@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.hwpf.model.Ffn;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.SubmissionInfo;
@@ -120,6 +121,7 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
         String autori = request.getParameter("search_authors");
         String uuidSubmission = request.getParameter("suuid");
         String uuidLookup = request.getParameter("iuuid");
+        String fuuidLookup = request.getParameter("fuuid");
         
         if (StringUtils.isBlank(uuidSubmission))
         {
@@ -133,16 +135,16 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
         {
         	return STATUS_SUBMISSION_EXPIRED;
         }
-        
+ 
         ItemSubmissionLookupDTO itemLookup = null;
-    	if (StringUtils.isNotBlank(uuidLookup))
-        {
-    		itemLookup = submissionDTO.getLookupItem(uuidLookup);
-    		if (itemLookup == null)
-    		{
-    			return STATUS_SUBMISSION_EXPIRED;
-    		}
-        }
+		if (fuuidLookup == null || fuuidLookup.isEmpty()) {
+			if (StringUtils.isNotBlank(uuidLookup)) {
+				itemLookup = submissionDTO.getLookupItem(uuidLookup);
+				if (itemLookup == null) {
+					return STATUS_SUBMISSION_EXPIRED;
+				}
+			}
+		}
         // if the user didn't select a collection,
         // send him/her back to "select a collection" page
         if (id < 0)
@@ -168,15 +170,21 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
 				e.printStackTrace();
 			}
 			
-			ItemSubmissionLookupDTO dto = null;
+			List<ItemSubmissionLookupDTO> dto = new ArrayList<ItemSubmissionLookupDTO>();
 			
             if (itemLookup != null)
             {
-            	dto = itemLookup;
-				
-            }
-            else
-            {
+            	dto.add(itemLookup);
+            } else if (fuuidLookup != null) { 
+            	String[] ss = fuuidLookup.split(",");
+            	for(String s : ss) {
+            		itemLookup = submissionDTO.getLookupItem(s);
+            		if (itemLookup == null) {
+    					return STATUS_SUBMISSION_EXPIRED;
+    				}
+            		dto.add(itemLookup);
+            	}
+        	} else {
 				SubmissionLookupPublication manualPub = new SubmissionLookupPublication(
 						SubmissionLookupService.MANUAL_USER_INPUT);
             	manualPub.add("title", titolo);
@@ -198,7 +206,7 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
     			}
     			List<Record> publications = new ArrayList<Record>();
     			publications.add(manualPub);
-    			dto = new ItemSubmissionLookupDTO(publications);
+    			dto.add(new ItemSubmissionLookupDTO(publications));
             	
             }
             
@@ -207,14 +215,14 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
             TransformationEngine transformationEngine = slService.getPhase2TransformationEngine();
 			if (transformationEngine != null){
 				SubmissionItemDataLoader dataLoader = (SubmissionItemDataLoader)transformationEngine.getDataLoader();
-				dataLoader.setDtoList(Arrays.asList(new ItemSubmissionLookupDTO[]{dto}));
+				dataLoader.setDtoList(dto);
 				//dataLoader.setProviders()
 
 				DSpaceWorkspaceItemOutputGenerator outputGenerator = (DSpaceWorkspaceItemOutputGenerator)transformationEngine.getOutputGenerator();
 				outputGenerator.setCollection(col);
 				outputGenerator.setContext(context);
 				outputGenerator.setFormName(inputSet.getFormName());
-				outputGenerator.setDto(dto);
+				outputGenerator.setDto(dto.get(0));
 				
 				try {
 					transformationEngine.transform(new TransformationSpec());
