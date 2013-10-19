@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+-->
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/"
+ debug="false">
+ <appender name="MyLogic" class="org.apache.log4j.FileAppender">
+  <param name="File" value="${mylogic.log.file}" />
+  <param name="Append" value="true" />
+  <layout class="org.apache.log4j.PatternLayout">
+   <param name="ConversionPattern" value="%-5p [%t] %c{1}.%M : %m%n" />
+  </layout>
+ </appender>
+ <appender name="Spring" class="org.apache.log4j.FileAppender">
+  <param name="File" value="${spring.log.file}" />
+  <param name="Append" value="false" />
+  <layout class="org.apache.log4j.PatternLayout">
+   <param name="ConversionPattern" value="%-5p [%t] %c{1}.%M : %m%n" />
+  </layout>
+ </appender>
+ <appender name="DSpace" class="org.apache.log4j.FileAppender">
+  <param name="File" value="${dspace.log.file}" />
+  <param name="Append" value="false" />
+  <layout class="org.apache.log4j.PatternLayout">
+   <param name="ConversionPattern" value="%-5p [%t] %c{1}.%M : %m%n" />
+  </layout>
+ </appender>
+ <logger name="fi.helsinki.lib.simplerest">
+  <level value="debug" />
+  <appender-ref ref="MyLogic" />
+ </logger>
+ <logger name="org.springframework">
+  <level value="debug" />
+  <appender-ref ref="Spring" />
+ </logger>
+ <logger name="org.dspace">
+  <level value="debug" />
+  <appender-ref ref="DSpace" />
+ </logger>
+</log4j:configuration>

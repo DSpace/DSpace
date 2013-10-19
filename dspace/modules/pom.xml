@@ -99,5 +99,14 @@
                 <module>oai</module>
             </modules>
         </profile>
+        <profile>
+            <id>dspace-simplerest</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>simplerest</module>
+            </modules>
+        </profile>
     </profiles>
 </project>

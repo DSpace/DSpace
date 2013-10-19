@@ -183,6 +183,7 @@
                         <exclude>**/readme*</exclude>
                         <exclude>**/.gitignore</exclude>
                         <exclude>**/build.properties*</exclude>
+			<exclude>**/THIRD-PARTY.properties</exclude>
                     </excludes>
                     <mapping> 
                         <!-- Custom DSpace file extensions which are not recognized by maven-release-plugin: 
@@ -474,6 +475,19 @@
             </modules>
         </profile>
 
+        <!-- SimpleREST -->
+        <profile>
+          <id>dspace-simplerest</id>
+          <activation>
+              <file>
+                  <exists>dspace-simplerest/pom.xml</exists>
+              </file>
+          </activation>
+          <modules>
+              <module>dspace-simplerest</module>
+          </modules>
+        </profile>
+
 
       <!--
          The 'release' profile is used by the 'maven-release-plugin' (see above)
@@ -494,6 +508,7 @@
             <module>dspace-oai</module>
             <module>dspace-sword</module>
             <module>dspace-swordv2</module>
+            <module>dspace-simplerest</module>
          </modules>
       </profile>
 

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+-->
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+                             http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+    <display-name>simplerest</display-name>
+    <context-param>
+        <description>The location of the main DSpace configuration file</description>
+        <param-name>dspace-config</param-name>
+        <param-value>${dspace.config.file}</param-value>
+    </context-param>
+    <context-param>
+        <param-name>org.restlet.application</param-name>
+        <param-value>fi.helsinki.lib.simplerest.SimpleRestApplication</param-value>
+    </context-param>
+    <context-param>
+        <param-name>dspace.dir</param-name>
+        <param-value>/data/dspace</param-value>
+    </context-param>
+    <listener>
+        <listener-class>org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>org.dspace.app.util.DSpaceContextListener</listener-class>
+    </listener>
+    <servlet>
+        <servlet-name>RestletServlet</servlet-name>
+        <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
+        <init-param>
+            <param-name>adminID</param-name>
+            <param-value>${dspace.eperson.id}</param-value>
+        </init-param>
+        <init-param>
+            <param-name>username</param-name>
+            <param-value>${dspace.rest.username}</param-value>
+        </init-param>
+        <init-param>
+            <param-name>password</param-name>
+            <param-value>${dspace.rest.password}</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RestletServlet</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+</web-app>
