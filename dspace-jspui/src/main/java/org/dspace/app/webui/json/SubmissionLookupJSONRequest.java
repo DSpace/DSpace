@@ -15,10 +15,12 @@ import gr.ekt.bte.exceptions.BadTransformationSpec;
 import gr.ekt.bte.exceptions.MalformedSourceException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -27,6 +29,14 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.UIUtil;
@@ -53,10 +63,11 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 
 	@Override
 	public void doJSONRequest(Context context, HttpServletRequest req,
-			HttpServletResponse resp) throws AuthorizeException, IOException 
-			{
+			HttpServletResponse resp) throws AuthorizeException, IOException {
 		String suuid = req.getParameter("s_uuid");
 		SubmissionLookupDTO subDTO = service.getSubmissionLookupDTO(req, suuid);
+		// Check that we have a file upload request
+		boolean isMultipart = ServletFileUpload.isMultipartContent(req);
 		if ("identifiers".equalsIgnoreCase(req.getParameter("type"))) {
 			Map<String, Set<String>> identifiers = new HashMap<String, Set<String>>();
 			Enumeration e = req.getParameterNames();
@@ -77,17 +88,20 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 
 			List<ItemSubmissionLookupDTO> result = new ArrayList<ItemSubmissionLookupDTO>();
 
-			TransformationEngine transformationEngine = service.getPhase1TransformationEngine();
-			if (transformationEngine != null){
-				MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader)transformationEngine.getDataLoader();
+			TransformationEngine transformationEngine = service
+					.getPhase1TransformationEngine();
+			if (transformationEngine != null) {
+				MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader) transformationEngine
+						.getDataLoader();
 				dataLoader.setIdentifiers(identifiers);
 
 				try {
 					log.debug("BTE transformation is about to start!");
 					transformationEngine.transform(new TransformationSpec());
 					log.debug("BTE transformation finished!");
-					
-					SubmissionLookupOutputGenerator outputGenerator = (SubmissionLookupOutputGenerator)transformationEngine.getOutputGenerator();
+
+					SubmissionLookupOutputGenerator outputGenerator = (SubmissionLookupOutputGenerator) transformationEngine
+							.getOutputGenerator();
 					result = outputGenerator.getDtoList();
 				} catch (BadTransformationSpec e1) {
 					e1.printStackTrace();
@@ -117,15 +131,18 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 			searchTerms.put("title", tmp1);
 			searchTerms.put("authors", tmp2);
 			searchTerms.put("year", tmp3);
-			
+
 			List<ItemSubmissionLookupDTO> result = new ArrayList<ItemSubmissionLookupDTO>();
 
-			TransformationEngine transformationEngine = service.getPhase1TransformationEngine();
-			if (transformationEngine != null){
-				MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader)transformationEngine.getDataLoader();
+			TransformationEngine transformationEngine = service
+					.getPhase1TransformationEngine();
+			if (transformationEngine != null) {
+				MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader) transformationEngine
+						.getDataLoader();
 				dataLoader.setSearchTerms(searchTerms);
 
-				SubmissionLookupOutputGenerator outputGenerator = (SubmissionLookupOutputGenerator)transformationEngine.getOutputGenerator();
+				SubmissionLookupOutputGenerator outputGenerator = (SubmissionLookupOutputGenerator) transformationEngine
+						.getOutputGenerator();
 				result = outputGenerator.getDtoList();
 				try {
 					transformationEngine.transform(new TransformationSpec());
@@ -149,13 +166,86 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 			Map<String, Object> dto = getDetails(subDTO.getLookupItem(i_uuid),
 					context);
 			serializer.deepSerialize(dto, resp.getWriter());
+		} else if (isMultipart) {
+
+			// Create a factory for disk-based file items
+			FileItemFactory factory = new DiskFileItemFactory();
+			// Create a new file upload handler
+			ServletFileUpload upload = new ServletFileUpload(factory);
+			// Parse the request
+			Map<String, String> valueMap = new HashMap<String, String>();
+			InputStream io = null;
+			// Parse the request
+			FileItemIterator iter;
+			try {
+				iter = upload.getItemIterator(req);
+				while (iter.hasNext()) {
+				    FileItemStream item = iter.next();
+				    String name = item.getFieldName();
+				    InputStream stream = item.openStream();
+				    if (item.isFormField()) {
+				        String value = Streams.asString(stream);
+				        valueMap.put(name, value);
+				    } else {
+				        io = stream;
+				        // Process the input stream
+				    }
+				}
+			} catch (FileUploadException e) {
+				throw new IOException(e);
+			}
+
+
+			List<ItemSubmissionLookupDTO> result = new ArrayList<ItemSubmissionLookupDTO>();
+
+			TransformationEngine transformationEngine = service
+					.getPhase1TransformationEngine();
+			if (transformationEngine != null) {
+				MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader) transformationEngine
+						.getDataLoader();
+				dataLoader.setFile(io);
+
+				SubmissionLookupOutputGenerator outputGenerator = (SubmissionLookupOutputGenerator) transformationEngine
+						.getOutputGenerator();
+				result = outputGenerator.getDtoList();
+				try {
+					transformationEngine.transform(new TransformationSpec());
+				} catch (BadTransformationSpec e1) {
+					e1.printStackTrace();
+				} catch (MalformedSourceException e1) {
+					e1.printStackTrace();
+				}
+			}
+			subDTO.setItems(result);
+			service.storeDTOs(req, valueMap.get("s_uuid"), subDTO);
+			List<Map<String, Object>> dto = getLightResultList(result);
+			if (valueMap.containsKey("skip_loader")) {
+				if (valueMap.get("skip_loader").equals("true")) {
+				Map<String, Object> skip = new HashMap<String, Object>();
+				skip.put(
+						"skip",
+						Boolean.TRUE);
+				skip.put(
+						"uuid",
+						valueMap.containsKey("s_uuid") ? valueMap.get("s_uuid")
+								: -1);
+				skip.put(
+						"collectionid",
+						valueMap.containsKey("collectionid") ? valueMap
+								.get("collectionid") : -1);
+				dto.add(skip);
+				}
+			}
+			JSONSerializer serializer = new JSONSerializer();
+			serializer.rootName("result");
+			serializer.deepSerialize(dto, resp.getWriter());
 		}
 	}
 
 	private Map<String, Object> getDetails(ItemSubmissionLookupDTO item,
 			Context context) {
 		List<String> fieldOrder = getFieldOrderFromConfiguration();
-        Record totalData = item.getTotalPublication(service.getProviders());
+		Record totalData = item.getTotalPublication(service.getProviders());
 		Set<String> availableFields = totalData.getFields();
 		List<String[]> fieldsLabels = new ArrayList<String[]>();
 		for (String f : fieldOrder) {
@@ -172,7 +262,7 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 		}
 		Map<String, Object> data = new HashMap<String, Object>();
 		String uuid = item.getUUID();
-        Record pub = item.getTotalPublication(service.getProviders());
+		Record pub = item.getTotalPublication(service.getProviders());
 		data.put("uuid", uuid);
 		data.put("providers", item.getProviders());
 		data.put("publication", pub);
@@ -199,17 +289,22 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 	private List<Map<String, Object>> getLightResultList(
 			List<ItemSubmissionLookupDTO> result) {
 		List<Map<String, Object>> publications = new ArrayList<Map<String, Object>>();
-		if (result != null && result.size()>0) {
+		if (result != null && result.size() > 0) {
 			for (ItemSubmissionLookupDTO item : result) {
 				String uuid = item.getUUID();
 				Record pub = item.getTotalPublication(service.getProviders());
 				Map<String, Object> data = new HashMap<String, Object>();
 				data.put("uuid", uuid);
 				data.put("providers", item.getProviders());
-				data.put("title", SubmissionLookupUtils.getFirstValue(pub, "title"));
-				data.put("authors",pub.getValues("authors")!=null?
-						StringUtils.join(SubmissionLookupUtils.getValues(pub, "authors").iterator(), ", "):"");
-				data.put("issued", SubmissionLookupUtils.getFirstValue(pub, "issued"));
+				data.put("title",
+						SubmissionLookupUtils.getFirstValue(pub, "title"));
+				data.put(
+						"authors",
+						pub.getValues("authors") != null ? StringUtils.join(
+								SubmissionLookupUtils.getValues(pub, "authors")
+										.iterator(), ", ") : "");
+				data.put("issued",
+						SubmissionLookupUtils.getFirstValue(pub, "issued"));
 
 				publications.add(data);
 			}

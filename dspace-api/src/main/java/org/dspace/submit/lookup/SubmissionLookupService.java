@@ -7,8 +7,8 @@
  */
 package org.dspace.submit.lookup;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 import gr.ekt.bte.core.Record;
+import gr.ekt.bte.core.TransformationEngine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,10 +18,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.dspace.identifier.DOI;
 import org.dspace.submit.util.SubmissionLookupDTO;
-
-import gr.ekt.bte.core.TransformationEngine;
 
 public class SubmissionLookupService {
 
@@ -149,4 +146,9 @@ public class SubmissionLookupService {
     public static String getType(Record rec) {
         return SubmissionLookupUtils.getFirstValue(rec, SubmissionLookupProvider.TYPE);
     }
+
+	public List<String> getFileProviders() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
