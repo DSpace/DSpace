@@ -68,6 +68,7 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 		SubmissionLookupDTO subDTO = service.getSubmissionLookupDTO(req, suuid);
 		// Check that we have a file upload request
 		boolean isMultipart = ServletFileUpload.isMultipartContent(req);
+		boolean isTestMultipart = false;
 		if ("identifiers".equalsIgnoreCase(req.getParameter("type"))) {
 			Map<String, Set<String>> identifiers = new HashMap<String, Set<String>>();
 			Enumeration e = req.getParameterNames();
@@ -166,6 +167,102 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 			Map<String, Object> dto = getDetails(subDTO.getLookupItem(i_uuid),
 					context);
 			serializer.deepSerialize(dto, resp.getWriter());
+		} else if (isTestMultipart) { //FIXME remove this in release version
+
+			// Create a factory for disk-based file items
+			FileItemFactory factory = new DiskFileItemFactory();
+			// Create a new file upload handler
+			//ServletFileUpload upload = new ServletFileUpload(factory);
+			// Parse the request
+			List<FileItem> items;
+			Map<String, String> valueMap = new HashMap<String, String>();
+			InputStream io = null;
+			
+			// Create a new file upload handler
+			ServletFileUpload upload = new ServletFileUpload(factory);
+
+			// Parse the request
+			FileItemIterator iter;
+			try {
+				iter = upload.getItemIterator(req);
+				while (iter.hasNext()) {
+				    FileItemStream item = iter.next();
+				    String name = item.getFieldName();
+				    InputStream stream = item.openStream();
+				    if (item.isFormField()) {
+				        String value = Streams.asString(stream);
+				        valueMap.put(name, value);
+				    } else {
+				        io = stream;
+				        // Process the input stream
+				    }
+				}
+			} catch (FileUploadException e) {
+				throw new IOException(e);
+			}
+
+			Map<String, Set<String>> identifiers = new HashMap<String, Set<String>>();
+			Set<String> aa = new HashSet<String>();
+			aa.add("arXiv:1302.1497");
+			aa.add("arXiv:hep-lat/0105002");
+//			Set<String> aaa = new HashSet<String>();
+//			aaa.add("20524090");
+			identifiers.put("arxiv", aa);
+//			identifiers.put("pubmed", aaa);
+			
+			suuid = valueMap.get("s_uuid");
+			subDTO = service.getSubmissionLookupDTO(req, suuid);
+			
+			List<ItemSubmissionLookupDTO> result = new ArrayList<ItemSubmissionLookupDTO>();
+
+			TransformationEngine transformationEngine = service
+					.getPhase1TransformationEngine();
+			if (transformationEngine != null) {
+				MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader) transformationEngine
+						.getDataLoader();
+				dataLoader.setIdentifiers(identifiers);
+
+				try {
+					log.debug("BTE transformation is about to start!");
+					transformationEngine.transform(new TransformationSpec());
+					log.debug("BTE transformation finished!");
+
+					SubmissionLookupOutputGenerator outputGenerator = (SubmissionLookupOutputGenerator) transformationEngine
+							.getOutputGenerator();
+					result = outputGenerator.getDtoList();
+				} catch (BadTransformationSpec e1) {
+					e1.printStackTrace();
+				} catch (MalformedSourceException e1) {
+					e1.printStackTrace();
+				}
+			}
+
+			subDTO.setItems(result);
+			
+			service.storeDTOs(req, suuid, subDTO);
+			List<Map<String, Object>> dto = getLightResultList(result);
+			if (valueMap.containsKey("skip_loader")) {
+				if (valueMap.get("skip_loader").equals("true")) {
+				Map<String, Object> skip = new HashMap<String, Object>();
+				skip.put(
+						"skip",
+						Boolean.TRUE);
+				skip.put(
+						"uuid",
+						valueMap.containsKey("s_uuid") ? suuid
+								: -1);
+				skip.put(
+						"collectionid",
+						valueMap.containsKey("collectionid") ? valueMap
+								.get("collectionid") : -1);
+				dto.add(skip);
+				}
+			}
+
+			JSONSerializer serializer = new JSONSerializer();
+			serializer.rootName("result");
+			serializer.deepSerialize(dto, resp.getWriter());
+			resp.setContentType("text/plain");
 		} else if (isMultipart) {
 
 			// Create a factory for disk-based file items
@@ -195,7 +292,9 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 				throw new IOException(e);
 			}
 
-
+			suuid = valueMap.get("s_uuid");
+			subDTO = service.getSubmissionLookupDTO(req, suuid);
+			
 			List<ItemSubmissionLookupDTO> result = new ArrayList<ItemSubmissionLookupDTO>();
 
 			TransformationEngine transformationEngine = service
@@ -217,7 +316,7 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 				}
 			}
 			subDTO.setItems(result);
-			service.storeDTOs(req, valueMap.get("s_uuid"), subDTO);
+			service.storeDTOs(req, suuid, subDTO);
 			List<Map<String, Object>> dto = getLightResultList(result);
 			if (valueMap.containsKey("skip_loader")) {
 				if (valueMap.get("skip_loader").equals("true")) {
@@ -227,7 +326,7 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 						Boolean.TRUE);
 				skip.put(
 						"uuid",
-						valueMap.containsKey("s_uuid") ? valueMap.get("s_uuid")
+						valueMap.containsKey("s_uuid") ? suuid
 								: -1);
 				skip.put(
 						"collectionid",
