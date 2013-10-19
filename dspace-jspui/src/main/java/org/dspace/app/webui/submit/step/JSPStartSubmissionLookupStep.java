@@ -9,6 +9,7 @@ package org.dspace.app.webui.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -173,8 +174,11 @@ public class JSPStartSubmissionLookupStep extends JSPStep
                     .getProvidersIdentifiersMap();
             List<SubmissionLookupProvider> searchProviders = slService
                     .getSearchProviders();
+            List<String> fileProviders = slService
+                    .getFileProviders();
             request.setAttribute("identifiers2providers", identifiers2providers);
             request.setAttribute("searchProviders", searchProviders);
+            request.setAttribute("fileLoaders", fileProviders);
             request.setAttribute("identifiers", slService.getIdentifiers());
             // we need to load the select collection JSP
             JSPStepManager

@@ -113,6 +113,14 @@ submissionLookupShowResult = function(info){
 	j('#result-list').html(" ");
 	for (var i=0;i<info.result.length;i++)
 	{
+		if(info.result[i].skip==true) {
+			//skip details
+			j('#collectionid').val(info.result[i].collectionid);
+			j('#suuid').val(info.result[i].uuid);
+			j('#form-submission').submit();
+			return false;
+		}
+		
 		var bt = j('<button class="btn btn-info" type="button">').append(j('#jsseedetailsbuttonmessage').text());
 		var par = j('<p class="sl-result">');
 		var divImg = j('<div class="submission-lookup-providers">');
@@ -186,4 +194,58 @@ submissionLookupShowDetails = function(info){
 	});
 	modalfooter.append(start);
 	j('#loading-details').modal('show');
+}
+
+submissionLookupPreview = function(){
+	
+	var suuidVal = j('#suuid').val();
+	var suuid = j('<input type="hidden" name="s_uuid" value="'+suuidVal+'">');
+	var collectionidVal = j('#select-collection-file').val();
+	var collectionid = j('<input type="hidden" name="collectionid" value="'+collectionidVal+'">');
+	var preview_loader = "";
+	if(j('#preview_loader').is (':checked')) {
+		preview_loader = j('<input type="hidden" name="skip_loader" value="false">');
+	}
+	else {
+		preview_loader = j('<input type="hidden" name="skip_loader" value="true">');
+	}
+	
+	var provider_loaderVal = j('#provider_loader').val();
+	var provider_loader = j('<input type="hidden" name="provider_loader" value="'+provider_loaderVal+'">');
+	
+         var iframe = j('<iframe name="postiframe" id="postiframe" style="display: none" />');
+
+         j("body").append(iframe);
+
+         var form = j('#form-loader');
+         form.attr("action", dspaceContextPath+"/json/submissionLookup");
+         form.attr("method", "post");
+         form.attr("enctype", "multipart/form-data");
+         form.attr("encoding", "multipart/form-data");
+         form.attr("target", "postiframe");
+         form.attr("file", j('#file_upload').val());
+         j(form).append(suuid);
+         j(form).append(collectionid);
+         j(form).append(preview_loader);
+         j(form).append(provider_loader);
+         form.submit();
+
+         j("#postiframe").load(function () {
+             var iframeContents = j("#postiframe")[0].contentWindow.document.body.innerHTML;
+             j('#iframecontent').html(iframeContents);
+             var json = j.parseJSON(j("#iframecontent").text());
+            	 if (json == null || json.result == null || json.result.length == 0)
+       			{
+       				j('#result-list').hide();
+       				j('#empty-result').show();
+       			}
+       			else
+       			{
+       				submissionLookupShowResult(json);
+       			}
+            	 j('#loading-file-result').modal("hide");	 
+ 			j('#tabs').find('a[href="#tabs-result"]').click();
+         });
+         j('#loading-file-result').modal("show");
+	 
 }

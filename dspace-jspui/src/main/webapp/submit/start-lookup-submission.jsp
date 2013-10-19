@@ -52,6 +52,7 @@
     
     Map<String, List<SubmissionLookupProvider>> identifiers2providers = (Map<String, List<SubmissionLookupProvider>>) request.getAttribute("identifiers2providers");
     List<SubmissionLookupProvider> searchProviders = (List<SubmissionLookupProvider>) request.getAttribute("searchProviders");
+    List<String> fileLoaders = (List<String>) request.getAttribute("fileLoaders");
     List<String> identifiers = (List<String>) request.getAttribute("identifiers");
     String uuid = (String) request.getAttribute("s_uuid");
 %>
@@ -70,7 +71,7 @@
 	<script type='text/javascript'>var dspaceContextPath = "<%=request.getContextPath()%>";</script>		
 </c:set>
 <c:set var="dspace.layout.head.last" scope="request">		
-	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/submission-lookup.js"></script>	
+	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/submission-lookup.js"></script>
 </c:set>
 
 <dspace:layout style="submission" locbar="off"
@@ -162,6 +163,7 @@
 		</div>
 	</div>
 <% } %>	
+
 	<h3><a href="#"><fmt:message key="jsp.submit.start-lookup-submission.identifiers"/></a></h3>
 	<div>
 <% if (identifiers != null && identifiers.size()>0) {
@@ -201,9 +203,63 @@
 		
 	} %>
 	
+	<% if (fileLoaders != null && fileLoaders.size()>0) {
+	%>
+	<h3><a href="#"><fmt:message key="jsp.submit.start-lookup-submission.byfile"/></a></h3>
+	<div id="file-accordion" class="container">	
+	<p class="help-block"><fmt:message key="jsp.submit.start-lookup-submission.byfile.hints"/></p>
+	
+	<div class="form-group">
+	<label class="col-md-3" for="provider_loader"><span class="submission-lookup-label"><fmt:message key="jsp.submit.start-lookup-submission.byfile.chooseprovider"/>:</span></label>
+	<div class="col-md-6">
+	<select class="form-control submission-file-loader" name="provider_loader" id="provider_loader">
+	<option value="-1"><fmt:message key="jsp.submit.start-lookup-submission.select.collection.defaultoption"/></option>
+	<%	
+	for (String dataLoader : fileLoaders)
+		{			
+	%>
+				<option value="<%= dataLoader %>"><%= dataLoader %></option>
+	<% 
+		}
+	%>
+	</select> 	
+	</div>
+	</div>
+	<div class="form-group">
+			<label class="col-md-3" for="file_upload"><fmt:message key="jsp.submit.start-lookup-submission.byfile.file"/>:</label>
+			<div class="col-md-7"> 
+			<input class="form-control submission-file-loader" type="file" name="file_upload" id="file_upload" />
+			</div>
+	</div>
+	
+	<div class="container checkbox">
+      <input class="submission-file-loader submission-preview-loader" type="checkbox" name="preview_loader" id="preview_loader" value="<%= Boolean.TRUE%>"/><span class="help-block"><fmt:message key="jsp.submit.start-lookup-submission.byfile.filepreview"/></span>
+  	</div>
+  
+	<div class="form-group" id="select-collection-file-div">
+				<label class="col-md-3" for="select-collection-file"><fmt:message key="jsp.submit.start-lookup-submission.byfile.filecollection"/>:</label>
+				<div class="col-md-6">
+				<select class="form-control submission-file-loader" name="select-collection-file" id="select-collection-file">
+					<% for (Collection c : collections) { %>
+					<option value="<%= c.getID() %>"><%= c.getName() %></option>
+					<% }  %>
+				</select>
+				</div>
+	</div>
+			
+	<div class="btn-group col-md-offset-5">	
+		<button class="btn btn-primary" type="button" id="loadfile_go"><fmt:message key="jsp.submit.start-lookup-submission.identifier.lookup"/></button>
+		<button type="button" class="btn btn-default exit"><fmt:message key="jsp.submit.start-lookup-submission.exit"/></button>
+	</div>
+	</div>
+<% 
+		
+	} %>
+	
 	<h3><a href="#"><fmt:message key="jsp.submit.start-lookup-submission.manual-submission"/></a></h3>
 	<div id="manual-accordion">&nbsp;</div>
 	</div>
+	</form>
 </div>
 
 	<div class="tab-pane" id="tabs-result">
@@ -241,6 +297,10 @@
 				</select>
 			</div>
 		</div>
+		
+		<form id="form-loader" action="" method="post">
+		</form>
+		<div id="iframecontent" style="display: none"></div>
 <div id="no-collection-warn" class="modal">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -259,6 +319,23 @@
 </div><!-- /.modal -->
 
 <div id="loading-search-result" class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><fmt:message key="jsp.submit.start-lookup-submission.search-loading.title" /></h4>
+      </div>
+      <div class="modal-body">
+       		<p class="help-block"><fmt:message key="jsp.submit.start-lookup-submission.search-loading.hint" /></p>
+      </div>
+      <div class="modal-footer">
+        <img src="<%= request.getContextPath()  %>/sherpa/image/ajax-loader-big.gif"/>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div id="loading-file-result" class="modal">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -344,6 +421,9 @@
     	j('#search_go').click(function(){
     		submissionLookupSearch(j('.submission-lookup-search'));
     	});
+    	j('#loadfile_go').click(function(){
+    		submissionLookupPreview(j('.submission-file-loader'));
+    	});
     	j('button.exit').click(function(event){
     		event.preventDefault();
     		window.location = "<%= request.getContextPath() %>/mydspace";
@@ -356,6 +436,14 @@
   			 j('#loading-details .modal-body').empty();
   			 j('#loading-details .modal-footer').empty();
    		});
+    	j(".submission-preview-loader").click(function() {
+    		if(j(this).is (':checked')) {
+    			j("#select-collection-file-div").hide();
+    		}
+    		else {
+    			j("#select-collection-file-div").show();
+    		}
+    	});
     --></script>
 	   
 </dspace:layout>
