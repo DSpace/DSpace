@@ -1095,6 +1095,32 @@ public class Item extends DSpaceObject
 
 
     /**
+     * Delete the item from the archive, remove it from collections. 
+     * This operation cannot be undone.
+     * 
+     * TODO: is it necessary to also remove it from workflows?
+     *
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    public void expunge() throws SQLException, AuthorizeException, IOException
+    {
+        // Check authorisation here. If we don't, it may happen that we remove the
+        // metadata but when getting to the point of removing the bundles we get an exception
+        // leaving the database in an inconsistent state
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
+
+        Collection[] collections = this.getCollections();
+        for (Collection collection : collections)
+        {  
+            collection.removeItem(this);
+        }
+        
+        this.delete(); // not strictly necessary as collection.removeItem() calls this if it's the item's only remaining owning collection
+    }
+    
+    /**
      * Withdraw the item from the archive. It is kept in place, and the content
      * and metadata are not deleted, but it is not publicly accessible.
      *
@@ -1219,9 +1245,10 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Delete (expunge) the item. Bundles and bitstreams are also deleted if
+     * Delete (permanently remove) the item. Bundles and bitstreams are also deleted if
      * they are not also included in another item. The Dublin Core metadata is
      * deleted.
+     * This doesn't remove collection membership, use <code>Item.expunge()</code> for that.
      *
      * @throws SQLException
      * @throws AuthorizeException
