@@ -384,26 +384,11 @@
                     </xsl:otherwise>
                 </xsl:choose>
                 
-                <!-- Display a language selection if more than 1 language is supported -->
-                <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='supportedLocale']) &gt; 1">
-                    <div id="ds-language-selection">
-                        <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='supportedLocale']">
-                            <xsl:variable name="locale" select="."/>
-                            <a>
-                                <xsl:attribute name="href">
-                                    <xsl:value-of select="concat($context-path,'/?locale-attribute=')"/>
-                                    <xsl:value-of select="$locale"/>
-                                </xsl:attribute>
-                                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='supportedLocale'][@qualifier=$locale]"/>
-                            </a>
-                        </xsl:for-each>
-                    </div>
-                </xsl:if>
+                <xsl:call-template name="languageSelection" />
                 
             </div>
         </div>
     </xsl:template>
-
 
     <!-- The header (distinct from the HTML head element) contains the title, subtitle, login box and various
         placeholders for header images -->

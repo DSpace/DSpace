@@ -130,7 +130,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         pageMeta.addMetadata("page","contactURL").addContent(contextPath + "/contact");
         pageMeta.addMetadata("page","feedbackURL").addContent(contextPath + "/feedback");
 
-        // Add the locale meta data including language dependent labels
+        // Add the locale metadata including language-dependent labels
         Locale[] locales = I18nUtil.getSupportedLocales();
         for (int i=0; i < locales.length; i++)
         {
