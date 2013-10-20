@@ -2178,7 +2178,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     protected String transformAuthorityValue(Context context, String field, String value) throws SQLException {
-        if (field.endsWith("_filter") || field.endsWith("_ac")
+    	if(field.equals("location.comm") || field.equals("location.coll"))
+    	{
+            return value;
+    	}
+    	if (field.endsWith("_filter") || field.endsWith("_ac")
                 || field.endsWith("_acid"))
         {
             //We have a filter make sure we split !
