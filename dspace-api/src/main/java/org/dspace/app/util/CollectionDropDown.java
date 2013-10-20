@@ -5,11 +5,12 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.xmlui.utils;
+package org.dspace.app.util;
 
 import java.sql.SQLException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.core.ConfigurationManager;
 
 /**
  * Utility class for lists of collections.
@@ -42,23 +43,32 @@ public class CollectionDropDown {
      */
     public static String collectionPath(Collection col, int maxchars) throws SQLException
     {
-
+        String separator = ConfigurationManager.getProperty("subcommunity.separator");
+        if (separator == null)
+        {
+            separator = " > ";
+        }
+        
         Community[] getCom = null;
-        String name = "";
+        StringBuffer name = new StringBuffer("");
         getCom = col.getCommunities(); // all communities containing given collection
-        for (Community com : getCom) {
-            name = com.getMetadata("name") + "/" + name;
+        for (Community com : getCom)
+        {
+            name.insert(0, com.getMetadata("name") + separator);
         }
 
-        name = name + col.getMetadata("name");
+        name.append(col.getMetadata("name"));
 
-        if (maxchars != 0) {
+        if (maxchars != 0)
+        {
             int len = name.length();
-            if (len > maxchars) {
-                name = "…" + name.substring(len - (maxchars - 1), len);
+            if (len > maxchars)
+            {
+                name = new StringBuffer(name.substring(len - (maxchars - 1), len));
+                name.insert(0, "\u2026"); // prepend with an ellipsis (cut from left)
             }
         }
 
-        return name;
+        return name.toString();
     }
 }
