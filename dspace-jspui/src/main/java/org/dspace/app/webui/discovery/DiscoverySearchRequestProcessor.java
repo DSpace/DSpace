@@ -251,6 +251,8 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         DiscoverQuery queryArgs = DiscoverUtility.getDiscoverQuery(context,
                 request, scope, true);
 
+        queryArgs.setSpellCheck(discoveryConfiguration.isSpellCheckEnabled()); 
+        
         List<DiscoverySearchFilterFacet> availableFacet = discoveryConfiguration
                 .getSidebarFacets();
         
@@ -339,6 +341,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         {
             qResults = SearchUtils.getSearchService().search(context, scope,
                     queryArgs);
+            
             List<Community> resultsListComm = new ArrayList<Community>();
             List<Collection> resultsListColl = new ArrayList<Collection>();
             List<Item> resultsListItem = new ArrayList<Item>();
@@ -401,7 +404,8 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
             request.setAttribute("pagecurrent", new Long(pageCurrent));
             request.setAttribute("pagelast", new Long(pageLast));
             request.setAttribute("pagefirst", new Long(pageFirst));
-
+            request.setAttribute("spellcheck", qResults.getSpellCheckQuery());
+            
             request.setAttribute("queryresults", qResults);
 
             try
