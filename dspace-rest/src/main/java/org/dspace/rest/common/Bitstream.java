@@ -8,6 +8,7 @@
 package org.dspace.rest.common;
 
 import org.apache.log4j.Logger;
+import org.dspace.core.Constants;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.sql.SQLException;
@@ -49,7 +50,13 @@ public class Bitstream extends DSpaceObject {
             expandFields = Arrays.asList(expand.split(","));
         }
 
-        bundleName = bitstream.getBundles()[0].getName();
+        //A logo bitstream might not have a bundle...
+        if(bitstream.getBundles() != null & bitstream.getBundles().length >= 0) {
+            if(bitstream.getParentObject().getType() == Constants.ITEM) {
+                bundleName = bitstream.getBundles()[0].getName();
+            }
+        }
+
         description = bitstream.getDescription();
         format = bitstream.getFormatDescription();
         sizeBytes = bitstream.getSize() + "";

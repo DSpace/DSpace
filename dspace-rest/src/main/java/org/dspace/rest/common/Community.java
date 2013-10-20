@@ -168,4 +168,8 @@ public class Community extends DSpaceObject{
     public void setParentCommunity(Community parentCommunity) {
         this.parentCommunity = parentCommunity;
     }
+
+    public Bitstream getLogo() {
+        return logo;
+    }
 }
