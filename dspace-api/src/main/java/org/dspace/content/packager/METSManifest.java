@@ -1271,6 +1271,10 @@ public class METSManifest
             {
                 crosswalkXmd(context, params, bitstream, (Element)ti.next(), callback);
             }
+            for (Iterator ti = amdSec.getChildren("rightsMD", metsNS).iterator(); ti.hasNext();)
+            {
+                crosswalkXmd(context, params, bitstream, (Element)ti.next(), callback);
+            }
         }
     }
 
