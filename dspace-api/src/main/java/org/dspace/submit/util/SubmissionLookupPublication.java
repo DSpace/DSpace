@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.dspace.submit.lookup.SubmissionLookupProvider;
+import org.dspace.submit.lookup.SubmissionLookupDataLoader;
 
 public class SubmissionLookupPublication implements MutableRecord, Serializable {
 	private String providerName;
@@ -68,7 +68,7 @@ public class SubmissionLookupPublication implements MutableRecord, Serializable 
 	}
 
 	public String getType() {
-		return getFirstValue(SubmissionLookupProvider.TYPE);
+		return getFirstValue(SubmissionLookupDataLoader.TYPE);
 	}
 
 	//BTE Record interface methods
@@ -104,14 +104,18 @@ public class SubmissionLookupPublication implements MutableRecord, Serializable 
 	public boolean addField(String md, List<Value> values) {
 		if (storage.containsKey(md)){
 			List<String> stringValues = storage.get(md);
-			for (Value value : values){
-				stringValues.add(value.getAsString());
+			if (values != null){
+				for (Value value : values){
+					stringValues.add(value.getAsString());
+				}
 			}
 		}
 		else {
 			List<String> tmp = new ArrayList<String>();
-			for (Value value : values){
-				tmp.add(value.getAsString());
+			if (values != null){
+				for (Value value : values){
+					tmp.add(value.getAsString());
+				}
 			}
 			storage.put(md, tmp);
 		}

@@ -20,13 +20,12 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.submit.importer.pubmed.PubmedItem;
 
-public class PubmedLookupProvider extends ConfigurableLookupProvider {
+public class PubmedOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
     private boolean searchProvider = true;
-    private static Logger log = Logger.getLogger(PubmedLookupProvider.class);
+    private static Logger log = Logger.getLogger(PubmedOnlineDataLoader.class);
     
-    private PubmedService pubmedService;
+    private PubmedService pubmedService = new PubmedService();
 	
 	public void setPubmedService(PubmedService pubmedService) {
 		this.pubmedService = pubmedService;
@@ -55,7 +54,7 @@ public class PubmedLookupProvider extends ConfigurableLookupProvider {
 		List<Record> results = new ArrayList<Record>();
 		if (pmids != null && pmids.size()>0 && (dois == null || dois.size()==0)) {
 			for (String pmid : pmids){
-				PubmedItem p = null;
+				Record p = null;
 				try
 				{
 					p = pubmedService.getByPubmedID(pmid);
@@ -65,7 +64,7 @@ public class PubmedLookupProvider extends ConfigurableLookupProvider {
 					log.error(LogManager.getHeader(context, "getByIdentifier", "pmid="+pmid), e);
 				}
 				if (p != null)
-					results.add(convert(p));
+					results.add(convertFields(p));
 			}
 		}
 		else if (dois != null && dois.size()>0 && (pmids == null || pmids.size()==0)) {
@@ -77,18 +76,18 @@ public class PubmedLookupProvider extends ConfigurableLookupProvider {
 				query.append(d).append("[AI]");
 			}
 
-			List<PubmedItem> pubmedResults = pubmedService.search(query.toString());
-			for (PubmedItem p : pubmedResults) {
-				results.add(convert(p));
+			List<Record> pubmedResults = pubmedService.search(query.toString());
+			for (Record p : pubmedResults) {
+				results.add(convertFields(p));
 			}
 		}
 		else if (dois != null && dois.size()>0 && pmids != null && pmids.size()>0)
 		{
 			//EKT:ToDo: support list of dois and pmids in the search method of pubmedService
-			List<PubmedItem> pubmedResults = pubmedService.search(dois.iterator().next(), pmids.iterator().next());
+			List<Record> pubmedResults = pubmedService.search(dois.iterator().next(), pmids.iterator().next());
 			if (pubmedResults != null) {
-				for (PubmedItem p : pubmedResults) {
-					results.add(convert(p));
+				for (Record p : pubmedResults) {
+					results.add(convertFields(p));
 				}
 			}
 		}
@@ -99,12 +98,12 @@ public class PubmedLookupProvider extends ConfigurableLookupProvider {
 	@Override
 	public List<Record> search(Context context, String title,
 			String author, int year) throws HttpException, IOException {
-		List<PubmedItem> pubmedResults = pubmedService.search(title, author,
+		List<Record> pubmedResults = pubmedService.search(title, author,
 				year);
 		List<Record> results = new ArrayList<Record>();
 		if (pubmedResults != null) {
-			for (PubmedItem p : pubmedResults) {
-				results.add(convert(p));
+			for (Record p : pubmedResults) {
+				results.add(convertFields(p));
 			}
 		}
 		return results;

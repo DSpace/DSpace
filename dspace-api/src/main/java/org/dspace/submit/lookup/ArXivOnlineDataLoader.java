@@ -18,10 +18,9 @@ import java.util.Set;
 
 import org.apache.commons.httpclient.HttpException;
 import org.dspace.core.Context;
-import org.dspace.submit.importer.arxiv.ArXivItem;
 
-public class ArXivLookupProvider extends ConfigurableLookupProvider {
-	private ArXivService arXivService;
+public class ArXivOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
+	private ArXivService arXivService = new ArXivService();
 	private boolean searchProvider = true;
 	
 	public void setArXivService(ArXivService arXivService) {
@@ -50,7 +49,7 @@ public class ArXivLookupProvider extends ConfigurableLookupProvider {
 		if (keys != null) {
 			Set<String> dois = keys.get(DOI);
 			Set<String> arxivids = keys.get(ARXIV);
-			List<ArXivItem> items = new ArrayList<ArXivItem>();
+			List<Record> items = new ArrayList<Record>();
 			if (dois!=null && dois.size()>0) {
 				items.addAll(arXivService.getByDOIs(dois));
 			}
@@ -60,8 +59,8 @@ public class ArXivLookupProvider extends ConfigurableLookupProvider {
 				}
 			}
 
-			for (ArXivItem item : items) {
-				results.add(convert(item));
+			for (Record item : items) {
+				results.add(convertFields(item));
 			}
 		}
 		return results;
@@ -71,9 +70,9 @@ public class ArXivLookupProvider extends ConfigurableLookupProvider {
 	public List<Record> search(Context context, String title,
 			String author, int year) throws HttpException, IOException {
 		List<Record> results = new ArrayList<Record>();
-		List<ArXivItem> items = arXivService.searchByTerm(title, author, year);
-		for (ArXivItem item : items) {
-			results.add(convert(item));
+		List<Record> items = arXivService.searchByTerm(title, author, year);
+		for (Record item : items) {
+			results.add(convertFields(item));
 		}
 		return results;
 	}	

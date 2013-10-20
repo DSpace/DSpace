@@ -142,11 +142,12 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 						.getDataLoader();
 				dataLoader.setSearchTerms(searchTerms);
 
-				SubmissionLookupOutputGenerator outputGenerator = (SubmissionLookupOutputGenerator) transformationEngine
-						.getOutputGenerator();
-				result = outputGenerator.getDtoList();
 				try {
 					transformationEngine.transform(new TransformationSpec());
+					
+					SubmissionLookupOutputGenerator outputGenerator = (SubmissionLookupOutputGenerator) transformationEngine
+							.getOutputGenerator();
+					result = outputGenerator.getDtoList();
 				} catch (BadTransformationSpec e1) {
 					e1.printStackTrace();
 				} catch (MalformedSourceException e1) {
@@ -268,33 +269,68 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 			// Create a factory for disk-based file items
 			FileItemFactory factory = new DiskFileItemFactory();
 			// Create a new file upload handler
-			ServletFileUpload upload = new ServletFileUpload(factory);
+			//ServletFileUpload upload = new ServletFileUpload(factory);
 			// Parse the request
 			Map<String, String> valueMap = new HashMap<String, String>();
 			InputStream io = null;
+
+			// Create a new file upload handler
+			ServletFileUpload upload = new ServletFileUpload(factory);
+
 			// Parse the request
 			FileItemIterator iter;
 			try {
 				iter = upload.getItemIterator(req);
 				while (iter.hasNext()) {
-				    FileItemStream item = iter.next();
-				    String name = item.getFieldName();
-				    InputStream stream = item.openStream();
-				    if (item.isFormField()) {
-				        String value = Streams.asString(stream);
-				        valueMap.put(name, value);
-				    } else {
-				        io = stream;
-				        // Process the input stream
-				    }
+					FileItemStream item = iter.next();
+					String name = item.getFieldName();
+					InputStream stream = item.openStream();
+					if (item.isFormField()) {
+						String value = Streams.asString(stream);
+						valueMap.put(name, value);
+					} else {
+						io = stream;
+						// Process the input stream
+					}
 				}
 			} catch (FileUploadException e) {
 				throw new IOException(e);
 			}
 
+			/*
+			// Create a factory for disk-based file items
+			FileItemFactory factory = new DiskFileItemFactory();
+			// Create a new file upload handler
+			ServletFileUpload upload = new ServletFileUpload(factory);
+			// Parse the request
+			Map<String, String> valueMap = new HashMap<String, String>();
+			String filename = null;
+			// Parse the request
+			Iterator<FileItem> iter;
+			List<FileItem> fileItems;
+			try {
+				//iter = upload.getItemIterator(req);
+				fileItems = upload.parseRequest(req);
+				iter = fileItems.iterator();
+				while (iter.hasNext()) {
+				    FileItem item = iter.next();
+				    String name = item.getFieldName();
+				    //InputStream stream = item.openStream();
+				    if (item.isFormField()) {
+				        //String value = Streams.asString(stream);
+				        valueMap.put(name, item.getString());
+				    } else {
+				        filename = item.getName();
+				        // Process the input stream
+				    }
+				}
+			} catch (FileUploadException e) {
+				throw new IOException(e);
+			}*/
+
 			suuid = valueMap.get("s_uuid");
 			subDTO = service.getSubmissionLookupDTO(req, suuid);
-			
+
 			List<ItemSubmissionLookupDTO> result = new ArrayList<ItemSubmissionLookupDTO>();
 
 			TransformationEngine transformationEngine = service
@@ -302,13 +338,14 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 			if (transformationEngine != null) {
 				MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader) transformationEngine
 						.getDataLoader();
-				dataLoader.setFile(io);
+				dataLoader.setFile("/usr/local/bibtex", valueMap.get("provider_loader"));
 
-				SubmissionLookupOutputGenerator outputGenerator = (SubmissionLookupOutputGenerator) transformationEngine
-						.getOutputGenerator();
-				result = outputGenerator.getDtoList();
 				try {
 					transformationEngine.transform(new TransformationSpec());
+					
+					SubmissionLookupOutputGenerator outputGenerator = (SubmissionLookupOutputGenerator) transformationEngine
+							.getOutputGenerator();
+					result = outputGenerator.getDtoList();
 				} catch (BadTransformationSpec e1) {
 					e1.printStackTrace();
 				} catch (MalformedSourceException e1) {
@@ -361,10 +398,16 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 		}
 		Map<String, Object> data = new HashMap<String, Object>();
 		String uuid = item.getUUID();
+		
 		Record pub = item.getTotalPublication(service.getProviders());
+		Map<String, List<String>> publication1 = new HashMap<String, List<String>>();
+		for (String field : pub.getFields()){
+			publication1.put(field, SubmissionLookupUtils.getValues(pub, field));
+		}
+		
 		data.put("uuid", uuid);
 		data.put("providers", item.getProviders());
-		data.put("publication", pub);
+		data.put("publication", publication1);
 		data.put("fieldsLabels", fieldsLabels);
 		return data;
 	}

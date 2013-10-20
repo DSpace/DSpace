@@ -38,11 +38,15 @@ public class SubmissionLookupOutputGenerator implements OutputGenerator {
     	dtoList = new ArrayList<ItemSubmissionLookupDTO>();
     	
         Map<String, List<Record>> record_sets = new HashMap<String, List<Record>>();
+        int counter = 0;
         for(Record rec : records) {
             String current_doi = NOT_FOUND_DOI;
             List<Value> values = rec.getValues(DOI_FIELD);
             if (values != null && values.size() > 0) {
                 current_doi = values.get(0).getAsString();
+            }
+            else {
+            	current_doi = NOT_FOUND_DOI + "_" + counter;
             }
 
             if(record_sets.keySet().contains(current_doi)) {
@@ -53,6 +57,8 @@ public class SubmissionLookupOutputGenerator implements OutputGenerator {
                 publication.add(rec);
                 record_sets.put(current_doi, publication);
             }
+            
+            counter++;
         }
         for(Map.Entry<String, List<Record>> entry : record_sets.entrySet()) {
             ItemSubmissionLookupDTO dto = new ItemSubmissionLookupDTO(entry.getValue());

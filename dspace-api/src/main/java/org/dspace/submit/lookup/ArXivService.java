@@ -7,6 +7,8 @@
  */
 package org.dspace.submit.lookup;
 
+import gr.ekt.bte.core.Record;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -26,7 +28,6 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.submit.importer.arxiv.ArXivItem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -39,7 +40,7 @@ public class ArXivService
         this.timeout = timeout;
     }
 
-    public List<ArXivItem> getByDOIs(Set<String> dois) throws HttpException,
+    public List<Record> getByDOIs(Set<String> dois) throws HttpException,
             IOException
     {
         if (dois != null && dois.size() > 0)
@@ -50,7 +51,7 @@ public class ArXivService
         return null;
     }
 
-    public List<ArXivItem> searchByTerm(String title, String author, int year)
+    public List<Record> searchByTerm(String title, String author, int year)
             throws HttpException, IOException
     {
         StringBuffer query = new StringBuffer();
@@ -68,10 +69,10 @@ public class ArXivService
         return search(query.toString(), "", 10);
     }
 
-    private List<ArXivItem> search(String query, String arxivid, int max_result)
+    private List<Record> search(String query, String arxivid, int max_result)
             throws IOException, HttpException
     {
-        List<ArXivItem> results = new ArrayList<ArXivItem>();
+        List<Record> results = new ArrayList<Record>();
         if (!ConfigurationManager.getBooleanProperty("remoteservice.demo"))
         {
             GetMethod method = null;
@@ -116,9 +117,7 @@ public class ArXivService
 
                     for (Element dataRoot : dataRoots)
                     {
-                        ArXivItem crossitem;
-
-                        crossitem = new ArXivItem(dataRoot);
+                    	Record crossitem = ArxivUtils.convertArxixDomToRecord(dataRoot);
                         if (crossitem != null)
                         {
                             results.add(crossitem);
@@ -163,7 +162,7 @@ public class ArXivService
                             "entry");
                     for (Element dataRoot : dataRoots)
                     {
-                        ArXivItem crossitem = new ArXivItem(dataRoot);
+                    	Record crossitem = ArxivUtils.convertArxixDomToRecord(dataRoot);
 
                         if (crossitem != null)
                         {
@@ -188,7 +187,7 @@ public class ArXivService
         return results;
     }
 
-    public ArXivItem getByArXivIDs(String raw) throws HttpException,
+    public Record getByArXivIDs(String raw) throws HttpException,
             IOException
     {
         if (StringUtils.isNotBlank(raw))
@@ -202,7 +201,7 @@ public class ArXivService
             {
                 raw = raw.substring("arxiv:".length());
             }
-            List<ArXivItem> result = search("", raw, 1);
+            List<Record> result = search("", raw, 1);
             if (result != null && result.size() > 0)
             {
                 return result.get(0);

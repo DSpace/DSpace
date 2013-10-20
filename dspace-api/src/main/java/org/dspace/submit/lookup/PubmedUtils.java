@@ -1,103 +1,39 @@
 /**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available online at
- *
- * http://www.dspace.org/license/
+ * 
  */
-package org.dspace.submit.importer.pubmed;
+package org.dspace.submit.lookup;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import gr.ekt.bte.core.MutableRecord;
+import gr.ekt.bte.core.Record;
+import gr.ekt.bte.core.StringValue;
+import gr.ekt.bte.core.Value;
 
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.util.XMLUtils;
-import org.dspace.submit.importer.ItemImport;
-import org.jdom.JDOMException;
-import org.w3c.dom.Document;
+import org.dspace.submit.util.SubmissionLookupPublication;
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
-public class PubmedItem implements ItemImport
-{
-	// Nome della classe istanziata
-	private String source;
-	// Valore del metadato source
-	private String record;
-	
-    private String pubmedID;
+/**
+ * @author kstamatis
+ *
+ */
+public class PubmedUtils {
 
-    private String doi;
-
-    private String issn;
-
-    private String eissn;
-
-    private String journalTitle;
-    
-    private String title;
-
-    private String pubblicationModel;
-
-    private String year;
-
-    private String volume;
-    
-    private String issue;
-
-    private String language;
-
-    private List<String> type = new LinkedList<String>();
-
-    private List<String> primaryKeywords = new LinkedList<String>();
-
-    private List<String> secondaryKeywords = new LinkedList<String>();
-    
-    private List<String> primaryMeshHeadings = new LinkedList<String>();
-
-    private List<String> secondaryMeshHeadings = new LinkedList<String>();
-
-    private String startPage;
-
-    private String endPage;
-
-    private String summary;
-
-    private String status;
-
-    private List<String[]> authors = new LinkedList<String[]>();
-
-    public PubmedItem(InputStream xmlData) throws JDOMException, IOException,
-            ParserConfigurationException, SAXException
-    {
-    	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setValidating(false);
-        factory.setIgnoringComments(true);
-        factory.setIgnoringElementContentWhitespace(true);
-
-        DocumentBuilder db = factory.newDocumentBuilder();
-        Document inDoc = db.parse(xmlData);
-
-        Element xmlRoot = inDoc.getDocumentElement();
-        Element pubArticle = XMLUtils
-                .getSingleElement(xmlRoot, "PubmedArticle");
-
-        loadData(pubArticle);
-    }
-    
-    public PubmedItem(Element xmlArticle) {
-    	loadData(xmlArticle);
+	/**
+	 * 
+	 */
+	public PubmedUtils() {
+		// TODO Auto-generated constructor stub
 	}
 
-	private void loadData(Element pubArticle) {
+	public static Record convertCrossRefDomToRecord(Element pubArticle){
+		MutableRecord record = new SubmissionLookupPublication("");
+	
 		Map<String, String> mounthToNum = new HashMap<String, String>();
         mounthToNum.put("Jan", "01");
         mounthToNum.put("Feb", "02");
@@ -127,19 +63,32 @@ public class PubmedItem implements ItemImport
                 {
                     if ("pubmed".equals(id.getAttribute("IdType")))
                     {
-                        pubmedID = id.getTextContent().trim();
+                        String pubmedID = id.getTextContent().trim();
+                        if (pubmedID!=null)
+                			record.addValue("pubmedID", new StringValue(pubmedID));
                     }
                     else if ("doi".equals(id.getAttribute("IdType")))
                     {
-                        doi = id.getTextContent().trim();
+                        String doi = id.getTextContent().trim();
+                        if (doi!=null)
+                			record.addValue("pubmedID", new StringValue(doi));
                     }
                 }
             }
         }
         
-        status = XMLUtils.getElementValue(pubmed, "PublicationStatus");
-        pubblicationModel = XMLUtils.getElementAttribute(medline, "Article", "PubModel");
-        title = XMLUtils.getElementValue(article, "ArticleTitle");
+        String status = XMLUtils.getElementValue(pubmed, "PublicationStatus");
+        if (status!=null)
+			record.addValue("status", new StringValue(status));
+        
+        String pubblicationModel = XMLUtils.getElementAttribute(medline, "Article", "PubModel");
+        if (pubblicationModel!=null)
+			record.addValue("pubblicationModel", new StringValue(pubblicationModel));
+        
+        String title = XMLUtils.getElementValue(article, "ArticleTitle");
+        if (title!=null)
+			record.addValue("title", new StringValue(title));
+        
         Element abstractElement = XMLUtils.getSingleElement(medline, "Abstract");
         if (abstractElement == null)
         {
@@ -147,9 +96,12 @@ public class PubmedItem implements ItemImport
         }
         if (abstractElement != null)
         {
-            summary = XMLUtils.getElementValue(abstractElement, "AbstractText");
+            String summary = XMLUtils.getElementValue(abstractElement, "AbstractText");
+            if (summary!=null)
+    			record.addValue("summary", new StringValue(summary));
         }
         
+        List<String[]> authors = new LinkedList<String[]>();
         Element authorList = XMLUtils.getSingleElement(article, "AuthorList");
         if (authorList != null)
         {
@@ -165,6 +117,13 @@ public class PubmedItem implements ItemImport
                 }
             }
         }
+        if (authors.size()>0){
+			List<Value> values = new LinkedList<Value>();
+			for (String[] sArray : authors){
+				values.add(new StringValue(sArray[1]+", "+sArray[0]));
+			}
+			record.addField("authors", values);
+		}
         
         Element journal = XMLUtils.getSingleElement(article, "Journal");
         if (journal != null)
@@ -176,27 +135,41 @@ public class PubmedItem implements ItemImport
                 {
                     if ("Print".equals(jnumber.getAttribute("IssnType")))
                     {
-                        issn = jnumber.getTextContent().trim();
+                        String issn = jnumber.getTextContent().trim();
+                        if (issn!=null)
+                			record.addValue("issn", new StringValue(issn));
                     }
                     else
                     {
-                        eissn = jnumber.getTextContent().trim();
+                        String eissn = jnumber.getTextContent().trim();
+                        if (eissn!=null)
+                			record.addValue("eissn", new StringValue(eissn));
                     }
                 }
             }
             
-            journalTitle = XMLUtils.getElementValue(journal, "Title");
+            String journalTitle = XMLUtils.getElementValue(journal, "Title");
+            if (journalTitle!=null)
+    			record.addValue("journalTitle", new StringValue(journalTitle));
+            
             Element journalIssueElement = XMLUtils.getSingleElement(journal, "JournalIssue");
             if (journalIssueElement != null)
             {
-                volume = XMLUtils.getElementValue(journalIssueElement, "Volume");
-                issue = XMLUtils.getElementValue(journalIssueElement, "Issue");
+                String volume = XMLUtils.getElementValue(journalIssueElement, "Volume");
+                if (volume!=null)
+        			record.addValue("volume", new StringValue(volume));
+                
+                String issue = XMLUtils.getElementValue(journalIssueElement, "Issue");
+                if (issue!=null)
+        			record.addValue("issue", new StringValue(issue));
                 
                 Element pubDataElement = XMLUtils.getSingleElement(journalIssueElement, "PubDate");
                 
+                String year = null;
                 if (pubDataElement != null)
                 {
                     year = XMLUtils.getElementValue(pubDataElement, "Year");
+                    
                     String mounth = XMLUtils.getElementValue(pubDataElement, "Month");
                     String day = XMLUtils.getElementValue(pubDataElement, "Day");
                     if (StringUtils.isNotBlank(mounth) && mounthToNum.containsKey(mounth))
@@ -208,10 +181,15 @@ public class PubmedItem implements ItemImport
                         }
                     }
                 }
+                if (year!=null)
+        			record.addValue("year", new StringValue(year));
             }
             
-            language = XMLUtils.getElementValue(article, "Language");
+            String language = XMLUtils.getElementValue(article, "Language");
+            if (language!=null)
+    			record.addValue("language", new StringValue(language));
             
+            List<String> type = new LinkedList<String>();
             Element publicationTypeList = XMLUtils.getSingleElement(article, "PublicationTypeList");
             if (publicationTypeList != null)
             {
@@ -221,7 +199,16 @@ public class PubmedItem implements ItemImport
                     type.add(publicationType.getTextContent().trim());
                 }
             }
+            if (type.size()>0){
+    			List<Value> values = new LinkedList<Value>();
+    			for (String s : type){
+    				values.add(new StringValue(s));
+    			}
+    			record.addField("type", values);
+    		}
             
+            List<String> primaryKeywords = new LinkedList<String>();
+            List<String> secondaryKeywords = new LinkedList<String>();
             Element keywordsList = XMLUtils.getSingleElement(medline, "KeywordList");
             if (keywordsList != null)
             {
@@ -238,7 +225,23 @@ public class PubmedItem implements ItemImport
                     }
                 }
             }
+            if (primaryKeywords.size()>0){
+    			List<Value> values = new LinkedList<Value>();
+    			for (String s : primaryKeywords){
+    				values.add(new StringValue(s));
+    			}
+    			record.addField("primaryKeywords", values);
+    		}
+            if (secondaryKeywords.size()>0){
+    			List<Value> values = new LinkedList<Value>();
+    			for (String s : secondaryKeywords){
+    				values.add(new StringValue(s));
+    			}
+    			record.addField("secondaryKeywords", values);
+    		}
             
+            List<String> primaryMeshHeadings = new LinkedList<String>();
+            List<String> secondaryMeshHeadings = new LinkedList<String>();
             Element meshHeadingsList = XMLUtils.getSingleElement(medline, "MeshHeadingList");
             if (meshHeadingsList != null)
             {
@@ -255,142 +258,38 @@ public class PubmedItem implements ItemImport
                     }
                 }
             }
-         
+            if (primaryMeshHeadings.size()>0){
+    			List<Value> values = new LinkedList<Value>();
+    			for (String s : primaryMeshHeadings){
+    				values.add(new StringValue(s));
+    			}
+    			record.addField("primaryMeshHeadings", values);
+    		}
+            if (secondaryMeshHeadings.size()>0){
+    			List<Value> values = new LinkedList<Value>();
+    			for (String s : secondaryMeshHeadings){
+    				values.add(new StringValue(s));
+    			}
+    			record.addField("secondaryMeshHeadings", values);
+    		}
+            
             Element paginationElement = XMLUtils.getSingleElement(article, "Pagination");
             if (paginationElement != null)
             {
-                startPage = XMLUtils.getElementValue(paginationElement, "StartPage");
-                endPage = XMLUtils.getElementValue(paginationElement, "EndPage");
+                String startPage = XMLUtils.getElementValue(paginationElement, "StartPage");
+                String endPage = XMLUtils.getElementValue(paginationElement, "EndPage");
                 if (StringUtils.isBlank(startPage))
                 {
                     startPage = XMLUtils.getElementValue(paginationElement, "MedlinePgn");
                 }
+                
+                if (startPage!=null)
+        			record.addValue("startPage", new StringValue(startPage));
+                if (endPage!=null)
+        			record.addValue("endPage", new StringValue(endPage));
             }
         }
-	}
-
-    public String getPubmedID()
-    {
-        return pubmedID;
-    }
-
-    public String getDoi()
-    {
-        return doi;
-    }
-
-    public String getIssn()
-    {
-        return issn;
-    }
-
-    public String getEissn()
-    {
-        return eissn;
-    }
-
-    public String getJournalTitle()
-    {
-        return journalTitle;
-    }
-
-    public String getTitle()
-    {
-        return title;
-    }
-
-    public String getPubblicationModel()
-    {
-        return pubblicationModel;
-    }
-
-    public String getYear()
-    {
-        return year;
-    }
-
-    public String getVolume()
-    {
-        return volume;
-    }
-
-    public String getIssue()
-    {
-        return issue;
-    }
-
-    public String getLanguage()
-    {
-        return language;
-    }
-
-    public List<String> getType()
-    {
-        return type;
-    }
-
-    public List<String> getPrimaryKeywords()
-    {
-        return primaryKeywords;
-    }
-
-    public List<String> getSecondaryKeywords()
-    {
-        return secondaryKeywords;
-    }
-
-    public List<String> getPrimaryMeshHeadings()
-    {
-        return primaryMeshHeadings;
-    }
-
-    public List<String> getSecondaryMeshHeadings()
-    {
-        return secondaryMeshHeadings;
-    }
-
-    public String getStartPage()
-    {
-        return startPage;
-    }
-
-    public String getEndPage()
-    {
-        return endPage;
-    }
-
-    public String getSummary()
-    {
-        return summary;
-    }
-
-    public String getStatus()
-    {
-        return status;
-    }
-
-    public List<String[]> getAuthors()
-    {
-        return authors;
-    }
-    
-    @Override
-	public void setSource(String source) {
-		this.source = source;
-	}
-
-	@Override
-	public void setRecord(String record) {
-		this.record = record;
-	}
-
-	@Override
-	public String getRecord() {
+		
 		return record;
-	}
-	
-	@Override
-	public String getSource() {
-		return source;
 	}
 }

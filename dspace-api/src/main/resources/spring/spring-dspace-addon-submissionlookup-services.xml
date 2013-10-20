@@ -28,15 +28,14 @@
   	</bean>
 		
 	<bean name="multipleDataLoader" class="org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader">
-	    <property name="providersMap">
+	    <property name="dataloadersMap">
 	        <map>
-	            <entry key="pubmed" value-ref="pubmedLookupProvider"/>
-	            <entry key="crossref" value-ref="crossrefLookupProvider"/>
-	            <entry key="arxiv" value-ref="arxivLookupProvider"/>
-	            <entry key="bibtex" value-ref="bibtexProvider"/>
+	            <entry key="pubmed" value-ref="pubmedOnlineDataLoader"/>
+	            <entry key="crossref" value-ref="crossRefOnlineDataLoader"/>
+	            <entry key="arxiv" value-ref="arXivOnlineDataLoader"/>
+	            <entry key="bibtex" value-ref="bibTeXDataLoader"/>
 			</map>
 	    </property>
-	    
 	</bean>
 
 	<bean name="org.dspace.submit.lookup.SubmissionLookupOutputGenerator" class="org.dspace.submit.lookup.SubmissionLookupOutputGenerator"/>
@@ -217,10 +216,7 @@
 	    </property>
 	</bean>
 	
-	<bean class="org.dspace.submit.lookup.PubmedService" name="pubmedService" />
-	
-	<bean class="org.dspace.submit.lookup.PubmedLookupProvider" name="pubmedLookupProvider">
-		<property name="pubmedService" ref="pubmedService" />
+	<bean class="org.dspace.submit.lookup.PubmedOnlineDataLoader" name="pubmedOnlineDataLoader">
 		<property name="searchProvider" value="false" />
 		<property name="fieldMap">
 			<map>
@@ -249,11 +245,8 @@
 		</property>
 	</bean>
 
-	<bean class="org.dspace.submit.lookup.ArXivService" name="arXivService" />
-	
-	<bean class="org.dspace.submit.lookup.ArXivLookupProvider"
-		name="arxivLookupProvider">
-		<property name="arXivService" ref="arXivService" />
+	<bean class="org.dspace.submit.lookup.ArXivOnlineDataLoader"
+		name="arXivOnlineDataLoader">
 		<property name="searchProvider" value="false" />
 		<property name="fieldMap">
 			<map>
@@ -271,13 +264,10 @@
 				<entry key="source" value="arxivID" />
 			</map>
 		</property>
-	</bean>
-
-	<bean class="org.dspace.submit.lookup.CrossRefService" name="crossrefService" />	
+	</bean>	
 	
-	<bean class="org.dspace.submit.lookup.CrossRefLookupProvider"
-		name="crossrefLookupProvider">
-		<property name="crossrefService" ref="crossrefService" />
+	<bean class="org.dspace.submit.lookup.CrossRefOnlineDataLoader"
+		name="crossRefOnlineDataLoader">
 		<property name="searchProvider" value="false" />
 		<property name="fieldMap">
 			<map>
@@ -390,15 +380,15 @@
 		</property> 
 	</bean>
 	
-	<bean id="bibtexProvider"
+	<bean id="bibTeXDataLoader"
         class="gr.ekt.bteio.loaders.BibTeXDataLoader">
     <property name="fieldMap">
       <map>
-        <entry key="title" value="Title"/>
-        <entry key="author" value="Author"/>
-        <entry key="journal" value="Journal"/>
-        <entry key="year" value="Year"/>
-        <entry key="ISSN" value="ISSN"/>
+        <entry key="title" value="title"/>
+        <entry key="author" value="authors"/>
+        <entry key="journal" value="journal"/>
+        <entry key="year" value="issued"/>
+        <entry key="ISSN" value="jissn"/>
       </map>
     </property>
   </bean>

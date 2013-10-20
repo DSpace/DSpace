@@ -49,19 +49,21 @@ public class RemoveLastDotModifier extends AbstractModifier {
 
 				List<Value> newValues = new ArrayList<Value>();
 
-				for (Value value : values){
-					String valueString = value.getAsString();
-					if (StringUtils.isNotBlank(valueString) && valueString.endsWith("."))
-					{
-						newValues.add(new StringValue(valueString.substring(0, valueString.length() - 1)));
+				if (values != null){
+					for (Value value : values){
+						String valueString = value.getAsString();
+						if (StringUtils.isNotBlank(valueString) && valueString.endsWith("."))
+						{
+							newValues.add(new StringValue(valueString.substring(0, valueString.length() - 1)));
+						}
+						else
+						{
+							newValues.add(new StringValue(valueString));
+						}
 					}
-					else
-					{
-						newValues.add(new StringValue(valueString));
-					}
-				}
 
-				record.updateField(key, newValues);
+					record.updateField(key, newValues);
+				}
 			}
 		}
 

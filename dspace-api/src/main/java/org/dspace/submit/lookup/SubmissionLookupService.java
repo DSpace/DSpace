@@ -72,9 +72,9 @@ public class SubmissionLookupService {
 				if (p instanceof FileDataLoader){
 					this.fileProviders.add(providerName);
 				}
-				else if (p instanceof ConfigurableLookupProvider){
+				else if (p instanceof NetworkSubmissionLookupDataLoader){
 				
-					ConfigurableLookupProvider p2 = (ConfigurableLookupProvider)p;
+					NetworkSubmissionLookupDataLoader p2 = (NetworkSubmissionLookupDataLoader)p;
 
 					p2.setProviderName(providerName);
 					
@@ -112,8 +112,8 @@ public class SubmissionLookupService {
 		MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader)phase1TransformationEngine.getDataLoader();
 		for (String providerName : dataLoader.getProvidersMap().keySet()) {
 			DataLoader provider = dataLoader.getProvidersMap().get(providerName);
-			if (provider instanceof SubmissionLookupProvider){
-				for (String identifier : ((SubmissionLookupProvider)provider).getSupportedIdentifiers()){
+			if (provider instanceof SubmissionLookupDataLoader){
+				for (String identifier : ((SubmissionLookupDataLoader)provider).getSupportedIdentifiers()){
 					if (!allSupportedIdentifiers.contains(identifier)){
 						allSupportedIdentifiers.add(identifier);
 					}
@@ -163,7 +163,7 @@ public class SubmissionLookupService {
     }
 
     public static String getType(Record rec) {
-        return SubmissionLookupUtils.getFirstValue(rec, SubmissionLookupProvider.TYPE);
+        return SubmissionLookupUtils.getFirstValue(rec, SubmissionLookupDataLoader.TYPE);
     }
 
 	public List<String> getFileProviders() {

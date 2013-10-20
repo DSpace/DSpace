@@ -19,7 +19,7 @@ import gr.ekt.bte.core.DataLoader;
 import gr.ekt.bte.core.Record;
 
 
-public interface SubmissionLookupProvider extends DataLoader {
+public interface SubmissionLookupDataLoader extends DataLoader {
 
 	public final static String DOI = "doi";
 	public final static String PUBMED = "pubmed";

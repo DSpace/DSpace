@@ -7,6 +7,8 @@
  */
 package org.dspace.submit.lookup;
 
+import gr.ekt.bte.core.Record;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -26,7 +28,6 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.submit.importer.pubmed.PubmedItem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -38,11 +39,11 @@ public class PubmedService {
 		this.timeout = timeout;
 	}
 	
-	public PubmedItem getByPubmedID(String pubmedid) throws HttpException,
+	public Record getByPubmedID(String pubmedid) throws HttpException,
 			IOException, ParserConfigurationException, SAXException {
 		List<String> ids = new ArrayList<String>();
 		ids.add(pubmedid.trim());
-		List<PubmedItem> items = getByPubmedIDs(ids);
+		List<Record> items = getByPubmedIDs(ids);
 		if (items != null && items.size() > 0)
 		{
 			return items.get(0);
@@ -50,7 +51,7 @@ public class PubmedService {
 		return null;
 	}
 
-	public List<PubmedItem> search(String title, String author, int year)
+	public List<Record> search(String title, String author, int year)
 			throws HttpException, IOException {
 		StringBuffer query = new StringBuffer();
 		if (StringUtils.isNotBlank(title)) {
@@ -74,9 +75,9 @@ public class PubmedService {
 		return search(query.toString());
 	}
 
-	public List<PubmedItem> search(String query) throws IOException,
+	public List<Record> search(String query) throws IOException,
 			HttpException {
-		List<PubmedItem> results = null;
+		List<Record> results = null;
 		if (!ConfigurationManager.getBooleanProperty("remoteservice.demo")) {
 			GetMethod method = null;
 			try {
@@ -167,9 +168,9 @@ public class PubmedService {
 		return results;
 	}
 
-	public List<PubmedItem> getByPubmedIDs(List<String> pubmedIDs)
+	public List<Record> getByPubmedIDs(List<String> pubmedIDs)
 			throws HttpException, IOException, ParserConfigurationException, SAXException {
-		List<PubmedItem> results = new ArrayList<PubmedItem>();
+		List<Record> results = new ArrayList<Record>();
 		if (!ConfigurationManager.getBooleanProperty("remoteservice.demo")) {
 			GetMethod method = null;
 			try {
@@ -207,9 +208,9 @@ public class PubmedService {
 
 		        for (Element xmlArticle : pubArticles)
 		        {
-					PubmedItem pubmedItem = null;
+					Record pubmedItem = null;
 					try {
-						pubmedItem = new PubmedItem(xmlArticle);
+						pubmedItem = PubmedUtils.convertCrossRefDomToRecord(xmlArticle);
 						results.add(pubmedItem);
 					} catch (Exception e) {
 						throw new RuntimeException(
@@ -245,9 +246,9 @@ public class PubmedService {
 
 		        for (Element xmlArticle : pubArticles)
 		        {
-					PubmedItem pubmedItem = null;
+					Record pubmedItem = null;
 					try {
-						pubmedItem = new PubmedItem(xmlArticle);
+						pubmedItem = PubmedUtils.convertCrossRefDomToRecord(xmlArticle);
 						results.add(pubmedItem);
 					} catch (Exception e) {
 						throw new RuntimeException(
@@ -266,7 +267,7 @@ public class PubmedService {
 		}
 	}
 
-	public List<PubmedItem> search(String doi, String pmid) throws HttpException, IOException {
+	public List<Record> search(String doi, String pmid) throws HttpException, IOException {
 		StringBuffer query = new StringBuffer();
 		if (StringUtils.isNotBlank(doi)) {
 			query.append(doi);

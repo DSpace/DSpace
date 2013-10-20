@@ -20,12 +20,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.httpclient.HttpException;
 import org.dspace.core.Context;
-import org.dspace.submit.importer.crossref.CrossrefItem;
 import org.jdom.JDOMException;
 import org.xml.sax.SAXException;
 
-public class CrossRefLookupProvider extends ConfigurableLookupProvider {
-	private CrossRefService crossrefService;
+public class CrossRefOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
+	private CrossRefService crossrefService = new CrossRefService();
 
 	private boolean searchProvider = true;
 	
@@ -48,8 +47,8 @@ public class CrossRefLookupProvider extends ConfigurableLookupProvider {
 			Map<String, Set<String>> keys) throws HttpException, IOException {
 		if (keys != null && keys.containsKey(DOI)) {
 			Set<String> dois = keys.get(DOI);
+			List<Record> items = null;
 			List<Record> results = new ArrayList<Record>();
-			List<CrossrefItem> items = null;
 			try {
 				items = crossrefService.search(context, dois);
 			} catch (JDOMException e) {
@@ -59,12 +58,10 @@ public class CrossRefLookupProvider extends ConfigurableLookupProvider {
 			} catch (SAXException e) {
 				throw new RuntimeException(e.getMessage(), e);
 			}
-			if (items != null) {
-				for (CrossrefItem p : items) {
-					results.add(convert(p));
-				}
-				return results;
+			for (Record record : items){
+				results.add(convertFields(record));
 			}
+			return results;
 		}
 		return null;
 	}
@@ -72,16 +69,8 @@ public class CrossRefLookupProvider extends ConfigurableLookupProvider {
 	@Override
 	public List<Record> search(Context context, String title,
 			String author, int year) throws HttpException, IOException {
-		List<Record> results = new ArrayList<Record>();
-		List<CrossrefItem> items = null;
-		items = crossrefService.search(context, title, author, year, 10);
-		if (items != null) {
-			for (CrossrefItem p : items) {
-				results.add(convert(p));
-			}
-			return results;
-		}
-		return null;
+		List<Record> items = crossrefService.search(context, title, author, year, 10);
+		return items;
 	}
 
 	@Override

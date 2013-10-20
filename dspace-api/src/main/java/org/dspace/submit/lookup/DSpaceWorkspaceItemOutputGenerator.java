@@ -177,7 +177,7 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
 		}
 
 		// creo un nuovo context per il check di esistenza dei metadata di cache
-		Context context = null;
+		/*Context context = null;
 		try {
 			context = new Context();
             for (Record pub : dto.getPublications()) {
@@ -217,7 +217,7 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
 			if (context != null && context.isValid()) {
 				context.abort();
 			}
-		}
+		}*/
 	}
 	
 	private String getMetadata(String formName,

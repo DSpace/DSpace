@@ -155,7 +155,7 @@ submissionLookupShowDetails = function(info){
 	{
 		var fieldName = info.fieldsLabels[i][0];
 		var fieldLabel = info.fieldsLabels[i][1]; 
-		var values = info.publication.storage[fieldName];
+		var values = info.publication[fieldName];
 		var tr = j('<tr>');
 		tr.append(j('<td class="submission-lookup-label">').append(fieldLabel));
 		var td = j('<td>');

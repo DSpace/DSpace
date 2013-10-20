@@ -29,7 +29,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.submit.lookup.SubmissionLookupProvider;
+import org.dspace.submit.lookup.SubmissionLookupDataLoader;
 import org.dspace.submit.lookup.SubmissionLookupService;
 import org.dspace.submit.step.StartSubmissionLookupStep;
 import org.dspace.utils.DSpace;

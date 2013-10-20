@@ -11,6 +11,7 @@ import gr.ekt.bte.core.DataLoadingSpec;
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.RecordSet;
 import gr.ekt.bte.core.StringValue;
+import gr.ekt.bte.core.Value;
 import gr.ekt.bte.exceptions.MalformedSourceException;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ import org.dspace.core.Context;
 import org.dspace.submit.util.SubmissionLookupPublication;
 
 
-public abstract class ConfigurableLookupProvider implements SubmissionLookupProvider {
+public abstract class NetworkSubmissionLookupDataLoader implements SubmissionLookupDataLoader {
 	
 	Map<String, Set<String>> identifiers; //Searching by identifiers (DOI ...)
 	Map<String, Set<String>> searchTerms; //Searching by author, title, date
@@ -38,14 +39,6 @@ public abstract class ConfigurableLookupProvider implements SubmissionLookupProv
 	Map<String, String> fieldMap; //mapping between service fields and local intermediate fields
 	
 	String providerName;
-	
-	protected Record convert(Object bean) {
-		try {
-			return convert(providerName, bean);
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-	}
 	
 	@Override
 	public List<Record> getByDOIs(Context context, Set<String> doiToSearch)
@@ -125,74 +118,27 @@ public abstract class ConfigurableLookupProvider implements SubmissionLookupProv
 	public void setProviderName(String providerName) {
 		this.providerName = providerName;
 	}
-
-	public Record convert(String shortName,
-			Object bean) throws SecurityException, NoSuchMethodException,
-			IllegalArgumentException, IllegalAccessException,
-			InvocationTargetException {
-		Record publication = new SubmissionLookupPublication(
-				shortName);
-		Field[] fields = bean.getClass().getDeclaredFields();
-		for (Field field : fields) {
-			     if (field.getType() == String.class) {
-				       Method getter = bean.getClass().getMethod(
-				           "get" + field.getName().substring(0, 1).toUpperCase()
-				               + field.getName().substring(1));
-				
-				       String value = (String) getter.invoke(bean);
-				
-				       addMetadata(shortName, publication, field.getName(), value);
-				
-				     } else if (field.getType() == List.class) {
-				       ParameterizedType pt = (ParameterizedType) field
-				           .getGenericType();
-				
-				       Method getter = bean.getClass().getMethod(
-				           "get" + field.getName().substring(0, 1).toUpperCase()
-				               + field.getName().substring(1));
-				
-				       if (pt.getActualTypeArguments()[0] instanceof GenericArrayType) { // nomi
-				                                         // di
-				                                         // persone
-				         List<String[]> values = (List<String[]>) getter.invoke(bean);
-				         if (values != null) {
-				           for (String[] nvalue : values) {
-				             String value = nvalue[1] + ", " + nvalue[0];
-				             addMetadata(shortName, publication,
-				                 field.getName(), value);
-				           }
-				         }
-				       } else { // metadati ripetibili
-				         List<String> values = (List<String>) getter.invoke(bean);
-				         if (values != null) {
-				           for (String value : values) {
-				             addMetadata(shortName, publication,
-				                 field.getName(), value);
-				           }
-				         }
-				       }
-				     }
-		}
-		return publication;
-	}
 	
-	private void addMetadata(String config, Record publication, String name, String value) {
-		if (StringUtils.isBlank(value))
-			return;
-		
-		String md = null;
-		if (fieldMap!=null){
-			md = this.fieldMap.get(name);
-		}
+	public Record convertFields(Record publication) {
+		for (String fieldName : fieldMap.keySet()) {
+			String md = null;
+			if (fieldMap!=null){
+				md = this.fieldMap.get(fieldName);
+			}
 
-		if (StringUtils.isBlank(md)) {
-			return;
-		} else {
-			md = md.trim();
+			if (StringUtils.isBlank(md)) {
+				continue;
+			} else {
+				md = md.trim();
+			}
+
+			if (publication.isMutable()){
+				List<Value> values = publication.getValues(fieldName);
+				publication.makeMutable().removeField(fieldName);
+				publication.makeMutable().addField(md, values);
+			}
 		}
 		
-		if (publication.isMutable()){
-			publication.makeMutable().addValue(md, new StringValue(value));
-		}
+		return publication;
 	}
 }

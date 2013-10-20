@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.dspace.submit.lookup.SubmissionLookupProvider;
+import org.dspace.submit.lookup.SubmissionLookupDataLoader;
 import org.dspace.submit.lookup.SubmissionLookupService;
 
 public class ItemSubmissionLookupDTO implements Serializable {
