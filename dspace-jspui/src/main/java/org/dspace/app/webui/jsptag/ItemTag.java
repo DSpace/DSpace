@@ -1002,20 +1002,18 @@ public class ItemTag extends TagSupport
 													.obtainContext(request),
 													bitstreams[k],
 													Constants.READ))
-										out.print("<a href=\""
+										out.print("&nbsp;<a class=\"btn btn-success\" href=\""
 												+ request.getContextPath()
 												+ "/request-item?handle="
 												+ handle
 												+ "&bitstream-id="
 												+ bitstreams[k].getID()
-												+ " \"><img src=\""
-												+ request.getContextPath()
-												+ "/image/lock.gif\" width='20' height='20' border='0' alt=\""
+												+ "\">"
 												+ LocaleSupport
 														.getLocalizedMessage(
 																pageContext,
 																"org.dspace.app.webui.jsptag.ItemTag.restrict")
-												+ "\"><a>");
+												+ "</a>");
 								} catch (Exception e) {
 								}
 								out.print("</td></tr>");

@@ -5,7 +5,7 @@
  *
  */
 
-package pt.uminho.sdum.dspace.requestItem.util;
+package org.dspace.app.webui.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

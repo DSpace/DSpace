@@ -53,7 +53,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<%@ page import="pt.uminho.sdum.dspace.requestItem.servlet.RequestItemServlet"%>
+<%@ page import="org.dspace.app.webui.servlet.RequestItemServlet"%>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%
@@ -73,31 +73,21 @@
 
 %>
 
-<dspace:layout locbar="off" navbar="off" titlekey="jsp.request.item.request-information.title" >
-
-<br>
-<p><fmt:message key="jsp.request.item.request-information.info1">
+<dspace:layout locbar="off" navbar="default" titlekey="jsp.request.item.request-information.title" >
+<h2><fmt:message key="jsp.request.item.request-information.info1" /></h2>
+<p><fmt:message key="jsp.request.item.request-information.info2">
 <fmt:param><a href="<%=request.getContextPath()%>/handle/<%=handle %>"><%=title %></a></fmt:param>
 <fmt:param><%=requestName %></a></fmt:param>
-</fmt:message> 
-</p>
-    <form name="form1" action="<%= request.getContextPath() %>/request-item" method="POST">
-        <input type="HIDDEN" name="token" value='<%= token %>'>
-        <input type="HIDDEN" name="step" value='<%=RequestItemServlet.APROVE_TOKEN %>'>
-        <center>
-            <table>
-                <tr>
-                    <td align="center">
-                    <input type="SUBMIT" name="submit_yes" value="<fmt:message key="jsp.request.item.request-information.yes"/>" >
-                    </td>
-                </tr>
-                <tr>
-                    <td align="center">
-                    <input type="SUBMIT" name="submit_no" value="<fmt:message key="jsp.request.item.request-information.no"/>" >
-                    </td>
-                </tr>
-            </table>
-        </center>
-    </form>
+</fmt:message></p>
+<p class="alert alert-info"><fmt:message key="jsp.request.item.request-information.note" /></p>
+<form name="form1" action="<%= request.getContextPath() %>/request-item" method="post">
+    <input type="hidden" name="token" value='<%= token %>' />
+    <input type="hidden" name="step" value='<%=RequestItemServlet.APROVE_TOKEN %>' />
+	<div class="text-center">
+        <input class="btn btn-danger" type="submit" name="submit_no" value="<fmt:message key="jsp.request.item.request-information.no"/>" />
+        <input class="btn btn-success" type="submit" name="submit_yes" value="<fmt:message key="jsp.request.item.request-information.yes"/>" />
+    </div>
+    </div>
+</form>
 
 </dspace:layout>

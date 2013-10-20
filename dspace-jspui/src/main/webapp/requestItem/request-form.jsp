@@ -52,7 +52,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<%@ page import="pt.uminho.sdum.dspace.requestItem.servlet.RequestItemServlet"%>
+<%@ page import="org.dspace.app.webui.servlet.RequestItemServlet"%>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%
@@ -85,57 +85,60 @@
 
 %>
 
-<dspace:layout locbar="off" navbar="off" titlekey="jsp.request.item.request-form.title" >
+<dspace:layout locbar="off" navbar="default" titlekey="jsp.request.item.request-form.title" >
 
-<br />
-<p><fmt:message key="jsp.request.item.request-form.info2">
+<h2><fmt:message key="jsp.request.item.request-form.info2">
 <fmt:param><a href="<%=request.getContextPath()%>/handle/<%=handle %>"><%=title %></a></fmt:param>
-</fmt:message>
-</p>
+</fmt:message></h2>
 
 <%
     	if (problem)
     	{
 %>
-        <P ALIGN="CENTER" STYLE="color: RED"><strong><fmt:message key="jsp.request.item.request-form.problem"/></strong></P>
+        <p class="alert alert-warning"><fmt:message key="jsp.request.item.request-form.problem"/></p>
 <%
     	}
 %>
-    <form name="form1" action="<%= request.getContextPath() %>/request-item" method="POST">
-        <center>
-            <table>
-                <tr>
-                    <td class="submitFormLabel"><fmt:message key="jsp.request.item.request-form.reqname"/></td>
-                    <td><input type="TEXT" name="reqname" size="50" value="<%= userName %>"></td>
-                </tr>
-                <tr>
-                    <td class="submitFormLabel"><fmt:message key="jsp.request.item.request-form.email"/></td>
-                    <td><input type="TEXT" name="email" size="50" value="<%= email %>"></td>
-                </tr>
-                <tr>
-                    <td class="submitFormLabel"><fmt:message key="jsp.request.item.request-form.allfiles"/></td>
-                    <td>
-                        <table><tr><td align="left">
-                            <input type="radio" name="allfiles" value="true" <%=allfiles?"checked":""%>><fmt:message key="jsp.request.item.request-form.yes"/></input>
-                        </td></tr><tr><td align="left">
-                            <input type="radio" name="allfiles" value="false" <%=allfiles?"":"checked"%>><fmt:message key="jsp.request.item.request-form.no"/></input>
-                        </td></tr></table>
-                    </td>
-                </tr>	
-                <tr>
-                    <td class="submitFormLabel"><fmt:message key="jsp.request.item.request-form.coment"/></td>
-                    <td><textarea name="coment" rows="6" cols="46" wrap=soft><%= coment %></textarea></td>
-                </tr>	
-                <tr>
-                    <td colspan="2" align="center">
-                    <input type="HIDDEN" name="handle" value='<%= handle %>'>
-                    <input type="HIDDEN" name="bitstream-id" value='<%= bitstream_id %>'>
-                    <input type="HIDDEN" name="step" value="<%=RequestItemServlet.ENTER_FORM_PAGE %>">
-                    <input type="SUBMIT" name="submit" value="<fmt:message key="jsp.request.item.request-form.go"/>" >
-                    </td>
-                </tr>
-            </table>
-        </center>
+    <form name="form1" class="form-horizontal" action="<%= request.getContextPath() %>/request-item" method="post">
+		<div class="form-group">
+         <label for="reqname" class="control-label col-md-2"><fmt:message key="jsp.request.item.request-form.reqname"/></label>
+         <div class="col-md-10">
+         	<input class="form-control" type="text" name="reqname" size="50" value="<%= userName %>">
+         </div>
+        </div>
+        <div class="form-group">
+         <label for="email" class="control-label col-md-2"><fmt:message key="jsp.request.item.request-form.email"/></label>
+         <div class="col-md-10">
+			<input type="text" class="form-control" name="email" size="50" value="<%= email %>">
+         </div>
+        </div>
+        <div class="form-group">
+         <label for="allfiles" class="control-label col-md-2"><fmt:message key="jsp.request.item.request-form.allfiles"/></label>
+         <div class="col-md-10">
+	        <div class="input-group"> 
+	         <span class="input-group-addon"><input type="radio" class="form-control" name="allfiles" value="true" <%=allfiles?"checked":""%> /></span>
+	         <span class="form-control"><fmt:message key="jsp.request.item.request-form.yes"/></span>
+	        </div>
+	        <div class="input-group">
+	         <span class="input-group-addon"><input type="radio" class="form-control" name="allfiles" value="false" <%=allfiles?"":"checked"%> /></span>
+	         <span class="form-control"><fmt:message key="jsp.request.item.request-form.no"/></span>
+	        </div> 
+         </div>
+        </div>
+        <div class="form-group">
+         <label for="coment" class="control-label col-md-2"><fmt:message key="jsp.request.item.request-form.coment"/></label>
+		 <div class="col-md-10">
+	         <textarea class="form-control" name="coment" rows="6" cols="46" wrap=soft><%= coment %></textarea>
+    	 </div>
+        </div>
+        
+         <input type="hidden" name="handle" value='<%= handle %>' />
+         <input type="hidden" name="bitstream-id" value='<%= bitstream_id %>' />
+         <input type="hidden" name="step" value="<%=RequestItemServlet.ENTER_FORM_PAGE %>" />
+        <div class="btn btn-group col-md-4 pull-right row">
+         <a class="btn btn-default col-md-6" href="<%=request.getContextPath()%>/handle/<%=handle %>"><fmt:message key="jsp.request.item.request-form.cancel" /></a>
+         <button type="submit" name="submit" class="btn btn-primary col-md-6" value="true"><fmt:message key="jsp.request.item.request-form.go"/></button>
+        </div> 
     </form>
 
 </dspace:layout>

@@ -5,7 +5,7 @@
  *
  */
 
-package pt.uminho.sdum.dspace.requestItem.util;
+package org.dspace.app.webui.util;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -13,7 +13,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.File;
 import java.util.Date;
+
 import org.apache.log4j.Logger;
+import org.dspace.app.webui.servlet.RequestItemServlet;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -22,7 +24,6 @@ import org.dspace.core.Utils;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
-import pt.uminho.sdum.dspace.requestItem.servlet.RequestItemServlet;
 
 /**
  *

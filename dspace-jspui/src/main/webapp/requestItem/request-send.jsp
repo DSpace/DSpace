@@ -47,18 +47,11 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<style type="text/css">
-<!--
-.style1 {color: #0000AE}
--->
-</style>
+<dspace:layout locbar="off" navbar="default" titlekey="jsp.request.item.request-send.title">
 
-
-<dspace:layout locbar="off" navbar="off" titlekey="jsp.request.item.request-send.title">
-
-    <h1><fmt:message key="jsp.request.item.request-send.info1"/></h1>
+    <h2><fmt:message key="jsp.request.item.request-send.info1"/></h2>
 
     <p><fmt:message key="jsp.request.item.request-send.info2"/> 
-	<a class="style1" href="#" onClick="window.close();"><fmt:message key="jsp.request.item.request-send.close"/></a></p>
+	<a href="<%= request.getContextPath() %>/handle/${handle}"><fmt:message key="jsp.request.item.request-send.return-item"/></a></p>
 
 </dspace:layout>

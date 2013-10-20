@@ -53,7 +53,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<%@ page import="pt.uminho.sdum.dspace.requestItem.servlet.RequestItemServlet"%>
+<%@ page import="org.dspace.app.webui.servlet.RequestItemServlet"%>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%

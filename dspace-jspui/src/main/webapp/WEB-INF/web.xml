@@ -468,7 +468,7 @@
   
   <servlet>
     <servlet-name>request-item</servlet-name>
-    <servlet-class>pt.uminho.sdum.dspace.requestItem.servlet.RequestItemServlet</servlet-class>
+    <servlet-class>org.dspace.app.webui.servlet.RequestItemServlet</servlet-class>
   </servlet>
     	
   <servlet-mapping>

@@ -1,4 +1,4 @@
-package pt.uminho.sdum.dspace.requestItem.util;
+package org.dspace.app.webui.util;
 
 import java.text.MessageFormat;
 import java.util.regex.Pattern;
