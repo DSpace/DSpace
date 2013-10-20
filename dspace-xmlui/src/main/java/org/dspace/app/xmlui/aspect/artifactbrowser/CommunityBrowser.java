@@ -139,8 +139,8 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 	                validity.add(node.getDSO());
 	                
 	                // If we are configured to use collection strengths (i.e. item counts) then include that number in the validity.
-	                boolean useCache = ConfigurationManager.getBooleanProperty("webui.strengths.cache");
-	                if (useCache)
+	                boolean showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
+	                if (showCount)
 	        		{
 	                    try
 	                    {	//try to determine Collection size (i.e. # of items)
