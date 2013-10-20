@@ -42,7 +42,7 @@ public class ItemCountDAOSolr implements ItemCountDAO
     SearchService searcher = dspace.getServiceManager().getServiceByName(SearchService.class.getName(), SearchService.class);
     
     /**
-     * Store the count of the given collection (does nothing in the Solr backend).
+     * Throw an ItemCountException as caching is not supported by ItemCountDAOSolr.
      * 
      * @param collection
      * @param count
@@ -50,10 +50,11 @@ public class ItemCountDAOSolr implements ItemCountDAO
      */
     public void collectionCount(Collection collection, int count) throws ItemCountException
     {
+        throw new ItemCountException("Caching is not supported by the ItemCountDAOSolr as it is not really needed, Solr is faster!");
     }
 
     /**
-     * Store the count of the given community (does nothing in the Solr backend).
+     * Throw an ItemCountException as caching is not supported by ItemCountDAOSolr.
      * 
      * @param community
      * @param count
@@ -61,6 +62,7 @@ public class ItemCountDAOSolr implements ItemCountDAO
      */
     public void communityCount(Community community, int count) throws ItemCountException
     {
+        throw new ItemCountException("Caching is not supported by the ItemCountDAOSolr as it is not really needed, Solr is faster!");
     }
 
     /**
@@ -82,34 +84,34 @@ public class ItemCountDAOSolr implements ItemCountDAO
      */
     public int getCount(DSpaceObject dso) throws ItemCountException
     {
-            DiscoverQuery query = new DiscoverQuery();
-            if (dso instanceof Collection)
-            {
-                query.addFilterQueries("location.coll:" + ((Collection) dso).getID());
-            }
-            else if (dso instanceof Community)
-            {
-                query.addFilterQueries("location.comm:" + ((Community) dso).getID());
-            }
-            else
-            {
-                throw new ItemCountException("We can only count items in Communities or Collections");
-            }
-            query.addFilterQueries("search.resourcetype:2");    // count only items
-            query.addFilterQueries("NOT(discoverable:false)");    // only discoverable
-            query.setMaxResults(0);
-            
-            DiscoverResult sResponse = null;
-            try
-            {
-                sResponse = searcher.search(context, query, false);
-            }
-            catch (SearchServiceException e)
-            {
-                log.error("caught exception: ", e);
-                throw new ItemCountException(e);
-            }
-            return (int) sResponse.getTotalSearchResults();
+        DiscoverQuery query = new DiscoverQuery();
+        if (dso instanceof Collection)
+        {
+            query.addFilterQueries("location.coll:" + ((Collection) dso).getID());
+        }
+        else if (dso instanceof Community)
+        {
+            query.addFilterQueries("location.comm:" + ((Community) dso).getID());
+        }
+        else
+        {
+            throw new ItemCountException("We can only count items in Communities or Collections");
+        }
+        query.addFilterQueries("search.resourcetype:2");    // count only items
+        query.addFilterQueries("NOT(discoverable:false)");  // only discoverable
+        query.setMaxResults(0);
+        
+        DiscoverResult sResponse = null;
+        try
+        {
+            sResponse = searcher.search(context, query, false);
+        }
+        catch (SearchServiceException e)
+        {
+            log.error("caught exception: ", e);
+            throw new ItemCountException(e);
+        }
+        return (int) sResponse.getTotalSearchResults();
     }
 
     /**
@@ -121,25 +123,4 @@ public class ItemCountDAOSolr implements ItemCountDAO
     public void remove(DSpaceObject dso) throws ItemCountException
     {
     }
-
-    /**
-     * remove the cache for the given collection (does nothing in the Solr backend)
-     * 
-     * @param collection
-     * @throws ItemCountException
-     */
-    private void removeCollection(Collection collection) throws ItemCountException
-    {
-    }
-    
-    /**
-     * Remove the cache for the given community (does nothing in the Solr backend)
-     * 
-     * @param community
-     * @throws ItemCountException
-     */
-    private void removeCommunity(Community community) throws ItemCountException
-    {
-    }
-    
 }
