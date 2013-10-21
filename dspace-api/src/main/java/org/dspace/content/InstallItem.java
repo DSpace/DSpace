@@ -72,11 +72,9 @@ public class InstallItem
             throw new RuntimeException("Can't create an Identifier!", e);
         }
 
-
         populateMetadata(c, item);
 
         return finishItem(c, item, is);
-
     }
 
     /**
