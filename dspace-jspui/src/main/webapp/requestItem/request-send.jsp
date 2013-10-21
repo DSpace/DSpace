@@ -52,6 +52,6 @@
     <h2><fmt:message key="jsp.request.item.request-send.info1"/></h2>
 
     <p><fmt:message key="jsp.request.item.request-send.info2"/> 
-	<a href="<%= request.getContextPath() %>/handle/${handle}"><fmt:message key="jsp.request.item.request-send.return-item"/></a></p>
+	<a href="<%= request.getContextPath() %>/handle/${handle}"><fmt:message key="jsp.request.item.return-item"/></a></p>
 
 </dspace:layout>

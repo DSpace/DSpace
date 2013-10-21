@@ -7,15 +7,14 @@
 
 package org.dspace.app.webui.util;
 
-import java.io.IOException;
 import java.sql.SQLException;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.File;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.servlet.RequestItemServlet;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -23,7 +22,6 @@ import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
 
 /**
  *
@@ -117,7 +115,7 @@ public class RequestItemManager {
             , int itemID, String reqEmail, String reqName, boolean allfiles)
             throws SQLException
     {
-        String base = ConfigurationManager.getProperty("dspace.baseUrl");
+        String base = ConfigurationManager.getProperty("dspace.url");
 
         String specialLink = (new StringBuffer()).append(base).append(
                 base.endsWith("/") ? "" : "/").append(
@@ -129,88 +127,17 @@ public class RequestItemManager {
         return specialLink;
     }
     
-     /**
-     * Get email by template.
-     * 
-     * @param template
-     *            The template email 
-     *
-     * @exception SQLExeption
-     *
-     */
-    public static ReqEmail getEmail(String template) throws IOException
+     public static boolean isRestricted(Context context, DSpaceObject o) throws SQLException
     {
-        String subject = "";
-        StringBuffer contentBuffer = new StringBuffer();
-
-        // Read in template
-        BufferedReader reader = null;
-        try
-        {
-            reader = new BufferedReader(new FileReader(
-                    ConfigurationManager.getProperty("dspace.dir") +
-                    File.separator + "config" + File.separator + "emails"
-                            + File.separator + template));
-
-            boolean more = true;
-            while (more)
-            {
-                String line = reader.readLine();
-
-                if (line == null)
-                {
-                    more = false;
-                } else if (line.toLowerCase().startsWith("subject:"))
-                {
-                    // Extract the first subject line - everything to the right
-                    // of the colon, trimmed of whitespace
-                    subject = line.substring(8).trim();
-                } else if (!line.startsWith("#"))
-                {
-                    // Add non-comment lines to the content
-                    contentBuffer.append(line);
-                    contentBuffer.append("\n");
-                }
-            }
-        }
-        finally
-        {
-            if (reader != null)
-            {
-                reader.close();
-            }
-        }
-        return getEmail(subject, contentBuffer.toString());
-    }
-
-     /**
-     * Get email.
-     * 
-     * @param subject
-     *            The subject of email 
-     * @param contentText
-     *            The text of email 
-     *
-     * @exception SQLExeption
-     *
-     */
-    public static ReqEmail getEmail(String subject, String contentText) throws IOException
-    {
-        ReqEmail email = new ReqEmail();
-        email.setField(email.FIELD_MESSAGE, contentText);
-        email.setField(email.FIELD_SUBJECT, subject);
-        return email;
-    }
-    
-    public static boolean isRestricted(Context context, DSpaceObject o) throws SQLException
-    {
-        TableRowIterator tri = DatabaseManager.query(context,
-        "SELECT * FROM resourcepolicy WHERE " + "resource_type_id="
-                + o.getType() + " AND " + "resource_id=" + o.getID()
-                + " AND " + "action_id=" + Constants.READ
-                + " AND epersongroup_id = '0';");
-        if(tri.hasNext())
-            return false;
+		List<ResourcePolicy> policies = AuthorizeManager
+				.getPoliciesActionFilter(context, o, Constants.READ);
+		for (ResourcePolicy rp : policies)
+		{
+			if (rp.isDateValid())
+			{
+				return false;
+			}
+		}
         return true;
     }
     

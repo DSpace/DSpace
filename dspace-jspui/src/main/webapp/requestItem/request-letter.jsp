@@ -66,50 +66,38 @@
     if (message == null)
         message = "";
 
-    String resp = (String) request.getAttribute("response");
-    if (resp == null)
-        resp = "";
-
-
+    boolean resp = (Boolean) request.getAttribute("response");
 %>
 
-<dspace:layout locbar="off" navbar="off" titlekey="jsp.request.item.request-letter.title" >
+<dspace:layout locbar="off" navbar="default" titlekey="jsp.request.item.request-letter.title" >
 
-<br>
-<% if(resp.equals("yes")) {%>
-    <p>
-    <fmt:message key="jsp.request.item.request-letter.info1">
-    <fmt:param><%=subject %></a></fmt:param>
-    </fmt:message> 
-    </p>
-<%}else{%>
-    <p>
-    <fmt:message key="jsp.request.item.request-letter.info2">
-    <fmt:param><%=subject %></a></fmt:param>
-    </fmt:message> 
-    </p>
-<%}%>
-    <form name="form1" action="<%= request.getContextPath() %>/request-item" method="POST">
-        <input type="HIDDEN" name="token" value='<%= token %>'>
-        <input type="HIDDEN" name="subject" value='<%= subject %>'>
-        <input type="HIDDEN" name="step" value="<%=RequestItemServlet.RESUME_REQUEST %>">
-        <center>
-            <table>
-                <tr>
-                    <td align="center" colspan="2">
-                    <textarea name="message" rows="20" cols="100" wrap=soft><%= message %></textarea>
-                    </td>
-                </tr>
-                <tr>
-                    <td align="center">
-                    <input type="SUBMIT" name="submit_back" value="<fmt:message key="jsp.request.item.request-letter.back"/>" >
-                    </td>
-                    <td align="center">
-                    <input type="SUBMIT" name="submit_next" value="<fmt:message key="jsp.request.item.request-letter.next"/>" >
-                    </td>
-                </tr>
-            </table>
-        </center>
+<% if(resp) { %>
+    <h2><fmt:message key="jsp.request.item.request-letter.accept.heading" /></h2>
+    <p><fmt:message key="jsp.request.item.request-letter.accept.info" /></p>
+<% } else { %>
+    <h2><fmt:message key="jsp.request.item.request-letter.reject.heading" /></h2>
+    <p><fmt:message key="jsp.request.item.request-letter.reject.info" /></p>
+<% } %>
+    <form name="form1" action="<%= request.getContextPath() %>/request-item" method="post" class="form-horizontal">
+        <input type="hidden" name="token" value='<%= token %>' />
+        <input type="hidden" name="accept_request" value="<%= resp %>" />
+        <input type="hidden" name="step" value="<%=RequestItemServlet.RESUME_REQUEST %>" />
+        <div class="form-group">
+	        <label for="subject" class="control-label col-md-2"><fmt:message key="jsp.request.item.request-letter.subject"/></label>
+	        <div class="col-md-10">
+	        	<input type="text" class="form-control" name="subject" value='<%= subject %>' />
+	        </div>
+        </div>
+        <div class="form-group">
+	        <label for="message" class="control-label col-md-2"><fmt:message key="jsp.request.item.request-letter.message"/></label>
+	        <div class="col-md-10">
+        		<textarea class="form-control" name="message" rows="20" cols="100"><%= message %></textarea>
+        	</div>
+        </div>
+        <div class="btn btn-group col-md-4 pull-right row">
+			<input type="submit" name="submit_back" class="btn btn-default col-md-6" value="<fmt:message key="jsp.request.item.request-letter.back"/>" >
+	        <input type="submit" class="btn btn-<%= resp?"success":"reject" %> col-md-6" name="submit_next" value="<fmt:message key="jsp.request.item.request-letter.next"/>" >
+	    </div>    
     </form>
 
 </dspace:layout>

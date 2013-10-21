@@ -54,11 +54,11 @@
 </style>
 
 
-<dspace:layout locbar="off" navbar="off" titlekey="jsp.request.item.response-send.title">
+<dspace:layout locbar="off" navbar="default" titlekey="jsp.request.item.response-send.title">
 
     <h1><fmt:message key="jsp.request.item.response-send.info1"/></h1>
 
     <p><fmt:message key="jsp.request.item.response-send.info2"/> 
-	<a class="style1" href="" onClick="window.close();"><fmt:message key="jsp.request.item.response-send.close"/></a></p>
+	<a href="<%= request.getContextPath() %>/handle/${handle}"><fmt:message key="jsp.request.item.return-item"/></a></p>
 
 </dspace:layout>

@@ -68,39 +68,28 @@
         title = "";
 %>
 
-<dspace:layout locbar="off" navbar="off" titlekey="jsp.request.item.request-free-acess.title" >
+<dspace:layout locbar="off" navbar="default" titlekey="jsp.request.item.request-free-acess.title" >
 
-<br/>
-    <p><fmt:message key="jsp.request.item.request-free-acess.info1"/>
-    <a class="style1" href="" onClick="window.close();"><fmt:message key="jsp.request.item.request-free-acess.close"/></a>
-    </p>
+<p class="alert alert-success"><fmt:message key="jsp.request.item.request-free-acess.info1"/></p>
 
+<p><b><fmt:message key="jsp.request.item.request-free-acess.info2" /></b></p>
 
-<p><b><fmt:message key="jsp.request.item.request-free-acess.info2">
-<fmt:param><a href="<%=request.getContextPath()%>/handle/<%=handle %>"><%=title %></a></fmt:param>
-</fmt:message> 
-</b></p>
-
-    <form name="form1" action="<%= request.getContextPath() %>/request-item" method="POST">
-        <input type="HIDDEN" name="token" value='<%= token %>'>
-        <input type="HIDDEN" name="step" value='<%=RequestItemServlet.RESUME_FREEACESS %>'>
-        <center>
-            <table>
-                <tr>
-                    <td class="submitFormLabel"><fmt:message key="jsp.request.item.request-free-acess.name"/></td>
-                    <td><input type="TEXT" name="name" size="50" value=""></td>
-                </tr>
-                <tr>
-                    <td class="submitFormLabel"><fmt:message key="jsp.request.item.request-free-acess.email"/></td>
-                    <td><input type="TEXT" name="email" size="50" value=""></td>
-                </tr>
-                <tr>
-                    <td align="center" colspan="2"><p>
-                    <input type="SUBMIT" name="submit_free" value="<fmt:message key="jsp.request.item.request-free-acess.free"/>" >
-                    </p></td>
-                </tr>                    
-            </table>
-        </center>
+    <form name="form1" action="<%= request.getContextPath() %>/request-item" method="post" class="form-horizontal">
+        <input type="hidden" name="token" value='<%= token %>'>
+        <input type="hidden" name="step" value='<%= RequestItemServlet.RESUME_FREEACESS %>'>
+        <div class="form-group">
+	        <label for="name" class="control-label col-md-2"><fmt:message key="jsp.request.item.request-free-acess.name"/></label>
+	        <div class="col-md-5">
+	        	<input type="text" class="form-control" name="name" size="50" value="" />
+	        </div>	
+        </div>
+        <div class="form-group">
+        <label for="email" class="control-label col-md-2"><fmt:message key="jsp.request.item.request-free-acess.email"/></label>
+        <div class="col-md-5">
+        	<input type="text" name="email" class="form-control" size="50" value="" />
+        </div>
+        </div>
+        <input class="btn btn-success col-md-offset-2" type="submit" name="submit_free" value="<fmt:message key="jsp.request.item.request-free-acess.free"/>"  />
     </form>
 
 </dspace:layout>

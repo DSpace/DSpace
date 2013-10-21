@@ -41,6 +41,7 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.Date;
 
 import javax.mail.MessagingException;
@@ -51,7 +52,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
-import org.dspace.app.webui.util.ReqEmail;
 import org.dspace.app.webui.util.RequestItemManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -344,67 +344,27 @@ public class RequestItemServlet extends DSpaceServlet
 			DCValue[] titleDC = item.getDC("title", null, Item.ANY);
 			String title = titleDC.length > 0 ? titleDC[0].value : I18nUtil
 					.getMessage("jsp.general.untitled", context);
-
-			String message = request.getParameter("message");
+			
 
 			EPerson submiter = item.getSubmitter();
-			Email email;
-			if (yes) {
-				email = Email.getEmail(I18nUtil.getEmailFilename(
-						context.getCurrentLocale(), "request_item.aprove"));
-			} else {
-				email = Email.getEmail(I18nUtil.getEmailFilename(
-						context.getCurrentLocale(), "request_item.reject"));
-			}
 
-			email.addRecipient(requestItem.getStringColumn("request_email"));
-
-			email.addArgument(requestItem.getStringColumn("request_name"));
-			email.addArgument("");
-			email.addArgument("");
-			email.addArgument(HandleManager.getCanonicalForm(item.getHandle())); // User
-																					// agent
-			email.addArgument(title); // request item title
-			email.addArgument(message); // message
-			email.addArgument(""); // # token link
-			email.addArgument(submiter.getFullName()); // # submmiter name
-			email.addArgument(submiter.getEmail()); // # submmiter email
-
-			if (yes)
-			{
-				if (requestItem.getBooleanColumn("allfiles")) {
-					Bundle[] bundles = item.getBundles("ORIGINAL");
-					for (int i = 0; i < bundles.length; i++) {
-						Bitstream[] bitstreams = bundles[i].getBitstreams();
-						for (int k = 0; k < bitstreams.length; k++) {
-							if (!bitstreams[k].getFormat().isInternal() 
-									/* && RequestItemManager.isRestricted(context, bitstreams[k])*/) {
-								email.addAttachment(BitstreamStorageManager
-										.retrieve(context, bitstreams[k].getID()),
-										bitstreams[k].getName(), bitstreams[k]
-												.getFormat().getMIMEType());
-							}
-						}
-					}
-				} else {
-					Bitstream bit = Bitstream.find(context,
-							requestItem.getIntColumn("bitstream_id"));
-					email.addAttachment(
-							BitstreamStorageManager.retrieve(context,
-									requestItem.getIntColumn("bitstream_id")),
-							bit.getName(), bit.getFormat().getMIMEType());
-				}
-			}
-			email.send();
-			requestItem.setColumn("decision_date", new Date());
-			requestItem.setColumn("accept_request", yes);
-			DatabaseManager.update(context, requestItem);
-
+			Object[] args = new String[]{
+						requestItem.getStringColumn("request_name"),
+						HandleManager.getCanonicalForm(item.getHandle()), // User
+						title, // request item title
+						submiter.getFullName(), // # submmiter name
+						submiter.getEmail() // # submmiter email
+					};
+			
+			String subject = I18nUtil.getMessage("itemRequest.response.subject."
+					+ (yes ? "approve" : "reject"), context);
+			String message = MessageFormat.format(I18nUtil.getMessage("itemRequest.response.body."
+					+ (yes ? "approve" : "reject"), context), args);
+			
 			// page
-			request.setAttribute("response", requestItem
-					.getBooleanColumn("accept_request") ? "yes" : "no");
-			// request.setAttribute("subject", email.getSubject());
-			// request.setAttribute("message", email.getMessage());
+			request.setAttribute("response", yes);
+			request.setAttribute("subject", subject);
+			request.setAttribute("message", message);
 			JSPManager.showJSP(request, response,
 					"/requestItem/request-letter.jsp");
 		} else {
@@ -437,41 +397,51 @@ public class RequestItemServlet extends DSpaceServlet
                 // Token
                 String subject = request.getParameter("subject");
                 String message = request.getParameter("message");
+                boolean accept = UIUtil.getBoolParameter(request, "accept_request");
                 try
                 {
                     Item item = Item.find(context, requestItem.getIntColumn("item_id"));
-                    ReqEmail email = RequestItemManager.getEmail(subject, message);
-                    email.setField(email.FIELD_TO,requestItem.getStringColumn("request_email"));
-                    email.setField(email.FIELD_FROM,ConfigurationManager.getProperty("mail.from.address"));
-                    email.setField(email.FIELD_HOST,ConfigurationManager.getProperty("mail.server"));
-                    email.setField(email.FIELD_SUBJECT, I18nUtil.getMessage("jsp.request.item.request-information.title"));
+                    Email email = new Email();
+                    email.setSubject(subject);
+                    email.setContent("{0}");
+        			email.addRecipient(requestItem.getStringColumn("request_email"));
+                    email.addArgument(message);
+                    
+					// add attach
+					if (accept) {
+						if (requestItem.getBooleanColumn("allfiles")) {
+							Bundle[] bundles = item.getBundles("ORIGINAL");
+							for (int i = 0; i < bundles.length; i++) {
+								Bitstream[] bitstreams = bundles[i]
+										.getBitstreams();
+								for (int k = 0; k < bitstreams.length; k++) {
+									if (!bitstreams[k].getFormat().isInternal()
+											&& RequestItemManager.isRestricted(
+													context, bitstreams[k])) {
+										email.addAttachment(
+												BitstreamStorageManager
+														.retrieve(
+																context,
+																bitstreams[k]
+																		.getID()),
+												bitstreams[k].getName(),
+												bitstreams[k].getFormat()
+														.getMIMEType());
+									}
+								}
+							}
+						} else {
+							Bitstream bit = Bitstream.find(context,
+									requestItem.getIntColumn("bitstream_id"));
+							email.addAttachment(BitstreamStorageManager
+									.retrieve(context, requestItem
+											.getIntColumn("bitstream_id")), bit
+									.getName(), bit.getFormat().getMIMEType());
+						}
+					}
+                    email.send();
 
-                    // add attach 
-                    if(requestItem.getBooleanColumn("accept_request"))
-                    {
-                        if (requestItem.getBooleanColumn("allfiles"))
-                        {
-                            Bundle[] bundles = item.getBundles("ORIGINAL");
-                            for (int i = 0; i < bundles.length; i++)
-                            {
-                                Bitstream[] bitstreams = bundles[i].getBitstreams();
-                                for (int k = 0; k < bitstreams.length; k++)
-                                {
-                                    if (!bitstreams[k].getFormat().isInternal() && RequestItemManager.isRestricted(context, bitstreams[k]))
-                                    {
-                                        email.addAttachment(BitstreamStorageManager.retrieve(context, bitstreams[k].getID())
-                                            , bitstreams[k].getName(), bitstreams[k].getFormat().getMIMEType());
-                                    }
-                                }
-                            }
-                        }else{
-                            Bitstream bit = Bitstream.find(context,requestItem.getIntColumn("bitstream_id"));
-                            email.addAttachment(BitstreamStorageManager.retrieve(context, requestItem.getIntColumn("bitstream_id"))
-                                    , bit.getName(), bit.getFormat().getMIMEType());
-                        }                
-                    }
-                    email.sendMessage();
-
+                    requestItem.setColumn("accept_request",accept);
                     requestItem.setColumn("decision_date",new Date());
                     DatabaseManager.update(context, requestItem);
 
@@ -480,7 +450,7 @@ public class RequestItemServlet extends DSpaceServlet
                         "token=" + token));
 
                     JSPManager.showJSP(request, response,
-                        "/requestItem/request-free-acess.jsp");
+                        "/requestItem/request-free-access.jsp");
                 }
                 catch (MessagingException me)
                 {
@@ -489,15 +459,15 @@ public class RequestItemServlet extends DSpaceServlet
                         ""), me);
                    JSPManager.showInternalError(request, response);
                 }            
-            }else
-                JSPManager.showInvalidIDError(request, response, null, -1);
-        }else{
-            processToken(context, request, response);
-        }
+			} else
+				JSPManager.showInvalidIDError(request, response, null, -1);
+		} else {
+			processToken(context, request, response);
+		}
    }
 
 	/*
-	 * receive aprovation and generate a letter 
+	 * receive approvation and generate a letter 
 	 * get all request data by token
 	 * send email to request user
 	 */
