@@ -28,7 +28,7 @@ import org.dspace.core.Constants;
 import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
 
-import org.dspace.app.xmlui.utils.CollectionDropDown;
+import org.dspace.app.util.CollectionDropDown;
 
 /**
  * Allow the user to select a collection they wish to submit an item to, 
