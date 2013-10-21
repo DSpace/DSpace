@@ -78,7 +78,7 @@ public class CollectionsResource {
             org.dspace.content.Collection[] collections;
 
             //Only support paging if limit/offset are 0 or positive values.
-            if(limit != null && limit >= 0 && offset != null && offset != 0) {
+            if(limit != null && limit >= 0 && offset != null && offset >= 0) {
                 collections = org.dspace.content.Collection.findAll(context, limit, offset);
             } else {
                 collections = org.dspace.content.Collection.findAll(context);
