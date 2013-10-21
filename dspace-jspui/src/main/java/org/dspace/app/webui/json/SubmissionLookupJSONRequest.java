@@ -182,6 +182,7 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 
 			// Parse the request
 			List<FileItem> iter;
+            String filename = null;
 			try {
 				iter = upload.parseRequest(req);
 				for(FileItem item : iter) {					
@@ -210,8 +211,25 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 				MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader) transformationEngine
 						.getDataLoader();
 				
-				File file = new File("test");
-				file.createNewFile();
+                //Create a subdirectory in the dspace.dir in order to
+                //write temporary files. Normally we should have
+                //permission to write there.
+                File tmp_dir = new File(ConfigurationManager.getProperty("dspace.dir") + File.separator + ".submission_lookup_tmp");
+                if (!tmp_dir.exists()) {
+                    //If we could not create the directory, we set the
+                    //File object to null to force File.createTempFile
+                    //below to write in the system defined temporary
+                    //dir. This could pose a security risk, so someone
+                    //with better understanding of security should
+                    //check it.
+                    if (!tmp_dir.mkdir()) {
+                        tmp_dir = null;
+                    }
+                }
+
+                //Create a temporary file with a unique filename in
+                //the specified directory
+                File file = File.createTempFile("submission_lookup", "_tmp", tmp_dir);
 				FileOutputStream out = new FileOutputStream(file);
 			    Utils.bufferedCopy(io, out);			    
 				dataLoader.setFile(file.getAbsolutePath(), valueMap.get("provider_loader"));
@@ -227,6 +245,8 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 				} catch (MalformedSourceException e1) {
 					e1.printStackTrace();
 				}
+
+                file.delete();
 			}
 			subDTO.setItems(result);
 			service.storeDTOs(req, suuid, subDTO);
