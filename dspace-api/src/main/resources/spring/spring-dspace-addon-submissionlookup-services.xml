@@ -33,7 +33,14 @@
 	            <entry key="pubmed" value-ref="pubmedOnlineDataLoader"/>
 	            <entry key="crossref" value-ref="crossRefOnlineDataLoader"/>
 	            <entry key="arxiv" value-ref="arXivOnlineDataLoader"/>
+	            <entry key="pubmed-file" value-ref="pubmedFileDataLoader"/>
+	            <entry key="crossref-file" value-ref="crossRefFileDataLoader"/>
+	            <entry key="arxiv-file" value-ref="arXivFileDataLoader"/>
 	            <entry key="bibtex" value-ref="bibTeXDataLoader"/>
+	            <entry key="ris" value-ref="risDataLoader"/>
+	            <entry key="endnote" value-ref="endnoteDataLoader"/>
+	            <entry key="csv" value-ref="csvDataLoader"/>
+	            <entry key="tsv" value-ref="tsvDataLoader"/>
 			</map>
 	    </property>
 	</bean>
@@ -216,11 +223,20 @@
 	    </property>
 	</bean>
 	
+	<!-- PubMed Data Loaders -->
 	<bean class="org.dspace.submit.lookup.PubmedOnlineDataLoader" name="pubmedOnlineDataLoader">
 		<property name="searchProvider" value="false" />
-		<property name="fieldMap">
-			<map>
-				<entry key="pubmedID" value="pmid" />
+		<property name="fieldMap" ref="pubmedInputMap"/>
+	</bean>
+
+	<bean class="org.dspace.submit.lookup.PubmedFileDataLoader" name="pubmedFileDataLoader">
+		<property name="fieldMap" ref="pubmedInputMap"/>
+	</bean>
+	
+	<bean name="pubmedInputMap" class="java.util.HashMap" scope="prototype" >
+    	<constructor-arg>
+        	<map key-type="java.lang.String" value-type="java.lang.String">
+            	<entry key="pubmedID" value="pmid" />
 				<entry key="doi" value="doi" />
 				<entry key="issn" value="issn" />
 				<entry key="eissn" value="eissn" />
@@ -241,16 +257,24 @@
 				<entry key="summary" value="abstract" />
 				<entry key="status" value="publicationstatus" />
 				<entry key="authors" value="authors" />
-			</map>
-		</property>
+        	</map>
+    	</constructor-arg>
 	</bean>
-
-	<bean class="org.dspace.submit.lookup.ArXivOnlineDataLoader"
-		name="arXivOnlineDataLoader">
+	
+	<!-- Arxiv Data Loaders -->
+	<bean class="org.dspace.submit.lookup.ArXivOnlineDataLoader" name="arXivOnlineDataLoader">
 		<property name="searchProvider" value="false" />
-		<property name="fieldMap">
-			<map>
-				<entry key="journalRef" value="journal" />
+		<property name="fieldMap" ref="arxivInputMap"/>
+	</bean>	
+	
+	<bean class="org.dspace.submit.lookup.ArXivFileDataLoader" name="arXivFileDataLoader">
+		<property name="fieldMap" ref="arxivInputMap"/>
+	</bean>	
+	
+	<bean name="arxivInputMap" class="java.util.HashMap" scope="prototype" >
+    	<constructor-arg>
+        	<map key-type="java.lang.String" value-type="java.lang.String">
+            	<entry key="journalRef" value="journal" />
 				<entry key="doi" value="doi" />
 				<entry key="authors" value="authors" />
 				<entry key="comment" value="note" />
@@ -262,37 +286,37 @@
 				<entry key="primaryCategory" value="arxivCategory" />
 				<entry key="category" value="arxivCategory" />
 				<entry key="source" value="arxivID" />
-			</map>
-		</property>
-	</bean>	
+        	</map>
+    	</constructor-arg>
+	</bean>
 	
-	<bean class="org.dspace.submit.lookup.CrossRefOnlineDataLoader"
-		name="crossRefOnlineDataLoader">
+	<!-- CrossRef Data Loaders -->
+	<bean class="org.dspace.submit.lookup.CrossRefOnlineDataLoader" name="crossRefOnlineDataLoader">
 		<property name="searchProvider" value="false" />
-		<property name="fieldMap">
-			<map>
+		<property name="fieldMap" ref="crossrefInputMap"/>
+	</bean>
+	
+	<bean class="org.dspace.submit.lookup.CrossRefFileDataLoader" name="crossRefFileDataLoader">
+		<property name="fieldMap" ref="crossrefInputMap"/>
+	</bean>
+	
+	<bean name="crossrefInputMap" class="java.util.HashMap" scope="prototype" >
+    	<constructor-arg>
+        	<map key-type="java.lang.String" value-type="java.lang.String">
+            	<entry key="journalRef" value="journal" />
 				<entry key="doi" value="doi" />
-				<entry key="itemType" value="" />
-				<entry key="issn" value="jissn" />
-				<entry key="eissn" value="jeissn" />
-				<entry key="isbn" value="isbn" />
-				<entry key="seriesTitle" value="serie" />
-				<entry key="journalTitle" value="journal" />
-				<entry key="volumeTitle" value="book" />
-				<entry key="articleTitle" value="title" />
 				<entry key="authors" value="authors" />
-				<entry key="editors" value="authors" />
-				<entry key="translators" value="translators" />
-				<entry key="chairs" value="chairs" />
-				<entry key="volume" value="volume" />
-				<entry key="issue" value="issue" />
-				<entry key="firstPage" value="firstPage" />
-				<entry key="lastPage" value="lastPage" />
-				<entry key="editionNumber" value="edition" />
+				<entry key="comment" value="note" />
 				<entry key="year" value="issued" />
-				<entry key="publicationType" value="subtype" />
-			</map>
-		</property>
+				<entry key="articleTitle" value="title" />
+				<entry key="summary" value="abstract" />
+				<entry key="splashPageUrl" value="url" />
+				<entry key="pdfUrl" value="fulltextUrl" />
+				<entry key="primaryCategory" value="arxivCategory" />
+				<entry key="category" value="arxivCategory" />
+				<entry key="source" value="arxivID" />
+        	</map>
+    	</constructor-arg>
 	</bean>
 	
 	
@@ -380,8 +404,8 @@
 		</property> 
 	</bean>
 	
-	<bean id="bibTeXDataLoader"
-        class="gr.ekt.bteio.loaders.BibTeXDataLoader">
+	<!-- BTE core data loaders -->
+	<bean id="bibTeXDataLoader" class="gr.ekt.bteio.loaders.BibTeXDataLoader">
     <property name="fieldMap">
       <map>
         <entry key="title" value="title"/>
@@ -389,6 +413,64 @@
         <entry key="journal" value="journal"/>
         <entry key="year" value="issued"/>
         <entry key="ISSN" value="jissn"/>
+      </map>
+    </property>
+  </bean>
+  
+  <bean id="csvDataLoader" class="gr.ekt.bteio.loaders.CSVDataLoader">
+    <property name="fieldMap">
+      <map>
+        <entry key="1" value="Title"/>
+        <entry key="0" value="Author"/>
+        <entry key="2" value="Year"/>
+        <entry key="3" value="Journal"/>
+        <entry key="14" value="Abstract"/>
+        <entry key="31" value="ISSN"/>
+        <entry key="38" value="Type"/>
+      </map>
+    </property>
+    <property name="skipLines" value="1"/>
+  </bean>
+  
+  <bean id="tsvDataLoader" class="gr.ekt.bteio.loaders.CSVDataLoader">
+    <property name="fieldMap">
+      <map>
+        <entry key="7" value="Title"/>
+        <entry key="1" value="Author"/>
+        <entry key="37" value="Year"/>
+        <entry key="8" value="Journal"/>
+        <entry key="19" value="Abstract"/>
+        <entry key="31" value="ISSN"/>
+        <entry key="0" value="Type"/>
+      </map>
+    </property>
+    <!-- This makes the CSV data loader able to load TSV data -->
+    <property name="separator" value="\u0009"/>
+    <property name="skipLines" value="1"/>
+  </bean>
+  
+  <bean id="risDataLoader" class="gr.ekt.bteio.loaders.RISDataLoader">
+    <property name="fieldMap">
+      <map>
+        <entry key="T1" value="Title"/>
+        <entry key="AU" value="Author"/>
+        <entry key="SO" value="Journal"/>
+        <entry key="PY" value="Year"/>
+        <entry key="SN" value="ISSN"/>
+        <entry key="PT" value="Type"/>
+        <entry key="AB" value="Abstract"/>
+      </map>
+    </property>
+  </bean>
+
+  <bean id="endnoteDataLoader" class="gr.ekt.bteio.loaders.EndnoteDataLoader">
+    <property name="fieldMap">
+      <map>
+        <entry key="TI" value="Title"/>
+        <entry key="AU" value="Author"/>
+        <entry key="AB" value="Abstract"/>
+        <entry key="PY" value="Date"/>
+        <entry key="SO" value="Source"/>
       </map>
     </property>
   </bean>

@@ -71,7 +71,7 @@ public class PubmedUtils {
                     {
                         String doi = id.getTextContent().trim();
                         if (doi!=null)
-                			record.addValue("pubmedID", new StringValue(doi));
+                			record.addValue("doi", new StringValue(doi));
                     }
                 }
             }

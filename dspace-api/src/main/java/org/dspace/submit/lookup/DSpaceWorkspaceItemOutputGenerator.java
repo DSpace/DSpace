@@ -176,6 +176,16 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
 			}
 		}
 
+		try {
+			item.update();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (AuthorizeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		// creo un nuovo context per il check di esistenza dei metadata di cache
 		/*Context context = null;
 		try {
