@@ -867,6 +867,14 @@ Common usage:
             <arg line="-f '${dspace.dir}/config/registries/dublin-core-types.xml'" />
         </java>
 
+        <!-- Import the new DCTerms schema -->
+        <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <sysproperty key="dspace.configuration" value="${config}" />
+            <arg line="-f '${dspace.dir}/config/registries/dcterms-types.xml'" />
+        </java>
+
         <!-- FIXME: this should be more modular -->
         <!-- import the SWORD required metadata -->
         <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
