@@ -67,6 +67,7 @@ public class ItemRequestResponseAction extends AbstractAction
         String isSent = request.getParameter("isSent");
         String message = request.getParameter("message");
         Context context = ContextUtil.obtainContext(objectModel);
+        request.setAttribute("token", token);
         
         TableRow requestItem = DatabaseManager.findByUnique(context, "requestitem", "token", token);
         String title;
@@ -154,20 +155,13 @@ public class ItemRequestResponseAction extends AbstractAction
 
 	private void processSendDocuments(Context context,Request request, TableRow requestItem,Item item,String title) throws SQLException, MessagingException, IOException {
     	String message = request.getParameter("message");
-    	        
-        EPerson submiter = item.getSubmitter();
-    	Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.aprove"));
-        email.addRecipient(requestItem.getStringColumn("request_email"));
-        
-        email.addArgument(requestItem.getStringColumn("request_name"));
-        email.addArgument("");    
-        email.addArgument("");      
-        email.addArgument(HandleManager.getCanonicalForm(item.getHandle()));      // User agent
-        email.addArgument(title);    // request item title
-        email.addArgument(message);   // message
-        email.addArgument("");    //#   token link 
-        email.addArgument(submiter.getFullName());    //#   submmiter name
-        email.addArgument(submiter.getEmail());    //#   submmiter email
+    	String subject = request.getParameter("subject");
+    	
+    	Email email = new Email();
+        email.setSubject(subject);
+        email.setContent("{0}");
+		email.addRecipient(requestItem.getStringColumn("request_email"));
+        email.addArgument(message);
        
         if (requestItem.getBooleanColumn("allfiles")){
             Bundle[] bundles = item.getBundles("ORIGINAL");
@@ -179,7 +173,7 @@ public class ItemRequestResponseAction extends AbstractAction
                     }
                 }
             }
-        }else{
+        } else {
             Bitstream bit = Bitstream.find(context,requestItem.getIntColumn("bitstream_id"));
             email.addAttachment(BitstreamStorageManager.retrieve(context, requestItem.getIntColumn("bitstream_id")), bit.getName(), bit.getFormat().getMIMEType());
         }     
@@ -188,28 +182,19 @@ public class ItemRequestResponseAction extends AbstractAction
         requestItem.setColumn("decision_date",new Date());
         requestItem.setColumn("accept_request",true);
         DatabaseManager.update(context, requestItem);
-
 	}
 
 	private void processDeny(Context context,Request request, TableRow requestItem,Item item,String title) throws SQLException, IOException, MessagingException {
 		String message = request.getParameter("message");
+    	String subject = request.getParameter("subject");
     	        
-        EPerson submiter = item.getSubmitter();
-        
-    	Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.reject"));
-        email.addRecipient(requestItem.getStringColumn("request_email"));
-        
-        email.addArgument(requestItem.getStringColumn("request_name"));
-        email.addArgument("");    
-        email.addArgument("");      
-        email.addArgument(HandleManager.getCanonicalForm(item.getHandle()));      // User agent
-        email.addArgument(title);    // request item title
-        email.addArgument(message);   // message
-        email.addArgument("");    //#   token link 
-        email.addArgument(submiter.getFullName());    //#   submmiter name
-        email.addArgument(submiter.getEmail());    //#   submmiter email
-
+    	Email email = new Email();
+        email.setSubject(subject);
+        email.setContent("{0}");
+		email.addRecipient(requestItem.getStringColumn("request_email"));
+        email.addArgument(message);
         email.send();
+        
         requestItem.setColumn("decision_date",new Date());
         requestItem.setColumn("accept_request",false);
         DatabaseManager.update(context, requestItem);

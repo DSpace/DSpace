@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.aspect.artifactbrowser;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -18,6 +19,7 @@ import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -25,8 +27,17 @@ import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
+import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DCValue;
+import org.dspace.content.Item;
+import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
+import org.dspace.eperson.EPerson;
+import org.dspace.handle.HandleManager;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
 import org.xml.sax.SAXException;
 
 /**
@@ -63,7 +74,10 @@ public class ItemRequestResponseTrueForm extends AbstractDSpaceTransformer imple
     
     private static final Message T_message = 
         message("xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.message");
-        
+
+    private static final Message T_subject = 
+            message("xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.subject");
+    
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
@@ -97,17 +111,45 @@ public class ItemRequestResponseTrueForm extends AbstractDSpaceTransformer imple
             UIException, SQLException, IOException, AuthorizeException
     {
     	Request request = ObjectModelHelper.getRequest(objectModel);
-        
+		Context context = ContextUtil.obtainContext(objectModel);
+
+		TableRow requestItem = DatabaseManager.findByUnique(context,
+				"requestitem", "token", (String) request.getAttribute("token"));
+		String title;
+		Item item = Item.find(context, requestItem.getIntColumn("item_id"));
+		DCValue[] titleDC = item.getDC("title", null, Item.ANY);
+		if (titleDC != null || titleDC.length > 0)
+			title = titleDC[0].value;
+		else
+			title = "untitled";
+		
+		EPerson submitter = item.getSubmitter();
+
+		Object[] args = new String[]{
+					requestItem.getStringColumn("request_name"),
+					HandleManager.getCanonicalForm(item.getHandle()), // User
+					title, // request item title
+					submitter.getFullName(), // # submmiter name
+					submitter.getEmail() // # submmiter email
+				};
+		
+		String subject = I18nUtil.getMessage("itemRequest.response.subject.approve", context);
+		String messageTemplate = MessageFormat.format(I18nUtil.getMessage("itemRequest.response.body.approve", context), args);
+		
         Division itemRequest = body.addInteractiveDivision("itemRequest-form", request.getRequestURI(),Division.METHOD_POST,"primary");
         itemRequest.setHead(T_head);
         
         itemRequest.addPara(T_para1);
                 
         List form = itemRequest.addList("form",List.TYPE_FORM);
-                
+        Text subj = form.addItem().addText("subject");
+        subj.setLabel(T_subject);
+        subj.setValue(subject);
+        subj.setSize(60);
         TextArea message = form.addItem().addTextArea("message");
+        message.setSize(20, 0);
         message.setLabel(T_message);
-        message.setValue(parameters.getParameter("message",""));
+        message.setValue(parameters.getParameter("message",messageTemplate));
         form.addItem().addHidden("decision").setValue(parameters.getParameter("decision",""));
         form.addItem().addButton("back").setValue(T_back);
         form.addItem().addButton("mail").setValue(T_mail);
