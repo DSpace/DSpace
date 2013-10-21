@@ -434,24 +434,19 @@
             <version>1.0</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>gr.ekt</groupId>
-            <artifactId>biblio-transformation-engine</artifactId>
-            <version>0.82</version>
-        </dependency>
-        <dependency>
             <groupId>gr.ekt.bte</groupId>
             <artifactId>bte-core</artifactId>
-            <version>0.9.2</version>
+            <version>0.9.2.2</version>
         </dependency>
         <dependency>
             <groupId>gr.ekt.bte</groupId>
             <artifactId>bte-io</artifactId>
-            <version>0.9.2</version>
+            <version>0.9.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
@@ -499,7 +494,7 @@
             <artifactId>coverity-escapers</artifactId>
             <version>1.1.1</version>
         </dependency>
- 
+
         <!--  Gson: Java to Json conversion -->
         <dependency>
             <groupId>com.google.code.gson</groupId>

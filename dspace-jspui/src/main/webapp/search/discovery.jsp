@@ -24,6 +24,7 @@
   -   appliedFilters   - The list of applied filters (user input or facet)
   -
   -   search.error     - a flag to say that an error has occurred
+  -   spellcheck	   - the suggested spell check query (if any)
   -   qResults		   - the discovery results
   -   items            - the results.  An array of Items, most relevant first
   -   communities      - results, Community[]
@@ -84,7 +85,7 @@
     String ascSelected = (SortOption.ASCENDING.equalsIgnoreCase(order)   ? "selected=\"selected\"" : "");
     String descSelected = (SortOption.DESCENDING.equalsIgnoreCase(order) ? "selected=\"selected\"" : "");
     String httpFilters ="";
-	
+	String spellCheckQuery = (String) request.getAttribute("spellcheck");
     List<DiscoverySearchFilter> availableFilters = (List<DiscoverySearchFilter>) request.getAttribute("availableFilters");
 	List<String[]> appliedFilters = (List<String[]>) request.getAttribute("appliedFilters");
 	List<String> appliedFilterQueries = (List<String>) request.getAttribute("appliedFilterQueries");
@@ -113,6 +114,10 @@
 <script type="text/javascript">
 	var jQ = jQuery.noConflict();
 	jQ(document).ready(function() {
+		jQ( "#spellCheckQuery").click(function(){
+			jQ("#query").val(jQ(this).attr('data-spell'));
+			jQ("#main-query-submit").click();
+		});
 		jQ( "#filterquery" )
 			.autocomplete({
 				source: function( request, response ) {
@@ -184,8 +189,11 @@
     }
 %>                                </select><br/>
                                 <label for="query"><fmt:message key="jsp.search.results.searchfor"/></label>
-                                <input type="text" size="50" name="query" value="<%= (query==null ? "" : StringEscapeUtils.escapeHtml(query)) %>"/>
-                                <input type="submit" class="btn btn-primary" value="<fmt:message key="jsp.general.go"/>" />
+                                <input type="text" size="50" id="query" name="query" value="<%= (query==null ? "" : StringEscapeUtils.escapeHtml(query)) %>"/>
+                                <input type="submit" id="main-query-submit" class="btn btn-primary" value="<fmt:message key="jsp.general.go"/>" />
+<% if (StringUtils.isNotBlank(spellCheckQuery)) {%>
+	<p class="lead"><fmt:message key="jsp.search.didyoumean"><fmt:param><a id="spellCheckQuery" data-spell="<%= StringEscapeUtils.escapeHtml(spellCheckQuery) %>" href="#"><%= spellCheckQuery %></a></fmt:param></fmt:message></p>
+<% } %>                  
                                 <input type="hidden" value="<%= rpp %>" name="rpp" />
                                 <input type="hidden" value="<%= sortedBy %>" name="sort_by" />
                                 <input type="hidden" value="<%= order %>" name="order" />

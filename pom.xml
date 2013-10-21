@@ -928,7 +928,7 @@
          <dependency>
             <groupId>com.ibm.icu</groupId>
             <artifactId>icu4j</artifactId>
-            <version>3.8</version>
+            <version>51.1</version>
          </dependency>
          <dependency>
             <groupId>postgresql</groupId>

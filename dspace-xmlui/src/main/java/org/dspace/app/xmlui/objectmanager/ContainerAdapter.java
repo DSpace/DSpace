@@ -273,21 +273,20 @@ public class ContainerAdapter extends AbstractAdapter
                 createField("dc","rights","license",null,rights_license);
                 createField("dc","title",null,null,title);
                 
-                boolean useCache = ConfigurationManager.getBooleanProperty("webui.strengths.cache");
+                boolean showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
                  
-                //To improve scalability, XMLUI only adds item counts if they are cached
-                if (useCache)
-        		{
-	                try
-	                {	//try to determine Collection size (i.e. # of items)
-	                	int size = new ItemCounter(this.dspaceContext).getCount(collection);
-	                	createField("dc","format","extent",null, String.valueOf(size)); 
-	                }
-	                catch(ItemCountException e)
-	                {
-	                    throw new IOException("Could not obtain Collection item-count", e);
-	                }
-        		}
+                if (showCount)
+                {
+                    try
+                    {	// try to determine Collection size (i.e. # of items)
+                        int size = new ItemCounter(this.dspaceContext).getCount(collection);
+                        createField("dc","format","extent",null, String.valueOf(size)); 
+                    }
+                    catch (ItemCountException e)
+                    {
+                        throw new IOException("Could not obtain Collection item count", e);
+                    }
+                }
             } 
             else if (dso.getType() == Constants.COMMUNITY) 
             {
@@ -307,26 +306,25 @@ public class ContainerAdapter extends AbstractAdapter
                 createField("dc","rights",null,null,rights);
                 createField("dc","title",null,null,title);
                 
-                boolean useCache = ConfigurationManager.getBooleanProperty("webui.strengths.cache");
+                boolean showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
         		
-                //To improve scalability, XMLUI only adds item counts if they are cached
-        		if (useCache)
-        		{
-        			try
-	                {	//try to determine Community size (i.e. # of items)
-	                	int size = new ItemCounter(this.dspaceContext).getCount(community);
-	                	createField("dc","format","extent",null, String.valueOf(size)); 
-	                }
-	                catch(ItemCountException e)
-	                {
-	                	throw new IOException("Could not obtain Collection item-count", e);
-	                }
-        		}
+                if (showCount)
+                {
+                    try
+                    {	// try to determine Community size (i.e. # of items)
+                        int size = new ItemCounter(this.dspaceContext).getCount(community);
+                        createField("dc","format","extent",null, String.valueOf(size)); 
+                    }
+                    catch (ItemCountException e)
+                    {
+                        throw new IOException("Could not obtain Collection item count", e);
+                    }
+                }
             }
             
             // ///////////////////////////////
-			// End the DIM element
-			endElement(DIM,"dim");
+            // End the DIM element
+            endElement(DIM,"dim");
             
             // ////////////////////////////////
             // End elements

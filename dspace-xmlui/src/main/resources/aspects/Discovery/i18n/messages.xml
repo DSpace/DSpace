@@ -148,4 +148,6 @@
     <message key="xmlui.Discovery.AbstractSearch.head2">Communities or Collections matching your query</message>
    	<message key="xmlui.Discovery.AbstractSearch.head3">Items matching your query</message>
 
+   	<message key="xmlui.Discovery.SimpleSearch.did_you_mean">Did you mean: </message>
+
 </catalogue>
