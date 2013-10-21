@@ -63,12 +63,6 @@
                     <artifactId>atmire-responselogging-api</artifactId>
                     <version>1.10.0</version>
                 </dependency>
-
-                <dependency>
-                    <groupId>com.atmire</groupId>
-                    <artifactId>atmire-responselogging-xmlui</artifactId>
-                    <version>1.10.0</version>
-                </dependency>
             </dependencies>
         </profile>
 

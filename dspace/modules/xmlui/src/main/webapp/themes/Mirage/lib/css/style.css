@@ -2469,3 +2469,7 @@ table#aspect_submission_workflow_WorkflowTransformer_table_workflow-actions tr.a
     background-color: #eee;
     border: thin solid #aaa;
 }
+
+.voucher-error{
+    color:red
+}
