@@ -14,6 +14,7 @@ import gr.ekt.bte.core.TransformationSpec;
 import gr.ekt.bte.exceptions.BadTransformationSpec;
 import gr.ekt.bte.exceptions.MalformedSourceException;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -32,8 +33,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -192,7 +191,6 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 						valueMap.put(name, value);
 					} else {
 						io = stream;
-						// Process the input stream
 					}
 				}
 			} catch (FileUploadException e) {
@@ -210,12 +208,15 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 				MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader) transformationEngine
 						.getDataLoader();
 				
-				File file = new File("test");
-				file.createNewFile();
-				FileOutputStream out = new FileOutputStream(file);
-			    Utils.bufferedCopy(io, out);			    
+				
+				String tempDir = (ConfigurationManager.getProperty("upload.temp.dir") != null)
+			            ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir"); 
+				File file = new File(tempDir + System.getProperty("file.separator") + "submissionlookup-loader.temp");
+				BufferedOutputStream out = new BufferedOutputStream(
+                        new FileOutputStream(file));
+			    Utils.bufferedCopy(io, out);
 				dataLoader.setFile(file.getAbsolutePath(), valueMap.get("provider_loader"));
-
+				
 				try {
 					transformationEngine.transform(new TransformationSpec());
 					
@@ -243,14 +244,15 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 								: -1);
 				skip.put(
 						"collectionid",
-						valueMap.containsKey("collectionid") ? valueMap
-								.get("collectionid") : -1);
+						valueMap.containsKey("select-collection-file") ? valueMap
+								.get("select-collection-file") : -1);
 				dto.add(skip);
 				}
 			}
 			JSONSerializer serializer = new JSONSerializer();
 			serializer.rootName("result");
 			serializer.deepSerialize(dto, resp.getWriter());
+			resp.setContentType("text/plain");
 		}
 	}
 

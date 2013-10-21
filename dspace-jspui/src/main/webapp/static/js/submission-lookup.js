@@ -7,7 +7,7 @@
  */
 submissionLookupIdentifiers = function(identInputs){
 	var mydata = new Object();
-	mydata['s_uuid'] = j('#suuid').val();
+	mydata['s_uuid'] = j('#suuid-identifier').val();
 	mydata['type'] = 'identifiers';
 	for (var i=0;i<identInputs.length;i++)
 	{
@@ -32,7 +32,7 @@ submissionLookupIdentifiers = function(identInputs){
 			}
 			else
 			{
-				submissionLookupShowResult(info);
+				submissionLookupShowResult(info, "-identifier");
 			}
 			j('#loading-search-result').modal("hide");
 			j('#tabs').find('a[href="#tabs-result"]').click();
@@ -44,7 +44,7 @@ submissionLookupIdentifiers = function(identInputs){
 
 submissionLookupSearch = function(){
 	var mydata = new Object();
-	mydata['s_uuid'] = j('#suuid').val();
+	mydata['s_uuid'] = j('#suuid-search').val();
 	mydata['type'] = 'search';
 	mydata['title'] = j('#search_title').val();
 	mydata['authors'] = j('#search_authors').val();
@@ -68,7 +68,7 @@ submissionLookupSearch = function(){
 			}
 			else
 			{
-				submissionLookupShowResult(info);
+				submissionLookupShowResult(info, "-search");
 			}
 			j('#loading-search-result').modal('hide');
 			j('#tabs').find('a[href="#tabs-result"]').click();
@@ -78,10 +78,11 @@ submissionLookupSearch = function(){
 	j('#loading-search-result').modal('show');
 }
 
-submissionLookupDetails = function(button){
+submissionLookupDetails = function(button, suffixID){
 	var uuid = j(button).data('uuid');
 	var mydata = new Object();
-	mydata['s_uuid'] = j('#suuid').val();
+	var suuidID = 'suuid' + suffixID
+	mydata['s_uuid'] = j('#'+suuidID).val();
 	mydata['type'] = 'details';
 	mydata['i_uuid'] = uuid;
 	j.ajax({url: dspaceContextPath+"/json/submissionLookup", 
@@ -107,7 +108,7 @@ submissionLookupDetails = function(button){
 }
 
 
-submissionLookupShowResult = function(info){
+submissionLookupShowResult = function(info, suffixID){
 	j('#result-list').show();
 	j('#empty-result').hide();
 	j('#result-list').html(" ");
@@ -131,7 +132,7 @@ submissionLookupShowResult = function(info){
 		bt.button();
 		bt.data({uuid: info.result[i].uuid});
 		bt.click(function(){
-			submissionLookupDetails(this);
+			submissionLookupDetails(this, suffixID);
 		});
 	}
 }
@@ -189,9 +190,8 @@ submissionLookupShowDetails = function(info){
 };
 
 submissionLookupFile = function(form){
-	
-	
-	var suuidVal = j('#suuid').val();
+
+	var suuidVal = j('#suuid-loader').val();
 	var suuid = j('<input type="hidden" name="s_uuid" value="'+suuidVal+'">');
 	var collectionidVal = j('#select-collection-file').val();
 	var collectionid = j('<input type="hidden" name="collectionid" value="'+collectionidVal+'">');
@@ -210,29 +210,17 @@ submissionLookupFile = function(form){
 	    var iframe = j('<iframe name="upload_iframe" id="upload_iframe" style="display: none" />');
 	    // Add to document...
 	    j("body").append(iframe);
-	    window.frames['upload_iframe'].name = "upload_iframe";
-	 
-	    iframeId = document.getElementById("upload_iframe");
 	 
 	    // Add event...
 	    var eventHandler = function () {
-	 
-	            if (iframeId.detachEvent) iframeId.detachEvent("onload", eventHandler);
-	            else iframeId.removeEventListener("load", eventHandler, false);
-	 
-	            // Message from server...
-	            if (iframeId.contentDocument) {
-	                content = iframeId.contentDocument.body.innerHTML;
-	            } else if (iframeId.contentWindow) {
-	                content = iframeId.contentWindow.document.body.innerHTML;
-	            } else if (iframeId.document) {
-	                content = iframeId.document.body.innerHTML;
-	            }
-	             j('#iframecontent').html(content);
+	    		
+	    		j('#upload_iframe').off();
+	    	
 	             var clickResultTab = true;
 	             var index = 0;
 	             var iindex = new Array();
-	             var json = j.parseJSON(j("#iframecontent").text());
+	             // Message from server...
+	             var json = j.parseJSON(j('#upload_iframe').contents().find('body').text());
 	            	 if (json == null || json.result == null || json.result.length == 0)
 	       			{
 	       				j('#result-list').hide();
@@ -250,7 +238,7 @@ submissionLookupFile = function(form){
 						}
 	       			}	            	
 					if (clickResultTab) {
-						submissionLookupShowResult(json);
+						submissionLookupShowResult(json, "-loader");
 						j('#loading-file-result').modal("hide");
 						j('#tabs').find('a[href="#tabs-result"]').click();
 					} else {
@@ -258,16 +246,15 @@ submissionLookupFile = function(form){
 						j('#collectionid').val(json.result[index].collectionid);
 						j('#suuid').val(json.result[index].uuid);
 						j('#fuuid').val(iindex);
-						j('#form-submission').submit();
+						j('#form-submission').submit();						
 						return false;
 					}
 	 			// Del the iframe...
 		        j('upload_iframe').empty();
 	        };
 	 
-	    if (iframeId.addEventListener) iframeId.addEventListener("load", eventHandler, true);
-	    if (iframeId.attachEvent) iframeId.attachEvent("onload", eventHandler);
-	 
+	    j('#upload_iframe').on("load", eventHandler);
+	    
 	    // Set properties of form...
 	    form.attr("target", "upload_iframe");
 	    form.attr("action", dspaceContextPath+"/json/submissionLookup");
@@ -275,9 +262,8 @@ submissionLookupFile = function(form){
 	    form.attr("enctype", "multipart/form-data");
 	    form.attr("encoding", "multipart/form-data");
 	    form.attr("target", "upload_iframe");
+	    form.attr("file", j('#file_upload').val());
 	    
-	    j(form).empty();
-	    j('#file_upload').clone().appendTo(j(form));
 	    j(form).append(suuid);
         j(form).append(collectionid);
         j(form).append(preview_loader);

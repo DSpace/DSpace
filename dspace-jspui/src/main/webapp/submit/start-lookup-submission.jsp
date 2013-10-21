@@ -121,19 +121,19 @@
 	</ul>
 	<div class="tab-content">
 	<div class="tab-pane" id="tabs-search">
-	<form class="form-horizontal" id="form-submission" action="" method="post">
-		<input type="hidden" id="suuid" name="suuid" value="<%= uuid %>"/>
-		<input type="hidden" id="iuuid" name="iuuid" value=""/>
-		<input type="hidden" id="fuuid" name="fuuid" value=""/>
-		<input type="hidden" id="collectionid" name="collectionid" value=""/>
+
 		
-		<div id="tabs-search-accordion">
+	<div id="tabs-search-accordion">
 <%		
 	if (searchProviders != null && searchProviders.size() > 0) {
 	%>
 		<h3><a href="#"><fmt:message key="jsp.submit.start-lookup-submission.search"/></a></h3>
 		<div>
-		
+		<form class="form-horizontal" id="form-submission-search" action="" method="post">
+		<input type="hidden" id="suuid-search" name="suuid" value="<%= uuid %>"/>
+		<input type="hidden" id="iuuid-search" name="iuuid" value=""/>
+		<input type="hidden" id="fuuid-search" name="fuuid" value=""/>
+		<input type="hidden" id="collectionid-search" name="collectionid" value=""/>
 <%	
 		for (String provider : searchProviders)
 		{			
@@ -161,11 +161,18 @@
 			<button type="button" class="btn btn-primary" id="search_go"><fmt:message key="jsp.submit.start-lookup-submission.search-go"/></button>
 			<button type="button" class="btn btn-default exit"><fmt:message key="jsp.submit.start-lookup-submission.exit"/></button>
 		</div>
+		</form>
 	</div>
 <% } %>	
+	
 
 	<h3><a href="#"><fmt:message key="jsp.submit.start-lookup-submission.identifiers"/></a></h3>
 	<div>
+		<form class="form-horizontal" id="form-submission-identifier" action="" method="post">
+		<input type="hidden" id="suuid-identifier" name="suuid" value="<%= uuid %>"/>
+		<input type="hidden" id="iuuid-identifier" name="iuuid" value=""/>
+		<input type="hidden" id="fuuid-identifier" name="fuuid" value=""/>
+		<input type="hidden" id="collectionid-identifier" name="collectionid" value=""/>
 <% if (identifiers != null && identifiers.size()>0) {
 	%>
 		
@@ -198,15 +205,21 @@
 		<button class="btn btn-primary" type="button" id="lookup_idenfifiers"><fmt:message key="jsp.submit.start-lookup-submission.identifier.lookup"/></button>
 		<button type="button" class="btn btn-default exit"><fmt:message key="jsp.submit.start-lookup-submission.exit"/></button></td></tr>
 	</div>
+	</form>
 	</div>
 <% 
 		
 	} %>
-	
+
 	<% if (fileLoaders != null && fileLoaders.size()>0) {
 	%>
 	<h3><a href="#"><fmt:message key="jsp.submit.start-lookup-submission.byfile"/></a></h3>
 	<div id="file-accordion" class="container">	
+	<form class="form-horizontal" id="form-submission-loader" action="" method="post">
+		<input type="hidden" id="suuid-loader" name="suuid" value="<%= uuid %>"/>
+		<input type="hidden" id="iuuid-loader" name="iuuid" value=""/>
+		<input type="hidden" id="fuuid-loader" name="fuuid" value=""/>
+		<input type="hidden" id="collectionid-loader" name="collectionid" value=""/>
 	<p class="help-block"><fmt:message key="jsp.submit.start-lookup-submission.byfile.hints"/></p>
 	
 	<div class="form-group">
@@ -251,23 +264,19 @@
 		<button class="btn btn-primary" type="button" id="loadfile_go"><fmt:message key="jsp.submit.start-lookup-submission.identifier.lookup"/></button>
 		<button type="button" class="btn btn-default exit"><fmt:message key="jsp.submit.start-lookup-submission.exit"/></button>
 	</div>
+		</form>
 	</div>
 <% 
 		
 	} %>
-	
+
 	<h3><a href="#"><fmt:message key="jsp.submit.start-lookup-submission.manual-submission"/></a></h3>
-	<div id="manual-accordion">&nbsp;</div>
+		<div id="manual-accordion">&nbsp;</div>
 	</div>
-	</form>
-	<div style="display: none">
-		<form id="form-loader" action="" method="post">
-		</form>
-		<div id="iframecontent"></div>
-	</div>
+
 </div>
 
-	<div class="tab-pane" id="tabs-result">
+<div class="tab-pane" id="tabs-result">
 		<div id="empty-result">
 			<p class="alert alert-warning"><fmt:message key="jsp.submit.start-lookup-submission.noresult"/></p>
 		</div>
@@ -286,9 +295,15 @@
 			</select>
 			</div>
 			</div>
+			<form class="form-horizontal" id="form-submission" action="" method="post">
+			<input type="hidden" id="iuuid" name="iuuid" value=""/>
+			<input type="hidden" id="fuuid" name="fuuid" value=""/>
+			<input type="hidden" id="suuid" name="suuid" value="<%= uuid %>"/>
+			<input type="hidden" id="collectionid" name="collectionid" value=""/>
 			<div class="btn-group">
 				<button class="btn btn-success col-md-offset-5" id="manual-submission-button" type="button"><fmt:message key="jsp.submit.start-lookup-submission.button.manual-submission"/> </button>
 			</div>
+			</form>
 		</div>	
 	</div>
 </div>
@@ -410,7 +425,7 @@
     		var colman = j('#select-collection-manual').val();
     		if (colman != -1)
     		{
-    			j('#collectionid').val(colman);
+    			j('#collectionid-manual').val(colman);
     			j('#form-submission').submit();
     		}
     		else
@@ -425,7 +440,8 @@
     		submissionLookupSearch(j('.submission-lookup-search'));
     	});
     	j('#loadfile_go').click(function(){
-    		submissionLookupFile(j('#form-loader'));
+    		j('#select-collection').val(j('#select-collection-file').val());
+    		submissionLookupFile(j('#form-submission-loader'));
     	});
     	j('button.exit').click(function(event){
     		event.preventDefault();
