@@ -55,7 +55,6 @@ public class BitstreamResource {
             log.error(e.getMessage());
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     @GET

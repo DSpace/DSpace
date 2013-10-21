@@ -28,7 +28,7 @@ public class ItemsResource {
     Logger log = Logger.getLogger(ItemsResource.class);
     //ItemList - Not Implemented
 
-    Context context;
+    private static org.dspace.core.Context context;
 
     @GET
     @Path("/{item_id}")

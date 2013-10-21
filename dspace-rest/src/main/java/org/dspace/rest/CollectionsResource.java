@@ -44,7 +44,11 @@ public class CollectionsResource {
     public String listHTML() {
         StringBuilder everything = new StringBuilder();
         try {
-            org.dspace.core.Context context = new org.dspace.core.Context();
+            if(context == null || !context.isValid() ) {
+                context = new org.dspace.core.Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
+            }
 
             org.dspace.content.Collection[] collections = org.dspace.content.Collection.findAll(context);
             for(org.dspace.content.Collection collection : collections) {
@@ -52,12 +56,12 @@ public class CollectionsResource {
                 everything.append("<li><a href='" + servletContext.getContextPath() + "/collections/" + collection.getID() + "'>" + collection.getID() + " - " + collection.getName() + "</a></li>\n");
             }
 
+            return "<html><title>Hello!</title><body>Collections<br/><ul>" + everything.toString() + "</ul>.</body></html> ";
+
         } catch (SQLException e) {
             log.error(e.getMessage());
-            return "ERROR: " + e.getMessage();
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-
-        return "<html><title>Hello!</title><body>Collections<br/><ul>" + everything.toString() + "</ul>.</body></html> ";
     }
 
     @GET

@@ -28,7 +28,7 @@ http://localhost:8080/<webapp>/communities
 public class CommunitiesResource {
     private static Logger log = Logger.getLogger(CommunitiesResource.class);
 
-    private static Context context;
+    private static org.dspace.core.Context context;
 
     /*
     The "GET" annotation indicates this method will respond to HTTP Get requests.
@@ -41,18 +41,19 @@ public class CommunitiesResource {
         try {
             if(context == null || !context.isValid() ) {
                 context = new Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
             }
             org.dspace.content.Community[] communities = org.dspace.content.Community.findAllTop(context);
             for(org.dspace.content.Community community : communities) {
                 everything.append(community.getName() + "<br/>\n");
             }
+            return "<html><title>Hello!</title><body>Communities:<br/>" + everything.toString() + ".</body></html> ";
 
         } catch (SQLException e) {
             log.error(e.getMessage());
-            return "ERROR: " + e.getMessage();
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-
-        return "<html><title>Hello!</title><body>Communities:<br/>" + everything.toString() + ".</body></html> ";
     }
 
     //TODO Respond to html for communities/:id
@@ -83,7 +84,7 @@ public class CommunitiesResource {
         } catch (SQLException e) {
             log.error(e.getMessage());
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
+        } //finally?
     }
 
     @GET
@@ -106,6 +107,6 @@ public class CommunitiesResource {
         } catch (SQLException e) {
             log.error(e.getMessage());
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
+        } //finally?
     }
 }
