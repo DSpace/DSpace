@@ -520,6 +520,12 @@ public class METSRightsCrosswalk
                                     if (el.getAttributeValue("MODIFY").equalsIgnoreCase("true"))
                                     {
                                         rp.setAction(Constants.DELETE);
+                                        if ((el.getAttributeValue("COPY").equalsIgnoreCase("true"))
+                                                &&(el.getAttributeValue("DUPLICATE").equalsIgnoreCase("true"))
+                                                &&(el.getAttributeValue("PRINT").equalsIgnoreCase("true")))
+                                        {
+                                            rp.setAction(Constants.ADMIN);
+                                        }
                                     }
                                 }
                             }
