@@ -20,36 +20,41 @@ import java.util.Date;
 
 public class VersionManager
 {
-	public void emptyBundle(Item item, String name)
+	public void removeBundle(Item item, String name)
 			throws SQLException, AuthorizeException, IOException
 	{
 		boolean keep = ConfigurationManager.getBooleanProperty("swordv2-server", "versions.keep");
 		Bundle[] bundles = item.getBundles(name);
 		for (Bundle b : bundles)
 		{
-			this.emptyBundle(item, b, keep);
+			this.removeBundle(item, b, keep);
 		}
 	}
 
-	public void emptyBundle(Item item, Bundle source)
+	public void removeBundle(Item item, Bundle source)
 			throws SQLException, AuthorizeException, IOException
 	{
 		boolean keep = ConfigurationManager.getBooleanProperty("swordv2-server", "versions.keep");
-		this.emptyBundle(item, source, keep);
+		this.removeBundle(item, source, keep);
 	}
 
-	public void emptyBundle(Item item, Bundle source, boolean archive)
+	public void removeBundle(Item item, Bundle source, boolean archive)
 			throws SQLException, AuthorizeException, IOException
 	{
+        // archive the bundle contents if desired
 		if (archive)
 		{
 			this.archiveBundle(item, source);
 		}
 
+        // remove all the bitstreams from the bundle
 		for (Bitstream bitstream : source.getBitstreams())
 		{
 			source.removeBitstream(bitstream);
 		}
+
+        // delete the bundle itself
+        item.removeBundle(source);
 	}
 
 	public void removeBitstream(Item item, Bitstream bitstream)
@@ -76,15 +81,27 @@ public class VersionManager
 				bundle.removeBitstream(bitstream);
 			}
 		}
+
+        // there is nowhere in the metadata to say when this file was moved, so we
+        // are going to drop it into the description
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        String desc = bitstream.getDescription();
+        String newDesc = "[Deleted on: " + sdf.format(new Date()) + "] ";
+        if (desc != null)
+        {
+            newDesc += desc;
+        }
+        bitstream.setDescription(newDesc);
+        bitstream.update();
 	}
 
-	public Bundle archiveBitstream(Item item, Bitstream bitstream)
+	private Bundle archiveBitstream(Item item, Bitstream bitstream)
 			throws SQLException, AuthorizeException, IOException
 	{
-		String swordBundle = ConfigurationManager.getProperty("swordv2-server", "bundle.name");
+		String swordBundle = ConfigurationManager.getProperty("swordv2-server", "bundle.deleted");
 		if (swordBundle == null)
 		{
-			swordBundle = "SWORD";
+			swordBundle = "DELETED";
 		}
 		
 		Bundle[] swords = item.getBundles(swordBundle);
@@ -101,18 +118,18 @@ public class VersionManager
 		return archive;
 	}
 
-	public void archiveBitstream(Bundle target, Bitstream bitstream)
+	private void archiveBitstream(Bundle target, Bitstream bitstream)
 			throws SQLException, AuthorizeException, IOException
 	{
 		target.addBitstream(bitstream);
 	}
 
-	public void archiveBundle(Item item, Bundle source)
+	private void archiveBundle(Item item, Bundle source)
 			throws SQLException, AuthorizeException, IOException
 	{
 		// get the datestamped root bundle name
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		String oldName = "V_" + sdf.format(new Date());
+		String oldName = "VER" + sdf.format(new Date());
 		oldName = this.getNumberedName(item, oldName, 0);
 
 		Bundle old = item.createBundle(oldName);

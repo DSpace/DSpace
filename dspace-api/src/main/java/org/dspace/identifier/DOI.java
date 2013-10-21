@@ -22,6 +22,7 @@ public class DOI
         implements Identifier
 {
     public static final String SCHEME = "doi:";
+
     public static final String RESOLVER = "http://dx.doi.org";
     
     
