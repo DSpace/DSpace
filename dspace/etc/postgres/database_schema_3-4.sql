@@ -42,7 +42,7 @@ CREATE INDEX doi_doi_idx ON Doi(doi);
 CREATE INDEX doi_resource_id_and_type_idx ON Doi(resource_id, resource_type_id);
 
 -------------------------------------------
--- New columns and longer hash for salted password hashing DS-861 --
+-- DS-1456 table of currently running webapps
 -------------------------------------------
 
 CREATE SEQUENCE webapp_seq;
@@ -54,4 +54,28 @@ CREATE TABLE Webapp
     URL VARCHAR,
     Started TIMESTAMP,
     isUI INTEGER
+);
+
+
+-------------------------------------------------------
+-- DS-824 RequestItem table
+-------------------------------------------------------
+
+CREATE SEQUENCE requestitem_seq;
+
+CREATE TABLE requestitem
+(
+  requestitem_id int4 NOT NULL,
+  token varchar(48),
+  item_id int4,
+  bitstream_id int4,
+  allfiles bool,
+  request_email varchar(64),
+  request_name varchar(64),
+  request_date timestamp,
+  accept_request bool,
+  decision_date timestamp,
+  expires timestamp,
+  CONSTRAINT requestitem_pkey PRIMARY KEY (requestitem_id),
+  CONSTRAINT requestitem_token_key UNIQUE (token)
 );

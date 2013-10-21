@@ -470,6 +470,11 @@
     <servlet-name>version-history</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.VersionHistoryServlet</servlet-class>
   </servlet>
+  
+  <servlet>
+    <servlet-name>request-item</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.RequestItemServlet</servlet-class>
+  </servlet>
     	
   <servlet-mapping>
     <servlet-name>shibboleth-login</servlet-name>
@@ -792,6 +797,12 @@
     <servlet-name>version-history</servlet-name>
     <url-pattern>/tools/history</url-pattern>
   </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>request-item</servlet-name>
+    <url-pattern>/request-item</url-pattern>
+  </servlet-mapping>
+  
   <!-- Icon MIME type -->
   <mime-mapping>
     <extension>ico</extension>
