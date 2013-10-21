@@ -1005,9 +1005,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>net.sf.flexjson</groupId>
-            <artifactId>flexjson</artifactId>
-            <version>2.1</version>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.2.1</version>
+            <scope>compile</scope>
         </dependency>
       </dependencies>
    </dependencyManagement>
