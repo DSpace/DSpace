@@ -7,10 +7,7 @@
  */
 package org.dspace.submit.lookup;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -96,8 +93,6 @@ public class CrossRefService {
 						        Document inDoc = db.parse(method.getResponseBodyAsStream());
 
 						        Element xmlRoot = inDoc.getDocumentElement();
-						        Element queryResult = XMLUtils.getSingleElement(xmlRoot, "query_result");
-						        Element body = XMLUtils.getSingleElement(xmlRoot, "body");
 						        Element dataRoot = XMLUtils.getSingleElement(xmlRoot, "query");
 						        
 								crossitem = CrossRefUtils.convertCrossRefDomToRecord(dataRoot);
