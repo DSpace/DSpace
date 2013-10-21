@@ -87,7 +87,7 @@ public class CollectionsResource {
             ArrayList<org.dspace.rest.common.Collection> collectionArrayList = new ArrayList<org.dspace.rest.common.Collection>();
             for(org.dspace.content.Collection collection : collections) {
                 if(AuthorizeManager.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {
-                    org.dspace.rest.common.Collection restCollection = new org.dspace.rest.common.Collection(collection, expand, context, limit, offset);
+                    org.dspace.rest.common.Collection restCollection = new org.dspace.rest.common.Collection(collection, null, context, limit, offset);
                     collectionArrayList.add(restCollection);
                 } // Not showing restricted-access collections
             }
