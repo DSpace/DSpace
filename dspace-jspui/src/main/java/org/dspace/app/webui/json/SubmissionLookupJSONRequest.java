@@ -338,7 +338,7 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 			if (transformationEngine != null) {
 				MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader) transformationEngine
 						.getDataLoader();
-				dataLoader.setFile("/usr/local/bibtex", valueMap.get("provider_loader"));
+				dataLoader.setFile("C:/java.bib", valueMap.get("provider_loader"));
 
 				try {
 					transformationEngine.transform(new TransformationSpec());
