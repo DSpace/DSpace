@@ -7,15 +7,21 @@
  */
 package org.dspace.sword2;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 
 import org.apache.log4j.Logger;
 
+import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.content.packager.PackageIngester;
 import org.dspace.content.packager.PackageParameters;
+import org.dspace.content.packager.PackageUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
@@ -38,71 +44,87 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
         return this.ingest(context, deposit, dso, verboseDescription, null);
     }
 
-	/* (non-Javadoc)
-	 * @see org.dspace.sword.SWORDIngester#ingest(org.dspace.core.Context, org.purl.sword.base.Deposit)
-	 */
-	public DepositResult ingest(Context context, Deposit deposit, DSpaceObject dso, VerboseDescription verboseDescription, DepositResult result)
-			throws DSpaceSwordException, SwordError
-	{
-        // FIXME: it's not clear how to make the METS ingester work over an existing item
-        
-		try
+    @Override
+    public DepositResult ingestToCollection(Context context, Deposit deposit, Collection collection, VerboseDescription verboseDescription, DepositResult result)
+            throws DSpaceSwordException, SwordError, SwordAuthException, SwordServerException
+    {
+        try
 		{
-			// first, make sure this is the right kind of ingester, and set the collection
-			if (!(dso instanceof Collection))
-			{
-				throw new DSpaceSwordException("Tried to run an ingester on wrong target type");
-			}
-			Collection collection = (Collection) dso;
+            // if we are actuall given an item in the deposit result of a previous operation
+            // then we do an ingestToItem
+            if (result != null)
+            {
+                Item item = result.getItem();
+                return this.ingestToItem(context, deposit, item, verboseDescription, result);
+            }
+
+            // otherwise, go on and do a create ...
+
+            // create the an item in the workspace.  This is necessary, because later
+            // we are going to ask a package ingester to /replace/ this item, which gives
+            // us finer control over the workflow state of the item, whereas asking
+            // the ingester to /create/ this item causes it to be injected into the workflow,
+            // irrespective of the In-Progress header provided by the depositor
+            WorkspaceItem wsi = WorkspaceItem.create(context, collection, true);
+            Item item = wsi.getItem();
+
+            // need to add a licence file, otherwise the METS replace function raises a NullPointerException
+            String licence = collection.getLicense();
+            if (PackageUtils.findDepositLicense(context, item) == null)
+            {
+                PackageUtils.addDepositLicense(context, licence, item, collection);
+            }
 
 			// get deposited file as InputStream
 			File depositFile = deposit.getFile();
 
 			// load the plugin manager for the required configuration
-			String cfg = ConfigurationManager.getProperty("swordv2-server", "mets-ingester.package-ingester");
+			String cfg = ConfigurationManager.getProperty("sword-server", "mets-ingester.package-ingester");
 			if (cfg == null || "".equals(cfg))
 			{
 				cfg = "METS";  // default to METS
 			}
 			verboseDescription.append("Using package manifest format: " + cfg);
 
-			PackageIngester pi = (PackageIngester)PluginManager.getNamedPlugin("swordv2-server", PackageIngester.class, cfg);
+			PackageIngester pi = (PackageIngester) PluginManager.getNamedPlugin(PackageIngester.class, cfg);
 			verboseDescription.append("Loaded package ingester: " + pi.getClass().getName());
-
-			// the licence is either in the zip or the mets manifest.  Either way
-			// it's none of our business here
-			String licence = null;
 
 			// Initialize parameters to packager
 			PackageParameters params = new PackageParameters();
-			// Force package ingester to respect Collection workflows
-			params.setWorkflowEnabled(true);
 
-			// Should restore mode be enabled, i.e. keep existing handle?
-			if (ConfigurationManager.getBooleanProperty("swordv2-server", "restore-mode.enable",false))
-				params.setRestoreModeEnabled(true);
+            // Force package ingester to respect Collection workflows
+            params.setWorkflowEnabled(true);
+
+            // Should restore mode be enabled, i.e. keep existing handle?
+            if (ConfigurationManager.getBooleanProperty("sword-server", "restore-mode.enable",false))
+            {
+                params.setRestoreModeEnabled(true);
+            }
+
+            // Whether or not to use the collection template
+            params.setUseCollectionTemplate(ConfigurationManager.getBooleanProperty("mets.default.ingest.useCollectionTemplate", false));
 
 			// ingest the item from the temp file
-			DSpaceObject ingestedObject = pi.ingest(context, collection, depositFile, params, licence);
+			DSpaceObject ingestedObject = pi.replace(context, item, depositFile, params);
 			if (ingestedObject == null)
 			{
 				verboseDescription.append("Failed to ingest the package; throwing exception");
-				throw new SwordError(DSpaceUriRegistry.UNPACKAGE_FAIL, "METS package ingester failed to unpack package");
+                throw new SwordError(DSpaceUriRegistry.UNPACKAGE_FAIL, "METS package ingester failed to unpack package");
 			}
 
-			//Verify we have an Item as a result -- SWORD can only ingest Items
-			if (!(ingestedObject instanceof Item))
+            // Verify we have an Item as a result
+            if (!(ingestedObject instanceof Item))
 			{
-				throw new DSpaceSwordException("DSpace Ingester returned wrong object type -- not an Item result.");
+                throw new DSpaceSwordException("DSpace Ingester returned wrong object type -- not an Item result.");
 			}
-			else
-			{
-				//otherwise, we have an item, and a workflow should have already been started for it.
-				verboseDescription.append("Workflow process started");
-			}
+            else
+            {
+                //otherwise, we have an item, and a workflow should have already been started for it.
+                verboseDescription.append("Workflow process started");
+            }
 
 			// get reference to item so that we can report on it
-			Item installedItem = (Item)ingestedObject;
+			Item installedItem = (Item) ingestedObject;
 
 			// update the item metadata to inclue the current time as
 			// the updated date
@@ -142,19 +164,112 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
 
 			return dr;
 		}
-		catch (RuntimeException re)
-		{
-			log.error("caught exception: ", re);
-			throw re;
-		}
-		catch (Exception e)
-		{
-			log.error("caught exception: ", e);
-			throw new DSpaceSwordException(e);
-		}
-	}
+        catch (RuntimeException re)
+        {
+            log.error("caught exception: ", re);
+            throw re;
+        }
+        catch (Exception e)
+        {
+            log.error("caught exception: ", e);
+            throw new DSpaceSwordException(e);
+        }
+    }
 
-	/**
+    @Override
+    public DepositResult ingestToItem(Context context, Deposit deposit, Item item, VerboseDescription verboseDescription, DepositResult result)
+            throws DSpaceSwordException, SwordError, SwordAuthException, SwordServerException
+    {
+        if (result == null)
+        {
+            result = new DepositResult();
+        }
+
+        try
+		{
+            // get deposited file as InputStream
+            File depositFile = deposit.getFile();
+
+            // load the plugin manager for the required configuration
+			String cfg = ConfigurationManager.getProperty("sword-server", "mets-ingester.package-ingester");
+			if (cfg == null || "".equals(cfg))
+			{
+				cfg = "METS";  // default to METS
+			}
+			verboseDescription.append("Using package manifest format: " + cfg);
+
+			PackageIngester pi = (PackageIngester) PluginManager.getNamedPlugin(PackageIngester.class, cfg);
+			verboseDescription.append("Loaded package ingester: " + pi.getClass().getName());
+
+			// Initialize parameters to packager
+			PackageParameters params = new PackageParameters();
+
+            // Force package ingester to respect Collection workflows
+            params.setWorkflowEnabled(true);
+
+            // Should restore mode be enabled, i.e. keep existing handle?
+            if (ConfigurationManager.getBooleanProperty("sword-server", "restore-mode.enable",false))
+            {
+                params.setRestoreModeEnabled(true);
+            }
+
+            // Whether or not to use the collection template
+            params.setUseCollectionTemplate(ConfigurationManager.getBooleanProperty("mets.default.ingest.useCollectionTemplate", false));
+
+			// ingest the item from the temp file
+			DSpaceObject ingestedObject = pi.replace(context, item, depositFile, params);
+			if (ingestedObject == null)
+			{
+				verboseDescription.append("Failed to replace the package; throwing exception");
+                throw new SwordError(DSpaceUriRegistry.UNPACKAGE_FAIL, "METS package ingester failed to unpack package");
+			}
+
+            // Verify we have an Item as a result
+            if (!(ingestedObject instanceof Item))
+			{
+                throw new DSpaceSwordException("DSpace Ingester returned wrong object type -- not an Item result.");
+			}
+
+			// get reference to item so that we can report on it
+			Item installedItem = (Item) ingestedObject;
+
+			// update the item metadata to inclue the current time as
+			// the updated date
+			this.setUpdatedDate(installedItem, verboseDescription);
+
+			// in order to write these changes, we need to bypass the
+			// authorisation briefly, because although the user may be
+			// able to add stuff to the repository, they may not have
+			// WRITE permissions on the archive.
+			boolean ignore = context.ignoreAuthorization();
+			context.setIgnoreAuthorization(true);
+			installedItem.update();
+			context.setIgnoreAuthorization(ignore);
+
+			// for some reason, DSpace will not give you the handle automatically,
+			// so we have to look it up
+			String handle = HandleManager.findHandle(context, installedItem);
+
+			verboseDescription.append("Replace successful");
+
+			result.setItem(installedItem);
+			result.setTreatment(this.getTreatment());
+
+			return result;
+		}
+        catch (RuntimeException re)
+        {
+            log.error("caught exception: ", re);
+            throw re;
+        }
+        catch (Exception e)
+        {
+            log.error("caught exception: ", e);
+            throw new DSpaceSwordException(e);
+        }
+    }
+
+    /**
 	 * The human readable description of the treatment this ingester has
 	 * put the deposit through
 	 *

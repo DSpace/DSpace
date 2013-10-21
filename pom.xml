@@ -1004,6 +1004,11 @@
             <version>1.06</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>net.sf.flexjson</groupId>
+            <artifactId>flexjson</artifactId>
+            <version>2.1</version>
+        </dependency>
       </dependencies>
    </dependencyManagement>
 

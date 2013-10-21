@@ -34,7 +34,7 @@ public interface DOIConnector {
     /**
      * Sends the DELETE-Request to the DOI registry.
      * 
-     * <p>This method sends a request to "delete" a DOI. As DOIs are persistant
+     * <p>This method sends a request to "delete" a DOI. As DOIs are persistent
      * identifiers they should never be deleted. For example, if you send a HTTP
      * DELETE request to the DataCite Metadata API directly, it will set the DOI
      * to inactive.</p>
@@ -92,7 +92,7 @@ public interface DOIConnector {
             throws DOIIdentifierException;
     
     /**
-     * Sends a request to the DOI registry to update Metadate for a DOI.
+     * Sends a request to the DOI registry to update Metadata for a DOI.
      * The DOIConnector won't do any tests and throws an IdentifierException 
      * in case of any problems with the DOI you want to update the metadata.
      * 

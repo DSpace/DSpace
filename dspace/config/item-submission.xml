@@ -87,6 +87,15 @@
        <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.SelectCollectionStep</xmlui-binding>
        <workflow-editable>false</workflow-editable>
      </step>
+     
+	 <!-- Uncomment this to make available the bibliographic import from external source - note ONLY for JSPUI -->     
+	 <!-- <step id="collection">
+       <heading></heading> can specify heading, if you want it to appear in Progress Bar
+	   <processing-class>org.dspace.submit.step.StartSubmissionLookupStep</processing-class>
+       <jspui-binding>org.dspace.app.webui.submit.step.JSPStartSubmissionLookupStep</jspui-binding>
+       <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.SelectCollectionStep</xmlui-binding>
+       <workflow-editable>false</workflow-editable>
+     </step> -->
    
      <!-- The "complete" step is a "special step" which is *REQUIRED* to be-->
      <!-- in this section!  In DSpace, when a submission is completed,       -->

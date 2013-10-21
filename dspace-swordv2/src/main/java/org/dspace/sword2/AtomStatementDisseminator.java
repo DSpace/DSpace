@@ -44,7 +44,7 @@ public class AtomStatementDisseminator extends GenericStatementDisseminator impl
 		}
 
 		DCValue[] dcvs = item.getMetadata(field);
-		if (dcvs == null)
+		if (dcvs == null || dcvs.length == 0)
 		{
 			return null;
 		}

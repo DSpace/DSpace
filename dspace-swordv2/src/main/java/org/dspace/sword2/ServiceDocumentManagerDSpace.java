@@ -140,6 +140,10 @@ public class ServiceDocumentManagerDSpace implements ServiceDocumentManager
 		{
 			// we are dealing with a partial or sub-service document
 			DSpaceObject dso = urlManager.extractDSpaceObject(url);
+            if (dso == null)
+            {
+                throw new SwordError(404);
+            }
 
 			if (dso instanceof Community)
 			{

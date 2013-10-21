@@ -50,6 +50,15 @@ public class ReceiptGenerator
 		return receipt;
 	}
 
+    protected DepositReceipt createMediaResourceReceipt(Context context, Item item, SwordConfigurationDSpace config)
+            throws DSpaceSwordException, SwordError, SwordServerException
+    {
+        SwordUrlManager urlManager = config.getUrlManager(context, config);
+        DepositReceipt receipt = new DepositReceipt();
+        receipt.setLocation(urlManager.getContentUrl(item));
+        return receipt;
+    }
+
 	protected DepositReceipt createReceipt(Context context, DepositResult result, SwordConfigurationDSpace config)
 			throws DSpaceSwordException, SwordError, SwordServerException
 	{
@@ -61,7 +70,7 @@ public class ReceiptGenerator
 	 *
 	 * @throws DSpaceSwordException
 	 */
-	protected DepositReceipt createReceipt(Context context, DepositResult result, SwordConfigurationDSpace config, boolean mediaResource)
+	protected DepositReceipt createReceipt(Context context, DepositResult result, SwordConfigurationDSpace config, boolean mediaResourceLocation)
 			throws DSpaceSwordException, SwordError, SwordServerException
 	{
 		SwordUrlManager urlManager = config.getUrlManager(context, config);
@@ -78,7 +87,7 @@ public class ReceiptGenerator
         receipt.setMediaFeedIRI(urlManager.getMediaFeedUrl(result.getItem()));
         receipt.setLastModified(result.getItem().getLastModified());
 
-		if (mediaResource)
+		if (mediaResourceLocation)
 		{
 			receipt.setLocation(urlManager.getContentUrl(result.getItem()));
 		}
@@ -204,11 +213,6 @@ public class ReceiptGenerator
 		receipt.setPackaging(config.getDisseminatePackaging());
 
 		return receipt;
-	}
-
-	private void addMetadata(DepositResult result, DepositReceipt receipt)
-	{
-
 	}
 
 	/**

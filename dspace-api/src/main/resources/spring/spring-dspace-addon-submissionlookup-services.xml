@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+    <bean class="org.dspace.submit.lookup.SubmissionLookupService"
+		name="org.dspace.submit.lookup.SubmissionLookupService">
+		<property name="phase1TransformationEngine" ref="phase1TransformationEngine"/>
+		<property name="phase2TransformationEngine" ref="phase2TransformationEngine"/>
+	</bean>
+
+	<bean name="phase1TransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
+	    <property name="dataLoader" ref="multipleDataLoader"/>
+    	<property name="workflow" ref="linearWorkflow"/>
+    	<property name="outputGenerator" ref="org.dspace.submit.lookup.SubmissionLookupOutputGenerator"/>
+  	</bean>
+		
+	<bean name="multipleDataLoader" class="org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader">
+	    <property name="dataloadersMap">
+	        <map>
+	            <entry key="pubmed" value-ref="pubmedOnlineDataLoader"/>
+	            <entry key="crossref" value-ref="crossRefOnlineDataLoader"/>
+	            <entry key="arxiv" value-ref="arXivOnlineDataLoader"/>
+	            <entry key="pubmed-file" value-ref="pubmedFileDataLoader"/>
+	            <entry key="crossref-file" value-ref="crossRefFileDataLoader"/>
+	            <entry key="arxiv-file" value-ref="arXivFileDataLoader"/>
+	            <entry key="bibtex" value-ref="bibTeXDataLoader"/>
+	            <entry key="ris" value-ref="risDataLoader"/>
+	            <entry key="endnote" value-ref="endnoteDataLoader"/>
+	            <entry key="csv" value-ref="csvDataLoader"/>
+	            <entry key="tsv" value-ref="tsvDataLoader"/>
+			</map>
+	    </property>
+	</bean>
+
+	<bean name="org.dspace.submit.lookup.SubmissionLookupOutputGenerator" class="org.dspace.submit.lookup.SubmissionLookupOutputGenerator"/>
+	
+	<!-- Specify here any filters or modifiers to run before the output -->
+	<bean name="linearWorkflow" class="gr.ekt.bte.core.LinearWorkflow">
+	    <property name="process">
+			<list>
+			    <ref bean="mapConverter_arxivSubject"/>
+			    <ref bean="mapConverter_pubstatusPubmed"/>
+			    <ref bean="removeLastDot"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean name="mapConverter_arxivSubject" class="org.dspace.submit.lookup.MapConverterModifier">
+	    <constructor-arg value="apConverter_arxivSubject Modifier"/>
+	    <property name="mapping">
+	    	<map>
+				<entry key="stat.AP" value="Statistics - Applications" />
+				<entry key="stat.CO" value="Statistics - Computation" />
+				<entry key="stat.ML" value="Statistics - Machine Learning" />
+				<entry key="stat.ME" value="Statistics - Methodology" />
+				<entry key="stat.TH" value="Statistics - Theory" />
+				<entry key="q-bio.BM" value="Quantitative Biology - Biomolecules" />
+				<entry key="q-bio.CB" value="Quantitative Biology - Cell Behavior" />
+				<entry key="q-bio.GN" value="Quantitative Biology - Genomics" />
+				<entry key="q-bio.MN" value="Quantitative Biology - Molecular Networks" />
+				<entry key="q-bio.NC" value="Quantitative Biology - Neurons and Cognition" />
+				<entry key="q-bio.OT" value="Quantitative Biology - Other" />
+				<entry key="q-bio.PE" value="Quantitative Biology - Populations and Evolution" />
+				<entry key="q-bio.QM" value="Quantitative Biology - Quantitative Methods" />
+				<entry key="q-bio.SC" value="Quantitative Biology - Subcellular Processes" />
+				<entry key="q-bio.TO" value="Quantitative Biology - Tissues and Organs" />
+				<entry key="cs.AR" value="Computer Science - Architecture" />
+				<entry key="cs.AI" value="Computer Science - Artificial Intelligence" />
+				<entry key="cs.CL" value="Computer Science - Computation and Language" />
+				<entry key="cs.CC" value="Computer Science - Computational Complexity" />
+				<entry key="cs.CE" value="Computer Science - Computational Engineering; Finance; and Science" />
+				<entry key="cs.CG" value="Computer Science - Computational Geometry" />
+				<entry key="cs.GT" value="Computer Science - Computer Science and Game Theory" />
+				<entry key="cs.CV" value="Computer Science - Computer Vision and Pattern Recognition" />
+				<entry key="cs.CY" value="Computer Science - Computers and Society" />
+				<entry key="cs.CR" value="Computer Science - Cryptography and Security" />
+				<entry key="cs.DS" value="Computer Science - Data Structures and Algorithms" />
+				<entry key="cs.DB" value="Computer Science - Databases" />
+				<entry key="cs.DL" value="Computer Science - Digital Libraries" />
+				<entry key="cs.DM" value="Computer Science - Discrete Mathematics" />
+				<entry key="cs.DC" value="Computer Science - Distributed; Parallel; and Cluster Computing" />
+				<entry key="cs.GL" value="Computer Science - General Literature" />
+				<entry key="cs.GR" value="Computer Science - Graphics" />
+				<entry key="cs.HC" value="Computer Science - Human-Computer Interaction" />
+				<entry key="cs.IR" value="Computer Science - Information Retrieval" />
+				<entry key="cs.IT" value="Computer Science - Information Theory" />
+				<entry key="cs.LG" value="Computer Science - Learning" />
+				<entry key="cs.LO" value="Computer Science - Logic in Computer Science" />
+				<entry key="cs.MS" value="Computer Science - Mathematical Software" />
+				<entry key="cs.MA" value="Computer Science - Multiagent Systems" />
+				<entry key="cs.MM" value="Computer Science - Multimedia" />
+				<entry key="cs.NI" value="Computer Science - Networking and Internet Architecture" />
+				<entry key="cs.NE" value="Computer Science - Neural and Evolutionary Computing" />
+				<entry key="cs.NA" value="Computer Science - Numerical Analysis" />
+				<entry key="cs.OS" value="Computer Science - Operating Systems" />
+				<entry key="cs.OH" value="Computer Science - Other" />
+				<entry key="cs.PF" value="Computer Science - Performance" />
+				<entry key="cs.PL" value="Computer Science - Programming Languages" />
+				<entry key="cs.RO" value="Computer Science - Robotics" />
+				<entry key="cs.SE" value="Computer Science - Software Engineering" />
+				<entry key="cs.SD" value="Computer Science - Sound" />
+				<entry key="cs.SC" value="Computer Science - Symbolic Computation" />
+				<entry key="nlin.AO" value="Nonlinear Sciences - Adaptation and Self-Organizing Systems" />
+				<entry key="nlin.CG" value="Nonlinear Sciences - Cellular Automata and Lattice Gases" />
+				<entry key="nlin.CD" value="Nonlinear Sciences - Chaotic Dynamics" />
+				<entry key="nlin.SI" value="Nonlinear Sciences - Exactly Solvable and Integrable Systems" />
+				<entry key="nlin.PS" value="Nonlinear Sciences - Pattern Formation and Solitons" />
+				<entry key="math.AG" value="Mathematics - Algebraic Geometry" />
+				<entry key="math.AT" value="Mathematics - Algebraic Topology" />
+				<entry key="math.AP" value="Mathematics - Analysis of PDEs" />
+				<entry key="math.CT" value="Mathematics - Category Theory" />
+				<entry key="math.CA" value="Mathematics - Classical Analysis and ODEs" />
+				<entry key="math.CO" value="Mathematics - Combinatorics" />
+				<entry key="math.AC" value="Mathematics - Commutative Algebra" />
+				<entry key="math.CV" value="Mathematics - Complex Variables" />
+				<entry key="math.DG" value="Mathematics - Differential Geometry" />
+				<entry key="math.DS" value="Mathematics - Dynamical Systems" />
+				<entry key="math.FA" value="Mathematics - Functional Analysis" />
+				<entry key="math.GM" value="Mathematics - General Mathematics" />
+				<entry key="math.GN" value="Mathematics - General Topology" />
+				<entry key="math.GT" value="Mathematics - Geometric Topology" />
+				<entry key="math.GR" value="Mathematics - Group Theory" />
+				<entry key="math.HO" value="Mathematics - History and Overview" />
+				<entry key="math.IT" value="Mathematics - Information Theory" />
+				<entry key="math.KT" value="Mathematics - K-Theory and Homology" />
+				<entry key="math.LO" value="Mathematics - Logic" />
+				<entry key="math.MP" value="Mathematics - Mathematical Physics" />
+				<entry key="math.MG" value="Mathematics - Metric Geometry" />
+				<entry key="math.NT" value="Mathematics - Number Theory" />
+				<entry key="math.NA" value="Mathematics - Numerical Analysis" />
+				<entry key="math.OA" value="Mathematics - Operator Algebras" />
+				<entry key="math.OC" value="Mathematics - Optimization and Control" />
+				<entry key="math.PR" value="Mathematics - Probability" />
+				<entry key="math.QA" value="Mathematics - Quantum Algebra" />
+				<entry key="math.RT" value="Mathematics - Representation Theory" />
+				<entry key="math.RA" value="Mathematics - Rings and Algebras" />
+				<entry key="math.SP" value="Mathematics - Spectral Theory" />
+				<entry key="math.ST" value="Mathematics - Statistics" />
+				<entry key="math.SG" value="Mathematics - Symplectic Geometry" />
+				<entry key="astro-ph" value="Astrophysics" />
+				<entry key="cond-mat.dis-nn" value="Physics - Disordered Systems and Neural Networks" />
+				<entry key="cond-mat.mes-hall" value="Physics - Mesoscopic Systems and Quantum Hall Effect" />
+				<entry key="cond-mat.mtrl-sci" value="Physics - Materials Science" />
+				<entry key="cond-mat.other" value="Physics - Other" />
+				<entry key="cond-mat.soft" value="Physics - Soft Condensed Matter" />
+				<entry key="cond-mat.stat-mech" value="Physics - Statistical Mechanics" />
+				<entry key="cond-mat.str-el" value="Physics - Strongly Correlated Electrons" />
+				<entry key="cond-mat.supr-con" value="Physics - Superconductivity" />
+				<entry key="gr-qc" value="General Relativity and Quantum Cosmology" />
+				<entry key="hep-ex" value="High Energy Physics - Experiment" />
+				<entry key="hep-lat" value="High Energy Physics - Lattice" />
+				<entry key="hep-ph" value="High Energy Physics - Phenomenology" />
+				<entry key="hep-th" value="High Energy Physics - Theory" />
+				<entry key="math-ph" value="Mathematical Physics" />
+				<entry key="nucl-ex" value="Nuclear Experiment" />
+				<entry key="nucl-th" value="Nuclear Theory" />
+				<entry key="physics.acc-ph" value="Physics - Accelerator Physics" />
+				<entry key="physics.ao-ph" value="Physics - Atmospheric and Oceanic Physics" />
+				<entry key="physics.atom-ph" value="Physics - Atomic Physics" />
+				<entry key="physics.atm-clus" value="Physics - Atomic and Molecular Clusters" />
+				<entry key="physics.bio-ph" value="Physics - Biological Physics" />
+				<entry key="physics.chem-ph" value="Physics - Chemical Physics" />
+				<entry key="physics.class-ph" value="Physics - Classical Physics" />
+				<entry key="physics.comp-ph" value="Physics - Computational Physics" />
+				<entry key="physics.data-an" value="Physics - Data Analysis; Statistics and Probability" />
+				<entry key="physics.flu-dyn" value="Physics - Fluid Dynamics" />
+				<entry key="physics.gen-ph" value="Physics - General Physics" />
+				<entry key="physics.geo-ph" value="Physics - Geophysics" />
+				<entry key="physics.hist-ph" value="Physics - History of Physics" />
+				<entry key="physics.ins-det" value="Physics - Instrumentation and Detectors" />
+				<entry key="physics.med-ph" value="Physics - Medical Physics" />
+				<entry key="physics.optics" value="Physics - Optics" />
+				<entry key="physics.ed-ph" value="Physics - Physics Education" />
+				<entry key="physics.soc-ph" value="Physics - Physics and Society" />
+				<entry key="physics.plasm-ph" value="Physics - Plasma Physics" />
+				<entry key="physics.pop-ph" value="Physics - Popular Physics" />
+				<entry key="physics.space-ph" value="Physics - Space Physics" />
+				<entry key="quant-ph" value="Quantum Physics" />
+			</map>
+	    </property>
+	    <property name="fieldKeys">
+	        <list>
+	        	<value>arxivCategory</value>
+	        </list>
+	    </property>
+	</bean>
+	
+	<bean name="mapConverter_pubstatusPubmed" class="org.dspace.submit.lookup.MapConverterModifier">
+	    <constructor-arg value="mapConverter_pubstatusPubmed Modifier"/>
+	    <property name="defaultValue" value="Subjected to Journal"/>
+	    <property name="mapping">
+	    	<map>
+				<entry key="ppublish" value="Published" />
+				<entry key="epublish" value="Published" />
+			</map>
+	    </property>
+	    <property name="fieldKeys">
+	        <list>
+	        	<value>publicationstatus</value>
+	        </list>
+	    </property>
+	</bean>
+	
+	<bean name="removeLastDot" class="org.dspace.submit.lookup.RemoveLastDotModifier">
+	    <constructor-arg value="removeLastDot Modifier"/>
+	    <property name="fieldKeys">
+	        <list>
+	        	<value>title</value>
+	        </list>
+	    </property>
+	</bean>
+	
+	<!-- PubMed Data Loaders -->
+	<bean class="org.dspace.submit.lookup.PubmedOnlineDataLoader" name="pubmedOnlineDataLoader">
+		<property name="searchProvider" value="false" />
+		<property name="fieldMap" ref="pubmedInputMap"/>
+	</bean>
+
+	<bean class="org.dspace.submit.lookup.PubmedFileDataLoader" name="pubmedFileDataLoader">
+		<property name="fieldMap" ref="pubmedInputMap"/>
+	</bean>
+	
+	<bean name="pubmedInputMap" class="java.util.HashMap" scope="prototype" >
+    	<constructor-arg>
+        	<map key-type="java.lang.String" value-type="java.lang.String">
+            	<entry key="pubmedID" value="pmid" />
+				<entry key="doi" value="doi" />
+				<entry key="issn" value="issn" />
+				<entry key="eissn" value="eissn" />
+				<entry key="journalTitle" value="journal" />
+				<entry key="title" value="title" />
+				<entry key="pubblicationModel" value="" />
+				<entry key="year" value="issued" />
+				<entry key="volume" value="volume" />
+				<entry key="issue" value="issue" />
+				<entry key="language" value="language" />
+				<entry key="type" value="subtype" />
+				<entry key="primaryKeywords" value="keywords" />
+				<entry key="secondaryKeywords" value="keywords" />
+				<entry key="primaryMeshHeadings" value="mesh" />
+				<entry key="secondaryMeshHeadings" value="mesh" />
+				<entry key="startPage" value="firstpage" />
+				<entry key="endPage" value="lastpage" />
+				<entry key="summary" value="abstract" />
+				<entry key="status" value="publicationstatus" />
+				<entry key="authors" value="authors" />
+        	</map>
+    	</constructor-arg>
+	</bean>
+	
+	<!-- Arxiv Data Loaders -->
+	<bean class="org.dspace.submit.lookup.ArXivOnlineDataLoader" name="arXivOnlineDataLoader">
+		<property name="searchProvider" value="false" />
+		<property name="fieldMap" ref="arxivInputMap"/>
+	</bean>	
+	
+	<bean class="org.dspace.submit.lookup.ArXivFileDataLoader" name="arXivFileDataLoader">
+		<property name="fieldMap" ref="arxivInputMap"/>
+	</bean>	
+	
+	<bean name="arxivInputMap" class="java.util.HashMap" scope="prototype" >
+    	<constructor-arg>
+        	<map key-type="java.lang.String" value-type="java.lang.String">
+            	<entry key="journalRef" value="journal" />
+				<entry key="doi" value="doi" />
+				<entry key="authors" value="authors" />
+				<entry key="comment" value="note" />
+				<entry key="year" value="issued" />
+				<entry key="articleTitle" value="title" />
+				<entry key="summary" value="abstract" />
+				<entry key="splashPageUrl" value="url" />
+				<entry key="pdfUrl" value="fulltextUrl" />
+				<entry key="primaryCategory" value="arxivCategory" />
+				<entry key="category" value="arxivCategory" />
+				<entry key="source" value="arxivID" />
+        	</map>
+    	</constructor-arg>
+	</bean>
+	
+	<!-- CrossRef Data Loaders -->
+	<bean class="org.dspace.submit.lookup.CrossRefOnlineDataLoader" name="crossRefOnlineDataLoader">
+		<property name="searchProvider" value="false" />
+		<property name="fieldMap" ref="crossrefInputMap"/>
+	</bean>
+	
+	<bean class="org.dspace.submit.lookup.CrossRefFileDataLoader" name="crossRefFileDataLoader">
+		<property name="fieldMap" ref="crossrefInputMap"/>
+	</bean>
+	
+	<bean name="crossrefInputMap" class="java.util.HashMap" scope="prototype" >
+    	<constructor-arg>
+        	<map key-type="java.lang.String" value-type="java.lang.String">
+            	<entry key="journalRef" value="journal" />
+				<entry key="doi" value="doi" />
+				<entry key="authors" value="authors" />
+				<entry key="comment" value="note" />
+				<entry key="year" value="issued" />
+				<entry key="articleTitle" value="title" />
+				<entry key="summary" value="abstract" />
+				<entry key="splashPageUrl" value="url" />
+				<entry key="pdfUrl" value="fulltextUrl" />
+				<entry key="primaryCategory" value="arxivCategory" />
+				<entry key="category" value="arxivCategory" />
+				<entry key="source" value="arxivID" />
+        	</map>
+    	</constructor-arg>
+	</bean>
+	
+	
+	<!-- Phase2 transformation engine -->
+	<bean name="phase2TransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
+	    <property name="dataLoader" ref="submissionItemDataLoader"/>
+    	<property name="workflow" ref="phase2linearWorkflow"/>
+    	<property name="outputGenerator" ref="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator"/>
+  	</bean>
+  	
+	<bean name="submissionItemDataLoader" class="org.dspace.submit.lookup.SubmissionItemDataLoader"/>
+	
+	<!-- Specify here any filters or modifiers to run before the output -->
+	<bean name="phase2linearWorkflow" class="gr.ekt.bte.core.LinearWorkflow">
+	    <property name="process">
+			<list>
+			    <ref bean="fieldMergeModifier"/>
+			    <ref bean="valueConcatenationModifier"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean name="fieldMergeModifier" class="org.dspace.submit.lookup.FieldMergeModifier">
+	    <property name="mergeFieldMap">
+	        <map>
+	            <entry key="allauthors">
+	                <list>
+						<value>authors</value>
+					</list>
+	            </entry>
+	            <entry key="allkeywords">
+	                <list>
+						<value>keywords</value>
+						<value>mesh</value>
+					</list>
+	            </entry>
+	        </map>
+	    </property>
+	</bean>
+	
+	<bean name="valueConcatenationModifier" class="org.dspace.submit.lookup.ValueConcatenationModifier">
+	    <property name="field" value="allkeywords"/>
+	    <property name="separator" value=";" />
+	    <property name="whitespaceAfter" value="true" />
+	</bean>
+
+	<bean name="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator" class="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator">
+	    <property name="outputMap">
+	        <map>
+	            <entry key="pmid" value="dc.identifier.pmid"/>
+	            <entry key="doi" value="dc.identifier.doi"/>
+	            <entry key="jissn" value="dc.relation.issn"/>
+	            <entry key="jeissn" value="dc.relation.eissn"/>
+	            <entry key="journal" value="dc.relation.ispartofjournal"/>
+	            <entry key="title" value="dc.title"/>
+	            <entry key="issued" value="dc.date.issued"/>
+	            <entry key="volume" value="dc.relation.volume"/>
+	            <entry key="issue" value="dc.relation.issue"/>
+	            <entry key="language" value="dc.language.iso"/>
+	            <entry key="subtype" value="dc.type.contribution"/>
+	            <!-- <entry key="keywords" value="dc.subject"/> -->
+	            <entry key="mesh" value="dc.subject"/>
+	            <entry key="firstpage" value="dc.relation.firstpage"/>
+	            <entry key="lastpage" value="dc.relation.lastpage"/>
+	            <entry key="abstract" value="dc.description.abstract"/>
+	            <entry key="publicationstatus" value="dc.type.publicationstatus"/>
+	            <!-- <entry key="authorsWithAffiliations" value="dc.contributor.author"/> -->
+	            <!-- <entry key="authors" value="dc.contributor.author|authorsWithAffiliations"/> -->
+	            <entry key="authorsWithAffiliations" value=""/>
+	            <entry key="authors" value=""/>
+	            <entry key="articleNumber" value="dc.relation.article"/>
+	            <entry key="firstpage" value="dc.relation.firstpage"/>
+	            <entry key="firstpage" value="dc.relation.firstpage"/>
+	        </map>
+	    </property>
+	    <property name="extraMetadataToKeep">
+			<list>
+				<value>dc.import.contributorauthor</value>
+				<value>dc.import.contributoreditor</value>
+				<value>dc.import.contributortranslator</value>
+				<!-- <value>dc.description.scopusurl</value>
+				<value>dc.description.scopuscitationcount</value>
+				<value>dc.description.scopuscitationurl</value>-->
+			</list>
+		</property> 
+	</bean>
+	
+	<!-- BTE core data loaders -->
+	<bean id="bibTeXDataLoader" class="gr.ekt.bteio.loaders.BibTeXDataLoader">
+    <property name="fieldMap">
+      <map>
+        <entry key="title" value="title"/>
+        <entry key="author" value="authors"/>
+        <entry key="journal" value="journal"/>
+        <entry key="year" value="issued"/>
+        <entry key="ISSN" value="jissn"/>
+      </map>
+    </property>
+  </bean>
+  
+  <bean id="csvDataLoader" class="gr.ekt.bteio.loaders.CSVDataLoader">
+    <property name="fieldMap">
+      <map>
+        <entry key="1" value="title"/>
+        <entry key="0" value="authors"/>
+        <entry key="2" value="issued"/>
+        <entry key="3" value="journal"/>
+        <entry key="14" value="abstract"/>
+        <entry key="31" value="jissn"/>
+        <entry key="38" value="subtype"/>
+      </map>
+    </property>
+    <property name="skipLines" value="1"/>
+  </bean>
+  
+  <bean id="tsvDataLoader" class="gr.ekt.bteio.loaders.CSVDataLoader">
+    <property name="fieldMap">
+      <map>
+        <entry key="7" value="title"/>
+        <entry key="1" value="authors"/>
+        <entry key="37" value="issued"/>
+        <entry key="8" value="journal"/>
+        <entry key="19" value="abstract"/>
+        <entry key="31" value="jissn"/>
+        <entry key="0" value="subtype"/>
+      </map>
+    </property>
+    <!-- This makes the CSV data loader able to load TSV data -->
+    <property name="separator" value="\u0009"/>
+    <property name="skipLines" value="1"/>
+  </bean>
+  
+  <bean id="risDataLoader" class="gr.ekt.bteio.loaders.RISDataLoader">
+    <property name="fieldMap">
+      <map>
+        <entry key="T1" value="title"/>
+        <entry key="AU" value="authors"/>
+        <entry key="SO" value="journal"/>
+        <entry key="PY" value="issued"/>
+        <entry key="SN" value="jissn"/>
+        <entry key="PT" value="subtype"/>
+        <entry key="AB" value="abstract"/>
+      </map>
+    </property>
+  </bean>
+
+  <bean id="endnoteDataLoader" class="gr.ekt.bteio.loaders.EndnoteDataLoader">
+    <property name="fieldMap">
+      <map>
+        <entry key="TI" value="title"/>
+        <entry key="AU" value="authors"/>
+        <entry key="AB" value="abstract"/>
+        <entry key="PY" value="issued"/>
+        <entry key="SO" value="journal"/>
+      </map>
+    </property>
+  </bean>
+  
+</beans>
