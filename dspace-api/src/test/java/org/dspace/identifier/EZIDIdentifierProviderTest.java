@@ -72,24 +72,32 @@ public class EZIDIdentifierProviderTest
         ctx.turnOffAuthorisationSystem();
         ctx.setCurrentUser(eperson);
 
+        // Create an Item to play with
         WorkspaceItem wsItem = WorkspaceItem.create(ctx, collection, false);
 
-        WorkflowItem wfItem = WorkflowManager.start(ctx, wsItem);
-        WorkflowManager.advance(ctx, wfItem, ctx.getCurrentUser());
+        // Get it from the workspace and set some metadata
+        Item item = wsItem.getItem();
+        itemID = item.getID();
 
-        Item item = wfItem.getItem();
         item.addMetadata("dc", "contributor", "author", null, "Author, A. N.");
         item.addMetadata("dc", "title", null, null, "A Test Object");
         item.addMetadata("dc", "publisher", null, null, "DSpace Test Harness");
         item.update();
-        itemID = item.getID();
 
+        // I think we have to do this?
+        WorkflowItem wfItem = WorkflowManager.startWithoutNotify(ctx, wsItem);
+        WorkflowManager.advance(ctx, wfItem, ctx.getCurrentUser());
+        wfItem.update();
+        wfItem.deleteWrapper();
+
+        // Commit work, clean up
         ctx.commit();
         ctx.restoreAuthSystemState();
 
         return item;
     }
 
+    /*
     @BeforeClass
     public static void setUpClass()
             throws Exception
@@ -145,6 +153,7 @@ public class EZIDIdentifierProviderTest
     {
         context.restoreAuthSystemState();
     }
+    */
 
     /**
      * Test of supports method, of class DataCiteIdentifierProvider.
@@ -152,7 +161,7 @@ public class EZIDIdentifierProviderTest
     @Test
     public void testSupports_Class()
     {
-        System.out.println("supports");
+        System.out.println("supports Class");
 
         EZIDIdentifierProvider instance
                 = (EZIDIdentifierProvider)
@@ -169,7 +178,7 @@ public class EZIDIdentifierProviderTest
     @Test
     public void testSupports_String()
     {
-        System.out.println("supports");
+        System.out.println("supports String");
 
         EZIDIdentifierProvider instance
                 = (EZIDIdentifierProvider)
@@ -183,11 +192,12 @@ public class EZIDIdentifierProviderTest
     /**
      * Test of register method, of class DataCiteIdentifierProvider.
      */
+    /*
     @Test
     public void testRegister_Context_DSpaceObject()
             throws Exception
     {
-        System.out.println("register 2");
+        System.out.println("register Context, DSpaceObject");
 
         EZIDIdentifierProvider instance
                 = (EZIDIdentifierProvider)
@@ -199,10 +209,12 @@ public class EZIDIdentifierProviderTest
         assertTrue("Didn't get a DOI back", result.startsWith("doi:" + TEST_SHOULDER));
         System.out.println(" got identifier:  " + result);
     }
+    */
 
     /**
      * Test of register method, of class DataCiteIdentifierProvider.
      */
+    /*
     @Test
     public void testRegister_3args()
             throws SQLException, AuthorizeException, IOException
@@ -219,10 +231,12 @@ public class EZIDIdentifierProviderTest
 
         instance.register(context, object, identifier);
     }
+    */
 
     /**
      * Test of reserve method, of class DataCiteIdentifierProvider.
      */
+    /*
     @Test
     public void testReserve()
             throws Exception
@@ -237,10 +251,12 @@ public class EZIDIdentifierProviderTest
         String identifier = UUID.randomUUID().toString();
         instance.reserve(context, dso, identifier);
     }
+    */
 
     /**
      * Test of mint method, of class DataCiteIdentifierProvider.
      */
+    /*
     @Test
     public void testMint()
             throws Exception
@@ -255,10 +271,12 @@ public class EZIDIdentifierProviderTest
         String result = instance.mint(context, dso);
         assertNotNull("Null returned", result);
     }
+    */
 
     /**
      * Test of resolve method, of class DataCiteIdentifierProvider.
      */
+    /*
     @Test
     public void testResolve()
             throws Exception
@@ -277,10 +295,12 @@ public class EZIDIdentifierProviderTest
         DSpaceObject result = instance.resolve(context, identifier, attributes);
         assertEquals(expResult, result);
     }
+    */
 
     /**
      * Test of lookup method, of class DataCiteIdentifierProvider.
      */
+    /*
     @Test
     public void testLookup()
             throws Exception
@@ -298,10 +318,12 @@ public class EZIDIdentifierProviderTest
         String result = instance.lookup(context, object);
         assertNotNull("Null returned", result);
     }
+    */
 
     /**
      * Test of delete method, of class DataCiteIdentifierProvider.
      */
+    /*
     @Test
     public void testDelete_Context_DSpaceObject()
             throws Exception
@@ -342,10 +364,12 @@ public class EZIDIdentifierProviderTest
                 EZIDIdentifierProvider.DOI_QUALIFIER, id2);
         assertFalse("A test identifier is still present", found.hasNext());
     }
+    */
 
     /**
      * Test of delete method, of class DataCiteIdentifierProvider.
      */
+    /*
     @Test()
     public void testDelete_3args()
             throws Exception
@@ -372,4 +396,5 @@ public class EZIDIdentifierProviderTest
                 EZIDIdentifierProvider.DOI_QUALIFIER, identifier);
         assertFalse("Test identifier is still present", found.hasNext());
     }
+    */
 }

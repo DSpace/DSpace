@@ -659,20 +659,22 @@ public class EZIDIdentifierProvider
                     mapped.put(key, mappedValue);
                 }
             }
+        }
 
-            if (!mapped.containsKey(DATACITE_PUBLISHER))
-            {
-                String publisher = configurationService.getPropertyAsType(CFG_PUBLISHER, "unknown");
-                log.info("Supplying default publisher:  {}", publisher);
-                mapped.put(DATACITE_PUBLISHER, publisher);
-            }
+        // Supply a default publisher, if the Item has none.
+        if (!mapped.containsKey(DATACITE_PUBLISHER))
+        {
+            String publisher = configurationService.getPropertyAsType(CFG_PUBLISHER, "unknown");
+            log.info("Supplying default publisher:  {}", publisher);
+            mapped.put(DATACITE_PUBLISHER, publisher);
+        }
 
-            if (!mapped.containsKey(DATACITE_PUBLICATION_YEAR))
-            {
-                String year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
-                log.info("Supplying default publication year:  {}", year);
-                mapped.put(DATACITE_PUBLICATION_YEAR, year);
-            }
+        // Supply current year as year of publication, if the Item has none.
+        if (!mapped.containsKey(DATACITE_PUBLICATION_YEAR))
+        {
+            String year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+            log.info("Supplying default publication year:  {}", year);
+            mapped.put(DATACITE_PUBLICATION_YEAR, year);
         }
 
         // TODO find a way to get a current direct URL to the object and set _target
