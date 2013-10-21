@@ -439,19 +439,14 @@
             <version>0.9.2.2</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-            <version>4.2.1</version>
-        </dependency>
-        <dependency>
             <groupId>gr.ekt.bte</groupId>
             <artifactId>bte-io</artifactId>
             <version>0.9.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
@@ -517,6 +512,24 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
+
+		<dependency>
+	    	<groupId>backport-util-concurrent</groupId>
+	    	<artifactId>backport-util-concurrent</artifactId>
+	    	<version>3.1</version>
+		</dependency>
+		
+		<dependency>
+	    	<groupId>backport-util-concurrent</groupId>
+	    	<artifactId>backport-util-concurrent</artifactId>
+	    	<version>3.1</version>
+		</dependency>
+
+        <dependency>
+            <groupId>net.sf.flexjson</groupId>
+            <artifactId>flexjson</artifactId>            
+        </dependency>
+        
     </dependencies>
 
 </project>
