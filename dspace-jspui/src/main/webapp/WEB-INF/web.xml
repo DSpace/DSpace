@@ -298,6 +298,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>batchmetadataimport</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.BatchMetadataImportServlet</servlet-class>
+  </servlet>
+  
+  <servlet>
     <servlet-name>metadata-field-registry</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.MetadataFieldRegistryServlet</servlet-class>
   </servlet>
@@ -628,6 +633,11 @@
     <url-pattern>/dspace-admin/metadataimport</url-pattern>
   </servlet-mapping>
 
+  <servlet-mapping>
+    <servlet-name>batchmetadataimport</servlet-name>
+    <url-pattern>/dspace-admin/batchmetadataimport</url-pattern>
+  </servlet-mapping>
+  
   <servlet-mapping>
     <servlet-name>metadata-field-registry</servlet-name>
     <url-pattern>/dspace-admin/metadata-field-registry</url-pattern>
