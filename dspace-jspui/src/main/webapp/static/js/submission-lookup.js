@@ -275,7 +275,9 @@ submissionLookupFile = function(form){
 	    form.attr("enctype", "multipart/form-data");
 	    form.attr("encoding", "multipart/form-data");
 	    form.attr("target", "upload_iframe");
-	    form.attr("file", j('#file_upload').val());
+	    
+	    j(form).empty();
+	    j('#file_upload').clone().appendTo(j(form));
 	    j(form).append(suuid);
         j(form).append(collectionid);
         j(form).append(preview_loader);

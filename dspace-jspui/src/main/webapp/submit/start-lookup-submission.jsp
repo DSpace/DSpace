@@ -260,9 +260,11 @@
 	<div id="manual-accordion">&nbsp;</div>
 	</div>
 	</form>
-	<form id="form-loader" action="" method="post">
-	</form>
-	<div id="iframecontent" style="display: none"></div>
+	<div style="display: none">
+		<form id="form-loader" action="" method="post">
+		</form>
+		<div id="iframecontent"></div>
+	</div>
 </div>
 
 	<div class="tab-pane" id="tabs-result">
