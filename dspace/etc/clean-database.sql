@@ -134,4 +134,4 @@ DROP SEQUENCE versionhistory_seq;
 DROP SEQUENCE versionitem_seq;
 
 -- Drop the getnextid() function
-DROP FUNCTION getnextid(VARCHAR(40));
+DROP FUNCTION getnextid;
