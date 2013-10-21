@@ -181,6 +181,7 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 
 			// Parse the request
 			List<FileItem> iter;
+            String filename = null;
 			try {
 				iter = upload.parseRequest(req);
 				for(FileItem item : iter) {					
@@ -208,7 +209,6 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 				MultipleSubmissionLookupDataLoader dataLoader = (MultipleSubmissionLookupDataLoader) transformationEngine
 						.getDataLoader();
 				
-				
 				String tempDir = (ConfigurationManager.getProperty("upload.temp.dir") != null)
 			            ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir"); 
 				File file = new File(tempDir + System.getProperty("file.separator") + "submissionlookup-loader.temp");
@@ -228,6 +228,8 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 				} catch (MalformedSourceException e1) {
 					e1.printStackTrace();
 				}
+
+                file.delete();
 			}
 			subDTO.setItems(result);
 			service.storeDTOs(req, suuid, subDTO);
