@@ -901,6 +901,15 @@ public class ItemTag extends TagSupport
             	}	
             	else
             	{
+            		Context context = UIUtil
+							.obtainContext(request);
+            		boolean showRequestCopy = false;
+            		if ("all".equalsIgnoreCase(ConfigurationManager.getProperty("request.item.type")) || 
+            				("logged".equalsIgnoreCase(ConfigurationManager.getProperty("request.item.type")) &&
+            						context.getCurrentUser() != null))
+					{
+            			showRequestCopy = true;
+					}
             		for (int i = 0; i < bundles.length; i++)
             		{
             			Bitstream[] bitstreams = bundles[i].getBitstreams();
@@ -997,9 +1006,8 @@ public class ItemTag extends TagSupport
                                             + "</a>");
             					
 								try {
-									if (!AuthorizeManager
-											.authorizeActionBoolean(UIUtil
-													.obtainContext(request),
+									if (showRequestCopy && !AuthorizeManager
+											.authorizeActionBoolean(context,
 													bitstreams[k],
 													Constants.READ))
 										out.print("&nbsp;<a class=\"btn btn-success\" href=\""

@@ -72,7 +72,7 @@ public class RequestItemServlet extends DSpaceServlet
         HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
-                // First get the step
+        // First get the step
         int step = UIUtil.getIntParameter(request, "step");
 
         try
@@ -123,7 +123,20 @@ public class RequestItemServlet extends DSpaceServlet
         HttpServletRequest request,
         HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
-    {        
+    {
+    	boolean showRequestCopy = false;
+		if ("all".equalsIgnoreCase(ConfigurationManager.getProperty("request.item.type")) || 
+				("logged".equalsIgnoreCase(ConfigurationManager.getProperty("request.item.type")) &&
+						context.getCurrentUser() != null))
+		{
+			showRequestCopy = true;
+		}
+		
+		if (!showRequestCopy)
+		{
+			throw new AuthorizeException("The request copy feature is disabled");
+		}
+		
         // handle
         String handle = request.getParameter("handle");
         
