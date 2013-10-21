@@ -48,6 +48,49 @@
          <hint>Enter the names of the authors of this item below.</hint>
          <required></required>
        </field>
+       
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>author</dc-element>
+         <dc-qualifier>epersonIdentified</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Authors Registered as Users</label>
+         <input-type>author</input-type>
+         <hint>The authors matching with registered .</hint>
+         <required></required>
+       </field> 
+       
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>chosenAuthor</dc-element>
+         <dc-qualifier>epersonIdentified</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Authors Registered as Users</label>
+         <input-type>authorChosen</input-type>
+         <hint>The authors matching with registered .</hint>
+         <required></required>
+       </field> 
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>collectionAvailable</dc-element>
+         <dc-qualifier>authorWise</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Available collections</label>
+         <input-type>collectionAvailable</input-type>
+         <hint>Author wise collections </hint>
+         <required></required>
+       </field> 
+       
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>collectionChosen</dc-element>
+         <dc-qualifier>authorWise</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Chosen collections</label>
+         <input-type>collectionChosen</input-type>
+         <hint>Author wise collections </hint>
+         <required></required>
+       </field> 
 
        <field>
          <dc-schema>dc</dc-schema>
@@ -119,19 +162,6 @@
 
        <field>
          <dc-schema>dc</dc-schema>
-         <dc-element>identifier</dc-element>
-         <dc-qualifier></dc-qualifier>
-         <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
-         <repeatable>true</repeatable>
-         <label>Identifiers</label>
-         <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
-         <hint>If the item has any identification numbers or codes associated with
-it, please enter the types and the actual numbers or codes below.</hint>
-         <required></required>
-       </field>
-
-       <field>
-         <dc-schema>dc</dc-schema>
          <dc-element>type</dc-element>
          <dc-qualifier></dc-qualifier>
          <repeatable>true</repeatable>
@@ -165,6 +195,28 @@ it, please enter the types and the actual numbers or codes below.</hint>
          <hint>Enter appropriate subject keywords or phrases below. </hint>
          <required></required>
          <vocabulary>srsc</vocabulary>
+       </field>
+       
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
+         <repeatable>true</repeatable>
+         <label>Identifiers</label>
+         <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+         <hint>If the item has any identification numbers or codes associated with
+it, please enter the types and the actual numbers or codes below.</hint>
+         <required></required>
+       </field>
+       
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>DOI</dc-qualifier>
+          <label>DOI</label>
+          <input-type>onebox</input-type>
+          <type-bind>Article</type-bind>
        </field>
 
        <field>

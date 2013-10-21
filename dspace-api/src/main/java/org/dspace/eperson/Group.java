@@ -378,6 +378,28 @@ public class Group extends DSpaceObject
 
         return epersonInGroup(c, groupid, currentuser);
     }
+    
+    /**
+     * fast check to see if an eperson is a member called with eperson id, does
+     * database lookup without instantiating all of the epeople objects and is
+     * thus a static method
+     * 
+     * @param c
+     *            context
+     * @param groupid
+     *            group ID to check
+     */
+    public static boolean isMemberGivenUser(Context c, int groupid,EPerson givenUser) throws SQLException
+    {
+        // special, everyone is member of group 0 (anonymous)
+        if (groupid == 0)
+        {
+            return true;
+        }
+
+        
+        return epersonInGroup(c, groupid, givenUser);
+    }
 
     /**
      * Get all of the groups that an eperson is a member of.

@@ -10,7 +10,12 @@ package org.dspace.app.xmlui.aspect.submission.submit;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
 
@@ -37,6 +42,7 @@ import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCPersonName;
@@ -47,6 +53,7 @@ import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.Choices;
+import org.dspace.eperson.EPerson;
 
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
@@ -159,7 +166,10 @@ public class DescribeStep extends AbstractSubmissionStep
                 Item item = submission.getItem();
                 Collection collection = submission.getCollection();
                 String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
-
+                
+                DCValue[] chosenAuthorEpersons=item.getMetadata( "dc", "authorChosen", "epersonIdentified", Item.ANY);
+                DCValue[] chosenCollections=item.getMetadata( "dc", "collectionChosen", "authorWise", Item.ANY);
+                HashMap<Integer,EPerson> availableAuthorIdEpersonMap=new HashMap<Integer,EPerson>();
                 DCInputSet inputSet;
                 DCInput[] inputs;
                 try
@@ -226,6 +236,89 @@ public class DescribeStep extends AbstractSubmissionStep
                         {
                                 renderNameField(form, fieldName, dcInput, dcValues, readonly);
                         }
+                        else if (inputType.equals("author"))
+                        {  
+                            for (int x=0;x< dcValues.length;)
+                                {
+                                  DCValue  dcValue=dcValues[x];
+                                 if(dcValue!=null)
+                                    {
+                                         int epersonId=Integer.parseInt(dcValue.value);
+                                         EPerson authEPerson=EPerson.find(context, epersonId);
+                                         String name="";
+                                         if(authEPerson!=null)
+                                         {
+                                             name=authEPerson.getFullName();                                             
+                                             availableAuthorIdEpersonMap.put(epersonId, authEPerson);
+                                         }
+                                         dcValues[x].value=epersonId+"*#"+name;
+                                    }
+                                 x++;
+                                } 
+                                renderAutorEpersonField(form, fieldName, dcInput, dcValues,chosenAuthorEpersons ,readonly);
+                        }
+                        else if (inputType.equals("authorChosen"))
+                        {
+                           //do nothing
+                        }
+                        else if (inputType.equals("collectionAvailable"))
+                        {
+                            boolean isAnyAvailable=false;
+                            form.addItem().addCheckBox("abc").setLabel("Author wise available collections");
+                            Collection[] allCollections = Collection.findAll(context);
+                            
+                            if(availableAuthorIdEpersonMap!=null&&availableAuthorIdEpersonMap.size()>0
+                                    &&allCollections!=null && allCollections.length>0)
+                            {
+                                for (Integer eid : availableAuthorIdEpersonMap.keySet()) {   
+                                    EPerson eAuthor=availableAuthorIdEpersonMap.get(eid); 
+                                    CheckBox chkBox  = form.addItem().addCheckBox("chk-name2coll");
+                                    chkBox.setLabel(eAuthor.getFullName());
+                                      for(int a=0;a<allCollections.length;a++)
+                                      {
+                                          Collection currCollection;
+                                          currCollection = allCollections[a];
+                                          boolean isChosenCurrCollection=false;
+                                          if(chosenCollections!=null && chosenCollections.length>0)
+                                          {
+                                              for(int x=0;x<chosenCollections.length;x++)
+                                              {
+                                                  if(Integer.parseInt(chosenCollections[x].value)==currCollection.getID())
+                                                  {
+                                                      isChosenCurrCollection=true;
+                                                  }
+                                              }
+                                          }
+                                          boolean authorized=true;
+                                          try
+                                          {
+                                             AuthorizeManager.authorizeActionForGivenUser(context, currCollection, 3,eAuthor,true); 
+                                          }
+                                          catch(AuthorizeException e)
+                                          {
+                                              authorized=false;
+                                          }
+                                          if(authorized)
+                                          {              
+                                                isAnyAvailable=true;
+                                                chkBox.addOption(currCollection.getID(),currCollection.getName());
+                                                if(isChosenCurrCollection)
+                                                {
+                                                    chkBox.setOptionSelected(currCollection.getID());
+                                                }
+                                          }                                      
+                                   }
+                                    
+                                }                                
+                            }   
+                            if(!isAnyAvailable)
+                            form.addItem().addContent("No author wise collections available yet");
+                            
+                        }
+                        else if (inputType.equals("collectionChosen"))
+                        {
+                           //do nothing
+                        }
                         else if (inputType.equals("date"))
                         {
                                 renderDateField(form, fieldName, dcInput, dcValues, readonly);
@@ -280,9 +373,9 @@ public class DescribeStep extends AbstractSubmissionStep
                                 form.addItem(T_unknown_field);
                         }
                 }
-
+               
                 // add standard control/paging buttons
-        addControlButtons(form);
+                addControlButtons(form);
         }
 
     /**
@@ -371,6 +464,18 @@ public class DescribeStep extends AbstractSubmissionStep
                         {
                             displayValue = displayQual + ":" + value.value;
                         }
+                    }
+                    else if (inputType.equals("author"))
+                    {
+                        EPerson eauthor=EPerson.find(context, Integer.parseInt(value.value));
+                        if(eauthor!=null)
+                              displayValue =   eauthor.getFullName();
+                    }
+                    else if (inputType.equals("collectionChosen"))
+                    {
+                            Collection coll=Collection.find(context,Integer.parseInt(value.value) );
+                            if(coll!=null)
+                              displayValue =   coll.getName();
                     }
                     else
                     {
@@ -520,6 +625,44 @@ public class DescribeStep extends AbstractSubmissionStep
                             }
                 }
         }
+        }
+        
+        private void renderAutorEpersonField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues,DCValue[] chosenAuthorEpersons, boolean readonly) throws WingException
+        {
+         CheckBox chkBox=form.addItem().addCheckBox(fieldName);
+         boolean isAnyAvailable=false;
+         chkBox.setLabel("Authors mapped ");
+               for (int x=0;x< dcValues.length;)
+                  {
+                      DCValue  dcValue=dcValues[x];
+                        if(dcValue!=null)
+                            {
+                                StringTokenizer splitter=new StringTokenizer(dcValue.value,"*#");
+                                if(splitter.hasMoreTokens())
+                                        {
+                                            int id=Integer.parseInt(splitter.nextToken());
+                                            String name=splitter.nextToken();
+                                            chkBox.addOption(id+"",name);
+                                            isAnyAvailable=true;
+                                            boolean isChosen=false;
+                                            for(int y=0;y<chosenAuthorEpersons.length;y++)
+                                            {
+                                                if(id==Integer.parseInt(chosenAuthorEpersons[y].value))
+                                                {
+                                                  isChosen=true;  
+                                                  break;
+                                                }
+                                            }
+                                            if(isChosen)
+                                            chkBox.setOptionSelected(id+"");
+                                            chkBox.enableAddOperation();
+                                        }
+                            }
+                    x++;
+                  }   
+               
+               if(!isAnyAvailable)
+                    form.addItem().addContent("No user matching author names available yet");
         }
         
         /**
