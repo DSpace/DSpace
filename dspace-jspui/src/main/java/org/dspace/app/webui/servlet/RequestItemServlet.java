@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.requestitem.RequestItemAuthor;
+import org.dspace.app.requestitem.RequestItemAuthorExtractor;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.RequestItemManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -37,6 +39,7 @@ import org.dspace.handle.HandleManager;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.utils.DSpace;
 
 /**
  * Servlet for generate a statistisc report
@@ -149,13 +152,13 @@ public class RequestItemServlet extends DSpaceServlet
 		}
           
         // User email from context
-        String authEmail = request.getParameter("email");
+        String requesterEmail = request.getParameter("email");
         EPerson currentUser = context.getCurrentUser();
         String userName = null;
         
         if (currentUser != null)
         {
-            authEmail = currentUser.getEmail();
+            requesterEmail = currentUser.getEmail();
             userName = currentUser.getFullName();
         }
         
@@ -168,13 +171,13 @@ public class RequestItemServlet extends DSpaceServlet
             boolean allfiles = "true".equals(request.getParameter("allfiles"));
             
             // Check all data is there
-            if (authEmail == null || authEmail.equals("") ||
+            if (requesterEmail == null || requesterEmail.equals("") ||
                 reqname == null || reqname.equals("")) 
             {
                 request.setAttribute("handle",handle);
                 request.setAttribute("bitstream-id", bitstream_id);
                 request.setAttribute("reqname", reqname);
-                request.setAttribute("email", authEmail);
+                request.setAttribute("email", requesterEmail);
                 request.setAttribute("coment", coment);
                 request.setAttribute("title", title); 
                 request.setAttribute("allfiles", allfiles?"true":null); 
@@ -184,20 +187,38 @@ public class RequestItemServlet extends DSpaceServlet
                 return;
             }
 
-            // All data is there, send the email
-            // get submiter email
-            EPerson submiter = item.getSubmitter();
-       
-            //get email 
             try
             {
                 // All data is there, send the email
 				Email email = Email.getEmail(I18nUtil.getEmailFilename(
 						context.getCurrentLocale(), "request_item.author"));
-				email.addRecipient(submiter.getEmail());
+				
+				RequestItemAuthor author = new DSpace()
+						.getServiceManager()
+						.getServiceByName(
+								RequestItemAuthorExtractor.class.getName(),
+								RequestItemAuthorExtractor.class)
+						.getRequestItemAuthor(context, item);
+				
+				String authorEmail = author.getEmail();
+				String authorName = author.getFullName();
+				String emailRequest;
+				
+				if (authorEmail != null) {
+					emailRequest = authorEmail;
+				} else {
+					emailRequest = ConfigurationManager
+							.getProperty("mail.helpdesk");
+				}
+				
+				if (emailRequest == null) {
+					emailRequest = ConfigurationManager
+							.getProperty("mail.admin");
+				}
+				email.addRecipient(emailRequest);
 
 				email.addArgument(reqname);
-				email.addArgument(authEmail);
+				email.addArgument(requesterEmail);
 				email.addArgument(allfiles ? I18nUtil
 						.getMessage("itemRequest.all") : Bitstream.find(
 						context, Integer.parseInt(bitstream_id)).getName());
@@ -206,22 +227,23 @@ public class RequestItemServlet extends DSpaceServlet
 				email.addArgument(title); // request item title
 				email.addArgument(coment); // message
 				email.addArgument(RequestItemManager.getLinkTokenEmail(context,
-						bitstream_id, item.getID(), authEmail, reqname,
+						bitstream_id, item.getID(), requesterEmail, reqname,
 						allfiles));
-				email.addArgument(submiter.getFullName()); // submmiter name
-				email.addArgument(submiter.getEmail()); // submmiter email
+				
+				email.addArgument(authorName); // corresponding author name
+				email.addArgument(authorEmail); // corresponding author email
 				email.addArgument(ConfigurationManager
 						.getProperty("dspace.name"));
 				email.addArgument(ConfigurationManager
 						.getProperty("mail.helpdesk"));
-				email.setReplyTo(authEmail);
+				email.setReplyTo(requesterEmail);
 				email.send();
 
                 log.info(LogManager.getHeader(context,
                     "sent_email_requestItem",
-                    "submitter_id=" + authEmail
+                    "submitter_id=" + requesterEmail
                         + ",bitstream_id="+bitstream_id
-                        + ",requestEmail="+authEmail));
+                        + ",requestEmail="+requesterEmail));
 
                 request.setAttribute("handle", handle);
                 JSPManager.showJSP(request, response,
@@ -237,13 +259,13 @@ public class RequestItemServlet extends DSpaceServlet
         }
         else
         {
-            // Display sugget form
+            // Display request copy form
             log.info(LogManager.getHeader(context,
                 "show_requestItem_form",
                 "problem=false"));
             request.setAttribute("handle", handle);
             request.setAttribute("bitstream-id", bitstream_id);
-            request.setAttribute("email", authEmail);
+            request.setAttribute("email", requesterEmail);
             request.setAttribute("reqname", userName);
             request.setAttribute("title", title);
             request.setAttribute("allfiles", "true");

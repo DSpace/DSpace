@@ -20,6 +20,8 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.requestitem.RequestItemAuthor;
+import org.dspace.app.requestitem.RequestItemAuthorExtractor;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.Bitstream;
@@ -35,6 +37,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.utils.DSpace;
 
  /**
  * This action will send a mail to request a item to administrator when all mandatory data is present.
@@ -103,9 +106,18 @@ public class SendItemRequestAction extends AbstractAction
         	title=titleDC[0].value;
         }
         String emailRequest;
-        EPerson submiter = item.getSubmitter();
-        if(submiter!=null){
-            emailRequest=submiter.getEmail();
+        
+		RequestItemAuthor author = new DSpace()
+				.getServiceManager()
+				.getServiceByName(RequestItemAuthorExtractor.class.getName(),
+						RequestItemAuthorExtractor.class)
+				.getRequestItemAuthor(context, item);
+
+		String authorEmail = author.getEmail();
+		String authorName = author.getFullName();
+		
+        if(authorEmail!=null){
+            emailRequest=authorEmail;
         }else{
             emailRequest=ConfigurationManager.getProperty("mail.helpdesk");
         }
@@ -123,8 +135,8 @@ public class SendItemRequestAction extends AbstractAction
         email.addArgument(title);    // request item title
         email.addArgument(message);   // message
         email.addArgument(getLinkTokenEmail(context,request, bitstreamId, item.getID(), requesterEmail, requesterName, Boolean.parseBoolean(allFiles)));    
-        email.addArgument(submiter.getFullName());    //   submmiter name
-        email.addArgument(submiter.getEmail());    //   submmiter email
+        email.addArgument(authorName);    //   corresponding author name
+        email.addArgument(authorEmail);    //   corresponding author email
         email.addArgument(ConfigurationManager.getProperty("dspace.name"));
         email.addArgument(ConfigurationManager.getProperty("mail.helpdesk"));
 
