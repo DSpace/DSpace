@@ -420,13 +420,13 @@
   <bean id="csvDataLoader" class="gr.ekt.bteio.loaders.CSVDataLoader">
     <property name="fieldMap">
       <map>
-        <entry key="1" value="Title"/>
-        <entry key="0" value="Author"/>
-        <entry key="2" value="Year"/>
-        <entry key="3" value="Journal"/>
-        <entry key="14" value="Abstract"/>
-        <entry key="31" value="ISSN"/>
-        <entry key="38" value="Type"/>
+        <entry key="1" value="title"/>
+        <entry key="0" value="authors"/>
+        <entry key="2" value="issued"/>
+        <entry key="3" value="journal"/>
+        <entry key="14" value="abstract"/>
+        <entry key="31" value="jissn"/>
+        <entry key="38" value="subtype"/>
       </map>
     </property>
     <property name="skipLines" value="1"/>
@@ -435,13 +435,13 @@
   <bean id="tsvDataLoader" class="gr.ekt.bteio.loaders.CSVDataLoader">
     <property name="fieldMap">
       <map>
-        <entry key="7" value="Title"/>
-        <entry key="1" value="Author"/>
-        <entry key="37" value="Year"/>
-        <entry key="8" value="Journal"/>
-        <entry key="19" value="Abstract"/>
-        <entry key="31" value="ISSN"/>
-        <entry key="0" value="Type"/>
+        <entry key="7" value="title"/>
+        <entry key="1" value="authors"/>
+        <entry key="37" value="issued"/>
+        <entry key="8" value="journal"/>
+        <entry key="19" value="abstract"/>
+        <entry key="31" value="jissn"/>
+        <entry key="0" value="subtype"/>
       </map>
     </property>
     <!-- This makes the CSV data loader able to load TSV data -->
@@ -452,13 +452,13 @@
   <bean id="risDataLoader" class="gr.ekt.bteio.loaders.RISDataLoader">
     <property name="fieldMap">
       <map>
-        <entry key="T1" value="Title"/>
-        <entry key="AU" value="Author"/>
-        <entry key="SO" value="Journal"/>
-        <entry key="PY" value="Year"/>
-        <entry key="SN" value="ISSN"/>
-        <entry key="PT" value="Type"/>
-        <entry key="AB" value="Abstract"/>
+        <entry key="T1" value="title"/>
+        <entry key="AU" value="authors"/>
+        <entry key="SO" value="journal"/>
+        <entry key="PY" value="issued"/>
+        <entry key="SN" value="jissn"/>
+        <entry key="PT" value="subtype"/>
+        <entry key="AB" value="abstract"/>
       </map>
     </property>
   </bean>
@@ -466,11 +466,11 @@
   <bean id="endnoteDataLoader" class="gr.ekt.bteio.loaders.EndnoteDataLoader">
     <property name="fieldMap">
       <map>
-        <entry key="TI" value="Title"/>
-        <entry key="AU" value="Author"/>
-        <entry key="AB" value="Abstract"/>
-        <entry key="PY" value="Date"/>
-        <entry key="SO" value="Source"/>
+        <entry key="TI" value="title"/>
+        <entry key="AU" value="authors"/>
+        <entry key="AB" value="abstract"/>
+        <entry key="PY" value="issued"/>
+        <entry key="SO" value="journal"/>
       </map>
     </property>
   </bean>
