@@ -57,7 +57,7 @@ public class EZIDRequest
     /**
      * Prepare a context for requests concerning a specific identifier or
      * authority prefix.
-     * 
+     *
      * @param scheme URL scheme for access to the EZID service.
      * @param host Host name for access to the EZID service.
      * @param authority DOI authority prefix, e.g. "10.5072/FK2".
@@ -93,7 +93,7 @@ public class EZIDRequest
 
     /**
      * Fetch the metadata bound to an identifier.
-     * 
+     *
      * @throws IdentifierException if the response is error or body malformed.
      * @throws IOException if the HTTP request fails.
      * @throws URISyntaxException

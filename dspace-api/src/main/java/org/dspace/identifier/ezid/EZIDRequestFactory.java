@@ -34,11 +34,11 @@ public class EZIDRequestFactory
 
     /**
      * Configure an EZID request.
-     * 
+     *
      * @param authority our DOI authority number.
      * @param username EZID user name.
      * @param password {@code username}'s password.
-     * @throws URISyntaxException 
+     * @throws URISyntaxException
      */
     public EZIDRequest getInstance(String authority, String username, String password)
             throws URISyntaxException

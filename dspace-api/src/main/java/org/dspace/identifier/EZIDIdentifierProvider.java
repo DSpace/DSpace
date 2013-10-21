@@ -562,7 +562,7 @@ public class EZIDIdentifierProvider
 
     /**
      * Get configured value of EZID username.
-     * @throws IdentifierException 
+     * @throws IdentifierException
      */
     private String loadUser()
             throws IdentifierException
@@ -580,7 +580,7 @@ public class EZIDIdentifierProvider
 
     /**
      * Get configured value of EZID password.
-     * @throws IdentifierException 
+     * @throws IdentifierException
      */
     private String loadPassword()
             throws IdentifierException
@@ -598,7 +598,7 @@ public class EZIDIdentifierProvider
 
     /**
      * Get configured value of EZID "shoulder".
-     * @throws IdentifierException 
+     * @throws IdentifierException
      */
     private String loadAuthority()
             throws IdentifierException
@@ -626,7 +626,7 @@ public class EZIDIdentifierProvider
         Item item = (Item) dso; // TODO generalize to DSO when all DSOs have metadata.
 
         Map<String, String> mapped = new HashMap<String, String>();
-        
+
         for (Entry<String, String> datum : crosswalk.entrySet())
         {
             DCValue[] values = item.getMetadata(datum.getValue());
@@ -659,20 +659,22 @@ public class EZIDIdentifierProvider
                     mapped.put(key, mappedValue);
                 }
             }
+        }
 
-            if (!mapped.containsKey(DATACITE_PUBLISHER))
-            {
-                String publisher = configurationService.getPropertyAsType(CFG_PUBLISHER, "unknown");
-                log.info("Supplying default publisher:  {}", publisher);
-                mapped.put(DATACITE_PUBLISHER, publisher);
-            }
+        // Supply a default publisher, if the Item has none.
+        if (!mapped.containsKey(DATACITE_PUBLISHER))
+        {
+            String publisher = configurationService.getPropertyAsType(CFG_PUBLISHER, "unknown");
+            log.info("Supplying default publisher:  {}", publisher);
+            mapped.put(DATACITE_PUBLISHER, publisher);
+        }
 
-            if (!mapped.containsKey(DATACITE_PUBLICATION_YEAR))
-            {
-                String year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
-                log.info("Supplying default publication year:  {}", year);
-                mapped.put(DATACITE_PUBLICATION_YEAR, year);
-            }
+        // Supply current year as year of publication, if the Item has none.
+        if (!mapped.containsKey(DATACITE_PUBLICATION_YEAR))
+        {
+            String year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+            log.info("Supplying default publication year:  {}", year);
+            mapped.put(DATACITE_PUBLICATION_YEAR, year);
         }
 
         // TODO find a way to get a current direct URL to the object and set _target
