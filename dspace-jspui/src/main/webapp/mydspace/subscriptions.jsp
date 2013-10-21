@@ -27,8 +27,11 @@
 
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Collection" %>
+<%@ page import="org.dspace.app.util.CollectionDropDown" %>
 
 <%
+    Collection[] availableSubscriptions =
+        (Collection[]) request.getAttribute("availableSubscriptions");
     Collection[] subscriptions =
         (Collection[]) request.getAttribute("subscriptions");
     boolean updated =
@@ -49,10 +52,27 @@
     {
 %>
 	<p><strong><fmt:message key="jsp.mydspace.subscriptions.info1"/></strong></p>
+	<p><fmt:message key="jsp.mydspace.subscriptions.info2"/></p>
 <%
     }
 %>
-	<p><fmt:message key="jsp.mydspace.subscriptions.info2"/></p>
+        <form class="form-group" action="<%= request.getContextPath() %>/submit" method="post">
+        
+            <select id="available-subscriptions" class="ds-select-field" name="collection">
+                <option value="-1">( Vyberte kolekci )</option>
+<%
+    for (int i = 0; i < availableSubscriptions.length; i++)
+    {
+%>
+                <option value="<%= availableSubscriptions[i].getID() %>"><%= CollectionDropDown.collectionPath(availableSubscriptions[i], 0) %></option>
+<%
+    }
+%>
+            </select>
+            <input class="btn btn-sm btn-info" type="submit" name="submit_subscribe" value="<fmt:message key="jsp.collection-home.subscribe"/>" />
+
+	</form>
+        
 <%
     if (subscriptions.length > 0)
     {
