@@ -63,7 +63,7 @@ public class IfModifiedSinceSelector implements Selector
         {
             Request request = ObjectModelHelper.getRequest(objectModel);
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-            if (dso.getType() == Constants.ITEM)
+            if (dso != null && dso.getType() == Constants.ITEM)
             {
                 Item item = (Item) dso;
                 long modSince = request.getDateHeader("If-Modified-Since");
@@ -76,7 +76,7 @@ public class IfModifiedSinceSelector implements Selector
         }
         catch (Exception e)
         {
-            log.error("Error selecting based on If-Modified-Since: "+e.toString());
+            log.error("Error selecting based on If-Modified-Since",e);
             return false;
         }
     }
