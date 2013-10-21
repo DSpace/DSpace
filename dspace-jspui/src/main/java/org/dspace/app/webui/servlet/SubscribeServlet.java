@@ -61,6 +61,22 @@ public class SubscribeServlet extends DSpaceServlet
 
             context.complete();
         }
+        else if (submit.equals("submit_subscribe"))
+        {
+            int collID = UIUtil.getIntParameter(request, "collection");
+            Collection c = Collection.find(context, collID);
+
+            // Sanity check - ignore duff values
+            if (c != null)
+            {
+                Subscribe.subscribe(context, e, c);
+            }
+
+            // Show the list of subscriptions
+            showSubscriptions(context, request, response, true);
+
+            context.complete();
+        }
         else if (submit.equals("submit_unsubscribe"))
         {
             int collID = UIUtil.getIntParameter(request, "collection");
