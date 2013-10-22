@@ -474,14 +474,14 @@ public class EditProfile extends AbstractDSpaceTransformer
 
     /**
      * get the available Locales for the User Interface as defined in dspace.cfg
-     * property xmlui.supported.locales
+     * property webui.supported.locales
      * returns an array of Locales or null
      *
      * @return an array of supported Locales or null
      */
     private static Locale[] getSupportedLocales()
     {
-        String ll = ConfigurationManager.getProperty("xmlui.supported.locales");
+        String ll = ConfigurationManager.getProperty("webui.supported.locales");
         if (ll != null)
         {
             return I18nUtil.parseLocales(ll);
