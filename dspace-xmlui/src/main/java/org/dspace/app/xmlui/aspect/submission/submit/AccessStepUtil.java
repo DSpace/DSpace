@@ -80,6 +80,7 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
     public void addName(String name_, List form, int errorFlag) throws WingException {
         if(isAdvancedFormEnabled){
             Text name = form.addItem().addText("name");
+	        name.setSize(0, 30);
             name.setLabel(T_name);
 	        name.setHelp(T_name_help);
 
