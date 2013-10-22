@@ -7,7 +7,6 @@
  */
 package org.dspace.app.webui.json;
 
-import flexjson.JSONSerializer;
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.TransformationEngine;
 import gr.ekt.bte.core.TransformationSpec;
@@ -53,6 +52,10 @@ import org.dspace.submit.util.ItemSubmissionLookupDTO;
 import org.dspace.submit.util.SubmissionLookupDTO;
 import org.dspace.utils.DSpace;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 public class SubmissionLookupJSONRequest extends JSONRequest {
 
 	private SubmissionLookupService service = new DSpace().getServiceManager()
@@ -65,6 +68,7 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 	@Override
 	public void doJSONRequest(Context context, HttpServletRequest req,
 			HttpServletResponse resp) throws AuthorizeException, IOException {
+		Gson json = new Gson();
 		String suuid = req.getParameter("s_uuid");
 		SubmissionLookupDTO subDTO = service.getSubmissionLookupDTO(req, suuid);
 		// Check that we have a file upload request
@@ -114,9 +118,11 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 			subDTO.setItems(result);
 			service.storeDTOs(req, suuid, subDTO);
 			List<Map<String, Object>> dto = getLightResultList(result);
-			JSONSerializer serializer = new JSONSerializer();
-			serializer.rootName("result");
-			serializer.deepSerialize(dto, resp.getWriter());
+			JsonElement tree = json.toJsonTree(dto);
+			JsonObject jo = new JsonObject();
+		    jo.add("result", tree);
+			resp.getWriter().write(jo.toString());
+			
 		} else if ("search".equalsIgnoreCase(req.getParameter("type"))) {
 			String title = req.getParameter("title");
 			String author = req.getParameter("authors");
@@ -158,16 +164,18 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 			subDTO.setItems(result);
 			service.storeDTOs(req, suuid, subDTO);
 			List<Map<String, Object>> dto = getLightResultList(result);
-			JSONSerializer serializer = new JSONSerializer();
-			serializer.rootName("result");
-			serializer.deepSerialize(dto, resp.getWriter());
+			JsonElement tree = json.toJsonTree(dto);
+			JsonObject jo = new JsonObject();
+		    jo.add("result", tree);
+			resp.getWriter().write(jo.toString());
 		} else if ("details".equalsIgnoreCase(req.getParameter("type"))) {
 			String i_uuid = req.getParameter("i_uuid");
-			JSONSerializer serializer = new JSONSerializer();
-			serializer.rootName("result");
 			Map<String, Object> dto = getDetails(subDTO.getLookupItem(i_uuid),
 					context);
-			serializer.deepSerialize(dto, resp.getWriter());
+			JsonElement tree = json.toJsonTree(dto);
+			JsonObject jo = new JsonObject();
+		    jo.add("result", tree);
+			resp.getWriter().write(jo.toString());
 		} else if (isMultipart) {
 
 			// Create a factory for disk-based file items
@@ -251,9 +259,10 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 				dto.add(skip);
 				}
 			}
-			JSONSerializer serializer = new JSONSerializer();
-			serializer.rootName("result");
-			serializer.deepSerialize(dto, resp.getWriter());
+			JsonElement tree = json.toJsonTree(dto);
+			JsonObject jo = new JsonObject();
+		    jo.add("result", tree);
+			resp.getWriter().write(jo.toString());
 			resp.setContentType("text/plain");
 		}
 	}

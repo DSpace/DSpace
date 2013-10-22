@@ -7,7 +7,10 @@
  */
 package org.dspace.submit.lookup;
 
+import gr.ekt.bte.core.Record;
+
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -34,8 +37,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import flexjson.JSONDeserializer;
-import gr.ekt.bte.core.Record;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 public class CrossRefService {
     
@@ -161,8 +164,9 @@ public class CrossRefService {
 						+ method.getStatusLine());
 			}
 
-			JSONDeserializer<List<Map>> des = new JSONDeserializer<List<Map>>();
-			List<Map> json = des.deserialize(method.getResponseBodyAsString());
+			Gson gson = new Gson();
+			Type listType = new TypeToken<ArrayList<Map>>(){}.getType();
+			List<Map> json = gson.fromJson(method.getResponseBodyAsString(),listType);
 			Set<String> dois = new HashSet<String>();
 			for (Map r : json) {
 				dois.add(SubmissionLookupUtils.normalizeDOI((String) r.get("doi")));
