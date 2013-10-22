@@ -383,11 +383,12 @@
                         </div>
                     </xsl:otherwise>
                 </xsl:choose>
-
+                
+                <xsl:call-template name="languageSelection" />
+                
             </div>
         </div>
     </xsl:template>
-
 
     <!-- The header (distinct from the HTML head element) contains the title, subtitle, login box and various
         placeholders for header images -->
