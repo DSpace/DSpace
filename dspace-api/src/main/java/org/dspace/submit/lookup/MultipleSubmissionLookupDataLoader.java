@@ -148,7 +148,7 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader
                 SubmissionLookupDataLoader provider = (SubmissionLookupDataLoader) genProvider;
 
                 // Provider must support DOI
-                if (provider.getSupportedIdentifiers().contains(
+                if (!provider.getSupportedIdentifiers().contains(
                         SubmissionLookupDataLoader.DOI))
                 {
                     continue;

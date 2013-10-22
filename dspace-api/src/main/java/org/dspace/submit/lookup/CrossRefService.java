@@ -70,13 +70,13 @@ public class CrossRefService
                 try
                 {
                     if (!ConfigurationManager
-                            .getBooleanProperty("remoteservice.demo"))
+                            .getBooleanProperty(SubmissionLookupService.CFG_MODULE, "remoteservice.demo"))
                     {
                         GetMethod method = null;
                         try
                         {
                             String apiKey = ConfigurationManager
-                                    .getProperty("crossref.api-key");
+                                    .getProperty(SubmissionLookupService.CFG_MODULE, "crossref.api-key");
 
                             HttpClient client = new HttpClient();
                             client.setConnectionTimeout(timeout);
@@ -142,7 +142,7 @@ public class CrossRefService
                 }
                 catch (RuntimeException rt)
                 {
-                    rt.printStackTrace();
+                    log.error(rt.getMessage(), rt);
                 }
             }
         }
@@ -191,7 +191,7 @@ public class CrossRefService
 
             if (statusCode != HttpStatus.SC_OK)
             {
-                throw new RuntimeException("Chiamata http fallita: "
+                throw new RuntimeException("Http call failed:: "
                         + method.getStatusLine());
             }
 

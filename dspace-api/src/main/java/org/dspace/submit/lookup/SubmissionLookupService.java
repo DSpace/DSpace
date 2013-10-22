@@ -30,6 +30,7 @@ import org.dspace.submit.util.SubmissionLookupDTO;
  */
 public class SubmissionLookupService
 {
+    public static final String CFG_MODULE = "submission-lookup";
 
     public static final String SL_NAMESPACE_PREFIX = "http://www.dspace.org/sl/";
 

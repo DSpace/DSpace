@@ -79,7 +79,7 @@ public class ArXivService
             throws IOException, HttpException
     {
         List<Record> results = new ArrayList<Record>();
-        if (!ConfigurationManager.getBooleanProperty("remoteservice.demo"))
+        if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE, "remoteservice.demo"))
         {
             GetMethod method = null;
             try

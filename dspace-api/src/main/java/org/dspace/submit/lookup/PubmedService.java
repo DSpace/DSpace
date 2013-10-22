@@ -94,7 +94,7 @@ public class PubmedService
     public List<Record> search(String query) throws IOException, HttpException
     {
         List<Record> results = null;
-        if (!ConfigurationManager.getBooleanProperty("remoteservice.demo"))
+        if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE, "remoteservice.demo"))
         {
             GetMethod method = null;
             try
@@ -209,7 +209,7 @@ public class PubmedService
             SAXException
     {
         List<Record> results = new ArrayList<Record>();
-        if (!ConfigurationManager.getBooleanProperty("remoteservice.demo"))
+        if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE, "remoteservice.demo"))
         {
             GetMethod method = null;
             try
