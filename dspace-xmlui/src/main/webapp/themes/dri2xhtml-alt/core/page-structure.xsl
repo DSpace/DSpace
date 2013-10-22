@@ -354,6 +354,7 @@
                 </xsl:otherwise>
             </xsl:choose>
 
+            <xsl:call-template name="languageSelection" />
         </div>
     </xsl:template>
 
@@ -583,4 +584,23 @@
         </xsl:if>
     </xsl:variable>
     
+    <!-- Display language selection if more than 1 language is supported -->
+    <xsl:template name="languageSelection">
+        <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='supportedLocale']) &gt; 1">
+            <div id="ds-language-selection">
+                <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='supportedLocale']">
+                    <xsl:variable name="locale" select="."/>
+                    <a>
+                        <xsl:attribute name="href">
+                            <xsl:value-of select="$current-uri"/>
+                            <xsl:text>?locale-attribute=</xsl:text>
+                            <xsl:value-of select="$locale"/>
+                        </xsl:attribute>
+                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='supportedLocale'][@qualifier=$locale]"/>
+                    </a>
+                </xsl:for-each>
+            </div>
+        </xsl:if>
+    </xsl:template>
+
 </xsl:stylesheet>

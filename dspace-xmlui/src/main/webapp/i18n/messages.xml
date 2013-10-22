@@ -309,6 +309,78 @@
 	<message key="xmlui.ItemExportDownloadReader.auth_header">This export archive is restricted.</message>
 	<message key="xmlui.ItemExportDownloadReader.auth_message">The export archive you are attempting to access is a restricted resource and requires credentials to view. Please login below to access the export archive.</message>
 
+
+	<!-- REQUEST COPY -->
+	<!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestForm.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.title">Request a copy of the document</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.trail">Request a copy of the document</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.head">Request a copy of the document</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.para1">Enter the following information to request a copy of the document to the responsible</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail">E-mail</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail_help">This email address is used for sending the document.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail.error">E-mail is mandatory</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.message">Mensaje</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.message.error">Mensaje is mandatory</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.files">Files</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.allFiles">All files (of this document) in restricted access.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.notAllFiles">Only The requested file.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterName">Name</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterName.error">Name is mandatory</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.submit">Request copy</message>
+
+	<!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestSent.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestSent.title">Your request has been sent.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestSent.trail">Your request has been sent.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestSent.head">Your request has been sent.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestSent.para1">Your request has been sent to the author or responsible.</message>
+
+	<!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestResponseDecisionForm.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.title">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.trail">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.head">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.para1">IF YOU ARE THE AUTHOR (OR ONE AUTHOR) DOCUMENT "{0}" uses the buttons to answer the user's request.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.para2">According to your choice will be generated a model answer customizable.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.send">Send copy</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.dontSend">Don't send copy</message>
+	
+	<!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestResponseTrueForm.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.title">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.trail">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.head">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.para1">This is the text to be sent to the applicant.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.message">Message</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.subject">Subject</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.mail">Send</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.back">Back</message>
+
+    <!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestResponseFalseForm.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.title">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.trail">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.head">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.para1">This is the text that will send the applicant (together with the document).</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.message">Message</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.subject">Subject</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.mail">Send</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.back">Back</message>
+	
+	 <!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestChangeStatusForm.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.title">Change permissions request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.trail">Change permissions request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.head">Change permissions request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.para1">You can take advantage of the occasion to reconsider the free disposition of the document (to avoid having to respond to these requests), if there is no reason to keep it restricted. This may apply inserting your data below and press the button</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.name">Name</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.email">E-mail</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.name.error">The name is mandatory</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.email.error">The e-mail is mandatory</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.changeToOpen">Change to open access</message>
+	        
+	<!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestResponseFalseForm.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.title">Request sent</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.trail">Request sent</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.head">Your request to change permissions has been sent</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.para1">Your request has been sent to the administrator</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.para2">Thanks</message>
+	
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		                EPerson Aspect

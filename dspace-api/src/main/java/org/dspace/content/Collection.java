@@ -7,16 +7,6 @@
  */
 package org.dspace.content;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.MissingResourceException;
-
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -25,14 +15,9 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.IndexBrowse;
-import org.dspace.browse.ItemCounter;
 import org.dspace.browse.ItemCountException;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.LicenseManager;
-import org.dspace.core.LogManager;
+import org.dspace.browse.ItemCounter;
+import org.dspace.core.*;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
 import org.dspace.handle.HandleManager;
@@ -42,6 +27,16 @@ import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.MissingResourceException;
 
 /**
  * Class representing a collection.
@@ -339,6 +334,56 @@ public class Collection extends DSpaceObject
     }
 
     /**
+     * Get all collections in the system. Adds support for limit and offset.
+     * @param context
+     * @param limit
+     * @param offset
+     * @return
+     * @throws SQLException
+     */
+    public static Collection[] findAll(Context context, Integer limit, Integer offset) throws SQLException
+    {
+        TableRowIterator tri = DatabaseManager.queryTable(context, "collection",
+                "SELECT * FROM collection ORDER BY name limit ? offset ?", limit, offset);
+
+        List<Collection> collections = new ArrayList<Collection>();
+
+        try
+        {
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+
+                // First check the cache
+                Collection fromCache = (Collection) context.fromCache(
+                        Collection.class, row.getIntColumn("collection_id"));
+
+                if (fromCache != null)
+                {
+                    collections.add(fromCache);
+                }
+                else
+                {
+                    collections.add(new Collection(context, row));
+                }
+            }
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+            {
+                tri.close();
+            }
+        }
+
+        Collection[] collectionArray = new Collection[collections.size()];
+        collectionArray = (Collection[]) collections.toArray(collectionArray);
+
+        return collectionArray;
+    }
+
+    /**
      * Get the in_archive items in this collection. The order is indeterminate.
      *
      * @return an iterator over the items in the collection.
@@ -353,6 +398,27 @@ public class Collection extends DSpaceObject
 
         TableRowIterator rows = DatabaseManager.queryTable(ourContext, "item",
                 myQuery,getID());
+
+        return new ItemIterator(ourContext, rows);
+    }
+
+    /**
+     * Get the in_archive items in this collection. The order is indeterminate.
+     * Provides the ability to use limit and offset, for efficient paging.
+     * @param limit Max number of results in set
+     * @param offset Number of results to jump ahead by. 100 = 100th result is first, not 100th page.
+     * @return an iterator over the items in the collection.
+     * @throws SQLException
+     */
+    public ItemIterator getItems(Integer limit, Integer offset) throws SQLException
+    {
+        String myQuery = "SELECT item.* FROM item, collection2item WHERE "
+                + "item.item_id=collection2item.item_id AND "
+                + "collection2item.collection_id= ? "
+                + "AND item.in_archive='1' limit ? offset ?";
+
+        TableRowIterator rows = DatabaseManager.queryTable(ourContext, "item",
+                myQuery,getID(), limit, offset);
 
         return new ItemIterator(ourContext, rows);
     }
