@@ -57,6 +57,7 @@
             <exclude>src</exclude>
             <exclude>config/dspace.cfg</exclude>
             <exclude>config/log4j.properties</exclude>
+            <exclude>config/spring/api/bte.xml</exclude>
             <exclude>config/modules/**</exclude>
          </excludes>
       </fileSet>
@@ -80,6 +81,11 @@
       <file>
          <source>config/log4j.properties</source>
          <outputDirectory>config</outputDirectory>
+         <filtered>true</filtered>
+      </file>
+      <file>
+         <source>config/spring/api/bte.xml</source>
+         <outputDirectory>config/spring/api</outputDirectory>
          <filtered>true</filtered>
       </file>
    </files>
