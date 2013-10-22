@@ -64,5 +64,39 @@
         <property name='disseminationCrosswalkName' value="DataCite" />
     </bean>
     -->
-    
+
+    <!-- Provider to mint and register DOIs using EZID as the registrar.
+    -->
+    <!-- Uncomment to enable DOI using EZID
+    <bean id="org.dspace.identifier.EZIDIdentifierProvider"
+          class="org.dspace.identifier.EZIDIdentifierProvider"
+          scope='singleton'>
+        <description>Uses the EZID service to provide DOI identifiers from DataCite</description>
+        <property name="configurationService"
+                      ref="org.dspace.services.ConfigurationService"/>
+        <property name='requestFactory'>
+            <bean class='org.dspace.identifier.ezid.EZIDRequestFactory'>
+                <property name='EZID_SCHEME' value='https'/>
+                <property name='EZID_HOST' value='n2t.net'/>
+            </bean>
+        </property>
+        <property name='crosswalk'>
+            <map>
+                <entry key='datacite.creator' value='dc.contributor.author'/>
+                <entry key='datacite.title' value='dc.title'/>
+                <entry key='datacite.publisher' value='dc.publisher'/>
+                <entry key='datacite.publicationyear' value='dc.date.issued'/>
+            </map>
+        </property>
+        <property name='crosswalkTransform'>
+            <description>How to compute the crosswalked value from the original.  Default is plain copy.</description>
+            <map>
+                <entry key='datacite.publicationyear'>
+                    <bean class='org.dspace.identifier.ezid.DateToYear'/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+    -->
+
 </beans>
