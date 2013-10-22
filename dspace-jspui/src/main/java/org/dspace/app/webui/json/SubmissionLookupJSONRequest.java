@@ -258,9 +258,15 @@ public class SubmissionLookupJSONRequest extends JSONRequest
                         .getProperty("upload.temp.dir") != null) ? ConfigurationManager
                         .getProperty("upload.temp.dir") : System
                         .getProperty("java.io.tmpdir");
-                File file = new File(tempDir
-                        + System.getProperty("file.separator")
-                        + "submissionlookup-loader.temp");
+                File uploadDir = new File(tempDir);
+                if (!uploadDir.exists()) {
+                    if (!uploadDir.mkdir()) {
+                        uploadDir = null;
+                    }
+                }
+                File file = File.createTempFile("submissionlookup-loader",
+                                                ".temp",
+                                                uploadDir);
                 BufferedOutputStream out = new BufferedOutputStream(
                         new FileOutputStream(file));
                 Utils.bufferedCopy(io, out);
@@ -283,8 +289,10 @@ public class SubmissionLookupJSONRequest extends JSONRequest
                 {
                     log.error(e1.getMessage(), e1);
                 }
-
-                file.delete();
+                finally
+                {
+                    file.delete();
+                }
             }
             subDTO.setItems(result);
             service.storeDTOs(req, suuid, subDTO);
