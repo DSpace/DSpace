@@ -53,6 +53,7 @@ public class WorkspaceItemTest extends AbstractUnitTest
             //we have to create a new community in the database
             context.turnOffAuthorisationSystem();
             Collection col = Collection.create(context);
+            col.update();
             this.wi = WorkspaceItem.create(context, col, true);
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
@@ -123,6 +124,7 @@ public class WorkspaceItemTest extends AbstractUnitTest
         WorkspaceItem created = null;
 
         coll = Collection.create(context);
+        coll.update();
         template = false;
         created = WorkspaceItem.create(context, coll, template);
         assertThat("testCreate 0",created,notNullValue());
@@ -130,6 +132,7 @@ public class WorkspaceItemTest extends AbstractUnitTest
         assertThat("testCreate 2",created.getCollection(),equalTo(coll));
 
         coll = Collection.create(context);
+        coll.update();
         template = true;
         created = WorkspaceItem.create(context, coll, template);
         assertThat("testCreate 3",created,notNullValue());
@@ -157,6 +160,7 @@ public class WorkspaceItemTest extends AbstractUnitTest
         WorkspaceItem created = null;
 
         coll = Collection.create(context);
+        coll.update();
         template = false;
         created = WorkspaceItem.create(context, coll, template);
         fail("Exception expected");
