@@ -205,6 +205,31 @@ public class ConfigurationManager
     }
 
     /**
+    * Get a module configuration property value or return a default value if
+    * the property does not exist.
+    * 
+    * @param module 
+    *      the name of the module, or <code>null</code> for regular configuration
+    *      property
+    * @param property
+    *      the name (key) of the property
+    * @param defaultValue
+    *      the return value if the given property could not be found.
+    * @return
+    *      the value of the property, or the given defaultValue if the
+    *      property does not exist
+    */
+    public static String getProperty(String module, String property, String defaultValue)
+    {
+        String prop = ConfigurationManager.getProperty(module, property);
+        if (prop == null) {
+            prop = defaultValue;
+        }
+        return prop;
+    }
+    
+
+    /**
      * Get a configuration property as an integer
      *
      * @param property
