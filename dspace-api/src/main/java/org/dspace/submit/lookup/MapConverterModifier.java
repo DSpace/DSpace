@@ -21,8 +21,10 @@ import gr.ekt.bte.core.StringValue;
 import gr.ekt.bte.core.Value;
 
 /**
- *
- *
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
  */
 public class MapConverterModifier extends AbstractModifier {
 

@@ -22,6 +22,12 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.dspace.submit.util.SubmissionLookupDTO;
 
+/**
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
+ */
 public class SubmissionLookupService {
 
 	public static final String SL_NAMESPACE_PREFIX = "http://www.dspace.org/sl/"; 

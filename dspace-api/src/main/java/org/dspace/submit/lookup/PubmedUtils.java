@@ -26,17 +26,12 @@ import org.dspace.submit.util.SubmissionLookupPublication;
 import org.w3c.dom.Element;
 
 /**
- * @author kstamatis
- *
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
  */
 public class PubmedUtils {
-
-	/**
-	 * 
-	 */
-	public PubmedUtils() {
-		// TODO Auto-generated constructor stub
-	}
 
 	public static Record convertCrossRefDomToRecord(Element pubArticle){
 		MutableRecord record = new SubmissionLookupPublication("");

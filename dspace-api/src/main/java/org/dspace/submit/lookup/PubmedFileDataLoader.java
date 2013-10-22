@@ -34,8 +34,10 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 /**
- * @author kstamatis
- *
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
  */
 public class PubmedFileDataLoader extends FileDataLoader {
 

@@ -26,13 +26,23 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.core.ConfigurationManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+/**
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
+ */
 public class PubmedService {
+	
+	private static Logger log = Logger.getLogger(PubmedService.class);
+	
 	private int timeout = 1000;
 	
 	public void setTimeout(int timeout) {
@@ -98,7 +108,7 @@ public class PubmedService {
 
 				if (statusCode != HttpStatus.SC_OK) {
 					throw new RuntimeException(
-							"Chiamata al webservice fallita: "
+							"WS call failed: "
 									+ method.getStatusLine());
 				}
 
@@ -125,7 +135,7 @@ public class PubmedService {
 					e.printStackTrace();
 				}
 				catch (SAXException e1) {
-					e1.printStackTrace();
+					log.error(e1.getMessage(), e1);
 				}
 			} finally {
 				if (method != null) {
@@ -190,7 +200,7 @@ public class PubmedService {
 
 				if (statusCode != HttpStatus.SC_OK) {
 					throw new RuntimeException(
-							"Chiamata al webservice fallita: "
+							"WS call failed: "
 									+ method.getStatusLine());
 				}
 
@@ -214,7 +224,7 @@ public class PubmedService {
 						results.add(pubmedItem);
 					} catch (Exception e) {
 						throw new RuntimeException(
-								"PubmedID non valido o inesistente: "+e.getMessage(), e);
+								"PubmedID is not valid or not exist: "+e.getMessage(), e);
 					}
 		        }
 
@@ -252,7 +262,7 @@ public class PubmedService {
 						results.add(pubmedItem);
 					} catch (Exception e) {
 						throw new RuntimeException(
-								"PubmedID non valido o inesistente: "+e.getMessage(), e);
+								"PubmedID is not valid or not exist: "+e.getMessage(), e);
 					}
 		        }
 

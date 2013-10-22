@@ -11,6 +11,12 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
+ */
 public class SubmissionLookupDTO implements Serializable {
 	private static final long serialVersionUID = 1;
 	

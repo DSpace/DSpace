@@ -22,6 +22,9 @@ import org.dspace.submit.util.ItemSubmissionLookupDTO;
 
 
 /**
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
  * @author Panagiotis Koutsourakis
  */
 public class SubmissionLookupOutputGenerator implements OutputGenerator {
@@ -64,9 +67,6 @@ public class SubmissionLookupOutputGenerator implements OutputGenerator {
             ItemSubmissionLookupDTO dto = new ItemSubmissionLookupDTO(entry.getValue());
             dtoList.add(dto);
         }
-        
-        //Print debug messages
-        
         
         return new ArrayList<String>();
     }

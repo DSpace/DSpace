@@ -19,10 +19,16 @@ import java.util.Set;
 import org.apache.commons.httpclient.HttpException;
 import org.dspace.core.Context;
 
+/**
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
+ */
 public class ArXivOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
 	private ArXivService arXivService = new ArXivService();
 	private boolean searchProvider = true;
-	
+
 	public void setArXivService(ArXivService arXivService) {
 		this.arXivService = arXivService;
 	}
@@ -32,29 +38,28 @@ public class ArXivOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
 		return Arrays.asList(new String[] { ARXIV, DOI });
 	}
 
-	public void setSearchProvider(boolean searchProvider)
-    {
-        this.searchProvider = searchProvider;
-    }
-	
+	public void setSearchProvider(boolean searchProvider) {
+		this.searchProvider = searchProvider;
+	}
+
 	@Override
 	public boolean isSearchProvider() {
 		return searchProvider;
 	}
 
 	@Override
-	public List<Record> getByIdentifier(
-			Context context, Map<String, Set<String>> keys) throws HttpException, IOException {
+	public List<Record> getByIdentifier(Context context,
+			Map<String, Set<String>> keys) throws HttpException, IOException {
 		List<Record> results = new ArrayList<Record>();
 		if (keys != null) {
 			Set<String> dois = keys.get(DOI);
 			Set<String> arxivids = keys.get(ARXIV);
 			List<Record> items = new ArrayList<Record>();
-			if (dois!=null && dois.size()>0) {
+			if (dois != null && dois.size() > 0) {
 				items.addAll(arXivService.getByDOIs(dois));
 			}
-			if (arxivids!=null && arxivids.size()>0) {
-				for (String arxivid : arxivids){
+			if (arxivids != null && arxivids.size() > 0) {
+				for (String arxivid : arxivids) {
 					items.add(arXivService.getByArXivIDs(arxivid));
 				}
 			}
@@ -67,13 +72,13 @@ public class ArXivOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
 	}
 
 	@Override
-	public List<Record> search(Context context, String title,
-			String author, int year) throws HttpException, IOException {
+	public List<Record> search(Context context, String title, String author,
+			int year) throws HttpException, IOException {
 		List<Record> results = new ArrayList<Record>();
 		List<Record> items = arXivService.searchByTerm(title, author, year);
 		for (Record item : items) {
 			results.add(convertFields(item));
 		}
 		return results;
-	}	
+	}
 }

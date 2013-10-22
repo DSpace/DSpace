@@ -21,6 +21,9 @@ import org.dspace.submit.util.ItemSubmissionLookupDTO;
 
 
 /**
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
  * @author Panagiotis Koutsourakis
  */
 public class SubmissionItemDataLoader implements DataLoader {

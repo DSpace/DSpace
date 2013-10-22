@@ -31,6 +31,12 @@ import org.dspace.core.Context;
 import org.dspace.submit.util.SubmissionLookupPublication;
 
 
+/**
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
+ */
 public abstract class NetworkSubmissionLookupDataLoader implements SubmissionLookupDataLoader {
 	
 	Map<String, Set<String>> identifiers; //Searching by identifiers (DOI ...)

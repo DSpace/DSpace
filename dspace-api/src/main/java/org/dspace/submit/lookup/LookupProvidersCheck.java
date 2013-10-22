@@ -10,6 +10,12 @@ package org.dspace.submit.lookup;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
+ */
 public class LookupProvidersCheck {
 	private List<String> providersOk = new ArrayList<String>();
 	private List<String> providersErr = new ArrayList<String>();

@@ -21,6 +21,12 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.submit.lookup.SubmissionLookupDataLoader;
 
+/**
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
+ */
 public class SubmissionLookupPublication implements MutableRecord, Serializable {
 	private String providerName;
 
@@ -30,7 +36,7 @@ public class SubmissionLookupPublication implements MutableRecord, Serializable 
 		this.providerName = providerName;
 	}
 
-	// necessario per poter effettuare la serializzazione in JSON dei dati
+	// needed to serialize it with JSON
 	public Map<String, List<String>> getStorage() {
 		return storage;
 	}

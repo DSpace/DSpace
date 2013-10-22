@@ -23,6 +23,12 @@ import org.dspace.core.Context;
 import org.jdom.JDOMException;
 import org.xml.sax.SAXException;
 
+/**
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
+ */
 public class CrossRefOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
 	private CrossRefService crossrefService = new CrossRefService();
 

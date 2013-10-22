@@ -20,6 +20,12 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+/**
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
+ */
 public class ValueConcatenationModifier extends AbstractModifier {
     private String field;
     private String separator = ",";
