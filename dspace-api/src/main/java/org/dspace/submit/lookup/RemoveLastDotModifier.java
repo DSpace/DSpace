@@ -20,11 +20,10 @@ import gr.ekt.bte.core.StringValue;
 import gr.ekt.bte.core.Value;
 
 /**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available online at
- *
- * http://www.dspace.org/license/
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
  */
 public class RemoveLastDotModifier extends AbstractModifier {
 
@@ -35,7 +34,6 @@ public class RemoveLastDotModifier extends AbstractModifier {
 	 */
 	public RemoveLastDotModifier(String name) {
 		super(name);
-		// TODO Auto-generated constructor stub
 	}
 
 	/* (non-Javadoc)

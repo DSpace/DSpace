@@ -19,6 +19,12 @@ import gr.ekt.bte.core.DataLoader;
 import gr.ekt.bte.core.Record;
 
 
+/**
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
+ */
 public interface SubmissionLookupDataLoader extends DataLoader {
 
 	public final static String DOI = "doi";

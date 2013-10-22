@@ -21,6 +21,12 @@ import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
+/**
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
+ */
 public class PubmedOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
     private boolean searchProvider = true;
     private static Logger log = Logger.getLogger(PubmedOnlineDataLoader.class);

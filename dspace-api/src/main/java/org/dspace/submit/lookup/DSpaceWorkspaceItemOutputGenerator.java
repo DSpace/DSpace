@@ -40,7 +40,10 @@ import org.dspace.submit.util.ItemSubmissionLookupDTO;
 
 
 /**
+ * @author Andrea Bollini
  * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
  */
 public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
     
@@ -55,10 +58,6 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
 	
 	private List<String> extraMetadataToKeep;
 	
-    public DSpaceWorkspaceItemOutputGenerator() {
-        
-    }
-
     @Override
     public List<String> generateOutput(RecordSet recordSet) {
     	
@@ -82,14 +81,11 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
 				witems.add(wi);
 				
 			} catch (AuthorizeException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.error(e.getMessage(), e);
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.error(e.getMessage(), e);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.error(e.getMessage(), e);
 			}
         	 
         }
@@ -183,55 +179,11 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
 		try {
 			item.update();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		} catch (AuthorizeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		
-		// creo un nuovo context per il check di esistenza dei metadata di cache
-		/*Context context = null;
-		try {
-			context = new Context();
-            for (Record pub : dto.getPublications()) {
-                String providerName = SubmissionLookupService.getProviderName(pub);
-				if (providerName != SubmissionLookupService.MANUAL_USER_INPUT) {
-					for (String field : pub.getFields()) {
-						String metadata = getMetadata(formName, pub, field);
-						if (StringUtils.isBlank(metadata)) {
-							continue;
-						}
-
-						String[] md = splitMetadata(metadata);
-						if (isValidMetadata(formName, md)) {
-							makeSureMetadataExist(context, providerName, md[1],
-									md[2]);
-							if (isRepeatableMetadata(formName, md)) {
-								for (Value value : pub.getValues(field)) {
-									String[] splitValue = splitValue(value.getAsString());
-									item.addMetadata(providerName, md[1],
-											md[2], md[3], splitValue[0],
-											splitValue[1],
-											Integer.parseInt(splitValue[2]));
-								}
-							} else {
-								String[] splitValue = splitValue(SubmissionLookupUtils.getFirstValue(pub, field));
-								item.addMetadata(providerName, md[1], md[2],
-										md[3], splitValue[0], splitValue[1],
-										Integer.parseInt(splitValue[2]));
-							}
-						}
-					}
-				}
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage(), e);
-		} finally {
-			if (context != null && context.isValid()) {
-				context.abort();
-			}
-		}*/
 	}
 	
 	private String getMetadata(String formName,
@@ -296,7 +248,7 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
 			}
             return getDCInput(formName, md[0], md[1], md[2])!=null;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return false;
 	}

@@ -22,6 +22,12 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
+/**
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
+ */
 public class SubmissionLookupUtils {
 	private static Logger log = Logger.getLogger(SubmissionLookupUtils.class);
 

@@ -22,6 +22,12 @@ import java.util.UUID;
 import org.dspace.submit.lookup.SubmissionLookupDataLoader;
 import org.dspace.submit.lookup.SubmissionLookupService;
 
+/**
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
+ */
 public class ItemSubmissionLookupDTO implements Serializable {
 	private static final long serialVersionUID = 1;
 

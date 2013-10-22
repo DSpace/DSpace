@@ -34,8 +34,10 @@ import gr.ekt.bte.dataloader.FileDataLoader;
 import gr.ekt.bte.exceptions.MalformedSourceException;
 
 /**
- * @author kstamatis
- *
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
  */
 public class CrossRefFileDataLoader extends FileDataLoader {
 

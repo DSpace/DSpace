@@ -40,6 +40,12 @@ import org.xml.sax.SAXException;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+/**
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
+ */
 public class CrossRefService {
     
     private static final Logger log = Logger.getLogger(CrossRefService.class);
@@ -81,7 +87,7 @@ public class CrossRefService {
 	
 							if (statusCode != HttpStatus.SC_OK) {
 								throw new RuntimeException(
-										"Chiamata http fallita: "
+										"Http call failed: "
 												+ method.getStatusLine());
 							}
 	
@@ -106,7 +112,7 @@ public class CrossRefService {
 												context,
 												"retrieveRecordDOI",
 												record
-														+ " DOI non valido o inesistente: "
+														+ " DOI is not valid or not exist: "
 														+ e.getMessage()));
 							}
 						} finally {

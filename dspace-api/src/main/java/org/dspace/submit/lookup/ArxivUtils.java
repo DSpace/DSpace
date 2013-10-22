@@ -23,17 +23,14 @@ import org.dspace.submit.util.SubmissionLookupPublication;
 import org.w3c.dom.Element;
 
 /**
- * @author kstamatis
+ * 
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
  *
  */
 public class ArxivUtils {
-
-	/**
-	 * 
-	 */
-	public ArxivUtils() {
-		// TODO Auto-generated constructor stub
-	}
 
 	public static Record convertArxixDomToRecord(Element dataRoot){
 		MutableRecord record = new SubmissionLookupPublication("");

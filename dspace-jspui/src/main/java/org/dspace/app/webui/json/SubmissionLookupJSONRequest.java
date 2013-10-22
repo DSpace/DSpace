@@ -56,6 +56,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+/**
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
+ */
 public class SubmissionLookupJSONRequest extends JSONRequest {
 
 	private SubmissionLookupService service = new DSpace().getServiceManager()
@@ -109,9 +115,9 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 							.getOutputGenerator();
 					result = outputGenerator.getDtoList();
 				} catch (BadTransformationSpec e1) {
-					e1.printStackTrace();
+					log.error(e1.getMessage(), e1);
 				} catch (MalformedSourceException e1) {
-					e1.printStackTrace();
+					log.error(e1.getMessage(), e1);
 				}
 			}
 
@@ -155,9 +161,9 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 							.getOutputGenerator();
 					result = outputGenerator.getDtoList();
 				} catch (BadTransformationSpec e1) {
-					e1.printStackTrace();
+					log.error(e1.getMessage(), e1);
 				} catch (MalformedSourceException e1) {
-					e1.printStackTrace();
+					log.error(e1.getMessage(), e1);
 				}
 			}
 
@@ -232,9 +238,9 @@ public class SubmissionLookupJSONRequest extends JSONRequest {
 							.getOutputGenerator();
 					result = outputGenerator.getDtoList();
 				} catch (BadTransformationSpec e1) {
-					e1.printStackTrace();
+					log.error(e1.getMessage(), e1);
 				} catch (MalformedSourceException e1) {
-					e1.printStackTrace();
+					log.error(e1.getMessage(), e1);
 				}
 
                 file.delete();

@@ -26,8 +26,10 @@ import gr.ekt.bte.dataloader.FileDataLoader;
 import gr.ekt.bte.exceptions.MalformedSourceException;
 
 /**
+ * @author Andrea Bollini
  * @author Kostas Stamatis
- *
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
  */
 public class MultipleSubmissionLookupDataLoader implements DataLoader {
 

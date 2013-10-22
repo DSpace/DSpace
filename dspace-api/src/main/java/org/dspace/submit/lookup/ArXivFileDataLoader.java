@@ -21,6 +21,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -34,11 +35,16 @@ import gr.ekt.bte.dataloader.FileDataLoader;
 import gr.ekt.bte.exceptions.MalformedSourceException;
 
 /**
- * @author kstamatis
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
  *
  */
 public class ArXivFileDataLoader extends FileDataLoader {
 
+	private static Logger log = Logger.getLogger(ArXivFileDataLoader.class);
+	
 	Map<String, String> fieldMap; //mapping between service fields and local intermediate fields
 	
 	/**
@@ -87,13 +93,13 @@ public class ArXivFileDataLoader extends FileDataLoader {
 			    }
 			}
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		} catch (SAXException e) {
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
   	
 		return recordSet;

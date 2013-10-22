@@ -31,6 +31,12 @@ import org.dspace.core.ConfigurationManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+/**
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
+ */
 public class ArXivService
 {
     private int timeout = 1000;
@@ -127,7 +133,7 @@ public class ArXivService
                 catch (Exception e)
                 {
                     throw new RuntimeException(
-                            "Identificativo arXiv non valido o inesistente");
+                            "ArXiv identifier is not valid or not exist");
                 }
             }
             finally
@@ -173,7 +179,7 @@ public class ArXivService
                 catch (Exception e)
                 {
                     throw new RuntimeException(
-                            "Identificativo arXiv non valido o inesistente");
+                            "ArXiv identifier is not valid or not exist");
                 }
             }
             finally
