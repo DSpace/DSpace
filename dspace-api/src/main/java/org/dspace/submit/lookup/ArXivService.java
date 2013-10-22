@@ -123,7 +123,8 @@ public class ArXivService
 
                     for (Element dataRoot : dataRoots)
                     {
-                    	Record crossitem = ArxivUtils.convertArxixDomToRecord(dataRoot);
+                        Record crossitem = ArxivUtils
+                                .convertArxixDomToRecord(dataRoot);
                         if (crossitem != null)
                         {
                             results.add(crossitem);
@@ -168,7 +169,8 @@ public class ArXivService
                             "entry");
                     for (Element dataRoot : dataRoots)
                     {
-                    	Record crossitem = ArxivUtils.convertArxixDomToRecord(dataRoot);
+                        Record crossitem = ArxivUtils
+                                .convertArxixDomToRecord(dataRoot);
 
                         if (crossitem != null)
                         {
@@ -193,8 +195,7 @@ public class ArXivService
         return results;
     }
 
-    public Record getByArXivIDs(String raw) throws HttpException,
-            IOException
+    public Record getByArXivIDs(String raw) throws HttpException, IOException
     {
         if (StringUtils.isNotBlank(raw))
         {

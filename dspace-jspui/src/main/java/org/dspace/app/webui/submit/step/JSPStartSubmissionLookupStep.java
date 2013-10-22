@@ -35,21 +35,20 @@ import org.dspace.submit.step.StartSubmissionLookupStep;
 import org.dspace.utils.DSpace;
 
 /**
- * Step which controls selecting an item from external database service to auto fill metadata 
- * for DSpace JSP-UI
+ * Step which controls selecting an item from external database service to auto
+ * fill metadata for DSpace JSP-UI
  * <P>
- * This JSPStep class works with the SubmissionController servlet
- * for the JSP-UI
+ * This JSPStep class works with the SubmissionController servlet for the JSP-UI
  * <P>
  * The following methods are called in this order:
  * <ul>
  * <li>Call doPreProcessing() method</li>
- * <li>If showJSP() was specified from doPreProcessing(), then the JSP
- * specified will be displayed</li>
+ * <li>If showJSP() was specified from doPreProcessing(), then the JSP specified
+ * will be displayed</li>
  * <li>If showJSP() was not specified from doPreProcessing(), then the
  * doProcessing() method is called an the step completes immediately</li>
- * <li>Call doProcessing() method on appropriate AbstractProcessingStep after the user returns from the JSP, in order
- * to process the user input</li>
+ * <li>Call doProcessing() method on appropriate AbstractProcessingStep after
+ * the user returns from the JSP, in order to process the user input</li>
  * <li>Call doPostProcessing() method to determine if more user interaction is
  * required, and if further JSPs need to be called.</li>
  * <li>If there are more "pages" in this step then, the process begins again
@@ -71,12 +70,13 @@ public class JSPStartSubmissionLookupStep extends JSPStep
     private static final String START_LOOKUP_JSP = "/submit/start-lookup-submission.jsp";
 
     /** log4j logger */
-    private static Logger log = Logger.getLogger(JSPStartSubmissionLookupStep.class);
+    private static Logger log = Logger
+            .getLogger(JSPStartSubmissionLookupStep.class);
 
     SubmissionLookupService slService = new DSpace().getServiceManager()
-			.getServiceByName(
-					SubmissionLookupService.class.getCanonicalName(),
-					SubmissionLookupService.class);
+            .getServiceByName(SubmissionLookupService.class.getCanonicalName(),
+                    SubmissionLookupService.class);
+
     /**
      * Do any pre-processing to determine which JSP (if any) is used to generate
      * the UI for this step. This method should include the gathering and
@@ -169,13 +169,11 @@ public class JSPStartSubmissionLookupStep extends JSPStep
             // save collections to request for JSP
             request.setAttribute("collections", collections);
             request.setAttribute("collectionID", collectionID);
-            
+
             Map<String, List<String>> identifiers2providers = slService
                     .getProvidersIdentifiersMap();
-            List<String> searchProviders = slService
-                    .getSearchProviders();
-            List<String> fileProviders = slService
-                    .getFileProviders();
+            List<String> searchProviders = slService.getSearchProviders();
+            List<String> fileProviders = slService.getFileProviders();
             request.setAttribute("identifiers2providers", identifiers2providers);
             request.setAttribute("searchProviders", searchProviders);
             request.setAttribute("fileLoaders", fileProviders);
@@ -226,12 +224,12 @@ public class JSPStartSubmissionLookupStep extends JSPStep
         }
         else if (status == StartSubmissionLookupStep.STATUS_INVALID_COLLECTION)
         {
-            JSPManager.showInvalidIDError(request, response, request
-                    .getParameter("collectionid"), Constants.COLLECTION);
+            JSPManager.showInvalidIDError(request, response,
+                    request.getParameter("collectionid"), Constants.COLLECTION);
         }
         else if (status == StartSubmissionLookupStep.STATUS_NO_SUUID)
         {
-        	// specify "no suuid" error message should be displayed
+            // specify "no suuid" error message should be displayed
             request.setAttribute("no.suuid", new Boolean(true));
 
             // reload this page, by re-calling doPreProcessing()
@@ -239,25 +237,25 @@ public class JSPStartSubmissionLookupStep extends JSPStep
         }
         else if (status == StartSubmissionLookupStep.STATUS_SUBMISSION_EXPIRED)
         {
-        	// specify "no collection" error message should be displayed
+            // specify "no collection" error message should be displayed
             request.setAttribute("expired", new Boolean(true));
 
             // reload this page, by re-calling doPreProcessing()
-            doPreProcessing(context, request, response, subInfo);        	
+            doPreProcessing(context, request, response, subInfo);
         }
         else if (status != StartSubmissionLookupStep.STATUS_COMPLETE)
         {
-        	// specify "no suuid" error message should be displayed
+            // specify "no suuid" error message should be displayed
             request.setAttribute("no.suuid", new Boolean(true));
 
             // reload this page, by re-calling doPreProcessing()
             doPreProcessing(context, request, response, subInfo);
         }
     }
-    
+
     /**
-     * Return the URL path (e.g. /submit/review-metadata.jsp) of the JSP
-     * which will review the information that was gathered in this Step.
+     * Return the URL path (e.g. /submit/review-metadata.jsp) of the JSP which
+     * will review the information that was gathered in this Step.
      * <P>
      * This Review JSP is loaded by the 'Verify' Step, in order to dynamically
      * generate a submission verification page consisting of the information
@@ -275,6 +273,7 @@ public class JSPStartSubmissionLookupStep extends JSPStep
     public String getReviewJSP(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
     {
-        return NO_JSP;  //at this time, you cannot review what collection you selected.
+        return NO_JSP; // at this time, you cannot review what collection you
+                       // selected.
     }
 }

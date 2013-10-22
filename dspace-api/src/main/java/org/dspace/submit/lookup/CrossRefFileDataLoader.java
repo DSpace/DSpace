@@ -39,96 +39,125 @@ import gr.ekt.bte.exceptions.MalformedSourceException;
  * @author Luigi Andrea Pascarelli
  * @author Panagiotis Koutsourakis
  */
-public class CrossRefFileDataLoader extends FileDataLoader {
+public class CrossRefFileDataLoader extends FileDataLoader
+{
 
-	Map<String, String> fieldMap; //mapping between service fields and local intermediate fields
-	
-	/**
+    Map<String, String> fieldMap; // mapping between service fields and local
+                                  // intermediate fields
+
+    /**
 	 * 
 	 */
-	public CrossRefFileDataLoader() {
-	}
+    public CrossRefFileDataLoader()
+    {
+    }
 
-	/**
-	 * @param filename
-	 */
-	public CrossRefFileDataLoader(String filename) {
-		super(filename);
-	}
+    /**
+     * @param filename
+     */
+    public CrossRefFileDataLoader(String filename)
+    {
+        super(filename);
+    }
 
-	/* (non-Javadoc)
-	 * @see gr.ekt.bte.core.DataLoader#getRecords()
-	 */
-	@Override
-	public RecordSet getRecords() throws MalformedSourceException {
-		
-		RecordSet recordSet = new RecordSet();
-		
-		try {
-			InputStream inputStream = new FileInputStream(new File(filename));
-			
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			factory.setValidating(false);
-			factory.setIgnoringComments(true);
-			factory.setIgnoringElementContentWhitespace(true);
+    /*
+     * (non-Javadoc)
+     * 
+     * @see gr.ekt.bte.core.DataLoader#getRecords()
+     */
+    @Override
+    public RecordSet getRecords() throws MalformedSourceException
+    {
 
-			DocumentBuilder db = factory.newDocumentBuilder();
-			Document inDoc = db.parse(inputStream);
+        RecordSet recordSet = new RecordSet();
 
-			Element xmlRoot = inDoc.getDocumentElement();
-			Element dataRoot = XMLUtils.getSingleElement(xmlRoot, "query");
-			
-			Record record = CrossRefUtils.convertCrossRefDomToRecord(dataRoot);
-			recordSet.addRecord(convertFields(record));
-			
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return recordSet;
-		
-	}
+        try
+        {
+            InputStream inputStream = new FileInputStream(new File(filename));
 
-	/* (non-Javadoc)
-	 * @see gr.ekt.bte.core.DataLoader#getRecords(gr.ekt.bte.core.DataLoadingSpec)
-	 */
-	@Override
-	public RecordSet getRecords(DataLoadingSpec spec)
-			throws MalformedSourceException {
-		
-		return getRecords();
-	}
+            DocumentBuilderFactory factory = DocumentBuilderFactory
+                    .newInstance();
+            factory.setValidating(false);
+            factory.setIgnoringComments(true);
+            factory.setIgnoringElementContentWhitespace(true);
 
-	public Record convertFields(Record publication) {
-		for (String fieldName : fieldMap.keySet()) {
-			String md = null;
-			if (fieldMap!=null){
-				md = this.fieldMap.get(fieldName);
-			}
+            DocumentBuilder db = factory.newDocumentBuilder();
+            Document inDoc = db.parse(inputStream);
 
-			if (StringUtils.isBlank(md)) {
-				continue;
-			} else {
-				md = md.trim();
-			}
+            Element xmlRoot = inDoc.getDocumentElement();
+            Element dataRoot = XMLUtils.getSingleElement(xmlRoot, "query");
 
-			if (publication.isMutable()){
-				List<Value> values = publication.getValues(fieldName);
-				publication.makeMutable().removeField(fieldName);
-				publication.makeMutable().addField(md, values);
-			}
-		}
-		
-		return publication;
-	}
+            Record record = CrossRefUtils.convertCrossRefDomToRecord(dataRoot);
+            recordSet.addRecord(convertFields(record));
 
-	public void setFieldMap(Map<String, String> fieldMap) {
-		this.fieldMap = fieldMap;
-	}
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+        catch (ParserConfigurationException e)
+        {
+            e.printStackTrace();
+        }
+        catch (SAXException e)
+        {
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        return recordSet;
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * gr.ekt.bte.core.DataLoader#getRecords(gr.ekt.bte.core.DataLoadingSpec)
+     */
+    @Override
+    public RecordSet getRecords(DataLoadingSpec spec)
+            throws MalformedSourceException
+    {
+
+        return getRecords();
+    }
+
+    public Record convertFields(Record publication)
+    {
+        for (String fieldName : fieldMap.keySet())
+        {
+            String md = null;
+            if (fieldMap != null)
+            {
+                md = this.fieldMap.get(fieldName);
+            }
+
+            if (StringUtils.isBlank(md))
+            {
+                continue;
+            }
+            else
+            {
+                md = md.trim();
+            }
+
+            if (publication.isMutable())
+            {
+                List<Value> values = publication.getValues(fieldName);
+                publication.makeMutable().removeField(fieldName);
+                publication.makeMutable().addField(md, values);
+            }
+        }
+
+        return publication;
+    }
+
+    public void setFieldMap(Map<String, String> fieldMap)
+    {
+        this.fieldMap = fieldMap;
+    }
 }

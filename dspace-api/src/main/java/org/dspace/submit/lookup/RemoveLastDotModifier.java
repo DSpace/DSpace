@@ -25,50 +25,63 @@ import gr.ekt.bte.core.Value;
  * @author Luigi Andrea Pascarelli
  * @author Panagiotis Koutsourakis
  */
-public class RemoveLastDotModifier extends AbstractModifier {
+public class RemoveLastDotModifier extends AbstractModifier
+{
 
-	List<String> fieldKeys;
+    List<String> fieldKeys;
 
-	/**
-	 * @param name
-	 */
-	public RemoveLastDotModifier(String name) {
-		super(name);
-	}
+    /**
+     * @param name
+     */
+    public RemoveLastDotModifier(String name)
+    {
+        super(name);
+    }
 
-	/* (non-Javadoc)
-	 * @see gr.ekt.bte.core.AbstractModifier#modify(gr.ekt.bte.core.MutableRecord)
-	 */
-	@Override
-	public Record modify(MutableRecord record) {
-		if (fieldKeys != null) {
-			for (String key : fieldKeys){
-				List<Value> values = record.getValues(key);
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * gr.ekt.bte.core.AbstractModifier#modify(gr.ekt.bte.core.MutableRecord)
+     */
+    @Override
+    public Record modify(MutableRecord record)
+    {
+        if (fieldKeys != null)
+        {
+            for (String key : fieldKeys)
+            {
+                List<Value> values = record.getValues(key);
 
-				List<Value> newValues = new ArrayList<Value>();
+                List<Value> newValues = new ArrayList<Value>();
 
-				if (values != null){
-					for (Value value : values){
-						String valueString = value.getAsString();
-						if (StringUtils.isNotBlank(valueString) && valueString.endsWith("."))
-						{
-							newValues.add(new StringValue(valueString.substring(0, valueString.length() - 1)));
-						}
-						else
-						{
-							newValues.add(new StringValue(valueString));
-						}
-					}
+                if (values != null)
+                {
+                    for (Value value : values)
+                    {
+                        String valueString = value.getAsString();
+                        if (StringUtils.isNotBlank(valueString)
+                                && valueString.endsWith("."))
+                        {
+                            newValues.add(new StringValue(valueString
+                                    .substring(0, valueString.length() - 1)));
+                        }
+                        else
+                        {
+                            newValues.add(new StringValue(valueString));
+                        }
+                    }
 
-					record.updateField(key, newValues);
-				}
-			}
-		}
+                    record.updateField(key, newValues);
+                }
+            }
+        }
 
-		return record;
-	}
+        return record;
+    }
 
-	public void setFieldKeys(List<String> fieldKeys) {
-		this.fieldKeys = fieldKeys;
-	}
+    public void setFieldKeys(List<String> fieldKeys)
+    {
+        this.fieldKeys = fieldKeys;
+    }
 }

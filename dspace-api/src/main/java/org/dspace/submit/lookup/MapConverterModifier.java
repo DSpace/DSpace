@@ -26,108 +26,126 @@ import gr.ekt.bte.core.Value;
  * @author Luigi Andrea Pascarelli
  * @author Panagiotis Koutsourakis
  */
-public class MapConverterModifier extends AbstractModifier {
+public class MapConverterModifier extends AbstractModifier
+{
 
-	String filename; //The properties filename
-	Map<String, String> mapping;
-	String defaultValue = "";
+    String filename; // The properties filename
 
-	List<String> fieldKeys;
+    Map<String, String> mapping;
 
-	private Map<String, String> regexConfig = new HashMap<String, String>();
+    String defaultValue = "";
 
-	public final String REGEX_PREFIX = "regex.";
+    List<String> fieldKeys;
 
-	/**
-	 * @param name
-	 */
-	public MapConverterModifier(String name) {
-		super(name);
-	}
+    private Map<String, String> regexConfig = new HashMap<String, String>();
 
-	/* (non-Javadoc)
-	 * @see gr.ekt.bte.core.AbstractModifier#modify(gr.ekt.bte.core.MutableRecord)
-	 */
-	@Override
-	public Record modify(MutableRecord record) {
-		if (mapping != null && fieldKeys != null) {
-			for (String key : fieldKeys){
-				List<Value> values = record.getValues(key);
+    public final String REGEX_PREFIX = "regex.";
 
-				if (values==null) continue;
-				
-				List<Value> newValues = new ArrayList<Value>();
+    /**
+     * @param name
+     */
+    public MapConverterModifier(String name)
+    {
+        super(name);
+    }
 
-				for (Value value : values){
-					String stringValue = value.getAsString();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * gr.ekt.bte.core.AbstractModifier#modify(gr.ekt.bte.core.MutableRecord)
+     */
+    @Override
+    public Record modify(MutableRecord record)
+    {
+        if (mapping != null && fieldKeys != null)
+        {
+            for (String key : fieldKeys)
+            {
+                List<Value> values = record.getValues(key);
 
-					String tmp = "";
-					if (mapping.containsKey(stringValue))
-					{
-						tmp = mapping.get(stringValue);   
-					}
-					else
-					{
-						tmp = defaultValue;
-						for (String regex : regexConfig.keySet())
-						{
-							if (stringValue != null && stringValue.matches(regex))
-							{
-								tmp = stringValue.replaceAll(regex, regexConfig.get(regex));
-							}
-						}
-					}
+                if (values == null)
+                    continue;
 
-					if ("@@ident@@".equals(tmp))
-					{
-						newValues.add(new StringValue(stringValue));
-					}
-					else if (StringUtils.isNotBlank(tmp))
-					{
-						newValues.add(new StringValue(tmp));
-					}
-					else
-						newValues.add(new StringValue(stringValue));
-				}
+                List<Value> newValues = new ArrayList<Value>();
 
-				record.updateField(key, newValues);
-			}
-		}
+                for (Value value : values)
+                {
+                    String stringValue = value.getAsString();
 
-		return record;
-	}
+                    String tmp = "";
+                    if (mapping.containsKey(stringValue))
+                    {
+                        tmp = mapping.get(stringValue);
+                    }
+                    else
+                    {
+                        tmp = defaultValue;
+                        for (String regex : regexConfig.keySet())
+                        {
+                            if (stringValue != null
+                                    && stringValue.matches(regex))
+                            {
+                                tmp = stringValue.replaceAll(regex,
+                                        regexConfig.get(regex));
+                            }
+                        }
+                    }
 
-	public void setMapping(Map<String, String> mapping) {
-		this.mapping = mapping;
-		
-		for (String keyS : mapping.keySet())
-		{
-			if (keyS.startsWith(REGEX_PREFIX))
-			{
-				String regex = keyS.substring(REGEX_PREFIX.length());
-				String regReplace = mapping.get(keyS);
-				if (regReplace == null)
-				{
-					regReplace = "";
-				}
-				else if (regReplace.equalsIgnoreCase("@ident@"))
-				{
-					regReplace = "$0";
-				}
-				regexConfig.put(regex,regReplace);
-			}
-		}
-	}
+                    if ("@@ident@@".equals(tmp))
+                    {
+                        newValues.add(new StringValue(stringValue));
+                    }
+                    else if (StringUtils.isNotBlank(tmp))
+                    {
+                        newValues.add(new StringValue(tmp));
+                    }
+                    else
+                        newValues.add(new StringValue(stringValue));
+                }
 
-	public void setFilename(String filename) {
-		this.filename = filename;
-	}
+                record.updateField(key, newValues);
+            }
+        }
 
-	public void setFieldKeys(List<String> fieldKeys) {
-		this.fieldKeys = fieldKeys;
-	}
+        return record;
+    }
 
-	public void setDefaultValue(String defaultValue) {
-		this.defaultValue = defaultValue;
-	}
+    public void setMapping(Map<String, String> mapping)
+    {
+        this.mapping = mapping;
+
+        for (String keyS : mapping.keySet())
+        {
+            if (keyS.startsWith(REGEX_PREFIX))
+            {
+                String regex = keyS.substring(REGEX_PREFIX.length());
+                String regReplace = mapping.get(keyS);
+                if (regReplace == null)
+                {
+                    regReplace = "";
+                }
+                else if (regReplace.equalsIgnoreCase("@ident@"))
+                {
+                    regReplace = "$0";
+                }
+                regexConfig.put(regex, regReplace);
+            }
+        }
+    }
+
+    public void setFilename(String filename)
+    {
+        this.filename = filename;
+    }
+
+    public void setFieldKeys(List<String> fieldKeys)
+    {
+        this.fieldKeys = fieldKeys;
+    }
+
+    public void setDefaultValue(String defaultValue)
+    {
+        this.defaultValue = defaultValue;
+    }
 }
