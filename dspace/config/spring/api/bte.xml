@@ -109,137 +109,7 @@
 	<!-- Converts an input value to an output one -->
 	<bean name="mapConverter_arxivSubject" class="org.dspace.submit.lookup.MapConverterModifier">
 	    <constructor-arg value="apConverter_arxivSubject Modifier"/>
-	    <property name="mapping">
-	    	<map>
-				<entry key="stat.AP" value="Statistics - Applications" />
-				<entry key="stat.CO" value="Statistics - Computation" />
-				<entry key="stat.ML" value="Statistics - Machine Learning" />
-				<entry key="stat.ME" value="Statistics - Methodology" />
-				<entry key="stat.TH" value="Statistics - Theory" />
-				<entry key="q-bio.BM" value="Quantitative Biology - Biomolecules" />
-				<entry key="q-bio.CB" value="Quantitative Biology - Cell Behavior" />
-				<entry key="q-bio.GN" value="Quantitative Biology - Genomics" />
-				<entry key="q-bio.MN" value="Quantitative Biology - Molecular Networks" />
-				<entry key="q-bio.NC" value="Quantitative Biology - Neurons and Cognition" />
-				<entry key="q-bio.OT" value="Quantitative Biology - Other" />
-				<entry key="q-bio.PE" value="Quantitative Biology - Populations and Evolution" />
-				<entry key="q-bio.QM" value="Quantitative Biology - Quantitative Methods" />
-				<entry key="q-bio.SC" value="Quantitative Biology - Subcellular Processes" />
-				<entry key="q-bio.TO" value="Quantitative Biology - Tissues and Organs" />
-				<entry key="cs.AR" value="Computer Science - Architecture" />
-				<entry key="cs.AI" value="Computer Science - Artificial Intelligence" />
-				<entry key="cs.CL" value="Computer Science - Computation and Language" />
-				<entry key="cs.CC" value="Computer Science - Computational Complexity" />
-				<entry key="cs.CE" value="Computer Science - Computational Engineering; Finance; and Science" />
-				<entry key="cs.CG" value="Computer Science - Computational Geometry" />
-				<entry key="cs.GT" value="Computer Science - Computer Science and Game Theory" />
-				<entry key="cs.CV" value="Computer Science - Computer Vision and Pattern Recognition" />
-				<entry key="cs.CY" value="Computer Science - Computers and Society" />
-				<entry key="cs.CR" value="Computer Science - Cryptography and Security" />
-				<entry key="cs.DS" value="Computer Science - Data Structures and Algorithms" />
-				<entry key="cs.DB" value="Computer Science - Databases" />
-				<entry key="cs.DL" value="Computer Science - Digital Libraries" />
-				<entry key="cs.DM" value="Computer Science - Discrete Mathematics" />
-				<entry key="cs.DC" value="Computer Science - Distributed; Parallel; and Cluster Computing" />
-				<entry key="cs.GL" value="Computer Science - General Literature" />
-				<entry key="cs.GR" value="Computer Science - Graphics" />
-				<entry key="cs.HC" value="Computer Science - Human-Computer Interaction" />
-				<entry key="cs.IR" value="Computer Science - Information Retrieval" />
-				<entry key="cs.IT" value="Computer Science - Information Theory" />
-				<entry key="cs.LG" value="Computer Science - Learning" />
-				<entry key="cs.LO" value="Computer Science - Logic in Computer Science" />
-				<entry key="cs.MS" value="Computer Science - Mathematical Software" />
-				<entry key="cs.MA" value="Computer Science - Multiagent Systems" />
-				<entry key="cs.MM" value="Computer Science - Multimedia" />
-				<entry key="cs.NI" value="Computer Science - Networking and Internet Architecture" />
-				<entry key="cs.NE" value="Computer Science - Neural and Evolutionary Computing" />
-				<entry key="cs.NA" value="Computer Science - Numerical Analysis" />
-				<entry key="cs.OS" value="Computer Science - Operating Systems" />
-				<entry key="cs.OH" value="Computer Science - Other" />
-				<entry key="cs.PF" value="Computer Science - Performance" />
-				<entry key="cs.PL" value="Computer Science - Programming Languages" />
-				<entry key="cs.RO" value="Computer Science - Robotics" />
-				<entry key="cs.SE" value="Computer Science - Software Engineering" />
-				<entry key="cs.SD" value="Computer Science - Sound" />
-				<entry key="cs.SC" value="Computer Science - Symbolic Computation" />
-				<entry key="nlin.AO" value="Nonlinear Sciences - Adaptation and Self-Organizing Systems" />
-				<entry key="nlin.CG" value="Nonlinear Sciences - Cellular Automata and Lattice Gases" />
-				<entry key="nlin.CD" value="Nonlinear Sciences - Chaotic Dynamics" />
-				<entry key="nlin.SI" value="Nonlinear Sciences - Exactly Solvable and Integrable Systems" />
-				<entry key="nlin.PS" value="Nonlinear Sciences - Pattern Formation and Solitons" />
-				<entry key="math.AG" value="Mathematics - Algebraic Geometry" />
-				<entry key="math.AT" value="Mathematics - Algebraic Topology" />
-				<entry key="math.AP" value="Mathematics - Analysis of PDEs" />
-				<entry key="math.CT" value="Mathematics - Category Theory" />
-				<entry key="math.CA" value="Mathematics - Classical Analysis and ODEs" />
-				<entry key="math.CO" value="Mathematics - Combinatorics" />
-				<entry key="math.AC" value="Mathematics - Commutative Algebra" />
-				<entry key="math.CV" value="Mathematics - Complex Variables" />
-				<entry key="math.DG" value="Mathematics - Differential Geometry" />
-				<entry key="math.DS" value="Mathematics - Dynamical Systems" />
-				<entry key="math.FA" value="Mathematics - Functional Analysis" />
-				<entry key="math.GM" value="Mathematics - General Mathematics" />
-				<entry key="math.GN" value="Mathematics - General Topology" />
-				<entry key="math.GT" value="Mathematics - Geometric Topology" />
-				<entry key="math.GR" value="Mathematics - Group Theory" />
-				<entry key="math.HO" value="Mathematics - History and Overview" />
-				<entry key="math.IT" value="Mathematics - Information Theory" />
-				<entry key="math.KT" value="Mathematics - K-Theory and Homology" />
-				<entry key="math.LO" value="Mathematics - Logic" />
-				<entry key="math.MP" value="Mathematics - Mathematical Physics" />
-				<entry key="math.MG" value="Mathematics - Metric Geometry" />
-				<entry key="math.NT" value="Mathematics - Number Theory" />
-				<entry key="math.NA" value="Mathematics - Numerical Analysis" />
-				<entry key="math.OA" value="Mathematics - Operator Algebras" />
-				<entry key="math.OC" value="Mathematics - Optimization and Control" />
-				<entry key="math.PR" value="Mathematics - Probability" />
-				<entry key="math.QA" value="Mathematics - Quantum Algebra" />
-				<entry key="math.RT" value="Mathematics - Representation Theory" />
-				<entry key="math.RA" value="Mathematics - Rings and Algebras" />
-				<entry key="math.SP" value="Mathematics - Spectral Theory" />
-				<entry key="math.ST" value="Mathematics - Statistics" />
-				<entry key="math.SG" value="Mathematics - Symplectic Geometry" />
-				<entry key="astro-ph" value="Astrophysics" />
-				<entry key="cond-mat.dis-nn" value="Physics - Disordered Systems and Neural Networks" />
-				<entry key="cond-mat.mes-hall" value="Physics - Mesoscopic Systems and Quantum Hall Effect" />
-				<entry key="cond-mat.mtrl-sci" value="Physics - Materials Science" />
-				<entry key="cond-mat.other" value="Physics - Other" />
-				<entry key="cond-mat.soft" value="Physics - Soft Condensed Matter" />
-				<entry key="cond-mat.stat-mech" value="Physics - Statistical Mechanics" />
-				<entry key="cond-mat.str-el" value="Physics - Strongly Correlated Electrons" />
-				<entry key="cond-mat.supr-con" value="Physics - Superconductivity" />
-				<entry key="gr-qc" value="General Relativity and Quantum Cosmology" />
-				<entry key="hep-ex" value="High Energy Physics - Experiment" />
-				<entry key="hep-lat" value="High Energy Physics - Lattice" />
-				<entry key="hep-ph" value="High Energy Physics - Phenomenology" />
-				<entry key="hep-th" value="High Energy Physics - Theory" />
-				<entry key="math-ph" value="Mathematical Physics" />
-				<entry key="nucl-ex" value="Nuclear Experiment" />
-				<entry key="nucl-th" value="Nuclear Theory" />
-				<entry key="physics.acc-ph" value="Physics - Accelerator Physics" />
-				<entry key="physics.ao-ph" value="Physics - Atmospheric and Oceanic Physics" />
-				<entry key="physics.atom-ph" value="Physics - Atomic Physics" />
-				<entry key="physics.atm-clus" value="Physics - Atomic and Molecular Clusters" />
-				<entry key="physics.bio-ph" value="Physics - Biological Physics" />
-				<entry key="physics.chem-ph" value="Physics - Chemical Physics" />
-				<entry key="physics.class-ph" value="Physics - Classical Physics" />
-				<entry key="physics.comp-ph" value="Physics - Computational Physics" />
-				<entry key="physics.data-an" value="Physics - Data Analysis; Statistics and Probability" />
-				<entry key="physics.flu-dyn" value="Physics - Fluid Dynamics" />
-				<entry key="physics.gen-ph" value="Physics - General Physics" />
-				<entry key="physics.geo-ph" value="Physics - Geophysics" />
-				<entry key="physics.hist-ph" value="Physics - History of Physics" />
-				<entry key="physics.ins-det" value="Physics - Instrumentation and Detectors" />
-				<entry key="physics.med-ph" value="Physics - Medical Physics" />
-				<entry key="physics.optics" value="Physics - Optics" />
-				<entry key="physics.ed-ph" value="Physics - Physics Education" />
-				<entry key="physics.soc-ph" value="Physics - Physics and Society" />
-				<entry key="physics.plasm-ph" value="Physics - Plasma Physics" />
-				<entry key="physics.pop-ph" value="Physics - Popular Physics" />
-				<entry key="physics.space-ph" value="Physics - Space Physics" />
-				<entry key="quant-ph" value="Quantum Physics" />
-			</map>
-	    </property>
+	    <property name="mappingFile" value="${dspace.install.dir}/config/crosswalks/mapConverter-arxivSubject.properties"/>
 	    <property name="fieldKeys">
 	        <list>
 	            <!-- Specify the internal BTE keys that this modifiers needs to be applied -->
@@ -251,13 +121,8 @@
 	<!-- Converts an input value to an output one -->
 	<bean name="mapConverter_pubstatusPubmed" class="org.dspace.submit.lookup.MapConverterModifier">
 	    <constructor-arg value="mapConverter_pubstatusPubmed Modifier"/>
+	    <property name="mappingFile" value="${dspace.install.dir}/config/crosswalks/mapConverter-pubstatusPubmed.properties"/>
 	    <property name="defaultValue" value="Subjected to Journal"/>
-	    <property name="mapping">
-	    	<map>
-				<entry key="ppublish" value="Published" />
-				<entry key="epublish" value="Published" />
-			</map>
-	    </property>
 	    <property name="fieldKeys">
 	        <list>
 	            <!-- Specify the internal BTE keys that this modifiers needs to be applied -->
