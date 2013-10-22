@@ -668,12 +668,11 @@ public class ItemImport
     		outputFolder = workingDir + File.separator + ".bte_output_dspace";
     	}
     	
-        TransformationEngine te  = new DSpace().getSingletonService(TransformationEngine.class);
-
-        DataLoaderService dls  = new DSpace().getSingletonService(DataLoaderService.class);
+        BTEBatchImportService dls  = new DSpace().getSingletonService(BTEBatchImportService.class);
         DataLoader dataLoader = dls.getDataLoaders().get(inputType);
         Map<String, String> outputMap = dls.getOutputMap();
-
+        TransformationEngine te = dls.getTransformationEngine();
+        
         if (dataLoader==null){
             System.out.println("ERROR: The key used in -i parameter must match a valid DataLoader in the BTE Spring XML configuration file!");
             return;
