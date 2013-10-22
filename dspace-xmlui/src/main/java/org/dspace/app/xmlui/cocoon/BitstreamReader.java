@@ -320,8 +320,51 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 
             // Success, bitstream found and the user has access to read it.
             // Store these for later retrieval:
-            this.bitstreamInputStream = bitstream.retrieve();
-            this.bitstreamSize = bitstream.getSize();
+            //Due to the OSU Knowledge Bank policy of intercepting views to the original bitstream to instead show a
+            // citation altered version of the object, we need to check if this resource falls under the
+            // "show watermarked alternative" umbrella. At which time we will not return the "bitstream", but will
+            // instead on-the-fly generate the citation rendition.
+
+            // What will trigger a redirect/intercept?
+            // 1) Intercepting Enabled
+            // 2) This User is not an admin
+            // 3) This object is citation-able
+            if (CitationDocument.isCitationEnabledForBitstream(bitstream, context)) {
+                // on-the-fly citation generator
+                log.info(item.getHandle() + " - " + bitstream.getName() + " is citable.");
+                
+                File citedDocument = null;
+                FileInputStream fileInputStream = null;
+                CitationDocument citationDocument = new CitationDocument();
+                
+                try {
+                //Create the cited document
+                    citedDocument = citationDocument.makeCitedDocument(bitstream);
+                    if(citedDocument == null) {
+                        log.error("CitedDocument was null");
+                    } else {
+                        log.info("CitedDocument was ok," + citedDocument.getAbsolutePath());
+                    }
+                    
+                    
+                    fileInputStream = new FileInputStream(citedDocument);
+                    if(fileInputStream == null) {
+                        log.error("Error opening fileInputStream: ");
+                    }
+                    
+                    this.bitstreamInputStream = fileInputStream;
+                    this.bitstreamSize = citedDocument.length();
+                    
+                } catch (Exception e) {
+                    log.error("Caught an error with intercepting the citation document:" + e.getMessage());
+                }
+                
+                //End of CitationDocument
+            } else {
+                this.bitstreamInputStream = bitstream.retrieve();
+                this.bitstreamSize = bitstream.getSize();
+            }            
+
             this.bitstreamMimeType = bitstream.getFormat().getMIMEType();
             this.bitstreamName = bitstream.getName();
             if (context.getCurrentUser() == null)
