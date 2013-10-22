@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.dspace.app.util.CollectionDropDown;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -54,6 +55,22 @@ public class SubscribeServlet extends DSpaceServlet
         {
             // unsubscribe user from everything
             Subscribe.unsubscribe(context, e, null);
+
+            // Show the list of subscriptions
+            showSubscriptions(context, request, response, true);
+
+            context.complete();
+        }
+        else if (submit.equals("submit_subscribe"))
+        {
+            int collID = UIUtil.getIntParameter(request, "collection");
+            Collection c = Collection.find(context, collID);
+
+            // Sanity check - ignore duff values
+            if (c != null)
+            {
+                Subscribe.subscribe(context, e, c);
+            }
 
             // Show the list of subscriptions
             showSubscriptions(context, request, response, true);
@@ -102,10 +119,14 @@ public class SubscribeServlet extends DSpaceServlet
             HttpServletResponse response, boolean updated)
             throws ServletException, IOException, SQLException
     {
+        // collections the currently logged in user can subscribe to
+        Collection[] avail = Subscribe.getAvailableSubscriptions(context);
+        
         // Subscribed collections
         Collection[] subs = Subscribe.getSubscriptions(context, context
                 .getCurrentUser());
 
+        request.setAttribute("availableSubscriptions", avail);
         request.setAttribute("subscriptions", subs);
         request.setAttribute("updated", Boolean.valueOf(updated));
 

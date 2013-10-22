@@ -27,8 +27,11 @@
 
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Collection" %>
+<%@ page import="org.dspace.app.util.CollectionDropDown" %>
 
 <%
+    Collection[] availableSubscriptions =
+        (Collection[]) request.getAttribute("availableSubscriptions");
     Collection[] subscriptions =
         (Collection[]) request.getAttribute("subscriptions");
     boolean updated =
@@ -49,10 +52,28 @@
     {
 %>
 	<p><strong><fmt:message key="jsp.mydspace.subscriptions.info1"/></strong></p>
+	<p><fmt:message key="jsp.mydspace.subscriptions.info2"/></p>
 <%
     }
 %>
-	<p><fmt:message key="jsp.mydspace.subscriptions.info2"/></p>
+        <form class="form-group" action="<%= request.getContextPath() %>/subscribe" method="post">
+        	<div class="col-md-6">
+            <select id="available-subscriptions" class="form-control" name="collection">
+                <option value="-1"><fmt:message key="jsp.mydspace.subscriptions.select_collection" /></option>
+<%
+    for (int i = 0; i < availableSubscriptions.length; i++)
+    {
+%>
+                <option value="<%= availableSubscriptions[i].getID() %>"><%= CollectionDropDown.collectionPath(availableSubscriptions[i], 0) %></option>
+<%
+    }
+%>
+            </select>
+            </div>
+            <input class="btn btn-success" type="submit" name="submit_subscribe" value="<fmt:message key="jsp.collection-home.subscribe"/>" />
+ 			<input class="btn btn-danger" type="submit" name="submit_clear" value="<fmt:message key="jsp.mydspace.subscriptions.remove.button"/>" />
+	</form>
+        
 <%
     if (subscriptions.length > 0)
     {
@@ -73,7 +94,7 @@
                   --%>
 
                  <td class="<%= row %>RowOddCol">
-                      <a href="<%= request.getContextPath() %>/handle/<%= subscriptions[i].getHandle() %>"><%= subscriptions[i].getMetadata("name") %></a>
+                      <a href="<%= request.getContextPath() %>/handle/<%= subscriptions[i].getHandle() %>"><%= CollectionDropDown.collectionPath(subscriptions[i],0) %></a>
                  </td>
                  <td class="<%= row %>RowEvenCol">
                     <form method="post" action=""> 
@@ -90,9 +111,6 @@
 
     <br/>
 
-        <form method="post" action="">
-    	    <input class="btn btn-danger" type="submit" name="submit_clear" value="<fmt:message key="jsp.mydspace.subscriptions.remove.button"/>" />
-        </form>
 <%
     }
     else

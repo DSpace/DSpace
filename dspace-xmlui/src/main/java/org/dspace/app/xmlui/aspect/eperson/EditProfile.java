@@ -21,6 +21,7 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.log4j.Logger;
+import org.dspace.app.util.CollectionDropDown;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -33,12 +34,14 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Subscribe;
 import org.xml.sax.SAXException;
+
 
 /**
  * Display a form that allows the user to edit their profile.
@@ -374,12 +377,7 @@ public class EditProfile extends AbstractDSpaceTransformer
            subscriptions.addOption(-1,T_select_collection);
            for (Collection possible : possibleList)
            {
-               String name = possible.getMetadata("name");
-               if (name.length() > 50)
-               {
-                   name = name.substring(0, 47) + "...";
-               }
-               subscriptions.addOption(possible.getID(), name);
+               subscriptions.addOption(possible.getID(), CollectionDropDown.collectionPath(possible));
            }
                    
            for (Collection collection: currentList)
