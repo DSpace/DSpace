@@ -55,9 +55,10 @@ public class WorkspaceItemTest extends AbstractUnitTest
             Collection col = Collection.create(context);
             col.update();
             this.wi = WorkspaceItem.create(context, col, true);
+            this.wi.update();
             //we need to commit the changes so we don't block the table for testing
-            context.restoreAuthSystemState();
             context.commit();
+            context.restoreAuthSystemState();
         }
         catch (IOException ex) {
             log.error("IO Error in init", ex);
