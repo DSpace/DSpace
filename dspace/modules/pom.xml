@@ -64,6 +64,15 @@
             </modules>
         </profile>
         <profile>
+            <id>dspace-rest</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>rest</module>
+            </modules>
+        </profile>
+        <profile>
             <id>dspace-sword</id>
             <activation>
                 <activeByDefault>true</activeByDefault>

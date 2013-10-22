@@ -396,6 +396,19 @@
             </modules>
         </profile>
 
+       <!-- REST Jersey -->
+       <profile>
+           <id>dspace-rest</id>
+           <activation>
+               <file>
+                   <exists>dspace-rest/pom.xml</exists>
+               </file>
+           </activation>
+           <modules>
+               <module>dspace-rest</module>
+           </modules>
+       </profile>
+
 
         <!--
            Builds SWORD WAR for DSpace
@@ -492,6 +505,7 @@
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
             <module>dspace-oai</module>
+            <module>dspace-rest</module>
             <module>dspace-sword</module>
             <module>dspace-swordv2</module>
          </modules>
