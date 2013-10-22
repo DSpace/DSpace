@@ -513,22 +513,36 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
 
-		<dependency>
+	<dependency>
 	    	<groupId>backport-util-concurrent</groupId>
 	    	<artifactId>backport-util-concurrent</artifactId>
 	    	<version>3.1</version>
-		</dependency>
-		
-		<dependency>
+	</dependency>
+	
+	<dependency>
 	    	<groupId>backport-util-concurrent</groupId>
 	    	<artifactId>backport-util-concurrent</artifactId>
 	    	<version>3.1</version>
-		</dependency>
+	</dependency>
 
         <dependency>
             <groupId>net.sf.flexjson</groupId>
             <artifactId>flexjson</artifactId>            
         </dependency>
+
+	<!-- Needed for CitationPage CuationTask -->
+	<dependency>
+		<groupId>com.itextpdf</groupId>
+		<artifactId>itextpdf</artifactId>
+		<version>5.1.2</version>
+		<type>jar</type>
+	</dependency>
+	<dependency>
+		<groupId>com.itextpdf.tool</groupId>
+		<artifactId>xmlworker</artifactId>
+		<version>1.1.0</version>
+		<type>jar</type>
+	</dependency>
         
     </dependencies>
 
