@@ -19,51 +19,63 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
 
-
 /**
  * @author Andrea Bollini
  * @author Kostas Stamatis
  * @author Luigi Andrea Pascarelli
  * @author Panagiotis Koutsourakis
  */
-public class SubmissionItemDataLoader implements DataLoader {
+public class SubmissionItemDataLoader implements DataLoader
+{
     private List<ItemSubmissionLookupDTO> dtoList;
+
     List<DataLoader> providers;
 
-    private static Logger log = Logger.getLogger(SubmissionItemDataLoader.class);
-    
-    public SubmissionItemDataLoader() {
+    private static Logger log = Logger
+            .getLogger(SubmissionItemDataLoader.class);
+
+    public SubmissionItemDataLoader()
+    {
         dtoList = null;
         providers = null;
     }
 
     @Override
-    public RecordSet getRecords() throws MalformedSourceException {
-        if (dtoList == null) {
+    public RecordSet getRecords() throws MalformedSourceException
+    {
+        if (dtoList == null)
+        {
             throw new MalformedSourceException("dtoList not initialized");
         }
         RecordSet ret = new RecordSet();
 
-        for (ItemSubmissionLookupDTO dto : dtoList) {
+        for (ItemSubmissionLookupDTO dto : dtoList)
+        {
             Record rec = dto.getTotalPublication(providers);
             ret.addRecord(rec);
         }
 
-        log.info("BTE DataLoader finished. Items loaded: " + ret.getRecords().size());
-		
-		//Printing debug message
-		String totalString = "";
-		for (Record record : ret.getRecords()){
-			totalString += SubmissionLookupUtils.getPrintableString(record)+"\n";
-		}
-		log.debug("Records loaded:\n"+totalString);
-		
+        log.info("BTE DataLoader finished. Items loaded: "
+                + ret.getRecords().size());
+
+        // Printing debug message
+        String totalString = "";
+        for (Record record : ret.getRecords())
+        {
+            totalString += SubmissionLookupUtils.getPrintableString(record)
+                    + "\n";
+        }
+        log.debug("Records loaded:\n" + totalString);
+
         return ret;
     }
 
     @Override
-    public RecordSet getRecords(DataLoadingSpec spec) throws MalformedSourceException {
-        if(spec.getOffset() > 0) {
+    public RecordSet getRecords(DataLoadingSpec spec)
+            throws MalformedSourceException
+    {
+        if (spec.getOffset() > 0)
+        {
             return new RecordSet();
         }
 
@@ -73,28 +85,34 @@ public class SubmissionItemDataLoader implements DataLoader {
     /**
      * @return the dtoList
      */
-    public List<ItemSubmissionLookupDTO> getDtoList() {
+    public List<ItemSubmissionLookupDTO> getDtoList()
+    {
         return dtoList;
     }
 
     /**
-     * @param dtoList the dtoList to set
+     * @param dtoList
+     *            the dtoList to set
      */
-    public void setDtoList(List<ItemSubmissionLookupDTO> dtoList) {
+    public void setDtoList(List<ItemSubmissionLookupDTO> dtoList)
+    {
         this.dtoList = dtoList;
     }
 
     /**
      * @return the providers
      */
-    public List<DataLoader> getProviders() {
+    public List<DataLoader> getProviders()
+    {
         return providers;
     }
 
     /**
-     * @param providers the providers to set
+     * @param providers
+     *            the providers to set
      */
-    public void setProviders(List<DataLoader> providers) {
+    public void setProviders(List<DataLoader> providers)
+    {
         this.providers = providers;
     }
 }

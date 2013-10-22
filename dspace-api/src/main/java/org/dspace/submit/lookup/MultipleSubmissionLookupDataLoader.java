@@ -31,226 +31,304 @@ import gr.ekt.bte.exceptions.MalformedSourceException;
  * @author Luigi Andrea Pascarelli
  * @author Panagiotis Koutsourakis
  */
-public class MultipleSubmissionLookupDataLoader implements DataLoader {
+public class MultipleSubmissionLookupDataLoader implements DataLoader
+{
 
-	private static Logger log = Logger.getLogger(MultipleSubmissionLookupDataLoader.class);
-	
-	private static final String NOT_FOUND_DOI = "NOT-FOUND-DOI";
-	
+    private static Logger log = Logger
+            .getLogger(MultipleSubmissionLookupDataLoader.class);
 
-	Map<String, DataLoader> dataloadersMap;
+    private static final String NOT_FOUND_DOI = "NOT-FOUND-DOI";
 
-	//Depending on these values, the multiple data loader loads data from the appropriate providers
-	Map<String, Set<String>> identifiers = null; //Searching by identifiers (DOI ...)
-	Map<String, Set<String>> searchTerms = null; //Searching by author, title, date
-	String filename = null; //Uploading file
-	String type = null; //the type of the upload file (bibtex, etc.)
-	
-	/**
-	 * Default constructor
-	 */
-	public MultipleSubmissionLookupDataLoader() {
-	}
+    Map<String, DataLoader> dataloadersMap;
 
-	/* (non-Javadoc)
-	 * @see gr.ekt.bte.core.DataLoader#getRecords()
-	 */
-	@Override
-	public RecordSet getRecords() throws MalformedSourceException {
+    // Depending on these values, the multiple data loader loads data from the
+    // appropriate providers
+    Map<String, Set<String>> identifiers = null; // Searching by identifiers
+                                                 // (DOI ...)
 
-		RecordSet recordSet = new RecordSet();
+    Map<String, Set<String>> searchTerms = null; // Searching by author, title,
+                                                 // date
 
-		//KSTA:ToDo: Support timeout (problematic) providers
-		//List<String> timeoutProviders = new ArrayList<String>();
-		for (String providerName : filterProviders().keySet()) {
-			DataLoader provider = dataloadersMap.get(providerName);
-			RecordSet subRecordSet = provider.getRecords();
-			recordSet.addAll(subRecordSet);
-			//Add in each record the provider name... a new provider doesn't need to know about it!
-			for (Record record: subRecordSet.getRecords()){
-				if (record.isMutable()){
-					record.makeMutable().addValue(SubmissionLookupService.PROVIDER_NAME_FIELD, new StringValue(providerName));
-				}
-			}
-		}
+    String filename = null; // Uploading file
 
-		//Question: Do we want that in case of file data loader?
-		//for each publication in the record set, if it has a DOI, try to find extra pubs from the other providers
-		if (searchTerms!=null || (identifiers!=null && !identifiers.containsKey(SubmissionLookupDataLoader.DOI))){ //Extend
-			Map<String, Set<String>> provider2foundDOIs = new HashMap<String, Set<String>>();
-			List<String> foundDOIs = new ArrayList<String>();
+    String type = null; // the type of the upload file (bibtex, etc.)
 
-			for (Record publication : recordSet.getRecords()) {
-				String providerName = SubmissionLookupUtils.getFirstValue(publication, SubmissionLookupService.PROVIDER_NAME_FIELD);
+    /**
+     * Default constructor
+     */
+    public MultipleSubmissionLookupDataLoader()
+    {
+    }
 
-				String doi = null;
+    /*
+     * (non-Javadoc)
+     * 
+     * @see gr.ekt.bte.core.DataLoader#getRecords()
+     */
+    @Override
+    public RecordSet getRecords() throws MalformedSourceException
+    {
 
-				if (publication.getValues(SubmissionLookupDataLoader.DOI) != null && publication.getValues(SubmissionLookupDataLoader.DOI).size()>0)
-					doi = publication.getValues(SubmissionLookupDataLoader.DOI).iterator().next().getAsString();
-				if (doi == null) {
-					doi = NOT_FOUND_DOI;
-				} else {
-					doi = SubmissionLookupUtils.normalizeDOI(doi);
-					if (!foundDOIs.contains(doi))
-					{
-						foundDOIs.add(doi);
-					}
-					Set<String> tmp = provider2foundDOIs.get(providerName);
-					if (tmp == null) {
-						tmp = new HashSet<String>();
-						provider2foundDOIs.put(providerName, tmp);
-					}
-					tmp.add(doi);
-				}
-			}
+        RecordSet recordSet = new RecordSet();
 
-			for (String providerName : dataloadersMap.keySet()) {
-				DataLoader genProvider = dataloadersMap.get(providerName);
-				
-				if (! (genProvider instanceof SubmissionLookupDataLoader)){
-					continue;
-				}
-				
-				SubmissionLookupDataLoader provider = (SubmissionLookupDataLoader)genProvider;
-				
-				//Provider must support DOI
-				if (provider.getSupportedIdentifiers().contains(SubmissionLookupDataLoader.DOI)){
-					continue;
-				}
-				
-				//if (evictProviders != null
-						//		&& evictProviders.contains(provider.getShortName())) {
-				//	continue;
-				//}
-				Set<String> doiToSearch = new HashSet<String>();
-				Set<String> alreadyFoundDOIs = provider2foundDOIs.get(providerName);
-				for (String doi : foundDOIs) {
-					if (alreadyFoundDOIs == null
-							|| !alreadyFoundDOIs.contains(doi)) {
-						doiToSearch.add(doi);
-					}
-				}
-				List<Record> pPublications = null;
-				try {
-					if (doiToSearch.size() > 0) {
-						pPublications = provider
-								.getByDOIs(null, doiToSearch);
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				if (pPublications != null) {
-					for (Record rec : pPublications){
-						recordSet.addRecord(rec);
-					}
-				}
-			}
-		}
+        // KSTA:ToDo: Support timeout (problematic) providers
+        // List<String> timeoutProviders = new ArrayList<String>();
+        for (String providerName : filterProviders().keySet())
+        {
+            DataLoader provider = dataloadersMap.get(providerName);
+            RecordSet subRecordSet = provider.getRecords();
+            recordSet.addAll(subRecordSet);
+            // Add in each record the provider name... a new provider doesn't
+            // need to know about it!
+            for (Record record : subRecordSet.getRecords())
+            {
+                if (record.isMutable())
+                {
+                    record.makeMutable().addValue(
+                            SubmissionLookupService.PROVIDER_NAME_FIELD,
+                            new StringValue(providerName));
+                }
+            }
+        }
 
-		
-		log.info("BTE DataLoader finished. Items loaded: " + recordSet.getRecords().size());
-		
-		//Printing debug message
-		String totalString = "";
-		for (Record record : recordSet.getRecords()){
-			totalString += SubmissionLookupUtils.getPrintableString(record)+"\n";
-		}
-		log.debug("Records loaded:\n"+totalString);
-		
-		return recordSet;
-	}
+        // Question: Do we want that in case of file data loader?
+        // for each publication in the record set, if it has a DOI, try to find
+        // extra pubs from the other providers
+        if (searchTerms != null
+                || (identifiers != null && !identifiers
+                        .containsKey(SubmissionLookupDataLoader.DOI)))
+        { // Extend
+            Map<String, Set<String>> provider2foundDOIs = new HashMap<String, Set<String>>();
+            List<String> foundDOIs = new ArrayList<String>();
 
-	/* (non-Javadoc)
-	 * @see gr.ekt.bte.core.DataLoader#getRecords(gr.ekt.bte.core.DataLoadingSpec)
-	 */
-	@Override
-	public RecordSet getRecords(DataLoadingSpec loadingSpec)
-			throws MalformedSourceException {
+            for (Record publication : recordSet.getRecords())
+            {
+                String providerName = SubmissionLookupUtils.getFirstValue(
+                        publication,
+                        SubmissionLookupService.PROVIDER_NAME_FIELD);
 
-		if (loadingSpec.getOffset()>0) //Identify the end of loading
-			return new RecordSet();
-		
-		return getRecords();
-	}
+                String doi = null;
 
-	public Map<String, DataLoader> getProvidersMap() {
-		return dataloadersMap;
-	}
+                if (publication.getValues(SubmissionLookupDataLoader.DOI) != null
+                        && publication
+                                .getValues(SubmissionLookupDataLoader.DOI)
+                                .size() > 0)
+                    doi = publication.getValues(SubmissionLookupDataLoader.DOI)
+                            .iterator().next().getAsString();
+                if (doi == null)
+                {
+                    doi = NOT_FOUND_DOI;
+                }
+                else
+                {
+                    doi = SubmissionLookupUtils.normalizeDOI(doi);
+                    if (!foundDOIs.contains(doi))
+                    {
+                        foundDOIs.add(doi);
+                    }
+                    Set<String> tmp = provider2foundDOIs.get(providerName);
+                    if (tmp == null)
+                    {
+                        tmp = new HashSet<String>();
+                        provider2foundDOIs.put(providerName, tmp);
+                    }
+                    tmp.add(doi);
+                }
+            }
 
-	public void setDataloadersMap(Map<String, DataLoader> providersMap) {
-		this.dataloadersMap = providersMap;
-	}
+            for (String providerName : dataloadersMap.keySet())
+            {
+                DataLoader genProvider = dataloadersMap.get(providerName);
 
-	public void setIdentifiers(Map<String, Set<String>> identifiers) {
-		this.identifiers = identifiers;
-		this.filename = null;
-		this.searchTerms = null;
-		
-		if (dataloadersMap!=null){
-			for (String providerName : dataloadersMap.keySet()) {
-				DataLoader provider = dataloadersMap.get(providerName);
-				if (provider instanceof NetworkSubmissionLookupDataLoader){
-					((NetworkSubmissionLookupDataLoader)provider).setIdentifiers(identifiers);
-				}
-					
-			}
-		}
-	}
+                if (!(genProvider instanceof SubmissionLookupDataLoader))
+                {
+                    continue;
+                }
 
-	public void setSearchTerms(Map<String, Set<String>> searchTerms) {
-		this.searchTerms = searchTerms;
-		this.identifiers = null;
-		this.filename = null;
-		
-		if (dataloadersMap!=null){
-			for (String providerName : dataloadersMap.keySet()) {
-				DataLoader provider = dataloadersMap.get(providerName);
-				if (provider instanceof NetworkSubmissionLookupDataLoader){
-					((NetworkSubmissionLookupDataLoader)provider).setSearchTerms(searchTerms);
-				}
-			}
-		}
-	}
+                SubmissionLookupDataLoader provider = (SubmissionLookupDataLoader) genProvider;
 
-	public void setFile(String filename, String type) {
-		this.filename = filename;
-		this.type = type;
-		this.identifiers = null;
-		this.searchTerms = null;
-		
-		if (dataloadersMap!=null){
-			for (String providerName : dataloadersMap.keySet()) {
-				DataLoader provider = dataloadersMap.get(providerName);
-				if (provider instanceof FileDataLoader){
-					((FileDataLoader)provider).setFilename(filename);
-				}
-			}
-		}
-	}
-	
-	public Map<String, DataLoader> filterProviders(){
-		Map<String, DataLoader> result = new HashMap<String, DataLoader>();
-		for (String providerName : dataloadersMap.keySet()) {
-			DataLoader dataLoader = dataloadersMap.get(providerName);
-			if (searchTerms != null && identifiers == null && filename == null){
-				if (dataLoader instanceof SubmissionLookupDataLoader && 
-						((SubmissionLookupDataLoader)dataLoader).isSearchProvider()){
-					result.put(providerName, dataLoader);
-				}
-			}
-			else if (searchTerms == null && identifiers != null && filename == null){
-				if (dataLoader instanceof SubmissionLookupDataLoader){
-					result.put(providerName, dataLoader);
-				}
-			}
-			else if (searchTerms == null && identifiers == null && filename != null){
-				if (dataLoader instanceof FileDataLoader){
-					if (providerName.endsWith(type)) //add only the one that we are interested in
-						result.put(providerName, dataLoader);
-				}
-			}
-		}
-		
-		return result;
-	}
+                // Provider must support DOI
+                if (provider.getSupportedIdentifiers().contains(
+                        SubmissionLookupDataLoader.DOI))
+                {
+                    continue;
+                }
+
+                // if (evictProviders != null
+                // && evictProviders.contains(provider.getShortName())) {
+                // continue;
+                // }
+                Set<String> doiToSearch = new HashSet<String>();
+                Set<String> alreadyFoundDOIs = provider2foundDOIs
+                        .get(providerName);
+                for (String doi : foundDOIs)
+                {
+                    if (alreadyFoundDOIs == null
+                            || !alreadyFoundDOIs.contains(doi))
+                    {
+                        doiToSearch.add(doi);
+                    }
+                }
+                List<Record> pPublications = null;
+                try
+                {
+                    if (doiToSearch.size() > 0)
+                    {
+                        pPublications = provider.getByDOIs(null, doiToSearch);
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                if (pPublications != null)
+                {
+                    for (Record rec : pPublications)
+                    {
+                        recordSet.addRecord(rec);
+                    }
+                }
+            }
+        }
+
+        log.info("BTE DataLoader finished. Items loaded: "
+                + recordSet.getRecords().size());
+
+        // Printing debug message
+        String totalString = "";
+        for (Record record : recordSet.getRecords())
+        {
+            totalString += SubmissionLookupUtils.getPrintableString(record)
+                    + "\n";
+        }
+        log.debug("Records loaded:\n" + totalString);
+
+        return recordSet;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * gr.ekt.bte.core.DataLoader#getRecords(gr.ekt.bte.core.DataLoadingSpec)
+     */
+    @Override
+    public RecordSet getRecords(DataLoadingSpec loadingSpec)
+            throws MalformedSourceException
+    {
+
+        if (loadingSpec.getOffset() > 0) // Identify the end of loading
+            return new RecordSet();
+
+        return getRecords();
+    }
+
+    public Map<String, DataLoader> getProvidersMap()
+    {
+        return dataloadersMap;
+    }
+
+    public void setDataloadersMap(Map<String, DataLoader> providersMap)
+    {
+        this.dataloadersMap = providersMap;
+    }
+
+    public void setIdentifiers(Map<String, Set<String>> identifiers)
+    {
+        this.identifiers = identifiers;
+        this.filename = null;
+        this.searchTerms = null;
+
+        if (dataloadersMap != null)
+        {
+            for (String providerName : dataloadersMap.keySet())
+            {
+                DataLoader provider = dataloadersMap.get(providerName);
+                if (provider instanceof NetworkSubmissionLookupDataLoader)
+                {
+                    ((NetworkSubmissionLookupDataLoader) provider)
+                            .setIdentifiers(identifiers);
+                }
+
+            }
+        }
+    }
+
+    public void setSearchTerms(Map<String, Set<String>> searchTerms)
+    {
+        this.searchTerms = searchTerms;
+        this.identifiers = null;
+        this.filename = null;
+
+        if (dataloadersMap != null)
+        {
+            for (String providerName : dataloadersMap.keySet())
+            {
+                DataLoader provider = dataloadersMap.get(providerName);
+                if (provider instanceof NetworkSubmissionLookupDataLoader)
+                {
+                    ((NetworkSubmissionLookupDataLoader) provider)
+                            .setSearchTerms(searchTerms);
+                }
+            }
+        }
+    }
+
+    public void setFile(String filename, String type)
+    {
+        this.filename = filename;
+        this.type = type;
+        this.identifiers = null;
+        this.searchTerms = null;
+
+        if (dataloadersMap != null)
+        {
+            for (String providerName : dataloadersMap.keySet())
+            {
+                DataLoader provider = dataloadersMap.get(providerName);
+                if (provider instanceof FileDataLoader)
+                {
+                    ((FileDataLoader) provider).setFilename(filename);
+                }
+            }
+        }
+    }
+
+    public Map<String, DataLoader> filterProviders()
+    {
+        Map<String, DataLoader> result = new HashMap<String, DataLoader>();
+        for (String providerName : dataloadersMap.keySet())
+        {
+            DataLoader dataLoader = dataloadersMap.get(providerName);
+            if (searchTerms != null && identifiers == null && filename == null)
+            {
+                if (dataLoader instanceof SubmissionLookupDataLoader
+                        && ((SubmissionLookupDataLoader) dataLoader)
+                                .isSearchProvider())
+                {
+                    result.put(providerName, dataLoader);
+                }
+            }
+            else if (searchTerms == null && identifiers != null
+                    && filename == null)
+            {
+                if (dataLoader instanceof SubmissionLookupDataLoader)
+                {
+                    result.put(providerName, dataLoader);
+                }
+            }
+            else if (searchTerms == null && identifiers == null
+                    && filename != null)
+            {
+                if (dataLoader instanceof FileDataLoader)
+                {
+                    if (providerName.endsWith(type)) // add only the one that we
+                                                     // are interested in
+                        result.put(providerName, dataLoader);
+                }
+            }
+        }
+
+        return result;
+    }
 }

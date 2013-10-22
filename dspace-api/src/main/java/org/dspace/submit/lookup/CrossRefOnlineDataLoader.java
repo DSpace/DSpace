@@ -29,58 +29,74 @@ import org.xml.sax.SAXException;
  * @author Luigi Andrea Pascarelli
  * @author Panagiotis Koutsourakis
  */
-public class CrossRefOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
-	private CrossRefService crossrefService = new CrossRefService();
+public class CrossRefOnlineDataLoader extends NetworkSubmissionLookupDataLoader
+{
+    private CrossRefService crossrefService = new CrossRefService();
 
-	private boolean searchProvider = true;
-	
-	public void setSearchProvider(boolean searchProvider)
+    private boolean searchProvider = true;
+
+    public void setSearchProvider(boolean searchProvider)
     {
         this.searchProvider = searchProvider;
     }
-	
-	public void setCrossrefService(CrossRefService crossrefService) {
-		this.crossrefService = crossrefService;
-	}
 
-	@Override
-	public List<String> getSupportedIdentifiers() {
-		return Arrays.asList(new String[] { DOI });
-	}
+    public void setCrossrefService(CrossRefService crossrefService)
+    {
+        this.crossrefService = crossrefService;
+    }
 
-	@Override
-	public List<Record> getByIdentifier(Context context, 
-			Map<String, Set<String>> keys) throws HttpException, IOException {
-		if (keys != null && keys.containsKey(DOI)) {
-			Set<String> dois = keys.get(DOI);
-			List<Record> items = null;
-			List<Record> results = new ArrayList<Record>();
-			try {
-				items = crossrefService.search(context, dois);
-			} catch (JDOMException e) {
-				throw new RuntimeException(e.getMessage(), e);
-			} catch (ParserConfigurationException e) {
-				throw new RuntimeException(e.getMessage(), e);
-			} catch (SAXException e) {
-				throw new RuntimeException(e.getMessage(), e);
-			}
-			for (Record record : items){
-				results.add(convertFields(record));
-			}
-			return results;
-		}
-		return null;
-	}
+    @Override
+    public List<String> getSupportedIdentifiers()
+    {
+        return Arrays.asList(new String[] { DOI });
+    }
 
-	@Override
-	public List<Record> search(Context context, String title,
-			String author, int year) throws HttpException, IOException {
-		List<Record> items = crossrefService.search(context, title, author, year, 10);
-		return items;
-	}
+    @Override
+    public List<Record> getByIdentifier(Context context,
+            Map<String, Set<String>> keys) throws HttpException, IOException
+    {
+        if (keys != null && keys.containsKey(DOI))
+        {
+            Set<String> dois = keys.get(DOI);
+            List<Record> items = null;
+            List<Record> results = new ArrayList<Record>();
+            try
+            {
+                items = crossrefService.search(context, dois);
+            }
+            catch (JDOMException e)
+            {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+            catch (ParserConfigurationException e)
+            {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+            catch (SAXException e)
+            {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+            for (Record record : items)
+            {
+                results.add(convertFields(record));
+            }
+            return results;
+        }
+        return null;
+    }
 
-	@Override
-	public boolean isSearchProvider() {
-		return searchProvider;
-	}
+    @Override
+    public List<Record> search(Context context, String title, String author,
+            int year) throws HttpException, IOException
+    {
+        List<Record> items = crossrefService.search(context, title, author,
+                year, 10);
+        return items;
+    }
+
+    @Override
+    public boolean isSearchProvider()
+    {
+        return searchProvider;
+    }
 }

@@ -22,43 +22,54 @@ import java.util.Map;
  * @author Luigi Andrea Pascarelli
  * @author Panagiotis Koutsourakis
  */
-public class FieldMergeModifier extends AbstractModifier {
+public class FieldMergeModifier extends AbstractModifier
+{
     private Map<String, List<String>> mergeFieldMap;
-    public FieldMergeModifier() {
+
+    public FieldMergeModifier()
+    {
         super("FieldMergeModifier");
     }
 
     @Override
-    public Record modify(MutableRecord rec) {
-    	if (mergeFieldMap!=null){
-    		for (String target_field : mergeFieldMap.keySet()) {
-    			List<String> source_fields = mergeFieldMap.get(target_field);
-    			for (String source_field : source_fields) {
-    				List<Value> values = rec.getValues(source_field);
-    				if (values != null && values.size() > 0) {
-    					for (Value value : values) {
-    						rec.addValue(target_field, value);
-    					}
-    				}
-    				//rec.removeField(source_field);
-    			}
-    		}
-    	}
+    public Record modify(MutableRecord rec)
+    {
+        if (mergeFieldMap != null)
+        {
+            for (String target_field : mergeFieldMap.keySet())
+            {
+                List<String> source_fields = mergeFieldMap.get(target_field);
+                for (String source_field : source_fields)
+                {
+                    List<Value> values = rec.getValues(source_field);
+                    if (values != null && values.size() > 0)
+                    {
+                        for (Value value : values)
+                        {
+                            rec.addValue(target_field, value);
+                        }
+                    }
+                    // rec.removeField(source_field);
+                }
+            }
+        }
         return rec;
     }
 
     /**
      * @return the merge_field_map
      */
-    public Map<String, List<String>> getMergeFieldMap() {
+    public Map<String, List<String>> getMergeFieldMap()
+    {
         return mergeFieldMap;
     }
 
     /**
-     * @param merge_field_map the merge_field_map to set
+     * @param merge_field_map
+     *            the merge_field_map to set
      */
-    public void setMergeFieldMap(Map<String, List<String>> merge_field_map) {
+    public void setMergeFieldMap(Map<String, List<String>> merge_field_map)
+    {
         this.mergeFieldMap = merge_field_map;
     }
 }
-

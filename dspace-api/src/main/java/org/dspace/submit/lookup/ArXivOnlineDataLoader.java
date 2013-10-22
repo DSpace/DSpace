@@ -25,60 +25,74 @@ import org.dspace.core.Context;
  * @author Luigi Andrea Pascarelli
  * @author Panagiotis Koutsourakis
  */
-public class ArXivOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
-	private ArXivService arXivService = new ArXivService();
-	private boolean searchProvider = true;
+public class ArXivOnlineDataLoader extends NetworkSubmissionLookupDataLoader
+{
+    private ArXivService arXivService = new ArXivService();
 
-	public void setArXivService(ArXivService arXivService) {
-		this.arXivService = arXivService;
-	}
+    private boolean searchProvider = true;
 
-	@Override
-	public List<String> getSupportedIdentifiers() {
-		return Arrays.asList(new String[] { ARXIV, DOI });
-	}
+    public void setArXivService(ArXivService arXivService)
+    {
+        this.arXivService = arXivService;
+    }
 
-	public void setSearchProvider(boolean searchProvider) {
-		this.searchProvider = searchProvider;
-	}
+    @Override
+    public List<String> getSupportedIdentifiers()
+    {
+        return Arrays.asList(new String[] { ARXIV, DOI });
+    }
 
-	@Override
-	public boolean isSearchProvider() {
-		return searchProvider;
-	}
+    public void setSearchProvider(boolean searchProvider)
+    {
+        this.searchProvider = searchProvider;
+    }
 
-	@Override
-	public List<Record> getByIdentifier(Context context,
-			Map<String, Set<String>> keys) throws HttpException, IOException {
-		List<Record> results = new ArrayList<Record>();
-		if (keys != null) {
-			Set<String> dois = keys.get(DOI);
-			Set<String> arxivids = keys.get(ARXIV);
-			List<Record> items = new ArrayList<Record>();
-			if (dois != null && dois.size() > 0) {
-				items.addAll(arXivService.getByDOIs(dois));
-			}
-			if (arxivids != null && arxivids.size() > 0) {
-				for (String arxivid : arxivids) {
-					items.add(arXivService.getByArXivIDs(arxivid));
-				}
-			}
+    @Override
+    public boolean isSearchProvider()
+    {
+        return searchProvider;
+    }
 
-			for (Record item : items) {
-				results.add(convertFields(item));
-			}
-		}
-		return results;
-	}
+    @Override
+    public List<Record> getByIdentifier(Context context,
+            Map<String, Set<String>> keys) throws HttpException, IOException
+    {
+        List<Record> results = new ArrayList<Record>();
+        if (keys != null)
+        {
+            Set<String> dois = keys.get(DOI);
+            Set<String> arxivids = keys.get(ARXIV);
+            List<Record> items = new ArrayList<Record>();
+            if (dois != null && dois.size() > 0)
+            {
+                items.addAll(arXivService.getByDOIs(dois));
+            }
+            if (arxivids != null && arxivids.size() > 0)
+            {
+                for (String arxivid : arxivids)
+                {
+                    items.add(arXivService.getByArXivIDs(arxivid));
+                }
+            }
 
-	@Override
-	public List<Record> search(Context context, String title, String author,
-			int year) throws HttpException, IOException {
-		List<Record> results = new ArrayList<Record>();
-		List<Record> items = arXivService.searchByTerm(title, author, year);
-		for (Record item : items) {
-			results.add(convertFields(item));
-		}
-		return results;
-	}
+            for (Record item : items)
+            {
+                results.add(convertFields(item));
+            }
+        }
+        return results;
+    }
+
+    @Override
+    public List<Record> search(Context context, String title, String author,
+            int year) throws HttpException, IOException
+    {
+        List<Record> results = new ArrayList<Record>();
+        List<Record> items = arXivService.searchByTerm(title, author, year);
+        for (Record item : items)
+        {
+            results.add(convertFields(item));
+        }
+        return results;
+    }
 }

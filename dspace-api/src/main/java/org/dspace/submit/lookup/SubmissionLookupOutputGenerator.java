@@ -20,73 +20,88 @@ import java.util.Map;
 
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
 
-
 /**
  * @author Andrea Bollini
  * @author Kostas Stamatis
  * @author Luigi Andrea Pascarelli
  * @author Panagiotis Koutsourakis
  */
-public class SubmissionLookupOutputGenerator implements OutputGenerator {
+public class SubmissionLookupOutputGenerator implements OutputGenerator
+{
     private List<ItemSubmissionLookupDTO> dtoList;
+
     private static final String DOI_FIELD = "doi";
+
     private static final String NOT_FOUND_DOI = "NOT-FOUND-DOI";
 
-    public SubmissionLookupOutputGenerator() {
-        
+    public SubmissionLookupOutputGenerator()
+    {
+
     }
 
     @Override
-    public List<String> generateOutput(RecordSet records) {
-    	dtoList = new ArrayList<ItemSubmissionLookupDTO>();
-    	
+    public List<String> generateOutput(RecordSet records)
+    {
+        dtoList = new ArrayList<ItemSubmissionLookupDTO>();
+
         Map<String, List<Record>> record_sets = new HashMap<String, List<Record>>();
         int counter = 0;
-        for(Record rec : records) {
+        for (Record rec : records)
+        {
             String current_doi = NOT_FOUND_DOI;
             List<Value> values = rec.getValues(DOI_FIELD);
-            if (values != null && values.size() > 0) {
+            if (values != null && values.size() > 0)
+            {
                 current_doi = values.get(0).getAsString();
             }
-            else {
-            	current_doi = NOT_FOUND_DOI + "_" + counter;
+            else
+            {
+                current_doi = NOT_FOUND_DOI + "_" + counter;
             }
 
-            if(record_sets.keySet().contains(current_doi)) {
+            if (record_sets.keySet().contains(current_doi))
+            {
                 record_sets.get(current_doi).add(rec);
             }
-            else {
+            else
+            {
                 ArrayList<Record> publication = new ArrayList<Record>();
                 publication.add(rec);
                 record_sets.put(current_doi, publication);
             }
-            
+
             counter++;
         }
-        for(Map.Entry<String, List<Record>> entry : record_sets.entrySet()) {
-            ItemSubmissionLookupDTO dto = new ItemSubmissionLookupDTO(entry.getValue());
+        for (Map.Entry<String, List<Record>> entry : record_sets.entrySet())
+        {
+            ItemSubmissionLookupDTO dto = new ItemSubmissionLookupDTO(
+                    entry.getValue());
             dtoList.add(dto);
         }
-        
+
         return new ArrayList<String>();
     }
 
     @Override
-    public List<String> generateOutput(RecordSet records, DataOutputSpec spec) {
+    public List<String> generateOutput(RecordSet records, DataOutputSpec spec)
+    {
         return generateOutput(records);
     }
 
     /**
      * @return the items
      */
-    public List<ItemSubmissionLookupDTO> getDtoList() {
+    public List<ItemSubmissionLookupDTO> getDtoList()
+    {
         return dtoList;
     }
 
     /**
-     * @param items the items to set
+     * @param items
+     *            the items to set
      */
-    public void setDtoList(List<ItemSubmissionLookupDTO> items) {
+    public void setDtoList(List<ItemSubmissionLookupDTO> items)
+    {
         this.dtoList = items;
     }
 }
