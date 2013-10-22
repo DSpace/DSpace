@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.dspace.core.Context;
 
 import gr.ekt.bte.core.DataLoader;
 import gr.ekt.bte.core.DataLoadingSpec;
@@ -22,7 +23,6 @@ import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.RecordSet;
 import gr.ekt.bte.core.StringValue;
 import gr.ekt.bte.dataloader.FileDataLoader;
-
 import gr.ekt.bte.exceptions.MalformedSourceException;
 
 /**
@@ -52,13 +52,6 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader
     String filename = null; // Uploading file
 
     String type = null; // the type of the upload file (bibtex, etc.)
-
-    /**
-     * Default constructor
-     */
-    public MultipleSubmissionLookupDataLoader()
-    {
-    }
 
     /*
      * (non-Javadoc)
@@ -174,12 +167,24 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader
                 {
                     if (doiToSearch.size() > 0)
                     {
-                        pPublications = provider.getByDOIs(null, doiToSearch);
+                        Context context = null;
+                        try {
+                            context = new Context();
+                            pPublications = provider.getByDOIs(context, doiToSearch);
+                        }
+                        catch (Exception e) {
+                            log.error(e.getMessage(), e);
+                        }
+                        finally {
+                            if(context!=null && context.isValid()) {
+                                context.abort();
+                            }
+                        }
                     }
                 }
                 catch (Exception e)
                 {
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                 }
                 if (pPublications != null)
                 {

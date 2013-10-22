@@ -108,7 +108,7 @@
 	
 	<!-- Converts an input value to an output one -->
 	<bean name="mapConverter_arxivSubject" class="org.dspace.submit.lookup.MapConverterModifier">
-	    <constructor-arg value="apConverter_arxivSubject Modifier"/>
+	    <constructor-arg value="mapConverter_arxivSubject Modifier"/>
 	    <property name="mappingFile" value="${dspace.install.dir}/config/crosswalks/mapConverter-arxivSubject.properties"/>
 	    <property name="fieldKeys">
 	        <list>

@@ -113,8 +113,9 @@ public class CrossRefService
                                         .getResponseBodyAsStream());
 
                                 Element xmlRoot = inDoc.getDocumentElement();
-                                Element dataRoot = XMLUtils.getSingleElement(
-                                        xmlRoot, "query");
+                                Element queryResult = XMLUtils.getSingleElement(xmlRoot, "query_result");
+                                Element body = XMLUtils.getSingleElement(queryResult, "body");
+                                Element dataRoot = XMLUtils.getSingleElement(body, "query");
 
                                 crossitem = CrossRefUtils
                                         .convertCrossRefDomToRecord(dataRoot);

@@ -100,9 +100,9 @@ public class ArXivService
                 if (statusCode != HttpStatus.SC_OK)
                 {
                     if (statusCode == HttpStatus.SC_BAD_REQUEST)
-                        throw new RuntimeException("Query arXiv non valida");
+                        throw new RuntimeException("arXiv query is not valid");
                     else
-                        throw new RuntimeException("Chiamata http fallita: "
+                        throw new RuntimeException("Http call failed: "
                                 + method.getStatusLine());
                 }
 

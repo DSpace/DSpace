@@ -141,14 +141,18 @@ public class PubmedService
                             idList, "Id");
                     results = getByPubmedIDs(pubmedIDs);
                 }
-                catch (ParserConfigurationException e)
+                catch (ParserConfigurationException e1)
                 {
-                    e.printStackTrace();
+                    log.error(e1.getMessage(), e1);
                 }
                 catch (SAXException e1)
                 {
                     log.error(e1.getMessage(), e1);
                 }
+            }
+            catch (Exception e1)
+            {
+                log.error(e1.getMessage(), e1);
             }
             finally
             {
