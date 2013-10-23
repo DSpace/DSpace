@@ -33,6 +33,8 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
+import org.dspace.discovery.MockIndexEventConsumer;
 import org.dspace.eperson.EPerson;
 import org.dspace.search.DSIndexer;
 import org.dspace.servicemanager.DSpaceKernelImpl;
@@ -52,7 +54,7 @@ import org.xml.sax.SAXException;
  *
  * @author pvillega
  */
-@UsingMocksAndStubs({MockDatabaseManager.class, MockBrowseCreateDAOOracle.class})
+@UsingMocksAndStubs({MockDatabaseManager.class, MockBrowseCreateDAOOracle.class, MockIndexEventConsumer.class})
 public class AbstractUnitTest
 {
     /** log4j category */
@@ -147,6 +149,7 @@ public class AbstractUnitTest
                     eperson.setLastName("last");
                     eperson.setEmail("test@email.com");
                     eperson.setCanLogIn(true);
+                    eperson.setLanguage(I18nUtil.getDefaultLocale().getLanguage());
                 }
 
                 //Create search and browse indexes
@@ -349,6 +352,7 @@ public class AbstractUnitTest
         if(context != null && context.isValid())
         {
             context.abort();
+            context = null;
         }
     }
 
