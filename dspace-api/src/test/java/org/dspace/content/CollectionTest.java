@@ -63,12 +63,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest
         catch (AuthorizeException ex)
         {
             log.error("Authorization Error in init", ex);
-            fail("Authorization Error in init");
+            fail("Authorization Error in init: " + ex.getMessage());
         }
         catch (SQLException ex)
         {
             log.error("SQL Error in init", ex);
-            fail("SQL Error in init");
+            fail("SQL Error in init: " + ex.getMessage());
         }
     }
 
@@ -471,6 +471,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
         context.turnOffAuthorisationSystem();
         int step = 1;
         Group g = Group.create(context);
+        context.commit();
         context.restoreAuthSystemState();
         c.setWorkflowGroup(step, g);
         assertThat("testSetWorkflowGroup 0",c.getWorkflowGroup(step), notNullValue());
@@ -1868,6 +1869,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
             context.turnOffAuthorisationSystem();
             Community parent = Community.create(null, context);
             parent.addCollection(c);
+            context.commit();
             context.restoreAuthSystemState();
             assertThat("testGetParentObject 1", c.getParentObject(), notNullValue());
             assertThat("testGetParentObject 2", (Community)c.getParentObject(), equalTo(parent));
