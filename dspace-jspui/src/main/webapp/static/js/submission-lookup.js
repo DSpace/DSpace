@@ -121,7 +121,7 @@ submissionLookupShowResult = function(info, suffixID){
 		for (var k=0;k<info.result[i].providers.length;k++)
 		{
 			var prov = info.result[i].providers[k];
-			divImg.append(j('<img src="'+dspaceContextPath+'/image/submission-lookup-small-'+prov+'.jpg">'));
+			divImg.append(j('<img class="img-thumbnail" src="'+dspaceContextPath+'/image/submission-lookup-small-'+prov+'.jpg">'));
 		}	
 		par
 				.append(j('<span class="sl-result-title">').text(info.result[i].title))
