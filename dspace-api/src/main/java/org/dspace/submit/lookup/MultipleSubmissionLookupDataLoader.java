@@ -163,35 +163,37 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader
                     }
                 }
                 List<Record> pPublications = null;
+                Context context = null;
                 try
                 {
                     if (doiToSearch.size() > 0)
                     {
-                        Context context = null;
-                        try {
-                            context = new Context();
-                            pPublications = provider.getByDOIs(context, doiToSearch);
-                        }
-                        catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-                        finally {
-                            if(context!=null && context.isValid()) {
-                                context.abort();
-                            }
-                        }
+                        context = new Context();
+                        pPublications = provider.getByDOIs(context, doiToSearch);
                     }
                 }
                 catch (Exception e)
                 {
                     log.error(e.getMessage(), e);
                 }
+                finally {
+                    if(context!=null && context.isValid()) {
+                        context.abort();
+                    }
+                }
                 if (pPublications != null)
                 {
                     for (Record rec : pPublications)
                     {
                         recordSet.addRecord(rec);
+                        if (rec.isMutable())
+                        {
+                            rec.makeMutable().addValue(
+                                    SubmissionLookupService.PROVIDER_NAME_FIELD,
+                                    new StringValue(providerName));
+                        }
                     }
+                   
                 }
             }
         }
