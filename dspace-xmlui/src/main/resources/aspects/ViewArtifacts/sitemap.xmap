@@ -48,6 +48,7 @@ and searching the repository.
 		<map:matchers default="wildcard">
 			<map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher" />
 			<map:matcher name="HandleAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.general.HandleAuthorizedMatcher" />
+                        <map:matcher name="ContainerHomePageSelector" src="org.dspace.app.xmlui.aspect.viewArtifacts.ContainerHomePageMatcher"/>
 			<map:matcher name="ConfigurationMatcher" src="org.dspace.app.xmlui.aspect.general.ConfigurationMatcher" />
 		</map:matchers>
 
