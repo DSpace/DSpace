@@ -107,9 +107,10 @@
 	</bean>
 	
 	<!-- Converts an input value to an output one -->
-	<bean name="mapConverter_arxivSubject" class="org.dspace.submit.lookup.MapConverterModifier">
+	<bean name="mapConverter_arxivSubject" class="org.dspace.submit.lookup.MapConverterModifier" init-method="init">
 	    <constructor-arg value="mapConverter_arxivSubject Modifier"/>
-	    <property name="mappingFile" value="${dspace.install.dir}/config/crosswalks/mapConverter-arxivSubject.properties"/>
+	    <property name="converterNameFile" value="mapConverter-arxivSubject.properties"/>
+	    <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
 	    <property name="fieldKeys">
 	        <list>
 	            <!-- Specify the internal BTE keys that this modifiers needs to be applied -->
@@ -119,9 +120,10 @@
 	</bean>
 	
 	<!-- Converts an input value to an output one -->
-	<bean name="mapConverter_pubstatusPubmed" class="org.dspace.submit.lookup.MapConverterModifier">
+	<bean name="mapConverter_pubstatusPubmed" class="org.dspace.submit.lookup.MapConverterModifier" init-method="init">
 	    <constructor-arg value="mapConverter_pubstatusPubmed Modifier"/>
-	    <property name="mappingFile" value="${dspace.install.dir}/config/crosswalks/mapConverter-pubstatusPubmed.properties"/>
+	    <property name="converterNameFile" value="mapConverter-pubstatusPubmed.properties"/>
+	    <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
 	    <property name="defaultValue" value="Subjected to Journal"/>
 	    <property name="fieldKeys">
 	        <list>
