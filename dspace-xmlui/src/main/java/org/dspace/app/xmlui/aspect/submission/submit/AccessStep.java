@@ -177,7 +177,17 @@ public class AccessStep extends AbstractSubmissionStep
             WingException, UIException, SQLException, IOException,
             AuthorizeException
     {
-        // License step doesn't require reviewing
-        return null;
+	    List accessSection = reviewList.addList("submit-review-" + this.stepAndPage, List.TYPE_FORM);
+	    accessSection.setHead(T_head);
+
+	    Item item = submission.getItem();
+
+	    accessSection.addLabel(T_private_settings);
+	    accessSection.addItem(item.isDiscoverable() ? T_public_item : T_private_item);
+
+	    AccessStepUtil asu = new AccessStepUtil(context);
+	    asu.addListPolicies(accessSection, item, item.getOwningCollection());
+
+	    return accessSection;
     }
 }
