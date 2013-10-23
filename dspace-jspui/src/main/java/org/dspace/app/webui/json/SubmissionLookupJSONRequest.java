@@ -315,8 +315,10 @@ public class SubmissionLookupJSONRequest extends JSONRequest
             JsonElement tree = json.toJsonTree(dto);
             JsonObject jo = new JsonObject();
             jo.add("result", tree);
-            resp.getWriter().write(jo.toString());
             resp.setContentType("text/plain");
+//            if you works in localhost mode and use IE10 to debug the feature uncomment the follow line
+//            resp.setHeader("Access-Control-Allow-Origin","*");
+            resp.getWriter().write(jo.toString());
         }
     }
 
