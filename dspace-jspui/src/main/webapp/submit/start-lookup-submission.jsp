@@ -128,7 +128,7 @@
 	if (searchProviders != null && searchProviders.size() > 0) {
 	%>
 		<h3><a href="#"><fmt:message key="jsp.submit.start-lookup-submission.search"/></a></h3>
-		<div>
+		<div id="search-accordion">
 		<form class="form-horizontal" id="form-submission-search" action="" method="post">
 		<input type="hidden" id="suuid-search" name="suuid" value="<%= uuid %>"/>
 		<input type="hidden" id="iuuid-search" name="iuuid" value=""/>
@@ -167,7 +167,7 @@
 	
 
 	<h3><a href="#"><fmt:message key="jsp.submit.start-lookup-submission.identifiers"/></a></h3>
-	<div>
+	<div id="identifier-accordion">
 		<form class="form-horizontal" id="form-submission-identifier" action="" method="post">
 		<input type="hidden" id="suuid-identifier" name="suuid" value="<%= uuid %>"/>
 		<input type="hidden" id="iuuid-identifier" name="iuuid" value=""/>
