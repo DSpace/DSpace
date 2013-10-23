@@ -79,7 +79,7 @@ public class ArXivService
             throws IOException, HttpException
     {
         List<Record> results = new ArrayList<Record>();
-        if (!ConfigurationManager.getBooleanProperty("remoteservice.demo"))
+        if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE, "remoteservice.demo"))
         {
             GetMethod method = null;
             try
@@ -100,9 +100,9 @@ public class ArXivService
                 if (statusCode != HttpStatus.SC_OK)
                 {
                     if (statusCode == HttpStatus.SC_BAD_REQUEST)
-                        throw new RuntimeException("Query arXiv non valida");
+                        throw new RuntimeException("arXiv query is not valid");
                     else
-                        throw new RuntimeException("Chiamata http fallita: "
+                        throw new RuntimeException("Http call failed: "
                                 + method.getStatusLine());
                 }
 
