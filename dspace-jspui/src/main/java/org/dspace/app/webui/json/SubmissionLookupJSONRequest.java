@@ -114,12 +114,12 @@ public class SubmissionLookupJSONRequest extends JSONRequest
 
                 try
                 {
+                    SubmissionLookupOutputGenerator outputGenerator = (SubmissionLookupOutputGenerator) transformationEngine
+                            .getOutputGenerator();
+                    outputGenerator.setDtoList(new ArrayList<ItemSubmissionLookupDTO>());
                     log.debug("BTE transformation is about to start!");
                     transformationEngine.transform(new TransformationSpec());
                     log.debug("BTE transformation finished!");
-
-                    SubmissionLookupOutputGenerator outputGenerator = (SubmissionLookupOutputGenerator) transformationEngine
-                            .getOutputGenerator();
                     result = outputGenerator.getDtoList();
                 }
                 catch (BadTransformationSpec e1)
@@ -170,10 +170,12 @@ public class SubmissionLookupJSONRequest extends JSONRequest
 
                 try
                 {
-                    transformationEngine.transform(new TransformationSpec());
-
                     SubmissionLookupOutputGenerator outputGenerator = (SubmissionLookupOutputGenerator) transformationEngine
                             .getOutputGenerator();
+                    outputGenerator.setDtoList(new ArrayList<ItemSubmissionLookupDTO>());
+                    log.debug("BTE transformation is about to start!");
+                    transformationEngine.transform(new TransformationSpec());
+                    log.debug("BTE transformation finished!");
                     result = outputGenerator.getDtoList();
                 }
                 catch (BadTransformationSpec e1)
@@ -275,10 +277,12 @@ public class SubmissionLookupJSONRequest extends JSONRequest
 
                 try
                 {
-                    transformationEngine.transform(new TransformationSpec());
-
                     SubmissionLookupOutputGenerator outputGenerator = (SubmissionLookupOutputGenerator) transformationEngine
                             .getOutputGenerator();
+                    outputGenerator.setDtoList(new ArrayList<ItemSubmissionLookupDTO>());
+                    log.debug("BTE transformation is about to start!");
+                    transformationEngine.transform(new TransformationSpec());
+                    log.debug("BTE transformation finished!");
                     result = outputGenerator.getDtoList();
                 }
                 catch (BadTransformationSpec e1)
