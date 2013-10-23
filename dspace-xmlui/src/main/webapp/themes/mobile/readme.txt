@@ -5,9 +5,14 @@
     http://www.dspace.org/license/
 
 Mobile theme for DSpace 1.6
-Created by Elias Tzoc <tzoce@muohio.edu> and
+Created by Elias Tzoc <tzoce@miamioh.edu> and
            James Russell <james@ohiolink.edu>
            September 14, 2012
+
+Mobile theme 1.1
+Updated by Elias Tzoc <tzoce@miamioh.edu>
+           September 30, 2013
+Fixes: switch to non-mobile pages; CSS and reloading problems; and mobile-optimized page for advanced search 
 
 ===================================================================================
 The mobile theme file structure
