@@ -42,10 +42,8 @@ public class Item extends DSpaceObject {
 
     List<Community> parentCommunityList;
 
-    @XmlElement(name = "metadata", required = true)
     List<MetadataEntry> metadata;
 
-    @XmlElement(name = "bitstreams")
     List<Bitstream> bitstreams;
 
     public Item(){}
@@ -167,4 +165,25 @@ public class Item extends DSpaceObject {
     public List<Community> getParentCommunityList() {
         return parentCommunityList;
     }
+
+	public void setParentCollection(Collection parentCollection) {
+		this.parentCollection = parentCollection;
+	}
+
+	public void setParentCollectionList(List<Collection> parentCollectionList) {
+		this.parentCollectionList = parentCollectionList;
+	}
+
+	public void setParentCommunityList(List<Community> parentCommunityList) {
+		this.parentCommunityList = parentCommunityList;
+	}
+
+	@XmlElement(required = true)
+	public void setMetadata(List<MetadataEntry> metadata) {
+		this.metadata = metadata;
+	}
+
+	public void setBitstreams(List<Bitstream> bitstreams) {
+		this.bitstreams = bitstreams;
+	}
 }

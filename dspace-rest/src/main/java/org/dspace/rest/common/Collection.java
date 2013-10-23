@@ -36,7 +36,6 @@ public class Collection extends DSpaceObject {
     private Community parentCommunity;
     private List<Community> parentCommunityList = new ArrayList<Community>();
 
-    @XmlElement(name = "items")
     private List<Item> items = new ArrayList<Item>();
 
     //Collection-Metadata

@@ -243,6 +243,39 @@ public class SolrLogger
         	log.error(e.getMessage(), e);
         }
     }
+    
+	public static void postView(DSpaceObject dspaceObject,
+			String ip, String userAgent, String xforwarderfor, EPerson currentUser) {
+		if (solr == null || locationService == null) {
+			return;
+		}
+
+		try {
+			SolrInputDocument doc1 = getCommonSolrDoc(dspaceObject, ip, userAgent, xforwarderfor,
+					currentUser);
+			if (doc1 == null)
+				return;
+			if (dspaceObject instanceof Bitstream) {
+				Bitstream bit = (Bitstream) dspaceObject;
+				Bundle[] bundles = bit.getBundles();
+				for (Bundle bundle : bundles) {
+					doc1.addField("bundleName", bundle.getName());
+				}
+			}
+
+			doc1.addField("statistics_type", StatisticsType.VIEW.text());
+
+			solr.add(doc1);
+			// commits are executed automatically using the solr autocommit
+			// solr.commit(false, false);
+
+		} catch (RuntimeException re) {
+			throw re;
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+	}
+    
 
     /**
      * Returns a solr input document containing common information about the statistics
@@ -346,6 +379,92 @@ public class SolrLogger
         return doc1;
     }
 
+    private static SolrInputDocument getCommonSolrDoc(DSpaceObject dspaceObject, String ip, String userAgent, String xforwarderfor, EPerson currentUser) throws SQLException {
+        boolean isSpiderBot = SpiderDetector.isSpider(ip);
+        if(isSpiderBot &&
+                !ConfigurationManager.getBooleanProperty("usage-statistics", "logBots", true))
+        {
+            return null;
+        }
+
+        SolrInputDocument doc1 = new SolrInputDocument();
+        // Save our basic info that we already have
+
+
+            if (isUseProxies() && xforwarderfor != null) {
+                /* This header is a comma delimited list */
+                for (String xfip : xforwarderfor.split(",")) {
+                    /* proxy itself will sometime populate this header with the same value in
+                    remote address. ordering in spec is vague, we'll just take the last
+                    not equal to the proxy
+                    */
+                    if (!xforwarderfor.contains(ip)) {
+                        ip = xfip.trim();
+                    }
+                }
+
+            doc1.addField("ip", ip);
+
+            try
+            {
+                String dns = DnsLookup.reverseDns(ip);
+                doc1.addField("dns", dns.toLowerCase());
+            }
+            catch (Exception e)
+            {
+                log.error("Failed DNS Lookup for IP:" + ip);
+                log.debug(e.getMessage(),e);
+            }
+
+            // Save the location information if valid, save the event without
+            // location information if not valid
+            if(locationService != null)
+            {
+                Location location = locationService.getLocation(ip);
+                if (location != null
+                        && !("--".equals(location.countryCode)
+                        && location.latitude == -180 && location.longitude == -180))
+                {
+                    try
+                    {
+                        doc1.addField("continent", LocationUtils
+                                .getContinentCode(location.countryCode));
+                    }
+                    catch (Exception e)
+                    {
+                        System.out
+                                .println("COUNTRY ERROR: " + location.countryCode);
+                    }
+                    doc1.addField("countryCode", location.countryCode);
+                    doc1.addField("city", location.city);
+                    doc1.addField("latitude", location.latitude);
+                    doc1.addField("longitude", location.longitude);
+                    doc1.addField("isBot",isSpiderBot);
+
+                    if(userAgent != null)
+                    {
+                        doc1.addField("userAgent", userAgent);
+                    }
+                }
+            }
+        }
+
+        if(dspaceObject != null){
+            doc1.addField("id", dspaceObject.getID());
+            doc1.addField("type", dspaceObject.getType());
+            storeParents(doc1, dspaceObject);
+        }
+        // Save the current time
+        doc1.addField("time", DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+        if (currentUser != null)
+        {
+            doc1.addField("epersonid", currentUser.getID());
+        }
+
+        return doc1;
+    }
+
+    
     public static void postSearch(DSpaceObject resultObject, HttpServletRequest request, EPerson currentUser,
                                  List<String> queries, int rpp, String sortBy, String order, int page, DSpaceObject scope) {
         try

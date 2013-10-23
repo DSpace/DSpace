@@ -33,7 +33,6 @@ public class Community extends DSpaceObject{
     //Exandable relationships
     private Bitstream logo;
 
-    @XmlElement(name = "parentCommunity")
     private Community parentCommunity;
 
     private String copyrightText, introductoryText, shortDescription, sidebarText;
@@ -42,7 +41,6 @@ public class Community extends DSpaceObject{
     @XmlElement(name = "subcommunities", required = true)
     private List<Community> subCommunities = new ArrayList<Community>();
 
-    @XmlElement(name = "collections")
     private List<Collection> collections = new ArrayList<Collection>();
 
     public Community(){}

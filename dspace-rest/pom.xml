@@ -38,6 +38,59 @@
             <artifactId>jersey-json</artifactId>
             <version>1.17.1</version>
         </dependency>
+        
+        
+        
+		<!-- Spring 3 dependencies -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+		</dependency>
+ 
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+ 
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+		</dependency>
+		
+ 
+		<!-- Jersey + Spring -->
+		<dependency>
+			<groupId>com.sun.jersey.contribs</groupId>
+			<artifactId>jersey-spring</artifactId>
+			<version>1.8</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-web</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-beans</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-context</artifactId>
+				</exclusion>
+				<exclusion>
+        			<groupId>org.springframework</groupId>
+        			<artifactId>spring-aop</artifactId>
+      			</exclusion>
+			</exclusions>
+		</dependency>
+ 
 
         <!-- Use DSpace, for now, an older version to minimize spring generated dependency on Discovery -->
         <dependency>
@@ -60,11 +113,20 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.atteo</groupId>
             <artifactId>evo-inflector</artifactId>
             <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+        <dependency>
+        	<groupId>org.dspace</groupId>
+        	<artifactId>dspace-services</artifactId>
         </dependency>
     </dependencies>
     <build>
