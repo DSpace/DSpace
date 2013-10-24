@@ -52,7 +52,7 @@
       <profile>
          <id>xpdf-mediafilter-support</id>
          <activation>
-            <activeByDefault>false</activeByDefault>
+            <activeByDefault>true</activeByDefault>
          </activation>
          <dependencies>
             <dependency>
