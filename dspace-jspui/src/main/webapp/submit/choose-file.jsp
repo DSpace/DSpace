@@ -135,8 +135,10 @@
     				$('#spanFile').remove();
     				$('#selectedFile').remove();
     				$('<input type="file" name="file" id="tfile">').appendTo(parent);
-    				$('#tfile').wrap('<span id="spanFile" class="fileinput-button btn btn-success col-md-2"><span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;<fmt:message key="jsp.submit.choose-file.upload-ajax.button.select-file"/></span>');
-    		    	$('#tfile').on('change', function(){
+                    $('#tfile').wrap('<span id="spanFile" class="fileinput-button btn btn-success col-md-2"></span>');
+                    $('#spanFile').prepend('&nbsp;&nbsp;<fmt:message key="jsp.submit.choose-file.upload-ajax.button.select-file"/>');
+                    $('#spanFile').prepend('<span class="glyphicon glyphicon-folder-open"></span>');
+                   	$('#tfile').on('change', function(){
     		    		 decorateFileInputChangeEvent($);
     		    	});
     		});
@@ -151,10 +153,14 @@
    		progressbarArea.find('p.progressBarProgressMsg').hide();
    		progressbarArea.find('p.progressBarCompleteMsg').hide();
    		progressbarArea.hide();
-    	$('#tfile').wrap('<span id="spanFile" class="fileinput-button btn btn-success col-md-2"><span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;<fmt:message key="jsp.submit.choose-file.upload-ajax.button.select-file"/></span>');
-    	$('#tfile').on('change', function(){
-    		 decorateFileInputChangeEvent($);
-   		});
+
+        $('#tfile').wrap('<span id="spanFile" class="fileinput-button btn btn-success col-md-2"></span>');
+        $('#spanFile').prepend('&nbsp;&nbsp;<fmt:message key="jsp.submit.choose-file.upload-ajax.button.select-file"/>');
+        $('#spanFile').prepend('<span class="glyphicon glyphicon-folder-open"></span>');
+        $('#tfile').on('change', function(){
+            decorateFileInputChangeEvent($);
+        });
+
    		// the skip button should not send any files
    		$('input[name="<%=UploadStep.SUBMIT_SKIP_BUTTON%>"]').on('click', function(){
    			$('#tfile').val('');
