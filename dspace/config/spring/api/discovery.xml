@@ -136,14 +136,16 @@
                 <property name="metadataSortField" value="dc.date.accessioned" />
                 <property name="type" value="date"/>
                 <property name="max" value="5"/>
+                <!-- If enabled the collection home page will not display metadata but show a pageable list of recent submissions -->
+                <property name="useAsHomePage" value="false"/>
             </bean>
         </property>
         <!--Default result per page  -->
         <property name="defaultRpp" value="10" />
         <property name="hitHighlightingConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightingConfiguration">
-        <property name="metadataFields">
-            <list>
+                <property name="metadataFields">
+                    <list>
                         <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
                             <property name="field" value="dc.title"/>
                             <property name="snippets" value="5"/>
@@ -162,9 +164,9 @@
                             <property name="maxSize" value="250"/>
                             <property name="snippets" value="2"/>
                         </bean>
-            </list>
-        </property>
-    </bean>
+                    </list>
+                </property>
+            </bean>
         </property>
         <property name="moreLikeThisConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration">

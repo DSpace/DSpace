@@ -87,7 +87,7 @@ public class InstallItemTest extends AbstractUnitTest
         String handle = "1345/567";
         Collection col = Collection.create(context);
         WorkspaceItem is = WorkspaceItem.create(context, col, false);
-
+      
         //Test assigning a specified handle to an item
         // (this handle should not already be used by system, as it doesn't start with "1234567689" prefix)
         Item result = InstallItem.installItem(context, is, handle);

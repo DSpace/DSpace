@@ -138,10 +138,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     {
         if ( solr == null)
         {
-			String solrService = new DSpace().getConfigurationService()
-					.getProperty("discovery.search.server");
-			UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
-            if(urlValidator.isValid(solrService))
+            String solrService = new DSpace().getConfigurationService().getProperty("discovery.search.server");
+
+            UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
+            if (urlValidator.isValid(solrService))
             {
                 try {
                     log.debug("Solr URL: " + solrService);
@@ -156,7 +156,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 } catch (SolrServerException e) {
                     log.error("Error while initialinging solr server", e);
                 }
-            }else{
+            }
+            else
+            {
                 log.error("Error while initializing solr, invalid url: " + solrService);
             }
         }

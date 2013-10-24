@@ -1388,3 +1388,8 @@ table.discovery-filters th.new-filter-header
 .didYouMean a{
     font-weight: bold;
 }
+
+.recentSubmissionViewMore {
+    text-align: right;
+    font-size: 100%;
+}

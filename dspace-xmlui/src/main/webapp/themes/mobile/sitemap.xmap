@@ -23,7 +23,7 @@
 		<map:component-configurations>
 			<global-variables>
 				<theme-path>mobile</theme-path>
-				<theme-name>Mobile theme for DSpace from Miami University</theme-name>
+				<theme-name>Mobile theme for DSpace</theme-name>
 			</global-variables>
 		</map:component-configurations>
 		

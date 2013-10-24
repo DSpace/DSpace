@@ -73,6 +73,7 @@ public class CommunityRecentSubmissions extends AbstractRecentSubmissionTransfor
                     lastSubmitted.addReference(resultObject);
                 }
             }
+            addViewMoreLink(lastSubmittedDiv, dso);
         }
     }
 }
