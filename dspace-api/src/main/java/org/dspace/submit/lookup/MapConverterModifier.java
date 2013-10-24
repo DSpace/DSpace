@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
 
 import gr.ekt.bte.core.AbstractModifier;
 import gr.ekt.bte.core.MutableRecord;
@@ -33,18 +35,93 @@ import gr.ekt.bte.core.Value;
 public class MapConverterModifier extends AbstractModifier
 {
 
-	String mappingFile; //The properties filename
+	private String mappingFile; //The properties absolute filename
+	
+	private String converterNameFile; //The properties filename
 
-    Map<String, String> mapping;
+	private ConfigurationService configurationService;
+	
+    private Map<String, String> mapping;
 
-    String defaultValue = "";
+    private String defaultValue = "";
 
-    List<String> fieldKeys;
+    private List<String> fieldKeys;
 
     private Map<String, String> regexConfig = new HashMap<String, String>();
 
     public final String REGEX_PREFIX = "regex.";
 
+    public void init() {
+        this.mappingFile = configurationService.getProperty("dspace.dir") + File.separator + "config" + File.separator + "crosswalks" + File.separator + converterNameFile;
+        
+        this.mapping = new HashMap<String, String>();
+        
+        FileInputStream fis = null;
+        try
+        {
+            fis = new FileInputStream(new File(mappingFile));
+            Properties mapConfig = new Properties();
+            mapConfig.load(fis);
+            fis.close();
+            for (Object key : mapConfig.keySet())
+            {
+                String keyS = (String)key;
+                if (keyS.startsWith(REGEX_PREFIX))
+                {
+                    String regex = keyS.substring(REGEX_PREFIX.length());
+                    String regReplace = mapping.get(keyS);
+                    if (regReplace == null)
+                    {
+                        regReplace = "";
+                    }
+                    else if (regReplace.equalsIgnoreCase("@ident@"))
+                    {
+                        regReplace = "$0";
+                    }
+                    regexConfig.put(regex,regReplace);
+                }
+                if (mapConfig.getProperty(keyS) != null)
+                    mapping.put(keyS, mapConfig.getProperty(keyS));
+                else 
+                    mapping.put(keyS, "");
+            }
+        }
+        catch (Exception e)
+        {
+            throw new IllegalArgumentException("", e);
+        }
+        finally
+        {
+            if (fis != null)
+            {
+                try
+                {
+                    fis.close();
+                }
+                catch (IOException ioe)
+                {
+                    // ...
+                }
+            }
+        }
+        for (String keyS : mapping.keySet())
+        {
+            if (keyS.startsWith(REGEX_PREFIX))
+            {
+                String regex = keyS.substring(REGEX_PREFIX.length());
+                String regReplace = mapping.get(keyS);
+                if (regReplace == null)
+                {
+                    regReplace = "";
+                }
+                else if (regReplace.equalsIgnoreCase("@ident@"))
+                {
+                    regReplace = "$0";
+                }
+                regexConfig.put(regex,regReplace);
+            }
+        }
+    }
     /**
      * @param name
      */
@@ -115,77 +192,6 @@ public class MapConverterModifier extends AbstractModifier
         return record;
     }
 
-    public void setMappingFile(String mappingFile) {
-		this.mappingFile = mappingFile;
-		
-		this.mapping = new HashMap<String, String>();
-		
-		FileInputStream fis = null;
-		try
-		{
-			fis = new FileInputStream(new File(mappingFile));
-			Properties mapConfig = new Properties();
-			mapConfig.load(fis);
-			fis.close();
-			for (Object key : mapConfig.keySet())
-			{
-				String keyS = (String)key;
-				if (keyS.startsWith(REGEX_PREFIX))
-				{
-					String regex = keyS.substring(REGEX_PREFIX.length());
-					String regReplace = mapping.get(keyS);
-					if (regReplace == null)
-					{
-						regReplace = "";
-					}
-					else if (regReplace.equalsIgnoreCase("@ident@"))
-					{
-						regReplace = "$0";
-					}
-					regexConfig.put(regex,regReplace);
-				}
-				if (mapConfig.getProperty(keyS) != null)
-					mapping.put(keyS, mapConfig.getProperty(keyS));
-				else 
-					mapping.put(keyS, "");
-			}
-		}
-		catch (Exception e)
-		{
-			throw new IllegalArgumentException("", e);
-		}
-		finally
-		{
-			if (fis != null)
-			{
-				try
-				{
-					fis.close();
-				}
-				catch (IOException ioe)
-				{
-					// ...
-				}
-			}
-		}
-		for (String keyS : mapping.keySet())
-		{
-			if (keyS.startsWith(REGEX_PREFIX))
-			{
-				String regex = keyS.substring(REGEX_PREFIX.length());
-				String regReplace = mapping.get(keyS);
-				if (regReplace == null)
-				{
-					regReplace = "";
-				}
-				else if (regReplace.equalsIgnoreCase("@ident@"))
-				{
-					regReplace = "$0";
-				}
-				regexConfig.put(regex,regReplace);
-			}
-		}
-    }
 
     public void setFieldKeys(List<String> fieldKeys)
     {
@@ -195,5 +201,14 @@ public class MapConverterModifier extends AbstractModifier
     public void setDefaultValue(String defaultValue)
     {
         this.defaultValue = defaultValue;
+    }
+    
+    public void setConverterNameFile(String converterNameFile)
+    {
+        this.converterNameFile = converterNameFile;
+    }
+    public void setConfigurationService(ConfigurationService configurationService)
+    {
+        this.configurationService = configurationService;
     }
 }
