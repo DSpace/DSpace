@@ -17,8 +17,10 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.usage.UsageEvent;
@@ -35,9 +37,11 @@ import org.dspace.utils.DSpace;
 public class ItemsResource {
 	
 	private static final boolean writeStatistics;
+	private static final int maxPagination;
 	
 	static{
 		writeStatistics=ConfigurationManager.getBooleanProperty("rest","stats",false);
+		maxPagination=ConfigurationManager.getIntProperty("rest", "max_pagination");
 	}
 	
 	 /** log4j category */
@@ -45,6 +49,57 @@ public class ItemsResource {
     //ItemList - Not Implemented
 
     private static org.dspace.core.Context context;
+    
+    @GET
+    @Path("/")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public org.dspace.rest.common.Item[] list(
+    		@QueryParam("expand") String expand,
+    		@QueryParam("limit") Integer size, 
+    		@QueryParam("offset") Integer offset)  throws WebApplicationException {
+    	
+    	try {
+            if(context == null || !context.isValid()) {
+                context = new org.dspace.core.Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
+            }
+            //make sure maximum count per page is more than allowed
+            if(size==null || size>maxPagination){
+            	size=maxPagination;
+            }
+            if(offset==null){
+            	offset=0;
+            }
+            log.debug("limit " + size + " offset " + offset);
+            
+            ArrayList<org.dspace.rest.common.Item> selectedItems= new ArrayList<org.dspace.rest.common.Item>();
+            ItemIterator items = org.dspace.content.Item.findAll(context);
+            int count=0;
+            int added=0;
+            org.dspace.content.Item item;
+            while(items.hasNext() && added<size){
+            	item = items.next();
+            	if(count>=offset && count<(offset+size)){
+            		if(AuthorizeManager.authorizeActionBoolean(context, item, org.dspace.core.Constants.READ)) {
+                        selectedItems.add(new org.dspace.rest.common.Item(item, expand, context));
+                        added++;
+                    }
+            	}
+            	count++;
+            		
+            }
+            
+            return(selectedItems.toArray(new org.dspace.rest.common.Item[selectedItems.size()]));
+           
+            
+            
+    	 } catch (SQLException e)  {
+             log.error(e.getMessage());
+             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+         }
+    	
+    }
 
     @GET
     @Path("/{item_id}")
