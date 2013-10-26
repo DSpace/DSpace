@@ -21,6 +21,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -34,105 +35,137 @@ import gr.ekt.bte.dataloader.FileDataLoader;
 import gr.ekt.bte.exceptions.MalformedSourceException;
 
 /**
- * @author kstamatis
- *
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
+ * 
  */
-public class ArXivFileDataLoader extends FileDataLoader {
+public class ArXivFileDataLoader extends FileDataLoader
+{
 
-	Map<String, String> fieldMap; //mapping between service fields and local intermediate fields
-	
-	/**
-	 * Empty constructor
-	 */
-	public ArXivFileDataLoader() {
-	}
+    private static Logger log = Logger.getLogger(ArXivFileDataLoader.class);
 
-	/**
-	 * @param filename
-	 */
-	public ArXivFileDataLoader(String filename) {
-		super(filename);
-	}
+    Map<String, String> fieldMap; // mapping between service fields and local
+                                  // intermediate fields
 
-	/* (non-Javadoc)
-	 * @see gr.ekt.bte.core.DataLoader#getRecords()
-	 */
-	@Override
-	public RecordSet getRecords() throws MalformedSourceException {
-		
-		RecordSet recordSet = new RecordSet();
+    /**
+     * Empty constructor
+     */
+    public ArXivFileDataLoader()
+    {
+    }
 
-		try {
-			InputStream inputStream = new FileInputStream(new File(filename));
-			
-			DocumentBuilderFactory factory = DocumentBuilderFactory
-			        .newInstance();
-			factory.setValidating(false);
-			factory.setIgnoringComments(true);
-			factory.setIgnoringElementContentWhitespace(true);
+    /**
+     * @param filename
+     */
+    public ArXivFileDataLoader(String filename)
+    {
+        super(filename);
+    }
 
-			DocumentBuilder db = factory.newDocumentBuilder();
-			Document inDoc = db.parse(inputStream);
+    /*
+     * (non-Javadoc)
+     * 
+     * @see gr.ekt.bte.core.DataLoader#getRecords()
+     */
+    @Override
+    public RecordSet getRecords() throws MalformedSourceException
+    {
 
-			Element xmlRoot = inDoc.getDocumentElement();
-			List<Element> dataRoots = XMLUtils.getElementList(xmlRoot,
-			        "entry");
+        RecordSet recordSet = new RecordSet();
 
-			for (Element dataRoot : dataRoots)
-			{
-				Record record = ArxivUtils.convertArxixDomToRecord(dataRoot);
-			    if (record != null)
-			    {
-			        recordSet.addRecord(convertFields(record));
-			    }
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-  	
-		return recordSet;
-	}
+        try
+        {
+            InputStream inputStream = new FileInputStream(new File(filename));
 
-	/* (non-Javadoc)
-	 * @see gr.ekt.bte.core.DataLoader#getRecords(gr.ekt.bte.core.DataLoadingSpec)
-	 */
-	@Override
-	public RecordSet getRecords(DataLoadingSpec spec)
-			throws MalformedSourceException {
-		
-		return getRecords();
-	}
+            DocumentBuilderFactory factory = DocumentBuilderFactory
+                    .newInstance();
+            factory.setValidating(false);
+            factory.setIgnoringComments(true);
+            factory.setIgnoringElementContentWhitespace(true);
 
-	public Record convertFields(Record publication) {
-		for (String fieldName : fieldMap.keySet()) {
-			String md = null;
-			if (fieldMap!=null){
-				md = this.fieldMap.get(fieldName);
-			}
+            DocumentBuilder db = factory.newDocumentBuilder();
+            Document inDoc = db.parse(inputStream);
 
-			if (StringUtils.isBlank(md)) {
-				continue;
-			} else {
-				md = md.trim();
-			}
+            Element xmlRoot = inDoc.getDocumentElement();
+            List<Element> dataRoots = XMLUtils.getElementList(xmlRoot, "entry");
 
-			if (publication.isMutable()){
-				List<Value> values = publication.getValues(fieldName);
-				publication.makeMutable().removeField(fieldName);
-				publication.makeMutable().addField(md, values);
-			}
-		}
-		
-		return publication;
-	}
+            for (Element dataRoot : dataRoots)
+            {
+                Record record = ArxivUtils.convertArxixDomToRecord(dataRoot);
+                if (record != null)
+                {
+                    recordSet.addRecord(convertFields(record));
+                }
+            }
+        }
+        catch (FileNotFoundException e)
+        {
+            log.error(e.getMessage(), e);
+        }
+        catch (ParserConfigurationException e)
+        {
+            log.error(e.getMessage(), e);
+        }
+        catch (SAXException e)
+        {
+            log.error(e.getMessage(), e);
+        }
+        catch (IOException e)
+        {
+            log.error(e.getMessage(), e);
+        }
 
-	public void setFieldMap(Map<String, String> fieldMap) {
-		this.fieldMap = fieldMap;
-	}
+        return recordSet;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * gr.ekt.bte.core.DataLoader#getRecords(gr.ekt.bte.core.DataLoadingSpec)
+     */
+    @Override
+    public RecordSet getRecords(DataLoadingSpec spec)
+            throws MalformedSourceException
+    {
+
+        return getRecords();
+    }
+
+    public Record convertFields(Record publication)
+    {
+        for (String fieldName : fieldMap.keySet())
+        {
+            String md = null;
+            if (fieldMap != null)
+            {
+                md = this.fieldMap.get(fieldName);
+            }
+
+            if (StringUtils.isBlank(md))
+            {
+                continue;
+            }
+            else
+            {
+                md = md.trim();
+            }
+
+            if (publication.isMutable())
+            {
+                List<Value> values = publication.getValues(fieldName);
+                publication.makeMutable().removeField(fieldName);
+                publication.makeMutable().addField(md, values);
+            }
+        }
+
+        return publication;
+    }
+
+    public void setFieldMap(Map<String, String> fieldMap)
+    {
+        this.fieldMap = fieldMap;
+    }
 }

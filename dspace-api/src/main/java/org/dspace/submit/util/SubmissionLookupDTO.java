@@ -11,32 +11,42 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
-public class SubmissionLookupDTO implements Serializable {
-	private static final long serialVersionUID = 1;
-	
-	private String uuid;
+/**
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
+ */
+public class SubmissionLookupDTO implements Serializable
+{
+    private static final long serialVersionUID = 1;
 
-	private List<ItemSubmissionLookupDTO> items;
+    private String uuid;
 
-	public SubmissionLookupDTO() {
-		this.uuid = UUID.randomUUID().toString();
-	}
-	
-	public void setItems(List<ItemSubmissionLookupDTO> items) {
-		this.items = items;
-	}
+    private List<ItemSubmissionLookupDTO> items;
 
-	public ItemSubmissionLookupDTO getLookupItem(String uuidLookup) {
-		if (items != null)
-		{
-			for (ItemSubmissionLookupDTO item : items)
-			{
-				if (item.getUUID().equals(uuidLookup))
-				{
-					return item;
-				}
-			}
-		}
-		return null;		
-	}
+    public SubmissionLookupDTO()
+    {
+        this.uuid = UUID.randomUUID().toString();
+    }
+
+    public void setItems(List<ItemSubmissionLookupDTO> items)
+    {
+        this.items = items;
+    }
+
+    public ItemSubmissionLookupDTO getLookupItem(String uuidLookup)
+    {
+        if (items != null)
+        {
+            for (ItemSubmissionLookupDTO item : items)
+            {
+                if (item.getUUID().equals(uuidLookup))
+                {
+                    return item;
+                }
+            }
+        }
+        return null;
+    }
 }

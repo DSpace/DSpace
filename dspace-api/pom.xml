@@ -499,7 +499,6 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.2.1</version>
             <scope>compile</scope>
         </dependency>
 
@@ -507,23 +506,17 @@
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
-
+		
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-
-	<dependency>
-            <groupId>backport-util-concurrent</groupId>
-            <artifactId>backport-util-concurrent</artifactId>
-            <version>3.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>net.sf.flexjson</groupId>
-            <artifactId>flexjson</artifactId>            
-        </dependency>
-        
+		
+		<dependency>
+	    	<groupId>backport-util-concurrent</groupId>
+	    	<artifactId>backport-util-concurrent</artifactId>
+	    	<version>3.1</version>
+		</dependency>
     </dependencies>
 
 </project>

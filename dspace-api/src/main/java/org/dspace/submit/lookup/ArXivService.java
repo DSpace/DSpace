@@ -31,6 +31,12 @@ import org.dspace.core.ConfigurationManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+/**
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
+ */
 public class ArXivService
 {
     private int timeout = 1000;
@@ -73,7 +79,7 @@ public class ArXivService
             throws IOException, HttpException
     {
         List<Record> results = new ArrayList<Record>();
-        if (!ConfigurationManager.getBooleanProperty("remoteservice.demo"))
+        if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE, "remoteservice.demo"))
         {
             GetMethod method = null;
             try
@@ -94,9 +100,9 @@ public class ArXivService
                 if (statusCode != HttpStatus.SC_OK)
                 {
                     if (statusCode == HttpStatus.SC_BAD_REQUEST)
-                        throw new RuntimeException("Query arXiv non valida");
+                        throw new RuntimeException("arXiv query is not valid");
                     else
-                        throw new RuntimeException("Chiamata http fallita: "
+                        throw new RuntimeException("Http call failed: "
                                 + method.getStatusLine());
                 }
 
@@ -117,7 +123,8 @@ public class ArXivService
 
                     for (Element dataRoot : dataRoots)
                     {
-                    	Record crossitem = ArxivUtils.convertArxixDomToRecord(dataRoot);
+                        Record crossitem = ArxivUtils
+                                .convertArxixDomToRecord(dataRoot);
                         if (crossitem != null)
                         {
                             results.add(crossitem);
@@ -127,7 +134,7 @@ public class ArXivService
                 catch (Exception e)
                 {
                     throw new RuntimeException(
-                            "Identificativo arXiv non valido o inesistente");
+                            "ArXiv identifier is not valid or not exist");
                 }
             }
             finally
@@ -162,7 +169,8 @@ public class ArXivService
                             "entry");
                     for (Element dataRoot : dataRoots)
                     {
-                    	Record crossitem = ArxivUtils.convertArxixDomToRecord(dataRoot);
+                        Record crossitem = ArxivUtils
+                                .convertArxixDomToRecord(dataRoot);
 
                         if (crossitem != null)
                         {
@@ -173,7 +181,7 @@ public class ArXivService
                 catch (Exception e)
                 {
                     throw new RuntimeException(
-                            "Identificativo arXiv non valido o inesistente");
+                            "ArXiv identifier is not valid or not exist");
                 }
             }
             finally
@@ -187,8 +195,7 @@ public class ArXivService
         return results;
     }
 
-    public Record getByArXivIDs(String raw) throws HttpException,
-            IOException
+    public Record getByArXivIDs(String raw) throws HttpException, IOException
     {
         if (StringUtils.isNotBlank(raw))
         {

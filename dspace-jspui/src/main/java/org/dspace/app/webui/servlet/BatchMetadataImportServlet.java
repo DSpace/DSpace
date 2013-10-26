@@ -23,7 +23,7 @@ import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededExcepti
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.FileUploadRequest;
-import org.dspace.app.itemimport.DataLoaderService;
+import org.dspace.app.itemimport.BTEBatchImportService;
 import org.dspace.app.itemimport.ItemImport;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -95,7 +95,7 @@ public class BatchMetadataImportServlet extends DSpaceServlet
         	}
         	
         	//Get all the possible data loaders from the Spring configuration
-        	DataLoaderService dls  = new DSpace().getSingletonService(DataLoaderService.class);
+        	BTEBatchImportService dls  = new DSpace().getSingletonService(BTEBatchImportService.class);
         	List<String> inputTypes = Lists.newArrayList(dls.getDataLoaders().keySet());
         	
         	request.setAttribute("input-types", inputTypes);
@@ -149,7 +149,7 @@ public class BatchMetadataImportServlet extends DSpaceServlet
             SQLException, AuthorizeException
     {
     	//Get all the possible data loaders from the Spring configuration
-    	DataLoaderService dls  = new DSpace().getSingletonService(DataLoaderService.class);
+    	BTEBatchImportService dls  = new DSpace().getSingletonService(BTEBatchImportService.class);
     	List<String> inputTypes = Lists.newArrayList(dls.getDataLoaders().keySet());
     	
     	request.setAttribute("input-types", inputTypes);

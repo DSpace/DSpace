@@ -34,107 +34,141 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 /**
- * @author kstamatis
- *
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
  */
-public class PubmedFileDataLoader extends FileDataLoader {
+public class PubmedFileDataLoader extends FileDataLoader
+{
 
-	Map<String, String> fieldMap; //mapping between service fields and local intermediate fields
+    Map<String, String> fieldMap; // mapping between service fields and local
+                                  // intermediate fields
 
-	/**
+    /**
 	 * 
 	 */
-	public PubmedFileDataLoader() {
-	}
+    public PubmedFileDataLoader()
+    {
+    }
 
-	/**
-	 * @param filename
-	 */
-	public PubmedFileDataLoader(String filename) {
-		super(filename);
-	}
+    /**
+     * @param filename
+     */
+    public PubmedFileDataLoader(String filename)
+    {
+        super(filename);
+    }
 
-	/* (non-Javadoc)
-	 * @see gr.ekt.bte.core.DataLoader#getRecords()
-	 */
-	@Override
-	public RecordSet getRecords() throws MalformedSourceException {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see gr.ekt.bte.core.DataLoader#getRecords()
+     */
+    @Override
+    public RecordSet getRecords() throws MalformedSourceException
+    {
 
-		RecordSet recordSet = new RecordSet();
+        RecordSet recordSet = new RecordSet();
 
-		try {
-			InputStream inputStream = new FileInputStream(new File(filename));
+        try
+        {
+            InputStream inputStream = new FileInputStream(new File(filename));
 
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			factory.setValidating(false);
-			factory.setIgnoringComments(true);
-			factory.setIgnoringElementContentWhitespace(true);
+            DocumentBuilderFactory factory = DocumentBuilderFactory
+                    .newInstance();
+            factory.setValidating(false);
+            factory.setIgnoringComments(true);
+            factory.setIgnoringElementContentWhitespace(true);
 
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document inDoc = builder.parse(inputStream);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document inDoc = builder.parse(inputStream);
 
-			Element xmlRoot = inDoc.getDocumentElement();
-			List<Element> pubArticles = XMLUtils
-					.getElementList(xmlRoot, "PubmedArticle");
+            Element xmlRoot = inDoc.getDocumentElement();
+            List<Element> pubArticles = XMLUtils.getElementList(xmlRoot,
+                    "PubmedArticle");
 
-			for (Element xmlArticle : pubArticles)
-			{
-				Record record = null;
-				try {
-					record = PubmedUtils.convertCrossRefDomToRecord(xmlArticle);
-					recordSet.addRecord(convertFields(record));
-				} catch (Exception e) {
-					throw new RuntimeException(e.getMessage(), e);
-				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+            for (Element xmlArticle : pubArticles)
+            {
+                Record record = null;
+                try
+                {
+                    record = PubmedUtils.convertCrossRefDomToRecord(xmlArticle);
+                    recordSet.addRecord(convertFields(record));
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+        catch (ParserConfigurationException e)
+        {
+            e.printStackTrace();
+        }
+        catch (SAXException e)
+        {
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
 
-		return recordSet;
+        return recordSet;
 
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see gr.ekt.bte.core.DataLoader#getRecords(gr.ekt.bte.core.DataLoadingSpec)
-	 */
-	@Override
-	public RecordSet getRecords(DataLoadingSpec spec)
-			throws MalformedSourceException {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * gr.ekt.bte.core.DataLoader#getRecords(gr.ekt.bte.core.DataLoadingSpec)
+     */
+    @Override
+    public RecordSet getRecords(DataLoadingSpec spec)
+            throws MalformedSourceException
+    {
 
-		return getRecords();
-	}
+        return getRecords();
+    }
 
-	public Record convertFields(Record publication) {
-		for (String fieldName : fieldMap.keySet()) {
-			String md = null;
-			if (fieldMap!=null){
-				md = this.fieldMap.get(fieldName);
-			}
+    public Record convertFields(Record publication)
+    {
+        for (String fieldName : fieldMap.keySet())
+        {
+            String md = null;
+            if (fieldMap != null)
+            {
+                md = this.fieldMap.get(fieldName);
+            }
 
-			if (StringUtils.isBlank(md)) {
-				continue;
-			} else {
-				md = md.trim();
-			}
+            if (StringUtils.isBlank(md))
+            {
+                continue;
+            }
+            else
+            {
+                md = md.trim();
+            }
 
-			if (publication.isMutable()){
-				List<Value> values = publication.getValues(fieldName);
-				publication.makeMutable().removeField(fieldName);
-				publication.makeMutable().addField(md, values);
-			}
-		}
+            if (publication.isMutable())
+            {
+                List<Value> values = publication.getValues(fieldName);
+                publication.makeMutable().removeField(fieldName);
+                publication.makeMutable().addField(md, values);
+            }
+        }
 
-		return publication;
-	}
+        return publication;
+    }
 
-	public void setFieldMap(Map<String, String> fieldMap) {
-		this.fieldMap = fieldMap;
-	}
+    public void setFieldMap(Map<String, String> fieldMap)
+    {
+        this.fieldMap = fieldMap;
+    }
 }
