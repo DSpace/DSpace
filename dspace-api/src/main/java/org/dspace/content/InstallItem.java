@@ -190,14 +190,9 @@ public class InstallItem
         // set owning collection
         item.setOwningCollection(is.getCollection());
 
-        // set in_archive=true only if the user didn't specify that it is a private item
-        if(item.isDiscoverable()){
-            item.setArchived(true);
-        }
-        else{ // private item is withdrawn as well
-            item.withdraw();
-        }
-
+        // set in_archive=true
+        item.setArchived(true);
+        
         // save changes ;-)
         item.update();
 
