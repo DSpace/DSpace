@@ -121,7 +121,7 @@
 
     <%-- HACK: leftmargin, topmargin: for non-CSS compliant Microsoft IE browser --%>
     <%-- HACK: marginwidth, marginheight: for non-CSS compliant Netscape browser --%>
-    <body style="padding-top: 55px;">
+    <body class="undernavigation">
 <a class="sr-only" href="#content">Skip navigation</a>
 <header class="navbar navbar-inverse navbar-fixed-top">    
     <%
@@ -136,7 +136,7 @@
 %>
 </header>
 
-<main id="content" role="main" style="padding-bottom:60px;">
+<main id="content" role="main">
 <div class="container banner">
 	<div class="row">
 		<div class="col-md-9 brand">
