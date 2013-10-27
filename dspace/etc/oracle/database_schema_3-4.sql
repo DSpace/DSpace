@@ -76,3 +76,9 @@ CREATE TABLE requestitem
 );
 
 CREATE SEQUENCE requestitem_seq;
+
+-------------------------------------------------------
+-- DS-1655 Disable "Initial Questions" page in Submission UI by default
+-------------------------------------------------------
+update workspaceitem set multiple_titles=1, published_before=1, multiple_files=1;
+update workflowitem set multiple_titles=1, published_before=1, multiple_files=1;

@@ -181,24 +181,22 @@
      
      <!--Uncommment to display the SAMPLE step as your first step-->
      <!--<step id="sample"/>-->
+
+	 <!-- Step 1. Since DSpace 4.0, the initial questions has been disabled. Metadata are shown exactly as 
+	 	  required in input-forms and items are assumed to have always multiple-files attached.
+	      If re-enable the initial questions step you should comment out this step-->
+	 <step>
+		<processing-class>org.dspace.submit.step.SkipInitialQuestionsStep</processing-class>
+	 </step>
           
-     <!--Step 1 will be to gather initial information-->
+     <!--Disabled by default Since DSpace 4.0: Step 1 will be to gather initial information
 	  <step>
 	    <heading>submit.progressbar.initial-questions</heading>
 		<processing-class>org.dspace.submit.step.InitialQuestionsStep</processing-class>
 		<jspui-binding>org.dspace.app.webui.submit.step.JSPInitialQuestionsStep</jspui-binding>   	    
 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.InitialQuestionsStep</xmlui-binding>
 	    <workflow-editable>true</workflow-editable>
-	  </step>
-	
-	<!--If you disable the initial questions step you should insert the -->
-	<!--SkipInitialQuestionsStep below, to enable proper processing of  -->
-	<!--input-forms configuration                                       -->
-	<!-- 
-	<step>
-		<processing-class>org.dspace.submit.step.SkipInitialQuestionsStep</processing-class>
-	</step>
-    -->  
+	  </step> -->
       
       <!--Step 2 will be to Describe the item.-->
       <step>
