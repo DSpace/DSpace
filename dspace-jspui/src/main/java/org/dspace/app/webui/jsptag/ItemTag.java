@@ -473,7 +473,7 @@ public class ItemTag extends TagSupport
                 try
                 {
                     label = I18nUtil.getMessage("metadata."
-                            + (style != null ? style + "." : "") + field,
+                            + ("default".equals(this.style) ? "" : this.style + ".") + field,
                             context);
                 }
                 catch (MissingResourceException e)
