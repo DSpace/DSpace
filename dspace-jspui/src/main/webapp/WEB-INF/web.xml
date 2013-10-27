@@ -298,6 +298,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>batchmetadataimport</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.BatchMetadataImportServlet</servlet-class>
+  </servlet>
+  
+  <servlet>
     <servlet-name>metadata-field-registry</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.MetadataFieldRegistryServlet</servlet-class>
   </servlet>
@@ -455,7 +460,22 @@
   	<servlet-name>privateitems</servlet-name>
   	<servlet-class>org.dspace.app.webui.servlet.admin.PrivateItemsServlet</servlet-class>
   </servlet>
-	
+
+  <servlet>
+    <servlet-name>version-item</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.VersionItemServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>version-history</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.VersionHistoryServlet</servlet-class>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>request-item</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.RequestItemServlet</servlet-class>
+  </servlet>
+    	
   <servlet-mapping>
     <servlet-name>shibboleth-login</servlet-name>
     <url-pattern>/shibboleth-login</url-pattern>
@@ -619,6 +639,11 @@
   </servlet-mapping>
 
   <servlet-mapping>
+    <servlet-name>batchmetadataimport</servlet-name>
+    <url-pattern>/dspace-admin/batchmetadataimport</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
     <servlet-name>metadata-field-registry</servlet-name>
     <url-pattern>/dspace-admin/metadata-field-registry</url-pattern>
   </servlet-mapping>
@@ -763,6 +788,21 @@
     <url-pattern>/dspace-admin/privateitems</url-pattern>
   </servlet-mapping>
 
+  <servlet-mapping>
+    <servlet-name>version-item</servlet-name>
+    <url-pattern>/tools/version</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>version-history</servlet-name>
+    <url-pattern>/tools/history</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>request-item</servlet-name>
+    <url-pattern>/request-item</url-pattern>
+  </servlet-mapping>
+  
   <!-- Icon MIME type -->
   <mime-mapping>
     <extension>ico</extension>

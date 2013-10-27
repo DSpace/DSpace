@@ -31,29 +31,39 @@ public abstract class GenericStatementDisseminator implements SwordStatementDiss
 			throws DSpaceSwordException
 	{
 		this.urlManager = new SwordUrlManager(new SwordConfigurationDSpace(), context);
-		List<OriginalDeposit> originalDeposits = this.getOriginalDeposits(context, item);
-		Map<String, String> states = this.getStates(context, item);
-		List<ResourcePart> resources = this.getResourceParts(context, item);
-        Date lastModified = this.getLastModified(context, item);
+        List<String> includeBundles = this.getIncludeBundles();
+        String originalDepositBundle = this.getOriginalDepositsBundle();
 
+        // we only list the original deposits in full if the sword bundle is in the includeBundles
+        if (includeBundles.contains(originalDepositBundle))
+        {
+            List<OriginalDeposit> originalDeposits = this.getOriginalDeposits(context, item, originalDepositBundle);
+            statement.setOriginalDeposits(originalDeposits);
+        }
+
+		Map<String, String> states = this.getStates(context, item);
+        statement.setStates(states);
+
+        // remove the original deposit bundle from the include bundles
+        includeBundles.remove(originalDepositBundle);
+		List<ResourcePart> resources = this.getResourceParts(context, item, includeBundles);
+        statement.setResources(resources);
+
+        Date lastModified = this.getLastModified(context, item);
         statement.setLastModified(lastModified);
-		statement.setOriginalDeposits(originalDeposits);
-		statement.setStates(states);
-		statement.setResources(resources);
 	}
 
-	protected List<OriginalDeposit> getOriginalDeposits(Context context, Item item)
+	protected List<OriginalDeposit> getOriginalDeposits(Context context, Item item, String swordBundle)
 			throws DSpaceSwordException
 	{
 		try
 		{
-			// an original deposit is everything in the SWORD bundle
+            // NOTE: DSpace does not store file metadata, so we can't access the information
+            // about who deposited what, when, on behalf of whoever.
+
 			List<OriginalDeposit> originalDeposits = new ArrayList<OriginalDeposit>();
-            String swordBundle = ConfigurationManager.getProperty("swordv2-server", "bundle.name");
-            if (swordBundle == null)
-            {
-                swordBundle = "SWORD";
-            }
+
+            // an original deposit is everything in the SWORD bundle
 			Bundle[] swords = item.getBundles(swordBundle);
 			for (Bundle sword : swords)
 			{
@@ -106,25 +116,29 @@ public abstract class GenericStatementDisseminator implements SwordStatementDiss
 		return states;
 	}
 
-	protected List<ResourcePart> getResourceParts(Context context, Item item)
+	protected List<ResourcePart> getResourceParts(Context context, Item item, List<String> includeBundles)
 			throws DSpaceSwordException
 	{
 		try
 		{
-			// the list of resource parts is everything in the ORIGINAL bundle
+			// the list of resource parts is everything in the bundles to be included
 			List<ResourcePart> resources = new ArrayList<ResourcePart>();
-			Bundle[] originals = item.getBundles("ORIGINAL");
-			for (Bundle original : originals)
-			{
-				for (Bitstream bitstream : original.getBitstreams())
-				{
-					// note that individual bitstreams have actionable urls
-					ResourcePart part = new ResourcePart(this.urlManager.getActionableBitstreamUrl(bitstream));
-					part.setMediaType(bitstream.getFormat().getMIMEType());
-					resources.add(part);
 
-				}
-			}
+            for (String bundleName : includeBundles)
+            {
+                Bundle[] bundles = item.getBundles(bundleName);
+                for (Bundle bundle : bundles)
+                {
+                    for (Bitstream bitstream : bundle.getBitstreams())
+                    {
+                        // note that individual bitstreams have actionable urls
+                        ResourcePart part = new ResourcePart(this.urlManager.getActionableBitstreamUrl(bitstream));
+                        part.setMediaType(bitstream.getFormat().getMIMEType());
+                        resources.add(part);
+                    }
+                }
+            }
+
 			return resources;
 		}
 		catch (SQLException e)
@@ -136,5 +150,35 @@ public abstract class GenericStatementDisseminator implements SwordStatementDiss
     protected Date getLastModified(Context context, Item item)
     {
         return item.getLastModified();
+    }
+
+    private List<String> getIncludeBundles()
+    {
+        String cfg = ConfigurationManager.getProperty("swordv2-server", "statement.bundles");
+        if (cfg == null || "".equals(cfg))
+        {
+            cfg = "ORIGINAL, SWORD";
+        }
+        String[] bits = cfg.split(",");
+        List<String> include = new ArrayList<String>();
+        for (String bit : bits)
+        {
+            String bundleName = bit.trim().toUpperCase();
+            if (!include.contains(bundleName))
+            {
+                include.add(bundleName);
+            }
+        }
+        return include;
+    }
+
+    private String getOriginalDepositsBundle()
+    {
+        String swordBundle = ConfigurationManager.getProperty("swordv2-server", "bundle.name");
+        if (swordBundle == null)
+        {
+            swordBundle = "SWORD";
+        }
+        return swordBundle;
     }
 }

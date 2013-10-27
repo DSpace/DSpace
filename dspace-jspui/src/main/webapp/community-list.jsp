@@ -50,10 +50,9 @@
 %>
 
 <%!
-    void showCommunity(Community c, JspWriter out, HttpServletRequest request, 
+    void showCommunity(Community c, JspWriter out, HttpServletRequest request, ItemCounter ic,
     		Map collectionMap, Map subcommunityMap) throws ItemCountException, IOException, SQLException
     {
-    	ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
         out.println( "<li class=\"media well\">" );
         Bitstream logo = c.getLogo();
         if (logo != null)
@@ -113,7 +112,7 @@
             out.println("<ul class=\"media-list\">");
             for (int k = 0; k < comms.length; k++)
             {
-               showCommunity(comms[k], out, request, collectionMap, subcommunityMap);
+               showCommunity(comms[k], out, request, ic, collectionMap, subcommunityMap);
             }
             out.println("</ul>"); 
         }
@@ -156,7 +155,7 @@
 <%
         for (int i = 0; i < communities.length; i++)
         {
-            showCommunity(communities[i], out, request, collectionMap, subcommunityMap);
+            showCommunity(communities[i], out, request, ic, collectionMap, subcommunityMap);
         }
 %>
     </ul>

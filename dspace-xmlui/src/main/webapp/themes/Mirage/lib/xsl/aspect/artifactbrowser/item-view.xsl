@@ -104,7 +104,7 @@
           <xsl:when test="$clause = 1">
 
               <xsl:choose>
-                  <xsl:when test="count(dim:field[@element='title'][not(@qualifier)]) &gt; 1">
+                  <xsl:when test="descendant::text() and (count(dim:field[@element='title'][not(@qualifier)]) &gt; 1)">
                       <!-- display first title as h1 -->
                       <h1>
                           <xsl:value-of select="dim:field[@element='title'][not(@qualifier)][1]/node()"/>
@@ -122,7 +122,7 @@
                           </span>
                       </div>
                   </xsl:when>
-                  <xsl:when test="count(dim:field[@element='title'][not(@qualifier)]) = 1">
+                  <xsl:when test="dim:field[@element='title'][descendant::text()] and count(dim:field[@element='title'][not(@qualifier)]) = 1">
                       <h1>
                           <xsl:value-of select="dim:field[@element='title'][not(@qualifier)][1]/node()"/>
                       </h1>
@@ -140,7 +140,7 @@
           </xsl:when>
 
           <!-- Author(s) row -->
-          <xsl:when test="$clause = 2 and (dim:field[@element='contributor'][@qualifier='author'] or dim:field[@element='creator'] or dim:field[@element='contributor'])">
+          <xsl:when test="$clause = 2 and (dim:field[@element='contributor'][@qualifier='author' and descendant::text()] or dim:field[@element='creator' and descendant::text()] or dim:field[@element='contributor' and descendant::text()])">
                     <div class="simple-item-view-authors">
 	                    <xsl:choose>
 	                        <xsl:when test="dim:field[@element='contributor'][@qualifier='author']">
@@ -184,7 +184,7 @@
           </xsl:when>
 
           <!-- identifier.uri row -->
-          <xsl:when test="$clause = 3 and (dim:field[@element='identifier' and @qualifier='uri'])">
+          <xsl:when test="$clause = 3 and (dim:field[@element='identifier' and @qualifier='uri' and descendant::text()])">
                     <div class="simple-item-view-other">
 	                <span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-uri</i18n:text>:</span>
 	                <span>
@@ -208,7 +208,7 @@
           </xsl:when>
 
           <!-- date.issued row -->
-          <xsl:when test="$clause = 4 and (dim:field[@element='date' and @qualifier='issued'])">
+          <xsl:when test="$clause = 4 and (dim:field[@element='date' and @qualifier='issued' and descendant::text()])">
                     <div class="simple-item-view-other">
 	                <span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-date</i18n:text>:</span>
 	                <span>
@@ -259,7 +259,7 @@
           </xsl:when>
 
           <!-- Description row -->
-          <xsl:when test="$clause = 6 and (dim:field[@element='description' and not(@qualifier)])">
+          <xsl:when test="$clause = 6 and (dim:field[@element='description' and not(@qualifier) and descendant::text()])">
                 <div class="simple-item-view-description">
 	                <h3 class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-description</i18n:text>:</h3>
 	                <div>
@@ -407,6 +407,17 @@
                             <img alt="Icon" src="{concat($theme-path, '/images/mime.png')}" style="height: {$thumbnail.maxheight}px;"/>
                         </xsl:otherwise>
                     </xsl:choose>
+                    <xsl:if test="contains(mets:FLocat[@LOCTYPE='URL']/@xlink:href,'isAllowed=n')">
+ 	                    <img>
+ 	                     <xsl:attribute name="src">
+ 	                        <xsl:value-of select="$context-path"/>
+ 	                        <xsl:text>/static/icons/lock24.png</xsl:text>
+ 	                     </xsl:attribute>
+ 	                      <xsl:attribute name="alt">
+ 	                        <xsl:text>Bloqueado</xsl:text>
+ 	                      </xsl:attribute>               
+ 	                    </img>
+                     </xsl:if>
                 </a>
             </div>
             <div class="file-metadata" style="height: {$thumbnail.maxheight}px;">

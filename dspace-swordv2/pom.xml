@@ -96,15 +96,15 @@
         </dependency>
         <dependency>
             <groupId>org.swordapp</groupId>
-            <artifactId>server</artifactId>
-            <version>2.0</version>
+            <artifactId>sword2-server</artifactId>
+            <version>1.0</version>
             <type>jar</type>
             <classifier>classes</classifier>
         </dependency>
         <dependency>
             <groupId>org.swordapp</groupId>
-            <artifactId>server</artifactId>
-            <version>2.0</version>
+            <artifactId>sword2-server</artifactId>
+            <version>1.0</version>
             <type>war</type>
         </dependency>
         <dependency>

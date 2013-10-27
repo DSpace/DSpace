@@ -11,6 +11,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.swordapp.server.Deposit;
 import org.swordapp.server.SwordError;
@@ -18,6 +19,11 @@ import org.swordapp.server.UriRegistry;
 
 import java.sql.SQLException;
 
+/**
+ * This implementation of WorkflowManager is restricted and only allows UPDATE and DELETE operations
+ * on items which are not in workflow, in archive, or withdrawn.  These operations can only be
+ * performed on items which are in the deposit phase.
+ */
 public class WorkflowManagerDefault implements WorkflowManager
 {
 	public void retrieveServiceDoc(Context context) throws SwordError
@@ -60,6 +66,14 @@ public class WorkflowManagerDefault implements WorkflowManager
 
 	public void replaceMetadata(Context context, Item item) throws SwordError, DSpaceSwordException
 	{
+        boolean allowUpdate = ConfigurationManager.getBooleanProperty("swordv2-server", "workflowmanagerdefault.always-update-metadata");
+        if (allowUpdate)
+        {
+            // all updates are allowed
+            return;
+        }
+
+        // otherwise, go ahead and figure out the state
 		WorkflowTools wft = new WorkflowTools();
 		if (item.isArchived() || item.isWithdrawn())
 		{
@@ -118,6 +132,15 @@ public class WorkflowManagerDefault implements WorkflowManager
     public void replaceBitstream(Context context, Bitstream bitstream)
             throws SwordError, DSpaceSwordException
     {
+        // File replace with DSpace actually violates the RESTful environment, so it is
+        // turned off by default, and strongly advised against.  Nonetheless, it is used
+        // by some DepositMO aware extensions, so must be supported (as shown below)
+        boolean fileReplace = ConfigurationManager.getBooleanProperty("swordv2-server", "workflowmanagerdefault.file-replace.enable");
+        if (!fileReplace)
+        {
+            throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED, "DSpace does not support file replace; you should DELETE the original file and PUT the new one");
+        }
+
         // this is equivalent to asking whether the media resource in the item can be deleted
 		try
 		{
@@ -156,6 +179,14 @@ public class WorkflowManagerDefault implements WorkflowManager
 
 	public void addMetadata(Context context, Item item) throws SwordError, DSpaceSwordException
 	{
+        boolean allowUpdate = ConfigurationManager.getBooleanProperty("swordv2-server", "workflowmanagerdefault.always-update-metadata");
+        if (allowUpdate)
+        {
+            // all updates are allowed
+            return;
+        }
+
+        // otherwise, lookup the state of the item
 		WorkflowTools wft = new WorkflowTools();
 		if (item.isArchived() || item.isWithdrawn())
 		{
@@ -227,17 +258,17 @@ public class WorkflowManagerDefault implements WorkflowManager
         boolean inarch = item.isArchived() || item.isWithdrawn();
 
         // in progress      inws    inwf    inarch      action      description
-        // 0                0       0       1           ERROR       the deposit finished, and the item is in the archive; this should never be allowed to arise
+        // 0                0       0       1           NOTHING     the deposit finished, and the item is in the archive;
         // 0                0       1       0           NOTHING     the deposit finished, and the item is in the workflow.  Carry on as normal
         // 0                1       0       0           START WF    the deposit is finished, and the item is in the workflow, so we start it
-        // 1                0       0       1           ERROR       the deposit is not finished, and the item is in the archive; this should never be allowed to arise
+        // 1                0       0       1           NOTHING     the deposit is not finished, and the item is in the archive;
         // 1                0       1       0           STOP WF     the deposit is not finished, and it is in the workflow.  Pull it out into the workspace
         // 1                1       0       0           NOTHING     the deposit is not finished, and is in the workspace; leave it there
 
         if (!deposit.isInProgress() && inarch)
         {
-            verboseDescription.append("The deposit is finished, but the item is already in the archive");
-            throw new DSpaceSwordException("Invalid workflow state");
+            verboseDescription.append("The deposit is finished, and the item is already in the archive");
+            // throw new DSpaceSwordException("Invalid workflow state");
         }
 
         if (!deposit.isInProgress() && inws)
@@ -248,8 +279,8 @@ public class WorkflowManagerDefault implements WorkflowManager
 
         if (deposit.isInProgress() && inarch)
         {
-            verboseDescription.append("The deposit is not finished, but the item is already in the archive");
-            throw new DSpaceSwordException("Invalid workflow state");
+            verboseDescription.append("The deposit is not finished, and the item is already in the archive");
+            // throw new DSpaceSwordException("Invalid workflow state");
         }
 
         if (deposit.isInProgress() && inwf)

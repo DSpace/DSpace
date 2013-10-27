@@ -138,10 +138,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     {
         if ( solr == null)
         {
-			String solrService = new DSpace().getConfigurationService()
-					.getProperty("discovery.search.server");
-			UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
-            if(urlValidator.isValid(solrService))
+            String solrService = new DSpace().getConfigurationService().getProperty("discovery.search.server");
+
+            UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
+            if (urlValidator.isValid(solrService))
             {
                 try {
                     log.debug("Solr URL: " + solrService);
@@ -156,7 +156,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 } catch (SolrServerException e) {
                     log.error("Error while initialinging solr server", e);
                 }
-            }else{
+            }
+            else
+            {
                 log.error("Error while initializing solr, invalid url: " + solrService);
             }
         }
@@ -2178,7 +2180,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     protected String transformAuthorityValue(Context context, String field, String value) throws SQLException {
-        if (field.endsWith("_filter") || field.endsWith("_ac")
+    	if(field.equals("location.comm") || field.equals("location.coll"))
+    	{
+            return value;
+    	}
+    	if (field.endsWith("_filter") || field.endsWith("_ac")
                 || field.endsWith("_acid"))
         {
             //We have a filter make sure we split !

@@ -445,7 +445,7 @@ public class HandleManager
      * @exception SQLException
      *                If a database error occurs
      */
-    static List<String> getHandlesForPrefix(Context context, String prefix)
+    public static List<String> getHandlesForPrefix(Context context, String prefix)
             throws SQLException
     {
         String sql = "SELECT handle FROM handle WHERE handle LIKE ? ";

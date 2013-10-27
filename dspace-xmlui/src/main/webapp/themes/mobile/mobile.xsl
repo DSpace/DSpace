@@ -11,11 +11,11 @@
 <!--
 
     mobile.xsl
-    Mobile theme for DSpace 1.6
+    Mobile theme 1.1 for DSpace 3.0
     Last update by Elias Tzoc <tzoce@muohio.edu>
-    September 14, 2012
+    September 30, 2013
 -->
-    
+ 
 
 <xsl:stylesheet 
     xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
@@ -36,7 +36,8 @@
     <!-- mobile variable -->
     <xsl:variable name="mobile-url" select="confman:getProperty('dspace.mobileUrl')"/>
     <xsl:variable name="dspace-url" select="confman:getProperty('dspace.url')"/>
-             
+    <xsl:variable name="page-url" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']"/>
+
      <!--
         The starting point of any XSL processing is matching the root element. In DRI the root element is document,
         which contains a version attribute and three top level elements: body, options, meta (in that order).
@@ -98,7 +99,8 @@
         <!-- If you get ocassional non-styled pages, try using absolute paths for the CSS -->
                 <link rel="stylesheet">
                     <xsl:attribute name="href">
-                        <xsl:text>./themes/mobile/lib/sc-mobile.min.css</xsl:text>
+                        <xsl:value-of select="$mobile-url"/>
+                        <xsl:text>/themes/mobile/lib/sc-mobile.min.css</xsl:text>
                     </xsl:attribute>
                 </link>
                 
@@ -112,7 +114,8 @@
         <!-- If you get ocassional non-styled pages, try using absolute paths for the CSS -->
                 <link rel="stylesheet">
                     <xsl:attribute name="href">
-                        <xsl:text>./themes/mobile/lib/m-tweaks.css</xsl:text>
+                        <xsl:value-of select="$mobile-url"/>
+                        <xsl:text>/themes/mobile/lib/m-tweaks.css</xsl:text>
                     </xsl:attribute>
                 </link>
 
@@ -128,7 +131,14 @@
 
         <script>
         <xsl:attribute name="src">
-        <xsl:text>themes/mobile/lib/cookies.js</xsl:text>
+        <xsl:value-of select="$mobile-url"/>
+        <xsl:text>/themes/mobile/lib/cookies.js</xsl:text>
+        </xsl:attribute>&#160;</script>
+
+        <script>
+        <xsl:attribute name="src">
+        <xsl:value-of select="$mobile-url"/>
+        <xsl:text>/themes/mobile/lib/m-tweaks.js</xsl:text>
         </xsl:attribute>&#160;</script>
 
             <!-- Add the title in -->
@@ -154,10 +164,10 @@
         <div data-role="header"> 
             <h2> 
                 <i18n:text>xmlui.mobile.home_mobile</i18n:text>
-   	        </h2>
+   	    </h2>
             <a>
                 <xsl:attribute name="href">
-                    <xsl:value-of select="$mobile-url"/>
+                <xsl:value-of select="$mobile-url"/>
                 </xsl:attribute>
                 <xsl:attribute name="data-icon">
                 <xsl:text>home</xsl:text>
@@ -169,7 +179,26 @@
                 <xsl:text>reverse</xsl:text>
                 </xsl:attribute>
                 <xsl:text>Home</xsl:text>
-		   </a>
+	    </a>
+
+            <!-- link to full website page -->
+            <a>
+                <xsl:attribute name="href">
+                <xsl:value-of select="$dspace-url"/>
+                <xsl:text>/</xsl:text>
+                <xsl:value-of select="$page-url"/>
+                </xsl:attribute>
+                <xsl:attribute name="data-icon">
+                <xsl:text>forward</xsl:text>
+                </xsl:attribute>
+                <xsl:attribute name="data-iconpos">
+                <xsl:text>notext</xsl:text>
+                </xsl:attribute>
+                <xsl:attribute name="data-direction">
+                <xsl:text>reverse</xsl:text>
+                </xsl:attribute>
+                <xsl:text>non-mobile view</xsl:text>
+	    </a>
        </div><!-- header -->
 
     </xsl:template>
@@ -200,7 +229,8 @@
            <div id="browse-front-page" data-role="controlgroup">
             <a>
                 <xsl:attribute name="href">
-                <xsl:text>browse?type=dateissued</xsl:text>
+                <xsl:value-of select="$mobile-url"/>
+                <xsl:text>/browse?type=dateissued</xsl:text>
                 </xsl:attribute>
                 <xsl:attribute name="data-role">
                 <xsl:text>button</xsl:text>
@@ -216,7 +246,8 @@
 
             <a>
                 <xsl:attribute name="href">
-                <xsl:text>browse?type=author</xsl:text>
+                <xsl:value-of select="$mobile-url"/>
+                <xsl:text>/browse?type=author</xsl:text>
                 </xsl:attribute>
                 <xsl:attribute name="data-role">
                 <xsl:text>button</xsl:text>
@@ -232,7 +263,8 @@
 
             <a>
                 <xsl:attribute name="href">
-                <xsl:text>browse?type=title</xsl:text>
+                <xsl:value-of select="$mobile-url"/>
+                <xsl:text>/browse?type=title</xsl:text>
                 </xsl:attribute>
                 <xsl:attribute name="data-role">
                 <xsl:text>button</xsl:text>
@@ -248,7 +280,8 @@
 
             <a>
                 <xsl:attribute name="href">
-                <xsl:text>browse?type=subject</xsl:text>
+                <xsl:value-of select="$mobile-url"/>
+                <xsl:text>/browse?type=subject</xsl:text>
                 </xsl:attribute>
                 <xsl:attribute name="data-role">
                 <xsl:text>button</xsl:text>
@@ -341,15 +374,6 @@
             </xsl:if>-->
         </xsl:variable>
         <li>
-<!--
-            <xsl:attribute name="class">
-                <xsl:text>ds-artifact-item </xsl:text>
-                <xsl:choose>
-                    <xsl:when test="position() mod 2 = 0">even</xsl:when>
-                    <xsl:otherwise>odd</xsl:otherwise>
-                </xsl:choose>
-            </xsl:attribute>
--->
             <xsl:apply-templates select="document($externalMetadataURL)" mode="summaryList"/>
             <xsl:apply-templates />
         </li>

@@ -123,9 +123,9 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 	            {
 	                validity.add(subCommunity);
 	                
-	                // Include the item count in the validity, only if the value is cached.
-	                boolean useCache = ConfigurationManager.getBooleanProperty("webui.strengths.cache");
-	                if (useCache)
+	                // Include the item count in the validity, only if the value is shown.
+	                boolean showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
+	                if (showCount)
 	        		{
 	                    try {	
 	                    	int size = new ItemCounter(context).getCount(subCommunity);
@@ -138,9 +138,9 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 	            {
 	                validity.add(collection);
 	                
-	                // Include the item count in the validity, only if the value is cached.
-	                boolean useCache = ConfigurationManager.getBooleanProperty("webui.strengths.cache");
-	                if (useCache)
+	                // Include the item count in the validity, only if the value is shown.
+	                boolean showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
+	                if (showCount)
 	        		{
 	                    try {
 	                    	int size = new ItemCounter(context).getCount(collection);

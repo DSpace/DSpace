@@ -35,7 +35,7 @@ and searching the repository.
                         <map:transformer name="FeedbackSent" src="org.dspace.app.xmlui.aspect.artifactbrowser.FeedbackSent"/>
                         <map:transformer name="Contact" src="org.dspace.app.xmlui.aspect.artifactbrowser.Contact"/>
                         <map:transformer name="RestrictedItem" src="org.dspace.app.xmlui.aspect.artifactbrowser.RestrictedItem"/>
-                        <map:transformer name="FrontPageSearch" src="org.dspace.app.xmlui.aspect.artifactbrowser.FrontPageSearch"/>
+                        <map:transformer name="FrontPageFeeds" src="org.dspace.app.xmlui.aspect.artifactbrowser.FrontPageFeeds"/>
 
             <map:transformer name="Statistics" src="org.dspace.app.xmlui.aspect.artifactbrowser.StatisticsViewer"/>
         </map:transformers>
@@ -94,7 +94,7 @@ and searching the repository.
                                 <map:transform type="Include" src="file://{dspace.dir}/config/news-xmlui.xml" />
                             </map:act>
 
-                            <map:transform type="FrontPageSearch"/>
+                            <map:transform type="FrontPageFeeds"/>
                             <map:transform type="CommunityBrowser">
                                 <map:parameter name="depth" value="1"/>
                             </map:transform>

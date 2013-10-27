@@ -9,9 +9,13 @@ package org.dspace.sword2;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.swordapp.server.AuthCredentials;
@@ -41,106 +45,214 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
 
     private VerboseDescription verboseDescription = new VerboseDescription();
 
-    public MediaResource getMediaResourceRepresentation(String uri, Map<String, String> accept, AuthCredentials authCredentials, SwordConfiguration swordConfig)
-            throws SwordError, SwordServerException, SwordAuthException
+    private boolean isAccessible(Context context, Bitstream bitstream)
+            throws DSpaceSwordException
     {
         try
         {
-            SwordContext sc = null;
-            SwordConfigurationDSpace config = (SwordConfigurationDSpace) swordConfig;
+            return AuthorizeManager.authorizeActionBoolean(context, bitstream, Constants.READ);
+        }
+        catch (SQLException e)
+        {
+            throw new DSpaceSwordException(e);
+        }
+    }
 
-            SwordAuthenticator auth = new SwordAuthenticator();
-            sc = auth.authenticate(authCredentials);
-            Context context = sc.getContext();
+    private boolean isAccessible(Context context, Item item)
+            throws DSpaceSwordException
+    {
+        try
+        {
+            return AuthorizeManager.authorizeActionBoolean(context, item, Constants.READ);
+        }
+        catch (SQLException e)
+        {
+            throw new DSpaceSwordException(e);
+        }
+    }
 
-            if (log.isDebugEnabled())
+    private MediaResource getBitstreamResource(Context context, Bitstream bitstream)
+            throws SwordServerException, SwordAuthException
+    {
+        try
+        {
+            InputStream stream = bitstream.retrieve();
+            MediaResource mr = new MediaResource(stream, bitstream.getFormat().getMIMEType(), null, true);
+            mr.setContentMD5(bitstream.getChecksum());
+            mr.setLastModified(this.getLastModified(context, bitstream));
+            return mr;
+        }
+        catch (IOException e)
+        {
+            throw new SwordServerException(e);
+        }
+        catch (SQLException e)
+        {
+            throw new SwordServerException(e);
+        }
+        catch (AuthorizeException e)
+        {
+            throw new SwordAuthException(e);
+        }
+    }
+
+    private MediaResource getItemResource(Context context, Item item, SwordUrlManager urlManager, String uri, Map<String, String> accept)
+            throws SwordError, DSpaceSwordException, SwordServerException
+    {
+        boolean feedRequest = urlManager.isFeedRequest(context, uri);
+        SwordContentDisseminator disseminator = null;
+
+        // first off, consider the accept headers.  The accept argument is a map
+        // from accept header to value.
+        // we only care about Accept and Accept-Packaging
+        if (!feedRequest)
+        {
+            String acceptContentType = this.getHeader(accept, "Accept", null);
+            String acceptPackaging = this.getHeader(accept, "Accept-Packaging", UriRegistry.PACKAGE_SIMPLE_ZIP);
+
+            // we know that only one Accept-Packaging value is allowed, so we don't need
+            // to do any further work on it.
+
+            // we extract from the Accept header the ordered list of content types
+            TreeMap<Float, List<String>> analysed = this.analyseAccept(acceptContentType);
+
+            // the meat of this is done by the package disseminator
+            disseminator = SwordDisseminatorFactory.getContentInstance(analysed, acceptPackaging);
+        }
+        else
+        {
+            // we just want to ask for the atom version, so we bypass the main content
+            // negotiation place
+            Map<Float, List<String>> analysed = new HashMap<Float, List<String>>();
+            List<String> list = new ArrayList<String>();
+            list.add("application/atom+xml");
+            analysed.put((float) 1.0, list);
+            disseminator = SwordDisseminatorFactory.getContentInstance(analysed, null);
+        }
+
+        // Note that at this stage, if we don't have a desiredContentType, it will
+        // be null, and the disseminator is free to choose the format
+        InputStream stream = disseminator.disseminate(context, item);
+        MediaResource mr = new MediaResource(stream, disseminator.getContentType(), disseminator.getPackaging());
+        return mr;
+    }
+
+    public MediaResource getMediaResourceRepresentation(String uri, Map<String, String> accept, AuthCredentials authCredentials, SwordConfiguration swordConfig)
+                throws SwordError, SwordServerException, SwordAuthException
+    {
+        // all the bits we need to make this method function
+        SwordContext sc = null;
+        SwordConfigurationDSpace config = (SwordConfigurationDSpace) swordConfig;
+        Context ctx = null;
+
+        try
+        {
+            // create an unauthenticated context for our initial explorations
+            ctx = new Context();
+            SwordUrlManager urlManager = config.getUrlManager(ctx, config);
+
+            // is this a request for a bitstream or an item (which is the full media resource)?
+            if (urlManager.isActionableBitstreamUrl(ctx, uri))
             {
-                log.debug(LogManager.getHeader(context, "sword_get_media_resource", ""));
+                // request for a bitstream
+                Bitstream bitstream = urlManager.getBitstream(ctx, uri);
+                if (bitstream == null)
+                {
+                    // bitstream not found in the database, so 404 the client.
+                    // Arguably, we should try to authenticate first, but it's not so important
+                    throw new SwordError(404);
+                }
+
+                // find out, now we know what we're being asked for, whether this is allowed
+                WorkflowManagerFactory.getInstance().retrieveBitstream(ctx, bitstream);
+
+                // we can do this in principle, but now find out whether the bitstream is accessible without credentials
+                boolean accessible = this.isAccessible(ctx, bitstream);
+
+                if (!accessible)
+                {
+                    // try to authenticate, and if successful switch the contexts around
+                    sc = this.doAuth(authCredentials);
+                    ctx.abort();
+                    ctx = sc.getContext();
+
+                    // re-retrieve the bitstream using the new context
+                    bitstream = Bitstream.find(ctx, bitstream.getID());
+
+                    // and re-verify its accessibility
+                    accessible = this.isAccessible(ctx, bitstream);
+                    if (!accessible)
+                    {
+                        throw new SwordAuthException();
+                    }
+                }
+
+                // if we get to here we are either allowed to access the bitstream without credentials,
+                // or we have been authenticated with acceptable credentials
+                MediaResource mr = this.getBitstreamResource(ctx, bitstream);
+                if (sc != null)
+                {
+                    sc.abort();
+                }
+                if (ctx.isValid())
+                {
+                    ctx.abort();
+                }
+                return mr;
             }
+            else
+            {
+                // request for an item
+                Item item = urlManager.getItem(ctx, uri);
+                if (item == null)
+                {
+                    // item now found in the database, so 404 the client
+                    // Arguably, we should try to authenticate first, but it's not so important
+                    throw new SwordError(404);
+                }
 
-            // log the request
-            String un = authCredentials.getUsername() != null ? authCredentials.getUsername() : "NONE";
-            String obo = authCredentials.getOnBehalfOf() != null ? authCredentials.getOnBehalfOf() : "NONE";
-            log.info(LogManager.getHeader(context, "sword_get_media_resource", "username=" + un + ",on_behalf_of=" + obo));
+                // find out, now we know what we're being asked for, whether this is allowed
+                WorkflowManagerFactory.getInstance().retrieveContent(ctx, item);
 
-            // first thing is to figure out what we're being asked to work on; it may be an Item or a Bitstream
-            SwordUrlManager urlManager = config.getUrlManager(context, config);
-			if (urlManager.isActionableBitstreamUrl(context, uri))
-			{
-				// we're being asked for the bitstream itself
-				Bitstream bitstream = urlManager.getBitstream(context, uri);
+                // we can do this in principle but now find out whether the item is accessible without credentials
+                boolean accessible = this.isAccessible(ctx, item);
 
-				// find out, now we know what we're being asked for, whether this is allowed
-				WorkflowManagerFactory.getInstance().retrieveBitstream(context, bitstream);
-			
-				InputStream stream = bitstream.retrieve();
-				MediaResource mr = new MediaResource(stream, bitstream.getFormat().getMIMEType(), null, true);
-                mr.setContentMD5(bitstream.getChecksum());
-                mr.setLastModified(this.getLastModified(context, bitstream));
-				return mr;
-			}
-			else
-			{
-				// we're dealing with a request for a representation of the item as a media resource
-				Item item = urlManager.getItem(context, uri);
-				boolean feedRequest = urlManager.isFeedRequest(context, uri);
+                if (!accessible)
+                {
+                    // try to authenticate, and if successful switch the contexts around
+                    sc = this.doAuth(authCredentials);
+                    ctx.abort();
+                    ctx = sc.getContext();
+                }
 
-				// find out, now we know what we're being asked for, whether this is allowed
-				WorkflowManagerFactory.getInstance().retrieveContent(context, item);
-
-				SwordContentDisseminator disseminator = null;
-
-				// first off, consider the accept headers.  The accept argument is a map
-				// from accept header to value.
-				// we only care about Accept and Accept-Packaging
-				if (!feedRequest)
-				{
-					String acceptContentType = this.getHeader(accept, "Accept", null);
-					String acceptPackaging = this.getHeader(accept, "Accept-Packaging", UriRegistry.PACKAGE_SIMPLE_ZIP);
-
-					// we know that only one Accept-Packaging value is allowed, so we don't need
-					// to do any further work on it.
-
-					// we extract from the Accept header the ordered list of content types
-					TreeMap<Float, List<String>> analysed = this.analyseAccept(acceptContentType);
-
-					// the meat of this is done by the package disseminator
-					disseminator = SwordDisseminatorFactory.getContentInstance(analysed, acceptPackaging);
-				}
-				else
-				{
-					// we just want to ask for the atom version, so we bypass the main content
-					// negotiation place
-					Map<Float, List<String>> analysed = new HashMap<Float, List<String>>();
-					List<String> list = new ArrayList<String>();
-					list.add("application/atom+xml");
-					analysed.put((float) 1.0, list);
-					disseminator = SwordDisseminatorFactory.getContentInstance(analysed, null);
-				}
-
-				// Note that at this stage, if we don't have a desiredContentType, it will
-				// be null, and the disseminator is free to choose the format
-				InputStream stream = disseminator.disseminate(context, item);
-				MediaResource mr = new MediaResource(stream, disseminator.getContentType(), disseminator.getPackaging());
-				return mr;
-			}
+                // if we get to here we are either allowed to access the bitstream without credentials,
+                // or we have been authenticated
+                MediaResource mr = this.getItemResource(ctx, item, urlManager, uri, accept);
+                // sc.abort();
+                ctx.abort();
+                return mr;
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new SwordServerException(e);
         }
         catch (DSpaceSwordException e)
         {
             throw new SwordServerException(e);
         }
-		catch (SQLException e)
-		{
-			throw new SwordServerException(e);
-		}
-		catch (IOException e)
-		{
-			throw new SwordServerException(e);
-		}
-		catch (AuthorizeException e)
-		{
-			throw new SwordServerException(e);
-		}
+        finally
+        {
+            // if there is a sword context, abort it (this will abort the inner dspace context as well)
+            if (sc != null)
+            {
+                sc.abort();
+            }
+            if (ctx != null && ctx.isValid())
+            {
+                ctx.abort();
+            }
+        }
     }
 
     private Date getLastModified(Context context, Bitstream bitstream)
@@ -196,6 +308,10 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
 			if (urlManager.isActionableBitstreamUrl(context, emUri))
 			{
                 Bitstream bitstream = urlManager.getBitstream(context, emUri);
+                if (bitstream == null)
+                {
+                    throw new SwordError(404);
+                }
 
                 // now we have the deposit target, we can determine whether this operation is allowed
                 // at all
@@ -266,6 +382,10 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
             {
                 // get the deposit target
                 Item item = this.getDSpaceTarget(context, emUri, config);
+                if (item == null)
+                {
+                    throw new SwordError(404);
+                }
 
                 // now we have the deposit target, we can determine whether this operation is allowed
                 // at all
@@ -333,8 +453,8 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
                 // now we've produced a deposit, we need to decide on its workflow state
                 wfm.resolveState(context, deposit, null, this.verboseDescription, false);
 
-                // ReceiptGenerator genny = new ReceiptGenerator();
-                // DepositReceipt receipt = genny.createReceipt(context, result, config);
+                ReceiptGenerator genny = new ReceiptGenerator();
+                receipt = genny.createMediaResourceReceipt(context, item, config);
             }
 
             Date finish = new Date();
@@ -397,6 +517,10 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
 			if (urlManager.isActionableBitstreamUrl(context, emUri))
 			{
 				Bitstream bitstream = urlManager.getBitstream(context, emUri);
+                if (bitstream == null)
+                {
+                    throw new SwordError(404);
+                }
 
 				// now we have the deposit target, we can determine whether this operation is allowed
 				// at all
@@ -425,6 +549,10 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
 			else
 			{
 				Item item = this.getDSpaceTarget(context, emUri, config);
+                if (item == null)
+                {
+                    throw new SwordError(404);
+                }
 
 				// now we have the deposit target, we can determine whether this operation is allowed
 				// at all
@@ -518,6 +646,10 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
 
             // get the deposit target
             Item item = this.getDSpaceTarget(context, emUri, config);
+            if (item == null)
+            {
+                throw new SwordError(404);
+            }
 
 			// now we have the deposit target, we can determine whether this operation is allowed
 			// at all
@@ -620,7 +752,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
             long delta = finish.getTime() - start.getTime();
 
             this.verboseDescription.append("Total time for add processing: " + delta + " ms");
-            receipt.setVerboseDescription(this.verboseDescription.toString());
+            this.addVerboseDescription(receipt, this.verboseDescription);
 
             // if something hasn't killed it already (allowed), then complete the transaction
             sc.commit();
@@ -652,7 +784,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
 			Bundle[] originals = item.getBundles("ORIGINAL");
 			for (Bundle original : originals)
 			{
-				vm.emptyBundle(item, original);
+				vm.removeBundle(item, original);
 			}
 		}
 		catch (SQLException e)
@@ -714,7 +846,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
 			// delegate the to the version manager to get rid of any existing content and to version
 			// if if necessary
 			VersionManager vm = new VersionManager();
-			vm.emptyBundle(item, "ORIGINAL");
+			vm.removeBundle(item, "ORIGINAL");
 		}
 		catch (SQLException e)
 		{
@@ -741,8 +873,11 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
 			throws DSpaceSwordException, SwordError, SwordAuthException, SwordServerException
     {
 		// FIXME: this is basically not possible with the existing DSpace API.
-        // we are going to hack around the problem, by deleting the old bitstream and
-        // adding the new one and returning it
+
+        // We hack around it by deleting the old bitstream and
+        // adding the new one and returning it,
+        // but this isn't in line with the REST approach of SWORD, so the caller should really
+        // 405 the client
 
         // get the things out of the service that we need
 		Context context = swordContext.getContext();

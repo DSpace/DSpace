@@ -223,6 +223,9 @@ public final class CachingServiceImpl implements CachingService, InitializedServ
         log.info("init()");
         // get settings
         reloadConfig();
+        
+        // don't display the EhCache update notice in logs - it's meant for developers, not users
+        System.setProperty("net.sf.ehcache.skipUpdateCheck", "true"); 
 
         // make sure we have a cache manager
         if (cacheManager == null) {

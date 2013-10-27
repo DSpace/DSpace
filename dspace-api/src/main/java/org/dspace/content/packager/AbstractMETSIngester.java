@@ -749,6 +749,8 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         // Loop through these files, and add them one by one to Item
         List<Element> manifestContentFiles = manifest
                 .getContentFiles();
+        List<Element> manifestBundleFiles = manifest
+                .getBundleFiles();
 
         boolean setPrimaryBitstream = false;
         BitstreamFormat unknownFormat = BitstreamFormat.findUnknown(context);
@@ -835,6 +837,36 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 bitstream.setFormat(bf);
             }
             bitstream.update();
+        }// end for each manifest file
+
+        for (Iterator<Element> mi = manifestBundleFiles.iterator(); mi
+                .hasNext();)
+        {
+            Element mfile = mi.next();
+
+            String mfileGrp = mfile.getAttributeValue("ADMID");
+            if (mfileGrp == null)
+            {
+                throw new PackageValidationException(
+                        "Invalid METS Manifest: file element without ID attribute.");
+            }
+
+            String bundleName = METSManifest.getBundleName(mfile, false);
+
+            Bundle bundle;
+            Bundle bns[] = item.getBundles(bundleName);
+            if (bns != null && bns.length > 0)
+            {
+                bundle = bns[0];
+            }
+            else
+            {
+                bundle = item.createBundle(bundleName);
+            }
+
+            manifest.crosswalkBundle(context, params, bundle, mfileGrp,mdRefCallback);
+
+            bundle.update();
         }// end for each manifest file
 
         // Step 3 -- Sanity checks

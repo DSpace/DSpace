@@ -84,7 +84,7 @@
                         <xsl:value-of select="$href"/>
                     </xsl:attribute>
                     <xsl:choose>
-                        <xsl:when test="dim:field[@element='title']">
+                        <xsl:when test="dim:field[@element='title' and descendant::text()]">
                             <xsl:value-of select="dim:field[@element='title'][1]/node()"/>
                         </xsl:when>
                         <xsl:otherwise>
@@ -158,7 +158,7 @@
                         <xsl:value-of select="$href"/>
                     </xsl:attribute>
                     <xsl:choose>
-                        <xsl:when test="dim:field[@element='title']">
+                        <xsl:when test="dim:field[@element='title' and descendant::text()]">
                             <xsl:value-of select="dim:field[@element='title'][1]/node()"/>
                         </xsl:when>
                         <xsl:otherwise>

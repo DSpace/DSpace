@@ -26,7 +26,7 @@ and searching the repository.
             <map:transformer name="SimpleSearch" src="org.dspace.app.xmlui.aspect.discovery.SimpleSearch"/>
             <map:transformer name="BrowseFacet" src="org.dspace.app.xmlui.aspect.discovery.BrowseFacet"/>
             <map:transformer name="SearchFacetFilter" src="org.dspace.app.xmlui.aspect.discovery.SearchFacetFilter"/>
-            <map:transformer name="FrontPageSearch" src="org.dspace.app.xmlui.aspect.discovery.SiteViewer"/>
+            <map:transformer name="FrontPageFeeds" src="org.dspace.app.xmlui.aspect.discovery.SiteViewer"/>
             <map:transformer name="SiteRecentSubmissions" src="org.dspace.app.xmlui.aspect.discovery.SiteRecentSubmissions"/>
             <map:transformer name="SidebarFacetsTransformer" src="org.dspace.app.xmlui.aspect.discovery.SidebarFacetsTransformer"/>
 
@@ -42,6 +42,7 @@ and searching the repository.
             <map:transformer name="RelatedItems" src="org.dspace.app.xmlui.aspect.discovery.RelatedItems"/>
 
             <map:transformer name="RestrictedItem" src="org.dspace.app.xmlui.aspect.artifactbrowser.RestrictedItem"/>
+            <map:transformer name="RecentSubmissionTransformer" src="org.dspace.app.xmlui.aspect.discovery.recentSubmissions.RecentSubmissionTransformer"/>
         </map:transformers>
                
         <map:actions>
@@ -51,6 +52,7 @@ and searching the repository.
         <map:matchers default="wildcard">
             <map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
             <map:matcher name="HandleAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.general.HandleAuthorizedMatcher"/>
+            <map:matcher name="ContainerHomePageSelector" src="org.dspace.app.xmlui.aspect.viewArtifacts.ContainerHomePageMatcher"/>
         </map:matchers>
     <map:selectors>
         <map:selector name="AuthenticatedSelector" src="org.dspace.app.xmlui.aspect.general.AuthenticatedSelector"/>
@@ -81,9 +83,17 @@ and searching the repository.
                     -->
             <map:match pattern="">
                 <map:transform type="SidebarFacetsTransformer"/>
-                <map:transform type="FrontPageSearch"/>
+                <map:transform type="FrontPageFeeds"/>
 
                 <map:transform type="SiteRecentSubmissions"/>
+
+                <map:serialize type="xml"/>
+            </map:match>
+
+            <map:match pattern="recent-submissions">
+                <map:transform type="RecentSubmissionTransformer">
+                    <map:parameter name="isHomePage" value="false"/>
+                </map:transform>
 
                 <map:serialize type="xml"/>
             </map:match>
@@ -149,10 +159,28 @@ and searching the repository.
                             <map:serialize type="xml"/>
 						</map:match>
 
-
                         <map:match pattern="handle/*/*/search-filter">
                             <map:transform type="SearchFacetFilter"/>
                             <map:serialize type="xml"/>
+                        </map:match>
+
+                        <map:match pattern="handle/*/*/recent-submissions">
+                            <map:transform type="RecentSubmissionTransformer">
+                                <map:parameter name="isHomePage" value="false"/>
+                            </map:transform>
+                            <map:serialize type="xml"/>
+                        </map:match>
+
+                        <map:match pattern="handle/*/*">
+                            <map:match type="HandleTypeMatcher" pattern="collection">
+                                <map:match type="ContainerHomePageSelector" pattern="discoveryRecentSubmissions">
+                                    <map:transform type="SidebarFacetsTransformer"/>
+                                    <map:transform type="RecentSubmissionTransformer">
+                                        <map:parameter name="isHomePage" value="true"/>
+                                    </map:transform>
+                                    <map:serialize type="xml"/>
+                                </map:match>
+                            </map:match>
                         </map:match>
                     </map:match>
                 </map:match>
