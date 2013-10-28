@@ -34,6 +34,7 @@ public class DSpaceObject {
     @XmlElement(name = "link", required = true)
     private String link;
 
+    @XmlElement(required = true)
     private ArrayList<String> expand = new ArrayList<String>();
 
     public DSpaceObject() {

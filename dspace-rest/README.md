@@ -53,6 +53,13 @@ View information about a bitstream
 View/Download a specific Bitstream
 - http://localhost:8080/rest/bitstreams/:ID/retrieve
 
+####Statistics
+Recording of statistics for view of items or download of bitstreams (set stats = true in rest.cfg to enable stats recording)
+http://localhost:8080/rest/items/:ID?userIP=ip&userAgent=userAgent&xforwarderfor=xforwarderfor
+If no parameters are given the details of httprequest sender are used in statistics. 
+This enables tools to record the details of their user rather then themselves.
+
+
 ###Handles
 Lookup a DSpaceObject by its Handle, this produces the name/ID, that you lookup in /bitstreams, /items, /collections, /communities
 - http://localhost:8080/rest/handle/{prefix}/{suffix}

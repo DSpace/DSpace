@@ -52,6 +52,12 @@ public class UsageEvent extends Event {
 
 	private transient HttpServletRequest request;
 	
+	private transient String ip;
+	
+	private transient String userAgent;
+	
+	private transient String xforwarderfor;
+	
 	private transient Context context;
 	
 	private transient DSpaceObject object;
@@ -86,6 +92,39 @@ public class UsageEvent extends Event {
             eventName.append(objText).append(":");
         }
         eventName.append(action.text());
+        
+		return eventName.toString();
+	}
+	
+	private static String checkParams(Action action, Context context, DSpaceObject object)
+	{
+        StringBuilder eventName = new StringBuilder();
+		if(action == null)
+        {
+            throw new IllegalStateException("action cannot be null");
+        }
+			
+//		if(action != Action.WORKFLOW)
+//        {
+//            throw new IllegalStateException("request cannot be null");
+//        }
+		
+
+		if(context == null)
+        {
+            throw new IllegalStateException("context cannot be null");
+        }
+		
+		if(action != Action.WORKFLOW && action != Action.SEARCH && object == null)
+        {
+            throw new IllegalStateException("object cannot be null");
+        }else
+        if(object != null){
+            String objText = Constants.typeText[object.getType()].toLowerCase();
+            eventName.append(objText).append(":");
+        }
+        eventName.append(action.text());
+        
 
 		return eventName.toString();
 	}
@@ -124,8 +163,70 @@ public class UsageEvent extends Event {
 		this.object = object;
 	}
 
+	public UsageEvent(Action action, String ip, String userAgent, String xforwarderfor, Context context, DSpaceObject object)
+	{
+		
+		super(checkParams(action, context, object));
+		
+		this.action = action;
+	
+		this.setResourceReference(object != null ? Constants.typeText[object.getType()].toLowerCase() + ":" + object.getID() : null);
+		
+		switch(action)
+		{
+			case CREATE:
+			case UPDATE:
+			case DELETE:
+			case WITHDRAW:
+			case REINSTATE:	
+			case ADD:
+			case REMOVE:
+				this.setModify(true);
+				break;
+			default : 
+				this.setModify(false);
+		}
+		
+		if(context != null && context.getCurrentUser() != null)
+		{
+			this.setUserId(
+					String.valueOf(context.getCurrentUser().getID()));
+		}
+		this.request = null;
+		this.ip = ip;
+		this.userAgent = userAgent;
+		this.xforwarderfor = xforwarderfor;
+		this.context = context;
+		this.object = object;
+	}
+
+	
 	public HttpServletRequest getRequest() {
 		return request;
+	}
+
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+	public String getUserAgent() {
+		return userAgent;
+	}
+
+	public void setUserAgent(String userAgent) {
+		this.userAgent = userAgent;
+	}
+
+	public String getXforwarderfor() {
+		return xforwarderfor;
+	}
+
+	public void setXforwarderfor(String xforwarderfor) {
+		this.xforwarderfor = xforwarderfor;
 	}
 
 	public void setRequest(HttpServletRequest request) {

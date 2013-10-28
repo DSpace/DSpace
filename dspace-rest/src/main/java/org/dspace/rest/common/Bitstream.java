@@ -31,9 +31,11 @@ public class Bitstream extends DSpaceObject {
     private String description;
     private String format;
     private String mimeType;
-    private String sizeBytes;
+    private Long sizeBytes;
     private DSpaceObject parentObject;
     private String retrieveLink;
+    private CheckSum checkSum;
+    private Integer sequenceId;
 
     public Bitstream() {
 
@@ -59,9 +61,14 @@ public class Bitstream extends DSpaceObject {
 
         description = bitstream.getDescription();
         format = bitstream.getFormatDescription();
-        sizeBytes = bitstream.getSize() + "";
+        sizeBytes = bitstream.getSize();
         retrieveLink = "/bitstreams/" + bitstream.getID() + "/retrieve";
         mimeType = bitstream.getFormat().getMIMEType();
+        sequenceId = bitstream.getSequenceID();
+        CheckSum checkSum = new CheckSum();
+        checkSum.setCheckSumAlgorith(bitstream.getChecksumAlgorithm());
+        checkSum.setValue(bitstream.getChecksum());
+        this.setCheckSum(checkSum);
 
         if(expandFields.contains("parent") || expandFields.contains("all")) {
             parentObject = new DSpaceObject(bitstream.getParentObject());
@@ -74,11 +81,47 @@ public class Bitstream extends DSpaceObject {
         }
     }
 
-    public String getBundleName() {
+    public Integer getSequenceId() {
+		return sequenceId;
+	}
+
+	public void setSequenceId(Integer sequenceId) {
+		this.sequenceId = sequenceId;
+	}
+
+	public String getBundleName() {
         return bundleName;
     }
 
-    public String getDescription() {
+    public void setBundleName(String bundleName) {
+		this.bundleName = bundleName;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public void setFormat(String format) {
+		this.format = format;
+	}
+
+	public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
+	}
+
+	public void setSizeBytes(Long sizeBytes) {
+		this.sizeBytes = sizeBytes;
+	}
+
+	public void setParentObject(DSpaceObject parentObject) {
+		this.parentObject = parentObject;
+	}
+
+	public void setRetrieveLink(String retrieveLink) {
+		this.retrieveLink = retrieveLink;
+	}
+
+	public String getDescription() {
         return description;
     }
 
@@ -90,7 +133,7 @@ public class Bitstream extends DSpaceObject {
         return mimeType;
     }
 
-    public String getSizeBytes() {
+    public Long getSizeBytes() {
         return sizeBytes;
     }
 
@@ -101,4 +144,13 @@ public class Bitstream extends DSpaceObject {
     public DSpaceObject getParentObject() {
         return parentObject;
     }
+    
+    public CheckSum getCheckSum() {
+		return checkSum;
+	}
+    
+    public void setCheckSum(CheckSum checkSum) {
+		this.checkSum = checkSum;
+	}
+
 }

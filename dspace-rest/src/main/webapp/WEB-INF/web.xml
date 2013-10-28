@@ -15,7 +15,7 @@
          id="WebApp_ID" version="2.5">
     <servlet>
         <servlet-name>DSpace REST API</servlet-name>
-        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+        <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
         <init-param>
             <!--
              The jersey ServletContainer will look for our Root Resource Class
@@ -91,6 +91,13 @@
     <listener>
         <listener-class>org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener</listener-class>
     </listener>
+    
+    <listener>
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener>
+
 
 
 </web-app>

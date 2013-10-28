@@ -36,7 +36,6 @@ public class Collection extends DSpaceObject {
     private Community parentCommunity;
     private List<Community> parentCommunityList = new ArrayList<Community>();
 
-    @XmlElement(name = "items")
     private List<Item> items = new ArrayList<Item>();
 
     //Collection-Metadata
@@ -138,7 +137,19 @@ public class Collection extends DSpaceObject {
         this.parentCommunity = parentCommunity;
     }
 
-    public List<Community> getParentCommunityList() {
+    public List<Item> getItems() {
+		return items;
+	}
+
+	public void setItems(List<Item> items) {
+		this.items = items;
+	}
+
+	public void setParentCommunityList(List<Community> parentCommunityList) {
+		this.parentCommunityList = parentCommunityList;
+	}
+
+	public List<Community> getParentCommunityList() {
         return parentCommunityList;
     }
 
