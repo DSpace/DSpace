@@ -7,9 +7,7 @@
  */
 package org.dspace.app.xmlui.cocoon;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.Map;
