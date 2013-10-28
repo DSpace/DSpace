@@ -86,7 +86,7 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
 
     private void generateJSON(PaymentSystemConfigurationManager paymentSystemConfigurationManager, ShoppingCart shoppingCart, Response response,PaymentSystemService paymentSystemService,Context context,Request request,String errorMessage) throws SQLException,IOException {
         Double total = shoppingCart.getTotal();
-        String symbol = PaymentSystemConfigurationManager.getCurrencySymbol(shoppingCart.getCurrency());
+        String symbol = PaymentSystemConfigurationManager.getCurrencySymbolISO(shoppingCart.getCurrency())+";";
         //{ "firstName":"John" , "lastName":"Doe" }
         String journal =request.getParameter("journal");
         Double basicFee =shoppingCart.getBasicFee();

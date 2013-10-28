@@ -461,6 +461,23 @@ public class PaypalImpl implements PaypalService{
             }
             else
             {
+
+                Division voucher = mainDiv.addDivision("voucher");
+                if(errorMessage!=null&&errorMessage.length()>0) {
+                    voucher.addPara("voucher-error","voucher-error").addHighlight("bold").addContent(errorMessage);
+
+                }
+
+                Voucher voucher1 = Voucher.findById(context,shoppingCart.getVoucher());
+                if(voucher1!=null){
+                    paypalService.generateVoucherForm(voucher,voucher1.getCode(),actionURL,knotId);
+                }
+                else if(voucherCode!=null&&voucherCode.length()>0){
+                    paypalService.generateVoucherForm(voucher,voucherCode,actionURL,knotId);
+                }
+                else{
+                    paypalService.generateVoucherForm(voucher,null,actionURL,knotId);
+                }
                 Division creditcard = mainDiv.addDivision("creditcard");
                 paypalService.generatePaypalForm(creditcard,shoppingCart,actionURL,type);
 
