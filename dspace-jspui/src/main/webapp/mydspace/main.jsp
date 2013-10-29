@@ -399,4 +399,6 @@
 		<% } %>
 	</ol>
 	<%} %>
+	</div>
+</div>	
 </dspace:layout>
