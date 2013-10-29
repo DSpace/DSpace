@@ -7,6 +7,7 @@
  */
 package org.dspace.storage.rdbms;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -198,6 +199,38 @@ public class TableRow
         }
 
         return ((Long) value).longValue();
+    }
+
+    /**
+     * Return the BigDecimal value of column.
+     *
+     * @param column
+     *      The column name (case-insensitive).
+     * @return The BigDecimal value of the column, or -1 if the column is an SQL null.
+     * @throws IllegalArgumentException if the column does not exist or is not
+     *      convertible to BigDecimal.
+     */
+    public BigDecimal getNumericColumn(String column)
+    {
+        String canonicalized = canonicalizeAndCheck(column);
+        if (isColumnNullCanonicalized(canonicalized))
+            return BigDecimal.valueOf(-1);
+
+        Object value = data.get(canonicalized);
+
+        if (value == null)
+            throw new IllegalArgumentException("Column " + column + " not present");
+
+        if (value instanceof Integer)
+            return new BigDecimal((Integer)value);
+        else if (value instanceof Long)
+            return new BigDecimal((Long)value);
+        else if (value instanceof Double)
+            return new BigDecimal((Double)value);
+        else if (value instanceof BigDecimal)
+            return (BigDecimal)value;
+        else
+            throw new IllegalArgumentException("Value for " + column + " is not numeric");
     }
 
     /**
@@ -460,6 +493,26 @@ public class TableRow
         if (!value.equals(data.get(canonicalized)))
         {
             data.put(canonicalized, value);
+            changed.put(canonicalized, Boolean.TRUE);
+        }
+    }
+
+    /**
+     * Set column to the BigDecimal bd.
+     *
+     * @param column
+     *          The column name (case-insensitive).
+     * @param bd
+     *          The BigDecimal value.
+     * @throws IllegalArgumentException if the column does not exist.
+     */
+    public void setColumn(String column, BigDecimal bd)
+    {
+        String canonicalized = canonicalizeAndCheck(column);
+        Object value = (bd == null) ? NULL_OBJECT : bd;
+        if (!value.equals(data.get(canonicalized)))
+        {
+            data.put(canonicalized, bd);
             changed.put(canonicalized, Boolean.TRUE);
         }
     }
