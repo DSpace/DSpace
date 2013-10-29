@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "itemList")
 public class ItemReturn {
 	private org.dspace.rest.common.Context context;
-	private List<org.dspace.rest.common.Item> values;
+	private List<org.dspace.rest.common.Item> item;
 	public Context getContext() {
 		return context;
 	}
@@ -23,11 +23,11 @@ public class ItemReturn {
 		this.context = context;
 	}
 	
-	public List<org.dspace.rest.common.Item>  getValues() {
-		return values;
+	public List<org.dspace.rest.common.Item>  getItem() {
+		return item;
 	}
-	public void setValues(List<org.dspace.rest.common.Item> values) {
-		this.values = values;
+	public void setItem(List<org.dspace.rest.common.Item> values) {
+		this.item = values;
 	}
 	
 	

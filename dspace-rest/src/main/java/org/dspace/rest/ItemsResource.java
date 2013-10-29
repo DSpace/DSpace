@@ -104,7 +104,7 @@ public class ItemsResource {
             
             ItemReturn item_return= new ItemReturn();
             item_return.setContext(item_context);
-            item_return.setValues(selectedItems);
+            item_return.setItem(selectedItems);
             
             return(item_return);
            
