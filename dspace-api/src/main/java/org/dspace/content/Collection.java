@@ -90,6 +90,13 @@ public class Collection extends DSpaceObject
     /** The default group of administrators */
     private Group admins;
 
+    // Keys for accessing Collection metadata
+    public static final String COPYRIGHT_TEXT = "copyright_text";
+    public static final String INTRODUCTORY_TEXT = "introductory_text";
+    public static final String SHORT_DESCRIPTION = "short_description";
+    public static final String SIDEBAR_TEXT = "side_bar_text";
+    public static final String PROVENANCE_TEXT = "provenance_description";
+    
     /**
      * Construct a collection with the given table row
      *
