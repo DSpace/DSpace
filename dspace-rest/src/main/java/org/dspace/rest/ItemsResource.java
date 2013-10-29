@@ -23,6 +23,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.rest.common.ItemReturn;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 
@@ -53,10 +54,11 @@ public class ItemsResource {
     @GET
     @Path("/")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public org.dspace.rest.common.Item[] list(
+    public org.dspace.rest.common.ItemReturn list(
     		@QueryParam("expand") String expand,
     		@QueryParam("limit") Integer size, 
-    		@QueryParam("offset") Integer offset)  throws WebApplicationException {
+    		@QueryParam("offset") Integer offset,
+    		@Context HttpServletRequest request)  throws WebApplicationException {
     	
     	try {
             if(context == null || !context.isValid()) {
@@ -87,10 +89,24 @@ public class ItemsResource {
                     }
             	}
             	count++;
-            		
+            }
+            org.dspace.rest.common.Context item_context = new org.dspace.rest.common.Context();
+            item_context.setLimit(size);
+            item_context.setOffset(offset);
+            StringBuffer requestURL = request.getRequestURL();
+            String queryString = request.getQueryString();
+
+            if (queryString == null) {
+            	item_context.setQuery(requestURL.toString());
+            } else {
+            	item_context.setQuery(requestURL.append('?').append(queryString).toString());
             }
             
-            return(selectedItems.toArray(new org.dspace.rest.common.Item[selectedItems.size()]));
+            ItemReturn item_return= new ItemReturn();
+            item_return.setContext(item_context);
+            item_return.setValues(selectedItems);
+            
+            return(item_return);
            
             
             
