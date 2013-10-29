@@ -385,6 +385,11 @@ public class DSpaceCSV implements Serializable
      */
     public final void addItem(Item i) throws Exception
     {
+        // If the item is not in the archive, the call to get its handle below will fail
+        if (i.isWithdrawn() || !i.isArchived() || i.getOwningCollection() == null) {
+            return;
+        }
+
         // Create the CSV line
         DSpaceCSVLine line = new DSpaceCSVLine(i.getID());
 
