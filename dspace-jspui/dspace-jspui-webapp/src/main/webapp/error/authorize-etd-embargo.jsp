@@ -55,7 +55,7 @@
   if (date != null) {
     java.text.SimpleDateFormat f = new java.text.SimpleDateFormat("MMMM dd, yyyy");
     %>
-    <p>At the request of the author, this file is not available online 
+    <p>At the request of the author, this document is not available 
        until <%= f.format(date) %>.
     </p>
     <%
