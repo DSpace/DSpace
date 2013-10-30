@@ -57,5 +57,7 @@ public interface IndexingService {
 
     void commit() throws SearchServiceException;
 
+    void commit(Boolean commit) throws SearchServiceException;
+
     void optimize() throws SearchServiceException;
 }
