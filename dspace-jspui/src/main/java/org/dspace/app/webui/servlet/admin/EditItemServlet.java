@@ -339,6 +339,7 @@ public class EditItemServlet extends DSpaceServlet
 
             // Withdraw the item
             item.setDiscoverable(false);
+            item.update();
             JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
             context.complete();
 
@@ -346,6 +347,7 @@ public class EditItemServlet extends DSpaceServlet
 
         case PUBLICIZE:
             item.setDiscoverable(true);
+            item.update();
             JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
             context.complete();
 
