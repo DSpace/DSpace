@@ -75,10 +75,9 @@
                     <option value="advisor" <%= field1.equals("advisor") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.advisor"/></option>
                     <option value="title" <%= field1.equals("title") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.title"/></option>
                     <option value="keyword" <%= field1.equals("keyword") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.subject"/></option>
+                    <option value="department" <%= field1.equals("department") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.department"/></option>
+                    <option value="type" <%= field1.equals("type") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.type"/></option>
                     <option value="abstract" <%= field1.equals("abstract") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.abstract"/></option>
-                    <option value="series" <%= field1.equals("series") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.series"/></option>
-                    <option value="sponsor" <%= field1.equals("sponsor") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.sponsor"/></option>
-                    <option value="identifier" <%= field1.equals("identifier") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.id"/></option>
                     <option value="language" <%= field1.equals("language") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.language"/></option>
                   </select>
             </td>
@@ -106,10 +105,9 @@
                     <option value="advisor" <%= field2.equals("advisor") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.advisor"/></option>
                     <option value="title" <%= field2.equals("title") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.title"/></option>
                     <option value="keyword" <%= field2.equals("keyword") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.subject"/></option>
+                    <option value="department" <%= field2.equals("department") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.department"/></option>
+                    <option value="type" <%= field2.equals("type") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.type"/></option>
                     <option value="abstract" <%= field2.equals("abstract") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.abstract"/></option>
-                    <option value="series" <%= field2.equals("series") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.series"/></option>
-                    <option value="sponsor" <%= field2.equals("sponsor") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.sponsor"/></option>
-                    <option value="identifier" <%= field2.equals("identifier") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.id"/></option>
                     <option value="language" <%= field2.equals("language") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.language"/></option>
                   </select>
            </td>
@@ -133,10 +131,9 @@
                     <option value="advisor" <%= field3.equals("advisor") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.advisor"/></option>
                     <option value="title" <%= field3.equals("title") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.title"/></option>
                     <option value="keyword" <%= field3.equals("keyword") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.subject"/></option>
+                    <option value="department" <%= field3.equals("department") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.department"/></option>
+                    <option value="type" <%= field3.equals("type") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.type"/></option>
                     <option value="abstract" <%= field3.equals("abstract") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.abstract"/></option>
-                    <option value="series" <%= field3.equals("series") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.series"/></option>
-                    <option value="sponsor" <%= field3.equals("sponsor") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.sponsor"/></option>
-                    <option value="identifier" <%= field3.equals("identifier") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.id"/></option>
                     <option value="language" <%= field3.equals("language") ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.search.advanced.type.language"/></option>
                   </select>
                   <br/>
