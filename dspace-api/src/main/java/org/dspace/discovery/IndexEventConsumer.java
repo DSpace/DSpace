@@ -40,10 +40,15 @@ public class IndexEventConsumer implements Consumer {
 
     DSpace dspace = new DSpace();
 
+    private Boolean doCommit = null; 
+    
     IndexingService indexer = dspace.getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
 
     public void initialize() throws Exception {
-
+        String stringDoCommit = dspace.getConfigurationService().getProperty("discovery.index.commit");
+        if(stringDoCommit!=null) {
+            doCommit = Boolean.parseBoolean(stringDoCommit);
+        }
     }
 
     /**
@@ -157,7 +162,7 @@ public class IndexEventConsumer implements Consumer {
     public void end(Context ctx) throws Exception {
 
         if (objectsToUpdate != null && handlesToDelete != null) {
-
+            boolean pushCommit = false;
             // update the changed Items not deleted because they were on create list
             for (DSpaceObject iu : objectsToUpdate) {
                 /* we let all types through here and 
@@ -168,10 +173,11 @@ public class IndexEventConsumer implements Consumer {
                 if (hdl != null && !handlesToDelete.contains(hdl)) {
                     try {
                         indexer.indexContent(ctx, iu, true);
+                        pushCommit = true;
                         log.debug("Indexed "
                                 + Constants.typeText[iu.getType()]
                                 + ", id=" + String.valueOf(iu.getID())
-                                + ", handle=" + hdl);
+                                + ", handle=" + hdl);                        
                     }
                     catch (Exception e) {
                         log.error("Failed while indexing object: ", e);
@@ -182,6 +188,7 @@ public class IndexEventConsumer implements Consumer {
             for (String hdl : handlesToDelete) {
                 try {
                     indexer.unIndexContent(ctx, hdl, false);
+                    pushCommit = true;
                     if (log.isDebugEnabled())
                     {
                         log.debug("UN-Indexed Item, handle=" + hdl);
@@ -192,8 +199,10 @@ public class IndexEventConsumer implements Consumer {
                 }
 
             }
-
-            indexer.commit(true);
+            
+            if(pushCommit) {            
+                indexer.commit(doCommit);
+            }
         }
 
         // "free" the resources
