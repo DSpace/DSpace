@@ -9,8 +9,11 @@ package org.dspace.app.itemimport;
 
 import gr.ekt.bte.core.DataLoader;
 import gr.ekt.bte.core.TransformationEngine;
+import gr.ekt.bte.dataloader.FileDataLoader;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -74,5 +77,17 @@ public class BTEBatchImportService
 
 	public void setTransformationEngine(TransformationEngine transformationEngine) {
 		this.transformationEngine = transformationEngine;
+	}
+	
+	public List<String> getFileDataLoaders(){
+		List<String> result = new ArrayList<String>();
+				
+		for (String key : dataLoaders.keySet()){
+			DataLoader dl = dataLoaders.get(key);
+			if (dl instanceof FileDataLoader){
+				result.add(key);
+			}
+		}
+		return result;
 	}
 }
