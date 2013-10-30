@@ -216,27 +216,26 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
         if(item.isDiscoverable())
         {
             itemInfo.addLabel(T_label_private);
-            try
-            {
-                // who can Withdraw can also Make It Private
-                AuthorizeUtil.authorizeWithdrawItem(context, item);
-                itemInfo.addItem().addButton("submit_private").setValue(T_submit_private);
-            }
-            catch (AuthorizeException authex)
-            {
-                addNotAllowedButton(itemInfo.addItem(), "submit_private", T_submit_private);
-            }
+			if (AuthorizeManager.authorizeActionBoolean(context, item,
+					Constants.WRITE)) 
+			{
+				itemInfo.addItem().addButton("submit_private")
+						.setValue(T_submit_private);
+			} 
+			else 
+			{
+				addNotAllowedButton(itemInfo.addItem(), "submit_private",
+						T_submit_private);
+			}
         }
         else
         {
             itemInfo.addLabel(T_label_public);
-            try
+            if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.WRITE))
             {
-                // who can Reinstate can also Make It Public
-                AuthorizeUtil.authorizeReinstateItem(context, item);
                 itemInfo.addItem().addButton("submit_public").setValue(T_submit_public);
             }
-            catch (AuthorizeException authex)
+            else
             {
                 addNotAllowedButton(itemInfo.addItem(), "submit_public", T_submit_public);
             }
