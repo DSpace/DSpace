@@ -615,6 +615,7 @@ public class SearchFilterTransformer extends AbstractDSpaceTransformer implement
             String url = generateURL(contextPath + (dso == null ? "" : "/handle/" + dso.getHandle()) + "/" + getDiscoverUrl(), urlParams);
             //Add already existing filter queries
             url = addFilterQueriesToUrl(url);
+            url += "?field="+field;
             //Last add the current filter query
             url += "&fq=" + URLEncoder.encode(filterQuery, "UTF-8");
             String splitChar = SearchUtils.getConfig().getString("solr.facets.split.char");
