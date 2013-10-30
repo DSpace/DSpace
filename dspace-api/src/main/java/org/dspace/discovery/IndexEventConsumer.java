@@ -176,12 +176,12 @@ public class IndexEventConsumer implements Consumer {
                     catch (Exception e) {
                         log.error("Failed while indexing object: ", e);
                     }
-                }
+                }                
             }
 
             for (String hdl : handlesToDelete) {
                 try {
-                    indexer.unIndexContent(ctx, hdl, true);
+                    indexer.unIndexContent(ctx, hdl, false);
                     if (log.isDebugEnabled())
                     {
                         log.debug("UN-Indexed Item, handle=" + hdl);
@@ -193,6 +193,7 @@ public class IndexEventConsumer implements Consumer {
 
             }
 
+            indexer.commit(true);
         }
 
         // "free" the resources

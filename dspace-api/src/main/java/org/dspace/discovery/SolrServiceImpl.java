@@ -2267,4 +2267,41 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 			throw new SearchServiceException(e.getMessage(), e);
 		}
 	}
+
+	/**
+	 * The method performing an explicit commit unless commit is null; 
+	 * The kind of the commit are soft or hard commit. If true performs
+	 * a soft commit with waitFlush and waitSearcher to false, then if false
+	 * run a default hard commit with waitFlush and waitSearcher to true.
+	 * 
+	 * 
+     * @param commit true softCommit, false hardCommit, null none
+     * @throws SearchServiceException
+     */
+    @Override    
+    public void commit(Boolean commit) throws SearchServiceException
+    {
+        if (commit != null)
+        {
+            if (commit) //softcommit
+            {
+                try
+                {
+                    if (getSolr() != null)
+                    {
+                        getSolr().commit(false, false, true);
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new SearchServiceException(e.getMessage(), e);
+                }
+            }
+            else
+            {
+                //hard commit
+                commit();
+            }
+        }
+    }
 }
