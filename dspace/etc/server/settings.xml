@@ -82,6 +82,8 @@
 				<paypal.verbosity>HIGH</paypal.verbosity>
 				<paypal.slienttran>TRUE</paypal.slienttran>
 				<paypal.mode>test</paypal.mode>
+                <noid.batchId.length>5</noid.batchId.length>
+                <noid.code.length>8</noid.code.length>
 			</properties>
 		</profile>
 	</profiles>

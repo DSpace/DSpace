@@ -13,22 +13,15 @@ import java.security.SecureRandom;
  */
 public class NoidGenerator {
 
-    static public String buildVar() {
+    static public String buildVar(int length) {
 
-        int mySuffixVarLength=5;
         SecureRandom myRandom = new SecureRandom();
 
-        try{
-            mySuffixVarLength = ConfigurationManager.getIntProperty("doi.suffix.length");
-        }catch (NumberFormatException nfe){
-            mySuffixVarLength=5;
-        }
-
-        String bigInt = new BigInteger(mySuffixVarLength * 5, myRandom).toString(32);
+        String bigInt = new BigInteger(length * 5, myRandom).toString(32);
         StringBuilder buffer = new StringBuilder(bigInt);
         int charCount = 0;
 
-        while (buffer.length() < mySuffixVarLength) {
+        while (buffer.length() < length) {
             buffer.append('0');
         }
 

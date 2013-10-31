@@ -10,6 +10,7 @@ package org.dspace.paymentsystem;
 import org.apache.commons.lang.RandomStringUtils;
 import org.dspace.app.util.NoidGenerator;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
 import java.sql.SQLException;
@@ -121,11 +122,11 @@ public class VoucherValidationImpl implements VoucherValidationService
     public ArrayList<Voucher> createVouchers(Context context,String status,Date creation,int totalNumber,String explanation,String customer, Integer generator) throws SQLException,AuthorizeException {
         ArrayList<Voucher> vouchers = new ArrayList<Voucher>();
         int i =0;
-        String batchId = NoidGenerator.buildVar();
+        String batchId = NoidGenerator.buildVar(ConfigurationManager.getIntProperty("payment-system","noid.batchId.length"));
         while(i < totalNumber)
         {
             Random random = new Random();
-            String code = NoidGenerator.buildVar();
+            String code = NoidGenerator.buildVar(ConfigurationManager.getIntProperty("payment-system","noid.code.length"));
             vouchers.add(create(context,code,status, creation, explanation,customer,generator,batchId));
             i=i+1;
         }

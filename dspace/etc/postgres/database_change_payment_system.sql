@@ -44,3 +44,5 @@ CREATE TABLE voucher
   explanation VARCHAR(256),
   batch_id VARCHAR(256)
 );
+
+ALTER TABLE voucher ADD COLUMN batch_id VARCHAR(256);
