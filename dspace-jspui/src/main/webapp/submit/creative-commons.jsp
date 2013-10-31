@@ -62,7 +62,8 @@
         licenseURL = CreativeCommons.getLicenseURL(subInfo.getSubmissionItem().getItem());
 %>
 
-<dspace:layout locbar="off"
+<dspace:layout style="submission"
+			   locbar="off"
                navbar="off"
                titlekey="jsp.submit.creative-commons.title"
                nocache="true">
@@ -73,7 +74,6 @@
 
         <%-- <h1>Submit: Use a Creative Commons License</h1> --%>
 		<h1><fmt:message key="jsp.submit.creative-commons.heading"/></h1>
-<br />
 
 <%
         if (licenseExists)
@@ -81,13 +81,13 @@
 %>
         <%-- <p>You have already chosen a Creative Commons license and added it to this item.
         You may:</p> --%>
-		<p><fmt:message key="jsp.submit.creative-commons.info1"/></p>
+		<p class="help-block"><fmt:message key="jsp.submit.creative-commons.info1"/></p>
     <%-- <ul>
             <li>Press the 'Next' button below to <em>keep</em> the license previously chosen.</li>
             <li>Press the 'Skip Creative Commons' button below to <em>remove</em> the current choice, and forego a Creative Commons license.</li>
             <li>Complete the selection process below to <em>replace</em> the current choice.</li>
          </ul> --%>
-		 <ul>
+		 <ul class="alert alert-info">
             <li><fmt:message key="jsp.submit.creative-commons.choice1"/></li>
             <li><fmt:message key="jsp.submit.creative-commons.choice2"/></li>
             <li><fmt:message key="jsp.submit.creative-commons.choice3"/></li>
@@ -113,37 +113,28 @@
     <%= SubmissionController.getSubmissionParameters(context, request) %>
 
 	<input type="hidden" name="cc_license_url" value="<%=licenseURL %>" />
-	<input type="hidden" name="submit_grant" value="I Grant the License" />
-        <center>
-            <table border="0" width="80%">
-                <tr>
-                    <td width="100%">&nbsp;</td>
+    <input type="submit" id="submit_grant" name="submit_grant" value="submit_grant" style="display: none;" />	
+	<%
+		int numButton = 2 + (!SubmissionController.isFirstStep(request, subInfo)?1:0) + (licenseExists?1:0);
+	
+	%>
+    <div class="row col-md-<%= 2*numButton %> pull-right btn-group">
                 <%  //if not first step, show "Previous" button
 					if(!SubmissionController.isFirstStep(request, subInfo))
 					{ %>
-                    <td>
-						<input type="submit" name="<%=AbstractProcessingStep.PREVIOUS_BUTTON%>" value="<fmt:message key="jsp.submit.general.previous"/>" />
-                    </td>
+			<input class="btn btn-default col-md-<%= 12 / numButton %>" type="submit" name="<%=AbstractProcessingStep.PREVIOUS_BUTTON%>" value="<fmt:message key="jsp.submit.general.previous"/>" />
                 <%  } %>
+
+            <input class="btn btn-default col-md-<%= 12 / numButton %>" type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>"/>
+			<input class="btn btn-warning col-md-<%= 12 / numButton %>" type="submit" name="submit_no_cc" value="<fmt:message key="jsp.submit.creative-commons.skip.button"/>"/>
 <%
      if (licenseExists)
      {
 %>
-                    <td>
-                        <input type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
-                    </td>
+			<input class="btn btn-primary col-md-<%= 12 / numButton %>" type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
 <%
      }
 %>
-                    <td>
-						<input type="submit" name="submit_no_cc" value="<fmt:message key="jsp.submit.creative-commons.skip.button"/>"/>
-                    </td>
-                    <td>&nbsp;&nbsp;&nbsp;</td>
-                    <td align="right">
-                       <input type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>"/>
-                    </td>
-                </tr>
-            </table>
-        </center>
+    </div>
     </form>
 </dspace:layout>

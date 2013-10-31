@@ -135,12 +135,19 @@ if (submissions != null && submissions.count() > 0)
 		        {
 		            displayTitle = dcv[0].value;
 		        }
+		        dcv = item.getMetadata("dc", "description", "abstract", Item.ANY);
+		        String displayAbstract = "";
+		        if (dcv != null & dcv.length > 0)
+		        {
+		            displayAbstract = dcv[0].value;
+		        }
 		%>
 		    <div style="padding-bottom: 50px; min-height: 200px;" class="item <%= first?"active":""%>">
 		      <div style="padding-left: 80px; padding-right: 80px; display: inline-block;"><%= StringUtils.abbreviate(displayTitle, 400) %> 
 		      	<a href="<%= request.getContextPath() %>/handle/<%=item.getHandle() %>"> 
 		      		<button class="btn btn-success" type="button">See</button>
 		      		</a>
+                        <p><%= StringUtils.abbreviate(displayAbstract, 500) %></p>
 		      </div>
 		    </div>
 		<%
@@ -195,19 +202,20 @@ if (communities != null && communities.length != 0)
 <% } else { %>
 	<div class="col-md-12">
 <% }  %>		
-		<h4 class="list-group-item-heading"><a href="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></a></h4>
-		<p><%= communities[i].getMetadata("short_description") %></p>
-    </div>
-</div>                            
+		<h4 class="list-group-item-heading"><a href="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></a>
 <%
         if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
         {
 %>
-            [<%= ic.getCount(communities[i]) %>]
+		<span class="badge pull-right"><%= ic.getCount(communities[i]) %></span>
 <%
         }
 
 %>
+		</h4>
+		<p><%= communities[i].getMetadata("short_description") %></p>
+    </div>
+</div>                            
 <%
     }
 %>

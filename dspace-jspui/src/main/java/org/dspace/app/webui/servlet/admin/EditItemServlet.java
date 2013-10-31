@@ -339,7 +339,7 @@ public class EditItemServlet extends DSpaceServlet
 
             // Withdraw the item
             item.setDiscoverable(false);
-            item.withdraw();
+            item.update();
             JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
             context.complete();
 
@@ -347,7 +347,7 @@ public class EditItemServlet extends DSpaceServlet
 
         case PUBLICIZE:
             item.setDiscoverable(true);
-            item.reinstate();
+            item.update();
             JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
             context.complete();
 
@@ -534,33 +534,16 @@ public class EditItemServlet extends DSpaceServlet
             }
         }
 
-        if (item.isDiscoverable())
-        {
-            try
-            {
-                // who can Withdraw can also Make It Private
-                AuthorizeUtil.authorizeWithdrawItem(context, item);
-                request.setAttribute("privating_button", Boolean.TRUE);
-            }
-            catch (AuthorizeException authex)
-            {
-                request.setAttribute("privating_button", Boolean.FALSE);
-            }
-        }
-        else
-        {
-            try
-            {
-                // who can Reinstate can also Make It Public
-                AuthorizeUtil.authorizeReinstateItem(context, item);
-                request.setAttribute("publicize_button", Boolean.TRUE);
-            }
-            catch (AuthorizeException authex)
-            {
-                request.setAttribute("publicize_button", Boolean.FALSE);
-            }
-        }
-        
+		if (item.isDiscoverable()) 
+		{
+			request.setAttribute("privating_button", AuthorizeManager
+					.authorizeActionBoolean(context, item, Constants.WRITE));
+		} 
+		else 
+		{
+			request.setAttribute("publicize_button", AuthorizeManager
+					.authorizeActionBoolean(context, item, Constants.WRITE));
+		}
         
         request.setAttribute("item", item);
         request.setAttribute("handle", handle);
