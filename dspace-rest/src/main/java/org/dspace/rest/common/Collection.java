@@ -40,7 +40,7 @@ public class Collection extends DSpaceObject {
 
     //Collection-Metadata
     private String license;
-    private String copyrightText, introductoryText, shortDescription, sidebarText, provenanceText;
+    private String copyrightText, introductoryText, shortDescription, sidebarText;
 
     //Calculated
     private Integer numberItems;
@@ -62,7 +62,6 @@ public class Collection extends DSpaceObject {
         this.setIntroductoryText(collection.getMetadata(org.dspace.content.Collection.INTRODUCTORY_TEXT));
         this.setShortDescription(collection.getMetadata(org.dspace.content.Collection.SHORT_DESCRIPTION));
         this.setSidebarText(collection.getMetadata(org.dspace.content.Collection.SIDEBAR_TEXT));
-        this.setProvenanceText(collection.getMetadata(org.dspace.content.Collection.SIDEBAR_TEXT));
         this.setLicense(collection.getLicense());
         
         if(expandFields.contains("parentCommunityList") || expandFields.contains("all")) {
@@ -198,13 +197,5 @@ public class Collection extends DSpaceObject {
 
 	public void setSidebarText(String sidebarText) {
 		this.sidebarText = sidebarText;
-	}
-
-	public String getProvenanceText() {
-		return provenanceText;
-	}
-
-	public void setProvenanceText(String provenanceText) {
-		this.provenanceText = provenanceText;
 	}
 }
