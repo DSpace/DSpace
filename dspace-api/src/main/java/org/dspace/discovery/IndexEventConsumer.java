@@ -40,7 +40,7 @@ public class IndexEventConsumer implements Consumer {
 
     DSpace dspace = new DSpace();
 
-    private Boolean softCommit = null; 
+    private boolean softCommit; 
     
     IndexingService indexer = dspace.getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
 
