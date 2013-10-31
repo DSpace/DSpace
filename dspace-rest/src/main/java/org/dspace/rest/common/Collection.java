@@ -40,11 +40,6 @@ public class Collection extends DSpaceObject {
 
     //Collection-Metadata
     private String license;
-    //String provenance_description;
-    //String short_description;
-    //String introductory_text;
-    //String copyright_text;
-    //String side_bar_text;
     private String copyrightText, introductoryText, shortDescription, sidebarText, provenanceText;
 
     //Calculated
